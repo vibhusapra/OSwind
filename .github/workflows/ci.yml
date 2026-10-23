@@ -22,6 +22,10 @@ jobs:
         run: python3 scripts/integration-smoke.py .build/release/oswindctl --indexed
       - name: Exercise durable conversation processes
         run: python3 scripts/conversation-smoke.py .build/release/oswindctl
+      - name: Exercise long-source evidence and follow-ups
+        run: python3 scripts/evidence-smoke.py .build/release/oswindctl
+      - name: Exercise local chat provider and incomplete-response boundaries
+        run: python3 scripts/chat-provider-smoke.py .build/release/oswindctl
       - name: Evaluate authored retrieval fixture
         run: |
           mkdir -p .artifacts

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "scope": "Observed synthetic development failures. Experimental source-by-source generation was discarded, not promoted. Early keyword-presence checks were replaced with fixture-specific assignment checks and final-answer/error checks. These are failure observations, not a controlled ablation.",
+  "observations": [
+    {
+      "provider": "apple",
+      "timestamp": "2026-10-23T08:24:03.737155+00:00",
+      "fixture": "long-shared-prefix-v1",
+      "pipeline": "discarded source-by-source experiment",
+      "issue": "False South\u2192Lina ownership and a contradictory unknown North owner",
+      "first_answer": "North Zephyr release owner is Lina. [1]\n\nSouth Zephyr release owner is Lina. [1]\n\nNorth Zephyr release owner is unknown. [2]\n\nSouth Zephyr release owner is Theo. [2]",
+      "followup": "South deadline is Monday. [1]\n\nNorth deadline is Thursday. [2]"
+    },
+    {
+      "provider": "ollama",
+      "timestamp": "2026-10-23T08:24:10.937979+00:00",
+      "fixture": "long-shared-prefix-v1",
+      "pipeline": "discarded prior-question prompt with qwen3:4b thinking-only alias",
+      "issue": "Unanswerable prompt returned unfinished metareasoning; early bag-of-words checks were insufficient.",
+      "visible_response_characters": 4624,
+      "response_sha256": "774c8d16c37a0924bbe1a4df7539205448f24cef2d915d53df8c1feb3603585d"
+    },
+    {
+      "provider": "apple",
+      "timestamp": "2026-10-23T08:14:44.340802+00:00",
+      "fixture": "long-shared-prefix-v1",
+      "pipeline": "earlier batch guided-claims prompt",
+      "issue": "Omitted requested subject despite both sources being present",
+      "first_answer": "North Zephyr release owner is Lina. [1]",
+      "followup": "Theo's deadline is Monday. [1]"
+    }
+  ],
+  "short_alias_at_validation": [
+    {
+      "name": "qwen3:4b",
+      "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7"
+    }
+  ],
+  "publisher_sources": [
+    "https://registry.ollama.com/library/qwen3/tags",
+    "https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507"
+  ]
+}

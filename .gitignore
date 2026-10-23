@@ -5,5 +5,7 @@
 dist/
 .artifacts/
 .local/
+__pycache__/
+*.pyc
 *.wav
 *.mp4

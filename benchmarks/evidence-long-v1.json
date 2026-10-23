@@ -1,0 +1,428 @@
+{
+  "schema": 1,
+  "fixture": "long-shared-prefix-v1",
+  "hardware": "Apple M5 Max",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "runtime": {
+    "version": "0.40.8"
+  },
+  "pipeline": "single-request guided Apple claims / local Qwen3 Instruct, current question only, lexical excerpts; discarded source-wise experiment is not used",
+  "scope": "Two fictional ~9.9 KB notes with identical first 500 characters; two answerable requests and optional unsupported budget follow-up. Fixture-specific name/value binding, no swapped binding, concise final answer, citations, source IDs, durable reopen and absence checks. Authored development smoke, not held-out accuracy or universal semantic validation. A million-vector CPU graph build ran concurrently; latency is not an isolated machine benchmark. Trials were generated before cosmetic word-boundary trimming, which do not change the factual fixture.",
+  "sources": [
+    "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507",
+    "https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507",
+    "https://ollama.com/library/qwen3:4b-instruct-2507-q4_K_M"
+  ],
+  "trials": [
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "evidence",
+      "model": "evidence",
+      "timestamp": "2026-10-23T08:35:39.327638+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "first": {
+        "text": "Recorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 1:35\u202fAM \u00b7 note \u00b7 OSwind \u00b7 CLI note\n\u2026 ephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nNorth Zephyr release owner is Lina. North deadline is Thursday.\n\n[2] Oct 23, 2026 at 1:35\u202fAM \u00b7 note \u00b7 OSwind \u00b7 CLI note\n\u2026 Zephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nSouth Zephyr release owner is Theo. South deadline is Monday.",
+        "provider": "evidence",
+        "duration": 0.007326960563659668,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "1170ACB1-F912-486F-A6F1-AD7A6FDF96B3",
+          "360645B9-091D-42DA-8715-6B89A2D45012"
+        ]
+      },
+      "followup": {
+        "text": "Recorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 1:35\u202fAM \u00b7 note \u00b7 OSwind \u00b7 CLI note\n\u2026 Zephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nSouth Zephyr release owner is Theo. South deadline is Monday.\n\n[2] Oct 23, 2026 at 1:35\u202fAM \u00b7 note \u00b7 OSwind \u00b7 CLI note\n\u2026 ephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nZephyr release background. Routine project notes and repeated application chrome.\nNorth Zephyr release owner is Lina. North deadline is Thursday.",
+        "provider": "evidence",
+        "duration": 0.008882999420166016,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "360645B9-091D-42DA-8715-6B89A2D45012",
+          "1170ACB1-F912-486F-A6F1-AD7A6FDF96B3"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "no_inference_errors": true
+      },
+      "trial": "evidence"
+    },
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "apple",
+      "model": "apple",
+      "timestamp": "2026-10-23T08:35:40.280898+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "first": {
+        "text": "North Zephyr release owner is Lina. [1]\n\nSouth Zephyr release owner is Theo. [2]",
+        "provider": "apple",
+        "duration": 1.3289819955825806,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "537C792A-6E35-40E3-AA8C-ACF1E9FA7655",
+          "F0088C2B-F7EB-43A1-AD67-85FBB64BA2DA"
+        ]
+      },
+      "followup": {
+        "text": "South Zephyr release deadline is Monday. [1]\n\nNorth Zephyr release deadline is Thursday. [2]",
+        "provider": "apple",
+        "duration": 1.0222870111465454,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "F0088C2B-F7EB-43A1-AD67-85FBB64BA2DA",
+          "537C792A-6E35-40E3-AA8C-ACF1E9FA7655"
+        ]
+      },
+      "unanswerable": {
+        "text": "Insufficient evidence. [1] [2]",
+        "provider": "apple",
+        "duration": 0.8660850524902344,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "F0088C2B-F7EB-43A1-AD67-85FBB64BA2DA",
+          "537C792A-6E35-40E3-AA8C-ACF1E9FA7655"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "unsupported_budget_abstention": true,
+        "no_invented_budget": true,
+        "concise_final_answers": true,
+        "no_inference_errors": true
+      },
+      "trial": "apple-1"
+    },
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "apple",
+      "model": "apple",
+      "timestamp": "2026-10-23T08:35:44.496150+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "first": {
+        "text": "North Zephyr release owner is Lina. [1]\n\nSouth Zephyr release owner is Theo. [2]",
+        "provider": "apple",
+        "duration": 0.9982030391693115,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "81B1D633-A8AA-4B39-BA84-C2FEF0B17FCD",
+          "CD9CFF6C-830C-417D-8F24-3F4EE727BC40"
+        ]
+      },
+      "followup": {
+        "text": "South Zephyr release deadline is Monday. [1]\n\nNorth Zephyr release deadline is Thursday. [2]",
+        "provider": "apple",
+        "duration": 1.0487420558929443,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "CD9CFF6C-830C-417D-8F24-3F4EE727BC40",
+          "81B1D633-A8AA-4B39-BA84-C2FEF0B17FCD"
+        ]
+      },
+      "unanswerable": {
+        "text": "Insufficient evidence. [1] [2]",
+        "provider": "apple",
+        "duration": 0.8685790300369263,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "CD9CFF6C-830C-417D-8F24-3F4EE727BC40",
+          "81B1D633-A8AA-4B39-BA84-C2FEF0B17FCD"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "unsupported_budget_abstention": true,
+        "no_invented_budget": true,
+        "concise_final_answers": true,
+        "no_inference_errors": true
+      },
+      "trial": "apple-2"
+    },
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "apple",
+      "model": "apple",
+      "timestamp": "2026-10-23T08:35:48.419059+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "first": {
+        "text": "North Zephyr release owner is Lina. [1]\n\nSouth Zephyr release owner is Theo. [2]",
+        "provider": "apple",
+        "duration": 1.0218650102615356,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "A2FFBAF0-7B23-4BF4-B6E8-2277E05950AA",
+          "343F00CC-FCED-4D4B-A373-CF7518C939BB"
+        ]
+      },
+      "followup": {
+        "text": "South Zephyr release deadline is Monday. [1]\n\nNorth Zephyr release deadline is Thursday. [2]",
+        "provider": "apple",
+        "duration": 1.0097479820251465,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "343F00CC-FCED-4D4B-A373-CF7518C939BB",
+          "A2FFBAF0-7B23-4BF4-B6E8-2277E05950AA"
+        ]
+      },
+      "unanswerable": {
+        "text": "Insufficient evidence. [1] [2]",
+        "provider": "apple",
+        "duration": 0.8848289251327515,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "343F00CC-FCED-4D4B-A373-CF7518C939BB",
+          "A2FFBAF0-7B23-4BF4-B6E8-2277E05950AA"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "unsupported_budget_abstention": true,
+        "no_invented_budget": true,
+        "concise_final_answers": true,
+        "no_inference_errors": true
+      },
+      "trial": "apple-3"
+    },
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "timestamp": "2026-10-23T08:35:52.354085+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "model_metadata": {
+        "capabilities": [
+          "tools",
+          "thinking",
+          "completion"
+        ],
+        "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+        "name": "qwen3:4b-instruct-2507-q4_K_M",
+        "size": 2497293803
+      },
+      "first": {
+        "text": "The North Zephyr release is owned by Lina [1], and the South Zephyr release is owned by Theo [2].",
+        "provider": "ollama",
+        "duration": 1.2998099327087402,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "23E453BC-9D04-4B3F-8CDF-FCBE49402950",
+          "6E145E00-F754-4FF6-99CF-8FB3C522FEAF"
+        ]
+      },
+      "followup": {
+        "text": "The deadlines are: South Zephyr deadline is Monday, and North Zephyr deadline is Thursday. [1] [2]",
+        "provider": "ollama",
+        "duration": 0.4630190134048462,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "6E145E00-F754-4FF6-99CF-8FB3C522FEAF",
+          "23E453BC-9D04-4B3F-8CDF-FCBE49402950"
+        ]
+      },
+      "unanswerable": {
+        "text": "Insufficient evidence.",
+        "provider": "ollama",
+        "duration": 0.22117698192596436,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "6E145E00-F754-4FF6-99CF-8FB3C522FEAF",
+          "23E453BC-9D04-4B3F-8CDF-FCBE49402950"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "unsupported_budget_abstention": true,
+        "no_invented_budget": true,
+        "concise_final_answers": true,
+        "no_inference_errors": true
+      },
+      "trial": "instruct-1"
+    },
+    {
+      "fixture": "long-shared-prefix-v1",
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "timestamp": "2026-10-23T08:35:55.465341+00:00",
+      "source_utf8_bytes": [
+        9903,
+        9901
+      ],
+      "source_sha256": [
+        "d6dd326566a659301688ea3a58851c282a75c24c2e1331c72f518b7520b961e1",
+        "62f389194f7ba0ff5d61d4d7f3d46ea58f4eb6de731a88df314cce7f820c5e97"
+      ],
+      "scope": "Two fictional long notes and two questions; authored regression smoke, not held-out grounding or abstention accuracy.",
+      "model_metadata": {
+        "capabilities": [
+          "tools",
+          "thinking",
+          "completion"
+        ],
+        "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+        "name": "qwen3:4b-instruct-2507-q4_K_M",
+        "size": 2497293803
+      },
+      "first": {
+        "text": "The North Zephyr release is owned by Lina [1], and the South Zephyr release is owned by Theo [2].",
+        "provider": "ollama",
+        "duration": 0.4408590793609619,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "A7E6EF82-15CB-469A-93B1-A691ABF85405",
+          "AFF627EC-18C7-4AF1-B593-9257FC8BA34C"
+        ]
+      },
+      "followup": {
+        "text": "The deadlines are: South Zephyr deadline is Monday, and North Zephyr deadline is Thursday. [1] [2]",
+        "provider": "ollama",
+        "duration": 0.35589706897735596,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "AFF627EC-18C7-4AF1-B593-9257FC8BA34C",
+          "A7E6EF82-15CB-469A-93B1-A691ABF85405"
+        ]
+      },
+      "unanswerable": {
+        "text": "Insufficient evidence.",
+        "provider": "ollama",
+        "duration": 0.122528076171875,
+        "warnings": [
+          "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+        ],
+        "source_ids": [
+          "AFF627EC-18C7-4AF1-B593-9257FC8BA34C",
+          "A7E6EF82-15CB-469A-93B1-A691ABF85405"
+        ]
+      },
+      "checks": {
+        "both_distinct_sources": true,
+        "both_owners": true,
+        "both_deadlines": true,
+        "correct_owner_bindings": true,
+        "correct_deadline_bindings": true,
+        "bounded_excerpt_warning": true,
+        "citations": true,
+        "reopened_turns": true,
+        "unsupported_budget_abstention": true,
+        "no_invented_budget": true,
+        "concise_final_answers": true,
+        "no_inference_errors": true
+      },
+      "trial": "instruct-2"
+    }
+  ],
+  "runtime_residency": [
+    {
+      "name": "qwen3:4b-instruct-2507-q4_K_M",
+      "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+      "size": 3311423979,
+      "size_vram": 3311423979,
+      "context_length": 8192
+    }
+  ]
+}

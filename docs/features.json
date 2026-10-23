@@ -188,7 +188,7 @@
     "axis": "Retrieval",
     "feature": "OCR highlights, copy and source link",
     "status": "partial",
-    "evidence": "All OCR boxes, text copy, http(s) source links; query-only highlights pending",
+    "evidence": "Query-matched text excerpts/highlights, all OCR boxes, text copy and http(s) source links; query-only image boxes pending",
     "references": "TimeScroll, Retrace, Unlost"
   },
   {
@@ -204,7 +204,7 @@
     "axis": "AI",
     "feature": "Apple on-device generation",
     "status": "live verified",
-    "evidence": "Real fixture answer ~0.8s; citation adherence needs hardening",
+    "evidence": "Guided claims and simplified current-question prompt pass narrow owner/deadline/absence trials; broader grounding remains open",
     "references": "Screenpipe, Retrace (jhammant)"
   },
   {
@@ -212,7 +212,7 @@
     "axis": "AI",
     "feature": "Ollama local Metal generation",
     "status": "live verified",
-    "evidence": "qwen3:4b fixture answered with [1]; runtime reports 100% GPU; ~3.8s warm sample",
+    "evidence": "Versioned Qwen3 Instruct baseline passes narrow long-note assignment/absence smoke; local GPU residency recorded; broader model matrix pending",
     "references": "Screenpipe, Pensieve, Minne"
   },
   {
@@ -236,7 +236,7 @@
     "axis": "AI",
     "feature": "Provider presets and model discovery",
     "status": "partial",
-    "evidence": "Installed models, pull/progress/cancel, GPU residency and resumable index UX delivered; unlocked interaction pending",
+    "evidence": "Discovery/pull/progress/cancel, GPU residency, resumable indexing, versioned Instruct preset; basic unlocked model preparation verified; broader failure UX pending",
     "references": "Pieces, Screenpipe"
   },
   {
@@ -244,7 +244,7 @@
     "axis": "AI",
     "feature": "Grounded answers and citations",
     "status": "partial",
-    "evidence": "Apple guided source-number claims; other-model citation warnings; real follow-up smoke; semantic support/abstention evaluation pending",
+    "evidence": "Current-question prompts, guided citations, long-source assignment/absence smoke and output-limit guard; broader support/abstention evaluation pending",
     "references": "Pieces, Littlebird"
   },
   {

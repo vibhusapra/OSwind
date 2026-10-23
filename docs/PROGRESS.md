@@ -7,7 +7,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 ## Implemented and directly verified
 
 - Native Swift package builds in debug and release on macOS 26.6.2 / Swift 6.3.3 / M5 Max. Ad-hoc signed .app packages successfully; a debug app process ran with isolated sample data.
-- 76 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
+- 84 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
 - CLI durable note/search and real stdio MCP initialize/list/search smoke pass. Live loopback HTTP health/stats/search/get pass; unauthorized requests return 401, browser Origin and bad Host return 403.
 - Apple Intelligence answered the local synthetic ownership question with the correct owner and [1] citation (~0.70 seconds in a repeated sample).
 - Ollama qwen3:4b answered the same question with correct owner and [1] (~3.75 seconds warm sample). Runtime `ollama ps` reported 100% GPU, 8192 context. Reasoning text is stripped before display.
@@ -58,6 +58,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; larger relevance/scaling validation, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
+- [x] [Draft PR #5](https://github.com/vibhusapra/OSwind/pull/5) adds journaled native indexing and its recovery/recall/performance checks; current-head macOS CI passed.
 - [x] [Draft PR #4](https://github.com/vibhusapra/OSwind/pull/4) adds bounded exact scanning and preserves the failed million-vector gate; current-head macOS CI passed.
 - [x] [Draft PR #3](https://github.com/vibhusapra/OSwind/pull/3) adds durable conversations, follow-up context and source-linked erasure; current-head macOS CI passed.
 - [x] [Draft PR #2](https://github.com/vibhusapra/OSwind/pull/2) adds local GPU retrieval/model setup and relevance evaluation; current-head macOS CI passed.
@@ -75,9 +76,21 @@ Pinned dependency: USearch 2.26.5 / resolved NumKong 7.8.5, Apache-2.0; notices/
 
 The retained million-vector ANN build is running; no result is claimed. Next gates: million/cold tails, independent realistic recall, write contention, scope/count/statistics costs (including tags), long-run memory/power, orphan/fork/restore recovery and broader UI/audio/parity work. Vault encryption, routines, meeting workflows, migration/backup and real competitor runs remain open.
 
+## Long-source evidence and query highlights — draft PR #6
+
+[Draft PR #6](https://github.com/vibhusapra/OSwind/pull/6) replaces first-500-character duplicate suppression with full source/context fingerprints and first-800-character context with query-anchored lexical windows. Distant terms can select a second passage; Unicode stays composed and ellipses mark omissions. Recaps/unanchored queries retain opening/ending text. Native cards/source inspector show asynchronously selected highlighted excerpts. A rendered synthetic long-note search was reviewed; compact snippets now keep the deadline visible. Live interaction remains separate from the app's own layout render.
+
+Source date/kind revisions now invalidate saved and in-flight answers while leaving content-compatible embeddings available. CLI one-off/chat Ask accept model/endpoint overrides; one-off scope flags are applied and questions sanitized. Output-limit stop reasons fail without appending a partial chat answer. Offline provider process tests verify this boundary. Local Ollama generation does not read BYOK accounts. Recent user questions resolve retrieval; generation receives the current question and fresh evidence.
+
+Current validation: 84 tests pass, one opt-in runtime case skipped. Long-note evidence mode, model/endpoint/limit process smoke, indexed API/MCP and durable chat checks pass. Three Apple and two pinned Qwen3 Instruct trials passed owner/deadline assignment and an unsupported budget question on the authored two-note fixture. Native rendering shows the late deadline inside the highlighted card. Broader live UI, semantic support and adversarial questions remain open.
+
+The testing exposed real model failures and a weak initial grader. A source-by-source Apple experiment generated a false owner and was discarded. The installed short Qwen tag matched a thinking-only model; its ~10–26 s development answers sometimes exhausted the output budget or exposed unfinished metareasoning. The explicit Instruct tag passed the stricter fixture, with first observed answer ~1.3 s and later answers ~0.12–0.46 s. These tiny concurrent-load observations are not general quality or performance rankings. Historical failures and current trial metadata are in the benchmark ledger. Setup/default model presets now use the explicit non-thinking version; selected user model names remain intact.
+
+Remaining evidence work: semantic chunk indexing beyond embedding input limits, held-out multilingual/long-archive grounding, source/citation entailment, robust abstention, token/context budgets and prompt-injection evaluation. Query-only image boxes remain pending; the delivered query highlights are text excerpts.
+
 ## Local artifacts
 
-- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (3b9c243) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
+- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (fe51c8c) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
 - Raw test/model/runtime logs and synthetic media: `.artifacts/` (excluded from Git).
 - Reproducible public synthetic metrics: `benchmarks/`.
 - Local synthetic verification databases: `.local/` (excluded from Git).

@@ -44,7 +44,7 @@ struct WorkspaceView: View {
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView().environmentObject(m) }
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
-        .sheet(item:$m.selected) { MemoryDetail(memory:$0).environmentObject(m) }
+        .sheet(item:$m.selected) { MemoryDetail(memory:$0,query:m.selectedEvidenceQuery).environmentObject(m) }
         .sheet(isPresented:$showNote) { VStack(alignment:.leading,spacing:16) { Text("Keep a thought").font(.title2.weight(.semibold)); TextEditor(text:$note).font(.body).frame(width:500,height:220); HStack { Button("Cancel") { showNote = false }; Spacer(); Button("Save note") { m.addNote(note); note = ""; showNote = false }.buttonStyle(.borderedProminent).disabled(note.isEmpty) } }.padding(24) }
         .alert("OSwind",isPresented:Binding(get:{m.errorMessage != nil},set:{if !$0 {m.errorMessage = nil}})) { Button("OK") { m.errorMessage = nil } } message: { Text(m.errorMessage ?? "") }
     }
@@ -74,7 +74,7 @@ struct WorkspaceView: View {
             }
             ForEach(m.searchWarnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
-            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.selected = $0 } }
+            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.openMemory($0,query:m.query) } }
             if m.hits.isEmpty {
                 ContentUnavailableView { Label(m.query.isEmpty ? "A fresh start" : "No matching memories",systemImage:m.query.isEmpty ? "wind" : "magnifyingglass") } description: { Text(m.query.isEmpty ? "Resume capture, import an export, or save a note. Your memory stays on this Mac." : "Try fewer words, another app, or a wider time range.") } actions: { HStack { Button("Setup") { m.showSettings = true }; Button("Import JSON") { m.importData() } } }.frame(maxWidth:.infinity,maxHeight:.infinity)
             } else {
@@ -90,20 +90,21 @@ struct MemoryCard: View {
     var memory: Memory { hit.memory }
     var body: some View {
         VStack(alignment:.leading,spacing:0) {
-            Button { m.selected = memory } label: {
+            Button { m.openMemory(memory,query:m.query) } label: {
                 ZStack(alignment:.topLeading) {
                     if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
-                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); Text(memory.text).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
+                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.query,budget:m.query.isEmpty ? 400 : 100).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
                     Text(memory.kind.rawValue.uppercased()).font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
                 HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent); Spacer(); Text(memory.timestamp,style:.time).font(.caption2).foregroundStyle(.secondary) }
-                Button { m.selected = memory } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
+                Button { m.openMemory(memory,query:m.query) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
+                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.query,budget:m.query.isEmpty ? 400 : 100).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
             }.padding(15)
         }.background(.background,in:RoundedRectangle(cornerRadius:12)).clipShape(RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.07)))
-        .contextMenu { Button("Open memory") { m.selected = memory }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
+        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.query) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
     }
 }
 struct TimelineStrip: View {
@@ -117,12 +118,20 @@ struct MemoryDetail: View {
     @EnvironmentObject var m: AppModel
     @Environment(\.dismiss) var dismiss
     let memory: Memory
+    var query = ""
     @State private var boxes = false
     @State private var tags = ""
     var body: some View {
         VStack(alignment:.leading,spacing:18) {
             HStack { VStack(alignment:.leading,spacing:4) { Text(memory.title).font(.title2.weight(.semibold)); Text("\(memory.app) · \(memory.timestamp.formatted())").font(.caption).foregroundStyle(.secondary) }; Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
             ScrollView {
+                if !query.isEmpty {
+                    VStack(alignment:.leading,spacing:8) {
+                        Text("SEARCH EXCERPT").font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
+                        EvidenceSnippetView(text:memory.text,query:query,budget:800).textSelection(.enabled).font(.callout)
+                        Text("Ellipses mark omitted text. The complete source follows.").font(.caption2).foregroundStyle(.secondary)
+                    }.frame(maxWidth:.infinity,alignment:.leading).padding(14).background(accent.opacity(0.06),in:RoundedRectangle(cornerRadius:8))
+                }
                 if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).overlay { if boxes { GeometryReader { geo in ForEach(Array(memory.regions.enumerated()),id:\.offset) { _,r in Rectangle().stroke(accent,lineWidth:1).frame(width:geo.size.width*r.width,height:geo.size.height*r.height).position(x:geo.size.width*(r.x+r.width/2),y:geo.size.height*(1-r.y-r.height/2)) } } } }.clipShape(RoundedRectangle(cornerRadius:9)) }
                 Text(memory.text).textSelection(.enabled).font(.system(size:14)).frame(maxWidth:.infinity,alignment:.leading).padding(.top,12)
             }
@@ -169,7 +178,7 @@ struct AskView: View {
                             ForEach(m.chatTurns) { turn in
                                 VStack(alignment:.leading,spacing:12) {
                                     Text(turn.question).font(.system(size:15,weight:.medium)).textSelection(.enabled).padding(16).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:12))
-                                    AnswerCard(answer:turn.answer)
+                                    AnswerCard(answer:turn.answer,question:turn.question)
                                     Text("\(turn.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(turn.filter.app ?? "All apps") · \(turn.filter.start.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any start") → \(turn.filter.end.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any end")").font(.caption2).foregroundStyle(.secondary)
                                 }.id(turn.id)
                             }
@@ -184,6 +193,7 @@ struct AskView: View {
 struct AnswerCard: View {
     @EnvironmentObject var m: AppModel
     let answer: Answer
+    var question = ""
     var body: some View {
         VStack(alignment:.leading,spacing:16) {
             ForEach(answer.warnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
@@ -191,7 +201,14 @@ struct AnswerCard: View {
             HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save recap") { m.addNote(answer.text,title:"Saved answer",kind:.summary) }; Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
             if !answer.sources.isEmpty {
                 DisclosureGroup("Check \(answer.sources.count) sources") {
-                    ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in Button { m.selected = hit.memory } label: { HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary) }.padding(10).background(.quaternary.opacity(0.5),in:RoundedRectangle(cornerRadius:8)) }.buttonStyle(.plain) }
+                    ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in
+                        Button { m.openMemory(hit.memory,query:question) } label: {
+                            VStack(alignment:.leading,spacing:7) {
+                                HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary) }
+                                EvidenceSnippetView(text:hit.memory.text,query:question).foregroundStyle(.secondary).lineLimit(3).frame(maxWidth:.infinity,alignment:.leading)
+                            }.padding(10).background(.quaternary.opacity(0.5),in:RoundedRectangle(cornerRadius:8))
+                        }.buttonStyle(.plain)
+                    }
                 }.font(.caption)
             }
         }.padding(20).background(.background,in:RoundedRectangle(cornerRadius:12))
