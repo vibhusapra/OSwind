@@ -84,7 +84,7 @@ public enum MarkdownExport {
                         if let end = memory.endTimestamp { metadata["ended"] = try ISOTime.string(end) }
                         if let session = memory.audioSessionID { metadata["audio_session_id"] = session }
                         try page.write("---\n")
-                        for name in metadata.keys.sorted() { try page.write(name+": "+json(metadata[name]!)+"\n") }
+                        for name in metadata.keys.sorted() { try page.write(name+": "+yaml(metadata[name]!)+"\n") }
                         try page.write("---\n\n# "+inline(memory.title)+"\n\n[All sources](../index.md)\n\n")
                         if let url = memory.url { try page.write("## Original location\n\n"+literal(url)) }
                         for (label,path) in media { try page.write("[Open retained \(label)](\(path))\n\n") }
@@ -194,6 +194,17 @@ public enum MarkdownExport {
     }
     private static func seconds(_ value: Double) -> String { String(format:"%.3f s",locale:Locale(identifier:"en_US_POSIX"),value) }
     private static func json(_ value: Any) -> String { (try? JSONSerialization.data(withJSONObject:value,options:[.fragmentsAllowed,.sortedKeys])).flatMap { String(data:$0,encoding:.utf8) } ?? "null" }
+    /// YAML accepts JSON scalars. Escape Markdown syntax inside string values
+    /// too, for readers that render front matter as ordinary Markdown text.
+    private static func yaml(_ value: Any) -> String {
+        if let strings = value as? [String] { return "["+strings.map { yaml($0) }.joined(separator:",")+"]" }
+        guard let string = value as? String else { return json(value) }
+        var result = json(string)
+        for byte in "<>![]()*_`#&".utf8 {
+            result = result.replacingOccurrences(of:String(UnicodeScalar(byte)),with:String(format:"\\u%04x",Int(byte)))
+        }
+        return result
+    }
     private static func inline(_ text: String) -> String {
         let punctuation = Set("\\`*_{}[]<>()#+-.!|~=")
         return text.map { $0 == "\n" || $0 == "\r" ? " " : punctuation.contains($0) ? "\\"+String($0) : String($0) }.joined()

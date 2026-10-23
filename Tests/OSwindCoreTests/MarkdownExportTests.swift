@@ -29,6 +29,8 @@ final class MarkdownExportTests: XCTestCase {
         let info = try MarkdownExport.create(store:store,destination:output,policy:PrivacyPolicy(),includeMedia:true)
         XCTAssertEqual(info.memories,3); XCTAssertEqual(info.turns,1); XCTAssertEqual(info.mediaFiles,3)
         let source = try String(contentsOf:sourceURL(memory.id)); XCTAssertTrue(source.contains("````text\n"+body)); XCTAssertTrue(source.contains("favorite: true")); XCTAssertTrue(source.contains("[Open retained image](../media/"))
+        let metadata = source.components(separatedBy:"---\n")[1]
+        XCTAssertFalse(metadata.contains("<title>")); XCTAssertFalse(metadata.contains("[bracket]")); XCTAssertTrue(metadata.contains("\\u003c"))
         XCTAssertTrue(try texts("sources").contains("### 0.250 s – 1.500 s")); XCTAssertTrue(try texts("sources").contains("Speaker: Maya")); XCTAssertTrue(try texts("sources").contains("## Sampled replay frames"))
         let conversation = try texts("conversations"); XCTAssertTrue(conversation.contains("[1] [A \\[bracket\\] \\<title\\>](../sources/")); XCTAssertTrue(conversation.contains("### Search scope"))
         XCTAssertFalse(FileManager.default.fileExists(atPath:output.appendingPathComponent("api-token").path)); XCTAssertFalse(FileManager.default.fileExists(atPath:output.appendingPathComponent("memory.sqlite").path))
