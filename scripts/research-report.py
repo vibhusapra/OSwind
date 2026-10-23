@@ -22,15 +22,15 @@ vendors=[
 ]
 # Each row is a requirement, not a marketing checkbox. Test status is maintained in PROGRESS.md.
 rows=[
-('Capture','Focused-window snapshots','live verified','Real targeted synthetic window: OCR, correct source identity and image saved; automatic foreground transition test pending','Screenpipe, Littlebird, Recall'),
+('Capture','Focused-window snapshots','live verified','Real targeted synthetic window: OCR, source identity and image saved. Shared fail-closed focus binding tested; latest physical and automatic-transition acceptance pending','Screenpipe, Littlebird, Recall'),
 ('Capture','All displays','partial','Display filters implemented; browser windows intentionally masked; hardware test pending','ScreenMemory, TimeScroll, Pensieve'),
-('Capture','Continuous visual replay / HEVC','todo','JPEG snapshots only; no inter-frame video compression','Rewind Desktop, Retrace (haseab), rem'),
+('Capture','Continuous visual replay / HEVC','partial','Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Twelve generated frames encode/decode; real synthetic-window capture and native seek/play verified. All-display replay, natural workload/power and broad lock/resume acceptance remain open','Rewind Desktop, Retrace (haseab), rem'),
 ('Capture','Accessibility context and text','implemented','Bounded tree traversal; secure-field suppression; app/window metadata','Screenpipe, TimeScroll, Minne'),
 ('Capture','Browser URL capture','partial','Accessibility URL extraction; cross-browser behavior unverified','Screenpipe, Unlost, Pensieve'),
 ('Capture','Multilingual OCR','partial','Vision auto language detection; multilingual fixture suite outstanding','Screenpipe, Retrace'),
-('Capture','Event-driven capture','partial','App-switch triggers plus interval; no window-content event observer yet','Screenpipe'),
+('Capture','Event-driven capture','partial','Replay uses ScreenCaptureKit frame events; snapshots use app-switch plus interval. Broad automatic window/context transition acceptance remains open','Screenpipe'),
 ('Capture','Screen selection and crop regions','todo','Focused window/all display toggle only','Recall, visual recorders'),
-('Energy','Light/Balanced/Detailed modes','tested','20/5/2 seconds; size/quality settings and policy tests','Screenpipe, TimeScroll'),
+('Energy','Light/Balanced/Detailed modes','tested','Snapshots 20/5/2 s; replay 5/1/0.5 s, reduced on low power/thermal pressure. Policy tests pass; measured battery budget remains open','Screenpipe, TimeScroll'),
 ('Energy','Perceptual change deduplication','tested','32x18 grayscale delta; exact small-text false negatives need study','TimeScroll, Retrace'),
 ('Energy','Idle / sleep / lock suspension','partial','Observers plus startup lock check; locked state verified; unlock/resume pending','Recall, Retrace (jhammant)'),
 ('Energy','Low-power / thermal backoff','tested','Interval policy tested; physical battery drain not measured','TimeScroll'),

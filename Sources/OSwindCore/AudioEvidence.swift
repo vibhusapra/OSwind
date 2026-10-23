@@ -81,6 +81,6 @@ public enum AudioEvidence {
 }
 public extension SearchHit {
     func answerEvidence(query:String,budget:Int=800,summary:Bool=false,speaker:String?=nil) -> String {
-        AudioEvidence.render(self,query:query,budget:budget,summary:summary,speaker:speaker) ?? excerpt(query:query,budget:budget,summary:summary)
+        AudioEvidence.render(self,query:query,budget:budget,summary:summary,speaker:speaker) ?? VisualEvidence.render(self,query:query,budget:budget,summary:summary) ?? excerpt(query:query,budget:budget,summary:summary)
     }
 }

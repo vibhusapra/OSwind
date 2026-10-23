@@ -58,12 +58,12 @@ final class BackupDataReader {
         var cursor = Int64.min, first = true
         while true {
             try Task.checkCancellation()
-            let statement = try db.prepare("SELECT rowid,json_extract(CAST(payload AS TEXT),'$.imagePath'),json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories NOT INDEXED WHERE rowid\(first ? ">=" : ">")? ORDER BY rowid LIMIT 128")
+            let statement = try db.prepare("SELECT rowid,json_extract(CAST(payload AS TEXT),'$.imagePath'),json_extract(CAST(payload AS TEXT),'$.audioPath'),json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories NOT INDEXED WHERE rowid\(first ? ">=" : ">")? ORDER BY rowid LIMIT 128")
             sqlite3_bind_int64(statement,1,cursor); var paths = [String](), last: Int64?, status = sqlite3_step(statement)
             do {
                 while status == SQLITE_ROW {
                     last = sqlite3_column_int64(statement,0)
-                    for column: Int32 in [1,2] where sqlite3_column_type(statement,column) != SQLITE_NULL { let path = try db.text(statement,column); try BackupMediaEntry.validateSourcePath(path); paths.append(path) }
+                    for column: Int32 in [1,2,3] where sqlite3_column_type(statement,column) != SQLITE_NULL { let path = try db.text(statement,column); try BackupMediaEntry.validateSourcePath(path); paths.append(path) }
                     status = sqlite3_step(statement)
                 }
                 guard status == SQLITE_DONE else { throw db.error("Cannot read source media references") }; sqlite3_finalize(statement)

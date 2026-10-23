@@ -2,6 +2,9 @@
 
 Updated 2026-10-23, America/Los_Angeles. Goal remains active. This ledger records implementation, direct evidence and remaining release gates.
 
+Current work adds [sampled visual replay](REPLAY.md): focused-window ScreenCaptureKit streaming, hardware-required HEVC, timed OCR/AX, native frame seek and OCR overlays, isolated video ownership, backup/restore/erasure, and publication barriers. Current full suite: **329 tests, 325 pass / four opt-in skips**, including hardware-independent software mux/decode, player completion/restart, cancellation, privacy publication barriers, timed evidence, backup/restore and deletion. **60 focused ThreadSanitizer checks pass**; signed release, installed CLI/HTTP/MCP replay, preview regression and backup interruption checks pass. The app and ZIP are installed/packaged from code `dd2f372`; final native controls and latest strict-window device retest remain pending after the Mac locked. Three generated 12-frame packaged release probes preserved every original/decoded OCR ownership and authored frame-token check, using 0.159× the same-pixel JPEG reference bytes including thumbnails. A separate 12-second synthetic native-window stream saved 12 frames in four clips, opened and sought in the native player. These narrow checks do not establish natural capture, power, all-display replay or competitor wins. The pinned schema-11 component soak remains running independently.
+
+
 The full objective is an open-source macOS desktop-memory product with meaningful broad parity, local GPU inference, optional BYOK, great daily-use design, sustained performance, current research, tests, progress tracking and comparative benchmarks. **Feature completeness and top-three placement are not established.** Remaining work is preserved in the 74-row [feature ledger](features.json), its [interactive report](landscape.html) and the release gates here.
 
 ## Implemented and directly verified
@@ -35,7 +38,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 
 ## Implemented, broader runtime checks still needed
 
-- ScreenCaptureKit capture, Vision + Accessibility context, JPEG retention, focused window/all display modes with excluded-app/browser masking, raw-image suppression on redaction, generation-token cancellation.
+- ScreenCaptureKit capture, Vision + Accessibility context, JPEG snapshots and opt-in focused-window HEVC replay, focused window/all display snapshot modes with excluded-app/browser masking, raw-image suppression on redaction, generation-token cancellation.
 - Adaptive capture profiles, app-switch triggers, idle/lock/sleep handling, thermal/low-power backoff and change detection.
 - Native search/timeline/cards/inspector, tags/favorites/notes, Ask source cards, coverage-aware recap samples, insights and capture health.
 - Microphone conversion and system-audio stream; 30-second chunks; silence gating; bounded queue; short-session final flush; cancellable local Whisper jobs. Pause discards pending audio; explicit Stop audio finishes a final segment. Lock/sleep stop audio.
@@ -52,9 +55,9 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Native interaction/permission flow, automatic foreground transitions, browser URL metadata/private-window tests. Real targeted screen capture and sampled layout rendering pass.
 - [ ] End-to-end mic/system audio, short recordings, device changes, queue pressure and pause/lock boundaries. Subprocess cancellation is covered by an automated test.
 - [ ] Extend the new multilingual relevance suite to realistic larger archives, adversarial questions and abstention; add multimodal retrieval. Qwen3 local embedding and the authored 35-query suite are delivered; state-of-the-art claims remain unproven.
-- [ ] Natural-language time filters, scheduled routines, meeting sessions/diarization, calendar view and query-specific highlights. Durable chats/follow-ups and chat Markdown export are delivered with v0 history bounds; broader conversation/grounding evaluation remains open.
+- [ ] Scheduled routines, meeting-session organization and calendar integration; broader natural/overlap/continuity evaluation for delivered recording-local diarization. Natural-language time scopes, query highlights, named recording-local speakers, durable chats and chat Markdown export are delivered; broader grounding evaluation remains open.
 - [ ] Encrypted vault/biometric unlock, stronger PII/image redaction, granular range/app/site erasure.
-- [ ] Compressed video/media backup/restore, Markdown export, Rewind/Limitless migration, collector/plugin SDK.
+- [ ] All-display/long-run replay acceptance, bulk memory Markdown export, Rewind/Limitless migration and collector/plugin SDK. Complete library backup/restore, including replay video, is delivered.
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; larger relevance/scaling validation, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
@@ -299,3 +302,16 @@ Added a run-owned pinned CLI, persistent MCP reader and concurrent CLI writer wo
 Eight harness contracts pass, including a confirmed-live process at response timeout and a simulated-clock gap that cannot be reported as continuous success. A short real local-model rehearsal also passes. See [reliability scope and operation](RELIABILITY.md). Full 24-hour capture/power/fault evidence remains open; these component checks do not establish product-level reliability.
 
 The 24-hour synthetic component run is now started from a pinned backend, with controller/MCP processes verified live and its first write/read/local-answer cycle completed. The [early snapshot](../benchmarks/component-soak-running-v1.json) is explicitly not a completion result or live monitor. No HTTP listener or sleep prevention is used. The full capture/power/fault gate remains open. Search-preview PR18 CI is green.
+
+
+## Sampled visual replay — draft PR #20
+
+[Draft PR #20](https://github.com/vibhusapra/OSwind/pull/20), stacked on #19, adds focused-window HEVC clips, timed Vision OCR/accessibility text, frame-linked answer evidence, native playback/seek/boxes, per-source video ownership and a publication barrier shared with finalizing chunks. Snapshot and replay selection reject a missing focused window instead of choosing another same-app window. Append/flush/close remain serialized across actor suspension; normal pause preserves admitted work, stream errors propagate and bounded capture fails on errors or no evidence. Hardware is required for ordinary encoding; software H264 is an explicit generated-fixture option.
+
+The latest full suite is 329 cases (325 pass, four opt-in skips); all 60 focused sanitizer cases pass. Release CLI/HTTP/MCP source transport, complete backup/restore byte equality and interruption recovery, JSON media stripping, erasure, existing audio preview contracts and installed-binary synthetic smoke pass. A schema-11 writer is rejected from a schema-12 replay library without changing source payloads. Strict signatures and packaged app/CLI hashes agree across package, installed app and extracted ZIP. Ad-hoc signing changes raw build hashes; signature removal and normalization of only the signing-related __LINKEDIT virtual size verifies all remaining bytes agree. Installation preserves prior versions and opens no normal library.
+
+[Generated replay evidence](../benchmarks/visual-replay-v1.json): three 12-frame 1280×720 packaged release trials preserve every authored original/decoded ownership phrase and strict unique frame token. Video plus thumbnails uses 91,205 bytes versus 572,784 same-pixel quality-0.75 JPEG bytes (0.159 ratio). Metadata/database bytes are excluded. A retained initial heading-equality failure identified OCR “0” versus “O”; expected unique token identities remain strict, without numeric substitution. This is a small static generated fixture, not an energy, daily storage or competitor win.
+
+[Native observations](../benchmarks/visual-replay-native-v1.json): parent `dc9abf8` captured a changing public synthetic window for 12 seconds, saving 12 frames in four HEVC clips; every movie decodes. Its release player opened the saved video with the revised layout. Earlier pilot seek/play/OCR-box interaction is separately labeled. The Mac locked before final control interaction and the latest strict source selector could be retested on-device. Locked-session capture rejected the request with zero rows/media. This proves lock admission, not continuous lock/unlock recovery. [Regression evidence](../benchmarks/visual-replay-regression-v1.json) separates those boundaries.
+
+All-display replay, continuous cross-clip scrubbing, frame-level date filtering, readable OCR/AX reconciliation, physical lock/resume/permission recovery, natural-workload fidelity, measured power and matched competitor app runs remain open. The pinned 24-hour component trial is independent, still running and does not establish capture/power acceptance. Broad parity and top-three placement remain unproved.

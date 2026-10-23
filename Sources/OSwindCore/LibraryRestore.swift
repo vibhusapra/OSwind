@@ -73,7 +73,7 @@ private final class RestoreRows {
                   memory.id == (try self.source.db.text(row,0)), memory.timestamp.timeIntervalSince1970 == (try self.number(row,1)), memory.kind.rawValue == (try self.source.db.text(row,2)),
                   memory.app == (try self.source.db.text(row,3)), memory.title == (try self.source.db.text(row,4)), memory.url == (try self.optionalText(row,5)), memory.text == (try self.source.db.text(row,6)),
                   (try self.integer(row,7)) == (memory.favorite ? 1 : 0), memory.embeddingModel == (try self.optionalText(row,10)) else { throw BackupFileError.invalid("Source payload and database metadata differ") }
-            memory.imagePath = try self.mappedPath(memory.imagePath); memory.audioPath = try self.mappedPath(memory.audioPath)
+            memory.imagePath = try self.mappedPath(memory.imagePath); memory.audioPath = try self.mappedPath(memory.audioPath);memory.videoPath=try self.mappedPath(memory.videoPath)
             memory.embedding = sqlite3_column_type(row,9)==SQLITE_NULL ? nil : try self.vector(row,9)
             try self.hashes.record(memory); try self.destination.insert(memory)
             count = try BackupMath.add(count,1); if count%64==0 { try progress(count) }

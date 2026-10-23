@@ -4,7 +4,7 @@
     "axis": "Capture",
     "feature": "Focused-window snapshots",
     "status": "live verified",
-    "evidence": "Real targeted synthetic window: OCR, correct source identity and image saved; automatic foreground transition test pending",
+    "evidence": "Real targeted synthetic window: OCR, source identity and image saved. Shared fail-closed focus binding tested; latest physical and automatic-transition acceptance pending",
     "references": "Screenpipe, Littlebird, Recall"
   },
   {
@@ -19,8 +19,8 @@
     "id": "F003",
     "axis": "Capture",
     "feature": "Continuous visual replay / HEVC",
-    "status": "todo",
-    "evidence": "JPEG snapshots only; no inter-frame video compression",
+    "status": "partial",
+    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Twelve generated frames encode/decode; real synthetic-window capture and native seek/play verified. All-display replay, natural workload/power and broad lock/resume acceptance remain open",
     "references": "Rewind Desktop, Retrace (haseab), rem"
   },
   {
@@ -52,7 +52,7 @@
     "axis": "Capture",
     "feature": "Event-driven capture",
     "status": "partial",
-    "evidence": "App-switch triggers plus interval; no window-content event observer yet",
+    "evidence": "Replay uses ScreenCaptureKit frame events; snapshots use app-switch plus interval. Broad automatic window/context transition acceptance remains open",
     "references": "Screenpipe"
   },
   {
@@ -68,7 +68,7 @@
     "axis": "Energy",
     "feature": "Light/Balanced/Detailed modes",
     "status": "tested",
-    "evidence": "20/5/2 seconds; size/quality settings and policy tests",
+    "evidence": "Snapshots 20/5/2 s; replay 5/1/0.5 s, reduced on low power/thermal pressure. Policy tests pass; measured battery budget remains open",
     "references": "Screenpipe, TimeScroll"
   },
   {
