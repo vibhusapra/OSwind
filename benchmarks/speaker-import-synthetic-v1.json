@@ -1,0 +1,552 @@
+{
+  "scope": "OSwind integrated import, naming, redaction-compatible persistence, search and portability on stock-voice A/B/A/B synthetic audio",
+  "synthetic": true,
+  "duration_seconds": 32.225,
+  "fixture_sha256": "9edaeed2566521d67262f1f35118403afe925324818c102ac2ece71283a33419",
+  "reference": {
+    "synthetic": true,
+    "seconds": 32.225,
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 7.1,
+        "speaker": "A",
+        "stock_voice": "af_heart",
+        "text": "Let's release the desktop memory preview on Friday. I will own the capture tests and the privacy checklist."
+      },
+      {
+        "start": 7.85,
+        "end": 15.575,
+        "speaker": "B",
+        "stock_voice": "am_echo",
+        "text": "That works for me. I'll handle local model setup and the search benchmark. We should keep recording off until setup is complete."
+      },
+      {
+        "start": 16.325,
+        "end": 23.85,
+        "speaker": "A",
+        "stock_voice": "af_heart",
+        "text": "What did we decide about the archive format? I want the media and transcripts to restore together, including their timestamps."
+      },
+      {
+        "start": 24.6,
+        "end": 32.225,
+        "speaker": "B",
+        "stock_voice": "am_echo",
+        "text": "The first package is local and unencrypted. We will verify the restored copy, and add encryption in the next milestone."
+      }
+    ],
+    "scope": "known stock voice sources and intervals; not natural-meeting DER or annotated VAD"
+  },
+  "wall_import_seconds": 0.6491332079749554,
+  "normalized_WER": 0.0,
+  "timed_words": 80,
+  "speaker_info": {
+    "detectedSpeakers": 2,
+    "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+    "scope": "recording",
+    "unassignedSegments": 9
+  },
+  "word_segments": [
+    {
+      "end": 0.48,
+      "start": 0,
+      "text": "Let's"
+    },
+    {
+      "end": 0.7999999999999999,
+      "speaker": "Speaker 1",
+      "start": 0.48,
+      "text": "release"
+    },
+    {
+      "end": 1.04,
+      "speaker": "Speaker 1",
+      "start": 0.8,
+      "text": "the"
+    },
+    {
+      "end": 1.68,
+      "speaker": "Speaker 1",
+      "start": 1.04,
+      "text": "desktop"
+    },
+    {
+      "end": 2.08,
+      "speaker": "Speaker 1",
+      "start": 1.68,
+      "text": "memory"
+    },
+    {
+      "end": 2.48,
+      "speaker": "Speaker 1",
+      "start": 2.08,
+      "text": "preview"
+    },
+    {
+      "end": 2.64,
+      "speaker": "Speaker 1",
+      "start": 2.48,
+      "text": "on"
+    },
+    {
+      "end": 3.4400000000000004,
+      "speaker": "Speaker 1",
+      "start": 2.64,
+      "text": "Friday."
+    },
+    {
+      "end": 3.6799999999999997,
+      "start": 3.44,
+      "text": "I"
+    },
+    {
+      "end": 3.92,
+      "speaker": "Speaker 1",
+      "start": 3.68,
+      "text": "will"
+    },
+    {
+      "end": 4.16,
+      "speaker": "Speaker 1",
+      "start": 3.92,
+      "text": "own"
+    },
+    {
+      "end": 4.32,
+      "speaker": "Speaker 1",
+      "start": 4.16,
+      "text": "the"
+    },
+    {
+      "end": 4.720000000000001,
+      "speaker": "Speaker 1",
+      "start": 4.32,
+      "text": "capture"
+    },
+    {
+      "end": 5.2,
+      "speaker": "Speaker 1",
+      "start": 4.72,
+      "text": "tests"
+    },
+    {
+      "end": 5.36,
+      "speaker": "Speaker 1",
+      "start": 5.2,
+      "text": "and"
+    },
+    {
+      "end": 5.5200000000000005,
+      "speaker": "Speaker 1",
+      "start": 5.36,
+      "text": "the"
+    },
+    {
+      "end": 6.08,
+      "speaker": "Speaker 1",
+      "start": 5.5200000000000005,
+      "text": "privacy"
+    },
+    {
+      "end": 7.44,
+      "start": 6.08,
+      "text": "checklist."
+    },
+    {
+      "end": 8.08,
+      "start": 7.76,
+      "text": "That"
+    },
+    {
+      "end": 8.48,
+      "speaker": "Speaker 2",
+      "start": 8.08,
+      "text": "works"
+    },
+    {
+      "end": 8.64,
+      "speaker": "Speaker 2",
+      "start": 8.48,
+      "text": "for"
+    },
+    {
+      "end": 8.88,
+      "speaker": "Speaker 2",
+      "start": 8.64,
+      "text": "me,"
+    },
+    {
+      "end": 9.200000000000001,
+      "speaker": "Speaker 2",
+      "start": 8.88,
+      "text": "I'll"
+    },
+    {
+      "end": 9.52,
+      "speaker": "Speaker 2",
+      "start": 9.200000000000001,
+      "text": "handle"
+    },
+    {
+      "end": 10,
+      "speaker": "Speaker 2",
+      "start": 9.52,
+      "text": "local"
+    },
+    {
+      "end": 10.16,
+      "speaker": "Speaker 2",
+      "start": 10,
+      "text": "model"
+    },
+    {
+      "end": 10.8,
+      "speaker": "Speaker 2",
+      "start": 10.32,
+      "text": "setup"
+    },
+    {
+      "end": 10.88,
+      "speaker": "Speaker 2",
+      "start": 10.8,
+      "text": "and"
+    },
+    {
+      "end": 11.040000000000001,
+      "speaker": "Speaker 2",
+      "start": 10.88,
+      "text": "the"
+    },
+    {
+      "end": 11.36,
+      "speaker": "Speaker 2",
+      "start": 11.040000000000001,
+      "text": "search"
+    },
+    {
+      "end": 12.16,
+      "speaker": "Speaker 2",
+      "start": 11.36,
+      "text": "benchmark."
+    },
+    {
+      "end": 12.32,
+      "speaker": "Speaker 2",
+      "start": 12.16,
+      "text": "We"
+    },
+    {
+      "end": 12.56,
+      "speaker": "Speaker 2",
+      "start": 12.32,
+      "text": "should"
+    },
+    {
+      "end": 12.8,
+      "speaker": "Speaker 2",
+      "start": 12.56,
+      "text": "keep"
+    },
+    {
+      "end": 13.280000000000001,
+      "speaker": "Speaker 2",
+      "start": 12.8,
+      "text": "recording"
+    },
+    {
+      "end": 13.440000000000001,
+      "speaker": "Speaker 2",
+      "start": 13.280000000000001,
+      "text": "off"
+    },
+    {
+      "end": 13.84,
+      "speaker": "Speaker 2",
+      "start": 13.44,
+      "text": "until"
+    },
+    {
+      "end": 14.24,
+      "speaker": "Speaker 2",
+      "start": 13.84,
+      "text": "setup"
+    },
+    {
+      "end": 14.4,
+      "speaker": "Speaker 2",
+      "start": 14.24,
+      "text": "is"
+    },
+    {
+      "end": 16.24,
+      "start": 14.4,
+      "text": "complete."
+    },
+    {
+      "end": 16.639999999999997,
+      "start": 16.240000000000002,
+      "text": "What"
+    },
+    {
+      "end": 16.8,
+      "speaker": "Speaker 1",
+      "start": 16.64,
+      "text": "did"
+    },
+    {
+      "end": 16.96,
+      "speaker": "Speaker 1",
+      "start": 16.8,
+      "text": "we"
+    },
+    {
+      "end": 17.36,
+      "speaker": "Speaker 1",
+      "start": 16.96,
+      "text": "decide"
+    },
+    {
+      "end": 17.52,
+      "speaker": "Speaker 1",
+      "start": 17.36,
+      "text": "about"
+    },
+    {
+      "end": 17.68,
+      "speaker": "Speaker 1",
+      "start": 17.52,
+      "text": "the"
+    },
+    {
+      "end": 18.24,
+      "speaker": "Speaker 1",
+      "start": 17.68,
+      "text": "archive"
+    },
+    {
+      "end": 18.88,
+      "speaker": "Speaker 1",
+      "start": 18.240000000000002,
+      "text": "format?"
+    },
+    {
+      "end": 19.2,
+      "start": 18.88,
+      "text": "I"
+    },
+    {
+      "end": 19.36,
+      "speaker": "Speaker 1",
+      "start": 19.2,
+      "text": "want"
+    },
+    {
+      "end": 19.52,
+      "speaker": "Speaker 1",
+      "start": 19.36,
+      "text": "the"
+    },
+    {
+      "end": 19.84,
+      "speaker": "Speaker 1",
+      "start": 19.52,
+      "text": "media"
+    },
+    {
+      "end": 20,
+      "speaker": "Speaker 1",
+      "start": 19.84,
+      "text": "and"
+    },
+    {
+      "end": 20.72,
+      "speaker": "Speaker 1",
+      "start": 20,
+      "text": "transcripts"
+    },
+    {
+      "end": 20.88,
+      "speaker": "Speaker 1",
+      "start": 20.72,
+      "text": "to"
+    },
+    {
+      "end": 21.28,
+      "speaker": "Speaker 1",
+      "start": 20.88,
+      "text": "restore"
+    },
+    {
+      "end": 21.84,
+      "speaker": "Speaker 1",
+      "start": 21.28,
+      "text": "together,"
+    },
+    {
+      "end": 22.4,
+      "speaker": "Speaker 1",
+      "start": 21.84,
+      "text": "including"
+    },
+    {
+      "end": 22.64,
+      "speaker": "Speaker 1",
+      "start": 22.400000000000002,
+      "text": "their"
+    },
+    {
+      "end": 24.080000000000002,
+      "start": 22.64,
+      "text": "timestamps."
+    },
+    {
+      "end": 24.8,
+      "start": 24.48,
+      "text": "The"
+    },
+    {
+      "end": 25.12,
+      "speaker": "Speaker 2",
+      "start": 24.8,
+      "text": "first"
+    },
+    {
+      "end": 25.6,
+      "speaker": "Speaker 2",
+      "start": 25.12,
+      "text": "package"
+    },
+    {
+      "end": 25.84,
+      "speaker": "Speaker 2",
+      "start": 25.6,
+      "text": "is"
+    },
+    {
+      "end": 26.16,
+      "speaker": "Speaker 2",
+      "start": 25.84,
+      "text": "local"
+    },
+    {
+      "end": 26.32,
+      "speaker": "Speaker 2",
+      "start": 26.16,
+      "text": "and"
+    },
+    {
+      "end": 27.44,
+      "speaker": "Speaker 2",
+      "start": 26.32,
+      "text": "unencrypted."
+    },
+    {
+      "end": 27.6,
+      "speaker": "Speaker 2",
+      "start": 27.44,
+      "text": "We"
+    },
+    {
+      "end": 27.76,
+      "speaker": "Speaker 2",
+      "start": 27.6,
+      "text": "will"
+    },
+    {
+      "end": 28.240000000000002,
+      "speaker": "Speaker 2",
+      "start": 27.76,
+      "text": "verify"
+    },
+    {
+      "end": 28.400000000000002,
+      "speaker": "Speaker 2",
+      "start": 28.240000000000002,
+      "text": "the"
+    },
+    {
+      "end": 28.88,
+      "speaker": "Speaker 2",
+      "start": 28.400000000000002,
+      "text": "restored"
+    },
+    {
+      "end": 29.28,
+      "speaker": "Speaker 2",
+      "start": 28.88,
+      "text": "copy"
+    },
+    {
+      "end": 29.599999999999998,
+      "speaker": "Speaker 2",
+      "start": 29.36,
+      "text": "and"
+    },
+    {
+      "end": 29.84,
+      "speaker": "Speaker 2",
+      "start": 29.6,
+      "text": "add"
+    },
+    {
+      "end": 30.32,
+      "speaker": "Speaker 2",
+      "start": 29.84,
+      "text": "encryption"
+    },
+    {
+      "end": 30.48,
+      "speaker": "Speaker 2",
+      "start": 30.32,
+      "text": "in"
+    },
+    {
+      "end": 30.56,
+      "speaker": "Speaker 2",
+      "start": 30.48,
+      "text": "the"
+    },
+    {
+      "end": 30.8,
+      "speaker": "Speaker 2",
+      "start": 30.560000000000002,
+      "text": "next"
+    },
+    {
+      "end": 31.439999999999998,
+      "speaker": "Speaker 2",
+      "start": 30.8,
+      "text": "milestone."
+    }
+  ],
+  "assigned_words": 71,
+  "eligible_words_with_250ms_edge_collar": 76,
+  "eligible_correct_assigned": 71,
+  "eligible_unassigned": 5,
+  "eligible_wrong_assigned": [],
+  "anonymous_label_mapping_in_this_fixture": {
+    "Speaker 1": "A",
+    "Speaker 2": "B"
+  },
+  "checks": [
+    "real native local-only ASR+diarization saved and retrieved",
+    "recording-local naming persists and refuses merging two identities",
+    "retained original bytes match; full backup restores speaker metadata and audio",
+    "text interchange preserves sanitized speaker metadata and strips media",
+    "erasure removes owned clip; fixture remains"
+  ],
+  "limits": [
+    "clean generated voices, four known utterances, not natural-meeting DER/WDER or independent word-alignment ground truth",
+    "coverage/unknowns reported; accuracy among assigned words alone can conceal abstention",
+    "no live speaker tracking, persistent cross-recording identities, microphone/TCC/UI acceptance, power or competitor ranking",
+    "wall time includes model load, normalization, inference, redaction, insertion and indexing; caches uncontrolled"
+  ],
+  "source_commit": "79f0e76",
+  "sdk": "FluidAudio 0.17.7 / 503b4bd1bbf7220882de39fe8ae6716aae4132da",
+  "hardware": "Apple M5 Max",
+  "binary_sha256": "b9a8da15eeb7e2b1ef7b0333c0405548c320c968ca5874397614c911bb350687",
+  "speaker_catalog_sha256": "e374b2ce5f70e10846253cc087cb32ba945628f502b55c33b00e64ec589824b5",
+  "speaker_model_revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232",
+  "asr_model_revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe"
+}

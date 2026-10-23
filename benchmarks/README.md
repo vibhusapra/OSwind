@@ -294,3 +294,20 @@ python3 scripts/speech-eval.py .build/release/oswindctl \
   --whisper-model /absolute/ggml-base.en.bin \
   --output /absolute/speech-import-report.json
 ```
+
+
+## Integrated imported speaker workflow (synthetic, v1)
+
+`speaker-import-synthetic-v1.json` runs the real packaged CLI through snapshot/normalization, local Parakeet + Community-1 inference, redaction/admission, naming, lookup, retained-byte comparison, full backup/restore, text interchange and deletion. It includes all 80 raw word assignments, authored stock-voice utterance intervals, model/catalog/binary identity and unknown counts. Voice embeddings are not exported.
+
+Four stock-voice A/B/A/B utterances (32.225 s) yield two recording-local clusters and normalized ASR WER 0. Among 76 ASR-midpoint words at least .25 s from an authored utterance edge, 71 have the expected synthetic voice label, five are unknown and none have the other voice's label. Nine of all 80 words are unknown. Reporting only correctness among assigned words would conceal the abstentions. The raw report retains whole-import wall time, which includes loading/compilation/saving with uncontrolled caches. It is not resident inference throughput or measured energy.
+
+This is a clean generated-voice regression. Known source-voice intervals plus model-generated word times are not independent word alignment, natural-meeting DER/WDER, overlap/noise robustness, live/cross-recording voice identity or a competitor ranking. Product UI rendering/compilation does not prove native click/keyboard or device acceptance.
+
+```bash
+python3 scripts/setup-native-speech.py --model speakers --destination /absolute/new/community1
+python3 scripts/speaker-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl \
+  --fixture /absolute/generated-two-speaker-fixture \
+  --asr-model /absolute/parakeet-v3 --speaker-model /absolute/new/community1 \
+  --output /absolute/speaker-product-report.json
+```
