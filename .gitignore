@@ -1,0 +1,9 @@
+.build/
+.DS_Store
+*.sqlite*
+.env
+dist/
+.artifacts/
+.local/
+*.wav
+*.mp4
