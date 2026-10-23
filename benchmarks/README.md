@@ -137,3 +137,17 @@ A separate read-only development profile during graph construction observed the 
 ### Timing estimators
 
 New benchmark reports declare `latency_quantiles`: median averages the center pair for an even sample, p95 uses nearest rank `ceil(.95*n)`, and max is reported explicitly. For fewer than 20 samples, p95 is the slowest observed sample; it is not a reliable population-tail estimate. Earlier reports used the lower sample at `floor((n-1)*.95)`, which can understate a small run's tail. Historical artifacts remain intact. `ann-million-tail-summary.json` contains a source hash and recomputed quantiles from the same raw million-vector measurements; no observations were rerun or dropped. The failed recall values are unchanged. `statistics-scan-development.json` preserves the separate read-only SQL profile under build load.
+
+
+## Metal exhaustive-scoring component prototype
+
+```bash
+swiftc -O -parse-as-library scripts/metal-probe.swift -o .artifacts/metal-probe
+.artifacts/metal-probe benchmarks/ann-storage-1000000-indexed.json result.json
+```
+
+`metal-component-100000.json` and `metal-component-1000000.json` exercise MPS float32 matrix-vector scoring, a CPU top-200 heap and float32 cosine reranking against the already recorded SQL ground-truth IDs. Each has 16 non-self queries per scope; both unfiltered and half-row scopes recovered all exact top-10 IDs in these trials. The input reference SHA256 is retained. Synthetic vectors are regenerated from the same deterministic seeds directly into shared GPU memory; this bypasses SQLite extraction and the actual product cache.
+
+At one million × 1024 dimensions, the matrix uses 4.096 GB and process peak RSS is about 4.1 GB. Generation took roughly 2.3 s. Full component timings include CPU candidate selection and reranking; command-buffer GPU durations are separate. Inspect the JSON for every observation and nearest-rank tails, including first-use overhead. This is an isolated component, not a delivered end-to-end search improvement or a competitor ranking.
+
+Integration gates: bounded-memory backend choice, durable snapshot format and checksum, mutation replay, erase/revision/identity protection, scope masks/metadata invalidation, power policy, cancellation, fault recovery and whole-path benchmarks. The current shipped preview still uses the native/exact paths; its million-record ANN recall failure remains open. Additional independent queries and real model archives are required even if this component retains 1.0 on the current fixture.

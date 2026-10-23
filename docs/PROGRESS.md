@@ -101,6 +101,12 @@ Benchmark tail estimation is corrected: new reports use nearest-rank p95 and exp
 
 Next performance gate is the failed million-record ANN non-self recall (.675/.825): tune search budget/precision on the retained graph, validate on independent queries and realistic archives, and remeasure warm/cold latency, memory, build time and write contention. Keep the slow exact and weak approximate results visible. Core parity gates above remain active.
 
+## Current work: Metal retrieval prototype
+
+The `codex/metal-retrieval` branch contains a standalone MPS float32 exhaustive-scoring probe. On the retained 100k/1m synthetic references, all exact top-10 neighbors were recovered for 16 non-self queries per scope. The million-row matrix uses 4.096 GB; measured component latency and GPU-command durations are preserved separately in `benchmarks/metal-component-*`. No production cache or filter/erasure integration has been promoted. Regenerated vectors bypass database extraction, and these observations do not establish whole-app speed, power or an overall ranking.
+
+Next: integrate a memory-bounded Metal backend with the existing journal/identity/checksum discipline; preserve exact source validation and filtered scopes; verify updates, deletion, reopen, cancellation and failure fallback; then run whole-path and independent-query evaluations. Keep the CPU native index and exact path available where GPU/memory/power constraints require them. The completed native million-record recall failure remains a release gate.
+
 ## Local artifacts
 
 - App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (d0c2f6f) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
