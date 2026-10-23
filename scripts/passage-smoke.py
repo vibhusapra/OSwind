@@ -6,7 +6,7 @@ binary=pathlib.Path(o.binary).resolve()
 background=('Archive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\n'*150)
 trailer=('General archive housekeeping continued. Empty folders were moved and index pages checked.\n'*75)
 cases=[('warehouse','Elian Hart','Frostline operations decision: Elian Hart is responsible for replacing the warehouse signing keys. This depot authentication credential rotation must finish Thursday at noon. The accountable person is Elian Hart and the deadline is Thursday noon.','Who must replace the depot authentication certificates, and what is the due date?'),('accessibility','Val Rivera','Orchard accessibility decision: Val Rivera owns checking keyboard navigation and VoiceOver focus on the new account dialog. The screen reader verification must be completed by Monday. Val Rivera is the assigned reviewer.','Who is assigned to audit the account popup for assistive technology and when?'),('translation','Miriam Chen','Harbor localization decision: Miriam Chen owns verifying the German checkout translations. The linguistic review of the payment flow is due Wednesday afternoon. Miriam Chen is accountable for the German language quality check.','Who is in charge of the German payment translation review, and its deadline?')]
-report={'schema':1,'fixture':'semantic-passages-long-v1','provider':o.provider,'timestamp':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Three authored fictional long records, three paraphrase queries plus one unrelated record. Before/after removes only passage vectors from the same isolated store; base vectors and model stay fixed. Process latencies include CLI startup/model HTTP/coverage/scoring. Not held out, competitor, capture, energy or broad language accuracy.'}
+report={'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'script_sha256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'schema':1,'fixture':'semantic-passages-long-v1','provider':o.provider,'timestamp':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Three authored fictional long records, three paraphrase queries plus one unrelated record. Before/after removes only passage vectors from the same isolated store; base vectors and model stay fixed. Process latencies include CLI startup/model HTTP/coverage/scoring. Not held out, competitor, capture, energy or broad language accuracy.'}
 with tempfile.TemporaryDirectory(prefix='oswind-passages-') as d:
     root=pathlib.Path(d); prefix=[str(binary),'--data',str(root/'store')]
     def cli(*args):
@@ -44,9 +44,10 @@ with tempfile.TemporaryDirectory(prefix='oswind-passages-') as d:
     if o.answer_provider:
         answers=[]
         for i,(label,owner,fact,query) in enumerate(cases):
+            evidence=json.loads(cli('ask','--provider','evidence',query))
             answer=json.loads(cli('ask','--provider',o.answer_provider,*(['--model',o.answer_model] if o.answer_provider=='ollama' else []),query))
             day=['Thursday','Monday','Wednesday'][i]
-            answers.append({'case':label,'text':answer['text'],'provider':answer['provider'],'seconds':answer['duration'],'warnings':answer['warnings'],'correct_owner_and_day':owner.split()[0] in answer['text'] and day in answer['text'],'has_citation':'[1]' in answer['text']})
+            answers.append({'context':evidence['text'],'context_has_owner_and_day':owner in evidence['text'] and day in evidence['text'],'case':label,'text':answer['text'],'provider':answer['provider'],'seconds':answer['duration'],'warnings':answer['warnings'],'correct_owner_and_day':owner.split()[0] in answer['text'] and day in answer['text'],'has_citation':'[1]' in answer['text']})
         report['answers']=answers
     config=root/'store/settings.json'; previous=config.read_text(); settings=json.loads(previous); settings['search']['provider']='ollama'; settings['search']['endpoint']='http://127.0.0.1:1'; config.write_text(json.dumps(settings))
     offline_id=cli('note','Synthetic offline ingestion marker').strip(); config.write_text(previous)

@@ -568,7 +568,8 @@ extension MemoryStore {
             let nativeValid = validParents.count
             // A bounded recent sample keeps repeated identical captures from
             // arbitrarily hiding the newest source behind native tie ordering.
-            let recent = try prepare(select+" WHERE r.model=? AND r.revision<=? AND \(whereSQL) ORDER BY m.timestamp DESC,m.id,r.ordinal LIMIT 100")
+            let recentSelect = select.replacingOccurrences(of:"FROM vector_keys r JOIN memories m ON m.id=r.memory_id",with:"FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id")
+            let recent = try prepare(recentSelect+" WHERE r.model=? AND r.revision<=? AND \(whereSQL) ORDER BY m.timestamp DESC,m.id,r.ordinal LIMIT 100")
             defer { sqlite3_finalize(recent) }; bind(recent,1,modelID); sqlite3_bind_int64(recent,2,sequence)
             for (i,value) in values.enumerated() { bind(recent,Int32(i+3),value) }
             var recentStatus = sqlite3_step(recent)
