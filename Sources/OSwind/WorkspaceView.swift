@@ -6,10 +6,11 @@ private let ink = Color(red:0.08,green:0.12,blue:0.14)
 private let accent = Color(red:0.25,green:0.70,blue:0.59)
 struct WorkspaceView: View {
     @EnvironmentObject var m: AppModel
+    @FocusState private var searchFocused: Bool
     @State private var note = ""
     @State private var showNote = false
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing:0) {
             VStack(alignment:.leading,spacing:0) {
                 HStack(spacing:10) { Image(systemName:"wind").font(.system(size:26,weight:.semibold)).foregroundStyle(accent); Text("OSwind").font(.system(size:24,weight:.semibold,design:.rounded)) }.padding(.horizontal,22).padding(.top,28).padding(.bottom,6)
                 Text("A little more of your memory.").font(.caption).foregroundStyle(.secondary).padding(.horizontal,22).padding(.bottom,30)
@@ -24,8 +25,8 @@ struct WorkspaceView: View {
                     HStack { Label("\(m.settings.privacy.retentionDays) day retention",systemImage:"shield.lefthalf.filled").font(.caption2); Spacer() }
                 }.padding(16).background(.quaternary.opacity(0.4),in:RoundedRectangle(cornerRadius:12)).padding(12)
                 Button { m.showSettings = true } label: { Label("Settings & setup",systemImage:"slider.horizontal.3").frame(maxWidth:.infinity,alignment:.leading).padding(14) }.buttonStyle(.plain).padding(.horizontal,10).padding(.bottom,10)
-            }.navigationSplitViewColumnWidth(230)
-        } detail: {
+            }.frame(width:230).frame(maxHeight:.infinity).background(Color(nsColor:.controlBackgroundColor))
+            Divider()
             VStack(spacing:0) {
                 HStack {
                     HStack(spacing:7) { Circle().fill(m.capture.running ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running ? "CAPTURING" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
@@ -42,6 +43,7 @@ struct WorkspaceView: View {
                 HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
+        .onReceive(NotificationCenter.default.publisher(for:.oswindFocusSearch)) { _ in m.section = "Memories"; searchFocused = true }
         .sheet(isPresented:$m.showSettings) { SettingsView().environmentObject(m) }
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
         .sheet(item:$m.selected) { MemoryDetail(memory:$0).environmentObject(m) }
@@ -60,7 +62,7 @@ struct WorkspaceView: View {
             }
             HStack(spacing:12) {
                 Image(systemName:"magnifyingglass").foregroundStyle(accent)
-                TextField("Search anything you’ve seen or heard…",text:$m.query).textFieldStyle(.plain).font(.system(size:16)).onSubmit { m.refresh() }.accessibilityIdentifier("memory-search")
+                TextField("Search anything you’ve seen or heard…",text:$m.query).textFieldStyle(.plain).font(.system(size:16)).onSubmit { m.refresh() }.accessibilityIdentifier("memory-search").focused($searchFocused)
                 if !m.query.isEmpty { Button { m.query = "" } label: { Image(systemName:"xmark.circle.fill") }.buttonStyle(.plain) }
                 Text("⌘K").font(.caption).foregroundStyle(.tertiary)
             }.padding(17).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.08)))
@@ -69,7 +71,7 @@ struct WorkspaceView: View {
                 if m.range == "Choose day" { DatePicker("Date",selection:$m.date,displayedComponents:.date).labelsHidden().frame(width:120) }
                 Picker("Application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
-                Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented).frame(width:250)
+                Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented).labelsHidden().frame(width:250)
             }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.selected = $0 } }

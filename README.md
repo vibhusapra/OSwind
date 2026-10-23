@@ -4,6 +4,10 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 **v0 is in active development.** Broad competitive parity and a top-three ranking are goals; they are not verified claims. See [delivery ledger](docs/PROGRESS.md), [competitive research](docs/landscape.html), and [benchmarks](benchmarks/README.md).
 
+![Rendered OSwind sample workspace](assets/workspace-sample.png)
+
+*Native sample workspace rendered for layout review; these are synthetic memories.*
+
 ## Build & run
 
 macOS 14+, Apple Silicon recommended, Xcode 16+ for core features. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. No third-party Swift dependencies.
