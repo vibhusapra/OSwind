@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','99 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','100 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar')
 ]
 features=[dict(id=f'F{i+1:03}',axis=a,feature=f,status=s,evidence=e,references=r) for i,(a,f,s,e,r) in enumerate(rows)]
