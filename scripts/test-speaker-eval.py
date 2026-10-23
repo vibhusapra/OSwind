@@ -17,6 +17,11 @@ class MetricContracts(unittest.TestCase):
         ref=self.annotation([(0,1,'A'),(1,2,'B')]);hyp=self.annotation([(0,1.1,'x'),(1.1,2,'y')])
         self.assertAlmostEqual(score(ref,hyp,2)['diarization error rate'],.05)
         self.assertAlmostEqual(score(ref,hyp,2,collar=.25)['diarization error rate'],0)
+    def testFalseAlarmsCanExceedOneHundredPercentDER(self):
+        reference=self.annotation([(0,.1,'A')]);hypothesis=self.annotation([(0,1,'predicted')])
+        detail=score(reference,hypothesis,1)
+        self.assertAlmostEqual(detail['diarization error rate'],9)
+        self.assertAlmostEqual(detail['total'],.1)
     def testWeightedAggregationIsNotMeanOfPercentages(self):
         metric=DiarizationErrorRate(collar=0,skip_overlap=False)
         score(self.annotation([(0,1,'A')]),self.annotation([]),1,metric=metric)

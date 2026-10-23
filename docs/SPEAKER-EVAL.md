@@ -62,3 +62,24 @@ The actual product import also processed the 664-second `ahnss` file using GPU-r
 ## Packaged regression verification
 
 The final signed release at source `8cac2b0` reproduces every fixed-policy error component above for both repetitions of all ten clips. Its actual installed CLI also handles three seconds of silence as two empty timelines, refuses existing output without changing it, creates output at mode 0600, fails for a missing model and never creates the forbidden memory library. [Packaged evidence](../benchmarks/speaker-natural-packaged-v1.json) records source/binary/model/input identities, full fixed results, 334 XCTest cases (330 pass/four opt-in skips), 45 focused sanitizer cases (43 pass/two opt-in skips), independent scorer/preparation contracts and process regressions. The app is installed but the normal app/library was not launched.
+
+## Complete development-set comparison
+
+The [frozen complete plan](../benchmarks/fixtures/voxconverse-dev-full-v1.json) includes every one of the 216 development references in the pinned official annotation ZIP, including the ten previously evaluated clips. The 73,068.2535 seconds of source audio (20.30 hours) pass ZIP CRC, input/reference hashing and reference-boundary preflight. Preparation checks that a full-development plan equals the complete pinned reference set, rather than trusting a claimed count. This remains a development comparison, not unseen/official test quality.
+
+[Complete paired evidence](../benchmarks/speaker-corpus-v1.json) scores both release binaries twice on the same local model tree and source/reference bytes. All recordings complete, with no result exclusions. The same independent scorer uses the whole WAV duration, includes overlapping voices and aggregates over reference speaker-time.
+
+| Repetition | Baseline DER, no collar | Current DER, no collar | Baseline DER, 250 ms collar | Current DER, 250 ms collar |
+|---|---:|---:|---:|---:|
+| First inference in each fresh process | 11.2664% | 10.0788% | 8.9418% | 7.7884% |
+| Resident backend repetition | 11.2714% | 10.0788% | 8.9468% | 7.7884% |
+
+At zero collar, the first repetition improves 107 recordings, leaves 81 unchanged and regresses 28. With a 250 ms collar, the counts are 105/92/19. Both current repetitions produce identical error components; one baseline recording (`ezsgk`) differs between repetitions. The report retains every per-recording component, count and timing, not just the aggregate. Weight files and clustering parameters remain unchanged; speaker counts are never provided to inference. The current integration also includes explicit no-speech handling and diagnostic residency/cancellation changes, so the comparison names both source revisions rather than presenting a newly isolated single-line ablation.
+
+Speaker-count underestimation remains substantial: 109 recordings have fewer detected labels than reference speakers in the first repetition for both policies, 105 match and two overcount. A difficult recording (`tucrg`) has only 4.48 reference speaker-seconds in a 26.208-second WAV. Its false alarms produce 253.05% DER without a collar, unchanged between policies. DER can exceed 100% because its denominator is reference speaker-time; this outlier is retained, with no clipping of percentages. These failures remain part of the product-quality backlog.
+
+The six asset-preparation contracts include complete-reference coverage and selection bounds. Seven independent scorer/process contracts include known metric values, >100% false-alarm error, pinned CLI execution and rejection when a later inference mutates an already-scored source. Final audio/reference/model/binary audits gate a completed report. No Swift product changes or new app installation are required for this benchmark milestone; the current evaluated binary is the signed `cddb6bf` release already installed in the preceding milestone.
+
+Mac process RSS excludes device allocation and other services; model compute is Core ML eligible units with CPU-only FBank, not measured per-operation placement. Timings retain uncontrolled caches and concurrent component-soak/download activity. No isolated energy/speed, whole-competitor, word-error or natural-meeting acceptance claim follows from these numbers.
+
+The official test split is being staged separately, with its 232 reference IDs/hashes frozen before any OSwind test-split inference. Separately, checksum-verified LibriSpeech assets and a fixed five-utterance-per-speaker clean/challenging selection are prepared for future ASR evaluation; no WER score is claimed. [VoxConverse provenance/license](https://github.com/joonson/voxconverse/blob/24bf60be297701cd7e4ef18550c6d390c1b87365/README.md) and [LibriSpeech provenance/license](https://www.openslr.org/12/) remain authoritative; no source audio or human transcript text is committed.
