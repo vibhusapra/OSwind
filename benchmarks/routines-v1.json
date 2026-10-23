@@ -1,0 +1,274 @@
+{
+  "format": "OSwind scheduled routines v1",
+  "source_commit": "cddb6bfd1111540b607b73fddc7accddbd79fb7e",
+  "schema_version": 13,
+  "compiled_source_sha256": {
+    "Sources/OSwind/RoutinesModel.swift": "3e7c4a4400befdc61ae4b38e1721f273057571c2ae66cda0a098d75b158b8a23",
+    "Sources/OSwind/RoutinesView.swift": "5ff779ae12537752a5b1b28f7dd97d40133c975b535b5f5e3c2b53a0ad691e7c",
+    "Sources/OSwindCLI/RoutineCLI.swift": "7c4182cb55a78390d27914741bdaa1448d706d6d8fd1c172e25f07e82d8a58dc",
+    "Sources/OSwindCore/RoutineStore.swift": "af9c52c5745b88673d89108af431999d1afcc2b475a43a8a19fe29aa7c4b07cc",
+    "Sources/OSwindCore/Routines.swift": "d937d651b2aa064b3f769e73523c3c22091af0fd18e9ada2bd0890221dedf64d"
+  },
+  "implemented": [
+    "Native templates/editor/run-now/pause/enable/cancel/history and cited source navigation",
+    "Persistent prompt/provider/model snapshots and app/kind/tag source filters",
+    "Daily/weekday calendar schedules with pinned IANA zone and DST policy",
+    "Fixed one-minute to one-week interval slots; five source windows",
+    "Tolerant 30-second app timer, bounded latest-slot catch-up and stale claim recovery",
+    "Atomic claims, unique schedule slots, optimistic revisions and evidence-revision publication checks",
+    "Remote routine/global/saved-provider opt-ins; existing Keychain only",
+    "Trusted complete backup/restore, archived active jobs interrupted, automatic scheduling restored off",
+    "Source-dependent result erasure, routine/result deletion and delete-all integration",
+    "32 KiB encoded/archived payloads, 100 definitions and safe revision overflow rejection"
+  ],
+  "tests": {
+    "full_xctest": {
+      "total": 362,
+      "passed": 357,
+      "opt_in_skipped": 5,
+      "failed": 0
+    },
+    "focused_thread_sanitizer": {
+      "total": 41,
+      "passed": 41,
+      "failed": 0
+    },
+    "full_and_sanitizer_source_commit": "abd6de1",
+    "subsequent_source_change": "cddb6bf adds only the isolated Python delayed-response fixture; compiled Swift inputs unchanged",
+    "routine_core_contracts": 14,
+    "native_controller_contracts": 4,
+    "restore_contracts": 10
+  },
+  "installed_process_contracts": {
+    "format": "OSwind routine process contracts v1",
+    "state": "passed",
+    "binary_sha256": "7eb688fd7dc22ed6a00777f83988997a82348165dd3c35132a47c5920ed85e17",
+    "scope": "Explicit-clock synthetic routine processes on isolated libraries; not physical app controls, native wake, full-model accuracy, energy or competitor evidence",
+    "checks": [
+      "Scheduler off prevents execution; one due occurrence persists an evidence-backed conversation with exact source IDs",
+      "Preview has explicit source window; conflicting edits preserve the original revision",
+      "Eight competing CLI processes complete exactly one new schedule slot; no duplicate persisted output",
+      "Remote generation is rejected by explicit routine/global permission gates",
+      "Schema-12 writer refuses the schema-13 library without changing its database bytes",
+      "Full backup/restore preserves definitions, revisions, next occurrences, history and citations; automatic execution restores off",
+      "Source erasure removes dependent result text; deleting the routine removes its result conversations and history",
+      "Actual local Ollama routine result names the authored owner/deadline with the correct live citation"
+    ],
+    "older_writer_sha256": "fe19cb02c248c77e6f966dca610691f0e34613d87708fda44b3006fa26ce64b7",
+    "local_model": {
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "wall_seconds": 0.8587886251043528,
+      "status": "completed",
+      "scope": "One authored owner/deadline fixture with uncontrolled caches and concurrent local activity; not a broad accuracy or speed result",
+      "answer": "Mira owns the retrieval benchmark [1]. The prototype is due Friday [1].",
+      "warnings": [
+        "This recap uses a distributed sample of the selected timeline, not every recorded moment."
+      ],
+      "sources": [
+        "326711BB-B02C-4572-927D-5AF548A09228"
+      ]
+    }
+  },
+  "native_controls": {
+    "source_commit": "cddb6bfd1111540b607b73fddc7accddbd79fb7e",
+    "qa_binary_sha256": "b9691b3ded4707e15c32b24fe9fd0f8e6d8d08e932eb9650f07826476a60b98e",
+    "qa_pid": 29651,
+    "normal_library_opened": false,
+    "capture_started": false,
+    "checks": [
+      "Create/edit custom routine through native controls",
+      "First save after opening an existing routine succeeds with its revision",
+      "Direct numeric interval entry persists one minute",
+      "Manual actual local Qwen result contains owner/deadline with citation",
+      "Open saved result then complete original source",
+      "Pause/enable definition",
+      "Restart retains definitions and run history",
+      "Real app timer, actual clock, completes one scheduled local Qwen result",
+      "Global schedule toggle returns off",
+      "Deterministic delayed loopback transport: native Cancel run records cancelled, with no chat/result"
+    ],
+    "actual_scheduled_run": {
+      "chatID": "46F94320-E381-44E1-B454-0AC73F43897F",
+      "filter": {
+        "end": "2026-10-23T22:59:00Z",
+        "favoritesOnly": false,
+        "limit": 24,
+        "query": "",
+        "start": "2026-10-22T22:59:00Z"
+      },
+      "finished": "2026-10-23T22:59:09.578893Z",
+      "id": "46065B71-AB62-43CC-9669-425D575B1D81",
+      "resultAvailable": true,
+      "revision": 4,
+      "routineID": "F06A89FD-16D6-4E80-9449-02ECAE218D53",
+      "scheduledAt": "2026-10-23T22:59:00Z",
+      "started": "2026-10-23T22:59:09.29827Z",
+      "status": "completed",
+      "trigger": "scheduled"
+    },
+    "scheduled_answer": "Mira owns the retrieval benchmark [1]. The prototype is due Friday [1].",
+    "scheduled_warnings": [
+      "This recap uses a distributed sample of the selected timeline, not every recorded moment."
+    ],
+    "current_cancelled_run": {
+      "filter": {
+        "end": "2026-10-23T23:03:37.479272Z",
+        "favoritesOnly": false,
+        "limit": 24,
+        "query": "",
+        "start": "2026-10-22T23:03:37.479272Z"
+      },
+      "finished": "2026-10-23T23:03:44.987439156Z",
+      "id": "CDAE1998-443B-444F-A7B2-489B68805FA7",
+      "message": "Run cancelled; this occurrence will not retry automatically.",
+      "resultAvailable": false,
+      "revision": 6,
+      "routineID": "F06A89FD-16D6-4E80-9449-02ECAE218D53",
+      "scheduledAt": "2026-10-23T23:03:37.479271889Z",
+      "started": "2026-10-23T23:03:37.479271889Z",
+      "status": "cancelled",
+      "trigger": "manual"
+    },
+    "history_statuses": [
+      {
+        "id": "CDAE1998-443B-444F-A7B2-489B68805FA7",
+        "trigger": "manual",
+        "status": "cancelled",
+        "chatID": null,
+        "resultAvailable": false
+      },
+      {
+        "id": "0AA8DAB0-FB4F-46A2-826E-9D63CDCC3A7D",
+        "trigger": "manual",
+        "status": "failed",
+        "chatID": null,
+        "resultAvailable": false
+      },
+      {
+        "id": "46065B71-AB62-43CC-9669-425D575B1D81",
+        "trigger": "scheduled",
+        "status": "completed",
+        "chatID": "46F94320-E381-44E1-B454-0AC73F43897F",
+        "resultAvailable": true
+      },
+      {
+        "id": "D526C92A-04E0-4ADE-B540-C4B27C771161",
+        "trigger": "manual",
+        "status": "completed",
+        "chatID": "F933553C-0DE6-4816-B460-35D2C768A591",
+        "resultAvailable": true
+      }
+    ],
+    "retained_failures": [
+      {
+        "source": "1ad86f6",
+        "issue": "First edit could capture a nil revision; conflict refused the first save",
+        "fix_source": "3224e16",
+        "evidence": "native-edit-revision-failure.ax.txt"
+      },
+      {
+        "source": "3224e16",
+        "issue": "Native cancelled transport was displayed as failed; no answer was saved",
+        "fix_source": "abd6de1",
+        "evidence": "native-cancel-parent-history.json"
+      }
+    ],
+    "evidence_sha256": {
+      "native-cancel.ax.txt": "a1ddb68805fc17fe4ae3c409bfda8912beae020de4994730f6eac6a2c2a1088c",
+      "native-answer.ax.txt": "8ace4aaf7d56bc0ca8be117612485a64a8414ebf8dca8dacdf911283b060167b",
+      "native-auto.ax.txt": "46720070e668be53a8d50531df87c8637a3e3dea1802b53b1a20bb9c56db5893",
+      "native-controls-parent.ax.txt": "785bafc1d495b61166ecc30627b4d420da5100ed66d3369d5937ada597db04bb",
+      "native-edit-revision-failure.ax.txt": "470201c9ae0af11b3e9db4d13296b010adae20d27f1dcdce51e0bfadc42b293a"
+    },
+    "qa_stop_requested": true,
+    "limitations": [
+      "Native actions via CUA on an isolated library, not normal captured activity",
+      "Cancellation acceptance uses a synthetic 20-second loopback response; actual Qwen manual and timer results are separate",
+      "Not system sleep/wake, lock/resume, VoiceOver, exhaustive recap accuracy, power or competitor evidence"
+    ],
+    "qa_process_stopped_verified": true,
+    "loopback_fixture": {
+      "scope": "Synthetic loopback delayed transport fixture; not actual chat inference",
+      "pid": 29359,
+      "port": 47834,
+      "delay_seconds": 20,
+      "state": "stopped",
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/tags"
+        },
+        {
+          "method": "POST",
+          "path": "/api/chat"
+        }
+      ],
+      "chat_started": 1,
+      "reply_sent": 1,
+      "client_disconnected": 0
+    },
+    "no_late_result_after_fixture_reply": true,
+    "hardware_capture_started": false
+  },
+  "native_chronology": [
+    {
+      "source": "7f3357a",
+      "checks": "Own QA onboarding, creation, manual actual Qwen result/source navigation, pause/enable and restart persistence"
+    },
+    {
+      "source": "1ad86f6",
+      "checks": "Direct numeric entry introduced; retained first-edit revision failure"
+    },
+    {
+      "source": "3224e16",
+      "checks": "First-save revision regression fixed and one-minute entry verified; actual app timer completes scheduled Qwen result; cancellation-label failure retained"
+    },
+    {
+      "source": "abd6de1 / cddb6bf",
+      "checks": "Typed transport cancellation regression and deterministic native delayed-transport cancellation pass; no chat or late result admitted"
+    }
+  ],
+  "package": {
+    "source_commit": "cddb6bfd1111540b607b73fddc7accddbd79fb7e",
+    "schema_version": 13,
+    "installed_path": "/Applications/OSwind.app",
+    "prior_version_backup": ".artifacts/installed-before-routines-cddb6bf.app",
+    "strict_signature_verified": true,
+    "installed_launched": false,
+    "normal_library_opened": false,
+    "binaries": {
+      "OSwind": "a6dc5ec739a831c70a5e35891fdd10b597dd4690465888ea21c49f10d99ee41c",
+      "oswindctl": "7eb688fd7dc22ed6a00777f83988997a82348165dd3c35132a47c5920ed85e17"
+    },
+    "raw_build_binaries": {
+      "OSwind": "10a896c22857b3470fc19c6a667cf973c91a79b6b5fc767a9e48eba3d4523261",
+      "oswindctl": "2e15f05c15a6df24e4f27fd95de15cc1c129adf1256a516c9e6d9b410f858ab3"
+    },
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures from disposable copies; normalize only __LINKEDIT vmsize. Compare all remaining bytes.",
+    "zip_sha256": "f71c8c2ab03e5c4b2bf5834bd6b7ce52e59fc452ef739315a3d9e005fe3c5e0d",
+    "zip_binary_equality_verified": true,
+    "installed_process_contracts_passed": 8
+  },
+  "other_process_regressions": [
+    "Complete backup/restore plus SIGINT/SIGKILL recovery",
+    "Generated replay/decode/source transport/evidence/backup/erase",
+    "Long-transcript preview CLI/HTTP/MCP portability"
+  ],
+  "protocol_notes": [
+    "Two initial smoke-harness failures were preserved locally: note command emits a UUID, and recap coverage warnings are expected. Corrected harness retains warning text and fails on other model warnings.",
+    "Older-writer rejection is exercised on an isolated schema-13 database and verifies byte preservation.",
+    "Real timer acceptance uses the actual clock in a native isolated QA app; no explicit --at or CLI tick generates that result.",
+    "Cancelled transport fixture never performs chat inference; it returns a synthetic delayed response. Actual Qwen manual/timer runs are separate."
+  ],
+  "limits": [
+    "Summaries use existing distributed timeline samples and bounded excerpts; not exhaustive recorded-day analysis or broad factual-accuracy validation",
+    "Native UI actions are via CUA; full keyboard/VoiceOver, actual system sleep/wake and lock/resume remain unverified",
+    "No hardware capture, normal library read or permission grant was required",
+    "No automatic wake/daemon, arbitrary cron syntax, multi-step tool actions or external notifications",
+    "No measured power, whole-system memory or whole-competitor ranking; broad v0 parity is not achieved"
+  ]
+}

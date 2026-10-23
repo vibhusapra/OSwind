@@ -260,7 +260,7 @@
     "axis": "AI",
     "feature": "Scheduled routines",
     "status": "partial",
-    "evidence": "Durable calendar/weekday and interval schedules, bounded wake catch-up, citation-linked result history, remote opt-ins and quiet backup restore implemented. Controller timer/core contracts and isolated CLI/local Qwen run pass; final package and physical native controls/wake acceptance pending",
+    "evidence": "Native calendar/weekday/interval schedules, bounded catch-up, cited history, remote opt-ins and quiet restore. Actual native creation/edit/run/source/cancel and real one-minute Qwen timer result verified; installed CLI contention/backup/erase pass. Full wake/keyboard, exhaustive recap quality and cron/tool actions remain open",
     "references": "Screenpipe, Littlebird"
   },
   {
