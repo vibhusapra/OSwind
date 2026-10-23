@@ -20,7 +20,7 @@
     "axis": "Capture",
     "feature": "Continuous visual replay / HEVC",
     "status": "partial",
-    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Twelve generated frames encode/decode; real synthetic-window capture and native seek/play verified. All-display replay, natural workload/power and broad lock/resume acceptance remain open",
+    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Strict-selector device retest: 12 captured frames / 4 clips, all decoded with exact frame identity; native search match, seek and play observed. Excerpt/letterbox overlay fixes tested; corrected native visual retest pending after lock. All-display replay, natural workload/power and broad lock/resume remain open",
     "references": "Rewind Desktop, Retrace (haseab), rem"
   },
   {

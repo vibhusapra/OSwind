@@ -53,6 +53,16 @@ import OSwindCore
     }
     deinit {if let endObserver {NotificationCenter.default.removeObserver(endObserver)};ownedPlayer?.pause();if let observer {ownedPlayer?.removeTimeObserver(observer)}}
 }
+/// Vision regions use bottom-left normalized coordinates; AVPlayerView letterboxes
+/// within the SwiftUI surface. Map boxes into the actual video rect, not the view.
+enum ReplayVideoGeometry {
+    static func regionRect(_ region:TextRegion,video:CGSize,container:CGSize)->CGRect {
+        let fitted=AVMakeRect(aspectRatio:video,insideRect:CGRect(origin:.zero,size:container))
+        return CGRect(x:fitted.minX+fitted.width*region.x,
+                      y:fitted.minY+fitted.height*(1-region.y-region.height),
+                      width:fitted.width*region.width,height:fitted.height*region.height)
+    }
+}
 private struct ReplayPlayerSurface:NSViewRepresentable {
     let player:AVPlayer?
     func makeNSView(context:Context)->AVPlayerView {let view=AVPlayerView();view.controlsStyle = .none;view.videoGravity = .resizeAspect;view.player=player;return view}
@@ -71,7 +81,10 @@ struct VideoReplayView:View {
                 ReplayPlayerSurface(player:playback.player)
                     .aspectRatio(CGFloat(recording.width)/CGFloat(recording.height),contentMode:.fit)
                     .frame(maxHeight:350)
-                    .overlay {if boxes {GeometryReader {geometry in ForEach(Array(recording.frames[activeIndex].regions.enumerated()),id:\.offset) {_,region in Rectangle().stroke(OSwindTheme.accent,lineWidth:1).frame(width:geometry.size.width*region.width,height:geometry.size.height*region.height).position(x:geometry.size.width*(region.x+region.width/2),y:geometry.size.height*(1-region.y-region.height/2))}}}}
+                    .overlay {if boxes {GeometryReader {geometry in ForEach(Array(recording.frames[activeIndex].regions.enumerated()),id:\.offset) {_,region in
+                        let rect=ReplayVideoGeometry.regionRect(region,video:CGSize(width:recording.width,height:recording.height),container:geometry.size)
+                        Rectangle().stroke(OSwindTheme.accent,lineWidth:1).frame(width:rect.width,height:rect.height).position(x:rect.midX,y:rect.midY)
+                    }}.allowsHitTesting(false)}}
                     .clipShape(RoundedRectangle(cornerRadius:9))
                 HStack {
                     Button {playback.toggle()} label:{Image(systemName:playback.playing ? "pause.fill":"play.fill").frame(width:18)}.accessibilityLabel(playback.playing ? "Pause replay":"Play replay").disabled(playback.player==nil || playback.error != nil)
