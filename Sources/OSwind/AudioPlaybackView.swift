@@ -48,7 +48,8 @@ struct AudioPlaybackView: View {
             if let error=playback.error { HStack { Text(error).font(.caption).foregroundStyle(.orange); if let url { Button("Retry") { playback.load(url) } } } }
             if let transcript=memory.transcript {
                 Text(transcript.model+" · "+time(transcript.duration)).font(.caption2).foregroundStyle(.secondary)
-                LazyVStack(alignment:.leading,spacing:0) { ForEach(Array(transcript.segments.enumerated()),id:\.offset) { _, segment in
+                LazyVStack(alignment:.leading,spacing:0) { ForEach(transcript.segments.indices,id:\.self) { index in
+                    let segment=transcript.segments[index]
                     HStack(alignment:.top,spacing:12) {
                         Button(time(segment.start)) { playback.seek(segment.start) }.font(.system(.caption,design:.monospaced)).buttonStyle(.borderless).disabled(url == nil)
                         VStack(alignment:.leading,spacing:3) { if let speaker=segment.speaker { Text(speaker).font(.caption.weight(.semibold)).foregroundStyle(OSwindTheme.accent) }; Text(segment.text).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading) }

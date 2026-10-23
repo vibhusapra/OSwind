@@ -28,6 +28,9 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
     speech('password=synthetic123')
     redacted=json.loads(cli('import-audio',audio,'--retain-audio'))
     assert redacted.get('audioPath') is None and redacted['text']=='[REDACTED]' and redacted['transcript']['segments'][0]['text']=='[REDACTED]'
+    speech('My password is synthetic123')
+    spoken=json.loads(cli('import-audio',audio,'--retain-audio'))
+    assert spoken.get('audioPath') is None and 'synthetic123' not in json.dumps(spoken)
     package=root/'audio.oswindbackup';restored=root/'restored'
     cli('backup','create',package);cli('backup','restore',package,'--to',restored)
     reopened=json.loads(cli('search','--mode','keyword','checklist',data=restored))[0]['memory']

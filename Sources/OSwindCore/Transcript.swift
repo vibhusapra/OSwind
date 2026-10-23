@@ -24,11 +24,27 @@ public struct SpeechTranscript: Codable, Equatable, Sendable {
     }
     /// Pattern-based redaction cannot alter the underlying voice recording.
     /// Any detected secret therefore suppresses retention of the entire clip.
+    private static let spokenCredential = try? NSRegularExpression(pattern:#"\b(?:password|passcode|pass[ -]?phrase|pin|api[ -]?key|access[ -]?token|secret[ -]?key|credit[ -]?card\s+number|social\s+security\s+number)\s+(?:is|was|equals|colon)\b"#,options:.caseInsensitive)
+    private static func hasSpokenCredential(_ text: String) -> Bool { spokenCredential?.firstMatch(in:text,range:NSRange(text.startIndex...,in:text)) != nil }
     public func sanitized(policy: PrivacyPolicy) throws -> (transcript: Self, suppressAudio: Bool) {
-        _ = try validated(); var result=self; result.model=policy.sanitize(model).text; let main=policy.sanitize(text); result.text=main.text; var changed=main.redacted
-        result.segments=segments.map { segment in var clean=segment; let value=policy.sanitize(segment.text); clean.text=value.text; changed = changed || value.redacted; if let speaker=segment.speaker { let value=policy.sanitize(speaker); clean.speaker=value.text; changed = changed || value.redacted }; return clean }
+        _ = try validated(); guard policy.redactSecrets else { return (self,false) }
+        var result=self; result.model=policy.sanitize(model).text
+        let main=policy.sanitize(text), joined=segments.map(\.text).joined(separator:" ")
+        let spoken=Self.hasSpokenCredential(text) || Self.hasSpokenCredential(joined)
+        result.text=spoken ? "[REDACTED SENSITIVE SPEECH]":main.text
+        var changed=main.redacted || policy.sanitize(joined).redacted || spoken
+        result.segments=segments.map { segment in
+            var clean=segment; let value=policy.sanitize(segment.text); clean.text=value.text; changed = changed || value.redacted
+            if let speaker=segment.speaker { let value=policy.sanitize(speaker); clean.speaker=value.text; changed = changed || value.redacted }
+            return clean
+        }
+        // Segment boundaries can split a key/value. Without a trustworthy text
+        // alignment, retaining fragments could expose a value already redacted
+        // in the full text. Conservatively hide all timed text for this clip.
+        if changed { for index in result.segments.indices { result.segments[index].text="[REDACTED]" } }
         return (result,changed)
     }
+
 }
 public enum AudioAdmission {
     /// The caller owns the input clip. It is never moved/deleted here. A failed

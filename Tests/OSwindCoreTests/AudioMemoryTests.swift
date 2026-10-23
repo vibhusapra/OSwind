@@ -111,4 +111,22 @@ final class AudioMemoryTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf:existing),Data("keep".utf8)); XCTAssertTrue(FileManager.default.fileExists(atPath:file.path)); XCTAssertEqual(try store.matchingCount(),0)
     }
 
+    func testSpokenCredentialsAndValuesSplitAcrossSegmentsCannotLeak() throws {
+        var settings=AppSettings(); settings.retainAudio=true
+        for parts in [["password:","synthetic123"],["My password","is synthetic123"],["The access token","is synthetic123"]] {
+            let text=parts.joined(separator:" ")
+            let value=SpeechTranscript(text:text,duration:1,segments:[TranscriptSegment(start:0,end:0.5,text:parts[0]),TranscriptSegment(start:0.5,end:1,text:parts[1])],model:"fixture")
+            let memory=try AudioAdmission.save(value,file:file,store:store,settings:settings,timestamp:Date(),source:"Microphone")
+            XCTAssertNil(memory.audioPath,text)
+            let encoded=String(decoding:try JSONEncoder().encode(memory),as:UTF8.self)
+            XCTAssertFalse(encoded.contains("synthetic123"),text)
+        }
+        settings.privacy.redactSecrets=false
+        let unsafe=try AudioAdmission.save(transcript("My password is synthetic123"),file:file,store:store,settings:settings,timestamp:Date(),source:"Microphone")
+        let exported=root.appendingPathComponent("spoken.json"); try store.exportJSON(to:exported)
+        let target=try MemoryStore(root:root.appendingPathComponent("spoken-import")); _ = try target.importJSON(from:exported)
+        let restored=try XCTUnwrap(target.get(unsafe.id)); XCTAssertEqual(restored.text,"[REDACTED SENSITIVE SPEECH]")
+        XCTAssertEqual(restored.transcript?.text,restored.text); XCTAssertFalse(String(decoding:try JSONEncoder().encode(restored),as:UTF8.self).contains("synthetic123"))
+    }
+
 }
