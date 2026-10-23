@@ -171,10 +171,10 @@ public final class MemoryStore: @unchecked Sendable {
         let query = Self.ftsQuery(filter.query)
         var keyword = [Memory](); var scored = [String: SearchHit]()
         if query.isEmpty || mode != .semantic {
-            let sql = query.isEmpty ? "SELECT m.payload FROM memories m WHERE \(whereSQL) ORDER BY m.timestamp DESC LIMIT ?" : "SELECT m.payload FROM memory_fts f JOIN memories m ON m.id=f.id WHERE memory_fts MATCH ? AND \(whereSQL) ORDER BY bm25(memory_fts,0,3,1,1) LIMIT ?"
+            let sql = query.isEmpty ? "SELECT m.payload FROM memories m WHERE \(whereSQL) ORDER BY m.timestamp DESC LIMIT ?" : "SELECT m.payload FROM memory_fts f JOIN memories m ON m.id=f.id WHERE memory_fts MATCH ? AND f.rank MATCH 'bm25(0,3,1,1)' AND \(whereSQL) ORDER BY f.rank LIMIT ?"
             let stmt = try prepare(sql); defer { sqlite3_finalize(stmt) }; var index: Int32 = 1
             if !query.isEmpty { bind(stmt, index, query); index += 1 }
-            for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty ? limit : max(limit, 100)))
+            for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty || mode == .keyword ? limit : max(limit, 100)))
             while sqlite3_step(stmt) == SQLITE_ROW { keyword.append(try decode(stmt)) }
             for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : (similarityFusion && mode == .hybrid ? Self.keywordBonus(query:filter.query,memory:memory,rank:rank) : 1 / Double(60 + rank)), match: query.isEmpty ? "recent" : "keyword") }
         }
