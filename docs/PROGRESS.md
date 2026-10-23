@@ -290,3 +290,12 @@ Final packaged checks pass for complete/preview CLI/HTTP/MCP contracts, `get ID`
 
 
 Native follow-through on the isolated QA app subsequently passed 10,000-span source opening/end scrolling, Command-K search focus, exact speaker-scoped search, direct pointer word seeking, muted play/pause, and a real naming-dialog save followed by search for the new label. No normal capture/library was opened. AX-only link activation did not seek, and a bound-app synthetic global shortcut from Ask produced no visible change; global/background delivery and broader keyboard/accessibility acceptance remain unresolved. Native model pickers/download controls and microphone/system capture remain separate gates. The QA process was later observed sleeping/locked and stopped without changing permissions or unlocking. [`search-preview-native-ui-v1.json`](../benchmarks/search-preview-native-ui-v1.json) records the scope and screenshot/state hashes.
+
+
+## Persistent reliability-soak harness
+
+Added a run-owned pinned CLI, persistent MCP reader and concurrent CLI writer workload using only synthetic notes/timed transcripts. It verifies cross-process visibility, bounded-window erasure, exact source text/timings, explicit previews and optional local-model owner/citation contracts. Per-cycle evidence reports sampled MCP RSS/lifetime CPU, archive size and model outputs. Gaps prevent uninterrupted-pass claims; timeout does not imply exit/restart. Pinning/initialization failures and SIGTERM are recorded, and owned child processes are closed. Existing run roots are preserved, no normal library/devices/HTTP port are used, and sleep/power settings are unchanged.
+
+Eight harness contracts pass, including a confirmed-live process at response timeout and a simulated-clock gap that cannot be reported as continuous success. A short real local-model rehearsal also passes. See [reliability scope and operation](RELIABILITY.md). Full 24-hour capture/power/fault evidence remains open; these component checks do not establish product-level reliability.
+
+The 24-hour synthetic component run is now started from a pinned backend, with controller/MCP processes verified live and its first write/read/local-answer cycle completed. The [early snapshot](../benchmarks/component-soak-running-v1.json) is explicitly not a completion result or live monitor. No HTTP listener or sleep prevention is used. The full capture/power/fault gate remains open. Search-preview PR18 CI is green.
