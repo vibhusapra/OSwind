@@ -40,6 +40,7 @@ final class MetalRetrievalTests: XCTestCase {
         let index = try metal(budget:4096)
         XCTAssertThrowsError(try index.reserve(Int.max)); XCTAssertEqual(index.count,0)
         XCTAssertThrowsError(try index.add(0,vector:Array(repeating:1,count:32)))
+        XCTAssertThrowsError(try index.add(UInt64.max,vector:Array(repeating:1,count:32)))
         XCTAssertThrowsError(try index.add(1,vector:Array(repeating:0,count:32)))
         XCTAssertThrowsError(try index.add(1,vector:Array(repeating:.infinity,count:32)))
         XCTAssertThrowsError(try index.search([1],count:10)); XCTAssertEqual(index.count,0)
@@ -47,6 +48,25 @@ final class MetalRetrievalTests: XCTestCase {
         // File sizes are checked before large allocations and reads.
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:url) }
         try Data([255,255,255,255]).write(to:url); XCTAssertThrowsError(try index.load(url))
+    }
+    func testCancelledSearchDoesNotChangeIndex() async throws {
+        let index = try metal(), vector = VectorScalingEvaluation.vector(row:17,dimensions:32)
+        try index.add(1,vector:vector)
+        // Cancel before the backend guard without depending on scheduler order.
+        let gate = DispatchSemaphore(value:0)
+        let guarded = Task.detached { gate.wait(); return try index.search(vector,count:10) }
+        guarded.cancel(); gate.signal()
+        do { _ = try await guarded.value; XCTFail("Expected backend cancellation") } catch is CancellationError {} catch { XCTFail("Unexpected error: \(error)") }
+        XCTAssertEqual(index.count,1)
+    }
+    func testCacheRejectsRepeatedKeysBeforeUsingVectors() throws {
+        let index = try metal(); try index.add(1,vector:Array(repeating:1,count:32)); try index.add(2,vector:Array(repeating:2,count:32))
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:url) }
+        try index.save(url)
+        var data = try Data(contentsOf:url)
+        let length = data.withUnsafeBytes { Int(UInt32(littleEndian:$0.loadUnaligned(as:UInt32.self))) }, first = 4+length
+        data.replaceSubrange((first+8)..<(first+16),with:data[first..<(first+8)])
+        try data.write(to:url); XCTAssertThrowsError(try metal().load(url))
     }
     func testProductCacheUsesMetalAndLiveMetadataFromOtherConnection() async throws {
         _ = try metal()

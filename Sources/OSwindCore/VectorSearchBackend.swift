@@ -24,7 +24,7 @@ extension NativeANN: VectorSearchBackend {
 }
 enum VectorBackendFactory {
     static func format(dimensions: Int, count: Int) -> String {
-        count >= 20_000 && MetalFlatIndex.canFit(dimensions:dimensions,count:count+512) ? MetalFlatIndex.format : NativeANN.format
+        count >= 20_000 && count <= Int.max-512 && MetalFlatIndex.canFit(dimensions:dimensions,count:count+512) ? MetalFlatIndex.format : NativeANN.format
     }
     static func make(dimensions: Int, format: String) throws -> any VectorSearchBackend {
         if format == MetalFlatIndex.format { return try MetalFlatIndex(dimensions:dimensions) }

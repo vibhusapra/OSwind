@@ -51,7 +51,7 @@ final class MetalFlatIndex: VectorSearchBackend {
         if let buffer = matrixBuffer { memset(buffer.contents().advanced(by:slot*rowBytes),0,rowBytes) }
     }
     func add(_ key: UInt64, vector: [Float]) throws {
-        guard key > 0, vector.count == dimensions, CosineScorer(vector) != nil else { throw OSwindError.invalid("Invalid Metal index vector") }
+        guard key > 0, key <= UInt64(Int64.max), vector.count == dimensions, CosineScorer(vector) != nil else { throw OSwindError.invalid("Invalid Metal index vector") }
         let slot: Int
         if let existing = slots[key] { slot = existing }
         else if let available = free.popLast() { slot = available; keys[slot] = key; slots[key] = slot }
@@ -118,6 +118,7 @@ final class MetalFlatIndex: VectorSearchBackend {
         guard let data = try file.read(upToCount:count), data.count == count else { throw OSwindError.invalid("Truncated Metal index") }; return data
     }
     func load(_ url: URL) throws {
+        try Task.checkCancellation()
         let file = try FileHandle(forReadingFrom:url); defer { try? file.close() }
         let prefix = try readExactly(4,from:file), length = prefix.withUnsafeBytes { UInt32(littleEndian:$0.loadUnaligned(as:UInt32.self)) }
         guard length > 0, length <= 4096 else { throw OSwindError.invalid("Invalid Metal index header") }

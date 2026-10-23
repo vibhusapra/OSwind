@@ -41,8 +41,8 @@ public final class RetrievalEngine: @unchecked Sendable {
             else { let batch = try await client.embed([filter.query],configuration:configuration,query:true); vector = batch.vectors.first; identity = batch.modelID }
             try Task.checkCancellation()
             guard let vector else { throw OSwindError.unavailable("The selected embedding model is unavailable") }
-            let indexed = try store.vectorCount(modelID:identity,filter:filter)
-            let total = try store.matchingCount(filter)
+            let coverage = try store.indexCoverage(modelID:identity,filter:filter)
+            let indexed = coverage.indexed, total = coverage.total
             var warnings = indexed == 0 && total > 0 ? ["No vectors for the selected model in this range. Build its search index in Models settings."] : indexed < total ? ["Semantic index covers \(indexed) of \(total) memories in this range. Keyword matches remain available in Hybrid mode."] : []
             var execution = SearchExecution(strategy:"exact",warnings:[])
             let hits = try store.search(filter,mode:mode,vector:vector,modelID:identity,minimumSimilarity:configuration.provider == .apple ? 0.15 : 0.25,similarityFusion:configuration.provider == .ollama,indexPolicy:configuration.indexPolicy,indexedCount:indexed,allowIndexOnLowPower:configuration.indexOnLowPower) { execution = $0 }
