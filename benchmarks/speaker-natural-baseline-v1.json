@@ -1,0 +1,418 @@
+{
+  "format": "OSwind natural speaker development evaluation v1",
+  "state": "completed",
+  "dataset": {
+    "dataset": "VoxConverse dev",
+    "annotation_commit": "24bf60be297701cd7e4ef18550c6d390c1b87365",
+    "selection": "First five lexicographic dev RTTM identifiers, fixed before inference; no result-driven exclusions.",
+    "license": "CC BY 4.0; research use; original video copyright retained",
+    "attribution": "Chung, Huh, Nagrani, Afouras and Zisserman. Spot the conversation: speaker diarisation in the wild. Interspeech 2020.",
+    "license_source": "https://github.com/joonson/voxconverse/blob/24bf60be297701cd7e4ef18550c6d390c1b87365/README.md"
+  },
+  "binary_sha256": "dcd5e34e362e2bb977e6962d8753acc18435ecce84b4b5ceaf9201543bdb59f7",
+  "model_tree_sha256": "b74540837ba0e49f065e82ac17d441c35d61e1c4a7e3ab03d10fe4769ac1834b",
+  "repetitions": 2,
+  "scorer": {
+    "pyannote.metrics": "4.2.0",
+    "pyannote.core": "6.1.0",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "settings": {
+    "collars_seconds": [
+      0,
+      0.25
+    ],
+    "skip_overlap": false,
+    "uem": "Entire source WAV duration, including unannotated silence",
+    "oracle_speaker_count": false
+  },
+  "clips": [
+    {
+      "id": "abjxc",
+      "source_audio_seconds": 68.376,
+      "audio_sha256": "cadade53326e91918b482a41ab81817fc57bbaf35f809e5d7cc20e0c19d9ab2f",
+      "reference_sha256": "13cc19d2180889b786cf0fb86b522b95902d20fae27b7384ea943c7877286f9c",
+      "reference_speakers": 1,
+      "process_wall_seconds": 1.3101187499705702,
+      "process_peak_rss_bytes": 219168768,
+      "preparation_seconds": 0.05643105506896973,
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 0.6761749982833862,
+          "real_time_factor": 0.009889069238963762,
+          "resident_backend_reused": false,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 1,
+          "scores": {
+            "0": {
+              "missed detection": 0.0,
+              "total": 62.6,
+              "correct": 62.6,
+              "confusion": 0.0,
+              "false alarm": 0.38811751604080114,
+              "diarization error rate": 0.006199960320140593
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "total": 62.1,
+              "correct": 62.1,
+              "confusion": 0.0,
+              "false alarm": 0.09069000244140568,
+              "diarization error rate": 0.0014603865127440529
+            }
+          }
+        },
+        {
+          "index": 1,
+          "seconds": 0.21520793437957764,
+          "real_time_factor": 0.0031474191877205104,
+          "resident_backend_reused": true,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 1,
+          "scores": {
+            "0": {
+              "missed detection": 0.0,
+              "total": 62.6,
+              "correct": 62.6,
+              "confusion": 0.0,
+              "false alarm": 0.38811751604080114,
+              "diarization error rate": 0.006199960320140593
+            },
+            "0.25": {
+              "missed detection": 0.0,
+              "total": 62.1,
+              "correct": 62.1,
+              "confusion": 0.0,
+              "false alarm": 0.09069000244140568,
+              "diarization error rate": 0.0014603865127440529
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "afjiv",
+      "source_audio_seconds": 151.248,
+      "audio_sha256": "208eb00b0dfca6bd149837ca6bc736983f45b4dfe8606973460bd2cadf5f902f",
+      "reference_sha256": "58a764b4b5864b14dd39d91e420370d1f45cabc4bcf354a8e7516538b996d51f",
+      "reference_speakers": 5,
+      "process_wall_seconds": 0.9810728328302503,
+      "process_peak_rss_bytes": 235388928,
+      "preparation_seconds": 0.059097886085510254,
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 0.49141108989715576,
+          "real_time_factor": 0.003249041904006372,
+          "resident_backend_reused": false,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 1.367468795776368,
+              "total": 123.63999999999994,
+              "correct": 112.54444801330563,
+              "confusion": 9.728083190917957,
+              "false alarm": 11.29283315658575,
+              "diarization error rate": 0.181077201094145
+            },
+            "0.25": {
+              "missed detection": 1.3582324981689453,
+              "total": 116.63999999999994,
+              "correct": 106.80368431091304,
+              "confusion": 8.478083190917957,
+              "false alarm": 5.870126647949277,
+              "diarization error rate": 0.13465742744372589
+            }
+          }
+        },
+        {
+          "index": 1,
+          "seconds": 0.39719104766845703,
+          "real_time_factor": 0.002626091238683864,
+          "resident_backend_reused": true,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 1.367468795776368,
+              "total": 123.63999999999994,
+              "correct": 112.54444801330563,
+              "confusion": 9.728083190917957,
+              "false alarm": 11.29283315658575,
+              "diarization error rate": 0.181077201094145
+            },
+            "0.25": {
+              "missed detection": 1.3582324981689453,
+              "total": 116.63999999999994,
+              "correct": 106.80368431091304,
+              "confusion": 8.478083190917957,
+              "false alarm": 5.870126647949277,
+              "diarization error rate": 0.13465742744372589
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ahnss",
+      "source_audio_seconds": 664.2939375,
+      "audio_sha256": "54467015dcfebfce8af475f2ea6e38b6cf06fe00378916471df2ec1b222167b4",
+      "reference_sha256": "9a09a7c39311b9f0e4209f6a58930e35327c8fa9f36b671c1a1a19972d514e71",
+      "reference_speakers": 4,
+      "process_wall_seconds": 3.791622166056186,
+      "process_peak_rss_bytes": 300908544,
+      "preparation_seconds": 0.29373204708099365,
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 1.7751569747924805,
+          "real_time_factor": 0.002672246237069536,
+          "resident_backend_reused": false,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 69.18783866882325,
+              "total": 723.08,
+              "correct": 640.4167031860352,
+              "confusion": 13.47545814514125,
+              "false alarm": 1.505415771484416,
+              "diarization error rate": 0.11640304334990445
+            },
+            "0.25": {
+              "missed detection": 48.664027938842715,
+              "total": 668.8299999999996,
+              "correct": 611.3236462402342,
+              "confusion": 8.842325820922657,
+              "false alarm": 0.6700000000000017,
+              "diarization error rate": 0.08698227316323343
+            }
+          }
+        },
+        {
+          "index": 1,
+          "seconds": 1.646812081336975,
+          "real_time_factor": 0.002479041262267993,
+          "resident_backend_reused": true,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 69.18783866882325,
+              "total": 723.08,
+              "correct": 640.4167031860352,
+              "confusion": 13.47545814514125,
+              "false alarm": 1.505415771484416,
+              "diarization error rate": 0.11640304334990445
+            },
+            "0.25": {
+              "missed detection": 48.664027938842715,
+              "total": 668.8299999999996,
+              "correct": 611.3236462402342,
+              "confusion": 8.842325820922657,
+              "false alarm": 0.6700000000000017,
+              "diarization error rate": 0.08698227316323343
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "aisvi",
+      "source_audio_seconds": 469.080875,
+      "audio_sha256": "673754dc795c359aa097dddf4fdacee8bce3d9e35872241c927e93482628847b",
+      "reference_sha256": "b51dbe53aa0284d95f077d0e7eb904a1d7ed994706977b41b10fe3e0df51538a",
+      "reference_speakers": 8,
+      "process_wall_seconds": 2.7237467910163105,
+      "process_peak_rss_bytes": 274432000,
+      "preparation_seconds": 0.14634203910827637,
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 1.3332760334014893,
+          "real_time_factor": 0.0028423159085338733,
+          "resident_backend_reused": false,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 4.734313659667958,
+              "total": 441.88,
+              "correct": 405.28245376586915,
+              "confusion": 31.863232574462863,
+              "false alarm": 8.96631793975823,
+              "diarization error rate": 0.10311366021066593
+            },
+            "0.25": {
+              "missed detection": 3.0118072509765597,
+              "total": 430.98,
+              "correct": 398.5843817138672,
+              "confusion": 29.383811035156246,
+              "false alarm": 3.550397834777809,
+              "diarization error rate": 0.08340529983041119
+            }
+          }
+        },
+        {
+          "index": 1,
+          "seconds": 1.219310998916626,
+          "real_time_factor": 0.0025993619947021415,
+          "resident_backend_reused": true,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 4,
+          "scores": {
+            "0": {
+              "missed detection": 4.734313659667958,
+              "total": 441.88,
+              "correct": 405.28245376586915,
+              "confusion": 31.863232574462863,
+              "false alarm": 8.96631793975823,
+              "diarization error rate": 0.10311366021066593
+            },
+            "0.25": {
+              "missed detection": 3.0118072509765597,
+              "total": 430.98,
+              "correct": 398.5843817138672,
+              "confusion": 29.383811035156246,
+              "false alarm": 3.550397834777809,
+              "diarization error rate": 0.08340529983041119
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "akthc",
+      "source_audio_seconds": 114.520875,
+      "audio_sha256": "05846bc89b438e90a0fe3af02e1f770323ace859de4f96439611988385e948bf",
+      "reference_sha256": "89595c2816c056bfd5e0ca7e64d5d12323b417d16a915b015e1a471ac8695203",
+      "reference_speakers": 2,
+      "process_wall_seconds": 0.9795699168462306,
+      "process_peak_rss_bytes": 234291200,
+      "preparation_seconds": 0.0994880199432373,
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 0.4114009141921997,
+          "real_time_factor": 0.0035923661445321623,
+          "resident_backend_reused": false,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 1,
+          "scores": {
+            "0": {
+              "missed detection": 2.6027825927734156,
+              "total": 105.16,
+              "correct": 85.23721740722658,
+              "confusion": 17.32,
+              "false alarm": 2.7738468170165858,
+              "diarization error rate": 0.2158294922954546
+            },
+            "0.25": {
+              "missed detection": 1.616729736328118,
+              "total": 101.91,
+              "correct": 83.22327026367188,
+              "confusion": 17.07,
+              "false alarm": 1.387521743774413,
+              "diarization error rate": 0.19698019311257514
+            }
+          }
+        },
+        {
+          "index": 1,
+          "seconds": 0.4082150459289551,
+          "real_time_factor": 0.0035645470393843486,
+          "resident_backend_reused": true,
+          "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+          "detected_speakers": 1,
+          "scores": {
+            "0": {
+              "missed detection": 2.6027825927734156,
+              "total": 105.16,
+              "correct": 85.23721740722658,
+              "confusion": 17.32,
+              "false alarm": 2.7738468170165858,
+              "diarization error rate": 0.2158294922954546
+            },
+            "0.25": {
+              "missed detection": 1.616729736328118,
+              "total": 101.91,
+              "correct": 83.22327026367188,
+              "confusion": 17.07,
+              "false alarm": 1.387521743774413,
+              "diarization error rate": 0.19698019311257514
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Predetermined development clips, not held-out/corpus-wide or competitor app quality. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML compilation caches uncontrolled. macOS process RSS excludes device allocation, background daemons and system power.",
+  "aggregate": [
+    {
+      "run": 0,
+      "collar_seconds": 0,
+      "micro_der": 0.12030384577195807,
+      "components": {
+        "missed detection": 77.89240371704099,
+        "total": 1456.36,
+        "correct": 1306.0808223724366,
+        "confusion": 72.38677391052207,
+        "false alarm": 24.926531200885783
+      },
+      "combined_real_time_factor": 0.0031941104780352134
+    },
+    {
+      "run": 0,
+      "collar_seconds": 0.25,
+      "micro_der": 0.09416698325214504,
+      "components": {
+        "missed detection": 54.65079742431634,
+        "total": 1380.4599999999996,
+        "correct": 1262.0349825286862,
+        "confusion": 63.77422004699686,
+        "false alarm": 11.568736228942905
+      },
+      "combined_real_time_factor": 0.0031941104780352134
+    },
+    {
+      "run": 1,
+      "collar_seconds": 0,
+      "micro_der": 0.12030384577195807,
+      "components": {
+        "missed detection": 77.89240371704099,
+        "total": 1456.36,
+        "correct": 1306.0808223724366,
+        "confusion": 72.38677391052207,
+        "false alarm": 24.926531200885783
+      },
+      "combined_real_time_factor": 0.002648507642750511
+    },
+    {
+      "run": 1,
+      "collar_seconds": 0.25,
+      "micro_der": 0.09416698325214504,
+      "components": {
+        "missed detection": 54.65079742431634,
+        "total": 1380.4599999999996,
+        "correct": 1262.0349825286862,
+        "confusion": 63.77422004699686,
+        "false alarm": 11.568736228942905
+      },
+      "combined_real_time_factor": 0.002648507642750511
+    }
+  ],
+  "source_commit": "5b2a39d",
+  "build": "standalone release CLI",
+  "policy": "FluidAudio 0.17.7 default exclusive output; preserved pre-fix baseline",
+  "model_verification": {
+    "bytes": 21816863,
+    "files": 28,
+    "kind": "speakers",
+    "reused": true,
+    "revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232"
+  },
+  "conditions": "Five predetermined development clips. Concurrent synthetic MCP/local-chat soak and public data downloads; OS/Core ML caches uncontrolled. No isolated energy, daily-use or competitor ranking."
+}

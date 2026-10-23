@@ -24,11 +24,22 @@ public struct DiarizationConfiguration: Codable, Equatable, Sendable {
     }
 }
 protocol SpeakerDiarizationBackend:Sendable { func turns(file:URL) async throws -> [SpeakerTurn] }
+enum SpeakerNativePolicy {
+    static let version="overlap-preserving-v1"
+    static func configuration() -> OfflineDiarizerConfig {
+        var config=OfflineDiarizerConfig.default
+        // The product's mixed-span attribution must see both active voices.
+        // Exclusive SDK output trims overlap before that safeguard can run.
+        config.postProcessing.exclusiveSegments=false
+        config.embeddingExportPath=nil;config.exposeChunkEmbeddings=false
+        return config
+    }
+}
 private actor CoreMLSpeakerBackend:SpeakerDiarizationBackend {
     let manager:OfflineDiarizerManager
     init(models:OfflineDiarizerModels) {
         // No embedding/profile export, even when the upstream SDK adds options.
-        var config=OfflineDiarizerConfig.default; config.embeddingExportPath=nil; config.exposeChunkEmbeddings=false
+        let config=SpeakerNativePolicy.configuration()
         manager=OfflineDiarizerManager(config:config); manager.initialize(models:models)
     }
     func turns(file:URL) async throws -> [SpeakerTurn] {
@@ -73,6 +84,7 @@ enum SpeakerModelParameters {
 }
 
 public actor SpeakerDiarizer {
+    public static let policyVersion=SpeakerNativePolicy.version
     public static var supported:Bool { if #available(macOS 15,*) { return true }; return false }
     private let loader:@Sendable (URL) async throws -> any SpeakerDiarizationBackend
     private let supportedOS:@Sendable () -> Bool
@@ -108,7 +120,7 @@ public actor SpeakerDiarizer {
         _ = try SpeakerTimeline(duration:duration,model:"validation",turns:[]).validated()
         guard configuration.enabled else {throw OSwindError.invalid("Enable speaker recognition before requesting a timeline")}
         let turns=try await recognize(file:file,configuration:configuration,timeout:timeout)
-        return try SpeakerTimeline(duration:duration,model:"Community-1 · local Core ML / FluidAudio 0.17.7",turns:turns).validated()
+        return try SpeakerTimeline(duration:duration,model:"Community-1 · \(Self.policyVersion) · local Core ML / FluidAudio 0.17.7",turns:turns).validated()
     }
     private func recognize(file:URL,configuration:DiarizationConfiguration,timeout:Double) async throws -> [SpeakerTurn] {
         // SDK documents a crash-prone BNNS path on macOS 14; never enter it.

@@ -1,0 +1,33 @@
+{
+  "created_utc": "2026-10-23T21:52:25.505266+00:00",
+  "annotation_commit": "24bf60be297701cd7e4ef18550c6d390c1b87365",
+  "dataset": "VoxConverse dev",
+  "selection": "Next five lexicographic development IDs (positions 6\u201310), fixed before inference; overlap-fix validation, not parameter tuning or official held-out corpus.",
+  "clips": [
+    {
+      "id": "ampme",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ampme.rttm",
+      "annotation_sha256": "0bba54230960204b44f169a98b36df50d97a6318b2312cda28a3796bcfa9eff1"
+    },
+    {
+      "id": "asxwr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/asxwr.rttm",
+      "annotation_sha256": "9fb37050e71851454d4cc9cac5aaa44e2abdd5ec2c1eb0d3603f5cae6ba2f38c"
+    },
+    {
+      "id": "atgpi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/atgpi.rttm",
+      "annotation_sha256": "282b1fe4bd726d9a0de6a7b83a37198223fbf3f28509094f914638241f51643a"
+    },
+    {
+      "id": "aufkn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/aufkn.rttm",
+      "annotation_sha256": "1570b675e5c02c8c17fa15bcfc669d9a896ccea2a65a6c78b8468db6893faec0"
+    },
+    {
+      "id": "azisu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/azisu.rttm",
+      "annotation_sha256": "f58f1737ca0497afec89e74975485da916e62c0f2d0b3e42e06f7cbf651df69d"
+    }
+  ]
+}

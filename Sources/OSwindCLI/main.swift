@@ -141,7 +141,7 @@ do {
             runs.append(["index":index,"resident_backend_reused":index>0,"seconds":seconds,"real_time_factor":seconds/clip.duration,"timeline":try Integration.json(timeline)])
         }
         try await runtime.unload()
-        let result:[String:Any]=["format":"OSwind raw speaker timeline v1","preparation_seconds":prepareSeconds,"runs":runs,"scope":"Anonymous recording-local turns before ASR attribution. First run includes model load; later runs reuse this process backend. OS/Core ML compilation caches uncontrolled. No library write, embeddings or voice profiles exported."]
+        let result:[String:Any]=["format":"OSwind raw speaker timeline v1","policy":SpeakerDiarizer.policyVersion,"preparation_seconds":prepareSeconds,"runs":runs,"scope":"Anonymous recording-local turns before ASR attribution. First run includes model load; later runs reuse this process backend. OS/Core ML compilation caches uncontrolled. No library write, embeddings or voice profiles exported."]
         if let output {try writeNewPrivateJSON(result,to:output)}
         try emit(result)
     } else if command == "doctor" {
