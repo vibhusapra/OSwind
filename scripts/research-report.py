@@ -35,7 +35,7 @@ rows=[
 ('Energy','Idle / sleep / lock suspension','partial','Observers plus startup lock check; locked state verified; unlock/resume pending','Recall, Retrace (jhammant)'),
 ('Energy','Low-power / thermal backoff','tested','Interval policy tested; physical battery drain not measured','TimeScroll'),
 ('Energy','Long-run battery and CPU budget','todo','Paused debug RSS sampled; full capture power and 24h soak missing','Screenpipe, all always-on tools'),
-('Retrieval','Full-text search + ranking','tested','FTS5 BM25, quoted terms, Unicode matching','Most visual tools'),
+('Retrieval','Full-text search + ranking','tested','Explicit timed-audio previews preserve text/ranking; paired 32×10k-token release query p50 371→25 ms, process peak RSS105→29MB, not a general/competitor result. FTS5 BM25, quoted terms, Unicode matching','Most visual tools'),
 ('Retrieval','Semantic text search','tested','Apple baseline plus optional digest-versioned Qwen3 local GPU vectors; 35-query authored suite','Unlost, Pensieve, TimeScroll'),
 ('Retrieval','Hybrid fusion','tested','Apple RRF; GPU cosine + bounded lexical bonus; filters on both paths; cross-language regression test','Screenpipe, Retrace (jhammant)'),
 ('Retrieval','Visual / image semantic search','todo','No CLIP/VLM embeddings yet','TimeScroll, Recall'),
@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','290 passing tests, four optional skips and seven Python-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','310 passing tests, four optional skips and seven Python-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
 ('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality'),
 ('Audio','Retained clips / imports / playback','tested','Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain','Screenpipe, Omi, Limitless')

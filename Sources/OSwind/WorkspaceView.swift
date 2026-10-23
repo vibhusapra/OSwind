@@ -27,6 +27,7 @@ struct WorkspaceView: View {
             }.frame(width:230).frame(maxHeight:.infinity).background(Color(nsColor:.controlBackgroundColor))
             Divider()
             VStack(spacing:0) {
+                if m.openingMemoryID != nil { HStack { ProgressView().controlSize(.small); Text("Opening complete source…").font(.caption); Spacer(); Button("Cancel") { m.cancelOpeningMemory() } }.padding(10) }
                 HStack {
                     HStack(spacing:7) { Circle().fill(m.isCapturing ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running && m.audio.running ? "SCREEN + AUDIO" : m.capture.running ? "CAPTURING" : m.audio.running ? "AUDIO" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
                     Spacer()

@@ -26,6 +26,8 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     public var tags: [String]
     public var embedding: [Float]?
     public var embeddingModel: String?
+    /// Search-only projection. Never admit this incomplete value as a source.
+    public var searchPreview: MemorySearchPreview?
     public init(id: String = UUID().uuidString, timestamp: Date = Date(), endTimestamp: Date? = nil, kind: MemoryKind = .screen, app: String = "", bundleID: String = "", title: String = "", url: String? = nil, text: String, imagePath: String? = nil, audioPath: String? = nil, display: String? = nil, regions: [TextRegion] = [], favorite: Bool = false, tags: [String] = [], embedding: [Float]? = nil, embeddingModel: String? = nil) {
         self.id = id; self.timestamp = timestamp; self.endTimestamp = endTimestamp; self.kind = kind; self.app = app; self.bundleID = bundleID; self.title = title; self.url = url; self.text = text; self.imagePath = imagePath; self.audioPath = audioPath; self.display = display; self.regions = regions; self.favorite = favorite; self.tags = tags; self.embedding = embedding; self.embeddingModel = embeddingModel
     }

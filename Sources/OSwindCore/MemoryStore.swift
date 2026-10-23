@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 10
+    public static let schemaVersion = 11
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -95,10 +95,16 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(StatisticsSchema.sql)
         try exec(SearchScopeSchema.sql)
         try exec(SpeakerSearchSchema.sql)
-        if version < 10 {
+        try exec(SearchPreviewSchema.sql)
+        if version < 11 {
             let audio=try prepare("SELECT payload FROM memories WHERE kind='audio'")
             defer { sqlite3_finalize(audio) }
-            while sqlite3_step(audio)==SQLITE_ROW { try replaceSpeakerProjection(try decode(audio)) }
+            var status=sqlite3_step(audio)
+            while status==SQLITE_ROW {
+                try autoreleasepool {let memory=try decode(audio);if version<10 {try replaceSpeakerProjection(memory)};try replaceSearchPreview(memory)}
+                status=sqlite3_step(audio)
+            }
+            guard status==SQLITE_DONE else {throw failure()}
         }
         let statisticsState = try prepare("SELECT total=COALESCE((SELECT SUM(count) FROM application_statistics),0) FROM memory_statistics WHERE singleton=1")
         let statisticsNeedRepair = sqlite3_step(statisticsState) != SQLITE_ROW || sqlite3_column_int(statisticsState,0) != 1
@@ -121,6 +127,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func insert(_ memory: Memory) throws {
         lock.lock(); defer { lock.unlock() }
+        guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
         guard memory.audioSessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio session identifier") }
@@ -141,10 +148,44 @@ public final class MemoryStore: @unchecked Sendable {
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
-        try replaceSpeakerProjection(memory)
+        try replaceSpeakerProjection(memory);try replaceSearchPreview(memory)
         try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
     }
+    private func replaceSearchPreview(_ memory:Memory) throws {
+        guard memory.searchPreview==nil else { throw OSwindError.invalid("Cannot cache an incomplete source") }
+        guard memory.kind == .audio,let transcript=memory.transcript else {
+            let remove=try prepare("DELETE FROM audio_search_previews WHERE memory_id=?");defer {sqlite3_finalize(remove)};bind(remove,1,memory.id)
+            guard sqlite3_step(remove)==SQLITE_DONE else {throw failure()};return
+        }
+        var preview=memory;preview.transcript=nil;preview.embedding=nil
+        preview.searchPreview=MemorySearchPreview(memory:memory,transcript:transcript)
+        let data=try JSONEncoder().encode(preview)
+        let stmt=try prepare("INSERT INTO audio_search_previews(memory_id,payload) VALUES(?,?) ON CONFLICT(memory_id) DO UPDATE SET payload=excluded.payload")
+        defer {sqlite3_finalize(stmt)};bind(stmt,1,memory.id)
+        _ = data.withUnsafeBytes {sqlite3_bind_blob(stmt,2,$0.baseAddress,Int32(data.count),transient)}
+        guard sqlite3_step(stmt)==SQLITE_DONE else {throw failure()}
+    }
+    private func getForSearch(_ id:String,detail:SearchDetail) throws -> Memory? {
+        if detail == .full {return try get(id)}
+        let stmt=try prepare("SELECT COALESCE(p.payload,m.payload) FROM memories m LEFT JOIN audio_search_previews p ON p.memory_id=m.id WHERE m.id=?")
+        defer {sqlite3_finalize(stmt)};bind(stmt,1,id)
+        return sqlite3_step(stmt)==SQLITE_ROW ? try decode(stmt):nil
+    }
+    /// Revalidate and load complete evidence in one read snapshot. Deleted or
+    /// revised sources fail explicitly, rather than silently retargeting offsets.
+    public func hydrate(_ hits:[SearchHit]) throws -> [SearchHit] {
+        lock.lock();defer {lock.unlock()};try Task.checkCancellation()
+        try exec("SAVEPOINT hydrate_sources");defer {try? exec("RELEASE hydrate_sources")}
+        return try hits.map { hit in
+            try Task.checkCancellation()
+            let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
+            guard let current=try get(hit.id),current.searchPreview==nil,current.evidenceHash==expected else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            guard hit.passage.map({$0.text(in:current.text) != nil}) ?? true else {throw OSwindError.invalid("The source passage is no longer valid")}
+            return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage)
+        }
+    }
+    public func hydrate(_ memory:Memory) throws -> Memory {try hydrate([SearchHit(memory:memory,score:0,match:"")])[0].memory}
     private func replaceSpeakerProjection(_ memory:Memory) throws {
         let labels=memory.kind == .audio ? Set(memory.transcript?.segments.compactMap(\.speaker) ?? []):[]
         let existing=try prepare("SELECT label FROM audio_speakers WHERE memory_id=?"); defer { sqlite3_finalize(existing) }; bind(existing,1,memory.id)
@@ -205,7 +246,7 @@ public final class MemoryStore: @unchecked Sendable {
         // single matching question word overwhelm a cross-language match.
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
-    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
+    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
         try Task.checkCancellation()
         var indexStatus: SearchIndexStatus?
         let scoped = conditions(filter).0 != "1=1"
@@ -220,9 +261,11 @@ public final class MemoryStore: @unchecked Sendable {
         var strategy = "exact", diagnostics = [String]()
         let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter)
         let query = Self.ftsQuery(filter.query)
+        let payload=detail == .preview ? "COALESCE(preview.payload,m.payload)":"m.payload"
+        let previewJoin=detail == .preview ? " LEFT JOIN audio_search_previews preview ON preview.memory_id=m.id":""
         var keyword = [Memory](); var scored = [String: SearchHit]()
         if query.isEmpty || mode != .semantic {
-            let sql = query.isEmpty ? "SELECT m.payload FROM memories m WHERE \(whereSQL) ORDER BY m.timestamp DESC LIMIT ?" : "SELECT m.payload FROM memory_fts f JOIN memories m ON m.id=f.id WHERE memory_fts MATCH ? AND f.rank MATCH 'bm25(0,3,1,1)' AND \(whereSQL) ORDER BY f.rank LIMIT ?"
+            let sql = query.isEmpty ? "SELECT \(payload) FROM memories m\(previewJoin) WHERE \(whereSQL) ORDER BY m.timestamp DESC LIMIT ?" : "SELECT \(payload) FROM memory_fts f JOIN memories m ON m.id=f.id\(previewJoin) WHERE memory_fts MATCH ? AND f.rank MATCH 'bm25(0,3,1,1)' AND \(whereSQL) ORDER BY f.rank LIMIT ?"
             let stmt = try prepare(sql); defer { sqlite3_finalize(stmt) }; var index: Int32 = 1
             if !query.isEmpty { bind(stmt, index, query); index += 1 }
             for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty || mode == .keyword ? limit : max(limit, 100)))
@@ -237,7 +280,7 @@ public final class MemoryStore: @unchecked Sendable {
                     let id=string(names,0)
                     let score=similarityFusion && mode == .hybrid ? 0.08/(1+Double(rank)*0.1):1/Double(60+rank)
                     if var hit=scored[id] { hit.score += score*0.25; hit.match="keyword + speaker"; scored[id]=hit }
-                    else if let memory=try get(id) { scored[id]=SearchHit(memory:memory,score:score,match:"speaker name") }
+                    else if let memory=try getForSearch(id,detail:detail) { scored[id]=SearchHit(memory:memory,score:score,match:"speaker name") }
                     rank += 1
                 }
             }
@@ -272,7 +315,7 @@ public final class MemoryStore: @unchecked Sendable {
             }
             for (rank, pair) in best.enumerated() {
                 if var hit = scored[pair.id] { hit.score += similarityFusion ? pair.similarity : 1 / Double(60 + rank); hit.match = "hybrid"; hit.passage = pair.passage; scored[pair.id] = hit }
-                else if let memory = try get(pair.id) { scored[pair.id] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.similarity : 1 / Double(60 + rank), match: "semantic",passage:pair.passage) }
+                else if let memory = try getForSearch(pair.id,detail:detail) { scored[pair.id] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.similarity : 1 / Double(60 + rank), match: "semantic",passage:pair.passage) }
             }
         }
         try Task.checkCancellation(); execution?(SearchExecution(strategy:strategy,warnings:diagnostics))
@@ -358,18 +401,26 @@ public final class MemoryStore: @unchecked Sendable {
     public func semanticIndexes() throws -> [String:Int] {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT model,parents FROM vector_statistics WHERE parents>0"); defer { sqlite3_finalize(stmt) }; var result = [String:Int](); while sqlite3_step(stmt) == SQLITE_ROW { result[string(stmt,0)] = Int(sqlite3_column_int(stmt,1)) }; return result
     }
-    public func timelineSample(_ filter: SearchFilter, limit: Int = 24) throws -> [Memory] {
+    public func timelineSample(_ filter: SearchFilter, limit: Int = 24, detail:SearchDetail = .full) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }
         let count = min(100, max(2, limit)), (whereSQL, values) = conditions(filter)
-        let stmt = try prepare("WITH ranked AS (SELECT payload,ROW_NUMBER() OVER (ORDER BY timestamp) AS rn,COUNT(*) OVER () AS total FROM memories m WHERE \(whereSQL)) SELECT payload FROM ranked WHERE rn=1 OR rn=total OR (rn-1) % MAX(1,CAST((total-1)/? AS INTEGER))=0 ORDER BY rn")
+        let payload=detail == .preview ? "COALESCE(preview.payload,m.payload)":"m.payload"
+        let previewJoin=detail == .preview ? " LEFT JOIN audio_search_previews preview ON preview.memory_id=m.id":""
+        // Rank thin IDs first; never sort every full transcript into a temporary table.
+        let stmt = try prepare("WITH ranked AS (SELECT id,ROW_NUMBER() OVER (ORDER BY timestamp,id) AS rn,COUNT(*) OVER () AS total FROM memories m WHERE \(whereSQL)), chosen AS (SELECT id,rn FROM ranked WHERE rn=1 OR rn=total OR (rn-1) % MAX(1,CAST((total-1)/? AS INTEGER))=0) SELECT \(payload) FROM chosen r JOIN memories m ON m.id=r.id\(previewJoin) ORDER BY r.rn")
         defer { sqlite3_finalize(stmt) }
         for (index,value) in values.enumerated() { bind(stmt,Int32(index+1),value) }; sqlite3_bind_int(stmt,Int32(values.count+1),Int32(count-1))
         var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }
         if memories.count <= count { return memories }
         return (0..<count).map { memories[Int(Double($0)*Double(memories.count-1)/Double(count-1))] }
     }
-    public func setFavorite(_ id: String, value: Bool) throws { if var m = try get(id) { m.favorite = value; try updateMetadata(m) } }
-    public func setTags(_ id: String, tags: [String]) throws { if var m = try get(id) { m.tags = Array(Set(tags.filter { !$0.isEmpty })).sorted(); try updateMetadata(m) } }
+    private func changeMetadata(_ id:String,change:(inout Memory)->Void) throws {
+        lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
+        do {if var memory=try get(id) {change(&memory);try updateMetadata(memory)};try exec("COMMIT")}
+        catch {try? exec("ROLLBACK");throw error}
+    }
+    public func setFavorite(_ id: String, value: Bool) throws {try changeMetadata(id) {$0.favorite=value}}
+    public func setTags(_ id: String, tags: [String]) throws {try changeMetadata(id) {$0.tags=Array(Set(tags.filter {!$0.isEmpty})).sorted()}}
     public func renameAudioSpeaker(_ id:String,from speaker:String,to name:String,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Memory {
         lock.lock(); defer { lock.unlock() }; try Task.checkCancellation()
         let label=name.trimmingCharacters(in:.whitespacesAndNewlines)
@@ -380,11 +431,11 @@ public final class MemoryStore: @unchecked Sendable {
             guard label==speaker || !transcript.segments.contains(where:{$0.speaker != speaker && $0.speaker.map(SpeakerLabel.key)==SpeakerLabel.key(label)}) else { throw OSwindError.invalid("Another speaker in this recording already has that name") }
             for index in transcript.segments.indices where transcript.segments[index].speaker==speaker { transcript.segments[index].speaker=label }
             if label != speaker { try invalidateAudioEvidence(id) }
-            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try replaceSpeakerProjection(memory); try exec("COMMIT"); return memory
+            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT"); return memory
         } catch { try? exec("ROLLBACK"); throw error }
     }
     private func updateMetadata(_ m: Memory) throws {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m)
     }
     public func delete(_ id: String) throws {
         lock.lock(); defer { lock.unlock() }; let m = try get(id); let stmt = try prepare("DELETE FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
@@ -513,7 +564,7 @@ extension MemoryStore {
         try exec("BEGIN IMMEDIATE")
         do {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
-            for hit in answer.sources { guard let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
+            for hit in answer.sources { guard hit.memory.searchPreview==nil,let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
             var scope = answer.resolution?.filter ?? filter; scope.query = ""
             scope.speaker=scope.speaker.map { policy.sanitize($0).text }
             let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope,timeZone:answer.resolution?.timeZone)

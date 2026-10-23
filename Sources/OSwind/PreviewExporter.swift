@@ -37,7 +37,7 @@ import OSwindCore
             size = NSSize(width:1000,height:760); content = AnyView(LibraryRecoveryView(session:AppSession(selection:LibraryLocationSelection(url:model.store.root.appendingPathComponent("disconnected-drive"),requiresExisting:true,origin:"preview"))))
         } else if model.section == "SettingsModels" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Models").environmentObject(model))
-        } else if model.section == "MemoryDetail", let memory = model.hits.first?.memory {
+        } else if model.section == "MemoryDetail", let candidate = model.hits.first?.memory,let memory=try? model.store.hydrate(candidate) {
             size = NSSize(width:850,height:760); content = AnyView(MemoryDetail(memory:memory,query:model.query).environmentObject(model))
         } else { content = AnyView(WorkspaceView().environmentObject(model)) }
         let view = NSHostingView(rootView:content.frame(width:size.width,height:size.height).background(Color(nsColor:.windowBackgroundColor)).preferredColorScheme(NSApp.appearance?.bestMatch(from:[.darkAqua,.aqua]) == .darkAqua ? .dark : .light))

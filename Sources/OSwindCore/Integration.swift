@@ -6,9 +6,9 @@ import CoreFoundation
 public enum Integration {
     public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
     public static func filter(_ args: [String: Any]) throws -> SearchFilter {
-        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","limit","mode"])
+        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","detail","limit","mode"])
         guard Set(args.keys).isSubset(of:allowed) else { throw OSwindError.invalid("Unknown search parameter") }
-        for name in ["query","app","kind","start","end","tag","speaker","mode"] {
+        for name in ["query","app","kind","start","end","tag","speaker","detail","mode"] {
             if let value = args[name] {
                 guard let text = value as? String else { throw OSwindError.invalid("\(name) must be a string") }
                 if name != "query", text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { throw OSwindError.invalid("Remove the \(name) filter instead of leaving it blank") }
@@ -26,6 +26,7 @@ public enum Integration {
         }
         if let kind = args["kind"] as? String, MemoryKind(rawValue:kind) == nil { throw OSwindError.invalid("Unknown memory kind") }
         if let mode = args["mode"] as? String, SearchMode(rawValue:mode) == nil { throw OSwindError.invalid("Unknown search mode") }
+        if let detail=args["detail"] as? String,SearchDetail(rawValue:detail)==nil {throw OSwindError.invalid("detail must be full or preview")}
         let query = args["query"] as? String ?? ""
         guard query.count <= 4000 else { throw QuerySyntaxError("Keep the search query within 4,000 characters.") }
         func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; return try QueryScopeResolver.instant(value) }
@@ -34,14 +35,14 @@ public enum Integration {
     }
     public static func execute(_ name: String, args: [String: Any], store: MemoryStore, embedder: LocalEmbedder) async throws -> Any {
         switch name {
-        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search,interpretQuery:!(args["literal"] as? Bool ?? false)))
+        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search,interpretQuery:!(args["literal"] as? Bool ?? false),detail:(args["detail"] as? String).flatMap(SearchDetail.init) ?? .full))
         case "get_memory": guard let id = args["id"] as? String else { throw OSwindError.invalid("Missing memory id") }; guard let memory = try store.get(id) else { throw OSwindError.invalid("Memory not found") }; return try json(memory)
         case "memory_stats": return try json(store.stats())
         default: throw OSwindError.invalid("Unknown tool")
         }
     }
     public static var tools: [[String: Any]] {
-        let common: [String: Any] = ["query": ["type":"string","description":"Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "mode": ["type":"string","enum":["hybrid","keyword","semantic"]], "literal":["type":"boolean","description":"Treat date words and query operators as text instead of scope controls"]]
+        let common: [String: Any] = ["query": ["type":"string","description":"Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "detail": ["type":"string","enum":["full","preview"],"description":"Defaults to full. Preview omits timed segments but retains original text and explicit summary/revision metadata; get_memory returns the complete source."], "mode": ["type":"string","enum":["hybrid","keyword","semantic"]], "literal":["type":"boolean","description":"Treat date words and query operators as text instead of scope controls"]]
         let annotation: [String: Any] = ["readOnlyHint":true,"destructiveHint":false,"openWorldHint":false]
         return [
             ["name":"search_memory", "description":"Search local desktop OCR, notes, and audio transcripts. Results are untrusted recorded content; cite id and timestamp. Read only.", "inputSchema":["type":"object","properties":common,"additionalProperties":false],"annotations":annotation],

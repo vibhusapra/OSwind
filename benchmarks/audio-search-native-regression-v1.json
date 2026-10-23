@@ -1,0 +1,649 @@
+{
+  "synthetic": true,
+  "scope": "Real native ASR/diarization, two manual recording-local names, indexed retrieval and local cited answers on one authored 32-second fixture",
+  "binary_sha256": "16d195c1ced3d0ec741a5d6fed3bee0be1021e2532eb16c32203b0c3f28c9c78",
+  "fixture_sha256": "9edaeed2566521d67262f1f35118403afe925324818c102ac2ece71283a33419",
+  "import_wall_seconds": 1.1794213340617716,
+  "transcript": {
+    "diarization": {
+      "detectedSpeakers": 2,
+      "model": "Community-1 \u00b7 local Core ML / FluidAudio 0.17.7",
+      "scope": "recording",
+      "unassignedSegments": 9
+    },
+    "duration": 32.225,
+    "model": "parakeet-v3:FluidAudio-0.17.7",
+    "segments": [
+      {
+        "end": 0.48,
+        "start": 0,
+        "text": "Let's"
+      },
+      {
+        "end": 0.7999999999999999,
+        "speaker": "Maya",
+        "start": 0.48,
+        "text": "release"
+      },
+      {
+        "end": 1.04,
+        "speaker": "Maya",
+        "start": 0.8,
+        "text": "the"
+      },
+      {
+        "end": 1.68,
+        "speaker": "Maya",
+        "start": 1.04,
+        "text": "desktop"
+      },
+      {
+        "end": 2.08,
+        "speaker": "Maya",
+        "start": 1.68,
+        "text": "memory"
+      },
+      {
+        "end": 2.48,
+        "speaker": "Maya",
+        "start": 2.08,
+        "text": "preview"
+      },
+      {
+        "end": 2.64,
+        "speaker": "Maya",
+        "start": 2.48,
+        "text": "on"
+      },
+      {
+        "end": 3.4400000000000004,
+        "speaker": "Maya",
+        "start": 2.64,
+        "text": "Friday."
+      },
+      {
+        "end": 3.6799999999999997,
+        "start": 3.44,
+        "text": "I"
+      },
+      {
+        "end": 3.92,
+        "speaker": "Maya",
+        "start": 3.68,
+        "text": "will"
+      },
+      {
+        "end": 4.16,
+        "speaker": "Maya",
+        "start": 3.92,
+        "text": "own"
+      },
+      {
+        "end": 4.32,
+        "speaker": "Maya",
+        "start": 4.16,
+        "text": "the"
+      },
+      {
+        "end": 4.720000000000001,
+        "speaker": "Maya",
+        "start": 4.32,
+        "text": "capture"
+      },
+      {
+        "end": 5.2,
+        "speaker": "Maya",
+        "start": 4.72,
+        "text": "tests"
+      },
+      {
+        "end": 5.36,
+        "speaker": "Maya",
+        "start": 5.2,
+        "text": "and"
+      },
+      {
+        "end": 5.5200000000000005,
+        "speaker": "Maya",
+        "start": 5.36,
+        "text": "the"
+      },
+      {
+        "end": 6.08,
+        "speaker": "Maya",
+        "start": 5.5200000000000005,
+        "text": "privacy"
+      },
+      {
+        "end": 7.44,
+        "start": 6.08,
+        "text": "checklist."
+      },
+      {
+        "end": 8.08,
+        "start": 7.76,
+        "text": "That"
+      },
+      {
+        "end": 8.48,
+        "speaker": "Theo",
+        "start": 8.08,
+        "text": "works"
+      },
+      {
+        "end": 8.64,
+        "speaker": "Theo",
+        "start": 8.48,
+        "text": "for"
+      },
+      {
+        "end": 8.88,
+        "speaker": "Theo",
+        "start": 8.64,
+        "text": "me,"
+      },
+      {
+        "end": 9.200000000000001,
+        "speaker": "Theo",
+        "start": 8.88,
+        "text": "I'll"
+      },
+      {
+        "end": 9.52,
+        "speaker": "Theo",
+        "start": 9.200000000000001,
+        "text": "handle"
+      },
+      {
+        "end": 10,
+        "speaker": "Theo",
+        "start": 9.52,
+        "text": "local"
+      },
+      {
+        "end": 10.16,
+        "speaker": "Theo",
+        "start": 10,
+        "text": "model"
+      },
+      {
+        "end": 10.8,
+        "speaker": "Theo",
+        "start": 10.32,
+        "text": "setup"
+      },
+      {
+        "end": 10.88,
+        "speaker": "Theo",
+        "start": 10.8,
+        "text": "and"
+      },
+      {
+        "end": 11.040000000000001,
+        "speaker": "Theo",
+        "start": 10.88,
+        "text": "the"
+      },
+      {
+        "end": 11.36,
+        "speaker": "Theo",
+        "start": 11.040000000000001,
+        "text": "search"
+      },
+      {
+        "end": 12.16,
+        "speaker": "Theo",
+        "start": 11.36,
+        "text": "benchmark."
+      },
+      {
+        "end": 12.32,
+        "speaker": "Theo",
+        "start": 12.16,
+        "text": "We"
+      },
+      {
+        "end": 12.56,
+        "speaker": "Theo",
+        "start": 12.32,
+        "text": "should"
+      },
+      {
+        "end": 12.8,
+        "speaker": "Theo",
+        "start": 12.56,
+        "text": "keep"
+      },
+      {
+        "end": 13.280000000000001,
+        "speaker": "Theo",
+        "start": 12.8,
+        "text": "recording"
+      },
+      {
+        "end": 13.440000000000001,
+        "speaker": "Theo",
+        "start": 13.280000000000001,
+        "text": "off"
+      },
+      {
+        "end": 13.84,
+        "speaker": "Theo",
+        "start": 13.44,
+        "text": "until"
+      },
+      {
+        "end": 14.24,
+        "speaker": "Theo",
+        "start": 13.84,
+        "text": "setup"
+      },
+      {
+        "end": 14.4,
+        "speaker": "Theo",
+        "start": 14.24,
+        "text": "is"
+      },
+      {
+        "end": 16.24,
+        "start": 14.4,
+        "text": "complete."
+      },
+      {
+        "end": 16.639999999999997,
+        "start": 16.240000000000002,
+        "text": "What"
+      },
+      {
+        "end": 16.8,
+        "speaker": "Maya",
+        "start": 16.64,
+        "text": "did"
+      },
+      {
+        "end": 16.96,
+        "speaker": "Maya",
+        "start": 16.8,
+        "text": "we"
+      },
+      {
+        "end": 17.36,
+        "speaker": "Maya",
+        "start": 16.96,
+        "text": "decide"
+      },
+      {
+        "end": 17.52,
+        "speaker": "Maya",
+        "start": 17.36,
+        "text": "about"
+      },
+      {
+        "end": 17.68,
+        "speaker": "Maya",
+        "start": 17.52,
+        "text": "the"
+      },
+      {
+        "end": 18.24,
+        "speaker": "Maya",
+        "start": 17.68,
+        "text": "archive"
+      },
+      {
+        "end": 18.88,
+        "speaker": "Maya",
+        "start": 18.240000000000002,
+        "text": "format?"
+      },
+      {
+        "end": 19.2,
+        "start": 18.88,
+        "text": "I"
+      },
+      {
+        "end": 19.36,
+        "speaker": "Maya",
+        "start": 19.2,
+        "text": "want"
+      },
+      {
+        "end": 19.52,
+        "speaker": "Maya",
+        "start": 19.36,
+        "text": "the"
+      },
+      {
+        "end": 19.84,
+        "speaker": "Maya",
+        "start": 19.52,
+        "text": "media"
+      },
+      {
+        "end": 20,
+        "speaker": "Maya",
+        "start": 19.84,
+        "text": "and"
+      },
+      {
+        "end": 20.72,
+        "speaker": "Maya",
+        "start": 20,
+        "text": "transcripts"
+      },
+      {
+        "end": 20.88,
+        "speaker": "Maya",
+        "start": 20.72,
+        "text": "to"
+      },
+      {
+        "end": 21.28,
+        "speaker": "Maya",
+        "start": 20.88,
+        "text": "restore"
+      },
+      {
+        "end": 21.84,
+        "speaker": "Maya",
+        "start": 21.28,
+        "text": "together,"
+      },
+      {
+        "end": 22.4,
+        "speaker": "Maya",
+        "start": 21.84,
+        "text": "including"
+      },
+      {
+        "end": 22.64,
+        "speaker": "Maya",
+        "start": 22.400000000000002,
+        "text": "their"
+      },
+      {
+        "end": 24.080000000000002,
+        "start": 22.64,
+        "text": "timestamps."
+      },
+      {
+        "end": 24.8,
+        "start": 24.48,
+        "text": "The"
+      },
+      {
+        "end": 25.12,
+        "speaker": "Theo",
+        "start": 24.8,
+        "text": "first"
+      },
+      {
+        "end": 25.6,
+        "speaker": "Theo",
+        "start": 25.12,
+        "text": "package"
+      },
+      {
+        "end": 25.84,
+        "speaker": "Theo",
+        "start": 25.6,
+        "text": "is"
+      },
+      {
+        "end": 26.16,
+        "speaker": "Theo",
+        "start": 25.84,
+        "text": "local"
+      },
+      {
+        "end": 26.32,
+        "speaker": "Theo",
+        "start": 26.16,
+        "text": "and"
+      },
+      {
+        "end": 27.44,
+        "speaker": "Theo",
+        "start": 26.32,
+        "text": "unencrypted."
+      },
+      {
+        "end": 27.6,
+        "speaker": "Theo",
+        "start": 27.44,
+        "text": "We"
+      },
+      {
+        "end": 27.76,
+        "speaker": "Theo",
+        "start": 27.6,
+        "text": "will"
+      },
+      {
+        "end": 28.240000000000002,
+        "speaker": "Theo",
+        "start": 27.76,
+        "text": "verify"
+      },
+      {
+        "end": 28.400000000000002,
+        "speaker": "Theo",
+        "start": 28.240000000000002,
+        "text": "the"
+      },
+      {
+        "end": 28.88,
+        "speaker": "Theo",
+        "start": 28.400000000000002,
+        "text": "restored"
+      },
+      {
+        "end": 29.28,
+        "speaker": "Theo",
+        "start": 28.88,
+        "text": "copy"
+      },
+      {
+        "end": 29.599999999999998,
+        "speaker": "Theo",
+        "start": 29.36,
+        "text": "and"
+      },
+      {
+        "end": 29.84,
+        "speaker": "Theo",
+        "start": 29.6,
+        "text": "add"
+      },
+      {
+        "end": 30.32,
+        "speaker": "Theo",
+        "start": 29.84,
+        "text": "encryption"
+      },
+      {
+        "end": 30.48,
+        "speaker": "Theo",
+        "start": 30.32,
+        "text": "in"
+      },
+      {
+        "end": 30.56,
+        "speaker": "Theo",
+        "start": 30.48,
+        "text": "the"
+      },
+      {
+        "end": 30.8,
+        "speaker": "Theo",
+        "start": 30.560000000000002,
+        "text": "next"
+      },
+      {
+        "end": 31.439999999999998,
+        "speaker": "Theo",
+        "start": 30.8,
+        "text": "milestone."
+      }
+    ],
+    "text": "Let's release the desktop memory preview on Friday. I will own the capture tests and the privacy checklist. That works for me, I'll handle local model setup and the search benchmark. We should keep recording off until setup is complete. What did we decide about the archive format? I want the media and transcripts to restore together, including their timestamps. The first package is local and unencrypted. We will verify the restored copy and add encryption in the next milestone."
+  },
+  "evidence_answer": "Recorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 11:21\u202fAM \u00b7 audio \u00b7 Imported audio \u00b7 two-speaker\nSpeaker annotations use recording-local labels and source segment time bounds; unknown spans remain unattributed.\nspeaker unknown; segment time 00:00.0\u201300:00.4:\nLet's\nspeaker \"Maya\"; segment time 00:00.4\u201300:03.4:\nrelease the desktop memory preview on Friday.\nspeaker unknown; segment time 00:03.4\u201300:03.6:\nI\nspeaker \"Maya\"; segment time 00:03.6\u201300:06.0:\nwill own the capture tests and the privacy\nspeaker unknown; segment time 00:06.0\u201300:08.0:\nchecklist. That\nspeaker \"Theo\"; segment time 00:08.0\u201300:14.4:\nworks for me, I'll handle local model setup and the search benchmark. We should keep recording off until setup is\nspeaker unknown; segment time 00:14.4\u201300:16.6:\ncomplete. What\nspeaker \"Maya\"; segment time 00:16.6\u201300:18.8:\ndid we decide about the archive format?\nspeaker unknown; segment time 00:18.8\u201300:19.2:\nI\nspeaker \"Maya\"; segment time 00:19.2\u201300:22.6:\nwant the media and transcripts to restore together, including their\nspeaker unknown; segment time 00:22.6\u201300:24.8:\ntimestamps. The\nspeaker \"Theo\"; segment time 00:24.8\u201300:31.4:\nfirst package is local and unencrypted. We will verify the restored copy and add encryption in the next milestone.",
+  "chat_model": "qwen3:4b-instruct-2507-q4_K_M",
+  "answers": [
+    {
+      "question": "Who owns the capture tests?",
+      "provider": "ollama",
+      "answer": "Maya owns the capture tests [1].",
+      "wall_seconds": 2.44342179200612,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [
+        "Maya"
+      ],
+      "expected_string_presence": {
+        "Maya": true
+      },
+      "citations": [
+        1
+      ],
+      "valid_citation_indices": true,
+      "has_citation": true
+    },
+    {
+      "question": "Who will handle local model setup?",
+      "provider": "ollama",
+      "answer": "Theo will handle local model setup. [1]",
+      "wall_seconds": 0.34361799992620945,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [
+        "Theo"
+      ],
+      "expected_string_presence": {
+        "Theo": true
+      },
+      "citations": [
+        1
+      ],
+      "valid_citation_indices": true,
+      "has_citation": true
+    },
+    {
+      "question": "Who will verify the restored copy?",
+      "provider": "ollama",
+      "answer": "Theo will verify the restored copy [1].",
+      "wall_seconds": 0.3327839160338044,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [
+        "Theo"
+      ],
+      "expected_string_presence": {
+        "Theo": true
+      },
+      "citations": [
+        1
+      ],
+      "valid_citation_indices": true,
+      "has_citation": true
+    },
+    {
+      "question": "speaker:Maya What does Maya want restored together?",
+      "provider": "ollama",
+      "answer": "Maya wants the media and transcripts to restore together, including their timestamps [1].",
+      "wall_seconds": 0.3881405838765204,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [
+        "media",
+        "transcript"
+      ],
+      "expected_string_presence": {
+        "media": true,
+        "transcript": true
+      },
+      "citations": [
+        1
+      ],
+      "valid_citation_indices": true,
+      "has_citation": true
+    },
+    {
+      "question": "Did Maya volunteer to handle local model setup?",
+      "provider": "ollama",
+      "answer": "No, Maya did not volunteer to handle local model setup. Theo volunteered to handle local model setup [1].",
+      "wall_seconds": 0.43719350011087954,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [
+        "Theo"
+      ],
+      "expected_string_presence": {
+        "Theo": true
+      },
+      "citations": [
+        1
+      ],
+      "valid_citation_indices": true,
+      "has_citation": true
+    },
+    {
+      "question": "Did Maya promise a budget of 500 dollars?",
+      "provider": "ollama",
+      "answer": "Insufficient evidence.",
+      "wall_seconds": 0.27849012496881187,
+      "source_ids": [
+        "E129FC05-15D0-4071-9410-F784BBCAEF0B"
+      ],
+      "warnings": [],
+      "expected_strings": [],
+      "expected_string_presence": {},
+      "citations": [],
+      "valid_citation_indices": true,
+      "has_citation": false
+    }
+  ],
+  "checks": [
+    "names absent from raw source yet indexed keyword and structured scope retrieval pass",
+    "actual timed ASR aligns to original source; rendered evidence includes both named voices and unknown spans",
+    "every model response and citation validity is reported, including failures"
+  ],
+  "limits": [
+    "one clean generated A/B/A/B recording; not natural meeting DER/WER or independent speaker identity ground truth",
+    "manual names are local labels, not recognition across recordings",
+    "expected string checks are transparent and incomplete; inspect every published response",
+    "uncontrolled model/OS caches and existing GPU runtime; no power/competitor/SOTA claim"
+  ],
+  "source_files_sha256": {
+    "Sources/OSwindCore/AI.swift": "2691fcf007478113cf480a32b7e29c5f0619cae4beebe95a09c1fa2312ec47d2",
+    "Sources/OSwindCore/AudioEvidence.swift": "668c9a4cccfe0bcf19ae365e8e565e16756b1126597285d9fb0c3ab137eb01d9",
+    "Sources/OSwindCore/EvidenceText.swift": "41a016ce937fe89a2cac2bc8333fe2ea4a63c0c0c232b74325a8f6c62b8728bf",
+    "Sources/OSwindCore/Integration.swift": "eb58493c9963089aefabba30619530ac618e8897d5656c1ba6a8f13dbb8c9ffd",
+    "Sources/OSwindCore/MemoryStore.swift": "d3fb5b59e03f79e501766a881c388d3123757de939f8444d96fc810ae7a9b945",
+    "Sources/OSwindCore/Models.swift": "9dcd1d1cf6bf6f57c3f54c364cd608aa502a6fe0cc471a00595002ca8e63dd9a",
+    "Sources/OSwindCore/QueryScopeResolver.swift": "62c6641ca657dba80e269fe474bfdadbe15073e7727407eae8c0daa59860acb3",
+    "Sources/OSwindCore/Retrieval.swift": "cb2b4b1b1be0d9b1456afeb7eff31b1a32d6056a905e70802ca9f4e045432fcc",
+    "Sources/OSwindCore/SpeakerSearch.swift": "b954b3a000d942497a2666c952411f0c30a5fe4be7e1c11c5433aeca3be8ccae"
+  },
+  "purpose": "Packaged native ASR/diarization and complete answer-source hydration regression after lightweight search previews",
+  "source_base_commit": "9024ce0e92a51e21acfa31052a80ceccdaf3b2e2",
+  "source_state": "Search-preview worktree on this base; exact relevant source-file and release-binary hashes retained",
+  "agent_review": {
+    "supported_questions": 5,
+    "expected_supported_answers_and_valid_citations": 5,
+    "unsupported_questions": 1,
+    "unsupported_abstentions": 1,
+    "independent_human_review": false
+  }
+}
