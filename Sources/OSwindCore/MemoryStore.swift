@@ -6,7 +6,7 @@ public final class MemoryStore: @unchecked Sendable {
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
     private var metalScopeCache: MetalScopeCache?
-    private var coverageCache: (key:MetalScopeKey,indexed:Int,total:Int)?
+    private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
@@ -235,9 +235,12 @@ public final class MemoryStore: @unchecked Sendable {
         defer { sqlite3_finalize(state) }; guard sqlite3_step(state) == SQLITE_ROW else { throw failure() }
         let (predicate,values) = conditions(filter), revision = string(state,2)
         let key = MetalScopeKey(identity:string(state,0),model:modelID,sequence:sqlite3_column_int64(state,1),revision:revision,predicate:predicate,values:values)
-        if !revision.isEmpty, let cached = coverageCache, cached.key == key { return (cached.indexed,cached.total) }
+        coverageCache.removeAll { $0.key.identity != key.identity || $0.key.model != key.model || $0.key.sequence != key.sequence || $0.key.revision != key.revision }
+        if !revision.isEmpty, let index = coverageCache.firstIndex(where:{$0.key == key}) {
+            let cached = coverageCache.remove(at:index); coverageCache.append(cached); return (cached.indexed,cached.total)
+        }
         let indexed = try vectorCount(modelID:modelID,filter:filter), total = try matchingCount(filter)
-        coverageCache = revision.isEmpty ? nil : (key,indexed,total)
+        if !revision.isEmpty { coverageCache.append((key,indexed,total)); if coverageCache.count > 4 { coverageCache.removeFirst() } }
         return (indexed,total)
     }
     public func memoriesNeedingVectors(modelID: String, afterID: String = "", limit: Int = 16) throws -> [Memory] {
@@ -288,7 +291,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let maxBytes, diskBytes() > maxBytes {
             // Drop rebuildable graph storage before sacrificing recorded evidence.
             try exec("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
-            metalScopeCache = nil; coverageCache = nil; annCache.reset(); let cache = root.appendingPathComponent("indexes")
+            metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
             if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         }
         if let maxBytes, diskBytes() > maxBytes { try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;"); var size = diskBytes(); let stmt = try prepare("SELECT id FROM memories ORDER BY timestamp"); var oldest = [String](); while sqlite3_step(stmt) == SQLITE_ROW { oldest.append(string(stmt,0)) }; sqlite3_finalize(stmt)
@@ -308,7 +311,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         try exec("BEGIN IMMEDIATE")
         do { try exec("DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
-        metalScopeCache = nil; coverageCache = nil; annCache.reset(); let cache = root.appendingPathComponent("indexes")
+        metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
         if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
         for folder in ["images", "audio"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
@@ -369,7 +372,7 @@ extension MemoryStore {
         return sqlite3_step(legacy) == SQLITE_ROW ? Int(sqlite3_column_int(legacy,0)) : nil
     }
     public func cancelSearchIndexBuild(pauseAutomatic: Bool = false) { annCache.cancel(pauseAutomatic:pauseAutomatic) }
-    public func releaseSearchIndex() { lock.lock(); metalScopeCache = nil; coverageCache = nil; lock.unlock(); annCache.reset() }
+    public func releaseSearchIndex() { lock.lock(); metalScopeCache = nil; coverageCache.removeAll(); lock.unlock(); annCache.reset() }
     public func checkpointSearchIndexIfIdle(allowLowPower: Bool = false) throws { try annCache.checkpointIfIdle(allowLowPower:allowLowPower) }
 }
 
