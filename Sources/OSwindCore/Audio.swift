@@ -96,7 +96,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     @Published public private(set) var running = false
     @Published public private(set) var status = "Audio off"
     @Published public private(set) var transcribed = 0
-    public let recognizer = SpeechRecognizer()
+    public let recognizer: SpeechRecognizer
     public var onCapture: ((Memory) -> Void)?
     private var engine: AVAudioEngine?
     private var systemCapture: (any AudioSystemCapture)?
@@ -127,8 +127,8 @@ private final class AudioAccumulator: @unchecked Sendable {
     public convenience init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {
         self.init(store:store,embedder:embedder,settings:settings,startup:AudioStartupEnvironment())
     }
-    init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings, startup: AudioStartupEnvironment) {
-        self.store=store; self.embedder=embedder; self.settings=settings; self.startup=startup
+    init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings, startup: AudioStartupEnvironment, recognizer:SpeechRecognizer=SpeechRecognizer()) {
+        self.store=store; self.embedder=embedder; self.settings=settings; self.startup=startup; self.recognizer=recognizer
     }
     public func start() async {
         guard !running else { return }

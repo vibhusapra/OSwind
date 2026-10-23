@@ -17,6 +17,7 @@ import AVFoundation
     }
     private func fixture(_ gate: Gate, locked: @escaping () -> Bool = { false },
                          context: @escaping () -> WindowContext? = { nil },
+                         recognizer:SpeechRecognizer?=nil,
                          configure: (inout AudioStartupEnvironment) -> Void = { _ in },
                          acquire: @escaping () -> Void) throws -> (AudioController, URL) {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-audio-lifecycle-"+UUID().uuidString)
@@ -26,7 +27,7 @@ import AVFoundation
         try Data("not a real model".utf8).write(to:URL(fileURLWithPath:settings.whisperModel))
         var environment=AudioStartupEnvironment(locked:locked,context:context,authorizeMicrophone:{ await gate.authorize() },makeEngine:{ acquire(); throw OSwindError.unavailable("test stops before device acquisition") })
         configure(&environment)
-        return (AudioController(store:try MemoryStore(root:root.appendingPathComponent("library")),embedder:LocalEmbedder(),settings:settings,startup:environment),root)
+        return (AudioController(store:try MemoryStore(root:root.appendingPathComponent("library")),embedder:LocalEmbedder(),settings:settings,startup:environment,recognizer:recognizer ?? SpeechRecognizer()),root)
     }
     func testStopDuringAuthorizationCannotAcquireDevice() async throws {
         let gate=Gate(); var acquired=0
@@ -136,6 +137,45 @@ import AVFoundation
         // stop() releases an asynchronous ScreenCaptureKit resource on its own task.
         for _ in 0..<100 where new.active { await Task.yield() }
         XCTAssertFalse(audio.running); XCTAssertFalse(new.active)
+    }
+
+    private struct PreparedBackend:NativeSpeechBackend {
+        func transcribe(file:URL,language:String) async throws -> SpeechTranscript { SpeechTranscript(text:"Synthetic",duration:1,segments:[],model:"test") }
+    }
+    private func enableNative(_ audio:AudioController,root:URL) throws {
+        let models=root.appendingPathComponent("synthetic-compiled-model")
+        try Paths.ensure(models)
+        for name in ["Preprocessor.mlmodelc","Encoder.mlmodelc","Decoder.mlmodelc","JointDecisionv3.mlmodelc"] { try Paths.ensure(models.appendingPathComponent(name)) }
+        try Data("{}".utf8).write(to:models.appendingPathComponent("parakeet_vocab.json"))
+        audio.settings.speech.engine = .parakeet; audio.settings.speech.modelDirectory=models.path
+    }
+    func testStopLockAndSourceChangesDuringNativePreparationNeverRequestMicrophone() async throws {
+        for action in 0..<3 {
+            let model=Gate(), authorization=Gate(); var requested=0,locked=false
+            let recognizer=SpeechRecognizer(loader:{ _ in _ = await model.authorize(); return PreparedBackend() })
+            let (audio,root)=try fixture(authorization,locked:{locked},recognizer:recognizer,configure:{ env in env.authorizeMicrophone={ requested += 1; return false } },acquire:{ XCTFail("Never acquire a device") })
+            defer { audio.stop(); try? FileManager.default.removeItem(at:root) }
+            try enableNative(audio,root:root)
+            let attempt=Task { await audio.start() }; await fulfillment(of:[model.entered],timeout:5)
+            switch action { case 0: audio.stop(); case 1: locked=true; default: audio.settings.audioEnabled=false }
+            model.resolve(); await attempt.value
+            XCTAssertEqual(requested,0); XCTAssertFalse(audio.running)
+        }
+    }
+    func testOldPreparationCompletionCannotClearNewAttemptsCancellationHandle() async throws {
+        let old=Gate(), new=Gate(), authorization=Gate(); var loads=0,requested=0
+        let recognizer=SpeechRecognizer(loader:{ _ in
+            let gate=await MainActor.run { loads += 1; return loads==1 ? old : new }
+            _ = await gate.authorize(); return PreparedBackend()
+        })
+        let (audio,root)=try fixture(authorization,recognizer:recognizer,configure:{ env in env.authorizeMicrophone={ requested += 1; return false } },acquire:{ XCTFail("Never acquire a device") })
+        defer { audio.stop(); try? FileManager.default.removeItem(at:root) }
+        try enableNative(audio,root:root)
+        let first=Task { await audio.start() }; await fulfillment(of:[old.entered],timeout:5)
+        audio.stop(); let second=Task { await audio.start() }
+        old.resolve(); await fulfillment(of:[new.entered],timeout:5); await first.value
+        XCTAssertTrue(audio.running); audio.stop(); new.resolve(); await second.value
+        XCTAssertEqual(requested,0); XCTAssertFalse(audio.running); XCTAssertEqual(audio.status,"Audio off")
     }
 
 }

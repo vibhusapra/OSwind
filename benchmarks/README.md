@@ -270,3 +270,27 @@ These are single APFS operation trials with uncontrolled filesystem caches, CPU 
 `speech-diarization-synthetic-v1.json` records an isolated FluidAudio 0.17.7 / Community-1 offline trial, not app integration. Four original scripted utterances use stock Kokoro `af_heart` / `am_echo` in A/B/A/B order, with .75-second gaps (32.225 s total). The model chooses two clusters automatically and maps all four utterances consistently; all 76 eligible ASR-timed words (excluding .25 s around utterance edges) associate with their known synthetic voice cluster. Parakeet v3 transcribes the 80 scripted words with normalized WER 0 in this same easy clean fixture. Its reported inference is .173 s; diarization processing is 3.062 s. First diarization process is 16.18 s including 12.738 s model loading/download/compilation. Peak RSS is 204,259,328 bytes; macOS reports a larger 491,340,856-byte peak memory footprint, so RSS alone understates total memory impact.
 
 The reference uses known generated voice sources and clip intervals, not independently annotated natural speech activity; ASR word times are not independent annotations either. These checks establish synthetic association/consistency and execution, not natural-meeting DER/WDER, noise/overlap quality, energy, speaker identity or a competitor rank. The standalone pinned `tools/SpeechProbe` and its local fixture generator make the method reviewable. Code and model licenses are separate: SDK Apache-2.0, supported Community-1 converted assets scoped CC BY 4.0 per upstream card/NOTICE/provenance. Further model setup/integration and capture-lifecycle testing remain ahead.
+
+
+## Integrated speech import (JFK, v1)
+
+`benchmarks/speech-import-jfk-v1.json` records eight release CLI imports, two per configuration, on Apple M5 Max. Every trial normalizes the public 11-second JFK recording, recognizes, sanitizes, inserts and retrieves its transcript in a fresh library/process. All have normalized WER 0 on this one clean known clip. Parakeet returns 22 word spans; Whisper base.en returns one segment. This is a functional/latency regression, not held-out speech accuracy, independent word-alignment scoring or a competitor app comparison.
+
+| Configuration | First trial wall | Second trial wall | Reported peak RSS range |
+| --- | ---: | ---: | ---: |
+| Parakeet / ANE+CPU | 10.986 s | .254 s | 103–532 MB |
+| Parakeet / GPU+CPU | 6.598 s | .509 s | 2,419–2,636 MB |
+| Parakeet / CPU | 1.770 s | .379 s | 1,347–1,711 MB |
+| Whisper base.en / default | 13.653 s | .304 s | 385–411 MB |
+
+Existing Core ML/weight caches and system background activity are uncontrolled. “First” does not mean a reproducibly cold machine, and these numbers do not measure resident throughput or energy. RSS/footprint accounting differs and may exclude external ANE/Core ML services; these are not whole-system memory totals. Do not infer a universal engine/compute winner from two short trials. Raw outputs, file hashes, source/binary identity, retrieval checks and limitations are retained.
+
+```bash
+python3 scripts/setup-native-speech.py --destination /absolute/new/model-directory
+python3 scripts/speech-eval.py .build/release/oswindctl \
+  --audio /absolute/public/jfk.wav \
+  --reference "And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country." \
+  --native-model /absolute/new/model-directory \
+  --whisper-model /absolute/ggml-base.en.bin \
+  --output /absolute/speech-import-report.json
+```
