@@ -9,7 +9,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-visual-contract-') as temporary:
         assert (result.returncode==0)==ok,(args,result.stderr)
         return result.stdout
     report=json.loads(cli('probe-visual-replay','--output',probe,'--frames','2','--software'))
-    assert report['input_frames']==report['stored_frames']==report['decoded_frames']==report['ocr_checks_passed']==report['decoded_ocr_checks_passed']==report['decoded_frame_identity_checks_passed']==2
+    assert report['input_frames']==report['stored_frames']==report['decoded_frames']==report['ocr_checks_passed']==report['source_frame_identity_checks_passed']==report['decoded_ocr_checks_passed']==report['decoded_frame_identity_checks_passed']==2
     original=hashlib.sha256((probe/'report.json').read_bytes()).hexdigest()
     cli('probe-visual-replay','--output',probe,'--frames','2','--software',ok=False)
     assert hashlib.sha256((probe/'report.json').read_bytes()).hexdigest()==original

@@ -25,7 +25,7 @@ swift build -c release
   capture-replay --seconds 12 --app-bundle org.example.your-synthetic-fixture
 ```
 
-The generated probe uses only its own desktop-like pixels, real Vision OCR, the actual encoder and every-frame AVFoundation decode. It compares retained video plus thumbnail bytes against JPEGs of the same pixels at quality 0.75; it excludes database/metadata bytes. It refuses an existing output directory and preserves failed output for diagnosis. A bounded live command fails if it saves no evidence; it does not prompt for permissions or switch to another application if the chosen target is absent.
+The generated probe uses only its own desktop-like pixels, real Vision OCR, the actual encoder and every-frame AVFoundation decode. It checks both authored ownership phrases and a strict unique frame token in the original and decoded OCR, so a wrong-frame seek cannot pass on dimensions alone. It compares retained video plus thumbnail bytes against JPEGs of the same pixels at quality 0.75; it excludes database/metadata bytes. It refuses an existing output directory and preserves failed output for diagnosis. A bounded live command fails if it saves no evidence; it does not prompt for permissions or switch to another application if the chosen target is absent.
 
 On Apple M5 Max/macOS 26.6.2, the initial 12-frame 1280×720 probe preserved all OCR checks and decoded all frames. HEVC used 59,969 bytes plus 31,236 thumbnail bytes, versus 572,784 JPEG bytes: ratio 0.159. This small static synthetic fixture is not a daily storage, energy or competitor comparison. A separate 12-second ScreenCaptureKit run against an isolated changing native window saved 12 frames in four HEVC clips. Native app interaction opened the saved source, sought a frame, advanced playback and enabled timed OCR boxes. Logs/screenshots remain under the local artifacts directory; public benchmark summaries identify their scope.
 
@@ -36,5 +36,7 @@ On Apple M5 Max/macOS 26.6.2, the initial 12-frame 1280×720 probe preserved all
 - Physical sleep/lock/unlock recovery, permission revocation, long hardware capture and older Mac/macOS coverage.
 - Measured battery/CPU/storage growth against matched competitor app workloads.
 - Visual semantic embeddings, cross-clip continuous scrubbing and frame-level date filtering within a clip. Source filters currently use clip start time.
+
+A retained probe diagnostic initially failed strict heading equality because the decoded heading read numeral “0” as letter “O”; ownership and the unique `visual-000` frame token remained intact. The identity gate now uses the authored unique token with exact digits and the known global frame index. No numeric substitutions or fuzzy token matches are accepted.
 
 The broad parity and top-three product goals remain open. The separate 24-hour synthetic component soak is not a replay/device/power trial.
