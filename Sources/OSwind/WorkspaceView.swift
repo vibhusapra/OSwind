@@ -2,8 +2,7 @@ import SwiftUI
 import OSwindCore
 import AppKit
 
-private let ink = Color(red:0.08,green:0.12,blue:0.14)
-private let accent = Color(red:0.25,green:0.70,blue:0.59)
+private let accent = OSwindTheme.accent
 struct WorkspaceView: View {
     @EnvironmentObject var m: AppModel
     @FocusState private var searchFocused: Bool
@@ -29,18 +28,18 @@ struct WorkspaceView: View {
             Divider()
             VStack(spacing:0) {
                 HStack {
-                    HStack(spacing:7) { Circle().fill(m.capture.running ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running ? "CAPTURING" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
+                    HStack(spacing:7) { Circle().fill(m.isCapturing ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running && m.audio.running ? "SCREEN + AUDIO" : m.capture.running ? "CAPTURING" : m.audio.running ? "AUDIO" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
                     Spacer()
                     if m.demo { Text("SAMPLE DATA").font(.system(size:10,weight:.bold,design:.monospaced)).padding(6).background(.orange.opacity(0.12),in:Capsule()) }
                     Button { showNote = true } label: { Label("Quick note",systemImage:"plus") }.buttonStyle(.borderless)
-                    Button { m.toggleCapture() } label: { Label(m.capture.running ? "Pause" : "Resume",systemImage:m.capture.running ? "pause.fill" : "play.fill") }.buttonStyle(.bordered)
+                    Button { m.toggleCapture() } label: { Label(m.isCapturing ? "Pause" : "Resume",systemImage:m.isCapturing ? "pause.fill" : "play.fill") }.buttonStyle(.bordered)
                 }.padding(.horizontal,30).padding(.vertical,18)
                 Divider().opacity(0.5)
                 if m.section == "Ask" { AskView() }
                 else if m.section == "Insights" { InsightsView() }
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .onReceive(NotificationCenter.default.publisher(for:.oswindFocusSearch)) { _ in m.section = "Memories"; searchFocused = true }
@@ -139,7 +138,7 @@ struct AskView: View {
             Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
             Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
             HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } }
-            HStack { TextField("What did we decide about…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.buttonStyle(.borderedProminent).disabled(m.asking || m.question.isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12))
+            HStack { TextField("What did we decide about…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.buttonStyle(.borderedProminent).disabled(m.asking || m.question.isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
             HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
             if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary) } }
             ScrollView {

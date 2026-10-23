@@ -16,7 +16,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - 1,000-row debug and 10,000-row release synthetic retrieval benchmarks saved. 10k hybrid p95 ~21.7 ms, hit@5 1.0 and MRR .833; keyword MRR 1.0; semantic-only hit@5 .583. The narrow repeated-topic fixture favors keyword matching and is not a competitor benchmark.
 - Paused debug app sampled for 65 seconds while locked: median RSS ~155 MiB. This is not active-capture power use; ps CPU is a lifetime average.
 - CLI attempted capture while the Mac was locked and correctly reported `Locked · capture suspended`. Native UI automation could not proceed because the Mac was locked. No attempt was made to bypass the lock.
-- Native sample workspace rendered from its own NSHostingView and visually inspected without reading the desktop; search-mode label wrapping was fixed. Live keyboard, permissions and capture interactions remain unverified. Sample render is saved in `assets/workspace-sample.png`.
+- Native sample workspace rendered from its own NSHostingView and visually inspected without reading the desktop; search-mode label wrapping was fixed. Live keyboard, permissions and capture interactions remain unverified. Sample render is saved in `assets/workspace-sample.png`; a light-mode minimum-window layout and the Ask view were also rendered and inspected. Added appearance-aware accent contrast and a visible audio-only recording state.
 - Interactive research report reviewed in an in-app browser at desktop and narrow layout; feature filtering works (vault query: 1 of 72 requirements). Repaired a JavaScript newline escaping error found during review.
 
 ## Implemented, broader runtime checks still needed
