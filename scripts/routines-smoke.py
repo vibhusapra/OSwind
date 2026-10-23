@@ -52,7 +52,7 @@ try:
     check('Full backup/restore preserves definitions, revisions, next occurrences, history and citations; automatic execution restores off')
     cli('delete',source['id']);runs=cli('routine','history',identifier);assert next(r for r in runs if r['id']==first['id'])['resultAvailable'] is False
     assert not cli('chat','show',first['chatID'])['turns']
-    cli('routine','delete',identifier);assert not cli('routine','history',identifier)
+    cli('routine','delete',identifier);assert not cli('routine','history',identifier);assert not cli('chat','list')
     check('Source erasure removes dependent result text; deleting the routine removes its result conversations and history')
     if a.chat_model:
         model_library=root/'local-model';model_source={'id':cli('note','Mira owns the retrieval benchmark. The prototype is due Friday.',data=model_library).strip()}

@@ -23,7 +23,7 @@ struct RoutineDatabase {
     func text(_ row:OpaquePointer,_ column:Int32) -> String {guard let data=sqlite3_column_text(row,column) else {return ""};return String(decoding:UnsafeBufferPointer(start:data,count:Int(sqlite3_column_bytes(row,column))),as:UTF8.self)}
     func optional(_ row:OpaquePointer,_ column:Int32) -> String? {sqlite3_column_type(row,column)==SQLITE_NULL ? nil : text(row,column)}
     func bind(_ row:OpaquePointer,_ index:Int32,_ value:String?) {if let value {sqlite3_bind_text64(row,index,value,UInt64(value.utf8.count),transient,UInt8(SQLITE_UTF8))} else {sqlite3_bind_null(row,index)}}
-    func bind<T:Encodable>(_ row:OpaquePointer,_ index:Int32,json:T) throws {let data=try JSONEncoder().encode(json);_ = data.withUnsafeBytes {sqlite3_bind_blob(row,index,$0.baseAddress,Int32(data.count),transient)}}
+    func bind<T:Encodable>(_ row:OpaquePointer,_ index:Int32,json:T) throws {let data=try JSONEncoder().encode(json);guard data.count<=32768 else {throw OSwindError.invalid("Routine payload exceeds 32 KiB")};_ = data.withUnsafeBytes {sqlite3_bind_blob(row,index,$0.baseAddress,Int32(data.count),transient)}}
     func decode<T:Decodable>(_ row:OpaquePointer,_ column:Int32,as:T.Type) throws -> T {let count=Int(sqlite3_column_bytes(row,column));guard count>0,count<=32768,let data=sqlite3_column_blob(row,column) else {throw OSwindError.database("Invalid routine payload")};return try JSONDecoder().decode(T.self,from:Data(bytes:data,count:count))}
     func done(_ row:OpaquePointer) throws {guard sqlite3_step(row)==SQLITE_DONE else {throw error()}}
     func transaction<T>(_ body:() throws -> T) throws -> T {
@@ -61,6 +61,7 @@ extension MemoryStore {
             if current==nil {
                 let count=try db.statement("SELECT COUNT(*) FROM routines");defer {sqlite3_finalize(count)};guard sqlite3_step(count)==SQLITE_ROW,sqlite3_column_int(count,0)<100 else {throw OSwindError.invalid("At most 100 routines can be saved")}
             }
+            guard (current?.revision ?? 0)<Int.max-1 else {throw OSwindError.invalid("Routine revision limit reached")}
             let revision=(current?.revision ?? 0)+1
             let row=try db.statement("INSERT INTO routines(id,revision,enabled,next_due,payload) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,enabled=excluded.enabled,next_due=excluded.next_due,payload=excluded.payload");defer {sqlite3_finalize(row)}
             db.bind(row,1,value.id);sqlite3_bind_int64(row,2,Int64(revision));sqlite3_bind_int(row,3,value.enabled ? 1:0);sqlite3_bind_double(row,4,next.timeIntervalSince1970);try db.bind(row,5,json:value);try db.done(row)

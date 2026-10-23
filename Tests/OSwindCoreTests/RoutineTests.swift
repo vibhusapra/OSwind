@@ -49,6 +49,14 @@ final class RoutineTests:XCTestCase {
         XCTAssertThrowsError(try store.saveRoutine(d,expectedRevision:1,now:start))
         d.ai.provider = .compatible;d.ai.endpoint="https://user:secret@example.com";XCTAssertThrowsError(try store.saveRoutine(d,now:start))
     }
+    func testEncodedPayloadAndRevisionLimitsFailBeforeMutation() throws {
+        var d=definition();d.prompt=String(repeating:"\u{1}",count:8000)
+        XCTAssertThrowsError(try store.saveRoutine(d,now:start));XCTAssertTrue(try store.routines().isEmpty)
+        let saved=try store.saveRoutine(definition(),now:start)
+        try store.withRoutineDatabase {try $0.execute("UPDATE routines SET revision=9223372036854775807")}
+        XCTAssertThrowsError(try store.saveRoutine(saved.definition,expectedRevision:Int.max,now:start))
+        XCTAssertEqual(try store.routines().first?.revision,Int.max)
+    }
     func testConcurrentConnectionsClaimOneSlotAndConsumeFailures() async throws {
         let saved=try store.saveRoutine(definition(),now:start),second=try MemoryStore(root:store.root),at=date("2026-10-23T17:01:00Z")
         let claims=try await withThrowingTaskGroup(of:RoutineClaim?.self) {group in

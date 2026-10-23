@@ -137,9 +137,12 @@ private final class RestoreRows {
             if !startNull { let start = try self.integer(row,5), length = try self.integer(row,6); guard start>=0,length>0, PassageRange(start:Int(start),length:Int(length)).text(in:memory.text) != nil else { throw BackupFileError.invalid("Invalid restored evidence anchor") } }
         },progress:{ try progress(LibraryBackupProgress(phase:"Restoring conversations",completedItems:$0,unit:"sources")) })
         if source.schema>=13 {
+            var routineCount=0
             _ = try copy("routines",columns:["id","revision","enabled","next_due","payload"],into:handle,validate:{ row in
                 let id=try self.source.db.text(row,0),revision=try self.integer(row,1),enabled=try self.integer(row,2)
-                let definition=try JSONDecoder().decode(RoutineDefinition.self,from:self.payload(row,4));_ = try definition.validated()
+                routineCount += 1;guard routineCount<=100 else {throw BackupFileError.invalid("Backup has more than 100 routines")}
+                let data=try self.payload(row,4);guard data.count<=32768 else {throw BackupFileError.invalid("Routine payload exceeds 32 KiB")}
+                let definition=try JSONDecoder().decode(RoutineDefinition.self,from:data);_ = try definition.validated()
                 guard id==definition.id,revision>0,revision<Int64.max,enabled==(definition.enabled ? 1:0) else {throw BackupFileError.invalid("Invalid restored routine definition")}
                 try RoutineDefinition.validateDate(Date(timeIntervalSince1970:self.number(row,3)))
             })
@@ -149,7 +152,8 @@ private final class RestoreRows {
                 for column:Int32 in [3,4] {try RoutineDefinition.validateDate(Date(timeIntervalSince1970:self.number(row,column)))}
                 if sqlite3_column_type(row,5) != SQLITE_NULL {_ = try self.number(row,5)}
                 if let message=try self.optionalText(row,9) {guard message.utf8.count<=2000 else {throw BackupFileError.invalid("Oversized routine message")}}
-                let scope=try JSONDecoder().decode(SearchFilter.self,from:self.payload(row,10))
+                let data=try self.payload(row,10);guard data.count<=32768 else {throw BackupFileError.invalid("Routine scope exceeds 32 KiB")}
+                let scope=try JSONDecoder().decode(SearchFilter.self,from:data)
                 guard scope.query.isEmpty,let start=scope.start,let end=scope.end,start<=end else {throw BackupFileError.invalid("Invalid routine scope")}
                 try RoutineDefinition.validateDate(start);try RoutineDefinition.validateDate(end)
             },afterBind:{row,insert in

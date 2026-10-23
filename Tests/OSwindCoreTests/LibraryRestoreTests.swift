@@ -55,6 +55,22 @@ final class LibraryRestoreTests: XCTestCase {
         XCTAssertThrowsError(try LibraryBackup.restore(archive,to:restoredURL))
         XCTAssertFalse(FileManager.default.fileExists(atPath:restoredURL.path));XCTAssertEqual(try store.routines().count,1)
     }
+    func testPaddedRoutinePayloadCannotPublishRestoredLibrary() throws {
+        _ = try store.saveRoutine(RoutineDefinition());_ = try LibraryBackup.create(store:store,destination:archive)
+        try rewriteDatabase("UPDATE routines SET payload=CAST(CAST(payload AS TEXT)||printf('%40000s','') AS BLOB);")
+        XCTAssertThrowsError(try LibraryBackup.restore(archive,to:restoredURL));XCTAssertFalse(FileManager.default.fileExists(atPath:restoredURL.path))
+    }
+    func testOversizedArchivedRoutineCountCannotPublish() throws {
+        _ = try store.saveRoutine(RoutineDefinition());_ = try LibraryBackup.create(store:store,destination:archive)
+        var statements=[String]()
+        for i in 0..<100 {
+            var value=RoutineDefinition();value.id="synthetic-extra-\(i)"
+            let data=try JSONEncoder().encode(value),hex=data.map {String(format:"%02x",$0)}.joined()
+            statements.append("INSERT INTO routines(id,revision,enabled,next_due,payload) VALUES('\(value.id)',1,1,0,x'\(hex)');")
+        }
+        try rewriteDatabase(statements.joined())
+        XCTAssertThrowsError(try LibraryBackup.restore(archive,to:restoredURL));XCTAssertFalse(FileManager.default.fileExists(atPath:restoredURL.path))
+    }
     func testArchivedTriggerDoesNotReachTrustedRestoredSchema() throws {
         try store.insert(Memory(id:"one",text:"One")); try store.insert(Memory(id:"two",text:"Two")); _ = try LibraryBackup.create(store:store,destination:archive)
         try rewriteDatabase("CREATE TRIGGER archive_trap AFTER INSERT ON memories BEGIN DELETE FROM memories WHERE id<>new.id; END;")
