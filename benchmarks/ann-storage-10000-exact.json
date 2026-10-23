@@ -1,0 +1,450 @@
+{
+  "archive_retained" : true,
+  "build" : "release",
+  "count" : 10000,
+  "dimensions" : 1024,
+  "disk_bytes" : 57250822,
+  "gpu" : "Apple M5 Max",
+  "index_policy" : "exact",
+  "index_prepare_seconds" : 0,
+  "ingest_seconds" : 2.4824479818344116,
+  "layout" : "semantic_vectors",
+  "modes" : {
+    "all_candidates" : {
+      "app_filtered" : false,
+      "first_query_ms" : 12.910962104797363,
+      "measurements" : [
+        {
+          "latency_ms" : 12.910962104797363,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000",
+            "row-00002291",
+            "row-00004853",
+            "row-00005037",
+            "row-00002253"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 13.905048370361328,
+          "repetition" : 0,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 12.444972991943359,
+          "repetition" : 0,
+          "returned" : [
+            "row-00009999",
+            "row-00009908",
+            "row-00006683",
+            "row-00007980",
+            "row-00000985"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 12.24207878112793,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000",
+            "row-00002291",
+            "row-00004853",
+            "row-00005037",
+            "row-00002253"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 13.611912727355957,
+          "repetition" : 1,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 13.521075248718262,
+          "repetition" : 1,
+          "returned" : [
+            "row-00009999",
+            "row-00009908",
+            "row-00006683",
+            "row-00007980",
+            "row-00000985"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 14.161944389343262,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000",
+            "row-00002291",
+            "row-00004853",
+            "row-00005037",
+            "row-00002253"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 12.802958488464355,
+          "repetition" : 2,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 13.369083404541016,
+          "repetition" : 2,
+          "returned" : [
+            "row-00009999",
+            "row-00009908",
+            "row-00006683",
+            "row-00007980",
+            "row-00000985"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : -1,
+      "p50_ms" : 13.369083404541016,
+      "p95_ms" : 13.905048370361328,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "filtered" : {
+      "app_filtered" : true,
+      "first_query_ms" : 10.145068168640137,
+      "measurements" : [
+        {
+          "latency_ms" : 10.145068168640137,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000",
+            "row-00001326",
+            "row-00003510",
+            "row-00008978",
+            "row-00003854"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 9.3729496002197266,
+          "repetition" : 0,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.470032691955566,
+          "repetition" : 0,
+          "returned" : [
+            "row-00009999",
+            "row-00006683",
+            "row-00000985",
+            "row-00004661",
+            "row-00001079"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.779023170471191,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000",
+            "row-00001326",
+            "row-00003510",
+            "row-00008978",
+            "row-00003854"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.041952133178711,
+          "repetition" : 1,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 11.284947395324707,
+          "repetition" : 1,
+          "returned" : [
+            "row-00009999",
+            "row-00006683",
+            "row-00000985",
+            "row-00004661",
+            "row-00001079"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.444045066833496,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000",
+            "row-00001326",
+            "row-00003510",
+            "row-00008978",
+            "row-00003854"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.335922241210938,
+          "repetition" : 2,
+          "returned" : [
+            "row-00003333",
+            "row-00007679",
+            "row-00009715",
+            "row-00001003",
+            "row-00004479"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 9.5139741897583008,
+          "repetition" : 2,
+          "returned" : [
+            "row-00009999",
+            "row-00006683",
+            "row-00000985",
+            "row-00004661",
+            "row-00001079"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : -1,
+      "p50_ms" : 10.335922241210938,
+      "p95_ms" : 10.779023170471191,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "thresholded" : {
+      "app_filtered" : false,
+      "first_query_ms" : 11.489033699035645,
+      "measurements" : [
+        {
+          "latency_ms" : 11.489033699035645,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 11.85297966003418,
+          "repetition" : 0,
+          "returned" : [
+            "row-00003333"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 12.632012367248535,
+          "repetition" : 0,
+          "returned" : [
+            "row-00009999"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 10.545969009399414,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 15.336990356445312,
+          "repetition" : 1,
+          "returned" : [
+            "row-00003333"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 11.547088623046875,
+          "repetition" : 1,
+          "returned" : [
+            "row-00009999"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 11.733055114746094,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 11.422991752624512,
+          "repetition" : 2,
+          "returned" : [
+            "row-00003333"
+          ],
+          "row" : 3333,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 12.277007102966309,
+          "repetition" : 2,
+          "returned" : [
+            "row-00009999"
+          ],
+          "row" : 9999,
+          "strategy" : "exact",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : 0.25,
+      "p50_ms" : 11.733055114746094,
+      "p95_ms" : 12.632012367248535,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    }
+  },
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "process_peak_rss_bytes" : 24526848,
+  "random_seed" : "row+xorshift64star-v1",
+  "reused_records" : 0,
+  "schema" : 2,
+  "scope" : "Normalized synthetic random vectors and exact self-match checks. Timings include the selected SQLite search path and live validation\/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion\/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately.",
+  "timestamp" : "2026-10-23T07:24:03Z"
+}

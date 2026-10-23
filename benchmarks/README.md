@@ -10,7 +10,7 @@ swift build -c release
 .build/release/oswindctl benchmark --count 10000 --output benchmarks/oswind-10000.json
 ```
 
-The benchmark creates and removes an isolated temporary store. Twelve topic templates are repeated to fill the requested record count; 12 queries run three times across keyword, semantic and hybrid retrieval. It reports ingest throughput, disk bytes, hit rate@5, MRR@5, and p50/p95 including query embedding. Relevant items are any record with the expected topic label. This is a fast regression/scaling fixture, not a representative user study. Repeated topics can crowd out other sources and overstate recall. Semantic search scans every filtered vector.
+The benchmark creates and removes an isolated temporary store. Twelve topic templates are repeated to fill the requested record count; 12 queries run three times across keyword, semantic and hybrid retrieval. It reports ingest throughput, disk bytes, hit rate@5, MRR@5, and p50/p95 including query embedding. Relevant items are any record with the expected topic label. This is a fast regression/scaling fixture, not a representative user study. Repeated topics can crowd out other sources and overstate recall. Exact semantic search scans every filtered vector; Automatic may use the optional native index for larger unfiltered archives.
 
 Initial debug result on Apple M5 Max/macOS26: 1,000 rows ingested at ~116 records/s; ~7.75 MB database directory; hybrid p95 ~7.1 ms, hit@5 1.0, MRR .917. Keyword beat hybrid on this fixture. Semantic-only hit@5 .583 is a known quality limitation. Results must be regenerated after retrieval changes; retain build configuration with reported results.
 
@@ -73,3 +73,25 @@ Paired development runs on M5 Max/macOS26.6.2:
 ### Million-vector gate: failed
 
 `vector-scaling-1000000.json` records a real release run of 1,000,000 × 1024-dimensional vectors: ~5.33 GB database directory, ~235 seconds ingest, ~25 MiB benchmark-process peak RSS. Exact top-1 remained 1.0, but all-candidate p50 was ~1.31 s and p95 **22.42 s**. Thresholded p95 was ~1.22 s; half-archive app-filter p95 ~.88 s. The long tail fails the intended interactive-performance target. Its cause was not established; do not attribute it to cold caches without profiling. This historical run retains aggregate timings; the benchmark now also emits per-query/repetition timings and returned IDs for future diagnosis. ANN/partitioning, retained repeatable archives, cold/warm runs and capture-write contention are next gates. No competitor ranking follows from these results.
+
+
+## Native indexed retrieval milestone
+
+```bash
+.build/release/oswindctl benchmark-vectors --count 100000 --dimensions 1024 --indexed --quality-queries 16 --archive .local/ann-benchmark-100000 --output results.json
+```
+
+`--archive` retains an explicitly marked synthetic-only archive for repeat runs. Unknown/nonempty directories are refused. Source rows/vector batches resume after interruption; graph construction currently restarts. No model inference occurs in this workload. HNSW uses float16 normalized vectors; live float32 candidates are reranked in SQLite. Automatic keeps small and all filtered scopes exact; explicit `--indexed` tests the approximate path even where slower.
+
+Paired 1024-dimensional release trials on M5 Max/macOS 26.6.2 (`ann-storage-*`):
+
+| Records | Exact unfiltered p95 | Indexed unfiltered p95 | Exact half-app p95 | Indexed half-app p95 | Index preparation |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 10k | 13.91 ms | 12.70 ms | 10.78 ms | 55.38 ms | 4.53 s |
+| 100k | 132.00 ms | 66.79 ms | 99.41 ms | 399.03 ms | 251.94 s |
+
+Every self-match was top-1. These are nine warm samples per mode; p95 is coarse. Preparation uses at most four CPU workers, not the GPU. The initial 100k build process peaked near 517 MiB; a later reopen/query process after bounding hash-buffer lifetimes peaked near 289 MiB. These are different process lifecycles, not a controlled memory optimization comparison. Snapshots add disk/RAM costs; database and OS cache are separate.
+
+`ann-quality-100000.json` reopens the retained 100k graph in ~153 ms (warm filesystem, not a cold boot). Sixteen deterministic non-self queries per scope compare real parallel-built SQLite/ANN results with exhaustive float32 top-10 ground truth. Recall@10 was 1.0 for unfiltered and half-app queries. Unfiltered p95 was 58.35 ms indexed / 124.12 ms exact; filtered p95 was 456.29 / 105.83 ms. This small random-vector result is neither natural-language relevance nor a guarantee against approximation misses. Counts/statistics, cold starts, concurrent capture and larger realistic archives remain open. A million-vector retained build is in progress; its result is not established.
+
+`native-hnsw-component-*` separately records an initial serial native-only exploration: 100k build ~990 seconds; query expansion 128/512/2048/8192 yielded Recall@10 .156/.431/.850/1.0 on 16 random non-self queries. This motivated the conservative 8192 search budget. Component timings exclude SQLite, filters, validation and reranking and must not be presented as product latency. Full application fixtures now test replay, deletion/update, filters/favorites, >5000-change exact fallback, corruption recovery, store erasure and schema-3 preservation. Twelve cache/retrieval tests also pass ThreadSanitizer. No competitor runtime or power measurement was performed.

@@ -18,6 +18,8 @@ jobs:
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
+      - name: Exercise indexed API and MCP processes
+        run: python3 scripts/integration-smoke.py .build/release/oswindctl --indexed
       - name: Exercise durable conversation processes
         run: python3 scripts/conversation-smoke.py .build/release/oswindctl
       - name: Evaluate authored retrieval fixture
@@ -31,6 +33,16 @@ jobs:
           import json
           report = json.load(open('.artifacts/vector-scaling-ci.json'))
           assert all(mode['top1_exact_match_rate'] == 1 for mode in report['modes'].values())
+          PYCODE
+      - name: Verify indexed identity and non-self recall
+        run: |
+          .build/release/oswindctl benchmark-vectors --count 1000 --dimensions 128 --indexed --quality-queries 8 --output .artifacts/vector-indexed-ci.json
+          python3 - <<'PYCODE'
+          import json
+          report = json.load(open('.artifacts/vector-indexed-ci.json'))
+          assert all(mode['top1_exact_match_rate'] == 1 for mode in report['modes'].values())
+          assert all(mode['recall_at_10'] >= .95 for mode in report['nonself_quality'].values())
+          assert all(q['strategy'] == 'ann-exact-rerank' for mode in report['nonself_quality'].values() for q in mode['measurements'])
           PYCODE
       - name: Render sample workspace
         run: |
@@ -52,3 +64,4 @@ jobs:
             .artifacts/workspace-sample.png
             .artifacts/relevance-apple-ci.json
             .artifacts/vector-scaling-ci.json
+            .artifacts/vector-indexed-ci.json

@@ -1,9 +1,15 @@
 import Foundation
 import Accelerate
 
+public struct SearchExecution: Sendable {
+    public var strategy: String
+    public var warnings: [String]
+}
+
 /// Reads SQLite-owned vector bytes synchronously; no pointer escapes sqlite3_step.
 struct CosineScorer {
     private let query: [Float]
+    var queryVector: [Float] { query }
     private let norm: Float
     init?(_ query: [Float]) {
         guard !query.isEmpty, query.allSatisfy(\.isFinite) else { return nil }

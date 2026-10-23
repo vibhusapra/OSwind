@@ -1,0 +1,24 @@
+{
+  "originHash" : "45ee229e4865d4412d434728358a9fb4a98991b34d89f5288b141f7db6e576ee",
+  "pins" : [
+    {
+      "identity" : "numkong",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ashvardanian/NumKong",
+      "state" : {
+        "revision" : "337c1cb6e6fbea8c08b3b7b385e392ed95ccab46",
+        "version" : "7.8.5"
+      }
+    },
+    {
+      "identity" : "usearch",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/unum-cloud/USearch",
+      "state" : {
+        "revision" : "7a4abfb2033935498256044e01bc0049ec80d76c",
+        "version" : "2.26.5"
+      }
+    }
+  ],
+  "version" : 3
+}

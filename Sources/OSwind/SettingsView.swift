@@ -95,6 +95,13 @@ struct SettingsView: View {
                     Text("Ollama · local GPU embeddings").tag(EmbeddingProvider.ollama)
                 }
                 Text("The Apple path is ready without downloads. A multilingual embedding model can improve meaning-based recall; it uses more memory and energy. New captures remain searchable by text while its separate index is built.").font(.caption).foregroundStyle(.secondary)
+                Picker("Search strategy",selection:$m.settings.search.indexPolicy) {
+                    Text("Automatic").tag(SearchIndexPolicy.automatic)
+                    Text("Exact · exhaustive scan").tag(SearchIndexPolicy.exact)
+                    Text("Indexed · approximate").tag(SearchIndexPolicy.indexed)
+                }
+                Text("Indexed search reranks candidates using the original local vectors. Exact scans every vector in the selected range. Automatic uses indexing for larger archives and exact scans for filtered ranges.").font(.caption).foregroundStyle(.secondary)
+                Toggle("Allow additional indexing in Low Power Mode",isOn:$m.settings.search.indexOnLowPower)
                 if m.settings.search.provider == .ollama {
                     TextField("Local model server",text:$m.settings.search.endpoint)
                     TextField("Embedding model ID",text:$m.settings.search.model)
@@ -103,12 +110,12 @@ struct SettingsView: View {
                             ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("embedding") ?? $0.name.contains("embed")) }) { model in Text(model.name).tag(model.name) }
                         }
                     }
-                    Toggle("Allow GPU indexing in Low Power Mode",isOn:$m.settings.search.indexOnLowPower)
-                    HStack { Button(m.indexing ? "Indexing…" : "Build / resume search index") { m.rebuildIndex() }.disabled(m.indexing); if m.indexing { Button("Cancel") { m.cancelIndexing() } } }
-                    if m.indexing { ProgressView(value:m.indexProgress) }
-                    Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)
+                    Button(m.indexing ? "Indexing…" : "Build / resume embedding vectors") { m.rebuildIndex() }.disabled(m.indexing)
                     Text("Indexes are pinned to the installed model digest and kept on this Mac. Changing models never mixes incompatible vectors. Completed batches survive cancellation; deleted or changed source memories cannot be restored by an old indexing job.").font(.caption).foregroundStyle(.secondary)
                 }
+                HStack { Button("Prepare fast retrieval") { m.prepareFastIndex() }.disabled(m.indexing || m.settings.search.indexPolicy == .exact); if m.indexing { Button("Cancel") { m.cancelIndexing() } } }
+                if m.indexing { ProgressView(value:m.indexProgress) }
+                Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)
             }
             Section("Local model library") {
                 HStack { Button(m.startingModelServer ? "Starting…" : "Start local server") { m.startModelServer() }.disabled(m.startingModelServer); Button("Check local server") { m.inspectLocalModels() }; Text(m.modelStatus).font(.caption).foregroundStyle(.secondary) }
