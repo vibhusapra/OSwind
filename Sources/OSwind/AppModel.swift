@@ -3,6 +3,7 @@ import Combine
 import OSwindCore
 import AppKit
 import ServiceManagement
+import UniformTypeIdentifiers
 
 @MainActor final class AppModel: ObservableObject {
     let store: MemoryStore
@@ -73,6 +74,9 @@ import ServiceManagement
     private var statisticsUpdatedAt = Date.distantPast
     private var statisticsPending = false
     private var storageGeneration = UUID()
+    @Published var importingAudio=false
+    @Published var audioImportStatus=""
+    private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
     init(root selectedRoot: URL? = nil, startServices: Bool = true) throws {
         demo = CommandLine.arguments.contains("--demo")
@@ -97,7 +101,7 @@ import ServiceManagement
     }
     func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -327,6 +331,25 @@ import ServiceManagement
     }
     var isCapturing: Bool { capture.running || audio.running }
     func toggleCapture() { pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
+    func importAudio() {
+        guard !importingAudio else { return }
+        let panel=NSOpenPanel(); panel.allowedContentTypes=[.audio]; panel.allowsMultipleSelection=false; panel.message="Transcribe this file locally. Clip retention follows your Audio setting."
+        guard panel.runModal() == .OK,let file=panel.url else { return }
+        importingAudio=true; audioImportStatus="Preparing audio…"; let configuration=settings
+        audioImportTask=Task {
+            defer { importingAudio=false; audioImportTask=nil }
+            do {
+                let clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
+                audioImportStatus="Transcribing locally…"
+                var transcript=try await Whisper.detailed(file:clip.speechFile,binary:configuration.whisperBinary,model:configuration.whisperModel,language:configuration.transcriptionLanguage,timeout:1800)
+                try Task.checkCancellation(); transcript.duration=clip.duration
+                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,embedder:embedder)
+                captured(memory); audioImportStatus="Transcript saved · find it in Conversations"
+            } catch is CancellationError { audioImportStatus="Import cancelled" }
+            catch { audioImportStatus=error.localizedDescription }
+        }
+    }
+    func cancelAudioImport() { audioImportTask?.cancel() }
     func exportData() { pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
     func importData() { let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { let store = store, embedder = embedder, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.importJSON(from:url,embedder:embedder,policy:policy) }.value; invalidateStorageEstimate(); refresh(forceStatistics:true); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } } }
     func startAPI() { do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }

@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 7
+    public static let schemaVersion = 8
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -116,6 +116,8 @@ public final class MemoryStore: @unchecked Sendable {
     public func insert(_ memory: Memory) throws {
         lock.lock(); defer { lock.unlock() }
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
+        if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
+        guard memory.audioSessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio session identifier") }
         for path in [memory.imagePath, memory.audioPath].compactMap({$0}) { guard assetURL(path) != nil else { throw OSwindError.invalid("Asset path must stay inside the memory store") } }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
@@ -394,7 +396,7 @@ public final class MemoryStore: @unchecked Sendable {
         do { memories = try decoder.decode([Memory].self, from: data) } catch { memories = try JSONDecoder().decode([Memory].self, from: data) }
         lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); do {
             var count = 0
-            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; m.text = policy.sanitize(m.text).text; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
+            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; m.text = policy.sanitize(m.text).text; if let transcript=m.transcript { m.transcript=try transcript.sanitized(policy:policy).transcript }; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
             try exec("COMMIT"); return count
         } catch { try? exec("ROLLBACK"); throw error }
     }

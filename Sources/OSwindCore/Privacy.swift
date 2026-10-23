@@ -51,13 +51,14 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var search = SearchConfiguration()
     public var automaticMaintenance = true
     public var apiEnabled = false
+    public var retainAudio = false
     public var audioEnabled = false
     public var systemAudioEnabled = false
     public var whisperBinary = ["/opt/homebrew/bin/whisper-cli", "/usr/local/bin/whisper-cli"].first(where: { FileManager.default.isExecutableFile(atPath:$0) }) ?? "/opt/homebrew/bin/whisper-cli"
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
@@ -68,6 +69,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         search = try c.decodeIfPresent(SearchConfiguration.self,forKey:.search) ?? search
         automaticMaintenance = try c.decodeIfPresent(Bool.self,forKey:.automaticMaintenance) ?? automaticMaintenance
         apiEnabled = try c.decodeIfPresent(Bool.self,forKey:.apiEnabled) ?? apiEnabled
+        retainAudio = try c.decodeIfPresent(Bool.self,forKey:.retainAudio) ?? retainAudio
         audioEnabled = try c.decodeIfPresent(Bool.self,forKey:.audioEnabled) ?? audioEnabled
         systemAudioEnabled = try c.decodeIfPresent(Bool.self,forKey:.systemAudioEnabled) ?? systemAudioEnabled
         whisperBinary = try c.decodeIfPresent(String.self,forKey:.whisperBinary) ?? whisperBinary

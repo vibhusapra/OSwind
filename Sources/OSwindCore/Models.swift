@@ -18,6 +18,8 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     public var text: String
     public var imagePath: String?
     public var audioPath: String?
+    public var transcript: SpeechTranscript?
+    public var audioSessionID: String?
     public var display: String?
     public var regions: [TextRegion]
     public var favorite: Bool

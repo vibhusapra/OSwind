@@ -1,0 +1,82 @@
+import Foundation
+
+public struct TranscriptSegment: Codable, Equatable, Sendable {
+    public var start: Double
+    public var end: Double
+    public var text: String
+    public var speaker: String?
+    public init(start: Double, end: Double, text: String, speaker: String? = nil) { self.start=start; self.end=end; self.text=text; self.speaker=speaker }
+}
+public struct SpeechTranscript: Codable, Equatable, Sendable {
+    public var text: String
+    public var duration: Double
+    public var segments: [TranscriptSegment]
+    public var model: String
+    public init(text: String, duration: Double, segments: [TranscriptSegment], model: String) { self.text=text; self.duration=duration; self.segments=segments; self.model=model }
+    public func validated() throws -> Self {
+        guard duration.isFinite,duration>0,duration<=86400,text.count<=1_000_000,!text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,segments.count<=100000,!model.isEmpty,model.utf8.count<=1024 else { throw OSwindError.invalid("Invalid or oversized speech transcript") }
+        var previous = 0.0
+        for segment in segments {
+            guard segment.start.isFinite,segment.end.isFinite,segment.start>=0,segment.start>=previous,segment.end>=segment.start,segment.end<=duration+0.5,segment.text.count<=100000,segment.speaker.map({!$0.isEmpty && $0.count<=128}) ?? true else { throw OSwindError.invalid("Invalid transcript timestamps or speaker label") }
+            previous=segment.start
+        }
+        return self
+    }
+    /// Pattern-based redaction cannot alter the underlying voice recording.
+    /// Any detected secret therefore suppresses retention of the entire clip.
+    public func sanitized(policy: PrivacyPolicy) throws -> (transcript: Self, suppressAudio: Bool) {
+        _ = try validated(); var result=self; result.model=policy.sanitize(model).text; let main=policy.sanitize(text); result.text=main.text; var changed=main.redacted
+        result.segments=segments.map { segment in var clean=segment; let value=policy.sanitize(segment.text); clean.text=value.text; changed = changed || value.redacted; if let speaker=segment.speaker { let value=policy.sanitize(speaker); clean.speaker=value.text; changed = changed || value.redacted }; return clean }
+        return (result,changed)
+    }
+}
+public enum AudioAdmission {
+    /// The caller owns the input clip. It is never moved/deleted here. A failed
+    /// insert removes only this operation's newly created retained copy.
+    public static func save(_ transcript: SpeechTranscript, file: URL, store: MemoryStore, settings: AppSettings,
+                            timestamp: Date, source: String, title: String? = nil, sessionID: String? = nil,
+                            embedder: LocalEmbedder? = nil) throws -> Memory {
+        try Task.checkCancellation()
+        let clean=try transcript.sanitized(policy:settings.privacy)
+        guard timestamp.timeIntervalSince1970.isFinite,source.count<=512,sessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio source metadata") }
+        let label=settings.privacy.sanitize(title ?? source+" transcript").text
+        var memory=Memory(timestamp:timestamp,endTimestamp:timestamp.addingTimeInterval(clean.transcript.duration),kind:.audio,app:settings.privacy.sanitize(source).text,title:label,text:clean.transcript.text)
+        memory.transcript=clean.transcript; memory.audioSessionID=sessionID
+        if let embedder { memory.embedding=embedder.embed(memory.searchableText); memory.embeddingModel=memory.embedding == nil ? nil : embedder.modelID }
+        var retained: String?, committed=false
+        defer { if !committed,let retained,let url=store.assetURL(retained) { try? FileManager.default.removeItem(at:url) } }
+        if settings.retainAudio && !clean.suppressAudio {
+            let input=try BackupFileTree(root:file.deletingLastPathComponent()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+            let suffix=file.pathExtension.lowercased(); guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio clip needs a supported filename extension") }
+            let member="audio/"+UUID().uuidString+"."+suffix; retained=member
+            _ = try input.copy(file.lastPathComponent,to:output,as:member)
+            memory.audioPath=member
+        }
+        try Task.checkCancellation(); try store.insert(memory); committed=true; return memory
+    }
+}
+
+/// Immutable operation-owned input for ASR and subsequent retention. Keep this
+/// object alive until both have finished; callers use withExtendedLifetime.
+public final class AudioClipSnapshot: @unchecked Sendable {
+    private let workspace: BackupWorkspace
+    public let file: URL
+    public let speechFile: URL
+    public let duration: Double
+    public init(source: URL) throws {
+        guard source.isFileURL else { throw OSwindError.invalid("Choose a local audio file") }
+        let suffix=source.pathExtension.lowercased()
+        guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio file needs a supported extension") }
+        _ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-audio-import"])
+        let workspace=try BackupWorkspace(label:"oswind-audio-import")
+        let tree=try BackupFileTree(root:source.deletingLastPathComponent())
+        _ = try tree.pin(source.lastPathComponent,to:workspace.tree,as:"input."+suffix)
+        let original=workspace.url.appendingPathComponent("input."+suffix)
+        duration=try AudioNormalization.convert(original,to:workspace.tree,as:"speech.wav")
+        self.workspace=workspace; file=original; speechFile=workspace.url.appendingPathComponent("speech.wav")
+    }
+    public static func prepare(_ source: URL) async throws -> AudioClipSnapshot {
+        let task=Task.detached(priority:.utility) { try AudioClipSnapshot(source:source) }
+        return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+    }
+}
