@@ -45,7 +45,7 @@ Measured on M5 Max, macOS 26.6.2, release build:
 
 Qwen3-Embedding 0.6B uses 1024-dimensional normalized vectors; full model digest, fixture SHA256, timings, per-query IDs/scores, warnings, index time and storage are retained in JSON. `ollama ps` reported 100% GPU memory residency during the measured workload. This confirms residency, not a kernel-level utilization or energy measurement.
 
-All modes returned candidates for every unanswerable query (no-evidence empty rate 0). Candidate retrieval is not an answer-confidence decision: answer abstention/citation correctness must be evaluated separately. This relevance fixture did not run competitor binaries. Separate keyword component comparisons below do not support a top-three or state-of-the-art claim.
+Hybrid and semantic modes returned candidates for every unanswerable query (no-evidence empty rate 0); keyword-only empty rate was .5. Candidate retrieval is not an answer-confidence decision: answer abstention/citation correctness must be evaluated separately. This relevance fixture did not run competitor binaries. Separate keyword component comparisons below do not support a top-three or state-of-the-art claim.
 
 ## Conversation process smoke
 
@@ -196,3 +196,21 @@ Both implementations receive identical title+text and app labels from the 32-doc
 | 100,000 | OSwind | 9.045 ms | 16.965 ms | 1.0 / 1.0 | 1.0 |
 
 **OSwind loses this keyword component latency comparison.** Its 100k source insert path also took 15.37 s versus rem's 7.34 s; schemas, derived indexes, privacy/deletion and feature responsibilities differ. Both stores occupy the same process, so process peak RSS is not a per-product memory measure. No full app capture, power, OCR/ASR, compression, UI or current commercial-product runtime comparison is implied. These measurements identify a ranked-keyword optimization gate, not a top-three result. Screenpipe's current source license restricts competing-product use; its documented feature/plan comparison remains separate from this executable MIT reference.
+
+
+## Weighted keyword cursor follow-up
+
+`cc0551b` uses SQLite's [ranked FTS5 cursor](https://www.sqlite.org/fts5.html#sorting_by_auxiliary_function_results) with the same `bm25(0,3,1,1)` weights. Keyword-only queries now decode their requested limit; hybrid queries retain the larger lexical candidate pool. A regression oracle compares the resulting IDs/order with the old explicit BM25 SQL across five queries, six scopes and three limits (90 combinations), including weighted titles, repeated equal-score rows, app/kind/date/favorite/tag scopes and no matches.
+
+The same pinned rem script/fixture was repeated after this change. Reproduce with the commands above and `comparison-rem-ranked-{1000,100000}.json` output names. All narrow lexical checks still pass for both implementations.
+
+| Rows | Backend | p50 | Nearest-rank p95 |
+| --- | --- | ---: | ---: |
+| 1,000 | rem methods | .178 ms | .219 ms |
+| 1,000 | OSwind ranked cursor | .116 ms | .204 ms |
+| 100,000 | rem methods | .290 ms | .454 ms |
+| 100,000 | OSwind ranked cursor | 2.535 ms | 7.045 ms |
+
+The observed OSwind 100k p95 improves from 16.965 to 7.045 ms, but **rem remains faster on the large keyword component workload**. Ranking/query semantics and broader store responsibilities still differ. These sequential development runs do not establish a controlled universal speedup or overall product ranking. Original results are preserved.
+
+`relevance-apple-ranked.json` and `relevance-qwen3-ranked.json` repeat the authored 32-document/35-query fixture. Aggregate Recall@5, MRR@5 and no-evidence empty rates are unchanged in all three modes against the published baseline. Apple hybrid Recall@5/MRR@5 remains .871/.720; Qwen3 hybrid and semantic remain 1.0/1.0. Hybrid/semantic no-evidence empty rate remains 0, keyword .5; generative abstention remains a separate open gate. No million-vector rerun is needed for this lexical-only SQL change.
