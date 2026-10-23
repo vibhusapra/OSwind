@@ -5,7 +5,11 @@ public extension Memory {
     var contentHash: String { SHA256.hash(data:Data(searchableText.utf8)).map { String(format:"%02x",$0) }.joined() }
     /// Source dates/kinds can support a claim even when the embedding text is
     /// unchanged. Keep this stricter revision separate from vector identity.
-    var evidenceHash: String { contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue }
+    var evidenceHash: String {
+        let encoder=JSONEncoder(); encoder.outputFormatting = .sortedKeys
+        let audio=transcript.flatMap { try? encoder.encode($0) }.map { SHA256.hash(data:$0).map { String(format:"%02x",$0) }.joined() } ?? ""
+        return contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio
+    }
 }
 public struct VectorRecord: Sendable {
     public var memoryID: String

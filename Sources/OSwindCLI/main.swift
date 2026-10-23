@@ -22,7 +22,7 @@ func emit(_ object: Any) throws { let data = try JSONSerialization.data(withJSON
 func encoded<T: Encodable>(_ object: T) throws { try emit(Integration.json(object)) }
 func searchFilter() throws -> SearchFilter {
     var values = [String:Any]()
-    let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--limit","limit")]
+    let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--speaker","speaker"),("--limit","limit")]
     for (flag,name) in fields {
         guard args.filter({$0 == flag}).count <= 1 else { throw OSwindError.invalid("Use \(flag) only once") }
         if args.contains(flag) {
@@ -46,7 +46,7 @@ do {
           doctor                         Inspect local permissions, GPU and models
           search [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
-                 Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, tag:work, is:favorite
+                 Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
           chat list|new|show ID|delete ID  Manage saved local conversations
           chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up

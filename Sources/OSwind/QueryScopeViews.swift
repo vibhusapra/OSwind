@@ -36,8 +36,8 @@ struct QueryScopeControls: View {
                     .popover(isPresented:$showHelp) {
                         VStack(alignment:.leading,spacing:9) {
                             Text("Find a specific moment.").font(.headline)
-                            Text("Dates narrow when a memory was captured. Selected controls and query filters apply together. Weeks start Monday; dates use this Mac’s time zone.")
-                            Text("yesterday · last week · past 3 hours\non:2026-10-22 · since:2026-10-01\napp:\"Google Chrome\" · kind:audio\ntag:work · is:favorite").font(.system(.caption,design:.monospaced)).textSelection(.enabled)
+                            Text("Speaker filters select recordings containing that local label; they do not match voices across recordings. Dates narrow when a memory was captured. Selected controls and query filters apply together. Weeks start Monday; dates use this Mac’s time zone.")
+                            Text("yesterday · last week · past 3 hours\non:2026-10-22 · since:2026-10-01\napp:\"Google Chrome\" · kind:audio\nspeaker:\"Maya\" · tag:work · is:favorite").font(.system(.caption,design:.monospaced)).textSelection(.enabled)
                             Text("Use double quotes around date words/operators, or turn Query filters off, to search them as content. since: includes its boundary; until: excludes it.").foregroundStyle(.secondary)
                         }.font(.caption).padding(18).frame(width:340)
                     }
@@ -58,6 +58,7 @@ struct RecordedScopeView: View {
         if let kind = filter.kind { parts.append(kind.rawValue.capitalized) }
         if filter.favoritesOnly { parts.append("Saved") }
         if let tag = filter.tag { parts.append("#"+tag) }
+        if let speaker=filter.speaker { parts.append("Speaker: "+speaker) }
         if let start = filter.start { parts.append("From "+formatter.string(from:start)) }
         if let end = filter.end { parts.append("Before "+formatter.string(from:end)) }
         if parts.isEmpty { parts.append("All recorded times and apps") }
