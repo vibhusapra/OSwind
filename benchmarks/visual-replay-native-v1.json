@@ -58,7 +58,9 @@
     "source_commit": "dc9abf8",
     "app_bundle": "com.oswind.replayqa",
     "observed": "Opened the saved 5-frame HEVC source; video and frame text visible with the bounded-height player. Mac locked before final seek/end/restart/overlay interaction could finish.",
-    "controls_complete": false
+    "controls_complete": false,
+    "qa_executable_sha256": "2bcf2454ca57bc5ca9217e2c7f32a2b935caeb308b7310fb8e4a06a8ccb92857",
+    "signature_note": "The release executable was copied from parent dc9abf8 and re-signed for the isolated QA bundle identifier."
   },
   "earlier_uncommitted_pilot_controls": {
     "observed": [
