@@ -53,6 +53,14 @@ final class BackupFileTree {
         descriptor = file; self.root = root; self.writable = writable
     }
     func withRootDirectory<T>(_ body: (Int32) throws -> T) rethrows -> T { try body(descriptor) }
+    /// Trusted live-library aliases may be followed, but must still resolve to
+    /// the directory retained when this operation began.
+    func requireRootIdentity(at location: URL) throws {
+        var actual = stat(), current = stat()
+        guard location.isFileURL,!location.path.utf8.contains(0),fstat(descriptor,&actual)==0,
+              fstatat(AT_FDCWD,location.path,&current,0)==0,current.st_mode & S_IFMT==S_IFDIR,
+              current.st_dev==actual.st_dev,current.st_ino==actual.st_ino else { throw BackupFileError.changed("The source library moved or changed during backup") }
+    }
     func isAncestor(of other: BackupFileTree) throws -> Bool {
         var own = stat(); guard fstat(descriptor,&own) == 0 else { throw Self.failure("Cannot inspect backup source directory") }
         var current = other.withRootDirectory { openat($0,".",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW) }

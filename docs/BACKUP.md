@@ -35,3 +35,8 @@ Cleanup never removes a published backup or restored library. PID reuse, changed
 Format v1 accepts source database schema 6–7. Older normal libraries upgrade when opened for creation; records are limited to 128 MiB of serialized payload. Schema 7 prevents older app versions from opening a restored library and ignoring its cleanup-off setting. The schema-6 upgrade preserves existing cache identity/keys.
 
 See [design and validation](BACKUP-DESIGN.md), [raw benchmark evidence](../benchmarks/README.md), and [remaining product work](PROGRESS.md). Cross-volume/non-APFS integration, disk-full/power-loss fault injection, native panel/keyboard acceptance and encrypted backup remain open.
+
+
+![Backup controls in Settings → Data](../assets/backup-settings.png)
+
+![Recovery when a saved library is unavailable](../assets/backup-recovery.png)

@@ -1,0 +1,21 @@
+{
+  "fixture": "synthetic note, 1px PNG, silent PCM WAV, saved evidence chat",
+  "checks": [
+    "media/chat/metadata round trip, fingerprint, private permissions, quiet settings, isolated routing and reusable library",
+    "existing destinations, fingerprint mismatch and corrupted media refused without target publication",
+    {
+      "interrupt": "SIGINT",
+      "elapsed_s": 0.057744165998883545,
+      "destination_jobs_removed": 0,
+      "scratch_jobs_removed": 0
+    },
+    {
+      "interrupt": "SIGKILL",
+      "elapsed_s": 0.05855845904443413,
+      "destination_jobs_removed": 1,
+      "scratch_jobs_removed": 1
+    }
+  ],
+  "passed": true,
+  "interruptions": true
+}

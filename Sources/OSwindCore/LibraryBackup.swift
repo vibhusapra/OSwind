@@ -101,6 +101,7 @@ public enum LibraryBackup {
         defer { index.close(); withExtendedLifetime(scratch) {} }
         try progress(LibraryBackupProgress(phase:"Preparing media"))
         let live = try BackupDataReader(store.root.appendingPathComponent("memory.sqlite")); defer { live.close() }
+        try source.requireRootIdentity(at:store.root)
         var pinned: Int64 = 0
         try live.forEachAsset { path in
             let pending = try index.register(path)
@@ -116,9 +117,11 @@ public enum LibraryBackup {
             let snapshot = scratch.url.appendingPathComponent("memory.sqlite")
             if attempt > 1 { try scratch.tree.remove("memory.sqlite") }
             try progress(LibraryBackupProgress(phase:"Snapshotting database",attempt:attempt))
+            try source.requireRootIdentity(at:store.root)
             try SQLiteSnapshot.copy(source:store.root.appendingPathComponent("memory.sqlite"),to:snapshot) { state in
                 try progress(LibraryBackupProgress(phase:"Snapshotting database",completedItems:Int64(state.copiedPages),totalItems:Int64(state.totalPages),attempt:attempt,unit:"pages"))
             }
+            try source.requireRootIdentity(at:store.root)
             let reader = try BackupDataReader(snapshot)
             var missing = false
             do {
@@ -159,6 +162,7 @@ public enum LibraryBackup {
         try progress(LibraryBackupProgress(phase:"Verifying package",completedItems:files,totalItems:total,copiedBytes:copied,attempt:completedAttempt))
         _ = try inspect(output.url)
         try progress(LibraryBackupProgress(phase:"Publishing backup",completedItems:files,totalItems:total,copiedBytes:copied,attempt:completedAttempt))
+        try source.requireRootIdentity(at:store.root)
         try output.publish(as:destination)
         var result = info; result.archiveFingerprint = BackupSHA256.hex(headerData)
         return result

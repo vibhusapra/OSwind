@@ -87,4 +87,25 @@ final class LibraryBackupTests: XCTestCase {
         XCTAssertThrowsError(try LibraryBackup.inspect(archiveAlias))
     }
 
+    func testMovedLibraryAndRedirectedTrustedAliasFailWithoutPublishing() throws {
+        try store.insert(Memory(id:"original",text:"Original library"))
+        let alias = root.appendingPathComponent("alias"), replacement = root.appendingPathComponent("replacement")
+        try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:store.root)
+        let aliasStore = try MemoryStore(root:alias), other = try MemoryStore(root:replacement)
+        try other.insert(Memory(id:"different",text:"Different library")); var changed = false
+        XCTAssertThrowsError(try LibraryBackup.create(store:aliasStore,destination:output) { event in
+            if event.phase=="Snapshotting database",event.totalItems==0,!changed {
+                changed = true; try FileManager.default.removeItem(at:alias); try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:replacement)
+            }
+        })
+        XCTAssertTrue(changed); XCTAssertFalse(FileManager.default.fileExists(atPath:output.path))
+        changed = false
+        XCTAssertThrowsError(try LibraryBackup.create(store:store,destination:output) { event in
+            if event.phase=="Snapshotting database",event.totalItems==0,!changed {
+                changed = true; try FileManager.default.moveItem(at:self.store.root,to:self.root.appendingPathComponent("moved")); try Paths.ensure(self.store.root)
+            }
+        })
+        XCTAssertTrue(changed); XCTAssertFalse(FileManager.default.fileExists(atPath:output.path)); XCTAssertEqual(try store.get("original")?.text,"Original library")
+    }
+
 }

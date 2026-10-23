@@ -436,7 +436,7 @@
     "axis": "Data",
     "feature": "Media backup / restore",
     "status": "tested",
-    "evidence": "Full media/chat/vector packages, data-only safe restore, CLI and app/recovery controls; process SIGINT/SIGKILL and 100k/1k-media concurrent workload pass. Plaintext; native panels, disk faults and non-APFS integration remain open",
+    "evidence": "Full media/chat/vector packages, data-only safe restore, CLI and app/recovery controls; process SIGINT/SIGKILL and 100k/1k-media concurrent and million-1024D-vector round trips pass. Plaintext; native panels, disk faults and non-APFS integration remain open",
     "references": "Rewind Desktop S3, Retrace"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "196 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "197 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
