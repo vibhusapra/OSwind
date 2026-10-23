@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "oswind_revision": "4f7b527",
+  "status": "terminated before report completed",
+  "diagnosis": "Restoring memory-first loop order alone was insufficient. EXPLAIN QUERY PLAN selected the memory primary-key scan, the global model/revision index for each parent, and an ORDER BY temp tree. This permits quadratic work.",
+  "observed_plan": [
+    "SCAN m USING INDEX sqlite_autoindex_memories_1",
+    "SEARCH r USING INDEX vector_keys_revision (model=? AND revision<?)",
+    "USE TEMP B-TREE FOR ORDER BY"
+  ],
+  "fix": "Pin the bounded sample to its timestamp index and a new memory/model/revision covering index; preserve time/app order explicitly.",
+  "scope": "Failed performance attempt retained; no completed quantiles or recall claim."
+}

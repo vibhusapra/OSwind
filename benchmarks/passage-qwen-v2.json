@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "fixture": "semantic-passages-long-v1",
+  "provider": "ollama",
+  "timestamp": "2026-10-23T12:14:40.631394+00:00",
+  "scope": "Three authored fictional long records, three paraphrase queries plus one unrelated record. Before/after removes only passage vectors from the same isolated store; base vectors and model stay fixed. Process latencies include CLI startup/model HTTP/coverage/scoring. Not held out, competitor, capture, energy or broad language accuracy.",
+  "sources": [
+    {
+      "label": "warehouse",
+      "text_utf16_units": 26347,
+      "fact_offset": 19350,
+      "sha256": "1ce3f19d906cef2b9456afbc0456172dd77b8324b37f8f1d4822c297d2bf439f"
+    },
+    {
+      "label": "accessibility",
+      "text_utf16_units": 26321,
+      "fact_offset": 19350,
+      "sha256": "adb12f86db861661bbbea9e068de2f5284767f49a81b999238ca85f963d67dc1"
+    },
+    {
+      "label": "translation",
+      "text_utf16_units": 26327,
+      "fact_offset": 19350,
+      "sha256": "78af144a156c463242ee2b09c46a33d40050bd4b216a590e8462a45b3a16a9b9"
+    }
+  ],
+  "model_metadata": {
+    "capabilities": [
+      "tools",
+      "thinking",
+      "embedding"
+    ],
+    "digest": "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+    "name": "qwen3-embedding:0.6b",
+    "size": 639150858
+  },
+  "initial_index_seconds": 3.3370423750020564,
+  "model_ids": [
+    "apple-nl-sentence-en-v1",
+    "ollama:qwen3-embedding:0.6b@ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d:desktop-v1:d1024"
+  ],
+  "passages": 109,
+  "base_only": {
+    "trials": [
+      {
+        "case": "warehouse",
+        "query": "Who must replace the depot authentication certificates, and what is the due date?",
+        "rank": 3,
+        "milliseconds": 140.7909169793129,
+        "passage": null,
+        "passage_contains_owner": false,
+        "excerpt": null,
+        "strategy": "exact",
+        "warnings": [
+          "Long-source passage indexing is pending for 4 records. Build the selected embedding index in Models settings for complete semantic coverage."
+        ]
+      },
+      {
+        "case": "accessibility",
+        "query": "Who is assigned to audit the account popup for assistive technology and when?",
+        "rank": 2,
+        "milliseconds": 129.61120798718184,
+        "passage": null,
+        "passage_contains_owner": false,
+        "excerpt": null,
+        "strategy": "exact",
+        "warnings": [
+          "Long-source passage indexing is pending for 4 records. Build the selected embedding index in Models settings for complete semantic coverage."
+        ]
+      },
+      {
+        "case": "translation",
+        "query": "Who is in charge of the German payment translation review, and its deadline?",
+        "rank": 1,
+        "milliseconds": 127.75320804212242,
+        "passage": null,
+        "passage_contains_owner": false,
+        "excerpt": null,
+        "strategy": "exact",
+        "warnings": [
+          "Long-source passage indexing is pending for 4 records. Build the selected embedding index in Models settings for complete semantic coverage."
+        ]
+      }
+    ],
+    "recall_at_3": 1.0,
+    "mrr": 0.611111111111111,
+    "p50_ms": 129.61120798718184,
+    "p95_ms": 140.7909169793129
+  },
+  "passage_rebuild_seconds": 3.2125439998926595,
+  "with_passages": {
+    "trials": [
+      {
+        "case": "warehouse",
+        "query": "Who must replace the depot authentication certificates, and what is the due date?",
+        "rank": 1,
+        "milliseconds": 142.6785420626402,
+        "passage": {
+          "length": 1200,
+          "start": 19000
+        },
+        "passage_contains_owner": true,
+        "excerpt": "ng, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nFrostline operations decision: Elian Hart is responsible for replacing the warehouse signing keys. This depot authentication credential rotation must finish Thursday at noon. The accountable person is Elian Hart and the deadline is Thursday noon.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were move",
+        "strategy": "exact",
+        "warnings": []
+      },
+      {
+        "case": "accessibility",
+        "query": "Who is assigned to audit the account popup for assistive technology and when?",
+        "rank": 1,
+        "milliseconds": 127.98324995674193,
+        "passage": {
+          "length": 1200,
+          "start": 19000
+        },
+        "passage_contains_owner": true,
+        "excerpt": "ng, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nOrchard accessibility decision: Val Rivera owns checking keyboard navigation and VoiceOver focus on the new account dialog. The screen reader verification must be completed by Monday. Val Rivera is the assigned reviewer.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.",
+        "strategy": "exact",
+        "warnings": []
+      },
+      {
+        "case": "translation",
+        "query": "Who is in charge of the German payment translation review, and its deadline?",
+        "rank": 1,
+        "milliseconds": 127.33258306980133,
+        "passage": {
+          "length": 1200,
+          "start": 19000
+        },
+        "passage_contains_owner": true,
+        "excerpt": "ng, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nArchive maintenance log. Routine filing, window layout and standard office inventory were reviewed without any release decision.\nHarbor localization decision: Miriam Chen owns verifying the German checkout translations. The linguistic review of the payment flow is due Wednesday afternoon. Miriam Chen is accountable for the German language quality check.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages checked.\nGeneral archive housekeeping continued. Empty folders were moved and index pages ch",
+        "strategy": "exact",
+        "warnings": []
+      }
+    ],
+    "recall_at_3": 1.0,
+    "mrr": 1.0,
+    "p50_ms": 127.98324995674193,
+    "p95_ms": 142.6785420626402
+  },
+  "mcp_passage_returned": true,
+  "answers": [
+    {
+      "case": "warehouse",
+      "text": "Elian Hart must replace the depot authentication certificates, and the due date is Thursday at noon. [1]",
+      "provider": "ollama",
+      "seconds": 0.9732619524002075,
+      "warnings": [
+        "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+      ],
+      "correct_owner_and_day": true,
+      "has_citation": true
+    },
+    {
+      "case": "accessibility",
+      "text": "Insufficient evidence.",
+      "provider": "ollama",
+      "seconds": 0.3551650047302246,
+      "warnings": [
+        "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+      ],
+      "correct_owner_and_day": false,
+      "has_citation": false
+    },
+    {
+      "case": "translation",
+      "text": "Miriam Chen is in charge of the German payment translation review, and the deadline is Wednesday afternoon [1].",
+      "provider": "ollama",
+      "seconds": 0.4594419002532959,
+      "warnings": [
+        "Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records."
+      ],
+      "correct_owner_and_day": true,
+      "has_citation": true
+    }
+  ],
+  "offline_note_saved": true,
+  "checks": {
+    "offline_note_saved": true,
+    "passages_created": true,
+    "all_top3": true,
+    "all_matched_passages_include_owner": true,
+    "mcp_passage_returned": true,
+    "answers_owner_day_and_citations": false
+  },
+  "oswind_revision": "acb52af",
+  "build": "release"
+}

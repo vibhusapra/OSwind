@@ -148,7 +148,7 @@
     "axis": "Retrieval",
     "feature": "ANN indexing for long archives",
     "status": "partial",
-    "evidence": "Metal/HNSW cache, mutation replay and live float32 rerank; Metal million run with scope/coverage reuse recovers all reference top-10 neighbors on24 new queries per scope; median14.4/26.8ms unfiltered/filtered, first-scope tail639ms remains open. Earlier HNSW .675/.825 recall and uncached filtered tail failures retained. Automatic filtered stays exact; cold/soak/realistic recall gates open",
+    "evidence": "Metal/HNSW cache, mutation replay and live float32 rerank; Current parent-aware Metal million run recovers all reference top-10 neighbors on12 new queries per scope; median27.36/41.96ms unfiltered/filtered, first-scope tail687ms remains open. Earlier faster base-only trials and two recent-SQL regressions retained. Earlier HNSW .675/.825 recall and uncached filtered tail failures retained. Automatic filtered stays exact; cold/soak/realistic recall gates open",
     "references": "Configurable vector systems"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "124 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "143 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
@@ -574,5 +574,13 @@
     "status": "todo",
     "evidence": "Still missing; no reliability parity claim",
     "references": "OSwind quality bar"
+  },
+  {
+    "id": "F073",
+    "axis": "Retrieval",
+    "feature": "Complete-source semantic passages",
+    "status": "tested",
+    "evidence": "Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open",
+    "references": "Long-source retrieval quality"
   }
 ]
