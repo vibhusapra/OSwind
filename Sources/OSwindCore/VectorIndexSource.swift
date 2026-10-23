@@ -5,6 +5,7 @@ struct IndexedVector {
     var key: UInt64
     var revision: Int64
     var vector: [Float]?
+    var parentKey: UInt64 = 0
 }
 struct VectorSourceState {
     var identity: String
@@ -40,7 +41,7 @@ final class VectorIndexSource {
     }
     func state(includeCount: Bool = true) throws -> VectorSourceState { try snapshot { try stateInSnapshot(includeCount:includeCount) } }
     private func stateInSnapshot(includeCount: Bool) throws -> VectorSourceState {
-        let stmt = try statement("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),COALESCE((SELECT MAX(key) FROM vector_keys WHERE model=?),0)," + (includeCount ? "(SELECT COUNT(*) FROM vector_keys WHERE model=?)" : "-1"))
+        let stmt = try statement("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),COALESCE((SELECT MAX(key) FROM vector_keys WHERE model=?),0)," + (includeCount ? "COALESCE((SELECT entities FROM vector_statistics WHERE model=?),0)" : "-1"))
         defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID)
         if includeCount { bind(stmt,2,modelID) }
         guard sqlite3_step(stmt) == SQLITE_ROW, let identity = sqlite3_column_text(stmt,0) else { throw failure() }
@@ -49,9 +50,11 @@ final class VectorIndexSource {
         return VectorSourceState(identity:String(cString:identity),head:sqlite3_column_int64(stmt,1),highKey:UInt64(highKey),count:Int(sqlite3_column_int64(stmt,3)))
     }
     private static let vectorSelect = """
-        SELECT r.key,r.revision,COALESCE(v.vector,CASE WHEN m.embedding_model=r.model THEN m.embedding END)
+        SELECT r.key,r.revision,CASE WHEN r.ordinal=0 THEN COALESCE(v.vector,CASE WHEN m.embedding_model=r.model THEN m.embedding END) ELSE p.vector END,b.key
         FROM vector_keys r JOIN memories m ON m.id=r.memory_id
-        LEFT JOIN semantic_vectors v ON v.memory_id=r.memory_id AND v.model=r.model
+        JOIN vector_keys b ON b.memory_id=r.memory_id AND b.model=r.model AND b.ordinal=0
+        LEFT JOIN semantic_vectors v ON v.memory_id=r.memory_id AND v.model=r.model AND r.ordinal=0
+        LEFT JOIN semantic_passages p ON p.memory_id=r.memory_id AND p.model=r.model AND p.ordinal=r.ordinal
         """
     private func decode(_ stmt: OpaquePointer) throws -> IndexedVector {
         let key = sqlite3_column_int64(stmt,0)
@@ -61,7 +64,7 @@ final class VectorIndexSource {
             let values = Array(UnsafeBufferPointer(start:bytes.assumingMemoryBound(to:Float.self),count:dimensions))
             if CosineScorer(values) != nil { vector = values }
         }
-        return IndexedVector(key:UInt64(key),revision:sqlite3_column_int64(stmt,1),vector:vector)
+        return IndexedVector(key:UInt64(key),revision:sqlite3_column_int64(stmt,1),vector:vector,parentKey:UInt64(max(0,sqlite3_column_int64(stmt,3))))
     }
     func page(after key: UInt64, through highKey: UInt64, limit: Int = 256) throws -> [IndexedVector] {
         guard key <= UInt64(Int64.max), highKey <= UInt64(Int64.max) else { throw OSwindError.invalid("Invalid vector page bounds") }

@@ -55,7 +55,7 @@ do {
           stats                          Storage and capture counts
           config                         Print settings (no API keys)
           models list|status|pull NAME    Inspect/download local Ollama models
-          reindex [--model NAME] [--use-model]  Build/resume local GPU search vectors
+          reindex [--provider apple|ollama] [--model NAME] [--use-model]  Build/resume source and passage vectors
           index-search [--model NAME] [--rebuild] [--use-index]  Prepare fast local retrieval
           eval-retrieval [--model NAME]   Evaluate the diverse relevance fixture
           export PATH                    Export text and metadata JSON
@@ -173,7 +173,8 @@ do {
             else if action == "pull" { guard let name = args.first else { throw OSwindError.invalid("Enter a local model name") }; try await OllamaClient.shared.pull(name,endpoint:endpoint) { state in FileHandle.standardError.write(Data((state.status + (state.fraction.map { " \(Int($0*100))%" } ?? "") + "\n").utf8)) }; print("Download complete") }
             else { throw OSwindError.invalid("Use models list, status or pull NAME") }
         case "reindex":
-            var settings = AppSettings.load(root:root), configuration = settings.search; configuration.provider = .ollama
+            var settings = AppSettings.load(root:root), configuration = settings.search
+            if let provider = try validatedOption("--provider") { guard let selected = EmbeddingProvider(rawValue:provider) else { throw OSwindError.invalid("Use embedding provider apple or ollama") }; configuration.provider = selected } else { configuration.provider = .ollama }
             configuration.model = try validatedOption("--model") ?? configuration.model; configuration.endpoint = try validatedOption("--endpoint") ?? configuration.endpoint
             try await RetrievalEngine(store:store,apple:embedder).rebuild(configuration:configuration) { state in FileHandle.standardError.write(Data("\(state.indexed)/\(state.total) indexed\n".utf8)) }
             if args.contains("--use-model") { settings.search = configuration; try settings.save(root:root) }
@@ -199,7 +200,10 @@ do {
             guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
             let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:AppSettings.load(root:root).search,interpretQuery:!literalQuery)
             try encoded(answer)
-        case "note": let text = PrivacyPolicy().sanitize(args.joined(separator:" ")).text; guard !text.isEmpty else { throw OSwindError.invalid("Enter note text") }; var memory = Memory(kind:.note,app:"OSwind",title:"CLI note",text:text); memory.embedding = embedder.embed(memory.searchableText); memory.embeddingModel = embedder.modelID; try store.insert(memory); print(memory.id)
+        case "note": let text = PrivacyPolicy().sanitize(args.joined(separator:" ")).text; guard !text.isEmpty else { throw OSwindError.invalid("Enter note text") }; var memory = Memory(kind:.note,app:"OSwind",title:"CLI note",text:text); memory.embedding = embedder.embed(memory.searchableText); memory.embeddingModel = embedder.modelID; try store.insert(memory)
+            do { _ = try await RetrievalEngine(store:store,apple:embedder).index([memory],configuration:AppSettings.load(root:root).search) }
+            catch { FileHandle.standardError.write(Data(("Note saved; additional semantic indexing pending. " + error.localizedDescription + "\n").utf8)) }
+            print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
         case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")

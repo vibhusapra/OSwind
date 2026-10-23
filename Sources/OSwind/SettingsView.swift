@@ -98,7 +98,7 @@ struct SettingsView: View {
                 Picker("Search strategy",selection:$m.settings.search.indexPolicy) {
                     Text("Automatic").tag(SearchIndexPolicy.automatic)
                     Text("Exact · exhaustive scan").tag(SearchIndexPolicy.exact)
-                    Text("Indexed · approximate").tag(SearchIndexPolicy.indexed)
+                    Text("Indexed · accelerated").tag(SearchIndexPolicy.indexed)
                 }
                 Text("Indexed search reranks candidates using the original local vectors. Exact scans every vector in the selected range. Automatic uses indexing for larger archives and exact scans for filtered ranges.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Allow additional indexing in Low Power Mode",isOn:$m.settings.search.indexOnLowPower)
@@ -110,9 +110,9 @@ struct SettingsView: View {
                             ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("embedding") ?? $0.name.contains("embed")) }) { model in Text(model.name).tag(model.name) }
                         }
                     }
-                    Button(m.indexing ? "Indexing…" : "Build / resume embedding vectors") { m.rebuildIndex() }.disabled(m.indexing)
-                    Text("Indexes are pinned to the installed model digest and kept on this Mac. Changing models never mixes incompatible vectors. Completed batches survive cancellation; deleted or changed source memories cannot be restored by an old indexing job.").font(.caption).foregroundStyle(.secondary)
                 }
+                Button(m.indexing ? "Indexing…" : "Build / resume embedding vectors") { m.rebuildIndex() }.disabled(m.indexing)
+                Text("Long records use overlapping passages across the complete text. Indexes are pinned to the installed model digest and kept on this Mac. Changing models never mixes incompatible vectors. Completed sources survive cancellation; deleted or changed source memories cannot be restored by an old indexing job.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Prepare fast retrieval") { m.prepareFastIndex() }.disabled(m.indexing || m.settings.search.indexPolicy == .exact); if m.indexing { Button("Cancel") { m.cancelIndexing() } } }
                 if m.indexing { ProgressView(value:m.indexProgress) }
                 Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)

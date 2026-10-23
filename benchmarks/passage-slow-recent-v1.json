@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "oswind_revision": "acb52af",
+  "workload": "Retained million-record, 1024-dimensional synthetic archive; parent-aware Metal cache built successfully.",
+  "status": "terminated before query report completed",
+  "observed_runtime": "More than three minutes; no completed latency quantiles or recall result.",
+  "diagnosis": "One-second process sample spent all sampled active query time in SQLite recent-source candidate iteration, including overflow-page reads. The passage query changed a time-ordered memory-first join into a vector-first join/sort.",
+  "fix": "Restore a memory-first CROSS JOIN for the bounded recent-source sample. New run and raw trials recorded separately.",
+  "scope": "Preserved failed performance experiment, not a completed benchmark and not a competitor result."
+}

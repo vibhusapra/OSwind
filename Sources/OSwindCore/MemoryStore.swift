@@ -16,7 +16,7 @@ public final class MemoryStore: @unchecked Sendable {
         sqlite3_busy_timeout(db, 5000)
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
-        guard version <= 5 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
+        guard version <= 6 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
         try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON;")
         try exec("BEGIN IMMEDIATE")
         do {
@@ -60,7 +60,7 @@ public final class MemoryStore: @unchecked Sendable {
         CREATE TABLE IF NOT EXISTS chat_sources (
             turn_id TEXT NOT NULL REFERENCES chat_turns(id) ON DELETE CASCADE,
             memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
-            ordinal INTEGER NOT NULL, score REAL NOT NULL, match TEXT NOT NULL,
+            ordinal INTEGER NOT NULL, score REAL NOT NULL, match TEXT NOT NULL, passage_start INTEGER, passage_length INTEGER,
             PRIMARY KEY(turn_id,ordinal)
         );
         CREATE INDEX IF NOT EXISTS chat_source_memory ON chat_sources(memory_id);
@@ -77,7 +77,16 @@ public final class MemoryStore: @unchecked Sendable {
             DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=old.id);
         END;
         """)
+        if version > 0 && version < 6 {
+            let info = try prepare("SELECT 1 FROM pragma_table_info('chat_sources') WHERE name='passage_start'")
+            let needsPassageColumns = sqlite3_step(info) != SQLITE_ROW; sqlite3_finalize(info)
+            if needsPassageColumns { try exec("ALTER TABLE chat_sources ADD COLUMN passage_start INTEGER; ALTER TABLE chat_sources ADD COLUMN passage_length INTEGER;") }
+        }
+        if version >= 4 && version < 6 { try exec(VectorJournalSchema.migrateV5) }
         try exec(VectorJournalSchema.sql)
+        try exec(PassageSchema.sql)
+        try exec(VectorStatisticsSchema.sql)
+        if version < 6 { try exec(VectorStatisticsSchema.backfill) }
         if version < 4 { try exec(VectorJournalSchema.backfill) }
         try exec(StatisticsSchema.sql)
         try exec(SearchScopeSchema.sql)
@@ -86,7 +95,7 @@ public final class MemoryStore: @unchecked Sendable {
         sqlite3_finalize(statisticsState)
         if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
-        try exec("PRAGMA user_version=5; COMMIT")
+        try exec("PRAGMA user_version=6; COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
@@ -161,7 +170,7 @@ public final class MemoryStore: @unchecked Sendable {
         // Current measured native predicate callbacks cost more than a scoped
         // exact scan. Keep Automatic conservative until scoped indexing improves.
         if mode != .keyword, !Self.ftsQuery(filter.query).isEmpty, let vector, let modelID, indexPolicy != .exact, indexPolicy == .indexed || !scoped {
-            let count = try indexedCount ?? vectorCount(modelID:modelID,filter:filter)
+            let count = try vectorEntityCount(modelID:modelID)
             if indexPolicy == .indexed || count >= 20_000 { indexStatus = annCache.prepare(modelID:modelID,dimensions:vector.count,count:count,allowLowPower:allowIndexOnLowPower) }
         }
         lock.lock(); defer { lock.unlock() }
@@ -192,22 +201,23 @@ public final class MemoryStore: @unchecked Sendable {
             if let indexed { best = indexed; strategy = candidateStrategy }
             else {
             let vectorJoin = whereSQL == "1=1" ? "semantic_vectors v JOIN memories m ON m.id=v.memory_id" : "memories m CROSS JOIN semantic_vectors v ON m.id=v.memory_id"
-            let stmt = try prepare("SELECT m.id,m.embedding,m.timestamp FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? AND NOT EXISTS (SELECT 1 FROM semantic_vectors v WHERE v.memory_id=m.id AND v.model=m.embedding_model) UNION ALL SELECT m.id,v.vector,m.timestamp FROM \(vectorJoin) WHERE \(whereSQL) AND v.model=?")
+            let stmt = try prepare("SELECT m.id,m.embedding,m.timestamp,-1,0 FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? AND NOT EXISTS (SELECT 1 FROM semantic_vectors v WHERE v.memory_id=m.id AND v.model=m.embedding_model) UNION ALL SELECT m.id,v.vector,m.timestamp,-1,0 FROM \(vectorJoin) WHERE \(whereSQL) AND v.model=? UNION ALL SELECT m.id,p.vector,m.timestamp,p.start,p.length FROM semantic_passages p JOIN memories m ON m.id=p.memory_id WHERE \(whereSQL) AND p.model=?")
             defer { sqlite3_finalize(stmt) }; for (i,v) in values.enumerated() { bind(stmt, Int32(i+1), v) }; bind(stmt, Int32(values.count + 1), modelID)
             for (i,v) in values.enumerated() { bind(stmt,Int32(values.count+2+i),v) }; bind(stmt,Int32(2*values.count+2),modelID)
+            for (i,v) in values.enumerated() { bind(stmt,Int32(2*values.count+3+i),v) }; bind(stmt,Int32(3*values.count+3),modelID)
             var candidates = SemanticTopK(capacity:max(limit,100))
             var scanned = 0
             while sqlite3_step(stmt) == SQLITE_ROW {
                 scanned += 1; if scanned % 256 == 0 { try Task.checkCancellation() }
                 let size = Int(sqlite3_column_bytes(stmt, 1)); guard size == vector.count * MemoryLayout<Float>.size, let bytes = sqlite3_column_blob(stmt, 1) else { continue }
                 let similarity = scorer.score(bytes.assumingMemoryBound(to:Float.self),count:vector.count)
-                if similarity > minimumSimilarity, candidates.mayImprove(similarity) { candidates.offer(SemanticCandidate(id:string(stmt,0),similarity:similarity,timestamp:sqlite3_column_double(stmt,2))) }
+                if similarity > minimumSimilarity, candidates.mayImprove(similarity) { candidates.offer(SemanticCandidate(id:string(stmt,0),similarity:similarity,timestamp:sqlite3_column_double(stmt,2),passage:sqlite3_column_int64(stmt,3) < 0 ? nil : PassageRange(start:Int(sqlite3_column_int64(stmt,3)),length:Int(sqlite3_column_int64(stmt,4))))) }
             }
             best = candidates.sorted
             }
             for (rank, pair) in best.enumerated() {
-                if var hit = scored[pair.id] { hit.score += similarityFusion ? pair.similarity : 1 / Double(60 + rank); hit.match = "hybrid"; scored[pair.id] = hit }
-                else if let memory = try get(pair.id) { scored[pair.id] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.similarity : 1 / Double(60 + rank), match: "semantic") }
+                if var hit = scored[pair.id] { hit.score += similarityFusion ? pair.similarity : 1 / Double(60 + rank); hit.match = "hybrid"; hit.passage = pair.passage; scored[pair.id] = hit }
+                else if let memory = try get(pair.id) { scored[pair.id] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.similarity : 1 / Double(60 + rank), match: "semantic",passage:pair.passage) }
             }
         }
         try Task.checkCancellation(); execution?(SearchExecution(strategy:strategy,warnings:diagnostics))
@@ -221,7 +231,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func vectorCount(modelID: String, filter: SearchFilter = SearchFilter()) throws -> Int {
         lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
-        let sql = whereSQL == "1=1" ? "SELECT COUNT(*) FROM vector_keys WHERE model=?" : "SELECT COUNT(*) FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id WHERE r.model=? AND \(whereSQL)"
+        let sql = whereSQL == "1=1" ? "SELECT COALESCE((SELECT parents FROM vector_statistics WHERE model=?),0)" : "SELECT COUNT(*) FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id WHERE r.ordinal=0 AND r.model=? AND \(whereSQL)"
         let stmt = try prepare(sql)
         defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); for (i,v) in values.enumerated() { bind(stmt,Int32(i+2),v) }
         return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
@@ -268,8 +278,8 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func memoriesNeedingVectors(modelID: String, afterID: String = "", limit: Int = 16) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }
-        let stmt = try prepare("SELECT m.payload FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? WHERE v.memory_id IS NULL AND m.id>? ORDER BY m.id LIMIT ?")
-        defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); bind(stmt,2,afterID); sqlite3_bind_int(stmt,3,Int32(min(32,max(1,limit))))
+        let stmt = try prepare("SELECT m.payload FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? LEFT JOIN passage_manifests p ON p.memory_id=m.id AND p.model=? AND p.version=? WHERE m.id>? AND ((v.memory_id IS NULL AND NOT(m.embedding IS NOT NULL AND m.embedding_model IS ?)) OR (length(CAST(m.text AS BLOB))>2400 AND p.memory_id IS NULL)) ORDER BY m.id LIMIT ?")
+        defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); bind(stmt,2,modelID); sqlite3_bind_int(stmt,3,Int32(SemanticPassagePlan.version)); bind(stmt,4,afterID); bind(stmt,5,modelID); sqlite3_bind_int(stmt,6,Int32(min(32,max(1,limit))))
         var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; return memories
     }
     @discardableResult public func saveVectors(_ records: [VectorRecord], modelID: String) throws -> Int {
@@ -277,6 +287,12 @@ public final class MemoryStore: @unchecked Sendable {
         do {
             for record in records {
                 guard !record.vector.isEmpty, record.vector.count <= 8192, record.vector.allSatisfy(\.isFinite), let memory = try get(record.memoryID), memory.contentHash == record.contentHash else { continue }
+                let invalidate = try prepare("DELETE FROM semantic_passages WHERE memory_id=? AND model=? AND dimension<>?")
+                defer { sqlite3_finalize(invalidate) }; bind(invalidate,1,record.memoryID); bind(invalidate,2,modelID); sqlite3_bind_int(invalidate,3,Int32(record.vector.count))
+                guard sqlite3_step(invalidate) == SQLITE_DONE else { throw failure() }
+                if sqlite3_changes(db)>0 {
+                    let clear = try prepare("DELETE FROM passage_manifests WHERE memory_id=? AND model=?"); defer { sqlite3_finalize(clear) }; bind(clear,1,record.memoryID); bind(clear,2,modelID); guard sqlite3_step(clear) == SQLITE_DONE else { throw failure() }
+                }
                 let stmt = try prepare("INSERT INTO semantic_vectors(memory_id,model,dimension,vector,content_hash) VALUES(?,?,?,?,?) ON CONFLICT(memory_id,model) DO UPDATE SET dimension=excluded.dimension,vector=excluded.vector,content_hash=excluded.content_hash")
                 defer { sqlite3_finalize(stmt) }; bind(stmt,1,record.memoryID); bind(stmt,2,modelID); sqlite3_bind_int(stmt,3,Int32(record.vector.count)); _ = record.vector.withUnsafeBytes { sqlite3_bind_blob(stmt,4,$0.baseAddress,Int32($0.count),transient) }; bind(stmt,5,record.contentHash)
                 guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; count += 1
@@ -285,7 +301,7 @@ public final class MemoryStore: @unchecked Sendable {
         } catch { try? exec("ROLLBACK"); throw error }
     }
     public func semanticIndexes() throws -> [String:Int] {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT model,COUNT(*) FROM semantic_vectors GROUP BY model"); defer { sqlite3_finalize(stmt) }; var result = [String:Int](); while sqlite3_step(stmt) == SQLITE_ROW { result[string(stmt,0)] = Int(sqlite3_column_int(stmt,1)) }; return result
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT model,parents FROM vector_statistics WHERE parents>0"); defer { sqlite3_finalize(stmt) }; var result = [String:Int](); while sqlite3_step(stmt) == SQLITE_ROW { result[string(stmt,0)] = Int(sqlite3_column_int(stmt,1)) }; return result
     }
     public func timelineSample(_ filter: SearchFilter, limit: Int = 24) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }
@@ -373,7 +389,7 @@ public final class MemoryStore: @unchecked Sendable {
         do { memories = try decoder.decode([Memory].self, from: data) } catch { memories = try JSONDecoder().decode([Memory].self, from: data) }
         lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); do {
             var count = 0
-            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; m.text = policy.sanitize(m.text).text; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); count += 1 }
+            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; m.text = policy.sanitize(m.text).text; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
             try exec("COMMIT"); return count
         } catch { try? exec("ROLLBACK"); throw error }
     }
@@ -382,7 +398,7 @@ public final class MemoryStore: @unchecked Sendable {
 extension MemoryStore {
     public var searchIndexStatus: SearchIndexStatus { annCache.status }
     @discardableResult public func buildSearchIndex(modelID: String, dimensions: Int, rebuild: Bool = false, allowLowPower: Bool = false) async throws -> SearchIndexStatus {
-        let count = try vectorCount(modelID:modelID)
+        let count = try vectorEntityCount(modelID:modelID)
         guard count > 0 else { throw OSwindError.unavailable("No vectors exist for this model. Build its embedding index first.") }
         annCache.prepare(modelID:modelID,dimensions:dimensions,count:count,force:rebuild,allowLowPower:allowLowPower,replayAll:true,resumeBuild:true)
         return try await annCache.waitForBuild()
@@ -436,8 +452,10 @@ extension MemoryStore {
             let stmt = try prepare("INSERT INTO chat_turns(id,session_id,timestamp,payload) VALUES(?,?,?,?)"); defer { sqlite3_finalize(stmt) }
             bind(stmt,1,id); bind(stmt,2,sessionID); sqlite3_bind_double(stmt,3,timestamp.timeIntervalSince1970); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt,4,$0.baseAddress,Int32(data.count),transient) }; guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
             for (ordinal,hit) in answer.sources.enumerated() {
-                let source = try prepare("INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match) VALUES(?,?,?,?,?)"); defer { sqlite3_finalize(source) }
-                bind(source,1,id); bind(source,2,hit.id); sqlite3_bind_int(source,3,Int32(ordinal)); sqlite3_bind_double(source,4,hit.score); bind(source,5,hit.match); guard sqlite3_step(source) == SQLITE_DONE else { throw failure() }
+                let source = try prepare("INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match,passage_start,passage_length) VALUES(?,?,?,?,?,?,?)"); defer { sqlite3_finalize(source) }
+                bind(source,1,id); bind(source,2,hit.id); sqlite3_bind_int(source,3,Int32(ordinal)); sqlite3_bind_double(source,4,hit.score); bind(source,5,hit.match)
+                if let passage = hit.passage, passage.text(in:hit.memory.text) != nil { sqlite3_bind_int64(source,6,Int64(passage.start)); sqlite3_bind_int64(source,7,Int64(passage.length)) }
+                guard sqlite3_step(source) == SQLITE_DONE else { throw failure() }
             }
             let update = try prepare("UPDATE chat_sessions SET title=?,updated=? WHERE id=?"); defer { sqlite3_finalize(update) }
             bind(update,1,session.turnCount == 0 ? String(payload.question.replacingOccurrences(of:"\n",with:" ").prefix(80)) : session.title); sqlite3_bind_double(update,2,timestamp.timeIntervalSince1970); bind(update,3,sessionID); guard sqlite3_step(update) == SQLITE_DONE else { throw failure() }
@@ -459,9 +477,9 @@ extension MemoryStore {
             let id = string(stmt,0), date = Date(timeIntervalSince1970:sqlite3_column_double(stmt,1))
             guard let bytes = sqlite3_column_blob(stmt,2) else { throw OSwindError.database("Missing conversation payload") }
             let payload = try JSONDecoder().decode(ChatPayload.self,from:Data(bytes:bytes,count:Int(sqlite3_column_bytes(stmt,2))))
-            let source = try prepare("SELECT m.payload,s.score,s.match FROM chat_sources s JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
+            let source = try prepare("SELECT m.payload,s.score,s.match,s.passage_start,s.passage_length FROM chat_sources s JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
             var hits = [SearchHit]()
-            while sqlite3_step(source) == SQLITE_ROW { hits.append(SearchHit(memory:try decode(source),score:sqlite3_column_double(source,1),match:string(source,2))) }
+            while sqlite3_step(source) == SQLITE_ROW { hits.append(SearchHit(memory:try decode(source),score:sqlite3_column_double(source,1),match:string(source,2),passage:sqlite3_column_type(source,3) == SQLITE_NULL ? nil : PassageRange(start:Int(sqlite3_column_int64(source,3)),length:Int(sqlite3_column_int64(source,4))))) }
             turns.append(ChatTurn(id:id,sessionID:sessionID,timestamp:date,question:payload.question,answer:Answer(text:payload.text,sources:hits,provider:payload.provider,duration:payload.duration,warnings:payload.warnings),filter:payload.filter,timeZone:payload.timeZone))
         }
         return turns.reversed()
@@ -525,19 +543,14 @@ extension MemoryStore {
                 }
                 if let databaseError { throw databaseError }
             }
-            let select = """
-            SELECT m.id,COALESCE(v.vector,CASE WHEN m.embedding_model=r.model THEN m.embedding END),m.timestamp
-            FROM vector_keys r JOIN memories m ON m.id=r.memory_id
-            LEFT JOIN semantic_vectors v ON v.memory_id=r.memory_id AND v.model=r.model
-            """
+            let select = VectorCandidateSQL.select()
             let candidate = try prepare(select+" WHERE r.key=? AND r.model=? AND r.revision<=? AND \(whereSQL)")
-            defer { sqlite3_finalize(candidate) }; var best = SemanticTopK(capacity:limit), valid = 0, seen = Set<String>()
+            defer { sqlite3_finalize(candidate) }; var best = SemanticTopK(capacity:limit), validParents = Set<String>()
             func consume(_ stmt: OpaquePointer) {
                 guard sqlite3_column_bytes(stmt,1) == dimensions*MemoryLayout<Float>.size, let bytes = sqlite3_column_blob(stmt,1) else { return }
-                let id = string(stmt,0); guard seen.insert(id).inserted else { return }
-                valid += 1
+                let id = string(stmt,0); validParents.insert(id)
                 let score = scorer.score(bytes.assumingMemoryBound(to:Float.self),count:dimensions)
-                if score > minimumSimilarity, best.mayImprove(score) { best.offer(SemanticCandidate(id:id,similarity:score,timestamp:sqlite3_column_double(stmt,2))) }
+                if score > minimumSimilarity, best.mayImprove(score) { best.offer(SemanticCandidate(id:id,similarity:score,timestamp:sqlite3_column_double(stmt,2),passage:sqlite3_column_int64(stmt,3) < 0 ? nil : PassageRange(start:Int(sqlite3_column_int64(stmt,3)),length:Int(sqlite3_column_int64(stmt,4))))) }
             }
             for key in keys {
                 try Task.checkCancellation()
@@ -547,10 +560,10 @@ extension MemoryStore {
                 let status = sqlite3_step(candidate)
                 if status == SQLITE_ROW { consume(candidate) } else if status != SQLITE_DONE { throw failure() }
             }
-            let nativeValid = valid
+            let nativeValid = validParents.count
             // A bounded recent sample keeps repeated identical captures from
             // arbitrarily hiding the newest source behind native tie ordering.
-            let recent = try prepare("SELECT m.id,COALESCE(v.vector,CASE WHEN m.embedding_model=r.model THEN m.embedding END),m.timestamp FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id LEFT JOIN semantic_vectors v ON v.memory_id=r.memory_id AND v.model=r.model WHERE r.model=? AND r.revision<=? AND \(whereSQL) ORDER BY m.timestamp DESC,m.id LIMIT 100")
+            let recent = try prepare(VectorCandidateSQL.recent(appScoped:filter.app != nil,predicate:whereSQL))
             defer { sqlite3_finalize(recent) }; bind(recent,1,modelID); sqlite3_bind_int64(recent,2,sequence)
             for (i,value) in values.enumerated() { bind(recent,Int32(i+3),value) }
             var recentStatus = sqlite3_step(recent)
@@ -564,8 +577,69 @@ extension MemoryStore {
             var changed = 0, status = sqlite3_step(delta)
             while status == SQLITE_ROW { changed += 1; if changed % 256 == 0 { try Task.checkCancellation() }; if changed > 5000 { return nil }; consume(delta); status = sqlite3_step(delta) }
             guard status == SQLITE_DONE else { throw failure() }
-            if keys.count == keyCount && nativeValid < min(5,max(1,filter.limit)) { return nil }
+            if !(native is MetalFlatIndex) && keys.count == keyCount {
+                let parents = try vectorCount(modelID:modelID,filter:filter)
+                if nativeValid < min(limit,parents) { return nil }
+            }
             return best.sorted
         } ?? nil
+    }
+}
+
+extension MemoryStore {
+    func vectorEntityCount(modelID: String) throws -> Int {
+        lock.lock(); defer { lock.unlock() }
+        let stmt = try prepare("SELECT COALESCE((SELECT entities FROM vector_statistics WHERE model=?),0)"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID)
+        guard sqlite3_step(stmt) == SQLITE_ROW else { throw failure() }; return Int(sqlite3_column_int64(stmt,0))
+    }
+    func passagesCurrent(_ memory: Memory, modelID: String) throws -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        if !SemanticPassagePlan.needed(memory) { return true }
+        let stmt = try prepare("SELECT 1 FROM passage_manifests WHERE memory_id=? AND model=? AND content_hash=? AND version=?")
+        defer { sqlite3_finalize(stmt) }; bind(stmt,1,memory.id); bind(stmt,2,modelID); bind(stmt,3,memory.contentHash); sqlite3_bind_int(stmt,4,Int32(SemanticPassagePlan.version))
+        return sqlite3_step(stmt) == SQLITE_ROW
+    }
+    public func passageBacklog(modelID: String, filter: SearchFilter) throws -> Int {
+        lock.lock(); defer { lock.unlock() }; let (predicate,values) = conditions(filter)
+        // UTF-8 length is a conservative fast upper bound; a short multibyte
+        // record receives an empty completion manifest during its next pass.
+        let stmt = try prepare("SELECT COUNT(*) FROM memories m INDEXED BY memories_passage_candidates WHERE \(predicate) AND length(CAST(m.text AS BLOB))>2400 AND NOT EXISTS(SELECT 1 FROM passage_manifests p WHERE p.memory_id=m.id AND p.model=? AND p.version=?)")
+        defer { sqlite3_finalize(stmt) }; for (i,value) in values.enumerated() { bind(stmt,Int32(i+1),value) }; bind(stmt,Int32(values.count+1),modelID); sqlite3_bind_int(stmt,Int32(values.count+2),Int32(SemanticPassagePlan.version))
+        guard sqlite3_step(stmt) == SQLITE_ROW else { throw failure() }; return Int(sqlite3_column_int64(stmt,0))
+    }
+    /// Replace all passages atomically only while the source revision and base
+    /// vector still match. Cancellation saves earlier sources, never half a source.
+    @discardableResult func savePassages(memory: Memory, modelID: String, records: [PassageVector]) throws -> Bool {
+        let plan = SemanticPassagePlan.make(memory)
+        guard records.count == plan.count, zip(records,plan).allSatisfy({ $0.range == $1.range }), records.allSatisfy({ (1...8192).contains($0.vector.count) && CosineScorer($0.vector) != nil }), Set(records.map { $0.vector.count }).count <= 1 else { throw OSwindError.invalid("Invalid or incomplete passage vectors") }
+        lock.lock(); defer { lock.unlock() }; try Task.checkCancellation(); try exec("SAVEPOINT passage_commit")
+        do {
+            guard let current = try get(memory.id), current.contentHash == memory.contentHash else { try exec("RELEASE passage_commit"); return false }
+            let base = try prepare("SELECT length(COALESCE(v.vector,CASE WHEN m.embedding_model=? THEN m.embedding END))/4 FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? WHERE m.id=?")
+            defer { sqlite3_finalize(base) }; bind(base,1,modelID); bind(base,2,modelID); bind(base,3,memory.id)
+            guard sqlite3_step(base) == SQLITE_ROW, sqlite3_column_int(base,0)>0, records.first.map({$0.vector.count == Int(sqlite3_column_int(base,0))}) ?? true else { throw OSwindError.invalid("Passage and source vector dimensions must match") }
+            let remove = try prepare("DELETE FROM semantic_passages WHERE memory_id=? AND model=?"); defer { sqlite3_finalize(remove) }; bind(remove,1,memory.id); bind(remove,2,modelID); guard sqlite3_step(remove) == SQLITE_DONE else { throw failure() }
+            let insert = try prepare("INSERT INTO semantic_passages(memory_id,model,ordinal,start,length,dimension,vector) VALUES(?,?,?,?,?,?,?)"); defer { sqlite3_finalize(insert) }
+            for (i,record) in records.enumerated() {
+                if i%64 == 0 { try Task.checkCancellation() }
+                sqlite3_reset(insert); sqlite3_clear_bindings(insert); bind(insert,1,memory.id); bind(insert,2,modelID); sqlite3_bind_int(insert,3,Int32(i+1)); sqlite3_bind_int64(insert,4,Int64(record.range.start)); sqlite3_bind_int64(insert,5,Int64(record.range.length)); sqlite3_bind_int(insert,6,Int32(record.vector.count)); _ = record.vector.withUnsafeBytes { sqlite3_bind_blob(insert,7,$0.baseAddress,Int32($0.count),transient) }; guard sqlite3_step(insert) == SQLITE_DONE else { throw failure() }
+            }
+            let manifest = try prepare("INSERT INTO passage_manifests(memory_id,model,content_hash,version,count) VALUES(?,?,?,?,?) ON CONFLICT(memory_id,model) DO UPDATE SET content_hash=excluded.content_hash,version=excluded.version,count=excluded.count")
+            defer { sqlite3_finalize(manifest) }; bind(manifest,1,memory.id); bind(manifest,2,modelID); bind(manifest,3,memory.contentHash); sqlite3_bind_int(manifest,4,Int32(SemanticPassagePlan.version)); sqlite3_bind_int(manifest,5,Int32(records.count)); guard sqlite3_step(manifest) == SQLITE_DONE else { throw failure() }
+            try Task.checkCancellation(); try exec("RELEASE passage_commit"); return true
+        } catch { try? exec("ROLLBACK TO passage_commit; RELEASE passage_commit"); throw error }
+    }
+}
+
+extension MemoryStore {
+    func indexApplePassages(_ memory: Memory, embedder: LocalEmbedder) throws {
+        guard memory.embeddingModel == embedder.modelID, SemanticPassagePlan.needed(memory), try !passagesCurrent(memory,modelID:embedder.modelID) else { return }
+        var records = [PassageVector]()
+        for passage in SemanticPassagePlan.make(memory) {
+            try Task.checkCancellation()
+            guard let vector = embedder.embed(passage.input) else { throw OSwindError.unavailable("Apple passage embeddings unavailable") }
+            records.append(PassageVector(range:passage.range,vector:vector))
+        }
+        _ = try savePassages(memory:memory,modelID:embedder.modelID,records:records)
     }
 }

@@ -229,3 +229,24 @@ python3 scripts/query-scope-smoke.py .build/release/oswindctl --provider ollama
 Calendar tests inject a fixed clock and time zone, including 23/25-hour DST days, wall-clock day parts, weekdays, month/year boundaries and numeric rolling ranges. Separate cases cover quoted/smart-quoted operators, Unicode removal, URI form spaces/literal plus, typed parameter errors, fractional ISO export/import and embedded-NUL application-prefix rejection. Saved chat payloads remain backward readable. Current full-suite and sanitizer counts are recorded in the report. Earlier public relevance metrics remain unchanged in every mode on the authored 35-query fixture; no new natural-language generalization claim is made.
 
 Own-app NSHosting renders verify minimum-size light/dark layouts. Native click/shortcut verification remains blocked by the locked Mac. No continuous capture, full competitor app runtime or 24-hour/power result is implied. Synthetic vector scans measure their documented storage/candidate path and exclude query-language resolution, embeddings and UI publication.
+
+## Full-source semantic passage regression
+
+```bash
+python3 scripts/passage-smoke.py .build/release/oswindctl --provider apple --output .artifacts/passages-apple.json
+python3 scripts/passage-smoke.py .build/release/oswindctl --provider ollama --require-recall --output .artifacts/passages-qwen.json
+python3 scripts/passage-smoke.py .build/release/oswindctl --provider ollama --answer-provider ollama --output .artifacts/passages-answers.json
+```
+
+Three fictional long notes place distinct owner/deadline facts beyond 19,000 characters amid repeated background. The same store/model is queried first with only base vectors, then after passage backfill. An unrelated fourth record supplies a distractor. Measurements include separate CLI startup, model HTTP, query embedding, coverage and SQL scoring, so they are not comparable to in-process retrieval-only timings. Only three paraphrases are tested. There is no held-out dataset, cold-cache control, competitor or energy result.
+
+Exploratory reports retain provenance limits. `passage-qwen-v2.json` is the release runtime at `acb52af`: base-only MRR .611 and passage MRR 1.0, with all selected passages containing the answer fact. Generation is separately **2/3**: two cited correct owner/deadline answers and one conservative abstention. The failed combined check is intentionally retained. The Apple precursor report reaches MRR .833 with one non-answer passage; full coverage does not establish semantic selection accuracy. Relevance/generation must be assessed independently.
+
+The script also verifies real MCP passage metadata and that a CLI note remains committed with an offline optional model server. `--require-recall` fails on any selected semantic check (and on answer checks if generation was requested); without it, quality failures remain in the report while structural ingestion/MCP failures still fail the process.
+
+
+The final runtime reports `passage-apple-v3.json` and `passage-qwen-v3.json` pin source `99c87c2`, binary/script hashes, raw source hashes and per-query ranks. The Qwen report retains the actual bounded evidence context: all three contexts contain the correct owner/day, yet generation abstains on one. The first two v1 reports are explicitly labeled exploratory precursors without a retained binary hash.
+
+`metal-passages-1000000-v3.json` runs the upgraded parent-aware cache against the retained million-row archive, with 12 new queries in each scope (seed offset 10339). Recall@10 is 1.0/1.0 on these trials. Cache preparation takes 2.52 s, RSS peaks at 4.24 GB; self median/p95 is 27.36/96.77 ms unfiltered and 41.96/687.48 ms filtered. Non-self indexed p95 is 88.04/39.67 ms. The first exhaustive reference query takes 6.98 s; subsequent unfiltered references are about 1.1 s. These are uncontrolled cache trials and a small synthetic query set; parent grouping adds work and no energy or competitor claim follows. `passage-statistics-1000000.json` includes a 1.58 s open/new-index step, not a controlled full schema-5 migration timing.
+
+Both failed recent-source SQL experiments are retained as `passage-slow-recent-v1.json` and `v2.json`. They were terminated before producing quantiles/recall. Process profiles showed SQLite work; the second plan scanned a global model/revision range per parent. The final code pins time/app-time and parent/revision indexes. A regression measures executed VM/full-scan steps on a 1,500-record store. Large timestamp tie groups and sparse arbitrary metadata scopes still need expanded workload tests.

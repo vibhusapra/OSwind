@@ -49,6 +49,8 @@ public final class RetrievalEngine: @unchecked Sendable {
             let coverage = try store.indexCoverage(modelID:identity,filter:filter)
             let indexed = coverage.indexed, total = coverage.total
             var warnings = indexed == 0 && total > 0 ? ["No vectors for the selected model in this range. Build its search index in Models settings."] : indexed < total ? ["Semantic index covers \(indexed) of \(total) memories in this range. Keyword matches remain available in Hybrid mode."] : []
+            let backlog = try store.passageBacklog(modelID:identity,filter:filter)
+            if backlog > 0 { warnings.append("Long-source passage indexing is pending for \(backlog) records. Build the selected embedding index in Models settings for complete semantic coverage.") }
             var execution = SearchExecution(strategy:"exact",warnings:[])
             let hits = try store.search(filter,mode:mode,vector:vector,modelID:identity,minimumSimilarity:configuration.provider == .apple ? 0.15 : 0.25,similarityFusion:configuration.provider == .ollama,indexPolicy:configuration.indexPolicy,indexedCount:indexed,allowIndexOnLowPower:configuration.indexOnLowPower) { execution = $0 }
             warnings += execution.warnings
@@ -59,29 +61,54 @@ public final class RetrievalEngine: @unchecked Sendable {
             return RetrievalResult(hits:try store.search(filter,mode:.keyword),warnings:["Semantic search unavailable; showing keyword matches. " + error.localizedDescription],modelID:nil,duration:Date().timeIntervalSince(start),resolution:resolution)
         }
     }
-    @discardableResult public func index(_ memories: [Memory], configuration: SearchConfiguration) async throws -> String? {
-        guard configuration.provider == .ollama, !memories.isEmpty else { return nil }
-        let batch = try await client.embed(memories.map(\.searchableText),configuration:configuration)
+    @discardableResult public func index(_ memories: [Memory], configuration: SearchConfiguration, shouldContinue: @escaping @Sendable () -> Bool = { true }) async throws -> String? {
+        guard !memories.isEmpty else { return nil }
+        let batch = try await embeddings(memories.map(\.searchableText),configuration:configuration)
         try Task.checkCancellation()
         _ = try store.saveVectors(zip(memories,batch.vectors).map { VectorRecord(memory:$0.0,vector:$0.1) },modelID:batch.modelID)
+        for memory in memories { try await indexPassages(memory,identity:batch.modelID,configuration:configuration,shouldContinue:shouldContinue) }
         return batch.modelID
     }
+    private func embeddings(_ inputs: [String], configuration: SearchConfiguration) async throws -> EmbeddingBatch {
+        if configuration.provider == .ollama { return try await client.embed(inputs,configuration:configuration) }
+        let start = Date(), apple = self.apple
+        return try await Task.detached(priority:.utility) {
+            var vectors = [[Float]]()
+            for input in inputs { try Task.checkCancellation(); guard let vector = apple.embed(input) else { throw OSwindError.unavailable("Apple sentence embeddings are unavailable") }; vectors.append(vector) }
+            return EmbeddingBatch(vectors:vectors,modelID:apple.modelID,duration:Date().timeIntervalSince(start))
+        }.value
+    }
+    private func indexPassages(_ memory: Memory, identity: String, configuration: SearchConfiguration, shouldContinue: @escaping @Sendable () -> Bool = { true }) async throws {
+        guard try !store.passagesCurrent(memory,modelID:identity) else { return }
+        let plan = SemanticPassagePlan.make(memory); var records = [PassageVector]()
+        for first in stride(from:0,to:plan.count,by:8) {
+            try Task.checkCancellation()
+            guard shouldContinue() else { throw OSwindError.unavailable("Passage indexing deferred by power policy; earlier completed sources are saved") }
+            let slice = Array(plan[first..<min(first+8,plan.count)])
+            let batch = try await embeddings(slice.map(\.input),configuration:configuration)
+            guard batch.modelID == identity else { throw OSwindError.unavailable("Model changed during passage indexing; restart with the installed model") }
+            records += zip(slice,batch.vectors).map { PassageVector(range:$0.0.range,vector:$0.1) }
+        }
+        try Task.checkCancellation(); _ = try store.savePassages(memory:memory,modelID:identity,records:records)
+    }
     @discardableResult public func rebuild(configuration: SearchConfiguration, shouldContinue: @escaping @Sendable () -> Bool = { true }, progress: @escaping @Sendable (IndexProgress) -> Void) async throws -> IndexProgress {
-        guard configuration.provider == .ollama else { throw OSwindError.invalid("Apple vectors are built during capture. Select a local embedding model to build its additional index.") }
-        let probe = try await client.embed(["index identity"],configuration:configuration)
+        let probe = try await embeddings(["index identity"],configuration:configuration)
         let identity = probe.modelID, total = try store.matchingCount()
-        var indexed = try store.vectorCount(modelID:identity), cursor = ""
-        progress(IndexProgress(indexed:indexed,total:total,modelID:identity))
+        var cursor = ""
+        progress(IndexProgress(indexed:try store.vectorCount(modelID:identity),total:total,modelID:identity))
         while true {
             try Task.checkCancellation()
-            guard shouldContinue() else { throw OSwindError.unavailable("Indexing deferred by the current power policy; completed batches are saved") }
+            guard shouldContinue() else { throw OSwindError.unavailable("Indexing deferred by the current power policy; completed sources are saved") }
             let memories = try store.memoriesNeedingVectors(modelID:identity,afterID:cursor,limit:16)
             guard let last = memories.last else { break }
-            let batch = try await client.embed(memories.map(\.searchableText),configuration:configuration)
+            let batch = try await embeddings(memories.map(\.searchableText),configuration:configuration)
             guard batch.modelID == identity else { throw OSwindError.unavailable("Model changed during index build; restart with the installed model") }
             try Task.checkCancellation()
-            indexed += try store.saveVectors(zip(memories,batch.vectors).map { VectorRecord(memory:$0.0,vector:$0.1) },modelID:identity)
-            cursor = last.id; progress(IndexProgress(indexed:indexed,total:total,modelID:identity))
+            _ = try store.saveVectors(zip(memories,batch.vectors).map { VectorRecord(memory:$0.0,vector:$0.1) },modelID:identity)
+            for memory in memories { try await indexPassages(memory,identity:identity,configuration:configuration,shouldContinue:shouldContinue) }
+            // Short multibyte sources may pass the conservative SQL length test.
+            for memory in memories where !SemanticPassagePlan.needed(memory) { _ = try store.savePassages(memory:memory,modelID:identity,records:[]) }
+            cursor = last.id; progress(IndexProgress(indexed:try store.vectorCount(modelID:identity),total:total,modelID:identity))
         }
         let final = IndexProgress(indexed:try store.vectorCount(modelID:identity),total:try store.matchingCount(),modelID:identity); progress(final); return final
     }

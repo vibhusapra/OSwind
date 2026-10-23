@@ -108,7 +108,8 @@ import ServiceManagement
         section = "Memories"; showSettings = false; selected = nil
         searchFocusRequest = UUID()
     }
-    func openMemory(_ memory: Memory, query: String) { selectedEvidenceQuery = query; selected = memory }
+    @Published var selectedPassage: PassageRange?
+    func openMemory(_ memory: Memory, query: String, passage: PassageRange? = nil) { selectedEvidenceQuery = query; selectedPassage = passage; selected = memory }
     func refresh(forceStatistics: Bool = false) {
         refreshStatistics(force:forceStatistics)
         searchInputError = nil
@@ -198,20 +199,21 @@ import ServiceManagement
     private func captured(_ memory: Memory) {
         refreshStatistics(force:true)
         if refreshing { pendingRefresh = true } else { refresh() }
-        guard settings.search.provider == .ollama else { return }
+        guard settings.search.provider == .ollama || memory.text.utf16.count > 2400 else { return }
         guard settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { indexStatus = "GPU indexing deferred in Low Power Mode; keyword/Apple capture continues"; return }
         if pendingIndex.count >= 64 { indexStatus = "GPU index is behind capture. Rebuild to catch up."; return }
         pendingIndex.removeAll { $0.id == memory.id }; pendingIndex.append(memory)
         startAutomaticIndexer()
     }
     private func startAutomaticIndexer() {
-        guard automaticIndexTask == nil, settings.search.provider == .ollama, settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
+        guard automaticIndexTask == nil, settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
         automaticIndexTask = Task { [weak self] in
             guard let self else { return }; defer { self.automaticIndexTask = nil; if !self.pendingIndex.isEmpty { self.startAutomaticIndexer() } }
             while !self.pendingIndex.isEmpty && !Task.isCancelled {
                 guard self.settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { self.indexStatus = "GPU indexing deferred in Low Power Mode"; break }
                 let batch = Array(self.pendingIndex.prefix(16)); self.pendingIndex.removeFirst(batch.count)
-                do { _ = try await RetrievalEngine(store:self.store,apple:self.embedder).index(batch,configuration:self.settings.search) }
+                let configuration = self.settings.search
+                do { _ = try await RetrievalEngine(store:self.store,apple:self.embedder).index(batch,configuration:configuration,shouldContinue:{ configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled }) }
                 catch is CancellationError { break }
                 catch { if !Task.isCancelled { self.indexStatus = error.localizedDescription; self.pendingIndex.removeAll() }; break }
             }
@@ -292,8 +294,20 @@ import ServiceManagement
     }
     private func catchUpIndex() async {
         let configuration = settings.search
-        guard configuration.provider == .ollama, !indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
-        do { let model = try await OllamaClient.shared.models(endpoint:configuration.endpoint).first { $0.name == configuration.model || $0.name == configuration.model + ":latest" }; guard settings.search == configuration, let model else { return }; let prefix = "ollama:\(model.name)@\(model.digest):desktop-v1:"; let indexed = try store.semanticIndexes().filter { $0.key.hasPrefix(prefix) }.map(\.value).max() ?? 0; if indexed < (try store.matchingCount()) { rebuildIndex() } } catch { indexStatus = "Index catch-up waiting for the local model server" }
+        guard !indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
+        if configuration.provider == .apple {
+            if (try? store.passageBacklog(modelID:embedder.modelID,filter:SearchFilter())) ?? 0 > 0 { rebuildIndex() }
+            return
+        }
+        do {
+            let model = try await OllamaClient.shared.models(endpoint:configuration.endpoint).first { $0.name == configuration.model || $0.name == configuration.model + ":latest" }
+            guard settings.search == configuration, let model else { return }
+            let prefix = "ollama:\(model.name)@\(model.digest):desktop-v1:"
+            let indexes = try store.semanticIndexes().filter { $0.key.hasPrefix(prefix) }
+            let indexed = indexes.values.max() ?? 0
+            let pendingPassages = try indexes.keys.contains { try store.passageBacklog(modelID:$0,filter:SearchFilter())>0 }
+            if indexed < (try store.matchingCount()) || pendingPassages { rebuildIndex() }
+        } catch { indexStatus = "Index catch-up waiting for the local model server" }
     }
     func pauseAll() { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(); audio.stop() }
     func pauseFor(minutes: Int) {

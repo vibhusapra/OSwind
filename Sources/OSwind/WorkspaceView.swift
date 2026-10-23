@@ -93,21 +93,21 @@ struct MemoryCard: View {
     var memory: Memory { hit.memory }
     var body: some View {
         VStack(alignment:.leading,spacing:0) {
-            Button { m.openMemory(memory,query:m.activeSearchQuery) } label: {
+            Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) } label: {
                 ZStack(alignment:.topLeading) {
                     if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
-                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
+                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
                     Text(memory.kind.rawValue.uppercased()).font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
                 HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent); Spacer(); Text(memory.timestamp,style:.time).font(.caption2).foregroundStyle(.secondary) }
-                Button { m.openMemory(memory,query:m.activeSearchQuery) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
-                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
+                Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
+                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
             }.padding(15)
         }.background(.background,in:RoundedRectangle(cornerRadius:12)).clipShape(RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.07)))
-        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
+        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
     }
 }
 struct TimelineStrip: View {
@@ -131,7 +131,7 @@ struct MemoryDetail: View {
                 if !query.isEmpty {
                     VStack(alignment:.leading,spacing:8) {
                         Text("SEARCH EXCERPT").font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
-                        EvidenceSnippetView(text:memory.text,query:query,budget:800).textSelection(.enabled).font(.callout)
+                        EvidenceSnippetView(text:memory.text,query:query,budget:800,passage:m.selectedPassage).textSelection(.enabled).font(.callout)
                         Text("Ellipses mark omitted text. The complete source follows.").font(.caption2).foregroundStyle(.secondary)
                     }.frame(maxWidth:.infinity,alignment:.leading).padding(14).background(accent.opacity(0.06),in:RoundedRectangle(cornerRadius:8))
                 }
@@ -219,10 +219,10 @@ struct AnswerCard: View {
             if !answer.sources.isEmpty {
                 DisclosureGroup("Check \(answer.sources.count) sources") {
                     ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in
-                        Button { m.openMemory(hit.memory,query:question) } label: {
+                        Button { m.openMemory(hit.memory,query:question,passage:hit.passage) } label: {
                             VStack(alignment:.leading,spacing:7) {
                                 HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary) }
-                                EvidenceSnippetView(text:hit.memory.text,query:question).foregroundStyle(.secondary).lineLimit(3).frame(maxWidth:.infinity,alignment:.leading)
+                                EvidenceSnippetView(text:hit.memory.text,query:question,passage:hit.passage).foregroundStyle(.secondary).lineLimit(3).frame(maxWidth:.infinity,alignment:.leading)
                             }.padding(10).background(.quaternary.opacity(0.5),in:RoundedRectangle(cornerRadius:8))
                         }.buttonStyle(.plain)
                     }

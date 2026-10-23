@@ -116,7 +116,7 @@ public final class AnswerEngine {
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800
         let passages = hits.map { hit in
-            "\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + EvidenceText.excerpt(hit.memory.text,query:excerptQuery,budget:excerptBudget,summary:summarize)
+            "\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + hit.excerpt(query:excerptQuery,budget:excerptBudget,summary:summarize)
         }
         let context = passages.enumerated().map { "[\($0.offset+1)] \($0.element)" }.joined(separator:"\n\n")
         if hits.contains(where:{ ($0.memory.text as NSString).length > excerptBudget }) { retrievalWarnings.append("Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records.") }
