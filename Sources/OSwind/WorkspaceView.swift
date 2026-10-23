@@ -135,25 +135,66 @@ struct MemoryDetail: View {
 struct AskView: View {
     @EnvironmentObject var m: AppModel
     var body: some View {
-        VStack(alignment:.leading,spacing:22) {
+        VStack(alignment:.leading,spacing:18) {
             Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
             Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
+            HStack {
+                Menu {
+                    if m.chats.isEmpty { Text("No saved conversations yet") }
+                    ForEach(m.chats) { chat in Button("\(chat.title) · \(chat.turnCount)") { m.selectChat(chat.id) } }
+                } label: { Label(m.chats.first(where: { $0.id == m.currentChatID })?.title ?? "Conversation history",systemImage:"clock.arrow.circlepath").lineLimit(1) }
+                .disabled(m.asking)
+                Button("New",systemImage:"square.and.pencil") { m.newChat() }.disabled(m.asking)
+                Spacer()
+                if m.currentChatID != nil {
+                    Button("Export",systemImage:"square.and.arrow.up") { m.exportChat() }.disabled(m.asking)
+                    Button("Delete",systemImage:"trash",role:.destructive) { m.deleteCurrentChat() }.disabled(m.asking)
+                }
+            }.buttonStyle(.bordered)
             HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } }
-            HStack { TextField("What did we decide about…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.buttonStyle(.borderedProminent).disabled(m.asking || m.question.isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
+            HStack(spacing:12) {
+                Text("Search within").font(.caption).foregroundStyle(.secondary)
+                Picker("Answer time range",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"],id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
+                if m.range == "Choose day" { DatePicker("Answer date",selection:$m.date,displayedComponents:.date).labelsHidden().frame(width:120) }
+                Picker("Answer application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
+                Spacer()
+            }.disabled(m.asking)
+            HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
             HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
-            if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary) } }
-            ScrollView {
-                if let answer = m.answer {
-                    VStack(alignment:.leading,spacing:20) {
-                        ForEach(answer.warnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
-                        Text(answer.text).textSelection(.enabled).font(.system(size:15)).lineSpacing(5).frame(maxWidth:.infinity,alignment:.leading)
-                        HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save recap") { m.saveAnswer() }; Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
-                        Divider(); Text("CHECK THE SOURCES").font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
-                        ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in Button { m.selected = hit.memory } label: { HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary); Text(hit.memory.timestamp,style:.time).foregroundStyle(.secondary) }.padding(12).background(.quaternary.opacity(0.5),in:RoundedRectangle(cornerRadius:8)) }.buttonStyle(.plain) }
-                    }.padding(20).background(.background,in:RoundedRectangle(cornerRadius:12))
-                } else { VStack(alignment:.leading,spacing:12) { Text("Evidence comes first.").font(.title3.weight(.medium)); Text("Ask about a conversation, recover a forgotten link, or turn today’s activity into a recap. Every answer includes the memories it used.").foregroundStyle(.secondary); Text("Choose a local model for generated answers. Evidence mode works immediately, without a download.").font(.caption).foregroundStyle(.secondary) }.padding(24).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.06),in:RoundedRectangle(cornerRadius:12)) }
+            if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary); Spacer(); Button("Cancel") { m.cancelAnswer() } } }
+            ScrollViewReader { reader in
+                ScrollView {
+                    LazyVStack(alignment:.leading,spacing:24) {
+                        if !m.chatTurns.isEmpty {
+                            ForEach(m.chatTurns) { turn in
+                                VStack(alignment:.leading,spacing:12) {
+                                    Text(turn.question).font(.system(size:15,weight:.medium)).textSelection(.enabled).padding(16).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:12))
+                                    AnswerCard(answer:turn.answer)
+                                    Text("\(turn.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(turn.filter.app ?? "All apps") · \(turn.filter.start.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any start") → \(turn.filter.end.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any end")").font(.caption2).foregroundStyle(.secondary)
+                                }.id(turn.id)
+                            }
+                        } else if let answer = m.answer { AnswerCard(answer:answer) }
+                        else { VStack(alignment:.leading,spacing:12) { Text("Evidence comes first.").font(.title3.weight(.medium)); Text("Ask about a conversation, recover a forgotten link, or turn today’s activity into a recap. Saved conversations stay on this Mac.").foregroundStyle(.secondary); Text("Follow-ups recheck recorded sources within your current filters. Deleting evidence also removes saved chat answers that cited it.").font(.caption).foregroundStyle(.secondary) }.padding(24).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.06),in:RoundedRectangle(cornerRadius:12)) }
+                    }
+                }.onChange(of:m.chatTurns.last?.id) { _, _ in if let id = m.chatTurns.last?.id { reader.scrollTo(id,anchor:.bottom) } }
             }
-        }.padding(32)
+        }.padding(32).onAppear { m.refreshChats() }
+    }
+}
+struct AnswerCard: View {
+    @EnvironmentObject var m: AppModel
+    let answer: Answer
+    var body: some View {
+        VStack(alignment:.leading,spacing:16) {
+            ForEach(answer.warnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
+            Text(answer.text).textSelection(.enabled).font(.system(size:15)).lineSpacing(5).frame(maxWidth:.infinity,alignment:.leading)
+            HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save recap") { m.addNote(answer.text,title:"Saved answer",kind:.summary) }; Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
+            if !answer.sources.isEmpty {
+                DisclosureGroup("Check \(answer.sources.count) sources") {
+                    ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in Button { m.selected = hit.memory } label: { HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary) }.padding(10).background(.quaternary.opacity(0.5),in:RoundedRectangle(cornerRadius:8)) }.buttonStyle(.plain) }
+                }.font(.caption)
+            }
+        }.padding(20).background(.background,in:RoundedRectangle(cornerRadius:12))
     }
 }
 struct InsightsView: View {

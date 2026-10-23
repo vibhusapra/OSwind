@@ -30,7 +30,7 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     public var searchableText: String { [title, app, url ?? "", text].joined(separator: "\n") }
 }
 public enum SearchMode: String, Codable, CaseIterable { case hybrid, keyword, semantic }
-public struct SearchFilter: Sendable {
+public struct SearchFilter: Codable, Equatable, Sendable {
     public var query = ""
     public var app: String?
     public var kind: MemoryKind?

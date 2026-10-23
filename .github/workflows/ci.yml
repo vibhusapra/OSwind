@@ -18,6 +18,8 @@ jobs:
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
+      - name: Exercise durable conversation processes
+        run: python3 scripts/conversation-smoke.py .build/release/oswindctl
       - name: Evaluate authored retrieval fixture
         run: |
           mkdir -p .artifacts

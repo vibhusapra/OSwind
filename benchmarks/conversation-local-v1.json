@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "os": "26.6.2",
+  "hardware": "Apple M5 Max",
+  "fixture": "One synthetic note: Lunar release decision: Maya owns the checklist; deadline Friday.",
+  "ollama_model": "qwen3:4b",
+  "scope": "Single real-process smoke per provider, not an accuracy benchmark. Guided Apple claim format and latest-question prompt were revised after missing citations, false abstention and wrong-question answers were observed. Results require independent wider evaluation.",
+  "results": [
+    {
+      "provider": "apple",
+      "answers": [
+        {
+          "question": "Who owns the Lunar release checklist?",
+          "text": "Maya owns the checklist. [1]",
+          "duration_seconds": 0.8931909799575806,
+          "warnings": [],
+          "source_count": 1
+        },
+        {
+          "question": "And its deadline?",
+          "text": "Friday [1]",
+          "duration_seconds": 0.5590329170227051,
+          "warnings": [],
+          "source_count": 1
+        }
+      ]
+    },
+    {
+      "provider": "ollama",
+      "answers": [
+        {
+          "question": "Who owns the Lunar release checklist?",
+          "text": "Maya [1]",
+          "duration_seconds": 2.1042360067367554,
+          "warnings": [],
+          "source_count": 1
+        },
+        {
+          "question": "And its deadline?",
+          "text": "Friday [1]",
+          "duration_seconds": 4.73865008354187,
+          "warnings": [],
+          "source_count": 1
+        }
+      ]
+    }
+  ]
+}
