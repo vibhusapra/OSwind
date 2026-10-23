@@ -7,7 +7,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 ## Implemented and directly verified
 
 - Native Swift package builds in debug and release on macOS 26.6.2 / Swift 6.3.3 / M5 Max. Ad-hoc signed .app packages successfully; a debug app process ran with isolated sample data.
-- 76 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
+- 84 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
 - CLI durable note/search and real stdio MCP initialize/list/search smoke pass. Live loopback HTTP health/stats/search/get pass; unauthorized requests return 401, browser Origin and bad Host return 403.
 - Apple Intelligence answered the local synthetic ownership question with the correct owner and [1] citation (~0.70 seconds in a repeated sample).
 - Ollama qwen3:4b answered the same question with correct owner and [1] (~3.75 seconds warm sample). Runtime `ollama ps` reported 100% GPU, 8192 context. Reasoning text is stripped before display.
@@ -74,6 +74,18 @@ Current checks: 76 automated tests pass (plus one skipped opt-in runtime check);
 Pinned dependency: USearch 2.26.5 / resolved NumKong 7.8.5, Apache-2.0; notices/licenses bundled. At 100k × 1024 dimensions the actual bounded-parallel graph prepared in ~252 s. Whole-path unfiltered self-query p95 was ~66.8 ms indexed / 132 ms exact; half-app indexed was slower (~399 / 99 ms). Automatic therefore keeps every filtered query exact and only indexes unfiltered scopes at 20k+ vectors. Explicit Indexed remains an approximation choice. Sixteen non-self queries per scope recovered all exact top-10 neighbors in this small synthetic test; unfiltered p95 ~58 / 124 ms, filtered ~456 / 106 ms. Native-only exploration and full SQLite results remain separately labeled in the benchmark ledger.
 
 The retained million-vector ANN build is running; no result is claimed. Next gates: million/cold tails, independent realistic recall, write contention, scope/count/statistics costs (including tags), long-run memory/power, orphan/fork/restore recovery and broader UI/audio/parity work. Vault encryption, routines, meeting workflows, migration/backup and real competitor runs remain open.
+
+## Current work: long-source evidence and query highlights
+
+The `codex/evidence-excerpts` branch replaces first-500-character duplicate suppression with full source/context fingerprints and first-800-character context with query-anchored lexical windows. Distant terms can select a second passage; Unicode stays composed and ellipses mark omissions. Recaps/unanchored queries retain opening/ending text. Native cards/source inspector show asynchronously selected highlighted excerpts. A rendered synthetic long-note search was reviewed; compact snippets now keep the deadline visible. Live interaction remains separate from the app's own layout render.
+
+Source date/kind revisions now invalidate saved and in-flight answers while leaving content-compatible embeddings available. CLI one-off/chat Ask accept model/endpoint overrides; one-off scope flags are applied and questions sanitized. Output-limit stop reasons fail without appending a partial chat answer. Offline provider process tests verify this boundary. Local Ollama generation does not read BYOK accounts. Recent user questions resolve retrieval; generation receives the current question and fresh evidence.
+
+Current validation: 84 tests pass, one opt-in runtime case skipped. Long-note evidence mode, model/endpoint/limit process smoke, indexed API/MCP and durable chat checks pass. Three Apple and two pinned Qwen3 Instruct trials passed owner/deadline assignment and an unsupported budget question on the authored two-note fixture. Native rendering shows the late deadline inside the highlighted card. Broader live UI, semantic support and adversarial questions remain open.
+
+The testing exposed real model failures and a weak initial grader. A source-by-source Apple experiment generated a false owner and was discarded. The installed short Qwen tag matched a thinking-only model; its ~10–26 s development answers sometimes exhausted the output budget or exposed unfinished metareasoning. The explicit Instruct tag passed the stricter fixture, with first observed answer ~1.3 s and later answers ~0.12–0.46 s. These tiny concurrent-load observations are not general quality or performance rankings. Historical failures and current trial metadata are in the benchmark ledger. Setup/default model presets now use the explicit non-thinking version; selected user model names remain intact.
+
+Remaining evidence work: semantic chunk indexing beyond embedding input limits, held-out multilingual/long-archive grounding, source/citation entailment, robust abstention, token/context budgets and prompt-injection evaluation. Query-only image boxes remain pending; the delivered query highlights are text excerpts.
 
 ## Local artifacts
 

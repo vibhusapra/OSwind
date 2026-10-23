@@ -24,6 +24,7 @@ import ServiceManagement
     @Published var hits = [SearchHit]()
     @Published var stats = StoreStats()
     @Published var selected: Memory?
+    @Published var selectedEvidenceQuery = ""
     @Published var answer: Answer?
     @Published var question = ""
     @Published var asking = false
@@ -89,6 +90,7 @@ import ServiceManagement
         section = "Memories"; showSettings = false; selected = nil
         searchFocusRequest = UUID()
     }
+    func openMemory(_ memory: Memory, query: String) { selectedEvidenceQuery = query; selected = memory }
     func refresh() {
         refreshTask?.cancel(); let filter = self.filter, mode = self.mode, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
         refreshing = true

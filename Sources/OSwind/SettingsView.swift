@@ -69,7 +69,7 @@ struct SettingsView: View {
     private var models: some View {
         Group {
             Section("Answer engine") {
-                Picker("Provider",selection:$m.settings.ai.provider) { ForEach(AIProvider.allCases,id:\.self) { Text($0.label).tag($0) } }.onChange(of:m.settings.ai.provider) { _,provider in key = ""; keyStatus = ""; if provider == .ollama { m.settings.ai.endpoint = "http://127.0.0.1:11434"; m.settings.ai.model = "qwen3:4b" }; if provider == .anthropic { m.settings.ai.endpoint = "https://api.anthropic.com"; m.settings.ai.model = "" }; if provider == .compatible { m.settings.ai.endpoint = "https://api.openai.com/v1"; m.settings.ai.model = "" } }
+                Picker("Provider",selection:$m.settings.ai.provider) { ForEach(AIProvider.allCases,id:\.self) { Text($0.label).tag($0) } }.onChange(of:m.settings.ai.provider) { _,provider in key = ""; keyStatus = ""; if provider == .ollama { m.settings.ai.endpoint = "http://127.0.0.1:11434"; m.settings.ai.model = AIConfiguration.defaultLocalModel }; if provider == .anthropic { m.settings.ai.endpoint = "https://api.anthropic.com"; m.settings.ai.model = "" }; if provider == .compatible { m.settings.ai.endpoint = "https://api.openai.com/v1"; m.settings.ai.model = "" } }
                 Text("Evidence mode needs no model. Apple Intelligence requires macOS 26 and enabled model assets. Ollama uses local Metal acceleration on Apple Silicon. Choose the search model separately below; Apple capture indexing stays available.").font(.caption).foregroundStyle(.secondary)
                 if [.ollama,.compatible,.anthropic].contains(m.settings.ai.provider) {
                     TextField("Server base URL",text:$m.settings.ai.endpoint)
@@ -122,7 +122,7 @@ struct SettingsView: View {
                 ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
                 if !m.localRuntime.isEmpty { Text(m.localRuntime).font(.caption).textSelection(.enabled) }
                 HStack { TextField("Model to download",text:$downloadName); Button("Download") { m.downloadModel(downloadName) }.disabled(m.pullingModel != nil || downloadName.isEmpty) }
-                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · 4B") { downloadName = "qwen3:4b" } }.font(.caption)
+                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · 4B") { downloadName = AIConfiguration.defaultLocalModel } }.font(.caption)
                 if let model = m.pullingModel {
                     Text("Downloading \(model)").font(.caption)
                     if let fraction = m.pullProgress?.fraction { ProgressView(value:fraction) } else { ProgressView().controlSize(.small) }

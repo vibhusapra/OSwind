@@ -38,6 +38,21 @@ final class ConversationTests: XCTestCase {
         XCTAssertThrowsError(try store.appendChatTurn(sessionID:chat.id,question:"Owner?",answer:answer(memory)))
         XCTAssertTrue(try store.chats().isEmpty)
     }
+    func testSourceDateAndKindChangesInvalidateSavedAndInflightClaims() throws {
+        for field in ["date","kind"] {
+            let original = try source(field), chat = try store.createChat()
+            _ = try store.appendChatTurn(sessionID:chat.id,question:"When and what?",answer:answer(original))
+            var changed = original
+            if field == "date" { changed.timestamp = original.timestamp.addingTimeInterval(86400) }
+            else { changed.kind = .audio }
+            XCTAssertEqual(changed.contentHash,original.contentHash)
+            XCTAssertNotEqual(changed.evidenceHash,original.evidenceHash)
+            try store.insert(changed)
+            XCTAssertTrue(try store.chatTurns(chat.id).isEmpty)
+            XCTAssertThrowsError(try store.appendChatTurn(sessionID:chat.id,question:"Stale date/kind?",answer:answer(original)))
+            XCTAssertEqual(try store.chat(chat.id)?.title,"Conversation")
+        }
+    }
     func testPartialSourceFailureRollsBackEntireTurn() throws {
         let memory = try source(), chat = try store.createChat(); var result = answer(memory)
         result.sources.append(SearchHit(memory:Memory(id:"missing",text:"missing"),score:1,match:"test"))

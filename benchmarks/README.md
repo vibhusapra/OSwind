@@ -95,3 +95,23 @@ Every self-match was top-1. These are nine warm samples per mode; p95 is coarse.
 `ann-quality-100000.json` reopens the retained 100k graph in ~153 ms (warm filesystem, not a cold boot). Sixteen deterministic non-self queries per scope compare real parallel-built SQLite/ANN results with exhaustive float32 top-10 ground truth. Recall@10 was 1.0 for unfiltered and half-app queries. Unfiltered p95 was 58.35 ms indexed / 124.12 ms exact; filtered p95 was 456.29 / 105.83 ms. This small random-vector result is neither natural-language relevance nor a guarantee against approximation misses. Counts/statistics, cold starts, concurrent capture and larger realistic archives remain open. A million-vector retained build is in progress; its result is not established.
 
 `native-hnsw-component-*` separately records an initial serial native-only exploration: 100k build ~990 seconds; query expansion 128/512/2048/8192 yielded Recall@10 .156/.431/.850/1.0 on 16 random non-self queries. This motivated the conservative 8192 search budget. Component timings exclude SQLite, filters, validation and reranking and must not be presented as product latency. Full application fixtures now test replay, deletion/update, filters/favorites, >5000-change exact fallback, corruption recovery, store erasure and schema-3 preservation. Twelve cache/retrieval tests also pass ThreadSanitizer. No competitor runtime or power measurement was performed.
+
+
+## Long-source evidence and generation contract
+
+```bash
+python3 scripts/evidence-smoke.py .build/release/oswindctl
+python3 scripts/evidence-smoke.py .build/release/oswindctl --provider apple --abstention --output apple.json
+python3 scripts/evidence-smoke.py .build/release/oswindctl --provider ollama --model qwen3:4b-instruct-2507-q4_K_M --abstention --output local.json
+python3 scripts/chat-provider-smoke.py .build/release/oswindctl
+```
+
+`evidence-long-v1.json` records two fictional ~9.9 KB notes with identical opening text and different owners/deadlines at the end. The original prefix-based deduplication hid one note; prefix-only context hid the decisions. Full-source/context fingerprints and query-anchored excerpts preserve both. The current pipeline uses a single generation request, with the current question and fresh excerpts. Earlier user questions affect retrieval/excerpt selection rather than being repeated in generation.
+
+The fixture checks assignments, not just presence of names: North→Lina→Thursday; South→Theo→Monday, with no swapped bindings. It also checks bounded-excerpt warnings, citations, both source IDs, persisted turns, concise final prose, no inference error and an unsupported budget question. These are narrow regular-expression/known-fixture checks, not a semantic entailment grader. Passing cannot establish general factual support, multilingual completeness or abstention accuracy.
+
+After simplifying the prompt, three Apple trials and two versioned Qwen3 Instruct trials passed this fixture including the absent-budget request. Apple answer times were ~0.9–1.3 s. Instruct's first owner answer was ~1.3 s; later responses ~0.12–0.46 s. A million-vector CPU graph build ran concurrently. These few observations are not isolated latency percentiles, controlled cold starts, physical power or competitor measurements. Runtime metadata reports GPU memory residency; it does not measure utilization.
+
+Failures matter: `history/evidence-development-failures.json` preserves observed omissions, a discarded source-by-source Apple experiment that assigned the wrong owner despite valid citation numbers, and unfinished metareasoning from the short Qwen alias. Early keyword-presence checks were too weak. During 23 October 2026 validation, the [registry tags](https://registry.ollama.com/library/qwen3/tags) mapped the installed `qwen3:4b` digest to the [thinking-only model](https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507); its thinking mode cannot be disabled. Setup now uses the versioned [non-thinking Instruct model](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507), [Ollama Q4_K_M tag](https://ollama.com/library/qwen3:4b-instruct-2507-q4_K_M), while retaining explicit user choices. This is a practical baseline choice, not a claim that it is the best current model.
+
+The offline provider smoke checks explicit CLI model/endpoint selection, current-question prompts, one-off app scope and provider output-limit rejection. A failed/limited response does not append a completed chat turn. Real paid BYOK vendor contracts remain unrun. General support checking, model/context budgeting, prompt-injection evaluation and semantic chunk retrieval for long sources remain open.

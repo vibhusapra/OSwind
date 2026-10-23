@@ -68,8 +68,8 @@ public final class MemoryStore: @unchecked Sendable {
             DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=old.id);
         END;
         DROP TRIGGER IF EXISTS chat_source_revision;
-        CREATE TRIGGER chat_source_revision BEFORE UPDATE OF title,app,text,url ON memories
-        WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url
+        CREATE TRIGGER chat_source_revision BEFORE UPDATE OF title,app,text,url,timestamp,kind ON memories
+        WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind
         BEGIN
             UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT t.session_id FROM chat_turns t JOIN chat_sources s ON s.turn_id=t.id WHERE s.memory_id=old.id);
             DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=old.id);
@@ -363,7 +363,7 @@ extension MemoryStore {
         try exec("BEGIN IMMEDIATE")
         do {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
-            for hit in answer.sources { guard let current = try get(hit.id), current.contentHash == hit.memory.contentHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
+            for hit in answer.sources { guard let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
             var scope = filter; scope.query = ""
             let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope)
             let id = UUID().uuidString, timestamp = Date(), data = try JSONEncoder().encode(payload)

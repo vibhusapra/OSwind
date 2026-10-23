@@ -120,6 +120,7 @@ do {
                 } else if action == "ask" {
                     let settings = AppSettings.load(root:root); var configuration = settings.ai
                     if let value = option("--provider"), let provider = AIProvider(rawValue:value) { configuration.provider = provider }
+                    configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
                     let filter = try searchFilter(), question = settings.privacy.sanitize(args.joined(separator:" ")).text
                     guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
                     let history = ConversationContext.questions(try store.chatTurns(id))
@@ -152,7 +153,15 @@ do {
         case "search": let mode = SearchMode(rawValue:option("--mode") ?? "hybrid") ?? .hybrid; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
             let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search)
             if details { try encoded(result) } else { for warning in result.warnings { FileHandle.standardError.write(Data((warning+"\n").utf8)) }; try encoded(result.hits) }
-        case "ask": var configuration = AppSettings.load(root:root).ai; if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }; let answer = try await AnswerEngine(store:store,embedder:embedder).answer(args.joined(separator:" "),configuration:configuration,searchConfiguration:AppSettings.load(root:root).search); try encoded(answer)
+        case "ask":
+            var configuration = AppSettings.load(root:root).ai
+            if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }
+            configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            let filter = try searchFilter(), policy = AppSettings.load(root:root).privacy
+            let question = policy.sanitize(args.joined(separator:" ")).text
+            guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
+            let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:AppSettings.load(root:root).search)
+            try encoded(answer)
         case "note": let text = PrivacyPolicy().sanitize(args.joined(separator:" ")).text; guard !text.isEmpty else { throw OSwindError.invalid("Enter note text") }; var memory = Memory(kind:.note,app:"OSwind",title:"CLI note",text:text); memory.embedding = embedder.embed(memory.searchableText); memory.embeddingModel = embedder.modelID; try store.insert(memory); print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
