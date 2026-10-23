@@ -93,7 +93,7 @@ rows=[
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
 ('Quality','Retrieval / OCR / ASR fixture suite','partial','310 passing tests, four optional skips, seven Python-installer tests and eight soak-harness contracts; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
-('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
+('Quality','24-hour soak and fault recovery','partial','Eight harness contracts and short local-model rehearsal pass; a pinned synthetic MCP/storage/erasure/answer run has started. 24-hour completion and full capture/power/device/fault gates remain unproved','OSwind quality bar'),
 ('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality'),
 ('Audio','Retained clips / imports / playback','tested','Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain','Screenpipe, Omi, Limitless')
 ]

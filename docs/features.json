@@ -571,8 +571,8 @@
     "id": "F072",
     "axis": "Quality",
     "feature": "24-hour soak and fault recovery",
-    "status": "todo",
-    "evidence": "Still missing; no reliability parity claim",
+    "status": "partial",
+    "evidence": "Eight harness contracts and short local-model rehearsal pass; a pinned synthetic MCP/storage/erasure/answer run has started. 24-hour completion and full capture/power/device/fault gates remain unproved",
     "references": "OSwind quality bar"
   },
   {
