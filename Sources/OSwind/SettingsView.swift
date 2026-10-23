@@ -160,6 +160,8 @@ struct SettingsView: View {
                 }
             }
             Section("Transcription model") {
+                Picker("Release idle native models",selection:$m.settings.nativeModelRetention) { ForEach(NativeModelRetention.allCases,id:\.self) { Text($0.title) } }
+                Text("Applies to native speech and speaker models. Active and queued work finishes first; the next use reloads released weights. Model files stay on disk. Shared Ollama models are managed separately.").font(.caption).foregroundStyle(.secondary)
                 Picker("Speech engine",selection:$m.settings.speech.engine) { ForEach(SpeechEngine.allCases,id:\.self) { Text($0.title) } }
                 if m.settings.speech.engine == .parakeet {
                     NativeModelDownloadView(setup:m.nativeModels,kind:.parakeet)
@@ -170,7 +172,7 @@ struct SettingsView: View {
                         if panel.runModal() == .OK,let url=panel.url { m.settings.speech.modelDirectory=url.path }
                     }
                     Button("Release resident speech model") { Task { try? await m.audio.recognizer.unload() } }
-                    Text("Uses local models only. Initial preparation can take time. Models remain loaded for reuse; release them after replacing files at the same path. Weights have separate publisher licenses.").font(.caption).foregroundStyle(.secondary)
+                    Text("Uses local models only. Initial preparation can take time. Idle release follows your selection above; release manually after replacing files at the same path. Weights have separate publisher licenses.").font(.caption).foregroundStyle(.secondary)
                 } else {
                     TextField("whisper.cpp executable",text:$m.settings.whisperBinary)
                     TextField("Whisper ggml model file",text:$m.settings.whisperModel)

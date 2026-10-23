@@ -119,6 +119,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     private let startup: AudioStartupEnvironment
     public var settings: AppSettings {
         didSet {
+            if oldValue.nativeModelRetention != settings.nativeModelRetention {applyNativeModelRetention()}
             // A policy/source/recognizer change cannot leave hardware configured
             // using its previous snapshot. Resume is an explicit user action.
             if oldValue.audioEnabled != settings.audioEnabled || oldValue.systemAudioEnabled != settings.systemAudioEnabled || oldValue.whisperBinary != settings.whisperBinary || oldValue.whisperModel != settings.whisperModel || oldValue.transcriptionLanguage != settings.transcriptionLanguage || oldValue.speech != settings.speech || oldValue.privacy != settings.privacy {
@@ -131,6 +132,14 @@ private final class AudioAccumulator: @unchecked Sendable {
     }
     init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings, startup: AudioStartupEnvironment, recognizer:SpeechRecognizer=SpeechRecognizer()) {
         self.store=store; self.embedder=embedder; self.settings=settings; self.startup=startup; self.recognizer=recognizer
+        super.init();applyNativeModelRetention()
+    }
+    private func applyNativeModelRetention() {
+        Task { [weak self] in
+            guard let self else {return}
+            await self.recognizer.setRetention(self.settings.nativeModelRetention)
+            await self.speakers.setRetention(self.settings.nativeModelRetention)
+        }
     }
     public func start() async {
         guard !running else { return }

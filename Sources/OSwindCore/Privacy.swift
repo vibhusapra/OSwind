@@ -52,6 +52,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var search = SearchConfiguration()
     public var automaticMaintenance = true
     public var apiEnabled = false
+    public var nativeModelRetention:NativeModelRetention = .twoMinutes
     public var speech = SpeechConfiguration()
     public var diarization = DiarizationConfiguration()
     public var retainAudio = false
@@ -61,7 +62,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,visualCaptureMode,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,visualCaptureMode,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
@@ -74,6 +75,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         automaticMaintenance = try c.decodeIfPresent(Bool.self,forKey:.automaticMaintenance) ?? automaticMaintenance
         apiEnabled = try c.decodeIfPresent(Bool.self,forKey:.apiEnabled) ?? apiEnabled
         diarization = try c.decodeIfPresent(DiarizationConfiguration.self,forKey:.diarization) ?? diarization
+        nativeModelRetention = try c.decodeIfPresent(NativeModelRetention.self,forKey:.nativeModelRetention) ?? nativeModelRetention
         speech = try c.decodeIfPresent(SpeechConfiguration.self,forKey:.speech) ?? speech
         retainAudio = try c.decodeIfPresent(Bool.self,forKey:.retainAudio) ?? retainAudio
         audioEnabled = try c.decodeIfPresent(Bool.self,forKey:.audioEnabled) ?? audioEnabled

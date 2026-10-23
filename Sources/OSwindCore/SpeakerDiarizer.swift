@@ -90,6 +90,10 @@ public actor SpeakerDiarizer {
     private let supportedOS:@Sendable () -> Bool
     private var backend:(any SpeakerDiarizationBackend)?
     private var loadedDirectory:URL?
+    public private(set) var retentionPolicy=NativeModelRetention.twoMinutes
+    private var idleTimer=NativeModelIdleTimer()
+    /// OSwind backend ownership only; not a measurement of system/device memory.
+    public var modelResident:Bool {backend != nil}
     private var busy=false
     private var waiters=[(UUID,CheckedContinuation<Void,Error>)]()
     var queuedRequestCount:Int { waiters.count }
@@ -97,15 +101,29 @@ public actor SpeakerDiarizer {
         AppLogger.minimumLevel = .warning; AppLogger.mirrorsToConsole=false
         loader={ try await CoreMLSpeakerBackend.load($0) }; supportedOS={Self.supported}
     }
-    init(loader:@escaping @Sendable (URL) async throws -> any SpeakerDiarizationBackend,supported:@escaping @Sendable () -> Bool={true}) { self.loader=loader; self.supportedOS=supported }
+    init(loader:@escaping @Sendable (URL) async throws -> any SpeakerDiarizationBackend,supported:@escaping @Sendable () -> Bool={true},idleSleep:@escaping @Sendable (Double) async throws -> Void={try await Task.sleep(for:.seconds($0))}) { self.loader=loader; self.supportedOS=supported;idleTimer=NativeModelIdleTimer(sleep:idleSleep) }
     private func acquire(_ id:UUID) async throws {
         try Task.checkCancellation()
+        idleTimer.cancel()
         if !busy { busy=true; return }
         guard waiters.count<8 else { throw OSwindError.unavailable("Speaker recognition queue is full") }
         try await withTaskCancellationHandler { try await withCheckedThrowingContinuation { waiters.append((id,$0)) } } onCancel: { Task { await self.cancel(id) } }
     }
     private func cancel(_ id:UUID) { if let index=waiters.firstIndex(where:{$0.0==id}) { waiters.remove(at:index).1.resume(throwing:CancellationError()) } }
-    private func release() { if waiters.isEmpty { busy=false } else { waiters.removeFirst().1.resume() } }
+    private func release() { if waiters.isEmpty { busy=false; scheduleIdleRelease() } else { waiters.removeFirst().1.resume() } }
+    public func setRetention(_ policy:NativeModelRetention) {
+        retentionPolicy=policy;idleTimer.cancel()
+        if !busy {scheduleIdleRelease()}
+    }
+    private func scheduleIdleRelease() {
+        guard backend != nil else {return}
+        if retentionPolicy == .afterUse {backend=nil;loadedDirectory=nil;idleTimer.cancel();return}
+        idleTimer.schedule(retentionPolicy) { [weak self] token in await self?.expireIdleModel(token) }
+    }
+    private func expireIdleModel(_ token:UUID) {
+        guard token==idleTimer.generation,!busy,waiters.isEmpty else {return}
+        backend=nil;loadedDirectory=nil;idleTimer.cancel()
+    }
     public func unload() async throws { try await acquire(UUID()); defer { release() }; try Task.checkCancellation(); backend=nil; loadedDirectory=nil }
     public func annotate(_ transcript:SpeechTranscript,file:URL,configuration:DiarizationConfiguration,timeout:Double=1800) async throws -> SpeechTranscript {
         try Task.checkCancellation(); _ = try transcript.validated()
