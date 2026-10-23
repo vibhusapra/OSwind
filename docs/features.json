@@ -323,8 +323,8 @@
     "id": "F041",
     "axis": "Audio",
     "feature": "Speaker diarization / names",
-    "status": "todo",
-    "evidence": "Microphone/system labels only",
+    "status": "partial",
+    "evidence": "Integrated local imported-recording labels and manual names; synthetic voice consistency/unknown coverage, backup/interchange/deletion tested. Live/cross-recording identity, natural meeting accuracy and native UI acceptance pending",
     "references": "Granola, Omi, Limitless"
   },
   {
@@ -340,7 +340,7 @@
     "axis": "Audio",
     "feature": "Custom vocabulary / timestamps",
     "status": "partial",
-    "evidence": "Validated Whisper segments and Parakeet word timestamps with seek controls; no word highlighting or hotword configuration",
+    "evidence": "Validated Whisper segments/Parakeet word timestamps; cached speaker paragraphs, word seeks and playback highlight. Native link/keyboard acceptance and hotwords pending",
     "references": "Omi, Granola"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "232 passing tests, two optional skips and six model-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "249 passing tests, three optional skips and seven model-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

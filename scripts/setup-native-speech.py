@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install pinned Parakeet v3 Core ML weights into a NEW directory on macOS.
+"""Install pinned Parakeet v3 or Community-1 Core ML weights into a NEW directory on macOS.
 
 No SDK auto-recovery/cache deletion. Existing installations are verified, never
 replaced. Model downloads include no recordings, transcripts or credentials.
@@ -19,11 +19,12 @@ def verify(directory,catalog):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--model',choices=['parakeet','speakers'],default='parakeet',help='Speech recognizer or recording-local speaker models')
     parser.add_argument('--destination',help='New directory; defaults to the versioned OSwind model cache')
     parser.add_argument('--verify-only',action='store_true',help='Verify a complete install without any network access')
     args=parser.parse_args()
-    catalog=json.loads((ROOT/'models/parakeet-v3-coreml.json').read_text())
-    destination=pathlib.Path(args.destination).expanduser() if args.destination else pathlib.Path.home()/'Library/Caches/OSwind/models'/('parakeet-v3-'+catalog['revision'][:12])
+    catalog=json.loads((ROOT/'models'/({'parakeet':'parakeet-v3-coreml.json','speakers':'speaker-community1-coreml.json'}[args.model])).read_text())
+    destination=pathlib.Path(args.destination).expanduser() if args.destination else pathlib.Path.home()/'Library/Caches/OSwind/models'/(('parakeet-v3-' if args.model=='parakeet' else 'speaker-community1-')+catalog['revision'][:12])
     if not destination.is_absolute() or destination.is_symlink(): raise ValueError('Choose an absolute, non-symlink model directory')
     if destination.exists():
         verify(destination,catalog); print('Verified pinned local model: '+str(destination)); return

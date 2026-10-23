@@ -96,8 +96,8 @@ extension IndexMigrationTests {
 
 
 extension IndexMigrationTests {
-    func testSchemaSixAndSevenUpgradesPreserveStoreIdentityAndExistingVectorKeys() throws {
-        for version in [6,7] {
+    func testSchemaSixThroughEightUpgradesPreserveStoreIdentityAndExistingVectorKeys() throws {
+        for version in [6,7,8] {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }
         var store: MemoryStore? = try MemoryStore(root:root)
         let memory = Memory(id:"six",text:"Schema six source"); try store!.insert(memory)

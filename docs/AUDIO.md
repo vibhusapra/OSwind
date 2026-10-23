@@ -25,12 +25,32 @@ Parakeet exposes Neural Engine + CPU, GPU + CPU and CPU-only Core ML policies. I
   --engine parakeet --native-model /path/to/compiled-parakeet-v3 --compute neuralEngine
 ```
 
-Parakeet returns word timings; Whisper returns recognizer segments. English-only `.en` models are intended for English; choose multilingual weights for other languages. Timestamp resolution follows the recognizer's segments. Session IDs are preserved for grouping, but meeting detection, a meeting-session UI, word highlighting, named speakers, diarization and hotwords remain open work.
+Parakeet returns word timings; Whisper returns recognizer segments. English-only `.en` models are intended for English; choose multilingual weights for other languages. Timestamp resolution follows the recognizer's segments. Session IDs are preserved for grouping. Imported recordings can now receive recording-local speaker labels and manual names; live speaker tracking, meeting detection/session UI and hotwords remain open work.
 
 Temporary input/recognizer workspaces use private permissions and held leases outside the live library. Normal completion/cancellation removes owned work; subsequent operations conservatively clean recognized abandoned stages. Saved transcripts survive optional additional-index failures. Library switching cancels an in-flight import. Live capture rechecks lock, epoch and current privacy rules after ASR; polling gaps and changing foreground context remain limitations.
 
-Schema 8 prevents older binaries from silently rewriting away structured transcript fields. Schema-6/7 identities and vector keys survive upgrade. A muted runtime test on this Mac verifies the actual player clock, pause, seek, finish and stopping on deletion; it also passes ThreadSanitizer. Native microphone/device-change, button/focus/accessibility and file-panel acceptance remain separate.
+Schema 9 protects diarization provenance/scope/unknown counts from older writers. Schema-6/7/8 identities and vector keys survive upgrade. A muted runtime test on this Mac verifies the actual player clock, pause, seek, finish and stopping on deletion; it also passes ThreadSanitizer. Native microphone/device-change, button/focus/accessibility and file-panel acceptance remain separate.
 
 ![Audio memory with source playback](../assets/audio-detail.png)
 
 ![Audio settings](../assets/audio-settings.png)
+
+
+## Speaker labels for imported recordings
+
+Run `python3 scripts/setup-native-speech.py --model speakers`, then choose its printed directory under **Identify speakers in imported recordings**. This pinned Community-1 download contains 28 files / 21,816,863 bytes, including original license, attribution, citations and reconstructed provenance. Only the supported capitalized Community-1 models are included; legacy lowercase online models are excluded. The scoped [upstream notice](https://huggingface.co/FluidInference/speaker-diarization-coreml/blob/df2625ac79a7ac6b65ad868fee6d80f320da4232/NOTICE.md) identifies pyannote, WeSpeaker, BUT Speech@FIT and Fluid Inference. No weights ship inside the app.
+
+Speaker recognition requires macOS 15+ because the SDK documents a crash-prone BNNS path on macOS 14. Plain transcription still works without this option. Loading uses exact local Core ML files and bounded PLDA parameter decoding; it cannot download, recover or purge model caches. One serialized speaker runtime remains resident until released. Cancelled queued jobs disappear; cancelled/overdue inference cannot be saved. Core ML calls may finish after cancellation. No speaker embeddings, profile database or diagnostic embedding exports are persisted.
+
+```bash
+oswindctl --data /path/to/library import-audio /path/to/meeting.m4a \
+  --engine parakeet --native-model /path/to/parakeet-v3 \
+  --speaker-model /path/to/community1 --retain-audio
+oswindctl --data /path/to/library name-speaker MEMORY_ID --from "Speaker 1" --name "Maya"
+```
+
+`--speaker-model` enables diarization for that import; `--diarize` uses the configured path and `--no-diarize` disables it. A failed requested speaker stage fails the import before saving, rather than silently reporting success without labels. Original media remains untouched. Native word timings permit finer speaker attribution; a coarse Whisper segment containing multiple voices may stay wholly unassigned. It is never fabricated into independently timed words.
+
+Labels follow first appearance within the file. Attribution merges duplicate same-speaker turns and uses unambiguous temporal coverage; overlapping, weak and boundary spans can remain **Unassigned or mixed**. This threshold is a heuristic, not calibrated speaker confidence. A prefix-duration index avoids scanning every turn for every word, including long/nested ASR intervals. The UI reports estimated speaker count and assigned span coverage. Adjacent same-speaker spans become readable paragraphs without changing source timings. Selecting a word seeks to its original segment and the current timed span highlights during playback; this is word-level with Parakeet and coarse-segment-level with Whisper. Unknown spans remain separate. Paragraph ranges are cached rather than rebuilt on each playback tick. Native link/keyboard acceptance remains unverified while the Mac is locked. Select a label to name it within this recording. Naming refuses missing sources, duplicate identity names, invalid labels and detected secrets; changes are transactional and preserve unrelated metadata. Names are labels, not persistent voice identities. Name search/people memory, speaker-aware answer evidence and cross-recording/live identity matching are still pending.
+
+The real stock-voice A/B/A/B fixture returns 80 ASR words with normalized WER 0. Of 76 words whose ASR-timed midpoint is at least .25 s from an authored utterance edge, 71 receive the expected synthetic voice label, five stay unassigned and none receive the other voice's label. Nine of all 80 words stay unassigned. This uses known generated-voice intervals and model-generated word timings, not independent word-alignment ground truth or natural-meeting DER/WDER. Naming, retained bytes, full backup/restore, text interchange and deletion pass through actual CLI processes. Native GUI controls, real meetings, overlap/noise and sustained power remain unverified.

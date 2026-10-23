@@ -30,3 +30,12 @@ Converted model card metadata says CC BY 4.0; its prose says Apache 2.0.
 NVIDIA's base model expressly uses CC BY 4.0. Preserve NVIDIA/FluidInference
 attribution and consult the actual converted weights' license.
 No model download or weight redistribution is performed by recognition.
+
+Optional imported-speaker weights (downloaded separately, never bundled):
+pyannote Community-1, WeSpeaker, BUT Speech@FIT PLDA, and Fluid Inference
+modified Core ML conversions. Scoped CC-BY-4.0 assets at model revision
+ df2625ac79a7ac6b65ad868fee6d80f320da4232.
+https://huggingface.co/FluidInference/speaker-diarization-coreml
+The installer retains NOTICE.md, README.md citations, LICENSE, PROVENANCE.md
+and provenance.json. Legacy lowercase online models are excluded. Reconstructed
+provenance does not establish a fully attested reproducible conversion build.

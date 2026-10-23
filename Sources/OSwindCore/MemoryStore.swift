@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 8
+    public static let schemaVersion = 9
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -322,6 +322,18 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func setFavorite(_ id: String, value: Bool) throws { if var m = try get(id) { m.favorite = value; try updateMetadata(m) } }
     public func setTags(_ id: String, tags: [String]) throws { if var m = try get(id) { m.tags = Array(Set(tags.filter { !$0.isEmpty })).sorted(); try updateMetadata(m) } }
+    public func renameAudioSpeaker(_ id:String,from speaker:String,to name:String,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Memory {
+        lock.lock(); defer { lock.unlock() }; try Task.checkCancellation()
+        let label=name.trimmingCharacters(in:.whitespacesAndNewlines)
+        guard !label.isEmpty,label.count<=128,!label.utf8.contains(0),!policy.sanitize(label).redacted else { throw OSwindError.invalid("Use a speaker name of 1–128 characters without secrets") }
+        try exec("BEGIN IMMEDIATE")
+        do {
+            guard var memory=try get(id),memory.kind == .audio,var transcript=memory.transcript,transcript.text==memory.text,transcript.segments.contains(where:{$0.speaker==speaker}) else { throw OSwindError.invalid("Speaker or recording no longer exists") }
+            guard label==speaker || !transcript.segments.contains(where:{$0.speaker==label}) else { throw OSwindError.invalid("Another speaker in this recording already has that name") }
+            for index in transcript.segments.indices where transcript.segments[index].speaker==speaker { transcript.segments[index].speaker=label }
+            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT"); return memory
+        } catch { try? exec("ROLLBACK"); throw error }
+    }
     private func updateMetadata(_ m: Memory) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
     }

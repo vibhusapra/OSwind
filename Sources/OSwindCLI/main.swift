@@ -65,6 +65,8 @@ do {
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           import-audio PATH [--retain-audio] Transcribe and save an audio file locally
+            [--engine parakeet --native-model DIR] [--speaker-model DIR]
+          name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
           delete ID                      Delete one memory and its media
           prune [--days N] [--max-gb N]   Apply retention
           capture [--app-bundle ID]      Capture a chosen/current window once
@@ -248,14 +250,27 @@ do {
             if let compute=computeOverride { guard let value=SpeechCompute(rawValue:compute) else { throw OSwindError.invalid("Use --compute neuralEngine, gpu or cpu") }; settings.speech.compute=value }
             if settings.speech.engine == .whisper && (nativeOverride != nil || computeOverride != nil) { throw OSwindError.invalid("Native model/compute options require the Parakeet engine") }
             if settings.speech.engine == .parakeet && whisperOverride != nil { throw OSwindError.invalid("--model applies to Whisper; use --native-model for Parakeet") }
-            let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--engine whisper|parakeet] [--model PATH] [--native-model DIRECTORY] [--compute neuralEngine|gpu|cpu] [--retain-audio]") }
+            let diarize=args.contains("--diarize"),noDiarize=args.contains("--no-diarize")
+            guard !(diarize && noDiarize) else { throw OSwindError.invalid("Choose --diarize or --no-diarize") }
+            args.removeAll { $0=="--diarize" || $0=="--no-diarize" }
+            if let directory=try validatedOption("--speaker-model") { settings.diarization.modelDirectory=directory; settings.diarization.enabled=true }
+            if diarize { settings.diarization.enabled=true }; if noDiarize { settings.diarization.enabled=false }
+            if settings.diarization.enabled {
+                guard SpeakerDiarizer.supported else { throw OSwindError.unavailable("Speaker labels require macOS 15 or later") }
+                _ = try settings.diarization.localDirectory()
+            }
+            let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--engine whisper|parakeet] [--model PATH] [--native-model DIRECTORY] [--compute neuralEngine|gpu|cpu] [--diarize --speaker-model DIRECTORY] [--retain-audio]") }
             let file=URL(fileURLWithPath:args[0]), clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
             var transcript=try await SpeechRecognizer().transcribe(file:clip.speechFile,settings:settings,timeout:1800)
             transcript.duration=clip.duration
+            if settings.diarization.enabled { transcript=try await SpeakerDiarizer().annotate(transcript,file:clip.speechFile,configuration:settings.diarization) }
             var admission=settings; admission.retainAudio=retain
             let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
             do { _ = try await RetrievalEngine(store:store,apple:embedder).index([memory],configuration:settings.search) } catch { FileHandle.standardError.write(Data("Transcript saved; additional indexing pending.\n".utf8)) }
             try encoded(memory)
+        case "name-speaker":
+            guard let from=try validatedOption("--from"),let name=try validatedOption("--name"),args.count==1 else { throw OSwindError.invalid("Use name-speaker MEMORY_ID --from SPEAKER_LABEL --name NAME") }
+            try encoded(store.renameAudioSpeaker(args[0],from:from,to:name,policy:AppSettings.load(root:root).privacy))
         case "transcribe": let settings = AppSettings.load(root:root); let model = option("--model") ?? settings.whisperModel; guard let path = args.first else { throw OSwindError.invalid("Enter an audio file path") }; print(try await Whisper.transcribe(file:URL(fileURLWithPath:path),binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage))
         case "serve": let server = try LocalAPIServer(store:store,embedder:embedder); server.onState = { print($0); fflush(stdout) }; try server.start(); print("Token file: \(store.root.appendingPathComponent("api-token").path)"); while true { try await Task.sleep(nanoseconds:1_000_000_000) }
         case "mcp":
