@@ -14,6 +14,7 @@ public struct ChatTurn: Identifiable, Codable, Sendable {
     public var question: String
     public var answer: Answer
     public var filter: SearchFilter
+    public var timeZone: String? = nil
 }
 /// No source text snapshots: source links are hydrated from the live memory store.
 struct ChatPayload: Codable {
@@ -23,6 +24,7 @@ struct ChatPayload: Codable {
     var duration: Double
     var warnings: [String]
     var filter: SearchFilter
+    var timeZone: String? = nil
 }
 public enum ConversationContext {
     public static func questions(_ turns: [ChatTurn]) -> [String] { turns.suffix(3).map { String($0.question.prefix(500)) } }
@@ -36,7 +38,7 @@ public enum ConversationContext {
         var sections = ["# OSwind conversation", "Title: \(session.title.replacingOccurrences(of:"\n",with:" "))", "Exported \(ISO8601DateFormatter().string(from:Date())). Source numbers restart for each answer."]
         for turn in turns {
             sections.append("## \(ISO8601DateFormatter().string(from:turn.timestamp))\n\n### Question\n\n\(quoted(turn.question))\n\n### Answer\n\n\(quoted(turn.answer.text))")
-            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { ISO8601DateFormatter().string(from:$0) } ?? "any start") to \(turn.filter.end.map { ISO8601DateFormatter().string(from:$0) } ?? "any end").")
+            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { ISO8601DateFormatter().string(from:$0) } ?? "any start") to \(turn.filter.end.map { ISO8601DateFormatter().string(from:$0) } ?? "any end") (end exclusive). Time zone: \(turn.timeZone ?? "not recorded"). Saved only: \(turn.filter.favoritesOnly). Tag: \(turn.filter.tag ?? "any").")
             if !turn.answer.warnings.isEmpty { sections.append(turn.answer.warnings.map { "Warning: " + $0 }.joined(separator:"\n\n")) }
             sections.append(turn.answer.sources.enumerated().map { i,hit in
                 "[\(i+1)] \(hit.memory.title.replacingOccurrences(of:"\n",with:" ")) · \(hit.memory.app) · \(ISO8601DateFormatter().string(from:hit.memory.timestamp))\n\nMemory ID: `\(hit.id)`"

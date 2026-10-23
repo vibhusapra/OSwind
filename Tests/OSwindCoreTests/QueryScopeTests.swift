@@ -49,6 +49,13 @@ final class QueryScopeTests: XCTestCase {
         let escaped = try resolve(#"app:"A \"quoted\" app" today"#)
         XCTAssertEqual(escaped.filter.app,#"A "quoted" app"#)
     }
+    func testSmartQuotesAndSentencePunctuationPreserveFilterValues() throws {
+        let result = try resolve("Comet app:“Google Chrome”? yesterday!")
+        XCTAssertEqual(result.filter.app,"Google Chrome"); XCTAssertEqual(result.filter.start,date("2026-10-22T07:00:00Z"))
+        XCTAssertTrue(try resolve("“yesterday app:Mail”").clauses.isEmpty)
+        XCTAssertEqual(try resolve(#"app:"Why?""#).filter.app,"Why?")
+        XCTAssertEqual(try resolve("tag:work, kind:note.").filter.tag,"work")
+    }
     func testISOInstantsAndLocalDateBoundsIntersectControls() throws {
         let result = try resolve("budget since:2026-10-20 until:2026-10-24T00:00:00Z yesterday",filter:SearchFilter(start:date("2026-10-22T12:00:00Z")))
         XCTAssertEqual(result.filter.start,date("2026-10-22T12:00:00Z")); XCTAssertEqual(result.filter.end,date("2026-10-23T07:00:00Z"))

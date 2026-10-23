@@ -243,6 +243,29 @@ public final class MemoryStore: @unchecked Sendable {
         if !revision.isEmpty { coverageCache.append((key,indexed,total)); if coverageCache.count > 4 { coverageCache.removeFirst() } }
         return (indexed,total)
     }
+    public func resolveQueryScope(_ filter: SearchFilter, interpret: Bool = true, now: Date = Date(), timeZone: TimeZone = .current) throws -> QueryResolution {
+        lock.lock(); defer { lock.unlock() }
+        try exec("SAVEPOINT query_scope_snapshot"); defer { try? exec("RELEASE query_scope_snapshot") }
+        return try QueryScopeResolver.resolve(filter,now:now,timeZone:timeZone,interpret:interpret) { app in
+            let exact = try self.prepare("SELECT 1 FROM application_statistics WHERE app=?")
+            defer { sqlite3_finalize(exact) }; self.bind(exact,1,app)
+            let exactStatus = sqlite3_step(exact)
+            if exactStatus == SQLITE_ROW { return app }
+            guard exactStatus == SQLITE_DONE else { throw self.failure() }
+            // App catalogs are small; Foundation folding handles non-ASCII
+            // names which SQLite's built-in NOCASE does not cover.
+            let statement = try self.prepare("SELECT app FROM application_statistics ORDER BY app LIMIT 10001")
+            defer { sqlite3_finalize(statement) }
+            var names = [String](), status = sqlite3_step(statement)
+            while status == SQLITE_ROW {
+                if names.count%256 == 0 { try Task.checkCancellation() }
+                names.append(self.string(statement,0)); status = sqlite3_step(statement)
+            }
+            guard status == SQLITE_DONE else { throw self.failure() }
+            guard names.count <= 10000 else { throw QuerySyntaxError("Choose the application's exact spelling from the application menu.") }
+            return try QueryScopeResolver.canonicalAppName(app,names:names)
+        }
+    }
     public func memoriesNeedingVectors(modelID: String, afterID: String = "", limit: Int = 16) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }
         let stmt = try prepare("SELECT m.payload FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? WHERE v.memory_id IS NULL AND m.id>? ORDER BY m.id LIMIT ?")
@@ -407,8 +430,8 @@ extension MemoryStore {
         do {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
             for hit in answer.sources { guard let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
-            var scope = filter; scope.query = ""
-            let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope)
+            var scope = answer.resolution?.filter ?? filter; scope.query = ""
+            let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope,timeZone:answer.resolution?.timeZone)
             let id = UUID().uuidString, timestamp = Date(), data = try JSONEncoder().encode(payload)
             let stmt = try prepare("INSERT INTO chat_turns(id,session_id,timestamp,payload) VALUES(?,?,?,?)"); defer { sqlite3_finalize(stmt) }
             bind(stmt,1,id); bind(stmt,2,sessionID); sqlite3_bind_double(stmt,3,timestamp.timeIntervalSince1970); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt,4,$0.baseAddress,Int32(data.count),transient) }; guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
@@ -420,7 +443,12 @@ extension MemoryStore {
             bind(update,1,session.turnCount == 0 ? String(payload.question.replacingOccurrences(of:"\n",with:" ").prefix(80)) : session.title); sqlite3_bind_double(update,2,timestamp.timeIntervalSince1970); bind(update,3,sessionID); guard sqlite3_step(update) == SQLITE_DONE else { throw failure() }
             try exec("COMMIT")
             var cleanAnswer = answer; cleanAnswer.text = payload.text
-            return ChatTurn(id:id,sessionID:sessionID,timestamp:timestamp,question:payload.question,answer:cleanAnswer,filter:scope)
+            if var resolution = cleanAnswer.resolution {
+                if resolution.originalQuery != payload.question { resolution.clauses = [] }
+                resolution.originalQuery = payload.question; resolution.filter = scope
+                cleanAnswer.resolution = resolution
+            }
+            return ChatTurn(id:id,sessionID:sessionID,timestamp:timestamp,question:payload.question,answer:cleanAnswer,filter:scope,timeZone:payload.timeZone)
         } catch { try? exec("ROLLBACK"); throw error }
     }
     public func chatTurns(_ sessionID: String, limit: Int = 100) throws -> [ChatTurn] {
@@ -434,7 +462,7 @@ extension MemoryStore {
             let source = try prepare("SELECT m.payload,s.score,s.match FROM chat_sources s JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
             var hits = [SearchHit]()
             while sqlite3_step(source) == SQLITE_ROW { hits.append(SearchHit(memory:try decode(source),score:sqlite3_column_double(source,1),match:string(source,2))) }
-            turns.append(ChatTurn(id:id,sessionID:sessionID,timestamp:date,question:payload.question,answer:Answer(text:payload.text,sources:hits,provider:payload.provider,duration:payload.duration,warnings:payload.warnings),filter:payload.filter))
+            turns.append(ChatTurn(id:id,sessionID:sessionID,timestamp:date,question:payload.question,answer:Answer(text:payload.text,sources:hits,provider:payload.provider,duration:payload.duration,warnings:payload.warnings),filter:payload.filter,timeZone:payload.timeZone))
         }
         return turns.reversed()
     }

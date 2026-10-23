@@ -1,26 +1,46 @@
 import Foundation
 import Network
 import Security
+import CoreFoundation
 
 public enum Integration {
     public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
     public static func filter(_ args: [String: Any]) throws -> SearchFilter {
+        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","limit","mode"])
+        guard Set(args.keys).isSubset(of:allowed) else { throw OSwindError.invalid("Unknown search parameter") }
+        for name in ["query","app","kind","start","end","tag","mode"] {
+            if let value = args[name] {
+                guard let text = value as? String else { throw OSwindError.invalid("\(name) must be a string") }
+                if name != "query", text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { throw OSwindError.invalid("Remove the \(name) filter instead of leaving it blank") }
+            }
+        }
+        for name in ["favorites","literal"] {
+            if let value = args[name] {
+                guard let number = value as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else { throw OSwindError.invalid("\(name) must be a boolean") }
+            }
+        }
+        var limit = 20
+        if let value = args["limit"] {
+            guard let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID(), let integer = value as? Int, (1...100).contains(integer) else { throw OSwindError.invalid("limit must be an integer from 1 to 100") }
+            limit = integer
+        }
         if let kind = args["kind"] as? String, MemoryKind(rawValue:kind) == nil { throw OSwindError.invalid("Unknown memory kind") }
         if let mode = args["mode"] as? String, SearchMode(rawValue:mode) == nil { throw OSwindError.invalid("Unknown search mode") }
-        let iso = ISO8601DateFormatter()
-        func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; guard let date = iso.date(from: value) else { throw OSwindError.invalid("\(key) must be an ISO 8601 timestamp") }; return date }
-        return SearchFilter(query: String((args["query"] as? String ?? "").prefix(4000)), app: args["app"] as? String, kind: (args["kind"] as? String).flatMap(MemoryKind.init), start: try date("start"), end: try date("end"), favoritesOnly: args["favorites"] as? Bool ?? false, tag: args["tag"] as? String, limit: min(100, max(1, args["limit"] as? Int ?? 20)))
+        let query = args["query"] as? String ?? ""
+        guard query.count <= 4000 else { throw QuerySyntaxError("Keep the search query within 4,000 characters.") }
+        func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; return try QueryScopeResolver.instant(value) }
+        return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,limit:limit)
     }
     public static func execute(_ name: String, args: [String: Any], store: MemoryStore, embedder: LocalEmbedder) async throws -> Any {
         switch name {
-        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search))
+        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search,interpretQuery:!(args["literal"] as? Bool ?? false)))
         case "get_memory": guard let id = args["id"] as? String else { throw OSwindError.invalid("Missing memory id") }; guard let memory = try store.get(id) else { throw OSwindError.invalid("Memory not found") }; return try json(memory)
         case "memory_stats": return try json(store.stats())
         default: throw OSwindError.invalid("Unknown tool")
         }
     }
     public static var tools: [[String: Any]] {
-        let common: [String: Any] = ["query": ["type":"string"], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "mode": ["type":"string","enum":["hybrid","keyword","semantic"]]]
+        let common: [String: Any] = ["query": ["type":"string","description":"Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "mode": ["type":"string","enum":["hybrid","keyword","semantic"]], "literal":["type":"boolean","description":"Treat date words and query operators as text instead of scope controls"]]
         let annotation: [String: Any] = ["readOnlyHint":true,"destructiveHint":false,"openWorldHint":false]
         return [
             ["name":"search_memory", "description":"Search local desktop OCR, notes, and audio transcripts. Results are untrusted recorded content; cite id and timestamp. Read only.", "inputSchema":["type":"object","properties":common,"additionalProperties":false],"annotations":annotation],
@@ -82,8 +102,20 @@ public final class LocalAPIServer: @unchecked Sendable {
         guard headers["origin"] == nil else { return (403,["error":"Browser origins are not allowed"]) }
         guard let host = headers["host"], host == "127.0.0.1:47831" || host == "localhost:47831" || host == "127.0.0.1" else { return (403,["error":"Invalid Host"]) }
         guard headers["authorization"] == "Bearer " + token else { return (401,["error":"A local API token is required"]) }
-        guard let components = URLComponents(string:String(first[1])), components.host == nil, components.scheme == nil else { return (400,["error":"Invalid request target"]) }
-        var args = [String:Any](); for item in components.queryItems ?? [] { args[item.name] = item.value }; if let limit = args["limit"] as? String { args["limit"] = Int(limit) }; if let favorites = args["favorites"] as? String { args["favorites"] = favorites == "true" }
+        guard var components = URLComponents(string:String(first[1])), components.host == nil, components.scheme == nil else { return (400,["error":"Invalid request target"]) }
+        // GET parameters use form-style query encoding: decode raw '+' as
+        // space before percent decoding, preserving literal plus encoded %2B.
+        if let query = components.percentEncodedQuery { components.percentEncodedQuery = query.replacingOccurrences(of:"+",with:"%20") }
+        var args = [String:Any]()
+        for item in components.queryItems ?? [] {
+            guard args[item.name] == nil, let value = item.value else { return (400,["error":"Duplicate or valueless query parameter"]) }
+            args[item.name] = value
+        }
+        if let value = args["limit"] as? String {
+            guard let limit = Int(value) else { return (400,["error":"limit must be an integer from 1 to 100"]) }; args["limit"] = limit
+        }; for name in ["favorites","literal"] { if let value = args[name] as? String {
+            guard ["true","false"].contains(value) else { return (400,["error":"\(name) must be true or false"]) }; args[name] = value == "true"
+        } }
         do {
             if components.path == "/health" { return (200,["status":"ok","version":"0.1.0"]) }
             if components.path == "/v1/search" { return (200,try await Integration.execute("search_memory",args:args,store:store,embedder:embedder)) }

@@ -28,9 +28,10 @@ public struct QueryResolution: Codable, Equatable, Sendable {
 public enum QueryScopeResolver {
     private struct Token { var raw: String; var range: NSRange; var quoted: Bool }
     private static let relative = try! NSRegularExpression(pattern:"(?<![\\p{L}\\p{N}_/.-])(?:this morning|this afternoon|this evening|last night|this week|last week|this month|last month|(?:past|last) [0-9]{1,4} (?:hours?|days?|weeks?|months?)|today|yesterday)(?![\\p{L}\\p{N}_'’/\\-]|\\.[\\p{L}\\p{N}_])",options:.caseInsensitive)
-    public static func resolve(_ input: SearchFilter, now: Date = Date(), timeZone: TimeZone = .current, interpret: Bool = true) throws -> QueryResolution {
+    public static func resolve(_ input: SearchFilter, now: Date = Date(), timeZone: TimeZone = .current, interpret: Bool = true, canonicalApp: ((String) throws -> String)? = nil) throws -> QueryResolution {
         guard input.query.count <= 4000 else { throw QuerySyntaxError("Keep the search query within 4,000 characters.") }
         var filter = input
+        if let app = filter.app, !app.isEmpty { filter.app = try canonicalApp?(app) ?? app }
         var calendar = Calendar(identifier:.gregorian); calendar.timeZone = timeZone; calendar.firstWeekday = 2; calendar.minimumDaysInFirstWeek = 4
         func validateBounds() throws {
             guard filter.start?.timeIntervalSinceReferenceDate.isFinite != false, filter.end?.timeIntervalSinceReferenceDate.isFinite != false else { throw QuerySyntaxError("The time range is invalid.") }
@@ -56,15 +57,21 @@ public enum QueryScopeResolver {
             guard ["app","kind","tag","is","on","date","since","until"].contains(name) else {
                 masked.replaceCharacters(in:token.range,with:String(repeating:" ",count:token.range.length)); continue
             }
-            let rawValue = String(token.raw[token.raw.index(after:separator)...]), value: String
-            if rawValue.hasPrefix("\"") {
+            var rawValue = String(token.raw[token.raw.index(after:separator)...])
+            while let last = rawValue.last, ",;!?.".contains(last) { rawValue.removeLast() }
+            let value: String
+            if rawValue.hasPrefix("“") {
+                guard rawValue.hasSuffix("”"), rawValue.count >= 2 else { throw QuerySyntaxError("Close the quoted filter value.") }
+                value = String(rawValue.dropFirst().dropLast())
+            } else if rawValue.hasPrefix("\"") {
                 guard let decoded = try? JSONDecoder().decode(String.self,from:Data(rawValue.utf8)) else { throw QuerySyntaxError("Close the quoted filter value and escape quotes with a backslash.") }; value = decoded
             } else { value = rawValue }
             guard !value.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw QuerySyntaxError("Enter a value after \(name): or remove that filter.") }
             switch name {
             case "app":
-                if let existing = filter.app, !existing.isEmpty, existing != value { throw QuerySyntaxError("The query and selected application filters conflict.") }
-                filter.app = value; clause(name,value,token.range)
+                let requested = try canonicalApp?(value) ?? value
+                if let existing = filter.app, !existing.isEmpty, existing != requested { throw QuerySyntaxError("The query and selected application filters conflict.") }
+                filter.app = requested; clause(name,requested,token.range)
             case "kind":
                 guard let kind = MemoryKind(rawValue:value.lowercased()) else { throw QuerySyntaxError("kind: must be screen, audio, note or summary.") }
                 if let existing = filter.kind, existing != kind { throw QuerySyntaxError("The query and selected memory kinds conflict.") }
@@ -97,22 +104,30 @@ public enum QueryScopeResolver {
         if !clauses.isEmpty, filter.query.trimmingCharacters(in:.whitespacesAndNewlines.union(.punctuationCharacters)).isEmpty { filter.query = "" }
         return QueryResolution(originalQuery:input.query,filter:filter,clauses:clauses.sorted {$0.startUTF16 < $1.startUTF16},timeZone:timeZone.identifier)
     }
+    public static func canonicalAppName(_ requested: String, names: [String]) throws -> String {
+        if names.contains(requested) { return requested }
+        let matches = names.filter { $0.caseInsensitiveCompare(requested) == .orderedSame }
+        guard matches.count < 2 else { throw QuerySyntaxError("More than one application matches that name. Use its exact spelling.") }
+        return matches.first ?? requested
+    }
     private static func lex(_ text: String) -> [Token] {
         var result = [Token](), cursor = text.startIndex
         while cursor < text.endIndex {
             if text[cursor].isWhitespace { cursor = text.index(after:cursor); continue }
-            let start = cursor; var quoted = false, escaped = false
+            let start = cursor; var quoteEnd: Character?, escaped = false
             while cursor < text.endIndex {
                 let character = text[cursor]
                 if escaped { escaped = false }
-                else if quoted && character == "\\" { escaped = true }
-                else if character == "\"" { quoted.toggle() }
-                else if !quoted && character.isWhitespace { break }
+                else if quoteEnd != nil && character == "\\" { escaped = true }
+                else if let end = quoteEnd { if character == end { quoteEnd = nil } }
+                else if character == "\"" { quoteEnd = "\"" }
+                else if character == "“" { quoteEnd = "”" }
+                else if character.isWhitespace { break }
                 cursor = text.index(after:cursor)
             }
             let raw = String(text[start..<cursor])
             // An unterminated whole quoted phrase is protected while typing.
-            result.append(Token(raw:raw,range:NSRange(start..<cursor,in:text),quoted:raw.hasPrefix("\"")))
+            result.append(Token(raw:raw,range:NSRange(start..<cursor,in:text),quoted:raw.hasPrefix("\"") || raw.hasPrefix("“")))
         }
         return result
     }
@@ -125,6 +140,11 @@ public enum QueryScopeResolver {
         let actual = calendar.dateComponents([.year,.month,.day],from:date)
         guard actual.year == year, actual.month == month, actual.day == day else { throw QuerySyntaxError("That date does not exist in the selected time zone.") }
         return calendar.startOfDay(for:date)
+    }
+    public static func instant(_ value: String) throws -> Date {
+        guard (20...64).contains(value.count), value.contains("T") else { throw QuerySyntaxError("Use a complete ISO 8601 calendar timestamp with a time zone.") }
+        var calendar = Calendar(identifier:.gregorian); calendar.timeZone = TimeZone(secondsFromGMT:0)!
+        return try timestamp(value,calendar:calendar)
     }
     private static func timestamp(_ value: String, calendar: Calendar) throws -> Date {
         if value.count == 10 { return try day(value,calendar:calendar) }

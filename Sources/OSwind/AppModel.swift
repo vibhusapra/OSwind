@@ -43,6 +43,10 @@ import ServiceManagement
     @Published var searchStrategy = ""
     @Published var refreshing = false
     @Published var searchWarnings = [String]()
+    @Published var interpretQuery = true
+    @Published var resolvedSearch: QueryResolution?
+    @Published var searchInputError: String?
+    @Published var answerInputError: String?
     @Published var installedModels = [InstalledModel]()
     @Published var localRuntime = ""
     @Published var startingModelServer = false
@@ -87,11 +91,19 @@ import ServiceManagement
         refresh(forceStatistics:true); refreshChats(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
         housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain() } }
     }
-    var filter: SearchFilter {
+    var filter: SearchFilter { filter(at:Date()) }
+    func filter(at now: Date) -> SearchFilter {
         let calendar = Calendar.current; var start: Date?, end: Date?
-        switch range { case "Today": start = calendar.startOfDay(for:Date()); case "Yesterday": end = calendar.startOfDay(for:Date()); start = calendar.date(byAdding:.day,value:-1,to:end!); case "7 days": start = calendar.date(byAdding:.day,value:-7,to:Date()); case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!); default: break }
-        return SearchFilter(query:query, app:appFilter == "All apps" ? nil : appFilter, kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil, start:start, end:end, favoritesOnly:section == "Saved",limit:200)
+        switch range {
+        case "Today": let day = calendar.dateInterval(of:.day,for:now); start = day?.start; end = day?.end
+        case "Yesterday": end = calendar.startOfDay(for:now); start = calendar.date(byAdding:.day,value:-1,to:end!)
+        case "7 days": start = calendar.date(byAdding:.day,value:-7,to:now); end = now
+        case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
+        default: break
+        }
+        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",limit:200)
     }
+    var activeSearchQuery: String { resolvedSearch?.originalQuery == query ? resolvedSearch!.filter.query : query }
     func focusSearch() {
         section = "Memories"; showSettings = false; selected = nil
         searchFocusRequest = UUID()
@@ -99,14 +111,18 @@ import ServiceManagement
     func openMemory(_ memory: Memory, query: String) { selectedEvidenceQuery = query; selected = memory }
     func refresh(forceStatistics: Bool = false) {
         refreshStatistics(force:forceStatistics)
-        refreshTask?.cancel(); let filter = self.filter, mode = self.mode, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
+        searchInputError = nil
+        refreshTask?.cancel(); let now = Date(), mode = self.mode
+        let filter = self.filter(at:now), interpret = interpretQuery, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
         refreshing = true
         refreshTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds:150_000_000); guard !Task.isCancelled else { return }
             do {
-                let result = try await engine.search(filter,mode:mode,configuration:configuration)
-                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
-            } catch is CancellationError { } catch { guard !Task.isCancelled else { return }; self?.errorMessage = error.localizedDescription; self?.refreshing = false }
+                let result = try await engine.search(filter,mode:mode,configuration:configuration,interpretQuery:interpret,now:now)
+                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.resolvedSearch = result.resolution; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
+            } catch is CancellationError { }
+            catch let error as QuerySyntaxError { guard !Task.isCancelled else { return }; self?.hits = []; self?.resolvedSearch = nil; self?.searchWarnings = []; self?.searchInputError = error.localizedDescription; self?.searchMS = 0; self?.searchStrategy = ""; self?.refreshing = false }
+            catch { guard !Task.isCancelled else { return }; self?.errorMessage = error.localizedDescription; self?.refreshing = false }
         }
     }
     private func refreshStatistics(force: Bool) {
@@ -138,22 +154,29 @@ import ServiceManagement
         }
     }
     func ask(_ prompt: String? = nil, summarize: Bool = false) {
-        let text = settings.privacy.sanitize(prompt ?? question).text; guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
-        do {
-            if currentChatID == nil { currentChatID = try store.createChat().id }
-            guard let sessionID = currentChatID else { return }
-            asking = true; let f = filter, config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder), history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
-            answerTask = Task {
-                do {
-                    let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history)
-                    try Task.checkCancellation()
-                    let turn = try store.appendChatTurn(sessionID:sessionID,question:text,answer:result,filter:f,policy:policy)
-                    answer = turn.answer; question = ""; refreshChats()
-                } catch is CancellationError { }
-                catch { if !Task.isCancelled { errorMessage = error.localizedDescription } }
-                asking = false
-            }
-        } catch { errorMessage = error.localizedDescription }
+        let text = settings.privacy.sanitize(prompt ?? question).text
+        guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
+        answerInputError = nil
+        if prompt != nil { question = text }
+        let now = Date(), sessionID = currentChatID, interpret = interpretQuery
+        let f = filter(at:now)
+        let config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder)
+        let history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
+        asking = true
+        answerTask = Task {
+            do {
+                let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now)
+                try Task.checkCancellation()
+                let targetID: String
+                if let sessionID { targetID = sessionID }
+                else { targetID = try store.createChat().id; currentChatID = targetID }
+                let turn = try store.appendChatTurn(sessionID:targetID,question:text,answer:result,filter:f,policy:policy)
+                answer = turn.answer; if question == text { question = "" }; refreshChats()
+            } catch is CancellationError { }
+            catch let error as QuerySyntaxError { if !Task.isCancelled { answerInputError = error.localizedDescription } }
+            catch { if !Task.isCancelled { errorMessage = error.localizedDescription } }
+            asking = false
+        }
     }
     func cancelAnswer() { answerTask?.cancel() }
     func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "" }

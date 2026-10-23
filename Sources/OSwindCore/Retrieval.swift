@@ -19,6 +19,7 @@ public struct RetrievalResult: Codable, Sendable {
     public var modelID: String?
     public var duration: Double
     public var strategy: String? = nil
+    public var resolution: QueryResolution? = nil
 }
 public struct IndexProgress: Sendable {
     public var indexed: Int
@@ -30,10 +31,14 @@ public final class RetrievalEngine: @unchecked Sendable {
     private let apple: LocalEmbedder
     private let client: OllamaClient
     public init(store: MemoryStore, apple: LocalEmbedder = LocalEmbedder(), client: OllamaClient = .shared) { self.store = store; self.apple = apple; self.client = client }
-    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, configuration: SearchConfiguration = SearchConfiguration()) async throws -> RetrievalResult {
+    public func search(_ input: SearchFilter, mode: SearchMode = .hybrid, configuration: SearchConfiguration = SearchConfiguration(), interpretQuery: Bool = true, now: Date = Date(), timeZone: TimeZone = .current) async throws -> RetrievalResult {
         let start = Date()
+        // Invalid scopes must escape before model-failure fallback. Otherwise an
+        // incomplete operator could silently become an unfiltered keyword query.
+        let resolution = try store.resolveQueryScope(input,interpret:interpretQuery,now:now,timeZone:timeZone)
+        let filter = resolution.filter
         if filter.query.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || mode == .keyword {
-            return RetrievalResult(hits:try store.search(filter,mode:.keyword),warnings:[],modelID:nil,duration:Date().timeIntervalSince(start))
+            return RetrievalResult(hits:try store.search(filter,mode:.keyword),warnings:[],modelID:nil,duration:Date().timeIntervalSince(start),resolution:resolution)
         }
         do {
             let vector: [Float]?, identity: String
@@ -47,11 +52,11 @@ public final class RetrievalEngine: @unchecked Sendable {
             var execution = SearchExecution(strategy:"exact",warnings:[])
             let hits = try store.search(filter,mode:mode,vector:vector,modelID:identity,minimumSimilarity:configuration.provider == .apple ? 0.15 : 0.25,similarityFusion:configuration.provider == .ollama,indexPolicy:configuration.indexPolicy,indexedCount:indexed,allowIndexOnLowPower:configuration.indexOnLowPower) { execution = $0 }
             warnings += execution.warnings
-            return RetrievalResult(hits:hits,warnings:warnings,modelID:identity,duration:Date().timeIntervalSince(start),strategy:execution.strategy)
+            return RetrievalResult(hits:hits,warnings:warnings,modelID:identity,duration:Date().timeIntervalSince(start),strategy:execution.strategy,resolution:resolution)
         } catch is CancellationError { throw CancellationError() }
         catch {
             guard mode == .hybrid else { throw error }
-            return RetrievalResult(hits:try store.search(filter,mode:.keyword),warnings:["Semantic search unavailable; showing keyword matches. " + error.localizedDescription],modelID:nil,duration:Date().timeIntervalSince(start))
+            return RetrievalResult(hits:try store.search(filter,mode:.keyword),warnings:["Semantic search unavailable; showing keyword matches. " + error.localizedDescription],modelID:nil,duration:Date().timeIntervalSince(start),resolution:resolution)
         }
     }
     @discardableResult public func index(_ memories: [Memory], configuration: SearchConfiguration) async throws -> String? {

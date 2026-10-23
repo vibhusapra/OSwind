@@ -13,6 +13,8 @@ import OSwindCore
             }
             let preview = AppModel(), path = CommandLine.arguments[index+1]
             if let queryIndex = CommandLine.arguments.firstIndex(of:"--preview-query"), queryIndex+1 < CommandLine.arguments.count { preview.query = CommandLine.arguments[queryIndex+1] }
+            if let questionIndex = CommandLine.arguments.firstIndex(of:"--preview-question"), questionIndex+1 < CommandLine.arguments.count { preview.question = CommandLine.arguments[questionIndex+1] }
+            if CommandLine.arguments.contains("--preview-literal") { preview.interpretQuery = false }
             if let sectionIndex = CommandLine.arguments.firstIndex(of:"--preview-section"), sectionIndex+1 < CommandLine.arguments.count { preview.section = CommandLine.arguments[sectionIndex+1]; if preview.section == "SettingsModels" { preview.settings.search.provider = .ollama }; preview.refresh() }
             if CommandLine.arguments.contains("--preview-chat"), let chat = preview.chats.first { preview.selectChat(chat.id) }
             preview.refresh()
