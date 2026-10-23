@@ -1,11 +1,12 @@
 import SwiftUI
 import OSwindCore
 
+private struct RoutineEditorSelection:Identifiable {var value:RoutineDefinition;var revision:Int?;var id:String {value.id}}
+
 struct RoutinesView:View {
     @EnvironmentObject var app:AppModel
     @ObservedObject var model:RoutinesModel
-    @State private var editing:RoutineDefinition?
-    @State private var revision:Int?
+    @State private var editing:RoutineEditorSelection?
     @State private var deleting:StoredRoutine?
     private func nextTime(_ routine:StoredRoutine) -> String {
         let formatter=DateFormatter();formatter.dateStyle = .medium;formatter.timeStyle = .short;formatter.timeZone=TimeZone(identifier:routine.definition.schedule.timeZone)
@@ -16,7 +17,7 @@ struct RoutinesView:View {
             VStack(alignment:.leading,spacing:22) {
                 HStack(alignment:.top) {
                     VStack(alignment:.leading,spacing:7) {Text("Make room for reflection.").font(.system(size:32,weight:.medium,design:.rounded));Text("Recaps, standups and action lists, grounded in your recorded day.").foregroundStyle(.secondary)}
-                    Spacer();Button("New routine",systemImage:"plus") {revision=nil;var d=RoutineDefinition();d.ai=app.settings.ai;editing=d}.buttonStyle(.borderedProminent)
+                    Spacer();Button("New routine",systemImage:"plus") {var d=RoutineDefinition();d.ai=app.settings.ai;editing=RoutineEditorSelection(value:d,revision:nil)}.buttonStyle(.borderedProminent)
                 }
                 VStack(alignment:.leading,spacing:10) {
                     Toggle("Run schedules while OSwind is open",isOn:$app.settings.routinesEnabled).accessibilityIdentifier("routines-enabled")
@@ -36,7 +37,7 @@ struct RoutinesView:View {
                             Text(routine.definition.ai.provider.label)
                         }.font(.caption).foregroundStyle(.secondary)
                         Text("Next: \(nextTime(routine)) · \(routine.definition.schedule.timeZone)").font(.caption).foregroundStyle(.secondary)
-                        HStack {Button("Run now"){model.runNow(routine.id)}.disabled(model.busy);Button("Edit"){revision=routine.revision;editing=routine.definition};Button(routine.definition.enabled ? "Pause":"Enable"){model.toggle(routine)};Spacer();Button("Delete",role:.destructive){deleting=routine}}
+                        HStack {Button("Run now"){model.runNow(routine.id)}.disabled(model.busy);Button("Edit"){editing=RoutineEditorSelection(value:routine.definition,revision:routine.revision)};Button(routine.definition.enabled ? "Pause":"Enable"){model.toggle(routine)};Spacer();Button("Delete",role:.destructive){deleting=routine}}
                     }.padding(20).frame(maxWidth:.infinity,alignment:.leading).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.08)))
                 }
                 if !model.history.isEmpty {
@@ -58,7 +59,7 @@ struct RoutinesView:View {
             }.padding(30).frame(maxWidth:1100,alignment:.leading).frame(maxWidth:.infinity)
         }
         .task {model.reload()}
-        .sheet(item:$editing) {value in RoutineEditor(value:value,revision:revision,model:model)}
+        .sheet(item:$editing) {value in RoutineEditor(value:value.value,revision:value.revision,model:model)}
         .confirmationDialog("Delete this routine and its saved result conversations?",isPresented:Binding(get:{deleting != nil},set:{if !$0 {deleting=nil}}),titleVisibility:.visible) {Button("Delete routine and results",role:.destructive){if let deleting {model.delete(deleting.id)};deleting=nil};Button("Cancel",role:.cancel){deleting=nil}}
     }
 }
