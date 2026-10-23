@@ -13,7 +13,7 @@ struct WorkspaceView: View {
             VStack(alignment:.leading,spacing:0) {
                 HStack(spacing:10) { Image(systemName:"wind").font(.system(size:26,weight:.semibold)).foregroundStyle(accent); Text("OSwind").font(.system(size:24,weight:.semibold,design:.rounded)) }.padding(.horizontal,22).padding(.top,28).padding(.bottom,6)
                 Text("A little more of your memory.").font(.caption).foregroundStyle(.secondary).padding(.horizontal,22).padding(.bottom,30)
-                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Insights","chart.bar.xaxis")],id:\.0) { item in
+                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
                     Button { m.section = item.0; m.refresh() } label: { HStack(spacing:12) { Image(systemName:item.1).frame(width:20); Text(item.0); Spacer(); if item.0 == "Memories" { Text("\(m.stats.count)").font(.caption).monospacedDigit() } }.padding(.horizontal,14).padding(.vertical,11).background(m.section == item.0 ? accent.opacity(0.16) : .clear,in:RoundedRectangle(cornerRadius:9)) }.buttonStyle(.plain).padding(.horizontal,12).padding(.bottom,3)
                 }
                 Spacer()
@@ -37,6 +37,7 @@ struct WorkspaceView: View {
                 }.padding(.horizontal,30).padding(.vertical,18)
                 Divider().opacity(0.5)
                 if m.section == "Ask" { AskView() }
+                else if m.section == "Routines" { RoutinesView(model:m.routines) }
                 else if m.section == "Insights" { InsightsView() }
                 else { memories }
                 Divider().opacity(0.5)

@@ -42,6 +42,8 @@ jobs:
         run: python3 scripts/test-reliability-soak.py .build/release/oswindctl
       - name: Verify synthetic visual replay across processes
         run: python3 scripts/visual-replay-smoke.py .build/release/oswindctl
+      - name: Exercise scheduled routines and quiet backup restore
+        run: python3 scripts/routines-smoke.py .build/release/oswindctl --output .artifacts/routines-ci.json
       - name: Verify long-transcript preview contracts
         run: python3 scripts/search-preview-smoke.py .build/release/oswindctl
       - name: Exercise recording-local speaker search across processes
@@ -74,7 +76,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 12
+          assert report['count'] == 1000 and report['schema_version'] == 13
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes

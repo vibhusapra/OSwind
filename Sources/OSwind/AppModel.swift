@@ -11,10 +11,11 @@ import UniformTypeIdentifiers
     let capture: CaptureController
     let audio: AudioController
     let libraryTransfer = LibraryTransferModel()
+    let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
-        capture.settings = settings; audio.settings = settings
+        capture.settings = settings; audio.settings = settings;routines.apply(settings)
         if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
@@ -93,20 +94,23 @@ import UniformTypeIdentifiers
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)
         audio = AudioController(store:store, embedder:embedder, settings:loaded)
+        routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
+        routines.onChange = {[weak self] in self?.refreshChats()}
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
             NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop() }.store(in:&cancellables)
         }
+        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick() }.store(in:&cancellables)
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
         housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }
     }
-    func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
+    func startConfiguredServices() {if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {

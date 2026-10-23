@@ -53,7 +53,7 @@ private final class RestoreRows {
         guard result.allSatisfy(\.isFinite) else { throw BackupFileError.invalid("Invalid restored vector values") }; return result
     }
     func rows(_ table: String, columns: String, _ body: (OpaquePointer) throws -> Void) throws -> Int64 {
-        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources"]
+        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs"]
         guard allowed.contains(table) else { throw BackupFileError.invalid("Unsupported restore table") }
         let statement = try source.db.prepare("SELECT \(columns) FROM \(table) NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(statement) }
         var count: Int64 = 0, status = sqlite3_step(statement)
@@ -80,7 +80,7 @@ private final class RestoreRows {
         }
     }
     func copy(_ table: String, columns: [String], into handle: OpaquePointer,
-              validate: (OpaquePointer) throws -> Void, progress: (Int64) throws -> Void = { _ in }) throws -> Int64 {
+              validate: (OpaquePointer) throws -> Void, afterBind: (OpaquePointer,OpaquePointer) throws -> Void = {_,_ in}, progress: (Int64) throws -> Void = { _ in }) throws -> Int64 {
         let list = columns.joined(separator:","), sql = "INSERT INTO \(table)(\(list)) VALUES("+Array(repeating:"?",count:columns.count).joined(separator:",")+")"
         var insert: OpaquePointer?
         guard sqlite3_prepare_v2(handle,sql,-1,&insert,nil)==SQLITE_OK else { throw OSwindError.database("Cannot prepare trusted restore table") }; defer { sqlite3_finalize(insert) }
@@ -88,6 +88,7 @@ private final class RestoreRows {
         return try rows(table,columns:list) { row in
             try validate(row); sqlite3_reset(insert); sqlite3_clear_bindings(insert)
             for column in columns.indices { guard sqlite3_bind_value(insert,Int32(column+1),sqlite3_column_value(row,Int32(column)))==SQLITE_OK else { throw OSwindError.database("Cannot bind restored data") } }
+            try afterBind(row,insert!)
             guard sqlite3_step(insert)==SQLITE_DONE else { throw BackupFileError.invalid("Backup data violates the current library schema") }
             count = try BackupMath.add(count,1); if count%64==0 { try progress(count) }
         }
@@ -135,6 +136,35 @@ private final class RestoreRows {
             guard startNull==lengthNull else { throw BackupFileError.invalid("Incomplete restored evidence anchor") }
             if !startNull { let start = try self.integer(row,5), length = try self.integer(row,6); guard start>=0,length>0, PassageRange(start:Int(start),length:Int(length)).text(in:memory.text) != nil else { throw BackupFileError.invalid("Invalid restored evidence anchor") } }
         },progress:{ try progress(LibraryBackupProgress(phase:"Restoring conversations",completedItems:$0,unit:"sources")) })
+        if source.schema>=13 {
+            var routineCount=0
+            _ = try copy("routines",columns:["id","revision","enabled","next_due","payload"],into:handle,validate:{ row in
+                let id=try self.source.db.text(row,0),revision=try self.integer(row,1),enabled=try self.integer(row,2)
+                routineCount += 1;guard routineCount<=100 else {throw BackupFileError.invalid("Backup has more than 100 routines")}
+                let data=try self.payload(row,4);guard data.count<=32768 else {throw BackupFileError.invalid("Routine payload exceeds 32 KiB")}
+                let definition=try JSONDecoder().decode(RoutineDefinition.self,from:data);_ = try definition.validated()
+                guard id==definition.id,revision>0,revision<Int64.max,enabled==(definition.enabled ? 1:0) else {throw BackupFileError.invalid("Invalid restored routine definition")}
+                try RoutineDefinition.validateDate(Date(timeIntervalSince1970:self.number(row,3)))
+            })
+            _ = try copy("routine_runs",columns:["id","routine_id","revision","scheduled_at","started","finished","trigger","status","chat_id","message","scope"],into:handle,validate:{ row in
+                for column:Int32 in [0,1] {let value=try self.source.db.text(row,column);guard !value.isEmpty,value.utf8.count<=128 else {throw BackupFileError.invalid("Invalid routine run identifier")}}
+                guard try self.integer(row,2)>0,RoutineTrigger(rawValue:try self.source.db.text(row,6)) != nil,RoutineRunStatus(rawValue:try self.source.db.text(row,7)) != nil else {throw BackupFileError.invalid("Invalid routine run state")}
+                for column:Int32 in [3,4] {try RoutineDefinition.validateDate(Date(timeIntervalSince1970:self.number(row,column)))}
+                if sqlite3_column_type(row,5) != SQLITE_NULL {_ = try self.number(row,5)}
+                if let message=try self.optionalText(row,9) {guard message.utf8.count<=2000 else {throw BackupFileError.invalid("Oversized routine message")}}
+                let data=try self.payload(row,10);guard data.count<=32768 else {throw BackupFileError.invalid("Routine scope exceeds 32 KiB")}
+                let scope=try JSONDecoder().decode(SearchFilter.self,from:data)
+                guard scope.query.isEmpty,let start=scope.start,let end=scope.end,start<=end else {throw BackupFileError.invalid("Invalid routine scope")}
+                try RoutineDefinition.validateDate(start);try RoutineDefinition.validateDate(end)
+            },afterBind:{row,insert in
+                if try self.source.db.text(row,7)=="running" {
+                    let transient=unsafeBitCast(-1,to:sqlite3_destructor_type.self)
+                    sqlite3_bind_text(insert,8,"interrupted",-1,transient);sqlite3_bind_double(insert,6,Date().timeIntervalSince1970)
+                    sqlite3_bind_text(insert,10,"Restored interrupted run; automatic execution stays off.",-1,transient)
+                }
+            })
+        }
+
     }
 }
 

@@ -259,8 +259,8 @@
     "id": "F033",
     "axis": "AI",
     "feature": "Scheduled routines",
-    "status": "todo",
-    "evidence": "No persistent scheduler yet",
+    "status": "partial",
+    "evidence": "Native calendar/weekday/interval schedules, bounded catch-up, cited history, remote opt-ins and quiet restore. Actual native creation/edit/run/source/cancel and real one-minute Qwen timer result verified; installed CLI contention/backup/erase pass. Full wake/keyboard, exhaustive recap quality and cron/tool actions remain open",
     "references": "Screenpipe, Littlebird"
   },
   {

@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 12
+    public static let schemaVersion = 13
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -87,6 +87,7 @@ public final class MemoryStore: @unchecked Sendable {
             if needsPassageColumns { try exec("ALTER TABLE chat_sources ADD COLUMN passage_start INTEGER; ALTER TABLE chat_sources ADD COLUMN passage_length INTEGER;") }
         }
         if version >= 4 && version < 6 { try exec(VectorJournalSchema.migrateV5) }
+        try exec(RoutineSchema.sql)
         try exec(VectorJournalSchema.sql)
         try exec(PassageSchema.sql)
         try exec(VectorStatisticsSchema.sql)
@@ -116,6 +117,11 @@ public final class MemoryStore: @unchecked Sendable {
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
     deinit { annCache.cancel(); sqlite3_close(db) }
+    func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
+        lock.lock();defer {lock.unlock()}
+        guard let db else {throw OSwindError.database("Library connection closed")}
+        return try body(RoutineDatabase(handle:db))
+    }
     private func exec(_ sql: String) throws { if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
     private func failure() -> OSwindError { .database(String(cString: sqlite3_errmsg(db))) }
     private func prepare(_ sql: String) throws -> OpaquePointer { var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
@@ -470,7 +476,7 @@ public final class MemoryStore: @unchecked Sendable {
     public func deleteAll() throws {
         lock.lock(); defer { lock.unlock() }
         try exec("BEGIN IMMEDIATE")
-        do { try exec("DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
+        do { try exec("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
         metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
         if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
@@ -563,7 +569,8 @@ extension MemoryStore {
     @discardableResult public func appendChatTurn(sessionID: String, question: String, answer: Answer, filter: SearchFilter = SearchFilter(), policy: PrivacyPolicy = PrivacyPolicy()) throws -> ChatTurn {
         lock.lock(); defer { lock.unlock() }
         guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, question.count <= 8000, answer.text.count <= 100000, answer.sources.count <= 60 else { throw OSwindError.invalid("Invalid conversation turn size") }
-        try exec("BEGIN IMMEDIATE")
+        let ownsTransaction=sqlite3_get_autocommit(db) != 0
+        try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT chat_append")
         do {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
             for hit in answer.sources { guard hit.memory.searchPreview==nil,let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
@@ -581,7 +588,7 @@ extension MemoryStore {
             }
             let update = try prepare("UPDATE chat_sessions SET title=?,updated=? WHERE id=?"); defer { sqlite3_finalize(update) }
             bind(update,1,session.turnCount == 0 ? String(payload.question.replacingOccurrences(of:"\n",with:" ").prefix(80)) : session.title); sqlite3_bind_double(update,2,timestamp.timeIntervalSince1970); bind(update,3,sessionID); guard sqlite3_step(update) == SQLITE_DONE else { throw failure() }
-            try exec("COMMIT")
+            try exec(ownsTransaction ? "COMMIT":"RELEASE chat_append")
             var cleanAnswer = answer; cleanAnswer.text = payload.text
             if var resolution = cleanAnswer.resolution {
                 if resolution.originalQuery != payload.question { resolution.clauses = [] }
@@ -589,7 +596,7 @@ extension MemoryStore {
                 cleanAnswer.resolution = resolution
             }
             return ChatTurn(id:id,sessionID:sessionID,timestamp:timestamp,question:payload.question,answer:cleanAnswer,filter:scope,timeZone:payload.timeZone)
-        } catch { try? exec("ROLLBACK"); throw error }
+        } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO chat_append; RELEASE chat_append"); throw error }
     }
     public func chatTurns(_ sessionID: String, limit: Int = 100) throws -> [ChatTurn] {
         lock.lock(); defer { lock.unlock() }
