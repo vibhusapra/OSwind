@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "hardware": {
+    "cpu": "Apple M5 Max",
+    "physical_ram_bytes": 137438953472,
+    "logical_cpus": 18,
+    "os": "macOS26.6.2",
+    "swift": "Apple Swift6.3.3, Swift5 language mode"
+  },
+  "code": {
+    "metal_uncached": "7c41ca3",
+    "metal_v2": "bd0ec66",
+    "metal_v3": "01e6f30",
+    "rem_comparisons": "bd0ec66; source-tree SHA retained in each report"
+  },
+  "artifacts": {
+    "benchmarks/comparison-rem-1000.json": "655e9673dde9c45f49608f021b51b7ad603f13118ff65b34f99c16e289c16181",
+    "benchmarks/comparison-rem-100000.json": "620a1f2b6538d47e33a182ce6f75cd8eca35d119fec2dc2adeedcb0ff080eede",
+    "benchmarks/metal-storage-100000.json": "3c0c4d88a82a2a0a70c97d836ac1780c596eade78201efd1b6b354436a92fe7c",
+    "benchmarks/metal-storage-1000000-v2.json": "fca859c8ed8b60e4db747e4f2b2b988bd4fb0f7dca9c7028529c1ffe2c1778ec",
+    "benchmarks/metal-storage-1000000-v3.json": "98e5d857770b4e1c7543c5d56a9b9b5881150addf7fc16a66f497c8fdb273318",
+    "benchmarks/metal-storage-1000000.json": "98e6a53649c9a43f657a8475dd981598d417c78ceff8edcc5bbd7cf2d83e6911"
+  },
+  "limits": [
+    "Synthetic warm development workloads; no controlled OS cache reset or physical energy meter",
+    "Metal source/reference query seeds differ by run; no causal controlled latency claim",
+    "Rem database methods only; MIT source pinned and adapted only for logging and isolated data root; no full competitor app capture or current commercial app runtime",
+    "Old HNSW and exact failures are retained; no overall ranking or feature-completeness claim"
+  ]
+}

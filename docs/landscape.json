@@ -6,7 +6,7 @@
       "name": "Screenpipe",
       "category": "Desktop memory + automation",
       "price": "Free limited history; Basic $250/year (~$21/month); Business $500/seat/year (~$42/month); Enterprise custom.",
-      "license": "Source available; commercial source builds require a commercial license.",
+      "license": "Source available; commercial source builds and competing-product use require a commercial license.",
       "features": "Screen + mic/system audio; accessibility text/OCR; local Whisper; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows; personal device sync; managed seats; Enterprise SSO/MDM/retention and shared context.",
       "difference": "Broadest reference for capture-to-automation and assistant context. Business explicitly does not include shared teammate context; Infinite Context/mobile are Max/Ultra beta.",
       "caveat": "Rendered pricing defaults to annual. About/pricing pages have differing amounts; use checkout terms. ~30 GB/month and 600 MB\u20134 GB RAM are vendor estimates, not measured here.",
@@ -15,7 +15,8 @@
         "https://docs.screenpipe.com/home",
         "https://docs.screenpipe.com/recording-controls",
         "https://docs.screenpipe.com/local-or-cloud-ai",
-        "https://docs.screenpipe.com/privacy-filter"
+        "https://docs.screenpipe.com/privacy-filter",
+        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md"
       ]
     },
     {

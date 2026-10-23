@@ -1,6 +1,6 @@
 # Benchmark protocol and results
 
-No overall ranking against other products has been established. Competitor features are documented in the research report; competitor runtime performance has not been measured.
+No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
 ## Reproduce retrieval
 
@@ -45,7 +45,7 @@ Measured on M5 Max, macOS 26.6.2, release build:
 
 Qwen3-Embedding 0.6B uses 1024-dimensional normalized vectors; full model digest, fixture SHA256, timings, per-query IDs/scores, warnings, index time and storage are retained in JSON. `ollama ps` reported 100% GPU memory residency during the measured workload. This confirms residency, not a kernel-level utilization or energy measurement.
 
-All modes returned candidates for every unanswerable query (no-evidence empty rate 0). Candidate retrieval is not an answer-confidence decision: answer abstention/citation correctness must be evaluated separately. No competitor binary was run. These results do not support a top-three or state-of-the-art claim.
+All modes returned candidates for every unanswerable query (no-evidence empty rate 0). Candidate retrieval is not an answer-confidence decision: answer abstention/citation correctness must be evaluated separately. This relevance fixture did not run competitor binaries. Separate keyword component comparisons below do not support a top-three or state-of-the-art claim.
 
 ## Conversation process smoke
 
@@ -152,3 +152,47 @@ swiftc -O -parse-as-library scripts/metal-probe.swift -o .artifacts/metal-probe
 At one million × 1024 dimensions, the matrix uses 4.096 GB and process peak RSS is about 4.1 GB. Generation took roughly 2.3 s. Full component timings include CPU candidate selection and reranking; command-buffer GPU durations are separate. Inspect the JSON for every observation and nearest-rank tails, including first-use overhead. This is an isolated component, not a delivered end-to-end search improvement or a competitor ranking.
 
 Integration gates: bounded-memory backend choice, durable snapshot format and checksum, mutation replay, erase/revision/identity protection, scope masks/metadata invalidation, power policy, cancellation, fault recovery and whole-path benchmarks. The current shipped preview still uses the native/exact paths; its million-record ANN recall failure remains open. Additional independent queries and real model archives are required even if this component retains 1.0 on the current fixture.
+
+## Metal product path and scope reuse
+
+These runs are on Apple M5 Max, 128 GiB RAM, 18 logical CPUs, macOS 26.6.2, release builds with Swift 6.3.3. The component probe above is separate from these real SQLite/cache/candidate-validation runs.
+
+`metal-storage-100000.json` and `metal-storage-1000000.json` use `7c41ca3`: 16 non-self queries per scope at 100k and 24 at 1m (new seeds count+1009...count+1032). The million-row float32 cache was built from real SQLite pages in 27.04 s, peak process RSS 4.23 GB. Every self identity and exact non-self top-10 neighbor was recovered in these trials. Unfiltered self-query median was 14.63 ms, nearest-rank p95/max 106.34 ms. **Filtered latency failed:** self median 366.89 ms and p95/max 4732.93 ms; non-self filtered p95 841.84 ms. The 100k development run overlapped the unit suite. These initial reports exclude coverage-count costs by passing precomputed counts.
+
+`metal-storage-1000000-v2.json` uses `bd0ec66`, transactional scope-mask reuse and one cached coverage-count scope. It includes actual coverage lookup inside each timer. It reopens the retained graph (2.30 s preparation), rather than measuring a new build. All exact top-10 neighbors were recovered on 24 additional non-self queries per scope (offset 5099). Filtered non-self p95 was 34.06 ms, but mixed self-query scopes caused count-cache churn: median 296.70 ms, p95/max 661.60 ms. This failure led to retaining four recent coverage scopes. Earlier exact/native failures remain preserved.
+
+The current reproduction includes coverage lookup, SQL search, GPU candidate scores, CPU selection and original-vector/live-scope validation; it excludes query embedding, UI publication and model generation:
+
+```bash
+swift build -c release
+.build/release/oswindctl --data .local/bench-driver benchmark-vectors \
+  --count 1000000 --dimensions 1024 --indexed \
+  --archive .local/ann-benchmark-1000000 --quality-queries 24 \
+  --quality-seed-offset 8193 --output benchmarks/metal-storage-1000000-v3.json
+```
+
+`metal-storage-1000000-v3.json` uses `01e6f30` and retains four coverage scopes. It reopens the existing Metal cache in 2.28 s, with 4.23 GB process peak RSS. All self identities and exact top-10 neighbors were recovered on 24 additional non-self queries per scope (offset 8193). Self-query p50/p95 were 14.40/94.92 ms unfiltered, 13.30/13.61 ms thresholded, and 26.82/639.07 ms filtered. Non-self indexed p95 was 77.03 ms unfiltered and 28.92 ms filtered, versus exhaustive SQL reference p95 1046.25/845.04 ms. First-scope construction still dominates the filtered self tail; **that cold/scope gate remains open**. These are sequential development trials with warm retained fixtures, not randomized controlled cache/power experiments.
+
+The first invocation on a **new** archive also ingests and prepares the cache; rerunning a retained archive may reuse it. Disk measurements can include both old HNSW and Metal cache formats. Do not interpret reopen time as fresh build time, a first query as controlled cold-cache latency, or these small synthetic trials as realistic-language quality or a cross-product ranking. Filtered Automatic remains exact while first-scope/source-churn/long-run gates remain open. Scope caches use a transactionally maintained nonce, model/store identity and vector journal sequence; the 20k-row product test verifies other-connection edits/reopen/erasure. Allocation limits and failure fallback are covered separately; no GPU energy comparison was run.
+
+## Pinned rem keyword database comparison
+
+```bash
+python3 scripts/compare-rem.py --workspace .local/competitors/rem-benchmark \
+  --count 1000 --output benchmarks/comparison-rem-1000.json
+python3 scripts/compare-rem.py --workspace .local/competitors/rem-benchmark \
+  --count 100000 --output benchmarks/comparison-rem-100000.json
+```
+
+The script fetches MIT rem revision `f4f68049a064557bddeb93753f82aa41af776b98` and its pinned SQLite.swift submodule, verifies the upstream DB.swift SHA256, retains its license, and compiles the database methods in an isolated Swift package. The only adaptations are a CLI bundle-logging fallback and an explicit data-directory stub. It does not start the rem GUI, record a desktop, decode video or touch rem user data. Marked build workspaces can be reused; each execution gets a new retained synthetic archive. OSwind source-tree and input-fixture digests are recorded.
+
+Both implementations receive identical title+text and app labels from the 32-document fictional fixture. The 1k/100k archives repeat these documents, so this is a scaling/regression workload rather than independent document relevance. Thirteen authored lexical cases run five times, including two app scopes and one absent query. Query order alternates. Results include hit rate, unique document-label recall/precision, empty rate and raw returned labels; duplicated records are not treated as distinct relevant facts. OSwind uses keyword-only search with no embeddings. Its weighted BM25 ranking and OR-prefix query semantics differ from rem's FTS4 matching/default order; equal success on this narrow fixture does not make the behaviors identical.
+
+| Rows | Backend | Keyword p50 | Nearest-rank p95 | Answerable hit@5 / label recall | Absent empty rate |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 1,000 | rem methods | 0.193 ms | 0.263 ms | 1.0 / 1.0 | 1.0 |
+| 1,000 | OSwind | 0.258 ms | 0.490 ms | 1.0 / 1.0 | 1.0 |
+| 100,000 | rem methods | 0.359 ms | 0.515 ms | 1.0 / 1.0 | 1.0 |
+| 100,000 | OSwind | 9.045 ms | 16.965 ms | 1.0 / 1.0 | 1.0 |
+
+**OSwind loses this keyword component latency comparison.** Its 100k source insert path also took 15.37 s versus rem's 7.34 s; schemas, derived indexes, privacy/deletion and feature responsibilities differ. Both stores occupy the same process, so process peak RSS is not a per-product memory measure. No full app capture, power, OCR/ASR, compression, UI or current commercial-product runtime comparison is implied. These measurements identify a ranked-keyword optimization gate, not a top-three result. Screenpipe's current source license restricts competing-product use; its documented feature/plan comparison remains separate from this executable MIT reference.

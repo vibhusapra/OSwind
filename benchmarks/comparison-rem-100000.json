@@ -1,0 +1,2743 @@
+{
+  "count" : 100000,
+  "documents_sha256" : "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+  "ingestion" : {
+    "oswind_seconds" : 15.368770956993103,
+    "rem_seconds" : 7.3424229621887207
+  },
+  "latency_quantiles" : "Median averages center pair; p95 nearest rank ceil(.95*n)",
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "oswind_revision" : "bd0ec66dbe97abecee591bca3d0c98b26dec193e",
+  "oswind_source_tree_sha256" : "71e7baad0f66a72c412c07eb3d58218d47a826322bf6a73763705c37a4dac0ab",
+  "process_peak_rss_bytes_both_backends" : 70647808,
+  "queries_sha256" : "c9fcd9700333fd2a86fcac2f522f05e6378e5e0427daf99f790932581e84080c",
+  "rem_db_original_sha256" : "a859bf79fb1dc79a62edf80c3b8a2bfcb84cfd0d1c53eeaab052c0d29e2d18cb",
+  "rem_revision" : "f4f68049a064557bddeb93753f82aa41af776b98",
+  "repetitions" : 5,
+  "results" : {
+    "oswind" : {
+      "absent_query_empty_rate" : 1,
+      "answerable_hit_rate_at_5" : 1,
+      "max_ms" : 17.83597469329834,
+      "measurements" : [
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 16.146063804626465,
+          "query" : "Maya",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "release",
+            "new_decision",
+            "release",
+            "new_decision",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 10.128021240234375,
+          "query" : "refunded",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.9530220031738281,
+          "query" : "Avery",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 10.7879638671875,
+          "query" : "invoice 4821",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.431004524230957,
+          "query" : "password managers",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.957982063293457,
+          "query" : "near duplicates",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 15.318036079406738,
+          "query" : "quiet mint",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8289976119995117,
+          "query" : "SameSite",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.7820291519165039,
+          "query" : "loopback",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 11.64698600769043,
+          "query" : "Whisper",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 17.304062843322754,
+          "query" : "Friday",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8990926742553711,
+          "query" : "Boreal",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.071048736572265625,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 0,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 13.194084167480469,
+          "query" : "Maya",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "release",
+            "new_decision",
+            "release",
+            "new_decision",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.6810588836669922,
+          "query" : "refunded",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.9390277862548828,
+          "query" : "Avery",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.9490413665771484,
+          "query" : "invoice 4821",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.5890293121337891,
+          "query" : "password managers",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.9720487594604492,
+          "query" : "near duplicates",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 15.096068382263184,
+          "query" : "quiet mint",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.7820291519165039,
+          "query" : "SameSite",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.7230205535888672,
+          "query" : "loopback",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 11.039018630981445,
+          "query" : "Whisper",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 16.914010047912598,
+          "query" : "Friday",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.2089900970458984,
+          "query" : "Boreal",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.064969062805175781,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 1,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 13.342976570129395,
+          "query" : "Maya",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "release",
+            "new_decision",
+            "release",
+            "new_decision",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8340044021606445,
+          "query" : "refunded",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.4209442138671875,
+          "query" : "Avery",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8779926300048828,
+          "query" : "invoice 4821",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.5630416870117188,
+          "query" : "password managers",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.4829330444335938,
+          "query" : "near duplicates",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 14.621973037719727,
+          "query" : "quiet mint",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.6699724197387695,
+          "query" : "SameSite",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.4180831909179688,
+          "query" : "loopback",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 10.922908782958984,
+          "query" : "Whisper",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 17.035961151123047,
+          "query" : "Friday",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.3030462265014648,
+          "query" : "Boreal",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.066995620727539062,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 2,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 13.134956359863281,
+          "query" : "Maya",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "release",
+            "new_decision",
+            "release",
+            "new_decision",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8499784469604492,
+          "query" : "refunded",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.6480379104614258,
+          "query" : "Avery",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8149309158325195,
+          "query" : "invoice 4821",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 10.241031646728516,
+          "query" : "password managers",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.9729299545288086,
+          "query" : "near duplicates",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 15.932917594909668,
+          "query" : "quiet mint",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.0169906616210938,
+          "query" : "SameSite",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.3849897384643555,
+          "query" : "loopback",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 11.685967445373535,
+          "query" : "Whisper",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 16.965031623840332,
+          "query" : "Friday",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 8.8769197463989258,
+          "query" : "Boreal",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.074028968811035156,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 3,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 14.531970024108887,
+          "query" : "Maya",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "release",
+            "new_decision",
+            "release",
+            "new_decision",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.5709562301635742,
+          "query" : "refunded",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.0289115905761719,
+          "query" : "Avery",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.7450017929077148,
+          "query" : "invoice 4821",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.4280242919921875,
+          "query" : "password managers",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.0450048446655273,
+          "query" : "near duplicates",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 16.016960144042969,
+          "query" : "quiet mint",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.6480846405029297,
+          "query" : "SameSite",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.4780921936035156,
+          "query" : "loopback",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 11.737942695617676,
+          "query" : "Whisper",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 17.83597469329834,
+          "query" : "Friday",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 9.0410709381103516,
+          "query" : "Boreal",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.069975852966308594,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 4,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        }
+      ],
+      "p50_ms" : 9.0450048446655273,
+      "p95_ms" : 16.965031623840332,
+      "unique_label_recall_at_5" : 1
+    },
+    "rem" : {
+      "absent_query_empty_rate" : 1,
+      "answerable_hit_rate_at_5" : 1,
+      "max_ms" : 1.1630058288574219,
+      "measurements" : [
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 1.1630058288574219,
+          "query" : "Maya",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "new_decision",
+            "release",
+            "new_decision",
+            "release",
+            "new_decision"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.46002864837646484,
+          "query" : "refunded",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.37705898284912109,
+          "query" : "Avery",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.514984130859375,
+          "query" : "invoice 4821",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.50401687622070312,
+          "query" : "password managers",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.44107437133789062,
+          "query" : "near duplicates",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.53203105926513672,
+          "query" : "quiet mint",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.41401386260986328,
+          "query" : "SameSite",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.36406517028808594,
+          "query" : "loopback",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.35405158996582031,
+          "query" : "Whisper",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.44405460357666016,
+          "query" : "Friday",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.32496452331542969,
+          "query" : "Boreal",
+          "repetition" : 0,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.13303756713867188,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 0,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.38897991180419922,
+          "query" : "Maya",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "new_decision",
+            "release",
+            "new_decision",
+            "release",
+            "new_decision"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.32401084899902344,
+          "query" : "refunded",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.31507015228271484,
+          "query" : "Avery",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.41699409484863281,
+          "query" : "invoice 4821",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39196014404296875,
+          "query" : "password managers",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39792060852050781,
+          "query" : "near duplicates",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.47600269317626953,
+          "query" : "quiet mint",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.32496452331542969,
+          "query" : "SameSite",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.28896331787109375,
+          "query" : "loopback",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.33903121948242188,
+          "query" : "Whisper",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.38599967956542969,
+          "query" : "Friday",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.28002262115478516,
+          "query" : "Boreal",
+          "repetition" : 1,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.072956085205078125,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 1,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.26798248291015625,
+          "query" : "Maya",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "new_decision",
+            "release",
+            "new_decision",
+            "release",
+            "new_decision"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.33903121948242188,
+          "query" : "refunded",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.27799606323242188,
+          "query" : "Avery",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39803981781005859,
+          "query" : "invoice 4821",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.38599967956542969,
+          "query" : "password managers",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39398670196533203,
+          "query" : "near duplicates",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.42200088500976562,
+          "query" : "quiet mint",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.308990478515625,
+          "query" : "SameSite",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.29397010803222656,
+          "query" : "loopback",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.30100345611572266,
+          "query" : "Whisper",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39398670196533203,
+          "query" : "Friday",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.31805038452148438,
+          "query" : "Boreal",
+          "repetition" : 2,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.11992454528808594,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 2,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.35905838012695312,
+          "query" : "Maya",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "new_decision",
+            "release",
+            "new_decision",
+            "release",
+            "new_decision"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.32901763916015625,
+          "query" : "refunded",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.27692317962646484,
+          "query" : "Avery",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.43094158172607422,
+          "query" : "invoice 4821",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.51999092102050781,
+          "query" : "password managers",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.4520416259765625,
+          "query" : "near duplicates",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.514984130859375,
+          "query" : "quiet mint",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.34892559051513672,
+          "query" : "SameSite",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.32806396484375,
+          "query" : "loopback",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.38599967956542969,
+          "query" : "Whisper",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.39899349212646484,
+          "query" : "Friday",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.33402442932128906,
+          "query" : "Boreal",
+          "repetition" : 3,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.079035758972167969,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 3,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        },
+        {
+          "app" : "",
+          "case" : 0,
+          "empty" : false,
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.27596950531005859,
+          "query" : "Maya",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "new_decision",
+            "release",
+            "new_decision",
+            "release",
+            "new_decision"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 1,
+          "empty" : false,
+          "expected" : [
+            "refund"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.35202503204345703,
+          "query" : "refunded",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "refund",
+            "refund",
+            "refund",
+            "refund",
+            "refund"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 2,
+          "empty" : false,
+          "expected" : [
+            "renewal"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.31793117523193359,
+          "query" : "Avery",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal",
+            "renewal"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 3,
+          "empty" : false,
+          "expected" : [
+            "invoice"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.40602684020996094,
+          "query" : "invoice 4821",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice",
+            "invoice"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 4,
+          "empty" : false,
+          "expected" : [
+            "privacy"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.44810771942138672,
+          "query" : "password managers",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy",
+            "privacy"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 5,
+          "empty" : false,
+          "expected" : [
+            "battery"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.42700767517089844,
+          "query" : "near duplicates",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "battery",
+            "battery",
+            "battery",
+            "battery",
+            "battery"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 6,
+          "empty" : false,
+          "expected" : [
+            "design"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.46598911285400391,
+          "query" : "quiet mint",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "design",
+            "design",
+            "design",
+            "design",
+            "design"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 7,
+          "empty" : false,
+          "expected" : [
+            "login"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.3509521484375,
+          "query" : "SameSite",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "login",
+            "login",
+            "login",
+            "login",
+            "login"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 8,
+          "empty" : false,
+          "expected" : [
+            "server"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.33009052276611328,
+          "query" : "loopback",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "server",
+            "server",
+            "server",
+            "server",
+            "server"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 9,
+          "empty" : false,
+          "expected" : [
+            "audio"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.34403800964355469,
+          "query" : "Whisper",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "audio",
+            "audio",
+            "audio",
+            "audio",
+            "audio"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "Xcode",
+          "case" : 10,
+          "empty" : false,
+          "expected" : [
+            "release"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.50091743469238281,
+          "query" : "Friday",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "release",
+            "release",
+            "release",
+            "release",
+            "release"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 11,
+          "empty" : false,
+          "expected" : [
+            "legal_es"
+          ],
+          "hit_at_5" : true,
+          "latency_ms" : 0.34606456756591797,
+          "query" : "Boreal",
+          "repetition" : 4,
+          "returned_document_labels" : [
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es",
+            "legal_es"
+          ],
+          "unique_label_precision_at_5" : 1,
+          "unique_label_recall_at_5" : 1
+        },
+        {
+          "app" : "",
+          "case" : 12,
+          "empty" : true,
+          "expected" : [
+
+          ],
+          "hit_at_5" : false,
+          "latency_ms" : 0.13697147369384766,
+          "query" : "CobaltUnicornNeverSeen",
+          "repetition" : 4,
+          "returned_document_labels" : [
+
+          ],
+          "unique_label_precision_at_5" : null,
+          "unique_label_recall_at_5" : null
+        }
+      ],
+      "p50_ms" : 0.35905838012695312,
+      "p95_ms" : 0.514984130859375,
+      "unique_label_recall_at_5" : 1
+    }
+  },
+  "schema" : 1,
+  "scope" : "In-process keyword database\/search-method comparison on duplicated synthetic text. Upstream rem DB.swift with logging bundle fallback and isolated path stub; original SQL\/search logic and default store configuration. No upstream app UI, actual video, OCR, capture, model inference, energy or full-product comparison. OSwind keyword search only; same title+text concatenation in both text fields, no embeddings. Alternating query order after separate ingestion. A small authored workload, not held out or a ranking against major current commercial products.",
+  "timestamp" : "2026-10-23T10:28:09Z",
+  "unique_documents" : 32
+}
