@@ -24,6 +24,14 @@ jobs:
         run: |
           mkdir -p .artifacts
           .build/release/oswindctl eval-retrieval --fixture benchmarks/fixtures/desktop-retrieval-v1.json --output .artifacts/relevance-apple-ci.json
+      - name: Verify vector scan self-match
+        run: |
+          .build/release/oswindctl benchmark-vectors --count 1000 --dimensions 128 --output .artifacts/vector-scaling-ci.json
+          python3 - <<'PYCODE'
+          import json
+          report = json.load(open('.artifacts/vector-scaling-ci.json'))
+          assert all(mode['top1_exact_match_rate'] == 1 for mode in report['modes'].values())
+          PYCODE
       - name: Render sample workspace
         run: |
           mkdir -p .artifacts
@@ -43,3 +51,4 @@ jobs:
             dist/OSwind-macos.zip
             .artifacts/workspace-sample.png
             .artifacts/relevance-apple-ci.json
+            .artifacts/vector-scaling-ci.json

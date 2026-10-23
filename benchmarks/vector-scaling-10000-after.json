@@ -1,0 +1,41 @@
+{
+  "build" : "release",
+  "count" : 10000,
+  "dimensions" : 1024,
+  "disk_bytes" : 55247576,
+  "gpu" : "Apple M5 Max",
+  "ingest_seconds" : 1.9934849739074707,
+  "layout" : "semantic_vectors",
+  "modes" : {
+    "all_candidates" : {
+      "app_filtered" : false,
+      "minimum_similarity" : -1,
+      "p50_ms" : 12.40992546081543,
+      "p95_ms" : 12.948036193847656,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "filtered" : {
+      "app_filtered" : true,
+      "minimum_similarity" : -1,
+      "p50_ms" : 9.219050407409668,
+      "p95_ms" : 9.6030235290527344,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "thresholded" : {
+      "app_filtered" : false,
+      "minimum_similarity" : 0.25,
+      "p50_ms" : 11.521100997924805,
+      "p95_ms" : 12.73798942565918,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    }
+  },
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "process_peak_rss_bytes" : 26116096,
+  "random_seed" : "row+xorshift64star-v1",
+  "schema" : 1,
+  "scope" : "Normalized synthetic random vectors in isolated SQLite storage. Exact self-match and scan latency only; no model inference, natural-language quality, GPU execution, power or competitor measurement. all_candidates stresses ranking by retaining every vector above -1; filtered matches half the archive.",
+  "timestamp" : "2026-10-23T06:10:06Z"
+}

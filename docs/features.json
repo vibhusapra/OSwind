@@ -148,7 +148,7 @@
     "axis": "Retrieval",
     "feature": "ANN indexing for long archives",
     "status": "todo",
-    "evidence": "Exact vector scan; need 100k/1m benchmark and ANN design",
+    "evidence": "100k exact p95 ~115 ms; 1m all-candidate p95 22.4 s fails target. ANN/partitioning and fault/recall validation remain open",
     "references": "Configurable vector systems"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "53 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
+    "evidence": "58 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
