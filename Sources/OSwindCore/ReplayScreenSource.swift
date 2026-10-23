@@ -10,12 +10,12 @@ struct ReplayScreenFrame:@unchecked Sendable {
 }
 /// The capture callback never queues unbounded pixel buffers behind OCR.
 final class ReplayScreenSource:NSObject,SCStreamOutput,SCStreamDelegate,@unchecked Sendable {
-    let frames:AsyncStream<ReplayScreenFrame>
-    private let continuation:AsyncStream<ReplayScreenFrame>.Continuation
+    let frames:AsyncThrowingStream<ReplayScreenFrame,Error>
+    private let continuation:AsyncThrowingStream<ReplayScreenFrame,Error>.Continuation
     private var stream:SCStream?
     private let queue=DispatchQueue(label:"com.oswind.replay.frames",qos:.utility)
     init(filter:SCContentFilter,maximumDimension:Int,interval:Double) throws {
-        let pair=AsyncStream<ReplayScreenFrame>.makeStream(bufferingPolicy:.bufferingNewest(1))
+        let pair=AsyncThrowingStream<ReplayScreenFrame,Error>.makeStream(bufferingPolicy:.bufferingNewest(1))
         frames=pair.stream;continuation=pair.continuation
         super.init()
         let rect=filter.contentRect,scale=min(2,Double(maximumDimension)/max(1,max(rect.width,rect.height)))
@@ -29,7 +29,7 @@ final class ReplayScreenSource:NSObject,SCStreamOutput,SCStreamDelegate,@uncheck
     }
     func start() async throws {guard let stream else {throw OSwindError.unavailable("Replay stream is closed")};try await stream.startCapture()}
     func stop() async {let capture=stream;stream=nil;continuation.finish();try? await capture?.stopCapture()}
-    func stream(_ stream:SCStream,didStopWithError error:Error) {continuation.finish()}
+    func stream(_ stream:SCStream,didStopWithError error:Error) {continuation.finish(throwing:error)}
     func stream(_ stream:SCStream,didOutputSampleBuffer sampleBuffer:CMSampleBuffer,of type:SCStreamOutputType) {
         guard type == .screen,sampleBuffer.isValid,
               let attachments=CMSampleBufferGetSampleAttachmentsArray(sampleBuffer,createIfNecessary:false) as? [[SCStreamFrameInfo:Any]],

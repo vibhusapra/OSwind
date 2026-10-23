@@ -14,6 +14,7 @@ import Vision
     private var lastFlush=Date(),retryAfter=Date.distantPast
     private let onMemory:@MainActor (Memory)->Void
     private let onStatus:@MainActor (String)->Void
+    private let onFailure:@MainActor (String)->Void
     private var source:ReplayScreenSource?
     private var recorder:VisualChunkRecorder?
     private var consumer:Task<Void,Never>?
@@ -23,8 +24,8 @@ import Vision
     private var currentInterval=0.0
     private var stopped=false
     var settings:AppSettings
-    init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings,gate:ReplayCommitGate,targetBundleID:String?=nil,onMemory:@escaping @MainActor (Memory)->Void,onStatus:@escaping @MainActor (String)->Void) {
-        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.targetBundleID=targetBundleID;self.onMemory=onMemory;self.onStatus=onStatus
+    init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings,gate:ReplayCommitGate,targetBundleID:String?=nil,onMemory:@escaping @MainActor (Memory)->Void,onStatus:@escaping @MainActor (String)->Void,onFailure:@escaping @MainActor (String)->Void={_ in}) {
+        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.targetBundleID=targetBundleID;self.onMemory=onMemory;self.onStatus=onStatus;self.onFailure=onFailure
     }
     func start() {
         supervisor=Task { [weak self] in
@@ -38,17 +39,17 @@ import Vision
     /// Synchronous invalidation prevents a late OCR result publishing after a
     /// settings/library boundary. Discard is used for library switches/erasure.
     func stop(discard:Bool=false) {
-        stopped=true;generation=UUID();supervisor?.cancel();supervisor=nil
+        stopped=true;generation=UUID();if discard {supervisor?.cancel()};supervisor=nil
         retire(discard:discard)
     }
     private func retire(discard:Bool=false) {
-        generation=UUID();binding="";consumer?.cancel();consumer=nil
+        generation=UUID();binding="";if discard {consumer?.cancel()};consumer=nil
         let previousSource=source,previousRecorder=recorder;source=nil;recorder=nil
-        let id=UUID()
+        let id=UUID(),notifyFailure=onFailure,notifyStatus=onStatus
         retiring[id]=Task { [weak self] in
             defer {self?.retiring[id]=nil}
             await previousSource?.stop()
-            do {try await previousRecorder?.close(commit:!discard)} catch {if !discard {self?.onStatus("Replay finalization: "+error.localizedDescription)}}
+            do {try await previousRecorder?.close(commit:!discard)} catch {if !discard {notifyFailure(error.localizedDescription);notifyStatus("Replay finalization: "+error.localizedDescription)}}
         }
     }
     func waitUntilStopped() async {for task in Array(retiring.values) {await task.value}}
@@ -63,8 +64,9 @@ import Vision
         guard !stopped,!Task.isCancelled,Date()>=retryAfter else {return}
         if Date().timeIntervalSince(lastFlush)>=5 {
             lastFlush=Date()
-            do {try await recorder?.flush()} catch {retire(discard:true);retryAfter=Date().addingTimeInterval(10);onStatus("Replay finalization: "+error.localizedDescription);return}
+            do {try await recorder?.flush()} catch {guard !stopped else {return};retire(discard:true);retryAfter=Date().addingTimeInterval(10);onFailure(error.localizedDescription);onStatus("Replay finalization: "+error.localizedDescription);return}
         }
+        guard !stopped else {return}
         guard let context=eligible() else {if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
         let interval=settings.profile.replayInterval(lowPower:ProcessInfo.processInfo.isLowPowerModeEnabled,thermalLimited:ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical)
         let key=Self.key(context)
@@ -89,7 +91,7 @@ import Vision
             onStatus("Replay · \(interval.formatted()) s · hardware HEVC")
             consumer=Task { [weak self] in
                 do {
-                    for await frame in source.frames {
+                    for try await frame in source.frames {
                         try Task.checkCancellation()
                         guard let self,self.generation==token,let before=self.eligible(),Self.key(before)==key else {break}
                         let extracted=try await Task.detached(priority:.utility) {
@@ -103,10 +105,10 @@ import Vision
                     }
                     if let self,self.generation==token {self.retire()}
                 } catch is CancellationError {} catch {
-                    guard let self,self.generation==token else {return};self.retire(discard:true);self.retryAfter=Date().addingTimeInterval(10);self.onStatus("Replay: "+error.localizedDescription)
+                    guard let self,self.generation==token else {return};self.retire(discard:true);self.retryAfter=Date().addingTimeInterval(10);self.onFailure(error.localizedDescription);self.onStatus("Replay: "+error.localizedDescription)
                 }
             }
-        } catch {if generation==token {retire(discard:true);retryAfter=Date().addingTimeInterval(10);onStatus("Replay: "+error.localizedDescription)}}
+        } catch {if generation==token {retire(discard:true);retryAfter=Date().addingTimeInterval(10);onFailure(error.localizedDescription);onStatus("Replay: "+error.localizedDescription)}}
     }
     deinit {consumer?.cancel();supervisor?.cancel()}
 }

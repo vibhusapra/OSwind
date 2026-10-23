@@ -81,7 +81,7 @@ actor VisualChunkRecorder {
         // Validate before retaining pixels; an invalid source never reaches an encoder.
         _ = try VisualRecording(duration:max(time+0.01,interval),width:current.encoder.width,height:current.encoder.height,codec:codec,hardwareRequired:hardware,frames:current.frames+[entry]).validated()
         do {try await current.encoder.append(frame.buffer,time:time)} catch {if chunk === current {chunk=nil;current.encoder.cancel()};throw error}
-        guard !closed,!discarded,chunk === current else {throw CancellationError()}
+        guard !discarded,chunk === current else {throw CancellationError()}
         current.frames.append(entry);current.lastSourceTime=frame.time
     }
     func flush() async throws {await acquire();defer {release()};guard !closed else {return};try Task.checkCancellation();try await finishCurrent(endAt:nil)}

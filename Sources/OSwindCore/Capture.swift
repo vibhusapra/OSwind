@@ -93,7 +93,7 @@ public struct CaptureMetrics: Sendable {
     private func configureMode() {
         if settings.visualCaptureMode == .replay && !settings.allDisplays {
             timer?.invalidate();timer=nil;replay?.stop();
-            let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text})
+            let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
             replay=session;session.start()
         } else {replay?.stop();replay=nil;schedule();Task {await captureOnce()}}
     }
@@ -103,12 +103,13 @@ public struct CaptureMetrics: Sendable {
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
         guard seconds.isFinite,seconds>=1,seconds<=120,!running,!busy,!suspended else {throw OSwindError.invalid("Replay requires 1–120 seconds and an idle controller")}
         guard !SessionState.locked,CGPreflightScreenCaptureAccess() else {throw OSwindError.unavailable("Replay needs an unlocked session and existing Screen Recording access")}
-        let previousSaved=metrics.saved
+        let previousSaved=metrics.saved,previousErrors=metrics.errors
         busy=true;running=true;defer {busy=false;running=false;replay=nil}
-        let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,targetBundleID:targetBundleID,onMemory:{[weak self] memory in self?.metrics.saved+=1;self?.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text})
+        let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,targetBundleID:targetBundleID,onMemory:{[weak self] memory in self?.metrics.saved+=1;self?.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
         replay=session;session.start()
         do {try await Task.sleep(nanoseconds:UInt64(seconds*1_000_000_000))} catch {session.stop(discard:true);await session.waitUntilStopped();throw error}
         session.stop();await session.waitUntilStopped()
+        guard metrics.errors==previousErrors else {throw OSwindError.unavailable("Replay encountered \(metrics.errors-previousErrors) errors: "+status)}
         guard metrics.saved>previousSaved else {throw OSwindError.unavailable("Replay saved no evidence: "+status)}
     }
     private func schedule() {

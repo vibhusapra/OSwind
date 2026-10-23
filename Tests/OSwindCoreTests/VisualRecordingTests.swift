@@ -129,4 +129,18 @@ final class VisualRecordingTests:XCTestCase {
         }
     }
 
+    func testConcurrentFlushAndNormalCloseKeepEveryAdmittedFrame() async throws {
+        let directory=root();defer {try? FileManager.default.removeItem(at:directory)}
+        for index in 0..<8 {
+            let store=try MemoryStore(root:directory.appendingPathComponent(String(index))),recorder=VisualChunkRecorder(store:store,codec:"h264",hardwareRequired:false)
+            for frame in 0..<4 {try await recorder.append(input(time:Double(frame),text:"Admitted frame \(frame)"),privacy:PrivacyPolicy(),interval:1)}
+            try await withThrowingTaskGroup(of:Void.self) {group in
+                group.addTask {try await recorder.flush()};group.addTask {try await recorder.close()};try await group.waitForAll()
+            }
+            let memories=try store.search(SearchFilter(),mode:.keyword).map(\.memory)
+            XCTAssertEqual(memories.count,1);XCTAssertEqual(memories.first?.visualRecording?.frames.count,4)
+            XCTAssertTrue(memories.first?.text.contains("Admitted frame 3") == true)
+        }
+    }
+
 }
