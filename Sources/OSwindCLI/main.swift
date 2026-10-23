@@ -134,6 +134,8 @@ do {
         _ = try configuration.localDirectory()
         let prepare=Date(),clip=try await AudioClipSnapshot.prepare(URL(fileURLWithPath:args[0]));defer {withExtendedLifetime(clip){}}
         let prepareSeconds=Date().timeIntervalSince(prepare),runtime=SpeakerDiarizer()
+        // Repeated diagnostics promise one resident backend until explicit unload.
+        await runtime.setRetention(.untilQuit)
         var runs=[[String:Any]]()
         for index in 0..<repetitions {
             let start=Date(),timeline=try await runtime.timeline(file:clip.speechFile,duration:clip.duration,configuration:configuration)
