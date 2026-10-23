@@ -35,6 +35,13 @@ final class QueryScopeTests: XCTestCase {
         let month = try resolve("last month",now:"2026-01-03T12:00:00Z")
         XCTAssertEqual(month.filter.start,date("2025-12-01T08:00:00Z")); XCTAssertEqual(month.filter.end,date("2026-01-01T08:00:00Z"))
     }
+    func testWeekdayPhrasesUseCalendarDatesAndLeaveBareDeadlineWeekdaysAsWords() throws {
+        XCTAssertEqual(try resolve("last Monday").filter.start,date("2026-10-19T07:00:00Z"))
+        XCTAssertEqual(try resolve("last Friday").filter.start,date("2026-10-16T07:00:00Z"))
+        XCTAssertEqual(try resolve("this Sunday").filter.start,date("2026-10-25T07:00:00Z"))
+        XCTAssertEqual(try resolve("last Sunday",now:"2026-11-02T20:00:00Z").filter.start,date("2026-11-01T07:00:00Z"))
+        XCTAssertTrue(try resolve("deadline Friday").clauses.isEmpty)
+    }
     func testRollingWindowCountsAndBounds() throws {
         let hours = try resolve("past 24 hours",now:"2026-03-08T19:00:00Z")
         XCTAssertEqual(hours.filter.end!.timeIntervalSince(hours.filter.start!),24*3600)

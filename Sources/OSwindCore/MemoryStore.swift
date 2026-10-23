@@ -94,8 +94,8 @@ public final class MemoryStore: @unchecked Sendable {
     private func exec(_ sql: String) throws { if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
     private func failure() -> OSwindError { .database(String(cString: sqlite3_errmsg(db))) }
     private func prepare(_ sql: String) throws -> OpaquePointer { var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
-    private func bind(_ stmt: OpaquePointer, _ index: Int32, _ value: String?) { if let value { sqlite3_bind_text(stmt, index, value, -1, transient) } else { sqlite3_bind_null(stmt, index) } }
-    private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { sqlite3_column_text(stmt, column).map { String(cString: $0) } ?? "" }
+    private func bind(_ stmt: OpaquePointer, _ index: Int32, _ value: String?) { if let value { sqlite3_bind_text64(stmt,index,value,UInt64(value.utf8.count),transient,UInt8(SQLITE_UTF8)) } else { sqlite3_bind_null(stmt, index) } }
+    private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {
         guard let bytes = sqlite3_column_blob(stmt, column) else { throw OSwindError.database("Missing payload") }
         return try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
@@ -365,10 +365,10 @@ public final class MemoryStore: @unchecked Sendable {
         guard status == SQLITE_DONE else { throw failure() }; return stats
     }
     public func exportJSON(to url: URL) throws {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories ORDER BY timestamp"); defer { sqlite3_finalize(stmt) }; var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted,.sortedKeys]; encoder.dateEncodingStrategy = .iso8601; try encoder.encode(memories).write(to: url, options: .atomic)
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories ORDER BY timestamp"); defer { sqlite3_finalize(stmt) }; var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted,.sortedKeys]; encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; try encoder.encode(memories).write(to: url, options: .atomic)
     }
     @discardableResult public func importJSON(from url: URL, embedder: LocalEmbedder? = nil, policy: PrivacyPolicy = PrivacyPolicy()) throws -> Int {
-        let data = try Data(contentsOf: url); guard data.count <= 100_000_000 else { throw OSwindError.invalid("Import exceeds 100 MB") }; let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        let data = try Data(contentsOf: url); guard data.count <= 100_000_000 else { throw OSwindError.invalid("Import exceeds 100 MB") }; let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .custom { decoder in try ISOTime.decode(from:decoder) }
         let memories: [Memory]
         do { memories = try decoder.decode([Memory].self, from: data) } catch { memories = try JSONDecoder().decode([Memory].self, from: data) }
         lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); do {

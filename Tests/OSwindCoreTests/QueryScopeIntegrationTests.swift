@@ -77,6 +77,15 @@ final class QueryScopeIntegrationTests: XCTestCase {
         let decoded = try JSONDecoder().decode(ChatTurn.self,from:JSONSerialization.data(withJSONObject:value))
         XCTAssertNil(decoded.timeZone); XCTAssertEqual(decoded.question,"Legacy")
     }
+    func testEmbeddedNulCannotTurnAnUnknownAppIntoItsExistingPrefix() async throws {
+        let result = try await RetrievalEngine(store:store).search(SearchFilter(query:"app:\"Safari\\u0000unknown\""),mode:.keyword,now:now,timeZone:zone)
+        XCTAssertTrue(result.hits.isEmpty)
+        let identifier = "full\0identifier"
+        try store.insert(Memory(id:identifier,kind:.note,app:"Test\0App",text:"Nul fixture"))
+        XCTAssertEqual(try store.get(identifier)?.id,identifier)
+        XCTAssertNil(try store.get("full"))
+        XCTAssertEqual(try store.stats(includeDiskUsage:false).apps["Test\0App"],1)
+    }
     func testHTTPFormSpacesPreserveScopeAndEncodedPlusRemainsLiteral() async throws {
         let server = try LocalAPIServer(store:store,embedder:LocalEmbedder())
         func request(_ query: String) -> String { "GET /v1/search?mode=keyword&\(query) HTTP/1.1\r\nHost: 127.0.0.1:47831\r\nAuthorization: Bearer \(server.token)\r\n\r\n" }

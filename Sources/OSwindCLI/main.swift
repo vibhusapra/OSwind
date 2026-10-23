@@ -184,8 +184,9 @@ do {
             let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search,interpretQuery:!literalQuery)
             if details { try encoded(result) } else {
                 if let resolution = result.resolution, !resolution.clauses.isEmpty {
-                    let f = resolution.filter, iso = ISO8601DateFormatter()
-                    let scope = "Scope: \(f.app ?? "all apps"), \(f.start.map {iso.string(from:$0)} ?? "any start") to before \(f.end.map {iso.string(from:$0)} ?? "any end"), \(resolution.timeZone)"
+                    let f = resolution.filter
+                    func stamp(_ date: Date) throws -> String { try ISOTime.string(date) }
+                    let scope = "Scope: \(f.app ?? "all apps"), \(try f.start.map {try stamp($0)} ?? "any start") to before \(try f.end.map {try stamp($0)} ?? "any end"), \(resolution.timeZone)"
                     FileHandle.standardError.write(Data((scope+"\n").utf8))
                 }
                 for warning in result.warnings { FileHandle.standardError.write(Data((warning+"\n").utf8)) }; try encoded(result.hits) }

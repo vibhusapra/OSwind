@@ -32,7 +32,7 @@ final class VectorIndexSource {
     deinit { sqlite3_close(db) }
     private func failure() -> OSwindError { .database(String(cString:sqlite3_errmsg(db))) }
     private func statement(_ sql: String) throws -> OpaquePointer { var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db,sql,-1,&stmt,nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
-    private func bind(_ stmt: OpaquePointer,_ index: Int32,_ text: String) { sqlite3_bind_text(stmt,index,text,-1,transient) }
+    private func bind(_ stmt: OpaquePointer,_ index: Int32,_ text: String) { sqlite3_bind_text64(stmt,index,text,UInt64(text.utf8.count),transient,UInt8(SQLITE_UTF8)) }
     private func exec(_ sql: String) throws { guard sqlite3_exec(db,sql,nil,nil,nil) == SQLITE_OK else { throw failure() } }
     private func snapshot<T>(_ body: () throws -> T) throws -> T {
         try exec("BEGIN")

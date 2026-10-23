@@ -27,7 +27,7 @@ public struct QueryResolution: Codable, Equatable, Sendable {
 /// query. Quoted text, URLs and path-like date words remain searchable content.
 public enum QueryScopeResolver {
     private struct Token { var raw: String; var range: NSRange; var quoted: Bool }
-    private static let relative = try! NSRegularExpression(pattern:"(?<![\\p{L}\\p{N}_/.-])(?:this morning|this afternoon|this evening|last night|this week|last week|this month|last month|(?:past|last) [0-9]{1,4} (?:hours?|days?|weeks?|months?)|today|yesterday)(?![\\p{L}\\p{N}_'’/\\-]|\\.[\\p{L}\\p{N}_])",options:.caseInsensitive)
+    private static let relative = try! NSRegularExpression(pattern:"(?<![\\p{L}\\p{N}_/.-])(?:this morning|this afternoon|this evening|last night|this week|last week|this month|last month|(?:this|last) (?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|(?:past|last) [0-9]{1,4} (?:hours?|days?|weeks?|months?)|today|yesterday)(?![\\p{L}\\p{N}_'’/\\-]|\\.[\\p{L}\\p{N}_])",options:.caseInsensitive)
     public static func resolve(_ input: SearchFilter, now: Date = Date(), timeZone: TimeZone = .current, interpret: Bool = true, canonicalApp: ((String) throws -> String)? = nil) throws -> QueryResolution {
         guard input.query.count <= 4000 else { throw QuerySyntaxError("Keep the search query within 4,000 characters.") }
         var filter = input
@@ -150,11 +150,8 @@ public enum QueryScopeResolver {
         if value.count == 10 { return try day(value,calendar:calendar) }
         var utc = calendar; utc.timeZone = TimeZone(secondsFromGMT:0)!
         _ = try day(String(value.prefix(10)),calendar:utc)
-        let iso = ISO8601DateFormatter(); iso.formatOptions = [.withInternetDateTime,.withFractionalSeconds]
-        if let date = iso.date(from:value) { return date }
-        iso.formatOptions = [.withInternetDateTime]
-        guard let date = iso.date(from:value) else { throw QuerySyntaxError("Use YYYY-MM-DD or a complete ISO 8601 timestamp for since:/until:.") }
-        return date
+        do { return try Date.ISO8601FormatStyle(includingFractionalSeconds:value.contains(".")).parse(value) }
+        catch { throw QuerySyntaxError("Use YYYY-MM-DD or a complete ISO 8601 timestamp for since:/until:.") }
     }
     private static func window(_ value: String, now: Date, calendar: Calendar) throws -> DateInterval {
         guard now.timeIntervalSinceReferenceDate.isFinite else { throw QuerySyntaxError("The current time is unavailable.") }
@@ -181,6 +178,15 @@ public enum QueryScopeResolver {
         case "last night": return try DateInterval(start:clock(18,shifted(.day,-1,today)),end:clock(6,today))
         default:
             let words = phrase.split(separator:" ")
+            let weekdays = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+            if words.count == 2, ["this","last"].contains(words[0]), let target = weekdays.firstIndex(of:String(words[1])) {
+                let current = (calendar.component(.weekday,from:today)+5)%7
+                let offset: Int
+                if words[0] == "this" { offset = target-current }
+                else { let elapsed = (current-target+7)%7; offset = -(elapsed == 0 ? 7 : elapsed) }
+                let start = try shifted(.day,offset,today)
+                return try DateInterval(start:start,end:shifted(.day,1,start))
+            }
             if words.count == 3, ["past","last"].contains(words[0]), let count = Int(words[1]) {
                 guard (1...3650).contains(count) else { throw QuerySyntaxError("Choose between 1 and 3650 time units.") }
                 let unit = words[2], component: Calendar.Component

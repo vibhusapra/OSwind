@@ -34,14 +34,15 @@ public enum ConversationContext {
         (previousQuestions.suffix(2).map { String($0.prefix(300)) } + [String(question.prefix(2000))]).joined(separator:"\n")
     }
     public static func markdown(_ session: ChatSession, turns: [ChatTurn]) -> String {
+        func stamp(_ date: Date) -> String { (try? ISOTime.string(date)) ?? "invalid time" }
         func quoted(_ text: String) -> String { text.split(separator:"\n",omittingEmptySubsequences:false).map { "> " + $0 }.joined(separator:"\n") }
-        var sections = ["# OSwind conversation", "Title: \(session.title.replacingOccurrences(of:"\n",with:" "))", "Exported \(ISO8601DateFormatter().string(from:Date())). Source numbers restart for each answer."]
+        var sections = ["# OSwind conversation", "Title: \(session.title.replacingOccurrences(of:"\n",with:" "))", "Exported \(stamp(Date())). Source numbers restart for each answer."]
         for turn in turns {
-            sections.append("## \(ISO8601DateFormatter().string(from:turn.timestamp))\n\n### Question\n\n\(quoted(turn.question))\n\n### Answer\n\n\(quoted(turn.answer.text))")
-            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { ISO8601DateFormatter().string(from:$0) } ?? "any start") to \(turn.filter.end.map { ISO8601DateFormatter().string(from:$0) } ?? "any end") (end exclusive). Time zone: \(turn.timeZone ?? "not recorded"). Saved only: \(turn.filter.favoritesOnly). Tag: \(turn.filter.tag ?? "any").")
+            sections.append("## \(stamp(turn.timestamp))\n\n### Question\n\n\(quoted(turn.question))\n\n### Answer\n\n\(quoted(turn.answer.text))")
+            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { stamp($0) } ?? "any start") to \(turn.filter.end.map { stamp($0) } ?? "any end") (end exclusive). Time zone: \(turn.timeZone ?? "not recorded"). Saved only: \(turn.filter.favoritesOnly). Tag: \(turn.filter.tag ?? "any").")
             if !turn.answer.warnings.isEmpty { sections.append(turn.answer.warnings.map { "Warning: " + $0 }.joined(separator:"\n\n")) }
             sections.append(turn.answer.sources.enumerated().map { i,hit in
-                "[\(i+1)] \(hit.memory.title.replacingOccurrences(of:"\n",with:" ")) · \(hit.memory.app) · \(ISO8601DateFormatter().string(from:hit.memory.timestamp))\n\nMemory ID: `\(hit.id)`"
+                "[\(i+1)] \(hit.memory.title.replacingOccurrences(of:"\n",with:" ")) · \(hit.memory.app) · \(stamp(hit.memory.timestamp))\n\nMemory ID: `\(hit.id)`"
             }.joined(separator:"\n\n"))
         }
         return sections.joined(separator:"\n\n") + "\n"

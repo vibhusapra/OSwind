@@ -4,7 +4,7 @@ import Security
 import CoreFoundation
 
 public enum Integration {
-    public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
+    public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
     public static func filter(_ args: [String: Any]) throws -> SearchFilter {
         let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","limit","mode"])
         guard Set(args.keys).isSubset(of:allowed) else { throw OSwindError.invalid("Unknown search parameter") }
