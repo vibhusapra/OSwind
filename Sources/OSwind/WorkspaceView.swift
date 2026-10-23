@@ -130,7 +130,7 @@ struct MemoryDetail: View {
         VStack(alignment:.leading,spacing:18) {
             HStack { VStack(alignment:.leading,spacing:4) { Text(memory.title).font(.title2.weight(.semibold)); Text("\(memory.app) · \(memory.timestamp.formatted())").font(.caption).foregroundStyle(.secondary) }; Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
             ScrollView {
-                if !query.isEmpty {
+                if !query.isEmpty && memory.visualRecording == nil {
                     VStack(alignment:.leading,spacing:8) {
                         Text("SEARCH EXCERPT").font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
                         EvidenceSnippetView(text:memory.text,query:query,budget:800,passage:m.selectedPassage).textSelection(.enabled).font(.callout)
