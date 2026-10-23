@@ -240,10 +240,17 @@ do {
         case "prune": let days = Int(option("--days") ?? "30") ?? 30; let gb = Int64(option("--max-gb") ?? "20") ?? 20; guard days > 0 && gb > 0 else { throw OSwindError.invalid("Retention and budget must be positive") }; print(try store.prune(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000))
         case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
         case "import-audio":
-            let settings=AppSettings.load(root:root), model=try validatedOption("--model") ?? settings.whisperModel
-            let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--model PATH] [--retain-audio]") }
+            var settings=AppSettings.load(root:root)
+            let whisperOverride=try validatedOption("--model"), nativeOverride=try validatedOption("--native-model"), computeOverride=try validatedOption("--compute")
+            if let model=whisperOverride { settings.whisperModel=model }
+            if let engine=try validatedOption("--engine") { guard let value=SpeechEngine(rawValue:engine) else { throw OSwindError.invalid("Use --engine whisper or parakeet") }; settings.speech.engine=value }
+            if let directory=nativeOverride { settings.speech.modelDirectory=directory }
+            if let compute=computeOverride { guard let value=SpeechCompute(rawValue:compute) else { throw OSwindError.invalid("Use --compute neuralEngine, gpu or cpu") }; settings.speech.compute=value }
+            if settings.speech.engine == .whisper && (nativeOverride != nil || computeOverride != nil) { throw OSwindError.invalid("Native model/compute options require the Parakeet engine") }
+            if settings.speech.engine == .parakeet && whisperOverride != nil { throw OSwindError.invalid("--model applies to Whisper; use --native-model for Parakeet") }
+            let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--engine whisper|parakeet] [--model PATH] [--native-model DIRECTORY] [--compute neuralEngine|gpu|cpu] [--retain-audio]") }
             let file=URL(fileURLWithPath:args[0]), clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
-            var transcript=try await Whisper.detailed(file:clip.speechFile,binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage,timeout:1800)
+            var transcript=try await SpeechRecognizer().transcribe(file:clip.speechFile,settings:settings,timeout:1800)
             transcript.duration=clip.duration
             var admission=settings; admission.retainAudio=retain
             let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)

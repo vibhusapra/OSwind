@@ -10,7 +10,7 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 ## Build & run
 
-macOS 14+, Apple Silicon recommended, Xcode 16+ for core features. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. SwiftPM resolves pinned USearch/NumKong native search dependencies; notices and Apache-2.0 license are bundled.
+macOS 14+, Apple Silicon recommended, Swift 6.2+ / Xcode 26+ to build. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. SwiftPM resolves pinned USearch/NumKong search and FluidAudio speech dependencies; third-party notices are bundled.
 
 ```bash
 swift test
@@ -30,7 +30,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 - Native timeline, app/date filters, saved memories, notes/tags, query-matched excerpts/highlights, OCR region inspection, source URLs, capture health and storage insights.
 - Durable local Ask conversations, follow-up subject context, per-turn evidence cards/scope, cancellation, chat deletion and Markdown export. Deleting or revising a source removes chat answers that cited it.
 - Evidence-only answers without downloads; on-device Apple Intelligence; local Ollama; optional OpenAI-compatible and Anthropic BYOK. Keys live in Keychain. Cloud context is opt-in.
-- Optional microphone and system-audio capture, 30-second bounded chunks, local whisper.cpp transcription, separate source labels, silence gate, raw-chunk deletion.
+- Optional microphone and system-audio capture, 30-second bounded chunks, Whisper.cpp or resident Parakeet v3 Core ML transcription, ANE/GPU/CPU policies, timed transcripts, separate source labels and a silence gate. Raw clip retention is opt-in.
 - App/domain/window exclusions, common-secret pattern redaction with raw-image suppression, retention and storage pruning, deletion, JSON export/import.
 - Menu bar controls, global search shortcut ⇧⌘Space, pause ⇧⌘P, login item support, setup and permissions UI.
 - Read-only, token-authenticated localhost API; MCP stdio server for trusted local assistants.
@@ -43,7 +43,7 @@ These are implementation claims. The progress ledger separates automated tests, 
 scripts/setup-models.sh
 ```
 
-Installs Ollama and whisper.cpp through Homebrew if missing, starts a loopback Ollama server if necessary, pulls `qwen3:4b-instruct-2507-q4_K_M` and `qwen3-embedding:0.6b`, and checksum-verifies Whisper `base.en` from its publisher's Hugging Face repository. Model weights remain outside this Git repository. Whisper defaults to `~/Library/Caches/OSwind/models/ggml-base.en.bin`. Settings → Models offers independent answer/search models, installed-model discovery, download progress/cancel, runtime GPU residency and resumable search indexing. The app can start an installed Ollama server with cloud inference disabled; it never replaces an existing server. Large downloads are optional for capture and keyword search.
+Installs Ollama and whisper.cpp through Homebrew if missing, starts a loopback Ollama server if necessary, pulls `qwen3:4b-instruct-2507-q4_K_M` and `qwen3-embedding:0.6b`, and checksum-verifies Whisper `base.en` from its publisher's Hugging Face repository. Model weights remain outside this Git repository. For native Parakeet, run `python3 scripts/setup-native-speech.py`, then select its printed directory in Settings → Audio. The pinned 483 MB download checks every SHA-256 and never replaces an existing install. See [native speech setup and limits](docs/AUDIO.md). Whisper defaults to `~/Library/Caches/OSwind/models/ggml-base.en.bin`. Settings → Models offers independent answer/search models, installed-model discovery, download progress/cancel, runtime GPU residency and resumable search indexing. The app can start an installed Ollama server with cloud inference disabled; it never replaces an existing server. Large downloads are optional for capture and keyword search.
 
 The chat preset uses the explicitly versioned [non-thinking Qwen3 Instruct model](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507); the short `qwen3:4b` alias resolved to a thinking-only model during validation. Existing selected model names are preserved. Generation that reaches a provider's output limit fails without saving a partial chat answer.
 

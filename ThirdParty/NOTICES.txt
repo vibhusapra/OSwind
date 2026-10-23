@@ -13,3 +13,20 @@ License: Apache License 2.0 (see Apache-2.0.txt)
 These components are resolved by Swift Package Manager. Original OSwind code
 remains MIT licensed. Model weights have separate publisher licenses and are
 not included in the repository or application bundle.
+
+FluidAudio 0.17.7 — FluidInference and contributors
+https://github.com/FluidInference/FluidAudio
+Pinned revision: 503b4bd1bbf7220882de39fe8ae6716aae4132da
+License: Apache License 2.0. Optional NeMo text normalization is disabled.
+Includes FastCluster (BSD-2-Clause), VBx (Apache-2.0), and bundled optional
+text frontend resources; original upstream notices are in FluidAudio/.
+OSwind uses ASR only in this increment; speech weights are user-selected,
+loaded locally and never redistributed in this app.
+
+Parakeet v3 Core ML conversion: FluidInference; original model: NVIDIA
+https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v3-coreml
+https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+Converted model card metadata says CC BY 4.0; its prose says Apache 2.0.
+NVIDIA's base model expressly uses CC BY 4.0. Preserve NVIDIA/FluidInference
+attribution and consult the actual converted weights' license.
+No model download or weight redistribution is performed by recognition.

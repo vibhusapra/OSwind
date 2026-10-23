@@ -20,6 +20,8 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
         result=subprocess.run([str(binary),'--data',str(data),*map(str,arguments)],capture_output=True,text=True,timeout=60)
         assert (result.returncode==0)==ok,(arguments,result.returncode,result.stderr)
         return result.stdout
+    for options in [('--engine','unknown'),('--compute','cpu'),('--engine','parakeet','--model',str(model)),('--engine','parakeet','--native-model',str(root/'missing-native')),('--engine','parakeet','--compute','invalid')]:
+        cli('import-audio',audio,*options,ok=False)
     speech('Maya owns the Friday release checklist')
     memory=json.loads(cli('import-audio',audio,'--retain-audio'));retained=source/memory['audioPath']
     assert memory.get('endTimestamp') is None

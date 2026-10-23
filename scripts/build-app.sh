@@ -44,6 +44,8 @@ if [ -f assets/OSwind.icns ]; then cp assets/OSwind.icns "$app/Contents/Resource
 mkdir -p "$app/Contents/Resources/ThirdParty"
 install -m 644 ThirdParty/NOTICES.txt "$app/Contents/Resources/ThirdParty/NOTICES.txt"
 install -m 644 ThirdParty/Apache-2.0.txt "$app/Contents/Resources/ThirdParty/Apache-2.0.txt"
+mkdir -p "$app/Contents/Resources/ThirdParty/FluidAudio"
+ditto ThirdParty/FluidAudio "$app/Contents/Resources/ThirdParty/FluidAudio"
 codesign --force --deep --sign - --identifier com.oswind.desktop "$app"
 codesign --verify --deep --strict "$app"
 printf '%s\n' "$app"

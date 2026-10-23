@@ -12,7 +12,10 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "SettingsAudio" {
+        if model.section == "SettingsNativeAudio" {
+            model.settings.speech.engine = .parakeet
+            size = NSSize(width:760,height:800); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
+        } else if model.section == "SettingsAudio" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
         } else if model.section == "SettingsData" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
