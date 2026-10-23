@@ -1,0 +1,578 @@
+[
+  {
+    "id": "F001",
+    "axis": "Capture",
+    "feature": "Focused-window snapshots",
+    "status": "live verified",
+    "evidence": "Real targeted synthetic window: OCR, correct source identity and image saved; automatic foreground transition test pending",
+    "references": "Screenpipe, Littlebird, Recall"
+  },
+  {
+    "id": "F002",
+    "axis": "Capture",
+    "feature": "All displays",
+    "status": "partial",
+    "evidence": "Display filters implemented; browser windows intentionally masked; hardware test pending",
+    "references": "ScreenMemory, TimeScroll, Pensieve"
+  },
+  {
+    "id": "F003",
+    "axis": "Capture",
+    "feature": "Continuous visual replay / HEVC",
+    "status": "todo",
+    "evidence": "JPEG snapshots only; no inter-frame video compression",
+    "references": "Rewind Desktop, Retrace (haseab), rem"
+  },
+  {
+    "id": "F004",
+    "axis": "Capture",
+    "feature": "Accessibility context and text",
+    "status": "implemented",
+    "evidence": "Bounded tree traversal; secure-field suppression; app/window metadata",
+    "references": "Screenpipe, TimeScroll, Minne"
+  },
+  {
+    "id": "F005",
+    "axis": "Capture",
+    "feature": "Browser URL capture",
+    "status": "partial",
+    "evidence": "Accessibility URL extraction; cross-browser behavior unverified",
+    "references": "Screenpipe, Unlost, Pensieve"
+  },
+  {
+    "id": "F006",
+    "axis": "Capture",
+    "feature": "Multilingual OCR",
+    "status": "partial",
+    "evidence": "Vision auto language detection; multilingual fixture suite outstanding",
+    "references": "Screenpipe, Retrace"
+  },
+  {
+    "id": "F007",
+    "axis": "Capture",
+    "feature": "Event-driven capture",
+    "status": "partial",
+    "evidence": "App-switch triggers plus interval; no window-content event observer yet",
+    "references": "Screenpipe"
+  },
+  {
+    "id": "F008",
+    "axis": "Capture",
+    "feature": "Screen selection and crop regions",
+    "status": "todo",
+    "evidence": "Focused window/all display toggle only",
+    "references": "Recall, visual recorders"
+  },
+  {
+    "id": "F009",
+    "axis": "Energy",
+    "feature": "Light/Balanced/Detailed modes",
+    "status": "tested",
+    "evidence": "20/5/2 seconds; size/quality settings and policy tests",
+    "references": "Screenpipe, TimeScroll"
+  },
+  {
+    "id": "F010",
+    "axis": "Energy",
+    "feature": "Perceptual change deduplication",
+    "status": "tested",
+    "evidence": "32x18 grayscale delta; exact small-text false negatives need study",
+    "references": "TimeScroll, Retrace"
+  },
+  {
+    "id": "F011",
+    "axis": "Energy",
+    "feature": "Idle / sleep / lock suspension",
+    "status": "partial",
+    "evidence": "Observers plus startup lock check; locked state verified; unlock/resume pending",
+    "references": "Recall, Retrace (jhammant)"
+  },
+  {
+    "id": "F012",
+    "axis": "Energy",
+    "feature": "Low-power / thermal backoff",
+    "status": "tested",
+    "evidence": "Interval policy tested; physical battery drain not measured",
+    "references": "TimeScroll"
+  },
+  {
+    "id": "F013",
+    "axis": "Energy",
+    "feature": "Long-run battery and CPU budget",
+    "status": "todo",
+    "evidence": "Paused debug RSS sampled; full capture power and 24h soak missing",
+    "references": "Screenpipe, all always-on tools"
+  },
+  {
+    "id": "F014",
+    "axis": "Retrieval",
+    "feature": "Full-text search + ranking",
+    "status": "tested",
+    "evidence": "FTS5 BM25, quoted terms, Unicode matching",
+    "references": "Most visual tools"
+  },
+  {
+    "id": "F015",
+    "axis": "Retrieval",
+    "feature": "Semantic text search",
+    "status": "tested",
+    "evidence": "Apple English sentence vectors; 1k synthetic result shows quality gap",
+    "references": "Unlost, Pensieve, TimeScroll"
+  },
+  {
+    "id": "F016",
+    "axis": "Retrieval",
+    "feature": "Hybrid fusion",
+    "status": "tested",
+    "evidence": "Reciprocal rank fusion; date/app filters applied to both paths",
+    "references": "Screenpipe, Retrace (jhammant)"
+  },
+  {
+    "id": "F017",
+    "axis": "Retrieval",
+    "feature": "Visual / image semantic search",
+    "status": "todo",
+    "evidence": "No CLIP/VLM embeddings yet",
+    "references": "TimeScroll, Recall"
+  },
+  {
+    "id": "F018",
+    "axis": "Retrieval",
+    "feature": "Multilingual embeddings",
+    "status": "todo",
+    "evidence": "English sentence embeddings only",
+    "references": "TimeScroll/Ollama, configurable systems"
+  },
+  {
+    "id": "F019",
+    "axis": "Retrieval",
+    "feature": "ANN indexing for long archives",
+    "status": "todo",
+    "evidence": "Exact vector scan; need 100k/1m benchmark and ANN design",
+    "references": "Configurable vector systems"
+  },
+  {
+    "id": "F020",
+    "axis": "Retrieval",
+    "feature": "App/date/kind/favorite/tag filters",
+    "status": "tested",
+    "evidence": "Inclusive start/exclusive end; bound SQL parameters",
+    "references": "Most visual tools"
+  },
+  {
+    "id": "F021",
+    "axis": "Retrieval",
+    "feature": "Natural-language dates and operators",
+    "status": "todo",
+    "evidence": "Explicit UI/ISO time filters; no date parser",
+    "references": "Unlost, Pieces"
+  },
+  {
+    "id": "F022",
+    "axis": "Retrieval",
+    "feature": "Timeline scrubbing",
+    "status": "implemented",
+    "evidence": "Snapshot strip, selection and source inspector; capped result window",
+    "references": "Rewind Desktop, rem, ScreenMemory"
+  },
+  {
+    "id": "F023",
+    "axis": "Retrieval",
+    "feature": "Calendar heatmap",
+    "status": "todo",
+    "evidence": "Date picker present, month heatmap absent",
+    "references": "ScreenMemory"
+  },
+  {
+    "id": "F024",
+    "axis": "Retrieval",
+    "feature": "OCR highlights, copy and source link",
+    "status": "partial",
+    "evidence": "All OCR boxes, text copy, http(s) source links; query-only highlights pending",
+    "references": "TimeScroll, Retrace, Unlost"
+  },
+  {
+    "id": "F025",
+    "axis": "AI",
+    "feature": "Immediate evidence-only mode",
+    "status": "tested",
+    "evidence": "No model dependency; returns source excerpts",
+    "references": "OSwind baseline"
+  },
+  {
+    "id": "F026",
+    "axis": "AI",
+    "feature": "Apple on-device generation",
+    "status": "live verified",
+    "evidence": "Real fixture answer ~0.8s; citation adherence needs hardening",
+    "references": "Screenpipe, Retrace (jhammant)"
+  },
+  {
+    "id": "F027",
+    "axis": "AI",
+    "feature": "Ollama local Metal generation",
+    "status": "live verified",
+    "evidence": "qwen3:4b fixture answered with [1]; runtime reports 100% GPU; ~3.8s warm sample",
+    "references": "Screenpipe, Pensieve, Minne"
+  },
+  {
+    "id": "F028",
+    "axis": "AI",
+    "feature": "OpenAI-compatible BYOK",
+    "status": "partial",
+    "evidence": "HTTPS/remote-consent guard, Keychain and API adapter; no paid provider request run",
+    "references": "Screenpipe, Pensieve"
+  },
+  {
+    "id": "F029",
+    "axis": "AI",
+    "feature": "Anthropic BYOK",
+    "status": "partial",
+    "evidence": "Messages adapter and Keychain; no paid request run",
+    "references": "Screenpipe"
+  },
+  {
+    "id": "F030",
+    "axis": "AI",
+    "feature": "Provider presets and model discovery",
+    "status": "partial",
+    "evidence": "Local Ollama model check; no one-click pull/progress in GUI",
+    "references": "Pieces, Screenpipe"
+  },
+  {
+    "id": "F031",
+    "axis": "AI",
+    "feature": "Grounded answers and citations",
+    "status": "partial",
+    "evidence": "Retrieved source cards; model can omit inline citations; evaluation needed",
+    "references": "Pieces, Littlebird"
+  },
+  {
+    "id": "F032",
+    "axis": "AI",
+    "feature": "Day recap / standup / action templates",
+    "status": "implemented",
+    "evidence": "Manual template prompts and save recap",
+    "references": "Screenpipe, Pieces, Littlebird"
+  },
+  {
+    "id": "F033",
+    "axis": "AI",
+    "feature": "Scheduled routines",
+    "status": "todo",
+    "evidence": "No persistent scheduler yet",
+    "references": "Screenpipe, Littlebird"
+  },
+  {
+    "id": "F034",
+    "axis": "AI",
+    "feature": "Chat history and follow-up context",
+    "status": "todo",
+    "evidence": "One answer at a time; no durable chat sessions",
+    "references": "Littlebird, Pieces"
+  },
+  {
+    "id": "F035",
+    "axis": "AI",
+    "feature": "Structured people/project memory",
+    "status": "todo",
+    "evidence": "Tags only; entity extraction/curation missing",
+    "references": "Minne, Omi"
+  },
+  {
+    "id": "F036",
+    "axis": "AI",
+    "feature": "Draft insertion into other apps",
+    "status": "todo",
+    "evidence": "Copy only; no global contextual drafting",
+    "references": "Minne, Littlebird Hover"
+  },
+  {
+    "id": "F037",
+    "axis": "Audio",
+    "feature": "Microphone capture",
+    "status": "partial",
+    "evidence": "AVAudioEngine conversion; live mic test gated by locked Mac",
+    "references": "Screenpipe, TimeScroll, Omi"
+  },
+  {
+    "id": "F038",
+    "axis": "Audio",
+    "feature": "System audio capture",
+    "status": "partial",
+    "evidence": "SCStream mono output; live input and device-change test pending",
+    "references": "Screenpipe, TimeScroll, Granola"
+  },
+  {
+    "id": "F039",
+    "axis": "Audio",
+    "feature": "Local GPU transcription",
+    "status": "live verified",
+    "evidence": "Official JFK audio fixture transcribed correctly with Whisper base.en; Metal backend available",
+    "references": "Screenpipe, TimeScroll"
+  },
+  {
+    "id": "F040",
+    "axis": "Audio",
+    "feature": "Silence gate / bounded queue",
+    "status": "tested",
+    "evidence": "WAV/RMS primitives tested; queue capped at 3 chunks",
+    "references": "Always-on audio tools"
+  },
+  {
+    "id": "F041",
+    "axis": "Audio",
+    "feature": "Speaker diarization / names",
+    "status": "todo",
+    "evidence": "Microphone/system labels only",
+    "references": "Granola, Omi, Limitless"
+  },
+  {
+    "id": "F042",
+    "axis": "Audio",
+    "feature": "Meeting sessions / detection",
+    "status": "todo",
+    "evidence": "Continuous transcript segments; no calendar/call session UX",
+    "references": "Granola, Littlebird, Omi"
+  },
+  {
+    "id": "F043",
+    "axis": "Audio",
+    "feature": "Custom vocabulary / timestamps",
+    "status": "todo",
+    "evidence": "Segment timestamp only; no word timing UI or hotword config",
+    "references": "Omi, Granola"
+  },
+  {
+    "id": "F044",
+    "axis": "Privacy",
+    "feature": "App/domain/title exclusions",
+    "status": "tested",
+    "evidence": "Case-insensitive apps/titles, exact/subdomain boundaries",
+    "references": "Recall, Screenpipe, Littlebird"
+  },
+  {
+    "id": "F045",
+    "axis": "Privacy",
+    "feature": "Private-window exclusion",
+    "status": "partial",
+    "evidence": "Title heuristic; localized browser test matrix needed",
+    "references": "Recall, TimeScroll, Retrace"
+  },
+  {
+    "id": "F046",
+    "axis": "Privacy",
+    "feature": "Common secrets redaction",
+    "status": "tested",
+    "evidence": "Unit and live secret fixtures pass; raw image is suppressed. Not a complete PII/DLP model",
+    "references": "Screenpipe, Minne, Recall"
+  },
+  {
+    "id": "F047",
+    "axis": "Privacy",
+    "feature": "PII model / image redaction",
+    "status": "todo",
+    "evidence": "No learned local PII or visual-sensitive-content model",
+    "references": "Screenpipe, Recall, Retrace (jhammant)"
+  },
+  {
+    "id": "F048",
+    "axis": "Privacy",
+    "feature": "Encrypted vault / biometric unlock",
+    "status": "todo",
+    "evidence": "Local permissions and FileVault recommendation only",
+    "references": "TimeScroll beta, Recall"
+  },
+  {
+    "id": "F049",
+    "axis": "Privacy",
+    "feature": "No telemetry / accounts",
+    "status": "implemented",
+    "evidence": "No analytics SDK or account system in original code",
+    "references": "rem, Minne, Retrace"
+  },
+  {
+    "id": "F050",
+    "axis": "Privacy",
+    "feature": "Pause all capture",
+    "status": "implemented",
+    "evidence": "Pausing screen also stops audio; independent audio start remains available",
+    "references": "All serious memory tools"
+  },
+  {
+    "id": "F051",
+    "axis": "Privacy",
+    "feature": "Timed pause",
+    "status": "implemented",
+    "evidence": "Menu bar 5/15/30/60 minute pause; pending runtime review",
+    "references": "Littlebird, Retrace (jhammant)"
+  },
+  {
+    "id": "F052",
+    "axis": "Privacy",
+    "feature": "Fine-grained history erasure",
+    "status": "partial",
+    "evidence": "Single row/all/retention; delete date/app/site range UI missing",
+    "references": "Recall, Littlebird"
+  },
+  {
+    "id": "F053",
+    "axis": "Data",
+    "feature": "Retention + storage budget",
+    "status": "tested",
+    "evidence": "Age prune tested; auto every 5 minutes; disk compaction refinement pending",
+    "references": "Recall, ScreenMemory"
+  },
+  {
+    "id": "F054",
+    "axis": "Data",
+    "feature": "JSON export/import",
+    "status": "tested",
+    "evidence": "Redaction/exclusions, transaction rollback, path stripping; text+metadata",
+    "references": "Most memory tools"
+  },
+  {
+    "id": "F055",
+    "axis": "Data",
+    "feature": "Media backup / restore",
+    "status": "partial",
+    "evidence": "Manual paused folder copy; no packaged backup/restore yet",
+    "references": "Rewind Desktop S3, Retrace"
+  },
+  {
+    "id": "F056",
+    "axis": "Data",
+    "feature": "Rewind / Limitless migration",
+    "status": "todo",
+    "evidence": "Schema adapters missing",
+    "references": "Retrace (haseab)"
+  },
+  {
+    "id": "F057",
+    "axis": "Data",
+    "feature": "Markdown / Obsidian export",
+    "status": "todo",
+    "evidence": "Plain JSON only",
+    "references": "Minne, Screenpipe"
+  },
+  {
+    "id": "F058",
+    "axis": "Data",
+    "feature": "Personal device sync",
+    "status": "todo",
+    "evidence": "No sync backend",
+    "references": "Screenpipe Business"
+  },
+  {
+    "id": "F059",
+    "axis": "Developer",
+    "feature": "Authenticated localhost API",
+    "status": "tested",
+    "evidence": "Live socket health/stats/search/get plus 401 auth and 403 Origin/Host checks pass",
+    "references": "Screenpipe, Pensieve"
+  },
+  {
+    "id": "F060",
+    "axis": "Developer",
+    "feature": "MCP stdio integration",
+    "status": "tested",
+    "evidence": "Real stdio subprocess initialize/list/search passes; protocol and unknown-tool unit tests pass",
+    "references": "Pieces, TimeScroll, Screenpipe"
+  },
+  {
+    "id": "F061",
+    "axis": "Developer",
+    "feature": "Plugin / collector SDK",
+    "status": "todo",
+    "evidence": "No extension API yet",
+    "references": "Pensieve, Screenpipe, Retrace (jhammant)"
+  },
+  {
+    "id": "F062",
+    "axis": "UX",
+    "feature": "Native macOS UI + menu bar",
+    "status": "implemented",
+    "evidence": "SwiftUI + AppKit; packaged debug process running; visual QA locked",
+    "references": "TimeScroll, rem, ScreenMemory"
+  },
+  {
+    "id": "F063",
+    "axis": "UX",
+    "feature": "Onboarding and permission health",
+    "status": "implemented",
+    "evidence": "Setup controls + CLI doctor; bundled permission-flow review pending",
+    "references": "All polished apps"
+  },
+  {
+    "id": "F064",
+    "axis": "UX",
+    "feature": "Global shortcut + login item",
+    "status": "partial",
+    "evidence": "Carbon hotkey and SMAppService; real keyboard/relaunch verification pending",
+    "references": "Most native tools"
+  },
+  {
+    "id": "F065",
+    "axis": "UX",
+    "feature": "Keyboard and accessibility review",
+    "status": "todo",
+    "evidence": "Native controls; full VoiceOver/focus/dynamic-type pass missing",
+    "references": "Quality bar"
+  },
+  {
+    "id": "F066",
+    "axis": "UX",
+    "feature": "Signed/notarized installer + updates",
+    "status": "todo",
+    "evidence": "Local ad-hoc .app only; CI artifact packaging implemented",
+    "references": "Commercial apps"
+  },
+  {
+    "id": "F067",
+    "axis": "Enterprise",
+    "feature": "SSO / MDM / audit / org controls",
+    "status": "out of v0 desktop scope",
+    "evidence": "Track as future enterprise work, not a single-user v0 claim",
+    "references": "Screenpipe, Pieces, Granola"
+  },
+  {
+    "id": "F068",
+    "axis": "Platform",
+    "feature": "macOS Apple Silicon",
+    "status": "partial",
+    "evidence": "Built/tested on M5 Max macOS26; older supported OS testing pending",
+    "references": "All macOS tools"
+  },
+  {
+    "id": "F069",
+    "axis": "Platform",
+    "feature": "Windows / Linux / mobile",
+    "status": "out of v0 desktop scope",
+    "evidence": "User requested Mac; no cross-platform parity claim",
+    "references": "Screenpipe, Pieces, Omi"
+  },
+  {
+    "id": "F070",
+    "axis": "Quality",
+    "feature": "Real competitor benchmarks",
+    "status": "todo",
+    "evidence": "No competitor binary run; source-feature comparison only",
+    "references": "Required before top-three claim"
+  },
+  {
+    "id": "F071",
+    "axis": "Quality",
+    "feature": "Retrieval / OCR / ASR fixture suite",
+    "status": "partial",
+    "evidence": "Storage/privacy/retrieval tests pass; OCR/audio fixture suite underway",
+    "references": "OSwind quality bar"
+  },
+  {
+    "id": "F072",
+    "axis": "Quality",
+    "feature": "24-hour soak and fault recovery",
+    "status": "todo",
+    "evidence": "Still missing; no reliability parity claim",
+    "references": "OSwind quality bar"
+  }
+]

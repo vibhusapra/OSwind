@@ -1,0 +1,36 @@
+name: macOS validation
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  native:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: swift test
+      - name: Package app
+        run: scripts/build-app.sh release
+      - name: CLI smoke test
+        run: |
+          dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
+          dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Render sample workspace
+        run: |
+          mkdir -p .artifacts
+          python3 - <<'PYCODE'
+          import pathlib, subprocess
+          output = pathlib.Path('.artifacts/workspace-sample.png').resolve()
+          subprocess.run(['.build/debug/OSwind', '--demo', '--render-preview', str(output)], check=True, timeout=30)
+          assert output.stat().st_size > 10000
+          PYCODE
+      - name: Package portable archive
+        run: ditto -c -k --sequesterRsrc --keepParent dist/OSwind.app dist/OSwind-macos.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OSwind-macos-unsigned
+          include-hidden-files: true
+          path: |
+            dist/OSwind-macos.zip
+            .artifacts/workspace-sample.png

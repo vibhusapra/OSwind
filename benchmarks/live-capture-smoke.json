@@ -1,0 +1,16 @@
+{
+  "result": "PASS",
+  "normal_capture": "Saved OSwind Synthetic Fixture \u00b7 673 ms",
+  "secret_capture": "Saved OSwind Synthetic Fixture \u00b7 441 ms",
+  "ocr_regions": 5,
+  "verified": [
+    "target identity",
+    "live OCR marker",
+    "image saved",
+    "secret text redacted",
+    "secret image absent",
+    "app exclusion",
+    "window-title exclusion",
+    "delete removes image and FTS entry"
+  ]
+}
