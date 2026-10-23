@@ -39,7 +39,7 @@ struct WorkspaceView: View {
                 else if m.section == "Insights" { InsightsView() }
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView().environmentObject(m) }

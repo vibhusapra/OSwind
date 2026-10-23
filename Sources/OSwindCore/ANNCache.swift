@@ -34,7 +34,7 @@ private final class IndexBuildLease {
 /// against stale snapshots and other processes writing to the same store.
 final class ANNCache: @unchecked Sendable {
     private final class Session {
-        let native: NativeANN
+        let native: any VectorSearchBackend
         let source: VectorIndexSource
         let modelID: String
         let identity: String
@@ -42,7 +42,7 @@ final class ANNCache: @unchecked Sendable {
         var lastCheckpoint = Date()
         var checkpointSequence: Int64 = -1
         var lastQuery = Date()
-        init(native: NativeANN, source: VectorIndexSource, modelID: String, identity: String, sequence: Int64) {
+        init(native: any VectorSearchBackend, source: VectorIndexSource, modelID: String, identity: String, sequence: Int64) {
             self.native = native; self.source = source; self.modelID = modelID; self.identity = identity; self.sequence = sequence
         }
     }
@@ -68,8 +68,8 @@ final class ANNCache: @unchecked Sendable {
         if let attrs = try? FileManager.default.attributesOfItem(atPath:directory.path), attrs[.type] as? FileAttributeType == .typeSymbolicLink { throw OSwindError.invalid("Search index directory cannot be a symbolic link") }
         try Paths.ensure(directory); try FileManager.default.setAttributes([.posixPermissions:0o700],ofItemAtPath:directory.path)
     }
-    private func prefix(identity: String, modelID: String, dimensions: Int) -> String {
-        SHA256.hash(data:Data("\(identity)\n\(modelID)\n\(dimensions)\n\(NativeANN.format)".utf8)).map { String(format:"%02x",$0) }.joined()
+    private func prefix(identity: String, modelID: String, dimensions: Int, format: String) -> String {
+        SHA256.hash(data:Data("\(identity)\n\(modelID)\n\(dimensions)\n\(format)".utf8)).map { String(format:"%02x",$0) }.joined()
     }
     private func manifestURL(_ prefix: String) -> URL { directory.appendingPathComponent(prefix+".json") }
     private func digest(_ url: URL) throws -> String {
@@ -85,20 +85,21 @@ final class ANNCache: @unchecked Sendable {
         return hash.finalize().map { String(format:"%02x",$0) }.joined()
     }
     private func graphURL(_ name: String, prefix: String) throws -> URL {
-        guard name.hasPrefix(prefix+"-"), name.hasSuffix(".usearch"), name == URL(fileURLWithPath:name).lastPathComponent, !name.contains("..") else { throw OSwindError.invalid("Invalid search index path") }
+        guard name.hasPrefix(prefix+"-"), (name.hasSuffix(".usearch") || name.hasSuffix(".metal")), name == URL(fileURLWithPath:name).lastPathComponent, !name.contains("..") else { throw OSwindError.invalid("Invalid search index path") }
         let url = directory.appendingPathComponent(name)
         if let attrs = try? FileManager.default.attributesOfItem(atPath:url.path), attrs[.type] as? FileAttributeType == .typeSymbolicLink { throw OSwindError.invalid("Search index cannot be a symbolic link") }
         return url
     }
     private func load(source: VectorIndexSource, modelID: String, state: VectorSourceState) throws -> Session? {
-        let key = prefix(identity:state.identity,modelID:modelID,dimensions:source.dimensions), manifest = manifestURL(key)
+        let format = VectorBackendFactory.format(dimensions:source.dimensions,count:try source.state().count)
+        let key = prefix(identity:state.identity,modelID:modelID,dimensions:source.dimensions,format:format), manifest = manifestURL(key)
         guard FileManager.default.fileExists(atPath:manifest.path) else { return nil }
         try ensureDirectory()
         let decoded = try JSONDecoder().decode(ANNManifest.self,from:Data(contentsOf:manifest))
-        guard decoded.storeID == state.identity, decoded.modelID == modelID, decoded.dimensions == source.dimensions, decoded.format == NativeANN.format, decoded.sequence <= state.head, decoded.sequence >= 0 else { throw OSwindError.invalid("Search index belongs to a different store or model version") }
+        guard decoded.storeID == state.identity, decoded.modelID == modelID, decoded.dimensions == source.dimensions, decoded.format == format, decoded.sequence <= state.head, decoded.sequence >= 0 else { throw OSwindError.invalid("Search index belongs to a different store or model version") }
         let file = try graphURL(decoded.graph,prefix:key)
         guard try digest(file) == decoded.sha256 else { throw OSwindError.invalid("Search index checksum mismatch; rebuild required") }
-        let native = try NativeANN(dimensions:source.dimensions); try native.load(file)
+        let native = try VectorBackendFactory.make(dimensions:source.dimensions,format:format); try native.load(file)
         guard try native.count == decoded.count else { throw OSwindError.invalid("Search index count mismatch") }
         let loaded = Session(native:native,source:source,modelID:modelID,identity:state.identity,sequence:decoded.sequence)
         loaded.checkpointSequence = decoded.sequence; return loaded
@@ -120,7 +121,7 @@ final class ANNCache: @unchecked Sendable {
     }
     private func checkpoint(_ session: Session, leaseHeld: Bool = false) throws {
         try ensureDirectory()
-        let key = prefix(identity:session.identity,modelID:session.modelID,dimensions:session.source.dimensions)
+        let key = prefix(identity:session.identity,modelID:session.modelID,dimensions:session.source.dimensions,format:session.native.indexFormat)
         var lease: IndexBuildLease?
         if !leaseHeld { lease = try IndexBuildLease(directory.appendingPathComponent(key+".lock")); guard lease != nil else { return } }
         defer { withExtendedLifetime(lease) {} }
@@ -129,11 +130,11 @@ final class ANNCache: @unchecked Sendable {
         let manifestFile = manifestURL(key)
         let previous = (try? Data(contentsOf:manifestFile)).flatMap { try? JSONDecoder().decode(ANNManifest.self,from:$0) }
         if let previous, previous.storeID == state.identity, previous.sequence > session.sequence, previous.sequence <= state.head { return }
-        let graphName = key+"-"+UUID().uuidString+".usearch", file = try graphURL(graphName,prefix:key)
+        let graphName = key+"-"+UUID().uuidString+(session.native.indexFormat == MetalFlatIndex.format ? ".metal" : ".usearch"), file = try graphURL(graphName,prefix:key)
         var committed = false; defer { if !committed { try? FileManager.default.removeItem(at:file) } }
         try session.native.save(file); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path)
         let handle = try FileHandle(forWritingTo:file); try handle.synchronize(); try handle.close()
-        let manifest = ANNManifest(storeID:session.identity,modelID:session.modelID,dimensions:session.source.dimensions,format:NativeANN.format,sequence:session.sequence,count:try session.native.count,graph:graphName,sha256:try digest(file))
+        let manifest = ANNManifest(storeID:session.identity,modelID:session.modelID,dimensions:session.source.dimensions,format:session.native.indexFormat,sequence:session.sequence,count:try session.native.count,graph:graphName,sha256:try digest(file))
         try Task.checkCancellation()
         guard try session.source.state(includeCount:false).identity == session.identity else { throw CancellationError() }
         try JSONEncoder().encode(manifest).write(to:manifestFile,options:.atomic)
@@ -181,14 +182,15 @@ final class ANNCache: @unchecked Sendable {
         job = Task.detached(priority:.utility) { [self] in
             do {
                 try ensureDirectory()
-                let key = prefix(identity:identity,modelID:modelID,dimensions:dimensions)
+                let source = try VectorIndexSource(root:root,modelID:modelID,dimensions:dimensions), initial = try source.state()
+                guard initial.identity == identity else { throw CancellationError() }
+                let format = VectorBackendFactory.format(dimensions:dimensions,count:initial.count)
+                let key = prefix(identity:identity,modelID:modelID,dimensions:dimensions,format:format)
                 guard let lease = try IndexBuildLease(directory.appendingPathComponent(key+".lock")) else {
                     finish(token:token,status:SearchIndexStatus(state:"waiting",message:"Another process is building the search index",indexed:0,total:total,sequence:0),retry:2); return
                 }
                 defer { withExtendedLifetime(lease) {} }
-                let source = try VectorIndexSource(root:root,modelID:modelID,dimensions:dimensions), initial = try source.state()
-                guard initial.identity == identity else { throw CancellationError() }
-                let native = try NativeANN(dimensions:dimensions); try native.reserve(initial.count+512)
+                let native = try VectorBackendFactory.make(dimensions:dimensions,format:format); try native.reserve(initial.count+512)
                 var cursor: UInt64 = 0
                 while true {
                     try Task.checkCancellation()
@@ -224,7 +226,7 @@ final class ANNCache: @unchecked Sendable {
         guard state.state == "ready" else { throw OSwindError.unavailable(state.message) }; return state
     }
     private func pendingJob() -> Task<Void,Never>? { lock.lock(); defer { lock.unlock() }; return job }
-    func withReady<T>(modelID: String, dimensions: Int, identity: String, snapshotHead: Int64, _ body: (NativeANN,Int64) throws -> T) rethrows -> T? {
+    func withReady<T>(modelID: String, dimensions: Int, identity: String, snapshotHead: Int64, _ body: (any VectorSearchBackend,Int64) throws -> T) rethrows -> T? {
         lock.lock(); defer { lock.unlock() }
         guard let session, session.modelID == modelID, session.source.dimensions == dimensions, session.identity == identity, session.sequence <= snapshotHead else { return nil }
         session.lastQuery = Date(); return try body(session.native,session.sequence)

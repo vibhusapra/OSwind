@@ -8,7 +8,7 @@ let package = Package(
     ],
     targets: [
         .systemLibrary(name: "CSQLite"),
-        .target(name: "OSwindCore", dependencies: ["CSQLite",.product(name:"USearch",package:"USearch")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage")]),
+        .target(name: "OSwindCore", dependencies: ["CSQLite",.product(name:"USearch",package:"USearch")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
         .executableTarget(name: "OSwind", dependencies: ["OSwindCore"]),
         .executableTarget(name: "OSwindCLI", dependencies: ["OSwindCore"]),
         .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore"])

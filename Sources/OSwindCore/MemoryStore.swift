@@ -177,15 +177,16 @@ public final class MemoryStore: @unchecked Sendable {
         }
         if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
             var indexed: [SemanticCandidate]?
+            var candidateStrategy = "ann-exact-rerank"
             if indexStatus != nil {
-                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100)) }
+                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100),strategy:{ candidateStrategy = $0 }) }
                 catch { diagnostics.append("Fast index unavailable; exact search used. "+error.localizedDescription) }
                 if indexed == nil && diagnostics.isEmpty {
                     diagnostics.append(indexStatus!.state == "ready" ? "Fast index is catching up; exact search used." : indexStatus!.message + " · exact search used.")
                 }
             }
             let best: [SemanticCandidate]
-            if let indexed { best = indexed; strategy = "ann-exact-rerank" }
+            if let indexed { best = indexed; strategy = candidateStrategy }
             else {
             let vectorJoin = whereSQL == "1=1" ? "semantic_vectors v JOIN memories m ON m.id=v.memory_id" : "memories m CROSS JOIN semantic_vectors v ON m.id=v.memory_id"
             let stmt = try prepare("SELECT m.id,m.embedding,m.timestamp FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? AND NOT EXISTS (SELECT 1 FROM semantic_vectors v WHERE v.memory_id=m.id AND v.model=m.embedding_model) UNION ALL SELECT m.id,v.vector,m.timestamp FROM \(vectorJoin) WHERE \(whereSQL) AND v.model=?")
@@ -422,7 +423,7 @@ extension MemoryStore {
 extension MemoryStore {
     /// Called inside the search's SQL snapshot. Only current, matching rows can
     /// become evidence. Mutations newer than the graph are searched exactly.
-    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int) throws -> [SemanticCandidate]? {
+    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int, strategy: (String) -> Void = { _ in }) throws -> [SemanticCandidate]? {
         lock.lock(); defer { lock.unlock() }
         try exec("SAVEPOINT index_candidate_snapshot"); defer { try? exec("RELEASE index_candidate_snapshot") }
         let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0)")
@@ -430,9 +431,25 @@ extension MemoryStore {
         guard sqlite3_step(state) == SQLITE_ROW else { throw failure() }
         let identity = string(state,0), head = sqlite3_column_int64(state,1), (whereSQL,values) = conditions(filter)
         return try annCache.withReady(modelID:modelID,dimensions:dimensions,identity:identity,snapshotHead:head) { native,sequence -> [SemanticCandidate]? in
+            strategy(native.strategy)
             let keyCount = min(2000,max(100,limit*2))
             var keys: [UInt64]
             if whereSQL == "1=1" { keys = try native.search(scorer.queryVector,count:keyCount) }
+            else if native is MetalFlatIndex {
+                // One SQL scope scan in this search snapshot, never one SQL
+                // statement per GPU row. Rebuilt on each query so metadata edits
+                // from any connection are visible without cache invalidation.
+                let allowed = try prepare("SELECT r.key FROM vector_keys r JOIN memories m ON m.id=r.memory_id WHERE r.model=? AND r.revision<=? AND \(whereSQL)")
+                defer { sqlite3_finalize(allowed) }; bind(allowed,1,modelID); sqlite3_bind_int64(allowed,2,sequence)
+                for (i,value) in values.enumerated() { bind(allowed,Int32(i+3),value) }
+                var allowedKeys = Set<UInt64>(), status = sqlite3_step(allowed)
+                while status == SQLITE_ROW {
+                    if allowedKeys.count%4096 == 0 { try Task.checkCancellation() }
+                    let key = sqlite3_column_int64(allowed,0); if key > 0 { allowedKeys.insert(UInt64(key)) }; status = sqlite3_step(allowed)
+                }
+                guard status == SQLITE_DONE else { throw failure() }
+                keys = try native.search(scorer.queryVector,count:keyCount,include:{ allowedKeys.contains($0) })
+            }
             else {
                 let allowed = try prepare("SELECT 1 FROM vector_keys r JOIN memories m ON m.id=r.memory_id WHERE r.key=? AND r.model=? AND r.revision<=? AND \(whereSQL)")
                 defer { sqlite3_finalize(allowed) }; var databaseError: Error?; let filterLock = NSLock()
