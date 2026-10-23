@@ -63,6 +63,7 @@ swift run oswindctl models list
 swift run oswindctl reindex --model qwen3-embedding:0.6b --use-model
 swift run oswindctl eval-retrieval --model qwen3-embedding:0.6b
 swift run oswindctl benchmark --count 1000
+swift run oswindctl benchmark-vectors --count 100000
 swift run oswindctl help
 ```
 

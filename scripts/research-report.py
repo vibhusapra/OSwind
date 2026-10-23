@@ -40,7 +40,7 @@ rows=[
 ('Retrieval','Hybrid fusion','tested','Apple RRF; GPU cosine + bounded lexical bonus; filters on both paths; cross-language regression test','Screenpipe, Retrace (jhammant)'),
 ('Retrieval','Visual / image semantic search','todo','No CLIP/VLM embeddings yet','TimeScroll, Recall'),
 ('Retrieval','Multilingual embeddings','tested','Optional Qwen3: 8 authored multilingual questions pass; larger independent corpus pending','TimeScroll/Ollama, configurable systems'),
-('Retrieval','ANN indexing for long archives','todo','Exact vector scan; need 100k/1m benchmark and ANN design','Configurable vector systems'),
+('Retrieval','ANN indexing for long archives','todo','100k exact p95 ~115 ms; 1m all-candidate p95 22.4 s fails target. ANN/partitioning and fault/recall validation remain open','Configurable vector systems'),
 ('Retrieval','App/date/kind/favorite/tag filters','tested','Inclusive start/exclusive end; bound SQL parameters','Most visual tools'),
 ('Retrieval','Natural-language dates and operators','todo','Explicit UI/ISO time filters; no date parser','Unlost, Pieces'),
 ('Retrieval','Timeline scrubbing','implemented','Snapshot strip, selection and source inspector; capped result window','Rewind Desktop, rem, ScreenMemory'),
@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','53 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','58 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar')
 ]
 features=[dict(id=f'F{i+1:03}',axis=a,feature=f,status=s,evidence=e,references=r) for i,(a,f,s,e,r) in enumerate(rows)]

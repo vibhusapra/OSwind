@@ -152,24 +152,22 @@ public final class MemoryStore: @unchecked Sendable {
             while sqlite3_step(stmt) == SQLITE_ROW { keyword.append(try decode(stmt)) }
             for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : (similarityFusion && mode == .hybrid ? Self.keywordBonus(query:filter.query,memory:memory,rank:rank) : 1 / Double(60 + rank)), match: query.isEmpty ? "recent" : "keyword") }
         }
-        if !query.isEmpty, mode != .keyword, let vector, let modelID {
-            let stmt = try prepare("SELECT m.id,m.embedding FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? UNION ALL SELECT m.id,v.vector FROM semantic_vectors v JOIN memories m ON m.id=v.memory_id WHERE \(whereSQL) AND v.model=?")
+        if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
+            let stmt = try prepare("SELECT m.id,m.embedding,m.timestamp FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? AND NOT EXISTS (SELECT 1 FROM semantic_vectors v WHERE v.memory_id=m.id AND v.model=m.embedding_model) UNION ALL SELECT m.id,v.vector,m.timestamp FROM semantic_vectors v JOIN memories m ON m.id=v.memory_id WHERE \(whereSQL) AND v.model=?")
             defer { sqlite3_finalize(stmt) }; for (i,v) in values.enumerated() { bind(stmt, Int32(i+1), v) }; bind(stmt, Int32(values.count + 1), modelID)
             for (i,v) in values.enumerated() { bind(stmt,Int32(values.count+2+i),v) }; bind(stmt,Int32(2*values.count+2),modelID)
-            var best = [(String, Double)]()
+            var best = SemanticTopK(capacity:max(limit,100))
             while sqlite3_step(stmt) == SQLITE_ROW {
                 let size = Int(sqlite3_column_bytes(stmt, 1)); guard size == vector.count * MemoryLayout<Float>.size, let bytes = sqlite3_column_blob(stmt, 1) else { continue }
-                let stored = Array(UnsafeBufferPointer(start: bytes.assumingMemoryBound(to: Float.self), count: vector.count))
-                let similarity = LocalEmbedder.cosine(vector, stored)
-                if similarity > minimumSimilarity { best.append((string(stmt, 0), similarity)) }
+                let similarity = scorer.score(bytes.assumingMemoryBound(to:Float.self),count:vector.count)
+                if similarity > minimumSimilarity, best.mayImprove(similarity) { best.offer(SemanticCandidate(id:string(stmt,0),similarity:similarity,timestamp:sqlite3_column_double(stmt,2))) }
             }
-            best.sort { $0.1 > $1.1 }
-            for (rank, pair) in best.prefix(max(limit, 100)).enumerated() {
-                if var hit = scored[pair.0] { hit.score += similarityFusion ? pair.1 : 1 / Double(60 + rank); hit.match = "hybrid"; scored[pair.0] = hit }
-                else if let memory = try get(pair.0) { scored[pair.0] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.1 : 1 / Double(60 + rank), match: "semantic") }
+            for (rank, pair) in best.sorted.enumerated() {
+                if var hit = scored[pair.id] { hit.score += similarityFusion ? pair.similarity : 1 / Double(60 + rank); hit.match = "hybrid"; scored[pair.id] = hit }
+                else if let memory = try get(pair.id) { scored[pair.id] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.similarity : 1 / Double(60 + rank), match: "semantic") }
             }
         }
-        return Array(scored.values.sorted { $0.score == $1.score ? $0.memory.timestamp > $1.memory.timestamp : $0.score > $1.score }.prefix(limit))
+        return Array(scored.values.sorted { a,b in a.score != b.score ? a.score > b.score : a.memory.timestamp != b.memory.timestamp ? a.memory.timestamp > b.memory.timestamp : a.id < b.id }.prefix(limit))
     }
     public func matchingCount(_ filter: SearchFilter = SearchFilter()) throws -> Int {
         lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)

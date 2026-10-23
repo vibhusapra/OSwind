@@ -41,6 +41,7 @@ do {
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
+          benchmark-vectors [--count N] [--dimensions N]  Exact-scan scaling stress
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
@@ -51,6 +52,10 @@ do {
         if #available(macOS 26, *) { result["appleIntelligence"] = SystemLanguageModel.default.isAvailable }
         #endif
         try emit(result)
+    } else if command == "benchmark-vectors" {
+        let count = Int(option("--count") ?? "10000") ?? 10000, dimensions = Int(option("--dimensions") ?? "1024") ?? 1024, repetitions = Int(option("--repetitions") ?? "3") ?? 3, output = option("--output")
+        let result = try VectorScalingEvaluation.run(count:count,dimensions:dimensions,repetitions:repetitions)
+        if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
     } else if command == "benchmark" {
         let count = min(50000,max(100,Int(option("--count") ?? "1000") ?? 1000))
         let output = option("--output")
