@@ -1,6 +1,6 @@
 # Isolated native diarization probe
 
-A component evaluator, separate from the app. It uses pinned FluidAudio 0.17.7 (Apache-2.0 code) and its Community-1 offline diarization assets (scoped CC BY 4.0; preserve upstream attribution/provenance). Model downloads go into the supplied cache directory. It exports segment labels/times, not speaker embeddings.
+A component evaluator, separate from the app. It uses pinned FluidAudio 0.17.7 (Apache-2.0 code) and its Community-1 offline diarization assets (scoped CC BY 4.0; preserve upstream attribution/provenance). The SDK pins the diarization model repo to `df2625ac79a7ac6b65ad868fee6d80f320da4232`; the report includes the actual cached-file SHA-256 manifest. Model downloads go into the supplied cache directory. It exports segment labels/times, not speaker embeddings.
 
 ```bash
 swift build --package-path tools/SpeechProbe -c release --disable-keychain --disable-netrc
