@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "fixture": "generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment",
+  "checks": [
+    "CLI file preparation, timestamp/session persistence and keyword retrieval",
+    "original clip retained privately, source never changed",
+    "detected secret suppresses complete raw clip and redacts both text representations",
+    "full media backup/restore preserves transcript/session and audio bytes",
+    "erasure removes owned clip only; malformed input fails"
+  ],
+  "limits": [
+    "mock ASR does not establish recognition quality",
+    "native capture/panels/playback acceptance remains separate"
+  ]
+}

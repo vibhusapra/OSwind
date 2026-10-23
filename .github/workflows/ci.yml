@@ -30,6 +30,8 @@ jobs:
         run: python3 scripts/query-scope-smoke.py .build/release/oswindctl --output .artifacts/query-scope-ci.json
       - name: Exercise complete backup, restore and interruption recovery
         run: python3 scripts/backup-smoke.py .build/release/oswindctl --interruptions --output .artifacts/backup-process-ci.json
+      - name: Exercise audio normalization, timestamp persistence and privacy
+        run: python3 scripts/audio-smoke.py .build/release/oswindctl --output .artifacts/audio-process-ci.json
       - name: Evaluate authored retrieval fixture
         run: |
           mkdir -p .artifacts
@@ -58,7 +60,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 7
+          assert report['count'] == 1000 and report['schema_version'] == 8
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes
@@ -88,3 +90,4 @@ jobs:
             .artifacts/query-scope-ci.json
             .artifacts/passages-apple-ci.json
             .artifacts/backup-process-ci.json
+            .artifacts/audio-process-ci.json

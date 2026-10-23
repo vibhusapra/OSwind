@@ -1,0 +1,32 @@
+{
+  "kind": "isolated upstream component smoke; not integrated into OSwind",
+  "sdk": {
+    "url": "https://github.com/FluidInference/FluidAudio",
+    "tag": "v0.17.7",
+    "commit": "503b4bd1bbf7220882de39fe8ae6716aae4132da",
+    "license": "Apache-2.0 code"
+  },
+  "model": {
+    "url": "https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v3-coreml",
+    "version": "v3",
+    "requested_encoder_units": "cpuAndNeuralEngine",
+    "license_note": "Model metadata lists CC BY 4.0; body mentions Apache 2.0. Verify actual base/model license and attribution before integration. Weights are not redistributed."
+  },
+  "fixture": {
+    "source": "https://github.com/ggml-org/whisper.cpp/blob/master/samples/jfk.wav",
+    "seconds": 11,
+    "description": "public, well-known JFK excerpt; not held-out"
+  },
+  "first_process_wall_seconds": 53.98,
+  "peak_rss_bytes": 547340288,
+  "reported_inference_seconds": 0.08253693580627441,
+  "reported_rtfx": 133.27367,
+  "word_timing_count": 22,
+  "text": "And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",
+  "limitations": [
+    "First total process includes download/model load/CoreML compilation; inference timing excludes those.",
+    "Own-process sample observed CoreML ANE compilation, not isolated energy or per-operation hardware utilization.",
+    "Uncontrolled caches; no independent word alignment or broad recognition-quality scoring.",
+    "No diarization trial or app integration yet."
+  ]
+}

@@ -63,8 +63,8 @@ rows=[
 ('Audio','Local GPU transcription','live verified','Official JFK audio fixture transcribed correctly with Whisper base.en; Metal backend available','Screenpipe, TimeScroll'),
 ('Audio','Silence gate / bounded queue','tested','WAV/RMS primitives tested; queue capped at 3 chunks','Always-on audio tools'),
 ('Audio','Speaker diarization / names','todo','Microphone/system labels only','Granola, Omi, Limitless'),
-('Audio','Meeting sessions / detection','todo','Continuous transcript segments; no calendar/call session UX','Granola, Littlebird, Omi'),
-('Audio','Custom vocabulary / timestamps','todo','Segment timestamp only; no word timing UI or hotword config','Omi, Granola'),
+('Audio','Meeting sessions / detection','partial','Capture/import session IDs persist; no calendar/call session grouping UX','Granola, Littlebird, Omi'),
+('Audio','Custom vocabulary / timestamps','partial','Validated segment timestamps and seek controls; no word highlighting or hotword configuration','Omi, Granola'),
 ('Privacy','App/domain/title exclusions','tested','Case-insensitive apps/titles, exact/subdomain boundaries','Recall, Screenpipe, Littlebird'),
 ('Privacy','Private-window exclusion','partial','Title heuristic; localized browser test matrix needed','Recall, TimeScroll, Retrace'),
 ('Privacy','Common secrets redaction','tested','Unit and live secret fixtures pass; raw image is suppressed. Not a complete PII/DLP model','Screenpipe, Minne, Recall'),
@@ -92,9 +92,10 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','197 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','210 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
-('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality')
+('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality'),
+('Audio','Retained clips / imports / playback','tested','Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain','Screenpipe, Omi, Limitless')
 ]
 features=[dict(id=f'F{i+1:03}',axis=a,feature=f,status=s,evidence=e,references=r) for i,(a,f,s,e,r) in enumerate(rows)]
 landscape=dict(reviewed='2026-10-22 America/Los_Angeles',method='Primary publisher pages and repository READMEs. Documented features are not independently tested competitor behavior. Pricing snapshots can change; annual equivalents are labeled. Never treat unchecked README roadmap items as shipped.',vendors=vendors)

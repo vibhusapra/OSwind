@@ -96,17 +96,19 @@ extension IndexMigrationTests {
 
 
 extension IndexMigrationTests {
-    func testSchemaSixUpgradePreservesStoreIdentityAndExistingVectorKeys() throws {
+    func testSchemaSixAndSevenUpgradesPreserveStoreIdentityAndExistingVectorKeys() throws {
+        for version in [6,7] {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }
         var store: MemoryStore? = try MemoryStore(root:root)
         let memory = Memory(id:"six",text:"Schema six source"); try store!.insert(memory)
         _ = try store!.saveVectors([VectorRecord(memory:memory,vector:[1,0])],modelID:"fixture")
         let original = try VectorIndexSource(root:root,modelID:"fixture",dimensions:2).state(); store = nil
         var handle: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK)
-        XCTAssertEqual(sqlite3_exec(handle,"PRAGMA user_version=6",nil,nil,nil),SQLITE_OK); sqlite3_close(handle)
+        XCTAssertEqual(sqlite3_exec(handle,"PRAGMA user_version=\(version)",nil,nil,nil),SQLITE_OK); sqlite3_close(handle)
         store = try MemoryStore(root:root)
         let upgraded = try VectorIndexSource(root:root,modelID:"fixture",dimensions:2).state()
         XCTAssertEqual(upgraded.identity,original.identity); XCTAssertEqual(upgraded.highKey,original.highKey)
         XCTAssertEqual(try store!.get(memory.id)?.text,memory.text)
+        }
     }
 }

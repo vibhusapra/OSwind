@@ -64,6 +64,7 @@ do {
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
+          import-audio PATH [--retain-audio] Transcribe and save an audio file locally
           delete ID                      Delete one memory and its media
           prune [--days N] [--max-gb N]   Apply retention
           capture [--app-bundle ID]      Capture a chosen/current window once
@@ -238,6 +239,16 @@ do {
         case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")
         case "prune": let days = Int(option("--days") ?? "30") ?? 30; let gb = Int64(option("--max-gb") ?? "20") ?? 20; guard days > 0 && gb > 0 else { throw OSwindError.invalid("Retention and budget must be positive") }; print(try store.prune(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000))
         case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
+        case "import-audio":
+            let settings=AppSettings.load(root:root), model=try validatedOption("--model") ?? settings.whisperModel
+            let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--model PATH] [--retain-audio]") }
+            let file=URL(fileURLWithPath:args[0]), clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
+            var transcript=try await Whisper.detailed(file:clip.speechFile,binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage,timeout:1800)
+            transcript.duration=clip.duration
+            var admission=settings; admission.retainAudio=retain
+            let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
+            do { _ = try await RetrievalEngine(store:store,apple:embedder).index([memory],configuration:settings.search) } catch { FileHandle.standardError.write(Data("Transcript saved; additional indexing pending.\n".utf8)) }
+            try encoded(memory)
         case "transcribe": let settings = AppSettings.load(root:root); let model = option("--model") ?? settings.whisperModel; guard let path = args.first else { throw OSwindError.invalid("Enter an audio file path") }; print(try await Whisper.transcribe(file:URL(fileURLWithPath:path),binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage))
         case "serve": let server = try LocalAPIServer(store:store,embedder:embedder); server.onState = { print($0); fflush(stdout) }; try server.start(); print("Token file: \(store.root.appendingPathComponent("api-token").path)"); while true { try await Task.sleep(nanoseconds:1_000_000_000) }
         case "mcp":

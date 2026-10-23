@@ -16,21 +16,36 @@ public enum WAV {
 }
 public enum Whisper {
     public static func transcribe(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120) async throws -> String {
-        guard FileManager.default.isExecutableFile(atPath: binary), FileManager.default.fileExists(atPath: model) else { throw OSwindError.unavailable("Install whisper.cpp and choose a downloaded ggml model in Settings → Audio") }
-        let task = Task.detached(priority: .utility) {
-            let prefix = FileManager.default.temporaryDirectory.appendingPathComponent("oswind-whisper-" + UUID().uuidString)
-            let log = prefix.appendingPathExtension("log"); FileManager.default.createFile(atPath: log.path, contents: nil)
-            let handle = try FileHandle(forWritingTo: log); defer { try? handle.close(); try? FileManager.default.removeItem(at: log); try? FileManager.default.removeItem(at: prefix.appendingPathExtension("txt")) }
-            let process = Process(); process.executableURL = URL(fileURLWithPath: binary); process.arguments = ["-m",model,"-f",file.path,"-l",language,"-otxt","-of",prefix.path,"-np","-t","4"]; process.standardOutput = handle; process.standardError = handle
-            try process.run()
-            defer { if process.isRunning { process.terminate() } }
-            let deadline = Date().addingTimeInterval(timeout)
-            while process.isRunning && Date() < deadline { try await Task.sleep(nanoseconds: 100_000_000) }
+        try await detailed(file:file,binary:binary,model:model,language:language,timeout:timeout).text
+    }
+    public static func detailed(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120) async throws -> SpeechTranscript {
+        guard timeout.isFinite,timeout>0,FileManager.default.isExecutableFile(atPath:binary),FileManager.default.fileExists(atPath:model) else { throw OSwindError.unavailable("Install whisper.cpp and choose a downloaded ggml model in Settings → Audio") }
+        let task=Task.detached(priority:.utility) {
+            _ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-transcription","oswind-audio-chunk"])
+            let scratch=try BackupWorkspace(label:"oswind-transcription"), prefix=scratch.url.appendingPathComponent("transcript")
+            defer { withExtendedLifetime(scratch) {} }
+            let log=prefix.appendingPathExtension("log"); try Data().write(to:log); let handle=try FileHandle(forWritingTo:log); defer { try? handle.close() }
+            let process=Process(); process.executableURL=URL(fileURLWithPath:binary); process.arguments=["-m",model,"-f",file.path,"-l",language,"-oj","-of",prefix.path,"-np","-t","4"]; process.standardOutput=handle; process.standardError=handle
+            try Task.checkCancellation(); try process.run(); defer { if process.isRunning { process.terminate() } }
+            let deadline=ContinuousClock.now.advanced(by:.seconds(timeout))
+            while process.isRunning && ContinuousClock.now<deadline { try await Task.sleep(nanoseconds:100_000_000) }
             if process.isRunning { process.terminate(); throw OSwindError.unavailable("Transcription exceeded its time budget") }
-            guard process.terminationStatus == 0 else { throw OSwindError.unavailable("whisper.cpp could not transcribe the segment; verify the model and input format") }
-            return try String(contentsOf: prefix.appendingPathExtension("txt"), encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
+            try Task.checkCancellation()
+            guard process.terminationStatus==0 else { throw OSwindError.unavailable("whisper.cpp could not transcribe the segment; verify the model and input format") }
+            return try parseJSON(scratch.tree.read("transcript.json",limit:32*1024*1024),model:"whisper:"+URL(fileURLWithPath:model).lastPathComponent)
         }
-        return try await withTaskCancellationHandler(operation: { try await task.value }, onCancel: { task.cancel() })
+        return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+    }
+    public static func parseJSON(_ data: Data, model: String) throws -> SpeechTranscript {
+        struct Document: Decodable {
+            struct Segment: Decodable { struct Offsets: Decodable {var from: Double; var to: Double}; var offsets: Offsets; var text: String }
+            var transcription: [Segment]
+        }
+        guard data.count<=32*1024*1024 else { throw OSwindError.invalid("Whisper output is too large") }
+        let document=try JSONDecoder().decode(Document.self,from:data)
+        let segments=document.transcription.map { TranscriptSegment(start:$0.offsets.from/1000,end:$0.offsets.to/1000,text:$0.text.trimmingCharacters(in:.whitespacesAndNewlines)) }
+        let text=segments.map(\.text).joined(separator:" "), duration=segments.map(\.end).max() ?? 0
+        return try SpeechTranscript(text:text,duration:duration,segments:segments,model:model).validated()
     }
 }
 private final class AudioAccumulator: @unchecked Sendable {
@@ -56,7 +71,8 @@ private final class AudioAccumulator: @unchecked Sendable {
     private var pending: [(samples: [Float], date: Date, source: String)] = []
     private var processing = false
     private var finishing = false
-    private var transcriptionTask: Task<String,Error>?
+    private var transcriptionTask: Task<SpeechTranscript,Error>?
+    private var sessionID = UUID().uuidString
     private var privacyTimer: Timer?
     private var epoch = UUID()
     private let store: MemoryStore
@@ -68,7 +84,7 @@ private final class AudioAccumulator: @unchecked Sendable {
         guard !SessionState.locked else { status = "Locked · audio suspended"; return }
         guard FileManager.default.isExecutableFile(atPath: settings.whisperBinary), FileManager.default.fileExists(atPath: settings.whisperModel) else { status = "Choose a local Whisper model first"; return }
         guard settings.audioEnabled || settings.systemAudioEnabled else { status = "Enable an audio source in Settings"; return }
-        epoch = UUID(); finishing = false; running = true
+        epoch = UUID(); sessionID = UUID().uuidString; finishing = false; running = true
         do {
             if settings.audioEnabled {
                 guard await AVCaptureDevice.requestAccess(for: .audio) else { throw OSwindError.unavailable("Microphone access required") }
@@ -134,14 +150,20 @@ private final class AudioAccumulator: @unchecked Sendable {
         guard !processing else { return }; processing = true; defer { processing = false }
         while !pending.isEmpty {
             let chunk = pending.removeFirst(), token = epoch, config = settings
-            let file = store.root.appendingPathComponent("audio/pending-\(UUID().uuidString).wav")
+            guard let operation=try? BackupWorkspace(label:"oswind-audio-chunk") else { status="Cannot create private audio workspace"; continue }
+            defer { withExtendedLifetime(operation) {} }
+            let file=operation.url.appendingPathComponent("capture.wav")
             do {
-                try WAV.data(samples: chunk.samples).write(to: file); defer { try? FileManager.default.removeItem(at: file) }
-                let task = Task { try await Whisper.transcribe(file:file,binary:config.whisperBinary,model:config.whisperModel,language:config.transcriptionLanguage) }; transcriptionTask = task
-                let text = try await task.value; transcriptionTask = nil
-                guard token == epoch && !SessionState.locked && !text.isEmpty else { continue }
-                var m = Memory(timestamp: chunk.date, endTimestamp: chunk.date.addingTimeInterval(Double(chunk.samples.count)/16000), kind: .audio, app: chunk.source, title: "\(chunk.source) transcript", text: config.privacy.sanitize(text).text)
-                m.embedding = embedder.embed(m.text); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); if config.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) }; transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
+                try WAV.data(samples: chunk.samples).write(to:file,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path); defer { try? FileManager.default.removeItem(at: file) }
+                let task = Task { try await Whisper.detailed(file:file,binary:config.whisperBinary,model:config.whisperModel,language:config.transcriptionLanguage) }; transcriptionTask = task
+                var transcript = try await task.value; transcriptionTask = nil
+                guard token == epoch && !SessionState.locked else { continue }
+                if let context=AccessibilityContext.current(),settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) != nil { continue }
+                transcript.duration=Double(chunk.samples.count)/16000
+                let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:sessionID,embedder:embedder)
+                transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
+                do { if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) } }
+                catch { status="Transcript saved · additional indexing pending" }
             } catch { if !(error is CancellationError) { status = error.localizedDescription }; try? FileManager.default.removeItem(at: file) }
         }
     }

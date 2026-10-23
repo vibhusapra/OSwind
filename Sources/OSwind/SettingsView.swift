@@ -137,12 +137,15 @@ struct SettingsView: View {
             Section("Local audio transcription") {
                 Toggle("Microphone",isOn:$m.settings.audioEnabled)
                 Toggle("System audio",isOn:$m.settings.systemAudioEnabled)
+                Toggle("Retain audio clips for playback",isOn:$m.settings.retainAudio)
                 TextField("whisper.cpp executable",text:$m.settings.whisperBinary)
                 TextField("Whisper ggml model file",text:$m.settings.whisperModel)
                 Button("Choose model…") { let panel = NSOpenPanel(); if panel.runModal() == .OK, let url = panel.url { m.settings.whisperModel = url.path } }
                 TextField("Language (en, auto, fr…)",text:$m.settings.transcriptionLanguage)
+                HStack { Button("Import audio file…") { m.importAudio() }.disabled(m.importingAudio); if m.importingAudio { ProgressView().controlSize(.small); Button("Cancel import") { m.cancelAudioImport() } } }
+                if !m.audioImportStatus.isEmpty { Text(m.audioImportStatus).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
                 HStack { Button(m.audio.running ? "Stop audio" : "Start audio") { if m.audio.running { m.audio.finish() } else { Task { await m.audio.start() } } }; Text(m.audio.status).font(.caption).foregroundStyle(.secondary) }
-                Text("30-second chunks, simple energy gate, bounded transcription queue. Raw chunks are deleted after processing; only redacted transcripts are retained. Microphone and system audio are labeled separately, not speaker-diarized. Stop audio before private conversations.").font(.caption).foregroundStyle(.secondary)
+                Text("30-second chunks, simple energy gate, bounded transcription queue. Clip retention is off by default. When enabled, a detected secret suppresses the entire raw clip; transcript text is redacted. Clips follow your storage/retention limits. Microphone and system audio are labeled separately, not speaker-diarized. Stop audio before private conversations.").font(.caption).foregroundStyle(.secondary)
             }
         }
     }

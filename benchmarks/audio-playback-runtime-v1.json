@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "fixture": "generated 2-second mono PCM, player volume zero",
+  "test": "OSwindAppTests.AudioPlaybackTests.testMutedRuntimeSeekPauseFinishAndDeletion",
+  "checks": [
+    "actual player time advances",
+    "pause freezes published position",
+    "seeking changes position",
+    "completion callback updates playing/time",
+    "deleting active clip stops player"
+  ],
+  "normal_run_seconds": 1.662,
+  "also_passes_thread_sanitizer": true,
+  "limits": [
+    "muted runtime; no human listening or native button/focus acceptance",
+    "microphone/system input and device changes remain separate"
+  ]
+}
