@@ -20,6 +20,7 @@ public final class MemoryStore: @unchecked Sendable {
         );
         CREATE INDEX IF NOT EXISTS memories_time ON memories(timestamp DESC);
         CREATE INDEX IF NOT EXISTS memories_app_time ON memories(app, timestamp DESC);
+        CREATE INDEX IF NOT EXISTS memories_embedding_model ON memories(embedding_model);
         CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(id UNINDEXED, title, app, text, tokenize='unicode61 remove_diacritics 2');
         CREATE TRIGGER IF NOT EXISTS memory_insert AFTER INSERT ON memories BEGIN
             INSERT INTO memory_fts(id,title,app,text) VALUES(new.id,new.title,new.app,new.text);
@@ -31,7 +32,16 @@ public final class MemoryStore: @unchecked Sendable {
             DELETE FROM memory_fts WHERE id=old.id;
             INSERT INTO memory_fts(id,title,app,text) VALUES(new.id,new.title,new.app,new.text);
         END;
-        PRAGMA user_version=1;
+        CREATE TABLE IF NOT EXISTS semantic_vectors (
+            memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+            model TEXT NOT NULL, dimension INTEGER NOT NULL, vector BLOB NOT NULL,
+            content_hash TEXT NOT NULL, PRIMARY KEY(memory_id,model)
+        );
+        CREATE INDEX IF NOT EXISTS semantic_model ON semantic_vectors(model);
+        CREATE TRIGGER IF NOT EXISTS semantic_content_update AFTER UPDATE OF title,app,text,url ON memories
+        WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url
+        BEGIN DELETE FROM semantic_vectors WHERE memory_id=new.id; END;
+        PRAGMA user_version=2;
         """)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
@@ -84,10 +94,22 @@ public final class MemoryStore: @unchecked Sendable {
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM json_each(CAST(\(prefix)payload AS TEXT), '$.tags') WHERE value=?)"); values.append(tag) }
         return (parts.joined(separator: " AND "), values)
     }
-    public static func ftsQuery(_ input: String) -> String {
-        input.split(whereSeparator: { !$0.isLetter && !$0.isNumber }).prefix(24).map { "\"\($0)\"*" }.joined(separator: " OR ")
+    public static func queryTerms(_ input: String) -> [String] {
+        let stopwords: Set<String> = ["a","an","the","and","or","is","are","was","were","be","been","being","to","of","for","in","on","at","by","from","with","as","it","its","s","t","do","does","did","can","could","would","should","will","we","our","i","my","me","you","your","they","their","this","that","these","those","what","which","who","when","where","how","why","about","before","after","la","le","les","el","los","las","de","del","du","des","un","une","en","et","y","que","qui","comment","por","para"]
+        let all = input.lowercased().split(whereSeparator:{ !$0.isLetter && !$0.isNumber }).map(String.init)
+        let content = all.filter { !stopwords.contains($0) }
+        return Array((content.isEmpty ? all : content).prefix(24))
     }
-    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil) throws -> [SearchHit] {
+    public static func ftsQuery(_ input: String) -> String { queryTerms(input).map { "\"\($0)\"*" }.joined(separator:" OR ") }
+    private static func keywordBonus(query: String, memory: Memory, rank: Int) -> Double {
+        let terms = queryTerms(query); guard !terms.isEmpty else { return 0 }
+        let words = memory.searchableText.lowercased().split(whereSeparator:{ !$0.isLetter && !$0.isNumber })
+        let coverage = Double(terms.filter { term in words.contains { $0.hasPrefix(term) } }.count)/Double(terms.count)
+        // A bounded lexical bonus breaks close semantic ties without letting a
+        // single matching question word overwhelm a cross-language match.
+        return 0.08 * coverage / (1 + Double(rank)*0.1)
+    }
+    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false) throws -> [SearchHit] {
         lock.lock(); defer { lock.unlock() }
         let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter)
         let query = Self.ftsQuery(filter.query)
@@ -98,25 +120,59 @@ public final class MemoryStore: @unchecked Sendable {
             if !query.isEmpty { bind(stmt, index, query); index += 1 }
             for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty ? limit : max(limit, 100)))
             while sqlite3_step(stmt) == SQLITE_ROW { keyword.append(try decode(stmt)) }
-            for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : 1 / Double(60 + rank), match: query.isEmpty ? "recent" : "keyword") }
+            for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : (similarityFusion && mode == .hybrid ? Self.keywordBonus(query:filter.query,memory:memory,rank:rank) : 1 / Double(60 + rank)), match: query.isEmpty ? "recent" : "keyword") }
         }
         if !query.isEmpty, mode != .keyword, let vector, let modelID {
-            let stmt = try prepare("SELECT m.id,m.embedding FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=?")
+            let stmt = try prepare("SELECT m.id,m.embedding FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? UNION ALL SELECT m.id,v.vector FROM semantic_vectors v JOIN memories m ON m.id=v.memory_id WHERE \(whereSQL) AND v.model=?")
             defer { sqlite3_finalize(stmt) }; for (i,v) in values.enumerated() { bind(stmt, Int32(i+1), v) }; bind(stmt, Int32(values.count + 1), modelID)
+            for (i,v) in values.enumerated() { bind(stmt,Int32(values.count+2+i),v) }; bind(stmt,Int32(2*values.count+2),modelID)
             var best = [(String, Double)]()
             while sqlite3_step(stmt) == SQLITE_ROW {
                 let size = Int(sqlite3_column_bytes(stmt, 1)); guard size == vector.count * MemoryLayout<Float>.size, let bytes = sqlite3_column_blob(stmt, 1) else { continue }
                 let stored = Array(UnsafeBufferPointer(start: bytes.assumingMemoryBound(to: Float.self), count: vector.count))
                 let similarity = LocalEmbedder.cosine(vector, stored)
-                if similarity > 0.15 { best.append((string(stmt, 0), similarity)) }
+                if similarity > minimumSimilarity { best.append((string(stmt, 0), similarity)) }
             }
             best.sort { $0.1 > $1.1 }
             for (rank, pair) in best.prefix(max(limit, 100)).enumerated() {
-                if var hit = scored[pair.0] { hit.score += 1 / Double(60 + rank); hit.match = "hybrid"; scored[pair.0] = hit }
-                else if let memory = try get(pair.0) { scored[pair.0] = SearchHit(memory: memory, score: mode == .semantic ? pair.1 : 1 / Double(60 + rank), match: "semantic") }
+                if var hit = scored[pair.0] { hit.score += similarityFusion ? pair.1 : 1 / Double(60 + rank); hit.match = "hybrid"; scored[pair.0] = hit }
+                else if let memory = try get(pair.0) { scored[pair.0] = SearchHit(memory: memory, score: mode == .semantic || similarityFusion ? pair.1 : 1 / Double(60 + rank), match: "semantic") }
             }
         }
         return Array(scored.values.sorted { $0.score == $1.score ? $0.memory.timestamp > $1.memory.timestamp : $0.score > $1.score }.prefix(limit))
+    }
+    public func matchingCount(_ filter: SearchFilter = SearchFilter()) throws -> Int {
+        lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
+        let stmt = try prepare("SELECT COUNT(*) FROM memories m WHERE \(whereSQL)"); defer { sqlite3_finalize(stmt) }
+        for (i,v) in values.enumerated() { bind(stmt,Int32(i+1),v) }
+        return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
+    }
+    public func vectorCount(modelID: String, filter: SearchFilter = SearchFilter()) throws -> Int {
+        lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
+        let stmt = try prepare("SELECT COUNT(DISTINCT m.id) FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? WHERE \(whereSQL) AND (m.embedding_model=? AND m.embedding IS NOT NULL OR v.memory_id IS NOT NULL)")
+        defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); for (i,v) in values.enumerated() { bind(stmt,Int32(i+2),v) }; bind(stmt,Int32(values.count+2),modelID)
+        return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
+    }
+    public func memoriesNeedingVectors(modelID: String, afterID: String = "", limit: Int = 16) throws -> [Memory] {
+        lock.lock(); defer { lock.unlock() }
+        let stmt = try prepare("SELECT m.payload FROM memories m LEFT JOIN semantic_vectors v ON v.memory_id=m.id AND v.model=? WHERE v.memory_id IS NULL AND m.id>? ORDER BY m.id LIMIT ?")
+        defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); bind(stmt,2,afterID); sqlite3_bind_int(stmt,3,Int32(min(32,max(1,limit))))
+        var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; return memories
+    }
+    @discardableResult public func saveVectors(_ records: [VectorRecord], modelID: String) throws -> Int {
+        lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); var count = 0
+        do {
+            for record in records {
+                guard !record.vector.isEmpty, record.vector.count <= 8192, record.vector.allSatisfy(\.isFinite), let memory = try get(record.memoryID), memory.contentHash == record.contentHash else { continue }
+                let stmt = try prepare("INSERT INTO semantic_vectors(memory_id,model,dimension,vector,content_hash) VALUES(?,?,?,?,?) ON CONFLICT(memory_id,model) DO UPDATE SET dimension=excluded.dimension,vector=excluded.vector,content_hash=excluded.content_hash")
+                defer { sqlite3_finalize(stmt) }; bind(stmt,1,record.memoryID); bind(stmt,2,modelID); sqlite3_bind_int(stmt,3,Int32(record.vector.count)); _ = record.vector.withUnsafeBytes { sqlite3_bind_blob(stmt,4,$0.baseAddress,Int32($0.count),transient) }; bind(stmt,5,record.contentHash)
+                guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; count += 1
+            }
+            try exec("COMMIT"); return count
+        } catch { try? exec("ROLLBACK"); throw error }
+    }
+    public func semanticIndexes() throws -> [String:Int] {
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT model,COUNT(*) FROM semantic_vectors GROUP BY model"); defer { sqlite3_finalize(stmt) }; var result = [String:Int](); while sqlite3_step(stmt) == SQLITE_ROW { result[string(stmt,0)] = Int(sqlite3_column_int(stmt,1)) }; return result
     }
     public func timelineSample(_ filter: SearchFilter, limit: Int = 24) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }

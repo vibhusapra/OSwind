@@ -10,7 +10,11 @@ import SwiftUI
             let dimensions = CommandLine.arguments[index+1].split(separator:"x").compactMap { Double($0) }
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
-        let view = NSHostingView(rootView:WorkspaceView().environmentObject(model).frame(width:size.width,height:size.height))
+        let content: AnyView
+        if model.section == "SettingsModels" {
+            size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Models").environmentObject(model))
+        } else { content = AnyView(WorkspaceView().environmentObject(model)) }
+        let view = NSHostingView(rootView:content.frame(width:size.width,height:size.height))
         let window = NSWindow(contentRect:NSRect(origin:.zero,size:size),styleMask:[.titled],backing:.buffered,defer:false)
         window.isReleasedWhenClosed = false; window.contentView = view
         view.layoutSubtreeIfNeeded(); window.displayIfNeeded()

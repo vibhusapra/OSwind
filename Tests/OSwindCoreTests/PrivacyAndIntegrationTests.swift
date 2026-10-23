@@ -56,19 +56,20 @@ final class PrivacyAndIntegrationTests: XCTestCase {
     func testSettingsRoundTripWithoutSecrets() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }; var s = AppSettings(); s.profile = .light; s.privacy.retentionDays = 7; try s.save(root:root); XCTAssertEqual(AppSettings.load(root:root),s)
     }
-    func testReadOnlyAPIAuthenticationAndOrigin() throws {
+    func testReadOnlyAPIAuthenticationAndOrigin() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }; let store = try MemoryStore(root:root); let api = try LocalAPIServer(store:store,embedder:LocalEmbedder())
         func request(_ path: String = "/health",extra: String = "",authorized: Bool = true,host: String = "127.0.0.1:47831") -> String { "GET \(path) HTTP/1.1\r\nHost: \(host)\r\n\(authorized ? "Authorization: Bearer " + api.token + "\r\n" : "")\(extra)\r\n" }
-        XCTAssertEqual(api.handle(request()).0,200); XCTAssertEqual(api.handle(request(authorized:false)).0,401); XCTAssertEqual(api.handle(request(extra:"Origin: https://evil.example\r\n")).0,403); XCTAssertEqual(api.handle(request(host:"evil.example")).0,403); XCTAssertEqual(api.handle("POST /v1/delete HTTP/1.1\r\n\r\n").0,405); XCTAssertEqual(api.handle(request("/notfound")).0,404)
-        try store.insert(Memory(text:"special marker")); let result = api.handle(request("/v1/search?query=special&mode=keyword")); XCTAssertEqual(result.0,200); XCTAssertEqual((result.1 as? [[String:Any]])?.count,1)
+        let checks: [(String,Int)] = [(request(),200),(request(authorized:false),401),(request(extra:"Origin: https://evil.example\r\n"),403),(request(host:"evil.example"),403),("POST /v1/delete HTTP/1.1\r\n\r\n",405),(request("/notfound"),404)]
+        for (input,expected) in checks { let response = await api.handle(input); XCTAssertEqual(response.0,expected) }
+        try store.insert(Memory(text:"special marker")); let result = await api.handle(request("/v1/search?query=special&mode=keyword")); XCTAssertEqual(result.0,200); XCTAssertEqual(((result.1 as? [String:Any])?["hits"] as? [[String:Any]])?.count,1)
     }
-    func testMCPNegotiationAndSearch() throws {
+    func testMCPNegotiationAndSearch() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }; let store = try MemoryStore(root:root); let embedder = LocalEmbedder()
-        let response = Integration.rpc(["jsonrpc":"2.0","id":1,"method":"initialize","params":["protocolVersion":"2025-06-18"]],store:store,embedder:embedder)
+        let response = await Integration.rpc(["jsonrpc":"2.0","id":1,"method":"initialize","params":["protocolVersion":"2025-06-18"]],store:store,embedder:embedder)
         XCTAssertEqual((response?["result"] as? [String:Any])?["protocolVersion"] as? String,"2025-06-18")
-        XCTAssertNil(Integration.rpc(["jsonrpc":"2.0","method":"notifications/initialized"],store:store,embedder:embedder))
-        XCTAssertNotNil(Integration.rpc(["jsonrpc":"2.0","id":2,"method":"tools/list"],store:store,embedder:embedder)?["result"])
-        let call = Integration.rpc(["jsonrpc":"2.0","id":3,"method":"tools/call","params":["name":"delete_all"]],store:store,embedder:embedder)
+        let notification = await Integration.rpc(["jsonrpc":"2.0","method":"notifications/initialized"],store:store,embedder:embedder); XCTAssertNil(notification)
+        let listing = await Integration.rpc(["jsonrpc":"2.0","id":2,"method":"tools/list"],store:store,embedder:embedder); XCTAssertNotNil(listing?["result"])
+        let call = await Integration.rpc(["jsonrpc":"2.0","id":3,"method":"tools/call","params":["name":"delete_all"]],store:store,embedder:embedder)
         XCTAssertEqual((call?["result"] as? [String:Any])?["isError"] as? Bool,true)
     }
     func testEvidenceModeAndNoResultsAbstention() async throws {

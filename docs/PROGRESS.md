@@ -1,13 +1,13 @@
 # OSwind delivery ledger
 
-Updated 2026-10-22, America/Los_Angeles. Goal remains active. The previous interrupted goal turn made no tool progress; this turn created the implementation and verified the evidence below.
+Updated 2026-10-22, America/Los_Angeles. Goal remains active. This ledger records implementation, direct evidence and remaining release gates.
 
 The full objective is an open-source macOS desktop-memory product with meaningful broad parity, local GPU inference, optional BYOK, great daily-use design, sustained performance, current research, tests, progress tracking and comparative benchmarks. **Feature completeness and top-three placement are not established.** Remaining work is preserved in the 72-row [feature ledger](features.json), its [interactive report](landscape.html) and the release gates here.
 
 ## Implemented and directly verified
 
 - Native Swift package builds in debug and release on macOS 26.6.2 / Swift 6.3.3 / M5 Max. Ad-hoc signed .app packages successfully; a debug app process ran with isolated sample data.
-- 29 XCTest cases pass: durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
+- 42 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
 - CLI durable note/search and real stdio MCP initialize/list/search smoke pass. Live loopback HTTP health/stats/search/get pass; unauthorized requests return 401, browser Origin and bad Host return 403.
 - Apple Intelligence answered the local synthetic ownership question with the correct owner and [1] citation (~0.70 seconds in a repeated sample).
 - Ollama qwen3:4b answered the same question with correct owner and [1] (~3.75 seconds warm sample). Runtime `ollama ps` reported 100% GPU, 8192 context. Reasoning text is stripped before display.
@@ -19,6 +19,11 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - CLI attempted capture while the Mac was locked and correctly reported `Locked · capture suspended`. Initial native UI automation could not proceed because the Mac was locked; the later unlocked state enabled targeted synthetic capture verification. No attempt was made to bypass the lock.
 - Native sample workspace rendered from its own NSHostingView and visually inspected without reading the desktop; search-mode label wrapping was fixed. Live keyboard, permissions and capture interactions remain unverified. Sample render is saved in `assets/workspace-sample.png`; a light-mode minimum-window layout and the Ask view were also rendered and inspected. Added appearance-aware accent contrast and a visible audio-only recording state.
 - Interactive research report reviewed in an in-app browser at desktop and narrow layout; feature filtering works (vault query: 1 of 72 requirements). Repaired a JavaScript newline escaping error found during review.
+
+- Optional Qwen3-Embedding 0.6B local index runs on the Mac GPU. Model digests/dimensions version the vectors; batch writes check content hashes and cannot resurrect deleted evidence. Native settings and CLI provide discovery, download progress/cancellation, runtime residency and resumable indexing. Shared search powers UI, answers, HTTP and MCP; unavailable Hybrid semantics explicitly fall back to keyword results. Semantic-only fails explicitly. Existing user model daemons are never replaced.
+- A 32-document / 35-query authored relevance fixture includes 31 answerable questions (paraphrase, code, multilingual and filtered) and 4 unanswerable questions. Qwen3 hybrid and semantic both achieved Recall@5/MRR@5 of 1.0; hybrid p95 ~92 ms. Apple hybrid Recall@5 .871, MRR .720, p95 ~4.7 ms. This small fixture does not establish broad superiority. All modes returned candidates for all unanswerable queries: abstention remains unsolved. See `benchmarks/README.md`.
+- Version-1 store migration, content/version races, stale vectors, cross-language fusion, cloud model aliases and explicit fallback have regression coverage. The real managed-server lifecycle is tested only when `OSWIND_TEST_MANAGED_RUNTIME=1` is set.
+- The Models page was rendered and inspected. A live settings interaction attempt was blocked by the Mac lock; native model controls still need unlocked interaction review.
 
 ## Implemented, broader runtime checks still needed
 
@@ -38,11 +43,11 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 
 - [ ] Native interaction/permission flow, automatic foreground transitions, browser URL metadata/private-window tests. Real targeted screen capture and sampled layout rendering pass.
 - [ ] End-to-end mic/system audio, short recordings, device changes, queue pressure and pause/lock boundaries. Subprocess cancellation is covered by an automated test.
-- [ ] Stronger semantic/multilingual/multimodal retrieval and a diverse labeled relevance suite; current baseline is insufficient for state-of-the-art claims.
+- [ ] Extend the new multilingual relevance suite to realistic larger archives, adversarial questions and abstention; add multimodal retrieval. Qwen3 local embedding and the authored 35-query suite are delivered; state-of-the-art claims remain unproven.
 - [ ] Durable chats/follow-ups, natural-language time filters, scheduled routines, meeting sessions/diarization, calendar view and query-specific highlights.
 - [ ] Encrypted vault/biometric unlock, stronger PII/image redaction, granular range/app/site erasure.
 - [ ] Compressed video/media backup/restore, Markdown export, Rewind/Limitless migration, collector/plugin SDK.
-- [ ] Model discovery/download UX, status/progress and provider contract tests beyond validation/parse paths.
+- [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; 100k+ scaling, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
 - [x] [Draft PR #1](https://github.com/vibhusapra/OSwind/pull/1) opened; initial GitHub macOS build/tests/package/CLI smoke passed. Later commits require their own checks.

@@ -10,14 +10,16 @@ Enable in app Settings → Connect, or run:
 swift run oswindctl serve
 ```
 
-The server binds to `127.0.0.1:47831` only. Every request, including health, requires `Authorization: Bearer TOKEN`. The token is generated from 32 cryptographic random bytes and saved at `~/Library/Application Support/OSwind/api-token` with mode 0600. Browser Origin headers are rejected. CORS is not enabled. No mutations, model calls, shell execution or external integrations are exposed.
+The server binds to `127.0.0.1:47831` only. Every request, including health, requires `Authorization: Bearer TOKEN`. The token is generated from 32 cryptographic random bytes and saved at `~/Library/Application Support/OSwind/api-token` with mode 0600. Browser Origin headers are rejected. CORS is not enabled. No mutations, answer generation, shell execution or external integrations are exposed. Semantic/Hybrid search can call the configured loopback embedding server; keyword mode has no model dependency.
 
 - `GET /health`
 - `GET /v1/stats`
 - `GET /v1/search?query=release&mode=hybrid&limit=20`
 - `GET /v1/memories/{id}`
 
-Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Returned dates are ISO 8601. Assets are relative paths, not served over HTTP.
+Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Returned dates are ISO 8601. Assets are relative paths, not served over HTTP. HTTP and MCP search return an envelope: `{ "hits": [...], "warnings": [...], "modelID": "..." | null, "duration": 0.1 }`. `duration` is seconds. Clients should show warnings for partial index coverage and Hybrid keyword fallback. Semantic-only returns an error if the selected model is unavailable. These paths read the store's `settings.json` search configuration; vectors must be built for the selected model first.
+
+CLI search prints the hit array by default, with warnings on stderr. Add `--details` for the same envelope. The HTTP header deadline is separate from model inference timeouts.
 
 ## MCP stdio
 

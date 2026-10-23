@@ -26,6 +26,9 @@ do {
           note TEXT                      Save a redacted, searchable note
           stats                          Storage and capture counts
           config                         Print settings (no API keys)
+          models list|status|pull NAME    Inspect/download local Ollama models
+          reindex [--model NAME] [--use-model]  Build/resume local GPU search vectors
+          eval-retrieval [--model NAME]   Evaluate the diverse relevance fixture
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           delete ID                      Delete one memory and its media
@@ -80,10 +83,30 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "eval-retrieval":
+            let fixture = option("--fixture") ?? "benchmarks/fixtures/desktop-retrieval-v1.json", output = option("--output")
+            var configuration = SearchConfiguration(); if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            let result = try await RetrievalEvaluation.run(fixture:URL(fileURLWithPath:fixture),configuration:configuration,repetitions:Int(option("--repetitions") ?? "3") ?? 3)
+            if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }
+            try emit(result)
+        case "models":
+            let action = args.first ?? "list"; if !args.isEmpty { args.removeFirst() }; let endpoint = option("--endpoint") ?? AppSettings.load(root:root).search.endpoint
+            if action == "list" { try encoded(await OllamaClient.shared.models(endpoint:endpoint)) }
+            else if action == "status" { print(try await OllamaClient.shared.runtime(endpoint:endpoint)) }
+            else if action == "pull" { guard let name = args.first else { throw OSwindError.invalid("Enter a local model name") }; try await OllamaClient.shared.pull(name,endpoint:endpoint) { state in FileHandle.standardError.write(Data((state.status + (state.fraction.map { " \(Int($0*100))%" } ?? "") + "\n").utf8)) }; print("Download complete") }
+            else { throw OSwindError.invalid("Use models list, status or pull NAME") }
+        case "reindex":
+            var settings = AppSettings.load(root:root), configuration = settings.search; configuration.provider = .ollama
+            configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            try await RetrievalEngine(store:store,apple:embedder).rebuild(configuration:configuration) { state in FileHandle.standardError.write(Data("\(state.indexed)/\(state.total) indexed\n".utf8)) }
+            if args.contains("--use-model") { settings.search = configuration; try settings.save(root:root) }
+            try emit(store.semanticIndexes())
         case "config": try encoded(AppSettings.load(root:root))
         case "stats": try encoded(store.stats())
-        case "search": let mode = SearchMode(rawValue:option("--mode") ?? "hybrid") ?? .hybrid; let filter = try searchFilter(); try encoded(store.search(filter,mode:mode,vector:mode == .keyword ? nil : embedder.embed(filter.query),modelID:embedder.modelID))
-        case "ask": var configuration = AppSettings.load(root:root).ai; if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }; let answer = try await AnswerEngine(store:store,embedder:embedder).answer(args.joined(separator:" "),configuration:configuration); try encoded(answer)
+        case "search": let mode = SearchMode(rawValue:option("--mode") ?? "hybrid") ?? .hybrid; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
+            let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search)
+            if details { try encoded(result) } else { for warning in result.warnings { FileHandle.standardError.write(Data((warning+"\n").utf8)) }; try encoded(result.hits) }
+        case "ask": var configuration = AppSettings.load(root:root).ai; if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }; let answer = try await AnswerEngine(store:store,embedder:embedder).answer(args.joined(separator:" "),configuration:configuration,searchConfiguration:AppSettings.load(root:root).search); try encoded(answer)
         case "note": let text = PrivacyPolicy().sanitize(args.joined(separator:" ")).text; guard !text.isEmpty else { throw OSwindError.invalid("Enter note text") }; var memory = Memory(kind:.note,app:"OSwind",title:"CLI note",text:text); memory.embedding = embedder.embed(memory.searchableText); memory.embeddingModel = embedder.modelID; try store.insert(memory); print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
@@ -93,7 +116,7 @@ do {
         case "transcribe": let settings = AppSettings.load(root:root); let model = option("--model") ?? settings.whisperModel; guard let path = args.first else { throw OSwindError.invalid("Enter an audio file path") }; print(try await Whisper.transcribe(file:URL(fileURLWithPath:path),binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage))
         case "serve": let server = try LocalAPIServer(store:store,embedder:embedder); server.onState = { print($0); fflush(stdout) }; try server.start(); print("Token file: \(store.root.appendingPathComponent("api-token").path)"); while true { try await Task.sleep(nanoseconds:1_000_000_000) }
         case "mcp":
-            while let line = readLine() { do { guard line.utf8.count <= 1_000_000, let request = try JSONSerialization.jsonObject(with:Data(line.utf8)) as? [String:Any] else { throw OSwindError.invalid("Invalid JSON-RPC") }; if let response = Integration.rpc(request,store:store,embedder:embedder) { let data = try JSONSerialization.data(withJSONObject:response,options:.sortedKeys); print(String(data:data,encoding:.utf8)!); fflush(stdout) } } catch { print("{\"jsonrpc\":\"2.0\",\"id\":null,\"error\":{\"code\":-32700,\"message\":\"Parse error\"}}"); fflush(stdout) } }
+            while let line = readLine() { do { guard line.utf8.count <= 1_000_000, let request = try JSONSerialization.jsonObject(with:Data(line.utf8)) as? [String:Any] else { throw OSwindError.invalid("Invalid JSON-RPC") }; if let response = await Integration.rpc(request,store:store,embedder:embedder) { let data = try JSONSerialization.data(withJSONObject:response,options:.sortedKeys); print(String(data:data,encoding:.utf8)!); fflush(stdout) } } catch { print("{\"jsonrpc\":\"2.0\",\"id\":null,\"error\":{\"code\":-32700,\"message\":\"Parse error\"}}"); fflush(stdout) } }
         default: throw OSwindError.invalid("Unknown command \(command). Run oswindctl help.")
         }
     }

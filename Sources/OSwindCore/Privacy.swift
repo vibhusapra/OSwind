@@ -48,6 +48,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var allDisplays = false
     public var captureOnLaunch = false
     public var ai = AIConfiguration()
+    public var search = SearchConfiguration()
     public var apiEnabled = false
     public var audioEnabled = false
     public var systemAudioEnabled = false
@@ -55,6 +56,22 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
+    enum CodingKeys: String, CodingKey { case profile,privacy,allDisplays,captureOnLaunch,ai,search,apiEnabled,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    public init(from decoder: Decoder) throws {
+        self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
+        profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
+        privacy = try c.decodeIfPresent(PrivacyPolicy.self,forKey:.privacy) ?? privacy
+        allDisplays = try c.decodeIfPresent(Bool.self,forKey:.allDisplays) ?? allDisplays
+        captureOnLaunch = try c.decodeIfPresent(Bool.self,forKey:.captureOnLaunch) ?? captureOnLaunch
+        ai = try c.decodeIfPresent(AIConfiguration.self,forKey:.ai) ?? ai
+        search = try c.decodeIfPresent(SearchConfiguration.self,forKey:.search) ?? search
+        apiEnabled = try c.decodeIfPresent(Bool.self,forKey:.apiEnabled) ?? apiEnabled
+        audioEnabled = try c.decodeIfPresent(Bool.self,forKey:.audioEnabled) ?? audioEnabled
+        systemAudioEnabled = try c.decodeIfPresent(Bool.self,forKey:.systemAudioEnabled) ?? systemAudioEnabled
+        whisperBinary = try c.decodeIfPresent(String.self,forKey:.whisperBinary) ?? whisperBinary
+        whisperModel = try c.decodeIfPresent(String.self,forKey:.whisperModel) ?? whisperModel
+        transcriptionLanguage = try c.decodeIfPresent(String.self,forKey:.transcriptionLanguage) ?? transcriptionLanguage
+    }
     public static func load(root: URL = Paths.data) -> AppSettings { guard let data = try? Data(contentsOf: root.appendingPathComponent("settings.json")), let value = try? JSONDecoder().decode(Self.self, from: data) else { return Self() }; return value }
     public func save(root: URL = Paths.data) throws { try Paths.ensure(root); let data = try JSONEncoder().encode(self); try data.write(to: root.appendingPathComponent("settings.json"), options: .atomic); try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: root.appendingPathComponent("settings.json").path) }
 }

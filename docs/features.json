@@ -116,7 +116,7 @@
     "axis": "Retrieval",
     "feature": "Semantic text search",
     "status": "tested",
-    "evidence": "Apple English sentence vectors; 1k synthetic result shows quality gap",
+    "evidence": "Apple baseline plus optional digest-versioned Qwen3 local GPU vectors; 35-query authored suite",
     "references": "Unlost, Pensieve, TimeScroll"
   },
   {
@@ -124,7 +124,7 @@
     "axis": "Retrieval",
     "feature": "Hybrid fusion",
     "status": "tested",
-    "evidence": "Reciprocal rank fusion; date/app filters applied to both paths",
+    "evidence": "Apple RRF; GPU cosine + bounded lexical bonus; filters on both paths; cross-language regression test",
     "references": "Screenpipe, Retrace (jhammant)"
   },
   {
@@ -139,8 +139,8 @@
     "id": "F018",
     "axis": "Retrieval",
     "feature": "Multilingual embeddings",
-    "status": "todo",
-    "evidence": "English sentence embeddings only",
+    "status": "tested",
+    "evidence": "Optional Qwen3: 8 authored multilingual questions pass; larger independent corpus pending",
     "references": "TimeScroll/Ollama, configurable systems"
   },
   {
@@ -236,7 +236,7 @@
     "axis": "AI",
     "feature": "Provider presets and model discovery",
     "status": "partial",
-    "evidence": "Local Ollama model check; no one-click pull/progress in GUI",
+    "evidence": "Installed models, pull/progress/cancel, GPU residency and resumable index UX delivered; unlocked interaction pending",
     "references": "Pieces, Screenpipe"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "Storage/privacy/retrieval tests pass; OCR/audio fixture suite underway",
+    "evidence": "42 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

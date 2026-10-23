@@ -1,0 +1,543 @@
+{
+  "schema": 1,
+  "description": "Hand-authored synthetic desktop-memory relevance fixture. Fictional names/commitments. Not a natural-user corpus or vendor comparison. No-evidence queries measure candidate false positives, not generative abstention.",
+  "documents": [
+    {
+      "id": "release",
+      "title": "Release checklist",
+      "text": "Maya owns the OSwind release checklist. Ship on Friday after the signing and restore checks pass.",
+      "app": "Xcode",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "battery",
+      "title": "Energy investigation",
+      "text": "Capturing identical frames wastes energy. Skip near duplicates, pause when idle, and increase the sampling interval when the laptop gets hot.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "refund",
+      "title": "Acme refund request",
+      "text": "Acme wants the unused annual subscription refunded. Jordan will send the credit receipt once finance approves it.",
+      "app": "Mail",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "renewal",
+      "title": "Acme renewal discussion",
+      "text": "Acme agreed to renew for twelve months, provided the new contract keeps the current per-seat rate through March. Avery owns the revised agreement.",
+      "app": "Slack",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "recipe",
+      "title": "Sunday dinner",
+      "text": "Roast cauliflower, then dress it with tahini, lemon juice and cumin. Sprinkle parsley on top and serve with flatbread.",
+      "app": "Safari",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "travel",
+      "title": "Seattle conference",
+      "text": "The Seattle flight departs Tuesday at 09:00. The hotel allows check-in after 15:00. Remember the demo laptop and HDMI adapter.",
+      "app": "Calendar",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "login",
+      "title": "Sign-in redirect",
+      "text": "Users return to the sign-in page because the session cookie uses SameSite=Strict. Update the authentication callback cookie policy.",
+      "app": "Xcode",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "meeting",
+      "title": "Customer discovery",
+      "text": "Jamie asked for meeting transcripts that work without an internet connection and citations that open the original source. Theo will build a prototype by Monday.",
+      "app": "System audio",
+      "kind": "audio",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "vector",
+      "title": "Retrieval design",
+      "text": "Combine BM25 lexical ranking with vector cosine similarity using reciprocal rank fusion. Keep model versions separate and rebuild derived vectors when text changes.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "privacy",
+      "title": "Retention decision",
+      "text": "Delete recorded material after thirty days. Exclude password managers and banking domains before saving screenshots. Private activity must be pausable.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "design",
+      "title": "Interface review",
+      "text": "Use a quiet mint accent and readable typography. Keep the pause control visible, including when only the microphone is recording.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "invoice",
+      "title": "Invoice 4821",
+      "text": "Acme invoice 4821 is due November 12. Jordan should receive the receipt after the transfer clears. This is unrelated to the renewal agreement.",
+      "app": "Mail",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "audio",
+      "title": "Local speech recognition",
+      "text": "Whisper base.en converts captured speech to text on the Mac. Metal acceleration speeds inference; silent chunks should not create invented transcripts.",
+      "app": "Xcode",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "backup",
+      "title": "Recovery drill",
+      "text": "Restore the encrypted archive into a fresh temporary directory. Verify image checksums, transcript counts, and source links before switching to the restored store.",
+      "app": "Terminal",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "dog",
+      "title": "Vet visit",
+      "text": "Pepper needs a rabies booster on Saturday. Bring the vaccination record to the veterinary clinic.",
+      "app": "Calendar",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "book",
+      "title": "Reading notes",
+      "text": "The book discusses spaced repetition and retrieval practice. Testing memory strengthens later recall more than rereading the same passage.",
+      "app": "Books",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "database",
+      "title": "SQLite contention",
+      "text": "A long transaction held the writer lock while a model request was running. Move network inference outside database transactions and use short compare-and-save writes.",
+      "app": "Xcode",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "display",
+      "title": "External display bug",
+      "text": "On the second monitor, captured text is blurry at the current scale. Compare native pixel dimensions with logical window bounds before setting capture resolution.",
+      "app": "Xcode",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "server",
+      "title": "Local server isolation",
+      "text": "The memory API must bind to loopback, require a random bearer token and reject unexpected browser origins. Do not expose the archive on the local network.",
+      "app": "Terminal",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "falsealarm",
+      "title": "Unrelated launch checklist",
+      "text": "Theo owns the Atlas launch checklist. It ships on Thursday, after marketing approves the announcement. Atlas is not OSwind.",
+      "app": "Slack",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "cardesign",
+      "title": "Mint paint",
+      "text": "The bicycle frame will use mint paint and cream tires. Its brake lever needs replacing before the weekend ride.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "banktravel",
+      "title": "Bank transfer",
+      "text": "The supplier transfer should clear on Tuesday. Check the bank statement before paying the same bill again.",
+      "app": "Mail",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "legal_es",
+      "title": "Contrato de soporte",
+      "text": "La renovación del soporte de Boreal será por seis meses. Lucía preparará el contrato nuevo antes del miércoles. No cambia el precio.",
+      "app": "Mail",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "lunch_es",
+      "title": "Comida del equipo",
+      "text": "La reserva para comer con Priya es el jueves a mediodía en un restaurante italiano. Hay cuatro personas confirmadas.",
+      "app": "Calendar",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "train_fr",
+      "title": "Train pour Lyon",
+      "text": "Le train pour Lyon part vendredi à 18 h 20. Camille doit apporter les billets et la réservation de l’hôtel.",
+      "app": "Calendar",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "garden_de",
+      "title": "Gartenplanung",
+      "text": "Die Tomaten brauchen morgens Wasser. Am Sonntag pflanzt Lena die Setzlinge in die großen Töpfe auf dem Balkon.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "release_ja",
+      "title": "翻訳レビュー",
+      "text": "日本語版の説明書は金曜日までに直します。担当は美咲です。アプリのリリース日とは別の予定です。",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "meeting_zh",
+      "title": "设计会议",
+      "text": "设计会议决定先修复键盘导航，再增加新的主题。王林负责在星期二之前完成焦点顺序的测试。",
+      "app": "System audio",
+      "kind": "audio",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "old_decision",
+      "title": "Yesterday’s scope",
+      "text": "Yesterday the team considered delaying OSwind until next month. That proposal was superseded by today’s Friday release decision.",
+      "app": "Slack",
+      "kind": "note",
+      "timestamp": "2026-10-21T14:00:00Z"
+    },
+    {
+      "id": "new_decision",
+      "title": "Current release decision",
+      "text": "Today the team confirmed OSwind will ship this Friday. Maya still owns the readiness checklist.",
+      "app": "Slack",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "support",
+      "title": "Support ticket",
+      "text": "A customer cannot find saved screenshots from last week. Ask them to widen the date filter and check their configured retention period.",
+      "app": "Mail",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    },
+    {
+      "id": "permissions",
+      "title": "Setup troubleshooting",
+      "text": "Screen Recording permission allows pixels to be captured. Accessibility allows reading app structure and browser context. Microphone access is separate.",
+      "app": "Notes",
+      "kind": "note",
+      "timestamp": "2026-10-22T14:00:00Z"
+    }
+  ],
+  "queries": [
+    {
+      "id": "p01",
+      "query": "Who is taking care of the OSwind shipping checks?",
+      "relevant": [
+        "release",
+        "new_decision"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p02",
+      "query": "How can we stop the recorder from draining the laptop?",
+      "relevant": [
+        "battery"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p03",
+      "query": "Which customer wants their money back?",
+      "relevant": [
+        "refund"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p04",
+      "query": "Who is drafting Acme’s updated agreement?",
+      "relevant": [
+        "renewal"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p05",
+      "query": "What goes on the roasted vegetables for dinner?",
+      "relevant": [
+        "recipe"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p06",
+      "query": "What should I pack for the conference trip?",
+      "relevant": [
+        "travel"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p07",
+      "query": "Why does authentication keep sending people back to login?",
+      "relevant": [
+        "login"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p08",
+      "query": "What did Jamie want to work offline?",
+      "relevant": [
+        "meeting"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p09",
+      "query": "How are exact words and meaning combined in search?",
+      "relevant": [
+        "vector"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p10",
+      "query": "How long should the app remember activity?",
+      "relevant": [
+        "privacy"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p11",
+      "query": "What must remain visible while the mic is on?",
+      "relevant": [
+        "design"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p12",
+      "query": "When does the customer need to pay invoice 4821?",
+      "relevant": [
+        "invoice"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p13",
+      "query": "Which engine turns speech into words without a cloud service?",
+      "relevant": [
+        "audio"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p14",
+      "query": "How do we know an archive restore is safe to switch to?",
+      "relevant": [
+        "backup"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p15",
+      "query": "What does Pepper need at the clinic?",
+      "relevant": [
+        "dog"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p16",
+      "query": "What study technique is better than repeatedly reading?",
+      "relevant": [
+        "book"
+      ],
+      "category": "paraphrase"
+    },
+    {
+      "id": "p17",
+      "query": "Why did other database writers have to wait?",
+      "relevant": [
+        "database"
+      ],
+      "category": "code"
+    },
+    {
+      "id": "p18",
+      "query": "Why is the screenshot fuzzy on my extra monitor?",
+      "relevant": [
+        "display"
+      ],
+      "category": "code"
+    },
+    {
+      "id": "p19",
+      "query": "What prevents websites or nearby machines from reading memory?",
+      "relevant": [
+        "server"
+      ],
+      "category": "code"
+    },
+    {
+      "id": "p20",
+      "query": "Which permissions cover the screen, app text, and sound?",
+      "relevant": [
+        "permissions"
+      ],
+      "category": "code"
+    },
+    {
+      "id": "m01",
+      "query": "¿Quién prepara la lista para publicar OSwind?",
+      "relevant": [
+        "release",
+        "new_decision"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m02",
+      "query": "Comment réduire la consommation de batterie pendant l’enregistrement ?",
+      "relevant": [
+        "battery"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m03",
+      "query": "Who will prepare Boreal’s six-month support contract?",
+      "relevant": [
+        "legal_es"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m04",
+      "query": "When and where are we eating with Priya?",
+      "relevant": [
+        "lunch_es"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m05",
+      "query": "What time does Camille’s train leave?",
+      "relevant": [
+        "train_fr"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m06",
+      "query": "Who will plant tomatoes on the balcony on Sunday?",
+      "relevant": [
+        "garden_de"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m07",
+      "query": "Who is responsible for the Japanese manual revision?",
+      "relevant": [
+        "release_ja"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "m08",
+      "query": "Who is testing keyboard focus order before Tuesday?",
+      "relevant": [
+        "meeting_zh"
+      ],
+      "category": "multilingual"
+    },
+    {
+      "id": "f01",
+      "query": "OSwind release decision",
+      "relevant": [
+        "new_decision",
+        "release"
+      ],
+      "category": "date_filter",
+      "start": "2026-10-22T00:00:00Z"
+    },
+    {
+      "id": "f02",
+      "query": "customer receipt",
+      "relevant": [
+        "refund",
+        "invoice"
+      ],
+      "category": "app_filter",
+      "app": "Mail"
+    },
+    {
+      "id": "f03",
+      "query": "source citations",
+      "relevant": [
+        "meeting"
+      ],
+      "category": "kind_filter",
+      "kind": "audio"
+    },
+    {
+      "id": "n01",
+      "query": "What is the password for the production database?",
+      "relevant": [],
+      "category": "no_evidence"
+    },
+    {
+      "id": "n02",
+      "query": "How many people attended last year’s company picnic?",
+      "relevant": [],
+      "category": "no_evidence"
+    },
+    {
+      "id": "n03",
+      "query": "What is the serial number of my washing machine?",
+      "relevant": [],
+      "category": "no_evidence"
+    },
+    {
+      "id": "n04",
+      "query": "Who won the 2035 chess championship?",
+      "relevant": [],
+      "category": "no_evidence"
+    }
+  ]
+}

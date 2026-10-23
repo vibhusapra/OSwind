@@ -12,7 +12,7 @@ import OSwindCore
                 NSApp.appearance = NSAppearance(named:CommandLine.arguments[appearanceIndex+1] == "light" ? .aqua : .darkAqua)
             }
             let preview = AppModel(), path = CommandLine.arguments[index+1]
-            if let sectionIndex = CommandLine.arguments.firstIndex(of:"--preview-section"), sectionIndex+1 < CommandLine.arguments.count { preview.section = CommandLine.arguments[sectionIndex+1]; preview.refresh() }
+            if let sectionIndex = CommandLine.arguments.firstIndex(of:"--preview-section"), sectionIndex+1 < CommandLine.arguments.count { preview.section = CommandLine.arguments[sectionIndex+1]; if preview.section == "SettingsModels" { preview.settings.search.provider = .ollama }; preview.refresh() }
             DispatchQueue.main.asyncAfter(deadline:.now()+1) {
                 do { try PreviewExporter.export(model:preview,path:path) } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)) }
                 NSApp.terminate(nil)
