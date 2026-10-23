@@ -58,6 +58,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; larger relevance/scaling validation, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
+- [x] [Draft PR #5](https://github.com/vibhusapra/OSwind/pull/5) adds journaled native indexing and its recovery/recall/performance checks; current-head macOS CI passed.
 - [x] [Draft PR #4](https://github.com/vibhusapra/OSwind/pull/4) adds bounded exact scanning and preserves the failed million-vector gate; current-head macOS CI passed.
 - [x] [Draft PR #3](https://github.com/vibhusapra/OSwind/pull/3) adds durable conversations, follow-up context and source-linked erasure; current-head macOS CI passed.
 - [x] [Draft PR #2](https://github.com/vibhusapra/OSwind/pull/2) adds local GPU retrieval/model setup and relevance evaluation; current-head macOS CI passed.
@@ -75,9 +76,9 @@ Pinned dependency: USearch 2.26.5 / resolved NumKong 7.8.5, Apache-2.0; notices/
 
 The retained million-vector ANN build is running; no result is claimed. Next gates: million/cold tails, independent realistic recall, write contention, scope/count/statistics costs (including tags), long-run memory/power, orphan/fork/restore recovery and broader UI/audio/parity work. Vault encryption, routines, meeting workflows, migration/backup and real competitor runs remain open.
 
-## Current work: long-source evidence and query highlights
+## Long-source evidence and query highlights — draft PR #6
 
-The `codex/evidence-excerpts` branch replaces first-500-character duplicate suppression with full source/context fingerprints and first-800-character context with query-anchored lexical windows. Distant terms can select a second passage; Unicode stays composed and ellipses mark omissions. Recaps/unanchored queries retain opening/ending text. Native cards/source inspector show asynchronously selected highlighted excerpts. A rendered synthetic long-note search was reviewed; compact snippets now keep the deadline visible. Live interaction remains separate from the app's own layout render.
+[Draft PR #6](https://github.com/vibhusapra/OSwind/pull/6) replaces first-500-character duplicate suppression with full source/context fingerprints and first-800-character context with query-anchored lexical windows. Distant terms can select a second passage; Unicode stays composed and ellipses mark omissions. Recaps/unanchored queries retain opening/ending text. Native cards/source inspector show asynchronously selected highlighted excerpts. A rendered synthetic long-note search was reviewed; compact snippets now keep the deadline visible. Live interaction remains separate from the app's own layout render.
 
 Source date/kind revisions now invalidate saved and in-flight answers while leaving content-compatible embeddings available. CLI one-off/chat Ask accept model/endpoint overrides; one-off scope flags are applied and questions sanitized. Output-limit stop reasons fail without appending a partial chat answer. Offline provider process tests verify this boundary. Local Ollama generation does not read BYOK accounts. Recent user questions resolve retrieval; generation receives the current question and fresh evidence.
 
@@ -89,7 +90,7 @@ Remaining evidence work: semantic chunk indexing beyond embedding input limits, 
 
 ## Local artifacts
 
-- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (3b9c243) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
+- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (fe51c8c) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
 - Raw test/model/runtime logs and synthetic media: `.artifacts/` (excluded from Git).
 - Reproducible public synthetic metrics: `benchmarks/`.
 - Local synthetic verification databases: `.local/` (excluded from Git).
