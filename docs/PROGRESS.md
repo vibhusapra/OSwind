@@ -58,15 +58,16 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; larger relevance/scaling validation, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
+- [x] [Draft PR #4](https://github.com/vibhusapra/OSwind/pull/4) adds bounded exact scanning and preserves the failed million-vector gate; current-head macOS CI passed.
 - [x] [Draft PR #3](https://github.com/vibhusapra/OSwind/pull/3) adds durable conversations, follow-up context and source-linked erasure; current-head macOS CI passed.
 - [x] [Draft PR #2](https://github.com/vibhusapra/OSwind/pull/2) adds local GPU retrieval/model setup and relevance evaluation; current-head macOS CI passed.
 - [x] [Draft PR #1](https://github.com/vibhusapra/OSwind/pull/1) opened; initial GitHub macOS build/tests/package/CLI smoke passed. Later commits require their own checks.
 
 Personal sync, enterprise policy/team controls and other platforms remain visible future axes rather than being silently counted as complete. The user's current implementation target is macOS; those axes need an explicit delivery decision before any whole-market parity claim.
 
-## Indexed retrieval milestone (draft PR preparation)
+## Indexed retrieval milestone — draft PR #5
 
-The `codex/ann-index` branch implements a schema-4 vector mutation journal, stable never-reused native keys, model/store-isolated HNSW snapshots, checksum verification, cross-process build leases, cancellation, low-power/thermal deferral, live SQL filters, fresh-change exact search and float32 candidate reranking. Graphs contain derived vectors/keys, not source text. Disposable cache files are evicted before recorded evidence under storage pressure; Delete all clears graph files and rotates store identity. Idle maintenance checkpoints changed graphs only. Manual cancel pauses automatic construction until resumed; completed embeddings remain, partial graph construction restarts.
+[Draft PR #5](https://github.com/vibhusapra/OSwind/pull/5) implements a schema-4 vector mutation journal, stable never-reused native keys, model/store-isolated HNSW snapshots, checksum verification, cross-process build leases, cancellation, low-power/thermal deferral, live SQL filters, fresh-change exact search and float32 candidate reranking. Graphs contain derived vectors/keys, not source text. Disposable cache files are evicted before recorded evidence under storage pressure; Delete all clears graph files and rotates store identity. Idle maintenance checkpoints changed graphs only. Manual cancel pauses automatic construction until resumed; completed embeddings remain, partial graph construction restarts.
 
 Current checks: 76 automated tests pass (plus one skipped opt-in runtime check); 12 cache/retrieval tests also pass ThreadSanitizer. Schema-3 vectors/FTS migrate without reprocessing. Real CLI Qwen3 verification loads a saved graph and returns the correct synthetic ownership note. Offline-model CLI/HTTP/MCP indexed process smoke and durable-chat process smoke pass. Apple/Qwen relevance metrics did not regress on the authored 35-query suite. Native model settings/preparation, Indexed selection, semantic result and Command-K worked during the unlocked session. A global-hotkey focus bug is fixed in code but live retest is blocked by the subsequent lock. Controlled targeted capture again passed (~0.77–0.85 s, five OCR regions), including redaction, raw-image suppression, exclusions and deletion.
 
@@ -76,7 +77,7 @@ The retained million-vector ANN build is running; no result is claimed. Next gat
 
 ## Local artifacts
 
-- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (480737d) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
+- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (3b9c243) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
 - Raw test/model/runtime logs and synthetic media: `.artifacts/` (excluded from Git).
 - Reproducible public synthetic metrics: `benchmarks/`.
 - Local synthetic verification databases: `.local/` (excluded from Git).
