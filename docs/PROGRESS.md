@@ -317,7 +317,7 @@ The latest full suite is 329 cases (325 pass, four opt-in skips); all 60 focused
 All-display replay, continuous cross-clip scrubbing, frame-level date filtering, readable OCR/AX reconciliation, physical lock/resume/permission recovery, natural-workload fidelity, measured power and matched competitor app runs remain open. The pinned 24-hour component trial is independent, still running and does not establish capture/power acceptance. Broad parity and top-three placement remain unproved.
 
 
-## Natural speaker quality and raw timelines — work in progress
+## Natural speaker quality and raw timelines — reviewable milestone
 
 The native diarizer now exposes a bounded, anonymous raw timeline through the same serialized runtime as word attribution. `diarize` runs without opening a memory library, snapshots/normalizes the input and refuses to overwrite diagnostic outputs, created at mode 0600. A corrected pipeline preserves overlapping voices; the previous SDK default forced exclusive output and deprived the mixed-word safeguard of its input. No detected speech is an empty observation, while hard failures and canceled/overdue results still fail.
 
@@ -325,4 +325,4 @@ Independent `pyannote.metrics` 4.2.0 scoring on two predetermined five-clip VoxC
 
 Actual GPU-requested Parakeet plus overlapping Community-1 import processed a 664-second public clip into 2,606 timed segments. All 175 segments predicted to contain mixed speech above the product threshold remain unattributed. Separate-process source reads, anonymous manual rename, scoped preview search, complete backup/restore and erasure pass on the imported record. No raw audio is retained in that library, and no normal library is touched. ASR WER and actual per-operation placement remain unmeasured.
 
-See [protocol and full boundaries](SPEAKER-EVAL.md) and [paired natural evidence](../benchmarks/speaker-natural-overlap-v1.json). Latest full/sanitizer/package and no-speech process checks are being finalized before this milestone is marked reviewable. The broader v0 goal remains active.
+See [protocol and full boundaries](SPEAKER-EVAL.md) and [paired natural evidence](../benchmarks/speaker-natural-overlap-v1.json). Final verification: 334 XCTest cases (330 pass, four opt-in skips), 45 focused ThreadSanitizer cases (43 pass, two opt-in skips), four independent scorer contracts and four offline asset contracts. Packaged speaker-search, preview, replay and interrupted backup processes pass. The exact signed package reproduces every prior fixed score component across both subsets and repetitions. Installed real-model silence returns two empty timelines; output permissions, overwrite preservation, hard model failure and no library creation pass. Strict package/installed/extracted-ZIP binary identity and source binding are verified in [packaged evidence](../benchmarks/speaker-natural-packaged-v1.json). The normal app/library was not opened. The broader v0 goal remains active.
