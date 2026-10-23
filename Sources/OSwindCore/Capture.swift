@@ -136,8 +136,12 @@ public struct CaptureMetrics: Sendable {
                 // Domain privacy cannot be established for background browser tabs. Mask all browsers in display mode.
                 let blocked = content.applications.filter { app in settings.privacy.excludedApps.contains(app.bundleIdentifier) || app.bundleIdentifier == Bundle.main.bundleIdentifier || ["safari","chrome","firefox","arc","brave","edge","vivaldi","orion"].contains(where: { app.bundleIdentifier.lowercased().contains($0) }) }
                 for display in content.displays { captures.append((SCContentFilter(display: display, excludingApplications: blocked, exceptingWindows: []), "display-\(display.displayID)", "Display \(display.displayID)")) }
-            } else if let window = content.windows.first(where: { $0.owningApplication?.processID == context.pid && $0.windowLayer == 0 && $0.frame.width > 100 && $0.frame.height > 100 && settings.privacy.exclusion(app: context.bundle, title: $0.title ?? context.title, url: context.url, isBrowser: context.browser) == nil }) {
-                captures.append((SCContentFilter(desktopIndependentWindow: window), "window-\(window.windowID)", window.title ?? context.title))
+            } else {
+                let candidates=content.windows.filter {$0.owningApplication?.processID==context.pid && $0.windowLayer==0 && $0.frame.width>100 && $0.frame.height>100}
+                guard let selected=FocusedWindowBinding.select(candidates.map {CaptureWindowDescriptor(frame:$0.frame,title:$0.title)},context:context) else {status="Waiting for an unambiguous focused window";return}
+                let window=candidates[selected]
+                guard settings.privacy.exclusion(app:context.bundle,title:window.title ?? context.title,url:context.url,isBrowser:context.browser)==nil else {metrics.excluded+=1;status="Excluded window";return}
+                captures.append((SCContentFilter(desktopIndependentWindow:window),"window-\(window.windowID)",window.title ?? context.title))
             }
             for (filter, displayID, title) in captures {
                 let config = SCStreamConfiguration(); let rect = filter.contentRect; let scale = min(2.0, Double(settings.profile.maxDimension) / max(rect.width, rect.height)); config.width = max(1, Int(rect.width * scale)); config.height = max(1, Int(rect.height * scale)); config.showsCursor = false; config.captureResolution = .best

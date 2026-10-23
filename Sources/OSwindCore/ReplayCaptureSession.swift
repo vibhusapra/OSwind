@@ -76,11 +76,9 @@ import Vision
             let content=try await SCShareableContent.excludingDesktopWindows(true,onScreenWindowsOnly:true)
             guard !stopped,generation==token,let now=eligible(),Self.key(now)==key else {return}
             let candidates=content.windows.filter {$0.owningApplication?.processID==context.pid && $0.windowLayer==0 && $0.frame.width>100 && $0.frame.height>100}
-            let exact=candidates.filter {window in
-                if let bounds=context.bounds {return abs(window.frame.minX-bounds.minX)<4 && abs(window.frame.minY-bounds.minY)<4 && abs(window.frame.width-bounds.width)<4 && abs(window.frame.height-bounds.height)<4}
-                return !context.title.isEmpty && window.title==context.title
-            }
-            guard let window=(exact.count==1 ? exact.first:candidates.count==1 ? candidates.first:nil),settings.privacy.exclusion(app:context.bundle,title:window.title ?? context.title,url:context.url,isBrowser:context.browser)==nil else {onStatus("Replay waiting for an unambiguous focused window");return}
+            guard let selected=FocusedWindowBinding.select(candidates.map {CaptureWindowDescriptor(frame:$0.frame,title:$0.title)},context:context) else {onStatus("Replay waiting for an unambiguous focused window");return}
+            let window=candidates[selected]
+            guard settings.privacy.exclusion(app:context.bundle,title:window.title ?? context.title,url:context.url,isBrowser:context.browser)==nil else {return}
             let source=try ReplayScreenSource(filter:SCContentFilter(desktopIndependentWindow:window),maximumDimension:settings.profile.maxDimension,interval:interval)
             let notify=onMemory
             let writer=VisualChunkRecorder(store:store,embedder:embedder,gate:gate,onMemory:{memory in await notify(memory)})
