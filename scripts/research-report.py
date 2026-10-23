@@ -76,7 +76,7 @@ rows=[
 ('Privacy','Fine-grained history erasure','partial','Single row/all/retention; delete date/app/site range UI missing','Recall, Littlebird'),
 ('Data','Retention + storage budget','tested','Age prune tested; auto every 5 minutes; disk compaction refinement pending','Recall, ScreenMemory'),
 ('Data','JSON export/import','tested','Redaction/exclusions, transaction rollback, path stripping; text+metadata','Most memory tools'),
-('Data','Media backup / restore','partial','Manual paused folder copy; no packaged backup/restore yet','Rewind Desktop S3, Retrace'),
+('Data','Media backup / restore','partial','WIP: WAL-consistent DB snapshot and APFS clone/streaming file foundations; 19 focused+TSan cases. Complete package/restore/UI/CLI workflow still pending','Rewind Desktop S3, Retrace'),
 ('Data','Rewind / Limitless migration','todo','Schema adapters missing','Retrace (haseab)'),
 ('Data','Markdown / Obsidian export','partial','Chat Markdown export with sources/scope; whole-memory Markdown/Obsidian library export pending','Minne, Screenpipe'),
 ('Data','Personal device sync','todo','No sync backend','Screenpipe Business'),
@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','143 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','162 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
 ('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality')
 ]

@@ -1,6 +1,6 @@
 # Complete library backup and restore
 
-Status: implementation in progress on `codex/full-backup`. PR #11 is green. A database snapshot primitive and its focused tests exist; no complete backup/restore workflow is delivered yet. JSON import/export remains available and is not a full backup.
+Status: implementation in progress on `codex/full-backup`. PR #11 is green. Database snapshot and descriptor-based file primitives with focused tests exist; no complete backup/restore workflow is delivered yet. JSON import/export remains available and is not a full backup.
 
 ## Required result
 
@@ -14,14 +14,16 @@ Encryption and an in-app vault remain requirements for the broader parity goal. 
 
 The [SQLite backup API](https://www.sqlite.org/c3ref/backup_finish.html) documents incremental copies, source/destination connection separation, locking, automatic restarts and cleanup. The [online-backup guide](https://www.sqlite.org/backup.html) explains why copying a live main database file alone is insufficient. Tests must prove behavior against the actual system SQLite, not infer it from the API name.
 
-Current focused fixtures cover an uncheckpointed WAL plus vectors/chats, concurrent insertion/deletion while copying one page at a time, cancellation cleanup, existing destinations, symlinks, malformed/missing databases and invalid batch sizes. Full package tests must add media and restore boundaries below.
+Six snapshot fixtures cover an uncheckpointed WAL plus vectors/chats, concurrent insertion/deletion while copying one page at a time, cancellation cleanup, existing destinations, symlinks, malformed/missing databases and invalid batch sizes. Full package tests must add media and restore boundaries below.
 
 ## Media consistency without a whole-export capture pause
 
-1. Privately pre-pin currently referenced media on the source filesystem, using hard links to immutable captured files. Stream the source payload rows; do not accumulate every Memory in an array. Pin by safe logical path and file identity, not by following arbitrary filesystem links.
-2. Produce the database snapshot. Enumerate its referenced media and fill any pins for newly captured assets. Already pinned files survive a subsequent source deletion. If a referenced asset disappeared before it was pinned, retry the database snapshot (bounded attempts), rather than publish an inconsistent backup.
+1. Privately pre-pin currently referenced media on the source filesystem, using descriptor-based APFS COW clones with a streaming-copy fallback. Stream the source payload rows; do not accumulate every Memory in an array. Pin by safe logical path and file identity, not by following arbitrary filesystem links.
+2. Produce the database snapshot. Enumerate its referenced media and fill any pins for newly captured assets. Already pinned files survive a subsequent source deletion or overwrite. If a referenced asset disappeared before it was pinned, retry the database snapshot (bounded attempts), rather than publish an inconsistent backup.
 3. Copy only assets referenced by the successful snapshot into an unpublished package beside the destination. Stream bytes and hashes, verify regular file identity/size/timestamps before and after copying, and fail on mutation or unreadable media. Never silently omit a retained asset.
-4. Exclude private pin staging from normal library storage-budget traversal; hard links otherwise appear to double the logical media size and could provoke unintended pruning. Staging ownership, active-job leases and conservative stale-job cleanup require tests. Cancellation removes owned staging only. Crashes may leave private staging, but must never publish an incomplete package or damage the source.
+4. Exclude private pin staging from normal library storage-budget traversal; clones otherwise appear to double the logical media size and could provoke unintended pruning. Staging ownership, active-job leases and conservative stale-job cleanup require tests. Cancellation removes owned staging only. Crashes may leave private staging, but must never publish an incomplete package or damage the source.
+
+The installed SDK declares `fclonefileat` (macOS 10.12+), also listed in Apple’s [APFS API guide](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/ToolsandAPIs/ToolsandAPIs.html). Pins clone the already-verified descriptor rather than resolve the source pathname again. A regular streaming-copy fallback is tested; non-APFS/external-volume integration remains open.
 
 Capture currently generates unique immutable media paths. A backup cannot promise an arbitrary cross-filesystem instant for externally modified files; that limitation must remain explicit. Test actual source deletion/new captures at each phase and retry exhaustion under sustained churn.
 
@@ -43,7 +45,7 @@ In-place replacement while other processes retain old database handles can corru
 
 ## Remaining implementation and evidence
 
-- Secure descriptor-based filesystem primitives and opaque media manifest.
+- Descriptor-based filesystem primitives pass 13 focused fixtures, including a successful APFS clone and forced streaming fallback. Package manifest work remains.
 - Streaming source pre-pin, snapshot/retry, copy/hash/progress/cancel and stale-stage cleanup.
 - Complete archive inspection and safe data-only reconstruction with old-format adapters.
 - UI/CLI backup, inspect, restore and library selection/relaunch/recovery.

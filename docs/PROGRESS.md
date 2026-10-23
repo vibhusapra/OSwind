@@ -155,3 +155,10 @@ The retained million-record archive upgrades/reopens successfully; adding the pa
 
 
 The `99c87c2` release runtime is installed at `/Applications/OSwind.app`, with a verified strict ad-hoc signature and refreshed portable ZIP. Final CLI/HTTP/MCP scope and long-source conversation process regressions pass. The isolated debug Models render shows the passage backfill controls; native segmented/button labels are unreliable in that headless render, so live settings/accessibility acceptance remains a gate. All sample processes were stopped, and normal capture was not started. The next independent work is complete media/chat backup and restore, followed by broader privacy/audio/meeting and sustained-workload gates.
+
+
+## Full backup / restore work in progress
+
+`codex/full-backup` starts complete library portability; it is not yet a user-facing packaged backup. A WAL-pinned incremental SQLite snapshot preserves source/chat/vector data while a second connection inserts/deletes records. It verifies a standalone result and cleans interrupted output. The system SQLite/temporary-directory edge cases are covered explicitly, including POSIX canonical paths and unused shared-memory sidecars.
+
+A descriptor-based file tree streams bytes/hashes with bounded buffers, checks changes during copying, refuses traversal/symlinks/special files and existing destinations, and supports streamed metadata files and directory enumeration. Descriptor-based APFS clones actually executed in the local fixture and remain independent of subsequent source overwrite/deletion. A streaming fallback is tested. Unicode filenames over 255 UTF-8 bytes, cancellation cleanup, a renamed source root and repeated directory enumeration have regressions. The full suite passes 162 cases with one optional skip (163 total); all 19 new snapshot/file cases pass ThreadSanitizer. Package consistency, manifest/restore validation, UI/CLI integration and large-workload/non-APFS evidence remain open. [Backup design](BACKUP-DESIGN.md) records the required full workflow and gates.

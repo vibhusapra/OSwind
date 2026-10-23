@@ -436,7 +436,7 @@
     "axis": "Data",
     "feature": "Media backup / restore",
     "status": "partial",
-    "evidence": "Manual paused folder copy; no packaged backup/restore yet",
+    "evidence": "WIP: WAL-consistent DB snapshot and APFS clone/streaming file foundations; 19 focused+TSan cases. Complete package/restore/UI/CLI workflow still pending",
     "references": "Rewind Desktop S3, Retrace"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "143 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "162 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
