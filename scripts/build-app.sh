@@ -24,6 +24,19 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>NSMicrophoneUsageDescription</key><string>OSwind optionally transcribes your microphone locally to help you recall conversations.</string>
 <key>NSScreenCaptureUsageDescription</key><string>OSwind captures your chosen windows to build a private, searchable memory on this Mac.</string>
 <key>NSAppleEventsUsageDescription</key><string>OSwind uses application context to apply your privacy rules.</string>
+<key>UTExportedTypeDeclarations</key><array><dict>
+<key>UTTypeIdentifier</key><string>com.oswind.backup</string>
+<key>UTTypeDescription</key><string>OSwind Library Backup</string>
+<key>UTTypeConformsTo</key><array><string>com.apple.package</string></array>
+<key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>oswindbackup</string></array></dict>
+</dict></array>
+<key>CFBundleDocumentTypes</key><array><dict>
+<key>CFBundleTypeName</key><string>OSwind Library Backup</string>
+<key>CFBundleTypeRole</key><string>Viewer</string>
+<key>LSHandlerRank</key><string>Owner</string>
+<key>LSItemContentTypes</key><array><string>com.oswind.backup</string></array>
+<key>LSTypeIsPackage</key><true/>
+</dict></array>
 <key>CFBundleIconFile</key><string>OSwind.icns</string>
 </dict></plist>
 PLIST

@@ -45,7 +45,7 @@ Follow-ups use up to three recent user questions for subject context; retrieval 
 
 ## Release risks
 
-Current store schema is version 6, with version-1/vector, version-2/conversation, version-3/native-index and version-4/statistics preservation fixtures. Older binaries refuse the upgraded schema. Newer unknown schemas fail without downgrading. Future schema changes require migrations and fixture coverage. App binaries are locally ad-hoc signed, with no notarization/update service. Apple English sentence embeddings remain the default zero-download baseline. Optional Qwen3 multilingual results are measured on a small authored fixture; multimodal retrieval and robust no-evidence abstention remain gaps. Long-run power, pressure, permission revocation, audio hardware changes, and adversarial privacy testing require broader validation.
+Current store schema is version 7 (the version-6 migration preserves cache identity; version 7 adds a compatibility barrier for restore cleanup settings), with version-1/vector, version-2/conversation, version-3/native-index and version-4/statistics preservation fixtures. Older binaries refuse the upgraded schema. Newer unknown schemas fail without downgrading. Future schema changes require migrations and fixture coverage. App binaries are locally ad-hoc signed, with no notarization/update service. Apple English sentence embeddings remain the default zero-download baseline. Optional Qwen3 multilingual results are measured on a small authored fixture; multimodal retrieval and robust no-evidence abstention remain gaps. Long-run power, pressure, permission revocation, audio hardware changes, and adversarial privacy testing require broader validation.
 
 
 ## Metadata and UI publication
@@ -89,3 +89,12 @@ Search hits carry an optional passage range. Ask, cards, the source inspector, s
 
 
 The bounded recent-source sample pins its time/app-time scan and a parent/model/revision covering index. Join order alone did not prevent SQLite from selecting a global model/revision range for every parent. A regression checks actual VM-step/full-scan work on 1,500 records rather than relying on latency thresholds or matching plan text. Two failed million-row attempts and the corrected run are retained in the benchmark ledger.
+
+
+## Portable libraries
+
+`LibraryBackup` uses a pinned WAL snapshot plus descriptor-relative APFS clone/streaming media pins outside the live root. Bounded NDJSON manifests are indexed in private SQLite scratch files; packages publish via atomic no-replace rename. Each scratch payload has a sibling private marker and flock lease for conservative abandoned-job cleanup.
+
+`LibraryBackup.restore` reads ordinary known archive tables with trusted-schema/query-only settings and bounded records, then rebuilds a fresh compiled schema. It preserves source/chat/vector/passages, remaps assets, and derives registry/counters/identity. Archived triggers, views, indexes and control metadata never enter the restored library. Restore integrity checks and explicit connection close precede publication. Source and destination stay separate; live in-place replacement is unsupported.
+
+`AppSession` owns the selected `AppModel`, handles unavailable saved locations with recovery, and opens a restored library after validation. Restored services/remote inference and automatic retention cleanup are disabled. CLI inspect/restore dispatch before normal store initialization. See [backup workflow and limits](BACKUP.md).

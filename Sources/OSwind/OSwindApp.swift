@@ -11,7 +11,9 @@ import OSwindCore
             if let appearanceIndex = CommandLine.arguments.firstIndex(of:"--preview-appearance"), appearanceIndex+1 < CommandLine.arguments.count {
                 NSApp.appearance = NSAppearance(named:CommandLine.arguments[appearanceIndex+1] == "light" ? .aqua : .darkAqua)
             }
-            let preview = AppModel(), path = CommandLine.arguments[index+1]
+            let preview: AppModel
+            do { preview = try AppModel() } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)); NSApp.terminate(nil); return }
+            let path = CommandLine.arguments[index+1]
             if let queryIndex = CommandLine.arguments.firstIndex(of:"--preview-query"), queryIndex+1 < CommandLine.arguments.count { preview.query = CommandLine.arguments[queryIndex+1] }
             if let questionIndex = CommandLine.arguments.firstIndex(of:"--preview-question"), questionIndex+1 < CommandLine.arguments.count { preview.question = CommandLine.arguments[questionIndex+1] }
             if CommandLine.arguments.contains("--preview-literal") { preview.interpretQuery = false }
@@ -40,12 +42,39 @@ import OSwindCore
 }
 @main struct OSwindApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var model = AppModel()
+    @StateObject var session = AppSession()
     var body: some Scene {
-        Window("OSwind",id:"main") { WorkspaceView().environmentObject(model).frame(minWidth:1000,minHeight:680).tint(OSwindTheme.accent) }
-            .defaultSize(width:1320,height:850)
-            .commands { CommandGroup(after:.newItem) { Button("Search memories") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); NotificationCenter.default.post(name:.oswindFocusSearch,object:nil) }.keyboardShortcut("k"); Button(model.isCapturing ? "Pause capture" : "Resume capture") { model.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]); Button("Settings…") { model.showSettings = true }.keyboardShortcut(",") } }
-        MenuBarExtra { VStack(alignment:.leading,spacing:12) {
+        Window("OSwind",id:"main") {
+            Group {
+                if let model = session.model { WorkspaceView().environmentObject(model) }
+                else { LibraryRecoveryView(session:session) }
+            }.frame(minWidth:1000,minHeight:680).tint(OSwindTheme.accent)
+                .onReceive(NotificationCenter.default.publisher(for:.oswindOpenLibrary)) { event in if let url = event.object as? URL { session.open(url) } }
+                .onReceive(NotificationCenter.default.publisher(for:.oswindChooseLibrary)) { _ in session.choose() }
+                .onOpenURL { url in
+                    if let model = session.model { model.settingsTab = "Data"; model.showSettings = true; model.libraryTransfer.inspect(url) }
+                    else { session.recoveryTransfer.inspect(url) }
+                }
+                .alert("Library could not be opened",isPresented:Binding(get:{session.model != nil && session.failure != nil},set:{if !$0 {session.failure=nil}})) { Button("OK") {session.failure=nil} } message: { Text(session.failure ?? "") }
+        }.defaultSize(width:1320,height:850)
+            .commands { CommandGroup(after:.newItem) {
+                Button("Search memories") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); NotificationCenter.default.post(name:.oswindFocusSearch,object:nil) }.keyboardShortcut("k")
+                Button(session.model?.isCapturing == true ? "Pause capture" : "Resume capture") { session.model?.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]).disabled(session.model == nil)
+                Button("Settings…") { if let model = session.model {model.showSettings=true} else {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)} }.keyboardShortcut(",")
+            } }
+        MenuBarExtra {
+            if let model = session.model { LibraryMenuContent().environmentObject(model) }
+            else { VStack(alignment:.leading,spacing:12) { Text("Library unavailable").font(.headline); Button("Open OSwind") {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)}; Button("Quit OSwind") {NSApp.terminate(nil)} }.padding() }
+        } label: {
+            if let model = session.model { MenuBarIcon().environmentObject(model) }
+            else { RecoveryMenuIcon() }
+        }.menuBarExtraStyle(.window)
+    }
+}
+struct LibraryMenuContent: View {
+    @EnvironmentObject var model: AppModel
+    var body: some View {
+        VStack(alignment:.leading,spacing:12) {
             Text("OSwind").font(.headline); Text(model.capture.status).font(.caption)
             Button("Open OSwind  ⇧⌘Space") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }
             Button(model.isCapturing ? "Pause capture" : "Resume capture") { model.toggleCapture() }
@@ -53,15 +82,22 @@ import OSwindCore
             Button("Capture now") { Task { await model.capture.captureOnce(manual:true) } }
             Button(model.audio.running ? "Stop audio" : "Start audio") { if model.audio.running { model.audio.finish() } else { Task { await model.audio.start() } } }
             Divider(); Text("\(model.stats.count) memories · stored on this Mac").font(.caption)
-            Button("Quit OSwind") { model.capture.pause(); model.audio.stop(); NSApp.terminate(nil) }
-        }.padding().frame(width:280) } label: { MenuBarIcon().environmentObject(model) }
-        .menuBarExtraStyle(.window)
+            Button("Quit OSwind") { model.prepareForLibrarySwitch(); NSApp.terminate(nil) }
+        }.padding().frame(width:280)
+    }
+}
+struct RecoveryMenuIcon: View {
+    @Environment(\.openWindow) var openWindow
+    var body: some View {
+        Image(systemName:"externaldrive.badge.exclamationmark").onReceive(NotificationCenter.default.publisher(for:.oswindOpenMain)) { _ in openWindow(id:"main"); NSApp.activate(ignoringOtherApps:true) }
     }
 }
 
 extension Notification.Name {
     static let oswindOpenMain = Notification.Name("OSwindOpenMain")
     static let oswindFocusSearch = Notification.Name("OSwindFocusSearch")
+    static let oswindOpenLibrary = Notification.Name("OSwindOpenLibrary")
+    static let oswindChooseLibrary = Notification.Name("OSwindChooseLibrary")
 }
 struct MenuBarIcon: View {
     @EnvironmentObject var model: AppModel

@@ -44,6 +44,65 @@ final class BackupFileTree {
         }
         descriptor = opened; self.root = root; self.writable = writable
     }
+    init(takingDirectory file: Int32, root: URL, writable: Bool) throws {
+        var actual = stat()
+        guard fstat(file,&actual) == 0, actual.st_mode & S_IFMT == S_IFDIR,
+              !writable || (actual.st_uid == getuid() && actual.st_mode & 0o077 == 0) else {
+            close(file); throw BackupFileError.invalid("Invalid owned backup workspace descriptor")
+        }
+        descriptor = file; self.root = root; self.writable = writable
+    }
+    func withRootDirectory<T>(_ body: (Int32) throws -> T) rethrows -> T { try body(descriptor) }
+    func isAncestor(of other: BackupFileTree) throws -> Bool {
+        var own = stat(); guard fstat(descriptor,&own) == 0 else { throw Self.failure("Cannot inspect backup source directory") }
+        var current = other.withRootDirectory { openat($0,".",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW) }
+        guard current >= 0 else { throw Self.failure("Cannot inspect backup destination directory") }
+        defer { close(current) }
+        for _ in 0..<1024 {
+            var child = stat(); guard fstat(current,&child) == 0 else { throw Self.failure("Cannot inspect backup directory ancestry") }
+            if own.st_dev == child.st_dev && own.st_ino == child.st_ino { return true }
+            let parent = openat(current,"..",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
+            guard parent >= 0 else { throw Self.failure("Cannot inspect backup parent directory") }
+            var metadata = stat(); guard fstat(parent,&metadata) == 0 else { close(parent); throw Self.failure("Cannot inspect backup parent") }
+            if metadata.st_dev == child.st_dev && metadata.st_ino == child.st_ino { close(parent); return false }
+            close(current); current = parent
+        }
+        throw BackupFileError.invalid("Backup directory ancestry is too deep")
+    }
+    func remove(_ relative: String) throws {
+        guard writable else { throw BackupFileError.invalid("Archive directories are read-only") }
+        let parts = try Self.components(relative), parent = try directory(parts.dropLast()); defer { close(parent) }
+        guard unlinkat(parent,parts.last!,0) == 0 else { throw Self.failure("Cannot remove backup scratch member") }
+    }
+    func removeAllChildren() throws {
+        guard writable else { throw BackupFileError.invalid("Archive directories are read-only") }
+        try Self.removeChildren(descriptor,depth:0)
+    }
+    private static func removeChildren(_ directory: Int32, depth: Int) throws {
+        guard depth < 64 else { throw BackupFileError.invalid("Backup cleanup directory depth exceeded") }
+        let duplicate = openat(directory,".",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
+        guard duplicate >= 0 else { throw failure("Cannot open backup cleanup directory") }
+        guard let entries = fdopendir(duplicate) else { close(duplicate); throw failure("Cannot enumerate backup cleanup directory") }
+        defer { closedir(entries) }
+        while true {
+            errno = 0
+            guard let entry = readdir(entries) else { if errno != 0 { throw failure("Backup cleanup enumeration failed") }; break }
+            let name = withUnsafePointer(to:&entry.pointee.d_name) { $0.withMemoryRebound(to:CChar.self,capacity:1024) { String(cString:$0) } }
+            if name == "." || name == ".." { continue }
+            var metadata = stat()
+            guard fstatat(directory,name,&metadata,AT_SYMLINK_NOFOLLOW) == 0 else { throw failure("Cannot inspect backup cleanup member") }
+            if metadata.st_mode & S_IFMT == S_IFDIR {
+                let child = openat(directory,name,O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
+                guard child >= 0 else { throw failure("Cannot open backup cleanup member") }
+                var opened = stat()
+                guard fstat(child,&opened) == 0, opened.st_dev == metadata.st_dev, opened.st_ino == metadata.st_ino else { close(child); throw BackupFileError.changed("Backup cleanup member changed before opening") }
+                do { try removeChildren(child,depth:depth+1); close(child) } catch { close(child); throw error }
+                var current = stat()
+                guard fstatat(directory,name,&current,AT_SYMLINK_NOFOLLOW) == 0, current.st_dev == metadata.st_dev, current.st_ino == metadata.st_ino else { throw BackupFileError.changed("Backup cleanup member changed") }
+                guard unlinkat(directory,name,AT_REMOVEDIR) == 0 else { throw failure("Cannot remove backup cleanup directory") }
+            } else { guard unlinkat(directory,name,0) == 0 else { throw failure("Cannot remove backup cleanup member") } }
+        }
+    }
     deinit { close(descriptor) }
     private static func failure(_ context: String, code: Int32 = errno) -> BackupFileError {
         if code == ENOENT { return .missing(context+": missing file") }
@@ -160,7 +219,7 @@ final class BackupFileTree {
     func withNewFile<T>(_ member: String, _ body: (Int32) throws -> T) throws -> T {
         try createFile(member,body)
     }
-    func forEachEntry(in relative: String? = nil, _ body: (String) throws -> Void) throws {
+    func forEachEntry(in relative: String? = nil, ignoreInvalidNames: Bool = false, _ body: (String) throws -> Void) throws {
         let parts = try relative.map(Self.components) ?? []
         let file = try directory(parts[...])
         guard let entries = fdopendir(file) else { close(file); throw Self.failure("Cannot enumerate backup directory") }
@@ -173,7 +232,7 @@ final class BackupFileTree {
                 guard length > 0, length <= bytes.count else { return nil }
                 return String(bytes:bytes.prefix(length),encoding:.utf8)
             }
-            guard let name else { throw BackupFileError.invalid("Backup member name is not valid UTF-8") }
+            guard let name else { if ignoreInvalidNames { continue }; throw BackupFileError.invalid("Backup member name is not valid UTF-8") }
             if name == "." || name == ".." { continue }
             try body(name)
         }
@@ -181,7 +240,7 @@ final class BackupFileTree {
     /// Prefer a descriptor-based APFS COW clone. The fallback also reads the
     /// verified descriptor, so pathname replacement cannot redirect the copy.
     @discardableResult func pin(_ relative: String, to target: BackupFileTree, as member: String,
-                               preferClone: Bool = true) throws -> BackupPinMethod {
+                               preferClone: Bool = true, progress: (Int64) throws -> Void = { _ in }) throws -> BackupPinMethod {
         guard target.writable else { throw BackupFileError.invalid("Pin destination is read-only") }
         return try withFile(relative) { file, metadata in
             if preferClone {
@@ -195,12 +254,12 @@ final class BackupFileTree {
                     let copied = try Self.stamp(output)
                     guard copied.bytes == metadata.bytes, try Self.stamp(file) == metadata else { throw BackupFileError.changed("Media changed while creating a snapshot pin") }
                     guard fchmod(output,0o600) == 0, fsync(output) == 0 else { throw Self.failure("Cannot secure cloned backup member") }
-                    complete = true; return .clone
+                    try progress(metadata.bytes); complete = true; return .clone
                 }
                 let code = errno
                 guard [ENOTSUP,EXDEV,EINVAL,ENOSYS].contains(code) else { throw Self.failure("Cannot clone backup member",code:code) }
             }
-            _ = try target.createFile(member) { output in try Self.stream(file,before:metadata,output:output,progress:{ _ in }) }
+            _ = try target.createFile(member) { output in try Self.stream(file,before:metadata,output:output,progress:progress) }
             return .copy
         }
     }

@@ -58,6 +58,10 @@ do {
           reindex [--provider apple|ollama] [--model NAME] [--use-model]  Build/resume source and passage vectors
           index-search [--model NAME] [--rebuild] [--use-index]  Prepare fast local retrieval
           eval-retrieval [--model NAME]   Evaluate the diverse relevance fixture
+          backup create PATH             Back up database, chats, settings and retained media
+          backup inspect PATH            Verify a complete .oswindbackup package
+          backup restore PATH --to DIR   Restore into a new, quiet library
+          backup cleanup [--directory PARENT] Remove abandoned staging jobs
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           delete ID                      Delete one memory and its media
@@ -72,6 +76,31 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "backup" {
+        guard let action = args.first else { throw OSwindError.invalid("Use backup create PATH, inspect PATH, restore PATH --to NEW_DIRECTORY, or cleanup") }; args.removeFirst()
+        let reporter = BackupCLIProgress()
+        switch action {
+        case "create":
+            let attemptsText = try validatedOption("--max-attempts") ?? "3"
+            guard let attempts = Int(attemptsText), (1...10).contains(attempts), args.count==1 else { throw OSwindError.invalid("Use backup create PATH [--max-attempts 1–10]") }
+            let destination = URL(fileURLWithPath:args[0]); guard FileManager.default.fileExists(atPath:root.appendingPathComponent("memory.sqlite").path) else { throw OSwindError.invalid("The source library does not exist") }
+            let store = try MemoryStore(root:root)
+            try encoded(await runBackupCLI { try LibraryBackup.create(store:store,destination:destination,maxAttempts:attempts,progress:reporter.update) })
+        case "inspect":
+            guard args.count==1 else { throw OSwindError.invalid("Use backup inspect PATH") }; let archive = URL(fileURLWithPath:args[0])
+            try encoded(await runBackupCLI { try LibraryBackup.inspect(archive,progress:reporter.update) })
+        case "restore":
+            guard let target = try validatedOption("--to") else { throw OSwindError.invalid("Use backup restore PATH --to NEW_DIRECTORY") }
+            let fingerprint = try validatedOption("--fingerprint")
+            guard args.count==1 else { throw OSwindError.invalid("Use backup restore PATH --to NEW_DIRECTORY [--fingerprint HASH]") }
+            let archive = URL(fileURLWithPath:args[0]), destination = URL(fileURLWithPath:target)
+            try encoded(await runBackupCLI { try LibraryBackup.restore(archive,to:destination,expectedFingerprint:fingerprint,progress:reporter.update) })
+        case "cleanup":
+            let directory = try validatedOption("--directory").map { URL(fileURLWithPath:$0) } ?? FileManager.default.temporaryDirectory
+            guard args.isEmpty else { throw OSwindError.invalid("Use backup cleanup [--directory PARENT]") }
+            try emit(["removed_jobs":BackupWorkspaceCleanup.run(in:directory)])
+        default: throw OSwindError.invalid("Use backup create, inspect, restore or cleanup")
+        }
     } else if command == "doctor" {
         let settings = AppSettings.load(root:root); let embedder = LocalEmbedder()
         var result: [String:Any] = ["version":"0.1.0","os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "unavailable","screenRecording":CGPreflightScreenCaptureAccess(),"screenLocked":SessionState.locked,"accessibility":AXIsProcessTrusted(),"sentenceEmbeddings":embedder.available,"dataDirectory":root.path,"whisperExecutable":FileManager.default.isExecutableFile(atPath:settings.whisperBinary),"whisperModel":FileManager.default.fileExists(atPath:settings.whisperModel),"provider":settings.ai.provider.rawValue]
@@ -216,4 +245,5 @@ do {
         default: throw OSwindError.invalid("Unknown command \(command). Run oswindctl help.")
         }
     }
-} catch { FileHandle.standardError.write(Data(("OSwind: " + error.localizedDescription + "\n").utf8)); exit(1) }
+} catch is CancellationError { FileHandle.standardError.write(Data("Backup cancelled.\n".utf8)); exit(130) }
+catch { FileHandle.standardError.write(Data(("OSwind: " + error.localizedDescription + "\n").utf8)); exit(1) }

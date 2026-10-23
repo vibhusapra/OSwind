@@ -1,6 +1,6 @@
 # Complete library backup and restore
 
-Status: implementation in progress on `codex/full-backup`. PR #11 is green. Database snapshot and descriptor-based file primitives with focused tests exist; no complete backup/restore workflow is delivered yet. JSON import/export remains available and is not a full backup.
+Status: the full package, safe restore, CLI and app/recovery controls are implemented on `codex/full-backup` / [PR #12](https://github.com/vibhusapra/OSwind/pull/12). See [usage](BACKUP.md). Backend/process checks and a 100k mixed-media workload pass; native interaction and the fault/platform gates below remain open. JSON import/export is still text interchange, not a full backup.
 
 ## Required result
 
@@ -18,10 +18,10 @@ Six snapshot fixtures cover an uncheckpointed WAL plus vectors/chats, concurrent
 
 ## Media consistency without a whole-export capture pause
 
-1. Privately pre-pin currently referenced media on the source filesystem, using descriptor-based APFS COW clones with a streaming-copy fallback. Stream the source payload rows; do not accumulate every Memory in an array. Pin by safe logical path and file identity, not by following arbitrary filesystem links.
+1. Privately pre-pin currently referenced media outside the live library in the system temporary directory, using descriptor-based APFS COW clones with a streaming-copy fallback. Stream the source payload rows; do not accumulate every Memory in an array. Pin by safe logical path and file identity, not by following arbitrary filesystem links.
 2. Produce the database snapshot. Enumerate its referenced media and fill any pins for newly captured assets. Already pinned files survive a subsequent source deletion or overwrite. If a referenced asset disappeared before it was pinned, retry the database snapshot (bounded attempts), rather than publish an inconsistent backup.
 3. Copy only assets referenced by the successful snapshot into an unpublished package beside the destination. Stream bytes and hashes, verify regular file identity/size/timestamps before and after copying, and fail on mutation or unreadable media. Never silently omit a retained asset.
-4. Exclude private pin staging from normal library storage-budget traversal; clones otherwise appear to double the logical media size and could provoke unintended pruning. Staging ownership, active-job leases and conservative stale-job cleanup require tests. Cancellation removes owned staging only. Crashes may leave private staging, but must never publish an incomplete package or damage the source.
+4. Keep private pin staging outside the live library so logical clone sizes cannot count against its storage budget. Each private payload has a sibling marker and held kernel lease. Cleanup requires a recognized marker, private permissions, a dead creator, an exclusive lease and matching directory identity. Cancellation removes owned staging; forced-exit cleanup is tested against real processes. PID reuse conservatively leaves stale work.
 
 The installed SDK declares `fclonefileat` (macOS 10.12+), also listed in Apple’s [APFS API guide](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/ToolsandAPIs/ToolsandAPIs.html). Pins clone the already-verified descriptor rather than resolve the source pathname again. A regular streaming-copy fallback is tested; non-APFS/external-volume integration remains open.
 
@@ -29,7 +29,7 @@ Capture currently generates unique immutable media paths. A backup cannot promis
 
 ## Package and manifest
 
-Use a private directory package (`.oswindbackup`) with a versioned small header, one standalone database, normalized settings and a streaming NDJSON media manifest. Each media entry maps its original logical path to an opaque lowercase-hex blob name, plus byte count and SHA-256. Opaque members avoid case/Unicode alias collisions on common Mac volumes. Original paths are metadata, never paths used to open archive members. Hashes detect corruption, not authorship/authenticity.
+Use a private directory package (`.oswindbackup`) with a versioned small header, one standalone database, source settings and a streaming NDJSON media manifest. Each media entry maps its original logical path to an opaque lowercase-hex blob name, plus byte count and SHA-256. Opaque members avoid case/Unicode alias collisions on common Mac volumes. Original paths are metadata, never paths used to open archive members. Hashes detect corruption, not authorship/authenticity.
 
 Manifest parsing must bound line/header/path lengths and counts, reject duplicate mappings and invalid sizes/hashes, and handle integer overflow. Only known member names and regular files are allowed. Open every filesystem component relative to retained directory descriptors with no symlink following; reject traversal, NULs, absolute paths, special files and archive/source/destination overlap. Check cancellation and disk errors while streaming. Publish the completed package atomically without replacing an existing path. Keep a partial package invisible to ordinary restore selection.
 
@@ -43,12 +43,11 @@ A chosen archive is untrusted input. Do not open its database as a normal Memory
 
 In-place replacement while other processes retain old database handles can corrupt media after a folder swap. A new-root restore avoids that race. Future in-place/undo support needs a process-wide lifetime lease protocol and crash-recovery state, with older already-running writers addressed explicitly; a successful rename alone does not prove safety.
 
-## Remaining implementation and evidence
+## Delivered evidence and remaining gates
 
-- Descriptor-based filesystem primitives pass 13 focused fixtures, including a successful APFS clone and forced streaming fallback. Package manifest work remains.
-- Streaming source pre-pin, snapshot/retry, copy/hash/progress/cancel and stale-stage cleanup.
-- Complete archive inspection and safe data-only reconstruction with old-format adapters.
-- UI/CLI backup, inspect, restore and library selection/relaunch/recovery.
-- Tests: WAL/chats/media/vectors/passages round trip; concurrent capture/deletion; schema/manifest tampering; malicious triggers; path/symlink/case aliases; oversized/truncated data; destination refusal; interruption/disk failure; no credentials or service auto-start.
-- Performance: sustained capture/search during backup, large archive RSS/disk/index lag, cancel latency, cold restore and controlled filesystem conditions. Retain failures and raw trials. Do not count a database-only fixture as full media/restore validation.
-- Encryption/vault and native GUI acceptance remain separate delivery gates.
+- Snapshot/file/manifest/workspace/backup/restore/location fixtures cover WAL data, media/chats/vectors/passages, source churn/retry exhaustion, original-library preservation, NUL identifiers, precise dates, case/Unicode paths, active kernel leases, abandoned stages, symlinks/FIFOs, malformed/generated tables, malicious archived triggers, hash/schema/fingerprint changes and cancellation. ThreadSanitizer is run on the new subset.
+- Real separate CLI processes verify media/chat reuse, settings, credentials/cache exclusion, destination refusal, invalid archives and SIGINT/SIGKILL recovery with a sparse 2 GiB synthetic media asset. No unrelated normal data root is opened by inspect/restore.
+- The first 100k benchmark fixture was invalid: Python's disabled foreign keys left its template vector orphaned. Restore correctly rejected it. The failed trial/logs remain in `benchmarks/backup-100000-v1.*`; source foreign-key/integrity checks are now mandatory.
+- The corrected 100k/1,000-file trial (373 MB payload) creates in 6.49 s, inspects in .70 s and restores in 25.93 s. Peak RSS is 117/20/130 MB respectively. Forty-two concurrent real CLI note/search cycles complete. This is one APFS run with uncontrolled caches, padded synthetic PNGs and short notes; it is not realistic media distribution, a million-vector restore, an energy measurement or competitor evidence.
+- The app's own offscreen settings/recovery views compile/render. Native AppKit controls are not all reliably rasterized by that harness; the locked Mac prevents live panel, focus/hotkey and accessibility acceptance. That remains an explicit gate.
+- Open: non-APFS/external-volume integration; disk-full/power-loss fault injection and stronger operation durability; realistic large vector/chat/media distributions; broader concurrent capture/retention; encrypted vault/backup; native interaction/accessibility and sustained energy/reliability.

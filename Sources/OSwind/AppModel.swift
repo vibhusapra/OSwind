@@ -9,6 +9,8 @@ import ServiceManagement
     let embedder = LocalEmbedder()
     let capture: CaptureController
     let audio: AudioController
+    let libraryTransfer = LibraryTransferModel()
+    @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings
         if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
@@ -72,10 +74,12 @@ import ServiceManagement
     private var statisticsPending = false
     private var storageGeneration = UUID()
     private var housekeeping: Timer?
-    init() {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true) throws {
         demo = CommandLine.arguments.contains("--demo")
-        let root = ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"].map { URL(fileURLWithPath:$0) } ?? (demo ? Paths.data.deletingLastPathComponent().appendingPathComponent("OSwind-Demo") : Paths.data)
-        do { store = try MemoryStore(root:root) } catch { fatalError("OSwind cannot open its local data directory: \(error.localizedDescription)") }
+        let resolved = LibraryLocationPreferences.selection(demo:demo)
+        let root = selectedRoot ?? resolved.url
+        if selectedRoot == nil { try resolved.validate() }
+        store = try MemoryStore(root:root)
         let loaded = AppSettings.load(root:root)
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)
@@ -88,8 +92,12 @@ import ServiceManagement
         }
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
-        refresh(forceStatistics:true); refreshChats(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
-        housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain() } }
+        refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
+        housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }
+    }
+    func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
+    func prepareForLibrarySwitch() {
+        pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -279,12 +287,12 @@ import ServiceManagement
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats() } catch { errorMessage = error.localizedDescription } }
-    func maintain() {
-        let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower
+    func maintain(automatic: Bool = false) {
+        let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower, shouldPrune = !automatic || settings.automaticMaintenance
         Task {
             do {
                 _ = try await Task.detached(priority:.utility) {
-                    let removed = try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000)
+                    let removed = shouldPrune ? try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000) : 0
                     try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower)
                     return removed
                 }.value

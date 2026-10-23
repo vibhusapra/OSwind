@@ -1,0 +1,285 @@
+{
+  "fixture": {
+    "records": 100000,
+    "media_files": 1000,
+    "bytes_per_media": 262144,
+    "description": "authored short notes without bulk vectors, padded 1px PNGs; concurrent CLI notes include Apple embeddings; no personal captures",
+    "seed_seconds": 4.435174040962011,
+    "database_bytes": 110977024
+  },
+  "limits": [
+    "one run per operation",
+    "uncontrolled filesystem caches",
+    "CLI timings include process startup and store open",
+    "synthetic retained bytes, not realistic capture distribution",
+    "no power or competitor comparison"
+  ],
+  "baseline_search_ms": [
+    48.92445798031986,
+    46.72500002197921,
+    46.6624170076102,
+    45.91112502384931,
+    45.8380829077214
+  ],
+  "create": {
+    "seconds": 6.486783375032246,
+    "peak_rss_bytes": 116785152,
+    "result": {
+      "archiveFingerprint": "36c1b781d4c862b892ef4b585797b8f43c6ede6ed9c6a00a2b1436e2f53328a2",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:07:35.277593Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 1000,
+      "memories": 100016,
+      "payloadBytes": 373257219,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "concurrent_cli": [
+    {
+      "insert_ms": 55.08654098957777,
+      "search_ms": 44.4567920640111,
+      "offset_s": 0.09966316598001868
+    },
+    {
+      "insert_ms": 53.15870908088982,
+      "search_ms": 44.84662495087832,
+      "offset_s": 0.2548376659397036
+    },
+    {
+      "insert_ms": 52.98416700679809,
+      "search_ms": 44.16404105722904,
+      "offset_s": 0.41203979100100696
+    },
+    {
+      "insert_ms": 53.43912495300174,
+      "search_ms": 45.116125023923814,
+      "offset_s": 0.5706439579371363
+    },
+    {
+      "insert_ms": 53.97316697053611,
+      "search_ms": 44.72629202064127,
+      "offset_s": 0.72939662495628
+    },
+    {
+      "insert_ms": 54.22358401119709,
+      "search_ms": 44.102084008045495,
+      "offset_s": 0.8801469580503181
+    },
+    {
+      "insert_ms": 53.592000040225685,
+      "search_ms": 43.49104198627174,
+      "offset_s": 1.0288997499737889
+    },
+    {
+      "insert_ms": 52.971625002101064,
+      "search_ms": 44.39362499397248,
+      "offset_s": 1.1791842080419883
+    },
+    {
+      "insert_ms": 53.90379193704575,
+      "search_ms": 44.10079098306596,
+      "offset_s": 1.330044790985994
+    },
+    {
+      "insert_ms": 51.9574589561671,
+      "search_ms": 43.230082956142724,
+      "offset_s": 1.476997165940702
+    },
+    {
+      "insert_ms": 52.068916033022106,
+      "search_ms": 43.37616602424532,
+      "offset_s": 1.6324854160193354
+    },
+    {
+      "insert_ms": 52.14350007008761,
+      "search_ms": 44.57883303985,
+      "offset_s": 1.789259499986656
+    },
+    {
+      "insert_ms": 52.822374971583486,
+      "search_ms": 43.51833404507488,
+      "offset_s": 1.9364817909663543
+    },
+    {
+      "insert_ms": 51.82137503288686,
+      "search_ms": 43.899667100049555,
+      "offset_s": 2.0922459580469877
+    },
+    {
+      "insert_ms": 52.26404103450477,
+      "search_ms": 45.16291699837893,
+      "offset_s": 2.24971937504597
+    },
+    {
+      "insert_ms": 53.19858400616795,
+      "search_ms": 43.39783301111311,
+      "offset_s": 2.4063587499549612
+    },
+    {
+      "insert_ms": 53.242500056512654,
+      "search_ms": 45.49574991688132,
+      "offset_s": 2.5651526249712333
+    },
+    {
+      "insert_ms": 52.817000076174736,
+      "search_ms": 43.838542071171105,
+      "offset_s": 2.7218638750491664
+    },
+    {
+      "insert_ms": 52.97833296936005,
+      "search_ms": 44.35191594529897,
+      "offset_s": 2.8708115000044927
+    },
+    {
+      "insert_ms": 54.283083067275584,
+      "search_ms": 45.04504194483161,
+      "offset_s": 3.022956999950111
+    },
+    {
+      "insert_ms": 53.4242499852553,
+      "search_ms": 45.227458933368325,
+      "offset_s": 3.1759090409614146
+    },
+    {
+      "insert_ms": 51.9705000333488,
+      "search_ms": 44.08100002910942,
+      "offset_s": 3.3272076250286773
+    },
+    {
+      "insert_ms": 52.81041597481817,
+      "search_ms": 44.59387494716793,
+      "offset_s": 3.484669249970466
+    },
+    {
+      "insert_ms": 66.99604191817343,
+      "search_ms": 44.898291933350265,
+      "offset_s": 3.6566107079852372
+    },
+    {
+      "insert_ms": 54.54791593365371,
+      "search_ms": 45.86708405986428,
+      "offset_s": 3.8155664999503642
+    },
+    {
+      "insert_ms": 54.372541955672204,
+      "search_ms": 45.44562508817762,
+      "offset_s": 3.973315624985844
+    },
+    {
+      "insert_ms": 55.07795896846801,
+      "search_ms": 46.612042002379894,
+      "offset_s": 4.133511040941812
+    },
+    {
+      "insert_ms": 55.81854097545147,
+      "search_ms": 47.360709053464234,
+      "offset_s": 4.29571054095868
+    },
+    {
+      "insert_ms": 56.104499963112175,
+      "search_ms": 46.759124961681664,
+      "offset_s": 4.450852624955587
+    },
+    {
+      "insert_ms": 54.227667045779526,
+      "search_ms": 46.11333296634257,
+      "offset_s": 4.607164916000329
+    },
+    {
+      "insert_ms": 56.13149993587285,
+      "search_ms": 46.08937492594123,
+      "offset_s": 4.760526124970056
+    },
+    {
+      "insert_ms": 54.67945791315287,
+      "search_ms": 46.098874998278916,
+      "offset_s": 4.912464458029717
+    },
+    {
+      "insert_ms": 55.159542011097074,
+      "search_ms": 53.88749996200204,
+      "offset_s": 5.081560791004449
+    },
+    {
+      "insert_ms": 55.404959013685584,
+      "search_ms": 47.03604197129607,
+      "offset_s": 5.234303666045889
+    },
+    {
+      "insert_ms": 54.630624945275486,
+      "search_ms": 46.56666703522205,
+      "offset_s": 5.38584941602312
+    },
+    {
+      "insert_ms": 54.59845904260874,
+      "search_ms": 46.703791012987494,
+      "offset_s": 5.547198040992953
+    },
+    {
+      "insert_ms": 56.28137500025332,
+      "search_ms": 47.85312502644956,
+      "offset_s": 5.706572333001532
+    },
+    {
+      "insert_ms": 54.19141601305455,
+      "search_ms": 47.07320895977318,
+      "offset_s": 5.858083416009322
+    },
+    {
+      "insert_ms": 54.850082960911095,
+      "search_ms": 47.217292012646794,
+      "offset_s": 6.020200832979754
+    },
+    {
+      "insert_ms": 54.55537501256913,
+      "search_ms": 46.28775001037866,
+      "offset_s": 6.178329707938246
+    },
+    {
+      "insert_ms": 54.490083013661206,
+      "search_ms": 46.175625058822334,
+      "offset_s": 6.339047332992777
+    },
+    {
+      "insert_ms": 54.43458294030279,
+      "search_ms": 53.47633396741003,
+      "offset_s": 6.498062583035789
+    }
+  ],
+  "inspect": {
+    "seconds": 0.6953084579436108,
+    "peak_rss_bytes": 19906560,
+    "result": {
+      "archiveFingerprint": "36c1b781d4c862b892ef4b585797b8f43c6ede6ed9c6a00a2b1436e2f53328a2",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:07:35.277593Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 1000,
+      "memories": 100016,
+      "payloadBytes": 373257219,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "restore": {
+    "seconds": 25.931330124964006,
+    "peak_rss_bytes": 130236416,
+    "result": {
+      "archiveFingerprint": "36c1b781d4c862b892ef4b585797b8f43c6ede6ed9c6a00a2b1436e2f53328a2",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:07:35.277593Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 1000,
+      "memories": 100016,
+      "payloadBytes": 373257219,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "passed": true
+}
