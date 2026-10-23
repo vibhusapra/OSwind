@@ -42,7 +42,7 @@ struct WorkspaceView: View {
                 HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
-        .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView().environmentObject(m) }
+        .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
         .sheet(item:$m.selected) { MemoryDetail(memory:$0,query:m.selectedEvidenceQuery).environmentObject(m) }
         .sheet(isPresented:$showNote) { VStack(alignment:.leading,spacing:16) { Text("Keep a thought").font(.title2.weight(.semibold)); TextEditor(text:$note).font(.body).frame(width:500,height:220); HStack { Button("Cancel") { showNote = false }; Spacer(); Button("Save note") { m.addNote(note); note = ""; showNote = false }.buttonStyle(.borderedProminent).disabled(note.isEmpty) } }.padding(24) }

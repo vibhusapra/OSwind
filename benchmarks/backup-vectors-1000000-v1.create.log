@@ -1,0 +1,52 @@
+Preparing media
+Snapshotting database
+Snapshotting database · 64000/1394679 pages
+Snapshotting database · 114176/1394679 pages
+Snapshotting database · 164864/1394679 pages
+Snapshotting database · 214528/1394679 pages
+Snapshotting database · 265216/1394679 pages
+Snapshotting database · 344064/1394679 pages
+Snapshotting database · 423424/1394679 pages
+Snapshotting database · 503808/1394679 pages
+Snapshotting database · 583680/1394679 pages
+Snapshotting database · 662528/1394679 pages
+Snapshotting database · 741888/1394679 pages
+Snapshotting database · 821760/1394679 pages
+Snapshotting database · 901632/1394679 pages
+Snapshotting database · 979968/1394679 pages
+Snapshotting database · 1058816/1394679 pages
+Snapshotting database · 1139200/1394679 pages
+Snapshotting database · 1219584/1394679 pages
+Snapshotting database · 1298432/1394679 pages
+Snapshotting database · 1379328/1394679 pages
+Copying database · 5.71 GB
+Verifying database · 1 MB
+Verifying database · 585.1 MB
+Verifying database · 1.18 GB
+Verifying database · 1.77 GB
+Verifying database · 2.35 GB
+Verifying database · 2.94 GB
+Verifying database · 3.52 GB
+Verifying database · 4.11 GB
+Verifying database · 4.7 GB
+Verifying database · 5.29 GB
+Verifying package
+Publishing backup
+       16.75 real         6.95 user         5.82 sys
+           116310016  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                8485  page reclaims
+                   6  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   1  messages sent
+                   0  messages received
+                   0  signals received
+               58075  voluntary context switches
+                2747  involuntary context switches
+        176986847378  instructions retired
+         57304989242  cycles elapsed
+           102957680  peak memory footprint

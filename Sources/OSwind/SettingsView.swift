@@ -156,7 +156,7 @@ struct SettingsView: View {
             }
             Section("MCP for Claude, Cursor, Codex and other clients") {
                 Text("Point your MCP client to oswindctl mcp. It provides search_memory, get_memory and memory_stats over stdio. The client runs locally with access to this user's OSwind store; configure only clients you trust.").font(.caption)
-                Text("{\"mcpServers\":{\"oswind\":{\"command\":\"/Applications/OSwind.app/Contents/MacOS/oswindctl\",\"args\":[\"mcp\"]}}}").font(.system(size:11,design:.monospaced)).textSelection(.enabled)
+                Text(mcpConfiguration).font(.system(size:11,design:.monospaced)).textSelection(.enabled)
             }
         }
     }
@@ -164,17 +164,28 @@ struct SettingsView: View {
         Group {
             Section("Your storage") {
                 Text(m.store.root.path).font(.caption).textSelection(.enabled)
+                Toggle("Automatic retention and storage cleanup",isOn:$m.settings.automaticMaintenance)
                 Stepper("Retain \(m.settings.privacy.retentionDays) days",value:$m.settings.privacy.retentionDays,in:1...3650)
                 Stepper("Storage budget: \(m.settings.privacy.maxStorageGB) GB",value:$m.settings.privacy.maxStorageGB,in:1...1000)
-                Text("Retention and storage cleanup run every five minutes while the app is open. Budget pruning removes oldest memories; SQLite file allocation can remain until compaction. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
+                Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Clean up now") { m.maintain() }; Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
             }
-            Section("Portability") {
+            Section("Complete backup & restore") { LibraryTransferView(transfer:m.libraryTransfer,store:m.store) }
+            Section("This library") {
+                Text(m.store.root.path).font(.system(.caption,design:.monospaced)).textSelection(.enabled)
+                Button("Choose another library…") { NotificationCenter.default.post(name:.oswindChooseLibrary,object:nil) }.disabled(m.libraryTransfer.busy)
+                if ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"] != nil { Text("Your launcher selects a library with OSWIND_DATA_DIR. It takes priority on the next launch.").font(.caption).foregroundStyle(.secondary) }
+            }
+            Section("Text interchange") {
                 HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() } }
-                Text("JSON exports include text, tags and source metadata with relative asset references. Copy the whole data folder while capture is paused for a media backup. Imported media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
+                Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Delete") { Button("Delete all local memories…",role:.destructive) { deleteConfirm = true } }
         }
+    }
+    private var mcpConfiguration: String {
+        let object = ["mcpServers":["oswind":["command":"/Applications/OSwind.app/Contents/MacOS/oswindctl","args":["--data",m.store.root.path,"mcp"]]]] as [String:Any]
+        return (try? JSONSerialization.data(withJSONObject:object,options:[.sortedKeys,.prettyPrinted])).flatMap { String(data:$0,encoding:.utf8) } ?? ""
     }
     private func entries(_ text: String) -> [String] { text.components(separatedBy:.newlines).map {$0.trimmingCharacters(in:.whitespaces)}.filter {!$0.isEmpty} }
     private func multiline(_ title: String,value: Binding<String>) -> some View { VStack(alignment:.leading,spacing:6) { Text(title).font(.caption); TextEditor(text:value).font(.system(size:11,design:.monospaced)).frame(height:68).padding(5).background(.background,in:RoundedRectangle(cornerRadius:6)) } }

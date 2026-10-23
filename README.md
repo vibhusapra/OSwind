@@ -76,6 +76,10 @@ Pass `--data /absolute/directory` or `OSWIND_DATA_DIR` for an isolated store. No
 
 For an unlocked Mac with capture permission, `python3 scripts/live-capture-smoke.py` checks real targeted capture/OCR, exclusions, secret redaction, image suppression and deletion using disposable synthetic apps and a temporary store.
 
+## Backup and restore
+
+Settings → Data creates a full `.oswindbackup` package and restores a separate verified library. Retained media, chats, metadata and vectors travel together; credentials, API tokens, models and disposable caches are excluded. Restored services and automatic cleanup start off. Packages are plaintext. See [backup usage and limits](docs/BACKUP.md).
+
 ## Integrations
 
 See [API & MCP](docs/INTEGRATIONS.md). Enabling MCP gives its client access to your local memory. That client may send results to its own provider. OSwind does not control another assistant's data policy.
@@ -86,7 +90,7 @@ Capture begins when you resume it. Audio sources start independently; Pause stop
 
 Secret redaction is pattern-based, not a guarantee of complete PII removal. Detected secrets suppress screenshot retention as well as redacting text. Audio privacy is separate: a one-second foreground privacy check stops audio on an exclusion, and chunks are checked again before queueing; raw chunks exist briefly during local processing. Changes within a polling interval remain a limitation. Transcripts contain microphone/system labels, not speaker identities.
 
-Chat follow-ups use recent user questions to resolve the subject and retrieve fresh evidence within the current scope. Generation receives the current question and the freshly read source excerpts. Earlier questions are kept out of the answer prompt to reduce repeated-question errors. Earlier generated prose is not reused as evidence. Long sources use query-anchored lexical excerpts (or opening/ending passages for recaps), with omission markers and access to the complete source. This is not a semantic chunk index. Chat source text is hydrated from the live store, rather than copied into a second source archive. Deleting/revising a source removes citing turns and resets their session titles; retention also ages out chat turns. Explicitly saved notes, copied text and exported files are independent copies. Apple generated claims use guided source-number output; valid citation numbers do not prove factual support.
+Chat follow-ups use recent user questions to resolve the subject and retrieve fresh evidence within the current scope. Generation receives the current question and the freshly read source excerpts. Earlier questions are kept out of the answer prompt to reduce repeated-question errors. Earlier generated prose is not reused as evidence. Long sources use query-anchored lexical excerpts (or opening/ending passages for recaps), with omission markers and access to the complete source. Long source bodies also have overlapping semantic passages with validated source anchors; lexical excerpts remain the fallback. Chat source text is hydrated from the live store, rather than copied into a second source archive. Deleting/revising a source removes citing turns and resets their session titles; retention also ages out chat turns. Explicitly saved notes, copied text and exported files are independent copies. Apple generated claims use guided source-number output; valid citation numbers do not prove factual support.
 
 SQLite and images are local with restrictive directory permissions; v0 does **not** yet provide an encrypted application vault or biometric unlock. Use FileVault. Ordinary deletion cannot guarantee forensic erasure from APFS snapshots, backups or exports. No analytics, advertising, account, vendor telemetry or automatic cloud fallback is included.
 

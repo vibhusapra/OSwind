@@ -1,0 +1,19 @@
+Verifying media · 1/1000 files
+        0.67 real         0.55 user         0.09 sys
+            19906560  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                1575  page reclaims
+                   6  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   1  messages sent
+                   0  messages received
+                   0  signals received
+                   5  voluntary context switches
+                 141  involuntary context switches
+         12597755484  instructions retired
+          2917559917  cycles elapsed
+            10093120  peak memory footprint

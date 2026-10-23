@@ -2,6 +2,8 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
+    public static let schemaVersion = 7
+    public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
@@ -10,13 +12,15 @@ public final class MemoryStore: @unchecked Sendable {
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
-        self.root = root; annCache = ANNCache(root:root); try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"))
+        self.root = root; annCache = ANNCache(root:root)
+        guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
+        try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"))
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
         sqlite3_busy_timeout(db, 5000)
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
-        guard version <= 6 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
+        guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
         try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON;")
         try exec("BEGIN IMMEDIATE")
         do {
@@ -95,7 +99,7 @@ public final class MemoryStore: @unchecked Sendable {
         sqlite3_finalize(statisticsState)
         if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
-        try exec("PRAGMA user_version=6; COMMIT")
+        try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
@@ -117,6 +121,7 @@ public final class MemoryStore: @unchecked Sendable {
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
         let data = try JSONEncoder().encode(payload)
+        guard data.count <= Self.maximumRecordBytes else { throw OSwindError.invalid("Memory payload exceeds 128 MiB") }
         bind(stmt, 1, memory.id); sqlite3_bind_double(stmt, 2, memory.timestamp.timeIntervalSince1970); bind(stmt, 3, memory.kind.rawValue); bind(stmt, 4, memory.app); bind(stmt, 5, memory.title); bind(stmt, 6, memory.url); bind(stmt, 7, memory.text); sqlite3_bind_int(stmt, 8, memory.favorite ? 1 : 0)
         _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 9, $0.baseAddress, Int32(data.count), transient) }
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
@@ -641,5 +646,39 @@ extension MemoryStore {
             records.append(PassageVector(range:passage.range,vector:vector))
         }
         _ = try savePassages(memory:memory,modelID:embedder.modelID,records:records)
+    }
+}
+
+extension MemoryStore {
+    /// Only the fresh, unpublished restore library uses this operation.
+    func withRestoreTransaction(_ body: (OpaquePointer) throws -> Void) throws {
+        lock.lock(); defer { lock.unlock() }
+        guard let db, try matchingCount()==0 else { throw OSwindError.invalid("Restore requires an empty unpublished library") }
+        // A private single-writer restore does not need WAL. Rollback can then
+        // discard newly appended pages without a large checkpoint on cancel.
+        try exec("PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL; PRAGMA cache_size=-8192; BEGIN IMMEDIATE;")
+        sqlite3_progress_handler(db,1000,{ _ in Task.isCancelled ? 1 : 0 },nil)
+        defer { sqlite3_progress_handler(db,0,nil,nil) }
+        do { try body(db); try Task.checkCancellation(); try exec("COMMIT") }
+        catch { sqlite3_progress_handler(db,0,nil,nil); try? exec("ROLLBACK"); try Task.checkCancellation(); throw error }
+    }
+    func sealRestoredLibrary() throws {
+        lock.lock(); defer { lock.unlock() }
+        guard let db else { throw OSwindError.database("Restore library is closed") }
+        sqlite3_progress_handler(db,1000,{ _ in Task.isCancelled ? 1 : 0 },nil)
+        defer { if let db = self.db { sqlite3_progress_handler(db,0,nil,nil) } }
+        let integrity = try prepare("PRAGMA quick_check")
+        guard sqlite3_step(integrity)==SQLITE_ROW, string(integrity,0)=="ok", sqlite3_step(integrity)==SQLITE_DONE else { sqlite3_finalize(integrity); try Task.checkCancellation(); throw OSwindError.database("Restored library integrity check failed") }
+        sqlite3_finalize(integrity)
+        let foreign = try prepare("PRAGMA foreign_key_check")
+        let status = sqlite3_step(foreign); sqlite3_finalize(foreign)
+        guard status==SQLITE_DONE else { throw OSwindError.database("Restored library has invalid source references") }
+        try Task.checkCancellation()
+        // All prepared statements must close before the folder is published.
+        sqlite3_progress_handler(db,0,nil,nil)
+        guard sqlite3_close(db)==SQLITE_OK else { throw failure() }; self.db = nil
+    }
+    func discardRestoreConnection() {
+        lock.lock(); defer { lock.unlock() }; if let db { sqlite3_close_v2(db); self.db = nil }
     }
 }

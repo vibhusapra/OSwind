@@ -1,0 +1,27 @@
+{
+  "passed": false,
+  "stage": "restore",
+  "records_requested": 100000,
+  "media_files_requested": 1000,
+  "reason": "Restored vector references a missing source",
+  "diagnosis": "The synthetic fixture generator deleted its initial template note with Python SQLite foreign_keys OFF. Its supplemental vector remained orphaned. Restore refused that invalid source; no target was published. This is an invalid-fixture trial, not healthy-library performance evidence.",
+  "correction": "Enable source foreign keys before template deletion; require PRAGMA foreign_key_check and integrity_check before measuring. Persist partial reports/logs on failures.",
+  "measurements": {
+    "create": {
+      "time_real_seconds": 6.41,
+      "peak_rss_bytes": 116817920
+    },
+    "inspect": {
+      "time_real_seconds": 0.67,
+      "peak_rss_bytes": 19906560
+    },
+    "restore": {
+      "time_real_seconds": 24.39,
+      "peak_rss_bytes": 130203648
+    }
+  },
+  "limits": [
+    "uncontrolled caches",
+    "failed invalid-fixture trial; not an end-to-end passing benchmark"
+  ]
+}

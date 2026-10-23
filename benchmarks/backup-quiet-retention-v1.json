@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "elapsed_seconds": 330.86043190956116,
+  "records_before": 6,
+  "records_after": 6,
+  "old_records_after": 6,
+  "automaticMaintenance": false,
+  "fixture": "six synthetic sample records, January 2000 timestamps, 1-day retention, restored settings; demo process ran past five-minute timer",
+  "limits": [
+    "demo paused process, not live capture/native panel acceptance"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "fixture": {
+    "kind": "OSwind synthetic vectors v1",
+    "count": 1000000,
+    "dimensions": 1024
+  },
+  "revision": "db6aa03fc3e31ab6ee215990526879c07fb7815f",
+  "limits": [
+    "single operation trial per phase",
+    "uncontrolled APFS/cache state",
+    "synthetic vectors/text; no retained media or chats",
+    "includes SQLite data/derived SQL tables; excludes disposable native graph files",
+    "not battery or competitor evidence"
+  ],
+  "create": {
+    "seconds": 16.75875499995891,
+    "peak_rss_bytes": 116310016,
+    "exit_code": 0,
+    "result": {
+      "archiveFingerprint": "73f0016898fd4678793c989a97f6e8ca1d00519328bb572665af02a3a5010ceb",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:14:10.956826Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 0,
+      "memories": 1000000,
+      "payloadBytes": 5712606211,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "inspect": {
+    "seconds": 2.6662796249147505,
+    "peak_rss_bytes": 19251200,
+    "exit_code": 0,
+    "result": {
+      "archiveFingerprint": "73f0016898fd4678793c989a97f6e8ca1d00519328bb572665af02a3a5010ceb",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:14:10.956826Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 0,
+      "memories": 1000000,
+      "payloadBytes": 5712606211,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "restore": {
+    "seconds": 184.3963501250837,
+    "peak_rss_bytes": 199278592,
+    "exit_code": 0,
+    "result": {
+      "archiveFingerprint": "73f0016898fd4678793c989a97f6e8ca1d00519328bb572665af02a3a5010ceb",
+      "conversations": 0,
+      "createdAt": "2026-10-23T14:14:10.956826Z",
+      "encryption": "none",
+      "formatVersion": 1,
+      "mediaFiles": 0,
+      "memories": 1000000,
+      "payloadBytes": 5712606211,
+      "sourceSchema": 7,
+      "turns": 0
+    }
+  },
+  "memories_rows_verified": 1000000,
+  "semantic_vectors_rows_verified": 1000000,
+  "passed": true
+}
