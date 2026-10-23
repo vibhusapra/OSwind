@@ -163,8 +163,8 @@
     "id": "F021",
     "axis": "Retrieval",
     "feature": "Natural-language dates and operators",
-    "status": "todo",
-    "evidence": "Explicit UI/ISO time filters; no date parser",
+    "status": "partial",
+    "evidence": "Shared deterministic English capture-time/weekday ranges, precise ISO dates/instants and app/kind/tag/saved operators; removable UI chips, literal mode, DST boundaries, typed API errors and persisted chat scope/timezone tested. Broader language/date grammar and native interaction remain open",
     "references": "Unlost, Pieces"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "100 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "124 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

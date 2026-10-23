@@ -214,3 +214,18 @@ The same pinned rem script/fixture was repeated after this change. Reproduce wit
 The observed OSwind 100k p95 improves from 16.965 to 7.045 ms, but **rem remains faster on the large keyword component workload**. Ranking/query semantics and broader store responsibilities still differ. These sequential development runs do not establish a controlled universal speedup or overall product ranking. Original results are preserved.
 
 `relevance-apple-ranked.json` and `relevance-qwen3-ranked.json` repeat the authored 32-document/35-query fixture. Aggregate Recall@5, MRR@5 and no-evidence empty rates are unchanged in all three modes against the published baseline. Apple hybrid Recall@5/MRR@5 remains .871/.720; Qwen3 hybrid and semantic remain 1.0/1.0. Hybrid/semantic no-evidence empty rate remains 0, keyword .5; generative abstention remains a separate open gate. No million-vector rerun is needed for this lexical-only SQL change.
+
+
+## Scoped query process and local model checks
+
+```bash
+python3 scripts/query-scope-smoke.py .build/release/oswindctl
+python3 scripts/query-scope-smoke.py .build/release/oswindctl --provider apple
+python3 scripts/query-scope-smoke.py .build/release/oswindctl --provider ollama
+```
+
+`query-scope-local-v1.json` records one Apple and one pinned Qwen3 Instruct answer on five fictional Comet notes and a clock marker. Each process run verifies source/date/app/tag/favorite boundaries, literal bypass, malformed/conflicting argument failures, actual HTTP/MCP behavior, absolute scope/time-zone persistence, history isolation and standalone-evaluation root isolation. Both model trials return the scoped owner Lina and deadline Thursday, with the two correct source IDs and citations. Scope/source checks are authoritative for the fixture; the simple answer-fact checks are a narrow smoke, not general citation entailment or held-out grounding accuracy. Timing is one development observation per provider, not a latency distribution or energy measure.
+
+Calendar tests inject a fixed clock and time zone, including 23/25-hour DST days, wall-clock day parts, weekdays, month/year boundaries and numeric rolling ranges. Separate cases cover quoted/smart-quoted operators, Unicode removal, URI form spaces/literal plus, typed parameter errors, fractional ISO export/import and embedded-NUL application-prefix rejection. Saved chat payloads remain backward readable. Current full-suite and sanitizer counts are recorded in the report. Earlier public relevance metrics remain unchanged in every mode on the authored 35-query fixture; no new natural-language generalization claim is made.
+
+Own-app NSHosting renders verify minimum-size light/dark layouts. Native click/shortcut verification remains blocked by the locked Mac. No continuous capture, full competitor app runtime or 24-hour/power result is implied. Synthetic vector scans measure their documented storage/candidate path and exclude query-language resolution, embeddings and UI publication.

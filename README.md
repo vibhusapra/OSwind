@@ -93,3 +93,29 @@ SQLite and images are local with restrictive directory permissions; v0 does **no
 ## Development
 
 Original implementation, MIT licensed. Competitor repositories informed research; no competitor source has been vendored. Contributions should add meaningful tests, update the feature ledger, preserve privacy boundaries and avoid unsupported parity/performance claims. See [architecture](docs/ARCHITECTURE.md).
+
+
+### Search a specific moment
+
+Query filters apply to when a memory was captured. The UI shows removable chips and the actual time bounds; selected controls apply together with query filters.
+
+```bash
+oswindctl search --details 'release decisions yesterday app:"Safari"'
+oswindctl search --mode keyword 'tag:work is:favorite on:2026-10-22'
+oswindctl search 'kind:audio since:2026-10-22T07:00:00Z until:2026-10-23T07:00:00Z'
+oswindctl search --literal 'yesterday app:Safari'
+```
+
+Examples assume `oswindctl` is on PATH; repository builds use `.build/release/oswindctl`. Supported English ranges include today/yesterday, this/last week or month, this/last weekday, this morning/afternoon/evening, last night, and past/last numeric hours/days/weeks/months. Weeks start Monday; plain dates use the Mac's local time zone. `since:` includes its boundary and `until:` excludes it. Quote multiword values (`app:"Google Chrome"`); quote whole date/operator phrases or use literal mode to search them as content. Unknown ordinary colon words remain text; malformed recognized filters fail visibly. This is a bounded grammar, not general temporal reasoning about due dates or every language.
+
+CLI `--details` includes the resolved filter; ordinary search preserves its result-array output and prints applied-scope diagnostics to stderr. HTTP/MCP accept `literal: true` to disable query interpretation while keeping explicit filter parameters. HTTP query parameters use form encoding: spaces may be `+` or `%20`, while literal plus signs must be `%2B`. Use a query encoder, for example:
+
+```bash
+curl --get 'http://127.0.0.1:47831/v1/search'   --data-urlencode 'query=C++ yesterday app:"Xcode"'   --data-urlencode 'mode=keyword'   -H "Authorization: Bearer $OSWIND_TOKEN"
+```
+
+Saved chat turns retain their actual absolute scope and time zone. Follow-up subjects can use earlier user questions; the current controls/question determine the current scope. Broader date grammar and native interaction verification remain in [the progress ledger](docs/PROGRESS.md).
+
+![Query filters in the minimum-size search layout](assets/query-scope-search.png)
+
+![Scoped Ask at the minimum window height](assets/query-scope-ask.png)

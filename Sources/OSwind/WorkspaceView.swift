@@ -39,7 +39,7 @@ struct WorkspaceView: View {
                 else if m.section == "Insights" { InsightsView() }
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView().environmentObject(m) }
@@ -72,16 +72,19 @@ struct WorkspaceView: View {
                 Spacer()
                 Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented).labelsHidden().frame(width:250)
             }
+            QueryScopeControls(query:$m.query,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.searchInputError)
             ForEach(m.searchWarnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
-            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.openMemory($0,query:m.query) } }
-            if m.hits.isEmpty {
+            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.openMemory($0,query:m.activeSearchQuery) } }
+            if let error = m.searchInputError {
+                ContentUnavailableView { Label("Adjust query filters",systemImage:"line.3.horizontal.decrease.circle") } description: { Text(error) } actions: { Button("Use as search text") { m.interpretQuery = false } }.frame(maxWidth:.infinity,maxHeight:.infinity)
+            } else if m.hits.isEmpty {
                 ContentUnavailableView { Label(m.query.isEmpty ? "A fresh start" : "No matching memories",systemImage:m.query.isEmpty ? "wind" : "magnifyingglass") } description: { Text(m.query.isEmpty ? "Resume capture, import an export, or save a note. Your memory stays on this Mac." : "Try fewer words, another app, or a wider time range.") } actions: { HStack { Button("Setup") { m.showSettings = true }; Button("Import JSON") { m.importData() } } }.frame(maxWidth:.infinity,maxHeight:.infinity)
             } else {
                 ScrollView { LazyVGrid(columns:[GridItem(.adaptive(minimum:280,maximum:450),spacing:16)],spacing:16) { ForEach(m.hits) { hit in MemoryCard(hit:hit).environmentObject(m) } }.padding(.vertical,4) }
             }
         }.padding(30)
-        .onChange(of:m.query) { m.refresh() }.onChange(of:m.mode) { m.refresh() }.onChange(of:m.appFilter) { m.refresh() }.onChange(of:m.range) { m.refresh() }.onChange(of:m.date) { m.refresh() }
+        .onChange(of:m.query) { m.refresh() }.onChange(of:m.mode) { m.refresh() }.onChange(of:m.interpretQuery) { m.refresh() }.onChange(of:m.appFilter) { m.refresh() }.onChange(of:m.range) { m.refresh() }.onChange(of:m.date) { m.refresh() }
     }
 }
 struct MemoryCard: View {
@@ -90,21 +93,21 @@ struct MemoryCard: View {
     var memory: Memory { hit.memory }
     var body: some View {
         VStack(alignment:.leading,spacing:0) {
-            Button { m.openMemory(memory,query:m.query) } label: {
+            Button { m.openMemory(memory,query:m.activeSearchQuery) } label: {
                 ZStack(alignment:.topLeading) {
                     if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
-                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.query,budget:m.query.isEmpty ? 400 : 100).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
+                    else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
                     Text(memory.kind.rawValue.uppercased()).font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
                 HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent); Spacer(); Text(memory.timestamp,style:.time).font(.caption2).foregroundStyle(.secondary) }
-                Button { m.openMemory(memory,query:m.query) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
-                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.query,budget:m.query.isEmpty ? 400 : 100).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
+                Button { m.openMemory(memory,query:m.activeSearchQuery) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
+                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
             }.padding(15)
         }.background(.background,in:RoundedRectangle(cornerRadius:12)).clipShape(RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.07)))
-        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.query) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
+        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
     }
 }
 struct TimelineStrip: View {
@@ -144,9 +147,20 @@ struct MemoryDetail: View {
 struct AskView: View {
     @EnvironmentObject var m: AppModel
     var body: some View {
-        VStack(alignment:.leading,spacing:18) {
-            Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
-            Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
+        GeometryReader { geometry in
+        let compact = geometry.size.height < 700
+        VStack(alignment:.leading,spacing:compact ? 12 : 18) {
+            if compact {
+                HStack {
+                    Label("Ask your memory",systemImage:"sparkles").font(.system(size:24,weight:.medium,design:.rounded))
+                    Spacer()
+                    Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Button("Choose model") { m.showSettings = true }
+                }
+            } else {
+                Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
+                Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
+            }
             HStack {
                 Menu {
                     if m.chats.isEmpty { Text("No saved conversations yet") }
@@ -160,7 +174,7 @@ struct AskView: View {
                     Button("Delete",systemImage:"trash",role:.destructive) { m.deleteCurrentChat() }.disabled(m.asking)
                 }
             }.buttonStyle(.bordered)
-            HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } }
+            if !compact { HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } } }
             HStack(spacing:12) {
                 Text("Search within").font(.caption).foregroundStyle(.secondary)
                 Picker("Answer time range",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"],id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
@@ -168,7 +182,8 @@ struct AskView: View {
                 Picker("Answer application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
             }.disabled(m.asking)
-            HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
+            HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }.onChange(of:m.question) { m.answerInputError = nil }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(compact ? 14 : 18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
+            QueryScopeControls(query:$m.question,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.answerInputError).disabled(m.asking)
             HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
             if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary); Spacer(); Button("Cancel") { m.cancelAnswer() } } }
             ScrollViewReader { reader in
@@ -178,8 +193,9 @@ struct AskView: View {
                             ForEach(m.chatTurns) { turn in
                                 VStack(alignment:.leading,spacing:12) {
                                     Text(turn.question).font(.system(size:15,weight:.medium)).textSelection(.enabled).padding(16).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:12))
+                                    RecordedScopeView(filter:turn.filter,timeZone:turn.timeZone)
                                     AnswerCard(answer:turn.answer,question:turn.question)
-                                    Text("\(turn.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(turn.filter.app ?? "All apps") · \(turn.filter.start.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any start") → \(turn.filter.end.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any end")").font(.caption2).foregroundStyle(.secondary)
+                                    Text(turn.timestamp.formatted(date:.abbreviated,time:.shortened)).font(.caption2).foregroundStyle(.secondary)
                                 }.id(turn.id)
                             }
                         } else if let answer = m.answer { AnswerCard(answer:answer) }
@@ -187,7 +203,8 @@ struct AskView: View {
                     }
                 }.onChange(of:m.chatTurns.last?.id) { _, _ in if let id = m.chatTurns.last?.id { reader.scrollTo(id,anchor:.bottom) } }
             }
-        }.padding(32).onAppear { m.refreshChats() }
+        }.padding(compact ? 24 : 32)
+        }.onAppear { m.refreshChats() }
     }
 }
 struct AnswerCard: View {

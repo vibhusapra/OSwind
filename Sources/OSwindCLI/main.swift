@@ -11,9 +11,33 @@ func option(_ name: String) -> String? { guard let i = args.firstIndex(of:name),
 let root = option("--data").map { URL(fileURLWithPath:$0) } ?? ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"].map { URL(fileURLWithPath:$0) } ?? Paths.data
 let command = args.first ?? "help"
 if !args.isEmpty { args.removeFirst() }
+let literalQuery = args.contains("--literal")
+func validatedOption(_ name: String) throws -> String? {
+    let count = args.filter {$0 == name}.count
+    guard count <= 1 else { throw OSwindError.invalid("Use \(name) only once") }
+    guard count == 1 else { return nil }
+    guard let value = option(name) else { throw OSwindError.invalid("Enter a value after \(name)") }; return value
+}
 func emit(_ object: Any) throws { let data = try JSONSerialization.data(withJSONObject:object,options:[.prettyPrinted,.sortedKeys,.fragmentsAllowed]); print(String(data:data,encoding:.utf8)!) }
 func encoded<T: Encodable>(_ object: T) throws { try emit(Integration.json(object)) }
-func searchFilter() throws -> SearchFilter { var values = [String:Any](); for (flag,name) in [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag")] { if let value = option(flag) { values[name] = value } }; values["limit"] = Int(option("--limit") ?? "20") ?? 20; values["favorites"] = args.contains("--favorites"); args.removeAll {$0 == "--favorites" || $0 == "--json"}; values["query"] = args.joined(separator:" "); return try Integration.filter(values) }
+func searchFilter() throws -> SearchFilter {
+    var values = [String:Any]()
+    let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--limit","limit")]
+    for (flag,name) in fields {
+        guard args.filter({$0 == flag}).count <= 1 else { throw OSwindError.invalid("Use \(flag) only once") }
+        if args.contains(flag) {
+            guard let value = option(flag) else { throw OSwindError.invalid("Enter a value after \(flag)") }
+            if name == "limit" { guard let limit = Int(value) else { throw OSwindError.invalid("limit must be an integer from 1 to 100") }; values[name] = limit }
+            else { values[name] = value }
+        }
+    }
+    if values["limit"] == nil { values["limit"] = 20 }
+    values["favorites"] = args.contains("--favorites")
+    args.removeAll {$0 == "--favorites" || $0 == "--json" || $0 == "--literal"}
+    values["query"] = args.joined(separator:" ")
+    return try Integration.filter(values)
+}
+
 do {
     if command == "help" || command == "--help" {
         print("""
@@ -21,7 +45,8 @@ do {
         Usage: oswindctl [--data DIRECTORY] COMMAND
           doctor                         Inspect local permissions, GPU and models
           search [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
-                 [--from ISO8601] [--to ISO8601] [--limit N] WORDS
+                 [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
+                 Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, tag:work, is:favorite
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
           chat list|new|show ID|delete ID  Manage saved local conversations
           chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up
@@ -95,6 +120,13 @@ do {
         }
         let result: [String:Any] = ["schema":2,"latency_quantiles":BenchmarkLatency.method,"timestamp":ISO8601DateFormatter().string(from:Date()),"os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","records":count,"embedding_model":embedder.modelID,"embeddings_available":embedder.available,"ingest_seconds":ingest,"records_per_second":Double(count)/ingest,"disk_bytes":store.diskBytes(),"modes":modes,"scope":"Synthetic repeated-topic corpus, not a real-user relevance study or a competitor comparison. All vectors scanned for semantic retrieval."]
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
+    } else if command == "eval-retrieval" {
+        let fixture = option("--fixture") ?? "benchmarks/fixtures/desktop-retrieval-v1.json", output = option("--output")
+        var configuration = SearchConfiguration(); if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+        if args.contains("--indexed") { configuration.indexPolicy = .indexed }
+        let result = try await RetrievalEvaluation.run(fixture:URL(fileURLWithPath:fixture),configuration:configuration,repetitions:Int(option("--repetitions") ?? "3") ?? 3)
+        if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }
+        try emit(result)
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
@@ -124,23 +156,16 @@ do {
                     try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path); print("Exported conversation")
                 } else if action == "ask" {
                     let settings = AppSettings.load(root:root); var configuration = settings.ai
-                    if let value = option("--provider"), let provider = AIProvider(rawValue:value) { configuration.provider = provider }
-                    configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+                    if let value = try validatedOption("--provider") { guard let provider = AIProvider(rawValue:value) else { throw OSwindError.invalid("Unknown AI provider") }; configuration.provider = provider }
+                    configuration.model = try validatedOption("--model") ?? configuration.model; configuration.endpoint = try validatedOption("--endpoint") ?? configuration.endpoint
                     let filter = try searchFilter(), question = settings.privacy.sanitize(args.joined(separator:" ")).text
                     guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
                     let history = ConversationContext.questions(try store.chatTurns(id))
-                    let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history)
+                    let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history,interpretQuery:!literalQuery)
                     try Task.checkCancellation()
                     try encoded(store.appendChatTurn(sessionID:id,question:question,answer:answer,filter:filter,policy:settings.privacy))
                 } else { throw OSwindError.invalid("Use chat list, new, show, ask, export or delete") }
             }
-        case "eval-retrieval":
-            let fixture = option("--fixture") ?? "benchmarks/fixtures/desktop-retrieval-v1.json", output = option("--output")
-            var configuration = SearchConfiguration(); if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
-            if args.contains("--indexed") { configuration.indexPolicy = .indexed }
-            let result = try await RetrievalEvaluation.run(fixture:URL(fileURLWithPath:fixture),configuration:configuration,repetitions:Int(option("--repetitions") ?? "3") ?? 3)
-            if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }
-            try emit(result)
         case "models":
             let action = args.first ?? "list"; if !args.isEmpty { args.removeFirst() }; let endpoint = option("--endpoint") ?? AppSettings.load(root:root).search.endpoint
             if action == "list" { try encoded(await OllamaClient.shared.models(endpoint:endpoint)) }
@@ -149,23 +174,30 @@ do {
             else { throw OSwindError.invalid("Use models list, status or pull NAME") }
         case "reindex":
             var settings = AppSettings.load(root:root), configuration = settings.search; configuration.provider = .ollama
-            configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            configuration.model = try validatedOption("--model") ?? configuration.model; configuration.endpoint = try validatedOption("--endpoint") ?? configuration.endpoint
             try await RetrievalEngine(store:store,apple:embedder).rebuild(configuration:configuration) { state in FileHandle.standardError.write(Data("\(state.indexed)/\(state.total) indexed\n".utf8)) }
             if args.contains("--use-model") { settings.search = configuration; try settings.save(root:root) }
             try emit(store.semanticIndexes())
         case "config": try encoded(AppSettings.load(root:root))
         case "stats": try encoded(store.stats())
-        case "search": let mode = SearchMode(rawValue:option("--mode") ?? "hybrid") ?? .hybrid; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
-            let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search)
-            if details { try encoded(result) } else { for warning in result.warnings { FileHandle.standardError.write(Data((warning+"\n").utf8)) }; try encoded(result.hits) }
+        case "search": let modeValue = try validatedOption("--mode") ?? "hybrid"; guard let mode = SearchMode(rawValue:modeValue) else { throw OSwindError.invalid("Unknown search mode") }; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
+            let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search,interpretQuery:!literalQuery)
+            if details { try encoded(result) } else {
+                if let resolution = result.resolution, !resolution.clauses.isEmpty {
+                    let f = resolution.filter
+                    func stamp(_ date: Date) throws -> String { try ISOTime.string(date) }
+                    let scope = "Scope: \(f.app ?? "all apps"), \(try f.start.map {try stamp($0)} ?? "any start") to before \(try f.end.map {try stamp($0)} ?? "any end"), \(resolution.timeZone)"
+                    FileHandle.standardError.write(Data((scope+"\n").utf8))
+                }
+                for warning in result.warnings { FileHandle.standardError.write(Data((warning+"\n").utf8)) }; try encoded(result.hits) }
         case "ask":
             var configuration = AppSettings.load(root:root).ai
-            if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }
-            configuration.model = option("--model") ?? configuration.model; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            if let value = try validatedOption("--provider") { guard let provider = AIProvider(rawValue:value) else { throw OSwindError.invalid("Unknown AI provider") }; configuration.provider = provider }
+            configuration.model = try validatedOption("--model") ?? configuration.model; configuration.endpoint = try validatedOption("--endpoint") ?? configuration.endpoint
             let filter = try searchFilter(), policy = AppSettings.load(root:root).privacy
             let question = policy.sanitize(args.joined(separator:" ")).text
             guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
-            let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:AppSettings.load(root:root).search)
+            let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:AppSettings.load(root:root).search,interpretQuery:!literalQuery)
             try encoded(answer)
         case "note": let text = PrivacyPolicy().sanitize(args.joined(separator:" ")).text; guard !text.isEmpty else { throw OSwindError.invalid("Enter note text") }; var memory = Memory(kind:.note,app:"OSwind",title:"CLI note",text:text); memory.embedding = embedder.embed(memory.searchableText); memory.embeddingModel = embedder.modelID; try store.insert(memory); print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
