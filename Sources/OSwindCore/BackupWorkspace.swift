@@ -16,7 +16,7 @@ struct BackupWorkspaceMarker: Codable {
 /// The private companion holds its lease/marker outside the package payload.
 /// A successful atomic publication never ships these operation-control files.
 final class BackupWorkspace {
-    static let operationLabels = ["oswind-audio-import","oswind-audio-chunk","oswind-transcription","oswind-backup","oswind-backup-pins","oswind-backup-inspect","oswind-backup-partial","oswind-restore-input","oswind-restore-partial"]
+    static let operationLabels = ["oswind-model-download","oswind-audio-import","oswind-audio-chunk","oswind-transcription","oswind-backup","oswind-backup-pins","oswind-backup-inspect","oswind-backup-partial","oswind-restore-input","oswind-restore-partial"]
     let tree: BackupFileTree
     let url: URL
     private let parent: Int32

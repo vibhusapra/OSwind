@@ -1,0 +1,79 @@
+{
+  "scope": "Native Swift streaming model setup; fresh versioned destinations followed by offline verification",
+  "development_base_commit": "2bb0f56",
+  "source_state": "Native-model-setup development worktree; streaming transport unchanged by later UI/location-policy edits. Exact development CLI binary identity is retained; this is not a controlled final-release performance baseline.",
+  "download_binary_sha256": "4e1ea00a54b3ec1825f8e4d65d3be80d0866c542950458fcacb1db715ce6a4a5",
+  "transport_source_sha256": "103297692afd0bb39c2c047cc5bc03b37f64c0a0384ef0bcc1ed1fa96e28cf7b",
+  "measurements": [
+    {
+      "kind": "parakeet",
+      "download_bytes": 483106120,
+      "files": 22,
+      "revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe",
+      "reused": false,
+      "wall_seconds": 47.78,
+      "user_seconds": 0.73,
+      "system_seconds": 0.68,
+      "peak_RSS_bytes": 40550400,
+      "peak_footprint_bytes": 14451432,
+      "offline_verify_reused": true
+    },
+    {
+      "kind": "speakers",
+      "download_bytes": 21816863,
+      "files": 28,
+      "revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232",
+      "reused": false,
+      "wall_seconds": 17.32,
+      "user_seconds": 0.19,
+      "system_seconds": 0.11,
+      "peak_RSS_bytes": 45252608,
+      "peak_footprint_bytes": 20021992,
+      "offline_verify_reused": true
+    }
+  ],
+  "interruptions": {
+    "scope": "native model CLI graceful SIGINT, SIGKILL lease recovery and verified reuse; public pinned model requests only",
+    "checks": [
+      {
+        "case": "catalog and missing verification",
+        "memory_library_created": false,
+        "network_required": false
+      },
+      {
+        "case": "graceful SIGINT after real streamed bytes",
+        "received_stage_bytes_at_signal": 1345804,
+        "exit": 130,
+        "seconds_to_exit": 0.00570179196074605,
+        "staging_and_leases_removed": true
+      },
+      {
+        "case": "SIGKILL partial then next install recovers lease and verifies an existing complete model",
+        "received_stage_bytes_at_kill": 1125208,
+        "killed_exit": -9,
+        "complete_model_source": "APFS clone",
+        "orphan_staging_removed": true,
+        "verified_reuse": true,
+        "memory_library_created": false
+      }
+    ],
+    "limits": [
+      "public network/CDN timing is uncontrolled",
+      "not capture, inference, power or competitor performance",
+      "recovery uses a complete pinned model copied into the expected destination after the killed partial job"
+    ],
+    "passed": true,
+    "binary_sha256": "bb34053d2fd50b36ef01acc54a8ad9b3d8c906c42d531e8a794f280643794d0a"
+  },
+  "checks": [
+    "all catalog file sizes and SHA-256 checked before no-replace publication",
+    "normal memory-library directory was never created by native-model commands",
+    "app-level explicitly configured verified-model selection passed without starting capture"
+  ],
+  "limits": [
+    "network/CDN caches and background activity uncontrolled; one download per model",
+    "process RSS/footprint are different metrics and exclude some system services; not whole-system memory",
+    "not recognition throughput, energy, battery, sustained capture or competitor ranking",
+    "interruption recovery checks a complete pinned APFS-cloned model after the killed partial job; it does not claim partial-byte resume"
+  ]
+}

@@ -98,6 +98,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     @Published public private(set) var transcribed = 0
     public let speakers=SpeakerDiarizer()
     public let recognizer: SpeechRecognizer
+    public var hasActiveWork:Bool { running || processing || !pending.isEmpty }
     public var onCapture: ((Memory) -> Void)?
     private var engine: AVAudioEngine?
     private var systemCapture: (any AudioSystemCapture)?

@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
     let capture: CaptureController
     let audio: AudioController
     let libraryTransfer = LibraryTransferModel()
+    let nativeModels:NativeModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings
@@ -78,7 +79,8 @@ import UniformTypeIdentifiers
     @Published var audioImportStatus=""
     private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
-    init(root selectedRoot: URL? = nil, startServices: Bool = true) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil) throws {
+        nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         demo = CommandLine.arguments.contains("--demo")
         let resolved = LibraryLocationPreferences.selection(demo:demo)
         let root = selectedRoot ?? resolved.url
@@ -101,7 +103,7 @@ import UniformTypeIdentifiers
     }
     func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -331,6 +333,28 @@ import UniformTypeIdentifiers
     }
     var isCapturing: Bool { capture.running || audio.running }
     func toggleCapture() { pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
+    func installNativeModel(_ kind:NativeModelKind,cache:URL?=nil,verifyOnly:Bool=false) {
+        let speech=settings.speech,diarization=settings.diarization
+        nativeModels.start(kind,cache:cache,verifyOnly:verifyOnly) { [weak self] result in
+            guard let self else{return}
+            let unchanged=kind == .parakeet ? self.settings.speech==speech:self.settings.diarization==diarization
+            guard unchanged,!self.audio.hasActiveWork,!self.importingAudio else {
+                self.nativeModels.message((result.reused ? "Verified.":"Installed.")+" Select Use model after current audio work finishes or to apply your new choice.",for:kind);return
+            }
+            self.useNativeModel(result)
+        }
+    }
+    func useNativeModel(_ result:NativeModelInstallation) {
+        guard !audio.hasActiveWork,!importingAudio else {nativeModels.message("Finish current audio work before changing models.",for:result.kind);return}
+        switch result.kind {
+        case .parakeet:
+            var value=settings.speech;value.engine = .parakeet;value.modelDirectory=result.directory.path;settings.speech=value
+        case .speakers:
+            guard SpeakerDiarizer.supported else {nativeModels.message("Speaker labels require macOS 15 or later.",for:.speakers);return}
+            var value=settings.diarization;value.modelDirectory=result.directory.path;value.enabled=true;settings.diarization=value
+        }
+        nativeModels.message("Ready for local transcription.",for:result.kind)
+    }
     func importAudio() {
         guard !importingAudio else { return }
         let panel=NSOpenPanel(); panel.allowedContentTypes=[.audio]; panel.allowsMultipleSelection=false; panel.message="Transcribe this file locally. Clip retention follows your Audio setting."

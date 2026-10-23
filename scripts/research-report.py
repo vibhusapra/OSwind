@@ -60,7 +60,7 @@ rows=[
 ('AI','Draft insertion into other apps','todo','Copy only; no global contextual drafting','Minne, Littlebird Hover'),
 ('Audio','Microphone capture','partial','AVAudioEngine conversion; live mic test gated by locked Mac','Screenpipe, TimeScroll, Omi'),
 ('Audio','System audio capture','partial','SCStream mono output; live input and device-change test pending','Screenpipe, TimeScroll, Granola'),
-('Audio','Local GPU transcription','live verified','Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; pinned installer verified','Screenpipe, TimeScroll'),
+('Audio','Local GPU transcription','live verified','Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified','Screenpipe, TimeScroll'),
 ('Audio','Silence gate / bounded queue','tested','WAV/RMS primitives tested; queue capped at 3 chunks','Always-on audio tools'),
 ('Audio','Speaker diarization / names','partial','Integrated local imported-recording labels and manual names; synthetic voice consistency/unknown coverage, backup/interchange/deletion tested. Live/cross-recording identity, natural meeting accuracy and native UI acceptance pending','Granola, Omi, Limitless'),
 ('Audio','Meeting sessions / detection','partial','Capture/import session IDs persist; no calendar/call session grouping UX','Granola, Littlebird, Omi'),
@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','249 passing tests, three optional skips and seven model-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','276 passing tests, four optional skips and seven Python-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
 ('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality'),
 ('Audio','Retained clips / imports / playback','tested','Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain','Screenpipe, Omi, Limitless')

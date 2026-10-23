@@ -12,7 +12,16 @@ import OSwindCore
                 NSApp.appearance = NSAppearance(named:CommandLine.arguments[appearanceIndex+1] == "light" ? .aqua : .darkAqua)
             }
             let preview: AppModel
-            do { preview = try AppModel() } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)); NSApp.terminate(nil); return }
+            do {
+                if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="NativeModelDownloadBusy" {
+                    let setup=NativeModelSetupModel(installer:{kind,_,_,progress in
+                        let catalog=try kind.catalog()
+                        progress(NativeModelProgress(phase:"Downloading",completedBytes:176_000_000,totalBytes:catalog.bytes,completedFiles:7,totalFiles:catalog.files.count,file:"Encoder.mlmodelc/weights/weight.bin"))
+                        try await Task.sleep(nanoseconds:120_000_000_000);throw CancellationError()
+                    })
+                    preview=try AppModel(startServices:false,nativeModelSetup:setup)
+                } else {preview=try AppModel()}
+            } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)); NSApp.terminate(nil); return }
             let path = CommandLine.arguments[index+1]
             if let queryIndex = CommandLine.arguments.firstIndex(of:"--preview-query"), queryIndex+1 < CommandLine.arguments.count { preview.query = CommandLine.arguments[queryIndex+1] }
             if let questionIndex = CommandLine.arguments.firstIndex(of:"--preview-question"), questionIndex+1 < CommandLine.arguments.count { preview.question = CommandLine.arguments[questionIndex+1] }

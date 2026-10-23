@@ -146,6 +146,7 @@ struct SettingsView: View {
                 if !m.audioImportStatus.isEmpty { Text(m.audioImportStatus).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
                 Toggle("Identify speakers in imported recordings",isOn:$m.settings.diarization.enabled).disabled(!SpeakerDiarizer.supported && !m.settings.diarization.enabled)
                 if m.settings.diarization.enabled {
+                    NativeModelDownloadView(setup:m.nativeModels,kind:.speakers)
                     TextField("Community-1 model directory",text:$m.settings.diarization.modelDirectory)
                     Button("Choose speaker model directory…") {
                         let panel=NSOpenPanel(); panel.canChooseDirectories=true; panel.canChooseFiles=false
@@ -160,6 +161,7 @@ struct SettingsView: View {
             Section("Transcription model") {
                 Picker("Speech engine",selection:$m.settings.speech.engine) { ForEach(SpeechEngine.allCases,id:\.self) { Text($0.title) } }
                 if m.settings.speech.engine == .parakeet {
+                    NativeModelDownloadView(setup:m.nativeModels,kind:.parakeet)
                     Picker("Compute",selection:$m.settings.speech.compute) { ForEach(SpeechCompute.allCases,id:\.self) { Text($0.title) } }
                     TextField("Parakeet v3 model directory",text:$m.settings.speech.modelDirectory)
                     Button("Choose native model directory…") {
