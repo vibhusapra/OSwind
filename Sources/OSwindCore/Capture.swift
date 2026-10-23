@@ -128,6 +128,8 @@ public struct CaptureMetrics: Sendable {
                 guard epoch == token, running || manual, !suspended, !SessionState.locked else { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; return }
                 memory.timestamp = begin
                 do { try store.insert(memory) } catch { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; throw error }
+                let saved = memory, passageStore = store
+                if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try await Task.detached(priority:.utility) { try passageStore.indexApplePassages(saved,embedder:localEmbedder) }.value }
                 fingerprints[displayID] = pixels; metrics.saved += 1; metrics.lastLatencyMS = Date().timeIntervalSince(begin) * 1000; status = "Saved \(context.app) · \(Int(metrics.lastLatencyMS)) ms"; onCapture?(memory)
             }
         } catch { metrics.errors += 1; status = error.localizedDescription }

@@ -141,7 +141,7 @@ private final class AudioAccumulator: @unchecked Sendable {
                 let text = try await task.value; transcriptionTask = nil
                 guard token == epoch && !SessionState.locked && !text.isEmpty else { continue }
                 var m = Memory(timestamp: chunk.date, endTimestamp: chunk.date.addingTimeInterval(Double(chunk.samples.count)/16000), kind: .audio, app: chunk.source, title: "\(chunk.source) transcript", text: config.privacy.sanitize(text).text)
-                m.embedding = embedder.embed(m.text); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
+                m.embedding = embedder.embed(m.text); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); if config.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) }; transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
             } catch { if !(error is CancellationError) { status = error.localizedDescription }; try? FileManager.default.removeItem(at: file) }
         }
     }

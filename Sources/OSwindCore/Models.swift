@@ -45,8 +45,9 @@ public struct SearchHit: Identifiable, Codable, Sendable {
     public var memory: Memory
     public var score: Double
     public var match: String
+    public var passage: PassageRange?
     public var id: String { memory.id }
-    public init(memory: Memory, score: Double, match: String) { self.memory = memory; self.score = score; self.match = match }
+    public init(memory: Memory, score: Double, match: String, passage: PassageRange? = nil) { self.memory = memory; self.score = score; self.match = match; self.passage = passage }
 }
 public struct StoreStats: Codable, Sendable {
     public var count: Int = 0

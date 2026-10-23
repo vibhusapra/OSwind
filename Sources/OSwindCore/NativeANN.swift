@@ -4,7 +4,7 @@ import USearchC
 /// Owns a mutable native HNSW index. All calls are serialized by its owning cache.
 /// The original float32 vectors stay in SQLite for exact candidate reranking.
 final class NativeANN {
-    static let format = "usearch-2.26.5-f16-cos-m32-v1"
+    static let format = "usearch-2.26.5-f16-cos-m32-passages-v2"
     private let handle: usearch_index_t
     let dimensions: Int
     init(dimensions: Int, expansion: Int = 8192) throws {

@@ -9,8 +9,8 @@ enum VectorJournalSchema {
     CREATE TABLE IF NOT EXISTS vector_keys (
         key INTEGER PRIMARY KEY AUTOINCREMENT,
         memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
-        model TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0,
-        UNIQUE(memory_id,model)
+        model TEXT NOT NULL, ordinal INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL DEFAULT 0,
+        UNIQUE(memory_id,model,ordinal)
     );
     CREATE INDEX IF NOT EXISTS vector_keys_model ON vector_keys(model,key);
     CREATE INDEX IF NOT EXISTS vector_keys_revision ON vector_keys(model,revision);
@@ -23,35 +23,57 @@ enum VectorJournalSchema {
     END;
     CREATE TRIGGER IF NOT EXISTS vector_legacy_insert AFTER INSERT ON memories
     WHEN new.embedding IS NOT NULL AND new.embedding_model IS NOT NULL BEGIN
-        INSERT INTO vector_keys(memory_id,model) VALUES(new.id,new.embedding_model) ON CONFLICT(memory_id,model) DO NOTHING;
-        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE memory_id=new.id AND model=new.embedding_model;
-        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE memory_id=new.id AND model=new.embedding_model;
+        INSERT INTO vector_keys(memory_id,model) VALUES(new.id,new.embedding_model) ON CONFLICT(memory_id,model,ordinal) DO NOTHING;
+        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE ordinal=0 AND memory_id=new.id AND model=new.embedding_model;
+        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE ordinal=0 AND memory_id=new.id AND model=new.embedding_model;
     END;
     CREATE TRIGGER IF NOT EXISTS vector_legacy_update AFTER UPDATE OF embedding,embedding_model ON memories BEGIN
-        DELETE FROM vector_keys WHERE memory_id=old.id AND model=old.embedding_model
+        DELETE FROM vector_keys WHERE ordinal=0 AND memory_id=old.id AND model=old.embedding_model
             AND (new.embedding IS NULL OR new.embedding_model IS NOT old.embedding_model)
             AND NOT EXISTS(SELECT 1 FROM semantic_vectors WHERE memory_id=old.id AND model=old.embedding_model);
         INSERT INTO vector_keys(memory_id,model)
-            SELECT new.id,new.embedding_model WHERE new.embedding IS NOT NULL AND new.embedding_model IS NOT NULL ON CONFLICT(memory_id,model) DO NOTHING;
-        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE memory_id=new.id AND model=new.embedding_model AND new.embedding IS NOT NULL;
-        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE memory_id=new.id AND model=new.embedding_model AND new.embedding IS NOT NULL;
+            SELECT new.id,new.embedding_model WHERE new.embedding IS NOT NULL AND new.embedding_model IS NOT NULL ON CONFLICT(memory_id,model,ordinal) DO NOTHING;
+        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE ordinal=0 AND memory_id=new.id AND model=new.embedding_model AND new.embedding IS NOT NULL;
+        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE ordinal=0 AND memory_id=new.id AND model=new.embedding_model AND new.embedding IS NOT NULL;
     END;
     CREATE TRIGGER IF NOT EXISTS vector_extra_insert AFTER INSERT ON semantic_vectors BEGIN
-        INSERT INTO vector_keys(memory_id,model) VALUES(new.memory_id,new.model) ON CONFLICT(memory_id,model) DO NOTHING;
-        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE memory_id=new.memory_id AND model=new.model;
-        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE memory_id=new.memory_id AND model=new.model;
+        INSERT INTO vector_keys(memory_id,model) VALUES(new.memory_id,new.model) ON CONFLICT(memory_id,model,ordinal) DO NOTHING;
+        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE ordinal=0 AND memory_id=new.memory_id AND model=new.model;
+        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE ordinal=0 AND memory_id=new.memory_id AND model=new.model;
     END;
     CREATE TRIGGER IF NOT EXISTS vector_extra_update AFTER UPDATE ON semantic_vectors BEGIN
-        INSERT INTO vector_keys(memory_id,model) VALUES(new.memory_id,new.model) ON CONFLICT(memory_id,model) DO NOTHING;
-        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE memory_id=new.memory_id AND model=new.model;
-        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE memory_id=new.memory_id AND model=new.model;
+        INSERT INTO vector_keys(memory_id,model) VALUES(new.memory_id,new.model) ON CONFLICT(memory_id,model,ordinal) DO NOTHING;
+        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE ordinal=0 AND memory_id=new.memory_id AND model=new.model;
+        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE ordinal=0 AND memory_id=new.memory_id AND model=new.model;
     END;
     CREATE TRIGGER IF NOT EXISTS vector_extra_delete AFTER DELETE ON semantic_vectors BEGIN
-        DELETE FROM vector_keys WHERE memory_id=old.memory_id AND model=old.model
+        DELETE FROM vector_keys WHERE ordinal=0 AND memory_id=old.memory_id AND model=old.model
             AND NOT EXISTS(SELECT 1 FROM memories WHERE id=old.memory_id AND embedding_model=old.model AND embedding IS NOT NULL);
-        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE memory_id=old.memory_id AND model=old.model;
-        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE memory_id=old.memory_id AND model=old.model;
+        INSERT INTO vector_changes(vector_key,model) SELECT key,model FROM vector_keys WHERE ordinal=0 AND memory_id=old.memory_id AND model=old.model;
+        UPDATE vector_keys SET revision=(SELECT MAX(seq) FROM vector_changes) WHERE ordinal=0 AND memory_id=old.memory_id AND model=old.model;
     END;
+    """
+    static let migrateV5 = """
+    CREATE TEMP TABLE vector_key_highwater AS SELECT COALESCE((SELECT seq FROM sqlite_sequence WHERE name='vector_keys'),0) AS value;
+    DROP TRIGGER IF EXISTS vector_key_deleted;
+    DROP TRIGGER IF EXISTS vector_legacy_insert;
+    DROP TRIGGER IF EXISTS vector_legacy_update;
+    DROP TRIGGER IF EXISTS vector_extra_insert;
+    DROP TRIGGER IF EXISTS vector_extra_update;
+    DROP TRIGGER IF EXISTS vector_extra_delete;
+    ALTER TABLE vector_keys RENAME TO vector_keys_v5;
+    CREATE TABLE vector_keys (
+        key INTEGER PRIMARY KEY AUTOINCREMENT,
+        memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+        model TEXT NOT NULL, ordinal INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL DEFAULT 0,
+        UNIQUE(memory_id,model,ordinal)
+    );
+    INSERT INTO vector_keys(key,memory_id,model,revision) SELECT key,memory_id,model,revision FROM vector_keys_v5;
+    INSERT INTO sqlite_sequence(name,seq) SELECT 'vector_keys',value FROM vector_key_highwater WHERE NOT EXISTS(SELECT 1 FROM sqlite_sequence WHERE name='vector_keys');
+    UPDATE sqlite_sequence SET seq=MAX(seq,(SELECT value FROM vector_key_highwater)) WHERE name='vector_keys';
+    DROP TABLE vector_keys_v5;
+    DROP TABLE vector_key_highwater;
+    UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity';
     """
     static let backfill = """
     INSERT OR IGNORE INTO vector_keys(memory_id,model)

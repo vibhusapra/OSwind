@@ -56,9 +56,11 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 5
+          assert report['count'] == 1000 and report['schema_version'] == 6
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
+      - name: Verify long-source semantic passage processes
+        run: python3 scripts/passage-smoke.py .build/release/oswindctl --provider apple --output .artifacts/passages-apple-ci.json
       - name: Render sample workspace
         run: |
           mkdir -p .artifacts
@@ -82,3 +84,4 @@ jobs:
             .artifacts/vector-indexed-ci.json
             .artifacts/statistics-ci.json
             .artifacts/query-scope-ci.json
+            .artifacts/passages-apple-ci.json
