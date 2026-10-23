@@ -64,13 +64,13 @@ public enum EvidenceText {
         }
         return selected
     }
-    public static func excerpt(_ text: String, query: String = "", budget: Int = 800, summary: Bool = false) -> String {
+    static func excerptRanges(_ text: String, query: String = "", budget: Int = 800, summary: Bool = false, anchors:[NSRange]=[]) -> [NSRange] {
         let value = text as NSString, size = max(40,min(12000,budget))
-        guard value.length > size else { return text }
-        let terms = terms(query), found = matches(value,terms:terms)
+        guard value.length > size else { return value.length == 0 ? []:[NSRange(location:0,length:value.length)] }
+        let terms = terms(query), found = (matches(value,terms:terms) + anchors.prefix(256).map { Match(range:$0,term:terms.count) }).sorted {$0.range.location < $1.range.location}
         var ranges = [NSRange]()
         if !summary && !found.isEmpty {
-            var frequency = [Int](repeating:0,count:terms.count)
+            var frequency = [Int](repeating:0,count:terms.count+(anchors.isEmpty ? 0:1))
             for match in found { frequency[match.term] += 1 }
             let weights = frequency.map { $0 > 0 ? 1/sqrt(Double($0)) : 0 }
             if let whole = bestRange(length:value.length,width:size,matches:found,weights:weights) {
@@ -102,6 +102,12 @@ public enum EvidenceText {
             if let last = merged.last, NSMaxRange(last) >= aligned.location { merged[merged.count-1] = NSUnionRange(last,aligned) }
             else { merged.append(aligned) }
         }
+        return merged
+    }
+    public static func excerpt(_ text: String, query: String = "", budget: Int = 800, summary: Bool = false) -> String {
+        if (text as NSString).length<=max(40,min(12000,budget)) { return text }
+        let value=text as NSString, merged=excerptRanges(text,query:query,budget:budget,summary:summary)
+        guard !merged.isEmpty else { return "" }
         let fragments = merged.map { value.substring(with:$0).trimmingCharacters(in:.whitespacesAndNewlines) }
         return (merged.first!.location > 0 ? "… " : "") + fragments.joined(separator:"\n…\n") + (NSMaxRange(merged.last!) < value.length ? " …" : "")
     }

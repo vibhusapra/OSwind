@@ -324,3 +324,22 @@ python3 scripts/native-model-smoke.py .build/release/oswindctl \
   --installed-model /absolute/verified/parakeet-v3-7dd20fe6b179 \
   --output /absolute/native-model-recovery.json
 ```
+
+
+## Recording-local speaker answers
+
+[`speaker-evidence-synthetic-v1.json`](speaker-evidence-synthetic-v1.json) records the packaged release CLI on the 32.225-second stock-voice A/B/A/B fixture. Real Parakeet and Community-1 produce the transcript; two recording-local labels are manually named Maya/Theo. Names are absent from raw transcript text but are found through the name index and exact speaker scopes. Speaker-tagged literal evidence aligns to the original transcript; unknown spans remain unknown.
+
+Qwen3 4B Instruct returned the expected attribution/content with source `[1]` on all five supported authored questions and abstained on an invented budget question. Every answer, warning, citation index and authored string expectation is retained. These are six transparent questions from one clean generated clip, inspected by the coding agent, not a held-out/natural-meeting accuracy score. An earlier pre-clarification run returned the right name with invalid citation `[8]`; that failure is also recorded. Header/prompt clarification fixed this observed case, without establishing universal citation correctness.
+
+The release import took 0.895 s in one warm/uncontrolled-cache trial, including normalization, native ASR/diarization, privacy, persistence and indexing. Ollama reported its 3,311,423,979-byte allocation fully in GPU memory, with context 8192. This does not profile every operation, whole-system memory, energy or competitor performance. Exact binary/source-file hashes, model digest and limits accompany the responses.
+
+```bash
+python3 scripts/speaker-evidence-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl \
+  --fixture .artifacts/diarization-fixture \
+  --asr-model /path/to/parakeet-v3 --speaker-model /path/to/community1 \
+  --chat-model qwen3:4b-instruct-2507-q4_K_M --output /tmp/speaker-evidence.json
+python3 scripts/speaker-search-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl
+```
+
+Generate the fixture with `tools/SpeechProbe/make-fixture.py`. The second script needs no model downloads and tests deterministic metadata through actual CLI, HTTP and MCP processes; it runs in CI. Neither script opens the normal capture library or exercises native input/device acceptance.

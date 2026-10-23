@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 9
+    public static let schemaVersion = 10
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -94,6 +94,12 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 4 { try exec(VectorJournalSchema.backfill) }
         try exec(StatisticsSchema.sql)
         try exec(SearchScopeSchema.sql)
+        try exec(SpeakerSearchSchema.sql)
+        if version < 10 {
+            let audio=try prepare("SELECT payload FROM memories WHERE kind='audio'")
+            defer { sqlite3_finalize(audio) }
+            while sqlite3_step(audio)==SQLITE_ROW { try replaceSpeakerProjection(try decode(audio)) }
+        }
         let statisticsState = try prepare("SELECT total=COALESCE((SELECT SUM(count) FROM application_statistics),0) FROM memory_statistics WHERE singleton=1")
         let statisticsNeedRepair = sqlite3_step(statisticsState) != SQLITE_ROW || sqlite3_column_int(statisticsState,0) != 1
         sqlite3_finalize(statisticsState)
@@ -119,6 +125,12 @@ public final class MemoryStore: @unchecked Sendable {
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
         guard memory.audioSessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio session identifier") }
         for path in [memory.imagePath, memory.audioPath].compactMap({$0}) { guard assetURL(path) != nil else { throw OSwindError.invalid("Asset path must stay inside the memory store") } }
+        // Reserve the writer before reading old evidence. A deferred read then
+        // write can fail immediately with SQLITE_BUSY across store connections.
+        let ownsTransaction=sqlite3_get_autocommit(db) != 0
+        try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
+        do {
+        if memory.kind == .audio,let current=try get(memory.id),current.transcript != memory.transcript { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
@@ -129,6 +141,28 @@ public final class MemoryStore: @unchecked Sendable {
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
+        try replaceSpeakerProjection(memory)
+        try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
+        } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
+    }
+    private func replaceSpeakerProjection(_ memory:Memory) throws {
+        let labels=memory.kind == .audio ? Set(memory.transcript?.segments.compactMap(\.speaker) ?? []):[]
+        let existing=try prepare("SELECT label FROM audio_speakers WHERE memory_id=?"); defer { sqlite3_finalize(existing) }; bind(existing,1,memory.id)
+        var old=Set<String>(); while sqlite3_step(existing)==SQLITE_ROW { old.insert(string(existing,0)) }
+        guard old != labels else { return }
+        let remove=try prepare("DELETE FROM audio_speakers WHERE memory_id=?"); defer { sqlite3_finalize(remove) }; bind(remove,1,memory.id)
+        guard sqlite3_step(remove)==SQLITE_DONE else { throw failure() }
+        let add=try prepare("INSERT INTO audio_speakers(memory_id,label,label_key) VALUES(?,?,?)"); defer { sqlite3_finalize(add) }
+        for label in labels.sorted() {
+            sqlite3_reset(add); sqlite3_clear_bindings(add); bind(add,1,memory.id); bind(add,2,label); bind(add,3,SpeakerLabel.key(label))
+            guard sqlite3_step(add)==SQLITE_DONE else { throw failure() }
+        }
+    }
+    private func invalidateAudioEvidence(_ id:String) throws {
+        let title=try prepare("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT t.session_id FROM chat_turns t JOIN chat_sources s ON s.turn_id=t.id WHERE s.memory_id=?)"); defer { sqlite3_finalize(title) }; bind(title,1,id)
+        guard sqlite3_step(title)==SQLITE_DONE else { throw failure() }
+        let turns=try prepare("DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=?)"); defer { sqlite3_finalize(turns) }; bind(turns,1,id)
+        guard sqlite3_step(turns)==SQLITE_DONE else { throw failure() }
     }
     public func assetURL(_ relative: String) -> URL? {
         let parts = relative.split(separator: "/", omittingEmptySubsequences: false)
@@ -153,6 +187,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let end = filter.end { parts.append("\(prefix)timestamp<?"); values.append(String(end.timeIntervalSince1970)) }
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM json_each(CAST(\(prefix)payload AS TEXT), '$.tags') WHERE value=?)"); values.append(tag) }
+        if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
         return (parts.joined(separator: " AND "), values)
     }
     public static func queryTerms(_ input: String) -> [String] {
@@ -193,6 +228,19 @@ public final class MemoryStore: @unchecked Sendable {
             for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty || mode == .keyword ? limit : max(limit, 100)))
             while sqlite3_step(stmt) == SQLITE_ROW { keyword.append(try decode(stmt)) }
             for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : (similarityFusion && mode == .hybrid ? Self.keywordBonus(query:filter.query,memory:memory,rank:rank) : 1 / Double(60 + rank)), match: query.isEmpty ? "recent" : "keyword") }
+            if !query.isEmpty {
+                let names=try prepare("SELECT m.id FROM speaker_fts f JOIN memories m ON m.id=f.memory_id WHERE speaker_fts MATCH ? AND \(whereSQL) GROUP BY m.id ORDER BY m.timestamp DESC,m.id LIMIT ?")
+                defer { sqlite3_finalize(names) }; bind(names,1,SpeakerLabel.ftsQuery(filter.query))
+                for (offset,value) in values.enumerated() { bind(names,Int32(offset+2),value) }; sqlite3_bind_int(names,Int32(values.count+2),Int32(max(limit,100)))
+                var rank=0
+                while sqlite3_step(names)==SQLITE_ROW {
+                    let id=string(names,0)
+                    let score=similarityFusion && mode == .hybrid ? 0.08/(1+Double(rank)*0.1):1/Double(60+rank)
+                    if var hit=scored[id] { hit.score += score*0.25; hit.match="keyword + speaker"; scored[id]=hit }
+                    else if let memory=try get(id) { scored[id]=SearchHit(memory:memory,score:score,match:"speaker name") }
+                    rank += 1
+                }
+            }
         }
         if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
             var indexed: [SemanticCandidate]?
@@ -329,9 +377,10 @@ public final class MemoryStore: @unchecked Sendable {
         try exec("BEGIN IMMEDIATE")
         do {
             guard var memory=try get(id),memory.kind == .audio,var transcript=memory.transcript,transcript.text==memory.text,transcript.segments.contains(where:{$0.speaker==speaker}) else { throw OSwindError.invalid("Speaker or recording no longer exists") }
-            guard label==speaker || !transcript.segments.contains(where:{$0.speaker==label}) else { throw OSwindError.invalid("Another speaker in this recording already has that name") }
+            guard label==speaker || !transcript.segments.contains(where:{$0.speaker != speaker && $0.speaker.map(SpeakerLabel.key)==SpeakerLabel.key(label)}) else { throw OSwindError.invalid("Another speaker in this recording already has that name") }
             for index in transcript.segments.indices where transcript.segments[index].speaker==speaker { transcript.segments[index].speaker=label }
-            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT"); return memory
+            if label != speaker { try invalidateAudioEvidence(id) }
+            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try replaceSpeakerProjection(memory); try exec("COMMIT"); return memory
         } catch { try? exec("ROLLBACK"); throw error }
     }
     private func updateMetadata(_ m: Memory) throws {
@@ -466,6 +515,7 @@ extension MemoryStore {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
             for hit in answer.sources { guard let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
             var scope = answer.resolution?.filter ?? filter; scope.query = ""
+            scope.speaker=scope.speaker.map { policy.sanitize($0).text }
             let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope,timeZone:answer.resolution?.timeZone)
             let id = UUID().uuidString, timestamp = Date(), data = try JSONEncoder().encode(payload)
             let stmt = try prepare("INSERT INTO chat_turns(id,session_id,timestamp,payload) VALUES(?,?,?,?)"); defer { sqlite3_finalize(stmt) }
