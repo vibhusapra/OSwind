@@ -42,6 +42,13 @@ final class PrivacyAndIntegrationTests: XCTestCase {
         do { _ = try await task.value; XCTFail("Cancelled transcription returned success") } catch { XCTAssertTrue(error is CancellationError) }
         XCTAssertLessThan(Date().timeIntervalSince(begin),2)
     }
+    @MainActor func testBackgroundTargetRequiresManualRequest() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); defer { try? FileManager.default.removeItem(at:root) }
+        let store = try MemoryStore(root:root), embedder = LocalEmbedder()
+        let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings())
+        await controller.captureOnce(targetBundleID:"com.oswind.fixture")
+        XCTAssertTrue(controller.status.contains("manual")); XCTAssertEqual(try store.stats().count,0)
+    }
     func testWAVEncodingAndSilence() {
         let data = WAV.data(samples:[0,1,-1]); XCTAssertEqual(data.count,50); XCTAssertEqual(String(data:data.prefix(4),encoding:.utf8),"RIFF"); XCTAssertEqual(String(data:data[8..<12],encoding:.utf8),"WAVE"); XCTAssertEqual(WAV.rms([0,0]),0); XCTAssertEqual(WAV.rms([1,-1]),1)
     }

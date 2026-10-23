@@ -3,8 +3,8 @@
     "id": "F001",
     "axis": "Capture",
     "feature": "Focused-window snapshots",
-    "status": "implemented",
-    "evidence": "ScreenCaptureKit window filter; live unlocked capture pending",
+    "status": "live verified",
+    "evidence": "Real targeted synthetic window: OCR, correct source identity and image saved; automatic foreground transition test pending",
     "references": "Screenpipe, Littlebird, Recall"
   },
   {
@@ -364,7 +364,7 @@
     "axis": "Privacy",
     "feature": "Common secrets redaction",
     "status": "tested",
-    "evidence": "Patterns + raw-image suppression; not a complete PII/DLP model",
+    "evidence": "Unit and live secret fixtures pass; raw image is suppressed. Not a complete PII/DLP model",
     "references": "Screenpipe, Minne, Recall"
   },
   {

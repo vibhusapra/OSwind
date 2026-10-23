@@ -25,11 +25,12 @@ do {
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
           note TEXT                      Save a redacted, searchable note
           stats                          Storage and capture counts
+          config                         Print settings (no API keys)
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           delete ID                      Delete one memory and its media
           prune [--days N] [--max-gb N]   Apply retention
-          capture                        Capture current window once (permissions needed)
+          capture [--app-bundle ID]      Capture a chosen/current window once
           transcribe FILE --model PATH   Local whisper.cpp transcription
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
@@ -79,6 +80,7 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "config": try encoded(AppSettings.load(root:root))
         case "stats": try encoded(store.stats())
         case "search": let mode = SearchMode(rawValue:option("--mode") ?? "hybrid") ?? .hybrid; let filter = try searchFilter(); try encoded(store.search(filter,mode:mode,vector:mode == .keyword ? nil : embedder.embed(filter.query),modelID:embedder.modelID))
         case "ask": var configuration = AppSettings.load(root:root).ai; if let p = option("--provider"), let provider = AIProvider(rawValue:p) { configuration.provider = provider }; let answer = try await AnswerEngine(store:store,embedder:embedder).answer(args.joined(separator:" "),configuration:configuration); try encoded(answer)
@@ -87,7 +89,7 @@ do {
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
         case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")
         case "prune": let days = Int(option("--days") ?? "30") ?? 30; let gb = Int64(option("--max-gb") ?? "20") ?? 20; guard days > 0 && gb > 0 else { throw OSwindError.invalid("Retention and budget must be positive") }; print(try store.prune(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000))
-        case "capture": let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true); print(controller.status)
+        case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
         case "transcribe": let settings = AppSettings.load(root:root); let model = option("--model") ?? settings.whisperModel; guard let path = args.first else { throw OSwindError.invalid("Enter an audio file path") }; print(try await Whisper.transcribe(file:URL(fileURLWithPath:path),binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage))
         case "serve": let server = try LocalAPIServer(store:store,embedder:embedder); server.onState = { print($0); fflush(stdout) }; try server.start(); print("Token file: \(store.root.appendingPathComponent("api-token").path)"); while true { try await Task.sleep(nanoseconds:1_000_000_000) }
         case "mcp":

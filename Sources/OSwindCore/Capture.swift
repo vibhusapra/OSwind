@@ -16,8 +16,9 @@ public struct WindowContext: Sendable {
     public var browser: Bool { ["safari", "chrome", "firefox", "arc", "brave", "edge", "vivaldi", "orion"].contains { bundle.lowercased().contains($0) } }
 }
 public enum AccessibilityContext {
-    @MainActor public static func current() -> WindowContext? {
-        guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
+    @MainActor public static func current(targetBundleID: String? = nil) -> WindowContext? {
+        let application = targetBundleID.flatMap { bundle in NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundle } } ?? (targetBundleID == nil ? NSWorkspace.shared.frontmostApplication : nil)
+        guard let app = application else { return nil }
         let root = AXUIElementCreateApplication(app.processIdentifier)
         var windowRef: CFTypeRef?; AXUIElementCopyAttributeValue(root, kAXFocusedWindowAttribute as CFString, &windowRef)
         var title = "", url: String?, texts = [String](), secure = false
@@ -82,12 +83,13 @@ public struct CaptureMetrics: Sendable {
         let interval = settings.profile.effectiveInterval(lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled, thermalLimited: ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical, idleSeconds: idle) ?? 20
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in Task { @MainActor in guard let self, self.running else { return }; await self.captureOnce(); self.schedule() } }
     }
-    public func captureOnce(manual: Bool = false) async {
+    public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
+        guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
         guard !busy, !suspended, running || manual else { return }
         guard !SessionState.locked else { status = "Locked · capture suspended"; return }
         guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }
         if !manual, CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .null) > 120 { metrics.idle += 1; status = "Idle · saving energy"; return }
-        guard let context = AccessibilityContext.current() else { return }
+        guard let context = AccessibilityContext.current(targetBundleID:targetBundleID) else { status = "Application context unavailable"; return }
         if context.bundle == "com.oswind.desktop" || context.bundle == Bundle.main.bundleIdentifier { status = "OSwind window · skipped"; return }
         if context.secure { metrics.excluded += 1; status = "Protected text field · skipped"; return }
         if let reason = settings.privacy.exclusion(app: context.bundle, title: context.title, url: context.url, isBrowser: context.browser) { metrics.excluded += 1; status = reason; return }

@@ -7,7 +7,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 ## Implemented and directly verified
 
 - Native Swift package builds in debug and release on macOS 26.6.2 / Swift 6.3.3 / M5 Max. Ad-hoc signed .app packages successfully; a debug app process ran with isolated sample data.
-- 28 XCTest cases pass: durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
+- 29 XCTest cases pass: durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
 - CLI durable note/search and real stdio MCP initialize/list/search smoke pass. Live loopback HTTP health/stats/search/get pass; unauthorized requests return 401, browser Origin and bad Host return 403.
 - Apple Intelligence answered the local synthetic ownership question with the correct owner and [1] citation (~0.70 seconds in a repeated sample).
 - Ollama qwen3:4b answered the same question with correct owner and [1] (~3.75 seconds warm sample). Runtime `ollama ps` reported 100% GPU, 8192 context. Reasoning text is stripped before display.
@@ -15,7 +15,8 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - Vision OCR read a generated 1600×900 text fixture, including the secret string used to verify redaction, in ~250–300 ms. This is not a broad OCR accuracy benchmark.
 - 1,000-row debug and 10,000-row release synthetic retrieval benchmarks saved. 10k hybrid p95 ~21.7 ms, hit@5 1.0 and MRR .833; keyword MRR 1.0; semantic-only hit@5 .583. The narrow repeated-topic fixture favors keyword matching and is not a competitor benchmark.
 - Paused debug app sampled for 65 seconds while locked: median RSS ~155 MiB. This is not active-capture power use; ps CPU is a lifetime average.
-- CLI attempted capture while the Mac was locked and correctly reported `Locked · capture suspended`. Native UI automation could not proceed because the Mac was locked. No attempt was made to bypass the lock.
+- Real targeted-window capture now passes on an unlocked Mac: 5 OCR regions, correct bundle identity, indexed synthetic marker and retained image (~0.49–0.67 s samples). The real-window secret fixture stores redacted text and no image. App/title exclusions create no rows; deletion removes the image and FTS entry. `scripts/live-capture-smoke.py` reproduces these checks using isolated temporary apps and data. This does not prove automatic foreground/app-switch behavior, browser URL privacy or audio capture.
+- CLI attempted capture while the Mac was locked and correctly reported `Locked · capture suspended`. Initial native UI automation could not proceed because the Mac was locked; the later unlocked state enabled targeted synthetic capture verification. No attempt was made to bypass the lock.
 - Native sample workspace rendered from its own NSHostingView and visually inspected without reading the desktop; search-mode label wrapping was fixed. Live keyboard, permissions and capture interactions remain unverified. Sample render is saved in `assets/workspace-sample.png`; a light-mode minimum-window layout and the Ask view were also rendered and inspected. Added appearance-aware accent contrast and a visible audio-only recording state.
 - Interactive research report reviewed in an in-app browser at desktop and narrow layout; feature filtering works (vault query: 1 of 72 requirements). Repaired a JavaScript newline escaping error found during review.
 
@@ -35,7 +36,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 
 ## Next release gates (still open)
 
-- [ ] Unlocked native visual/interaction review, permission flow, real screen capture, correct browser URL metadata and private-window tests.
+- [ ] Native interaction/permission flow, automatic foreground transitions, browser URL metadata/private-window tests. Real targeted screen capture and sampled layout rendering pass.
 - [ ] End-to-end mic/system audio, short recordings, device changes, queue pressure and pause/lock boundaries. Subprocess cancellation is covered by an automated test.
 - [ ] Stronger semantic/multilingual/multimodal retrieval and a diverse labeled relevance suite; current baseline is insufficient for state-of-the-art claims.
 - [ ] Durable chats/follow-ups, natural-language time filters, scheduled routines, meeting sessions/diarization, calendar view and query-specific highlights.
@@ -50,7 +51,7 @@ Personal sync, enterprise policy/team controls and other platforms remain visibl
 
 ## Local artifacts
 
-- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`).
+- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). A locally ad-hoc signed copy was installed at `/Applications/OSwind.app`; rebuild/install after later commits to refresh it.
 - Raw test/model/runtime logs and synthetic media: `.artifacts/` (excluded from Git).
 - Reproducible public synthetic metrics: `benchmarks/`.
 - Local synthetic verification databases: `.local/` (excluded from Git).
