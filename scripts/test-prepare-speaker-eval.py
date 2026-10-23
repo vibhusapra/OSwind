@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Offline HTTP/entity and local extraction contracts, with generated WAV bytes."""
-import hashlib,importlib.util,io,json,pathlib,re,tempfile,threading,unittest,wave,zipfile
+import contextlib,hashlib,importlib.util,io,json,pathlib,re,tempfile,threading,unittest,wave,zipfile
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 spec=importlib.util.spec_from_file_location('prepare',pathlib.Path(__file__).with_name('prepare-speaker-eval.py'));module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class PreparationContracts(unittest.TestCase):
@@ -48,4 +48,26 @@ class PreparationContracts(unittest.TestCase):
         plan['clips'][0]['annotation_sha256']='0'*64
         with self.assertRaises(ValueError):module.prepare(annotations,plan,self.root/'bad-reference',audio)
         self.assertEqual(json.loads((self.root/'bad-reference/manifest.json').read_text())['state'],'failed')
+    def testWholeDevelopmentCoverageAndLargerFixedSelection(self):
+        audio=self.root/'many.zip';annotations=self.root/'references.zip';clips=[]
+        with zipfile.ZipFile(audio,'w',compression=zipfile.ZIP_DEFLATED) as wavs,zipfile.ZipFile(annotations,'w') as refs:
+            for index in range(21):
+                identifier='aaaa'+chr(ord('a')+index);member='joonson-voxconverse-aaaaaaa/dev/'+identifier+'.rttm'
+                data=f'SPEAKER {identifier} 1 0 1 <NA> <NA> A <NA> <NA>\n'.encode()
+                wavs.writestr(identifier+'.wav',self.wav);refs.writestr(member,data);clips.append({'id':identifier,'annotation_member':member,'annotation_sha256':hashlib.sha256(data).hexdigest()})
+        plan={'annotation_commit':'a'*40,'selection':'all generated references','coverage':'full-development-set','clips':clips}
+        with contextlib.redirect_stdout(io.StringIO()):result=module.prepare(annotations,plan,self.root/'full',audio)
+        self.assertEqual(result['state'],'prepared');self.assertEqual(result['coverage'],'full-development-set');self.assertEqual(result['available_reference_clips'],21)
+        plan['clips']=clips[:-1]
+        with self.assertRaisesRegex(ValueError,'does not equal'):module.prepare(annotations,plan,self.root/'incomplete',audio)
+        self.assertEqual(json.loads((self.root/'incomplete/manifest.json').read_text())['state'],'failed')
+    def testOversizedSelectionFailsBeforeCreatingOutput(self):
+        def identifier(number):
+            letters=[]
+            for _ in range(5):letters.append(chr(ord('a')+number%26));number//=26
+            return ''.join(reversed(letters))
+        plan={'annotation_commit':'a'*40,'selection':'oversize','clips':[{'id':identifier(i)} for i in range(513)]}
+        output=self.root/'oversized'
+        with self.assertRaisesRegex(ValueError,'Invalid fixed'):module.prepare(self.root/'unused',plan,output,self.root/'unused-audio')
+        self.assertFalse(output.exists())
 if __name__=='__main__':unittest.main()

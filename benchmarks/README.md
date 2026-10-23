@@ -392,3 +392,5 @@ An actual public-file product import also preserves 2,606 Parakeet timed segment
 - [Native model idle retention](native-model-idle-v1.json): actual 120-second timer/reload, queue/policy/controller contracts and signed-package process identity; no RAM reclamation or power claim.
 
 - [Scheduled routines](routines-v1.json): atomic claims, native real-clock timer/local Qwen result, actual source navigation and deterministic cancellation; signed installed process/backup/erasure contracts. Full limits in [ROUTINES](../docs/ROUTINES.md).
+
+- [Complete development speaker comparison](speaker-corpus-v1.json): 216 recordings / 20.30 hours, two runs/policy, independent full-WAV/overlap-inclusive DER; all regressions and repeat differences retained. This is development evidence, not official test or competitor quality.

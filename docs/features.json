@@ -324,7 +324,7 @@
     "axis": "Audio",
     "feature": "Speaker diarization / names",
     "status": "partial",
-    "evidence": "Overlap-preserving native turns, local labels/manual names, exact speaker scopes and timed evidence. Two fixed five-clip natural-speech dev subsets measured with independent DER; actual GPU-requested ASR/import/mixed-word safeguard exercised. Full meetings, live continuity and native UI acceptance remain open",
+    "evidence": "Overlap-preserving native turns, local labels/manual names, exact speaker scopes and timed evidence. All 216 VoxConverse dev clips (20.30h), two runs/policy: independent DER 11.27\u219210.08% no collar, 8.94\u21927.79% at .25s; regressions and undercounts retained, not held-out/competitor quality. Actual GPU-requested ASR/import/mixed-word safeguard exercised. Full meetings, live continuity and native UI acceptance remain open",
     "references": "Granola, Omi, Limitless"
   },
   {

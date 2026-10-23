@@ -60,6 +60,8 @@ def evaluate(binary,model,dataset,output,repetitions=2):
     if sha(pinned)!=original_sha or sha(binary)!=original_sha:raise ValueError('Executable changed during pinning')
     binary=pinned
     report={'format':'OSwind natural speaker development evaluation v1','state':'running','dataset':{key:manifest[key] for key in ['dataset','annotation_commit','selection','license','attribution','license_source']},'binary_sha256':original_sha,'pinned_runner':'runner/oswindctl','model_tree_sha256':model_hash(model),'repetitions':repetitions,'scorer':{name:importlib.metadata.version(name) for name in ['pyannote.metrics','pyannote.core','numpy','scipy']},'settings':{'collars_seconds':[0,0.25],'skip_overlap':False,'uem':'Entire source WAV duration, including unannotated silence','oracle_speaker_count':False},'clips':[],'scope':'Predetermined development clips, not held-out/corpus-wide or competitor app quality. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML compilation caches uncontrolled. macOS process RSS excludes device allocation, background daemons and system power.'}
+    report['selection_coverage']={'kind':manifest.get('coverage','fixed-subset'),'planned_clips':len(manifest['clips']),'available_reference_clips':manifest.get('available_reference_clips')}
+    if manifest.get('coverage')=='full-development-set':report['scope']=report['scope'].replace('Predetermined development clips, not held-out/corpus-wide or competitor app quality.','Complete pinned development selection, not held-out/test-set or competitor app quality. Includes previously evaluated development clips.')
     metrics={(run,collar):DiarizationErrorRate(collar=collar,skip_overlap=False) for run in range(repetitions) for collar in [0,0.25]}
     private_json(output/'report.json',report)
     try:
@@ -92,10 +94,13 @@ def evaluate(binary,model,dataset,output,repetitions=2):
                 if run['index']!=index or run['resident_backend_reused']!=(index>0) or not math.isfinite(run['seconds']) or run['seconds']<=0:raise ValueError('Invalid inference timing/residency')
                 hypothesis=read_hypothesis(run['timeline'],identifier,duration)
                 entry['runs'].append({'index':index,'seconds':run['seconds'],'real_time_factor':run['seconds']/duration,'resident_backend_reused':index>0,'model':run['timeline']['model'],'detected_speakers':len(hypothesis.labels()),'scores':{str(collar):score(reference,hypothesis,duration,collar,metrics[index,collar]) for collar in [0,0.25]}})
-            if sha(audio)!=clip['audio_sha256'] or (output/'forbidden-library').exists():raise ValueError('Input mutation or unexpected library write')
+            if sha(audio)!=clip['audio_sha256'] or sha(reference_path)!=clip['reference_sha256'] or (output/'forbidden-library').exists():raise ValueError('Input mutation or unexpected library write')
             report['clips'].append(entry);private_json(output/'report.json',report);print('Scored',identifier,entry['runs'][0]['scores'],flush=True)
         if sha(binary)!=report['binary_sha256']:raise ValueError('Pinned executable changed during evaluation')
         if model_hash(model)!=report['model_tree_sha256']:raise ValueError('Model files changed during inference')
+        for clip in manifest['clips']:
+            if sha(dataset/'audio'/(clip['id']+'.wav'))!=clip['audio_sha256'] or sha(dataset/'reference'/(clip['id']+'.rttm'))!=clip['reference_sha256']:raise ValueError('Dataset source drift after corpus inference')
+        report['source_stability_verified']=True
         report['aggregate']=[{'run':run,'collar_seconds':collar,'micro_der':float(abs(metric)),'components':{k:float(v) for k,v in metric[:].items()},'combined_real_time_factor':sum(c['runs'][run]['seconds'] for c in report['clips'])/sum(c['source_audio_seconds'] for c in report['clips'])} for (run,collar),metric in metrics.items()]
         report['state']='completed';private_json(output/'report.json',report);return report
     except BaseException as error:

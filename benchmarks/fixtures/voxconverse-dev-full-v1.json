@@ -1,0 +1,1737 @@
+{
+  "created_utc": "2026-10-23T23:12:23.498786+00:00",
+  "annotation_commit": "24bf60be297701cd7e4ef18550c6d390c1b87365",
+  "dataset": "VoxConverse dev",
+  "coverage": "full-development-set",
+  "selection": "Every dev RTTM identifier in the pinned official annotation ZIP, sorted lexicographically before corpus inference; includes ten previously evaluated development clips. No result-driven exclusions, no oracle counts. Not held-out/test-set quality.",
+  "clips": [
+    {
+      "id": "abjxc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/abjxc.rttm",
+      "annotation_sha256": "13cc19d2180889b786cf0fb86b522b95902d20fae27b7384ea943c7877286f9c",
+      "reference_speakers": 1,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 64.64
+    },
+    {
+      "id": "afjiv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/afjiv.rttm",
+      "annotation_sha256": "58a764b4b5864b14dd39d91e420370d1f45cabc4bcf354a8e7516538b996d51f",
+      "reference_speakers": 5,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 145.32
+    },
+    {
+      "id": "ahnss",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ahnss.rttm",
+      "annotation_sha256": "9a09a7c39311b9f0e4209f6a58930e35327c8fa9f36b671c1a1a19972d514e71",
+      "reference_speakers": 4,
+      "reference_segments": 87,
+      "last_reference_end_seconds": 664.28
+    },
+    {
+      "id": "aisvi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/aisvi.rttm",
+      "annotation_sha256": "b51dbe53aa0284d95f077d0e7eb904a1d7ed994706977b41b10fe3e0df51538a",
+      "reference_speakers": 8,
+      "reference_segments": 42,
+      "last_reference_end_seconds": 468.92
+    },
+    {
+      "id": "akthc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/akthc.rttm",
+      "annotation_sha256": "89595c2816c056bfd5e0ca7e64d5d12323b417d16a915b015e1a471ac8695203",
+      "reference_speakers": 2,
+      "reference_segments": 13,
+      "last_reference_end_seconds": 113.83999999999999
+    },
+    {
+      "id": "ampme",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ampme.rttm",
+      "annotation_sha256": "0bba54230960204b44f169a98b36df50d97a6318b2312cda28a3796bcfa9eff1",
+      "reference_speakers": 3,
+      "reference_segments": 14,
+      "last_reference_end_seconds": 148.27999999999997
+    },
+    {
+      "id": "asxwr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/asxwr.rttm",
+      "annotation_sha256": "9fb37050e71851454d4cc9cac5aaa44e2abdd5ec2c1eb0d3603f5cae6ba2f38c",
+      "reference_speakers": 3,
+      "reference_segments": 18,
+      "last_reference_end_seconds": 237.72
+    },
+    {
+      "id": "atgpi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/atgpi.rttm",
+      "annotation_sha256": "282b1fe4bd726d9a0de6a7b83a37198223fbf3f28509094f914638241f51643a",
+      "reference_speakers": 1,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 121.72
+    },
+    {
+      "id": "aufkn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/aufkn.rttm",
+      "annotation_sha256": "1570b675e5c02c8c17fa15bcfc669d9a896ccea2a65a6c78b8468db6893faec0",
+      "reference_speakers": 3,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 180.0
+    },
+    {
+      "id": "azisu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/azisu.rttm",
+      "annotation_sha256": "f58f1737ca0497afec89e74975485da916e62c0f2d0b3e42e06f7cbf651df69d",
+      "reference_speakers": 4,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 194.12
+    },
+    {
+      "id": "bauzd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bauzd.rttm",
+      "annotation_sha256": "b219fe6eb11f660f4fe3d3b4e91a3e886618eac06752f5fa07135cd30c3cd88c",
+      "reference_speakers": 5,
+      "reference_segments": 83,
+      "last_reference_end_seconds": 499.71999999999997
+    },
+    {
+      "id": "bdopb",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bdopb.rttm",
+      "annotation_sha256": "fa73534c121fc2fd2deccb2be96d519b074a83b7ee9501eeac2704af47b1cf34",
+      "reference_speakers": 7,
+      "reference_segments": 85,
+      "last_reference_end_seconds": 942.72
+    },
+    {
+      "id": "bkwns",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bkwns.rttm",
+      "annotation_sha256": "9a0f78cbfb91e60703df7d064c795c8d906a388e2741efc465e4cd707cfc5dc3",
+      "reference_speakers": 2,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 48.959999999999994
+    },
+    {
+      "id": "blwmj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/blwmj.rttm",
+      "annotation_sha256": "063b45d9011461e044fa0aaedb93dc59f1c74e6117916a0a95f080a5af7e7677",
+      "reference_speakers": 2,
+      "reference_segments": 20,
+      "last_reference_end_seconds": 259.0
+    },
+    {
+      "id": "bravd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bravd.rttm",
+      "annotation_sha256": "e40398dbb3065816abbfc34eddf1112ca5a645bdeb9ac98d2fd97ba5131ed941",
+      "reference_speakers": 3,
+      "reference_segments": 73,
+      "last_reference_end_seconds": 395.84
+    },
+    {
+      "id": "bspxd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bspxd.rttm",
+      "annotation_sha256": "4b6c446e4a479a1bd0358bce4c5bb8730601c793c4e80c45682a89350a097e71",
+      "reference_speakers": 3,
+      "reference_segments": 61,
+      "last_reference_end_seconds": 336.32
+    },
+    {
+      "id": "bwzyf",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bwzyf.rttm",
+      "annotation_sha256": "364df9b6a82ac14c0957ac7e2d9bc1d9b6afbff514391d353daa600006faf8f9",
+      "reference_speakers": 4,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 80.0
+    },
+    {
+      "id": "bxpwa",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bxpwa.rttm",
+      "annotation_sha256": "042f6a883b4765a46fcdf4372c4c4e8d5b8dae3ff0d6520ec40ee703e14d59a3",
+      "reference_speakers": 5,
+      "reference_segments": 18,
+      "last_reference_end_seconds": 419.24
+    },
+    {
+      "id": "bydui",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/bydui.rttm",
+      "annotation_sha256": "7d16964dcf39af37784c1569cd6a65bc27c06c7eb8f1cca5062f6d4bd02ea932",
+      "reference_speakers": 3,
+      "reference_segments": 20,
+      "last_reference_end_seconds": 280.32
+    },
+    {
+      "id": "ccokr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ccokr.rttm",
+      "annotation_sha256": "4f84bf70900782e99dca621558e775659a2afe981f0fc07825d7c1b97d7d655d",
+      "reference_speakers": 5,
+      "reference_segments": 51,
+      "last_reference_end_seconds": 201.16
+    },
+    {
+      "id": "cjfer",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cjfer.rttm",
+      "annotation_sha256": "3d9a70e0284ba278ff1c6c9ada1f4317cd22cb45830375b39fd3c4180036f5b2",
+      "reference_speakers": 15,
+      "reference_segments": 88,
+      "last_reference_end_seconds": 634.24
+    },
+    {
+      "id": "cmfyw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cmfyw.rttm",
+      "annotation_sha256": "dde122a93663b80ad6e28584352041ec4e4f76c13a5ed796323ba9b5b596a690",
+      "reference_speakers": 5,
+      "reference_segments": 62,
+      "last_reference_end_seconds": 483.84
+    },
+    {
+      "id": "cmhsm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cmhsm.rttm",
+      "annotation_sha256": "a9d305118c0f44da7f500579db98ffb08aee36c2d87ad4fee6267edc2f4fff29",
+      "reference_speakers": 1,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 601.96
+    },
+    {
+      "id": "cobal",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cobal.rttm",
+      "annotation_sha256": "664f92b29f67cf2b90e844d431f379726de414ec9f4240b05600c5828a70b201",
+      "reference_speakers": 2,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 75.8
+    },
+    {
+      "id": "cqaec",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cqaec.rttm",
+      "annotation_sha256": "aefb9676ce5df053de943cc1b40d80d8e541ab444beea5409855111b0e96b3fa",
+      "reference_speakers": 5,
+      "reference_segments": 59,
+      "last_reference_end_seconds": 224.12
+    },
+    {
+      "id": "crixb",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/crixb.rttm",
+      "annotation_sha256": "bf35b373e06224ac7571742f1903a3720577179b5fe1387fe501ac3aa2d88f79",
+      "reference_speakers": 2,
+      "reference_segments": 59,
+      "last_reference_end_seconds": 300.08000000000004
+    },
+    {
+      "id": "cwryz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cwryz.rttm",
+      "annotation_sha256": "f5104494d1d66590ab362346c9938eca22a641058af19389f9a060daeba247ce",
+      "reference_speakers": 4,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 152.24
+    },
+    {
+      "id": "cyyxp",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/cyyxp.rttm",
+      "annotation_sha256": "4caa4ce821fc1fb38052af436774cb00612e7780bd89f37b8a40f589e367d41a",
+      "reference_speakers": 1,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 186.96
+    },
+    {
+      "id": "czlvt",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/czlvt.rttm",
+      "annotation_sha256": "ce480b85b18ed01ff71a9487fca29d5431efe8bd7628469848124c63608c5ae9",
+      "reference_speakers": 11,
+      "reference_segments": 68,
+      "last_reference_end_seconds": 942.92
+    },
+    {
+      "id": "dbugl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/dbugl.rttm",
+      "annotation_sha256": "9621babc7bee257682bfaf6363d1948b30103e579fee832d37b00e6280a0c82c",
+      "reference_speakers": 8,
+      "reference_segments": 48,
+      "last_reference_end_seconds": 797.16
+    },
+    {
+      "id": "dhorc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/dhorc.rttm",
+      "annotation_sha256": "9bf5c800d769b52cbc703e3ca86acc470141693e5a01bda0dcf6354379d0f303",
+      "reference_speakers": 4,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 302.6
+    },
+    {
+      "id": "djngn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/djngn.rttm",
+      "annotation_sha256": "a832d0ef7b5f85c8846924c56e91828868493da6ecb64c95905a989dd1f1a64a",
+      "reference_speakers": 2,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 171.95999999999998
+    },
+    {
+      "id": "djqif",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/djqif.rttm",
+      "annotation_sha256": "7c1f60781ae2ca248fd6e771421862116ffa60b50ae43a19c1f07d8a426a93be",
+      "reference_speakers": 3,
+      "reference_segments": 30,
+      "last_reference_end_seconds": 484.52
+    },
+    {
+      "id": "dscgs",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/dscgs.rttm",
+      "annotation_sha256": "55a3ce4ebe42851fb202ee1f51f289e13aedb930b8accbc83c9c3f71ad3bafe2",
+      "reference_speakers": 2,
+      "reference_segments": 34,
+      "last_reference_end_seconds": 207.32000000000002
+    },
+    {
+      "id": "dvngl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/dvngl.rttm",
+      "annotation_sha256": "d8e51b646b4b2576ba94a782cada15420d9fc64f4ece318bba2103aa05424ab6",
+      "reference_speakers": 8,
+      "reference_segments": 53,
+      "last_reference_end_seconds": 427.12
+    },
+    {
+      "id": "eapdk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/eapdk.rttm",
+      "annotation_sha256": "6289a0ba6a9ee8ab60e0a3893819b4724e301adffa9517844f168d5ead8a55c5",
+      "reference_speakers": 7,
+      "reference_segments": 27,
+      "last_reference_end_seconds": 544.52
+    },
+    {
+      "id": "edixl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/edixl.rttm",
+      "annotation_sha256": "c8bb215a2acd2dd2b0dfe909ef167be4a50bcfa96ad5b3c93e784161a0b57598",
+      "reference_speakers": 6,
+      "reference_segments": 13,
+      "last_reference_end_seconds": 311.0
+    },
+    {
+      "id": "ehpau",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ehpau.rttm",
+      "annotation_sha256": "4371af74ffc56924a52297dfb8a286b48fbfac4704e9c2c061b1e7161916a234",
+      "reference_speakers": 3,
+      "reference_segments": 36,
+      "last_reference_end_seconds": 155.16
+    },
+    {
+      "id": "epdpg",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/epdpg.rttm",
+      "annotation_sha256": "c085fb46888c89810f1e79b0ede5f48237db65e663959168994056a550573b99",
+      "reference_speakers": 12,
+      "reference_segments": 94,
+      "last_reference_end_seconds": 536.0
+    },
+    {
+      "id": "eqttu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/eqttu.rttm",
+      "annotation_sha256": "418a7885bd8e85b731367848fb72efa570f36c73f8f814f567ca630a931e14bb",
+      "reference_speakers": 2,
+      "reference_segments": 5,
+      "last_reference_end_seconds": 161.07999999999998
+    },
+    {
+      "id": "esrit",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/esrit.rttm",
+      "annotation_sha256": "0dd436485ee7ad70564d5bad5af62435e78222a6ab0c859618d31ed0f8cf812c",
+      "reference_speakers": 5,
+      "reference_segments": 22,
+      "last_reference_end_seconds": 215.0
+    },
+    {
+      "id": "evtyi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/evtyi.rttm",
+      "annotation_sha256": "0fda0548e5e8a13e2816ca3ee45e3243f9edbdc2f6e796299e9da21826d26546",
+      "reference_speakers": 2,
+      "reference_segments": 217,
+      "last_reference_end_seconds": 845.0799999999999
+    },
+    {
+      "id": "exymw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/exymw.rttm",
+      "annotation_sha256": "e2531bb2cef145960a53ae02f7ac0d74ccc54b0406d7da6462554b55be2504bf",
+      "reference_speakers": 5,
+      "reference_segments": 9,
+      "last_reference_end_seconds": 90.92
+    },
+    {
+      "id": "eziem",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/eziem.rttm",
+      "annotation_sha256": "e278ccebba4666782bbb21044451dedf5719253348fbea6264aef8da040268c9",
+      "reference_speakers": 8,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 175.2
+    },
+    {
+      "id": "ezsgk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ezsgk.rttm",
+      "annotation_sha256": "85b41d269aa5e7c2bbc70ad0df8956bdd53c6b45fe9893e9c0f741e2e5e0d48e",
+      "reference_speakers": 3,
+      "reference_segments": 52,
+      "last_reference_end_seconds": 207.64000000000001
+    },
+    {
+      "id": "falxo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/falxo.rttm",
+      "annotation_sha256": "61a5fde8af7796c683160503e796f666f5dec093d7230cec64a9444db665c1d7",
+      "reference_speakers": 8,
+      "reference_segments": 140,
+      "last_reference_end_seconds": 439.4
+    },
+    {
+      "id": "femmv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/femmv.rttm",
+      "annotation_sha256": "9b36191c6ae61fdf412df3280a38f11625e84d0810964755684305915c8952bf",
+      "reference_speakers": 4,
+      "reference_segments": 22,
+      "last_reference_end_seconds": 175.88
+    },
+    {
+      "id": "fkvvo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/fkvvo.rttm",
+      "annotation_sha256": "579d4b96d6873e6f453e9c2e9e8a870d5c08ccc103ebb13a730cdf6993a76be9",
+      "reference_speakers": 9,
+      "reference_segments": 51,
+      "last_reference_end_seconds": 541.16
+    },
+    {
+      "id": "fsaal",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/fsaal.rttm",
+      "annotation_sha256": "9dad3f1b916ed066475257f89d1f5703e36a8c239b7a31f1a19ccde0a2819121",
+      "reference_speakers": 7,
+      "reference_segments": 17,
+      "last_reference_end_seconds": 198.32
+    },
+    {
+      "id": "fvyvb",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/fvyvb.rttm",
+      "annotation_sha256": "6690da7c21bfbaab3ae6fa0d4a875fa16c3616ddcdd9b6e652ff20349c8c1529",
+      "reference_speakers": 7,
+      "reference_segments": 78,
+      "last_reference_end_seconds": 787.64
+    },
+    {
+      "id": "fxgvy",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/fxgvy.rttm",
+      "annotation_sha256": "921c9472af13b658ed3d0623b46d8f91b586f53d12b4a341bc1e588066333cdb",
+      "reference_speakers": 2,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 52.04
+    },
+    {
+      "id": "ggvel",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ggvel.rttm",
+      "annotation_sha256": "8523a041f4194e69c27fac2060fade5447d07aef17c9cfe5d4fc6eb6e7322361",
+      "reference_speakers": 6,
+      "reference_segments": 37,
+      "last_reference_end_seconds": 142.84
+    },
+    {
+      "id": "gocbm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gocbm.rttm",
+      "annotation_sha256": "b70891c6f71e8b6159339941ff2ef2102f294bce561ea67726c8b2af951d4cb6",
+      "reference_speakers": 8,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 265.44
+    },
+    {
+      "id": "gofnj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gofnj.rttm",
+      "annotation_sha256": "dc2c26d568027a986138993619dca07be62a61d194b83d86698e24d22c65ee95",
+      "reference_speakers": 3,
+      "reference_segments": 18,
+      "last_reference_end_seconds": 387.56
+    },
+    {
+      "id": "goyli",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/goyli.rttm",
+      "annotation_sha256": "555bcc28a6493808ca183a71e480a428c2e2ac862c687072d8232b0b6bdc182f",
+      "reference_speakers": 5,
+      "reference_segments": 57,
+      "last_reference_end_seconds": 653.5200000000001
+    },
+    {
+      "id": "gpjne",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gpjne.rttm",
+      "annotation_sha256": "670c545caee968011fb25edb934d2b99c8eca76595c426b427a0da49de054dfb",
+      "reference_speakers": 2,
+      "reference_segments": 16,
+      "last_reference_end_seconds": 185.2
+    },
+    {
+      "id": "gqbvk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gqbvk.rttm",
+      "annotation_sha256": "38649a5b9058bfc21c3d4aa1ed41279d89d511a374821fb9107a26c293a18960",
+      "reference_speakers": 4,
+      "reference_segments": 14,
+      "last_reference_end_seconds": 163.60000000000002
+    },
+    {
+      "id": "gqdxy",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gqdxy.rttm",
+      "annotation_sha256": "94fa2d0f24c656a8060883484bb755a98fbfcd2258e9bb67f87de740105a485a",
+      "reference_speakers": 3,
+      "reference_segments": 41,
+      "last_reference_end_seconds": 370.0
+    },
+    {
+      "id": "grzbb",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/grzbb.rttm",
+      "annotation_sha256": "03360f768b1fe87178983fe12f3f9600da79a1598d97ac147ad6652dc9d589fa",
+      "reference_speakers": 1,
+      "reference_segments": 44,
+      "last_reference_end_seconds": 592.08
+    },
+    {
+      "id": "gwtwd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gwtwd.rttm",
+      "annotation_sha256": "368f7df5d01d48a6ceec146b9b4bfeccacb99571063686f169368a363c460dd8",
+      "reference_speakers": 4,
+      "reference_segments": 11,
+      "last_reference_end_seconds": 53.24
+    },
+    {
+      "id": "gzvkx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/gzvkx.rttm",
+      "annotation_sha256": "5dfdc05296d2133dcbf85ddbcb5109f16fdb2769c11c78372c1e5203f6a6d3c1",
+      "reference_speakers": 6,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 225.08
+    },
+    {
+      "id": "hgdez",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hgdez.rttm",
+      "annotation_sha256": "f7aff17dfc0ac7826bb95c44f8f7dc1684f31de1081d09e4c970c4c4c8948454",
+      "reference_speakers": 10,
+      "reference_segments": 127,
+      "last_reference_end_seconds": 943.24
+    },
+    {
+      "id": "hgeec",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hgeec.rttm",
+      "annotation_sha256": "a03ec226d464079925a7c45bece980d4fcff2258e5c6bed230d5bbcd2272b093",
+      "reference_speakers": 7,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 423.92
+    },
+    {
+      "id": "hiyis",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hiyis.rttm",
+      "annotation_sha256": "b8b621cc41a1f8ea6b7181554f014874f853bac64074834d0a6323ef24c76f00",
+      "reference_speakers": 2,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 86.32
+    },
+    {
+      "id": "hkzpa",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hkzpa.rttm",
+      "annotation_sha256": "f622b5fecc3a11c0d15f110974da68a008bb7985caeb30e45d30f6a8eea86015",
+      "reference_speakers": 2,
+      "reference_segments": 61,
+      "last_reference_end_seconds": 952.4000000000001
+    },
+    {
+      "id": "houcx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/houcx.rttm",
+      "annotation_sha256": "4dc21c74eac85027d682738dd6de06f556fa019cc7fd164fe1cb5f35cf3d8ea1",
+      "reference_speakers": 3,
+      "reference_segments": 59,
+      "last_reference_end_seconds": 307.28
+    },
+    {
+      "id": "hqyok",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hqyok.rttm",
+      "annotation_sha256": "4881c34639b3236598876aa1cc10abd71a26b9d98251591d8220dee28bb2e9ce",
+      "reference_speakers": 1,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 21.96
+    },
+    {
+      "id": "hycgx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/hycgx.rttm",
+      "annotation_sha256": "f177e7256ea0cbdf042ff51ddbafed2bfb8e2b0807024b3c84217acd5b5eb3c8",
+      "reference_speakers": 2,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 249.92000000000002
+    },
+    {
+      "id": "ikgcq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ikgcq.rttm",
+      "annotation_sha256": "f73077ba77afab2ecd664c58802d4ed3fb3d40aa5cda8d5299fd9838ef5127b5",
+      "reference_speakers": 2,
+      "reference_segments": 20,
+      "last_reference_end_seconds": 124.32
+    },
+    {
+      "id": "imbqf",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/imbqf.rttm",
+      "annotation_sha256": "4133351b4ac99f743470ed56ecbe5dd0acce9a10e11e0768891bbf73d3a51562",
+      "reference_speakers": 5,
+      "reference_segments": 48,
+      "last_reference_end_seconds": 343.79999999999995
+    },
+    {
+      "id": "imtug",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/imtug.rttm",
+      "annotation_sha256": "c7291b6c76d07fc788d577b3ef229dc61be99fd7ef4b3fca8f2fe13454a639b2",
+      "reference_speakers": 2,
+      "reference_segments": 14,
+      "last_reference_end_seconds": 146.96
+    },
+    {
+      "id": "ioasm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ioasm.rttm",
+      "annotation_sha256": "a36d30e0cfbc04528c9a0563662d5167bc26ba32b93e72d01b8946775d2f49c7",
+      "reference_speakers": 3,
+      "reference_segments": 149,
+      "last_reference_end_seconds": 472.52
+    },
+    {
+      "id": "ipqqq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ipqqq.rttm",
+      "annotation_sha256": "b89eabf88ad1f232490006021b766dfe2669b5bba6a1f062a930df1bad74cda5",
+      "reference_speakers": 6,
+      "reference_segments": 29,
+      "last_reference_end_seconds": 337.15999999999997
+    },
+    {
+      "id": "iqbww",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/iqbww.rttm",
+      "annotation_sha256": "c224b251138588fa5488b5ef88ef3eff72753dd77ec4390469050e5354d870e2",
+      "reference_speakers": 3,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 222.72000000000003
+    },
+    {
+      "id": "iqtde",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/iqtde.rttm",
+      "annotation_sha256": "0dd797580f5a41edec6919db1a37fb9691627f7a56d4559ec741028ed4beaa6b",
+      "reference_speakers": 4,
+      "reference_segments": 4,
+      "last_reference_end_seconds": 109.4
+    },
+    {
+      "id": "irvat",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/irvat.rttm",
+      "annotation_sha256": "1aec294f60dfcac102af6046c9b618cd7afaf7e241f797d06e9ae2b0ccdea4b9",
+      "reference_speakers": 3,
+      "reference_segments": 22,
+      "last_reference_end_seconds": 225.8
+    },
+    {
+      "id": "iwdjy",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/iwdjy.rttm",
+      "annotation_sha256": "e48614cf683a0cfaebdd074d68b8ea2fbcef1025a828117879dbc38f9ed2ca31",
+      "reference_speakers": 3,
+      "reference_segments": 54,
+      "last_reference_end_seconds": 275.04
+    },
+    {
+      "id": "jcako",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jcako.rttm",
+      "annotation_sha256": "afce3267d174453c66899be7297ea6fc7cc78912ff64c48a19345f4ca7a07477",
+      "reference_speakers": 3,
+      "reference_segments": 217,
+      "last_reference_end_seconds": 996.0
+    },
+    {
+      "id": "jhdav",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jhdav.rttm",
+      "annotation_sha256": "c7a8a36c6ab60b2eba9455e8cdbe30294586a8ec2836bb9c57b2783019e20699",
+      "reference_speakers": 5,
+      "reference_segments": 10,
+      "last_reference_end_seconds": 144.76
+    },
+    {
+      "id": "jiqvr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jiqvr.rttm",
+      "annotation_sha256": "33abf5859ca0726143f4e56154080468c64df8a5a56ff17e952c88835f77582a",
+      "reference_speakers": 3,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 83.0
+    },
+    {
+      "id": "jnivh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jnivh.rttm",
+      "annotation_sha256": "1418f8fe86d67fd41da2893d5c350c36d70cfcff1297b1ef3253ec0651f90d84",
+      "reference_speakers": 3,
+      "reference_segments": 17,
+      "last_reference_end_seconds": 139.24
+    },
+    {
+      "id": "jsdmu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jsdmu.rttm",
+      "annotation_sha256": "b2d575716de867ec3bc4a49987fcf06c15d7283ade6fbc391140bd5e9cd5961b",
+      "reference_speakers": 1,
+      "reference_segments": 18,
+      "last_reference_end_seconds": 148.96
+    },
+    {
+      "id": "jsmbi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jsmbi.rttm",
+      "annotation_sha256": "96bbd8441a5161c9d112812c58c1a0857c0f39b80f1376a08c8cdca79acf27a1",
+      "reference_speakers": 5,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 111.84
+    },
+    {
+      "id": "jtagk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jtagk.rttm",
+      "annotation_sha256": "4b42c39496c0074cdac4d3b0241be4757413a2651ef484d2b0425369de777c8c",
+      "reference_speakers": 6,
+      "reference_segments": 35,
+      "last_reference_end_seconds": 291.03999999999996
+    },
+    {
+      "id": "jyflp",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jyflp.rttm",
+      "annotation_sha256": "dfaa32e3467e66e29d07a8cc6cbeb03286896faef88fb2abb4fd5a51edf9b04b",
+      "reference_speakers": 7,
+      "reference_segments": 61,
+      "last_reference_end_seconds": 451.0
+    },
+    {
+      "id": "jyirt",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jyirt.rttm",
+      "annotation_sha256": "2c34915926e46788093ad616d71bab37900bfaa0b5956877b697fa0b9477d3fc",
+      "reference_speakers": 4,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 85.03999999999999
+    },
+    {
+      "id": "jynhe",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/jynhe.rttm",
+      "annotation_sha256": "c4e10005356bb3215d35a0b4ba4d8ede64a34c4b6e71f6e5ecffd5cecd58bc14",
+      "reference_speakers": 5,
+      "reference_segments": 60,
+      "last_reference_end_seconds": 614.84
+    },
+    {
+      "id": "kbkon",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kbkon.rttm",
+      "annotation_sha256": "708c1cd029b61601eb7420cd34a75b7054c200a652804b981152a1412ae4e817",
+      "reference_speakers": 6,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 119.24
+    },
+    {
+      "id": "kckqn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kckqn.rttm",
+      "annotation_sha256": "822d2a3b2055c8b188acb8081bb1498b913d53ff0dc7a199ef5927878b1a3237",
+      "reference_speakers": 3,
+      "reference_segments": 26,
+      "last_reference_end_seconds": 349.56
+    },
+    {
+      "id": "kctgl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kctgl.rttm",
+      "annotation_sha256": "22d2a4747060c520ce3c01bdfc387b350a375ca040281ffa5874d0c0698094b3",
+      "reference_speakers": 2,
+      "reference_segments": 10,
+      "last_reference_end_seconds": 106.4
+    },
+    {
+      "id": "kdfqk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kdfqk.rttm",
+      "annotation_sha256": "862f7dce5d3c9fb30cc0df965cffd48f16260d54b2cf12f78bf431d5f36d1f1e",
+      "reference_speakers": 20,
+      "reference_segments": 170,
+      "last_reference_end_seconds": 1018.84
+    },
+    {
+      "id": "kefgo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kefgo.rttm",
+      "annotation_sha256": "5a3916d96f1471a89127763635fdc095eaea19cdc4189cba0126b2988c526a43",
+      "reference_speakers": 5,
+      "reference_segments": 33,
+      "last_reference_end_seconds": 378.68
+    },
+    {
+      "id": "kiadt",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kiadt.rttm",
+      "annotation_sha256": "0c033e830ebdc6b164ddc511f00ca772554724cdca18fa276d3aed87eb778121",
+      "reference_speakers": 5,
+      "reference_segments": 97,
+      "last_reference_end_seconds": 765.28
+    },
+    {
+      "id": "kkghn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kkghn.rttm",
+      "annotation_sha256": "dcf0a351c7c08b7cb6051f384274de003fb368b2e6abe394c8c1ecd99ec9498c",
+      "reference_speakers": 1,
+      "reference_segments": 113,
+      "last_reference_end_seconds": 800.92
+    },
+    {
+      "id": "kklpv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kklpv.rttm",
+      "annotation_sha256": "444910eac5aec42d8b06c2bae7c686c8d07630d5a72f8e4019dccb32e3f9b9df",
+      "reference_speakers": 2,
+      "reference_segments": 45,
+      "last_reference_end_seconds": 789.28
+    },
+    {
+      "id": "kkwkn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kkwkn.rttm",
+      "annotation_sha256": "8678750d3198937935b69168997b2535eb7ba0ac059b602a51cdaa4f306ad510",
+      "reference_speakers": 5,
+      "reference_segments": 32,
+      "last_reference_end_seconds": 470.56
+    },
+    {
+      "id": "kszpd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kszpd.rttm",
+      "annotation_sha256": "6a52dc17abe8e5e478e43fa7307aab3bc51936d616874d5c7d07aad9d5e7c7d5",
+      "reference_speakers": 5,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 160.39999999999998
+    },
+    {
+      "id": "ktzmw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ktzmw.rttm",
+      "annotation_sha256": "9b33aa290824ccdc0986c1253ab117a0ef7255750cddd10fb0053cacfd60586b",
+      "reference_speakers": 4,
+      "reference_segments": 54,
+      "last_reference_end_seconds": 968.1199999999999
+    },
+    {
+      "id": "kuduk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/kuduk.rttm",
+      "annotation_sha256": "8e24f5031e59fce5c6d8c3153512a9ed89f6f1ce326fe0aa8ae80642fd7f1ab5",
+      "reference_speakers": 5,
+      "reference_segments": 53,
+      "last_reference_end_seconds": 552.0
+    },
+    {
+      "id": "ldkmv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ldkmv.rttm",
+      "annotation_sha256": "0107405b9e8d4ecb142e8c7c60e8d7a20f421ec512a8d8a4c65de36f37a8925c",
+      "reference_speakers": 5,
+      "reference_segments": 53,
+      "last_reference_end_seconds": 490.84
+    },
+    {
+      "id": "ldnro",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ldnro.rttm",
+      "annotation_sha256": "5cb34d8dc1f16d8985b5cf00469bc33e6642ad6e1df52824f469594dc9272bc5",
+      "reference_speakers": 15,
+      "reference_segments": 82,
+      "last_reference_end_seconds": 1095.4799999999998
+    },
+    {
+      "id": "lfzib",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/lfzib.rttm",
+      "annotation_sha256": "bdd94570754fb52d19251ac40291bf47c414071ce641dcefba041046e8624b89",
+      "reference_speakers": 9,
+      "reference_segments": 37,
+      "last_reference_end_seconds": 283.12
+    },
+    {
+      "id": "lknjp",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/lknjp.rttm",
+      "annotation_sha256": "cc3fa32a01012febd61979dff3d9c438925cfae97fce1e14aa0772ad6e344f9b",
+      "reference_speakers": 5,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 86.56
+    },
+    {
+      "id": "luvfz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/luvfz.rttm",
+      "annotation_sha256": "e9be6689fc455d79c06a7612ca1a5720222325bdc96e800b676ef2ad93f5d9a1",
+      "reference_speakers": 7,
+      "reference_segments": 53,
+      "last_reference_end_seconds": 202.84
+    },
+    {
+      "id": "mdbod",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mdbod.rttm",
+      "annotation_sha256": "c8ae584785639a63ba68b92aa2b1a2e64c9f47589b79c2b678875298ea997433",
+      "reference_speakers": 11,
+      "reference_segments": 47,
+      "last_reference_end_seconds": 622.24
+    },
+    {
+      "id": "mekog",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mekog.rttm",
+      "annotation_sha256": "e6a7f9b2245fea02be774626f94b2739593cd2d4a54a5707fd147ac5f20e022e",
+      "reference_speakers": 2,
+      "reference_segments": 76,
+      "last_reference_end_seconds": 881.36
+    },
+    {
+      "id": "mesob",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mesob.rttm",
+      "annotation_sha256": "1314ac15280fb02dff2a8c02907d4d83db3f8d66f168c3902eb6a5b25febac76",
+      "reference_speakers": 4,
+      "reference_segments": 29,
+      "last_reference_end_seconds": 157.76000000000002
+    },
+    {
+      "id": "mevkw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mevkw.rttm",
+      "annotation_sha256": "d875474325126b6d573577c79a60a3f9f1019f16a04d46b0b85b34185f98fc91",
+      "reference_speakers": 3,
+      "reference_segments": 16,
+      "last_reference_end_seconds": 101.76
+    },
+    {
+      "id": "mgpok",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mgpok.rttm",
+      "annotation_sha256": "e10bd1575ef86c2baa5e07fad70f153a76270466deb4b34f9eea6561350b850c",
+      "reference_speakers": 4,
+      "reference_segments": 56,
+      "last_reference_end_seconds": 563.52
+    },
+    {
+      "id": "migzj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/migzj.rttm",
+      "annotation_sha256": "46c10585045ad782f95a123350c69c4608dbb9165a03daba694a08b0782d47da",
+      "reference_speakers": 4,
+      "reference_segments": 66,
+      "last_reference_end_seconds": 175.6
+    },
+    {
+      "id": "mjgil",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mjgil.rttm",
+      "annotation_sha256": "de881b59dc7816415f5c146d34d82c22698751b4a4de00d878bc219b7aa502c8",
+      "reference_speakers": 2,
+      "reference_segments": 27,
+      "last_reference_end_seconds": 207.24
+    },
+    {
+      "id": "mkrcv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mkrcv.rttm",
+      "annotation_sha256": "de2883227fff75786178981188b36422b3485c861484a0de0dda03c413f583b5",
+      "reference_speakers": 5,
+      "reference_segments": 76,
+      "last_reference_end_seconds": 611.04
+    },
+    {
+      "id": "mpvoh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mpvoh.rttm",
+      "annotation_sha256": "7008a8024591a309150ecabf560945ab7969c7c935af8e2c2f3e0aaf59663126",
+      "reference_speakers": 2,
+      "reference_segments": 35,
+      "last_reference_end_seconds": 139.88000000000002
+    },
+    {
+      "id": "mqxsf",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mqxsf.rttm",
+      "annotation_sha256": "e350f253c58c0d6a35d90e4630633b41ff178583e4f66ed9a67df7d1e1dedb27",
+      "reference_speakers": 12,
+      "reference_segments": 72,
+      "last_reference_end_seconds": 693.5999999999999
+    },
+    {
+      "id": "mvjuk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mvjuk.rttm",
+      "annotation_sha256": "e8a4fbc6e405f14c40053cf67c644fbcfb636262fb0ccc91640be384373e9e1b",
+      "reference_speakers": 3,
+      "reference_segments": 50,
+      "last_reference_end_seconds": 375.0
+    },
+    {
+      "id": "mwfmq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/mwfmq.rttm",
+      "annotation_sha256": "8081a5f014054755abc0ad53a7a862b84e40121ff125e70975ae4ddcdea65a61",
+      "reference_speakers": 2,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 463.96000000000004
+    },
+    {
+      "id": "nctdh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/nctdh.rttm",
+      "annotation_sha256": "15b9f18144ff15da5a2c3d644530209a921a2b03a2dbf3f985058103371ca551",
+      "reference_speakers": 6,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 122.12
+    },
+    {
+      "id": "ndkwv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ndkwv.rttm",
+      "annotation_sha256": "39d242c292280e4db79d83dbad63648bd4ad0ca23e02a0d882a564e78488e731",
+      "reference_speakers": 7,
+      "reference_segments": 86,
+      "last_reference_end_seconds": 759.2
+    },
+    {
+      "id": "nfqjx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/nfqjx.rttm",
+      "annotation_sha256": "c5adaa04da2e89cca5ec37aa66f30fd70495f589f6201d2be34c759667a7c1f8",
+      "reference_speakers": 6,
+      "reference_segments": 97,
+      "last_reference_end_seconds": 754.8
+    },
+    {
+      "id": "ngyrk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ngyrk.rttm",
+      "annotation_sha256": "3ddec78f7bcdb49fbaa84e25bf62f3c3969d99f194a5bc2efb00ca61ee8a2b79",
+      "reference_speakers": 2,
+      "reference_segments": 22,
+      "last_reference_end_seconds": 151.16
+    },
+    {
+      "id": "nnqfq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/nnqfq.rttm",
+      "annotation_sha256": "0a77c9db6f065065dd6ce964b82808e9222bf23c576ba23574499d1798f06284",
+      "reference_speakers": 5,
+      "reference_segments": 27,
+      "last_reference_end_seconds": 145.32
+    },
+    {
+      "id": "nrogz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/nrogz.rttm",
+      "annotation_sha256": "e23800a8b6020c132969412b0438143de87f5c3e98906fd836e7a6453095a4f0",
+      "reference_speakers": 11,
+      "reference_segments": 69,
+      "last_reference_end_seconds": 442.88
+    },
+    {
+      "id": "ntchr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ntchr.rttm",
+      "annotation_sha256": "b9803c53900ffb35c7223a973a945b7fd112c67eba5e445bc5f7e177e497a56e",
+      "reference_speakers": 2,
+      "reference_segments": 20,
+      "last_reference_end_seconds": 406.44
+    },
+    {
+      "id": "nxgad",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/nxgad.rttm",
+      "annotation_sha256": "65b3b8b5cf8ec178b64e369afc6ca9faff2ca72f973298626f904d14678455a3",
+      "reference_speakers": 2,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 169.60000000000002
+    },
+    {
+      "id": "odkzj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/odkzj.rttm",
+      "annotation_sha256": "23dd18d21fec2a7258dc823e2df3fa863574b7f9014a9d5355cb8548c59c637d",
+      "reference_speakers": 7,
+      "reference_segments": 53,
+      "last_reference_end_seconds": 590.48
+    },
+    {
+      "id": "oekmc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/oekmc.rttm",
+      "annotation_sha256": "f86db7b878b06773916e99bd8c4f1c3430f4e29a1eaed2a184f8cf3c3689bb5b",
+      "reference_speakers": 5,
+      "reference_segments": 11,
+      "last_reference_end_seconds": 150.0
+    },
+    {
+      "id": "oenox",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/oenox.rttm",
+      "annotation_sha256": "d9aac4803824d4aef4efb0c1ccfbf61f07d92679c00d4b562ce7d5cfe4d17066",
+      "reference_speakers": 2,
+      "reference_segments": 4,
+      "last_reference_end_seconds": 77.11999999999999
+    },
+    {
+      "id": "oklol",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/oklol.rttm",
+      "annotation_sha256": "cc189e958549d2f48c261b740405f73f6acedaeee7d06aaaef3d83244b5fac75",
+      "reference_speakers": 7,
+      "reference_segments": 146,
+      "last_reference_end_seconds": 959.36
+    },
+    {
+      "id": "onpra",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/onpra.rttm",
+      "annotation_sha256": "7c8235705fd8326f6b0f4f623edf3bdac421193e2a2d3ba61642ba10134f2131",
+      "reference_speakers": 6,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 272.92
+    },
+    {
+      "id": "ooxnm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ooxnm.rttm",
+      "annotation_sha256": "533cebae8f5dcb8712d3f5e474c5e2c140b2c9d4d93c9a0f0de4c9df5b84fb48",
+      "reference_speakers": 5,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 319.52
+    },
+    {
+      "id": "oxxwk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/oxxwk.rttm",
+      "annotation_sha256": "bcc6f992dfc55bb4c09ab8d47b5eca0b4db854d5791f973700eac70b360ca94e",
+      "reference_speakers": 2,
+      "reference_segments": 45,
+      "last_reference_end_seconds": 466.68
+    },
+    {
+      "id": "paibn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/paibn.rttm",
+      "annotation_sha256": "586ed5e189adb606f53925f4dc2ba506a41fe04be8aca737d09cc59191d9c3ca",
+      "reference_speakers": 3,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 340.91999999999996
+    },
+    {
+      "id": "pgkde",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/pgkde.rttm",
+      "annotation_sha256": "080aa6b79bddc1e8d1f2229001d85521170d287393801eeaaf1cd3d101724899",
+      "reference_speakers": 3,
+      "reference_segments": 29,
+      "last_reference_end_seconds": 294.4
+    },
+    {
+      "id": "pilgb",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/pilgb.rttm",
+      "annotation_sha256": "5cfa1ebafa92dc4da4aab46c243ff8d459c850067ddd8b20373af6d22120736d",
+      "reference_speakers": 6,
+      "reference_segments": 81,
+      "last_reference_end_seconds": 567.0400000000001
+    },
+    {
+      "id": "plbbw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/plbbw.rttm",
+      "annotation_sha256": "1d7ec8a345ff398f8bf27990b9a3865450fa8db66895954b580e95406a48cb77",
+      "reference_speakers": 2,
+      "reference_segments": 7,
+      "last_reference_end_seconds": 80.2
+    },
+    {
+      "id": "pnook",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/pnook.rttm",
+      "annotation_sha256": "f7e81672380103407b5e21f2ea2f48be17d75a6ac8025e83b38418bc125e54ea",
+      "reference_speakers": 9,
+      "reference_segments": 57,
+      "last_reference_end_seconds": 348.32
+    },
+    {
+      "id": "pnyir",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/pnyir.rttm",
+      "annotation_sha256": "a0c682a5946811442a6623d07a8c5a339270bd9be2e101361ba7ae3498143d37",
+      "reference_speakers": 8,
+      "reference_segments": 43,
+      "last_reference_end_seconds": 463.76
+    },
+    {
+      "id": "ppgjx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ppgjx.rttm",
+      "annotation_sha256": "7bc5be95952e20dcb788e295d46f5f1169e97010e523903115d552057c628980",
+      "reference_speakers": 2,
+      "reference_segments": 71,
+      "last_reference_end_seconds": 518.0
+    },
+    {
+      "id": "pqmho",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/pqmho.rttm",
+      "annotation_sha256": "c8724352b94c50f2a2d3adf3ef3863a298444b24e57393611af935d2b017ac37",
+      "reference_speakers": 1,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 67.4
+    },
+    {
+      "id": "praxo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/praxo.rttm",
+      "annotation_sha256": "aec034ef07e649b26d0511d6880288ac8fc569c7cce731b085eba29a33066f0c",
+      "reference_speakers": 2,
+      "reference_segments": 48,
+      "last_reference_end_seconds": 506.44
+    },
+    {
+      "id": "qfdpp",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qfdpp.rttm",
+      "annotation_sha256": "29a713ad34e36c040c90c8c33207f29419797a40157c84a5323a36488fa31447",
+      "reference_speakers": 4,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 323.0
+    },
+    {
+      "id": "qhesr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qhesr.rttm",
+      "annotation_sha256": "dd3ea784b08b38a50cc523bbf1425833373f10f65be6e4fd0d716e4c397b2fb4",
+      "reference_speakers": 2,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 154.04
+    },
+    {
+      "id": "qjgpl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qjgpl.rttm",
+      "annotation_sha256": "cab687183a738e1f5285ceb6c2c4664ab1451a70158be8b151ccd3b7e1d1a6bc",
+      "reference_speakers": 8,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 121.84
+    },
+    {
+      "id": "qouur",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qouur.rttm",
+      "annotation_sha256": "47141c0d10744ff35509b6f90049cc1dbc2d25a589a23c489050f5cef7333a66",
+      "reference_speakers": 1,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 1019.36
+    },
+    {
+      "id": "qppll",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qppll.rttm",
+      "annotation_sha256": "8024e599ba9fb8f29e175ec88986102710d4fdaf9f1b5837a2ace40a558f5367",
+      "reference_speakers": 1,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 69.6
+    },
+    {
+      "id": "qpylu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qpylu.rttm",
+      "annotation_sha256": "413212da068dc9150aba09a9e49aeeea2d3d960b1e1e1295b32e0b2a9f5a41c4",
+      "reference_speakers": 2,
+      "reference_segments": 9,
+      "last_reference_end_seconds": 43.76
+    },
+    {
+      "id": "qrzjk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qrzjk.rttm",
+      "annotation_sha256": "88cd91993815ae9d341101826e71a94763278a21d5eea0ea9c50651ba65d8767",
+      "reference_speakers": 1,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 38.88
+    },
+    {
+      "id": "qsfzo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qsfzo.rttm",
+      "annotation_sha256": "3e3010cc5ba63e2ca709aa396e6d4f343b96b05dc55dbe802b3f9bef668fc745",
+      "reference_speakers": 2,
+      "reference_segments": 9,
+      "last_reference_end_seconds": 143.64000000000001
+    },
+    {
+      "id": "qvtia",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qvtia.rttm",
+      "annotation_sha256": "e2d19a28a41157c26eabd54df5ba23000ba8fb68b9ec33ab74ed29162cff4150",
+      "reference_speakers": 2,
+      "reference_segments": 83,
+      "last_reference_end_seconds": 364.56
+    },
+    {
+      "id": "qydmg",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qydmg.rttm",
+      "annotation_sha256": "fa01f37ef600669ad4bcdc7b89707991e8788f2e3e2849b71d13f23df490ed80",
+      "reference_speakers": 1,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 112.75999999999999
+    },
+    {
+      "id": "qygfk",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qygfk.rttm",
+      "annotation_sha256": "c8576c5bc397c5933db8510d54d93ee571ca9f396b87583aaad9050727803025",
+      "reference_speakers": 4,
+      "reference_segments": 57,
+      "last_reference_end_seconds": 428.8
+    },
+    {
+      "id": "qzwxa",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/qzwxa.rttm",
+      "annotation_sha256": "38b1181a46b70240343bea8ca434db4bd2474800ad05a055e746c450988d0c4a",
+      "reference_speakers": 2,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 218.84
+    },
+    {
+      "id": "rcxzg",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/rcxzg.rttm",
+      "annotation_sha256": "8481b5b9c2d59bf78275b11a870269616bae722392270425466375929348447e",
+      "reference_speakers": 4,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 178.76
+    },
+    {
+      "id": "rtvuw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/rtvuw.rttm",
+      "annotation_sha256": "feee68fb41d32ecd8fdfa3654a79a14ec41010e758bc3f8e5eba32e54293f963",
+      "reference_speakers": 3,
+      "reference_segments": 11,
+      "last_reference_end_seconds": 56.64
+    },
+    {
+      "id": "rxgun",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/rxgun.rttm",
+      "annotation_sha256": "475b09d1d3529be02444e1a6bccad493ac09fc08ba98ee16db037e38ed1e4661",
+      "reference_speakers": 8,
+      "reference_segments": 30,
+      "last_reference_end_seconds": 214.0
+    },
+    {
+      "id": "sduml",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/sduml.rttm",
+      "annotation_sha256": "485ee7d129f4912669abe28b265b58e8dc1bb6c0b3a8e2a29c55e4b95a8b7921",
+      "reference_speakers": 6,
+      "reference_segments": 57,
+      "last_reference_end_seconds": 680.84
+    },
+    {
+      "id": "sikkm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/sikkm.rttm",
+      "annotation_sha256": "7bde538c79dc220b0182790578137bf6297f127725c4bd2d964ef220cb7561d0",
+      "reference_speakers": 1,
+      "reference_segments": 1,
+      "last_reference_end_seconds": 62.839999999999996
+    },
+    {
+      "id": "sldwj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/sldwj.rttm",
+      "annotation_sha256": "b3aa5ec230d03b9519a62268724b18793a730085db9abef95504f7c61b887620",
+      "reference_speakers": 3,
+      "reference_segments": 20,
+      "last_reference_end_seconds": 140.28
+    },
+    {
+      "id": "sosnj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/sosnj.rttm",
+      "annotation_sha256": "45f1710fbe085056917eb4153a4a5a29d9761733df1ab47f2786d049d839fc1a",
+      "reference_speakers": 3,
+      "reference_segments": 37,
+      "last_reference_end_seconds": 345.72
+    },
+    {
+      "id": "spzmn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/spzmn.rttm",
+      "annotation_sha256": "a4feadb35e3adee2a1ea5af29337cb74bd166444213687f311f3fe61d5f18cdc",
+      "reference_speakers": 2,
+      "reference_segments": 5,
+      "last_reference_end_seconds": 156.16
+    },
+    {
+      "id": "sqkup",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/sqkup.rttm",
+      "annotation_sha256": "d69bf4fc2d60fb32d7276af37904459589740be5ccabddccc2ff42198e74cbd7",
+      "reference_speakers": 9,
+      "reference_segments": 38,
+      "last_reference_end_seconds": 129.12
+    },
+    {
+      "id": "suuxu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/suuxu.rttm",
+      "annotation_sha256": "95ebf5a5cfbb93cf294775337e7d1d3580a3923ef8208f0ca19b971d09acd16b",
+      "reference_speakers": 6,
+      "reference_segments": 69,
+      "last_reference_end_seconds": 341.03999999999996
+    },
+    {
+      "id": "syiwe",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/syiwe.rttm",
+      "annotation_sha256": "06aef7558c36a6e486c19d674da1edc0f19652ff85fab5f7de802574a18b7a5e",
+      "reference_speakers": 3,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 69.12
+    },
+    {
+      "id": "szsyz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/szsyz.rttm",
+      "annotation_sha256": "6a3951304516c583da10f17b4d16d6dfa1f5973bd7a39b15f41cd681b4d4b83a",
+      "reference_speakers": 3,
+      "reference_segments": 7,
+      "last_reference_end_seconds": 49.32
+    },
+    {
+      "id": "tcwsn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tcwsn.rttm",
+      "annotation_sha256": "e2d2a1857da24d23158c0654df5d752ba839168e0573c96926b6b0e5c630ab9f",
+      "reference_speakers": 2,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 369.88
+    },
+    {
+      "id": "tfvyr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tfvyr.rttm",
+      "annotation_sha256": "89463b10cb68e377ad30de93dfc9d058c127db7fda351eb1260556a55d407911",
+      "reference_speakers": 1,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 27.96
+    },
+    {
+      "id": "tguxv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tguxv.rttm",
+      "annotation_sha256": "c016b0b95e387cb3e57ef95a2daf4da7d4bc5a24606e6991162aee741f218bd5",
+      "reference_speakers": 6,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 245.56
+    },
+    {
+      "id": "tiams",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tiams.rttm",
+      "annotation_sha256": "d0d56914659983bccb8faf332a188d02a0c29fda1aa244f8a3df594b3f924cc8",
+      "reference_speakers": 5,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 150.08
+    },
+    {
+      "id": "tjkfn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tjkfn.rttm",
+      "annotation_sha256": "8060aded582331ab27bc4ad14e336e8eb8870ad4f999c0880ce11af9bb947d25",
+      "reference_speakers": 10,
+      "reference_segments": 43,
+      "last_reference_end_seconds": 647.44
+    },
+    {
+      "id": "tlprc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tlprc.rttm",
+      "annotation_sha256": "f8439aa32fe122a6d0a5ea3654f21f6bfda2420743e08e01c3870143dd6db7b9",
+      "reference_speakers": 8,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 141.28
+    },
+    {
+      "id": "tplwz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tplwz.rttm",
+      "annotation_sha256": "5771db11c1d1c9ba656837e831ff54133dd2f131d4ebc72eca061bb3f11de367",
+      "reference_speakers": 6,
+      "reference_segments": 38,
+      "last_reference_end_seconds": 231.88
+    },
+    {
+      "id": "tucrg",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/tucrg.rttm",
+      "annotation_sha256": "d52b96e0c9ba8fd3b9068bc08cc776047676b57312039b1167864314226755e9",
+      "reference_speakers": 3,
+      "reference_segments": 5,
+      "last_reference_end_seconds": 26.16
+    },
+    {
+      "id": "txcok",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/txcok.rttm",
+      "annotation_sha256": "cb69e1cf7af35283da1886dc786162894520ec65848b8a563111f8f468ed8988",
+      "reference_speakers": 4,
+      "reference_segments": 38,
+      "last_reference_end_seconds": 429.32
+    },
+    {
+      "id": "uatlu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/uatlu.rttm",
+      "annotation_sha256": "1382b54e02de50651baf223509234a9b0151cc7af4cfeb5ae3f374f39f57a4b6",
+      "reference_speakers": 3,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 146.2
+    },
+    {
+      "id": "udjij",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/udjij.rttm",
+      "annotation_sha256": "ef39f65f075dd8e7dd63cbbab21cb2370a8d86e7cd2933175178b5dc3a7f174c",
+      "reference_speakers": 5,
+      "reference_segments": 109,
+      "last_reference_end_seconds": 562.52
+    },
+    {
+      "id": "uexjc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/uexjc.rttm",
+      "annotation_sha256": "f9e728ca9f602da3285410f1f6f8f8655192b1827cab8980770067ba9ea9d8b2",
+      "reference_speakers": 7,
+      "reference_segments": 51,
+      "last_reference_end_seconds": 308.04
+    },
+    {
+      "id": "ufpel",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ufpel.rttm",
+      "annotation_sha256": "59b77b978d0cb1d6066ce7445d775687976b29c6bc0de7411d3a583be271a9f3",
+      "reference_speakers": 10,
+      "reference_segments": 69,
+      "last_reference_end_seconds": 390.59999999999997
+    },
+    {
+      "id": "ulriv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ulriv.rttm",
+      "annotation_sha256": "fcadde70719422fad954cd8bc5b204f1602f164b47e8db96a7e31081d2b062f6",
+      "reference_speakers": 5,
+      "reference_segments": 64,
+      "last_reference_end_seconds": 463.12
+    },
+    {
+      "id": "usbgm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/usbgm.rttm",
+      "annotation_sha256": "395eba190d1f8fcfca1c603b6ec32011d07263da62f60e625440b30334f41470",
+      "reference_speakers": 1,
+      "reference_segments": 3,
+      "last_reference_end_seconds": 58.080000000000005
+    },
+    {
+      "id": "uvnmy",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/uvnmy.rttm",
+      "annotation_sha256": "e33cc4ae647bb4d7925fcd678766fcc5d04556dbb5f6f5706f88b4d6a8a0cc93",
+      "reference_speakers": 4,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 173.4
+    },
+    {
+      "id": "vbjlx",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/vbjlx.rttm",
+      "annotation_sha256": "614c14a79de385e7b32f1fc24d464439ce41b73805d5da9069ea0d6b643d6a8c",
+      "reference_speakers": 5,
+      "reference_segments": 77,
+      "last_reference_end_seconds": 323.68
+    },
+    {
+      "id": "vmaiq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/vmaiq.rttm",
+      "annotation_sha256": "5e65d2559d29aff2faf995bc512eac6d195b3b51146c18f651322b0e360b4b01",
+      "reference_speakers": 17,
+      "reference_segments": 100,
+      "last_reference_end_seconds": 728.4
+    },
+    {
+      "id": "vmbga",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/vmbga.rttm",
+      "annotation_sha256": "9e3d6377b4bce7e57adbb746891f6a3dba4600a258c2efaa58f213dd4ef6de07",
+      "reference_speakers": 4,
+      "reference_segments": 117,
+      "last_reference_end_seconds": 659.52
+    },
+    {
+      "id": "vysqj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/vysqj.rttm",
+      "annotation_sha256": "907f41ba2d663cad99db4a839ddd66b5dabb98da5c1cc1d7cd3a1077b6ecf392",
+      "reference_speakers": 1,
+      "reference_segments": 1,
+      "last_reference_end_seconds": 84.75999999999999
+    },
+    {
+      "id": "wbqza",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wbqza.rttm",
+      "annotation_sha256": "dae957175c85fc66ee4907f0b2fb59a6b997a32fa25c7f90e6fc7e426d8099e4",
+      "reference_speakers": 5,
+      "reference_segments": 51,
+      "last_reference_end_seconds": 652.88
+    },
+    {
+      "id": "wdjyj",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wdjyj.rttm",
+      "annotation_sha256": "de7421f5ef02e53a5247a8d9a1fa48833465806e20e65397111c84be631e3d96",
+      "reference_speakers": 8,
+      "reference_segments": 31,
+      "last_reference_end_seconds": 200.88
+    },
+    {
+      "id": "wewoz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wewoz.rttm",
+      "annotation_sha256": "d6d258830b021ef896df33dff8e14b9c5f88266f496c812c444d2aea758eb80a",
+      "reference_speakers": 12,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 130.8
+    },
+    {
+      "id": "whmpa",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/whmpa.rttm",
+      "annotation_sha256": "d23404befbb1293bb7ee0ba3db5114765e41191c910c378d18aae46df318f3ca",
+      "reference_speakers": 2,
+      "reference_segments": 4,
+      "last_reference_end_seconds": 44.839999999999996
+    },
+    {
+      "id": "willh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/willh.rttm",
+      "annotation_sha256": "44cdf08f11ff2e1a1679348032334c516460d707e1a81b3e6852d5f5cdf8af44",
+      "reference_speakers": 2,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 120.72
+    },
+    {
+      "id": "wjhgf",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wjhgf.rttm",
+      "annotation_sha256": "304e4dfe635dd080f0a8f629e26d5900e11b03450e16089e471e703de895bbd0",
+      "reference_speakers": 5,
+      "reference_segments": 13,
+      "last_reference_end_seconds": 84.72
+    },
+    {
+      "id": "wmori",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wmori.rttm",
+      "annotation_sha256": "21a6b1b682c7832e1be8548a72fb0eda8ecd8ca974878a53163509cf05b5953d",
+      "reference_speakers": 2,
+      "reference_segments": 11,
+      "last_reference_end_seconds": 116.0
+    },
+    {
+      "id": "wnfoi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wnfoi.rttm",
+      "annotation_sha256": "c2c1bd4242acd91cdd62ce7fc016fed4ac3b528a3bcc767273f45f974897d6a5",
+      "reference_speakers": 6,
+      "reference_segments": 40,
+      "last_reference_end_seconds": 238.4
+    },
+    {
+      "id": "wspbh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/wspbh.rttm",
+      "annotation_sha256": "a98c3cddb654a9219d29d415832f2451a83d999a5d081a14f1fafa25ffa9f708",
+      "reference_speakers": 6,
+      "reference_segments": 45,
+      "last_reference_end_seconds": 649.76
+    },
+    {
+      "id": "xiglo",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/xiglo.rttm",
+      "annotation_sha256": "9d2da00c202a1a0780308b87b59c618c77ce68ebbc52860768c298d90fcdaedc",
+      "reference_speakers": 3,
+      "reference_segments": 13,
+      "last_reference_end_seconds": 110.96000000000001
+    },
+    {
+      "id": "xmfzh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/xmfzh.rttm",
+      "annotation_sha256": "2f9e235dcc434aa45b9480fea07f0f8a1b22cc76eaf4a67f3f68b8a4e7820546",
+      "reference_speakers": 10,
+      "reference_segments": 23,
+      "last_reference_end_seconds": 181.35999999999999
+    },
+    {
+      "id": "xvllq",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/xvllq.rttm",
+      "annotation_sha256": "387ded357ff370f0d2c48aa9681c3991718981f5bf24754c17d278935767bf0f",
+      "reference_speakers": 3,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 251.76
+    },
+    {
+      "id": "xxwgv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/xxwgv.rttm",
+      "annotation_sha256": "8a20c985abbdb3f39debdeeeebf5673495bab2c45db07f4904d2426e95529c1d",
+      "reference_speakers": 10,
+      "reference_segments": 61,
+      "last_reference_end_seconds": 662.16
+    },
+    {
+      "id": "xypdm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/xypdm.rttm",
+      "annotation_sha256": "d6538ff57ee1889c8c45b0ea3ac524b253781117b7b622830a75a2fdfcb2bc17",
+      "reference_speakers": 1,
+      "reference_segments": 87,
+      "last_reference_end_seconds": 416.76
+    },
+    {
+      "id": "ycxxe",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ycxxe.rttm",
+      "annotation_sha256": "b2b04da0374040a2a123710e34616c16fa78796eba52f41813795a2c10c01486",
+      "reference_speakers": 4,
+      "reference_segments": 16,
+      "last_reference_end_seconds": 142.32
+    },
+    {
+      "id": "ydlfw",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ydlfw.rttm",
+      "annotation_sha256": "6b0decafa61a124875773ab198fa0a908c408b6d82ba19b2f8554005422e819b",
+      "reference_speakers": 6,
+      "reference_segments": 41,
+      "last_reference_end_seconds": 201.28
+    },
+    {
+      "id": "yfcmz",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/yfcmz.rttm",
+      "annotation_sha256": "0cd7c56bda16a8eb8344421d01ee3c829f0d1224c282789b55a64d29923328de",
+      "reference_speakers": 4,
+      "reference_segments": 30,
+      "last_reference_end_seconds": 545.72
+    },
+    {
+      "id": "ylnza",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ylnza.rttm",
+      "annotation_sha256": "7c3c27857f35486ea2c499727ee3a51a24c0aba7088f6b12b16857e93b9b3e18",
+      "reference_speakers": 10,
+      "reference_segments": 22,
+      "last_reference_end_seconds": 540.16
+    },
+    {
+      "id": "ypwjd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ypwjd.rttm",
+      "annotation_sha256": "50946c42c3304d25029136f8e94c53b3a97d7204c4e374daf3db52c1c3bd4679",
+      "reference_speakers": 4,
+      "reference_segments": 18,
+      "last_reference_end_seconds": 254.0
+    },
+    {
+      "id": "yrsve",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/yrsve.rttm",
+      "annotation_sha256": "c7cda0de6984099c8bef79d468c050323d133a9897629b2d7f2aad27aba9a85d",
+      "reference_speakers": 3,
+      "reference_segments": 73,
+      "last_reference_end_seconds": 587.0
+    },
+    {
+      "id": "ysgbf",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ysgbf.rttm",
+      "annotation_sha256": "80387e4101793ed9272a258fbb52798a8308bf30f715e0557e9a17770bb0bc09",
+      "reference_speakers": 1,
+      "reference_segments": 15,
+      "last_reference_end_seconds": 111.72
+    },
+    {
+      "id": "yuzyu",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/yuzyu.rttm",
+      "annotation_sha256": "f6bd9b049efdf773643c352de890a5764c5199689b30fb7a3a728a5f366f074e",
+      "reference_speakers": 2,
+      "reference_segments": 36,
+      "last_reference_end_seconds": 631.0400000000001
+    },
+    {
+      "id": "ywcwr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ywcwr.rttm",
+      "annotation_sha256": "2ae076723c835f5a16b1485f1245b7fe854d7a904b17263aa8c07491b2404913",
+      "reference_speakers": 2,
+      "reference_segments": 8,
+      "last_reference_end_seconds": 138.16
+    },
+    {
+      "id": "zajzs",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zajzs.rttm",
+      "annotation_sha256": "69bba75ee6fa0602730d79d294576fdf8f5034c36635d49917f0f347f4d700fc",
+      "reference_speakers": 2,
+      "reference_segments": 12,
+      "last_reference_end_seconds": 191.12
+    },
+    {
+      "id": "zcdsd",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zcdsd.rttm",
+      "annotation_sha256": "d0346578a6c17441be43295ddf2fa4eefe4daa4ea9f78dd1926ffe7ef07fe898",
+      "reference_speakers": 5,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 577.76
+    },
+    {
+      "id": "zfkap",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zfkap.rttm",
+      "annotation_sha256": "99ac1e1b747441dade1d6b7b67eef4a189201e02dc8fa2e0d5281e397d980b31",
+      "reference_speakers": 4,
+      "reference_segments": 6,
+      "last_reference_end_seconds": 106.12
+    },
+    {
+      "id": "zidwg",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zidwg.rttm",
+      "annotation_sha256": "8a04ac72c0813f338ec0998eef57267d04be4965e37ba9ec18dec4adfacbb9f0",
+      "reference_speakers": 7,
+      "reference_segments": 19,
+      "last_reference_end_seconds": 173.24
+    },
+    {
+      "id": "zmndm",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zmndm.rttm",
+      "annotation_sha256": "ca3aea819f85a092a2ee74f5e2a5251eb2eb8edf28fa64ec070812973bae4c4c",
+      "reference_speakers": 1,
+      "reference_segments": 9,
+      "last_reference_end_seconds": 278.36
+    },
+    {
+      "id": "zrlyl",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zrlyl.rttm",
+      "annotation_sha256": "77340ea4458887c8dd6c6a3b9afb816894e435d6adc8e3c0191fbed957008f15",
+      "reference_speakers": 2,
+      "reference_segments": 92,
+      "last_reference_end_seconds": 567.16
+    },
+    {
+      "id": "ztzzr",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ztzzr.rttm",
+      "annotation_sha256": "8005f105a2cff90f409007a65834d848e92f78ac67aeb802411bc77287d9a4eb",
+      "reference_speakers": 1,
+      "reference_segments": 51,
+      "last_reference_end_seconds": 292.03999999999996
+    },
+    {
+      "id": "zvmyn",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zvmyn.rttm",
+      "annotation_sha256": "47ef3e16f3f42b93165b4e82a6862d60d7ebce67a3e4e125ad04b9ada9a1163e",
+      "reference_speakers": 1,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 135.6
+    },
+    {
+      "id": "zyffh",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/zyffh.rttm",
+      "annotation_sha256": "358bbb891b5f30862c22af63ad273787bf869f3a3514f4fdc5eb86f234c948ec",
+      "reference_speakers": 3,
+      "reference_segments": 21,
+      "last_reference_end_seconds": 252.04
+    }
+  ]
+}
