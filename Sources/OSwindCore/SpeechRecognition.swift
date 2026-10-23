@@ -77,6 +77,10 @@ private struct ParakeetSpeechBackend: NativeSpeechBackend {
 public actor SpeechRecognizer {
     private var backend:(any NativeSpeechBackend)?
     private var loadedConfiguration:SpeechConfiguration?
+    public private(set) var retentionPolicy=NativeModelRetention.twoMinutes
+    private var idleTimer=NativeModelIdleTimer()
+    /// OSwind backend ownership only; not a measurement of system/device memory.
+    public var modelResident:Bool {backend != nil}
     private var busy=false
     private var waiters:[(UUID,CheckedContinuation<Void,Error>)]=[]
     var queuedRequestCount:Int { waiters.count }
@@ -87,9 +91,10 @@ public actor SpeechRecognizer {
         AppLogger.minimumLevel = .warning; AppLogger.mirrorsToConsole=false
         loader={ try await ParakeetSpeechBackend.load($0) }
     }
-    init(loader:@escaping @Sendable (SpeechConfiguration) async throws -> any NativeSpeechBackend) { self.loader=loader }
+    init(loader:@escaping @Sendable (SpeechConfiguration) async throws -> any NativeSpeechBackend,idleSleep:@escaping @Sendable (Double) async throws -> Void={try await Task.sleep(for:.seconds($0))}) { self.loader=loader;idleTimer=NativeModelIdleTimer(sleep:idleSleep) }
     private func acquire(_ id:UUID) async throws {
         try Task.checkCancellation()
+        idleTimer.cancel()
         if !busy { busy=true; return }
         try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { waiters.append((id,$0)) }
@@ -99,7 +104,20 @@ public actor SpeechRecognizer {
         if let i=waiters.firstIndex(where:{$0.0==id}) { waiters.remove(at:i).1.resume(throwing:CancellationError()) }
     }
     private func release() {
-        if waiters.isEmpty { busy=false } else { waiters.removeFirst().1.resume() }
+        if waiters.isEmpty { busy=false; scheduleIdleRelease() } else { waiters.removeFirst().1.resume() }
+    }
+    public func setRetention(_ policy:NativeModelRetention) {
+        retentionPolicy=policy;idleTimer.cancel()
+        if !busy {scheduleIdleRelease()}
+    }
+    private func scheduleIdleRelease() {
+        guard backend != nil else {return}
+        if retentionPolicy == .afterUse {backend=nil;loadedConfiguration=nil;idleTimer.cancel();return}
+        idleTimer.schedule(retentionPolicy) { [weak self] token in await self?.expireIdleModel(token) }
+    }
+    private func expireIdleModel(_ token:UUID) {
+        guard token==idleTimer.generation,!busy,waiters.isEmpty else {return}
+        backend=nil;loadedConfiguration=nil;idleTimer.cancel()
     }
     public func unload() async throws {
         try await acquire(UUID()); defer { release() }; try Task.checkCancellation()

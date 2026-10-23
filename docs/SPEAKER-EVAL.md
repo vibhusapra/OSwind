@@ -13,7 +13,7 @@ swift build -c release --product oswindctl
   --repetitions 2 --output /path/to/new-timeline.json
 ```
 
-The input is privately snapshotted and normalized using the product's audio path. Output creation refuses an existing file and starts with mode 0600. The first run includes resident model loading; later repetitions reuse the same process backend. OS/Core ML compilation caches remain uncontrolled. The API accepts the actual normalized duration independently of ASR words, validates intervals and clips at the source boundary using the existing 0.5-second rounding tolerance.
+The input is privately snapshotted and normalized using the product's audio path. Output creation refuses an existing file and starts with mode 0600. The first run includes resident model loading; later repetitions explicitly keep and reuse the same process backend until this diagnostic command unloads it. OS/Core ML compilation caches remain uncontrolled. The API accepts the actual normalized duration independently of ASR words, validates intervals and clips at the source boundary using the existing 0.5-second rounding tolerance.
 
 The [predetermined five-clip plan](../benchmarks/fixtures/voxconverse-dev-v1.json) selects the first five lexicographic VoxConverse development identifiers before inference. Their reference speaker counts are not passed to the model. Annotations are pinned to an immutable official repository commit. The [official dataset README](https://github.com/joonson/voxconverse/blob/24bf60be297701cd7e4ef18550c6d390c1b87365/README.md) provides download links, corrected v0.3 labels, attribution and CC BY 4.0 terms; original video copyright remains with its owners. Source audio is kept outside Git.
 

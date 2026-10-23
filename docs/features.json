@@ -590,5 +590,13 @@
     "status": "tested",
     "evidence": "Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain",
     "references": "Screenpipe, Omi, Limitless"
+  },
+  {
+    "id": "F075",
+    "axis": "Energy",
+    "feature": "Idle native model release",
+    "status": "tested",
+    "evidence": "Configurable after-use / 2-minute / 10-minute / until-quit speech/speaker retention. Queue/stale-expiry/controller contracts, actual default-timer/reload and signed release process checks pass; physical memory/power unmeasured",
+    "references": "Local always-on tools"
   }
 ]
