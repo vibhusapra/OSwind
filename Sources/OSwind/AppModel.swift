@@ -29,6 +29,9 @@ import UniformTypeIdentifiers
     @Published var stats = StoreStats()
     @Published var storageUpdatedAt: Date?
     @Published var selected: Memory?
+    @Published private(set) var openingMemoryID:String?
+    private var detailTask:Task<Void,Never>?
+    private var detailGeneration=UUID()
     @Published var selectedEvidenceQuery = ""
     @Published var answer: Answer?
     @Published var question = ""
@@ -103,7 +106,7 @@ import UniformTypeIdentifiers
     }
     func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -119,11 +122,28 @@ import UniformTypeIdentifiers
     }
     var activeSearchQuery: String { resolvedSearch?.originalQuery == query ? resolvedSearch!.filter.query : query }
     func focusSearch() {
-        section = "Memories"; showSettings = false; selected = nil
+        cancelOpeningMemory(); section = "Memories"; showSettings = false; selected = nil
         searchFocusRequest = UUID()
     }
     @Published var selectedPassage: PassageRange?
-    func openMemory(_ memory: Memory, query: String, passage: PassageRange? = nil) { selectedEvidenceQuery = query; selectedPassage = passage; selected = memory }
+    func cancelOpeningMemory() {
+        detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
+    }
+    func openMemory(_ memory: Memory, query: String, passage: PassageRange? = nil) {
+        cancelOpeningMemory();let generation=detailGeneration,store=self.store
+        openingMemoryID=memory.id
+        detailTask=Task { [weak self] in
+            let worker=Task.detached(priority:.userInitiated) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage)])[0].memory}
+            do {
+                let full=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
+                guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
+                self.selectedEvidenceQuery=query;self.selectedPassage=passage;self.selected=full;self.openingMemoryID=nil;self.detailTask=nil
+            } catch {
+                guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
+                self.openingMemoryID=nil;self.detailTask=nil;self.errorMessage=error.localizedDescription
+            }
+        }
+    }
     func refresh(forceStatistics: Bool = false) {
         refreshStatistics(force:forceStatistics)
         searchInputError = nil
@@ -133,7 +153,7 @@ import UniformTypeIdentifiers
         refreshTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds:150_000_000); guard !Task.isCancelled else { return }
             do {
-                let result = try await engine.search(filter,mode:mode,configuration:configuration,interpretQuery:interpret,now:now)
+                let result = try await engine.search(filter,mode:mode,configuration:configuration,interpretQuery:interpret,now:now,detail:.preview)
                 guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.resolvedSearch = result.resolution; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
             } catch is CancellationError { }
             catch let error as QuerySyntaxError { guard !Task.isCancelled else { return }; self?.hits = []; self?.resolvedSearch = nil; self?.searchWarnings = []; self?.searchInputError = error.localizedDescription; self?.searchMS = 0; self?.searchStrategy = ""; self?.refreshing = false }
@@ -292,7 +312,7 @@ import UniformTypeIdentifiers
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats() } catch { errorMessage = error.localizedDescription } }
+    func delete(_ memory: Memory) { do { try store.delete(memory.id); if openingMemoryID==memory.id {cancelOpeningMemory()}; if selected?.id == memory.id { selected = nil }; invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats() } catch { errorMessage = error.localizedDescription } }
     func maintain(automatic: Bool = false) {
         let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower, shouldPrune = !automatic || settings.automaticMaintenance
         Task {

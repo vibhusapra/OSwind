@@ -44,9 +44,10 @@ do {
         OSwind 0.1.0 · local desktop memory
         Usage: oswindctl [--data DIRECTORY] COMMAND
           doctor                         Inspect local permissions, GPU and models
-          search [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
+          search [--preview] [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
                  Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
+          get ID                         Read one complete source, including timed transcript
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
           chat list|new|show ID|delete ID  Manage saved local conversations
           chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up
@@ -76,6 +77,7 @@ do {
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
+          benchmark-audio-search --archive DIR [--prepare] [--detail full|preview]  Timed-transcript performance
           benchmark-vectors [--count N] [--dimensions N]  Vector scaling / optional --indexed --quality-queries N
           benchmark-stats --archive PATH  Compare synthetic archive metadata paths
         No cloud model is used unless explicitly configured. BYOK keys are read
@@ -130,6 +132,18 @@ do {
         guard let path = option("--archive") else { throw OSwindError.invalid("Pass --archive with an existing synthetic vector benchmark directory") }
         let output = option("--output"), result = try StatisticsEvaluation.run(archive:URL(fileURLWithPath:path),repetitions:Int(option("--repetitions") ?? "5") ?? 5)
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
+    } else if command == "benchmark-audio-search" {
+        guard let path=try validatedOption("--archive") else {throw OSwindError.invalid("Use benchmark-audio-search --archive SYNTHETIC_DIRECTORY [--prepare --clips 32 --words 10000 | --detail full|preview --repetitions 7]")}
+        let output=try validatedOption("--output"),detailText=try validatedOption("--detail") ?? "preview"
+        guard let detail=SearchDetail(rawValue:detailText) else {throw OSwindError.invalid("detail must be full or preview")}
+        let count=try validatedOption("--clips"),words=try validatedOption("--words"),repetitions=try validatedOption("--repetitions")
+        let preparing=args.contains("--prepare");args.removeAll {$0=="--prepare"}
+        guard args.isEmpty else {throw OSwindError.invalid("Unknown audio-search benchmark argument")}
+        func integer(_ input:String?,default fallback:Int) throws -> Int {guard let input else {return fallback};guard let value=Int(input) else {throw OSwindError.invalid("Benchmark sizes must be integers")};return value}
+        let archive=URL(fileURLWithPath:path),result:[String:Any]
+        if preparing {result=try AudioSearchEvaluation.prepare(archive:archive,clips:integer(count,default:32),words:integer(words,default:10000))}
+        else {guard count==nil,words==nil else {throw OSwindError.invalid("--clips and --words apply only with --prepare")};result=try AudioSearchEvaluation.run(archive:archive,detail:detail,repetitions:integer(repetitions,default:7))}
+        if let output {try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic)};try emit(result)
     } else if command == "benchmark-vectors" {
         let count = Int(option("--count") ?? "10000") ?? 10000, dimensions = Int(option("--dimensions") ?? "1024") ?? 1024, repetitions = Int(option("--repetitions") ?? "3") ?? 3, output = option("--output")
         let archive = option("--archive").map { URL(fileURLWithPath:$0) }
@@ -227,9 +241,13 @@ do {
             if args.contains("--use-model") { settings.search = configuration; try settings.save(root:root) }
             try emit(store.semanticIndexes())
         case "config": try encoded(AppSettings.load(root:root))
+        case "get":
+            guard args.count==1 else {throw OSwindError.invalid("Use get MEMORY_ID")}
+            guard let memory=try store.get(args[0]) else {throw OSwindError.invalid("Memory not found")}
+            try encoded(memory)
         case "stats": try encoded(store.stats())
-        case "search": let modeValue = try validatedOption("--mode") ?? "hybrid"; guard let mode = SearchMode(rawValue:modeValue) else { throw OSwindError.invalid("Unknown search mode") }; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
-            let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search,interpretQuery:!literalQuery)
+        case "search": let detail:SearchDetail=args.contains("--preview") ? .preview:.full;args.removeAll {$0=="--preview"};let modeValue = try validatedOption("--mode") ?? "hybrid"; guard let mode = SearchMode(rawValue:modeValue) else { throw OSwindError.invalid("Unknown search mode") }; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
+            let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search,interpretQuery:!literalQuery,detail:detail)
             if details { try encoded(result) } else {
                 if let resolution = result.resolution, !resolution.clauses.isEmpty {
                     let f = resolution.filter

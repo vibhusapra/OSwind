@@ -85,3 +85,6 @@ oswindctl --data /path/to/library ask --provider evidence 'Who owns capture? spe
 ```
 
 Name-only natural-language lookups should use Keyword/Hybrid; semantic-only search still ranks transcript content, with explicit speaker scopes supported. Speaker tags are diarization estimates and manual labels, not verified identity or correctness guarantees. A language model can still misattribute a claim or produce invalid citation numbers; warnings and the original source remain reviewable. The authored `scripts/speaker-evidence-smoke.py` records actual responses and failures instead of hiding them behind a success-only score.
+
+
+The app now browses explicit long-transcript previews, retaining the original text while deferring timed arrays until a source is opened or chosen for an answer. Opening runs off the UI thread with cancellation and revision checks. External API/CLI search stays complete by default; see [preview contracts](INTEGRATIONS.md#long-transcript-search-previews). Full transcripts, playback timings, local names and original passage anchors remain available after hydration.

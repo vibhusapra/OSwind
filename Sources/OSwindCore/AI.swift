@@ -108,10 +108,11 @@ public final class AnswerEngine {
         var f = resolution.filter; f.query = summarize ? "" : ConversationContext.retrievalQuery(f.query,previousQuestions:previousQuestions); f.limit = 60
         let candidates: [SearchHit]
         var retrievalWarnings = [String]()
-        if summarize { candidates = try store.timelineSample(f, limit: configuration.provider == .apple ? 12 : 24).map { SearchHit(memory:$0, score:0, match:"timeline sample") } }
-        else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone); candidates = result.hits; retrievalWarnings = result.warnings }
+        if summarize { candidates = try store.timelineSample(f, limit: configuration.provider == .apple ? 12 : 24,detail:.preview).map { SearchHit(memory:$0, score:0, match:"timeline sample") } }
+        else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone,detail:.preview); candidates = result.hits; retrievalWarnings = result.warnings }
         var fingerprints = Set<String>()
-        let hits = Array(candidates.filter { fingerprints.insert($0.memory.kind == .audio ? $0.memory.evidenceHash:$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
+        let selected = Array(candidates.filter { fingerprints.insert($0.memory.kind == .audio ? ($0.memory.searchPreview?.sourceRevision ?? $0.memory.evidenceHash):$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
+        let hits=try store.hydrate(selected)
         guard !hits.isEmpty else { return Answer(text: "I couldn’t find recorded evidence for that question. Try a different phrase or date range.", sources: [], provider: "evidence", duration: Date().timeIntervalSince(start),warnings:retrievalWarnings,resolution:resolution) }
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800

@@ -343,3 +343,32 @@ python3 scripts/speaker-search-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl
 ```
 
 Generate the fixture with `tools/SpeechProbe/make-fixture.py`. The second script needs no model downloads and tests deterministic metadata through actual CLI, HTTP and MCP processes; it runs in CI. Neither script opens the normal capture library or exercises native input/device acceptance.
+
+
+## Long-transcript search materialization
+
+[`audio-search-preview-v1.json`](audio-search-preview-v1.json) compares complete versus explicit preview results using the same release binary and synthetic archive: **32 recordings × 10,000 timed segments**. Three fresh processes per mode each run seven keyword queries; process order alternates. The medians of those process trials were:
+
+| Measurement | Complete results | Preview results |
+|---|---:|---:|
+| Query p50 | 371.188 ms | 25.018 ms |
+| Query p95 | 389.665 ms | 26.964 ms |
+| Process query peak RSS | 104.53 MB | 29.46 MB |
+| JSON response | 30.115 MB | 3.184 MB |
+| Response encoding | 358.4 ms | 6.1 ms |
+| One selected source hydration | 34.7 ms | 23.3 ms |
+
+Ordered source IDs/ranking and complete raw text match. Full mode returns all timed segments; preview mode explicitly reports their omission, counts and revision. Opening one result revalidates and restores all timings. Query RSS is sampled before response serialization and source hydration; both later stages are separately reported. Each query retains the previous result list while the next is loaded, as the app does during publication.
+
+This fixture measured about **14.8× faster median query time** and **3.5× lower process query peak RSS**. It does not establish general UI responsiveness, arbitrary-length memory bounds, natural relevance, model inference speed, tag-filter latency, power or competitor ranking. Raw text remains in previews. File/OS caches and background activity are uncontrolled; fresh processes are not controlled cold-cache trials. The 1.399-second preparation includes generation, validation, hashing, writes and per-clip preview verification; it is not ingestion-only throughput. The derived preview payloads add 3.182 MB of serialized text/metadata to the stored source data; they trade storage for lower query decoding cost.
+
+```bash
+python3 scripts/audio-search-benchmark.py dist/OSwind.app/Contents/MacOS/oswindctl \
+  --clips 32 --words 10000 --trials 3 --repetitions 7 \
+  --output /tmp/audio-search-preview.json
+python3 scripts/search-preview-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl
+```
+
+The benchmark command refuses unmarked existing data and constructs only an explicitly new synthetic archive. The process smoke verifies complete defaults, explicit previews, full-source reads, invalid-detail handling, rename revision updates, preview-import rejection and rebuilt backup caches without model downloads. Raw process measurements, identities, source/binary hashes, hardware and all scope limitations are retained in the report.
+
+The packaged [native answer regression](audio-search-native-regression-v1.json) repeats the actual local ASR/diarization and six authored Qwen questions after preview retrieval/full-source hydration. Five supported outputs cite `[1]` correctly; the invented budget question abstains. Full transcripts, evidence, model responses and hashes are retained. This remains one synthetic recording, not independent natural-meeting validation.

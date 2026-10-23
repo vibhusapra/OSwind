@@ -17,7 +17,7 @@ The server binds to `127.0.0.1:47831` only. Every request, including health, req
 - `GET /v1/search?query=release&mode=hybrid&limit=20`
 - `GET /v1/memories/{id}`
 
-Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Returned dates are ISO 8601. Assets are relative paths, not served over HTTP. HTTP and MCP search return an envelope: `{ "hits": [...], "warnings": [...], "modelID": "..." | null, "duration": 0.1, "strategy": "exact" | "ann-exact-rerank" | null }`. `duration` is seconds. Clients should show warnings for partial index coverage and Hybrid keyword fallback. Semantic-only returns an error if the selected model is unavailable. These paths read the store's `settings.json` search configuration; vectors must be built for the selected model first.
+Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `speaker` (recording-local name), `detail` (`full` or `preview`), `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Returned dates are ISO 8601. Assets are relative paths, not served over HTTP. HTTP and MCP search return an envelope: `{ "hits": [...], "warnings": [...], "modelID": "..." | null, "duration": 0.1, "strategy": "exact" | "ann-exact-rerank" | null }`. `duration` is seconds. Clients should show warnings for partial index coverage and Hybrid keyword fallback. Semantic-only returns an error if the selected model is unavailable. These paths read the store's `settings.json` search configuration; vectors must be built for the selected model first.
 
 CLI search prints the hit array by default, with warnings on stderr. Add `--details` for the same envelope. The HTTP header deadline is separate from model inference timeouts.
 
@@ -59,3 +59,19 @@ Settings → Models offers Automatic, Exact and Indexed. CLI `index-search --mod
 
 
 `ask` also accepts explicit local model/endpoint and scope flags. `python3 scripts/chat-provider-smoke.py .build/release/oswindctl` checks these overrides, current-question prompts, output-limit failure and absence of partial chat persistence using an offline Ollama fixture. It makes no paid provider request and uses no BYOK secret. Provider output-limit reasons (`length`, `max_tokens`, `model_length`) are errors; a partial answer is not persisted. A model can still produce a wrong claim with a valid citation or finish without exposing a recognized stop reason; structural validation is not semantic support checking.
+
+
+## Long-transcript search previews
+
+Complete records remain the default. For lighter browsing, request HTTP/MCP `detail=preview` or CLI `search --preview`. Timed audio results retain the **complete original text** and normal source metadata but omit the full `transcript` object and its timed segment array. An explicit `memory.searchPreview` contains `sourceRevision` and a transcript summary: duration, recognizer model, segment/assigned counts, speaker count, up to 32 exact local labels and `labelsComplete`. Labels above the per-label byte bound are omitted rather than shortened. Untimed audio and other memory kinds can remain complete.
+
+Read one complete source with CLI `get ID`, MCP `get_memory`, or `GET /v1/memories/{id}`. Swift clients can call `MemoryStore.hydrate` to load complete sources while revalidating the preview's evidence revision and original UTF-16 passage offsets. Deleted/revised evidence fails explicitly; favorite/tag changes can hydrate with current metadata. Preview values cannot be inserted as complete sources, imported as original records, or saved directly as chat evidence. Normal exports and backups keep complete source transcripts; restore rebuilds the derived cache.
+
+The app uses previews for result lists and hydrates a selected source away from the UI thread. Cancel, newer selections, source deletion and library switching discard late results. The answer engine previews candidate records, then hydrates the selected evidence before building speaker annotations or calling a model. Recaps rank thin timeline IDs before fetching sampled sources. These optimizations remove timed-array decoding from candidate browsing; raw text remains in results, and tag-filter parsing/large history hydration still need separate performance work.
+
+```bash
+oswindctl --data /path/to/library search --preview --mode keyword archive
+oswindctl --data /path/to/library get MEMORY_ID
+```
+
+Schema 11 builds the cache one audio source at a time during migration, within the migration transaction. Source, name-index and preview writes are atomic. Metadata changes reserve the SQLite writer before reading a source so concurrent attribution edits cannot be overwritten by stale favorite/tag updates.

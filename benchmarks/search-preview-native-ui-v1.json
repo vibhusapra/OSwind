@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-23",
+  "source_commit": "46bc609",
+  "scope": "Actual native app interactions in an isolated synthetic library; capture stayed paused",
+  "passed": [
+    "Open 10,000 timed segments and scroll through token9999",
+    "Command-K returns keyboard focus to search",
+    "Exact recording-local speaker scope finds the retained source",
+    "Pointer activation of a transcript word seeks to10.32 seconds",
+    "Native volume decreased to0 before playback; play advances and pause holds14.68175 seconds through naming",
+    "Native speaker naming dialog saves Maya QA and subsequent scoped search returns that source"
+  ],
+  "unresolved": [
+    "AX-only link activation did not move the clock; direct pointer activation passed",
+    "Bound-app synthetic Command-Shift-Space from Ask did not change view/focus; physical global delivery, registration conflict and background reopen remain unproved",
+    "Permission grants, microphone/system capture, native model picker/download interactions and broad accessibility acceptance not tested"
+  ],
+  "notes": [
+    "Two benchmark records dated2023 aged out under the default30-day automatic retention during the prolonged QA session; the current synthetic recording remained",
+    "Only generated/public voice audio and token transcripts were used; normal library untouched",
+    "QA process later observed sleeping/locked and stopped after verifying exact process path; no unlock or permission changes"
+  ],
+  "artifacts": {
+    "long-source-end.png": {
+      "sha256": "d12de402a37d5d33f4061ff4307e4cd6974f4c237f052a63d9ba4316603c65ae"
+    },
+    "long-source-end.ax.txt": {
+      "sha256": "2e159e4ab7d1451c2ebd59b22a252712999ff87c1eef466bad1d1a4e3e77cb4c"
+    },
+    "renamed-search.png": {
+      "sha256": "685b1490193767b28c8a9eb5f5643e98912f4acd0c48670d3460a88f0433427f"
+    },
+    "renamed-search.ax.txt": {
+      "sha256": "8fc953a427dbf4ab3a07dbfc76afd6cc5da3636a94777f60f3ff85b167090144"
+    }
+  }
+}
