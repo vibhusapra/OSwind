@@ -40,7 +40,7 @@ rows=[
 ('Retrieval','Hybrid fusion','tested','Apple RRF; GPU cosine + bounded lexical bonus; filters on both paths; cross-language regression test','Screenpipe, Retrace (jhammant)'),
 ('Retrieval','Visual / image semantic search','todo','No CLIP/VLM embeddings yet','TimeScroll, Recall'),
 ('Retrieval','Multilingual embeddings','tested','Optional Qwen3: 8 authored multilingual questions pass; larger independent corpus pending','TimeScroll/Ollama, configurable systems'),
-('Retrieval','ANN indexing for long archives','todo','100k exact p95 ~115 ms; 1m all-candidate p95 22.4 s fails target. ANN/partitioning and fault/recall validation remain open','Configurable vector systems'),
+('Retrieval','ANN indexing for long archives','partial','Pinned HNSW cache, mutation replay, live erasure/filter checks and float32 rerank; 100k non-self Recall@10 1.0 on 16 queries, unfiltered p95 ~58 ms. Filtered Automatic stays exact; million/cold/soak gates remain open','Configurable vector systems'),
 ('Retrieval','App/date/kind/favorite/tag filters','tested','Inclusive start/exclusive end; bound SQL parameters','Most visual tools'),
 ('Retrieval','Natural-language dates and operators','todo','Explicit UI/ISO time filters; no date parser','Unlost, Pieces'),
 ('Retrieval','Timeline scrubbing','implemented','Snapshot strip, selection and source inspector; capped result window','Rewind Desktop, rem, ScreenMemory'),

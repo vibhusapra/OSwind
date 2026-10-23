@@ -31,6 +31,7 @@ do {
           config                         Print settings (no API keys)
           models list|status|pull NAME    Inspect/download local Ollama models
           reindex [--model NAME] [--use-model]  Build/resume local GPU search vectors
+          index-search [--model NAME] [--rebuild] [--use-index]  Prepare fast local retrieval
           eval-retrieval [--model NAME]   Evaluate the diverse relevance fixture
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
@@ -41,7 +42,7 @@ do {
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
-          benchmark-vectors [--count N] [--dimensions N]  Exact-scan scaling stress
+          benchmark-vectors [--count N] [--dimensions N]  Vector scaling / optional --indexed --quality-queries N
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
@@ -54,7 +55,8 @@ do {
         try emit(result)
     } else if command == "benchmark-vectors" {
         let count = Int(option("--count") ?? "10000") ?? 10000, dimensions = Int(option("--dimensions") ?? "1024") ?? 1024, repetitions = Int(option("--repetitions") ?? "3") ?? 3, output = option("--output")
-        let result = try VectorScalingEvaluation.run(count:count,dimensions:dimensions,repetitions:repetitions)
+        let archive = option("--archive").map { URL(fileURLWithPath:$0) }
+        let result = try await VectorScalingEvaluation.run(count:count,dimensions:dimensions,repetitions:repetitions,indexed:args.contains("--indexed"),archive:archive,qualityQueries:Int(option("--quality-queries") ?? "0") ?? 0)
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
     } else if command == "benchmark" {
         let count = min(50000,max(100,Int(option("--count") ?? "1000") ?? 1000))
@@ -91,6 +93,17 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "index-search":
+            var settings = AppSettings.load(root:root), configuration = settings.search
+            if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }
+            configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            let identity: String, dimensions: Int
+            if configuration.provider == .ollama { let batch = try await OllamaClient.shared.embed(["search index identity"],configuration:configuration); identity = batch.modelID; dimensions = batch.vectors[0].count }
+            else { guard let vector = embedder.embed("search index identity") else { throw OSwindError.unavailable("Apple sentence embeddings are unavailable") }; identity = embedder.modelID; dimensions = vector.count }
+            let progress = Task { while !Task.isCancelled { let state = store.searchIndexStatus; FileHandle.standardError.write(Data("\(state.message) · \(state.indexed)/\(state.total)\n".utf8)); try? await Task.sleep(nanoseconds:500_000_000) } }; defer { progress.cancel() }
+            let state = try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,rebuild:args.contains("--rebuild"),allowLowPower:configuration.indexOnLowPower)
+            if args.contains("--use-index") { configuration.indexPolicy = .indexed; settings.search = configuration; try settings.save(root:root) }
+            try encoded(state)
         case "chat":
             let action = args.first ?? "list"; if !args.isEmpty { args.removeFirst() }
             if action == "list" { try encoded(store.chats()) }
@@ -118,6 +131,7 @@ do {
         case "eval-retrieval":
             let fixture = option("--fixture") ?? "benchmarks/fixtures/desktop-retrieval-v1.json", output = option("--output")
             var configuration = SearchConfiguration(); if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }; configuration.endpoint = option("--endpoint") ?? configuration.endpoint
+            if args.contains("--indexed") { configuration.indexPolicy = .indexed }
             let result = try await RetrievalEvaluation.run(fixture:URL(fileURLWithPath:fixture),configuration:configuration,repetitions:Int(option("--repetitions") ?? "3") ?? 3)
             if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }
             try emit(result)

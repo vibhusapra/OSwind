@@ -147,8 +147,8 @@
     "id": "F019",
     "axis": "Retrieval",
     "feature": "ANN indexing for long archives",
-    "status": "todo",
-    "evidence": "100k exact p95 ~115 ms; 1m all-candidate p95 22.4 s fails target. ANN/partitioning and fault/recall validation remain open",
+    "status": "partial",
+    "evidence": "Pinned HNSW cache, mutation replay, live erasure/filter checks and float32 rerank; 100k non-self Recall@10 1.0 on 16 queries, unfiltered p95 ~58 ms. Filtered Automatic stays exact; million/cold/soak gates remain open",
     "references": "Configurable vector systems"
   },
   {

@@ -1,19 +1,22 @@
 import Foundation
 
 public enum EmbeddingProvider: String, Codable, CaseIterable, Sendable { case apple, ollama }
+public enum SearchIndexPolicy: String, Codable, CaseIterable, Sendable { case automatic, exact, indexed }
 public struct SearchConfiguration: Codable, Equatable, Sendable {
     public var provider: EmbeddingProvider = .apple
     public var endpoint = "http://127.0.0.1:11434"
     public var model = "qwen3-embedding:0.6b"
     public var indexOnLowPower = false
+    public var indexPolicy: SearchIndexPolicy = .automatic
     public init() {}
-    enum CodingKeys: String, CodingKey { case provider,endpoint,model,indexOnLowPower }
+    enum CodingKeys: String, CodingKey { case provider,endpoint,model,indexOnLowPower,indexPolicy }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         provider = try c.decodeIfPresent(EmbeddingProvider.self,forKey:.provider) ?? provider
         endpoint = try c.decodeIfPresent(String.self,forKey:.endpoint) ?? endpoint
         model = try c.decodeIfPresent(String.self,forKey:.model) ?? model
         indexOnLowPower = try c.decodeIfPresent(Bool.self,forKey:.indexOnLowPower) ?? indexOnLowPower
+        indexPolicy = (try? c.decodeIfPresent(SearchIndexPolicy.self,forKey:.indexPolicy)) ?? indexPolicy
     }
 }
 public struct InstalledModel: Codable, Identifiable, Sendable {
@@ -25,7 +28,7 @@ public struct InstalledModel: Codable, Identifiable, Sendable {
     public var remoteModel: String?
     enum CodingKeys: String, CodingKey { case name,digest,size,capabilities; case remoteHost = "remote_host", remoteModel = "remote_model" }
     public var isRemote: Bool { name.lowercased().hasSuffix(":cloud") || name.lowercased().hasSuffix("-cloud") || remoteHost?.isEmpty == false || remoteModel?.isEmpty == false || capabilities?.contains("cloud") == true }
-    public var id: String { digest }
+    public var id: String { name + "@" + digest }
 }
 public struct ModelPullProgress: Codable, Sendable {
     public var status: String

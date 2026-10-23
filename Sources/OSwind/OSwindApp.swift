@@ -24,7 +24,10 @@ import OSwindCore
         let id = EventHotKeyID(signature:0x4f53574e,id:1)
         RegisterEventHotKey(UInt32(kVK_Space), UInt32(cmdKey | shiftKey),id,GetApplicationEventTarget(),0,&hotKey)
         var spec = EventTypeSpec(eventClass:OSType(kEventClassKeyboard),eventKind:UInt32(kEventHotKeyPressed))
-        InstallEventHandler(GetApplicationEventTarget(), { _,_,_ in DispatchQueue.main.async { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }; return noErr },1,&spec,nil,nil)
+        InstallEventHandler(GetApplicationEventTarget(), { _,_,_ in DispatchQueue.main.async {
+            NotificationCenter.default.post(name:.oswindOpenMain,object:nil)
+            NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)
+        }; return noErr },1,&spec,nil,nil)
     }
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
@@ -62,5 +65,6 @@ struct MenuBarIcon: View {
             .onReceive(NotificationCenter.default.publisher(for:.oswindOpenMain)) { _ in
                 openWindow(id:"main"); NSApp.activate(ignoringOtherApps:true)
             }
+            .onReceive(NotificationCenter.default.publisher(for:.oswindFocusSearch)) { _ in model.focusSearch() }
     }
 }

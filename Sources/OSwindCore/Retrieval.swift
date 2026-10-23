@@ -15,6 +15,7 @@ public struct RetrievalResult: Codable, Sendable {
     public var warnings: [String]
     public var modelID: String?
     public var duration: Double
+    public var strategy: String? = nil
 }
 public struct IndexProgress: Sendable {
     public var indexed: Int
@@ -39,8 +40,11 @@ public final class RetrievalEngine: @unchecked Sendable {
             guard let vector else { throw OSwindError.unavailable("The selected embedding model is unavailable") }
             let indexed = try store.vectorCount(modelID:identity,filter:filter)
             let total = try store.matchingCount(filter)
-            let warnings = indexed == 0 && total > 0 ? ["No vectors for the selected model in this range. Build its search index in Models settings."] : indexed < total ? ["Semantic index covers \(indexed) of \(total) memories in this range. Keyword matches remain available in Hybrid mode."] : []
-            return RetrievalResult(hits:try store.search(filter,mode:mode,vector:vector,modelID:identity,minimumSimilarity:configuration.provider == .apple ? 0.15 : 0.25,similarityFusion:configuration.provider == .ollama),warnings:warnings,modelID:identity,duration:Date().timeIntervalSince(start))
+            var warnings = indexed == 0 && total > 0 ? ["No vectors for the selected model in this range. Build its search index in Models settings."] : indexed < total ? ["Semantic index covers \(indexed) of \(total) memories in this range. Keyword matches remain available in Hybrid mode."] : []
+            var execution = SearchExecution(strategy:"exact",warnings:[])
+            let hits = try store.search(filter,mode:mode,vector:vector,modelID:identity,minimumSimilarity:configuration.provider == .apple ? 0.15 : 0.25,similarityFusion:configuration.provider == .ollama,indexPolicy:configuration.indexPolicy,indexedCount:indexed,allowIndexOnLowPower:configuration.indexOnLowPower) { execution = $0 }
+            warnings += execution.warnings
+            return RetrievalResult(hits:hits,warnings:warnings,modelID:identity,duration:Date().timeIntervalSince(start),strategy:execution.strategy)
         } catch is CancellationError { throw CancellationError() }
         catch {
             guard mode == .hybrid else { throw error }

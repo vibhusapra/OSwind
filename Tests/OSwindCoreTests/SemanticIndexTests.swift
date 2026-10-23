@@ -113,6 +113,9 @@ final class SemanticIndexTests: XCTestCase {
         var object = try JSONSerialization.jsonObject(with:JSONEncoder().encode(settings)) as! [String:Any]; object.removeValue(forKey:"search")
         let migrated = try JSONDecoder().decode(AppSettings.self,from:JSONSerialization.data(withJSONObject:object))
         XCTAssertEqual(migrated.privacy.excludedDomains,["private.example"]); XCTAssertEqual(migrated.profile,.light); XCTAssertEqual(migrated.search.provider,.apple)
+        object["search"] = ["indexPolicy":"a-future-strategy"]
+        let forward = try JSONDecoder().decode(AppSettings.self,from:JSONSerialization.data(withJSONObject:object))
+        XCTAssertEqual(forward.privacy.excludedDomains,["private.example"]); XCTAssertEqual(forward.search.indexPolicy,.automatic)
     }
     func testVersionOneStoreMigratesWithoutLosingEvidenceOrLegacyVectors() throws {
         var memory = Memory(id:"legacy",text:"Archived release checklist"); memory.embedding = [1,0]; memory.embeddingModel = "apple-test"

@@ -11,10 +11,11 @@ import ServiceManagement
     let audio: AudioController
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings
-        if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search model changed; build or resume its index" }
+        if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
     @Published var section = "Memories"
+    @Published var searchFocusRequest: UUID?
     @Published var query = ""
     @Published var mode: SearchMode = .hybrid
     @Published var appFilter = "All apps"
@@ -37,6 +38,7 @@ import ServiceManagement
     private var pauseTimer: Timer?
     @Published var apiStatus = "API off"
     @Published var searchMS = 0.0
+    @Published var searchStrategy = ""
     @Published var refreshing = false
     @Published var searchWarnings = [String]()
     @Published var installedModels = [InstalledModel]()
@@ -83,6 +85,10 @@ import ServiceManagement
         switch range { case "Today": start = calendar.startOfDay(for:Date()); case "Yesterday": end = calendar.startOfDay(for:Date()); start = calendar.date(byAdding:.day,value:-1,to:end!); case "7 days": start = calendar.date(byAdding:.day,value:-7,to:Date()); case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!); default: break }
         return SearchFilter(query:query, app:appFilter == "All apps" ? nil : appFilter, kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil, start:start, end:end, favoritesOnly:section == "Saved",limit:200)
     }
+    func focusSearch() {
+        section = "Memories"; showSettings = false; selected = nil
+        searchFocusRequest = UUID()
+    }
     func refresh() {
         refreshTask?.cancel(); let filter = self.filter, mode = self.mode, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
         refreshing = true
@@ -90,7 +96,7 @@ import ServiceManagement
             try? await Task.sleep(nanoseconds:150_000_000); guard !Task.isCancelled else { return }
             do {
                 let result = try await engine.search(filter,mode:mode,configuration:configuration); let stats = try await Task.detached(priority:.utility) { try store.stats() }.value
-                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.stats = stats; self?.searchMS = result.duration*1000; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
+                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.stats = stats; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
             } catch is CancellationError { } catch { guard !Task.isCancelled else { return }; self?.errorMessage = error.localizedDescription; self?.refreshing = false }
         }
     }
@@ -180,10 +186,49 @@ import ServiceManagement
             indexing = false
         }
     }
-    func cancelIndexing() { indexTask?.cancel() }
+    private func watchFastIndex(_ generation: UUID) -> Task<Void,Never> {
+        Task { [weak self] in
+            while !Task.isCancelled {
+                do { try await Task.sleep(nanoseconds:500_000_000) } catch { return }
+                guard let self, self.indexGeneration == generation else { return }
+                let state = self.store.searchIndexStatus
+                self.indexStatus = state.message + (state.total > 0 ? " · \(state.indexed)/\(state.total)" : "")
+                if state.total > 0 { self.indexProgress = min(1,Double(state.indexed)/Double(state.total)) }
+            }
+        }
+    }
+    func prepareFastIndex() {
+        guard !indexing else { return }
+        let configuration = settings.search, localEmbedder = embedder; indexGeneration = UUID(); let generation = indexGeneration
+        indexing = true; indexProgress = 0; indexStatus = "Preparing fast retrieval…"
+        indexTask = Task {
+            let observer = watchFastIndex(generation); defer { observer.cancel() }
+            do {
+                let identity: String, dimensions: Int
+                if configuration.provider == .ollama { let batch = try await OllamaClient.shared.embed(["search index identity"],configuration:configuration); identity = batch.modelID; dimensions = batch.vectors[0].count }
+                else { guard let vector = await Task.detached(priority:.utility,operation:{ localEmbedder.embed("search index identity") }).value else { throw OSwindError.unavailable("Apple sentence embeddings are unavailable") }; identity = localEmbedder.modelID; dimensions = vector.count }
+                let state = try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,allowLowPower:configuration.indexOnLowPower)
+                guard indexGeneration == generation else { return }; indexStatus = "Fast retrieval ready · \(state.indexed) vectors"; indexProgress = 1; refresh()
+            } catch { guard indexGeneration == generation else { return }; indexStatus = Task.isCancelled ? "Preparation cancelled; source vectors are retained" : error.localizedDescription }
+            if indexGeneration == generation { indexing = false }
+        }
+    }
+    func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; refresh(); refreshChats() } catch { errorMessage = error.localizedDescription } }
-    func maintain() { let store = self.store, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000) }.value; refresh(); refreshChats(); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } }
+    func maintain() {
+        let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower
+        Task {
+            do {
+                _ = try await Task.detached(priority:.utility) {
+                    let removed = try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000)
+                    try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower)
+                    return removed
+                }.value
+                refresh(); refreshChats(); await catchUpIndex()
+            } catch { errorMessage = error.localizedDescription }
+        }
+    }
     private func catchUpIndex() async {
         let configuration = settings.search
         guard configuration.provider == .ollama, !indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }

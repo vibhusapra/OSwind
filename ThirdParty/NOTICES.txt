@@ -1,0 +1,15 @@
+OSwind third-party components
+
+USearch 2.26.5 — vector search engine by Ash Vardanian and contributors
+https://github.com/unum-cloud/USearch
+Pinned revision: 7a4abfb2033935498256044e01bc0049ec80d76c
+License: Apache License 2.0 (see Apache-2.0.txt)
+
+NumKong 7.8.5 — SIMD math kernels by Ash Vardanian and contributors
+https://github.com/ashvardanian/NumKong
+Pinned revision: 337c1cb6e6fbea8c08b3b7b385e392ed95ccab46
+License: Apache License 2.0 (see Apache-2.0.txt)
+
+These components are resolved by Swift Package Manager. Original OSwind code
+remains MIT licensed. Model weights have separate publisher licenses and are
+not included in the repository or application bundle.

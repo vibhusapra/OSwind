@@ -19,6 +19,14 @@ public enum RetrievalEvaluation {
         }
         let engine = RetrievalEngine(store:store,apple:apple); var indexSeconds = Date().timeIntervalSince(ingestStart)
         if configuration.provider == .ollama { let start = Date(); try await engine.rebuild(configuration:configuration) { _ in }; indexSeconds = Date().timeIntervalSince(start) }
+        var annSeconds = 0.0
+        if configuration.indexPolicy == .indexed {
+            let identity: String
+            if configuration.provider == .apple { identity = apple.modelID }
+            else { identity = try await OllamaClient.shared.embed(["search index identity"],configuration:configuration).modelID }
+            guard let dimensions = try store.embeddingDimensions(modelID:identity) else { throw OSwindError.unavailable("No vectors exist for the selected search model") }
+            let before = Date(); _ = try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,allowLowPower:configuration.indexOnLowPower); annSeconds = Date().timeIntervalSince(before)
+        }
         var reports = [String:Any](), modelIDs = Set<String>()
         for mode in SearchMode.allCases {
             var times = [Double](), recall = 0.0, hitRate = 0.0, reciprocal = 0.0, positives = 0, emptyCorrect = 0, negatives = 0
@@ -34,7 +42,7 @@ public enum RetrievalEvaluation {
                     let mrr = rank.map { 1/Double($0+1) } ?? 0
                     if relevant.isEmpty { negatives += 1; if ids.isEmpty { emptyCorrect += 1 } }
                     else { positives += 1; recall += r; hitRate += rank == nil ? 0 : 1; reciprocal += mrr; let old = categories[query.category] ?? (0,0,0); categories[query.category] = (old.count+1,old.recall+r,old.mrr+mrr) }
-                    if repetition == 0 { perQuery.append(["id":query.id,"query":query.query,"category":query.category,"expected":query.relevant,"returned":ids,"recall_at_5":r,"mrr_at_5":mrr,"scores":result.hits.map(\.score),"warnings":result.warnings,"latency_ms":result.duration*1000]) }
+                    if repetition == 0 { perQuery.append(["id":query.id,"query":query.query,"category":query.category,"expected":query.relevant,"returned":ids,"recall_at_5":r,"mrr_at_5":mrr,"scores":result.hits.map(\.score),"warnings":result.warnings,"strategy":result.strategy ?? "keyword","latency_ms":result.duration*1000]) }
                 }
             }
             times.sort()
@@ -45,6 +53,6 @@ public enum RetrievalEvaluation {
         #else
         let build = "release"
         #endif
-        return ["schema":1,"timestamp":iso.string(from:Date()),"fixture_sha256":SHA256.hash(data:bytes).map { String(format:"%02x",$0) }.joined(),"fixture_description":data.description,"documents":data.documents.count,"queries":data.queries.count,"repetitions":max(1,min(10,repetitions)),"provider":configuration.provider.rawValue,"hybrid_fusion":configuration.provider == .apple ? "rrf60" : "cosine-plus-bounded-lexical-bonus-v1","model_ids":modelIDs.sorted(),"model_index_seconds":indexSeconds,"disk_bytes":store.diskBytes(),"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":reports]
+        return ["schema":1,"timestamp":iso.string(from:Date()),"fixture_sha256":SHA256.hash(data:bytes).map { String(format:"%02x",$0) }.joined(),"fixture_description":data.description,"documents":data.documents.count,"queries":data.queries.count,"repetitions":max(1,min(10,repetitions)),"provider":configuration.provider.rawValue,"search_index":configuration.indexPolicy.rawValue,"ann_build_seconds":annSeconds,"hybrid_fusion":configuration.provider == .apple ? "rrf60" : "cosine-plus-bounded-lexical-bonus-v1","model_ids":modelIDs.sorted(),"model_index_seconds":indexSeconds,"disk_bytes":store.diskBytes(),"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":reports]
     }
 }

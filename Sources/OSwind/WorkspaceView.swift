@@ -39,11 +39,10 @@ struct WorkspaceView: View {
                 else if m.section == "Insights" { InsightsView() }
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) results · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
-        .onReceive(NotificationCenter.default.publisher(for:.oswindFocusSearch)) { _ in m.section = "Memories"; searchFocused = true }
-        .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh() }) { SettingsView().environmentObject(m) }
+        .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView().environmentObject(m) }
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
         .sheet(item:$m.selected) { MemoryDetail(memory:$0).environmentObject(m) }
         .sheet(isPresented:$showNote) { VStack(alignment:.leading,spacing:16) { Text("Keep a thought").font(.title2.weight(.semibold)); TextEditor(text:$note).font(.body).frame(width:500,height:220); HStack { Button("Cancel") { showNote = false }; Spacer(); Button("Save note") { m.addNote(note); note = ""; showNote = false }.buttonStyle(.borderedProminent).disabled(note.isEmpty) } }.padding(24) }
@@ -62,6 +61,7 @@ struct WorkspaceView: View {
             HStack(spacing:12) {
                 Image(systemName:"magnifyingglass").foregroundStyle(accent)
                 TextField("Search anything you’ve seen or heard…",text:$m.query).textFieldStyle(.plain).font(.system(size:16)).onSubmit { m.refresh() }.accessibilityIdentifier("memory-search").focused($searchFocused)
+                    .task(id:m.searchFocusRequest) { if m.searchFocusRequest != nil && !m.showSettings { await Task.yield(); searchFocused = true } }
                 if !m.query.isEmpty { Button { m.query = "" } label: { Image(systemName:"xmark.circle.fill") }.buttonStyle(.plain) }
                 Text("⌘K").font(.caption).foregroundStyle(.tertiary)
             }.padding(17).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.08)))
