@@ -87,7 +87,7 @@ struct RoutineEditor:View {
                 Picker("Source kind",selection:Binding(get:{value.kind?.rawValue ?? "all"},set:{value.kind=MemoryKind(rawValue:$0)})){Text("All kinds").tag("all");ForEach(MemoryKind.allCases,id:\.self){Text($0.rawValue.capitalized).tag($0.rawValue)}}
                 Picker("Cadence",selection:$value.schedule.cadence){Text("Time and weekdays").tag(RoutineCadence.calendar);Text("Every interval").tag(RoutineCadence.interval)}
                 if value.schedule.cadence == .interval {
-                    Stepper("Every \(value.schedule.intervalMinutes) minutes",value:$value.schedule.intervalMinutes,in:1...10080)
+                    TextField("Interval in minutes (1–10080)",value:$value.schedule.intervalMinutes,format:.number).accessibilityIdentifier("routine-interval-minutes")
                     Text("Intervals use fixed elapsed-minute boundaries. Missed intervals coalesce to the latest one.").font(.caption).foregroundStyle(.secondary)
                 } else {
                 HStack {Stepper("Hour \(value.schedule.hour)",value:$value.schedule.hour,in:0...23);Stepper("Minute \(String(format:"%02d",value.schedule.minute))",value:$value.schedule.minute,in:0...59)}
