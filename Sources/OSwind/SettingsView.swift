@@ -138,9 +138,21 @@ struct SettingsView: View {
                 Toggle("Microphone",isOn:$m.settings.audioEnabled)
                 Toggle("System audio",isOn:$m.settings.systemAudioEnabled)
                 Toggle("Retain audio clips for playback",isOn:$m.settings.retainAudio)
+                Picker("Speech engine",selection:$m.settings.speech.engine) { ForEach(SpeechEngine.allCases,id:\.self) { Text($0.title) } }
+                if m.settings.speech.engine == .parakeet {
+                    Picker("Compute",selection:$m.settings.speech.compute) { ForEach(SpeechCompute.allCases,id:\.self) { Text($0.title) } }
+                    TextField("Compiled Parakeet v3 model directory",text:$m.settings.speech.modelDirectory)
+                    Button("Choose native model directory…") {
+                        let panel=NSOpenPanel(); panel.canChooseDirectories=true; panel.canChooseFiles=false
+                        if panel.runModal() == .OK,let url=panel.url { m.settings.speech.modelDirectory=url.path }
+                    }
+                    Button("Release resident speech model") { Task { try? await m.audio.recognizer.unload() } }
+                    Text("Parakeet keeps one model resident and serializes capture/import work. Recognition uses local files only. Initial Core ML compilation can take time. ANE favors background efficiency; GPU is an explicit throughput option. Changing a model in place requires releasing it first. Model weights have separate publisher licenses.").font(.caption).foregroundStyle(.secondary)
+                } else {
                 TextField("whisper.cpp executable",text:$m.settings.whisperBinary)
                 TextField("Whisper ggml model file",text:$m.settings.whisperModel)
                 Button("Choose model…") { let panel = NSOpenPanel(); if panel.runModal() == .OK, let url = panel.url { m.settings.whisperModel = url.path } }
+                }
                 TextField("Language (en, auto, fr…)",text:$m.settings.transcriptionLanguage)
                 HStack { Button("Import audio file…") { m.importAudio() }.disabled(m.importingAudio); if m.importingAudio { ProgressView().controlSize(.small); Button("Cancel import") { m.cancelAudioImport() } } }
                 if !m.audioImportStatus.isEmpty { Text(m.audioImportStatus).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }

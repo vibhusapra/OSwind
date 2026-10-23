@@ -308,7 +308,7 @@
     "axis": "Audio",
     "feature": "Local GPU transcription",
     "status": "live verified",
-    "evidence": "Official JFK audio fixture transcribed correctly with Whisper base.en; Metal backend available",
+    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; pinned installer verified",
     "references": "Screenpipe, TimeScroll"
   },
   {
@@ -340,7 +340,7 @@
     "axis": "Audio",
     "feature": "Custom vocabulary / timestamps",
     "status": "partial",
-    "evidence": "Validated segment timestamps and seek controls; no word highlighting or hotword configuration",
+    "evidence": "Validated Whisper segments and Parakeet word timestamps with seek controls; no word highlighting or hotword configuration",
     "references": "Omi, Granola"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "210 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "230 passing tests, two optional skips and six model-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

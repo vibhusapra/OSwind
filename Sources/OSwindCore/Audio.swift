@@ -96,6 +96,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     @Published public private(set) var running = false
     @Published public private(set) var status = "Audio off"
     @Published public private(set) var transcribed = 0
+    public let recognizer = SpeechRecognizer()
     public var onCapture: ((Memory) -> Void)?
     private var engine: AVAudioEngine?
     private var systemCapture: (any AudioSystemCapture)?
@@ -106,6 +107,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     private var pending: [(samples: [Float], date: Date, source: String)] = []
     private var processing = false
     private var finishing = false
+    private var preparationTask: Task<Void,Error>?
     private var transcriptionTask: Task<SpeechTranscript,Error>?
     private var sessionID = UUID().uuidString
     private var privacyTimer: Timer?
@@ -117,7 +119,7 @@ private final class AudioAccumulator: @unchecked Sendable {
         didSet {
             // A policy/source/recognizer change cannot leave hardware configured
             // using its previous snapshot. Resume is an explicit user action.
-            if oldValue.audioEnabled != settings.audioEnabled || oldValue.systemAudioEnabled != settings.systemAudioEnabled || oldValue.whisperBinary != settings.whisperBinary || oldValue.whisperModel != settings.whisperModel || oldValue.transcriptionLanguage != settings.transcriptionLanguage || oldValue.privacy != settings.privacy {
+            if oldValue.audioEnabled != settings.audioEnabled || oldValue.systemAudioEnabled != settings.systemAudioEnabled || oldValue.whisperBinary != settings.whisperBinary || oldValue.whisperModel != settings.whisperModel || oldValue.transcriptionLanguage != settings.transcriptionLanguage || oldValue.speech != settings.speech || oldValue.privacy != settings.privacy {
                 if running || finishing || processing { stop(); status="Audio settings changed · start to resume" }
             }
         }
@@ -131,7 +133,10 @@ private final class AudioAccumulator: @unchecked Sendable {
     public func start() async {
         guard !running else { return }
         guard !startup.locked() else { status="Locked · audio suspended"; return }
-        guard FileManager.default.isExecutableFile(atPath:settings.whisperBinary), FileManager.default.fileExists(atPath:settings.whisperModel) else { status="Choose a local Whisper model first"; return }
+        do {
+            if settings.speech.engine == .parakeet { _ = try settings.speech.validateLocalModel() }
+            else if !FileManager.default.isExecutableFile(atPath:settings.whisperBinary) || !FileManager.default.fileExists(atPath:settings.whisperModel) { throw OSwindError.unavailable("Choose a local Whisper model first") }
+        } catch { status=error.localizedDescription; return }
         guard settings.audioEnabled || settings.systemAudioEnabled else { status="Enable an audio source in Settings"; return }
         epoch=UUID(); let token=epoch, config=settings
         sessionID=UUID().uuidString; finishing=false; starting=true; running=true
@@ -140,6 +145,13 @@ private final class AudioAccumulator: @unchecked Sendable {
         await withTaskCancellationHandler {
             do {
                 try validateStartup(token)
+                if config.speech.engine == .parakeet {
+                    status="Preparing local speech model…"
+                    let task=Task { try await recognizer.prepare(settings:config) }; preparationTask=task
+                    try await task.value
+                    try validateStartup(token); preparationTask=nil
+                    status="Starting local audio…"
+                }
                 if config.audioEnabled {
                     let authorized=await startup.authorizeMicrophone()
                     try validateStartup(token)
@@ -192,7 +204,7 @@ private final class AudioAccumulator: @unchecked Sendable {
         if let context=startup.context(), let reason=settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) { throw OSwindError.unavailable("Audio stopped · "+reason) }
     }
     public func stop() {
-        privacyTimer?.invalidate(); privacyTimer=nil; transcriptionTask?.cancel(); finishing=false; starting=false; running=false; epoch=UUID()
+        privacyTimer?.invalidate(); privacyTimer=nil; preparationTask?.cancel(); preparationTask=nil; transcriptionTask?.cancel(); finishing=false; starting=false; running=false; epoch=UUID()
         engine?.inputNode.removeTap(onBus:0); engine?.stop(); engine=nil
         if let capture=systemCapture { Task { try? await capture.stop() } }; systemCapture=nil
         micSink?.stop(); systemSink?.stop(); micSink=nil; systemSink=nil; pending.removeAll(); status="Audio off"
@@ -243,7 +255,7 @@ private final class AudioAccumulator: @unchecked Sendable {
             let file=operation.url.appendingPathComponent("capture.wav")
             do {
                 try WAV.data(samples: chunk.samples).write(to:file,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path); defer { try? FileManager.default.removeItem(at: file) }
-                let task = Task { try await Whisper.detailed(file:file,binary:config.whisperBinary,model:config.whisperModel,language:config.transcriptionLanguage) }; transcriptionTask = task
+                let task = Task { try await recognizer.transcribe(file:file,settings:config) }; transcriptionTask = task
                 var transcript = try await task.value; transcriptionTask = nil
                 guard token == epoch && !startup.locked() else { continue }
                 if let context=startup.context(),settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) != nil { continue }
