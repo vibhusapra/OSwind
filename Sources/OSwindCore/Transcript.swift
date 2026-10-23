@@ -12,9 +12,13 @@ public struct SpeechTranscript: Codable, Equatable, Sendable {
     public var duration: Double
     public var segments: [TranscriptSegment]
     public var model: String
-    public init(text: String, duration: Double, segments: [TranscriptSegment], model: String) { self.text=text; self.duration=duration; self.segments=segments; self.model=model }
+    public var diarization:DiarizationInfo?
+    public init(text: String, duration: Double, segments: [TranscriptSegment], model: String, diarization:DiarizationInfo?=nil) { self.text=text; self.duration=duration; self.segments=segments; self.model=model; self.diarization=diarization }
     public func validated() throws -> Self {
         guard duration.isFinite,duration>0,duration<=86400,text.count<=1_000_000,!text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,segments.count<=100000,!model.isEmpty,model.utf8.count<=1024 else { throw OSwindError.invalid("Invalid or oversized speech transcript") }
+        if let info=diarization {
+            guard info.scope=="recording",!info.model.isEmpty,info.model.utf8.count<=1024,(0...256).contains(info.detectedSpeakers),info.unassignedSegments==segments.filter({$0.speaker==nil}).count,Set(segments.compactMap(\.speaker)).count<=info.detectedSpeakers else { throw OSwindError.invalid("Invalid diarization metadata") }
+        }
         var previous = 0.0
         for segment in segments {
             guard segment.start.isFinite,segment.end.isFinite,segment.start>=0,segment.start>=previous,segment.end>=segment.start,segment.end<=duration+0.5,segment.text.count<=100000,segment.speaker.map({!$0.isEmpty && $0.count<=128}) ?? true else { throw OSwindError.invalid("Invalid transcript timestamps or speaker label") }
@@ -29,6 +33,7 @@ public struct SpeechTranscript: Codable, Equatable, Sendable {
     public func sanitized(policy: PrivacyPolicy) throws -> (transcript: Self, suppressAudio: Bool) {
         _ = try validated(); guard policy.redactSecrets else { return (self,false) }
         var result=self; result.model=policy.sanitize(model).text
+        if let info=diarization { result.diarization?.model=policy.sanitize(info.model).text }
         let main=policy.sanitize(text), joined=segments.map(\.text).joined(separator:" ")
         let spoken=Self.hasSpokenCredential(text) || Self.hasSpokenCredential(joined)
         result.text=spoken ? "[REDACTED SENSITIVE SPEECH]":main.text

@@ -36,7 +36,14 @@ import OSwindCore
 struct AudioPlaybackView: View {
     let memory: Memory
     let url: URL?
+    @EnvironmentObject private var model:AppModel
     @StateObject private var playback=AudioPlaybackModel()
+    @State private var editedTranscript:SpeechTranscript?
+    @State private var paragraphs=[TranscriptParagraph]()
+    @State private var renaming=false
+    @State private var renameOriginal=""
+    @State private var speakerName=""
+    @State private var renameError:String?
     var body: some View {
         VStack(alignment:.leading,spacing:12) {
             if let url {
@@ -48,17 +55,56 @@ struct AudioPlaybackView: View {
                 HStack { Image(systemName:playback.volume==0 ? "speaker.slash":"speaker.wave.2"); Slider(value:$playback.volume,in:0...1).frame(maxWidth:140).accessibilityLabel("Playback volume") }.font(.caption).foregroundStyle(.secondary)
             } else { Label("Audio was not retained for this transcript",systemImage:"waveform.slash").font(.caption).foregroundStyle(.secondary) }
             if let error=playback.error { HStack { Text(error).font(.caption).foregroundStyle(.orange); if let url { Button("Retry") { playback.load(url) } } } }
-            if let transcript=memory.transcript {
+            if let error=renameError { Text(error).font(.caption).foregroundStyle(.orange) }
+            if let transcript=editedTranscript ?? memory.transcript {
                 Text(transcript.model+" · "+time(transcript.duration)).font(.caption2).foregroundStyle(.secondary)
-                LazyVStack(alignment:.leading,spacing:0) { ForEach(transcript.segments.indices,id:\.self) { index in
-                    let segment=transcript.segments[index]
+                if let info=transcript.diarization {
+                    Text("\(info.detectedSpeakers) estimated speakers · \(transcript.segments.count-info.unassignedSegments)/\(transcript.segments.count) timed spans assigned").font(.caption).foregroundStyle(.secondary)
+                    Text("Labels apply to this recording only. Select a speaker label to name it.").font(.caption2).foregroundStyle(.secondary)
+                }
+                LazyVStack(alignment:.leading,spacing:12) { ForEach(paragraphs) { paragraph in
                     HStack(alignment:.top,spacing:12) {
-                        Button(time(segment.start)) { playback.seek(segment.start) }.font(.system(.caption,design:.monospaced)).buttonStyle(.borderless).disabled(url == nil)
-                        VStack(alignment:.leading,spacing:3) { if let speaker=segment.speaker { Text(speaker).font(.caption.weight(.semibold)).foregroundStyle(OSwindTheme.accent) }; Text(segment.text).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading) }
-                    }.padding(.vertical,4)
-                } }
+                        Button(time(paragraph.start)) { playback.seek(paragraph.start) }.font(.system(.caption,design:.monospaced)).buttonStyle(.borderless).disabled(url == nil || playback.error != nil)
+                        VStack(alignment:.leading,spacing:4) {
+                            if let speaker=paragraph.speaker {
+                                Button(speaker) { renameOriginal=speaker; speakerName=speaker; renameError=nil; renaming=true }.buttonStyle(.plain).font(.caption.weight(.semibold)).foregroundStyle(OSwindTheme.accent).help("Name this speaker for this recording")
+                            } else if transcript.diarization != nil { Text("Unassigned or mixed").font(.caption2).foregroundStyle(.secondary) }
+                            Text(words(paragraph,in:transcript)).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading).help(url == nil ? "Transcript":"Select a word to seek")
+                        }
+                    }
+                } }.environment(\.openURL,OpenURLAction { target in
+                    guard target.scheme=="oswind-audio-seek",target.host=="seek",let components=URLComponents(url:target,resolvingAgainstBaseURL:false),let raw=components.queryItems?.first(where:{$0.name=="segment"})?.value,let index=Int(raw),transcript.segments.indices.contains(index),url != nil else { return .discarded }
+                    playback.seek(transcript.segments[index].start); return .handled
+                })
             }
-        }.padding(14).background(.primary.opacity(0.035),in:RoundedRectangle(cornerRadius:10)).onDisappear { playback.stop() }
+        }.alert("Name this speaker",isPresented:$renaming) {
+            TextField("Speaker name",text:$speakerName)
+            Button("Save") {
+                do { editedTranscript=try model.store.renameAudioSpeaker(memory.id,from:renameOriginal,to:speakerName,policy:model.settings.privacy).transcript; rebuildParagraphs(); model.refresh() }
+                catch { renameError=error.localizedDescription }
+            }
+            Button("Cancel",role:.cancel) {}
+        } message: { Text("Changes labels in this recording only. No voice profile is created.") }
+        .onAppear { rebuildParagraphs() }
+        .onChange(of:memory.id) { _,_ in editedTranscript=nil; renameError=nil; rebuildParagraphs() }
+        .onChange(of:memory.transcript) { _,_ in editedTranscript=nil; rebuildParagraphs() }
+        .padding(14).background(.primary.opacity(0.035),in:RoundedRectangle(cornerRadius:10)).onDisappear { playback.stop() }
+    }
+    private func rebuildParagraphs() {
+        guard let transcript=editedTranscript ?? memory.transcript else { paragraphs=[]; return }
+        paragraphs=(try? TranscriptParagraph.make(transcript)) ?? []
+    }
+    private func words(_ paragraph:TranscriptParagraph,in transcript:SpeechTranscript) -> AttributedString {
+        var text=AttributedString()
+        for index in paragraph.range where transcript.segments.indices.contains(index) {
+            let segment=transcript.segments[index]
+            if index>paragraph.range.lowerBound { text.append(AttributedString(" ")) }
+            var word=AttributedString(segment.text); word.foregroundColor = .primary
+            if url != nil && playback.error==nil { word.link=URL(string:"oswind-audio-seek://seek?segment=\(index)") }
+            if url != nil && playback.position>=segment.start && playback.position<segment.end { word.backgroundColor=OSwindTheme.accent.opacity(0.18) }
+            text.append(word)
+        }
+        return text
     }
     private func time(_ value: Double) -> String { let seconds=Int(max(0,value.isFinite ? value:0)); return seconds>=3600 ? String(format:"%d:%02d:%02d",seconds/3600,seconds/60%60,seconds%60) : String(format:"%d:%02d",seconds/60,seconds%60) }
 }

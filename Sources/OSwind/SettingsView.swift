@@ -134,30 +134,46 @@ struct SettingsView: View {
     }
     private var audio: some View {
         Group {
-            Section("Local audio transcription") {
+            Section("Capture and playback") {
                 Toggle("Microphone",isOn:$m.settings.audioEnabled)
                 Toggle("System audio",isOn:$m.settings.systemAudioEnabled)
                 Toggle("Retain audio clips for playback",isOn:$m.settings.retainAudio)
+                HStack { Button(m.audio.running ? "Stop audio" : "Start audio") { if m.audio.running { m.audio.finish() } else { Task { await m.audio.start() } } }; Text(m.audio.status).font(.caption).foregroundStyle(.secondary) }
+                Text("Live audio is transcribed in 30-second segments. Pause discards pending capture. Clip retention applies to recordings and imports; detected secrets suppress the raw clip. Stop before private conversations.").font(.caption).foregroundStyle(.secondary)
+            }
+            Section("Import a recording") {
+                HStack { Button("Import audio file…") { m.importAudio() }.disabled(m.importingAudio); if m.importingAudio { ProgressView().controlSize(.small); Button("Cancel import") { m.cancelAudioImport() } } }
+                if !m.audioImportStatus.isEmpty { Text(m.audioImportStatus).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
+                Toggle("Identify speakers in imported recordings",isOn:$m.settings.diarization.enabled).disabled(!SpeakerDiarizer.supported && !m.settings.diarization.enabled)
+                if m.settings.diarization.enabled {
+                    TextField("Community-1 model directory",text:$m.settings.diarization.modelDirectory)
+                    Button("Choose speaker model directory…") {
+                        let panel=NSOpenPanel(); panel.canChooseDirectories=true; panel.canChooseFiles=false
+                        if panel.runModal() == .OK,let url=panel.url { m.settings.diarization.modelDirectory=url.path }
+                    }
+                    Button("Release resident speaker model") { Task { try? await m.audio.speakers.unload() } }
+                    Text("Labels apply within this recording. Mixed or uncertain spans stay unassigned; no voice profiles are saved. Requires macOS 15+. Live speaker tracking is still in progress.").font(.caption).foregroundStyle(.secondary)
+                } else if !SpeakerDiarizer.supported {
+                    Text("Speaker labels require macOS 15+. Plain transcription remains available.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Section("Transcription model") {
                 Picker("Speech engine",selection:$m.settings.speech.engine) { ForEach(SpeechEngine.allCases,id:\.self) { Text($0.title) } }
                 if m.settings.speech.engine == .parakeet {
                     Picker("Compute",selection:$m.settings.speech.compute) { ForEach(SpeechCompute.allCases,id:\.self) { Text($0.title) } }
-                    TextField("Compiled Parakeet v3 model directory",text:$m.settings.speech.modelDirectory)
+                    TextField("Parakeet v3 model directory",text:$m.settings.speech.modelDirectory)
                     Button("Choose native model directory…") {
                         let panel=NSOpenPanel(); panel.canChooseDirectories=true; panel.canChooseFiles=false
                         if panel.runModal() == .OK,let url=panel.url { m.settings.speech.modelDirectory=url.path }
                     }
                     Button("Release resident speech model") { Task { try? await m.audio.recognizer.unload() } }
-                    Text("Parakeet keeps one model resident and serializes capture/import work. Recognition uses local files only. Initial Core ML compilation can take time. ANE favors background efficiency; GPU is an explicit throughput option. Changing a model in place requires releasing it first. Model weights have separate publisher licenses.").font(.caption).foregroundStyle(.secondary)
+                    Text("Uses local models only. Initial preparation can take time. Models remain loaded for reuse; release them after replacing files at the same path. Weights have separate publisher licenses.").font(.caption).foregroundStyle(.secondary)
                 } else {
-                TextField("whisper.cpp executable",text:$m.settings.whisperBinary)
-                TextField("Whisper ggml model file",text:$m.settings.whisperModel)
-                Button("Choose model…") { let panel = NSOpenPanel(); if panel.runModal() == .OK, let url = panel.url { m.settings.whisperModel = url.path } }
+                    TextField("whisper.cpp executable",text:$m.settings.whisperBinary)
+                    TextField("Whisper ggml model file",text:$m.settings.whisperModel)
+                    Button("Choose model…") { let panel=NSOpenPanel(); if panel.runModal() == .OK,let url=panel.url { m.settings.whisperModel=url.path } }
                 }
                 TextField("Language (en, auto, fr…)",text:$m.settings.transcriptionLanguage)
-                HStack { Button("Import audio file…") { m.importAudio() }.disabled(m.importingAudio); if m.importingAudio { ProgressView().controlSize(.small); Button("Cancel import") { m.cancelAudioImport() } } }
-                if !m.audioImportStatus.isEmpty { Text(m.audioImportStatus).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
-                HStack { Button(m.audio.running ? "Stop audio" : "Start audio") { if m.audio.running { m.audio.finish() } else { Task { await m.audio.start() } } }; Text(m.audio.status).font(.caption).foregroundStyle(.secondary) }
-                Text("30-second chunks, simple energy gate, bounded transcription queue. Clip retention is off by default. When enabled, a detected secret suppresses the entire raw clip; transcript text is redacted. Clips follow your storage/retention limits. Microphone and system audio are labeled separately, not speaker-diarized. Stop audio before private conversations.").font(.caption).foregroundStyle(.secondary)
             }
         }
     }

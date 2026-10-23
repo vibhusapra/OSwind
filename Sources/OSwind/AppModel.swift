@@ -339,10 +339,19 @@ import UniformTypeIdentifiers
         audioImportTask=Task {
             defer { importingAudio=false; audioImportTask=nil }
             do {
+                if configuration.diarization.enabled {
+                    guard SpeakerDiarizer.supported else { throw OSwindError.unavailable("Speaker labels require macOS 15 or later") }
+                    _ = try configuration.diarization.localDirectory()
+                }
                 let clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
                 audioImportStatus="Transcribing locally…"
                 var transcript=try await audio.recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800)
                 try Task.checkCancellation(); transcript.duration=clip.duration
+                if configuration.diarization.enabled {
+                    audioImportStatus="Identifying speakers locally…"
+                    transcript=try await audio.speakers.annotate(transcript,file:clip.speechFile,configuration:configuration.diarization)
+                }
+                try Task.checkCancellation()
                 let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
                 captured(memory); audioImportStatus="Transcript saved · find it in Conversations"
             } catch is CancellationError { audioImportStatus="Import cancelled" }

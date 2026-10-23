@@ -96,6 +96,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     @Published public private(set) var running = false
     @Published public private(set) var status = "Audio off"
     @Published public private(set) var transcribed = 0
+    public let speakers=SpeakerDiarizer()
     public let recognizer: SpeechRecognizer
     public var onCapture: ((Memory) -> Void)?
     private var engine: AVAudioEngine?
