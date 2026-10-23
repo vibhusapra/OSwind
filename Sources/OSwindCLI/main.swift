@@ -66,6 +66,7 @@ do {
           backup inspect PATH            Verify a complete .oswindbackup package
           backup restore PATH --to DIR   Restore into a new, quiet library
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
+          export-markdown NEW_DIR [--include-media]  Export portable Markdown sources and conversations
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           diarize PATH --speaker-model DIR [--repetitions N] [--output NEW_JSON]  Anonymous raw timeline, no library write
@@ -306,6 +307,10 @@ do {
             do { _ = try await RetrievalEngine(store:store,apple:embedder).index([memory],configuration:AppSettings.load(root:root).search) }
             catch { FileHandle.standardError.write(Data(("Note saved; additional semantic indexing pending. " + error.localizedDescription + "\n").utf8)) }
             print(memory.id)
+        case "export-markdown":
+            let media = args.contains("--include-media"); args.removeAll {$0 == "--include-media"}
+            guard args.count == 1,!args[0].hasPrefix("--") else { throw OSwindError.invalid("Enter a new output folder and optional --include-media") }
+            try encoded(MarkdownExport.create(store:store,destination:URL(fileURLWithPath:args[0]),policy:AppSettings.load(root:root).privacy,includeMedia:media))
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
         case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")
