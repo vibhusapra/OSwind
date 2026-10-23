@@ -58,6 +58,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; larger relevance/scaling validation, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
+- [x] [Draft PR #6](https://github.com/vibhusapra/OSwind/pull/6) adds long-source excerpts/highlights and a pinned non-thinking local chat preset; current-head macOS CI passed.
 - [x] [Draft PR #5](https://github.com/vibhusapra/OSwind/pull/5) adds journaled native indexing and its recovery/recall/performance checks; current-head macOS CI passed.
 - [x] [Draft PR #4](https://github.com/vibhusapra/OSwind/pull/4) adds bounded exact scanning and preserves the failed million-vector gate; current-head macOS CI passed.
 - [x] [Draft PR #3](https://github.com/vibhusapra/OSwind/pull/3) adds durable conversations, follow-up context and source-linked erasure; current-head macOS CI passed.
@@ -88,9 +89,9 @@ The testing exposed real model failures and a weak initial grader. A source-by-s
 
 Remaining evidence work: semantic chunk indexing beyond embedding input limits, held-out multilingual/long-archive grounding, source/citation entailment, robust abstention, token/context budgets and prompt-injection evaluation. Query-only image boxes remain pending; the delivered query highlights are text excerpts.
 
-## Current work: metadata performance
+## Metadata performance — draft PR #7
 
-The `codex/metadata-performance` branch adds schema-5 maintained counts/application totals and index-based timestamp extrema. Source-transaction triggers cover every app/CLI writer; metadata-only favorites/tags skip FTS rewrites. Missing/inconsistent derived counts repair on reopen. A schema-4 fixture preserves source, chat, FTS and the native manifest without vector reprocessing. Five new tests compare counters with independent source scans, including concurrent store connections, overwrite, deletion, rollback and repair.
+[Draft PR #7](https://github.com/vibhusapra/OSwind/pull/7) adds schema-5 maintained counts/application totals and index-based timestamp extrema. Source-transaction triggers cover every app/CLI writer; metadata-only favorites/tags skip FTS rewrites. Missing/inconsistent derived counts repair on reopen. A schema-4 fixture preserves source, chat, FTS and the native manifest without vector reprocessing. Five new tests compare counters with independent source scans, including concurrent store connections, overwrite, deletion, rollback and repair.
 
 The UI publishes hits independently from statistics. Count tasks are coalesced; file enumeration runs outside the store lock in a separate 30-second estimate task, with measuring/last-check state and invalidation on erase/import/cleanup. A generation token discards superseded storage scans. This removes known work from each keystroke; actual live native latency under sustained capture remains unmeasured.
 
@@ -102,7 +103,7 @@ Next performance gate is the failed million-record ANN non-self recall (.675/.82
 
 ## Local artifacts
 
-- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (fe51c8c) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
+- App: `dist/OSwind.app` (excluded from Git; reproducible with `scripts/build-app.sh`). The current tested release preview (d0c2f6f) is installed at `/Applications/OSwind.app` and passes strict code-signature verification; `dist/OSwind-macos.zip` is packaged. Later code changes require rebuilding/reinstalling.
 - Raw test/model/runtime logs and synthetic media: `.artifacts/` (excluded from Git).
 - Reproducible public synthetic metrics: `benchmarks/`.
 - Local synthetic verification databases: `.local/` (excluded from Git).
