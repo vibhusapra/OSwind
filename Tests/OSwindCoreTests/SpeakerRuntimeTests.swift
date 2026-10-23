@@ -43,6 +43,18 @@ final class SpeakerRuntimeTests:XCTestCase {
         try await runtime.unload();_ = try await runtime.annotate(input,file:root,configuration:config)
         loads=await count.count;XCTAssertEqual(loads,2)
     }
+    func testRawTimelineAndWordAttributionShareResidentBackend() async throws {
+        let count=Counter(),runtime=SpeakerDiarizer(loader:{_ in await count.increment();return Backend()})
+        let timeline=try await runtime.timeline(file:root,duration:1,configuration:config)
+        XCTAssertEqual(timeline.turns,[SpeakerTurn(start:0,end:1,speaker:"arbitrary-local-id")]);XCTAssertEqual(timeline.scope,"recording")
+        let transcript=try await runtime.annotate(input,file:root,configuration:config)
+        XCTAssertEqual(transcript.segments[0].speaker,"Speaker 1")
+        let loads=await count.count;XCTAssertEqual(loads,1)
+        var disabled=config!;disabled.enabled=false
+        do {_ = try await runtime.timeline(file:root,duration:1,configuration:disabled);XCTFail("A disabled timeline must not be scored as silence")} catch {XCTAssertTrue(error.localizedDescription.contains("Enable"))}
+        do {_ = try await runtime.timeline(file:root,duration:.infinity,configuration:config);XCTFail("Invalid duration accepted")} catch {}
+        try await runtime.unload()
+    }
     func testQueuedCancellationAndInferenceCancellationDoNotReturnLabels() async throws {
         let gate=Gate(),backend=Backend(gate:gate),runtime=SpeakerDiarizer(loader:{_ in backend})
         let first=Task { try await runtime.annotate(input,file:root,configuration:config) };await fulfillment(of:[gate.entered],timeout:5)

@@ -14,6 +14,8 @@ jobs:
         run: swift test
       - name: Verify pinned native-model installer without network
         run: python3 scripts/test-native-model-setup.py
+      - name: Verify evaluation asset integrity contracts offline
+        run: python3 scripts/test-prepare-speaker-eval.py
       - name: Package app
         run: scripts/build-app.sh release
       - name: CLI smoke test

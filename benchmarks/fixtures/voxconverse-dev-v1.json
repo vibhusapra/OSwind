@@ -1,0 +1,54 @@
+{
+  "created_utc": "2026-10-23T21:24:25.885975+00:00",
+  "annotation_commit": "24bf60be297701cd7e4ef18550c6d390c1b87365",
+  "dataset": "VoxConverse dev",
+  "selection": "First five lexicographic dev RTTM identifiers, fixed before inference; no result-driven exclusions.",
+  "clips": [
+    {
+      "id": "abjxc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/abjxc.rttm",
+      "annotation_sha256": "13cc19d2180889b786cf0fb86b522b95902d20fae27b7384ea943c7877286f9c",
+      "reference_speakers": 1,
+      "reference_segments": 2,
+      "last_reference_end_seconds": 64.64
+    },
+    {
+      "id": "afjiv",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/afjiv.rttm",
+      "annotation_sha256": "58a764b4b5864b14dd39d91e420370d1f45cabc4bcf354a8e7516538b996d51f",
+      "reference_speakers": 5,
+      "reference_segments": 28,
+      "last_reference_end_seconds": 145.32
+    },
+    {
+      "id": "ahnss",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/ahnss.rttm",
+      "annotation_sha256": "9a09a7c39311b9f0e4209f6a58930e35327c8fa9f36b671c1a1a19972d514e71",
+      "reference_speakers": 4,
+      "reference_segments": 87,
+      "last_reference_end_seconds": 664.28
+    },
+    {
+      "id": "aisvi",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/aisvi.rttm",
+      "annotation_sha256": "b51dbe53aa0284d95f077d0e7eb904a1d7ed994706977b41b10fe3e0df51538a",
+      "reference_speakers": 8,
+      "reference_segments": 42,
+      "last_reference_end_seconds": 468.92
+    },
+    {
+      "id": "akthc",
+      "annotation_member": "joonson-voxconverse-24bf60b/dev/akthc.rttm",
+      "annotation_sha256": "89595c2816c056bfd5e0ca7e64d5d12323b417d16a915b015e1a471ac8695203",
+      "reference_speakers": 2,
+      "reference_segments": 13,
+      "last_reference_end_seconds": 113.83999999999999
+    }
+  ],
+  "scope": "Development subset only. Download/preparation is not a score; no held-out/corpus/competitor ranking.",
+  "metrics_planned": [
+    "Diarization error with official reference labels and independent standard scorer; explicit collar/overlap settings",
+    "RTF, warm/cold behavior and peak process RSS",
+    "Projected word-speaker attribution coverage, kept separate from raw speaker timeline quality"
+  ]
+}

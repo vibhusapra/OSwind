@@ -65,6 +65,7 @@ do {
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
+          diarize PATH --speaker-model DIR [--repetitions N] [--output NEW_JSON]  Anonymous raw timeline, no library write
           import-audio PATH [--retain-audio] Transcribe and save an audio file locally
             [--engine parakeet --native-model DIR] [--speaker-model DIR]
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
@@ -123,6 +124,26 @@ do {
             try emit(["removed_jobs":BackupWorkspaceCleanup.run(in:directory)])
         default: throw OSwindError.invalid("Use backup create, inspect, restore or cleanup")
         }
+    } else if command == "diarize" {
+        guard let model=try validatedOption("--speaker-model") else {throw OSwindError.invalid("Use diarize AUDIO --speaker-model LOCAL_DIRECTORY")}
+        let repeatText=try validatedOption("--repetitions") ?? "1",output=try validatedOption("--output")
+        guard let repetitions=Int(repeatText),(1...10).contains(repetitions),args.count==1 else {throw OSwindError.invalid("Use one audio path and 1–10 repetitions")}
+        if let output,FileManager.default.fileExists(atPath:output) {throw OSwindError.invalid("Timeline output must be a new file")}
+        var configuration=DiarizationConfiguration();configuration.enabled=true;configuration.modelDirectory=model
+        guard SpeakerDiarizer.supported else {throw OSwindError.unavailable("Speaker diarization requires macOS 15 or later")}
+        _ = try configuration.localDirectory()
+        let prepare=Date(),clip=try await AudioClipSnapshot.prepare(URL(fileURLWithPath:args[0]));defer {withExtendedLifetime(clip){}}
+        let prepareSeconds=Date().timeIntervalSince(prepare),runtime=SpeakerDiarizer()
+        var runs=[[String:Any]]()
+        for index in 0..<repetitions {
+            let start=Date(),timeline=try await runtime.timeline(file:clip.speechFile,duration:clip.duration,configuration:configuration)
+            let seconds=Date().timeIntervalSince(start)
+            runs.append(["index":index,"resident_backend_reused":index>0,"seconds":seconds,"real_time_factor":seconds/clip.duration,"timeline":try Integration.json(timeline)])
+        }
+        try await runtime.unload()
+        let result:[String:Any]=["format":"OSwind raw speaker timeline v1","preparation_seconds":prepareSeconds,"runs":runs,"scope":"Anonymous recording-local turns before ASR attribution. First run includes model load; later runs reuse this process backend. OS/Core ML compilation caches uncontrolled. No library write, embeddings or voice profiles exported."]
+        if let output {try writeNewPrivateJSON(result,to:output)}
+        try emit(result)
     } else if command == "doctor" {
         let settings = AppSettings.load(root:root); let embedder = LocalEmbedder()
         var result: [String:Any] = ["version":"0.1.0","os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "unavailable","screenRecording":CGPreflightScreenCaptureAccess(),"screenLocked":SessionState.locked,"accessibility":AXIsProcessTrusted(),"sentenceEmbeddings":embedder.available,"dataDirectory":root.path,"whisperExecutable":FileManager.default.isExecutableFile(atPath:settings.whisperBinary),"whisperModel":FileManager.default.fileExists(atPath:settings.whisperModel),"provider":settings.ai.provider.rawValue]

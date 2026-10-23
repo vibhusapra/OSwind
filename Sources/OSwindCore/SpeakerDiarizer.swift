@@ -98,6 +98,19 @@ public actor SpeakerDiarizer {
     public func annotate(_ transcript:SpeechTranscript,file:URL,configuration:DiarizationConfiguration,timeout:Double=1800) async throws -> SpeechTranscript {
         try Task.checkCancellation(); _ = try transcript.validated()
         guard configuration.enabled else { return transcript }
+        let result=try await timeline(file:file,duration:transcript.duration,configuration:configuration,timeout:timeout)
+        return try SpeakerAttribution.attach(result.turns,to:transcript,model:result.model)
+    }
+    /// The caller supplies the duration of the normalized input, independent of
+    /// ASR word coverage. CLI callers obtain it from AudioClipSnapshot.
+    public func timeline(file:URL,duration:Double,configuration:DiarizationConfiguration,timeout:Double=1800) async throws -> SpeakerTimeline {
+        try Task.checkCancellation()
+        _ = try SpeakerTimeline(duration:duration,model:"validation",turns:[]).validated()
+        guard configuration.enabled else {throw OSwindError.invalid("Enable speaker recognition before requesting a timeline")}
+        let turns=try await recognize(file:file,configuration:configuration,timeout:timeout)
+        return try SpeakerTimeline(duration:duration,model:"Community-1 · local Core ML / FluidAudio 0.17.7",turns:turns).validated()
+    }
+    private func recognize(file:URL,configuration:DiarizationConfiguration,timeout:Double) async throws -> [SpeakerTurn] {
         // SDK documents a crash-prone BNNS path on macOS 14; never enter it.
         guard supportedOS() else { throw OSwindError.unavailable("Speaker diarization requires macOS 15 or later; turn it off to use transcription on macOS 14") }
         guard timeout.isFinite,timeout>0,timeout<=86400 else { throw OSwindError.invalid("Invalid speaker recognition time budget") }
@@ -115,7 +128,7 @@ public actor SpeakerDiarizer {
             let turns=try await withTaskCancellationHandler { try await operation.value } onCancel: { operation.cancel() }
             try Task.checkCancellation()
             guard ContinuousClock.now<deadline else { throw OSwindError.unavailable("Speaker recognition exceeded its time budget") }
-            return try SpeakerAttribution.attach(turns,to:transcript,model:"Community-1 · local Core ML / FluidAudio 0.17.7")
+            return turns
         } catch {
             try Task.checkCancellation()
             if ContinuousClock.now>=deadline { throw OSwindError.unavailable("Speaker recognition exceeded its time budget") }
