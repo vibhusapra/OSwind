@@ -147,9 +147,20 @@ struct MemoryDetail: View {
 struct AskView: View {
     @EnvironmentObject var m: AppModel
     var body: some View {
-        VStack(alignment:.leading,spacing:18) {
-            Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
-            Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
+        GeometryReader { geometry in
+        let compact = geometry.size.height < 700
+        VStack(alignment:.leading,spacing:compact ? 12 : 18) {
+            if compact {
+                HStack {
+                    Label("Ask your memory",systemImage:"sparkles").font(.system(size:24,weight:.medium,design:.rounded))
+                    Spacer()
+                    Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Button("Choose model") { m.showSettings = true }
+                }
+            } else {
+                Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
+                Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
+            }
             HStack {
                 Menu {
                     if m.chats.isEmpty { Text("No saved conversations yet") }
@@ -163,7 +174,7 @@ struct AskView: View {
                     Button("Delete",systemImage:"trash",role:.destructive) { m.deleteCurrentChat() }.disabled(m.asking)
                 }
             }.buttonStyle(.bordered)
-            HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } }
+            if !compact { HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } } }
             HStack(spacing:12) {
                 Text("Search within").font(.caption).foregroundStyle(.secondary)
                 Picker("Answer time range",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"],id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
@@ -171,7 +182,7 @@ struct AskView: View {
                 Picker("Answer application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
             }.disabled(m.asking)
-            HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }.onChange(of:m.question) { m.answerInputError = nil }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
+            HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }.onChange(of:m.question) { m.answerInputError = nil }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(compact ? 14 : 18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
             QueryScopeControls(query:$m.question,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.answerInputError).disabled(m.asking)
             HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
             if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary); Spacer(); Button("Cancel") { m.cancelAnswer() } } }
@@ -184,7 +195,7 @@ struct AskView: View {
                                     Text(turn.question).font(.system(size:15,weight:.medium)).textSelection(.enabled).padding(16).frame(maxWidth:.infinity,alignment:.leading).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:12))
                                     RecordedScopeView(filter:turn.filter,timeZone:turn.timeZone)
                                     AnswerCard(answer:turn.answer,question:turn.question)
-                                    Text("\(turn.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(turn.filter.app ?? "All apps") · \(turn.filter.start.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any start") → \(turn.filter.end.map { $0.formatted(date:.abbreviated,time:.shortened) } ?? "Any end")").font(.caption2).foregroundStyle(.secondary)
+                                    Text(turn.timestamp.formatted(date:.abbreviated,time:.shortened)).font(.caption2).foregroundStyle(.secondary)
                                 }.id(turn.id)
                             }
                         } else if let answer = m.answer { AnswerCard(answer:answer) }
@@ -192,7 +203,8 @@ struct AskView: View {
                     }
                 }.onChange(of:m.chatTurns.last?.id) { _, _ in if let id = m.chatTurns.last?.id { reader.scrollTo(id,anchor:.bottom) } }
             }
-        }.padding(32).onAppear { m.refreshChats() }
+        }.padding(compact ? 24 : 32)
+        }.onAppear { m.refreshChats() }
     }
 }
 struct AnswerCard: View {

@@ -26,6 +26,8 @@ jobs:
         run: python3 scripts/evidence-smoke.py .build/release/oswindctl
       - name: Exercise local chat provider and incomplete-response boundaries
         run: python3 scripts/chat-provider-smoke.py .build/release/oswindctl
+      - name: Exercise query scopes, literal mode and saved time bounds
+        run: python3 scripts/query-scope-smoke.py .build/release/oswindctl --output .artifacts/query-scope-ci.json
       - name: Evaluate authored retrieval fixture
         run: |
           mkdir -p .artifacts
@@ -79,3 +81,4 @@ jobs:
             .artifacts/vector-scaling-ci.json
             .artifacts/vector-indexed-ci.json
             .artifacts/statistics-ci.json
+            .artifacts/query-scope-ci.json

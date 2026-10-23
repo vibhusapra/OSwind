@@ -35,7 +35,7 @@ struct QueryScopeControls: View {
                 Button { showHelp.toggle() } label: { Image(systemName:"questionmark.circle") }.buttonStyle(.plain).foregroundStyle(.secondary).accessibilityLabel("Query filter help")
                     .popover(isPresented:$showHelp) {
                         VStack(alignment:.leading,spacing:9) {
-                            Text("Find a moment, with scope.").font(.headline)
+                            Text("Find a specific moment.").font(.headline)
                             Text("Dates narrow when a memory was captured. Selected controls and query filters apply together. Weeks start Monday; dates use this Mac’s time zone.")
                             Text("yesterday · last week · past 3 hours\non:2026-10-22 · since:2026-10-01\napp:\"Google Chrome\" · kind:audio\ntag:work · is:favorite").font(.system(.caption,design:.monospaced)).textSelection(.enabled)
                             Text("Use double quotes around date words/operators, or turn Query filters off, to search them as content. since: includes its boundary; until: excludes it.").foregroundStyle(.secondary)
@@ -64,7 +64,7 @@ struct RecordedScopeView: View {
         return parts.joined(separator:" · ")
     }
     var body: some View {
-        Label(text,systemImage:"line.3.horizontal.decrease.circle").font(.caption2).foregroundStyle(.secondary).lineLimit(2).textSelection(.enabled)
+        Label(text,systemImage:"line.3.horizontal.decrease.circle").font(.caption2).foregroundStyle(.primary.opacity(0.72)).lineLimit(2).textSelection(.enabled)
             .help("Recorded scope · \(timeZone ?? "original time zone not recorded") · start inclusive, end exclusive")
     }
 }
