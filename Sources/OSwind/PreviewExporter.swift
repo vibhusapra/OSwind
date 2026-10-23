@@ -12,7 +12,17 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "SettingsSpeakerAudio" {
+        if model.section == "NativeModelDownloads" || model.section == "NativeModelDownloadBusy" {
+            if model.section == "NativeModelDownloadBusy" {model.nativeModels.start(.parakeet){_ in}}
+            size=NSSize(width:760,height:650)
+            content=AnyView(VStack(alignment:.leading,spacing:24) {
+                Text("Set up local speech.").font(.title2.weight(.medium))
+                Text("Download the models you want to use. Current audio work and model choices stay under your control.").foregroundStyle(.secondary)
+                NativeModelDownloadView(setup:model.nativeModels,kind:.parakeet)
+                Divider()
+                NativeModelDownloadView(setup:model.nativeModels,kind:.speakers)
+            }.padding(28).environmentObject(model))
+        } else if model.section == "SettingsSpeakerAudio" {
             model.settings.speech.engine = .parakeet; model.settings.diarization.enabled=true
             model.settings.diarization.modelDirectory="/path/to/local/community1-model"
             size = NSSize(width:760,height:900); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))

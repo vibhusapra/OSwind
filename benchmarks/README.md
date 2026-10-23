@@ -311,3 +311,16 @@ python3 scripts/speaker-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl \
   --asr-model /absolute/parakeet-v3 --speaker-model /absolute/new/community1 \
   --output /absolute/speaker-product-report.json
 ```
+
+
+## Native model streaming and interruption checks
+
+`native-model-install-v1.json` records real fresh native Swift downloads and offline verified reuse for Parakeet (483,106,120 bytes / 22 files) and Community-1 (21,816,863 bytes / 28 files). The development CLI reports 40.6 MB and 45.3 MB peak RSS respectively; transfers take 47.78 s and 17.32 s on an uncontrolled network/CDN. This tests disk streaming rather than buffering a model-sized response; it is not a final-release timing baseline, inference/energy measurement or competitor ranking. The exact development binary and streaming source hashes are retained, with source-state limitations.
+
+The release CLI also survives graceful SIGINT after real streamed bytes (exit 130, private staging removed). A SIGKILL leaves a recognized dead lease; the next install removes it and verifies an APFS-cloned complete pinned model without redownloading it. This establishes orphan recovery, not partial-byte resume. Native-model listing/verification/downloads do not create a normal memory library. A separate explicit-cache app integration test verifies the real installed weights and applies both choices without starting capture.
+
+```bash
+python3 scripts/native-model-smoke.py .build/release/oswindctl \
+  --installed-model /absolute/verified/parakeet-v3-7dd20fe6b179 \
+  --output /absolute/native-model-recovery.json
+```

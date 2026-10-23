@@ -67,6 +67,8 @@ do {
           import-audio PATH [--retain-audio] Transcribe and save an audio file locally
             [--engine parakeet --native-model DIR] [--speaker-model DIR]
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
+          native-model list             List pinned native model downloads
+          native-model install|verify parakeet|speakers [--cache-root PATH]
           delete ID                      Delete one memory and its media
           prune [--days N] [--max-gb N]   Apply retention
           capture [--app-bundle ID]      Capture a chosen/current window once
@@ -79,6 +81,19 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "native-model" {
+        let operation=args.first ?? "list";if !args.isEmpty {args.removeFirst()}
+        let cache=try validatedOption("--cache-root").map{URL(fileURLWithPath:$0)}
+        if operation=="list" {
+            guard args.isEmpty else {throw OSwindError.invalid("Use native-model list [--cache-root PATH]")}
+            try emit(try NativeModelKind.allCases.map {kind -> [String:Any] in
+                let catalog=try kind.catalog();return ["kind":kind.rawValue,"name":kind.title,"bytes":catalog.bytes,"revision":catalog.revision,"license":catalog.license,"directory":try NativeModelInstaller.destination(for:kind,cache:cache).path]
+            })
+        } else {
+            guard ["install","verify"].contains(operation),args.count==1,let kind=NativeModelKind(rawValue:args[0]) else {throw OSwindError.invalid("Use native-model install|verify parakeet|speakers [--cache-root PATH]")}
+            do {try encoded(await runNativeModelCLI(kind,cache:cache,verifyOnly:operation=="verify"))}
+            catch is CancellationError {FileHandle.standardError.write(Data("Model setup cancelled.\n".utf8));exit(130)}
+        }
     } else if command == "backup" {
         guard let action = args.first else { throw OSwindError.invalid("Use backup create PATH, inspect PATH, restore PATH --to NEW_DIRECTORY, or cleanup") }; args.removeFirst()
         let reporter = BackupCLIProgress()

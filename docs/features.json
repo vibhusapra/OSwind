@@ -308,7 +308,7 @@
     "axis": "Audio",
     "feature": "Local GPU transcription",
     "status": "live verified",
-    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; pinned installer verified",
+    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified",
     "references": "Screenpipe, TimeScroll"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "249 passing tests, three optional skips and seven model-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "276 passing tests, four optional skips and seven Python-installer tests; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
