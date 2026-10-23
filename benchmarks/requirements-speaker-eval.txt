@@ -1,0 +1,3 @@
+# Independent reference scorer; optional benchmark environment, not app runtime.
+# The resolved environment versions are recorded in every evaluation result.
+pyannote.metrics==4.2.0

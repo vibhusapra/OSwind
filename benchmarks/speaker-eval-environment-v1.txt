@@ -1,0 +1,16 @@
+cloudpickle==3.1.2
+joblib==1.6.0
+narwhals==2.27.1
+numpy==2.5.4
+pandas==3.1.0
+pyannote-core==6.1.0
+pyannote-database==6.1.1
+pyannote-metrics==4.2.0
+python-dateutil==3.0.0
+PyYAML==6.0.3
+scikit-learn==1.9.1
+scipy==1.18.1
+six==1.17.0
+sortedcontainers==2.4.0
+threadpoolctl==3.7.0
+tzdata==2026.5

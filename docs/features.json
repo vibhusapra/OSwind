@@ -324,7 +324,7 @@
     "axis": "Audio",
     "feature": "Speaker diarization / names",
     "status": "partial",
-    "evidence": "Local imported labels/manual names; indexed name search and exact recording-label scopes; literal speaker/time answer evidence, stale-answer invalidation and backup/interchange/erasure tests. Natural meeting accuracy, live/cross-recording identity and native UI acceptance pending",
+    "evidence": "Overlap-preserving native turns, local labels/manual names, exact speaker scopes and timed evidence. Two fixed five-clip natural-speech dev subsets measured with independent DER; actual GPU-requested ASR/import/mixed-word safeguard exercised. Full meetings, live continuity and native UI acceptance remain open",
     "references": "Granola, Omi, Limitless"
   },
   {

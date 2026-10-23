@@ -1,4 +1,5 @@
 import XCTest
+import FluidAudio
 @testable import OSwindCore
 
 final class SpeakerRuntimeTests:XCTestCase {
@@ -14,6 +15,14 @@ final class SpeakerRuntimeTests:XCTestCase {
         var gate:Gate?
         init(gate:Gate?=nil) { self.gate=gate }
         func turns(file:URL) async throws -> [SpeakerTurn] { calls += 1; if calls==1,let gate { await gate.wait() };return [SpeakerTurn(start:0,end:1,speaker:"arbitrary-local-id")] }
+    }
+    actor EmptyOrFailedBackend:SpeakerDiarizationBackend {
+        let noSpeech:Bool
+        init(noSpeech:Bool) {self.noSpeech=noSpeech}
+        func turns(file:URL) async throws -> [SpeakerTurn] {
+            if noSpeech {throw OfflineDiarizationError.noSpeechDetected}
+            throw OSwindError.unavailable("Fixture hard failure")
+        }
     }
     var root:URL!,config:DiarizationConfiguration!
     let input=SpeechTranscript(text:"Synthetic",duration:1,segments:[TranscriptSegment(start:0,end:1,text:"Synthetic")],model:"fixture")
@@ -42,6 +51,26 @@ final class SpeakerRuntimeTests:XCTestCase {
         var loads=await count.count;XCTAssertEqual(loads,1)
         try await runtime.unload();_ = try await runtime.annotate(input,file:root,configuration:config)
         loads=await count.count;XCTAssertEqual(loads,2)
+    }
+    func testRawTimelineAndWordAttributionShareResidentBackend() async throws {
+        let count=Counter(),runtime=SpeakerDiarizer(loader:{_ in await count.increment();return Backend()})
+        let timeline=try await runtime.timeline(file:root,duration:1,configuration:config)
+        XCTAssertEqual(timeline.turns,[SpeakerTurn(start:0,end:1,speaker:"arbitrary-local-id")]);XCTAssertEqual(timeline.scope,"recording")
+        let transcript=try await runtime.annotate(input,file:root,configuration:config)
+        XCTAssertEqual(transcript.segments[0].speaker,"Speaker 1")
+        let loads=await count.count;XCTAssertEqual(loads,1)
+        var disabled=config!;disabled.enabled=false
+        do {_ = try await runtime.timeline(file:root,duration:1,configuration:disabled);XCTFail("A disabled timeline must not be scored as silence")} catch {XCTAssertTrue(error.localizedDescription.contains("Enable"))}
+        do {_ = try await runtime.timeline(file:root,duration:.infinity,configuration:config);XCTFail("Invalid duration accepted")} catch {}
+        try await runtime.unload()
+    }
+    func testNoDetectedSpeechIsEmptyButActualFailuresStillThrow() async throws {
+        let empty=SpeakerDiarizer(loader:{_ in EmptyOrFailedBackend(noSpeech:true)})
+        let timeline=try await empty.timeline(file:root,duration:1,configuration:config);XCTAssertTrue(timeline.turns.isEmpty)
+        let transcript=try await empty.annotate(input,file:root,configuration:config)
+        XCTAssertEqual(transcript.text,input.text);XCTAssertNil(transcript.segments[0].speaker);XCTAssertEqual(transcript.diarization?.detectedSpeakers,0);XCTAssertEqual(transcript.diarization?.unassignedSegments,1)
+        let failed=SpeakerDiarizer(loader:{_ in EmptyOrFailedBackend(noSpeech:false)})
+        do {_ = try await failed.timeline(file:root,duration:1,configuration:config);XCTFail("Actual failure became an empty score")} catch {XCTAssertTrue(error.localizedDescription.contains("Fixture hard failure"))}
     }
     func testQueuedCancellationAndInferenceCancellationDoNotReturnLabels() async throws {
         let gate=Gate(),backend=Backend(gate:gate),runtime=SpeakerDiarizer(loader:{_ in backend})
