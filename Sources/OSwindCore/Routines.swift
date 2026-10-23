@@ -134,9 +134,11 @@ public final class RoutineRunner {
             let answer=try await generate(definition,claim.run.filter,settings,claim.run.scheduledAt)
             try Task.checkCancellation()
             return try store.completeRoutine(claim,answer:answer,policy:settings.privacy)
-        } catch is CancellationError {
-            _ = try store.finishRoutine(claim.run.id,status:.cancelled,message:"Run cancelled; this occurrence will not retry automatically.");throw CancellationError()
         } catch {
+            if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
+                _ = try store.finishRoutine(claim.run.id,status:.cancelled,message:"Run cancelled; this occurrence will not retry automatically.")
+                throw CancellationError()
+            }
             return try store.finishRoutine(claim.run.id,status:.failed,message:"Run could not complete. Check model settings and remaining source evidence, then run manually.")
         }
     }

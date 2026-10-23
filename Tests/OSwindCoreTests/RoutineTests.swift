@@ -109,6 +109,14 @@ final class RoutineTests:XCTestCase {
         do {_ = try await cancelled.value;XCTFail("Cancelled run published")} catch is CancellationError {} catch {throw error}
         XCTAssertEqual(try store.routineRuns().first?.status,.cancelled);XCTAssertTrue(try store.chats().isEmpty)
     }
+    func testURLSessionTransportCancellationIsNotACompletedOrFailedResult() async throws {
+        let saved=try store.saveRoutine(definition(),now:start),gate=Gate()
+        let runner=RoutineRunner(store:store,generate:{_,_,_,_ in await gate.wait();throw URLError(.cancelled)})
+        let task=Task {try await runner.runNow(saved.id,settings:settings(),now:start)}
+        await fulfillment(of:[gate.entered],timeout:5);task.cancel();await gate.open()
+        do {_ = try await task.value;XCTFail("Transport cancellation succeeded")} catch is CancellationError {} catch {throw error}
+        XCTAssertEqual(try store.routineRuns().first?.status,.cancelled);XCTAssertTrue(try store.chats().isEmpty)
+    }
     func testRemoteOptInsAndDisabledSchedulerPreventGeneration() async throws {
         var d=definition();d.ai.provider = .compatible;d.ai.endpoint="https://example.invalid";d.ai.allowRemote=true
         let saved=try store.saveRoutine(d,now:start),count=Count(),runner=RoutineRunner(store:store,generate:{_,_,_,_ in await count.add();return Answer(text:"unused",sources:[],provider:"fixture",duration:0)})
