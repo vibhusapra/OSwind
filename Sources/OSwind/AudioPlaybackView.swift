@@ -6,13 +6,14 @@ import OSwindCore
     @Published var playing=false
     @Published var position=0.0
     @Published var duration=0.0
+    @Published var volume: Float=1 { didSet { player?.volume=max(0,min(volume,1)) } }
     @Published var error: String?
     private var player: AVAudioPlayer?
     private var timer: Timer?
     private var sourceURL: URL?
     func load(_ url: URL) {
         stop(); duration=0; position=0; error=nil; sourceURL=nil
-        do { let player=try AVAudioPlayer(contentsOf:url); guard player.duration.isFinite,player.duration>0 else { throw OSwindError.invalid("Invalid audio duration") }; sourceURL=url; player.delegate=self; player.prepareToPlay(); self.player=player; duration=player.duration; position=0; error=nil }
+        do { let player=try AVAudioPlayer(contentsOf:url); guard player.duration.isFinite,player.duration>0 else { throw OSwindError.invalid("Invalid audio duration") }; sourceURL=url; player.volume=max(0,min(volume,1)); player.delegate=self; player.prepareToPlay(); self.player=player; duration=player.duration; position=0; error=nil }
         catch { self.error=error.localizedDescription }
     }
     func toggle() {
@@ -44,6 +45,7 @@ struct AudioPlaybackView: View {
                     Slider(value:Binding(get:{playback.position},set:{playback.seek($0)}),in:0...max(0.01,playback.duration)).accessibilityLabel("Clip position")
                     Text(time(playback.position)+" / "+time(playback.duration)).font(.system(.caption,design:.monospaced)).monospacedDigit()
                 }.onAppear { playback.load(url) }.onChange(of:url) { _,value in playback.load(value) }
+                HStack { Image(systemName:playback.volume==0 ? "speaker.slash":"speaker.wave.2"); Slider(value:$playback.volume,in:0...1).frame(maxWidth:140).accessibilityLabel("Playback volume") }.font(.caption).foregroundStyle(.secondary)
             } else { Label("Audio was not retained for this transcript",systemImage:"waveform.slash").font(.caption).foregroundStyle(.secondary) }
             if let error=playback.error { HStack { Text(error).font(.caption).foregroundStyle(.orange); if let url { Button("Retry") { playback.load(url) } } } }
             if let transcript=memory.transcript {

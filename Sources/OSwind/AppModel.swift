@@ -343,7 +343,7 @@ import UniformTypeIdentifiers
                 audioImportStatus="Transcribing locally…"
                 var transcript=try await Whisper.detailed(file:clip.speechFile,binary:configuration.whisperBinary,model:configuration.whisperModel,language:configuration.transcriptionLanguage,timeout:1800)
                 try Task.checkCancellation(); transcript.duration=clip.duration
-                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,embedder:embedder)
+                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
                 captured(memory); audioImportStatus="Transcript saved · find it in Conversations"
             } catch is CancellationError { audioImportStatus="Import cancelled" }
             catch { audioImportStatus=error.localizedDescription }

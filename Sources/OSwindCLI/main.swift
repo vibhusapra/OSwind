@@ -246,7 +246,7 @@ do {
             var transcript=try await Whisper.detailed(file:clip.speechFile,binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage,timeout:1800)
             transcript.duration=clip.duration
             var admission=settings; admission.retainAudio=retain
-            let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,embedder:embedder)
+            let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
             do { _ = try await RetrievalEngine(store:store,apple:embedder).index([memory],configuration:settings.search) } catch { FileHandle.standardError.write(Data("Transcript saved; additional indexing pending.\n".utf8)) }
             try encoded(memory)
         case "transcribe": let settings = AppSettings.load(root:root); let model = option("--model") ?? settings.whisperModel; guard let path = args.first else { throw OSwindError.invalid("Enter an audio file path") }; print(try await Whisper.transcribe(file:URL(fileURLWithPath:path),binary:settings.whisperBinary,model:model,language:settings.transcriptionLanguage))

@@ -92,10 +92,10 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','208 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','210 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar'),
 ('Retrieval','Complete-source semantic passages','tested','Schema-6 full-text overlapping passages, validated UTF-16 anchors, source-level ranking, Apple/Ollama backfill, cancellation and erasure tests; 3 authored Qwen paraphrases select answer-bearing passages. Apple misses one passage fact; broader held-out quality remains open','Long-source retrieval quality'),
-('Audio','Retained clips / imports / playback','partial','Opt-in originals, secret suppression, private snapshot + streamed AAC/WAV normalization, timestamp seek UI, portable metadata and erasure tests; real Whisper WAV/AAC imports pass. Native controls/capture/device acceptance pending','Screenpipe, Omi, Limitless')
+('Audio','Retained clips / imports / playback','tested','Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain','Screenpipe, Omi, Limitless')
 ]
 features=[dict(id=f'F{i+1:03}',axis=a,feature=f,status=s,evidence=e,references=r) for i,(a,f,s,e,r) in enumerate(rows)]
 landscape=dict(reviewed='2026-10-22 America/Los_Angeles',method='Primary publisher pages and repository READMEs. Documented features are not independently tested competitor behavior. Pricing snapshots can change; annual equivalents are labeled. Never treat unchecked README roadmap items as shipped.',vendors=vendors)

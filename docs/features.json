@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "208 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
+    "evidence": "210 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {
@@ -587,8 +587,8 @@
     "id": "F074",
     "axis": "Audio",
     "feature": "Retained clips / imports / playback",
-    "status": "partial",
-    "evidence": "Opt-in originals, secret suppression, private snapshot + streamed AAC/WAV normalization, timestamp seek UI, portable metadata and erasure tests; real Whisper WAV/AAC imports pass. Native controls/capture/device acceptance pending",
+    "status": "tested",
+    "evidence": "Opt-in originals, split/spoken-secret protection, bounded AAC/WAV imports, portable timestamps and erasure. Real Whisper imports and muted player clock/seek/pause/finish/delete pass; native input/panel/accessibility gates remain",
     "references": "Screenpipe, Omi, Limitless"
   }
 ]

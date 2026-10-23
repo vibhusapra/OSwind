@@ -22,6 +22,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
         return result.stdout
     speech('Maya owns the Friday release checklist')
     memory=json.loads(cli('import-audio',audio,'--retain-audio'));retained=source/memory['audioPath']
+    assert memory.get('endTimestamp') is None
     assert memory['transcript']['duration']==2 and memory['transcript']['segments'][0]['end']==1 and memory['audioSessionID']
     assert hashlib.sha256(retained.read_bytes()).hexdigest()==digest and retained.stat().st_mode&0o777==0o600
     assert json.loads(cli('search','--mode','keyword','checklist'))[0]['memory']['id']==memory['id']

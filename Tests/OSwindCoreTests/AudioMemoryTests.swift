@@ -52,7 +52,8 @@ final class AudioMemoryTests: XCTestCase {
     }
     func testTextInterchangeRedactsStructuredTranscriptAndStripsAudio() throws {
         var settings=AppSettings(); settings.retainAudio=true; settings.privacy.redactSecrets=false
-        let original=try AudioAdmission.save(transcript("password=synthetic123"),file:file,store:store,settings:settings,timestamp:Date(),source:"Imported audio")
+        let original=try AudioAdmission.save(transcript("password=synthetic123"),file:file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",recordedLive:false)
+        XCTAssertNil(original.endTimestamp)
         let exported=root.appendingPathComponent("text.json"); try store.exportJSON(to:exported)
         let target=try MemoryStore(root:root.appendingPathComponent("text-import")); XCTAssertEqual(try target.importJSON(from:exported),1)
         let memory=try XCTUnwrap(target.get(original.id)); XCTAssertNil(memory.audioPath); XCTAssertEqual(memory.text,"[REDACTED]"); XCTAssertEqual(memory.transcript?.text,memory.text); XCTAssertEqual(memory.transcript?.segments[0].text,"[REDACTED]")
@@ -127,6 +128,14 @@ final class AudioMemoryTests: XCTestCase {
         let target=try MemoryStore(root:root.appendingPathComponent("spoken-import")); _ = try target.importJSON(from:exported)
         let restored=try XCTUnwrap(target.get(unsafe.id)); XCTAssertEqual(restored.text,"[REDACTED SENSITIVE SPEECH]")
         XCTAssertEqual(restored.transcript?.text,restored.text); XCTAssertFalse(String(decoding:try JSONEncoder().encode(restored),as:UTF8.self).contains("synthetic123"))
+    }
+
+    func testTrustedParentAliasesResolveWithoutFollowingFinalFileLinks() throws {
+        let alias=root.appendingPathComponent("parent-alias"); try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:root)
+        let clip=try AudioClipSnapshot(source:alias.appendingPathComponent("source.wav")); defer { withExtendedLifetime(clip) {} }
+        XCTAssertEqual(try Data(contentsOf:clip.file),try Data(contentsOf:file))
+        let fileAlias=root.appendingPathComponent("final-alias.wav"); try FileManager.default.createSymbolicLink(at:fileAlias,withDestinationURL:file)
+        XCTAssertThrowsError(try AudioClipSnapshot(source:fileAlias))
     }
 
 }

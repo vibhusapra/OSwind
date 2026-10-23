@@ -50,19 +50,19 @@ public enum AudioAdmission {
     /// The caller owns the input clip. It is never moved/deleted here. A failed
     /// insert removes only this operation's newly created retained copy.
     public static func save(_ transcript: SpeechTranscript, file: URL, store: MemoryStore, settings: AppSettings,
-                            timestamp: Date, source: String, title: String? = nil, sessionID: String? = nil,
+                            timestamp: Date, source: String, title: String? = nil, sessionID: String? = nil, recordedLive: Bool = true,
                             embedder: LocalEmbedder? = nil) throws -> Memory {
         try Task.checkCancellation()
         let clean=try transcript.sanitized(policy:settings.privacy)
         guard timestamp.timeIntervalSince1970.isFinite,source.count<=512,sessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio source metadata") }
         let label=settings.privacy.sanitize(title ?? source+" transcript").text
-        var memory=Memory(timestamp:timestamp,endTimestamp:timestamp.addingTimeInterval(clean.transcript.duration),kind:.audio,app:settings.privacy.sanitize(source).text,title:label,text:clean.transcript.text)
+        var memory=Memory(timestamp:timestamp,endTimestamp:recordedLive ? timestamp.addingTimeInterval(clean.transcript.duration):nil,kind:.audio,app:settings.privacy.sanitize(source).text,title:label,text:clean.transcript.text)
         memory.transcript=clean.transcript; memory.audioSessionID=sessionID
         if let embedder { memory.embedding=embedder.embed(memory.searchableText); memory.embeddingModel=memory.embedding == nil ? nil : embedder.modelID }
         var retained: String?, committed=false
         defer { if !committed,let retained,let url=store.assetURL(retained) { try? FileManager.default.removeItem(at:url) } }
         if settings.retainAudio && !clean.suppressAudio {
-            let input=try BackupFileTree(root:file.deletingLastPathComponent()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+            let input=try BackupFileTree(root:file.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
             let suffix=file.pathExtension.lowercased(); guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio clip needs a supported filename extension") }
             let member="audio/"+UUID().uuidString+"."+suffix; retained=member
             _ = try input.copy(file.lastPathComponent,to:output,as:member)
@@ -85,7 +85,7 @@ public final class AudioClipSnapshot: @unchecked Sendable {
         guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio file needs a supported extension") }
         _ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-audio-import"])
         let workspace=try BackupWorkspace(label:"oswind-audio-import")
-        let tree=try BackupFileTree(root:source.deletingLastPathComponent())
+        let tree=try BackupFileTree(root:source.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath())
         _ = try tree.pin(source.lastPathComponent,to:workspace.tree,as:"input."+suffix)
         let original=workspace.url.appendingPathComponent("input."+suffix)
         duration=try AudioNormalization.convert(original,to:workspace.tree,as:"speech.wav")
