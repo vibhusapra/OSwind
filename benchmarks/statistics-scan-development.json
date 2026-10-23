@@ -1,0 +1,51 @@
+{
+  "scope": "Read-only SQL portion of MemoryStore.stats, plus raw count; synthetic million-record archive, concurrent four-worker ANN construction. Excludes file enumeration, app rendering and model inference; not an isolated or whole-UI benchmark.",
+  "queries": {
+    "combined_stats": {
+      "milliseconds": [
+        2987.8765830071643,
+        152.0867079962045,
+        151.4176670461893
+      ],
+      "rows": [
+        [
+          1000000,
+          1000000,
+          0,
+          0,
+          1792700000.0,
+          1793699999.0
+        ]
+      ]
+    },
+    "application_counts": {
+      "milliseconds": [
+        160.26525001507252,
+        35.13758396729827,
+        31.0309159103781
+      ],
+      "rows": [
+        [
+          "Synthetic A",
+          500000
+        ],
+        [
+          "Synthetic B",
+          500000
+        ]
+      ]
+    },
+    "unfiltered_count": {
+      "milliseconds": [
+        64.64424997102469,
+        6.033292040228844,
+        5.238290992565453
+      ],
+      "rows": [
+        [
+          1000000
+        ]
+      ]
+    }
+  }
+}

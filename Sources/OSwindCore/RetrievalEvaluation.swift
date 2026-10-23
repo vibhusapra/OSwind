@@ -45,14 +45,14 @@ public enum RetrievalEvaluation {
                     if repetition == 0 { perQuery.append(["id":query.id,"query":query.query,"category":query.category,"expected":query.relevant,"returned":ids,"recall_at_5":r,"mrr_at_5":mrr,"scores":result.hits.map(\.score),"warnings":result.warnings,"strategy":result.strategy ?? "keyword","latency_ms":result.duration*1000]) }
                 }
             }
-            times.sort()
-            reports[mode.rawValue] = ["p50_ms":times[times.count/2],"p95_ms":times[Int(Double(times.count-1)*0.95)],"recall_at_5":recall/Double(max(1,positives)),"hit_rate_at_5":hitRate/Double(max(1,positives)),"mrr_at_5":reciprocal/Double(max(1,positives)),"no_evidence_empty_rate":Double(emptyCorrect)/Double(max(1,negatives)),"categories":categories.mapValues { ["count":Double($0.count),"recall_at_5":$0.recall/Double($0.count),"mrr_at_5":$0.mrr/Double($0.count)] },"queries":perQuery]
+            let latency = try BenchmarkLatency(samples:times)
+            reports[mode.rawValue] = ["p50_ms":latency.median,"p95_ms":latency.p95,"max_ms":latency.maximum,"recall_at_5":recall/Double(max(1,positives)),"hit_rate_at_5":hitRate/Double(max(1,positives)),"mrr_at_5":reciprocal/Double(max(1,positives)),"no_evidence_empty_rate":Double(emptyCorrect)/Double(max(1,negatives)),"categories":categories.mapValues { ["count":Double($0.count),"recall_at_5":$0.recall/Double($0.count),"mrr_at_5":$0.mrr/Double($0.count)] },"queries":perQuery]
         }
         #if DEBUG
         let build = "debug"
         #else
         let build = "release"
         #endif
-        return ["schema":1,"timestamp":iso.string(from:Date()),"fixture_sha256":SHA256.hash(data:bytes).map { String(format:"%02x",$0) }.joined(),"fixture_description":data.description,"documents":data.documents.count,"queries":data.queries.count,"repetitions":max(1,min(10,repetitions)),"provider":configuration.provider.rawValue,"search_index":configuration.indexPolicy.rawValue,"ann_build_seconds":annSeconds,"hybrid_fusion":configuration.provider == .apple ? "rrf60" : "cosine-plus-bounded-lexical-bonus-v1","model_ids":modelIDs.sorted(),"model_index_seconds":indexSeconds,"disk_bytes":store.diskBytes(),"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":reports]
+        return ["schema":2,"latency_quantiles":BenchmarkLatency.method,"timestamp":iso.string(from:Date()),"fixture_sha256":SHA256.hash(data:bytes).map { String(format:"%02x",$0) }.joined(),"fixture_description":data.description,"documents":data.documents.count,"queries":data.queries.count,"repetitions":max(1,min(10,repetitions)),"provider":configuration.provider.rawValue,"search_index":configuration.indexPolicy.rawValue,"ann_build_seconds":annSeconds,"hybrid_fusion":configuration.provider == .apple ? "rrf60" : "cosine-plus-bounded-lexical-bonus-v1","model_ids":modelIDs.sorted(),"model_index_seconds":indexSeconds,"disk_bytes":store.diskBytes(),"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":reports]
     }
 }

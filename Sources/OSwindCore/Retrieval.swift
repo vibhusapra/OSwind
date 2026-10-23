@@ -64,7 +64,7 @@ public final class RetrievalEngine: @unchecked Sendable {
     @discardableResult public func rebuild(configuration: SearchConfiguration, shouldContinue: @escaping @Sendable () -> Bool = { true }, progress: @escaping @Sendable (IndexProgress) -> Void) async throws -> IndexProgress {
         guard configuration.provider == .ollama else { throw OSwindError.invalid("Apple vectors are built during capture. Select a local embedding model to build its additional index.") }
         let probe = try await client.embed(["index identity"],configuration:configuration)
-        let identity = probe.modelID, total = try store.stats().count
+        let identity = probe.modelID, total = try store.matchingCount()
         var indexed = try store.vectorCount(modelID:identity), cursor = ""
         progress(IndexProgress(indexed:indexed,total:total,modelID:identity))
         while true {

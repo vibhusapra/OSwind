@@ -40,13 +40,22 @@ jobs:
           PYCODE
       - name: Verify indexed identity and non-self recall
         run: |
-          .build/release/oswindctl benchmark-vectors --count 1000 --dimensions 128 --indexed --quality-queries 8 --output .artifacts/vector-indexed-ci.json
+          .build/release/oswindctl benchmark-vectors --count 1000 --dimensions 128 --indexed --quality-queries 8 --archive "$RUNNER_TEMP/oswind-vector-fixture" --output .artifacts/vector-indexed-ci.json
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/vector-indexed-ci.json'))
           assert all(mode['top1_exact_match_rate'] == 1 for mode in report['modes'].values())
           assert all(mode['recall_at_10'] >= .95 for mode in report['nonself_quality'].values())
           assert all(q['strategy'] == 'ann-exact-rerank' for mode in report['nonself_quality'].values() for q in mode['measurements'])
+          PYCODE
+      - name: Verify maintained archive statistics
+        run: |
+          .build/release/oswindctl benchmark-stats --archive "$RUNNER_TEMP/oswind-vector-fixture" --output .artifacts/statistics-ci.json
+          python3 - <<'PYCODE'
+          import json
+          report = json.load(open('.artifacts/statistics-ci.json'))
+          assert report['count'] == 1000 and report['schema_version'] == 5
+          assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Render sample workspace
         run: |
@@ -69,3 +78,4 @@ jobs:
             .artifacts/relevance-apple-ci.json
             .artifacts/vector-scaling-ci.json
             .artifacts/vector-indexed-ci.json
+            .artifacts/statistics-ci.json

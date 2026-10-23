@@ -1,0 +1,51 @@
+{
+  "build" : "release",
+  "count" : 1000000,
+  "latency_quantiles" : "median averages the center pair; p95 is nearest rank ceil(0.95*n); max includes every sample",
+  "modes" : {
+    "legacy_sql_scan" : {
+      "max_ms" : 190.47341599999999,
+      "milliseconds" : [
+        190.47341599999999,
+        179.08908299999999,
+        176.797416,
+        178.05195800000001,
+        180.204959
+      ],
+      "p50_ms" : 179.08908299999999,
+      "p95_ms" : 190.47341599999999
+    },
+    "maintained_sql" : {
+      "max_ms" : 0.049000000000000002,
+      "milliseconds" : [
+        0.049000000000000002,
+        0.019917000000000001,
+        0.015958,
+        0.018582999999999999,
+        0.014083
+      ],
+      "p50_ms" : 0.018582999999999999,
+      "p95_ms" : 0.049000000000000002
+    },
+    "maintained_with_disk" : {
+      "max_ms" : 1.106833,
+      "milliseconds" : [
+        1.106833,
+        0.170542,
+        0.12779099999999999,
+        0.11612500000000001,
+        0.10050000000000001
+      ],
+      "p50_ms" : 0.12779099999999999,
+      "p95_ms" : 1.106833
+    }
+  },
+  "open_including_migration_seconds" : 0.0043110847473144531,
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "process_peak_rss_bytes" : 22118400,
+  "repetitions" : 5,
+  "schema" : 2,
+  "schema_version" : 5,
+  "scope" : "Marked synthetic vector archive, maintained metadata versus the previous aggregate\/app SQL scans. File traversal is measured separately. Warm development samples; opening may perform a one-time schema-4 migration. Not controlled cold-cache, media-heavy filesystem, whole-UI, power or competitor measurements. The archive is retained and its derived schema may be upgraded; no sources or native graphs are deleted.",
+  "timestamp" : "2026-10-23T09:39:42Z"
+}

@@ -71,8 +71,8 @@ public enum VectorScalingEvaluation {
                 let milliseconds = Date().timeIntervalSince(start)*1000
                 times.append(milliseconds); measurements.append(["row":row,"repetition":repetition,"latency_ms":milliseconds,"returned":hits.map(\.id),"strategy":execution.strategy,"warnings":execution.warnings]); if hits.first?.id == String(format:"row-%08d",row) { correct += 1 }
             } }
-            let first = times[0]; times.sort()
-            modes[label] = ["p50_ms":times[times.count/2],"p95_ms":times[Int(Double(times.count-1)*0.95)],"first_query_ms":first,"top1_exact_match_rate":Double(correct)/Double(times.count),"query_samples":times.count,"minimum_similarity":threshold,"app_filtered":scope,"measurements":measurements]
+            let first = times[0], latency = try BenchmarkLatency(samples:times)
+            modes[label] = ["p50_ms":latency.median,"p95_ms":latency.p95,"max_ms":latency.maximum,"first_query_ms":first,"top1_exact_match_rate":Double(correct)/Double(times.count),"query_samples":times.count,"minimum_similarity":threshold,"app_filtered":scope,"measurements":measurements]
         }
         var quality = [String:Any]()
         if indexed && qualityQueries > 0 {
@@ -92,8 +92,8 @@ public enum VectorScalingEvaluation {
                     let target = Set(exact.map(\.id)), observed = Set(approximate.map(\.id)), score = Double(target.intersection(observed).count)/Double(max(1,target.count))
                     recall += score; measurements.append(["query_seed":count+17+queryID,"recall_at_10":score,"exact_ids":exact.map(\.id),"indexed_ids":approximate.map(\.id),"exact_ms":exactTimes.last!,"indexed_ms":indexedTimes.last!,"strategy":execution.strategy,"warnings":execution.warnings])
                 }
-                exactTimes.sort(); indexedTimes.sort()
-                quality[scope ? "filtered" : "all_candidates"] = ["recall_at_10":recall/Double(qualityQueries),"queries":qualityQueries,"exact_p95_ms":exactTimes[Int(Double(exactTimes.count-1)*0.95)],"indexed_p95_ms":indexedTimes[Int(Double(indexedTimes.count-1)*0.95)],"measurements":measurements]
+                let exactLatency = try BenchmarkLatency(samples:exactTimes), indexedLatency = try BenchmarkLatency(samples:indexedTimes)
+                quality[scope ? "filtered" : "all_candidates"] = ["recall_at_10":recall/Double(qualityQueries),"queries":qualityQueries,"exact_p95_ms":exactLatency.p95,"indexed_p95_ms":indexedLatency.p95,"exact_max_ms":exactLatency.maximum,"indexed_max_ms":indexedLatency.maximum,"measurements":measurements]
             }
         }
         var usage = rusage(); getrusage(RUSAGE_SELF,&usage)
@@ -102,6 +102,6 @@ public enum VectorScalingEvaluation {
         #else
         let build = "release"
         #endif
-        return ["schema":3,"timestamp":ISO8601DateFormatter().string(from:Date()),"count":count,"dimensions":dimensions,"layout":"semantic_vectors","random_seed":"row+xorshift64star-v1","ingest_seconds":ingest,"reused_records":existing,"archive_retained":archive != nil,"index_policy":indexed ? "indexed" : "exact","index_prepare_seconds":preparation,"disk_bytes":store.diskBytes(),"process_peak_rss_bytes":usage.ru_maxrss,"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":modes,"nonself_quality":quality,"scope":"Normalized synthetic random vectors and exact self-match checks, plus optional non-self Recall@10 against exhaustive float32 ground truth. Timings include the selected SQLite search path and live validation/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately."]
+        return ["schema":4,"latency_quantiles":BenchmarkLatency.method,"timestamp":ISO8601DateFormatter().string(from:Date()),"count":count,"dimensions":dimensions,"layout":"semantic_vectors","random_seed":"row+xorshift64star-v1","ingest_seconds":ingest,"reused_records":existing,"archive_retained":archive != nil,"index_policy":indexed ? "indexed" : "exact","index_prepare_seconds":preparation,"disk_bytes":store.diskBytes(),"process_peak_rss_bytes":usage.ru_maxrss,"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":modes,"nonself_quality":quality,"scope":"Normalized synthetic random vectors and exact self-match checks, plus optional non-self Recall@10 against exhaustive float32 ground truth. Timings include the selected SQLite search path and live validation/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately."]
     }
 }

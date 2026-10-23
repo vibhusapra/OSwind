@@ -23,6 +23,7 @@ import ServiceManagement
     @Published var date = Date()
     @Published var hits = [SearchHit]()
     @Published var stats = StoreStats()
+    @Published var storageUpdatedAt: Date?
     @Published var selected: Memory?
     @Published var selectedEvidenceQuery = ""
     @Published var answer: Answer?
@@ -61,6 +62,11 @@ import ServiceManagement
     private var api: LocalAPIServer?
     private var cancellables = Set<AnyCancellable>()
     private var refreshTask: Task<Void,Never>?
+    private var statisticsTask: Task<Void,Never>?
+    private var diskUsageTask: Task<Void,Never>?
+    private var statisticsUpdatedAt = Date.distantPast
+    private var statisticsPending = false
+    private var storageGeneration = UUID()
     private var housekeeping: Timer?
     init() {
         demo = CommandLine.arguments.contains("--demo")
@@ -78,7 +84,7 @@ import ServiceManagement
         }
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
-        refresh(); refreshChats(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
+        refresh(forceStatistics:true); refreshChats(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
         housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain() } }
     }
     var filter: SearchFilter {
@@ -91,15 +97,44 @@ import ServiceManagement
         searchFocusRequest = UUID()
     }
     func openMemory(_ memory: Memory, query: String) { selectedEvidenceQuery = query; selected = memory }
-    func refresh() {
+    func refresh(forceStatistics: Bool = false) {
+        refreshStatistics(force:forceStatistics)
         refreshTask?.cancel(); let filter = self.filter, mode = self.mode, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
         refreshing = true
         refreshTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds:150_000_000); guard !Task.isCancelled else { return }
             do {
-                let result = try await engine.search(filter,mode:mode,configuration:configuration); let stats = try await Task.detached(priority:.utility) { try store.stats() }.value
-                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.stats = stats; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
+                let result = try await engine.search(filter,mode:mode,configuration:configuration)
+                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
             } catch is CancellationError { } catch { guard !Task.isCancelled else { return }; self?.errorMessage = error.localizedDescription; self?.refreshing = false }
+        }
+    }
+    private func refreshStatistics(force: Bool) {
+        if statisticsTask != nil { if force { statisticsPending = true }; return }
+        guard force || Date().timeIntervalSince(statisticsUpdatedAt) >= 5 else { return }
+        let store = self.store
+        statisticsTask = Task { [weak self] in
+            do {
+                var value = try await Task.detached(priority:.utility) { try store.stats(includeDiskUsage:false) }.value
+                guard let self else { return }; value.bytes = self.stats.bytes
+                self.stats = value; self.statisticsUpdatedAt = Date()
+            } catch { self?.errorMessage = error.localizedDescription }
+            guard let self else { return }; self.statisticsTask = nil
+            if self.statisticsPending { self.statisticsPending = false; self.refreshStatistics(force:true) }
+        }
+        // Storage traversal is independent of both query publication and SQL
+        // counts. Coalesce it across captures/keystrokes, including large stores.
+        refreshStorageEstimate()
+    }
+    func invalidateStorageEstimate() { storageGeneration = UUID(); storageUpdatedAt = nil }
+    private func refreshStorageEstimate() {
+        guard diskUsageTask == nil, storageUpdatedAt.map({ Date().timeIntervalSince($0) >= 30 }) ?? true else { return }
+        let store = self.store, generation = storageGeneration
+        diskUsageTask = Task { [weak self] in
+            let bytes = await Task.detached(priority:.utility) { store.diskBytes() }.value
+            guard let self else { return }; self.diskUsageTask = nil
+            if generation == self.storageGeneration { self.stats.bytes = bytes; self.storageUpdatedAt = Date() }
+            else { self.refreshStorageEstimate() }
         }
     }
     func ask(_ prompt: String? = nil, summarize: Bool = false) {
@@ -138,6 +173,7 @@ import ServiceManagement
         Task { do { let memory = try await Task.detached(priority:.utility) { var m = Memory(kind:kind,app:"OSwind",title:title,text:clean); m.embedding = embedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); return m }.value; captured(memory) } catch { errorMessage = error.localizedDescription } }
     }
     private func captured(_ memory: Memory) {
+        refreshStatistics(force:true)
         if refreshing { pendingRefresh = true } else { refresh() }
         guard settings.search.provider == .ollama else { return }
         guard settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { indexStatus = "GPU indexing deferred in Low Power Mode; keyword/Apple capture continues"; return }
@@ -217,7 +253,7 @@ import ServiceManagement
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; refresh(); refreshChats() } catch { errorMessage = error.localizedDescription } }
+    func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats() } catch { errorMessage = error.localizedDescription } }
     func maintain() {
         let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower
         Task {
@@ -227,7 +263,7 @@ import ServiceManagement
                     try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower)
                     return removed
                 }.value
-                refresh(); refreshChats(); await catchUpIndex()
+                invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats(); await catchUpIndex()
             } catch { errorMessage = error.localizedDescription }
         }
     }
@@ -247,7 +283,7 @@ import ServiceManagement
     var isCapturing: Bool { capture.running || audio.running }
     func toggleCapture() { pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
     func exportData() { pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
-    func importData() { let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { let store = store, embedder = embedder, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.importJSON(from:url,embedder:embedder,policy:policy) }.value; refresh(); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } } }
+    func importData() { let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { let store = store, embedder = embedder, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.importJSON(from:url,embedder:embedder,policy:policy) }.value; invalidateStorageEstimate(); refresh(forceStatistics:true); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } } }
     func startAPI() { do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }
     func stopAPI() { api?.stop(); api = nil; apiStatus = "API off"; settings.apiEnabled = false }
     func login(_ enabled: Bool) { do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { errorMessage = error.localizedDescription } }

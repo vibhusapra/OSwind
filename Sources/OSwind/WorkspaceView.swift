@@ -19,7 +19,7 @@ struct WorkspaceView: View {
                 Spacer()
                 VStack(alignment:.leading,spacing:10) {
                     Label(m.demo ? "Sample workspace" : "Stored on this Mac",systemImage:"internaldrive").font(.caption.weight(.medium))
-                    Text(ByteCountFormatter.string(fromByteCount:m.stats.bytes,countStyle:.file) + " of \(m.settings.privacy.maxStorageGB) GB").font(.caption2).foregroundStyle(.secondary)
+                    Text(m.storageUpdatedAt == nil ? "Measuring storage…" : ByteCountFormatter.string(fromByteCount:m.stats.bytes,countStyle:.file) + " of \(m.settings.privacy.maxStorageGB) GB").font(.caption2).foregroundStyle(.secondary)
                     ProgressView(value:min(1,Double(m.stats.bytes)/(Double(m.settings.privacy.maxStorageGB)*1e9))).tint(accent)
                     HStack { Label("\(m.settings.privacy.retentionDays) day retention",systemImage:"shield.lefthalf.filled").font(.caption2); Spacer() }
                 }.padding(16).background(.quaternary.opacity(0.4),in:RoundedRectangle(cornerRadius:12)).padding(12)
@@ -219,7 +219,8 @@ struct InsightsView: View {
     var body: some View { ScrollView { VStack(alignment:.leading,spacing:24) {
         Text("A clearer view of your day.").font(.system(size:32,weight:.medium,design:.rounded))
         Text("Capture counts reflect saved evidence, not measured time at work.").foregroundStyle(.secondary)
-        HStack(spacing:16) { metric("Memories","\(m.stats.count)","square.stack.3d.up"); metric("Searchable vectors","\(m.stats.embedded)","point.3.connected.trianglepath.dotted"); metric("Local storage",ByteCountFormatter.string(fromByteCount:m.stats.bytes,countStyle:.file),"internaldrive") }
+        HStack(spacing:16) { metric("Memories",m.stats.count.formatted(),"square.stack.3d.up"); metric("Apple vectors",m.stats.embedded.formatted(),"point.3.connected.trianglepath.dotted"); metric("Local storage",m.storageUpdatedAt == nil ? "…" : ByteCountFormatter.string(fromByteCount:m.stats.bytes,countStyle:.file),"internaldrive") }
+        if let updated = m.storageUpdatedAt { Text("Storage checked \(updated.formatted(date:.omitted,time:.shortened)).").font(.caption).foregroundStyle(.secondary) }
         Text("CAPTURED APPLICATIONS").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
         ForEach(m.stats.apps.sorted {$0.value > $1.value},id:\.key) { app,count in HStack { Text(app).frame(width:140,alignment:.leading); GeometryReader { geo in RoundedRectangle(cornerRadius:4).fill(accent.opacity(0.6)).frame(width:max(2,geo.size.width*Double(count)/Double(max(1,m.stats.count)))) }.frame(height:18); Text("\(count)").monospacedDigit().frame(width:55,alignment:.trailing) }.padding(.vertical,4) }
         Divider()

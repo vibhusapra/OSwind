@@ -14,7 +14,7 @@ public final class MemoryStore: @unchecked Sendable {
         sqlite3_busy_timeout(db, 5000)
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
-        guard version <= 4 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
+        guard version <= 5 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
         try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON;")
         try exec("BEGIN IMMEDIATE")
         do {
@@ -77,7 +77,13 @@ public final class MemoryStore: @unchecked Sendable {
         """)
         try exec(VectorJournalSchema.sql)
         if version < 4 { try exec(VectorJournalSchema.backfill) }
-        try exec("PRAGMA user_version=4; COMMIT")
+        try exec(StatisticsSchema.sql)
+        let statisticsState = try prepare("SELECT total=COALESCE((SELECT SUM(count) FROM application_statistics),0) FROM memory_statistics WHERE singleton=1")
+        let statisticsNeedRepair = sqlite3_step(statisticsState) != SQLITE_ROW || sqlite3_column_int(statisticsState,0) != 1
+        sqlite3_finalize(statisticsState)
+        if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
+        if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
+        try exec("PRAGMA user_version=5; COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
@@ -205,7 +211,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func matchingCount(_ filter: SearchFilter = SearchFilter()) throws -> Int {
         lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
-        let stmt = try prepare("SELECT COUNT(*) FROM memories m WHERE \(whereSQL)"); defer { sqlite3_finalize(stmt) }
+        let stmt = try prepare(whereSQL == "1=1" ? "SELECT total FROM memory_statistics WHERE singleton=1" : "SELECT COUNT(*) FROM memories m WHERE \(whereSQL)"); defer { sqlite3_finalize(stmt) }
         for (i,v) in values.enumerated() { bind(stmt,Int32(i+1),v) }
         return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
     }
@@ -293,10 +299,26 @@ public final class MemoryStore: @unchecked Sendable {
         guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey]) else { return 0 }
         var total: Int64 = 0; for case let url as URL in enumerator { if let values = try? url.resourceValues(forKeys: [.fileSizeKey,.isRegularFileKey]), values.isRegularFile == true { total += Int64(values.fileSize ?? 0) } }; return total
     }
-    public func stats() throws -> StoreStats {
-        lock.lock(); defer { lock.unlock() }; var stats = StoreStats(); let stmt = try prepare("SELECT COUNT(*),SUM(kind='screen'),SUM(kind='audio'),SUM(embedding IS NOT NULL),MIN(timestamp),MAX(timestamp) FROM memories"); defer { sqlite3_finalize(stmt) }
-        if sqlite3_step(stmt) == SQLITE_ROW { stats.count = Int(sqlite3_column_int(stmt,0)); stats.screenshots = Int(sqlite3_column_int(stmt,1)); stats.audioSegments = Int(sqlite3_column_int(stmt,2)); stats.embedded = Int(sqlite3_column_int(stmt,3)); if stats.count > 0 { stats.oldest = Date(timeIntervalSince1970: sqlite3_column_double(stmt,4)); stats.newest = Date(timeIntervalSince1970: sqlite3_column_double(stmt,5)) } }
-        let apps = try prepare("SELECT app,COUNT(*) FROM memories GROUP BY app ORDER BY COUNT(*) DESC"); defer { sqlite3_finalize(apps) }; while sqlite3_step(apps) == SQLITE_ROW { stats.apps[string(apps,0)] = Int(sqlite3_column_int(apps,1)) }; stats.bytes = diskBytes(); return stats
+    /// Counts and extrema are a short consistent SQL snapshot. File traversal
+    /// runs after releasing the store lock, so it cannot stall capture/search.
+    public func stats(includeDiskUsage: Bool = true) throws -> StoreStats {
+        var stats = try metadataStatistics()
+        if includeDiskUsage { stats.bytes = diskBytes() }
+        return stats
+    }
+    private func metadataStatistics() throws -> StoreStats {
+        lock.lock(); defer { lock.unlock() }
+        try exec("SAVEPOINT statistics_snapshot"); defer { try? exec("RELEASE statistics_snapshot") }
+        var stats = StoreStats()
+        let stmt = try prepare("SELECT total,screens,audio,embedded,(SELECT timestamp FROM memories ORDER BY timestamp LIMIT 1),(SELECT timestamp FROM memories ORDER BY timestamp DESC LIMIT 1) FROM memory_statistics WHERE singleton=1")
+        defer { sqlite3_finalize(stmt) }
+        guard sqlite3_step(stmt) == SQLITE_ROW else { throw OSwindError.database("Statistics metadata is missing; reopen or repair the store") }
+        stats.count = Int(sqlite3_column_int64(stmt,0)); stats.screenshots = Int(sqlite3_column_int64(stmt,1)); stats.audioSegments = Int(sqlite3_column_int64(stmt,2)); stats.embedded = Int(sqlite3_column_int64(stmt,3))
+        if stats.count > 0 { stats.oldest = Date(timeIntervalSince1970:sqlite3_column_double(stmt,4)); stats.newest = Date(timeIntervalSince1970:sqlite3_column_double(stmt,5)) }
+        let apps = try prepare("SELECT app,count FROM application_statistics ORDER BY count DESC,app")
+        defer { sqlite3_finalize(apps) }; var status = sqlite3_step(apps)
+        while status == SQLITE_ROW { stats.apps[string(apps,0)] = Int(sqlite3_column_int64(apps,1)); status = sqlite3_step(apps) }
+        guard status == SQLITE_DONE else { throw failure() }; return stats
     }
     public func exportJSON(to url: URL) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories ORDER BY timestamp"); defer { sqlite3_finalize(stmt) }; var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted,.sortedKeys]; encoder.dateEncodingStrategy = .iso8601; try encoder.encode(memories).write(to: url, options: .atomic)
