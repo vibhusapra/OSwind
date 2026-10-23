@@ -52,6 +52,9 @@ do {
           chat list|new|show ID|delete ID  Manage saved local conversations
           chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up
           chat export ID PATH            Export a conversation to Markdown
+          routine template|put FILE|list|history [ID]  Configure scheduled source-linked recaps
+          routine run ID|tick [--at ISO8601]           Run once or process one due occurrence
+          routine scheduler on|off|preview ID|delete ID
           note TEXT                      Save a redacted, searchable note
           stats                          Storage and capture counts
           config                         Print settings (no API keys)
@@ -223,6 +226,8 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "routine":
+            try emit(await routinesCLI(args,store:store,embedder:embedder))
         case "index-search":
             var settings = AppSettings.load(root:root), configuration = settings.search
             if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }

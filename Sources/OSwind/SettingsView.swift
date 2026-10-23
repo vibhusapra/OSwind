@@ -29,7 +29,7 @@ struct SettingsView: View {
                 }
             }.formStyle(.grouped) }
         }.padding(24).frame(width:760,height:720)
-        .alert("Delete all local memories?",isPresented:$deleteConfirm) { Button("Cancel",role:.cancel) {}; Button("Delete everything",role:.destructive) { m.pauseAll(discardReplay:true); m.cancelAnswer(); do { try m.store.deleteAll(); m.refreshChats(); m.answer = nil; m.invalidateStorageEstimate(); m.refresh(forceStatistics:true) } catch { m.errorMessage = error.localizedDescription } } } message: { Text("Deletes the local index, screenshots, replay clips, audio, saved notes, recaps, and conversations. Exports you saved elsewhere remain.") }
+        .alert("Delete all local memories?",isPresented:$deleteConfirm) { Button("Cancel",role:.cancel) {}; Button("Delete everything",role:.destructive) { m.pauseAll(discardReplay:true); m.cancelAnswer();m.routines.cancel(); do { try m.store.deleteAll();m.routines.reload(); m.refreshChats(); m.answer = nil; m.invalidateStorageEstimate(); m.refresh(forceStatistics:true) } catch { m.errorMessage = error.localizedDescription } } } message: { Text("Deletes the local index, screenshots, replay clips, audio, saved notes, recaps, routines, routine results, and conversations. Exports you saved elsewhere remain.") }
     }
     private var capture: some View {
         Group {

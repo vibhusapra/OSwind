@@ -50,6 +50,7 @@ final class BackupDataReader {
         schema = Int(try db.integer("PRAGMA user_version"))
         guard (6...MemoryStore.schemaVersion).contains(schema) else { throw BackupFileError.invalid("Unsupported backup database schema") }
         for name in ["memories","chat_sessions","chat_turns","chat_sources","semantic_vectors","semantic_passages","passage_manifests"] { try db.requireTable(name) }
+        if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
         guard try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED WHERE length(payload)>\(MemoryStore.maximumRecordBytes)")==0 else { throw BackupFileError.invalid("A source payload exceeds the backup format's 128 MiB record bound") }
     }
     func close() { db.close() }
@@ -78,7 +79,7 @@ public enum LibraryBackup {
     static func quietSettings(_ settings: AppSettings) -> AppSettings {
         var result = settings
         result.captureOnLaunch = false; result.audioEnabled = false; result.systemAudioEnabled = false; result.apiEnabled = false
-        result.automaticMaintenance = false; result.ai.allowRemote = false; result.ai.provider = .evidence
+        result.routinesEnabled = false;result.automaticMaintenance = false; result.ai.allowRemote = false; result.ai.provider = .evidence
         result.ai.endpoint = AIConfiguration().endpoint; result.search.provider = .apple; result.search.endpoint = SearchConfiguration().endpoint
         result.whisperBinary = AppSettings().whisperBinary; result.whisperModel = AppSettings().whisperModel
         return result

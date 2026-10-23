@@ -12,7 +12,18 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "NativeModelDownloads" || model.section == "NativeModelDownloadBusy" {
+        if model.section == "RoutineEditor" {
+            var sample=RoutineDefinition();sample.ai=model.settings.ai
+            size=NSSize(width:760,height:850);content=AnyView(RoutineEditor(value:sample,revision:nil,model:model.routines).environmentObject(model))
+        } else if model.section == "Routines" {
+            if model.routines.items.isEmpty {
+                var sample=RoutineDefinition();sample.title="Evening reflection · sample";sample.window = .last24Hours
+                _ = model.routines.save(sample,revision:nil)
+                _ = try await RoutineRunner(store:model.store,embedder:model.embedder).runNow(sample.id,settings:model.settings)
+                model.routines.reload()
+            }
+            content=AnyView(WorkspaceView().environmentObject(model))
+        } else if model.section == "NativeModelDownloads" || model.section == "NativeModelDownloadBusy" {
             if model.section == "NativeModelDownloadBusy" {model.nativeModels.start(.parakeet){_ in}}
             size=NSSize(width:760,height:650)
             content=AnyView(VStack(alignment:.leading,spacing:24) {
