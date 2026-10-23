@@ -1,0 +1,212 @@
+{
+  "reviewed": "2026-10-22 America/Los_Angeles",
+  "method": "Primary publisher pages and repository READMEs. Documented features are not independently tested competitor behavior. Pricing snapshots can change; annual equivalents are labeled. Never treat unchecked README roadmap items as shipped.",
+  "vendors": [
+    {
+      "name": "Screenpipe",
+      "category": "Desktop memory + automation",
+      "price": "Free limited history; Basic $250/year (~$21/month); Business $500/seat/year (~$42/month); Enterprise custom.",
+      "license": "Source available; commercial source builds require a commercial license.",
+      "features": "Screen + mic/system audio; accessibility text/OCR; local Whisper; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows; personal device sync; managed seats; Enterprise SSO/MDM/retention and shared context.",
+      "difference": "Broadest reference for capture-to-automation and assistant context. Business explicitly does not include shared teammate context; Infinite Context/mobile are Max/Ultra beta.",
+      "caveat": "Rendered pricing defaults to annual. About/pricing pages have differing amounts; use checkout terms. ~30 GB/month and 600 MB\u20134 GB RAM are vendor estimates, not measured here.",
+      "sources": [
+        "https://screenpipe.com/onboarding",
+        "https://docs.screenpipe.com/home",
+        "https://docs.screenpipe.com/recording-controls",
+        "https://docs.screenpipe.com/local-or-cloud-ai",
+        "https://docs.screenpipe.com/privacy-filter"
+      ]
+    },
+    {
+      "name": "Original Rewind / Limitless",
+      "category": "Historical desktop memory / pendant",
+      "price": "Not sold to new Pendant customers. Continuing Pendant customers get Unlimited free through 2026; old desktop prices are historical.",
+      "license": "Proprietary service.",
+      "features": "Original Rewind combined screen/audio recall and AI retrieval. Limitless shifted toward meeting/lifelog transcripts and Pendant. Export can include transcripts, chats and audio.",
+      "difference": "The authoritative legacy product reference, not an available new desktop competitor. Do not conflate it with rewind.app.",
+      "caveat": "Official announcement: Rewind capture disabled December 19, 2025; Limitless desktop/web no longer record. Existing meeting access continues through 2026; regional restrictions apply.",
+      "sources": [
+        "https://www.limitless.ai/",
+        "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info"
+      ]
+    },
+    {
+      "name": "Rewind Desktop (rewind.app)",
+      "category": "Visual desktop history",
+      "price": "$30/month in its own product comparison; no free tier claimed there.",
+      "license": "Proprietary; distinct from original Rewind AI.",
+      "features": "Always-on screen history; local OCR keyword search; full-screen timeline; global shortcut; private-window detection; H.264 compression; optional encrypted archive to user-owned S3 with on-demand older video.",
+      "difference": "Visual replay and storage are its focus. Source says AI-powered search and meeting/audio transcription are not yet available.",
+      "caveat": "~2 GB/week is a vendor claim, not our measurement. Marketing comparisons about other vendors are not used as evidence for those other vendors.",
+      "sources": [
+        "https://rewind.app/",
+        "https://rewind.app/blog/rewind-vs-rewind-desktop"
+      ]
+    },
+    {
+      "name": "Pieces",
+      "category": "Work memory + assistant context",
+      "price": "Pro $18.99/user/month; Enterprise $22.99/user/month; 7-day card-required trial. Current page says no free plan.",
+      "license": "Proprietary desktop product.",
+      "features": "On-device long-term memory across apps/websites; chronology and scoped recall; single-click standup, meeting prep and recaps; local/cloud model selection; unlimited MCP. Enterprise adds org capture/feature policies, approved providers and own API keys.",
+      "difference": "Strong assistant/IDE context and prebuilt summary workflows. Enterprise governance is distinct from personal memory.",
+      "caveat": "Do not reuse older free/$10 pricing or assume every model call stays local because memory is on-device. Vendor not run here.",
+      "sources": [
+        "https://pieces.app/pricing"
+      ]
+    },
+    {
+      "name": "Littlebird",
+      "category": "Contextual assistant + meetings",
+      "price": "Basic free; Plus $204/year ($17/month equivalent); Power $510/year ($42.50/month); Pro from $100/month. Team from $17/seat/month annual; Enterprise custom.",
+      "license": "Proprietary cloud service.",
+      "features": "Active-window work context; bot-free meeting notes; chat, routines, hover, MCP and connected email/calendar/files. Free: 25 total meeting notes, 5 routines, daily credits. Plus: unlimited notes, up to 100 routines, MCP. Higher tiers expand credits/modes.",
+      "difference": "Integrated actions and routines, with desktop/web/mobile access. Security page explicitly says context is encrypted and stored in AWS US East, not local-only.",
+      "caveat": "Pricing includes credit limits; unlimited meeting notes are not unlimited AI. Audit/compliance statements are vendor claims, not reviewed reports. Desktop scope differs from full-screen video.",
+      "sources": [
+        "https://littlebird.ai/pricing",
+        "https://littlebird.ai/privacy"
+      ]
+    },
+    {
+      "name": "Microsoft Recall",
+      "category": "OS-integrated visual memory",
+      "price": "Windows feature on supported Copilot+ PCs; hardware/OS requirements apply. No separate Recall subscription documented in cited support.",
+      "license": "Proprietary Windows feature; no macOS app.",
+      "features": "Opt-in snapshots, timeline, semantic recall and source re-entry; on-device storage; Windows Hello/enclave security; app/site exclusions; private-browsing and sensitive-data filters; time/app/site deletion; storage management and enterprise policy.",
+      "difference": "Reference for OS-level security, authentication and local inference. It does not record audio or continuous video.",
+      "caveat": "Browser filtering is browser-dependent. NPU/security requirements limit hardware. Snapshot storage can pause below free-space thresholds. OSwind lacks enclave/vault parity.",
+      "sources": [
+        "https://support.microsoft.com/en-us/windows/ai/ai-features/retrace-your-steps-with-recall",
+        "https://support.microsoft.com/en-us/windows/privacy/privacy-and-control-over-your-recall-experience",
+        "https://support.microsoft.com/en-us/windows/ai/ai-features/filtering-apps-websites-and-sensitive-information-in-recall",
+        "https://learn.microsoft.com/en-us/windows/client-management/manage-recall"
+      ]
+    },
+    {
+      "name": "ScreenMemory",
+      "category": "Visual desktop history",
+      "price": "Free 24-hour/single-monitor tier; Standard $29 with one year updates and optional $5/year renewal; Lifetime $39 one-time.",
+      "license": "Proprietary macOS app.",
+      "features": "Continuous screen recording; visual timeline; high-resolution playback; local OCR; app filters; calendar activity heatmaps; app blacklist; unlimited paid history; multiple monitors and three devices on Standard.",
+      "difference": "Simple local visual recall with one-time pricing and a calendar-oriented interface.",
+      "caveat": "Free table also contains an inconsistent Unlimited History row; 24-hour description is the clearer restriction. No local RAG/audio/BYOK promise established by cited page.",
+      "sources": [
+        "https://screenmemory.app/"
+      ]
+    },
+    {
+      "name": "TimeScroll",
+      "category": "Open-source visual memory",
+      "price": "Free, open source.",
+      "license": "Repository linked by publisher; verify exact license before code reuse.",
+      "features": "Native Swift; local keyword and AI image/meaning search; highlights and app/date filtering; timeline; Accessibility direct mode; duplicate suppression; thermal backoff; MobileCLIP2 or Ollama embeddings; mic/system Whisper audio; MCP; app exclusions; encrypted vault with Touch ID/password (beta).",
+      "difference": "A particularly relevant native, local, multimodal and energy-conscious competitor. Vault and visual embeddings are meaningful OSwind gaps.",
+      "caveat": "macOS 14+, Intel/Apple Silicon per publisher. Vault is beta. No downloaded binary or battery benchmark evaluated here.",
+      "sources": [
+        "https://timescroll.muzhen.org/",
+        "https://github.com/XInTheDark/TimeScrollApp"
+      ]
+    },
+    {
+      "name": "Retrace (haseab)",
+      "category": "Open-source visual memory",
+      "price": "Free, MIT source.",
+      "license": "MIT.",
+      "features": "Two-second configurable screen snapshots; Vision OCR; FTS/app/date filters; timeline; usage dashboard; Rewind import; hotkeys; HEVC encoding; highlights; app/private-window exclusion.",
+      "difference": "Strong migration and visual replay reference. README distinguishes working HEVC from optimization work.",
+      "caveat": "Very early development. Audio/Whisper is listed as disabled/coming soon, not shipped parity. Semantic search on website is coming soon.",
+      "sources": [
+        "https://github.com/haseab/retrace",
+        "https://retrace.to/"
+      ]
+    },
+    {
+      "name": "Retrace (jhammant)",
+      "category": "Open-source local memory",
+      "price": "Free source; no paid plan verified.",
+      "license": "Apache-2.0.",
+      "features": "Local text + thumbnail history; native capture/OCR/embeddings/Foundation Models; hybrid search; timeline; AFK-aware stats; lock/idle stop; sensitive filters; timed hidden mode; retention; API/MCP; collectors for calendar, git, media and other context.",
+      "difference": "Explicit local-only boundaries; no retained full-resolution raw frames; extensible per-app collectors. Separate project from haseab/retrace.",
+      "caveat": "README claims are not independent validation. Source now describes Windows alongside macOS with differing capabilities.",
+      "sources": [
+        "https://github.com/jhammant/retrace"
+      ]
+    },
+    {
+      "name": "rem",
+      "category": "Open-source visual recall",
+      "price": "Free source.",
+      "license": "MIT.",
+      "features": "Two-second screenshots/OCR; full-screen scrubber; text copy; keyword/app search; recent-context copy for LLMs; SQLite and video; purge-all; Intel build and basic multiple-monitor support.",
+      "difference": "Small, inspectable early native implementation focused on rewind and text recovery.",
+      "caveat": "README labels very alpha. Semantic/vector search, spatial search, more date filters, fine-grained purge and first-class multimonitor remain unchecked roadmap items.",
+      "sources": [
+        "https://github.com/jasonjmcghee/rem"
+      ]
+    },
+    {
+      "name": "Unlost",
+      "category": "Open-source semantic recall",
+      "price": "Free source/download; no current paid plan verified.",
+      "license": "Apache-2.0.",
+      "features": "Semantic memory search; natural-language date/app filters; Zoom/Meet transcript search; screenshot text crop/copy; open website from screenshot; SwiftUI frontend and local Python/txtai index.",
+      "difference": "Reference for semantic retrieval and natural-language filtering rather than just keyword matching.",
+      "caveat": "Local/provider LLM-agent integration and remote/cloud storage are explicitly unchecked future work. Repository feature claims were not run.",
+      "sources": [
+        "https://github.com/Vincent-liuwingsang/unlost"
+      ]
+    },
+    {
+      "name": "Pensieve (formerly Memos)",
+      "category": "Open-source capture/search platform",
+      "price": "Free source; self-hosted infrastructure/model costs apply.",
+      "license": "Apache-2.0.",
+      "features": "Passive multi-screen recording; local data control; full-text/vector search; chronological entity context; browser URL metadata; Ollama and OpenAI-compatible model endpoints; plugins; config UI; app blacklist; agent skill integration.",
+      "difference": "Extensible Python/web architecture and configurable model processing. Renamed because Memos was already taken.",
+      "caveat": "README says Mac/Windows, Linux in development. Local-only operation requires local endpoints/configuration; compatibility is not proof every external provider works.",
+      "sources": [
+        "https://github.com/arkohut/pensieve"
+      ]
+    },
+    {
+      "name": "Minne",
+      "category": "Open-source text memory + drafting",
+      "price": "Free MIT app; provider account/API charges or local Ollama separately.",
+      "license": "MIT.",
+      "features": "Active-window text capture without screenshots; Markdown memory folder for people/projects/days/sources; contextual draft panel with explicit Insert; undo; memory chat; Claude/ChatGPT account or local Ollama; card/ID masking and password-field skips.",
+      "difference": "Text-first memory and drafting with transparent, editable files. Avoids the visual archive and its storage cost.",
+      "caveat": "Provider requests may send selected notes/context; local storage does not imply local inference. Optional daily version check. No screen replay parity intended.",
+      "sources": [
+        "https://minne.sh/"
+      ]
+    },
+    {
+      "name": "Omi",
+      "category": "Open-source audio memory ecosystem",
+      "price": "Current offer: $129 device (regular $179), optional. Free: 300 cloud min/month, unlimited on-phone transcription, 30 Ask questions/month. Pro $29.99/month or $269.91/year.",
+      "license": "Open-source ecosystem; inspect per-component licenses before reuse.",
+      "features": "Mac/mobile/web audio capture, conversations and summaries, tasks, searchable memories, speaker profiles, custom vocabulary, templates, app integrations and MCP; optional wearable offline capture.",
+      "difference": "Audio/real-world and wearable memory with broad integration ecosystem. Mac app can be used without buying hardware.",
+      "caveat": "Do not equate self-hosting option with default app being local. Free Ask limits differ across landing pages; verify in app. Battery and compliance are vendor claims.",
+      "sources": [
+        "https://get.omi.me/",
+        "https://help.omi.me/en/articles/13135007-overview",
+        "https://www.omi.me/pages/download"
+      ]
+    },
+    {
+      "name": "Granola",
+      "category": "Meeting-first adjacent competitor",
+      "price": "Basic $0; Business $14/user/month; Enterprise $35/user/month as rendered.",
+      "license": "Proprietary cloud product.",
+      "features": "Bot-free device-audio notes; speaker tags; templates, multilingual notes and recipes; cross-meeting chat; shared folders; MCP; paid unlimited history, advanced models/integrations, prep and follow-up; Enterprise SSO, policy, SCIM/audit and admin controls.",
+      "difference": "Meeting usability, team workflow and note quality reference; not an always-on visual desktop recorder.",
+      "caveat": "Basic history is 30 days; audio deleted after transcription per pricing matrix. Model-training opt-out is a listed control. Not locally benchmarked.",
+      "sources": [
+        "https://www.granola.ai/pricing"
+      ]
+    }
+  ]
+}

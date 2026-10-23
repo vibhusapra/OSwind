@@ -1,0 +1,21 @@
+name: macOS validation
+on:
+  push:
+  pull_request:
+jobs:
+  native:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: swift test
+      - name: Package app
+        run: scripts/build-app.sh release
+      - name: CLI smoke test
+        run: |
+          dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
+          dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OSwind-macos-unsigned
+          path: dist/OSwind.app

@@ -1,0 +1,39 @@
+{
+  "disk_bytes" : 48614944,
+  "embedding_model" : "apple-nl-sentence-en-v1",
+  "embeddings_available" : true,
+  "gpu" : "Apple M5 Max",
+  "ingest_seconds" : 80.973374962806702,
+  "modes" : {
+    "hybrid" : {
+      "hit_rate_at_5" : 1,
+      "mrr_at_5" : 0.83333333333333337,
+      "p50_ms" : 15.516996383666992,
+      "p95_ms" : 21.746039390563965,
+      "queries" : 12,
+      "repetitions" : 3
+    },
+    "keyword" : {
+      "hit_rate_at_5" : 1,
+      "mrr_at_5" : 1,
+      "p50_ms" : 2.8439760208129883,
+      "p95_ms" : 11.741042137145996,
+      "queries" : 12,
+      "repetitions" : 3
+    },
+    "semantic" : {
+      "hit_rate_at_5" : 0.58333333333333337,
+      "mrr_at_5" : 0.54166666666666663,
+      "p50_ms" : 12.143969535827637,
+      "p95_ms" : 13.084053993225098,
+      "queries" : 12,
+      "repetitions" : 3
+    }
+  },
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "records" : 10000,
+  "records_per_second" : 123.49738422775727,
+  "schema" : 1,
+  "scope" : "Synthetic repeated-topic corpus, not a real-user relevance study or a competitor comparison. All vectors scanned for semantic retrieval.",
+  "timestamp" : "2026-10-23T03:15:50Z"
+}
