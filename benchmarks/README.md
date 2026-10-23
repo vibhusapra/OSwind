@@ -142,6 +142,7 @@ New benchmark reports declare `latency_quantiles`: median averages the center pa
 ## Metal exhaustive-scoring component prototype
 
 ```bash
+mkdir -p .artifacts
 swiftc -O -parse-as-library scripts/metal-probe.swift -o .artifacts/metal-probe
 .artifacts/metal-probe benchmarks/ann-storage-1000000-indexed.json result.json
 ```
