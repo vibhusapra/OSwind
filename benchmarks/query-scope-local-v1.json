@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "code": "131a15f",
+  "script_sha256": "ec2ce6b5b9ed297a8276fd21a201ccf16b7b405ba7d33085dcd637d2d6085f26",
+  "hardware": "Apple M5 Max,128GiB RAM,macOS26.6.2",
+  "ollama_model": {
+    "name": "qwen3:4b-instruct-2507-q4_K_M",
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "size": 2497293803
+  },
+  "trials": [
+    {
+      "schema": 1,
+      "fixture": "query-scope-process-v1",
+      "provider": "apple",
+      "model": "apple",
+      "timestamp": "2026-10-23T04:50:30.435687-07:00",
+      "scope": "Five fictional Comet notes and a clock marker; narrow process/grounding regression, not held-out relevance, power or a product ranking.",
+      "relative_today": "passed",
+      "checks": "passed",
+      "source_ids": [
+        "4C850AED-43C9-4186-AFA1-6AED24765B24",
+        "6835A9AC-BE73-49E4-B22C-7C795B6C529A"
+      ],
+      "time_zone": "America/Los_Angeles",
+      "answer": "Comet owner is Lina. [2]\n\nComet deadline is Thursday. [1]",
+      "answer_seconds": 1.4470490217208862
+    },
+    {
+      "schema": 1,
+      "fixture": "query-scope-process-v1",
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct-2507-q4_K_M",
+      "timestamp": "2026-10-23T04:50:33.137920-07:00",
+      "scope": "Five fictional Comet notes and a clock marker; narrow process/grounding regression, not held-out relevance, power or a product ranking.",
+      "relative_today": "passed",
+      "checks": "passed",
+      "source_ids": [
+        "470202A7-125F-4101-AE4B-271840D21E1C",
+        "C54C1D6E-9BAA-49F1-B21C-A4A5B99E0445"
+      ],
+      "time_zone": "America/Los_Angeles",
+      "answer": "Comet is owned by Lina [2]. The deadline is Thursday [1].",
+      "answer_seconds": 1.3238780498504639
+    }
+  ],
+  "limits": [
+    "One answer per provider on five fictional notes and a clock marker",
+    "Authoritative source/date/filter and persistence checks; narrow owner/deadline response smoke, not held-out grounding accuracy",
+    "Native interaction/permissions remain pending while Mac is locked; own NSHosting renders are separate layout evidence",
+    "No competitor, power, continuous capture or 24-hour reliability measurement"
+  ],
+  "validation": {
+    "tests_total": 125,
+    "tests_passed": 124,
+    "optional_runtime_skipped": 1,
+    "thread_sanitizer_cases": 36,
+    "relevance": "Authored Apple/Qwen3 Recall@5,MRR@5,empty-rate metrics unchanged after scope integration; no new held-out study"
+  }
+}

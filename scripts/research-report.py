@@ -42,7 +42,7 @@ rows=[
 ('Retrieval','Multilingual embeddings','tested','Optional Qwen3: 8 authored multilingual questions pass; larger independent corpus pending','TimeScroll/Ollama, configurable systems'),
 ('Retrieval','ANN indexing for long archives','partial','Metal/HNSW cache, mutation replay and live float32 rerank; Metal million run with scope/coverage reuse recovers all reference top-10 neighbors on24 new queries per scope; median14.4/26.8ms unfiltered/filtered, first-scope tail639ms remains open. Earlier HNSW .675/.825 recall and uncached filtered tail failures retained. Automatic filtered stays exact; cold/soak/realistic recall gates open','Configurable vector systems'),
 ('Retrieval','App/date/kind/favorite/tag filters','tested','Inclusive start/exclusive end; bound SQL parameters','Most visual tools'),
-('Retrieval','Natural-language dates and operators','todo','Explicit UI/ISO time filters; no date parser','Unlost, Pieces'),
+('Retrieval','Natural-language dates and operators','partial','Shared deterministic English capture-time/weekday ranges, precise ISO dates/instants and app/kind/tag/saved operators; removable UI chips, literal mode, DST boundaries, typed API errors and persisted chat scope/timezone tested. Broader language/date grammar and native interaction remain open','Unlost, Pieces'),
 ('Retrieval','Timeline scrubbing','implemented','Snapshot strip, selection and source inspector; capped result window','Rewind Desktop, rem, ScreenMemory'),
 ('Retrieval','Calendar heatmap','todo','Date picker present, month heatmap absent','ScreenMemory'),
 ('Retrieval','OCR highlights, copy and source link','partial','Query-matched text excerpts/highlights, all OCR boxes, text copy and http(s) source links; query-only image boxes pending','TimeScroll, Retrace, Unlost'),
@@ -92,7 +92,7 @@ rows=[
 ('Platform','macOS Apple Silicon','partial','Built/tested on M5 Max macOS26; older supported OS testing pending','All macOS tools'),
 ('Platform','Windows / Linux / mobile','out of v0 desktop scope','User requested Mac; no cross-platform parity claim','Screenpipe, Pieces, Omi'),
 ('Quality','Real competitor benchmarks','todo','No competitor binary run; source-feature comparison only','Required before top-three claim'),
-('Quality','Retrieval / OCR / ASR fixture suite','partial','100 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
+('Quality','Retrieval / OCR / ASR fixture suite','partial','124 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks','OSwind quality bar'),
 ('Quality','24-hour soak and fault recovery','todo','Still missing; no reliability parity claim','OSwind quality bar')
 ]
 features=[dict(id=f'F{i+1:03}',axis=a,feature=f,status=s,evidence=e,references=r) for i,(a,f,s,e,r) in enumerate(rows)]
