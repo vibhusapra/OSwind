@@ -1,0 +1,178 @@
+{
+  "format": "OSwind targeted native replay acceptance v2",
+  "date": "2026-10-23",
+  "device": "Apple M5 Max / macOS 26.6.2",
+  "capture_source_commit": "cddb6bfd1111540b607b73fddc7accddbd79fb7e",
+  "capture_scope": "Explicit 12-second ScreenCaptureKit command targeting only owned synthetic native fixture; existing screen/AX permissions and unlocked session. No normal library or other app content.",
+  "capture": {
+    "clips": 4,
+    "stored_frames": 12,
+    "decode_identity_passed": 12,
+    "errors": 0,
+    "hardware_required": true,
+    "codec": "HEVC",
+    "width": 1920,
+    "height": 1290,
+    "all_frames_audit": [
+      {
+        "decoded_ownership": true,
+        "decoded_time": 0,
+        "frame": "14",
+        "height": 1290,
+        "requested_time": 0,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "47CF7D07-099F-4C42-882D-3C50D8BCD458",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 1,
+        "frame": "15",
+        "height": 1290,
+        "requested_time": 1.0010269999038428,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "47CF7D07-099F-4C42-882D-3C50D8BCD458",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 2,
+        "frame": "16",
+        "height": 1290,
+        "requested_time": 2.0014804578386247,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "47CF7D07-099F-4C42-882D-3C50D8BCD458",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 3.005,
+        "frame": "17",
+        "height": 1290,
+        "requested_time": 3.005351291038096,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "47CF7D07-099F-4C42-882D-3C50D8BCD458",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 4.005,
+        "frame": "18",
+        "height": 1290,
+        "requested_time": 4.006401540944353,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "47CF7D07-099F-4C42-882D-3C50D8BCD458",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 0,
+        "frame": "19",
+        "height": 1290,
+        "requested_time": 0,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "1E0B89A5-E3E6-47A4-B786-AAB43B7A9F6D",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 1.0016666666666667,
+        "frame": "20",
+        "height": 1290,
+        "requested_time": 1.0020172921940684,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "1E0B89A5-E3E6-47A4-B786-AAB43B7A9F6D",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 2.0016666666666665,
+        "frame": "21",
+        "height": 1290,
+        "requested_time": 2.002589417155832,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "1E0B89A5-E3E6-47A4-B786-AAB43B7A9F6D",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 3.0033333333333334,
+        "frame": "22",
+        "height": 1290,
+        "requested_time": 3.003559792181477,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "1E0B89A5-E3E6-47A4-B786-AAB43B7A9F6D",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 4.001666666666667,
+        "frame": "23",
+        "height": 1290,
+        "requested_time": 4.002915667137131,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "1E0B89A5-E3E6-47A4-B786-AAB43B7A9F6D",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 0,
+        "frame": "24",
+        "height": 1290,
+        "requested_time": 0,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "EE2B2A2B-20F3-4B89-9432-709B884D8713",
+        "width": 1920
+      },
+      {
+        "decoded_ownership": true,
+        "decoded_time": 0,
+        "frame": "25",
+        "height": 1290,
+        "requested_time": 0,
+        "source_and_decoded_frame_identity": true,
+        "source_id": "0E101A08-F775-4164-8AB1-F0FDDF71F9BA",
+        "width": 1920
+      }
+    ]
+  },
+  "native_observations_on_capture_parent": {
+    "search_frame_21_opened_correct_visible_video_frame": true,
+    "initial_seek_seconds": 2.001666666666666,
+    "sample_time_seconds": 2.002589417155832,
+    "frame_button_zero_showed_frame_19": true,
+    "play_button_changed_to_pause_and_position_advanced": true,
+    "ocr_overlay_toggle_exercised": true,
+    "bugs_found": [
+      "Long generic search excerpt obscured player until scrolling",
+      "OCR boxes spanned full player bounds rather than letterboxed video image"
+    ],
+    "end_restart_pause_acceptance": "Not established on native UI; covered by automated AVPlayer model test."
+  },
+  "fix_source_commit": "32ce5793d13e8875f69fd9bbc70e69def3471c1e",
+  "fixes": [
+    "Replay sources open with player first; full timed frame text remains below",
+    "Vision bottom-left normalized boxes mapped into AVPlayerView aspect-fit video rect; overlay ignores pointer events"
+  ],
+  "validation": {
+    "focused_tests": 13,
+    "full_tests": 363,
+    "passed": 358,
+    "skipped_opt_in": 5,
+    "failed": 0,
+    "packaged_cli_http_mcp_backup_restore_erase_smoke": true,
+    "strict_signature": true,
+    "build_package_installed_zip_agree": true,
+    "final_native_retest": "Pending: Mac locked before corrected QA app could open. No unlock or permission change attempted."
+  },
+  "installed_binaries": {
+    "OSwind": "3e25ae3b48f635d013bb9c9ce411e9b98c59bf1ebe6f72b772868213d9563733",
+    "oswindctl": "7eb688fd7dc22ed6a00777f83988997a82348165dd3c35132a47c5920ed85e17"
+  },
+  "zip_sha256": "cc15dff54da422d2361b69e88674a5c864fe2bcb5a03a5e9344c7de2f69bb77e",
+  "limits": [
+    "Synthetic targeted window; no natural desktop, all-display or automatic focus-transition acceptance",
+    "Final corrected visual layout, OCR alignment and native end/restart/pause still require unlocked device",
+    "No power, sustained capture or competitor win demonstrated"
+  ]
+}
