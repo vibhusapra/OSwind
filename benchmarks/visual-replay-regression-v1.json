@@ -1,0 +1,69 @@
+{
+  "format": "OSwind visual replay regression evidence v1",
+  "source_commit": "dd2f372",
+  "xctest": {
+    "total": 329,
+    "passed": 325,
+    "opt_in_skipped": 4,
+    "evidence": {
+      "artifact": ".artifacts/visual-replay-final-full-tests.log",
+      "sha256": "41a11be8fa71cd4a4fe3a9d4aff816405210d2bdec346df3b911719f70add700"
+    }
+  },
+  "thread_sanitizer": {
+    "passed": 60,
+    "evidence": {
+      "artifact": ".artifacts/visual-replay-final-tsan.log",
+      "sha256": "beb0fdfa36ba30041bc015df598f55e1b6c4aab0021ea696981aed4ced22a0c8"
+    }
+  },
+  "release_package": {
+    "artifact": ".artifacts/visual-replay-final-package.log",
+    "sha256": "4757da4c90d52a76a43f756dd1b6b211efdaa8c3c554d5a9b0db2adc842916f7"
+  },
+  "process_smokes": [
+    {
+      "artifact": ".artifacts/visual-replay-release-process-smoke.log",
+      "sha256": "58c97006e8ae55baed6a280e8c50444b07bc5705e9b8f942b7723a353a72a857"
+    },
+    {
+      "artifact": ".artifacts/visual-replay-preview-regression.log",
+      "sha256": "512398ced6a5adbd7131d0e3a69cb7383d2f73ed47adf9a6c65884241e69215b"
+    },
+    {
+      "artifact": ".artifacts/visual-replay-backup-regression.log",
+      "sha256": "bd48e520b9d2b988b56b3d0d8c7784cd87863d2a7a2d2a89bb2867cc09f71539"
+    }
+  ],
+  "scope": "Source/persistence, privacy publication barriers, source binding, mux/decode, actual AVPlayer runtime, CLI/HTTP/MCP, backup byte equality/interruption recovery, media deletion and preview regression. Distinct from physical UI/device/power and competitor acceptance.",
+  "delivery": {
+    "source_commit": "dd2f3725050a40e94188c53420fc8edf03508920",
+    "schema_version": 12,
+    "binaries": {
+      "OSwind": "80657d949f8bc8210cda13ba9f2fce5059700924160d58c0d40475fac6660e95",
+      "oswindctl": "30edfe66022fc8e2c438f811293bb02ae2f9255dd425bf4d5acdc9c736348b00"
+    },
+    "strict_signature_verified": true,
+    "zip_sha256": "1b3fd43069ef5665787a7fe9aa98b67e082e9a96097e5e4f6ed723a7e1fc627f",
+    "zip_binary_equality_verified": true,
+    "installed_synthetic_process_smoke_passed": true,
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures from disposable copies; normalize only __LINKEDIT vmsize, which ad-hoc bundle signing changes. Compare all remaining bytes.",
+    "normal_library_opened": false,
+    "installed_launched": false
+  },
+  "older_writer_refusal": {
+    "older_schema": 11,
+    "new_schema": 12,
+    "older_writer_rejected": true,
+    "source_payloads_preserved": true,
+    "stderr": "OSwind: This memory store was created by a newer OSwind version. Update OSwind before opening it."
+  },
+  "installed_smoke": {
+    "artifact": ".artifacts/visual-replay-installed-process-smoke.log",
+    "sha256": "58c97006e8ae55baed6a280e8c50444b07bc5705e9b8f942b7723a353a72a857"
+  }
+}

@@ -4,7 +4,7 @@
     "axis": "Capture",
     "feature": "Focused-window snapshots",
     "status": "live verified",
-    "evidence": "Real targeted synthetic window: OCR, correct source identity and image saved; automatic foreground transition test pending",
+    "evidence": "Real targeted synthetic window: OCR, source identity and image saved. Shared fail-closed focus binding tested; latest physical and automatic-transition acceptance pending",
     "references": "Screenpipe, Littlebird, Recall"
   },
   {
@@ -52,7 +52,7 @@
     "axis": "Capture",
     "feature": "Event-driven capture",
     "status": "partial",
-    "evidence": "App-switch triggers plus interval; no window-content event observer yet",
+    "evidence": "Replay uses ScreenCaptureKit frame events; snapshots use app-switch plus interval. Broad automatic window/context transition acceptance remains open",
     "references": "Screenpipe"
   },
   {

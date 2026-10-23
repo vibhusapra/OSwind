@@ -1,0 +1,88 @@
+{
+  "format": "OSwind isolated native replay observations v1",
+  "device_capture_source_commit": "dc9abf8",
+  "latest_binding_hardening_commit": "dd2f372",
+  "device_trial": {
+    "seconds": 12,
+    "application": "Owned synthetic native fixture only",
+    "clips": [
+      {
+        "source_id": "58FE1D7A-B186-44AB-BE90-041C4712E4E5",
+        "frames": 1,
+        "duration_seconds": 0.8316666666666667,
+        "width": 1920,
+        "height": 1290,
+        "video_sha256": "9fe266066b8528e0e31a48d2920461a13fbf77c1d883afb6f8511d5812a1e234",
+        "decoded": true
+      },
+      {
+        "source_id": "8D81130A-31AD-4DD1-A0D5-22E64026AFCB",
+        "frames": 5,
+        "duration_seconds": 4.7,
+        "width": 1920,
+        "height": 1290,
+        "video_sha256": "1ce8f9d7cc6fcd05d54ca2f9270dd73493d93cb18d3f00dd42081dbcfad58cfe",
+        "decoded": true
+      },
+      {
+        "source_id": "8B487ABE-BCC5-4DD6-84DE-EED51D4EDB80",
+        "frames": 1,
+        "duration_seconds": 0.25833333333333336,
+        "width": 1920,
+        "height": 1290,
+        "video_sha256": "a886eae100ebbe0830ff016dc0634294eb6c5435c3abce2b7d58ff4caae2cd92",
+        "decoded": true
+      },
+      {
+        "source_id": "E21A06D3-23EB-4F84-A172-8ADF4E3A6508",
+        "frames": 5,
+        "duration_seconds": 5.003333333333333,
+        "width": 1920,
+        "height": 1290,
+        "video_sha256": "088355afc75430390f9c5097057c368653999598270985f02a1a1532a30b78f5",
+        "decoded": true
+      }
+    ],
+    "total_frames": 12,
+    "result": {
+      "errors": 0,
+      "saved": 4,
+      "status": "Replay · 1 s · hardware HEVC"
+    },
+    "capture_result_evidence": {
+      "artifact": ".artifacts/visual-replay-final-live-v1.log",
+      "sha256": "e2d0be7c5d487e34635628c3bb2c5874274110702304ee65a5e1a649d1f5e621"
+    }
+  },
+  "native_final_release_open": {
+    "source_commit": "dc9abf8",
+    "app_bundle": "com.oswind.replayqa",
+    "observed": "Opened the saved 5-frame HEVC source; video and frame text visible with the bounded-height player. Mac locked before final seek/end/restart/overlay interaction could finish.",
+    "controls_complete": false
+  },
+  "earlier_uncommitted_pilot_controls": {
+    "observed": [
+      "Frame-time button sought 2.001666 seconds and displayed matching Frame 14",
+      "Play advanced from 2.001666 to 2.300044 seconds",
+      "OCR boxes toggled on"
+    ],
+    "scope": "Earlier uncommitted pilot before end-state/layout/finalization fixes; not final-build acceptance.",
+    "ax": {
+      "artifact": ".artifacts/visual-replay-native-ui/frame-seek.ax.txt",
+      "sha256": "073d63c60e1e9c0103c3a3067e62ab932935360caaecd9da6a968fae7ec8e6e0"
+    },
+    "screenshot": {
+      "artifact": ".artifacts/visual-replay-native-ui/frame-seek.png",
+      "sha256": "695bbd6b907e0bc2ae16f7d1b4e1ca79fc780149933a3bf9177bba39345b470f"
+    }
+  },
+  "lock_admission": {
+    "source_commit": "dc9abf8",
+    "locked": true,
+    "capture_rejected": true,
+    "rows": 0,
+    "media": 0,
+    "stderr": "OSwind: Replay needs an unlocked session and existing Screen Recording access"
+  },
+  "scope": "Targeted synthetic window and own paused QA app; no normal library or other apps captured. Lock admission is observed; continuous lock/unlock/resume, final selector device retest, global shortcut, natural workload and power remain open."
+}
