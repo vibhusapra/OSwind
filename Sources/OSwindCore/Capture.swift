@@ -65,6 +65,7 @@ public struct CaptureMetrics: Sendable {
     @Published public private(set) var metrics = CaptureMetrics()
     public var settings: AppSettings {
         didSet {
+            guard settings.profile != oldValue.profile || settings.visualCaptureMode != oldValue.visualCaptureMode || settings.allDisplays != oldValue.allDisplays || settings.privacy != oldValue.privacy else {return}
             epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
         }

@@ -37,7 +37,7 @@ public enum VisualReplayBenchmark {
             let memories=try store.search(SearchFilter(limit:100),mode:.keyword).map(\.memory)
             let frameCount=memories.reduce(0,{$0+($1.visualRecording?.frames.count ?? 0)})
             guard frameCount==frames,ocrChecks==frames else {throw OSwindError.unavailable("Synthetic replay lost frames or expected OCR text")}
-            var videoBytes:Int64=0,thumbnailBytes:Int64=0,decoded=0
+            var videoBytes:Int64=0,thumbnailBytes:Int64=0,decoded=0,decodedOCR=0,decodedIdentity=0
             for memory in memories {
                 guard let source=memory.visualRecording,let url=memory.videoPath.flatMap({store.assetURL($0)}) else {throw OSwindError.invalid("Replay source is incomplete")}
                 videoBytes+=try bytes(url)
@@ -46,10 +46,14 @@ public enum VisualReplayBenchmark {
                 for frame in source.frames {
                     let image=try generator.copyCGImage(at:CMTime(seconds:frame.time,preferredTimescale:600),actualTime:nil)
                     guard image.width==width,image.height==height else {throw OSwindError.invalid("Decoded replay dimensions changed")};decoded+=1
+                    let recognized=try VisualOCR.regions(image).map(\.text).joined(separator:"\n")
+                    if recognized.localizedCaseInsensitiveContains("Maya owns capture") && recognized.localizedCaseInsensitiveContains("Theo owns archive") {decodedOCR+=1}
+                    if let header=frame.text.components(separatedBy:.newlines).first(where:{$0.localizedCaseInsensitiveContains("OSwind synthetic replay frame")}),recognized.localizedCaseInsensitiveContains(header) {decodedIdentity+=1}
                 }
             }
+            guard decodedOCR==frames,decodedIdentity==frames else {throw OSwindError.unavailable("Compressed replay lost readable ownership text or frame identity")}
             let jpegBytes=try FileManager.default.contentsOfDirectory(at:jpeg,includingPropertiesForKeys:nil).reduce(Int64(0)) {try $0+bytes($1)}
-            let report:[String:Any]=["format":"OSwind synthetic visual replay probe v1","schema_version":MemoryStore.schemaVersion,"hardware_required":hardwareRequired,"codec":hardwareRequired ? "hevc":"h264","width":width,"height":height,"interval_seconds":1,"input_frames":frames,"stored_frames":frameCount,"decoded_frames":decoded,"ocr_checks_passed":ocrChecks,"clips":memories.count,"video_bytes":videoBytes,"thumbnail_bytes":thumbnailBytes,"jpeg_reference_bytes":jpegBytes,"video_plus_thumbnail_to_jpeg_ratio":Double(videoBytes+thumbnailBytes)/Double(max(1,jpegBytes)),"ocr_ms":ocrMS,"append_including_chunk_finalization_ms":appendMS,"wall_seconds":Date().timeIntervalSince(start),"scope":"Generated static desktop-like pixels with changing labels; actual Vision OCR, required-hardware HEVC (or explicit software H264), source storage and every-frame decode. JPEG uses the same pixels at quality 0.75. Excludes desktop capture, natural workloads, power, database/metadata bytes and competitors."]
+            let report:[String:Any]=["format":"OSwind synthetic visual replay probe v1","schema_version":MemoryStore.schemaVersion,"hardware_required":hardwareRequired,"codec":hardwareRequired ? "hevc":"h264","width":width,"height":height,"interval_seconds":1,"input_frames":frames,"stored_frames":frameCount,"decoded_frames":decoded,"decoded_ocr_checks_passed":decodedOCR,"decoded_frame_identity_checks_passed":decodedIdentity,"ocr_checks_passed":ocrChecks,"clips":memories.count,"video_bytes":videoBytes,"thumbnail_bytes":thumbnailBytes,"jpeg_reference_bytes":jpegBytes,"video_plus_thumbnail_to_jpeg_ratio":Double(videoBytes+thumbnailBytes)/Double(max(1,jpegBytes)),"ocr_ms":ocrMS,"append_including_chunk_finalization_ms":appendMS,"wall_seconds":Date().timeIntervalSince(start),"scope":"Generated static desktop-like pixels with changing labels; actual Vision OCR, required-hardware HEVC (or explicit software H264), source storage, every-frame decode and decoded ownership/frame-identity OCR checks. JPEG uses the same pixels at quality 0.75. Excludes desktop capture, natural workloads, power, database/metadata bytes and competitors."]
             try JSONSerialization.data(withJSONObject:report,options:[.prettyPrinted,.sortedKeys]).write(to:directory.appendingPathComponent("report.json"),options:.atomic)
             return report
         } catch {try? await recorder.close(commit:false);throw error}
