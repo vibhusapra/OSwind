@@ -388,3 +388,5 @@ The packaged [native answer regression](audio-search-native-regression-v1.json) 
 An actual public-file product import also preserves 2,606 Parakeet timed segments through persistence and backup. All 175 word spans intersecting model-predicted mixed speech above the attribution threshold remain unassigned. This is a pipeline-safeguard check, not human word-speaker accuracy or ASR WER. [Reproduction, licensing and scope](../docs/SPEAKER-EVAL.md) and the retained [pre-fix baseline](speaker-natural-baseline-v1.json) separate these claims.
 
 - [Signed package natural-speech regression](speaker-natural-packaged-v1.json): exact shipped binary, identical development-subset scores, real silence and private-output contracts; full limits in [SPEAKER-EVAL](../docs/SPEAKER-EVAL.md).
+
+- [Native model idle retention](native-model-idle-v1.json): actual 120-second timer/reload, queue/policy/controller contracts and signed-package process identity; no RAM reclamation or power claim.

@@ -92,3 +92,5 @@ The app now browses explicit long-transcript previews, retaining the original te
 ## Idle native model retention
 
 The retention choice persists per library, applies to the existing speech and speaker runtimes without interrupting capture/import work, and defaults safely when loading older settings. Changing the policy while idle reschedules expiry; **After each use** releases immediately when idle. Manual release remains available. This releases OSwind-owned model references rather than deleting downloaded weights, clearing Core ML/system caches or changing a shared Ollama server. Memory returned to the OS, battery savings and per-operation device placement require separate measurements. Canceled/in-flight native calls still follow the cancellation boundaries above.
+
+[Idle policy evidence](../benchmarks/native-model-idle-v1.json) records queue/stale-timer/controller contracts, an actual default-timeout/reload trial with local models, release process checks and package identity. This is not an energy benchmark.

@@ -1,0 +1,151 @@
+{
+  "format": "OSwind native model idle retention v1",
+  "source_commit": "13f47f01130cae1771e5f22c8f3efc9fd536507a",
+  "core_tests_source_commit": "17e269d",
+  "core_source_identity_unchanged_since_tests": {
+    "Sources/OSwindCore/NativeModelRetention.swift": "e71275f86a019e348811db4cd8dca1eb19dd06476c092142d98843f4f314706c",
+    "Sources/OSwindCore/SpeechRecognition.swift": "e6bf571fa08e67d15154bf5ba5469e50303991f2b9f21f6ae87958df0ded0973",
+    "Sources/OSwindCore/SpeakerDiarizer.swift": "4b1811aa5d5acf04d7269cd62c95bb92fd9cfbd973087c606c6fa3965de1ccb5",
+    "Sources/OSwindCore/Audio.swift": "28f84a1bf001181a7ef5208d81039e0d4a48b592e3b54b9755fb65d01b2150d3"
+  },
+  "platform": {
+    "hardware": "Apple M5 Max",
+    "machine": "arm64",
+    "scope": "local macOS development host, uncontrolled caches/concurrent workloads"
+  },
+  "policies": {
+    "default_idle_seconds": 120,
+    "options": [
+      "afterUse",
+      "twoMinutes",
+      "tenMinutes",
+      "untilQuit"
+    ],
+    "starts_when": "Runtime queue empty",
+    "ownership": "OSwind backend references only; no downloaded model/cache/shared Ollama deletion"
+  },
+  "tests": {
+    "full_xctest": {
+      "total": 341,
+      "passed": 336,
+      "opt_in_skipped": 5,
+      "failed": 0
+    },
+    "focused_thread_sanitizer": {
+      "total": 28,
+      "passed": 25,
+      "opt_in_skipped": 3,
+      "failed": 0
+    },
+    "shared_policy_and_controller_contracts": 6,
+    "real_native_default_timer_trial": {
+      "passed": true,
+      "total_trial_seconds_including_inference": 123.363,
+      "public_fixture_sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+      "source_duration_seconds": 11.0,
+      "checks": [
+        "Both runtime references present after actual local inference",
+        "Both expire under the actual default 120-second policy",
+        "Reloaded ASR transcript and raw speaker timeline exactly equal initial results",
+        "After-use selection releases both idle runtimes"
+      ],
+      "compute": "GPU requested for Parakeet; native speaker SDK configured all eligible units with CPU-only FBank; per-operation placement unmeasured"
+    }
+  },
+  "package": {
+    "source_commit": "13f47f01130cae1771e5f22c8f3efc9fd536507a",
+    "schema_version": 12,
+    "installed_path": "/Applications/OSwind.app",
+    "prior_version_backup": ".artifacts/installed-before-model-idle-13f47f0.app",
+    "strict_signature_verified": true,
+    "installed_launched": false,
+    "normal_library_opened": false,
+    "binaries": {
+      "OSwind": "d4295140cb664e2958676c55c34cc028ac3c9d27f6387da73750d9c24144b032",
+      "oswindctl": "fe19cb02c248c77e6f966dca610691f0e34613d87708fda44b3006fa26ce64b7"
+    },
+    "raw_build_binaries": {
+      "OSwind": "817264f229a2c8ed28bf9d4d150862080c91f5c90f82987fc3c30e4e8cc3102e",
+      "oswindctl": "ecac5ca14e57c6b6304e5ada02281b90f58b6c0f95f92f2e3a56bee3a9618f87"
+    },
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures from disposable copies; normalize only __LINKEDIT vmsize. Compare all remaining bytes.",
+    "zip_sha256": "b7deb040d04ca810c809dd6b5a4fa77b573fbfb3830b1763424a4d6ceea69a3e",
+    "zip_binary_equality_verified": true,
+    "installed_process_checks": {
+      "real_timeline_repetition_equal": true,
+      "resident_comparison_enabled": true,
+      "unexpected_library_absent": true,
+      "both_local_model_verifications_passed": true
+    }
+  },
+  "verified_local_models": {
+    "parakeet": {
+      "bytes": 483106120,
+      "files": 22,
+      "kind": "parakeet",
+      "reused": true,
+      "revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe"
+    },
+    "speakers": {
+      "bytes": 21816863,
+      "files": 28,
+      "kind": "speakers",
+      "reused": true,
+      "revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232"
+    }
+  },
+  "packaged_product_import": {
+    "scope": "OSwind integrated import, naming, redaction-compatible persistence, search and portability on stock-voice A/B/A/B synthetic audio",
+    "synthetic": true,
+    "duration_seconds": 32.225,
+    "fixture_sha256": "9edaeed2566521d67262f1f35118403afe925324818c102ac2ece71283a33419",
+    "normalized_WER": 0.0,
+    "timed_words": 80,
+    "speaker_info": {
+      "detectedSpeakers": 2,
+      "model": "Community-1 \u00b7 overlap-preserving-v1 \u00b7 local Core ML / FluidAudio 0.17.7",
+      "scope": "recording",
+      "unassignedSegments": 9
+    },
+    "assigned_words": 71,
+    "eligible_words_with_250ms_edge_collar": 76,
+    "eligible_correct_assigned": 71,
+    "eligible_unassigned": 5,
+    "eligible_wrong_assigned": [],
+    "checks": [
+      "real native local-only ASR+diarization saved and retrieved",
+      "recording-local naming persists and refuses merging two identities",
+      "retained original bytes match; full backup restores speaker metadata and audio",
+      "text interchange preserves sanitized speaker metadata and strips media",
+      "erasure removes owned clip; fixture remains"
+    ],
+    "limits": [
+      "clean generated voices, four known utterances, not natural-meeting DER/WDER or independent word-alignment ground truth",
+      "coverage/unknowns reported; accuracy among assigned words alone can conceal abstention",
+      "no live speaker tracking, persistent cross-recording identities, microphone/TCC/UI acceptance, power or competitor ranking",
+      "wall time includes model load, normalization, inference, redaction, insertion and indexing; caches uncontrolled"
+    ]
+  },
+  "packaged_regressions": [
+    "Explicit long-transcript previews CLI/HTTP/MCP",
+    "Generated visual replay/decode/source transport/evidence/complete backup/erase",
+    "Installed raw timeline repetitions and offline native-model verification; forbidden library absent"
+  ],
+  "ui": {
+    "review": "Own synthetic light and dark Audio settings renders inspected; physical control acceptance unverified",
+    "render_sha256": {
+      "audio-settings-light.png": "e69bcd09d042cb4e61897be1689a0d397366d020c1cc311a11734f6a33f40d50",
+      "audio-settings-dark.png": "06f94732b83137b72185508be23693f726ba38a420beb9c00aaf408ed5fe0b7b"
+    }
+  },
+  "limitations": [
+    "Model ownership is not physical RAM/GPU/ANE reclamation or measured power",
+    "Default timer/reload trial uses test-linked debug Core ML runtimes; release package import/process contracts are separately recorded",
+    "No hardware capture, lock/resume, real meeting acceptance or competitor ranking",
+    "Normal app and normal library were not opened"
+  ]
+}

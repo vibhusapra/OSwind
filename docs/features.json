@@ -595,8 +595,8 @@
     "id": "F075",
     "axis": "Energy",
     "feature": "Idle native model release",
-    "status": "partial",
-    "evidence": "Configurable after-use / 2-minute / 10-minute / until-quit retention for speech and speakers, with queue and stale-expiry contracts. Real-model default-timer/reload verification in progress; physical memory/power unmeasured",
+    "status": "tested",
+    "evidence": "Configurable after-use / 2-minute / 10-minute / until-quit speech/speaker retention. Queue/stale-expiry/controller contracts, actual default-timer/reload and signed release process checks pass; physical memory/power unmeasured",
     "references": "Local always-on tools"
   }
 ]
