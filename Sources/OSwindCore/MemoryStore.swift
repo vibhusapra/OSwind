@@ -5,6 +5,8 @@ public final class MemoryStore: @unchecked Sendable {
     public let root: URL
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
+    private var metalScopeCache: MetalScopeCache?
+    private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
@@ -78,6 +80,7 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(VectorJournalSchema.sql)
         if version < 4 { try exec(VectorJournalSchema.backfill) }
         try exec(StatisticsSchema.sql)
+        try exec(SearchScopeSchema.sql)
         let statisticsState = try prepare("SELECT total=COALESCE((SELECT SUM(count) FROM application_statistics),0) FROM memory_statistics WHERE singleton=1")
         let statisticsNeedRepair = sqlite3_step(statisticsState) != SQLITE_ROW || sqlite3_column_int(statisticsState,0) != 1
         sqlite3_finalize(statisticsState)
@@ -177,15 +180,16 @@ public final class MemoryStore: @unchecked Sendable {
         }
         if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
             var indexed: [SemanticCandidate]?
+            var candidateStrategy = "ann-exact-rerank"
             if indexStatus != nil {
-                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100)) }
+                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100),strategy:{ candidateStrategy = $0 }) }
                 catch { diagnostics.append("Fast index unavailable; exact search used. "+error.localizedDescription) }
                 if indexed == nil && diagnostics.isEmpty {
                     diagnostics.append(indexStatus!.state == "ready" ? "Fast index is catching up; exact search used." : indexStatus!.message + " · exact search used.")
                 }
             }
             let best: [SemanticCandidate]
-            if let indexed { best = indexed; strategy = "ann-exact-rerank" }
+            if let indexed { best = indexed; strategy = candidateStrategy }
             else {
             let vectorJoin = whereSQL == "1=1" ? "semantic_vectors v JOIN memories m ON m.id=v.memory_id" : "memories m CROSS JOIN semantic_vectors v ON m.id=v.memory_id"
             let stmt = try prepare("SELECT m.id,m.embedding,m.timestamp FROM memories m WHERE \(whereSQL) AND embedding IS NOT NULL AND embedding_model=? AND NOT EXISTS (SELECT 1 FROM semantic_vectors v WHERE v.memory_id=m.id AND v.model=m.embedding_model) UNION ALL SELECT m.id,v.vector,m.timestamp FROM \(vectorJoin) WHERE \(whereSQL) AND v.model=?")
@@ -221,6 +225,23 @@ public final class MemoryStore: @unchecked Sendable {
         let stmt = try prepare(sql)
         defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); for (i,v) in values.enumerated() { bind(stmt,Int32(i+2),v) }
         return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
+    }
+    /// Coverage counts have the same scope as retrieval, independent of query
+    /// words. Reuse only within an unchanged transactional metadata/vector state.
+    public func indexCoverage(modelID: String, filter: SearchFilter = SearchFilter()) throws -> (indexed:Int,total:Int) {
+        lock.lock(); defer { lock.unlock() }
+        try exec("SAVEPOINT coverage_snapshot"); defer { try? exec("RELEASE coverage_snapshot") }
+        let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),(SELECT hex(revision) FROM search_scope_revision WHERE singleton=1)")
+        defer { sqlite3_finalize(state) }; guard sqlite3_step(state) == SQLITE_ROW else { throw failure() }
+        let (predicate,values) = conditions(filter), revision = string(state,2)
+        let key = MetalScopeKey(identity:string(state,0),model:modelID,sequence:sqlite3_column_int64(state,1),revision:revision,predicate:predicate,values:values)
+        coverageCache.removeAll { $0.key.identity != key.identity || $0.key.model != key.model || $0.key.sequence != key.sequence || $0.key.revision != key.revision }
+        if !revision.isEmpty, let index = coverageCache.firstIndex(where:{$0.key == key}) {
+            let cached = coverageCache.remove(at:index); coverageCache.append(cached); return (cached.indexed,cached.total)
+        }
+        let indexed = try vectorCount(modelID:modelID,filter:filter), total = try matchingCount(filter)
+        if !revision.isEmpty { coverageCache.append((key,indexed,total)); if coverageCache.count > 4 { coverageCache.removeFirst() } }
+        return (indexed,total)
     }
     public func memoriesNeedingVectors(modelID: String, afterID: String = "", limit: Int = 16) throws -> [Memory] {
         lock.lock(); defer { lock.unlock() }
@@ -270,7 +291,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let maxBytes, diskBytes() > maxBytes {
             // Drop rebuildable graph storage before sacrificing recorded evidence.
             try exec("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
-            annCache.reset(); let cache = root.appendingPathComponent("indexes")
+            metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
             if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         }
         if let maxBytes, diskBytes() > maxBytes { try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;"); var size = diskBytes(); let stmt = try prepare("SELECT id FROM memories ORDER BY timestamp"); var oldest = [String](); while sqlite3_step(stmt) == SQLITE_ROW { oldest.append(string(stmt,0)) }; sqlite3_finalize(stmt)
@@ -290,7 +311,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         try exec("BEGIN IMMEDIATE")
         do { try exec("DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
-        annCache.reset(); let cache = root.appendingPathComponent("indexes")
+        metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
         if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
         for folder in ["images", "audio"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
@@ -351,7 +372,7 @@ extension MemoryStore {
         return sqlite3_step(legacy) == SQLITE_ROW ? Int(sqlite3_column_int(legacy,0)) : nil
     }
     public func cancelSearchIndexBuild(pauseAutomatic: Bool = false) { annCache.cancel(pauseAutomatic:pauseAutomatic) }
-    public func releaseSearchIndex() { annCache.reset() }
+    public func releaseSearchIndex() { lock.lock(); metalScopeCache = nil; coverageCache.removeAll(); lock.unlock(); annCache.reset() }
     public func checkpointSearchIndexIfIdle(allowLowPower: Bool = false) throws { try annCache.checkpointIfIdle(allowLowPower:allowLowPower) }
 }
 
@@ -422,17 +443,46 @@ extension MemoryStore {
 extension MemoryStore {
     /// Called inside the search's SQL snapshot. Only current, matching rows can
     /// become evidence. Mutations newer than the graph are searched exactly.
-    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int) throws -> [SemanticCandidate]? {
+    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int, strategy: (String) -> Void = { _ in }) throws -> [SemanticCandidate]? {
         lock.lock(); defer { lock.unlock() }
         try exec("SAVEPOINT index_candidate_snapshot"); defer { try? exec("RELEASE index_candidate_snapshot") }
-        let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0)")
+        let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),(SELECT hex(revision) FROM search_scope_revision WHERE singleton=1)")
         defer { sqlite3_finalize(state) }
         guard sqlite3_step(state) == SQLITE_ROW else { throw failure() }
-        let identity = string(state,0), head = sqlite3_column_int64(state,1), (whereSQL,values) = conditions(filter)
+        let identity = string(state,0), head = sqlite3_column_int64(state,1), scopeRevision = string(state,2), (whereSQL,values) = conditions(filter)
         return try annCache.withReady(modelID:modelID,dimensions:dimensions,identity:identity,snapshotHead:head) { native,sequence -> [SemanticCandidate]? in
+            strategy(native.strategy)
             let keyCount = min(2000,max(100,limit*2))
             var keys: [UInt64]
             if whereSQL == "1=1" { keys = try native.search(scorer.queryVector,count:keyCount) }
+            else if native is MetalFlatIndex {
+                let scopeKey = MetalScopeKey(identity:identity,model:modelID,sequence:sequence,revision:scopeRevision,predicate:whereSQL,values:values)
+                let allowedKeys: Set<UInt64>
+                if !scopeRevision.isEmpty, let cached = metalScopeCache?.lookup(scopeKey) { allowedKeys = cached }
+                else {
+                    // One bounded mask, invalidated by transactional metadata
+                    // nonce and graph replay sequence. Query words are excluded
+                    // so typing/follow-ups reuse the same scope safely.
+                    let allowed = try prepare("SELECT r.key FROM vector_keys r JOIN memories m ON m.id=r.memory_id WHERE r.model=? AND r.revision<=? AND \(whereSQL)")
+                    defer { sqlite3_finalize(allowed) }; bind(allowed,1,modelID); sqlite3_bind_int64(allowed,2,sequence)
+                    for (i,value) in values.enumerated() { bind(allowed,Int32(i+3),value) }
+                    var loaded = Set<UInt64>(), status = sqlite3_step(allowed)
+                    while status == SQLITE_ROW {
+                        if loaded.count%4096 == 0 { try Task.checkCancellation() }
+                        // Avoid a large unbounded CPU allocation on high-volume
+                        // low-dimensional archives. Full exact stays available.
+                        if loaded.count >= 2_000_000 { metalScopeCache = nil; return nil }
+                        let key = sqlite3_column_int64(allowed,0); if key > 0 { loaded.insert(UInt64(key)) }; status = sqlite3_step(allowed)
+                    }
+                    guard status == SQLITE_DONE else { throw failure() }
+                    allowedKeys = loaded
+                    if !scopeRevision.isEmpty {
+                        if metalScopeCache == nil { metalScopeCache = MetalScopeCache() }
+                        metalScopeCache?.insert(MetalScopeSnapshot(key:scopeKey,allowed:loaded))
+                    }
+                }
+                keys = try native.search(scorer.queryVector,count:keyCount,include:{ allowedKeys.contains($0) })
+            }
             else {
                 let allowed = try prepare("SELECT 1 FROM vector_keys r JOIN memories m ON m.id=r.memory_id WHERE r.key=? AND r.model=? AND r.revision<=? AND \(whereSQL)")
                 defer { sqlite3_finalize(allowed) }; var databaseError: Error?; let filterLock = NSLock()

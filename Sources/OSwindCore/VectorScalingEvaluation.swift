@@ -22,8 +22,8 @@ public enum VectorScalingEvaluation {
         }
         deinit { flock(descriptor,LOCK_UN); close(descriptor) }
     }
-    public static func run(count: Int, dimensions: Int = 1024, repetitions: Int = 3, indexed: Bool = false, archive: URL? = nil, qualityQueries: Int = 0) async throws -> [String:Any] {
-        guard (100...1_000_000).contains(count), (32...4096).contains(dimensions), (1...10).contains(repetitions), (0...64).contains(qualityQueries) else { throw OSwindError.invalid("Choose 100–1000000 rows, 32–4096 dimensions and 1–10 repetitions and 0–64 quality queries") }
+    public static func run(count: Int, dimensions: Int = 1024, repetitions: Int = 3, indexed: Bool = false, archive: URL? = nil, qualityQueries: Int = 0, qualitySeedOffset: Int = 17) async throws -> [String:Any] {
+        guard (100...1_000_000).contains(count), (32...4096).contains(dimensions), (1...10).contains(repetitions), (0...64).contains(qualityQueries), (1...1_000_000).contains(qualitySeedOffset) else { throw OSwindError.invalid("Choose 100–1000000 rows, 32–4096 dimensions and 1–10 repetitions and 0–64 quality queries and a positive seed offset ≤1000000") }
         let root = archive ?? FileManager.default.temporaryDirectory.appendingPathComponent("oswind-vector-scale-"+UUID().uuidString)
         try Paths.ensure(root); defer { if archive == nil { try? FileManager.default.removeItem(at:root) } }
         let lease = try Lease(root.appendingPathComponent("benchmark.lock")); defer { withExtendedLifetime(lease) {} }
@@ -67,7 +67,9 @@ public enum VectorScalingEvaluation {
             var times = [Double](), correct = 0, measurements = [[String:Any]]()
             for repetition in 0..<repetitions { for row in samples {
                 let query = vector(row:row,dimensions:dimensions), start = Date(); var execution = SearchExecution(strategy:"exact",warnings:[])
-                let hits = try store.search(SearchFilter(query:"synthetic query",app:scope ? (row % 2 == 0 ? "Synthetic A" : "Synthetic B") : nil,limit:5),mode:.semantic,vector:query,modelID:identity,minimumSimilarity:threshold,indexPolicy:indexed ? .indexed : .exact,indexedCount:scope ? count/2 : count) { execution = $0 }
+                let filter = SearchFilter(query:"synthetic query",app:scope ? (row % 2 == 0 ? "Synthetic A" : "Synthetic B") : nil,limit:5)
+                let coverage = try store.indexCoverage(modelID:identity,filter:filter)
+                let hits = try store.search(filter,mode:.semantic,vector:query,modelID:identity,minimumSimilarity:threshold,indexPolicy:indexed ? .indexed : .exact,indexedCount:coverage.indexed) { execution = $0 }
                 let milliseconds = Date().timeIntervalSince(start)*1000
                 times.append(milliseconds); measurements.append(["row":row,"repetition":repetition,"latency_ms":milliseconds,"returned":hits.map(\.id),"strategy":execution.strategy,"warnings":execution.warnings]); if hits.first?.id == String(format:"row-%08d",row) { correct += 1 }
             } }
@@ -81,16 +83,19 @@ public enum VectorScalingEvaluation {
                 for queryID in 0..<qualityQueries {
                     try Task.checkCancellation()
                     // Seeds lie outside the archive: these are non-self queries.
-                    let query = vector(row:count+17+queryID,dimensions:dimensions)
+                    FileHandle.standardError.write(Data("Evaluating non-self \(scope ? "filtered" : "all") \(queryID+1)/\(qualityQueries)\n".utf8))
+                    let query = vector(row:count+qualitySeedOffset+queryID,dimensions:dimensions)
                     let filter = SearchFilter(query:"synthetic query",app:scope ? "Synthetic A" : nil,limit:10)
                     var start = Date()
+                    _ = try store.indexCoverage(modelID:identity,filter:filter)
                     let exact = try store.search(filter,mode:.semantic,vector:query,modelID:identity,minimumSimilarity:-1,indexPolicy:.exact)
                     exactTimes.append(Date().timeIntervalSince(start)*1000); start = Date()
                     var execution = SearchExecution(strategy:"exact",warnings:[])
-                    let approximate = try store.search(filter,mode:.semantic,vector:query,modelID:identity,minimumSimilarity:-1,indexPolicy:.indexed,indexedCount:scope ? count/2 : count) { execution = $0 }
+                    let coverage = try store.indexCoverage(modelID:identity,filter:filter)
+                    let approximate = try store.search(filter,mode:.semantic,vector:query,modelID:identity,minimumSimilarity:-1,indexPolicy:.indexed,indexedCount:coverage.indexed) { execution = $0 }
                     indexedTimes.append(Date().timeIntervalSince(start)*1000)
                     let target = Set(exact.map(\.id)), observed = Set(approximate.map(\.id)), score = Double(target.intersection(observed).count)/Double(max(1,target.count))
-                    recall += score; measurements.append(["query_seed":count+17+queryID,"recall_at_10":score,"exact_ids":exact.map(\.id),"indexed_ids":approximate.map(\.id),"exact_ms":exactTimes.last!,"indexed_ms":indexedTimes.last!,"strategy":execution.strategy,"warnings":execution.warnings])
+                    recall += score; measurements.append(["query_seed":count+qualitySeedOffset+queryID,"recall_at_10":score,"exact_ids":exact.map(\.id),"indexed_ids":approximate.map(\.id),"exact_ms":exactTimes.last!,"indexed_ms":indexedTimes.last!,"strategy":execution.strategy,"warnings":execution.warnings])
                 }
                 let exactLatency = try BenchmarkLatency(samples:exactTimes), indexedLatency = try BenchmarkLatency(samples:indexedTimes)
                 quality[scope ? "filtered" : "all_candidates"] = ["recall_at_10":recall/Double(qualityQueries),"queries":qualityQueries,"exact_p95_ms":exactLatency.p95,"indexed_p95_ms":indexedLatency.p95,"exact_max_ms":exactLatency.maximum,"indexed_max_ms":indexedLatency.maximum,"measurements":measurements]
@@ -102,6 +107,6 @@ public enum VectorScalingEvaluation {
         #else
         let build = "release"
         #endif
-        return ["schema":4,"latency_quantiles":BenchmarkLatency.method,"timestamp":ISO8601DateFormatter().string(from:Date()),"count":count,"dimensions":dimensions,"layout":"semantic_vectors","random_seed":"row+xorshift64star-v1","ingest_seconds":ingest,"reused_records":existing,"archive_retained":archive != nil,"index_policy":indexed ? "indexed" : "exact","index_prepare_seconds":preparation,"disk_bytes":store.diskBytes(),"process_peak_rss_bytes":usage.ru_maxrss,"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":modes,"nonself_quality":quality,"scope":"Normalized synthetic random vectors and exact self-match checks, plus optional non-self Recall@10 against exhaustive float32 ground truth. Timings include the selected SQLite search path and live validation/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately."]
+        return ["schema":6,"coverage_counts_included":true,"quality_seed_offset":qualitySeedOffset,"latency_quantiles":BenchmarkLatency.method,"timestamp":ISO8601DateFormatter().string(from:Date()),"count":count,"dimensions":dimensions,"layout":"semantic_vectors","random_seed":"row+xorshift64star-v1","ingest_seconds":ingest,"reused_records":existing,"archive_retained":archive != nil,"index_policy":indexed ? "indexed" : "exact","index_prepare_seconds":preparation,"disk_bytes":store.diskBytes(),"process_peak_rss_bytes":usage.ru_maxrss,"build":build,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","os":ProcessInfo.processInfo.operatingSystemVersionString,"modes":modes,"nonself_quality":quality,"scope":"Normalized synthetic random vectors and exact self-match checks, plus optional non-self Recall@10 against exhaustive float32 ground truth. Timings include coverage-count lookup, the selected SQLite search path and live validation/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, isolated GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately."]
     }
 }

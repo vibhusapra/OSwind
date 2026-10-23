@@ -61,7 +61,7 @@ do {
     } else if command == "benchmark-vectors" {
         let count = Int(option("--count") ?? "10000") ?? 10000, dimensions = Int(option("--dimensions") ?? "1024") ?? 1024, repetitions = Int(option("--repetitions") ?? "3") ?? 3, output = option("--output")
         let archive = option("--archive").map { URL(fileURLWithPath:$0) }
-        let result = try await VectorScalingEvaluation.run(count:count,dimensions:dimensions,repetitions:repetitions,indexed:args.contains("--indexed"),archive:archive,qualityQueries:Int(option("--quality-queries") ?? "0") ?? 0)
+        let result = try await VectorScalingEvaluation.run(count:count,dimensions:dimensions,repetitions:repetitions,indexed:args.contains("--indexed"),archive:archive,qualityQueries:Int(option("--quality-queries") ?? "0") ?? 0,qualitySeedOffset:Int(option("--quality-seed-offset") ?? "17") ?? 17)
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
     } else if command == "benchmark" {
         let count = min(50000,max(100,Int(option("--count") ?? "1000") ?? 1000))

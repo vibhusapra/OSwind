@@ -148,7 +148,7 @@
     "axis": "Retrieval",
     "feature": "ANN indexing for long archives",
     "status": "partial",
-    "evidence": "Pinned HNSW cache, mutation replay, live erasure/filter checks and float32 rerank; 100k non-self Recall@10 1.0; million .675/.825 fails recall despite ~207 ms unfiltered self nearest-rank p95/max. Filtered Automatic stays exact; tuning/cold/soak gates remain open",
+    "evidence": "Metal/HNSW cache, mutation replay and live float32 rerank; Metal million run with scope/coverage reuse recovers all reference top-10 neighbors on24 new queries per scope; median14.4/26.8ms unfiltered/filtered, first-scope tail639ms remains open. Earlier HNSW .675/.825 recall and uncached filtered tail failures retained. Automatic filtered stays exact; cold/soak/realistic recall gates open",
     "references": "Configurable vector systems"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "58 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
+    "evidence": "99 passing tests plus one optional runtime skip; authored retrieval/long-source/Metal fixtures and pinned rem keyword component comparison; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

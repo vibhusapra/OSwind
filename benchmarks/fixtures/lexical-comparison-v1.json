@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "description": "Small authored keyword-only component comparison. Source documents are desktop-retrieval-v1; duplicates at scale are deliberate. Not held out, screen/audio capture, AI or whole-product performance.",
+  "queries": [
+    {"query":"Maya","expected":["release","new_decision"]},
+    {"query":"refunded","expected":["refund"]},
+    {"query":"Avery","expected":["renewal"]},
+    {"query":"invoice 4821","expected":["invoice"]},
+    {"query":"password managers","expected":["privacy"]},
+    {"query":"near duplicates","expected":["battery"]},
+    {"query":"quiet mint","expected":["design"]},
+    {"query":"SameSite","expected":["login"]},
+    {"query":"loopback","expected":["server"]},
+    {"query":"Whisper","expected":["audio"],"app":"Xcode"},
+    {"query":"Friday","expected":["release"],"app":"Xcode"},
+    {"query":"Boreal","expected":["legal_es"]},
+    {"query":"CobaltUnicornNeverSeen","expected":[]}
+  ]
+}
