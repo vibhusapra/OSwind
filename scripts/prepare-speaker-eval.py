@@ -35,6 +35,11 @@ class RangeFile(io.RawIOBase):
         self.position+=size;self.bytes_read+=size;self.requests+=1;return payload
 
 def digest(data):return hashlib.sha256(data).hexdigest()
+def file_digest(path):
+    result=hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda:stream.read(1024*1024),b''):result.update(block)
+    return result.hexdigest()
 def save(root,manifest):
     temporary=root/'manifest.json.part';temporary.write_text(json.dumps(manifest,indent=2)+'\n');os.chmod(temporary,0o600);temporary.replace(root/'manifest.json')
 def prepare(annotations,plan,output,audio_archive=None):
@@ -43,11 +48,12 @@ def prepare(annotations,plan,output,audio_archive=None):
     ids=[clip['id'] for clip in plan['clips']]
     if not 1<=len(ids)<=20 or len(set(ids))!=len(ids) or not all(re.fullmatch('[a-z]{5}',value) for value in ids):raise ValueError('Invalid fixed clip identifiers')
     output.mkdir(mode=0o700,parents=True);(output/'audio').mkdir(mode=0o700);(output/'reference').mkdir(mode=0o700)
-    manifest={'format':'OSwind natural speaker subset v1','state':'preparing','dataset':'VoxConverse dev','annotation_commit':plan['annotation_commit'],'selection':plan['selection'],'license':'CC BY 4.0; research use; original video copyright retained','attribution':'Chung, Huh, Nagrani, Afouras and Zisserman. Spot the conversation: speaker diarisation in the wild. Interspeech 2020.','license_source':'https://github.com/joonson/voxconverse/blob/'+plan['annotation_commit']+'/README.md','source_audio_url':AUDIO_URL,'annotation_zip_sha256':digest(annotations.read_bytes()),'clips':[],'scope':'Predetermined development subset; no inference or quality score. Source audio stays local and is not part of the repository.'}
+    manifest={'format':'OSwind natural speaker subset v1','state':'preparing','dataset':'VoxConverse dev','annotation_commit':plan['annotation_commit'],'selection':plan['selection'],'license':'CC BY 4.0; research use; original video copyright retained','attribution':'Chung, Huh, Nagrani, Afouras and Zisserman. Spot the conversation: speaker diarisation in the wild. Interspeech 2020.','license_source':'https://github.com/joonson/voxconverse/blob/'+plan['annotation_commit']+'/README.md','source_audio_url':AUDIO_URL,'annotation_zip_sha256':file_digest(annotations),'clips':[],'scope':'Predetermined development subset; no inference or quality score. Source audio stays local and is not part of the repository.'}
     source=None
     try:
         source=open(audio_archive,'rb') if audio_archive else RangeFile(AUDIO_URL)
-        if not audio_archive:manifest.update(audio_archive_bytes=source.length,audio_archive_etag=source.etag)
+        if not audio_archive:manifest.update(audio_archive_bytes=source.length,audio_archive_etag=source.etag,retrieval='Official URL with exact HTTP ranges and pinned entity')
+        else:manifest.update(audio_archive_bytes=audio_archive.stat().st_size,audio_archive_sha256=file_digest(audio_archive),retrieval='Caller-provided ZIP; no publisher fingerprint claim')
         with zipfile.ZipFile(annotations) as reference,zipfile.ZipFile(source) as audio:
             entries=audio.infolist()
             for clip in plan['clips']:
@@ -56,6 +62,7 @@ def prepare(annotations,plan,output,audio_archive=None):
                 info=matches[0]
                 if info.file_size>MAX_MEMBER or info.compress_size>MAX_MEMBER or info.flag_bits&1:raise ValueError('Unsupported/oversized audio member')
                 if not clip['annotation_member'].startswith('joonson-voxconverse-'+plan['annotation_commit'][:7]+'/dev/'):raise ValueError('Annotation member does not match pinned revision')
+                if reference.getinfo(clip['annotation_member']).file_size>1024*1024:raise ValueError('Oversized reference annotation')
                 labels=reference.read(clip['annotation_member'])
                 if digest(labels)!=clip['annotation_sha256']:raise ValueError('Reference annotation hash changed')
                 started=time.monotonic();data=audio.read(info) # ZipExtFile verifies the official CRC.

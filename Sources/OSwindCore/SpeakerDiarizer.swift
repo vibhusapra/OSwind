@@ -144,6 +144,9 @@ public actor SpeakerDiarizer {
         } catch {
             try Task.checkCancellation()
             if ContinuousClock.now>=deadline { throw OSwindError.unavailable("Speaker recognition exceeded its time budget") }
+            // A detector finding no speech is an empty observation, not a
+            // model/decoder failure. Cancellation and expired results still fail.
+            if case OfflineDiarizationError.noSpeechDetected = error {return []}
             throw error
         }
     }

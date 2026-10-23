@@ -1,6 +1,6 @@
 # Natural speaker evaluation
 
-The raw timeline API and `oswindctl diarize` expose anonymous recording-local speech intervals before word attribution. Both this API and normal transcript annotation share the same serialized native model runtime. Voice embeddings and speaker profiles are not exported. A raw timeline must not be confused with named-person recognition or word-label coverage.
+The raw timeline API and `oswindctl diarize` expose anonymous recording-local speech intervals before word attribution. Both this API and normal transcript annotation share the same serialized native model runtime. Voice embeddings and speaker profiles are not exported. No detected speech is a valid empty timeline; cancellation, invalid models, decoder failures and deadlines still fail. A missed detection on a speech reference is scored as missed speech rather than excluded. A raw timeline must not be confused with named-person recognition or word-label coverage.
 
 ## Reproduce
 
@@ -18,6 +18,9 @@ The input is privately snapshotted and normalized using the product's audio path
 The [predetermined five-clip plan](../benchmarks/fixtures/voxconverse-dev-v1.json) selects the first five lexicographic VoxConverse development identifiers before inference. Their reference speaker counts are not passed to the model. Annotations are pinned to an immutable official repository commit. The [official dataset README](https://github.com/joonson/voxconverse/blob/24bf60be297701cd7e4ef18550c6d390c1b87365/README.md) provides download links, corrected v0.3 labels, attribution and CC BY 4.0 terms; original video copyright remains with its owners. Source audio is kept outside Git.
 
 ```bash
+curl --fail --location \
+  https://api.github.com/repos/joonson/voxconverse/zipball/24bf60be297701cd7e4ef18550c6d390c1b87365 \
+  --output /path/to/pinned-annotation.zip
 python3 scripts/prepare-speaker-eval.py \
   --annotations /path/to/pinned-annotation.zip \
   --plan benchmarks/fixtures/voxconverse-dev-v1.json \
@@ -38,4 +41,20 @@ The independent scorer is pinned `pyannote.metrics` 4.2.0. It computes permutati
 
 Report inference real-time factor separately from preparation and whole-process time. macOS peak process RSS excludes GPU/ANE allocations, background services and system power. Each clip starts a fresh process; repetitions within it reuse the model. A source/model/binary hash drift, failed clip, output error or unexpected library write prevents a completed evaluation. Concurrent local component-soak work and data downloads may affect timings.
 
-This is a small development subset, not a held-out, full-corpus or competitor-app ranking. Natural scores are pending until the complete run is verified. ASR word error, projected speaker-label coverage, real meeting acceptance and live speaker continuity are separate gates. Broad parity and top-three placement remain unproved.
+This is a small development subset, not a held-out, full-corpus or competitor-app ranking. The measured results below are development ablations with complete-run verification. ASR word error, projected speaker-label coverage, real meeting acceptance and live speaker continuity are separate gates. Broad parity and top-three placement remain unproved.
+
+
+## Overlap correction and measured results
+
+The previous integration inherited the SDK's exclusive output default. That trims simultaneous voices to one speaker before OSwind's mixed-word safeguard can run. The product now preserves overlapping turns; embedding overlap masking and every clustering parameter remain unchanged. The policy is identified as `overlap-preserving-v1`, and voice-embedding/profile export remains disabled.
+
+[Paired results](../benchmarks/speaker-natural-overlap-v1.json) compare the same model, input hashes, reference hashes and independent scorer in two fixed development subsets. Both repeated runs produce identical error components. No reference speaker counts are supplied to inference.
+
+| Development subset | Pre-fix DER, no collar | Overlap-preserving DER, no collar | Pre-fix DER, 250 ms collar | Overlap-preserving DER, 250 ms collar |
+|---|---:|---:|---:|---:|
+| Initial five clips | 12.03% | 9.78% | 9.42% | 7.36% |
+| Second five, fixed before inference | 8.52% | 7.66% | 6.87% | 5.98% |
+
+This is not a universal per-clip improvement: `ampme` regresses from 4.33% to 5.52% with a 250 ms collar, and `asxwr` changes from 1.42% to 1.44%. Several recordings still undercount speakers, including eight reference speakers detected as four. Full per-clip components and counts remain in the report. Timings are retained, but concurrent activity and uncontrolled caches prevent an isolated speed or energy claim.
+
+The actual product import also processed the 664-second `ahnss` file using GPU-requested Parakeet ASR plus native speaker annotation. All 2,606 timed segments persist and reopen. Of them, 175 intersect model-predicted mixed speech above the product threshold; all 175 remain unattributed. This checks the safeguard against the raw model timeline, not against a human word-level speaker reference. Scoped name search, rename, complete backup/restore and erasure also pass on that real imported source. ASR word error remains unmeasured, and per-operation accelerator placement is not inferred from the compute request.
