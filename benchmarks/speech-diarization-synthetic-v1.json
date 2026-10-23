@@ -1,0 +1,134 @@
+{
+  "passed_synthetic_consistency": true,
+  "scope": "isolated offline component; not integrated into OSwind and not natural-meeting DER",
+  "sdk": {
+    "url": "https://github.com/FluidInference/FluidAudio",
+    "tag": "v0.17.7",
+    "commit": "503b4bd1bbf7220882de39fe8ae6716aae4132da"
+  },
+  "model": {
+    "url": "https://huggingface.co/FluidInference/speaker-diarization-coreml",
+    "subset": "Community-1 offline assets",
+    "license_card": "scoped CC BY 4.0; SDK Apache-2.0 is separate",
+    "requested_compute_units": "all; actual per-op placement/energy not measured"
+  },
+  "fixture": {
+    "synthetic": true,
+    "seconds": 32.225,
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 7.1,
+        "speaker": "A",
+        "stock_voice": "af_heart",
+        "text": "Let's release the desktop memory preview on Friday. I will own the capture tests and the privacy checklist."
+      },
+      {
+        "start": 7.85,
+        "end": 15.575,
+        "speaker": "B",
+        "stock_voice": "am_echo",
+        "text": "That works for me. I'll handle local model setup and the search benchmark. We should keep recording off until setup is complete."
+      },
+      {
+        "start": 16.325,
+        "end": 23.85,
+        "speaker": "A",
+        "stock_voice": "af_heart",
+        "text": "What did we decide about the archive format? I want the media and transcripts to restore together, including their timestamps."
+      },
+      {
+        "start": 24.6,
+        "end": 32.225,
+        "speaker": "B",
+        "stock_voice": "am_echo",
+        "text": "The first package is local and unencrypted. We will verify the restored copy, and add encryption in the next milestone."
+      }
+    ],
+    "scope": "known stock voice sources and intervals; not natural-meeting DER or annotated VAD"
+  },
+  "predicted": {
+    "load_seconds": 12.73822808265686,
+    "processing_seconds": 3.061574935913086,
+    "scope": "isolated component; synthetic speaker consistency, not product integration or natural-meeting DER",
+    "sdk": "FluidAudio v0.17.7 / 503b4bd1",
+    "segments": [
+      {
+        "end": 3.42954158782959,
+        "speaker": "S1",
+        "start": 0.2037351429462433
+      },
+      {
+        "end": 6.723259925842285,
+        "speaker": "S1",
+        "start": 3.6672325134277344
+      },
+      {
+        "end": 14.940577507019043,
+        "speaker": "S2",
+        "start": 8.098471641540527
+      },
+      {
+        "end": 18.879457473754883,
+        "speaker": "S1",
+        "start": 16.58743667602539
+      },
+      {
+        "end": 23.4804744720459,
+        "speaker": "S1",
+        "start": 19.11714744567871
+      },
+      {
+        "end": 31.561969757080078,
+        "speaker": "S2",
+        "start": 24.838708877563477
+      }
+    ]
+  },
+  "utterance_cluster_assignments": [
+    {
+      "source_speaker": "A",
+      "dominant_cluster": "S1",
+      "overlap_seconds": 6.281833857297897
+    },
+    {
+      "source_speaker": "B",
+      "dominant_cluster": "S2",
+      "overlap_seconds": 6.842105865478516
+    },
+    {
+      "source_speaker": "A",
+      "dominant_cluster": "S1",
+      "overlap_seconds": 6.65534782409668
+    },
+    {
+      "source_speaker": "B",
+      "dominant_cluster": "S2",
+      "overlap_seconds": 6.723260879516602
+    }
+  ],
+  "first_process_wall_seconds": 16.18,
+  "peak_rss_bytes": 204259328,
+  "peak_memory_footprint_bytes": 491340856,
+  "limits": [
+    "two stock synthetic voices, easy clean no-overlap fixture",
+    "utterance bounds include pauses; not an annotated speech-activity reference",
+    "single trial, uncontrolled cache state; load includes downloads/compilation",
+    "no independent natural meeting accuracy, app integration, or power claim"
+  ],
+  "asr_component": {
+    "reported_processing_seconds": 0.1730870008468628,
+    "reference_words": 80,
+    "hypothesis_words": 80,
+    "edit_distance": 0,
+    "normalized_wer": 0.0,
+    "word_timing_count": 80,
+    "text": "Let's release the desktop memory preview on Friday. I will own the capture tests and the privacy checklist. That works for me, I'll handle local model setup and the search benchmark. We should keep recording off until setup is complete. What did we decide about the archive format? I want the media and transcripts to restore together, including their timestamps. The first package is local and unencrypted. We will verify the restored copy and add encryption in the next milestone."
+  },
+  "word_alignment_seam": {
+    "eligible_words_with_quarter_second_utterance_edge_exclusion": 76,
+    "matching_synthetic_voice_cluster": 76,
+    "fraction": 1.0,
+    "limit": "ASR timings are not independently annotated; this is functional association, not natural-meeting WDER."
+  }
+}
