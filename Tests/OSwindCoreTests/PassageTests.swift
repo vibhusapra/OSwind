@@ -144,3 +144,25 @@ extension PassageTests {
         XCTAssertTrue(try store.search(SearchFilter(query:"meaning"),mode:.semantic,vector:[1,0],modelID:"fixture").isEmpty)
     }
 }
+
+extension PassageTests {
+    func testRecentSampleHasBoundedSQLWorkInsteadOfGlobalScanPerParent() throws {
+        for i in 0..<1500 {
+            var memory = Memory(id:"bounded-\(i)",timestamp:Date(timeIntervalSince1970:Double(i)),app:i%2==0 ? "A" : "B",text:"Synthetic bounded lookup")
+            memory.embedding = [1,0]; memory.embeddingModel = "fixture"; try store.insert(memory)
+        }
+        var db: OpaquePointer?; XCTAssertEqual(sqlite3_open_v2(root.appendingPathComponent("memory.sqlite").path,&db,SQLITE_OPEN_READONLY,nil),SQLITE_OK); defer { sqlite3_close(db) }
+        for scoped in [false,true] {
+            var stmt: OpaquePointer?; let sql = VectorCandidateSQL.recent(appScoped:scoped,predicate:scoped ? "m.app=?" : "1=1")
+            XCTAssertEqual(sqlite3_prepare_v2(db,sql,-1,&stmt,nil),SQLITE_OK); defer { sqlite3_finalize(stmt) }
+            sqlite3_bind_text(stmt,1,"fixture",-1,unsafeBitCast(-1,to:sqlite3_destructor_type.self)); sqlite3_bind_int64(stmt,2,Int64.max); if scoped { sqlite3_bind_text(stmt,3,"A",-1,unsafeBitCast(-1,to:sqlite3_destructor_type.self)) }
+            var count = 0, status = sqlite3_step(stmt)
+            while status == SQLITE_ROW { count += 1; status = sqlite3_step(stmt) }
+            XCTAssertEqual(status,SQLITE_DONE); XCTAssertEqual(count,100)
+            // VM steps check actual executed work, not a fragile plan string or
+            // wall-clock threshold. A registry scan per parent exceeds this.
+            XCTAssertLessThan(sqlite3_stmt_status(stmt,SQLITE_STMTSTATUS_VM_STEP,0),20000)
+            XCTAssertLessThan(sqlite3_stmt_status(stmt,SQLITE_STMTSTATUS_FULLSCAN_STEP,0),300)
+        }
+    }
+}

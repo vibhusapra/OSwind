@@ -543,12 +543,7 @@ extension MemoryStore {
                 }
                 if let databaseError { throw databaseError }
             }
-            let select = """
-            SELECT m.id,CASE WHEN r.ordinal=0 THEN COALESCE(v.vector,CASE WHEN m.embedding_model=r.model THEN m.embedding END) ELSE p.vector END,m.timestamp,COALESCE(p.start,-1),COALESCE(p.length,0)
-            FROM vector_keys r JOIN memories m ON m.id=r.memory_id
-            LEFT JOIN semantic_vectors v ON v.memory_id=r.memory_id AND v.model=r.model AND r.ordinal=0
-            LEFT JOIN semantic_passages p ON p.memory_id=r.memory_id AND p.model=r.model AND p.ordinal=r.ordinal
-            """
+            let select = VectorCandidateSQL.select()
             let candidate = try prepare(select+" WHERE r.key=? AND r.model=? AND r.revision<=? AND \(whereSQL)")
             defer { sqlite3_finalize(candidate) }; var best = SemanticTopK(capacity:limit), validParents = Set<String>()
             func consume(_ stmt: OpaquePointer) {
@@ -568,8 +563,7 @@ extension MemoryStore {
             let nativeValid = validParents.count
             // A bounded recent sample keeps repeated identical captures from
             // arbitrarily hiding the newest source behind native tie ordering.
-            let recentSelect = select.replacingOccurrences(of:"FROM vector_keys r JOIN memories m ON m.id=r.memory_id",with:"FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id")
-            let recent = try prepare(recentSelect+" WHERE r.model=? AND r.revision<=? AND \(whereSQL) ORDER BY m.timestamp DESC,m.id,r.ordinal LIMIT 100")
+            let recent = try prepare(VectorCandidateSQL.recent(appScoped:filter.app != nil,predicate:whereSQL))
             defer { sqlite3_finalize(recent) }; bind(recent,1,modelID); sqlite3_bind_int64(recent,2,sequence)
             for (i,value) in values.enumerated() { bind(recent,Int32(i+3),value) }
             var recentStatus = sqlite3_step(recent)

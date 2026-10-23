@@ -41,6 +41,7 @@ enum SemanticPassagePlan {
 struct PassageVector: Sendable { var range: PassageRange; var vector: [Float] }
 enum PassageSchema {
     static let sql = """
+    CREATE INDEX IF NOT EXISTS vector_keys_parent_revision ON vector_keys(memory_id,model,revision,ordinal);
     CREATE INDEX IF NOT EXISTS memories_passage_candidates ON memories(id) WHERE length(CAST(text AS BLOB))>2400;
     CREATE TABLE IF NOT EXISTS semantic_passages (
         memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
