@@ -16,6 +16,12 @@ jobs:
         run: |
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Exercise API and MCP processes
+        run: python3 scripts/integration-smoke.py .build/release/oswindctl
+      - name: Evaluate authored retrieval fixture
+        run: |
+          mkdir -p .artifacts
+          .build/release/oswindctl eval-retrieval --fixture benchmarks/fixtures/desktop-retrieval-v1.json --output .artifacts/relevance-apple-ci.json
       - name: Render sample workspace
         run: |
           mkdir -p .artifacts
@@ -34,3 +40,4 @@ jobs:
           path: |
             dist/OSwind-macos.zip
             .artifacts/workspace-sample.png
+            .artifacts/relevance-apple-ci.json

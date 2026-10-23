@@ -7,13 +7,14 @@ model_dir="${OSWIND_MODEL_DIR:-$HOME/Library/Caches/OSwind/models}"
 mkdir -p "$model_dir"
 chmod 700 "$model_dir"
 if ! curl --fail --silent http://127.0.0.1:11434/api/tags >/dev/null; then
-    nohup ollama serve > "$model_dir/ollama.log" 2>&1 &
+    OLLAMA_NO_CLOUD=1 nohup ollama serve > "$model_dir/ollama.log" 2>&1 &
     for i in {1..30}; do
         if curl --fail --silent http://127.0.0.1:11434/api/tags >/dev/null; then break; fi
         sleep 1
     done
 fi
 ollama pull "${OSWIND_CHAT_MODEL:-qwen3:4b}"
+ollama pull "${OSWIND_EMBEDDING_MODEL:-qwen3-embedding:0.6b}"
 python3 - "$model_dir" <<'PY'
 import hashlib, json, pathlib, sys, urllib.request
 root = pathlib.Path(sys.argv[1])

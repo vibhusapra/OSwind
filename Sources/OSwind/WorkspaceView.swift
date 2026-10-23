@@ -43,7 +43,7 @@ struct WorkspaceView: View {
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .onReceive(NotificationCenter.default.publisher(for:.oswindFocusSearch)) { _ in m.section = "Memories"; searchFocused = true }
-        .sheet(isPresented:$m.showSettings) { SettingsView().environmentObject(m) }
+        .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh() }) { SettingsView().environmentObject(m) }
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
         .sheet(item:$m.selected) { MemoryDetail(memory:$0).environmentObject(m) }
         .sheet(isPresented:$showNote) { VStack(alignment:.leading,spacing:16) { Text("Keep a thought").font(.title2.weight(.semibold)); TextEditor(text:$note).font(.body).frame(width:500,height:220); HStack { Button("Cancel") { showNote = false }; Spacer(); Button("Save note") { m.addNote(note); note = ""; showNote = false }.buttonStyle(.borderedProminent).disabled(note.isEmpty) } }.padding(24) }
@@ -72,6 +72,7 @@ struct WorkspaceView: View {
                 Spacer()
                 Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented).labelsHidden().frame(width:250)
             }
+            ForEach(m.searchWarnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.selected = $0 } }
             if m.hits.isEmpty {

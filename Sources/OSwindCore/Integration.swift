@@ -11,9 +11,9 @@ public enum Integration {
         func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; guard let date = iso.date(from: value) else { throw OSwindError.invalid("\(key) must be an ISO 8601 timestamp") }; return date }
         return SearchFilter(query: String((args["query"] as? String ?? "").prefix(4000)), app: args["app"] as? String, kind: (args["kind"] as? String).flatMap(MemoryKind.init), start: try date("start"), end: try date("end"), favoritesOnly: args["favorites"] as? Bool ?? false, tag: args["tag"] as? String, limit: min(100, max(1, args["limit"] as? Int ?? 20)))
     }
-    public static func execute(_ name: String, args: [String: Any], store: MemoryStore, embedder: LocalEmbedder) throws -> Any {
+    public static func execute(_ name: String, args: [String: Any], store: MemoryStore, embedder: LocalEmbedder) async throws -> Any {
         switch name {
-        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(store.search(f, mode: mode, vector: mode == .keyword || f.query.isEmpty ? nil : embedder.embed(f.query), modelID: embedder.modelID))
+        case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search))
         case "get_memory": guard let id = args["id"] as? String else { throw OSwindError.invalid("Missing memory id") }; guard let memory = try store.get(id) else { throw OSwindError.invalid("Memory not found") }; return try json(memory)
         case "memory_stats": return try json(store.stats())
         default: throw OSwindError.invalid("Unknown tool")
@@ -28,7 +28,7 @@ public enum Integration {
             ["name":"memory_stats","description":"Read local capture counts and storage use.","inputSchema":["type":"object","additionalProperties":false],"annotations":annotation]
         ]
     }
-    public static func rpc(_ request: [String: Any], store: MemoryStore, embedder: LocalEmbedder) -> [String: Any]? {
+    public static func rpc(_ request: [String: Any], store: MemoryStore, embedder: LocalEmbedder) async -> [String: Any]? {
         guard let id = request["id"] else { return nil }
         func success(_ value: Any) -> [String: Any] { ["jsonrpc":"2.0","id":id,"result":value] }
         guard request["jsonrpc"] as? String == "2.0", let method = request["method"] as? String else { return ["jsonrpc":"2.0","id":id,"error":["code":-32600,"message":"Invalid Request"]] }
@@ -38,7 +38,7 @@ public enum Integration {
         case "tools/list": return success(["tools":tools])
         case "tools/call":
             let params = request["params"] as? [String: Any] ?? [:]
-            do { let result = try execute(params["name"] as? String ?? "", args: params["arguments"] as? [String: Any] ?? [:], store: store, embedder: embedder); let text = String(data: try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys]), encoding: .utf8)!; return success(["content":[["type":"text","text":text]],"isError":false]) }
+            do { let result = try await execute(params["name"] as? String ?? "", args: params["arguments"] as? [String: Any] ?? [:], store: store, embedder: embedder); let text = String(data: try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys]), encoding: .utf8)!; return success(["content":[["type":"text","text":text]],"isError":false]) }
             catch { return success(["content":[["type":"text","text":error.localizedDescription]],"isError":true]) }
         default: return ["jsonrpc":"2.0","id":id,"error":["code":-32601,"message":"Method not found"]]
         }
@@ -66,16 +66,17 @@ public final class LocalAPIServer: @unchecked Sendable {
         listener.start(queue:queue)
     }
     public func stop() { listener?.cancel(); listener = nil }
-    private func read(_ connection: NWConnection, buffer: Data) {
+    private func read(_ connection: NWConnection, buffer: Data, headerTimeout: DispatchWorkItem? = nil) {
+        let timeout = headerTimeout ?? DispatchWorkItem { connection.cancel() }
+        if headerTimeout == nil { queue.asyncAfter(deadline:.now()+5,execute:timeout) }
         connection.receive(minimumIncompleteLength:1, maximumLength:16384) { [weak self] data,_,complete,error in
             guard let self else { connection.cancel(); return }; var buffer = buffer; buffer.append(data ?? Data())
-            if buffer.count > 16384 { self.send(connection,status:413,object:["error":"Request too large"]); return }
-            if buffer.range(of: Data("\r\n\r\n".utf8)) != nil { let response = self.handle(String(data:buffer,encoding:.utf8) ?? ""); self.send(connection,status:response.0,object:response.1) }
-            else if complete || error != nil { connection.cancel() } else { self.read(connection,buffer:buffer) }
+            if buffer.count > 16384 { timeout.cancel(); self.send(connection,status:413,object:["error":"Request too large"]); return }
+            if buffer.range(of: Data("\r\n\r\n".utf8)) != nil { timeout.cancel(); Task { let response = await self.handle(String(data:buffer,encoding:.utf8) ?? ""); self.send(connection,status:response.0,object:response.1) } }
+            else if complete || error != nil { timeout.cancel(); connection.cancel() } else { self.read(connection,buffer:buffer,headerTimeout:timeout) }
         }
-        queue.asyncAfter(deadline:.now() + 5) { connection.cancel() }
     }
-    public func handle(_ request: String) -> (Int,Any) {
+    public func handle(_ request: String) async -> (Int,Any) {
         let lines = request.components(separatedBy:"\r\n"); let first = (lines.first ?? "").split(separator:" "); guard first.count == 3, first[0] == "GET" else { return (405,["error":"Read-only GET API"]) }
         var headers = [String:String](); for line in lines.dropFirst() { guard let colon = line.firstIndex(of:":") else { continue }; let key = line[..<colon].lowercased(); guard headers[key] == nil else { return (400,["error":"Duplicate header"]) }; headers[key] = line[line.index(after:colon)...].trimmingCharacters(in:.whitespaces) }
         guard headers["origin"] == nil else { return (403,["error":"Browser origins are not allowed"]) }
@@ -85,9 +86,9 @@ public final class LocalAPIServer: @unchecked Sendable {
         var args = [String:Any](); for item in components.queryItems ?? [] { args[item.name] = item.value }; if let limit = args["limit"] as? String { args["limit"] = Int(limit) }; if let favorites = args["favorites"] as? String { args["favorites"] = favorites == "true" }
         do {
             if components.path == "/health" { return (200,["status":"ok","version":"0.1.0"]) }
-            if components.path == "/v1/search" { return (200,try Integration.execute("search_memory",args:args,store:store,embedder:embedder)) }
+            if components.path == "/v1/search" { return (200,try await Integration.execute("search_memory",args:args,store:store,embedder:embedder)) }
             if components.path == "/v1/stats" { return (200,try Integration.json(store.stats())) }
-            if components.path.hasPrefix("/v1/memories/") { return (200,try Integration.execute("get_memory",args:["id":String(components.path.dropFirst("/v1/memories/".count))],store:store,embedder:embedder)) }
+            if components.path.hasPrefix("/v1/memories/") { return (200,try await Integration.execute("get_memory",args:["id":String(components.path.dropFirst("/v1/memories/".count))],store:store,embedder:embedder)) }
             return (404,["error":"Not found"])
         } catch { return (400,["error":error.localizedDescription]) }
     }

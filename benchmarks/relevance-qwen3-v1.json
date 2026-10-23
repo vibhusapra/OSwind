@@ -1,0 +1,2915 @@
+{
+  "build" : "release",
+  "disk_bytes" : 1952696,
+  "documents" : 32,
+  "fixture_description" : "Hand-authored synthetic desktop-memory relevance fixture. Fictional names\/commitments. Not a natural-user corpus or vendor comparison. No-evidence queries measure candidate false positives, not generative abstention.",
+  "fixture_sha256" : "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+  "gpu" : "Apple M5 Max",
+  "hybrid_fusion" : "cosine-plus-bounded-lexical-bonus-v1",
+  "model_ids" : [
+    "ollama:qwen3-embedding:0.6b@ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d:desktop-v1:d1024"
+  ],
+  "model_index_seconds" : 0.71308004856109619,
+  "modes" : {
+    "hybrid" : {
+      "categories" : {
+        "app_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "code" : {
+          "count" : 12,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "date_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "kind_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "multilingual" : {
+          "count" : 24,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "paraphrase" : {
+          "count" : 48,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        }
+      },
+      "hit_rate_at_5" : 1,
+      "mrr_at_5" : 1,
+      "no_evidence_empty_rate" : 0,
+      "p50_ms" : 81.001996994018555,
+      "p95_ms" : 92.206954956054688,
+      "queries" : [
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "p01",
+          "latency_ms" : 92.674016952514648,
+          "mrr_at_5" : 1,
+          "query" : "Who is taking care of the OSwind shipping checks?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "release",
+            "falsealarm",
+            "old_decision",
+            "banktravel"
+          ],
+          "scores" : [
+            0.66223640521367388,
+            0.63795023632049563,
+            0.54759441687510568,
+            0.53059206077030729,
+            0.45821446180343628
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "p02",
+          "latency_ms" : 83.263039588928223,
+          "mrr_at_5" : 1,
+          "query" : "How can we stop the recorder from draining the laptop?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "battery",
+            "privacy",
+            "permissions",
+            "design",
+            "audio"
+          ],
+          "scores" : [
+            0.55987008333206179,
+            0.53815460205078125,
+            0.48862183094024658,
+            0.43761566281318665,
+            0.40492066740989685
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "refund"
+          ],
+          "id" : "p03",
+          "latency_ms" : 79.532027244567871,
+          "mrr_at_5" : 1,
+          "query" : "Which customer wants their money back?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "refund",
+            "support",
+            "banktravel",
+            "privacy",
+            "backup"
+          ],
+          "scores" : [
+            0.5645861799066717,
+            0.50207991997400925,
+            0.49872058629989624,
+            0.47153043746948242,
+            0.46677568554878235
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "renewal"
+          ],
+          "id" : "p04",
+          "latency_ms" : 75.284957885742188,
+          "mrr_at_5" : 1,
+          "query" : "Who is drafting Acme’s updated agreement?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "renewal",
+            "invoice",
+            "refund",
+            "meeting_zh",
+            "meeting"
+          ],
+          "scores" : [
+            0.66700223922729496,
+            0.58524367700923574,
+            0.49083493749300638,
+            0.43058720231056213,
+            0.42500627040863037
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "recipe"
+          ],
+          "id" : "p05",
+          "latency_ms" : 76.804995536804199,
+          "mrr_at_5" : 1,
+          "query" : "What goes on the roasted vegetables for dinner?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "recipe",
+            "garden_de",
+            "lunch_es",
+            "dog"
+          ],
+          "scores" : [
+            0.66619415998458864,
+            0.4353993833065033,
+            0.40376704931259155,
+            0.27149251103401184
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "travel"
+          ],
+          "id" : "p06",
+          "latency_ms" : 80.168008804321289,
+          "mrr_at_5" : 1,
+          "query" : "What should I pack for the conference trip?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "travel",
+            "meeting",
+            "privacy",
+            "meeting_zh",
+            "design"
+          ],
+          "scores" : [
+            0.46574508706728618,
+            0.4113897979259491,
+            0.39958453178405762,
+            0.38173842430114746,
+            0.37201929092407227
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "login"
+          ],
+          "id" : "p07",
+          "latency_ms" : 81.734061241149902,
+          "mrr_at_5" : 1,
+          "query" : "Why does authentication keep sending people back to login?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "login",
+            "support",
+            "privacy",
+            "backup",
+            "server"
+          ],
+          "scores" : [
+            0.59347249348958331,
+            0.41032683849334717,
+            0.40081340074539185,
+            0.38910630345344543,
+            0.38061428070068359
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "p08",
+          "latency_ms" : 85.868954658508301,
+          "mrr_at_5" : 1,
+          "query" : "What did Jamie want to work offline?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "privacy",
+            "meeting_zh",
+            "old_decision",
+            "backup"
+          ],
+          "scores" : [
+            0.68071488380432132,
+            0.46470773220062256,
+            0.44383484125137329,
+            0.40200972557067871,
+            0.38421371579170227
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "vector"
+          ],
+          "id" : "p09",
+          "latency_ms" : 83.22298526763916,
+          "mrr_at_5" : 1,
+          "query" : "How are exact words and meaning combined in search?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "vector",
+            "audio",
+            "design",
+            "meeting",
+            "privacy"
+          ],
+          "scores" : [
+            0.53043949604034424,
+            0.34783107042312622,
+            0.34542924165725708,
+            0.33391469717025757,
+            0.31863510608673096
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "privacy"
+          ],
+          "id" : "p10",
+          "latency_ms" : 83.912968635559082,
+          "mrr_at_5" : 1,
+          "query" : "How long should the app remember activity?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "privacy",
+            "permissions",
+            "support",
+            "design",
+            "server"
+          ],
+          "scores" : [
+            0.61337383508682253,
+            0.46242876132329302,
+            0.43182379007339478,
+            0.42309349775314331,
+            0.37137389183044434
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "design"
+          ],
+          "id" : "p11",
+          "latency_ms" : 81.605911254882812,
+          "mrr_at_5" : 1,
+          "query" : "What must remain visible while the mic is on?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "design",
+            "permissions",
+            "privacy",
+            "meeting",
+            "audio"
+          ],
+          "scores" : [
+            0.65093218755722049,
+            0.59642093254969675,
+            0.49965505083401995,
+            0.48994717001914978,
+            0.48816794157028198
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "invoice"
+          ],
+          "id" : "p12",
+          "latency_ms" : 83.232998847961426,
+          "mrr_at_5" : 1,
+          "query" : "When does the customer need to pay invoice 4821?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "invoice",
+            "banktravel",
+            "privacy",
+            "support",
+            "refund"
+          ],
+          "scores" : [
+            0.68980216455459598,
+            0.54337544520696002,
+            0.44945728778839111,
+            0.41807874862353006,
+            0.41689848899841309
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "audio"
+          ],
+          "id" : "p13",
+          "latency_ms" : 84.398984909057617,
+          "mrr_at_5" : 1,
+          "query" : "Which engine turns speech into words without a cloud service?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "audio",
+            "meeting",
+            "backup",
+            "vector",
+            "design"
+          ],
+          "scores" : [
+            0.64600498437881471,
+            0.47696746190389,
+            0.43123857053843412,
+            0.42306444048881531,
+            0.40498170256614685
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "backup"
+          ],
+          "id" : "p14",
+          "latency_ms" : 92.206954956054688,
+          "mrr_at_5" : 1,
+          "query" : "How do we know an archive restore is safe to switch to?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "backup",
+            "privacy",
+            "support",
+            "server",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.7910387139320374,
+            0.54174554347991943,
+            0.48802971839904785,
+            0.46292419513066607,
+            0.39917424321174622
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "dog"
+          ],
+          "id" : "p15",
+          "latency_ms" : 80.083012580871582,
+          "mrr_at_5" : 1,
+          "query" : "What does Pepper need at the clinic?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "dog",
+            "backup",
+            "lunch_es",
+            "privacy",
+            "banktravel"
+          ],
+          "scores" : [
+            0.6676907110214233,
+            0.35994580388069153,
+            0.34870296716690063,
+            0.34384047985076904,
+            0.3300754725933075
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "book"
+          ],
+          "id" : "p16",
+          "latency_ms" : 81.331014633178711,
+          "mrr_at_5" : 1,
+          "query" : "What study technique is better than repeatedly reading?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "book",
+            "battery",
+            "design",
+            "meeting",
+            "vector"
+          ],
+          "scores" : [
+            0.69647237221399938,
+            0.39774954319000244,
+            0.35820537805557251,
+            0.35340043902397156,
+            0.34333926439285278
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "database"
+          ],
+          "id" : "p17",
+          "latency_ms" : 87.083101272583008,
+          "mrr_at_5" : 1,
+          "query" : "Why did other database writers have to wait?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "database",
+            "meeting_zh",
+            "old_decision",
+            "privacy",
+            "meeting"
+          ],
+          "scores" : [
+            0.5253139410018921,
+            0.46705996990203857,
+            0.4322044849395752,
+            0.39999958872795105,
+            0.39495232701301575
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "display"
+          ],
+          "id" : "p18",
+          "latency_ms" : 79.06806468963623,
+          "mrr_at_5" : 1,
+          "query" : "Why is the screenshot fuzzy on my extra monitor?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "display",
+            "support",
+            "permissions",
+            "privacy",
+            "battery"
+          ],
+          "scores" : [
+            0.7379774045944214,
+            0.54015578428904221,
+            0.48909485340118408,
+            0.420132207328623,
+            0.39682450890541077
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "server"
+          ],
+          "id" : "p19",
+          "latency_ms" : 80.265998840332031,
+          "mrr_at_5" : 1,
+          "query" : "What prevents websites or nearby machines from reading memory?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "server",
+            "privacy",
+            "permissions",
+            "book",
+            "backup"
+          ],
+          "scores" : [
+            0.59759017891354027,
+            0.47477895021438599,
+            0.4384797331058618,
+            0.42522295872370403,
+            0.37028759717941284
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "permissions"
+          ],
+          "id" : "p20",
+          "latency_ms" : 83.122014999389648,
+          "mrr_at_5" : 1,
+          "query" : "Which permissions cover the screen, app text, and sound?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "permissions",
+            "privacy",
+            "design",
+            "display",
+            "audio"
+          ],
+          "scores" : [
+            0.71496262709299718,
+            0.50251017176743706,
+            0.4610363245010376,
+            0.45778785996966892,
+            0.42589306888126194
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "m01",
+          "latency_ms" : 81.219077110290527,
+          "mrr_at_5" : 1,
+          "query" : "¿Quién prepara la lista para publicar OSwind?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "old_decision",
+            "release",
+            "falsealarm",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.70086885770161944,
+            0.6405020720618112,
+            0.59161944584413007,
+            0.55912249161646921,
+            0.48398146033287048
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "m02",
+          "latency_ms" : 85.184931755065918,
+          "mrr_at_5" : 1,
+          "query" : "Comment réduire la consommation de batterie pendant l’enregistrement ?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "battery",
+            "privacy",
+            "permissions",
+            "design",
+            "audio"
+          ],
+          "scores" : [
+            0.57779961862261331,
+            0.50563067197799683,
+            0.47675704956054688,
+            0.47580534219741821,
+            0.43437475027182165
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "legal_es"
+          ],
+          "id" : "m03",
+          "latency_ms" : 80.864071846008301,
+          "mrr_at_5" : 1,
+          "query" : "Who will prepare Boreal’s six-month support contract?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "legal_es",
+            "meeting_zh",
+            "banktravel",
+            "new_decision",
+            "renewal"
+          ],
+          "scores" : [
+            0.78766283459133568,
+            0.43884235620498657,
+            0.40611326694488525,
+            0.39699035882949829,
+            0.39633950153986613
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "lunch_es"
+          ],
+          "id" : "m04",
+          "latency_ms" : 81.998944282531738,
+          "mrr_at_5" : 1,
+          "query" : "When and where are we eating with Priya?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "lunch_es",
+            "recipe",
+            "meeting",
+            "new_decision",
+            "travel"
+          ],
+          "scores" : [
+            0.85312251091003422,
+            0.40790793299674988,
+            0.33626836538314819,
+            0.3301730751991272,
+            0.32970601320266724
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "train_fr"
+          ],
+          "id" : "m05",
+          "latency_ms" : 90.352058410644531,
+          "mrr_at_5" : 1,
+          "query" : "What time does Camille’s train leave?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "train_fr",
+            "travel",
+            "lunch_es",
+            "invoice",
+            "meeting"
+          ],
+          "scores" : [
+            0.7311525130271912,
+            0.40291467308998108,
+            0.37885349988937378,
+            0.35990911722183228,
+            0.34525957703590393
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "garden_de"
+          ],
+          "id" : "m06",
+          "latency_ms" : 82.939028739929199,
+          "mrr_at_5" : 1,
+          "query" : "Who will plant tomatoes on the balcony on Sunday?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "garden_de",
+            "recipe",
+            "lunch_es",
+            "new_decision",
+            "banktravel"
+          ],
+          "scores" : [
+            0.65834915637969971,
+            0.41496356248855593,
+            0.4046606719493866,
+            0.37419825792312622,
+            0.3613857626914978
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release_ja"
+          ],
+          "id" : "m07",
+          "latency_ms" : 78.104019165039062,
+          "mrr_at_5" : 1,
+          "query" : "Who is responsible for the Japanese manual revision?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "release_ja",
+            "meeting_zh",
+            "design",
+            "new_decision",
+            "release"
+          ],
+          "scores" : [
+            0.56552714109420776,
+            0.45510187745094299,
+            0.3599296510219574,
+            0.33686372637748718,
+            0.33310729265213013
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "meeting_zh"
+          ],
+          "id" : "m08",
+          "latency_ms" : 81.107974052429199,
+          "mrr_at_5" : 1,
+          "query" : "Who is testing keyboard focus order before Tuesday?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting_zh",
+            "new_decision",
+            "design",
+            "old_decision",
+            "display"
+          ],
+          "scores" : [
+            0.68970060348510742,
+            0.43946558237075806,
+            0.42833170294761658,
+            0.41857954859733582,
+            0.40289449691772461
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "date_filter",
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "id" : "f01",
+          "latency_ms" : 77.087998390197754,
+          "mrr_at_5" : 1,
+          "query" : "OSwind release decision",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "release",
+            "falsealarm",
+            "meeting_zh",
+            "privacy"
+          ],
+          "scores" : [
+            0.79918493509292599,
+            0.67339234207615706,
+            0.4937966180153382,
+            0.42148157954216003,
+            0.41882223023308646
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "app_filter",
+          "expected" : [
+            "refund",
+            "invoice"
+          ],
+          "id" : "f02",
+          "latency_ms" : 77.522039413452148,
+          "mrr_at_5" : 1,
+          "query" : "customer receipt",
+          "recall_at_5" : 1,
+          "returned" : [
+            "refund",
+            "invoice",
+            "support",
+            "banktravel"
+          ],
+          "scores" : [
+            0.55851695775985721,
+            0.55555603106816609,
+            0.48962775360454214,
+            0.45669940114021301
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "kind_filter",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "f03",
+          "latency_ms" : 79.331040382385254,
+          "mrr_at_5" : 1,
+          "query" : "source citations",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.52865667819976803,
+            0.40874046087265015
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n01",
+          "latency_ms" : 80.675005912780762,
+          "mrr_at_5" : 0,
+          "query" : "What is the password for the production database?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "privacy",
+            "backup",
+            "database",
+            "meeting_zh",
+            "server"
+          ],
+          "scores" : [
+            0.45963319698969524,
+            0.42712557315826416,
+            0.38116853760950492,
+            0.37210917472839355,
+            0.35561287403106689
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n02",
+          "latency_ms" : 81.062078475952148,
+          "mrr_at_5" : 0,
+          "query" : "How many people attended last year’s company picnic?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "lunch_es",
+            "support",
+            "recipe",
+            "old_decision",
+            "privacy"
+          ],
+          "scores" : [
+            0.37442475557327271,
+            0.28963998624256682,
+            0.2815014123916626,
+            0.26713407039642334,
+            0.25011521577835083
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n03",
+          "latency_ms" : 83.447933197021484,
+          "mrr_at_5" : 0,
+          "query" : "What is the serial number of my washing machine?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "privacy",
+            "audio",
+            "backup",
+            "support",
+            "banktravel"
+          ],
+          "scores" : [
+            0.29348874092102051,
+            0.28039175271987915,
+            0.27611267566680908,
+            0.27034330368041992,
+            0.25361669063568115
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n04",
+          "latency_ms" : 77.191948890686035,
+          "mrr_at_5" : 0,
+          "query" : "Who won the 2035 chess championship?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "new_decision",
+            "meeting_zh",
+            "lunch_es",
+            "old_decision",
+            "vector"
+          ],
+          "scores" : [
+            0.32331448793411255,
+            0.30051219463348389,
+            0.2969571053981781,
+            0.27180761098861694,
+            0.2557235062122345
+          ],
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "recall_at_5" : 1
+    },
+    "keyword" : {
+      "categories" : {
+        "app_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "code" : {
+          "count" : 12,
+          "mrr_at_5" : 0.83333333333333348,
+          "recall_at_5" : 1
+        },
+        "date_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "kind_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "multilingual" : {
+          "count" : 24,
+          "mrr_at_5" : 0.35416666666666669,
+          "recall_at_5" : 0.5
+        },
+        "paraphrase" : {
+          "count" : 48,
+          "mrr_at_5" : 0.90625,
+          "recall_at_5" : 0.9375
+        }
+      },
+      "hit_rate_at_5" : 0.83870967741935487,
+      "mrr_at_5" : 0.76344086021505375,
+      "no_evidence_empty_rate" : 0.5,
+      "p50_ms" : 0.053048133850097656,
+      "p95_ms" : 0.095963478088378906,
+      "queries" : [
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "p01",
+          "latency_ms" : 0.098943710327148438,
+          "mrr_at_5" : 1,
+          "query" : "Who is taking care of the OSwind shipping checks?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "release",
+            "backup",
+            "new_decision",
+            "falsealarm",
+            "old_decision"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "p02",
+          "latency_ms" : 0.056028366088867188,
+          "mrr_at_5" : 1,
+          "query" : "How can we stop the recorder from draining the laptop?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "battery",
+            "travel"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "refund"
+          ],
+          "id" : "p03",
+          "latency_ms" : 0.06198883056640625,
+          "mrr_at_5" : 0.5,
+          "query" : "Which customer wants their money back?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "refund",
+            "support"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "renewal"
+          ],
+          "id" : "p04",
+          "latency_ms" : 0.057935714721679688,
+          "mrr_at_5" : 1,
+          "query" : "Who is drafting Acme’s updated agreement?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "renewal",
+            "invoice",
+            "refund"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "recipe"
+          ],
+          "id" : "p05",
+          "latency_ms" : 0.041961669921875,
+          "mrr_at_5" : 1,
+          "query" : "What goes on the roasted vegetables for dinner?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "recipe"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "travel"
+          ],
+          "id" : "p06",
+          "latency_ms" : 0.038981437683105469,
+          "mrr_at_5" : 1,
+          "query" : "What should I pack for the conference trip?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "travel"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "login"
+          ],
+          "id" : "p07",
+          "latency_ms" : 0.068902969360351562,
+          "mrr_at_5" : 1,
+          "query" : "Why does authentication keep sending people back to login?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "login",
+            "design",
+            "vector",
+            "renewal"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "p08",
+          "latency_ms" : 0.046968460083007812,
+          "mrr_at_5" : 1,
+          "query" : "What did Jamie want to work offline?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "refund"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "vector"
+          ],
+          "id" : "p09",
+          "latency_ms" : 0.028967857360839844,
+          "mrr_at_5" : 0,
+          "query" : "How are exact words and meaning combined in search?",
+          "recall_at_5" : 0,
+          "returned" : [
+
+          ],
+          "scores" : [
+
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "privacy"
+          ],
+          "id" : "p10",
+          "latency_ms" : 0.079035758972167969,
+          "mrr_at_5" : 1,
+          "query" : "How long should the app remember activity?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "privacy",
+            "travel",
+            "database",
+            "refund",
+            "falsealarm"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "design"
+          ],
+          "id" : "p11",
+          "latency_ms" : 0.070095062255859375,
+          "mrr_at_5" : 1,
+          "query" : "What must remain visible while the mic is on?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "design",
+            "database",
+            "privacy",
+            "permissions",
+            "server"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "invoice"
+          ],
+          "id" : "p12",
+          "latency_ms" : 0.079035758972167969,
+          "mrr_at_5" : 1,
+          "query" : "When does the customer need to pay invoice 4821?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "invoice",
+            "meeting",
+            "banktravel",
+            "dog",
+            "cardesign"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "audio"
+          ],
+          "id" : "p13",
+          "latency_ms" : 0.071048736572265625,
+          "mrr_at_5" : 1,
+          "query" : "Which engine turns speech into words without a cloud service?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "audio",
+            "backup",
+            "meeting"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "backup"
+          ],
+          "id" : "p14",
+          "latency_ms" : 0.058054924011230469,
+          "mrr_at_5" : 1,
+          "query" : "How do we know an archive restore is safe to switch to?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "backup",
+            "release",
+            "server"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "dog"
+          ],
+          "id" : "p15",
+          "latency_ms" : 0.048041343688964844,
+          "mrr_at_5" : 1,
+          "query" : "What does Pepper need at the clinic?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "dog",
+            "cardesign"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "book"
+          ],
+          "id" : "p16",
+          "latency_ms" : 0.055074691772460938,
+          "mrr_at_5" : 1,
+          "query" : "What study technique is better than repeatedly reading?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "book",
+            "permissions"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "database"
+          ],
+          "id" : "p17",
+          "latency_ms" : 0.044107437133789062,
+          "mrr_at_5" : 1,
+          "query" : "Why did other database writers have to wait?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "database"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "display"
+          ],
+          "id" : "p18",
+          "latency_ms" : 0.051021575927734375,
+          "mrr_at_5" : 1,
+          "query" : "Why is the screenshot fuzzy on my extra monitor?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "display",
+            "privacy",
+            "support"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "server"
+          ],
+          "id" : "p19",
+          "latency_ms" : 0.06389617919921875,
+          "mrr_at_5" : 0.33333333333333331,
+          "query" : "What prevents websites or nearby machines from reading memory?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "book",
+            "permissions",
+            "server"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "permissions"
+          ],
+          "id" : "p20",
+          "latency_ms" : 0.099897384643554688,
+          "mrr_at_5" : 1,
+          "query" : "Which permissions cover the screen, app text, and sound?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "permissions",
+            "privacy",
+            "support",
+            "vector",
+            "audio"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "m01",
+          "latency_ms" : 0.078082084655761719,
+          "mrr_at_5" : 0.5,
+          "query" : "¿Quién prepara la lista para publicar OSwind?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "legal_es",
+            "release",
+            "new_decision",
+            "falsealarm",
+            "old_decision"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "m02",
+          "latency_ms" : 0.16701221466064453,
+          "mrr_at_5" : 0,
+          "query" : "Comment réduire la consommation de batterie pendant l’enregistrement ?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "train_fr",
+            "server",
+            "falsealarm",
+            "audio",
+            "legal_es"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872,
+            0.015625
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "legal_es"
+          ],
+          "id" : "m03",
+          "latency_ms" : 0.068068504333496094,
+          "mrr_at_5" : 0.33333333333333331,
+          "query" : "Who will prepare Boreal’s six-month support contract?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "renewal",
+            "support",
+            "legal_es",
+            "old_decision"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "lunch_es"
+          ],
+          "id" : "m04",
+          "latency_ms" : 0.033020973205566406,
+          "mrr_at_5" : 1,
+          "query" : "When and where are we eating with Priya?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "lunch_es"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "train_fr"
+          ],
+          "id" : "m05",
+          "latency_ms" : 0.04100799560546875,
+          "mrr_at_5" : 1,
+          "query" : "What time does Camille’s train leave?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "train_fr"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "garden_de"
+          ],
+          "id" : "m06",
+          "latency_ms" : 0.039935111999511719,
+          "mrr_at_5" : 0,
+          "query" : "Who will plant tomatoes on the balcony on Sunday?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "recipe"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release_ja"
+          ],
+          "id" : "m07",
+          "latency_ms" : 0.030040740966796875,
+          "mrr_at_5" : 0,
+          "query" : "Who is responsible for the Japanese manual revision?",
+          "recall_at_5" : 0,
+          "returned" : [
+
+          ],
+          "scores" : [
+
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "meeting_zh"
+          ],
+          "id" : "m08",
+          "latency_ms" : 0.056028366088867188,
+          "mrr_at_5" : 0,
+          "query" : "Who is testing keyboard focus order before Tuesday?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "book",
+            "banktravel",
+            "travel"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "date_filter",
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "id" : "f01",
+          "latency_ms" : 0.064015388488769531,
+          "mrr_at_5" : 1,
+          "query" : "OSwind release decision",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "release",
+            "privacy",
+            "falsealarm"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516,
+            0.015873015873015872
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "app_filter",
+          "expected" : [
+            "refund",
+            "invoice"
+          ],
+          "id" : "f02",
+          "latency_ms" : 0.046014785766601562,
+          "mrr_at_5" : 1,
+          "query" : "customer receipt",
+          "recall_at_5" : 1,
+          "returned" : [
+            "refund",
+            "support",
+            "invoice"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821,
+            0.016129032258064516
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "kind_filter",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "f03",
+          "latency_ms" : 0.033974647521972656,
+          "mrr_at_5" : 1,
+          "query" : "source citations",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n01",
+          "latency_ms" : 0.043034553527832031,
+          "mrr_at_5" : 0,
+          "query" : "What is the password for the production database?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "privacy",
+            "database"
+          ],
+          "scores" : [
+            0.016666666666666666,
+            0.016393442622950821
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n02",
+          "latency_ms" : 0.06103515625,
+          "mrr_at_5" : 0,
+          "query" : "How many people attended last year’s company picnic?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "support"
+          ],
+          "scores" : [
+            0.016666666666666666
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n03",
+          "latency_ms" : 0.030040740966796875,
+          "mrr_at_5" : 0,
+          "query" : "What is the serial number of my washing machine?",
+          "recall_at_5" : 0,
+          "returned" : [
+
+          ],
+          "scores" : [
+
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n04",
+          "latency_ms" : 0.025033950805664062,
+          "mrr_at_5" : 0,
+          "query" : "Who won the 2035 chess championship?",
+          "recall_at_5" : 0,
+          "returned" : [
+
+          ],
+          "scores" : [
+
+          ],
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "recall_at_5" : 0.83870967741935487
+    },
+    "semantic" : {
+      "categories" : {
+        "app_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "code" : {
+          "count" : 12,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "date_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "kind_filter" : {
+          "count" : 3,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "multilingual" : {
+          "count" : 24,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        },
+        "paraphrase" : {
+          "count" : 48,
+          "mrr_at_5" : 1,
+          "recall_at_5" : 1
+        }
+      },
+      "hit_rate_at_5" : 1,
+      "mrr_at_5" : 1,
+      "no_evidence_empty_rate" : 0,
+      "p50_ms" : 79.913020133972168,
+      "p95_ms" : 98.248958587646484,
+      "queries" : [
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "p01",
+          "latency_ms" : 84.584951400756836,
+          "mrr_at_5" : 1,
+          "query" : "Who is taking care of the OSwind shipping checks?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "release",
+            "falsealarm",
+            "old_decision",
+            "banktravel"
+          ],
+          "scores" : [
+            0.64890307188034058,
+            0.60595023632049561,
+            0.53528672456741333,
+            0.51916348934173584,
+            0.45821446180343628
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "p02",
+          "latency_ms" : 86.680054664611816,
+          "mrr_at_5" : 1,
+          "query" : "How can we stop the recorder from draining the laptop?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "battery",
+            "privacy",
+            "permissions",
+            "design",
+            "audio"
+          ],
+          "scores" : [
+            0.53987008333206177,
+            0.53815460205078125,
+            0.48862183094024658,
+            0.43761566281318665,
+            0.40492066740989685
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "refund"
+          ],
+          "id" : "p03",
+          "latency_ms" : 81.461071968078613,
+          "mrr_at_5" : 1,
+          "query" : "Which customer wants their money back?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "refund",
+            "banktravel",
+            "support",
+            "privacy",
+            "backup"
+          ],
+          "scores" : [
+            0.54640436172485352,
+            0.49872058629989624,
+            0.48541325330734253,
+            0.47153043746948242,
+            0.46677568554878235
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "renewal"
+          ],
+          "id" : "p04",
+          "latency_ms" : 78.595995903015137,
+          "mrr_at_5" : 1,
+          "query" : "Who is drafting Acme’s updated agreement?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "renewal",
+            "invoice",
+            "refund",
+            "meeting_zh",
+            "meeting"
+          ],
+          "scores" : [
+            0.62700223922729492,
+            0.54888004064559937,
+            0.47416827082633972,
+            0.43058720231056213,
+            0.42500627040863037
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "recipe"
+          ],
+          "id" : "p05",
+          "latency_ms" : 76.730012893676758,
+          "mrr_at_5" : 1,
+          "query" : "What goes on the roasted vegetables for dinner?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "recipe",
+            "garden_de",
+            "lunch_es",
+            "dog"
+          ],
+          "scores" : [
+            0.64619415998458862,
+            0.4353993833065033,
+            0.40376704931259155,
+            0.27149251103401184
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "travel"
+          ],
+          "id" : "p06",
+          "latency_ms" : 77.365994453430176,
+          "mrr_at_5" : 1,
+          "query" : "What should I pack for the conference trip?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "travel",
+            "meeting",
+            "privacy",
+            "meeting_zh",
+            "design"
+          ],
+          "scores" : [
+            0.43907842040061951,
+            0.4113897979259491,
+            0.39958453178405762,
+            0.38173842430114746,
+            0.37201929092407227
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "login"
+          ],
+          "id" : "p07",
+          "latency_ms" : 81.207990646362305,
+          "mrr_at_5" : 1,
+          "query" : "Why does authentication keep sending people back to login?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "login",
+            "support",
+            "privacy",
+            "backup",
+            "server"
+          ],
+          "scores" : [
+            0.58013916015625,
+            0.41032683849334717,
+            0.40081340074539185,
+            0.38910630345344543,
+            0.38061428070068359
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "p08",
+          "latency_ms" : 76.228976249694824,
+          "mrr_at_5" : 1,
+          "query" : "What did Jamie want to work offline?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "privacy",
+            "meeting_zh",
+            "old_decision",
+            "backup"
+          ],
+          "scores" : [
+            0.64071488380432129,
+            0.46470773220062256,
+            0.44383484125137329,
+            0.40200972557067871,
+            0.38421371579170227
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "vector"
+          ],
+          "id" : "p09",
+          "latency_ms" : 75.286030769348145,
+          "mrr_at_5" : 1,
+          "query" : "How are exact words and meaning combined in search?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "vector",
+            "audio",
+            "design",
+            "meeting",
+            "privacy"
+          ],
+          "scores" : [
+            0.53043949604034424,
+            0.34783107042312622,
+            0.34542924165725708,
+            0.33391469717025757,
+            0.31863510608673096
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "privacy"
+          ],
+          "id" : "p10",
+          "latency_ms" : 77.368021011352539,
+          "mrr_at_5" : 1,
+          "query" : "How long should the app remember activity?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "privacy",
+            "permissions",
+            "support",
+            "design",
+            "server"
+          ],
+          "scores" : [
+            0.59337383508682251,
+            0.44909542798995972,
+            0.43182379007339478,
+            0.42309349775314331,
+            0.37137389183044434
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "design"
+          ],
+          "id" : "p11",
+          "latency_ms" : 75.659036636352539,
+          "mrr_at_5" : 1,
+          "query" : "What must remain visible while the mic is on?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "design",
+            "permissions",
+            "meeting",
+            "audio",
+            "privacy"
+          ],
+          "scores" : [
+            0.61893218755722046,
+            0.58411324024200439,
+            0.48994717001914978,
+            0.48816794157028198,
+            0.48632171750068665
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "invoice"
+          ],
+          "id" : "p12",
+          "latency_ms" : 78.531980514526367,
+          "mrr_at_5" : 1,
+          "query" : "When does the customer need to pay invoice 4821?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "invoice",
+            "banktravel",
+            "privacy",
+            "refund",
+            "support"
+          ],
+          "scores" : [
+            0.65780216455459595,
+            0.53004211187362671,
+            0.44945728778839111,
+            0.41689848899841309,
+            0.4074120819568634
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "audio"
+          ],
+          "id" : "p13",
+          "latency_ms" : 80.543994903564453,
+          "mrr_at_5" : 1,
+          "query" : "Which engine turns speech into words without a cloud service?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "audio",
+            "meeting",
+            "vector",
+            "backup",
+            "design"
+          ],
+          "scores" : [
+            0.6360049843788147,
+            0.46863412857055664,
+            0.42306444048881531,
+            0.42214766144752502,
+            0.40498170256614685
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "backup"
+          ],
+          "id" : "p14",
+          "latency_ms" : 77.77094841003418,
+          "mrr_at_5" : 1,
+          "query" : "How do we know an archive restore is safe to switch to?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "backup",
+            "privacy",
+            "support",
+            "server",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.74303871393203735,
+            0.54174554347991943,
+            0.48802971839904785,
+            0.44959086179733276,
+            0.39917424321174622
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "dog"
+          ],
+          "id" : "p15",
+          "latency_ms" : 76.846957206726074,
+          "mrr_at_5" : 1,
+          "query" : "What does Pepper need at the clinic?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "dog",
+            "backup",
+            "lunch_es",
+            "privacy",
+            "banktravel"
+          ],
+          "scores" : [
+            0.58769071102142334,
+            0.35994580388069153,
+            0.34870296716690063,
+            0.34384047985076904,
+            0.3300754725933075
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "paraphrase",
+          "expected" : [
+            "book"
+          ],
+          "id" : "p16",
+          "latency_ms" : 76.524019241333008,
+          "mrr_at_5" : 1,
+          "query" : "What study technique is better than repeatedly reading?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "book",
+            "battery",
+            "design",
+            "meeting",
+            "vector"
+          ],
+          "scores" : [
+            0.66980570554733276,
+            0.39774954319000244,
+            0.35820537805557251,
+            0.35340043902397156,
+            0.34333926439285278
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "database"
+          ],
+          "id" : "p17",
+          "latency_ms" : 81.534028053283691,
+          "mrr_at_5" : 1,
+          "query" : "Why did other database writers have to wait?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "database",
+            "meeting_zh",
+            "old_decision",
+            "privacy",
+            "meeting"
+          ],
+          "scores" : [
+            0.50931394100189209,
+            0.46705996990203857,
+            0.4322044849395752,
+            0.39999958872795105,
+            0.39495232701301575
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "display"
+          ],
+          "id" : "p18",
+          "latency_ms" : 80.410957336425781,
+          "mrr_at_5" : 1,
+          "query" : "Why is the screenshot fuzzy on my extra monitor?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "display",
+            "support",
+            "permissions",
+            "privacy",
+            "battery"
+          ],
+          "scores" : [
+            0.71797740459442139,
+            0.52348911762237549,
+            0.48909485340118408,
+            0.40195038914680481,
+            0.39682450890541077
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "server"
+          ],
+          "id" : "p19",
+          "latency_ms" : 84.103941917419434,
+          "mrr_at_5" : 1,
+          "query" : "What prevents websites or nearby machines from reading memory?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "server",
+            "privacy",
+            "permissions",
+            "book",
+            "backup"
+          ],
+          "scores" : [
+            0.5864790678024292,
+            0.47477895021438599,
+            0.42635852098464966,
+            0.39855629205703735,
+            0.37028759717941284
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "code",
+          "expected" : [
+            "permissions"
+          ],
+          "id" : "p20",
+          "latency_ms" : 77.850937843322754,
+          "mrr_at_5" : 1,
+          "query" : "Which permissions cover the screen, app text, and sound?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "permissions",
+            "privacy",
+            "design",
+            "display",
+            "audio"
+          ],
+          "scores" : [
+            0.68829596042633057,
+            0.49038895964622498,
+            0.4610363245010376,
+            0.44889897108078003,
+            0.41636925935745239
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release",
+            "new_decision"
+          ],
+          "id" : "m01",
+          "latency_ms" : 97.779989242553711,
+          "mrr_at_5" : 1,
+          "query" : "¿Quién prepara la lista para publicar OSwind?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "old_decision",
+            "release",
+            "falsealarm",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.68753552436828613,
+            0.62907350063323975,
+            0.57707399129867554,
+            0.54681479930877686,
+            0.48398146033287048
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "battery"
+          ],
+          "id" : "m02",
+          "latency_ms" : 87.027072906494141,
+          "mrr_at_5" : 1,
+          "query" : "Comment réduire la consommation de batterie pendant l’enregistrement ?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "battery",
+            "privacy",
+            "permissions",
+            "design",
+            "audio"
+          ],
+          "scores" : [
+            0.57145041227340698,
+            0.50563067197799683,
+            0.47675704956054688,
+            0.47580534219741821,
+            0.42411834001541138
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "legal_es"
+          ],
+          "id" : "m03",
+          "latency_ms" : 82.574963569641113,
+          "mrr_at_5" : 1,
+          "query" : "Who will prepare Boreal’s six-month support contract?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "legal_es",
+            "meeting_zh",
+            "banktravel",
+            "new_decision",
+            "renewal"
+          ],
+          "scores" : [
+            0.77655172348022461,
+            0.43884235620498657,
+            0.40611326694488525,
+            0.39699035882949829,
+            0.36967283487319946
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "lunch_es"
+          ],
+          "id" : "m04",
+          "latency_ms" : 81.542015075683594,
+          "mrr_at_5" : 1,
+          "query" : "When and where are we eating with Priya?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "lunch_es",
+            "recipe",
+            "meeting",
+            "new_decision",
+            "travel"
+          ],
+          "scores" : [
+            0.81312251091003418,
+            0.40790793299674988,
+            0.33626836538314819,
+            0.3301730751991272,
+            0.32970601320266724
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "train_fr"
+          ],
+          "id" : "m05",
+          "latency_ms" : 79.60200309753418,
+          "mrr_at_5" : 1,
+          "query" : "What time does Camille’s train leave?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "train_fr",
+            "travel",
+            "lunch_es",
+            "invoice",
+            "meeting"
+          ],
+          "scores" : [
+            0.69115251302719116,
+            0.40291467308998108,
+            0.37885349988937378,
+            0.35990911722183228,
+            0.34525957703590393
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "garden_de"
+          ],
+          "id" : "m06",
+          "latency_ms" : 82.062005996704102,
+          "mrr_at_5" : 1,
+          "query" : "Who will plant tomatoes on the balcony on Sunday?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "garden_de",
+            "lunch_es",
+            "recipe",
+            "new_decision",
+            "banktravel"
+          ],
+          "scores" : [
+            0.65834915637969971,
+            0.4046606719493866,
+            0.39496356248855591,
+            0.37419825792312622,
+            0.3613857626914978
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "release_ja"
+          ],
+          "id" : "m07",
+          "latency_ms" : 81.300020217895508,
+          "mrr_at_5" : 1,
+          "query" : "Who is responsible for the Japanese manual revision?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "release_ja",
+            "meeting_zh",
+            "design",
+            "new_decision",
+            "release"
+          ],
+          "scores" : [
+            0.56552714109420776,
+            0.45510187745094299,
+            0.3599296510219574,
+            0.33686372637748718,
+            0.33310729265213013
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "multilingual",
+          "expected" : [
+            "meeting_zh"
+          ],
+          "id" : "m08",
+          "latency_ms" : 77.583074569702148,
+          "mrr_at_5" : 1,
+          "query" : "Who is testing keyboard focus order before Tuesday?",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting_zh",
+            "new_decision",
+            "design",
+            "old_decision",
+            "display"
+          ],
+          "scores" : [
+            0.68970060348510742,
+            0.43946558237075806,
+            0.42833170294761658,
+            0.41857954859733582,
+            0.40289449691772461
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "date_filter",
+          "expected" : [
+            "new_decision",
+            "release"
+          ],
+          "id" : "f01",
+          "latency_ms" : 79.913020133972168,
+          "mrr_at_5" : 1,
+          "query" : "OSwind release decision",
+          "recall_at_5" : 1,
+          "returned" : [
+            "new_decision",
+            "release",
+            "falsealarm",
+            "meeting_zh",
+            "privacy"
+          ],
+          "scores" : [
+            0.71918493509292603,
+            0.62490749359130859,
+            0.4732837975025177,
+            0.42148157954216003,
+            0.39660000801086426
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "app_filter",
+          "expected" : [
+            "refund",
+            "invoice"
+          ],
+          "id" : "f02",
+          "latency_ms" : 78.437924385070801,
+          "mrr_at_5" : 1,
+          "query" : "customer receipt",
+          "recall_at_5" : 1,
+          "returned" : [
+            "invoice",
+            "refund",
+            "banktravel",
+            "support"
+          ],
+          "scores" : [
+            0.52222269773483276,
+            0.51851695775985718,
+            0.45669940114021301,
+            0.45326411724090576
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "kind_filter",
+          "expected" : [
+            "meeting"
+          ],
+          "id" : "f03",
+          "latency_ms" : 77.702999114990234,
+          "mrr_at_5" : 1,
+          "query" : "source citations",
+          "recall_at_5" : 1,
+          "returned" : [
+            "meeting",
+            "meeting_zh"
+          ],
+          "scores" : [
+            0.44865667819976807,
+            0.40874046087265015
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n01",
+          "latency_ms" : 77.818036079406738,
+          "mrr_at_5" : 0,
+          "query" : "What is the password for the production database?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "privacy",
+            "backup",
+            "meeting_zh",
+            "database",
+            "server"
+          ],
+          "scores" : [
+            0.43296653032302856,
+            0.42712557315826416,
+            0.37210917472839355,
+            0.35692611336708069,
+            0.35561287403106689
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n02",
+          "latency_ms" : 76.27403736114502,
+          "mrr_at_5" : 0,
+          "query" : "How many people attended last year’s company picnic?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "lunch_es",
+            "recipe",
+            "support",
+            "old_decision",
+            "privacy"
+          ],
+          "scores" : [
+            0.37442475557327271,
+            0.2815014123916626,
+            0.27821141481399536,
+            0.26713407039642334,
+            0.25011521577835083
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n03",
+          "latency_ms" : 75.341939926147461,
+          "mrr_at_5" : 0,
+          "query" : "What is the serial number of my washing machine?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "privacy",
+            "audio",
+            "backup",
+            "support",
+            "banktravel"
+          ],
+          "scores" : [
+            0.29348874092102051,
+            0.28039175271987915,
+            0.27611267566680908,
+            0.27034330368041992,
+            0.25361669063568115
+          ],
+          "warnings" : [
+
+          ]
+        },
+        {
+          "category" : "no_evidence",
+          "expected" : [
+
+          ],
+          "id" : "n04",
+          "latency_ms" : 75.0579833984375,
+          "mrr_at_5" : 0,
+          "query" : "Who won the 2035 chess championship?",
+          "recall_at_5" : 0,
+          "returned" : [
+            "new_decision",
+            "meeting_zh",
+            "lunch_es",
+            "old_decision",
+            "vector"
+          ],
+          "scores" : [
+            0.32331448793411255,
+            0.30051219463348389,
+            0.2969571053981781,
+            0.27180761098861694,
+            0.2557235062122345
+          ],
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "recall_at_5" : 1
+    }
+  },
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "provider" : "ollama",
+  "queries" : 35,
+  "repetitions" : 3,
+  "schema" : 1,
+  "timestamp" : "2026-10-23T05:43:33Z"
+}

@@ -12,7 +12,8 @@ struct SettingsView: View {
     @State private var key = ""
     @State private var keyStatus = ""
     @State private var deleteConfirm = false
-    @State private var modelStatus = ""
+    @State private var downloadName = "qwen3-embedding:0.6b"
+    init(initialTab: String = "Capture") { _tab = State(initialValue:initialTab) }
     var body: some View {
         VStack(alignment:.leading,spacing:18) {
             HStack { Text("Make OSwind yours.").font(.title2.weight(.medium)); Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
@@ -69,7 +70,7 @@ struct SettingsView: View {
         Group {
             Section("Answer engine") {
                 Picker("Provider",selection:$m.settings.ai.provider) { ForEach(AIProvider.allCases,id:\.self) { Text($0.label).tag($0) } }.onChange(of:m.settings.ai.provider) { _,provider in key = ""; keyStatus = ""; if provider == .ollama { m.settings.ai.endpoint = "http://127.0.0.1:11434"; m.settings.ai.model = "qwen3:4b" }; if provider == .anthropic { m.settings.ai.endpoint = "https://api.anthropic.com"; m.settings.ai.model = "" }; if provider == .compatible { m.settings.ai.endpoint = "https://api.openai.com/v1"; m.settings.ai.model = "" } }
-                Text("Evidence mode needs no model. Apple Intelligence requires macOS 26 and enabled model assets. Ollama uses local Metal acceleration on Apple Silicon. Search embeddings use Apple’s English sentence model and Accelerate.").font(.caption).foregroundStyle(.secondary)
+                Text("Evidence mode needs no model. Apple Intelligence requires macOS 26 and enabled model assets. Ollama uses local Metal acceleration on Apple Silicon. Choose the search model separately below; Apple capture indexing stays available.").font(.caption).foregroundStyle(.secondary)
                 if [.ollama,.compatible,.anthropic].contains(m.settings.ai.provider) {
                     TextField("Server base URL",text:$m.settings.ai.endpoint)
                     TextField("Model ID",text:$m.settings.ai.model)
@@ -80,13 +81,47 @@ struct SettingsView: View {
                         Text(keyStatus).font(.caption)
                         Text("BYOK API billing is separate from a chat subscription. Only retrieved text is sent; screenshots and raw audio are not included. No automatic cloud fallback.").font(.caption).foregroundStyle(.secondary)
                     }
-                    Button("Check local Ollama") { Task { do { let (data,response) = try await URLSession.shared.data(from:URL(string:"http://127.0.0.1:11434/api/tags")!); guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw OSwindError.network("Ollama unavailable") }; let json = try JSONSerialization.jsonObject(with:data) as? [String:Any]; let names = (json?["models"] as? [[String:Any]] ?? []).compactMap {$0["name"] as? String}; modelStatus = names.isEmpty ? "No installed models. Run scripts/setup-models.sh." : names.joined(separator:", ") } catch { modelStatus = "Ollama is not running. See scripts/setup-models.sh." } } }
-                    Text(modelStatus).font(.caption).foregroundStyle(.secondary)
+                    Button("Discover local models") { m.inspectLocalModels() }
+                    if m.settings.ai.provider == .ollama, !m.installedModels.isEmpty {
+                        Picker("Installed chat model",selection:$m.settings.ai.model) {
+                            ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("completion") ?? true) }) { model in Text(model.name).tag(model.name) }
+                        }
+                    }
                 }
             }
-            Section("Local model setup") {
-                Text("From the repository, run scripts/setup-models.sh. It installs Ollama if needed, downloads a 4B chat model and Whisper base.en, and prints the paths. These downloads are explicit; capture and keyword search work without them.").font(.caption)
-                Text("Whisper runs locally through whisper.cpp with Metal enabled by the installed build. No cloud transcription provider is used.").font(.caption).foregroundStyle(.secondary)
+            Section("Search model") {
+                Picker("Semantic retrieval",selection:$m.settings.search.provider) {
+                    Text("Apple · lightweight English").tag(EmbeddingProvider.apple)
+                    Text("Ollama · local GPU embeddings").tag(EmbeddingProvider.ollama)
+                }
+                Text("The Apple path is ready without downloads. A multilingual embedding model can improve meaning-based recall; it uses more memory and energy. New captures remain searchable by text while its separate index is built.").font(.caption).foregroundStyle(.secondary)
+                if m.settings.search.provider == .ollama {
+                    TextField("Local model server",text:$m.settings.search.endpoint)
+                    TextField("Embedding model ID",text:$m.settings.search.model)
+                    if !m.installedModels.isEmpty {
+                        Picker("Installed embedding model",selection:$m.settings.search.model) {
+                            ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("embedding") ?? $0.name.contains("embed")) }) { model in Text(model.name).tag(model.name) }
+                        }
+                    }
+                    Toggle("Allow GPU indexing in Low Power Mode",isOn:$m.settings.search.indexOnLowPower)
+                    HStack { Button(m.indexing ? "Indexing…" : "Build / resume search index") { m.rebuildIndex() }.disabled(m.indexing); if m.indexing { Button("Cancel") { m.cancelIndexing() } } }
+                    if m.indexing { ProgressView(value:m.indexProgress) }
+                    Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)
+                    Text("Indexes are pinned to the installed model digest and kept on this Mac. Changing models never mixes incompatible vectors. Completed batches survive cancellation; deleted or changed source memories cannot be restored by an old indexing job.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Section("Local model library") {
+                HStack { Button(m.startingModelServer ? "Starting…" : "Start local server") { m.startModelServer() }.disabled(m.startingModelServer); Button("Check local server") { m.inspectLocalModels() }; Text(m.modelStatus).font(.caption).foregroundStyle(.secondary) }
+                ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
+                if !m.localRuntime.isEmpty { Text(m.localRuntime).font(.caption).textSelection(.enabled) }
+                HStack { TextField("Model to download",text:$downloadName); Button("Download") { m.downloadModel(downloadName) }.disabled(m.pullingModel != nil || downloadName.isEmpty) }
+                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · 4B") { downloadName = "qwen3:4b" } }.font(.caption)
+                if let model = m.pullingModel {
+                    Text("Downloading \(model)").font(.caption)
+                    if let fraction = m.pullProgress?.fraction { ProgressView(value:fraction) } else { ProgressView().controlSize(.small) }
+                    HStack { Text(m.pullProgress?.status ?? "Connecting…").font(.caption); Spacer(); Button("Cancel download") { m.cancelModelDownload() } }
+                }
+                Text("Install and start Ollama with scripts/setup-models.sh if the local server is unavailable. Downloads use Ollama’s model registry; captured content is never included in a model download. Local modes reject known cloud-backed aliases. Whisper setup remains in the script.").font(.caption).foregroundStyle(.secondary)
             }
         }
     }

@@ -26,7 +26,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 
 - ScreenCaptureKit focused-window capture and optional multi-display snapshots; Vision OCR and bounded Accessibility text extraction.
 - Light / Balanced / Detailed capture profiles, perceptual duplicate suppression, idle/sleep/lock suspension and thermal/low-power backoff.
-- SQLite WAL + FTS5 keyword search, Apple sentence embeddings, Accelerate cosine similarity, reciprocal-rank hybrid search.
+- SQLite WAL + FTS5 keyword search, Apple sentence embeddings or optional local GPU Qwen3 embeddings, model-versioned indexes and hybrid ranking.
 - Native timeline, app/date filters, saved memories, notes/tags, OCR region inspection, source URLs, capture health and storage insights.
 - Evidence-only answers without downloads; on-device Apple Intelligence; local Ollama; optional OpenAI-compatible and Anthropic BYOK. Keys live in Keychain. Cloud context is opt-in.
 - Optional microphone and system-audio capture, 30-second bounded chunks, local whisper.cpp transcription, separate source labels, silence gate, raw-chunk deletion.
@@ -42,9 +42,9 @@ These are implementation claims. The progress ledger separates automated tests, 
 scripts/setup-models.sh
 ```
 
-Installs Ollama and whisper.cpp through Homebrew if missing, starts a loopback Ollama server if necessary, pulls `qwen3:4b`, and checksum-verifies Whisper `base.en` from its publisher's Hugging Face repository. Model weights remain outside this Git repository. Whisper defaults to `~/Library/Caches/OSwind/models/ggml-base.en.bin`. Choose the answer provider in Settings → Models. Large downloads are optional for capture and keyword search.
+Installs Ollama and whisper.cpp through Homebrew if missing, starts a loopback Ollama server if necessary, pulls `qwen3:4b` and `qwen3-embedding:0.6b`, and checksum-verifies Whisper `base.en` from its publisher's Hugging Face repository. Model weights remain outside this Git repository. Whisper defaults to `~/Library/Caches/OSwind/models/ggml-base.en.bin`. Settings → Models offers independent answer/search models, installed-model discovery, download progress/cancel, runtime GPU residency and resumable search indexing. The app can start an installed Ollama server with cloud inference disabled; it never replaces an existing server. Large downloads are optional for capture and keyword search.
 
-Apple's sentence embeddings are English. Vision OCR auto-detects supported languages. Choose a multilingual Whisper model and language for non-English speech. No unmeasured GPU speedups are promised: the runtime's `ollama ps` and whisper.cpp backend logs establish actual model execution.
+Apple's default sentence embeddings are English. For multilingual text, select Ollama embeddings in Models and build the additional index. Hybrid search warns when falling back to keywords or when vectors cover only part of the range. Semantic-only reports model failure explicitly. Vision OCR auto-detects supported languages. Choose a multilingual Whisper model and language for non-English speech. No unmeasured GPU speedups are promised: the runtime's `ollama ps` and whisper.cpp backend logs establish actual model execution.
 
 ## Command line
 
@@ -55,6 +55,9 @@ swift run oswindctl doctor
 swift run oswindctl note "Maya owns Friday's release checklist"
 swift run oswindctl search --mode hybrid "release checklist"
 swift run oswindctl ask --provider apple "Who owns the checklist?"
+swift run oswindctl models list
+swift run oswindctl reindex --model qwen3-embedding:0.6b --use-model
+swift run oswindctl eval-retrieval --model qwen3-embedding:0.6b
 swift run oswindctl benchmark --count 1000
 swift run oswindctl help
 ```

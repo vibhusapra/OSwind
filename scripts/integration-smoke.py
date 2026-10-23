@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-smoke-') as directory:
             except urllib.error.URLError: time.sleep(.1)
         assert status==200 and health['status']=='ok'
         assert get('/v1/stats')[1]['count']==1
-        status,hits=get('/v1/search?query=socket&mode=keyword'); assert status==200 and hits[0]['memory']['id']==identifier
+        status,hits=get('/v1/search?query=socket&mode=keyword'); assert status==200 and hits['hits'][0]['memory']['id']==identifier
         assert get('/v1/memories/'+identifier)[1]['text']=='OSwind socket smoke marker'
         assert get('/health',authorized=False)[0]==401
         assert get('/health',extra={'Origin':'https://example.com'})[0]==403
