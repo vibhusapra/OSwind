@@ -65,7 +65,10 @@ private final class LibraryProgressRelay: @unchecked Sendable {
             defer { observer.cancel(); self.cancelWorker = nil; self.task = nil; self.busy = false; self.progress = nil }
             do { let info = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }; completion(info) }
             catch is CancellationError { status = "Cancelled. Unfinished temporary data was removed." }
-            catch { self.error = error.localizedDescription; status = "Operation did not complete." }
+            catch {
+                if worker.isCancelled || Task.isCancelled { status = "Cancelled. Unfinished temporary data was removed." }
+                else { self.error = error.localizedDescription; status = "Operation did not complete." }
+            }
         }
     }
 }
@@ -99,7 +102,7 @@ struct LibraryTransferStatusView: View {
                 if let progress = transfer.progress {
                     Text(progress.phase).font(.callout)
                     if progress.totalItems>0 { ProgressView(value:min(1,Double(progress.completedItems)/Double(progress.totalItems))) } else { ProgressView().controlSize(.small) }
-                    HStack { if progress.unit=="files",progress.totalItems>0 { Text("\(progress.completedItems) / \(progress.totalItems) files").font(.caption) }; if progress.copiedBytes>0 { Text(ByteCountFormatter.string(fromByteCount:progress.copiedBytes,countStyle:.file)).font(.caption) }; Spacer(); Button("Cancel") { transfer.cancel() } }
+                    HStack { if progress.totalItems>0 { Text("\(progress.completedItems) / \(progress.totalItems) \(progress.unit)").font(.caption) }; if progress.copiedBytes>0 { Text(ByteCountFormatter.string(fromByteCount:progress.copiedBytes,countStyle:.file)).font(.caption) }; Spacer(); Button("Cancel") { transfer.cancel() } }
                 }
             }
             if !transfer.status.isEmpty { Text(transfer.status).font(.caption) }

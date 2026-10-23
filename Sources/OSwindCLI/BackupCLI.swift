@@ -16,7 +16,7 @@ final class BackupCLIProgress: @unchecked Sendable {
         FileHandle.standardError.write(Data((value.phase+count+bytes+"\n").utf8))
     }
 }
-func runBackupCLI(_ operation: @escaping @Sendable () throws -> LibraryBackupInfo) async throws -> LibraryBackupInfo {
+func runBackupCLI<T: Sendable>(_ operation: @escaping @Sendable () throws -> T) async throws -> T {
     let task = Task.detached(priority:.utility,operation:operation)
     let queue = DispatchQueue(label:"OSwind.backup.interrupt"), source = DispatchSource.makeSignalSource(signal:SIGINT,queue:queue)
     let previous = signal(SIGINT,SIG_IGN); let interrupts = BackupCLIInterrupts()
@@ -26,7 +26,8 @@ func runBackupCLI(_ operation: @escaping @Sendable () throws -> LibraryBackupInf
     }
     source.resume()
     defer { source.setEventHandler(handler:nil); source.cancel(); signal(SIGINT,previous) }
-    return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+    do { return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() } }
+    catch { if task.isCancelled { throw CancellationError() }; throw error }
 }
 
 private final class BackupCLIInterrupts: @unchecked Sendable {

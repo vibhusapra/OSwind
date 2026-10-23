@@ -49,6 +49,9 @@ public enum MarkdownExport {
             let rows = try reader.db.prepare("SELECT id,payload FROM memories NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(rows) }
             var status = sqlite3_step(rows)
             while status == SQLITE_ROW {
+                // This worker may run without a run-loop pool for hours. Drain
+                // Foundation's bridged formatting/regex objects per record.
+                try autoreleasepool {
                 try Task.checkCancellation()
                 let id = try reader.db.text(rows,0)
                 let original = try JSONDecoder().decode(Memory.self,from:payload(rows,1))
@@ -108,6 +111,7 @@ public enum MarkdownExport {
                     info.memories += 1
                 }
                 try progress(LibraryBackupProgress(phase:"Exporting sources",completedItems:info.memories+info.excludedMemories,totalItems:total,unit:"sources"))
+                }
                 status = sqlite3_step(rows)
             }
             guard status == SQLITE_DONE else { throw reader.db.error("Cannot enumerate sources") }
@@ -123,6 +127,7 @@ public enum MarkdownExport {
                     let turns = try reader.db.prepare("SELECT id,timestamp,payload FROM chat_turns WHERE session_id=? ORDER BY timestamp,id"); defer { sqlite3_finalize(turns) }; reader.db.bind(turns,1,session)
                     var turnStatus = sqlite3_step(turns), number = 0
                     while turnStatus == SQLITE_ROW {
+                        try autoreleasepool {
                         try Task.checkCancellation()
                         let turn = try reader.db.text(turns,0), date = Date(timeIntervalSince1970:sqlite3_column_double(turns,1))
                         let value = try JSONDecoder().decode(ChatPayload.self,from:payload(turns,2))
@@ -149,6 +154,7 @@ public enum MarkdownExport {
                             for warning in value.warnings { try page.write("Warning: "+inline(policy.sanitize(warning).text)+"\n\n") }
                             for (ordinal,path,title) in links { try page.write("[\(ordinal)] ["+inline(title)+"](../"+path+")\n\n") }
                             info.turns += 1
+                        }
                         }
                         turnStatus = sqlite3_step(turns)
                     }
