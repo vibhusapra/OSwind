@@ -2,6 +2,9 @@
 
 Updated 2026-10-23, America/Los_Angeles. Goal remains active. This ledger records implementation, direct evidence and remaining release gates.
 
+Current work adds [sampled visual replay](REPLAY.md): focused-window ScreenCaptureKit streaming, hardware-required HEVC, timed OCR/AX, native frame seek and OCR overlays, isolated video ownership, backup/restore/erasure, and publication barriers. Current full suite: **325 tests, 321 pass / four opt-in skips**, including hardware-independent software mux/decode, player completion/restart, cancellation, privacy publication barriers, timed evidence, backup/restore and deletion. Sanitizer/package/process verification is tracked with this milestone. A generated 12-frame probe preserved every OCR check/frame decode, using 0.159× the same-pixel JPEG reference bytes including thumbnails. A separate 12-second synthetic native-window stream saved 12 frames in four clips, opened and sought in the native player. These narrow checks do not establish natural capture, power, all-display replay or competitor wins. The pinned schema-11 component soak remains running independently.
+
+
 The full objective is an open-source macOS desktop-memory product with meaningful broad parity, local GPU inference, optional BYOK, great daily-use design, sustained performance, current research, tests, progress tracking and comparative benchmarks. **Feature completeness and top-three placement are not established.** Remaining work is preserved in the 74-row [feature ledger](features.json), its [interactive report](landscape.html) and the release gates here.
 
 ## Implemented and directly verified

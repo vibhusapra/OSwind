@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 11
+    public static let schemaVersion = 12
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -14,7 +14,7 @@ public final class MemoryStore: @unchecked Sendable {
     public init(root: URL = Paths.data) throws {
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
-        try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"))
+        try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
         sqlite3_busy_timeout(db, 5000)
@@ -130,14 +130,16 @@ public final class MemoryStore: @unchecked Sendable {
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
+        if let visual=memory.visualRecording {_ = try visual.validated();guard memory.kind == .screen,memory.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}}
+        guard memory.videoPath==nil || memory.visualRecording != nil else {throw OSwindError.invalid("A replay asset requires frame metadata")}
         guard memory.audioSessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio session identifier") }
-        for path in [memory.imagePath, memory.audioPath].compactMap({$0}) { guard assetURL(path) != nil else { throw OSwindError.invalid("Asset path must stay inside the memory store") } }
+        for path in [memory.imagePath, memory.audioPath,memory.videoPath].compactMap({$0}) { guard assetURL(path) != nil else { throw OSwindError.invalid("Asset path must stay inside the memory store") } }
         // Reserve the writer before reading old evidence. A deferred read then
         // write can fail immediately with SQLITE_BUSY across store connections.
         let ownsTransaction=sqlite3_get_autocommit(db) != 0
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
-        if memory.kind == .audio,let current=try get(memory.id),current.transcript != memory.transcript { try invalidateAudioEvidence(memory.id) }
+        if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
@@ -207,7 +209,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func assetURL(_ relative: String) -> URL? {
         let parts = relative.split(separator: "/", omittingEmptySubsequences: false)
-        guard parts.count >= 2, ["images", "audio"].contains(String(parts[0])), !relative.hasPrefix("/"), !parts.contains(".."), !parts.contains("") else { return nil }
+        guard parts.count >= 2, ["images", "audio","video"].contains(String(parts[0])), !relative.hasPrefix("/"), !parts.contains(".."), !parts.contains("") else { return nil }
         var walking = root
         for part in parts {
             walking.appendPathComponent(String(part))
@@ -439,7 +441,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     public func delete(_ id: String) throws {
         lock.lock(); defer { lock.unlock() }; let m = try get(id); let stmt = try prepare("DELETE FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
-        for path in [m?.imagePath, m?.audioPath].compactMap({$0}) { if let url = assetURL(path) { try? FileManager.default.removeItem(at: url) } }
+        for path in [m?.imagePath, m?.audioPath,m?.videoPath].compactMap({$0}) { if let url = assetURL(path) { try? FileManager.default.removeItem(at: url) } }
     }
     @discardableResult public func prune(before: Date, maxBytes: Int64? = nil) throws -> Int {
         lock.lock(); defer { lock.unlock() }; var ids = [String](); let stmt = try prepare("SELECT id FROM memories WHERE timestamp<?"); sqlite3_bind_double(stmt, 1, before.timeIntervalSince1970); while sqlite3_step(stmt) == SQLITE_ROW { ids.append(string(stmt,0)) }; sqlite3_finalize(stmt)
@@ -472,7 +474,7 @@ public final class MemoryStore: @unchecked Sendable {
         metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
         if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
-        for folder in ["images", "audio"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
+        for folder in ["images", "audio","video"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
     }
     public func diskBytes() -> Int64 {
         guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey]) else { return 0 }
@@ -508,7 +510,7 @@ public final class MemoryStore: @unchecked Sendable {
         do { memories = try decoder.decode([Memory].self, from: data) } catch { memories = try JSONDecoder().decode([Memory].self, from: data) }
         lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); do {
             var count = 0
-            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; if let transcript=m.transcript { guard m.text==transcript.text else { throw OSwindError.invalid("Transcript and source text differ") }; let clean=try transcript.sanitized(policy:policy).transcript; m.transcript=clean; m.text=clean.text } else { m.text=policy.sanitize(m.text).text }; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
+            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; if let visual=m.visualRecording {guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")};let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text} else if let transcript=m.transcript { guard m.text==transcript.text else { throw OSwindError.invalid("Transcript and source text differ") }; let clean=try transcript.sanitized(policy:policy).transcript; m.transcript=clean; m.text=clean.text } else { m.text=policy.sanitize(m.text).text }; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.videoPath=nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
             try exec("COMMIT"); return count
         } catch { try? exec("ROLLBACK"); throw error }
     }

@@ -45,6 +45,7 @@ public enum CaptureProfile: String, Codable, CaseIterable, Sendable {
 public struct AppSettings: Codable, Equatable, Sendable {
     public var profile: CaptureProfile = .balanced
     public var privacy = PrivacyPolicy()
+    public var visualCaptureMode:VisualCaptureMode = .snapshots
     public var allDisplays = false
     public var captureOnLaunch = false
     public var ai = AIConfiguration()
@@ -60,11 +61,12 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,visualCaptureMode,allDisplays,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
         privacy = try c.decodeIfPresent(PrivacyPolicy.self,forKey:.privacy) ?? privacy
+        visualCaptureMode = try c.decodeIfPresent(VisualCaptureMode.self,forKey:.visualCaptureMode) ?? visualCaptureMode
         allDisplays = try c.decodeIfPresent(Bool.self,forKey:.allDisplays) ?? allDisplays
         captureOnLaunch = try c.decodeIfPresent(Bool.self,forKey:.captureOnLaunch) ?? captureOnLaunch
         ai = try c.decodeIfPresent(AIConfiguration.self,forKey:.ai) ?? ai

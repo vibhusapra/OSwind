@@ -29,15 +29,16 @@ struct SettingsView: View {
                 }
             }.formStyle(.grouped) }
         }.padding(24).frame(width:760,height:720)
-        .alert("Delete all local memories?",isPresented:$deleteConfirm) { Button("Cancel",role:.cancel) {}; Button("Delete everything",role:.destructive) { m.pauseAll(); m.cancelAnswer(); do { try m.store.deleteAll(); m.refreshChats(); m.answer = nil; m.invalidateStorageEstimate(); m.refresh(forceStatistics:true) } catch { m.errorMessage = error.localizedDescription } } } message: { Text("Deletes the local index, screenshots, audio, saved notes, recaps, and conversations. Exports you saved elsewhere remain.") }
+        .alert("Delete all local memories?",isPresented:$deleteConfirm) { Button("Cancel",role:.cancel) {}; Button("Delete everything",role:.destructive) { m.pauseAll(discardReplay:true); m.cancelAnswer(); do { try m.store.deleteAll(); m.refreshChats(); m.answer = nil; m.invalidateStorageEstimate(); m.refresh(forceStatistics:true) } catch { m.errorMessage = error.localizedDescription } } } message: { Text("Deletes the local index, screenshots, replay clips, audio, saved notes, recaps, and conversations. Exports you saved elsewhere remain.") }
     }
     private var capture: some View {
         Group {
             Section("Capture profile") {
-                Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(Int($0.interval)) s").tag($0) } }
-                Text("Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
+                Picker("Visual memory",selection:$m.settings.visualCaptureMode) { Text("Snapshots").tag(VisualCaptureMode.snapshots); Text("Replay · HEVC clips").tag(VisualCaptureMode.replay) }
+                Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(m.settings.visualCaptureMode == .replay ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }
+                Text(m.settings.visualCaptureMode == .replay ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Capture all displays",isOn:$m.settings.allDisplays)
-                Text("Default: focused window only. Full-display mode masks all browser windows and excluded applications; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
+                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "All-display replay is not available yet; this combination uses snapshots. Turn off all displays for replay." : "Default: focused window only. Full-display mode masks all browser windows and excluded applications; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Resume capture when OSwind opens",isOn:$m.settings.captureOnLaunch)
                 Toggle("Open at login",isOn:Binding(get:{SMAppService.mainApp.status == .enabled},set:{m.login($0)}))
             }
@@ -61,7 +62,7 @@ struct SettingsView: View {
             Section("Protect stored evidence") {
                 Toggle("Redact common secrets and sensitive numbers",isOn:$m.settings.privacy.redactSecrets)
                 Text("Matches common API tokens, password assignments, card-like numbers, SSNs and private key blocks. Redacted captures keep text only; the original image is discarded. Pattern filtering is best effort and does not detect every kind of personal information.").font(.caption).foregroundStyle(.secondary)
-                Toggle("Keep screenshots alongside extracted text",isOn:$m.settings.privacy.retainImages)
+                Toggle("Keep screenshots and replay clips alongside text",isOn:$m.settings.privacy.retainImages)
                 Text("Screen, audio, and model access are separate. Audio segments are discarded when a foreground privacy rule is active at segment completion. Use Pause and Stop audio for sensitive activity.").font(.caption).foregroundStyle(.secondary)
             }
         }

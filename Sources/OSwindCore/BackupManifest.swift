@@ -13,7 +13,7 @@ struct BackupMediaEntry: Codable, Equatable, Sendable {
     static func member(for sourcePath: String) -> String { "media/"+SHA256.hash(data:Data(sourcePath.utf8)).map { String(format:"%02x",$0) }.joined() }
     static func validateSourcePath(_ path: String) throws {
         let parts = try BackupFileTree.components(path)
-        guard parts.count >= 2, ["images","audio"].contains(parts[0]) else { throw BackupFileError.invalid("Backup media must belong to images or audio") }
+        guard parts.count >= 2, ["images","audio","video"].contains(parts[0]) else { throw BackupFileError.invalid("Backup media must belong to images, audio or video") }
     }
     func validate() throws {
         try Self.validateSourcePath(sourcePath)

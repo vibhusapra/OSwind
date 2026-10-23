@@ -72,11 +72,13 @@ do {
           native-model install|verify parakeet|speakers [--cache-root PATH]
           delete ID                      Delete one memory and its media
           prune [--days N] [--max-gb N]   Apply retention
+          capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
           capture [--app-bundle ID]      Capture a chosen/current window once
           transcribe FILE --model PATH   Local whisper.cpp transcription
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
+          probe-visual-replay --output NEW_DIR [--frames 12] [--software]  Synthetic OCR/video/decode probe
           benchmark-audio-search --archive DIR [--prepare] [--detail full|preview]  Timed-transcript performance
           benchmark-vectors [--count N] [--dimensions N]  Vector scaling / optional --indexed --quality-queries N
           benchmark-stats --archive PATH  Compare synthetic archive metadata paths
@@ -132,6 +134,13 @@ do {
         guard let path = option("--archive") else { throw OSwindError.invalid("Pass --archive with an existing synthetic vector benchmark directory") }
         let output = option("--output"), result = try StatisticsEvaluation.run(archive:URL(fileURLWithPath:path),repetitions:Int(option("--repetitions") ?? "5") ?? 5)
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
+    } else if command == "probe-visual-replay" {
+        guard let path=try validatedOption("--output") else {throw OSwindError.invalid("Use probe-visual-replay --output NEW_DIRECTORY")}
+        let framesText=try validatedOption("--frames") ?? "12"
+        guard let frames=Int(framesText) else {throw OSwindError.invalid("frames must be 2–120")}
+        let software=args.contains("--software");args.removeAll {$0=="--software"}
+        guard args.isEmpty else {throw OSwindError.invalid("Unknown visual probe argument")}
+        try emit(await VisualReplayBenchmark.run(directory:URL(fileURLWithPath:path),frames:frames,hardwareRequired:!software))
     } else if command == "benchmark-audio-search" {
         guard let path=try validatedOption("--archive") else {throw OSwindError.invalid("Use benchmark-audio-search --archive SYNTHETIC_DIRECTORY [--prepare --clips 32 --words 10000 | --detail full|preview --repetitions 7]")}
         let output=try validatedOption("--output"),detailText=try validatedOption("--detail") ?? "preview"
@@ -273,6 +282,12 @@ do {
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
         case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")
         case "prune": let days = Int(option("--days") ?? "30") ?? 30; let gb = Int64(option("--max-gb") ?? "20") ?? 20; guard days > 0 && gb > 0 else { throw OSwindError.invalid("Retention and budget must be positive") }; print(try store.prune(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000))
+        case "capture-replay":
+            let bundle=try validatedOption("--app-bundle"),duration=try validatedOption("--seconds")
+            guard let duration,let seconds=Double(duration),args.isEmpty else {throw OSwindError.invalid("Use capture-replay --seconds 1..120 [--app-bundle ID]")}
+            let controller=CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root))
+            try await controller.captureReplay(seconds:seconds,targetBundleID:bundle)
+            try emit(["status":controller.status,"saved":controller.metrics.saved,"errors":controller.metrics.errors])
         case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
         case "import-audio":
             var settings=AppSettings.load(root:root)

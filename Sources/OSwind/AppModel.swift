@@ -106,7 +106,7 @@ import UniformTypeIdentifiers
     }
     func startConfiguredServices() { if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -343,7 +343,7 @@ import UniformTypeIdentifiers
             if indexed < (try store.matchingCount()) || pendingPassages { rebuildIndex() }
         } catch { indexStatus = "Index catch-up waiting for the local model server" }
     }
-    func pauseAll() { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(); audio.stop() }
+    func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
     func pauseFor(minutes: Int) {
         let screenWasRunning = capture.running, audioWasRunning = audio.running
         pauseAll(); pauseUntil = Date().addingTimeInterval(Double(minutes)*60)

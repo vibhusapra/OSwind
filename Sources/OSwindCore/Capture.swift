@@ -13,6 +13,7 @@ public struct WindowContext: Sendable {
     public var url: String?
     public var accessibilityText: String
     public var secure: Bool
+    public var bounds: CGRect? = nil
     public var browser: Bool { ["safari", "chrome", "firefox", "arc", "brave", "edge", "vivaldi", "orion"].contains { bundle.lowercased().contains($0) } }
 }
 public enum AccessibilityContext {
@@ -21,10 +22,14 @@ public enum AccessibilityContext {
         guard let app = application else { return nil }
         let root = AXUIElementCreateApplication(app.processIdentifier)
         var windowRef: CFTypeRef?; AXUIElementCopyAttributeValue(root, kAXFocusedWindowAttribute as CFString, &windowRef)
-        var title = "", url: String?, texts = [String](), secure = false
+        var title = "", url: String?, texts = [String](), secure = false, bounds: CGRect?
         func value(_ element: AXUIElement, _ name: String) -> CFTypeRef? { var out: CFTypeRef?; AXUIElementCopyAttributeValue(element, name as CFString, &out); return out }
         if let windowRef, CFGetTypeID(windowRef) == AXUIElementGetTypeID() {
             let window = unsafeBitCast(windowRef, to: AXUIElement.self); title = value(window, kAXTitleAttribute) as? String ?? ""
+            if let position=value(window,kAXPositionAttribute),let size=value(window,kAXSizeAttribute),CFGetTypeID(position)==AXValueGetTypeID(),CFGetTypeID(size)==AXValueGetTypeID() {
+                var point=CGPoint.zero,dimensions=CGSize.zero
+                if AXValueGetValue(unsafeBitCast(position,to:AXValue.self),.cgPoint,&point),AXValueGetValue(unsafeBitCast(size,to:AXValue.self),.cgSize,&dimensions) {bounds=CGRect(origin:point,size:dimensions)}
+            }
             var queue: [AXUIElement] = [window], visited = 0, textSize = 0
             while !queue.isEmpty && visited < 600 && textSize < 16000 {
                 let element = queue.removeFirst(); visited += 1
@@ -40,7 +45,7 @@ public enum AccessibilityContext {
                 if let children = value(element, kAXChildrenAttribute) as? [AXUIElement] { queue.append(contentsOf: children.prefix(100)) }
             }
         }
-        return WindowContext(app: app.localizedName ?? "Unknown", bundle: app.bundleIdentifier ?? "", pid: app.processIdentifier, title: title, url: url, accessibilityText: texts.joined(separator: "\n"), secure: secure)
+        return WindowContext(app: app.localizedName ?? "Unknown", bundle: app.bundleIdentifier ?? "", pid: app.processIdentifier, title: title, url: url, accessibilityText: texts.joined(separator: "\n"), secure: secure,bounds:bounds)
     }
 }
 public enum SessionState {
@@ -58,7 +63,14 @@ public struct CaptureMetrics: Sendable {
     @Published public private(set) var running = false
     @Published public private(set) var status = "Paused"
     @Published public private(set) var metrics = CaptureMetrics()
-    public var settings: AppSettings
+    public var settings: AppSettings {
+        didSet {
+            epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
+            if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
+        }
+    }
+    private var replay:ReplayCaptureSession?
+    private var replayGate=ReplayCommitGate()
     public var onCapture: ((Memory) -> Void)?
     private let store: MemoryStore
     private let embedder: LocalEmbedder
@@ -73,17 +85,38 @@ public struct CaptureMetrics: Sendable {
         self.store = store; self.embedder = embedder; self.settings = settings
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in guard let self, self.running, Date().timeIntervalSince(self.lastCapture) > 1 else { return }; await self.captureOnce() } })
-        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.status = "Sleeping / locked" } }) }
-        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false } }) }
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
+        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
-    public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; schedule(); Task { await captureOnce() } }
-    public func pause() { running = false; epoch = UUID(); timer?.invalidate(); timer = nil; status = "Paused" }
+    public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
+    private func configureMode() {
+        if settings.visualCaptureMode == .replay && !settings.allDisplays {
+            timer?.invalidate();timer=nil;replay?.stop();
+            let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text})
+            replay=session;session.start()
+        } else {replay?.stop();replay=nil;schedule();Task {await captureOnce()}}
+    }
+    public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID(); timer?.invalidate(); timer = nil; status = "Paused" }
+    /// Explicit bounded replay, including a chosen app. Existing permissions
+    /// only; never prompts or falls through to a different app when absent.
+    public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
+        guard seconds.isFinite,seconds>=1,seconds<=120,!running,!busy,!suspended else {throw OSwindError.invalid("Replay requires 1–120 seconds and an idle controller")}
+        guard !SessionState.locked,CGPreflightScreenCaptureAccess() else {throw OSwindError.unavailable("Replay needs an unlocked session and existing Screen Recording access")}
+        let previousSaved=metrics.saved
+        busy=true;running=true;defer {busy=false;running=false;replay=nil}
+        let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,targetBundleID:targetBundleID,onMemory:{[weak self] memory in self?.metrics.saved+=1;self?.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text})
+        replay=session;session.start()
+        do {try await Task.sleep(nanoseconds:UInt64(seconds*1_000_000_000))} catch {session.stop(discard:true);await session.waitUntilStopped();throw error}
+        session.stop();await session.waitUntilStopped()
+        guard metrics.saved>previousSaved else {throw OSwindError.unavailable("Replay saved no evidence: "+status)}
+    }
     private func schedule() {
         timer?.invalidate(); let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .null)
         let interval = settings.profile.effectiveInterval(lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled, thermalLimited: ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical, idleSeconds: idle) ?? 20
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in Task { @MainActor in guard let self, self.running else { return }; await self.captureOnce(); self.schedule() } }
     }
     public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
+        guard manual || settings.visualCaptureMode != .replay || settings.allDisplays else {return}
         guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
         guard !busy, !suspended, running || manual else { return }
         guard !SessionState.locked else { status = "Locked · capture suspended"; return }

@@ -19,8 +19,8 @@
     "id": "F003",
     "axis": "Capture",
     "feature": "Continuous visual replay / HEVC",
-    "status": "todo",
-    "evidence": "JPEG snapshots only; no inter-frame video compression",
+    "status": "partial",
+    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Twelve generated frames encode/decode; real synthetic-window capture and native seek/play verified. All-display replay, natural workload/power and broad lock/resume acceptance remain open",
     "references": "Rewind Desktop, Retrace (haseab), rem"
   },
   {
@@ -68,7 +68,7 @@
     "axis": "Energy",
     "feature": "Light/Balanced/Detailed modes",
     "status": "tested",
-    "evidence": "20/5/2 seconds; size/quality settings and policy tests",
+    "evidence": "Snapshots 20/5/2 s; replay 5/1/0.5 s, reduced on low power/thermal pressure. Policy tests pass; measured battery budget remains open",
     "references": "Screenpipe, TimeScroll"
   },
   {
