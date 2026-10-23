@@ -1,0 +1,47 @@
+{
+  "build" : "release",
+  "count" : 1000000,
+  "modes" : {
+    "legacy_sql_scan" : {
+      "milliseconds" : [
+        175.789333,
+        174.892583,
+        173.85825,
+        176.40629200000001,
+        176.712875
+      ],
+      "p50_ms" : 175.789333,
+      "p95_ms" : 176.40629200000001
+    },
+    "maintained_sql" : {
+      "milliseconds" : [
+        0.030457999999999999,
+        0.012,
+        0.011708,
+        0.010416999999999999,
+        0.0087919999999999995
+      ],
+      "p50_ms" : 0.011708,
+      "p95_ms" : 0.012
+    },
+    "maintained_with_disk" : {
+      "milliseconds" : [
+        4.407,
+        0.14641599999999999,
+        0.10000000000000001,
+        0.090666999999999998,
+        0.083375000000000005
+      ],
+      "p50_ms" : 0.10000000000000001,
+      "p95_ms" : 0.14641599999999999
+    }
+  },
+  "open_including_migration_seconds" : 0.89696800708770752,
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "process_peak_rss_bytes" : 31244288,
+  "repetitions" : 5,
+  "schema" : 1,
+  "schema_version" : 5,
+  "scope" : "Marked synthetic vector archive, maintained metadata versus the previous aggregate\/app SQL scans. File traversal is measured separately. Warm development samples; opening may perform a one-time schema-4 migration. Not controlled cold-cache, media-heavy filesystem, whole-UI, power or competitor measurements. The archive is retained and its derived schema may be upgraded; no sources or native graphs are deleted.",
+  "timestamp" : "2026-10-23T09:19:13Z"
+}

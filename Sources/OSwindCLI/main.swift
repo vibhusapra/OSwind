@@ -43,6 +43,7 @@ do {
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
           benchmark-vectors [--count N] [--dimensions N]  Vector scaling / optional --indexed --quality-queries N
+          benchmark-stats --archive PATH  Compare synthetic archive metadata paths
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
@@ -53,6 +54,10 @@ do {
         if #available(macOS 26, *) { result["appleIntelligence"] = SystemLanguageModel.default.isAvailable }
         #endif
         try emit(result)
+    } else if command == "benchmark-stats" {
+        guard let path = option("--archive") else { throw OSwindError.invalid("Pass --archive with an existing synthetic vector benchmark directory") }
+        let output = option("--output"), result = try StatisticsEvaluation.run(archive:URL(fileURLWithPath:path),repetitions:Int(option("--repetitions") ?? "5") ?? 5)
+        if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
     } else if command == "benchmark-vectors" {
         let count = Int(option("--count") ?? "10000") ?? 10000, dimensions = Int(option("--dimensions") ?? "1024") ?? 1024, repetitions = Int(option("--repetitions") ?? "3") ?? 3, output = option("--output")
         let archive = option("--archive").map { URL(fileURLWithPath:$0) }
@@ -85,10 +90,10 @@ do {
         for mode in SearchMode.allCases {
             var times = [Double](), recall = 0.0, reciprocal = 0.0
             for _ in 0..<3 { for (query,expected) in queries { let before = Date(); let vector = mode == .keyword ? nil : embedder.embed(query); let hits = try store.search(SearchFilter(query:query,limit:5),mode:mode,vector:vector,modelID:embedder.modelID); times.append(Date().timeIntervalSince(before)*1000); if let rank = hits.firstIndex(where:{$0.id.hasPrefix(expected+"-")}) { recall += 1; reciprocal += 1/Double(rank+1) } } }
-            times.sort(); let total = Double(queries.count*3)
-            modes[mode.rawValue] = ["p50_ms":times[times.count/2],"p95_ms":times[Int(Double(times.count-1)*0.95)],"hit_rate_at_5":recall/total,"mrr_at_5":reciprocal/total,"queries":queries.count,"repetitions":3]
+            let latency = try BenchmarkLatency(samples:times); let total = Double(queries.count*3)
+            modes[mode.rawValue] = ["p50_ms":latency.median,"p95_ms":latency.p95,"max_ms":latency.maximum,"hit_rate_at_5":recall/total,"mrr_at_5":reciprocal/total,"queries":queries.count,"repetitions":3]
         }
-        let result: [String:Any] = ["schema":1,"timestamp":ISO8601DateFormatter().string(from:Date()),"os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","records":count,"embedding_model":embedder.modelID,"embeddings_available":embedder.available,"ingest_seconds":ingest,"records_per_second":Double(count)/ingest,"disk_bytes":store.diskBytes(),"modes":modes,"scope":"Synthetic repeated-topic corpus, not a real-user relevance study or a competitor comparison. All vectors scanned for semantic retrieval."]
+        let result: [String:Any] = ["schema":2,"latency_quantiles":BenchmarkLatency.method,"timestamp":ISO8601DateFormatter().string(from:Date()),"os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "none","records":count,"embedding_model":embedder.modelID,"embeddings_available":embedder.available,"ingest_seconds":ingest,"records_per_second":Double(count)/ingest,"disk_bytes":store.diskBytes(),"modes":modes,"scope":"Synthetic repeated-topic corpus, not a real-user relevance study or a competitor comparison. All vectors scanned for semantic retrieval."]
         if let output { try JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]).write(to:URL(fileURLWithPath:output),options:.atomic) }; try emit(result)
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()

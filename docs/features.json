@@ -148,7 +148,7 @@
     "axis": "Retrieval",
     "feature": "ANN indexing for long archives",
     "status": "partial",
-    "evidence": "Pinned HNSW cache, mutation replay, live erasure/filter checks and float32 rerank; 100k non-self Recall@10 1.0 on 16 queries, unfiltered p95 ~58 ms. Filtered Automatic stays exact; million/cold/soak gates remain open",
+    "evidence": "Pinned HNSW cache, mutation replay, live erasure/filter checks and float32 rerank; 100k non-self Recall@10 1.0; million .675/.825 fails recall despite ~207 ms unfiltered self nearest-rank p95/max. Filtered Automatic stays exact; tuning/cold/soak gates remain open",
     "references": "Configurable vector systems"
   },
   {
