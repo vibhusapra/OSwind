@@ -23,6 +23,9 @@ do {
           search [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] WORDS
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
+          chat list|new|show ID|delete ID  Manage saved local conversations
+          chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up
+          chat export ID PATH            Export a conversation to Markdown
           note TEXT                      Save a redacted, searchable note
           stats                          Storage and capture counts
           config                         Print settings (no API keys)
@@ -83,6 +86,30 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "chat":
+            let action = args.first ?? "list"; if !args.isEmpty { args.removeFirst() }
+            if action == "list" { try encoded(store.chats()) }
+            else if action == "new" { try encoded(store.createChat(title:args.isEmpty ? "New conversation" : args.joined(separator:" "))) }
+            else {
+                guard !args.isEmpty else { throw OSwindError.invalid("Enter a conversation ID") }; let id = args.removeFirst()
+                guard let session = try store.chat(id) else { throw OSwindError.invalid("Conversation not found") }
+                if action == "show" { try emit(["session":Integration.json(session),"turns":Integration.json(store.chatTurns(id,limit:1000))]) }
+                else if action == "delete" { try store.deleteChat(id); print("Deleted conversation") }
+                else if action == "export" {
+                    guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }
+                    let url = URL(fileURLWithPath:path); try ConversationContext.markdown(session,turns:store.chatTurns(id,limit:1000)).write(to:url,atomically:true,encoding:.utf8)
+                    try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path); print("Exported conversation")
+                } else if action == "ask" {
+                    let settings = AppSettings.load(root:root); var configuration = settings.ai
+                    if let value = option("--provider"), let provider = AIProvider(rawValue:value) { configuration.provider = provider }
+                    let filter = try searchFilter(), question = settings.privacy.sanitize(args.joined(separator:" ")).text
+                    guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
+                    let history = ConversationContext.questions(try store.chatTurns(id))
+                    let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history)
+                    try Task.checkCancellation()
+                    try encoded(store.appendChatTurn(sessionID:id,question:question,answer:answer,filter:filter,policy:settings.privacy))
+                } else { throw OSwindError.invalid("Use chat list, new, show, ask, export or delete") }
+            }
         case "eval-retrieval":
             let fixture = option("--fixture") ?? "benchmarks/fixtures/desktop-retrieval-v1.json", output = option("--output")
             var configuration = SearchConfiguration(); if let model = option("--model") { configuration.provider = .ollama; configuration.model = model }; configuration.endpoint = option("--endpoint") ?? configuration.endpoint

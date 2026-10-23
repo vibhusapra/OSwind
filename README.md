@@ -28,13 +28,14 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 - Light / Balanced / Detailed capture profiles, perceptual duplicate suppression, idle/sleep/lock suspension and thermal/low-power backoff.
 - SQLite WAL + FTS5 keyword search, Apple sentence embeddings or optional local GPU Qwen3 embeddings, model-versioned indexes and hybrid ranking.
 - Native timeline, app/date filters, saved memories, notes/tags, OCR region inspection, source URLs, capture health and storage insights.
+- Durable local Ask conversations, follow-up subject context, per-turn evidence cards/scope, cancellation, chat deletion and Markdown export. Deleting or revising a source removes chat answers that cited it.
 - Evidence-only answers without downloads; on-device Apple Intelligence; local Ollama; optional OpenAI-compatible and Anthropic BYOK. Keys live in Keychain. Cloud context is opt-in.
 - Optional microphone and system-audio capture, 30-second bounded chunks, local whisper.cpp transcription, separate source labels, silence gate, raw-chunk deletion.
 - App/domain/window exclusions, common-secret pattern redaction with raw-image suppression, retention and storage pruning, deletion, JSON export/import.
 - Menu bar controls, global search shortcut ⇧⌘Space, pause ⇧⌘P, login item support, setup and permissions UI.
 - Read-only, token-authenticated localhost API; MCP stdio server for trusted local assistants.
 
-These are implementation claims. The progress ledger separates automated tests, live verification and outstanding validation.
+These are implementation claims. The progress ledger separates automated tests, live verification and outstanding validation. [View the native chat sample](assets/chat-sample.png).
 
 ## Local models
 
@@ -55,6 +56,9 @@ swift run oswindctl doctor
 swift run oswindctl note "Maya owns Friday's release checklist"
 swift run oswindctl search --mode hybrid "release checklist"
 swift run oswindctl ask --provider apple "Who owns the checklist?"
+swift run oswindctl chat new
+swift run oswindctl chat ask CONVERSATION_ID "Who owns the checklist?"
+swift run oswindctl chat export CONVERSATION_ID conversation.md
 swift run oswindctl models list
 swift run oswindctl reindex --model qwen3-embedding:0.6b --use-model
 swift run oswindctl eval-retrieval --model qwen3-embedding:0.6b
@@ -75,6 +79,8 @@ See [API & MCP](docs/INTEGRATIONS.md). Enabling MCP gives its client access to y
 Capture begins when you resume it. Audio sources start independently; Pause stops both screen and audio. Explicit Stop audio finishes a short final segment; privacy pauses discard pending chunks. Default capture is the focused window. Browser capture fails closed when domain rules need a URL and Accessibility cannot provide one. Full-display mode masks all browser apps because background-tab URLs cannot be verified. Window-title detection of private browsing is best effort and varies by browser and language.
 
 Secret redaction is pattern-based, not a guarantee of complete PII removal. Detected secrets suppress screenshot retention as well as redacting text. Audio privacy is separate: a one-second foreground privacy check stops audio on an exclusion, and chunks are checked again before queueing; raw chunks exist briefly during local processing. Changes within a polling interval remain a limitation. Transcripts contain microphone/system labels, not speaker identities.
+
+Chat follow-ups use up to three earlier user questions to resolve the subject and retrieve fresh evidence within the current scope. Earlier generated prose is not reused as evidence. Chat source text is hydrated from the live store, rather than copied into a second source archive. Deleting/revising a source removes citing turns and resets their session titles; retention also ages out chat turns. Explicitly saved notes, copied text and exported files are independent copies. Apple generated claims use guided source-number output; valid citation numbers do not prove factual support.
 
 SQLite and images are local with restrictive directory permissions; v0 does **not** yet provide an encrypted application vault or biometric unlock. Use FileVault. Ordinary deletion cannot guarantee forensic erasure from APFS snapshots, backups or exports. No analytics, advertising, account, vendor telemetry or automatic cloud fallback is included.
 

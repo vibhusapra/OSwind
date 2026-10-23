@@ -7,7 +7,7 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 ## Implemented and directly verified
 
 - Native Swift package builds in debug and release on macOS 26.6.2 / Swift 6.3.3 / M5 Max. Ad-hoc signed .app packages successfully; a debug app process ran with isolated sample data.
-- 42 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
+- 53 automated XCTest cases pass (plus one opt-in real-runtime check): durable SQLite/FTS, Unicode, metadata/vector preservation, filters, retention/storage compaction, transactional import rollback, redaction, asset traversal/symlink rejection, concurrent readers/writers, API/MCP protocol, local model endpoint boundaries, WAV encoding, power policy, summary sampling, reasoning cleanup, actual Vision OCR.
 - CLI durable note/search and real stdio MCP initialize/list/search smoke pass. Live loopback HTTP health/stats/search/get pass; unauthorized requests return 401, browser Origin and bad Host return 403.
 - Apple Intelligence answered the local synthetic ownership question with the correct owner and [1] citation (~0.70 seconds in a repeated sample).
 - Ollama qwen3:4b answered the same question with correct owner and [1] (~3.75 seconds warm sample). Runtime `ollama ps` reported 100% GPU, 8192 context. Reasoning text is stripped before display.
@@ -24,6 +24,10 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - A 32-document / 35-query authored relevance fixture includes 31 answerable questions (paraphrase, code, multilingual and filtered) and 4 unanswerable questions. Qwen3 hybrid and semantic both achieved Recall@5/MRR@5 of 1.0; hybrid p95 ~92 ms. Apple hybrid Recall@5 .871, MRR .720, p95 ~4.7 ms. This small fixture does not establish broad superiority. All modes returned candidates for all unanswerable queries: abstention remains unsolved. See `benchmarks/README.md`.
 - Version-1 store migration, content/version races, stale vectors, cross-language fusion, cloud model aliases and explicit fallback have regression coverage. The real managed-server lifecycle is tested only when `OSWIND_TEST_MANAGED_RUNTIME=1` is set.
 - The Models page was rendered and inspected. A live settings interaction attempt was blocked by the Mac lock; native model controls still need unlocked interaction review.
+
+- Durable saved chats now pass separate-process create/ask/follow-up/reopen/export/delete checks. Ten conversation tests cover source/session erasure races, transaction rollback, retention, schema-2 migration, future-schema refusal and source hydration; a claim-rendering test rejects invalid citations. Repeated source text is not stored in chat payloads.
+- Real local chat smoke passes with Qwen3 and Apple: correct owner, Friday follow-up and [1] citations. Apple now uses guided source-number claims after the smoke exposed missing citations, false abstention and answering the earlier question. The current-question prompt was corrected; this tiny smoke is not a grounding/abstention accuracy study. `benchmarks/conversation-local-v1.json` records observed responses/timings.
+- Chat layouts were rendered and visually inspected in dark mode and at the minimum light-mode window size. Live native interaction remains pending while locked.
 
 ## Implemented, broader runtime checks still needed
 
@@ -44,12 +48,13 @@ The full objective is an open-source macOS desktop-memory product with meaningfu
 - [ ] Native interaction/permission flow, automatic foreground transitions, browser URL metadata/private-window tests. Real targeted screen capture and sampled layout rendering pass.
 - [ ] End-to-end mic/system audio, short recordings, device changes, queue pressure and pause/lock boundaries. Subprocess cancellation is covered by an automated test.
 - [ ] Extend the new multilingual relevance suite to realistic larger archives, adversarial questions and abstention; add multimodal retrieval. Qwen3 local embedding and the authored 35-query suite are delivered; state-of-the-art claims remain unproven.
-- [ ] Durable chats/follow-ups, natural-language time filters, scheduled routines, meeting sessions/diarization, calendar view and query-specific highlights.
+- [ ] Natural-language time filters, scheduled routines, meeting sessions/diarization, calendar view and query-specific highlights. Durable chats/follow-ups and chat Markdown export are delivered with v0 history bounds; broader conversation/grounding evaluation remains open.
 - [ ] Encrypted vault/biometric unlock, stronger PII/image redaction, granular range/app/site erasure.
 - [ ] Compressed video/media backup/restore, Markdown export, Rewind/Limitless migration, collector/plugin SDK.
 - [ ] Unlocked interaction review of delivered model discovery/download/index UX; broader provider contracts, failure recovery and backend/version matrix. Local-model API mocks, real pull, embedding, runtime and managed-server checks are covered.
 - [ ] Real competitor runs on matched workloads; 100k+ scaling, storage growth, index lag, 24-hour capture/soak, fault injection and measured power.
 - [ ] Accessibility/focus audit, supported older macOS/hardware coverage, notarized install/update channel.
+- [x] [Draft PR #2](https://github.com/vibhusapra/OSwind/pull/2) adds local GPU retrieval/model setup and relevance evaluation; current-head macOS CI passed.
 - [x] [Draft PR #1](https://github.com/vibhusapra/OSwind/pull/1) opened; initial GitHub macOS build/tests/package/CLI smoke passed. Later commits require their own checks.
 
 Personal sync, enterprise policy/team controls and other platforms remain visible future axes rather than being silently counted as complete. The user's current implementation target is macOS; those axes need an explicit delivery decision before any whole-market parity claim.

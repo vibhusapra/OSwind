@@ -244,7 +244,7 @@
     "axis": "AI",
     "feature": "Grounded answers and citations",
     "status": "partial",
-    "evidence": "Retrieved source cards; model can omit inline citations; evaluation needed",
+    "evidence": "Apple guided source-number claims; other-model citation warnings; real follow-up smoke; semantic support/abstention evaluation pending",
     "references": "Pieces, Littlebird"
   },
   {
@@ -267,8 +267,8 @@
     "id": "F034",
     "axis": "AI",
     "feature": "Chat history and follow-up context",
-    "status": "todo",
-    "evidence": "One answer at a time; no durable chat sessions",
+    "status": "tested",
+    "evidence": "Durable sessions, subject follow-ups, source hydration/erasure, real local-model smoke; broader dialogue accuracy pending",
     "references": "Littlebird, Pieces"
   },
   {
@@ -451,8 +451,8 @@
     "id": "F057",
     "axis": "Data",
     "feature": "Markdown / Obsidian export",
-    "status": "todo",
-    "evidence": "Plain JSON only",
+    "status": "partial",
+    "evidence": "Chat Markdown export with sources/scope; whole-memory Markdown/Obsidian library export pending",
     "references": "Minne, Screenpipe"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "42 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
+    "evidence": "53 automated tests; 32-document/35-query retrieval suite; targeted capture/OCR and public speech checks",
     "references": "OSwind quality bar"
   },
   {

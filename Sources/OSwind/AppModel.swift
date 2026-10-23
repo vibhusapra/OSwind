@@ -26,6 +26,10 @@ import ServiceManagement
     @Published var answer: Answer?
     @Published var question = ""
     @Published var asking = false
+    @Published var chats = [ChatSession]()
+    @Published var chatTurns = [ChatTurn]()
+    @Published var currentChatID: String?
+    private var answerTask: Task<Void,Never>?
     @Published var errorMessage: String?
     @Published var showSettings = false
     @Published var showOnboarding = false
@@ -71,7 +75,7 @@ import ServiceManagement
         }
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
-        refresh(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
+        refresh(); refreshChats(); if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() }
         housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain() } }
     }
     var filter: SearchFilter {
@@ -91,9 +95,34 @@ import ServiceManagement
         }
     }
     func ask(_ prompt: String? = nil, summarize: Bool = false) {
-        let text = prompt ?? question; guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
-        asking = true; let f = filter, config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder)
-        Task { do { answer = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig) } catch { errorMessage = error.localizedDescription }; asking = false }
+        let text = settings.privacy.sanitize(prompt ?? question).text; guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
+        do {
+            if currentChatID == nil { currentChatID = try store.createChat().id }
+            guard let sessionID = currentChatID else { return }
+            asking = true; let f = filter, config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder), history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
+            answerTask = Task {
+                do {
+                    let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history)
+                    try Task.checkCancellation()
+                    let turn = try store.appendChatTurn(sessionID:sessionID,question:text,answer:result,filter:f,policy:policy)
+                    answer = turn.answer; question = ""; refreshChats()
+                } catch is CancellationError { }
+                catch { if !Task.isCancelled { errorMessage = error.localizedDescription } }
+                asking = false
+            }
+        } catch { errorMessage = error.localizedDescription }
+    }
+    func cancelAnswer() { answerTask?.cancel() }
+    func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "" }
+    func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = ""; refreshChats() }
+    func refreshChats() {
+        do { chats = try store.chats(); if let id = currentChatID { if try store.chat(id) != nil { chatTurns = try store.chatTurns(id); answer = chatTurns.last?.answer } else { currentChatID = nil; chatTurns = []; answer = nil } } }
+        catch { errorMessage = error.localizedDescription }
+    }
+    func deleteCurrentChat() { guard !asking, let id = currentChatID else { return }; do { try store.deleteChat(id); newChat(); refreshChats() } catch { errorMessage = error.localizedDescription } }
+    func exportChat() {
+        guard let id = currentChatID else { return }
+        do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK, let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
     }
     func saveAnswer() { guard let answer else { return }; addNote(answer.text, title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",kind:.summary) }
     func addNote(_ text: String, title: String = "Quick note", kind: MemoryKind = .note) {
@@ -153,8 +182,8 @@ import ServiceManagement
     }
     func cancelIndexing() { indexTask?.cancel() }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func maintain() { let store = self.store, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000) }.value; refresh(); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } }
+    func delete(_ memory: Memory) { do { try store.delete(memory.id); if selected?.id == memory.id { selected = nil }; refresh(); refreshChats() } catch { errorMessage = error.localizedDescription } }
+    func maintain() { let store = self.store, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000) }.value; refresh(); refreshChats(); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } }
     private func catchUpIndex() async {
         let configuration = settings.search
         guard configuration.provider == .ollama, !indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }

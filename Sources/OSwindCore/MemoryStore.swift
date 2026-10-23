@@ -11,6 +11,9 @@ public final class MemoryStore: @unchecked Sendable {
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
         sqlite3_busy_timeout(db, 5000)
+        let versionStatement = try prepare("PRAGMA user_version")
+        let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
+        guard version <= 3 else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
         try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON;")
         try exec("""
         CREATE TABLE IF NOT EXISTS memories (
@@ -41,7 +44,34 @@ public final class MemoryStore: @unchecked Sendable {
         CREATE TRIGGER IF NOT EXISTS semantic_content_update AFTER UPDATE OF title,app,text,url ON memories
         WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url
         BEGIN DELETE FROM semantic_vectors WHERE memory_id=new.id; END;
-        PRAGMA user_version=2;
+        CREATE TABLE IF NOT EXISTS chat_sessions (
+            id TEXT PRIMARY KEY, title TEXT NOT NULL, created REAL NOT NULL, updated REAL NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS chat_turns (
+            id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
+            timestamp REAL NOT NULL, payload BLOB NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS chat_session_time ON chat_turns(session_id,timestamp);
+        CREATE TABLE IF NOT EXISTS chat_sources (
+            turn_id TEXT NOT NULL REFERENCES chat_turns(id) ON DELETE CASCADE,
+            memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+            ordinal INTEGER NOT NULL, score REAL NOT NULL, match TEXT NOT NULL,
+            PRIMARY KEY(turn_id,ordinal)
+        );
+        CREATE INDEX IF NOT EXISTS chat_source_memory ON chat_sources(memory_id);
+        DROP TRIGGER IF EXISTS chat_source_erasure;
+        CREATE TRIGGER chat_source_erasure BEFORE DELETE ON memories BEGIN
+            UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT t.session_id FROM chat_turns t JOIN chat_sources s ON s.turn_id=t.id WHERE s.memory_id=old.id);
+            DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=old.id);
+        END;
+        DROP TRIGGER IF EXISTS chat_source_revision;
+        CREATE TRIGGER chat_source_revision BEFORE UPDATE OF title,app,text,url ON memories
+        WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url
+        BEGIN
+            UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT t.session_id FROM chat_turns t JOIN chat_sources s ON s.turn_id=t.id WHERE s.memory_id=old.id);
+            DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=old.id);
+        END;
+        PRAGMA user_version=3;
         """)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
     }
@@ -195,6 +225,8 @@ public final class MemoryStore: @unchecked Sendable {
     }
     @discardableResult public func prune(before: Date, maxBytes: Int64? = nil) throws -> Int {
         lock.lock(); defer { lock.unlock() }; var ids = [String](); let stmt = try prepare("SELECT id FROM memories WHERE timestamp<?"); sqlite3_bind_double(stmt, 1, before.timeIntervalSince1970); while sqlite3_step(stmt) == SQLITE_ROW { ids.append(string(stmt,0)) }; sqlite3_finalize(stmt)
+        let titles = try prepare("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE timestamp<?)"); sqlite3_bind_double(titles,1,before.timeIntervalSince1970); guard sqlite3_step(titles) == SQLITE_DONE else { sqlite3_finalize(titles); throw failure() }; sqlite3_finalize(titles)
+        let chats = try prepare("DELETE FROM chat_turns WHERE timestamp<?"); sqlite3_bind_double(chats,1,before.timeIntervalSince1970); guard sqlite3_step(chats) == SQLITE_DONE else { sqlite3_finalize(chats); throw failure() }; sqlite3_finalize(chats)
         for id in ids { try delete(id) }; var deleted = ids.count
         if let maxBytes, diskBytes() > maxBytes { try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;"); var size = diskBytes(); let stmt = try prepare("SELECT id FROM memories ORDER BY timestamp"); var oldest = [String](); while sqlite3_step(stmt) == SQLITE_ROW { oldest.append(string(stmt,0)) }; sqlite3_finalize(stmt)
             for (index,id) in oldest.enumerated() {
@@ -210,7 +242,7 @@ public final class MemoryStore: @unchecked Sendable {
         return deleted
     }
     public func deleteAll() throws {
-        lock.lock(); defer { lock.unlock() }; try exec("DELETE FROM memories; PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
+        lock.lock(); defer { lock.unlock() }; try exec("DELETE FROM chat_sessions; DELETE FROM memories; PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
         for folder in ["images", "audio"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
     }
     public func diskBytes() -> Int64 {
@@ -234,5 +266,69 @@ public final class MemoryStore: @unchecked Sendable {
             for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; m.text = policy.sanitize(m.text).text; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); count += 1 }
             try exec("COMMIT"); return count
         } catch { try? exec("ROLLBACK"); throw error }
+    }
+}
+
+extension MemoryStore {
+    public func createChat(title: String = "New conversation") throws -> ChatSession {
+        lock.lock(); defer { lock.unlock() }
+        let session = ChatSession(id:UUID().uuidString,title:String(title.prefix(160)),created:Date(),updated:Date(),turnCount:0)
+        let stmt = try prepare("INSERT INTO chat_sessions(id,title,created,updated) VALUES(?,?,?,?)"); defer { sqlite3_finalize(stmt) }
+        bind(stmt,1,session.id); bind(stmt,2,session.title); sqlite3_bind_double(stmt,3,session.created.timeIntervalSince1970); sqlite3_bind_double(stmt,4,session.updated.timeIntervalSince1970)
+        guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; return session
+    }
+    public func chats(limit: Int = 100) throws -> [ChatSession] {
+        lock.lock(); defer { lock.unlock() }
+        let stmt = try prepare("SELECT s.id,s.title,s.created,s.updated,COUNT(t.id) FROM chat_sessions s LEFT JOIN chat_turns t ON t.session_id=s.id GROUP BY s.id ORDER BY s.updated DESC,s.id LIMIT ?"); defer { sqlite3_finalize(stmt) }; sqlite3_bind_int(stmt,1,Int32(min(500,max(1,limit))))
+        var sessions = [ChatSession]()
+        while sqlite3_step(stmt) == SQLITE_ROW { sessions.append(ChatSession(id:string(stmt,0),title:string(stmt,1),created:Date(timeIntervalSince1970:sqlite3_column_double(stmt,2)),updated:Date(timeIntervalSince1970:sqlite3_column_double(stmt,3)),turnCount:Int(sqlite3_column_int(stmt,4)))) }
+        return sessions
+    }
+    public func chat(_ id: String) throws -> ChatSession? {
+        lock.lock(); defer { lock.unlock() }
+        let stmt = try prepare("SELECT title,created,updated,(SELECT COUNT(*) FROM chat_turns WHERE session_id=?) FROM chat_sessions WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,id); bind(stmt,2,id)
+        guard sqlite3_step(stmt) == SQLITE_ROW else { return nil }
+        return ChatSession(id:id,title:string(stmt,0),created:Date(timeIntervalSince1970:sqlite3_column_double(stmt,1)),updated:Date(timeIntervalSince1970:sqlite3_column_double(stmt,2)),turnCount:Int(sqlite3_column_int(stmt,3)))
+    }
+    public func deleteChat(_ id: String) throws {
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("DELETE FROM chat_sessions WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
+    }
+    @discardableResult public func appendChatTurn(sessionID: String, question: String, answer: Answer, filter: SearchFilter = SearchFilter(), policy: PrivacyPolicy = PrivacyPolicy()) throws -> ChatTurn {
+        lock.lock(); defer { lock.unlock() }
+        guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, question.count <= 8000, answer.text.count <= 100000, answer.sources.count <= 60 else { throw OSwindError.invalid("Invalid conversation turn size") }
+        try exec("BEGIN IMMEDIATE")
+        do {
+            guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
+            for hit in answer.sources { guard let current = try get(hit.id), current.contentHash == hit.memory.contentHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
+            var scope = filter; scope.query = ""
+            let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope)
+            let id = UUID().uuidString, timestamp = Date(), data = try JSONEncoder().encode(payload)
+            let stmt = try prepare("INSERT INTO chat_turns(id,session_id,timestamp,payload) VALUES(?,?,?,?)"); defer { sqlite3_finalize(stmt) }
+            bind(stmt,1,id); bind(stmt,2,sessionID); sqlite3_bind_double(stmt,3,timestamp.timeIntervalSince1970); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt,4,$0.baseAddress,Int32(data.count),transient) }; guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
+            for (ordinal,hit) in answer.sources.enumerated() {
+                let source = try prepare("INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match) VALUES(?,?,?,?,?)"); defer { sqlite3_finalize(source) }
+                bind(source,1,id); bind(source,2,hit.id); sqlite3_bind_int(source,3,Int32(ordinal)); sqlite3_bind_double(source,4,hit.score); bind(source,5,hit.match); guard sqlite3_step(source) == SQLITE_DONE else { throw failure() }
+            }
+            let update = try prepare("UPDATE chat_sessions SET title=?,updated=? WHERE id=?"); defer { sqlite3_finalize(update) }
+            bind(update,1,session.turnCount == 0 ? String(payload.question.replacingOccurrences(of:"\n",with:" ").prefix(80)) : session.title); sqlite3_bind_double(update,2,timestamp.timeIntervalSince1970); bind(update,3,sessionID); guard sqlite3_step(update) == SQLITE_DONE else { throw failure() }
+            try exec("COMMIT")
+            var cleanAnswer = answer; cleanAnswer.text = payload.text
+            return ChatTurn(id:id,sessionID:sessionID,timestamp:timestamp,question:payload.question,answer:cleanAnswer,filter:scope)
+        } catch { try? exec("ROLLBACK"); throw error }
+    }
+    public func chatTurns(_ sessionID: String, limit: Int = 100) throws -> [ChatTurn] {
+        lock.lock(); defer { lock.unlock() }
+        let stmt = try prepare("SELECT id,timestamp,payload FROM chat_turns WHERE session_id=? ORDER BY timestamp DESC,id DESC LIMIT ?"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,sessionID); sqlite3_bind_int(stmt,2,Int32(min(1000,max(1,limit))))
+        var turns = [ChatTurn]()
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            let id = string(stmt,0), date = Date(timeIntervalSince1970:sqlite3_column_double(stmt,1))
+            guard let bytes = sqlite3_column_blob(stmt,2) else { throw OSwindError.database("Missing conversation payload") }
+            let payload = try JSONDecoder().decode(ChatPayload.self,from:Data(bytes:bytes,count:Int(sqlite3_column_bytes(stmt,2))))
+            let source = try prepare("SELECT m.payload,s.score,s.match FROM chat_sources s JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
+            var hits = [SearchHit]()
+            while sqlite3_step(source) == SQLITE_ROW { hits.append(SearchHit(memory:try decode(source),score:sqlite3_column_double(source,1),match:string(source,2))) }
+            turns.append(ChatTurn(id:id,sessionID:sessionID,timestamp:date,question:payload.question,answer:Answer(text:payload.text,sources:hits,provider:payload.provider,duration:payload.duration,warnings:payload.warnings),filter:payload.filter))
+        }
+        return turns.reversed()
     }
 }

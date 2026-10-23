@@ -46,3 +46,7 @@ Measured on M5 Max, macOS 26.6.2, release build:
 Qwen3-Embedding 0.6B uses 1024-dimensional normalized vectors; full model digest, fixture SHA256, timings, per-query IDs/scores, warnings, index time and storage are retained in JSON. `ollama ps` reported 100% GPU memory residency during the measured workload. This confirms residency, not a kernel-level utilization or energy measurement.
 
 All modes returned candidates for every unanswerable query (no-evidence empty rate 0). Candidate retrieval is not an answer-confidence decision: answer abstention/citation correctness must be evaluated separately. No competitor binary was run. These results do not support a top-three or state-of-the-art claim.
+
+## Conversation process smoke
+
+`python3 scripts/conversation-smoke.py .build/release/oswindctl` tests persistence, source identity, follow-up subject context, Markdown export/0600 permissions and erasure across separate CLI processes. It defaults to no-model evidence mode for CI. Optional `--provider apple` or `--provider ollama` with `--output PATH` runs installed local generation and asserts the owner/deadline facts and [1] citations. `conversation-local-v1.json` records one measured successful scenario per provider. Missing citations, false abstention and answering the earlier question were found and corrected while developing this fixture; it is a regression smoke, not a held-out accuracy benchmark. Guided citation structure does not prove the text follows from its cited source.

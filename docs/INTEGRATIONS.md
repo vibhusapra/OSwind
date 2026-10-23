@@ -44,4 +44,10 @@ Configure a trusted client yourself in its supported configuration. OSwind does 
 
 The app stores keys under Keychain service `com.oswind.secrets`, accounts `compatible` and `anthropic`. The settings JSON contains no keys. Model requests use ephemeral URL sessions, reject HTTP redirects, require HTTPS for remote endpoints and explicit remote context permission. Local Ollama mode accepts only loopback endpoints. Use a base URL ending in `/v1` for OpenAI-compatible chat servers; OSwind appends `/chat/completions`. Anthropic mode expects a base URL such as `https://api.anthropic.com` and appends `/v1/messages`.
 
-Only selected text evidence is sent to the selected model. No provider fallback occurs. Some compatible implementations do not accept all Chat Completions parameters; integration tests against named third-party providers remain outstanding.
+The current question, bounded recent user questions (for chat follow-ups) and selected text evidence are sent to the selected model. Earlier generated answers are not used as evidence. No provider fallback occurs. Some compatible implementations do not accept all Chat Completions parameters; integration tests against named third-party providers remain outstanding.
+
+## Local conversations (CLI)
+
+`chat new`, `chat list`, `chat show ID`, `chat ask ID QUESTION`, `chat export ID PATH` and `chat delete ID` manage durable sessions. `chat ask` accepts `--provider`, app/kind/date/tag/favorite search flags and uses the configured search model. Each successful turn is saved atomically; failed/cancelled inference saves no completed turn. `show` returns the session plus hydrated turns. Exports are Markdown with question/answer blocks, provider, scope and source references, created with mode 0600. Chat history is not exposed through HTTP/MCP.
+
+The UI reads the most recent 100 turns per session; CLI show/export read up to 1000. These bounds are explicit v0 limits, not unlimited-history claims. Source erasure/revision removes derived turns; copied/exported text and explicitly saved recap notes are independent files/records.
