@@ -41,6 +41,9 @@ final class VisualEncoderTests:XCTestCase {
         try Paths.ensure(root);try Data("{}".utf8).write(to:root.appendingPathComponent("OSWIND-VISION.json"))
         XCTAssertThrowsError(try VisualModelBundle.verify(at:root))
         let runtime=VisualEncoder()
+        do {_ = try await runtime.embed(pixels:[.nan],directory:root);XCTFail("Invalid tensor admitted")}catch{}
+        do {_ = try await runtime.embed(pixels:[Float](repeating:2,count:3*224*224),directory:root);XCTFail("Unnormalized tensor admitted")}catch{}
+        do {_ = try await runtime.embed(image:Data("bad".utf8),directory:root);XCTFail("Invalid image admitted")}catch{}
         do {_ = try await runtime.embed(text:String(repeating:"x",count:32769),directory:root);XCTFail("Oversized query admitted")}catch{}
         let resident=await runtime.resident;XCTAssertFalse(resident)
         do {_ = try await runtime.embed(text:"red car",directory:root);XCTFail("Bad bundle loaded")}catch{}

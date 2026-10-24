@@ -30,6 +30,8 @@ A successful conversion publishes `OSWIND-VISION.json` only after both encoders 
 
 The fixture contains `queries` (strings) and `images` (absolute local file paths). The probe emits token IDs, normalized embeddings, text/image cosine similarities and timings to stdout. **Its output contains information derived from the supplied inputs; keep real-history probes private.** It never opens an OSwind library, reads saved provider keys, starts capture or contacts a model service. It is a developer qualification surface, not a visual-search UI.
 
+For numerical diagnosis, `--pixel-output /absolute/NEW-directory` explicitly exports private, little-endian Float32 NCHW inputs as `input-N.f32`. These arrays contain the decoded image content. The directory must be new and outside the model bundle. Ordinary inference writes no image scratch; this diagnostic export is optional and must remain private for real inputs.
+
 Only upright, single-frame images of at most 16 megapixels / 64 MiB are admitted. ImageIO decodes into sRGB; transparency is composited onto white. The native resize matches the pinned Pillow antialiased bilinear convention, then converts to 224×224 normalized NCHW RGB. Exact byte fixtures cover eight resize shapes. Arbitrary ICC profiles, HDR, EXIF rotation and transparent images are outside the exact PyTorch pixel-parity claim; rotated input is rejected. Retained desktop images are normally opaque and upright.
 
 The tokenizer preserves case, whitespace and Unicode composition. Queries are limited to 32 KiB, truncated to 63 content tokens, terminated with EOS=1 and right-padded with PAD=0 to 64 positions. Truncation is reported. Do not lowercase, trim or apply a CLIP prompt template silently. SigLIP's final pooled position makes padding part of the model contract.
@@ -55,6 +57,8 @@ uv run --python 3.12 scripts/evaluate-visual-model.py \
 ```
 
 The evaluator downloads official COCO annotations over certificate-verified HTTPS through the dataset's S3 bucket and checks the public TensorFlow Datasets [annotation checksum](https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/url_checksums/coco_captions.txt). It selects 100 validation images using seed 1729 and runs their captions through the native CLI and original local PyTorch model. It reports both retrieval directions, tokenizer/numerical agreement, timings and peak process RSS. Images, captions and raw vectors remain in the private work directory; only sanitized aggregate evidence is published.
+
+The first natural-photo run failed an end-to-end 0.999 cosine gate (worst 0.9909), despite identical aggregate retrieval scores. All eight worst cases agree above 0.9999999 after both runtimes receive the same decoded RGB pixels. Native ImageIO/sRGB decoding differs from Pillow's JPEG/ICC handling. The revised evaluator therefore exports the actual native input tensors and measures **encoder** agreement against PyTorch on those identical tensors. It separately retains the original Pillow pipeline agreement and both retrieval baselines. The original failed report remains evidence; no full JPEG-pipeline equivalence or lowered encoder threshold is claimed.
 
 This small photo subset is **not the standard COCO 5k benchmark, a desktop-history relevance study, a proven unseen training holdout or a comparison with competitor apps**. It establishes a local implementation baseline. No threshold is tuned against its labels.
 

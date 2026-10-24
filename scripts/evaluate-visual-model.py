@@ -89,6 +89,7 @@ def evaluate(args):
     from PIL import Image
     from transformers import AutoModel, AutoProcessor
     work = args.work.resolve()
+    fingerprints = dict(cli=sha(args.cli), harness=sha(Path(__file__)), selection=sha(work / "selection.json"))
     pinned_source = json.loads((Path(__file__).resolve().parent.parent / "models/siglip2-source.json").read_text())
     for file in pinned_source["files"]:
         path = args.source / file["path"]
@@ -96,6 +97,9 @@ def evaluate(args):
             raise ValueError("Original model source does not match pinned provenance: " + file["path"])
     selection = json.loads((work / "selection.json").read_text())
     fixture = json.loads((work / "fixture.json").read_text())
+    expected_images = [str((work / "images" / x["file_name"]).resolve()) for x in selection["images"]]
+    if fixture != dict(queries=[x["caption"] for x in selection["captions"]], images=expected_images):
+        raise ValueError("Fixture differs from the frozen selection")
     # Detect local dataset changes before either implementation observes them.
     for name, expected in selection["hashes"].items():
         if sha(work / "images" / name) != expected:
@@ -103,7 +107,11 @@ def evaluate(args):
     native_file = work / ("native-" + args.compute + ".json")
     if native_file.exists():
         raise ValueError("Native report exists; preserve it and choose a new work directory")
-    command = ["/usr/bin/time", "-lp", str(args.cli.resolve()), "vision", "probe", str(work / "fixture.json"), "--model-dir", str(args.model_dir.resolve()), "--compute", args.compute]
+    unopened_library = work / "unused-library"
+    if unopened_library.exists():
+        raise ValueError("Qualification requires a nonexistent designated library path")
+    pixel_directory = work / ("native-pixels-" + args.compute)
+    command = ["/usr/bin/time", "-lp", str(args.cli.resolve()), "--data", str(unopened_library), "vision", "probe", str(work / "fixture.json"), "--model-dir", str(args.model_dir.resolve()), "--compute", args.compute, "--pixel-output", str(pixel_directory)]
     before = time.monotonic()
     with native_file.open("x") as out, native_file.with_suffix(".stderr").open("x") as error:
         process = subprocess.Popen(command, stdout=out, stderr=error, start_new_session=True)
@@ -121,18 +129,25 @@ def evaluate(args):
                     process.wait()
             raise
     wall = time.monotonic() - before
+    if unopened_library.exists():
+        raise ValueError("Visual probe unexpectedly created a library")
     native = json.loads(native_file.read_text())
     peak = re.search(r"(\d+)\s+maximum resident set size", native_file.with_suffix(".stderr").read_text())
     torch.set_num_threads(4)
     model = AutoModel.from_pretrained(args.source, local_files_only=True, use_safetensors=True,
                                      torch_dtype=torch.float32, attn_implementation="eager").eval()
     processor = AutoProcessor.from_pretrained(args.source, local_files_only=True, use_fast=False)
-    image_vectors, text_vectors, token_ids = [], [], []
+    image_vectors, matched_image_vectors, text_vectors, token_ids = [], [], [], []
     with torch.inference_mode():
-        for path in fixture["images"]:
+        for index, path in enumerate(fixture["images"]):
             with Image.open(path) as image:
                 pixels = processor(images=image.convert("RGB"), return_tensors="pt")["pixel_values"]
             image_vectors.append(model.vision_model(pixel_values=pixels, return_dict=False)[1].numpy()[0])
+            native_pixels = np.fromfile(pixel_directory / f"input-{index}.f32", dtype="<f4")
+            if native_pixels.size != 3 * 224 * 224 or not np.isfinite(native_pixels).all() or np.max(np.abs(native_pixels)) > 1:
+                raise ValueError("Invalid exported native tensor")
+            matched = torch.from_numpy(native_pixels.reshape(1, 3, 224, 224))
+            matched_image_vectors.append(model.vision_model(pixel_values=matched, return_dict=False)[1].numpy()[0])
         for query in fixture["queries"]:
             ids = processor(text=query, padding="max_length", max_length=64, truncation=True, return_tensors="pt")["input_ids"]
             token_ids.append(ids.numpy()[0].tolist())
@@ -140,16 +155,21 @@ def evaluate(args):
 
     def normalized(values):
         values = np.asarray(values, dtype=np.float64)
+        if not np.isfinite(values).all() or np.any(np.linalg.norm(values, axis=-1) == 0):
+            raise ValueError("Nonfinite or zero embedding")
         return values / np.linalg.norm(values, axis=-1, keepdims=True)
 
     reference_i, reference_t = normalized(image_vectors), normalized(text_vectors)
+    matched_i = normalized(matched_image_vectors)
     native_i = normalized([x["vector"] for x in native["images"]])
     native_t = normalized([x["vector"] for x in native["text"]])
     expected = {x["id"]: i for i, x in enumerate(selection["images"])}
     targets = np.array([expected[x["image_id"]] for x in selection["captions"]])
 
     def quality(images, text):
-        scores = text @ images.T
+        scores = np.einsum("qd,id->qi", text, images, optimize=False)
+        if not np.isfinite(scores).all():
+            raise ValueError("Nonfinite similarity")
         ordered = np.argsort(-scores, axis=1, kind="stable")
         inverse = np.argsort(-scores.T, axis=1, kind="stable")
         return dict(textToImage={f"recallAt{k}": float(np.mean(np.any(ordered[:, :k] == targets[:, None], axis=1))) for k in [1, 5, 10]},
@@ -161,17 +181,32 @@ def evaluate(args):
                     warmP95Milliseconds=float(np.percentile(seconds[1:], 95)) * 1000)
 
     parity = dict(tokenIDsExact=token_ids == native["queryTokens"],
-                  minimumImageCosine=float(np.sum(reference_i * native_i, axis=-1).min()),
+                  minimumImageCosine=float(np.sum(matched_i * native_i, axis=-1).min()),
                   minimumTextCosine=float(np.sum(reference_t * native_t, axis=-1).min()))
     passed = parity["tokenIDsExact"] and min(parity["minimumImageCosine"], parity["minimumTextCosine"]) >= 0.999
-    summary = dict(schema=1, state="passed" if passed else "failed", images=len(reference_i), queries=len(reference_t), seed=1729,
+    for file in pinned_source["files"]:
+        if sha(args.source / file["path"]) != file["sha256"]:
+            raise ValueError("Original model source changed during evaluation")
+    for name, expected_hash in selection["hashes"].items():
+        if sha(work / "images" / name) != expected_hash:
+            raise ValueError("Dataset image changed during evaluation")
+    if fingerprints != dict(cli=sha(args.cli), harness=sha(Path(__file__)), selection=sha(work / "selection.json")):
+        raise ValueError("Runner, harness or selection changed during evaluation")
+    np.savez(work / ("reference-" + args.compute + ".npz"), originalImages=reference_i, nativePixelImages=matched_i, text=reference_t)
+    summary = dict(schema=2, state="passed" if passed else "failed", images=len(reference_i), queries=len(reference_t), seed=1729,
+                   scope="Encoder agreement gate >=0.999 on IDENTICAL preprocessed tensors. Platform JPEG/ICC preprocessing differences are reported separately; full pipeline equivalence is not claimed.",
                    dataset="COCO 2017 validation, deterministic 100-image subset; NOT the standard 5k benchmark",
                    source="https://cocodataset.org/#download", annotationSHA256=ANNOTATION_SHA,
                    selectionSHA256=sha(work / "selection.json"), sourceRevision=pinned_source["revision"],
+                   harnessSHA256=fingerprints["harness"], sourceStabilityVerified=True,
                    modelID=native["modelID"], cliSHA256=sha(args.cli), requestedCompute=args.compute,
                    host=dict(cpu=subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"], text=True).strip(), macOS=platform.mac_ver()[0]),
                    peakProcessResidentBytes=int(peak.group(1)) if peak else None,
+                   designatedLibraryCreated=False,
                    parity=parity, native=quality(native_i, native_t), pytorch=quality(reference_i, reference_t),
+                   pytorchNativePixels=quality(matched_i, reference_t),
+                   originalImagePipelineAgreement=dict(minimumCosine=float(np.sum(reference_i * native_i, axis=-1).min()),
+                                                        meetsOriginal0999Gate=bool(np.sum(reference_i * native_i, axis=-1).min() >= 0.999)),
                    timings=dict(image=timing(native["images"]), text=timing(native["text"]),
                                 preparationAndFirstTextSeconds=native["preparationAndFirstTextSeconds"], processWallSeconds=wall),
                    limits=["Public natural photos/captions, not desktop screenshots, unseen training holdout, or competitor execution.",

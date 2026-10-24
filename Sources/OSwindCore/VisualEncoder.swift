@@ -107,8 +107,16 @@ public actor VisualEncoder {
         return VisualEmbedding(modelID:model.verified.modelID,vector:vector,seconds:Date().timeIntervalSince(start),truncated:tokens.truncated)
     }
     public func embed(image data:Data,directory:URL,compute:VisualCompute = .cpuAndGPU) async throws -> VisualEmbedding {
+        let start=Date(),pixels=try VisualImageInput.pixels(data:data)
+        var result=try await embed(pixels:pixels,directory:directory,compute:compute)
+        result.seconds=Date().timeIntervalSince(start);return result
+    }
+    /// Preprocessed NCHW RGB in [-1,1]. Also lets conversion evaluation compare
+    /// identical tensors independently of platform JPEG/color-profile decoding.
+    public func embed(pixels:[Float],directory:URL,compute:VisualCompute = .cpuAndGPU) async throws -> VisualEmbedding {
+        guard pixels.count==3*224*224,pixels.allSatisfy({$0.isFinite && (-1...1).contains($0)}) else {throw OSwindError.invalid("Use finite 1×3×224×224 normalized RGB pixels in [-1,1]")}
         let model=try await prepare(directory,compute:compute);idle.cancel();defer {scheduleRelease()}
-        let start=Date(),pixels=try VisualImageInput.pixels(data:data),input=try MLMultiArray(shape:[1,3,224,224],dataType:.float32)
+        let start=Date(),input=try MLMultiArray(shape:[1,3,224,224],dataType:.float32)
         let pointer=input.dataPointer.assumingMemoryBound(to:Float.self)
         for i in pixels.indices {pointer[i]=pixels[i]}
         let vector=try model.predict(input,name:"pixel_values",imageInput:true)
