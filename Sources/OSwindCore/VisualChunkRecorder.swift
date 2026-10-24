@@ -108,7 +108,9 @@ actor VisualChunkRecorder {
         memory.visualRecording=visual;memory.videoPath="video/"+current.id+".mov"
         memory.embedding=embedder?.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:embedder?.modelID
         try gate.commit {
-        let output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+        try store.requireMediaRootIdentity()
+        let output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true),outputIdentity=try output.identity()
+        guard outputIdentity.device==store.mediaRootIdentity.device,outputIdentity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before replay retention")}
         var copied=[String](),committed=false
         defer {if !committed {for path in copied {try? output.remove(path)}}}
         _ = try current.workspace.tree.copy("clip.mov",to:output,as:memory.videoPath!);copied.append(memory.videoPath!)
@@ -123,7 +125,7 @@ actor VisualChunkRecorder {
             }
         }
         guard !discarded else {throw CancellationError()}
-        try store.insert(memory);committed=true
+        try store.requireMediaRootIdentity();try store.insert(memory);committed=true
         }
         await onMemory(memory)
     }

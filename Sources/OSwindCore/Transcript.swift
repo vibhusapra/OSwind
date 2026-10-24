@@ -84,16 +84,19 @@ public enum AudioAdmission {
         defer {owned?.release()}
         guard let lease=admission ?? owned else {throw OSwindError.invalid("Audio requires a media reservation")}
         return try lease.withActive(for:store.mediaRootIdentity) {
-        var retained: String?, committed=false
-        defer { if !committed,let retained,let url=store.assetURL(retained) { try? FileManager.default.removeItem(at:url) } }
+        try store.requireMediaRootIdentity()
+        var retained: String?, committed=false;var ownedOutput:BackupFileTree?
+        defer {if !committed,let retained {try? ownedOutput?.remove(retained)}}
         if settings.retainAudio && !clean.suppressAudio {
             let input=try BackupFileTree(root:file.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+            let outputIdentity=try output.identity();guard outputIdentity.device==store.mediaRootIdentity.device,outputIdentity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before audio retention")}
+            ownedOutput=output
             let suffix=file.pathExtension.lowercased(); guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio clip needs a supported filename extension") }
             let member="audio/"+UUID().uuidString+"."+suffix; retained=member
             _ = try input.copy(file.lastPathComponent,to:output,as:member)
             memory.audioPath=member
         }
-        try Task.checkCancellation(); try store.insert(memory); committed=true; return memory
+        try Task.checkCancellation();try store.requireMediaRootIdentity();try store.insert(memory);committed=true;return memory
         }
     }
 }

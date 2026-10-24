@@ -7,10 +7,14 @@ final class LibraryWorkspaceTests:XCTestCase {
     var root:URL!,store:MemoryStore!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString);try Paths.ensure(root);store=try MemoryStore(root:root.appendingPathComponent("library"))}
     override func tearDownWithError() throws {store=nil;try? FileManager.default.removeItem(at:root)}
+    func assertStagingParent(_ operation:URL,bucket:String,file:StaticString=#filePath,line:UInt=#line) throws {
+        let actual=try BackupFileTree(root:operation.deletingLastPathComponent()).identity(),expected=try BackupFileTree(root:store.root.appendingPathComponent(bucket+"/.staging")).identity()
+        XCTAssertEqual(actual.device,expected.device,file:file,line:line);XCTAssertEqual(actual.inode,expected.inode,file:file,line:line)
+    }
     func testAudioInputAndNormalizationStayInsideLibraryAndAreRemoved() throws {
         let input=root.appendingPathComponent("source.wav"),bytes=WAV.data(samples:[Float](repeating:0.1,count:16000));try bytes.write(to:input)
         var clip:AudioClipSnapshot?=try AudioClipSnapshot(source:input,store:store)
-        let folder=clip!.file.deletingLastPathComponent();XCTAssertTrue(folder.path.hasPrefix(store.root.appendingPathComponent("audio/.staging").resolvingSymlinksInPath().path+"/"));XCTAssertEqual(clip!.duration,1,accuracy:0.001)
+        let folder=clip!.file.deletingLastPathComponent();try assertStagingParent(folder,bucket:"audio");XCTAssertEqual(clip!.duration,1,accuracy:0.001)
         XCTAssertEqual(try Data(contentsOf:clip!.file),bytes);XCTAssertTrue(FileManager.default.fileExists(atPath:clip!.speechFile.path));XCTAssertNotNil(clip!.mediaActivity)
         clip=nil;XCTAssertFalse(FileManager.default.fileExists(atPath:folder.path));XCTAssertEqual(try Data(contentsOf:input),bytes)
         XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:store.root.appendingPathComponent("audio/.staging").resolvingSymlinksInPath().path).isEmpty)
@@ -19,7 +23,7 @@ final class LibraryWorkspaceTests:XCTestCase {
         let outside=root.appendingPathComponent("keep");try Data([9]).write(to:outside)
         for bucket in [LibraryWorkspaceBucket.audio,.video] {
             var workspace:BackupWorkspace?=try store.libraryWorkspace("oswind-visual-recording",bucket:bucket);let path=workspace!.url
-            XCTAssertTrue(path.path.hasPrefix(store.root.appendingPathComponent(bucket.rawValue+"/.staging").resolvingSymlinksInPath().path+"/"));try workspace!.tree.write(Data([1]),as:"private")
+            try assertStagingParent(path,bucket:bucket.rawValue);try workspace!.tree.write(Data([1]),as:"private")
             let mode=try FileManager.default.attributesOfItem(atPath:path.path)[.posixPermissions] as! NSNumber;XCTAssertEqual(mode.intValue&0o077,0)
             workspace=nil;XCTAssertFalse(FileManager.default.fileExists(atPath:path.path))
         }
@@ -79,6 +83,15 @@ final class LibraryWorkspaceTests:XCTestCase {
         XCTAssertThrowsError(try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:Date(),source:"fixture",admission:foreign))
         let released=try store.mediaWriteLease();released.release();XCTAssertThrowsError(try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:Date(),source:"fixture",admission:released))
         XCTAssertEqual(try store.stats().count,0);XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:store.root.appendingPathComponent("audio").path).isEmpty)
+    }
+    func testRedirectedLibraryAliasCannotWriteAudioToReplacement() throws {
+        let alias=root.appendingPathComponent("alias"),other=try MemoryStore(root:root.appendingPathComponent("other"));try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:store.root)
+        let aliased=try MemoryStore(root:alias),file=root.appendingPathComponent("fixture.wav");try WAV.data(samples:[Float](repeating:0.1,count:16000)).write(to:file)
+        let clip=try AudioClipSnapshot(source:file,store:aliased);defer {withExtendedLifetime(clip){}}
+        try FileManager.default.removeItem(at:alias);try FileManager.default.createSymbolicLink(at:alias,withDestinationURL:other.root)
+        let transcript=SpeechTranscript(text:"Fixture speech",duration:1,segments:[.init(start:0,end:1,text:"Fixture speech")],model:"fixture");var settings=AppSettings();settings.retainAudio=true
+        XCTAssertThrowsError(try AudioAdmission.save(transcript,file:clip.file,store:aliased,settings:settings,timestamp:Date(),source:"fixture",admission:clip.mediaActivity))
+        XCTAssertEqual(try store.stats().count,0);XCTAssertEqual(try other.stats().count,0);XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:other.root.appendingPathComponent("audio").path).isEmpty)
     }
     func testBorrowedReservationKeepsAudioAdmissionInsideWorkspaceLifecycle() throws {
         let file=root.appendingPathComponent("fixture.wav");try WAV.data(samples:[Float](repeating:0.1,count:16000)).write(to:file)
