@@ -1,6 +1,6 @@
 # Frozen natural-speech evaluation
 
-The [public protocol](../benchmarks/heldout-protocol-v1.json) records a complete speaker evaluation and a running ASR evaluation. This is not a product ranking. The current product runner is the signed schema-16 release at `184efd6`. Product binaries are unchanged by the benchmark tooling.
+The [public protocol](../benchmarks/heldout-protocol-v1.json) records complete speaker and ASR evaluations, including failed imports. This is not a product ranking. The current product runner is the signed schema-16 release at `184efd6`. Product binaries are unchanged by the benchmark tooling.
 
 Two independent reference scorers measure different things: pyannote.metrics measures anonymous speaker diarization before ASR word attribution; JiWER measures text errors after a complete audio import. Neither metric by itself establishes meeting quality, natural live capture, named-person recognition, word alignment accuracy or parity with another desktop app.
 
@@ -40,6 +40,16 @@ The first ASR attempt stopped on a real Whisper import failure after 70 successf
 Three declared profiles run twice per utterance: Parakeet v3 with Neural Engine + CPU, Parakeet v3 with GPU + CPU, and whisper.cpp base.en with its default backend. Each of the planned 2,190 imports starts a fresh process and isolated library. The response must match an actual SQLite record, and raw audio retention stays off. Models are local, explicitly selected and fingerprinted; no inference command downloads models. References never enter inference arguments or prompts.
 
 JiWER aligns case-folded ASCII alphanumeric words with internal apostrophes. Curly apostrophes become ASCII; punctuation is discarded. There is no number expansion or spelling correction and no claim of NIST-equivalent normalization. Empty hypotheses count as deletions; insertions and WER above 100% remain visible. Micro WER uses summed substitution/deletion/insertion and reference-word counts within each split/profile/trial, not mean utterance WER. See the [independent scorer's documentation](https://jitsi.github.io/jiwer/usage/).
+
+The [complete import report](../benchmarks/speech-imports-v1.json) covers every planned **2,190 attempts**. Final input/model/runner/harness checks pass; outcomes and word-error counts agree across repetitions. Both Parakeet configurations complete every import. The original Whisper integration fails on 17 unique clips (eight clean, nine challenging) in both repetitions, with no partially saved records. All 34 diagnostics report invalid transcript timestamps. The source-bounding repair is a separate draft and is **not** in this evaluated runner.
+
+| Local import profile | Clean end-to-end WER | Challenging end-to-end WER | Failed imports per repetition |
+|---|---:|---:|---|
+| Parakeet v3 · Neural Engine + CPU | 2.62% | 3.73% | 0 / 200 clean; 0 / 165 challenging |
+| Parakeet v3 · GPU + CPU | 2.62% | 3.80% | 0 / 200 clean; 0 / 165 challenging |
+| whisper.cpp base.en · default backend | 7.00% | 15.02% | 8 / 200 clean; 9 / 165 challenging |
+
+End-to-end WER counts failed delivery as all reference words deleted. On successful Whisper imports only, WER is 4.63% clean and 9.61% challenging; those smaller denominators must not be substituted for the full-attempt result. The JSON includes reference words, hits, substitutions, deletions and insertions, every per-utterance outcome and all raw timings/RSS. These are complete OSwind imports through normalization, privacy/admission and saved-record verification, not raw recognizer/model-card scores.
 
 ```bash
 python3 scripts/prepare_asr_eval.py \

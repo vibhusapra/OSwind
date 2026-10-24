@@ -1,6 +1,6 @@
 {
   "format": "OSwind frozen held-out evaluation protocol v1",
-  "state": "running",
+  "state": "completed",
   "created_utc": "2026-10-24T03:49:13.916736+00:00",
   "harness_source_commit": "53a69c428cb487c3a05f029534319c39d0b6e81a",
   "product_source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
@@ -58,20 +58,27 @@
     "whisper_model_sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002",
     "scope": "All ASR IDs, normalization/scorer and profiles frozen before any natural ASR inference. Read English audiobook speech, OSwind imports/configurations rather than competitor apps.",
     "harness_source_commit": "d47bdc17135842bd11a76ffadff44ae6674cd515",
-    "state": "running",
+    "state": "completed",
     "prior_attempt": {
       "state": "failed",
       "successful_imports": 70,
       "failure": "test-clean-121-121726-0001-whisper-default-0 import exited 1; logs retained",
       "report_sha256": "48bfd0adbdae41f55eb22b36c980f3f0cade9b5196951bf799e277e65ded3c78"
     },
-    "failure_policy": "Only harness failure accounting: nonzero/timeout imports remain attempted rows, end-to-end WER all-deletions and successful-only WER separately. Exact same product/model/IDs/text normalization, no input exclusions/model tuning. Both failed attempts retained; this is a full new pass, not an unseen initial run."
+    "failure_policy": "Only harness failure accounting: nonzero/timeout imports remain attempted rows, end-to-end WER all-deletions and successful-only WER separately. Exact same product/model/IDs/text normalization, no input exclusions/model tuning. Both failed attempts retained; this is a full new pass, not an unseen initial run.",
+    "result": "benchmarks/speech-imports-v1.json",
+    "attempts": 2190,
+    "failed_imports": 34,
+    "failed_unique_clips": 17,
+    "source_stability_verified": true,
+    "repetition_outcomes_and_counts_identical": true
   },
-  "execution": "Serial speaker-current, speaker-baseline, then ASR-current. Existing pinned synthetic Qwen component soak remains separate; OS/model caches and other background activity are uncontrolled.",
+  "execution": "Serial complete speaker configurations; retained first ASR attempt stopped on a real import failure after70 successful attempts; complete new2190-attempt pass uses unchanged product/models/IDs/text normalization and disclosed failure accounting. No local Swift builds during timed passes. Separate pinned Qwen component soak and uncontrolled OS/model caches/background remain.",
   "limits": [
     "No complete result until all declared inputs and final source stability checks finish",
     "Held out from OSwind tuning, upstream model pretraining overlap unaudited; not competitor app ranking",
     "ASR subset is selected English audiobook speech, not full LibriSpeech or meeting acceptance",
     "Initial speaker attempt retained: four scored/five inferred clips before rejecting a 26ms annotation tail; no model settings or IDs changed; explicit full-WAV UEM correction is tested and disclosed"
-  ]
+  ],
+  "all_imports_succeeded": false
 }
