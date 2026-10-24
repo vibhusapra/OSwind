@@ -3,7 +3,7 @@ import AppKit
 import UniformTypeIdentifiers
 import OSwindCore
 
-private final class LibraryProgressRelay: @unchecked Sendable {
+final class LibraryProgressRelay: @unchecked Sendable {
     private let lock = NSLock(); private var value: LibraryBackupProgress?
     func set(_ value: LibraryBackupProgress) { lock.lock(); self.value = value; lock.unlock() }
     func get() -> LibraryBackupProgress? { lock.lock(); defer { lock.unlock() }; return value }

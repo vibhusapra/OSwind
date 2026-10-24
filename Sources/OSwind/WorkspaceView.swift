@@ -64,7 +64,7 @@ struct WorkspaceView: View {
                     Text(m.section == "Conversations" ? "Local transcripts from the audio sources you enable." : m.section == "Timeline" ? "Scrub through the moments you saved." : "Find the thought, tab, or conversation you’re looking for.").foregroundStyle(.secondary)
                 }; Spacer()
                 if m.section == "Recaps" { Button("Create day recap") { m.section = "Ask"; m.range = "Today"; m.ask("Summarize today's work. List decisions and action items, with evidence citations.",summarize:true) }.buttonStyle(.borderedProminent) }
-                if m.section == "Conversations" { Button(m.audio.running ? "Stop audio" : "Start audio") { if m.audio.running { m.audio.finish() } else { Task { await m.audio.start() } } }.buttonStyle(.borderedProminent) }
+                if m.section == "Conversations" { Button(m.audio.running ? "Stop audio" : "Start audio") { Task {await m.toggleAudio()} }.buttonStyle(.borderedProminent) }
             }
             HStack(spacing:12) {
                 Image(systemName:"magnifyingglass").foregroundStyle(accent)

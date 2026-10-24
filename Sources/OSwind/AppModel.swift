@@ -11,6 +11,8 @@ import UniformTypeIdentifiers
     let capture: CaptureController
     let audio: AudioController
     let libraryTransfer = LibraryTransferModel()
+    let libraryWipe=LibraryWipeModel()
+    private var noteTasks=[UUID:Task<Void,Never>]()
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     @Published var settingsTab = "Capture"
@@ -107,6 +109,8 @@ import UniformTypeIdentifiers
         audio = AudioController(store:store, embedder:embedder, settings:loaded)
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
         routines.onChange = {[weak self] in self?.refreshChats()}
+        libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
+        libraryWipe.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
@@ -117,12 +121,13 @@ import UniformTypeIdentifiers
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
-        housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }
+        startHousekeeping()
     }
-    func startConfiguredServices() {if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
+    private func startHousekeeping() {housekeeping?.invalidate();housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }}
+    func startConfiguredServices() {guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
-        libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
+        libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil;apiStatus="API off"
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -254,7 +259,7 @@ import UniformTypeIdentifiers
         do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK, let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
     }
     func saveAnswer(_ value:Answer?=nil) {
-        guard !savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
+        guard !libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
         savingRecap=true;recapSaveStatus="Saving a source-linked recap…"
         let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)}
@@ -270,9 +275,15 @@ import UniformTypeIdentifiers
             }
         }
     }
-    func addNote(_ text: String, title: String = "Quick note", kind: MemoryKind = .note) {
-        let clean = settings.privacy.sanitize(text).text; let embedder = self.embedder, store = self.store
-        Task { do { let memory = try await Task.detached(priority:.utility) { var m = Memory(kind:kind,app:"OSwind",title:title,text:clean); m.embedding = embedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); return m }.value; captured(memory) } catch { errorMessage = error.localizedDescription } }
+    func addNote(_ text:String,title:String="Quick note",kind:MemoryKind = .note) {
+        guard !libraryWipe.busy else {return}
+        let clean=settings.privacy.sanitize(text).text,embedder=self.embedder,store=self.store,id=UUID(),generation=libraryOperationGeneration
+        let worker=Task.detached(priority:.utility) {var m=Memory(kind:kind,app:"OSwind",title:title,text:clean);m.embedding=embedder.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder.modelID;try Task.checkCancellation();try store.insert(m);return m}
+        noteTasks[id]=Task {
+            defer {noteTasks[id]=nil}
+            do {let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()};guard libraryOperationGeneration==generation else {return};captured(memory)}
+            catch {guard libraryOperationGeneration==generation,!Task.isCancelled else {return};errorMessage=error.localizedDescription}
+        }
     }
     private func captured(_ memory: Memory) {
         refreshStatistics(force:true)
@@ -357,7 +368,7 @@ import UniformTypeIdentifiers
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory:Memory) {
-        guard deletingID==nil,!maintenanceBusy else {return};deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
+        guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
         if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
         let store=self.store
         Task {
@@ -371,7 +382,8 @@ import UniformTypeIdentifiers
         }
     }
     func maintain(automatic:Bool=false) {
-        guard !maintenanceBusy,deletingID==nil else {return}
+        guard !automatic || !libraryWipe.pendingCleanup else {return}
+        guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil else {return}
         let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance
         maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
         Task {
@@ -408,6 +420,17 @@ import UniformTypeIdentifiers
             if indexed < (try store.matchingCount()) || pendingPassages { rebuildIndex() }
         } catch { indexStatus = "Index catch-up waiting for the local model server" }
     }
+    func wipeLocalLibrary(retry:Bool=false) {
+        guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
+        prepareForLibrarySwitch()
+        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false
+        let generation=libraryOperationGeneration
+        libraryWipe.run(store:store,retry:retry) {[weak self] result in
+            guard let self,self.libraryOperationGeneration==generation else {return}
+            self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
+            self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping()
+        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.startHousekeeping()}
+    }
     func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
     func pauseFor(minutes: Int) {
         let screenWasRunning = capture.running, audioWasRunning = audio.running
@@ -417,7 +440,9 @@ import UniformTypeIdentifiers
         }
     }
     var isCapturing: Bool { capture.running || audio.running }
-    func toggleCapture() { pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
+    func captureNow() async {guard !libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
+    func toggleAudio() async {guard !libraryWipe.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
+    func toggleCapture() {guard !libraryWipe.busy else {return};pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
     func installNativeModel(_ kind:NativeModelKind,cache:URL?=nil,verifyOnly:Bool=false) {
         let speech=settings.speech,diarization=settings.diarization
         nativeModels.start(kind,cache:cache,verifyOnly:verifyOnly) { [weak self] result in
@@ -475,7 +500,7 @@ import UniformTypeIdentifiers
     }
     func cancelJSONImport() {jsonImportTask?.cancel()}
     func importJSONFile(_ url:URL) {
-        guard !importingJSON else {return};importingJSON=true;importStatus="Importing sources and checking recap links…"
+        guard !libraryWipe.busy,!importingJSON else {return};importingJSON=true;importStatus="Importing sources and checking recap links…"
         let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {try store.importJSONDetailed(from:url,embedder:embedder,policy:policy)}
         jsonImportTask=Task {
@@ -490,7 +515,7 @@ import UniformTypeIdentifiers
         }
     }
 
-    func startAPI() { do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }
+    func startAPI() {guard !libraryWipe.busy else {return};do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }
     func stopAPI() { api?.stop(); api = nil; apiStatus = "API off"; settings.apiEnabled = false }
     func login(_ enabled: Bool) { do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { errorMessage = error.localizedDescription } }
     func seedDemo() throws {

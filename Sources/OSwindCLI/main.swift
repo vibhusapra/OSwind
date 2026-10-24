@@ -78,6 +78,8 @@ do {
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
           native-model list             List pinned native model downloads
           native-model install|verify parakeet|speakers [--cache-root PATH]
+          wipe --confirm DELETE-ALL [--json]  Erase the entire local library; report pending cleanup
+          wipe retry [--json]            Retry sealed pending work; preserve new recordings
           delete ID [--json]             Delete one source; report shared/pending media
           erase preview|apply [--from ISO8601] [--to ISO8601] [--app NAME] [--bundle ID]
                  [--domain HOST] [--exact-host] [--kind KIND] [--token PREVIEW_TOKEN]
@@ -97,6 +99,14 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "wipe" {
+        let retry=args.first=="retry";if retry {args.removeFirst()}
+        let confirmation=try validatedOption("--confirm"),json=args.contains("--json")
+        guard args.filter({$0=="--json"}).count<=1 else {throw OSwindError.invalid("Use --json once")};args.removeAll {$0=="--json"}
+        guard args.isEmpty,retry ? confirmation==nil:confirmation=="DELETE-ALL" else {throw OSwindError.invalid("Use wipe --confirm DELETE-ALL [--json], or wipe retry [--json]")}
+        let store=try MemoryStore(root:root),reporter=BackupCLIProgress()
+        let result=try await runBackupCLI(cancellationMessage:"Stopping cleanup. Committed history erasure cannot be undone. Press Ctrl-C again to exit immediately.") {try retry ? store.retryLibraryWipeCleanup(progress:{reporter.update($0)}):store.wipeLibrary(progress:{reporter.update($0)})}
+        if json {try encoded(result)} else {print("Removed \(result.erasure.sources) sources · \(result.conversations) conversations · \(result.routines) routines · \(result.erasure.pendingMedia) pending files · cleanup \(result.cleanupComplete ? "complete":"requires retry")");for warning in result.erasure.warnings {FileHandle.standardError.write(Data((warning+"\n").utf8))}}
     } else if command == "delete" || command == "prune" {
         let store=try MemoryStore(root:root)
         if command == "delete" {

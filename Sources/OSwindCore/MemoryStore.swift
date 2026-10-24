@@ -1,10 +1,12 @@
 import Foundation
 import CSQLite
+import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 15
+    public static let schemaVersion = 16
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
+    let mediaRootIdentity:BackupFileStamp
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
     private var metalScopeCache: MetalScopeCache?
@@ -15,6 +17,8 @@ public final class MemoryStore: @unchecked Sendable {
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
         try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
+        let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
+        mediaRootIdentity=try directory.withRootDirectory {file in var metadata=stat();guard fstat(file,&metadata)==0 else {throw OSwindError.unavailable("Cannot inspect the library directory")};return BackupFileStamp(metadata)}
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
         sqlite3_busy_timeout(db, 5000)
@@ -489,15 +493,7 @@ public final class MemoryStore: @unchecked Sendable {
     private func updateMetadata(_ m: Memory) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m)
     }
-    public func deleteAll() throws {
-        lock.lock(); defer { lock.unlock() }
-        try exec("BEGIN IMMEDIATE")
-        do { try exec("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM erasure_assets; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
-        metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
-        if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
-        try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
-        for folder in ["images", "audio","video"] { let url = root.appendingPathComponent(folder); try FileManager.default.removeItem(at: url); try Paths.ensure(url) }
-    }
+    @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
     public func diskBytes() -> Int64 {
         guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey]) else { return 0 }
         var total: Int64 = 0; for case let url as URL in enumerator { if let values = try? url.resourceValues(forKeys: [.fileSizeKey,.isRegularFileKey]), values.isRegularFile == true { total += Int64(values.fileSize ?? 0) } }; return total

@@ -66,11 +66,11 @@ final class HistoryErasureTests:XCTestCase {
         XCTAssertEqual(r.removedMedia,1);XCTAssertEqual(r.sharedMedia,1);XCTAssertEqual(r.pendingMedia,0);XCTAssertTrue(r.searchCacheRemoved);XCTAssertTrue(r.warnings.isEmpty)
         XCTAssertTrue(FileManager.default.fileExists(atPath:root.appendingPathComponent("images/shared").path));XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("images/unique").path));XCTAssertFalse(FileManager.default.fileExists(atPath:cache.path))
     }
-    func testInvalidPendingPathRetainedWithoutTraversingAndDeleteAllClearsQueue() throws {
+    func testInvalidPendingPathRetainedWithoutTraversingEvenDuringFullWipe() throws {
         try store.withRoutineDatabase {try $0.execute("INSERT INTO erasure_assets VALUES('../outside')")}
         let r=store.retryErasureCleanup();XCTAssertEqual(r.pendingMedia,1);XCTAssertFalse(r.warnings.isEmpty)
         store=nil;store=try MemoryStore(root:root);XCTAssertEqual(store.retryErasureCleanup().pendingMedia,1)
-        try store.deleteAll();XCTAssertEqual(try count("SELECT COUNT(*) FROM erasure_assets"),0)
+        let result=try store.deleteAll();XCTAssertEqual(try count("SELECT COUNT(*) FROM erasure_assets"),1);XCTAssertEqual(result.erasure.pendingMedia,1);XCTAssertFalse(result.cleanupComplete)
     }
     func testRetryDoesNotRemoveAReusedLivePathAndMissingFileIsSuccessful() throws {
         try Data([1]).write(to:root.appendingPathComponent("images/live"));try add("live",app:"Notes",path:"images/live")

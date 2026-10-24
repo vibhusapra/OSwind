@@ -64,6 +64,7 @@ public enum AudioAdmission {
         var memory=Memory(timestamp:timestamp,endTimestamp:recordedLive ? timestamp.addingTimeInterval(clean.transcript.duration):nil,kind:.audio,app:settings.privacy.sanitize(source).text,title:label,text:clean.transcript.text)
         memory.transcript=clean.transcript; memory.audioSessionID=sessionID
         if let embedder { memory.embedding=embedder.embed(memory.searchableText); memory.embeddingModel=memory.embedding == nil ? nil : embedder.modelID }
+        let lease=try store.mediaWriteLease();defer {lease.release()}
         var retained: String?, committed=false
         defer { if !committed,let retained,let url=store.assetURL(retained) { try? FileManager.default.removeItem(at:url) } }
         if settings.retainAudio && !clean.suppressAudio {
