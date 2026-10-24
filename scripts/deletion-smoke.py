@@ -47,5 +47,6 @@ with tempfile.TemporaryDirectory(prefix='oswind-unified-deletion-') as temporary
     with connect(library/'memory.sqlite') as db:assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok' and not db.execute('PRAGMA foreign_key_check').fetchall()
 assert all(hashlib.sha256(pathlib.Path(b).read_bytes()).hexdigest()==s for b,s in pins.items())
 report=dict(format='OSwind unified media deletion process v1',binary_sha256=pins[str(binary)],schema_version=14,single_shared_dot_alias_and_unique_deletion=True,retention_preserves_newer_favorite_shared_bytes=True,postcommit_unsafe_directory_warning_and_retry=True,direct_sql_queue_admission=True,invalid_inputs_preserve_sources=True,sqlite_integrity_pass=True,actual_older_writer=dict(binary_sha256=pins[str(older)],schema13_to14_upgrade_identity_preserved=True,refusal_database_bytes_preserved=True) if older else None,limits=['Owned generated fixture; not secure wipe, crash/power-loss, arbitrary already-open older-writer or natural capture evidence'])
-if o.output:pathlib.Path(o.output).write_text(json.dumps(report,indent=2)+'\n')
+if o.output:
+    output=pathlib.Path(o.output).resolve();output.parent.mkdir(parents=True,exist_ok=True);output.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
