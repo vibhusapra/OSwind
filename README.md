@@ -1,5 +1,7 @@
 # OSwind
 
+Source now adds an optional [native visual encoder foundation](docs/VISUAL-MODELS.md): pinned local SigLIP2 conversion, Core ML image/text inference, CPU/GPU qualification and reproducible photo evaluation. **Library image indexing and visual-search UI are still pending.** The [evidence](benchmarks/visual-encoder-v1.json) retains the FP16 CPU failure and JPEG/Pillow pipeline discrepancy; it makes no desktop-relevance or competitor-ranking claim.
+
 Source schema18 adds [encrypted libraries and verified history copy](docs/VAULT.md), with a separately staged signed package: **516 test passes / six skips, 79 TSan passes and 15 signed-release process groups**. The installed schema17 app remains unchanged. Mac authentication is disabled in this ad-hoc build; passphrase unlock works. Native interaction, physical capture/power and matched competitor ranking remain open. The [frozen natural evaluations](docs/HELDOUT-EVALUATION.md) retain original results and failures.
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.

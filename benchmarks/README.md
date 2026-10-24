@@ -436,3 +436,16 @@ The generated age-retention release trial covers 20k sources/10k tiny shared fil
 [Encrypted libraries](encrypted-library-v1.json), code `a655a96`, records 522 total tests (516 pass / six skips), 79 focused TSan passes and 15 exact signed-release process groups. Owned APFS fixtures cover verified history copy, busy/close/retry, real older-writer refusal, relocation, unmounted backing devices, missing/unencrypted replacements and helper interruption. A reproduced false lock after package rename and a normal-quit modal-loop deadlock are retained with their fixes. All owned images are verified detached; six synthetic layout renders exit normally. Package signing and the complete extracted ZIP match are bound to the tested executables.
 
 This is functional and packaging evidence, not capture power, natural quality or competitor performance. Real Mac authentication is unaccepted and disabled in the current ad-hoc build; native click/keyboard/device and broader release gates remain in [the vault document](../docs/VAULT.md). The schema17 installation is preserved.
+
+## Native visual encoder foundation
+
+[Protocol/setup](../docs/VISUAL-MODELS.md), [full aggregate evidence](visual-encoder-v1.json). This is an optional encoder and developer CLI, with no library visual-search integration yet. A fixed 100-photo COCO 2017 subset / 501 captions is evaluated against original local PyTorch. GPU-enabled text→image R@1 is 459/ 501 and R@5 is 498/ 501; image→text R@1 is 100/100. The baseline has the same aggregate scores. These are not standard COCO 5k, held-out desktop relevance or competitor results.
+
+| M5 Max /macOS26.6.2 | Image warm median /p95 | Text warm median /p95 | Preparation + first text | Process peak RSS |
+|---|---:|---:|---:|---:|
+| CPU + GPU allowed |18.11 /21.56 ms|2.00 /2.28 ms|5.53 s|1.529 GB|
+| CPU only |36.14 /39.79 ms|4.09 /4.26 ms|5.93 s|1.162 GB|
+
+One sequential trial per policy, uncontrolled caches/background activity; diagnostic pixel export enabled. Image timing includes decode/resize/inference but excludes export I/O; process wall/RSS includes it. Static Core ML plans prefer GPU for all 307 image / 285 text operations with GPU allowed, but no hardware-counter or energy claim follows.
+
+The initial full-FP16 CPU image graph failed the 0.999 encoder gate (0.98236), so the recipe uses FP32 image compute and FP16 text. An initial raw-JPEG comparison also failed (0.99090): platform JPEG/ICC preprocessing differs from default Pillow. All eight worst cases agree above 0.9999999 on common decoded RGB. The revised encoder gate uses identical native-exported tensors and passes unchanged at 0.999 for both policies. **The original JPEG-pipeline equivalence gate remains failed and is published alongside the passing encoder results.** Original/native-input PyTorch baselines, methods, source hashes and all failed measurements remain explicit in the report.

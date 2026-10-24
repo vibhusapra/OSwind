@@ -132,7 +132,7 @@
     "axis": "Retrieval",
     "feature": "Visual / image semantic search",
     "status": "partial",
-    "evidence": "Qualified native SigLIP2 image/text encoder and CLI; exact tokenizer/resize fixtures and CPU/GPU reference gates. Library media indexing, scopes, frame opening, visual-search UI and privacy/erasure integration remain TODO; this is an encoder foundation, not delivered desktop visual search",
+    "evidence": "Qualified native SigLIP2 image/text encoder and CLI; exact tokenizer/resize fixtures and CPU/GPU encoder gates on identical tensors; original JPEG/Pillow pipeline differs. Library media indexing, scopes, frame opening, visual-search UI and privacy/erasure integration remain TODO; this is an encoder foundation, not delivered desktop visual search",
     "references": "TimeScroll, Recall"
   },
   {
