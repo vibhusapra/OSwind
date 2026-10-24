@@ -25,3 +25,9 @@ OSWIND_TEST_NATIVE_VAULT=1 swift test \
 ```
 
 Controlled sequence fixtures prove the verifier's decisions; they are not direct recordings of every possible APFS/Disk Arbitration transition. Native repetition verifies the ordinary owned-image lifecycle and history preservation. Broader OS/hardware, authentication, failed-device and timing behavior still need independent acceptance.
+
+## Qualified runtime
+
+[Runtime d224bff](../benchmarks/vault-detach-settling-v1.json) passes 745 normal cases (714 pass/31 opt-in skips), 247 native/model cases and one distinct physical audio case: 739 distinct passes/six remaining opt-in cases. All 283 focused race cases plus physical audio pass. The staged signed package and twelve process groups qualify, with three independent complete vault processes. The exact signed CLI also passes real targeted synthetic OCR/privacy/deletion.
+
+An intermediate full run failed a synthetic snapshot callback assertion while real host sleep invalidated capture work; OS power timestamps and the failed run are retained. Custom snapshot environments now receive a private lifecycle center; production explicitly uses NSWorkspace. A new injected-sleep case confirms pending synthetic capture is still cancelled before admission. This prevents real host events from redefining a fake world and keeps the live privacy behavior.

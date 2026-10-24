@@ -1,0 +1,511 @@
+{
+  "format": "OSwind native detach settlement and lifecycle qualification v1",
+  "codeCommit": "d224bff50a10ae051bd1bd5f912e162bc7e2322e",
+  "schema": 20,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "scope": "Deterministic native-inventory observations and real package/image/manifest replacements; owned encrypted volumes and rapid source-preserving lock cycles; native model and signed release regressions; real targeted synthetic-window capture/OCR and generated-tone system audio. No user history/Keychain/authentication/permission/system-volume changes, forced detach, full GUI/controller/microphone acceptance, energy or competitor ranking.",
+  "implementation": {
+    "verificationOnlyAfterSuccessfulNormalDetach": true,
+    "maximumObservations": 8,
+    "pauseMilliseconds": 50,
+    "maximumPauses": 7,
+    "consecutiveAbsentObservationsRequired": 2,
+    "stillAttachedOrTypedMissingVolumeResetsAbsenceCount": true,
+    "typedRetryIsOnlyEmptyUnmountedVolumeEntity": true,
+    "multipleVolumesAndUnknownErrorsStillRefuse": true,
+    "additionalDetachCommandsIntroducedByVerifier": false,
+    "forceFlagsIntroduced": false,
+    "originalDeviceUUIDMountRootChecksRetained": true,
+    "packageStampCapturedEvenForPrecreatedVaultObject": true,
+    "manifestVaultVolumeAndSetupStateBoundBeforeDetach": true,
+    "imageDeviceInodeCheckedAroundNativeInspection": true,
+    "cancellationCannotPublishObservedReply": true,
+    "configuredAttemptsAreNotHardRealtimeDeadline": true,
+    "productionCaptureWorkspace": "Public constructor explicitly observes NSWorkspace; injected snapshot environments default to private notification center",
+    "captureSubscriptions": "Cancellable subscriptions release with controller; handlers marshal to MainActor"
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 745,
+      "passed": 714,
+      "optInSkipped": 31,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 247,
+      "additionalPreviouslySkipped": 24,
+      "failures": 0
+    },
+    "physicalSystemAudio": {
+      "passed": 1,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 739,
+    "remainingOptInSkips": 6,
+    "threadSanitizerFocused": {
+      "passed": 283,
+      "failures": 0,
+      "racesReported": 0
+    },
+    "threadSanitizerPhysical": {
+      "passed": 1,
+      "failures": 0,
+      "racesReported": 0
+    },
+    "threadSanitizerDistinctCases": 284,
+    "newDeterministicDetachCases": 11,
+    "newRapidNativeCase": 1,
+    "newInjectedSleepCase": 1,
+    "broaderTSanScope": "Adds all VaultTests, VaultSessionTests and NativeVaultMigrationTests for the changed driver"
+  },
+  "nativeRapidFixture": {
+    "cyclesWithWrites": 6,
+    "independentHdiInventoryAfterEachCycle": true,
+    "allSixSourcesReopened": true,
+    "normalAndRaceRunsPassed": true,
+    "modelsOrKeychainNeeded": false
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema20 bounded native detach confirmation; physical audio is separately exercised by the native SwiftPM fixture; no installation or native capture/input acceptance",
+    "codeCommit": "d224bff50a10ae051bd1bd5f912e162bc7e2322e",
+    "schema": 20,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "1a7009e83e96faae1d9d59b922712646038c32e6b69d6d2c60d7b59c2fbb34b4",
+        "signedSHA256": "c505280cb5070fcf6450b11fc26a87bfafc0180dcbdda45f3dd9f73ec7e6a063",
+        "normalizedPayloadSHA256": "d2d3af8b94545f0712dccfc8f68ed33e313fb5985a3aa8029e2656d27fca1edb"
+      },
+      "oswindctl": {
+        "rawSHA256": "b373cb696fe75864d56ec5d4a1b1dcf86c329465ef190ef85f5a5d0c81f2b7e2",
+        "signedSHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+        "normalizedPayloadSHA256": "a4dbc230c82367fb1e18aa87e9ef554e5d8b8c2e59c0bbdbd7d519c671394a58"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "de9c5a09fd49907a033112c248f1d3d789a775e5e9804bc293a867ac116967cb",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "5cd7a7ef8d539c34aad2041efa46b40e2bea5a540fd9550db094806adf33d102",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalQualificationRuns": [
+    {
+      "name": "native-optin-v1",
+      "exitCode": 0,
+      "wallSeconds": 173.8614664999768
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 61.96874308306724
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.111223709071055
+    },
+    {
+      "name": "calendar-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 4.021439332980663
+    },
+    {
+      "name": "tag-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1702425410039723
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.3014337499625981
+    },
+    {
+      "name": "audio-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.9053499998990446
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.0813212499488145
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.48014545789919794
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.2978815408423543
+    },
+    {
+      "name": "capture-region-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.3759482919704169
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 15.46629587491043
+    },
+    {
+      "name": "vault-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 15.4628560829442
+    },
+    {
+      "name": "vault-process-v3",
+      "exitCode": 0,
+      "wallSeconds": 15.756239749956876
+    },
+    {
+      "name": "wipe-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.7332753750961274
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.0024391661863774
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 206.90713212499395
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 26.15566987497732
+    },
+    {
+      "name": "live-snapshot-v1",
+      "exitCode": 0,
+      "wallSeconds": 3.917720291065052,
+      "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+      "harnessSHA256": "3c2ee55d0e912c6cc9b11de6990cb669a019a177f1fd8c67a4c5f6f8d1451de1"
+    }
+  ],
+  "uniqueSignedProcessGroups": 12,
+  "vaultProcessRepetitions": [
+    {
+      "state": "completed",
+      "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+      "checks": [
+        "create initializes and detaches, public handle closed",
+        "closed handle refuses plaintext fallback",
+        "wrong passphrase refused without attachment",
+        "managed handle writes and retrieves on verified volume",
+        "supplied actual older writer refuses the current schema without changing DB bytes",
+        "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+        "explicit plaintext backup/Markdown export, private source staging cleaned",
+        "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+        "retry detaches after reader closes",
+        "verified native migration remounts with history and retains original",
+        "missing source refuses before destination creation",
+        "renamed attached package remains visibly attached despite stale OS image path",
+        "relocatable public handle still reaches the current schema and fences supplied older writer after rename",
+        "moved package closes public handle and normally unmounts/ejects verified backing device",
+        "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+      ],
+      "binary_sha256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+      "schema_version": 20,
+      "old_binary_sha256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+      "verified_detached": true,
+      "passphrase_persisted": false,
+      "normal_library_opened": false,
+      "cleanup_detached": true
+    },
+    {
+      "state": "completed",
+      "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+      "checks": [
+        "create initializes and detaches, public handle closed",
+        "closed handle refuses plaintext fallback",
+        "wrong passphrase refused without attachment",
+        "managed handle writes and retrieves on verified volume",
+        "supplied actual older writer refuses the current schema without changing DB bytes",
+        "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+        "explicit plaintext backup/Markdown export, private source staging cleaned",
+        "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+        "retry detaches after reader closes",
+        "verified native migration remounts with history and retains original",
+        "missing source refuses before destination creation",
+        "renamed attached package remains visibly attached despite stale OS image path",
+        "relocatable public handle still reaches the current schema and fences supplied older writer after rename",
+        "moved package closes public handle and normally unmounts/ejects verified backing device",
+        "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+      ],
+      "binary_sha256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+      "schema_version": 20,
+      "old_binary_sha256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+      "verified_detached": true,
+      "passphrase_persisted": false,
+      "normal_library_opened": false,
+      "cleanup_detached": true
+    },
+    {
+      "state": "completed",
+      "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+      "checks": [
+        "create initializes and detaches, public handle closed",
+        "closed handle refuses plaintext fallback",
+        "wrong passphrase refused without attachment",
+        "managed handle writes and retrieves on verified volume",
+        "supplied actual older writer refuses the current schema without changing DB bytes",
+        "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+        "explicit plaintext backup/Markdown export, private source staging cleaned",
+        "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+        "retry detaches after reader closes",
+        "verified native migration remounts with history and retains original",
+        "missing source refuses before destination creation",
+        "renamed attached package remains visibly attached despite stale OS image path",
+        "relocatable public handle still reaches the current schema and fences supplied older writer after rename",
+        "moved package closes public handle and normally unmounts/ejects verified backing device",
+        "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+      ],
+      "binary_sha256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+      "schema_version": 20,
+      "old_binary_sha256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+      "verified_detached": true,
+      "passphrase_persisted": false,
+      "normal_library_opened": false,
+      "cleanup_detached": true
+    }
+  ],
+  "calendarProcess": {
+    "scope": "Owned synthetic imports and live CLI/HTTP/MCP counts; no capture, native input, energy or competitor claim.",
+    "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "harnessSHA256": "8233563be88978bcba9134db89f3f3586ea37aa959b61a0f4a9b5dcf402c30ed",
+    "sources": 600,
+    "passed": true,
+    "checks": [
+      "complete counts exceed search caps",
+      "CLI HTTP MCP identical metadata scopes",
+      "repeated clock hour distinct UTC ranges",
+      "23 hour DST day and leap month",
+      "inclusive start exclusive end",
+      "invalid relevance and malformed parameters rejected",
+      "HTTP token origin host guards",
+      "external writer visible to persistent HTTP connection"
+    ]
+  },
+  "tagCompatibilityProcess": {
+    "format": "OSwind transactionally indexed tags v1",
+    "scope": "Owned synthetic source/tag mutations, schema20 compatibility, exact search and quiet portability. No capture, normal history or credentials.",
+    "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "olderBinarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+    "actualOlderSchema20Writer": true,
+    "harnessSHA256": "839948d6ae25e40a6571b21bf2635bc68f500daf7a5661835a088c0a0220e541",
+    "schema": 20,
+    "passed": true,
+    "checks": [
+      "schema20 upgrade preserves exact source payloads",
+      "duplicate tags count once; case stays exact",
+      "older writer insertion and replacement maintain projection",
+      "old JSON and new indexed searches agree",
+      "source metadata and tag rows match independent SQL JSON oracle",
+      "quiet backup restore rebuilds counts",
+      "JSON round trip rebuilds counts"
+    ]
+  },
+  "domainPrivacyProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "audioImportProcess": {
+    "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "report": {
+      "passed": true,
+      "fixture": "generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment",
+      "checks": [
+        "CLI file preparation, timestamp/session persistence and keyword retrieval",
+        "crossing decoder segment ends clipped to independently measured source duration; wholly outside segments refused without partial admission",
+        "original clip retained privately, source never changed",
+        "detected secret suppresses complete raw clip and redacts both text representations",
+        "full media backup/restore preserves transcript/session and audio bytes",
+        "erasure removes owned clip only; malformed input fails"
+      ],
+      "limits": [
+        "mock ASR does not establish recognition quality",
+        "native capture/panels/playback acceptance remains separate"
+      ]
+    },
+    "recognitionQualityEvidence": false
+  },
+  "signedLiveSnapshot": {
+    "binarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "harnessSHA256": "3c2ee55d0e912c6cc9b11de6990cb669a019a177f1fd8c67a4c5f6f8d1451de1",
+    "report": {
+      "result": "PASS",
+      "normal_capture": "Saved OSwind Synthetic Fixture \u00b7 942 ms",
+      "secret_capture": "Saved OSwind Synthetic Fixture \u00b7 577 ms",
+      "ocr_regions": 5,
+      "verified": [
+        "target identity",
+        "live OCR marker",
+        "image saved",
+        "secret text redacted",
+        "secret image absent",
+        "app exclusion",
+        "window-title exclusion",
+        "delete removes image and FTS entry"
+      ]
+    },
+    "preflightUsesExplicitTemporaryStore": true,
+    "wholeAppPerformanceEvidence": false
+  },
+  "physicalThreadSanitizer": {
+    "format": "OSwind owned native system-audio observations v1",
+    "observations": [
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310984767310822,
+        "intendedFrequencyHz": 440,
+        "intendedToOtherAmplitudeRatio": 2554289.9132057345,
+        "otherOwnedSourceAmplitude": 4.42823060484747e-09,
+        "passed": true,
+        "samples": 48640,
+        "source": "A",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      },
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310415111519635,
+        "intendedFrequencyHz": 997,
+        "intendedToOtherAmplitudeRatio": 1087015.4488993427,
+        "otherOwnedSourceAmplitude": 1.0405017815498384e-08,
+        "passed": true,
+        "samples": 48640,
+        "source": "B",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      }
+    ],
+    "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+    "threadSanitizer": true,
+    "sourceCommit": "d224bff50a10ae051bd1bd5f912e162bc7e2322e",
+    "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+    "harnessSHA256": "20b874239c4a3253af92d8f39bdc8ecc2f5b91046d6d5ad4bbfa3e991b219a95",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max",
+    "testLogSHA256": "42ca32e0c35ff2e8a027856b3752b8f7e96f374361162552ea8090d58bfe270b",
+    "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+    "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+    "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+    "permissionChanges": false,
+    "rawCapturedAudioPersisted": false,
+    "systemVolumeChanged": false
+  },
+  "retainedDevelopmentCorrections": {
+    "initialFullSuite": "Runtimefaf8eb8 full v1 passes 743 cases; later identity review adds an explicit package stamp for vault objects created before the folder exists",
+    "precreationCase": "Exact manifest and image inode moved into a replacement package must still refuse; original/replacement bytes preserved",
+    "hostSleepAlignedFullFailure": {
+      "source": "3c61d1108801af9523568191790a0003afc44350",
+      "suite": "full v2: 744 cases / one failed snapshot passage-callback case / two assertion failures",
+      "observation": "Saved metric was one, callback count zero and coverage nil; real host sleep notifications invalidate capture epoch before callback",
+      "powerEventsLocal": [
+        {
+          "localTime": "2026-10-24 12:12:03",
+          "kind": "Wake"
+        },
+        {
+          "localTime": "2026-10-24 12:12:04",
+          "kind": "Wake"
+        },
+        {
+          "localTime": "2026-10-24 12:12:31",
+          "kind": "Sleep"
+        },
+        {
+          "localTime": "2026-10-24 12:12:33",
+          "kind": "Wake"
+        },
+        {
+          "localTime": "2026-10-24 12:12:33",
+          "kind": "Sleep"
+        },
+        {
+          "localTime": "2026-10-24 12:16:37",
+          "kind": "Wake"
+        },
+        {
+          "localTime": "2026-10-24 12:16:37",
+          "kind": "Sleep"
+        },
+        {
+          "localTime": "2026-10-24 12:16:37",
+          "kind": "Wake"
+        }
+      ],
+      "nextCaseWallSeconds": 247.778,
+      "finalCorrection": "Private lifecycle center for injected snapshots; production explicitly keeps NSWorkspace; injected-sleep cancellation regression passes",
+      "failedLogSHA256": "f7698146a5cdb84c5133507a13dddbe8023127c2afc464489e979c2d2179756a"
+    },
+    "priorOriginalVaultFailure": "The initial unmounted-volume identity refusal from runtime20a51c8 was not captured at failure; its exact root cause remains unproven. New code handles one modeled empty-volume observation after successful detach."
+  },
+  "nativeBoundary": {
+    "freshSignedCLIdoctor": {
+      "screenLocked": false,
+      "accessibility": true,
+      "screenRecording": true
+    },
+    "installedSchema17Unchanged": true,
+    "normalHistoryOpenedByQualification": false,
+    "realKeychainCredentialsUsed": false,
+    "authenticationOrPermissionChanges": false,
+    "forcedDetach": false,
+    "GUIViewSourcesUnchanged": true,
+    "newGUIInputOrRenderClaimed": false,
+    "realMicrophoneCaptureClaimed": false,
+    "rawCapturedAudioPersisted": false
+  },
+  "remainingGates": [
+    "Original retained vault failure exact native inventory/root cause not captured",
+    "Initial/multiple-volume/other inspection errors and moved-image intermediate failures remain refusals",
+    "Broader OS/hardware and authentication acceptance",
+    "Actual signed-GUI/controller/microphone-to-ASR capture and device/route recovery",
+    "Arbitrary helper/browser-tab privacy, first-sound transitions and native warning visibility",
+    "Sustained capture power/CPU/disk and matched whole-app competitor benchmarks",
+    "Broad competitive feature parity and ranking"
+  ]
+}

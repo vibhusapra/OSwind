@@ -2,6 +2,16 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Native detach verification and signed live capture
+
+[Detach-settlement evidence](vault-detach-settling-v1.json) binds runtime d224bff and a signed 33-file package to 714 normal passes/31 opt-in skips, 247 native/model passes and one physical case: 739 distinct passes/six remaining opt-in cases. All 283 focused TSan cases plus physical audio pass, giving 284 distinct race checks. All nineteen final operations pass, including twelve unique signed process groups, three complete vault processes and native audio. The broader race selection adds vault/session/migration cases for the changed driver; test counts are coverage, not speed comparisons.
+
+An actual owned encrypted image preserves six sources across six rapid write/lock cycles, with independent hdiutil checks after each close and a final source read. Deterministic observation sequences prove two consecutive absent replies are required, reappearance/incompleteness resets the counter and cancellation/unknown or changed identity cannot confirm detach. Real replacement directories/manifests preserve marker bytes, including a precreated vault object whose exact image inode/manifest move into another package. Eight observations with 50 ms pauses are configured limits; native helper calls have separate timeouts. No forced or additional detach is introduced by the verifier.
+
+The exact signed CLI passes live targeted fixture capture/OCR/privacy/deletion, returning five OCR regions and normal/secret statuses of 942/577 ms. These are one-shot observations under uncontrolled host activity, not a benchmark distribution. The instrumented source-bound tone fixture also passes. Captured PCM is not saved; generated source WAVs and aggregate metrics are retained. This is not full GUI/controller/microphone/ASR, arbitrary app privacy, energy or competitor acceptance.
+
+An intermediate full run preserves one failed snapshot test/two assertions aligned with real OS sleep and a four-minute wall gap. Its synthetic snapshot controller observed the real workspace. Private lifecycle injection and an explicit injected-sleep cancellation case correct that fixture boundary; public capture retains macOS workspace observation. Final full/native/race runs pass. The earlier vault refusal's exact failing inventory remains unproven; this verifier handles a specific missing-volume observation after successful normal detach, while ambiguous/initial/other native failures remain refusals. [Design and remaining gates](../docs/VAULT-DETACH.md).
+
 ## Real owned system-audio buffers
 
 [Native system-audio evidence](native-system-audio-v1.json) binds runtime07cb8de and a separately signed 33-file package to 702 normal passes/30 opt-in skips, 234 native/model passes, one distinct physical case and 726 distinct passes/six remaining opt-in cases. All 236 focused TSan cases plus the physical case pass, giving 237 distinct race checks. All seventeen final qualification operations pass, including eleven signed process groups.
