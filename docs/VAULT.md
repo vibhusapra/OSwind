@@ -1,6 +1,6 @@
 # Encrypted libraries
 
-Schema 18 adds a native encrypted-library package, separate from the ordinary library. The source includes setup, verified copy, passphrase/optional Keychain unlock, an explicit locked screen, menu/Settings lock controls and sleep/session-lock requests. The installed schema-17 app has not yet been replaced with this work. Native authentication, click/focus/device acceptance and release qualification remain open.
+Schema 18 adds a native encrypted-library package, separate from the ordinary library. The source includes setup, verified copy, passphrase/optional Keychain unlock, an explicit locked screen, menu/Settings lock controls and sleep/session-lock requests. The installed schema-17 app has not yet been replaced with this work. The separately staged ad-hoc signed package passes headless release qualification: 522 total tests (516 pass / six skips), 79 focused TSan passes and all 15 signed-release process groups. Native authentication and click/focus/device acceptance remain open. [Sanitized evidence](../benchmarks/encrypted-library-v1.json).
 
 ## Storage and locking
 
@@ -11,6 +11,8 @@ Read-only status also checks that a detached completed image is still encrypted;
 Locking stops supported capture/audio, routines and local API access, cancels app workers, clears displayed history, closes the app's SQLite connection, closes the public handle, then attempts a normal detach and verifies it. A competing reader can prevent detach. That state is **closing, still mounted**, with retry; OSwind never force-detaches the volume or claims that pending state is cryptographically locked. An existing supported store can close through its retained, identity-checked directory descriptor after another process closes the public handle or moves the package. The descriptor is released on successful close so it cannot pin the volume indefinitely. Package-change events let an open app observe a competing CLI lock and close its connection. On a package rename, the watcher resolves its already-open directory descriptor, verifies the vault ID, updates the selected stable handle, clears displayed history and requests lock at the new location. Status separately reports `volumeMounted` and `imageAttached`. An unmounted filesystem with an attached decrypted backing device remains closing; only verified image detachment authorizes a cryptographic lock or normal exit. A detached incomplete setup can still terminate safely. Normal app termination returns to the ordinary event loop while awaiting a requested lock, then requests exit after verified detach; a failed lock keeps the app open. A reproduced `terminateLater` nested-loop deadlock from a MainActor caller is covered by a delegate lifecycle regression and owned preview-process exits. Force Quit, a crash, power loss and OS shutdown are different boundaries and cannot guarantee cleanup.
 
 A reproduced macOS rename case leaves the image-path and Disk Arbitration mount path stale while the kernel mount path changes. Attachment lookup binds the saved device, volume UUID, image identity and actual kernel mount instead of assuming a missing old path means detach. Normal detach targets the verified backing image device. Only for this verified renamed case, a stale-path refusal can fall back to a normal kernel unmount followed by verified backing-device detach. No force option is used. If interrupted between those steps, retry recognizes the still-attached unmounted image. Ambiguous identities remain unavailable rather than adopting or ejecting another device.
+
+Opening an older ordinary library in this build upgrades it to schema18. The retained original after a vault copy preserves its history, but is not a byte-identical/schema-downgrade backup; older executables refuse it. Keep an independent earlier backup if returning to an older build matters. No normal user library was opened during qualification.
 
 New schema-18 libraries exclude older executables before supported writes. This does not revoke already-open raw file handles or make arbitrary old/raw clients cooperative. Detached-handle refusal also prevents an older executable from silently creating a new plaintext library at that handle.
 
@@ -64,3 +66,13 @@ Create/migrate detach by default; `--keep-unlocked` is explicit. `--vault` requi
 - Remaining: actual authentication and Keychain signing on supported distributions; full keyboard/focus/VoiceOver and native sleep/wake/session transitions; older-macOS matrix; disk-full/media-device failures and large-history migration performance; crash/forced-shutdown recovery; packaged process regressions and final installation binding.
 
 No competitor security superiority, complete Recall security parity, broad feature completeness or top-three ranking follows from these checks.
+
+## Reviewed sample layouts
+
+These are synthetic application-owned renders, reviewed in light and dark appearance. All six export processes exit normally. They do not demonstrate native clicks, keyboard acceptance or Mac authentication.
+
+![Encrypted-library setup sample](../assets/vault-setup-light.png)
+
+![Locked-library sample](../assets/vault-locked-dark.png)
+
+![Busy lock sample](../assets/vault-closing-dark.png)

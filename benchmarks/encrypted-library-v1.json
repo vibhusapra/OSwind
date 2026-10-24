@@ -1,0 +1,310 @@
+{
+  "format": "OSwind encrypted-library functional qualification v1",
+  "created_utc": "2026-10-24T07:57:30.586181+00:00",
+  "code_commit": "a655a9676b8b7644473e6c252d994367fd939285",
+  "schema_version": 18,
+  "scope": "Owned synthetic libraries and native APFS images; headless application-model/delegate checks and sample layout renders. Not real Mac authentication, native clicks, sustained capture/power or a competitor performance benchmark.",
+  "hardware": {
+    "gpu": "Apple M5 Max",
+    "macOS": "26.6.2",
+    "native_session_locked": true
+  },
+  "full_suite": {
+    "total": 522,
+    "passed": 516,
+    "skipped": 6,
+    "failed": 0,
+    "native_vault_opt_in": true,
+    "log_sha256": "48130b1bd30169102c809a0f61cea296c873835d0b6cb0239a381b83dd340a71"
+  },
+  "thread_sanitizer": {
+    "total": 79,
+    "passed": 79,
+    "failed": 0,
+    "reported_data_races": 0,
+    "scope": "Vault, library location/workspace, backup/restore and workspace lifecycle",
+    "log_sha256": "056c25a0e1081b5896f2f793e8271cd3cb75530f2d3c1a817c4e499213f40502"
+  },
+  "release_process_checks": {
+    "groups": 15,
+    "all_passed": true,
+    "checks": [
+      {
+        "name": "native-vault",
+        "passed": true,
+        "elapsed_seconds": 30.590935208834708
+      },
+      {
+        "name": "vault-interruptions",
+        "passed": true,
+        "elapsed_seconds": 5.034298125188798
+      },
+      {
+        "name": "observed-17-recovery",
+        "passed": true,
+        "elapsed_seconds": 8.242609292035922
+      },
+      {
+        "name": "whole-wipe",
+        "passed": true,
+        "elapsed_seconds": 10.481906958855689
+      },
+      {
+        "name": "backup",
+        "passed": true,
+        "elapsed_seconds": 1.1685233749449253
+      },
+      {
+        "name": "markdown",
+        "passed": true,
+        "elapsed_seconds": 2.2123820001725107
+      },
+      {
+        "name": "audio",
+        "passed": true,
+        "elapsed_seconds": 2.44368933304213
+      },
+      {
+        "name": "replay",
+        "passed": true,
+        "elapsed_seconds": 1.9809076669625938
+      },
+      {
+        "name": "deletion",
+        "passed": true,
+        "elapsed_seconds": 0.715519999852404
+      },
+      {
+        "name": "erasure",
+        "passed": true,
+        "elapsed_seconds": 1.225658416049555
+      },
+      {
+        "name": "search",
+        "passed": true,
+        "elapsed_seconds": 1.3417650409974158
+      },
+      {
+        "name": "protocols",
+        "passed": true,
+        "elapsed_seconds": 0.3713143749628216
+      },
+      {
+        "name": "indexed-protocols",
+        "passed": true,
+        "elapsed_seconds": 1.1638550411444157
+      },
+      {
+        "name": "linked-recaps-qwen",
+        "passed": true,
+        "elapsed_seconds": 2.4083144159521908
+      },
+      {
+        "name": "routines",
+        "passed": true,
+        "elapsed_seconds": 2.0664385419804603
+      }
+    ],
+    "harness_sha256": {
+      "scripts/vault-smoke.py": "47e288abd785b6498ee26968f5a584a2eba154486a3fd8a6a73c25f0eefdfd96",
+      "scripts/vault-interruption-smoke.py": "328a2e5ef63f166a1b2b90481b03dc4e9254636ee8a85ee419c42acaac0c7c51",
+      "scripts/wipe-smoke.py": "131aa0ea03e88b17892a439564ca23fdb4bd97036c59c36b6ecc55a166153530",
+      "scripts/backup-smoke.py": "9a16dda2fd2fa86892a82a49f5ebd6a6f033036c6cf9c92ed7a77bd611ac35f2",
+      "scripts/markdown-export-smoke.py": "b3ef3e63617e01d92e7d3c2aa894018420a9a4dfc7441e24aa71b412b1d8a366",
+      "scripts/audio-smoke.py": "69c52f2fb9e802b4a4c049dad2006d1b1fe7298f09a7af36c61170755512adfd",
+      "scripts/visual-replay-smoke.py": "d0afde8d19c28de9e39a1d3199a4f66669d4627a08dc9b109f0f4a208e349e69",
+      "scripts/deletion-smoke.py": "8bde92edbe2c5d40791c4ac42e5fbeed910ffecf47797730ea448b671fcd42c5",
+      "scripts/erasure-smoke.py": "4ed7daac5ac2f0605a4941ec82f7170ba39fcb67c90807345b5f635f7f934f46",
+      "scripts/search-expression-smoke.py": "291a9b0939390504a5b393050dc5ee02e5bc902c4bf317a17b2bf887cf9a455a",
+      "scripts/integration-smoke.py": "0667605665d931c50b5a1c6ea374fdc10bb30f349ffb69cf0d84747b36b9ef97",
+      "scripts/recap-smoke.py": "f3a24918ca0b7de54867da07a437cbbfd250e3189d6b57d0cbebbbdb2aaff67f",
+      "scripts/routines-smoke.py": "68b19f182db0e160cdf8e772382dccc8bb90b0ae8ce37c382e5495adcc045076"
+    },
+    "source_stability_verified": true,
+    "elapsed_times_are_not_performance_benchmarks": true
+  },
+  "native_cli": {
+    "checks": [
+      "create initializes and detaches, public handle closed",
+      "closed handle refuses plaintext fallback",
+      "wrong passphrase refused without attachment",
+      "managed handle writes and retrieves on verified volume",
+      "supplied actual older writer refuses schema18 without changing DB bytes",
+      "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+      "explicit plaintext backup/Markdown export, private source staging cleaned",
+      "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+      "retry detaches after reader closes",
+      "verified native migration remounts with history and retains original",
+      "missing source refuses before destination creation",
+      "renamed attached package remains visibly attached despite stale OS image path",
+      "relocatable public handle still reaches schema18 and fences supplied older writer after rename",
+      "moved package closes public handle and normally unmounts/ejects verified backing device",
+      "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+    ],
+    "all_passed": true,
+    "all_owned_images_verified_detached": true,
+    "old_schema17_cli_sha256": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe",
+    "passphrase_persisted": false,
+    "normal_library_opened": false
+  },
+  "interruptions": {
+    "checks": [
+      {
+        "action": "create",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "create",
+        "still_attached": false,
+        "stdout_empty": true
+      },
+      {
+        "action": "unlock",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "attach",
+        "still_attached": false,
+        "stdout_empty": true
+      }
+    ],
+    "recovery_unlock_and_lock_passed": true,
+    "scope": "Actual SIGINT during observed owned hdiutil create/attach helpers; random in-memory passphrase, no Keychain or normal library"
+  },
+  "known_speech_failure_recovery": {
+    "count": 17,
+    "recovered": 17,
+    "one_attempt_per_known_failure": true,
+    "wav_and_model_hashes_stable": true,
+    "scope": "Previously observed failures only. Original frozen corpus reports are unchanged; this is not a new ASR quality or held-out result."
+  },
+  "package": {
+    "scope": "Separately staged adhoc signed arm64 package; not installed or native authentication acceptance",
+    "codeCommit": "a655a9676b8b7644473e6c252d994367fd939285",
+    "schemaVersion": 18,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "d284fe4f084ff04f6f64827aa9f64aa5d38aed54f8eb37ec2db4c761d4aa259f",
+        "signedSHA256": "d9a6d0d49d064ced004605fa06f15110c39cc27168bd461a57c90064922c72c0",
+        "normalizedPayloadSHA256": "fc0fb058ff55640bbc4a294bc26fb4747584ed00981c5cd17fb9bee32f96766a"
+      },
+      "oswindctl": {
+        "rawSHA256": "b265b3e5dbc0f021574037b833baa88844fe06db4e109e80a787dbd1c8b060fb",
+        "signedSHA256": "876c4cf7d421d1fb5edbd091942a29a27d261e9c28f7d66fefea9d05c6ff519c",
+        "normalizedPayloadSHA256": "0ac3d7e5e713b416f08e5e1bc39e603b87def3eded0d0eb00ca9ca059beb3e2a"
+      }
+    },
+    "zipSHA256": "742ec712ea09af05866f4820628a5e419fd0ca021b522b2b8577d441a10c4f0e",
+    "bundleTreeSHA256": "523a59af5af6313cfb9a401c09078ac5b73d36a7a942d6f7f224e532f18f7bef",
+    "bundleFileCount": 15,
+    "entireBundleMatchesExtractedZip": true,
+    "strictSignaturesPass": true,
+    "rawNormalizedSigningOnlyDifference": true,
+    "releaseNotThreadSanitized": true,
+    "installedSchema17ExecutablesUnchanged": {
+      "OSwind": "22fa18945187ef4811c87f97ca52b2ef69eb5ac3acce130d3319041779ff3fb3",
+      "oswindctl": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe"
+    },
+    "normalLibraryOpened": false
+  },
+  "layout": {
+    "code_commit": "a655a96",
+    "binary_sha256": "cf9c76f36f40182e25277cf2ef90f796fae381e76e58fe49e4deb54ed1b44fbb",
+    "renders": [
+      {
+        "section": "VaultSetup",
+        "appearance": "light",
+        "bytes": 56774,
+        "sha256": "44a5d7c4d9f6281f122ad855837097c4b5c10b2d6ba821417a33efd045c2406e",
+        "exitCode": 0,
+        "seconds": 2.841
+      },
+      {
+        "section": "VaultLocked",
+        "appearance": "light",
+        "bytes": 76826,
+        "sha256": "4a6da6dc53258acfcc682f9b0eb1984aa91a959327714c53aa8328072b988ecd",
+        "exitCode": 0,
+        "seconds": 1.785
+      },
+      {
+        "section": "VaultClosing",
+        "appearance": "light",
+        "bytes": 68436,
+        "sha256": "aafbb59bdb72e3043ac546c6f236892641f8b2e68bc8486dd5a1d458e8b02610",
+        "exitCode": 0,
+        "seconds": 1.82
+      },
+      {
+        "section": "VaultSetup",
+        "appearance": "dark",
+        "bytes": 59352,
+        "sha256": "8cfd3fdb27bfff73664ae1c22c2f79c0d4b8d138fa383a23c77feeb2b02d4e2f",
+        "exitCode": 0,
+        "seconds": 1.707
+      },
+      {
+        "section": "VaultLocked",
+        "appearance": "dark",
+        "bytes": 79481,
+        "sha256": "dcc4580ad125eaf15af9b5cfd94a5e72dfe7b02d426e2cd9a021bd393b54dcb6",
+        "exitCode": 0,
+        "seconds": 1.805
+      },
+      {
+        "section": "VaultClosing",
+        "appearance": "dark",
+        "bytes": 71028,
+        "sha256": "de95bd0f89536f310dba2098741b3a14da7afa338fb44e33a7a05a896c926c8c",
+        "exitCode": 0,
+        "seconds": 1.817
+      }
+    ],
+    "scope": "owned synthetic NSHostingView renders and normal quit path; not native clicks or authentication",
+    "visually_reviewed": true,
+    "native_click_or_authentication_acceptance": false
+  },
+  "retained_regressions": [
+    {
+      "trigger": "NSApplication terminateLater entered a nested modal loop from a MainActor caller",
+      "before": "Owned layout preview timed out after exporting its image",
+      "fix": "Return to normal run loop, finish verified lock, then request exit again; duplicate quit requests share cleanup",
+      "after": "Owned delegate regression and all six preview process exits pass"
+    },
+    {
+      "trigger": "Move an attached vault package",
+      "before_binary_sha256": "4fc6e9b82cf851125e6615fa6d42bf39060fd06429fd2a668cba38686610c21f",
+      "before_reported_state": "locked",
+      "before_reported_volume_mounted": false,
+      "actual_before_image_attached": true,
+      "fix": "Bind saved device/UUID/root/image identities, current kernel mount and backing image device; use relocatable relative handle, retained close descriptor and verified non-force unmount/eject recovery",
+      "after": "Native core, app session and signed CLI relocation/read/old-writer/lock/remount checks pass"
+    },
+    {
+      "trigger": "Qualification-only known-failure harness referenced archived worktree",
+      "before": "First qualification attempt passed native vault and interruption groups, then stopped before recovery cases",
+      "fix": "Corrected private harness copy points at active checkout; signed executable and product source unchanged",
+      "after": "Remaining 13 groups pass; original attempt and corrected continuation retained"
+    }
+  ],
+  "credential_status": {
+    "implementation": "Data Protection Keychain userPresence + WhenUnlockedThisDeviceOnly; fresh explicit-auth context",
+    "current_adhoc_build": "Controls disabled by app-identifier entitlement preflight; passphrase unlock works",
+    "fake_provider_lifecycle_passed": true,
+    "real_vault_keychain_item_created": false,
+    "actual_Mac_authentication_accepted": false
+  },
+  "limits": [
+    "Original libraries, exports, backups and APFS snapshots remain independent copies; no secure-erasure claim",
+    "Opening an older source library upgrades it to schema18; retained originals preserve history but are not byte-identical/schema-downgrade backups. Older builds refuse schema18.",
+    "Mounted data and process/model memory remain accessible under the Mac user; not an execution enclave or forensic RAM-erasure guarantee",
+    "Busy independent readers keep locking pending; no forced detach",
+    "Source revision/settings checks span the copy, not a permanent write lock against future independent changes",
+    "Real signed-distribution authentication, keyboard/VoiceOver/device/sleep-wake, disk-full/large-library migration and older-macOS acceptance remain open",
+    "Physical capture power, 24h completion, multimodal search and broad competitor/top-three gates remain open"
+  ],
+  "completion_claim": {
+    "vault_headless_qualification": true,
+    "installed_schema18": false,
+    "broad_feature_parity": false,
+    "competitor_superiority_or_top_three": false
+  }
+}

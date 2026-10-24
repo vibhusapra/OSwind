@@ -1,6 +1,6 @@
 # OSwind
 
-The installed schema-17 build includes library-scoped temporary work, coordinated close/wipe and source-bounded audio imports. [Release checks and limits](docs/LIBRARY-WORKSPACES.md): 481 unit passes / six opt-in skips, 80 focused TSan passes / one skip, 14 signed process groups. All 17 observed Whisper import failures recover in the repaired build. The [frozen natural evaluations](docs/HELDOUT-EVALUATION.md) retain original results and failures. The source now adds [encrypted libraries and verified copy](docs/VAULT.md); real Mac authentication, packaged vault qualification, physical capture/power, native acceptance and matched competitor ranking remain open.
+Source schema18 adds [encrypted libraries and verified history copy](docs/VAULT.md), with a separately staged signed package: **516 test passes / six skips, 79 TSan passes and 15 signed-release process groups**. The installed schema17 app remains unchanged. Mac authentication is disabled in this ad-hoc build; passphrase unlock works. Native interaction, physical capture/power and matched competitor ranking remain open. The [frozen natural evaluations](docs/HELDOUT-EVALUATION.md) retain original results and failures.
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
