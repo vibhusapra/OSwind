@@ -1,0 +1,259 @@
+{
+  "schema": 1,
+  "state": "headless-qualified; native and desktop relevance acceptance open",
+  "codeCommit": "2bc65e71a035a874880d659db5267b60712e9b45",
+  "sourceSchema": 19,
+  "scope": "Persisted local visual memory, protected image/replay indexing, scoped retrieval, previews, backup/restore and process integration. Not complete product parity, desktop capture/energy, a standard COCO benchmark or competitor ranking.",
+  "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+  "preprocessingID": "imageio-srgb-white-bilinear224-nchw-v1;gemma-unigram-swift1.3.5-eos1-pad0-right64",
+  "fixture": {
+    "dataset": "Fixed official COCO2017 validation subset, 100 photos / 501 captions",
+    "seed": 1729,
+    "selectionSHA256": "41fbeb3cd5d1aad40dfac48bf9aea220f29587ab41c47d66630e8d41d38e0715",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "unchangedFromEncoderQualification": true,
+    "notProvenTrainingHoldout": true,
+    "notDesktopCapture": true
+  },
+  "tests": {
+    "fullSuite": {
+      "cases": 565,
+      "passed": 539,
+      "skipped": 26,
+      "failures": 0
+    },
+    "additionalOptInDistinctPasses": 20,
+    "uniquePassedAcrossRuns": 559,
+    "remainingOptInSkips": 6,
+    "correctedModelVaultEngineTargetedPasses": 17,
+    "threadSanitizer": {
+      "first": {
+        "cases": 79,
+        "passed": 77,
+        "skipped": 2
+      },
+      "realModelAndEncryptedSnapshot": {
+        "cases": 7,
+        "passed": 7
+      },
+      "uniquePasses": 79,
+      "reportedRaces": 0
+    },
+    "testFailureHistory": [
+      "Initial new encrypted snapshot test assumed an empty mount directory disappeared. Corrected to verify empty contents plus actual backing-device absence; source reservations/pins release and persisted search verified.",
+      "Real after-use overlapping-batch lifecycle caught a default async protocol method shadowing the actor method. Default removed, actor batch methods made explicitly async. Corrected real-model tests and TSan pass."
+    ]
+  },
+  "signedRelease": {
+    "scope": "Separately staged signed schema19 app; no installation or native click acceptance",
+    "codeCommit": "2bc65e71a035a874880d659db5267b60712e9b45",
+    "schema": 19,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "32b25e8f81a5e294a088ec85c16233ac2e928d653fde4271acac685ba1bc7c0b",
+        "signedSHA256": "9fb956bf485ed0f3af90a674fca5bd7c3a96d4b0c83cabe0a6b9691c7ea1439e",
+        "normalizedPayloadSHA256": "7dbeb482eac2de6212f24ffb4d8bca30615c9abc4c941d6566311f0b8d65b336"
+      },
+      "oswindctl": {
+        "rawSHA256": "17479020ac920f7c6b4f39840f1dc4391d2729b7255e8c6a008568cd19370437",
+        "signedSHA256": "e566f2d797204ebe1168093e474facd795987ba00987e45e8b5d2f1e241e61c4",
+        "normalizedPayloadSHA256": "92d42106bcc361cd2ef11d86f2b0f31ac3ede2ecedefb3320c8e135616eed4b5"
+      }
+    },
+    "zipSHA256": "b637dc6c0a3c4c6e79293f7d87709681b014cd466d5d7090f0dd5bc0dfc3cb2a",
+    "bundleFiles": 28,
+    "bundleTreeSHA256": "20de67812a80729eb69e0d414ce872eb1ca17465cec23f09f8684231fb4278d6",
+    "entireExtractedZipMatches": true,
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "releaseNotThreadSanitized": true,
+    "relocatedLocalTokenizerWithoutBuildResources": true,
+    "installed17Unchanged": true,
+    "designatedLibraryCreated": false,
+    "checks": [
+      {
+        "case": "missing model does not create model or library",
+        "passed": true
+      },
+      {
+        "case": "invalid compute refused",
+        "passed": true
+      },
+      {
+        "case": "duplicate model option refused",
+        "passed": true
+      },
+      {
+        "case": "unknown options refused",
+        "passed": true
+      },
+      {
+        "case": "exact COW bundle validates",
+        "passed": true
+      },
+      {
+        "case": "unsupported recipe refused",
+        "passed": true
+      },
+      {
+        "case": "extra directories refused",
+        "passed": true
+      },
+      {
+        "case": "changed compiled bytes refused",
+        "passed": true
+      },
+      {
+        "case": "missing compiled file refused",
+        "passed": true
+      },
+      {
+        "case": "symlink member refused without changing target",
+        "passed": true
+      },
+      {
+        "case": "restored bundle retains identity",
+        "passed": true
+      }
+    ]
+  },
+  "naturalPhotoPipeline": {
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "gpu": "Apple M5 Max",
+    "images": 100,
+    "indexedFrames": 100,
+    "indexingSeconds": 9.705536007881165,
+    "limits": [
+      "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+      "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+      "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+      "No image, caption, source path or raw vector is included in this aggregate report."
+    ],
+    "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "queries": 501,
+    "queryMedianMilliseconds": 14.274001121520996,
+    "queryP95Milliseconds": 16.10398292541504,
+    "recallAt1": 0.9161676646706587,
+    "recallAt5": 0.9940119760479041,
+    "recallAt10": 0.9940119760479041,
+    "reopenedIndexSources": 100,
+    "schema": 19,
+    "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+    "scopedResultsVerified": true,
+    "recallAt1Count": 459,
+    "recallAt5Count": 498,
+    "recallAt10Count": 498,
+    "peakProcessRSSBytes": 1576206336,
+    "totalProcessWallSeconds": 19.04,
+    "requestedCompute": "cpuAndGPU",
+    "actualHardwareTrace": false,
+    "calibratedSimilarityConfidence": false,
+    "similarityPolicy": "Rank finite cosine scores; no default similarity cutoff. Labels were not used to fit a threshold."
+  },
+  "retainedInitialIntegrationFailure": {
+    "scope": "Earlier exploratory debug build with a borrowed uncalibrated cosine >=0.12 filter; not a qualified release or paired performance comparison",
+    "recallAt1Count": 439,
+    "recallAt5Count": 460,
+    "queries": 501,
+    "diagnosis": "Reference text vectors with the same stored image vectors recover459/498 when the cutoff is removed. This removes an unsupported confidence filter rather than fitting a threshold to labels.",
+    "report": {
+      "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+      "gpu": "Apple M5 Max",
+      "images": 100,
+      "indexedFrames": 100,
+      "indexingSeconds": 46.14179992675781,
+      "limits": [
+        "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+        "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+        "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+        "No image, caption, source path or raw vector is included in this aggregate report."
+      ],
+      "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "queries": 501,
+      "queryMedianMilliseconds": 3.6629438400268555,
+      "queryP95Milliseconds": 5.1490068435668945,
+      "recallAt1": 0.8762475049900199,
+      "recallAt5": 0.9181636726546906,
+      "recallAt10": 0.9181636726546906,
+      "reopenedIndexSources": 100,
+      "schema": 19,
+      "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+      "scopedResultsVerified": true
+    }
+  },
+  "processIntegration": {
+    "groups": 10,
+    "passed": true,
+    "visual": {
+      "scope": "Explicit isolated photo fixture; real local model; CLI, HTTP and MCP visual retrieval. No capture/UI/energy/competitor claim.",
+      "binarySHA256": "e566f2d797204ebe1168093e474facd795987ba00987e45e8b5d2f1e241e61c4",
+      "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+      "checks": [
+        "main CLI and explicit vision search agree",
+        "MCP preserves model and source identities",
+        "HTTP agrees with CLI/MCP",
+        "HTTP app/tag scopes",
+        "HTTP authentication required",
+        "changed source bytes omitted with warning"
+      ],
+      "passed": true
+    },
+    "otherGroups": [
+      "ordinary CLI/HTTP/MCP with disabled-model refusal and model-free visual browsing",
+      "indexed text CLI/HTTP/MCP",
+      "full backup/restore and SIGINT/SIGKILL recovery",
+      "native vault creation/migration/close/relocation/partial-unmount truth",
+      "timed replay OCR/video/decode/backup/erasure across processes",
+      "preview/default/get/evidence/export and atomic source refresh",
+      "whole-library wipe and interruption recovery",
+      "selective erasure and concurrent stale-token refusal",
+      "actual signed schema18 future-version refusal"
+    ],
+    "olderWriter": {
+      "passed": true,
+      "case": "Actual signed schema18 writer refuses schema19 before application migrations; logical schema/data remain identical",
+      "oldBinarySHA256": "231bbe69581ce6b8415e729dc71838aa14604582249bc4d0b1d01f68f6b5f81c",
+      "newSchema": 19,
+      "cases": [
+        {
+          "case": "closed photo fixture",
+          "refused": true,
+          "logicalSchemaAndDataUnchanged": true,
+          "rawDatabaseBytesUnchanged": true,
+          "walBytesBefore": 0,
+          "walBytesAfter": 0
+        },
+        {
+          "case": "Abruptly exited owned WAL fixture, logical snapshots inspected only in detached copies",
+          "refused": true,
+          "logicalSchemaAndDataUnchanged": true,
+          "rawDatabaseBytesUnchanged": false,
+          "walBytesBefore": 16512,
+          "walBytesAfter": 0
+        }
+      ],
+      "retainedInitialFailure": "Initial raw database-file byte equality failed on an abruptly stopped WAL-backed photo fixture. A controlled nonempty-WAL reproduction also changes physical bytes while preserving the entire logical dump and schema. SQLite open/close can checkpoint committed WAL; future-version refusal is an application-mutation gate, not a byte-immutability guarantee."
+    }
+  },
+  "layoutQA": {
+    "ownAppRenders": [
+      "shared native visual settings in light appearance",
+      "shared native visual settings in dark appearance",
+      "real local visual search against an explicit public-photo fixture at1000x680"
+    ],
+    "screenLocked": true,
+    "nativeClickKeyboardAcceptance": false,
+    "normalHistoryOpened": false,
+    "installedSchema17Unchanged": true
+  },
+  "nextGates": [
+    "One-click visual model preparation/download and broader setup acceptance",
+    "Labeled desktop relevance and negative-query score calibration",
+    "Realistic large-archive source-validation/media-I/O scaling",
+    "Physical capture, battery, thermal and idle workloads",
+    "Native keyboard, accessibility, permissions and replay interaction",
+    "Broader hardware/OS coverage and matched competitor measurements"
+  ]
+}
