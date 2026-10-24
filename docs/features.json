@@ -292,7 +292,7 @@
     "axis": "Audio",
     "feature": "Microphone capture",
     "status": "partial",
-    "evidence": "AVAudioEngine conversion and bounded async privacy checks; actual microphone/device permission and capture acceptance pending",
+    "evidence": "Bounded per-tap ingress, device-free 44.1/48 kHz stereo resampling/downmix tests and async privacy checks; actual microphone/device permission and capture acceptance pending",
     "references": "Screenpipe, TimeScroll, Omi"
   },
   {
@@ -300,7 +300,7 @@
     "axis": "Audio",
     "feature": "System audio capture",
     "status": "partial",
-    "evidence": "SCStream mono output; live input and device-change test pending",
+    "evidence": "Per-stream owned sink/output/delegate, exact 16 kHz packed mono Float32/frame-byte validation, interruption refusal and shared case-insensitive app exclusions; live input, new-app filters and device recovery pending",
     "references": "Screenpipe, TimeScroll, Granola"
   },
   {
@@ -316,7 +316,7 @@
     "axis": "Audio",
     "feature": "Silence gate / bounded queue",
     "status": "tested",
-    "evidence": "WAV/RMS primitives tested; queue capped at 3 chunks",
+    "evidence": "Accelerate silence gate; per-source callback/partial/three-segment ingress bounds and one scheduled actor delivery, plus shared three-chunk ASR queue. Stalled actor/concurrent callbacks, synchronous finish and dropped-duration warning/reset contracts pass; not a whole-process RSS or latency guarantee",
     "references": "Always-on audio tools"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "713-case normal suite (684 pass/29 opt-in skips),216-case native/model run adds23 cases (707 distinct pass/six remaining skips),218 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "728-case normal suite (699 pass/29 opt-in skips),231-case native/model run adds23 cases (722 distinct pass/six remaining skips),233 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

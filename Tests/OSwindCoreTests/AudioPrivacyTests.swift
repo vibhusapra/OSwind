@@ -14,7 +14,7 @@ private struct OwnedAudioBackend:NativeSpeechBackend {
 }
 @MainActor private final class OwnedSystemAudio:AudioSystemCapture {
     var active=false,starts=0,stops=0
-    var streamID:ObjectIdentifier? {nil}
+    var sink:AudioAccumulator?
     func start() async throws {starts+=1;active=true}
     func stop() async throws {stops+=1;active=false}
 }
@@ -28,7 +28,7 @@ private struct OwnedAudioBackend:NativeSpeechBackend {
         try Data("{}".utf8).write(to:models.appendingPathComponent("parakeet_vocab.json"))
         var settings=AppSettings();settings.systemAudioEnabled=true;settings.speech.engine = .parakeet;settings.speech.modelDirectory=models.path;settings.retainAudio=true
         let capture=OwnedSystemAudio(),store=try MemoryStore(root:root.appendingPathComponent("library"))
-        let environment=AudioStartupEnvironment(locked:locked,context:context,identityCurrent:identity,privacyInterval:3600,authorizeMicrophone:{XCTFail("Never request real microphone access");return false},makeEngine:{throw OSwindError.unavailable("Never construct hardware")},systemAvailable:{true},makeSystemCapture:{_,_ in capture})
+        let environment=AudioStartupEnvironment(locked:locked,context:context,identityCurrent:identity,privacyInterval:3600,authorizeMicrophone:{XCTFail("Never request real microphone access");return false},makeEngine:{throw OSwindError.unavailable("Never construct hardware")},systemAvailable:{true},makeSystemCapture:{_,sink in capture.sink=sink;return capture})
         let recognizer=SpeechRecognizer(loader:{_ in OwnedAudioBackend(operation:backend)})
         return Fixture(root:root,store:store,audio:AudioController(store:store,embedder:LocalEmbedder(),settings:settings,startup:environment,recognizer:recognizer),capture:capture)
     }
@@ -38,6 +38,38 @@ private struct OwnedAudioBackend:NativeSpeechBackend {
     }
     private func cleanup(_ f:Fixture) async throws {f.audio.stop();try await wait {!f.audio.hasActiveWork};try f.store.close();try FileManager.default.removeItem(at:f.root)}
     private func wavFiles(_ root:URL)->[URL] {(FileManager.default.enumerator(at:root,includingPropertiesForKeys:nil)?.allObjects as? [URL] ?? []).filter {$0.pathExtension=="wav"}}
+    private func feed(_ sink:AudioAccumulator,count:Int) {
+        var left=count
+        while left>0 {let size=min(left,AudioAccumulator.maximumCallbackSamples);sink.add(Array(repeating:Float(0.05),count:size));left-=size}
+    }
+    func testIngressFailureStopsItsResourceAndLateOldSinkCannotStopRestart() async throws {
+        let f=try fixture();await f.audio.start();let old=try XCTUnwrap(f.capture.sink)
+        old.fail("Owned stream interrupted · start to retry")
+        try await wait {!f.audio.running && !f.capture.active}
+        XCTAssertEqual(f.audio.status,"Owned stream interrupted · start to retry")
+        await f.audio.start();XCTAssertTrue(f.audio.running)
+        let fresh=try XCTUnwrap(f.capture.sink);XCTAssertFalse(old === fresh)
+        old.fail("Late old error");feed(old,count:480000)
+        XCTAssertTrue(f.audio.running);XCTAssertTrue(f.capture.active);XCTAssertEqual(old.snapshot.partialSamples,0)
+        fresh.fail("New format changed")
+        try await wait {!f.audio.running && !f.capture.active};XCTAssertEqual(f.audio.status,"New format changed");try await cleanup(f)
+    }
+    func testExplicitFinishTransfersActualIngressPendingSegmentBeforeClearingSink() async throws {
+        let f=try fixture();await f.audio.start();let sink=try XCTUnwrap(f.capture.sink)
+        feed(sink,count:480000+16000)
+        XCTAssertEqual(sink.snapshot.waitingSegments,1);XCTAssertEqual(sink.snapshot.partialSamples,16000)
+        f.audio.finish();try await wait {!f.audio.hasActiveWork}
+        XCTAssertEqual(try f.store.stats(includeDiskUsage:false).count,2)
+        XCTAssertTrue(sink.finish().isEmpty);try await cleanup(f)
+    }
+    func testIngressOverloadReportsDroppedDurationAndNewRunClearsHealth() async throws {
+        let f=try fixture();await f.audio.start();let sink=try XCTUnwrap(f.capture.sink)
+        feed(sink,count:480000*6)
+        XCTAssertEqual(sink.snapshot.waitingSegments,3);XCTAssertEqual(sink.snapshot.droppedSamples,480000*3)
+        f.audio.finish();try await wait {!f.audio.hasActiveWork && !sink.snapshot.deliveryScheduled}
+        XCTAssertTrue(f.audio.ingressStatus.contains("90.0 s dropped"));XCTAssertEqual(try f.store.stats(includeDiskUsage:false).count,3)
+        await f.audio.start();XCTAssertEqual(f.audio.ingressStatus,"");try await cleanup(f)
+    }
     func testSuspendedStartupKeepsMainActorResponsiveAndStopPreventsHardware() async throws {
         let gate=AudioContextGate(),f=try fixture(context:{await gate.read()})
         let task=Task {await f.audio.start()};await fulfillment(of:[gate.entered],timeout:5)

@@ -24,8 +24,9 @@ public struct PrivacyPolicy: Codable, Equatable, Sendable {
               components.path.isEmpty,components.query==nil,components.fragment==nil,let host=components.url?.host else {return nil}
         let key=hostKey(host);return key.isEmpty ? nil:key
     }
+    func excludesApplication(_ app:String)->Bool {excludedApps.contains {app.caseInsensitiveCompare($0) == .orderedSame}}
     public func exclusion(app: String, title: String, url: String?, isBrowser: Bool = false) -> String? {
-        if excludedApps.contains(where: { app.caseInsensitiveCompare($0) == .orderedSame }) { return "Excluded application" }
+        if excludesApplication(app) { return "Excluded application" }
         if excludedTitles.contains(where: { !$0.isEmpty && title.localizedCaseInsensitiveContains($0) }) { return "Excluded window" }
         let parsed=url.flatMap {URL(string:$0)},host=parsed?.host.map(Self.hostKey)
         let webContext=["http","https"].contains(parsed?.scheme?.lowercased() ?? "") && !(host ?? "").isEmpty

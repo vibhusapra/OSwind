@@ -153,6 +153,7 @@ struct SettingsView: View {
                 Toggle("System audio",isOn:$m.settings.systemAudioEnabled)
                 Toggle("Retain audio clips for playback",isOn:$m.settings.retainAudio)
                 HStack { Button(m.audio.running ? "Stop audio" : "Start audio") { Task {await m.toggleAudio()} }; Text(m.audio.status).font(.caption).foregroundStyle(.secondary) }
+                if !m.audio.ingressStatus.isEmpty {Text(m.audio.ingressStatus).font(.caption).foregroundStyle(.orange)}
                 Text("Live audio is transcribed in 30-second segments. Pause discards pending capture. Clip retention applies to recordings and imports; detected secrets suppress the raw clip. Stop before private conversations.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Import a recording") {

@@ -101,7 +101,6 @@ import AVFoundation
         audio.stop(); new.resolve(); await second.value; XCTAssertEqual(acquired,0)
     }
     private final class FakeCapture: AudioSystemCapture {
-        var streamID:ObjectIdentifier? { nil }
         var active=false, starts=0, stops=0
         var gate:Gate?
         init(gate:Gate?=nil) { self.gate=gate }
