@@ -45,6 +45,8 @@ public struct HistoryErasurePreview: Codable, Sendable {
     public let scope:HistoryErasureScope
     public let token:String
     public let sources,conversationTurns,mediaReferences:Int
+    public let matchedSources:Int
+    public var linkedRecaps:Int {sources-matchedSources}
     public let samples:[HistoryErasureSample]
 }
 public struct HistoryErasureResult: Codable, Sendable {
@@ -67,7 +69,7 @@ enum HistoryErasureSchema {
 }
 extension RoutineDatabase {
     func eraseCount(_ sql:String) throws -> Int {let row=try statement(sql);defer {sqlite3_finalize(row)};guard sqlite3_step(row)==SQLITE_ROW else {throw error()};return Int(sqlite3_column_int64(row,0))}
-    func prepareErasure(_ scope:HistoryErasureScope) throws {
+    func prepareErasure(_ scope:HistoryErasureScope) throws -> Int {
         try execute("CREATE TEMP TABLE IF NOT EXISTS erasure_ids(id TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.erasure_ids;")
         var predicates=["1=1"],values=[String]()
         if scope.start != nil {predicates.append("(timestamp>=? OR json_extract(CAST(payload AS TEXT),'$.endTimestamp')+978307200>?)")}
@@ -88,6 +90,9 @@ extension RoutineDatabase {
             status=sqlite3_step(row)
         }
         guard status==SQLITE_DONE else {throw error()}
+        let matched=try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids")
+        try execute("INSERT OR IGNORE INTO temp.erasure_ids WITH RECURSIVE linked(id) AS (SELECT id FROM temp.erasure_ids UNION SELECT r.recap_id FROM recap_sources r JOIN linked l ON r.source_id=l.id) SELECT id FROM linked")
+        return matched
     }
     static let affectedTurns="SELECT DISTINCT s.turn_id FROM chat_sources s JOIN temp.erasure_ids e ON e.id=s.memory_id"
     static let selectedAssets="""
@@ -95,17 +100,17 @@ extension RoutineDatabase {
     UNION SELECT json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories m JOIN temp.erasure_ids e ON e.id=m.id
     UNION SELECT json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories m JOIN temp.erasure_ids e ON e.id=m.id
     """
-    func erasurePreview(_ scope:HistoryErasureScope) throws -> HistoryErasurePreview {
+    func erasurePreview(_ scope:HistoryErasureScope,matched:Int) throws -> HistoryErasurePreview {
         var hash=SHA256();let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys];hash.update(data:try encoder.encode(scope))
         // Any source mutation invalidates a preview. Dependency IDs also catch new cited answers.
-        for sql in ["SELECT value FROM store_metadata WHERE key='identity'","SELECT hex(revision) FROM search_scope_revision WHERE singleton=1","\(Self.affectedTurns) ORDER BY s.turn_id"] {
+        for sql in ["SELECT value FROM store_metadata WHERE key='identity'","SELECT hex(revision) FROM search_scope_revision WHERE singleton=1","SELECT id FROM temp.erasure_ids ORDER BY id","\(Self.affectedTurns) ORDER BY s.turn_id"] {
             let row=try statement(sql);defer {sqlite3_finalize(row)};var status=sqlite3_step(row)
             while status==SQLITE_ROW {hash.update(data:Data((text(row,0)+"\n").utf8));status=sqlite3_step(row)}
             guard status==SQLITE_DONE else {throw error()}
         }
         var samples=[HistoryErasureSample]();let row=try statement("SELECT m.id,m.app,m.title,m.timestamp FROM memories m JOIN temp.erasure_ids e ON e.id=m.id ORDER BY m.timestamp DESC,m.id LIMIT 5");defer {sqlite3_finalize(row)}
         var status=sqlite3_step(row);while status==SQLITE_ROW {samples.append(.init(id:text(row,0),app:text(row,1),title:String(text(row,2).prefix(300)),timestamp:Date(timeIntervalSince1970:sqlite3_column_double(row,3))));status=sqlite3_step(row)};guard status==SQLITE_DONE else {throw error()}
-        return HistoryErasurePreview(scope:scope,token:hash.finalize().map {String(format:"%02x",$0)}.joined(),sources:try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids"),conversationTurns:try eraseCount("SELECT COUNT(*) FROM (\(Self.affectedTurns))"),mediaReferences:try eraseCount("SELECT COUNT(*) FROM (\(Self.selectedAssets)) WHERE path IS NOT NULL"),samples:samples)
+        return HistoryErasurePreview(scope:scope,token:hash.finalize().map {String(format:"%02x",$0)}.joined(),sources:try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids"),conversationTurns:try eraseCount("SELECT COUNT(*) FROM (\(Self.affectedTurns))"),mediaReferences:try eraseCount("SELECT COUNT(*) FROM (\(Self.selectedAssets)) WHERE path IS NOT NULL"),matchedSources:matched,samples:samples)
     }
 }
 func erasureCancellable<T>(_ db:RoutineDatabase,_ body:() throws -> T) throws -> T {
@@ -120,7 +125,7 @@ extension MemoryStore {
         return try withRoutineDatabase {db in
             try db.execute("CREATE TEMP TABLE IF NOT EXISTS erasure_ids(id TEXT PRIMARY KEY) WITHOUT ROWID; SAVEPOINT erasure_preview")
             defer {try? db.execute("DELETE FROM temp.erasure_ids");try? db.execute("RELEASE erasure_preview")}
-            do {return try erasureCancellable(db) {try db.prepareErasure(scope);let preview=try db.erasurePreview(scope);try Task.checkCancellation();return preview}}
+            do {return try erasureCancellable(db) {let matched=try db.prepareErasure(scope);let preview=try db.erasurePreview(scope,matched:matched);try Task.checkCancellation();return preview}}
             catch {try? db.execute("ROLLBACK TO erasure_preview");throw error}
         }
     }
@@ -131,7 +136,7 @@ extension MemoryStore {
         return try withRoutineDatabase {db in
             defer {try? db.execute("DELETE FROM temp.erasure_ids")}
             let preview=try erasureCancellable(db) {try db.transaction {
-                try db.prepareErasure(scope);let preview=try db.erasurePreview(scope)
+                let matched=try db.prepareErasure(scope);let preview=try db.erasurePreview(scope,matched:matched)
                 guard preview.token==expectedToken else {throw OSwindError.invalid("History changed after preview. Pause capture and preview again before erasing.")}
                 try db.execute("DELETE FROM memories WHERE id IN (SELECT id FROM temp.erasure_ids)")
                 // Existing source triggers remove entire cited turns, labels, previews, passages and vectors.
@@ -206,6 +211,7 @@ extension MemoryStore {
         cancelSearchIndexBuild();releaseSearchIndex()
         var cacheRemoved=true
         do {let cache=root.appendingPathComponent("indexes");if FileManager.default.fileExists(atPath:cache.path) {try FileManager.default.removeItem(at:cache)}} catch {cacheRemoved=false;warnings.append("Disposable search files could not be removed. They are invalidated; retry cleanup to remove the files.")}
+        if cacheRemoved {try? db.execute("DELETE FROM store_metadata WHERE key='recap_cache_dirty'")}
         // Best effort: concurrent readers may keep WAL pages. This is logical deletion, not secure wiping.
         try? db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         let pending=(try? db.eraseCount("SELECT COUNT(*) FROM erasure_assets")) ?? -1

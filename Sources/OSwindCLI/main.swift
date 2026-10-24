@@ -54,6 +54,7 @@ do {
           chat list|new|show ID|delete ID  Manage saved local conversations
           chat ask ID [--provider NAME] QUESTION  Recheck sources for a follow-up
           chat export ID PATH            Export a conversation to Markdown
+          chat save-recap ID --turn TURN [--title TEXT]  Save source-linked recap
           routine template|put FILE|list|history [ID]  Configure scheduled source-linked recaps
           routine run ID|tick [--at ISO8601]           Run once or process one due occurrence
           routine scheduler on|off|preview ID|delete ID
@@ -293,6 +294,10 @@ do {
                     guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }
                     let url = URL(fileURLWithPath:path); try ConversationContext.markdown(session,turns:store.chatTurns(id,limit:1000)).write(to:url,atomically:true,encoding:.utf8)
                     try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path); print("Exported conversation")
+                } else if action == "save-recap" {
+                    let turn=try validatedOption("--turn"),title=try validatedOption("--title") ?? "Saved recap"
+                    guard let turn,args.isEmpty else {throw OSwindError.invalid("Use chat save-recap SESSION --turn TURN [--title TEXT]")}
+                    try encoded(store.saveChatRecap(sessionID:id,turnID:turn,title:title,policy:AppSettings.load(root:root).privacy,embedder:embedder))
                 } else if action == "ask" {
                     let settings = AppSettings.load(root:root); var configuration = settings.ai
                     if let value = try validatedOption("--provider") { guard let provider = AIProvider(rawValue:value) else { throw OSwindError.invalid("Unknown AI provider") }; configuration.provider = provider }
@@ -303,7 +308,7 @@ do {
                     let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history,interpretQuery:!literalQuery)
                     try Task.checkCancellation()
                     try encoded(store.appendChatTurn(sessionID:id,question:question,answer:answer,filter:filter,policy:settings.privacy))
-                } else { throw OSwindError.invalid("Use chat list, new, show, ask, export or delete") }
+                } else { throw OSwindError.invalid("Use chat list, new, show, ask, save-recap, export or delete") }
             }
         case "models":
             let action = args.first ?? "list"; if !args.isEmpty { args.removeFirst() }; let endpoint = option("--endpoint") ?? AppSettings.load(root:root).search.endpoint
@@ -348,7 +353,10 @@ do {
             catch { FileHandle.standardError.write(Data(("Note saved; additional semantic indexing pending. " + error.localizedDescription + "\n").utf8)) }
             print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
-        case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
+        case "import":
+            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import PATH [--json]")}
+            let report=try store.importJSONDetailed(from:URL(fileURLWithPath:args[0]),embedder:embedder,policy:AppSettings.load(root:root).privacy)
+            if json {try encoded(report)} else {print(report.imported);if report.excluded>0 || report.skippedLinkedRecaps>0 {FileHandle.standardError.write(Data("Import omitted \(report.excluded) excluded records and \(report.skippedLinkedRecaps) linked recaps with excluded, redacted or stale originals.\n".utf8))}}
         case "capture-replay":
             let bundle=try validatedOption("--app-bundle"),duration=try validatedOption("--seconds")
             guard let duration,let seconds=Double(duration),args.isEmpty else {throw OSwindError.invalid("Use capture-replay --seconds 1..120 [--app-bundle ID]")}

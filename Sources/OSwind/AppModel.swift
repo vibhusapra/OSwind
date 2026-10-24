@@ -52,6 +52,13 @@ import UniformTypeIdentifiers
     @Published var refreshing = false
     @Published private(set) var deletingID:String?
     @Published var deletionStatus:String?
+    @Published private(set) var savingRecap=false
+    @Published var recapSaveStatus:String?
+    @Published private(set) var importingJSON=false
+    @Published private(set) var importStatus=""
+    private var jsonImportTask:Task<Void,Never>?
+    private var recapSaveTask:Task<Void,Never>?
+    private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
     @Published private(set) var maintenanceStatus=""
     @Published var searchWarnings = [String]()
@@ -114,6 +121,7 @@ import UniformTypeIdentifiers
     }
     func startConfiguredServices() {if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
     func prepareForLibrarySwitch() {
+        libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil
     }
     var filter: SearchFilter { filter(at:Date()) }
@@ -137,11 +145,23 @@ import UniformTypeIdentifiers
     func cancelOpeningMemory() {
         detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
     }
-    func openMemory(_ memory: Memory, query: String, passage: PassageRange? = nil) {
-        cancelOpeningMemory();let generation=detailGeneration,store=self.store
-        openingMemoryID=memory.id
+    func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil) {
+        let store=self.store
+        openSource(id:memory.id,query:query,passage:passage) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage)])[0].memory}
+    }
+    func openRecapSource(_ card:RecapSourceCard) {
+        let store=self.store
+        openSource(id:card.id,query:"",passage:card.passage) {
+            guard let current=try store.get(card.id),current.evidenceHash==card.revision else {throw OSwindError.unavailable("This original changed or was removed. Open the current history instead.")}
+            if let passage=card.passage,passage.text(in:current.text)==nil {throw OSwindError.invalid("The saved source anchor is no longer available")}
+            return current
+        }
+    }
+    private func openSource(id:String,query:String,passage:PassageRange?,load:@escaping @Sendable () throws -> Memory) {
+        cancelOpeningMemory();let generation=detailGeneration
+        openingMemoryID=id
         detailTask=Task { [weak self] in
-            let worker=Task.detached(priority:.userInitiated) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage)])[0].memory}
+            let worker=Task.detached(priority:.userInitiated) {try load()}
             do {
                 let full=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
                 guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
@@ -233,7 +253,23 @@ import UniformTypeIdentifiers
         guard let id = currentChatID else { return }
         do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK, let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
     }
-    func saveAnswer() { guard let answer else { return }; addNote(answer.text, title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",kind:.summary) }
+    func saveAnswer(_ value:Answer?=nil) {
+        guard !savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
+        savingRecap=true;recapSaveStatus="Saving a source-linked recap…"
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        let worker=Task.detached(priority:.utility) {try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)}
+        recapSaveTask=Task {
+            defer {savingRecap=false;recapSaveTask=nil}
+            do {
+                let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
+                guard libraryOperationGeneration==generation else {return}
+                recapSaveStatus="Saved to Recaps with \(result.sources.count) original \(result.sources.count==1 ? "source":"sources").";captured(memory)
+            } catch {
+                guard libraryOperationGeneration==generation else {return}
+                recapSaveStatus="Recap was not saved.";errorMessage=error.localizedDescription
+            }
+        }
+    }
     func addNote(_ text: String, title: String = "Quick note", kind: MemoryKind = .note) {
         let clean = settings.privacy.sanitize(text).text; let embedder = self.embedder, store = self.store
         Task { do { let memory = try await Task.detached(priority:.utility) { var m = Memory(kind:kind,app:"OSwind",title:title,text:clean); m.embedding = embedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder.modelID; try store.insert(m); return m }.value; captured(memory) } catch { errorMessage = error.localizedDescription } }
@@ -433,7 +469,27 @@ import UniformTypeIdentifiers
     }
     func cancelAudioImport() { audioImportTask?.cancel() }
     func exportData() { pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
-    func importData() { let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { let store = store, embedder = embedder, policy = settings.privacy; Task { do { _ = try await Task.detached(priority:.utility) { try store.importJSON(from:url,embedder:embedder,policy:policy) }.value; invalidateStorageEstimate(); refresh(forceStatistics:true); await catchUpIndex() } catch { errorMessage = error.localizedDescription } } } }
+    func importData() {
+        guard !importingJSON else {return};let panel=NSOpenPanel();panel.allowedContentTypes=[.json]
+        if panel.runModal() == .OK,let url=panel.url {importJSONFile(url)}
+    }
+    func cancelJSONImport() {jsonImportTask?.cancel()}
+    func importJSONFile(_ url:URL) {
+        guard !importingJSON else {return};importingJSON=true;importStatus="Importing sources and checking recap links…"
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        let worker=Task.detached(priority:.utility) {try store.importJSONDetailed(from:url,embedder:embedder,policy:policy)}
+        jsonImportTask=Task {
+            defer {importingJSON=false;jsonImportTask=nil}
+            do {
+                let result=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
+                guard libraryOperationGeneration==generation else {return}
+                importStatus="Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
+                selected=nil;invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
+            } catch is CancellationError {guard libraryOperationGeneration==generation else {return};importStatus="Import cancelled before publication."}
+            catch {guard libraryOperationGeneration==generation else {return};importStatus="Import did not complete: "+error.localizedDescription;errorMessage=error.localizedDescription}
+        }
+    }
+
     func startAPI() { do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }
     func stopAPI() { api?.stop(); api = nil; apiStatus = "API off"; settings.apiEnabled = false }
     func login(_ enabled: Bool) { do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { errorMessage = error.localizedDescription } }

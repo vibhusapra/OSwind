@@ -75,7 +75,7 @@ private final class RestoreRows {
                   (try self.integer(row,7)) == (memory.favorite ? 1 : 0), memory.embeddingModel == (try self.optionalText(row,10)) else { throw BackupFileError.invalid("Source payload and database metadata differ") }
             memory.imagePath = try self.mappedPath(memory.imagePath); memory.audioPath = try self.mappedPath(memory.audioPath);memory.videoPath=try self.mappedPath(memory.videoPath)
             memory.embedding = sqlite3_column_type(row,9)==SQLITE_NULL ? nil : try self.vector(row,9)
-            try self.hashes.record(memory); try self.destination.insert(memory)
+            try self.hashes.record(memory); try self.destination.insertRestoringRecap(memory)
             count = try BackupMath.add(count,1); if count%64==0 { try progress(count) }
         }
     }
@@ -95,6 +95,7 @@ private final class RestoreRows {
     }
     func restore(into handle: OpaquePointer, progress: (LibraryBackupProgress) throws -> Void) throws {
         _ = try memories { try progress(LibraryBackupProgress(phase:"Restoring sources",completedItems:$0,unit:"records")) }
+        try destination.rebuildRecapLinks()
         _ = try copy("semantic_vectors",columns:["memory_id","model","dimension","vector","content_hash"],into:handle,validate:{ row in
             let id = try self.source.db.text(row,0), hash = try self.source.db.text(row,4), dimension = try self.integer(row,2)
             guard (1...8192).contains(dimension), hash == (try self.hashes.hash(id)) else { throw BackupFileError.invalid("Restored vector source hash differs") }

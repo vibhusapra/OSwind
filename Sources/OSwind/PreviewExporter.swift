@@ -12,7 +12,12 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "CleanupResult" {
+        if model.section == "LinkedRecapDetail" {
+            let source=Memory(id:"recap-preview-source",app:"Notes",title:"Release decision · sample",text:"Maya owns the release. The deadline is Friday.")
+            try model.store.insert(source)
+            let recap=try model.store.saveRecap(Answer(text:"Maya owns the release, due Friday [1].",sources:[SearchHit(memory:source,score:1,match:"fixture")],provider:"evidence",duration:0),title:"Release recap · sample")
+            size=NSSize(width:850,height:760);content=AnyView(MemoryDetail(memory:recap,query:"").environmentObject(model))
+        } else if model.section == "CleanupResult" {
             try model.store.insert(Memory(id:"synthetic-retention-preview",timestamp:Date(timeIntervalSince1970:100),text:"Owned old source for cleanup rendering"))
             model.maintain()
             while model.maintenanceBusy {try await Task.sleep(nanoseconds:10_000_000)}

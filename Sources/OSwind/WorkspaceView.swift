@@ -27,6 +27,9 @@ struct WorkspaceView: View {
             }.frame(width:230).frame(maxHeight:.infinity).background(Color(nsColor:.controlBackgroundColor))
             Divider()
             VStack(spacing:0) {
+                if let status=m.recapSaveStatus {
+                    HStack {if m.savingRecap {ProgressView().controlSize(.small)};Text(status).font(.caption);Spacer();if !m.savingRecap {Button {m.recapSaveStatus=nil} label: {Image(systemName:"xmark")}.accessibilityLabel("Dismiss recap status")}}.padding(10).background(accent.opacity(0.06))
+                }
                 if let status=m.deletionStatus {
                     HStack {if m.deletingID != nil {ProgressView().controlSize(.small)};Text(status).font(.caption);Spacer();if m.deletingID==nil {Button {m.deletionStatus=nil} label: {Image(systemName:"xmark")}.accessibilityLabel("Dismiss deletion status")}}.padding(10).background(accent.opacity(0.06))
                 }
@@ -102,7 +105,7 @@ struct MemoryCard: View {
                 ZStack(alignment:.topLeading) {
                     if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
                     else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
-                    Text(memory.visualRecording == nil ? memory.kind.rawValue.uppercased():"REPLAY").font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
+                    Text(memory.recap != nil ? "LINKED RECAP":memory.visualRecording == nil ? memory.kind.rawValue.uppercased():"REPLAY").font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
@@ -133,6 +136,7 @@ struct MemoryDetail: View {
         VStack(alignment:.leading,spacing:18) {
             HStack { VStack(alignment:.leading,spacing:4) { Text(memory.title).font(.title2.weight(.semibold)); Text("\(memory.app) · \(memory.timestamp.formatted())").font(.caption).foregroundStyle(.secondary) }; Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
             ScrollView {
+                if memory.kind == .summary {RecapEvidenceView(memory:memory)}
                 if !query.isEmpty && memory.visualRecording == nil {
                     VStack(alignment:.leading,spacing:8) {
                         Text("SEARCH EXCERPT").font(.system(size:10,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
@@ -222,7 +226,7 @@ struct AnswerCard: View {
         VStack(alignment:.leading,spacing:16) {
             ForEach(answer.warnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             Text(answer.text).textSelection(.enabled).font(.system(size:15)).lineSpacing(5).frame(maxWidth:.infinity,alignment:.leading)
-            HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save recap") { m.addNote(answer.text,title:"Saved answer",kind:.summary) }; Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
+            HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save linked recap") {m.saveAnswer(answer)}.disabled(m.savingRecap || answer.sources.isEmpty); Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
             if !answer.sources.isEmpty {
                 DisclosureGroup("Check \(answer.sources.count) sources") {
                     ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in

@@ -51,6 +51,7 @@ final class BackupDataReader {
         guard (6...MemoryStore.schemaVersion).contains(schema) else { throw BackupFileError.invalid("Unsupported backup database schema") }
         for name in ["memories","chat_sessions","chat_turns","chat_sources","semantic_vectors","semantic_passages","passage_manifests"] { try db.requireTable(name) }
         if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
+        if schema>=15 {try db.requireTable("recap_sources")}
         guard try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED WHERE length(payload)>\(MemoryStore.maximumRecordBytes)")==0 else { throw BackupFileError.invalid("A source payload exceeds the backup format's 128 MiB record bound") }
     }
     func close() { db.close() }

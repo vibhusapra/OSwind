@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 14
+    public static let schemaVersion = 15
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -89,6 +89,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version >= 4 && version < 6 { try exec(VectorJournalSchema.migrateV5) }
         try exec(RoutineSchema.sql)
         try exec(HistoryErasureSchema.sql)
+        try exec(RecapSchema.sql)
         try exec(VectorJournalSchema.sql)
         try exec(PassageSchema.sql)
         try exec(VectorStatisticsSchema.sql)
@@ -114,9 +115,11 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
+        if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
+        _ = finishRecapInvalidation()
     }
     deinit { annCache.cancel(); sqlite3_close(db) }
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
@@ -133,7 +136,9 @@ public final class MemoryStore: @unchecked Sendable {
         guard let bytes = sqlite3_column_blob(stmt, column) else { throw OSwindError.database("Missing payload") }
         return try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
     }
-    public func insert(_ memory: Memory) throws {
+    public func insert(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:false)}
+    func insertRestoringRecap(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:true)}
+    private func insertValidated(_ memory:Memory,deferRecapLinks:Bool) throws {
         lock.lock(); defer { lock.unlock() }
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
@@ -147,6 +152,7 @@ public final class MemoryStore: @unchecked Sendable {
         let ownsTransaction=sqlite3_get_autocommit(db) != 0
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
+        try validateRecapInsertion(memory,deferred:deferRecapLinks)
         if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
@@ -158,8 +164,9 @@ public final class MemoryStore: @unchecked Sendable {
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
-        try replaceSpeakerProjection(memory);try replaceSearchPreview(memory)
-        try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
+        try replaceSpeakerProjection(memory);try replaceSearchPreview(memory);try replaceRecapLinks(memory,deferred:deferRecapLinks)
+        try Task.checkCancellation();try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
+        if ownsTransaction {_ = finishRecapInvalidation()}
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
     }
     private func replaceSearchPreview(_ memory:Memory) throws {
@@ -210,6 +217,7 @@ public final class MemoryStore: @unchecked Sendable {
         }
     }
     private func invalidateAudioEvidence(_ id:String) throws {
+        try invalidateRecapDependents(id)
         let title=try prepare("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT t.session_id FROM chat_turns t JOIN chat_sources s ON s.turn_id=t.id WHERE s.memory_id=?)"); defer { sqlite3_finalize(title) }; bind(title,1,id)
         guard sqlite3_step(title)==SQLITE_DONE else { throw failure() }
         let turns=try prepare("DELETE FROM chat_turns WHERE id IN (SELECT turn_id FROM chat_sources WHERE memory_id=?)"); defer { sqlite3_finalize(turns) }; bind(turns,1,id)
@@ -475,7 +483,7 @@ public final class MemoryStore: @unchecked Sendable {
             guard label==speaker || !transcript.segments.contains(where:{$0.speaker != speaker && $0.speaker.map(SpeakerLabel.key)==SpeakerLabel.key(label)}) else { throw OSwindError.invalid("Another speaker in this recording already has that name") }
             for index in transcript.segments.indices where transcript.segments[index].speaker==speaker { transcript.segments[index].speaker=label }
             if label != speaker { try invalidateAudioEvidence(id) }
-            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT"); return memory
+            memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT");_ = finishRecapInvalidation(); return memory
         } catch { try? exec("ROLLBACK"); throw error }
     }
     private func updateMetadata(_ m: Memory) throws {
@@ -518,16 +526,46 @@ public final class MemoryStore: @unchecked Sendable {
     public func exportJSON(to url: URL) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories ORDER BY timestamp"); defer { sqlite3_finalize(stmt) }; var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted,.sortedKeys]; encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; try encoder.encode(memories).write(to: url, options: .atomic)
     }
-    @discardableResult public func importJSON(from url: URL, embedder: LocalEmbedder? = nil, policy: PrivacyPolicy = PrivacyPolicy()) throws -> Int {
-        let data = try Data(contentsOf: url); guard data.count <= 100_000_000 else { throw OSwindError.invalid("Import exceeds 100 MB") }; let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .custom { decoder in try ISOTime.decode(from:decoder) }
-        let memories: [Memory]
-        do { memories = try decoder.decode([Memory].self, from: data) } catch { memories = try JSONDecoder().decode([Memory].self, from: data) }
-        lock.lock(); defer { lock.unlock() }; try exec("BEGIN IMMEDIATE"); do {
-            var count = 0
-            for var m in memories { if policy.exclusion(app: m.bundleID, title: m.title, url: m.url) != nil { continue }; if let visual=m.visualRecording {guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")};let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text} else if let transcript=m.transcript { guard m.text==transcript.text else { throw OSwindError.invalid("Transcript and source text differ") }; let clean=try transcript.sanitized(policy:policy).transcript; m.transcript=clean; m.text=clean.text } else { m.text=policy.sanitize(m.text).text }; m.title = policy.sanitize(m.title).text; m.url = m.url.map { policy.sanitize($0).text }; m.imagePath = nil; m.audioPath = nil; m.videoPath=nil; m.regions = []; m.embedding = embedder?.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : embedder?.modelID; try insert(m); if let embedder { try indexApplePassages(m,embedder:embedder) }; count += 1 }
-            try exec("COMMIT"); return count
-        } catch { try? exec("ROLLBACK"); throw error }
+    @discardableResult public func importJSON(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Int {try importJSONDetailed(from:url,embedder:embedder,policy:policy).imported}
+    public func importJSONDetailed(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> JSONImportResult {
+        try Task.checkCancellation()
+        let data=try Data(contentsOf:url);guard data.count<=100_000_000 else {throw OSwindError.invalid("Import exceeds 100 MB")}
+        let decoder=JSONDecoder();decoder.dateDecodingStrategy = .custom {try ISOTime.decode(from:$0)}
+        let memories:[Memory]
+        do {memories=try decoder.decode([Memory].self,from:data)} catch {memories=try JSONDecoder().decode([Memory].self,from:data)}
+        let ordered=try RecapImport.ordered(memories),inputIDs=Set(memories.map(\.id))
+        lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
+        do {
+            var report=JSONImportResult(),blocked=Set<String>()
+            for var m in ordered {
+                try Task.checkCancellation()
+                if policy.exclusion(app:m.bundleID,title:m.title,url:m.url) != nil {blocked.insert(m.id);report.excluded+=1;continue}
+                if let recap=m.recap {
+                    var omit=false
+                    for reference in recap.sources {
+                        if blocked.contains(reference.id) {omit=true;break}
+                        guard let current=try get(reference.id) else {throw OSwindError.invalid("Linked recap import is missing a source. Import the complete JSON library or restore a full backup.")}
+                        if !inputIDs.contains(reference.id),policy.exclusion(app:current.bundleID,title:current.title,url:current.url) != nil {omit=true;break}
+                        if current.evidenceHash != reference.revision {omit=true;break}
+                    }
+                    if omit {blocked.insert(m.id);report.skippedLinkedRecaps+=1;continue}
+                }
+                if let visual=m.visualRecording {
+                    guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}
+                    let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text
+                } else if let transcript=m.transcript {
+                    guard m.text==transcript.text else {throw OSwindError.invalid("Transcript and source text differ")}
+                    let clean=try transcript.sanitized(policy:policy).transcript;m.transcript=clean;m.text=clean.text
+                } else {m.text=policy.sanitize(m.text).text}
+                if var recap=m.recap {recap.provider=policy.sanitize(recap.provider).text;m.recap=recap}
+                m.title=policy.sanitize(m.title).text;m.url=m.url.map {policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
+                m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
+                try insert(m);if let embedder {try indexApplePassages(m,embedder:embedder)};report.imported+=1
+            }
+            try Task.checkCancellation();try exec("COMMIT");_ = finishRecapInvalidation();return report
+        } catch {try? exec("ROLLBACK");throw error}
     }
+
 }
 
 extension MemoryStore {
@@ -606,9 +644,11 @@ extension MemoryStore {
             return ChatTurn(id:id,sessionID:sessionID,timestamp:timestamp,question:payload.question,answer:cleanAnswer,filter:scope,timeZone:payload.timeZone)
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO chat_append; RELEASE chat_append"); throw error }
     }
-    public func chatTurns(_ sessionID: String, limit: Int = 100) throws -> [ChatTurn] {
+    public func chatTurns(_ sessionID:String,limit:Int=100,turnID:String?=nil) throws -> [ChatTurn] {
         lock.lock(); defer { lock.unlock() }
-        let stmt = try prepare("SELECT id,timestamp,payload FROM chat_turns WHERE session_id=? ORDER BY timestamp DESC,id DESC LIMIT ?"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,sessionID); sqlite3_bind_int(stmt,2,Int32(min(1000,max(1,limit))))
+        let selector=turnID==nil ? "":" AND id=?"
+        let stmt=try prepare("SELECT id,timestamp,payload FROM chat_turns WHERE session_id=?\(selector) ORDER BY timestamp DESC,id DESC LIMIT ?");defer {sqlite3_finalize(stmt)};bind(stmt,1,sessionID)
+        if let turnID {bind(stmt,2,turnID)};sqlite3_bind_int(stmt,turnID==nil ? 2:3,Int32(min(1000,max(1,limit))))
         var turns = [ChatTurn]()
         while sqlite3_step(stmt) == SQLITE_ROW {
             let id = string(stmt,0), date = Date(timeIntervalSince1970:sqlite3_column_double(stmt,1))
