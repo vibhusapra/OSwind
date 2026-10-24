@@ -12,7 +12,9 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "RoutineEditor" {
+        if model.section == "HistoryErasure" {
+            size=NSSize(width:720,height:760);content=AnyView(HistoryErasureView().environmentObject(model))
+        } else if model.section == "RoutineEditor" {
             var sample=RoutineDefinition();sample.ai=model.settings.ai
             size=NSSize(width:760,height:850);content=AnyView(RoutineEditor(value:sample,revision:nil,model:model.routines).environmentObject(model))
         } else if model.section == "Routines" {
