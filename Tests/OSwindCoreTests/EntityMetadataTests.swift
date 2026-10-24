@@ -1,4 +1,5 @@
 import XCTest
+import CSQLite
 @testable import OSwindCore
 
 final class EntityMetadataTests:XCTestCase {
@@ -57,6 +58,32 @@ final class EntityMetadataTests:XCTestCase {
         let next=try store.entityIndexPlan();try store.indexEntities(automatic.id,plan:next)
         try store.editEntity(project.id,name:"APOLLO LAUNCH",detail:"Case-only primary rename",aliases:["Brand New Alias"])
         XCTAssertNotEqual(try processor(),EntityExtractor.processor(next));XCTAssertEqual(try store.entitySources(project.id).map(\.id),[manual.id])
+    }
+    func testRestoredUncuratedProjectActivationInvalidatesBothEditAndCreate() throws {
+        // Data-only schema21 restore accepts an uncurated project definition.
+        // Its manual source keeps it alive while it is outside the rule plan.
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("UPDATE memory_entities SET curated=0 WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,project.id);try db.done(row)
+            let clear=try db.statement("DELETE FROM entity_mentions WHERE entity_id=? AND origin='automatic'");defer {sqlite3_finalize(clear)};db.bind(clear,1,project.id);try db.done(clear)
+        }
+        let parent=root.deletingLastPathComponent().appendingPathComponent("entity-activation-"+UUID().uuidString);try Paths.ensure(parent);defer {try? FileManager.default.removeItem(at:parent)}
+        let archive=parent.appendingPathComponent("archive.oswindbackup");_=try LibraryBackup.create(store:store,destination:archive)
+        for action in ["edit","create"] {
+            let destination=parent.appendingPathComponent("restored-"+action);_=try LibraryBackup.restore(archive,to:destination)
+            let copy=try MemoryStore(root:destination);defer {try? copy.close()}
+            XCTAssertEqual(try copy.entity(project.id)?.curated,false)
+            let before=try copy.entityIndexPlan();XCTAssertFalse(before.projects.contains {$0.id==project.id})
+            for id in [automatic.id,manual.id] {try copy.indexEntities(id,plan:before)}
+            XCTAssertEqual(try copy.entityIndexProgress(processor:EntityExtractor.processor(before)).indexed,2)
+            if action=="edit" {try copy.editEntity(project.id,name:project.name,detail:"Activate restored rule",aliases:project.aliases)}
+            else {_=try copy.createEntity(kind:.project,name:project.name,detail:"Activate restored rule")}
+            let after=try copy.entityIndexPlan();XCTAssertEqual(try copy.entity(project.id)?.curated,true)
+            XCTAssertNotEqual(after.revision,before.revision)
+            XCTAssertEqual(try copy.entityIndexProgress(processor:EntityExtractor.processor(after)).indexed,0)
+            XCTAssertThrowsError(try copy.saveEntityExtraction(memory:automatic,plan:before,result:EntityExtractor.extract(automatic.text,plan:before)))
+            for id in [automatic.id,manual.id] {try copy.indexEntities(id,plan:after)}
+            XCTAssertEqual(Set(try copy.entitySources(project.id).map(\.id)),[automatic.id,manual.id])
+        }
     }
     func testNewAliasViaExistingCreateInvalidatesButFailedCollisionDoesNot() throws {
         let old=try processor();_=try store.createEntity(kind:.project,name:"Other",aliases:["Taken"])

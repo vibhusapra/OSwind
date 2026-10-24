@@ -50,7 +50,24 @@ def qualify(label,binary,preserves):
  assert set(restoredProject['aliases'])=={'Apollo Launch','UNUSED-METADATA-RULE-42'}
  assert not json.loads((restored/'settings.json').read_text())['entityAutomaticIndex']
  assert cmd('entity','index',data=restored)['indexed']==a.sources and snapshot(restored)['anchorSHA256']==initial['anchorSHA256']
- return dict(label=label,binarySHA256=sha(binary),metadataPreserved=preserves,trials=trials,medianEditWallSeconds=statistics.median(v['editWallSeconds'] for v in trials),medianResumeWallSeconds=statistics.median(v['resumeWallSeconds'] for v in trials),medianTotalWallSeconds=statistics.median(v['totalWallSeconds'] for v in trials),checks=['source anchors unchanged after resume','manual link retained','rejected automatic source remains suppressed','real alias change invalidates completion/automatic links','quiet full backup preserves edited definitions and memberships','restored completion resets and resumed extraction retains correction'])
+ # Restores may contain an uncurated project. Completing a plan without it
+ # and subsequently curating it adds rules, even with identical aliases/name.
+ with contextlib.closing(sqlite3.connect(restored/'memory.sqlite')) as db:
+  db.execute('UPDATE memory_entities SET curated=0 WHERE id=?',(project['id'],))
+  db.execute("DELETE FROM entity_mentions WHERE entity_id=? AND origin='automatic'",(project['id'],));db.commit()
+ uncuratedArchive=library.parent/'uncurated.oswindbackup'
+ subprocess.run([str(binary),'--data',str(restored),'backup','create',str(uncuratedArchive)],capture_output=True,check=True,timeout=180)
+ for action in ['edit','create']:
+  data=library.parent/('uncurated-restored-'+action)
+  subprocess.run([str(binary),'backup','restore',str(uncuratedArchive),'--to',str(data)],capture_output=True,check=True,timeout=180)
+  assert not next(v for v in cmd('entity','list',data=data) if v['id']==project['id'])['curated']
+  assert cmd('entity','index',data=data)['indexed']==a.sources and snapshot(data)['automatic']==0
+  before=snapshot(data)
+  if action=='edit':cmd('entity','edit',project['id'],'--notes','Activate restored project',data=data)
+  else:cmd('entity','create','project','Apollo Launch','--notes','Activate restored project',data=data)
+  assert snapshot(data)['revision']!=before['revision'] and cmd('entity','progress',data=data)['indexed']==0
+  assert cmd('entity','index',data=data)['indexed']==a.sources and snapshot(data)['anchorSHA256']==initial['anchorSHA256']
+ return dict(label=label,binarySHA256=sha(binary),metadataPreserved=preserves,trials=trials,medianEditWallSeconds=statistics.median(v['editWallSeconds'] for v in trials),medianResumeWallSeconds=statistics.median(v['resumeWallSeconds'] for v in trials),medianTotalWallSeconds=statistics.median(v['totalWallSeconds'] for v in trials),checks=['source anchors unchanged after resume','manual link retained','rejected automatic source remains suppressed','real alias change invalidates completion/automatic links','quiet full backup preserves edited definitions and memberships','restored completion resets and resumed extraction retains correction','restored uncurated project activation by edit/create invalidates its completed plan'])
 if a.baseline_cli:results.append(qualify('baseline',a.baseline_cli,False))
 results.append(qualify('candidate',a.binary,True))
 report=dict(format='OSwind project metadata preservation observations v1',passed=True,sources=a.sources,repetitions=a.repetitions,syntheticInputSHA256=sha(inputFile),harnessSHA256=sha(pathlib.Path(__file__)),results=results,scope='Owned short synthetic sources and project metadata/alias/correction/backup contracts. Sequential CLI trials include startup, SQLite and extraction/resume with uncontrolled caches and host activity. Required rescan counts are exact for this fixture; no representative workload, energy or competitor claim.')
