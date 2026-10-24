@@ -160,5 +160,13 @@
     "Unlocked native interaction and rapid context changes",
     "Physical active-capture latency, slow-disk responsiveness and energy",
     "Broader hardware/OS and competitor benchmarks"
-  ]
+  ],
+  "testOnlyCIFollowup": {
+    "initialRun": 40105119203,
+    "initialFailure": "Whisper cancellation fixture observed an existing but not-yet-populated PID file",
+    "fix": "Atomic readiness rename and positive parsed-PID observation before cancellation; existing five-second bound retained",
+    "localWorkspaceCasesPassed": 15,
+    "productSourceAndBuildInputsUnchangedFromCodeCommit": true,
+    "signedAndTSanEvidencePrecedesTestOnlyFollowup": true
+  }
 }

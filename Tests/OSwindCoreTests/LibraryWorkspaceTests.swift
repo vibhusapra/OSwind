@@ -131,18 +131,25 @@ final class LibraryWorkspaceTests:XCTestCase {
         let binary=root.appendingPathComponent("whisper-fixture"),model=root.appendingPathComponent("model"),pidfile=root.appendingPathComponent("owned.pid")
         let script="""
         #!/bin/sh
-        printf '%s' "$$" > '\(pidfile.path)'
         trap '' TERM
+        printf '%s' "$$" > '\(pidfile.path).ready'
+        /bin/mv '\(pidfile.path).ready' '\(pidfile.path)'
         exec /bin/sleep 30
         """
         try Data(script.utf8).write(to:binary);try FileManager.default.setAttributes([.posixPermissions:0o700],ofItemAtPath:binary.path);try Data([1]).write(to:model)
         let file=root.appendingPathComponent("unused.wav"),parent=workspace.url
         let worker=Task {try await Whisper.detailed(file:file,binary:binary.path,model:model.path,workspaceParent:parent)}
         let deadline=ContinuousClock.now.advanced(by:.seconds(5))
-        while !FileManager.default.fileExists(atPath:pidfile.path),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
-        XCTAssertTrue(FileManager.default.fileExists(atPath:pidfile.path));worker.cancel()
+        var observedPID:Int32?
+        while observedPID==nil,ContinuousClock.now<deadline {
+            if let text=try? String(contentsOf:pidfile,encoding:.utf8),let pid=Int32(text),pid>0 {observedPID=pid;break}
+            try await Task.sleep(for:.milliseconds(10))
+        }
+        // Appearance alone is not readiness: opening a shell redirection can
+        // expose an empty file before printf has supplied the process ID.
+        worker.cancel()
         do {_=try await worker.value;XCTFail("Cancelled recognition succeeded")} catch is CancellationError {} catch {XCTFail("Unexpected \(error)")}
-        let pid=try XCTUnwrap(Int32(String(contentsOf:pidfile,encoding:.utf8)));errno=0;XCTAssertEqual(kill(pid,0),-1);XCTAssertEqual(errno,ESRCH)
+        let pid=try XCTUnwrap(observedPID);errno=0;XCTAssertEqual(kill(pid,0),-1);XCTAssertEqual(errno,ESRCH)
         XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:workspace.url.path).isEmpty)
     }
 
