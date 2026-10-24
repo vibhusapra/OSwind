@@ -1,5 +1,32 @@
 # OSwind delivery ledger
 
+## Project notes preserve completed indexing — runtime ea90902 / schema21
+
+[PR #52](https://github.com/vibhusapra/OSwind/pull/52) preserves automatic source links, completed extraction and valid prepared work when a curated project's notes or canonical-key-equivalent alias display change. An existing create without new aliases also preserves completed work. Actual alias changes and primary renames still invalidate matching rules. Restored uncurated project definitions require invalidation when edit/create promotes them into the rule plan; this compatibility edge is explicitly tested through actual data-only backup/restore.
+
+[Signed evidence](../benchmarks/entity-metadata-v1.json) exercises **all 791 defined cases** across runs: the regular suite has **760 pass / 31 opt-in skips**; **313 native/model/Metal passes** add 25, **five cached model/runtime passes** add five, and **one physical-audio pass** exercises the last skipped case. No defined case remains unexercised. **42 focused TSan cases plus the distinct physical case = 43**, with no races reported. All **fourteen final qualification operations** pass, including paired signed CLIs, entity/HTTP/MCP, regular/indexed integration, actual encrypted entity lock/remount/backup and live capture. The 33-file bundle, all three raw/signed normalized executables, strict signatures and extracted ZIP agree. This is coverage on one M5 Max/macOS26.6.2 host, not proof of broad feature completeness or competitive placement.
+
+The paired release fixture has 1,000 short synthetic sources, one manual link and one rejected automatic match. Before each notes edit the archive is fully indexed. Three old-CLI trials each leave **1,000** sources pending; the new CLI leaves **zero**, with every surviving source anchor unchanged. Median sums of edit and index/resume subprocess wall times are **1.224 → 0.117 seconds**, including process startup/SQLite and the required extraction or no-op resume. Intervening validation/progress queries, initial setup and backup/control checks are excluded. Caches and host activity are uncontrolled; note-save-only time is not claimed to improve by that ratio. Real alias changes, both restored curation paths, rejected matches and quiet portability remain correct.
+
+Native input opens a fresh quiet copy of six text-verified synthetic notes. After an explicit initial build, saving only project notes retains **6/6 completed sources and both manual/automatic links**, without another build. Adding an unused alias produces **0/6 and only the manual link**; Build / resume restores 6/6 and two sources. Scoped search returns two, then People & projects → ⌘K restores six global sources with search focused. Post-quit read-only CLI checks confirm persisted notes/counts. Capture/audio/automatic indexing stay off, no permissions change, and the owned GUI exits. The older sample is unchanged. The build-status sentence still shows its previous Updated count after rules change, although completion and memberships correctly invalidate; wording polish remains open.
+
+Explicit-cache checks verify pinned Parakeet/speaker files without downloads, apply setup to an isolated non-recording app, repeat public JFK ASR and synthetic alternating stock-voice attribution, observe actual default idle expiry and reload, and release both backends after use. The isolated managed local-server lifecycle passes. Two Apple MPSGraph cache-load diagnostics remain in the log despite passing output/contracts; their cause, actual per-operation compute placement and physical memory/power are unmeasured. These fixture checks do not refresh the separate natural speech/speaker quality evaluations.
+
+The exact signed CLI passes two owned targeted live captures: five OCR regions, normal/secret status timings **760/624 ms**, secret redaction/image suppression, app/title exclusions and image/FTS deletion. Normal and instrumented physical probes each isolate the two hidden generated-tone apps through production PCM decoding. No raw captured audio is persisted and system volume/permissions are unchanged. These are short controlled observations, not full GUI/controller/microphone-to-ASR, arbitrary application privacy, sustained latency or energy acceptance.
+
+Retained development evidence includes five failures in the original seven-case regression variant, and six failed assertions in the first frozen candidate's real restored-curation case. The corrected eight metadata regressions and related selections pass. Initial candidate/package/results and cancelled-before-execution supplemental work remain retained; earlier passing tests did not cover that missing compatibility condition. The current backup guide is reconciled to compiled schema6–21 acceptance. Both preceding PRs #50/#51 have green CI at their latest heads; this newer PR's CI remains independently tracked.
+
+A subsequent exploratory contract check reproduces an additional **unresolved** issue in both a91f25b's signed CLI and this release: reject a project's automatic source link, rename that same project while retaining its matching alias, then rescan. Expected zero links; observed one. Name-keyed project rejection no longer matches the new display name. It was not covered by the 791 defined tests, so passing those cases does not imply every known contract passes. The next change will preserve project corrections by stable ID and validate rename/merge/source-edit/erase/backup behavior. Code review also finds that project admission reads the full entity aggregate for every match; replace that with bounded definition/alias reads before million-source extraction claims.
+
+Next gates:
+
+- [ ] Fix reproduced project rejection loss across rename/merge with stable-ID exclusions and compatibility tests; remove per-match source-count aggregation from admission.
+
+- [ ] Million-source entity extraction, query/aggregation, no-op resume and index-lag measurements; sustained capture and power.
+- [ ] Independent entity gold corpus, multilingual/noisy OCR, curated speaker-to-person links, force-re-extraction and entity JSON/Markdown.
+- [ ] Documents-root startup, full controller/microphone/device flows, VoiceOver/global shortcut/dynamic type and build-status wording.
+- [ ] Matched full competitor application workloads; no top-three claim yet.
+
 ## Search shortcut refresh — runtime a91f25b / schema21
 
 [PR #51](https://github.com/vibhusapra/OSwind/pull/51) fixes the native ⌘K defect found during entity acceptance. The shortcut previously selected Memories without rerunning retrieval when query text stayed the same. Leaving a project scope could remove its chip while keeping old scoped hits; leaving Conversations retained audio-only results. It now requests the existing cancellable/debounced refresh and preserves explicit query, app, time, mode and entity controls.
@@ -10,7 +37,7 @@ Actual native input repeats the original two-source project → People & project
 
 The owned 20,000-vector / 32-dimension expression check passes all exact-top10 comparisons, alternating required phrases and stale-source invalidation. Three sequential Metal queries take 36.6/29.2/25.6 ms after index preparation on the M5 Max. Caches and host activity are uncontrolled, inference/capture/power excluded; these are observations, not a distribution or competitor result. Feature research remains **16 offerings / 76 requirements**; the ledger now correctly distinguishes the completed older component soak with gaps from the open current desktop/power gate.
 
-Next: optimize project metadata-only edits without invalidating automatic memberships; independently score local entity extraction, qualify Documents-root and full capture/controller/device flows, and measure million-source entity performance and power. Broad parity and a top-three ranking remain unfinished.
+Project metadata preservation is implemented and qualified in ea90902 above. Remaining work includes independent entity quality, Documents-root/full device flows, million-source performance and power. Broad parity and a top-three ranking remain unfinished.
 
 ## Local people and project memory — runtime 0a5cad1 / schema21
 
@@ -31,7 +58,7 @@ The signed GUI reproduces a real defect: search a two-source project, return to 
 Immediate remaining entity work:
 
 - [ ] Independent people/organization/place gold corpus, multilingual and noisy OCR/transcript cases; compare a better local extractor against the retained Apple baseline.
-- [ ] Avoid whole-archive re-extraction for project-note-only edits; current conservative metadata invalidation requires Build / resume.
+- [x] Avoid whole-archive re-extraction for project-note-only edits (ea90902, signed paired/native checks above).
 - [ ] Curated speaker-to-person associations, explicit forced re-extraction and entity-layer JSON/Markdown portability; no voice/face identity claim.
 - [x] Fix the observed ⌘K stale-results defect (a91f25b, signed native acceptance above).
 - [ ] Qualify Documents-root startup and full GUI/controller/microphone-to-ASR. Million-source entity latency, index lag and measured power remain open.

@@ -2,6 +2,24 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Project metadata without unnecessary extraction
+
+**Known unresolved counterexample:** outside the 791 defined tests, rejecting an automatic project link then renaming the same project and rescanning restores that link. Both old/new signed CLIs reproduce expected zero versus observed one. This passing metadata qualification does not establish that every known contract passes; stable-ID correction handling is the next fix.
+
+[Metadata-preservation evidence](entity-metadata-v1.json) binds runtime ea90902/schema21 and a separately staged signed package to **791 defined cases all exercised**: 760 normal passes/31 opt-in skips, 313 native/model/Metal passes adding 25, five real cached-model/runtime checks and one physical-audio case. All 42 focused plus one distinct physical TSan cases pass; all fourteen final qualification operations pass. This is one-host test coverage, not feature completeness, energy or a ranking. Package, normalized executable payloads and complete ZIP agree; installed schema17 is unchanged.
+
+Three paired signed-CLI trials begin with 1,000 indexed synthetic sources, one manual link and a rejected match. A notes edit previously invalidated 1,000 sources; it now invalidates **zero**, preserving exact automatic anchors. Median **sum of edit and index/resume subprocess times** is 1.224 → 0.117 seconds, including startup/SQLite and extraction/no-op resume. Setup, intervening validation/progress reads and backup/control work are excluded; caches/host activity are uncontrolled. This is not note-save-only or overall application acceleration. Genuine alias changes and restored uncurated-to-curated activation still invalidate, both edit/create paths rescan correctly, and quiet backup preserves definitions, anchors and corrections.
+
+Actual signed GUI input confirms notes-only save retains 6/6 completion and two original sources, whereas a new alias resets completion and removes only the automatic link; resume restores it. Cached model setup, repeated ASR/speaker fixtures, real idle expiry/reload and isolated managed runtime pass. Two Apple MPSGraph cache-load diagnostics remain retained; placement/physical memory/power are unmeasured. Latest signed targeted live capture/OCR/privacy/deletion and normal/TSan two-tone PCM checks pass without permission or volume changes. Full controller/microphone-to-ASR, Documents-root startup, representative entity quality, million-source entity work and matched competitor apps remain open. Earlier failed regression/curation variants are retained.
+
+```bash
+python3 scripts/entity-metadata-smoke.py /absolute/path/new/oswindctl \
+  --root /new/owned/metadata-check \
+  --baseline-cli /absolute/path/pre-fix-schema21/oswindctl
+```
+
+The optional baseline must be the pre-fix schema21 CLI; its expected invalidation behavior is asserted. Without that option the harness still validates the candidate, explicit alias/curation changes and quiet backup.
+
 ## Native search shortcut navigation
 
 [Search-navigation evidence](search-navigation-v1.json) binds runtime a91f25b/schema21 to 752 normal passes/31 opt-in skips, 305 native/model/Metal passes and **777 distinct functional passes/six remaining opt-in cases**. All 23 focused TSan cases and eight final qualification operations pass. Three of four new regressions fail before the fix; all four pass after it. Signed native input repeats a two-source project → People & projects → ⌘K and shows all six global sources, restores six after the zero-result Conversations view, deliberately retains Ask's project scope, and accepts typed quoted-phrase filtering. All data are synthetic; capture/audio remain off. Package/ZIP identity, signed entity/API/MCP and indexed integrations pass. The signed CLI matches the preceding entity report byte for byte; its broader race/physical-audio evidence stays separately attributed.

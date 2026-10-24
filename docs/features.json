@@ -4,7 +4,7 @@
     "axis": "Capture",
     "feature": "Focused-window snapshots",
     "status": "live verified",
-    "evidence": "Real targeted synthetic window: OCR, source identity and image saved. Shared fail-closed focus binding tested; latest physical and automatic-transition acceptance pending",
+    "evidence": "Latest ea90902 signed CLI targets owned synthetic windows: identity,5-region Vision OCR, normal image, secret suppression, app/title exclusions and image/FTS erasure pass. One-shot normal/secret status760/624ms; no continuous energy or full GUI/controller acceptance",
     "references": "Screenpipe, Littlebird, Recall"
   },
   {
@@ -276,7 +276,7 @@
     "axis": "AI",
     "feature": "Structured people/project memory",
     "status": "partial",
-    "evidence": "On-device Apple name suggestions; explicit project aliases; source-linked pages, curation/merges, scoped search/Ask and read-only integrations. NLP quality is unmeasured; the authored fixture fragments a person name. Curated speaker-to-person links, entity JSON/Markdown export and cross-recording voice/face identity are not implemented",
+    "evidence": "Source-linked on-device suggestions and explicit projects, curation/merges, scoped retrieval and native editors. Notes-only/equivalent-alias edits now preserve completion and anchors; real rules and restored curation invalidate. Paired signed1000-source rescan count1000\u21920; native6/6 retained. Known follow-up: rejected project links return after rename/rescan (old/new signed CLIs reproduce). Stable-ID corrections, NLP gold quality, curated speaker identity, entity JSON/Markdown and force re-extraction remain open",
     "references": "Minne, Omi"
   },
   {
@@ -500,7 +500,7 @@
     "axis": "UX",
     "feature": "Native macOS UI + menu bar",
     "status": "partial",
-    "evidence": "Signed SwiftUI/AppKit app; isolated native search/replay/routines/export exercised. Full keyboard/VoiceOver/global focus, permission flows and older Mac matrix open",
+    "evidence": "Signed native sample search/replay/routines/export and entity editing/linking/Ask exercised. Latest notes-only save retains6/6 and both sources; real alias change invalidates and resume restores. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open",
     "references": "TimeScroll, rem, ScreenMemory"
   },
   {
@@ -524,7 +524,7 @@
     "axis": "UX",
     "feature": "Keyboard and accessibility review",
     "status": "partial",
-    "evidence": "Native Cmd-K section/scope transitions and typed phrase filtering observed on signed synthetic library; source focus/cancellation regressions and23 focused TSan pass. Full VoiceOver/focus/dynamic-type/global shortcut review missing",
+    "evidence": "Native project notes/alias editor and Cmd-K scope transitions observed on signed synthetic library; source focus/cancellation and42 focused TSan cases pass. Full VoiceOver/dynamic-type/global shortcut review and stale build-status wording remain open",
     "references": "Quality bar"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "a91f25b:783 normal cases(752 pass/31 opt-in skips),305 native/model/Metal passes,777 distinct/six remaining opt-in cases and23 focused TSan. Parent0a5cad1 separately has318 distinct race checks and live capture/physical audio; signed CLI identical. Authored retrieval/Metal, pinned rem component and frozen natural speech/speaker evaluations retain limitations; no full-competitor rank",
+    "evidence": "ea90902:791 defined cases all exercised across760 normal passes/31 opt-in skips,313 native/model/Metal passes,5 cached model/runtime checks and1 physical case;43 focused/physical TSan pass. Actual latest capture/OCR/privacy, idle model expiry/reload and signed/native entity contracts pass. A new exploratory project-rename rejection failure is retained outside those791 defined tests. Frozen corpus and pinned rem component results remain separate; no overall competitor rank",
     "references": "OSwind quality bar"
   },
   {
