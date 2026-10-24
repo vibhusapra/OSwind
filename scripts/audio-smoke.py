@@ -15,7 +15,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
     fixture=root/'speech.json'
     executable=root/'fixture-asr';executable.write_text('#!/usr/bin/env python3\nimport json,pathlib,sys\nprefix=pathlib.Path(sys.argv[sys.argv.index("-of")+1])\nfixture=pathlib.Path(__file__).with_name("speech.json")\nprefix.with_suffix(".json").write_bytes(fixture.read_bytes())\n');executable.chmod(0o700)
     (source/'settings.json').write_text(json.dumps({'whisperBinary':str(executable),'whisperModel':str(model)}))
-    def speech(text):fixture.write_text(json.dumps({'transcription':[{'offsets':{'from':0,'to':1000},'text':text}]}))
+    def speech(text,end=1000,start=0):fixture.write_text(json.dumps({'transcription':[{'offsets':{'from':start,'to':end},'text':text}]}))
     def cli(*arguments,data=source,ok=True):
         result=subprocess.run([str(binary),'--data',str(data),*map(str,arguments)],capture_output=True,text=True,timeout=60)
         assert (result.returncode==0)==ok,(arguments,result.returncode,result.stderr)
@@ -28,6 +28,10 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
     assert memory['transcript']['duration']==2 and memory['transcript']['segments'][0]['end']==1 and memory['audioSessionID']
     assert hashlib.sha256(retained.read_bytes()).hexdigest()==digest and retained.stat().st_mode&0o777==0o600
     assert json.loads(cli('search','--mode','keyword','checklist'))[0]['memory']['id']==memory['id']
+    speech('Synthetic crossing-end speech',end=3700)
+    bounded=json.loads(cli('import-audio',audio));assert bounded['transcript']['duration']==2 and bounded['transcript']['segments'][0]['end']==2 and bounded['text']=='Synthetic crossing-end speech'
+    speech('Synthetic wholly-outside speech',start=2200,end=3700)
+    cli('import-audio',audio,ok=False);assert not json.loads(cli('search','--mode','keyword','wholly-outside'))
     speech('password=synthetic123')
     redacted=json.loads(cli('import-audio',audio,'--retain-audio'))
     assert redacted.get('audioPath') is None and redacted['text']=='[REDACTED]' and redacted['transcript']['segments'][0]['text']=='[REDACTED]'
@@ -41,6 +45,6 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
     assert hashlib.sha256((restored/reopened['audioPath']).read_bytes()).hexdigest()==digest
     cli('delete',memory['id']);assert not retained.exists() and hashlib.sha256(audio.read_bytes()).hexdigest()==digest
     invalid=root/'invalid.wav';invalid.write_text('not an audio container');cli('import-audio',invalid,'--retain-audio',ok=False)
-    report={'passed':True,'fixture':'generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment','checks':['CLI file preparation, timestamp/session persistence and keyword retrieval','original clip retained privately, source never changed','detected secret suppresses complete raw clip and redacts both text representations','full media backup/restore preserves transcript/session and audio bytes','erasure removes owned clip only; malformed input fails'],'limits':['mock ASR does not establish recognition quality','native capture/panels/playback acceptance remains separate']}
+    report={'passed':True,'fixture':'generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment','checks':['CLI file preparation, timestamp/session persistence and keyword retrieval','crossing decoder segment ends clipped to independently measured source duration; wholly outside segments refused without partial admission','original clip retained privately, source never changed','detected secret suppresses complete raw clip and redacts both text representations','full media backup/restore preserves transcript/session and audio bytes','erasure removes owned clip only; malformed input fails'],'limits':['mock ASR does not establish recognition quality','native capture/panels/playback acceptance remains separate']}
     if args.output:pathlib.Path(args.output).write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))

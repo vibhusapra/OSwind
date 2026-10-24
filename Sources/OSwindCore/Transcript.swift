@@ -26,6 +26,21 @@ public struct SpeechTranscript: Codable, Equatable, Sendable {
         }
         return self
     }
+    /// Align decoder metadata to the independently measured input duration.
+    /// A segment crossing EOF keeps its text and is clipped to the source.
+    /// A positive-length segment wholly beyond EOF remains an error; do not
+    /// fabricate source time or silently drop recognized content.
+    public func bounded(toSourceDuration sourceDuration:Double) throws -> Self {
+        _ = try validated()
+        guard sourceDuration.isFinite,sourceDuration>0,sourceDuration<=86400 else {throw OSwindError.invalid("Invalid source audio duration")}
+        var result=self;result.duration=sourceDuration
+        for index in result.segments.indices {
+            let segment=result.segments[index]
+            guard segment.start<=sourceDuration,segment.start<sourceDuration || segment.end==segment.start else {throw OSwindError.invalid("Transcript segment is outside the source audio")}
+            result.segments[index].end=min(segment.end,sourceDuration)
+        }
+        return try result.validated()
+    }
     /// Pattern-based redaction cannot alter the underlying voice recording.
     /// Any detected secret therefore suppresses retention of the entire clip.
     private static let spokenCredential = try? NSRegularExpression(pattern:#"\b(?:password|passcode|pass[ -]?phrase|pin|api[ -]?key|access[ -]?token|secret[ -]?key|credit[ -]?card\s+number|social\s+security\s+number)\s+(?:is|was|equals|colon)\b"#,options:.caseInsensitive)
