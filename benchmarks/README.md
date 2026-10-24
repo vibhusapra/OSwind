@@ -2,6 +2,14 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Bounded live PCM ingress
+
+[Ingress evidence](audio-ingress-v1.json) binds runtime 20a51c8 to 699 normal passes/29 skips, 231 native/model passes adding 23 distinct cases, 722 distinct passes/six remaining opt-in cases, 233 TSan passes and a separately verified 33-file signed package. All eleven final process groups pass. Twelve new ingress and three controller cases cover bounded stalled-actor storage/delivery, exact concurrent callback accounting, final-segment handoff, old-source isolation, actual generated CoreMedia buffers, device-free microphone conversion and per-run capacity-drop reporting.
+
+The configured per-source limits are 32,768 normalized input samples, fewer than 480,000 partial samples, three waiting full segments and one scheduled actor delivery. The shared downstream queue adds three waiting chunks and one active ASR operation. This does not bound macOS/model RSS or prove callback/UI latency and energy. Overload discards incoming complete segments and reports lost seconds; silence/privacy/recognizer/device gaps are not counted as capacity loss.
+
+The attempt ledger retains one failed vault process among 17 attempts. Lock and immediate cleanup refused an unidentifiable unmounted APFS attachment; a later independent inventory found no owned image, and normal retry confirmed detached. Two fresh full vault processes then pass. A detach-settling race is a possible explanation, not a captured diagnosis. No forced detach or identity relaxation occurred; retry hardening remains open. Physical audio/device/route capture, warning visibility, foreground/background isolation, energy, hardware/OS compatibility and competitors remain unverified. See [design and limits](../docs/AUDIO-INGRESS.md).
+
 ## Audio privacy and shared-reader regression checks
 
 [Bounded audio evidence](audio-privacy-v1.json) binds runtime 0118243 and a separate signed package to 713 normal cases (684 pass / 29 opt-in skips), 216 native/model cases and 218 race-check passes. The normal/native union has 707 distinct passes and six remaining opt-in cases. Eleven actual signed process groups pass; the audio process uses generated PCM and a deterministic ASR executable to test contracts, not recognition quality.
