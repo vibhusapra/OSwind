@@ -17,7 +17,7 @@ class WordScoringTests(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform=='darwin','Uses macOS /usr/bin/time -l')
 class ASRProcessTests(unittest.TestCase):
-    def fixture(self,root,bad_saved=False,mutate=False,pause=False):
+    def fixture(self,root,bad_saved=False,mutate=False,pause=False,fail=False):
         dataset=root/'dataset';dataset.mkdir();manifest={'state':'prepared','source':'authored fixture','license':'test fixture','selection':'all generated clips','created_utc':'fixed','splits':[]}
         for split in ['test-clean','test-other']:
             folder=dataset/split;(folder/'audio').mkdir(parents=True);(folder/'reference').mkdir();clips=[]
@@ -28,7 +28,7 @@ class ASRProcessTests(unittest.TestCase):
                 clips.append({'id':identifier,'wav_sha256':sha(audio),'flac_sha256':sha(flac),'reference_sha256':sha(ref),'duration_seconds':1})
             info={'split':split,'speakers':2,'selected_utterances':2,'clips':clips};(folder/'prepared.json').write_text(json.dumps(info));(folder/'selection-plan.json').write_text(json.dumps({'split':split,'clips':[{'id':c['id'],'reference_sha256':c['reference_sha256']} for c in clips]}));manifest['splits'].append({'split':split,'speakers':2,'selected_utterances':2})
         (dataset/'manifest.json').write_text(json.dumps(manifest));model=root/'model';model.mkdir();(model/'fixture').write_bytes(b'not a real model');whisper=root/'whisper';whisper.write_bytes(b'not invoked by fake CLI');weights=root/'whisper.bin';weights.write_bytes(b'not a real model')
-        binary=root/'fake-cli';binary.write_text("#!/usr/bin/env python3\nimport json,os,pathlib,sqlite3,sys,time\na=sys.argv[1:];library=pathlib.Path(a[a.index('--data')+1]);audio=pathlib.Path(a[a.index('import-audio')+1])\nassert not any('/reference/' in x for x in a)\n"+f"if {pause!r}:\n (pathlib.Path(__file__).parent/'active.pid').write_text(str(os.getpid()));time.sleep(30)\nif {mutate!r} and audio.stem=='2-1-0000':\n p=audio.with_name('1-1-0000.wav');p.write_bytes(p.read_bytes()+b'changed')\n"+"memory={'id':'fixture-memory','text':'Alpha beta','transcript':{'text':'Alpha beta','duration':1,'model':'explicit synthetic backend','segments':[]}}\ncon=sqlite3.connect(library/'memory.sqlite');con.execute('CREATE TABLE memories(id TEXT PRIMARY KEY,payload BLOB)')\n"+f"saved=dict(memory,text={'changed' if bad_saved else 'Alpha beta'!r})\n"+"con.execute('INSERT INTO memories VALUES(?,?)',(memory['id'],json.dumps(saved).encode()));con.commit();con.close();print(json.dumps(memory))\n");binary.chmod(0o700);return binary,dataset,model,whisper,weights
+        binary=root/'fake-cli';binary.write_text("#!/usr/bin/env python3\nimport json,os,pathlib,sqlite3,sys,time\na=sys.argv[1:];library=pathlib.Path(a[a.index('--data')+1]);audio=pathlib.Path(a[a.index('import-audio')+1])\nassert not any('/reference/' in x for x in a)\n"+f"if {fail!r} and audio.stem=='2-1-0000':sys.exit(7)\nif {pause!r}:\n (pathlib.Path(__file__).parent/'active.pid').write_text(str(os.getpid()));time.sleep(30)\nif {mutate!r} and audio.stem=='2-1-0000':\n p=audio.with_name('1-1-0000.wav');p.write_bytes(p.read_bytes()+b'changed')\n"+"memory={'id':'fixture-memory','text':'Alpha beta','transcript':{'text':'Alpha beta','duration':1,'model':'explicit synthetic backend','segments':[]}}\ncon=sqlite3.connect(library/'memory.sqlite');con.execute('CREATE TABLE memories(id TEXT PRIMARY KEY,payload BLOB)')\n"+f"saved=dict(memory,text={'changed' if bad_saved else 'Alpha beta'!r})\n"+"con.execute('INSERT INTO memories VALUES(?,?)',(memory['id'],json.dumps(saved).encode()));con.commit();con.close();print(json.dumps(memory))\n");binary.chmod(0o700);return binary,dataset,model,whisper,weights
     def testCompleteImportCoveragePinningAndIndependentScore(self):
         with tempfile.TemporaryDirectory() as folder:
             root=pathlib.Path(folder);args=self.fixture(root);output=root/'evaluation'
@@ -37,6 +37,15 @@ class ASRProcessTests(unittest.TestCase):
             before=(output/'report.json').read_bytes()
             with self.assertRaisesRegex(ValueError,'must be new'):evaluate(*args,output)
             self.assertEqual((output/'report.json').read_bytes(),before)
+    def testFailedImportsRemainInCoverageAndEndToEndDenominator(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=pathlib.Path(folder);args=self.fixture(root,fail=True);output=root/'evaluation'
+            with contextlib.redirect_stdout(io.StringIO()):report=evaluate(*args,output,trials=2,profiles=['whisper-default'])
+            self.assertEqual(report['state'],'completed');self.assertTrue(report['source_stability_verified']);self.assertFalse(report['all_imports_succeeded']);self.assertEqual(report['failed_imports'],4);self.assertEqual(len(report['measurements']),8)
+            for row in report['aggregate']:
+                self.assertEqual(row['utterances'],2);self.assertEqual(row['failed_imports'],1);self.assertEqual(row['successful_imports'],1);self.assertEqual(row['micro_wer'],.5);self.assertEqual(row['successful_import_scores']['micro_wer'],0)
+            failed=[r for r in report['measurements'] if not r['import_succeeded']]
+            self.assertTrue(all(r['exit_code']==7 and r['scores']['deletions']==2 and not r['saved_record_verified'] and r['saved_record_count']==0 for r in failed))
     def testResponseCannotSubstituteForActualSavedRecord(self):
         with tempfile.TemporaryDirectory() as folder:
             root=pathlib.Path(folder);args=self.fixture(root,bad_saved=True);output=root/'evaluation'
