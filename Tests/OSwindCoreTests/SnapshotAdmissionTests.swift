@@ -80,6 +80,14 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         try store.withRoutineDatabase {try $0.execute("DROP TRIGGER owned_snapshot_passage_failure")}
         try store.indexApplePassages(memory,embedder:embedder);XCTAssertTrue(try store.passagesCurrent(memory,modelID:embedder.modelID));XCTAssertEqual(try store.stats().count,1)
     }
+    func testSourceCommitFailureRemovesUnadmittedJPEGAndRetrySucceeds() async throws {
+        try store.withRoutineDatabase {try $0.execute("CREATE TRIGGER owned_snapshot_admission_failure BEFORE INSERT ON memories BEGIN SELECT RAISE(ABORT,'Owned admission failure'); END;")}
+        let world=SnapshotWorld(),bitmap=try image(),controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap})))
+        var callbacks=0;controller.onCapture={_ in callbacks+=1}
+        await controller.captureOnce(manual:true);try assertEmpty(controller);XCTAssertEqual(callbacks,0);XCTAssertEqual(controller.metrics.errors,1)
+        try store.withRoutineDatabase {try $0.execute("DROP TRIGGER owned_snapshot_admission_failure")}
+        await controller.captureOnce(manual:true);XCTAssertEqual(callbacks,1);XCTAssertEqual(controller.metrics.saved,1);XCTAssertEqual(try files().count,1);XCTAssertEqual(try store.stats().count,1)
+    }
     func testContextTransitionWhileDiscoveringSourcesNeverCapturesPixels() async throws {
         let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap}))
         environment.frames={_,_ in world.context?.url="https://accounts.google.com/private";await Task.yield();return [.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap})]}
