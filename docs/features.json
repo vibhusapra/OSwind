@@ -108,7 +108,7 @@
     "axis": "Retrieval",
     "feature": "Full-text search + ranking",
     "status": "tested",
-    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 410 tests, actual 20k Metal exact-top10 checks and stable FTS maintenance keys (paired synthetic erasure 17.43/8.77 s to 2.89/4.09 s); regex/NEAR and native keyboard/help acceptance remain open",
+    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 425 tests, actual 20k Metal exact-top10 checks and stable FTS maintenance keys (paired synthetic erasure 17.43/8.77 s to 2.89/4.09 s); regex/NEAR and native keyboard/help acceptance remain open",
     "references": "Most visual tools"
   },
   {
@@ -412,7 +412,7 @@
     "axis": "Privacy",
     "feature": "Fine-grained history erasure",
     "status": "partial",
-    "evidence": "Native/CLI date-overlap, exact app/bundle, normalized website/subdomain and type selectors; preview token rejects concurrent changes, source transaction plus durable media queue/shared-file protection, dependent cited turns and cache invalidation. 404 tests/31 TSan and 8-process admission; native clicks pending locked, earlier independent recap copies remain",
+    "evidence": "Schema14 universal media queue covers individual delete, age/budget retention and native/CLI scope erasure; canonical aliases, actual partial outcomes, async status and retry. 425 tests/57 TSan, old-writer refusal and 20k age-retention 2.29/3.41 s, all IDs/shared bytes. Native clicks, legacy recap provenance and broader scan/power gates remain",
     "references": "Recall, Littlebird"
   },
   {

@@ -95,6 +95,8 @@ final class MetalRetrievalTests: XCTestCase {
         _ = try compare(store,SearchFilter(query:"meaning",app:"A",kind:.note,start:Date(timeIntervalSince1970:100),end:Date(timeIntervalSince1970:15000),tag:"work",limit:10))
         try other.delete(target)
         var fresh = Memory(id:"new",text:"New vector from another connection"); fresh.embedding = query; fresh.embeddingModel = model; try other.insert(fresh)
+        // Public erasure clears persisted graphs. Rebuild and require the Metal path again.
+        _ = try await store.buildSearchIndex(modelID:model,dimensions:32)
         XCTAssertEqual(try compare(store,all).first?.id,"new")
         let reopened = try MemoryStore(root:root)
         XCTAssertEqual(try compare(reopened,all).first?.id,"new")

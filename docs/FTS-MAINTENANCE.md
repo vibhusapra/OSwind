@@ -1,5 +1,7 @@
 # Direct full-text maintenance
 
+This evidence pins the schema-13 cache milestone. The later [schema-14 media-deletion protocol](DELETION.md) makes newly opening older writers refuse the current library.
+
 Source updates and deletes previously found an FTS row by its unindexed string ID. That meant scanning the FTS virtual table once for every deleted source. The 20k-source selective-erasure workload exposed this cost.
 
 A separate `memory_fts_keys` table now maps source IDs to explicit integer primary keys. Insert/update triggers address the FTS row directly; a before-delete trigger removes it while the mapping still exists, and foreign-key cascade removes the map entry. Source IDs, source payloads, semantic identity/revisions and native vector keys remain unchanged.
@@ -22,7 +24,7 @@ Verification: **410 tests, 404 pass / six opt-in skips**; **37 focused ThreadSan
 ```bash
 swift test
 swift test --sanitize=thread --filter 'FullTextIdentityTests|HistoryErasureTests|HistoryErasureModelTests|ConversationTests'
-python3 scripts/fts-compatibility-smoke.py NEW_OSWINDCTL PINNED_LEGACY_OSWINDCTL --output /PATH/report.json
+python3 scripts/fts-compatibility-smoke.py PINNED_SCHEMA13_OSWINDCTL PINNED_LEGACY_OSWINDCTL --output /PATH/report.json
 python3 scripts/benchmark-erasure.py NEW_OSWINDCTL --root /NEW/SYNTHETIC/FIXTURE --records 20000
 ```
 

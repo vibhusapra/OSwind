@@ -1,5 +1,7 @@
 # Selective history erasure
 
+[Schema-14 individual deletion and retention](DELETION.md) now share the durable media queue and result reporting. The evidence below retains the earlier selective-erasure milestone.
+
 Open Settings → Privacy or Data → **Erase by time, app or website**. Choose an optional time range, exact application name, exact bundle ID, website hostname and source type. All selected filters intersect. **Pause & preview** pauses screen/audio capture and discards unfinished replay, then shows matching sources, dependent conversation turns and media references. Review up to five recent source titles before choosing Erase.
 
 Erasure requires an unchanged preview token bound to this library, the selectors, the source revision and affected cited turns. Any source mutation, including a concurrent capture, or a newly saved cited answer invalidates the preview. Capture remains paused after the operation. Source deletion and durable media-queue admission commit in one SQLite writer transaction; cancellation before commit rolls back. Once committed, cleanup reports its actual outcome even if cancellation arrives late.

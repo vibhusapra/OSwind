@@ -12,7 +12,16 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "HistoryErasure" {
+        if model.section == "CleanupResult" {
+            try model.store.insert(Memory(id:"synthetic-retention-preview",timestamp:Date(timeIntervalSince1970:100),text:"Owned old source for cleanup rendering"))
+            model.maintain()
+            while model.maintenanceBusy {try await Task.sleep(nanoseconds:10_000_000)}
+            size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:"Data").environmentObject(model))
+        } else if model.section == "DeletionResult",let candidate=model.hits.first?.memory {
+            model.delete(candidate)
+            while model.deletingID != nil {try await Task.sleep(nanoseconds:10_000_000)}
+            model.section="Memories";content=AnyView(WorkspaceView().environmentObject(model))
+        } else if model.section == "HistoryErasure" {
             size=NSSize(width:720,height:760);content=AnyView(HistoryErasureView().environmentObject(model))
         } else if model.section == "RoutineEditor" {
             var sample=RoutineDefinition();sample.ai=model.settings.ai

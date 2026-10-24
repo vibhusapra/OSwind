@@ -50,6 +50,10 @@ import UniformTypeIdentifiers
     @Published var searchMS = 0.0
     @Published var searchStrategy = ""
     @Published var refreshing = false
+    @Published private(set) var deletingID:String?
+    @Published var deletionStatus:String?
+    @Published private(set) var maintenanceBusy=false
+    @Published private(set) var maintenanceStatus=""
     @Published var searchWarnings = [String]()
     @Published var interpretQuery = true
     @Published var resolvedSearch: QueryResolution?
@@ -316,18 +320,39 @@ import UniformTypeIdentifiers
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func delete(_ memory: Memory) { do { try store.delete(memory.id); if openingMemoryID==memory.id {cancelOpeningMemory()}; if selected?.id == memory.id { selected = nil }; invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats() } catch { errorMessage = error.localizedDescription } }
-    func maintain(automatic: Bool = false) {
-        let store = self.store, policy = settings.privacy, allowLowPower = settings.search.indexOnLowPower, shouldPrune = !automatic || settings.automaticMaintenance
+    func delete(_ memory:Memory) {
+        guard deletingID==nil,!maintenanceBusy else {return};deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
+        if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
+        let store=self.store
         Task {
+            defer {deletingID=nil}
             do {
-                _ = try await Task.detached(priority:.utility) {
-                    let removed = shouldPrune ? try store.prune(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000) : 0
-                    try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower)
-                    return removed
+                let result=try await Task.detached(priority:.utility) {try store.delete(memory.id)}.value
+                deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
+                if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
+                invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats()
+            } catch {deletionStatus="Source was not deleted.";errorMessage=error.localizedDescription}
+        }
+    }
+    func maintain(automatic:Bool=false) {
+        guard !maintenanceBusy,deletingID==nil else {return}
+        let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance
+        maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
+        Task {
+            defer {maintenanceBusy=false}
+            do {
+                let (result,indexError)=try await Task.detached(priority:.utility) { () -> (RetentionCleanupResult?,String?) in
+                    let report=shouldPrune ? try store.pruneHistory(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000):nil
+                    do {try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower);return (report,nil)}
+                    catch {return (report,"Search cache maintenance did not finish: "+error.localizedDescription)}
                 }.value
-                invalidateStorageEstimate(); refresh(forceStatistics:true); refreshChats(); await catchUpIndex()
-            } catch { errorMessage = error.localizedDescription }
+                if let result {
+                    let budget=result.budgetMet==false ? "Storage target not reached.":"Storage target met."
+                    maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
+                } else {maintenanceStatus="Automatic retention is off."}
+                if let indexError {maintenanceStatus += " "+indexError}
+                invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
+            } catch {maintenanceStatus="Cleanup did not complete: "+error.localizedDescription;if !automatic {errorMessage=maintenanceStatus}}
         }
     }
     private func catchUpIndex() async {

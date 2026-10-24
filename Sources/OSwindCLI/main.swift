@@ -77,12 +77,12 @@ do {
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
           native-model list             List pinned native model downloads
           native-model install|verify parakeet|speakers [--cache-root PATH]
-          delete ID                      Delete one memory and its media
+          delete ID [--json]             Delete one source; report shared/pending media
           erase preview|apply [--from ISO8601] [--to ISO8601] [--app NAME] [--bundle ID]
                  [--domain HOST] [--exact-host] [--kind KIND] [--token PREVIEW_TOKEN]
                  Requires a selector; whole overlapping sources, dependent answers and media
           erase retry-media              Retry pending retained-media cleanup
-          prune [--days N] [--max-gb N]   Apply retention
+          prune [--days N] [--max-gb N] [--json]   Retention with explicit file/budget outcome
           capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
           capture [--app-bundle ID]      Capture a chosen/current window once
           transcribe FILE --model PATH   Local whisper.cpp transcription
@@ -96,6 +96,18 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "delete" || command == "prune" {
+        let store=try MemoryStore(root:root)
+        if command == "delete" {
+            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use delete ID [--json]")}
+            let result=try store.delete(args[0]);if json {try encoded(result)} else {print(result.sources==0 ? "Already absent":"Deleted");for warning in result.warnings {FileHandle.standardError.write(Data((warning+"\n").utf8))}}
+        } else {
+            let daysText=try validatedOption("--days") ?? "30",gbText=try validatedOption("--max-gb") ?? "20"
+            let json=args.contains("--json");args.removeAll {$0=="--json"}
+            guard args.isEmpty,let days=Int(daysText),(1...365000).contains(days),let gb=Int64(gbText),(1...100000).contains(gb) else {throw OSwindError.invalid("Use positive bounded --days and --max-gb integers")}
+            let result=try store.pruneHistory(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000)
+            if json {try encoded(result)} else {print(result.erasure.sources);for warning in result.erasure.warnings {FileHandle.standardError.write(Data((warning+"\n").utf8))}}
+        }
     } else if command == "erase" {
         let action=args.first ?? "preview";if !args.isEmpty {args.removeFirst()}
         let store=try MemoryStore(root:root)
@@ -337,8 +349,6 @@ do {
             print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "import": guard let path = args.first else { throw OSwindError.invalid("Enter an import path") }; print(try store.importJSON(from:URL(fileURLWithPath:path),embedder:embedder,policy:AppSettings.load(root:root).privacy))
-        case "delete": guard let id = args.first else { throw OSwindError.invalid("Enter a memory id") }; try store.delete(id); print("Deleted")
-        case "prune": let days = Int(option("--days") ?? "30") ?? 30; let gb = Int64(option("--max-gb") ?? "20") ?? 20; guard days > 0 && gb > 0 else { throw OSwindError.invalid("Retention and budget must be positive") }; print(try store.prune(before:Date().addingTimeInterval(-Double(days)*86400),maxBytes:gb*1_000_000_000))
         case "capture-replay":
             let bundle=try validatedOption("--app-bundle"),duration=try validatedOption("--seconds")
             guard let duration,let seconds=Double(duration),args.isEmpty else {throw OSwindError.invalid("Use capture-replay --seconds 1..120 [--app-bundle ID]")}

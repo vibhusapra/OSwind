@@ -31,9 +31,11 @@ final class ANNCacheTests: XCTestCase {
         XCTAssertEqual(try hits(reopened).first,originalKey)
         let other = try MemoryStore(root:root); try other.delete("row-42")
         reopened.prepare(modelID:"fixture",dimensions:32,count:127)
+        _ = try await reopened.waitForBuild() // Public erasure removes disposable files and changes identity.
         XCTAssertFalse(try hits(reopened).contains(originalKey))
         var replacement = Memory(id:"row-42",text:"Replacement"); replacement.embedding = VectorScalingEvaluation.vector(row:42,dimensions:32); replacement.embeddingModel = "fixture"; try other.insert(replacement)
         reopened.prepare(modelID:"fixture",dimensions:32,count:128)
+        _ = try await reopened.waitForBuild()
         XCTAssertNotEqual(try hits(reopened).first,originalKey); XCTAssertFalse(try hits(reopened).isEmpty)
     }
     func testCorruptSnapshotIsRebuiltBeforeNativeLoading() async throws {
