@@ -23,6 +23,7 @@ import OSwindCore
     private let locked:() -> Bool
     private var operation:Task<Void,Never>?
     private var pendingLock=false
+    private var terminationRequested=false
     private var closingStore:MemoryStore?
     private var workspaceSubscriptions=Set<AnyCancellable>()
     private var watcher:DispatchSourceFileSystemObject?
@@ -37,13 +38,13 @@ import OSwindCore
             } else {try resolved.validate();model=try AppModel(root:resolved.url)}
         } catch {failure=error.localizedDescription}
         for name in [NSWorkspace.willSleepNotification,NSWorkspace.screensDidSleepNotification,NSWorkspace.sessionDidResignActiveNotification] {
-            NSWorkspace.shared.notificationCenter.publisher(for:name).sink {[weak self] _ in self?.requestLock()}.store(in:&workspaceSubscriptions)
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink {[weak self] _ in Task {@MainActor in self?.requestLock()}}.store(in:&workspaceSubscriptions)
         }
         Self.current=self
     }
     deinit {watcher?.cancel();lockMonitor?.invalidate();operation?.cancel()}
     func retry() {
-        guard !busy else {return}
+        guard !terminationRequested,!busy else {return}
         if vaultPackage != nil {run {try await self.loadVault(startServices:false)}} else {open(selection.url,persist:false)}
     }
     func open(_ url:URL,persist:Bool=true) {
@@ -67,7 +68,7 @@ import OSwindCore
         }
     }
     private var maySwitch:Bool {
-        guard !busy,model?.libraryTransfer.busy != true,model?.libraryWipe.busy != true,!recoveryTransfer.busy else {failure="Complete or cancel the current library operation before switching libraries.";return false};return true
+        guard !terminationRequested,!busy,model?.libraryTransfer.busy != true,model?.libraryWipe.busy != true,!recoveryTransfer.busy else {failure="Complete or cancel the current library operation before switching libraries.";return false};return true
     }
     func choose() {
         guard maySwitch else {return}
@@ -87,7 +88,7 @@ import OSwindCore
         guard let package=vaultPackage else {return}
         let vault=try LibraryVault(package:package);vaultStatus=try await vault.status()
         if vaultStatus?.state == .unlocked {
-            if locked() {try await performLock();return}
+            if terminationRequested || locked() {try await performLock();return}
             if model==nil {model=try AppModel(root:vault.libraryURL,startServices:startServices)}
         } else if let previous=model {
             previous.clearForVaultLock();closingStore=previous.store;model=nil
@@ -97,7 +98,7 @@ import OSwindCore
         }
     }
     func unlock(passphrase:String,remember:Bool,using provider:any VaultSecretProvider=UserPresenceVaultSecrets()) {
-        guard !busy,let package=vaultPackage else {return}
+        guard !terminationRequested,!busy,let package=vaultPackage else {return}
         message=""
         run {
             var secret=Data(passphrase.utf8);defer {secret.resetBytes(in:0..<secret.count)}
@@ -113,7 +114,7 @@ import OSwindCore
         }
     }
     func unlockWithKeychain(using provider:any VaultSecretProvider=UserPresenceVaultSecrets()) {
-        guard !busy,let package=vaultPackage else {return}
+        guard !terminationRequested,!busy,let package=vaultPackage else {return}
         message=""
         run {
             let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlockUsingKeychain(using:provider);try Task.checkCancellation()
@@ -192,10 +193,13 @@ import OSwindCore
     }
     func cancelOperation() {if vaultPackage != nil {pendingLock=true};operation?.cancel()}
     func lockForTermination() async -> Bool {
+        terminationRequested=true
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
         guard vaultPackage != nil else {model?.prepareForLibrarySwitch();return true}
         if vaultStatus?.state != .locked {requestLock();while busy {if let operation {await operation.value} else {break}}}
-        return vaultStatus?.volumeMounted == false
+        let detached=vaultStatus?.volumeMounted == false
+        if !detached {terminationRequested=false}
+        return detached
     }
     private func run(_ work:@escaping @MainActor () async throws -> Void) {
         guard !busy else {return};busy=true;failure=nil

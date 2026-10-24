@@ -5,6 +5,9 @@ import OSwindCore
 
 @MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
     var hotKey: EventHotKeyRef?
+    private var terminationReady=false
+    private var terminationInProgress=false
+    var finishTermination:(NSApplication)->Void={application in application.terminate(nil)}
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if DEBUG
         if CommandLine.arguments.contains("--demo"), let index = CommandLine.arguments.firstIndex(of:"--render-preview"), index+1 < CommandLine.arguments.count {
@@ -48,9 +51,18 @@ import OSwindCore
     }
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
+        if terminationReady {return .terminateNow}
         guard let session=AppSession.current,session.vaultPackage != nil || session.busy else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
-        Task {@MainActor in let locked=await session.lockForTermination();sender.reply(toApplicationShouldTerminate:locked)}
-        return .terminateLater
+        guard !terminationInProgress else {return .terminateCancel}
+        terminationInProgress=true
+        // terminateLater enters AppKit's nested modal run loop. If terminate()
+        // was called by a MainActor task, that task can starve the cleanup task.
+        // Return to the ordinary loop, await the verified lock, then quit again.
+        Task {@MainActor in
+            let locked=await session.lockForTermination();self.terminationInProgress=false
+            if locked {self.terminationReady=true;DispatchQueue.main.async {self.finishTermination(sender)}}
+        }
+        return .terminateCancel
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }

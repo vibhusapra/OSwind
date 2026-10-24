@@ -1,4 +1,5 @@
 import XCTest
+import AppKit
 import OSwindCore
 @testable import OSwind
 
@@ -51,7 +52,7 @@ import OSwindCore
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Snapshot.oswindvault")
         let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false}),source=try XCTUnwrap(session.model?.store)
         try source.insert(Memory(id:"keep",text:"Original source"));let mutation=SessionMigrationMutation(store:source)
-        session.createVault(at:package,name:"Changed source snapshot",capacityGiB:1,passphrase:UUID().uuidString,copyHistory:true,remember:false,observeMigration:mutation.observe)
+        session.createVault(at:package,name:"Changed source snapshot",capacityGiB:1,passphrase:UUID().uuidString,copyHistory:true,remember:false,observeMigration:{mutation.observe($0)})
         try await finish(session);XCTAssertNil(session.failure);XCTAssertNil(session.vaultPackage);XCTAssertTrue(session.snapshotNeedsReview);XCTAssertNotNil(session.createdVault)
         XCTAssertNotNil(try session.model?.store.get("keep"));XCTAssertNotNil(try session.model?.store.get("changed"));XCTAssertNil(defaults.string(forKey:LibraryLocationPreferences.key))
         let status=try await LibraryVault(package:package).status();XCTAssertEqual(status.state,.locked)
@@ -84,6 +85,20 @@ import OSwindCore
         let deadline=ContinuousClock.now.advanced(by:.seconds(10))
         while session.model != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
         try await finish(session);XCTAssertNil(session.model);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
+    }
+    func testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes() async throws {
+        try native();let package=root.appendingPathComponent("Quit.oswindvault"),secret=UUID().uuidString
+        _=try await LibraryVault.create(at:package,name:"Quit lifecycle",capacityGiB:1,passphrase:Data(secret.utf8))
+        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+        session.unlock(passphrase:secret,remember:false);try await finish(session)
+        let delegate=AppDelegate();var exits=0;delegate.finishTermination={_ in exits+=1}
+        let app=NSApplication.shared
+        XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateCancel)
+        XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateCancel)
+        let deadline=ContinuousClock.now.advanced(by:.seconds(15))
+        while exits==0,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        XCTAssertEqual(exits,1);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.model);XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateNow)
+        session.unlock(passphrase:secret,remember:false);XCTAssertFalse(session.busy);XCTAssertNil(session.model)
     }
     func testNormalTerminationAwaitsCancelledSetupBeforeReturning() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Terminated.oswindvault")

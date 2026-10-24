@@ -13,7 +13,7 @@ public protocol VaultSecretProvider:Sendable {
 public struct UserPresenceVaultSecrets:VaultSecretProvider {
     public init() {}
     public static var unavailabilityReason:String? {
-        guard let task=SecTaskCreateFromSelf(nil),let id=SecTaskCopyValueForEntitlement(task,"com.apple.application-identifier" as CFString,nil) as? String,!id.isEmpty else {return "This build has no app-identifier entitlement for protected Keychain access. Use the vault passphrase."}
+        guard let task=SecTaskCreateFromSelf(nil),let id=SecTaskCopyValueForEntitlement(task,"com.apple.application-identifier" as CFString,nil) as? String,!id.isEmpty else {return "Mac-authenticated Keychain unlock is unavailable in this build. Use your vault passphrase."}
         return nil
     }
     private func query(_ id:String) throws -> [String:Any] {
