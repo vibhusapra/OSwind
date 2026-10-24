@@ -1,5 +1,16 @@
 # OSwind delivery ledger
 
+## Search shortcut refresh — runtime a91f25b / schema21
+
+[PR #51](https://github.com/vibhusapra/OSwind/pull/51) fixes the native ⌘K defect found during entity acceptance. The shortcut previously selected Memories without rerunning retrieval when query text stayed the same. Leaving a project scope could remove its chip while keeping old scoped hits; leaving Conversations retained audio-only results. It now requests the existing cancellable/debounced refresh and preserves explicit query, app, time, mode and entity controls.
+
+Three of four new regression cases fail before the fix. All four plus nineteen source-opening/entity/calendar cases pass afterward and under focused TSan. [New signed evidence](../benchmarks/search-navigation-v1.json) binds runtime a91f25b to **783 normal cases: 752 pass / 31 opt-in skips**, **305 native/model/Metal passes**, and **777 distinct functional passes / six remaining opt-in cases**. All **23 focused TSan cases** and all **eight final qualification operations** pass. Exact entity CLI/HTTP/MCP and regular/indexed integration processes pass. The 33-file bundle, all three raw/signed normalized executables and entire ZIP agree; no TSan dependency is in the release. The signed CLI is byte-identical to the preceding 0a5cad1 package. The preceding 318-case race/physical-audio evidence remains separately attributed, rather than being added to this runtime's counts.
+
+Actual native input repeats the original two-source project → People & projects → ⌘K sequence and restores all **six** global sources with search focused. Conversations shows **zero** audio sources and ⌘K restores six global sources. Coming from scoped Ask deliberately preserves its two-source project chip/results; native quoted-phrase typing narrows to one. A screenshot inspection at one light window size shows the scope, controls, result and footer without clipping. Only six synthetic notes were used, with capture paused, audio/automatic indexing off and no permission changes. The owned GUI was quit afterward; no owned encrypted images remain and installed schema17 is unchanged. This is not a complete accessibility, capture/controller/microphone-to-ASR or Documents-root startup acceptance.
+
+The owned 20,000-vector / 32-dimension expression check passes all exact-top10 comparisons, alternating required phrases and stale-source invalidation. Three sequential Metal queries take 36.6/29.2/25.6 ms after index preparation on the M5 Max. Caches and host activity are uncontrolled, inference/capture/power excluded; these are observations, not a distribution or competitor result. Feature research remains **16 offerings / 76 requirements**; the ledger now correctly distinguishes the completed older component soak with gaps from the open current desktop/power gate.
+
+Next: optimize project metadata-only edits without invalidating automatic memberships; independently score local entity extraction, qualify Documents-root and full capture/controller/device flows, and measure million-source entity performance and power. Broad parity and a top-three ranking remain unfinished.
 
 ## Local people and project memory — runtime 0a5cad1 / schema21
 
@@ -15,14 +26,15 @@ Native qualification reproduced three failures of the earlier detach confirmatio
 
 The initially locked checks were resumed after an unlocked preflight. The signed CLI passes owned targeted capture/OCR/privacy: five OCR regions, normal/secret status timings 700/550 ms, suppression/exclusions and image/FTS erasure. Normal and TSan physical probes each isolate two hidden generated-tone sources through production inventory/PCM decoding (16 kHz mono Float32, 320 samples maximum per callback, no invalid formats/interruption). Native input accepts creating/editing a project, manual source links, automatic one-source catch-up to six of six, scoped evidence-only Ask and opening complete cited sources. These are controlled fixture checks, not microphone/controller/ASR, sustained latency, energy or competitor acceptance.
 
-The signed GUI reproduces a real defect: search a two-source project, return to People & projects, then ⌘K. The scope chip disappears but the two cached results remain until a query/refresh change, although all six synthetic sources should be shown. A separate regression and fix follow. A Documents-root audio readiness attempt timed out before PCM testing; an owned GUI opening worker also stalled in file open. Exact owned processes were stopped. Restoring synthetic fixtures into temporary storage allows the native GUI and both audio probes to pass without any permission change. A protected-folder interaction is possible but unproven; Documents-root startup remains unqualified. Current PR CI passes both jobs ([40134405348](https://github.com/vibhusapra/OSwind/actions/runs/40134405348)). Broad parity and top-three placement remain unfinished.
+The signed GUI reproduces a real defect: search a two-source project, return to People & projects, then ⌘K. The scope chip disappears but the two cached results remain until a query/refresh change, although all six synthetic sources should be shown. The later a91f25b section above records its regression, fix and signed native acceptance. A Documents-root audio readiness attempt timed out before PCM testing; an owned GUI opening worker also stalled in file open. Exact owned processes were stopped. Restoring synthetic fixtures into temporary storage allows the native GUI and both audio probes to pass without any permission change. A protected-folder interaction is possible but unproven; Documents-root startup remains unqualified. Current PR CI passes both jobs ([40134405348](https://github.com/vibhusapra/OSwind/actions/runs/40134405348)). Broad parity and top-three placement remain unfinished.
 
 Immediate remaining entity work:
 
 - [ ] Independent people/organization/place gold corpus, multilingual and noisy OCR/transcript cases; compare a better local extractor against the retained Apple baseline.
 - [ ] Avoid whole-archive re-extraction for project-note-only edits; current conservative metadata invalidation requires Build / resume.
 - [ ] Curated speaker-to-person associations, explicit forced re-extraction and entity-layer JSON/Markdown portability; no voice/face identity claim.
-- [ ] Fix the observed ⌘K stale-results defect; qualify Documents-root startup and full GUI/controller/microphone-to-ASR. Million-source entity latency, index lag and measured power remain open.
+- [x] Fix the observed ⌘K stale-results defect (a91f25b, signed native acceptance above).
+- [ ] Qualify Documents-root startup and full GUI/controller/microphone-to-ASR. Million-source entity latency, index lag and measured power remain open.
 - [ ] Matched full competitor workloads and sustained latest-runtime desktop capture; the independent component soak below is not that gate.
 
 ## Independent 24-hour component soak — pinned older schema11
