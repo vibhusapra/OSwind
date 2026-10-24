@@ -15,6 +15,8 @@ public enum StatisticsEvaluation {
         var db: OpaquePointer?
         guard sqlite3_open_v2(archive.appendingPathComponent("memory.sqlite").path,&db,SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX,nil) == SQLITE_OK else { sqlite3_close(db); throw OSwindError.database("Cannot open benchmark reference reader") }
         defer { sqlite3_close(db) }
+        let temporaryPolicy=try VaultAccess.temporaryPolicy(at:archive)
+        guard sqlite3_exec(db,"PRAGMA temp_store=\(temporaryPolicy.rawValue)",nil,nil,nil)==SQLITE_OK else {throw OSwindError.database("Cannot configure reference-reader temporary storage")}
         func legacyScan() throws {
             var counts: OpaquePointer?, apps: OpaquePointer?
             guard sqlite3_prepare_v2(db,"SELECT COUNT(*),SUM(kind='screen'),SUM(kind='audio'),SUM(embedding IS NOT NULL),MIN(timestamp),MAX(timestamp) FROM memories",-1,&counts,nil) == SQLITE_OK else { throw OSwindError.database("Cannot prepare reference statistics") }

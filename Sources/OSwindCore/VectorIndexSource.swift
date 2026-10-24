@@ -26,9 +26,11 @@ final class VectorIndexSource {
     let dimensions: Int
     private let transient = unsafeBitCast(-1,to:sqlite3_destructor_type.self)
     init(root: URL, modelID: String, dimensions: Int) throws {
+        let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.modelID = modelID; self.dimensions = dimensions
         guard sqlite3_open_v2(root.appendingPathComponent("memory.sqlite").path,&db,SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX,nil) == SQLITE_OK else { sqlite3_close(db); db = nil; throw OSwindError.database("Cannot read vector source") }
         sqlite3_busy_timeout(db,5000)
+        do {try exec("PRAGMA temp_store=\(temporaryPolicy.rawValue)")} catch {sqlite3_close(db);db=nil;throw error}
     }
     deinit { sqlite3_close(db) }
     private func failure() -> OSwindError { .database(String(cString:sqlite3_errmsg(db))) }

@@ -25,6 +25,7 @@ enum SQLiteSnapshot {
         guard (1...8192).contains(pagesPerStep), source.isFileURL, destination.isFileURL,
               !source.path.utf8.contains(0), !destination.path.utf8.contains(0),
               source.standardizedFileURL != destination.standardizedFileURL else { throw OSwindError.invalid("Invalid snapshot source or page batch") }
+        let inputPolicy=try VaultAccess.temporaryPolicy(at:source),outputPolicy=try VaultAccess.temporaryPolicy(at:destination)
         var attributes = stat()
         guard lstat(source.path,&attributes) == 0, attributes.st_mode & S_IFMT == S_IFREG else { throw OSwindError.invalid("Snapshot source must be an existing regular database file") }
         // macOS temporary paths commonly pass through /var -> /private/var.
@@ -39,7 +40,7 @@ enum SQLiteSnapshot {
         }
         defer { sqlite3_close(input) }
         sqlite3_busy_timeout(input,1000)
-        try execute(input,"PRAGMA trusted_schema=OFF; PRAGMA query_only=ON; BEGIN;")
+        try execute(input,"PRAGMA temp_store=\(inputPolicy.rawValue); PRAGMA trusted_schema=OFF; PRAGMA query_only=ON; BEGIN;")
         // Force the read version before any progress callback can allow a writer.
         var pin: OpaquePointer?
         guard sqlite3_prepare_v2(input,"SELECT COUNT(*) FROM sqlite_master",-1,&pin,nil) == SQLITE_OK else { throw error(input,"Cannot pin database snapshot") }
@@ -63,7 +64,7 @@ enum SQLiteSnapshot {
         }
         defer { sqlite3_close(output) }
         sqlite3_busy_timeout(output,1000)
-        try execute(output,"PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL;")
+        try execute(output,"PRAGMA temp_store=\(outputPolicy.rawValue); PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL;")
         guard let backup = sqlite3_backup_init(output,"main",input,"main") else { throw error(output,"Cannot initialize database snapshot") }
         var finished = false
         defer { if !finished { sqlite3_backup_finish(backup) } }

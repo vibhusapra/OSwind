@@ -9,6 +9,7 @@ final class BackupDatabase {
     private let transient = unsafeBitCast(-1,to:sqlite3_destructor_type.self)
     init(_ url: URL, createPrivate: Bool = false) throws {
         guard url.isFileURL, !url.path.utf8.contains(0) else { throw BackupFileError.invalid("Invalid backup database path") }
+        let temporaryPolicy=try VaultAccess.temporaryPolicy(at:url)
         let parent = url.deletingLastPathComponent()
         guard let resolved = realpath(parent.path,nil) else { throw BackupFileError.invalid("Cannot resolve backup database directory") }
         defer { free(resolved) }
@@ -25,7 +26,7 @@ final class BackupDatabase {
         sqlite3_limit(handle,SQLITE_LIMIT_EXPR_DEPTH,128)
         sqlite3_progress_handler(handle,1000,{ _ in Task.isCancelled ? 1 : 0 },nil)
         do {
-            try execute("PRAGMA trusted_schema=OFF; PRAGMA cache_size=-4096; PRAGMA temp_store=FILE;")
+            try execute("PRAGMA trusted_schema=OFF; PRAGMA cache_size=-4096; PRAGMA temp_store=\(temporaryPolicy.rawValue);")
             try execute(createPrivate ? "PRAGMA journal_mode=DELETE; PRAGMA synchronous=NORMAL;" : "PRAGMA query_only=ON;")
         } catch { sqlite3_close(handle); handle = nil; throw error }
     }

@@ -3,7 +3,7 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 17
+    public static let schemaVersion = 18
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     let mediaRootIdentity:BackupFileStamp
@@ -14,6 +14,7 @@ public final class MemoryStore: @unchecked Sendable {
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
+        let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
         try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
@@ -25,7 +26,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=FILE; PRAGMA temp.cache_size=-4096;")
+        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
         try exec("BEGIN IMMEDIATE")
         do {
         try exec("""
