@@ -12,7 +12,13 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "VaultLocked" || model.section == "VaultClosing" {
+        if model.section == "VisualSearch" {
+            model.section="Memories";model.mode = .visual;model.refresh()
+            let deadline=ContinuousClock.now.advanced(by:.seconds(30))
+            while model.refreshing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+            guard !model.refreshing,model.hits.contains(where:{$0.visual != nil}) else {throw OSwindError.unavailable("Visual sample search did not finish with source-validated matches")}
+            content=AnyView(WorkspaceView().environmentObject(model))
+        } else if model.section == "VaultLocked" || model.section == "VaultClosing" {
             let session=try await AppSession.previewVault(in:model.store.root,state:model.section == "VaultClosing" ? .closing:.locked)
             size=NSSize(width:1000,height:850);content=AnyView(VaultLockedView(session:session))
         } else if model.section == "VaultSetup" {
@@ -73,6 +79,9 @@ import OSwindCore
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
         } else if model.section == "LibraryRecovery" {
             size = NSSize(width:1000,height:760); content = AnyView(LibraryRecoveryView(session:AppSession(selection:LibraryLocationSelection(url:model.store.root.appendingPathComponent("disconnected-drive"),requiresExisting:true,origin:"preview"))))
+        } else if model.section == "SettingsVisualMemory" {
+            size=NSSize(width:760,height:780)
+            content=AnyView(Form {VisualModelSettingsView()}.formStyle(.grouped).padding(12).environmentObject(model))
         } else if model.section == "SettingsModels" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Models").environmentObject(model))
         } else if model.section == "MemoryDetail", let candidate = model.hits.first?.memory,let memory=try? model.store.hydrate(candidate) {

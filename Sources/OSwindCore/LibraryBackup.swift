@@ -23,6 +23,7 @@ public struct LibraryBackupInfo: Codable, Sendable {
     public var payloadBytes: Int64
     public var encryption: String
     public var archiveFingerprint: String? = nil
+    public var discardedVisualIndexes:Int64? = nil
 }
 struct LibraryBackupHeader: Codable {
     var format = "OSwind library backup"
@@ -52,6 +53,7 @@ final class BackupDataReader {
         for name in ["memories","chat_sessions","chat_turns","chat_sources","semantic_vectors","semantic_passages","passage_manifests"] { try db.requireTable(name) }
         if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
         if schema>=15 {try db.requireTable("recap_sources")}
+        if schema>=19 {for name in ["visual_sources","visual_manifests","visual_vectors"] {try db.requireTable(name)}}
         guard try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED WHERE length(payload)>\(MemoryStore.maximumRecordBytes)")==0 else { throw BackupFileError.invalid("A source payload exceeds the backup format's 128 MiB record bound") }
     }
     func close() { db.close() }
@@ -82,6 +84,9 @@ public enum LibraryBackup {
         result.captureOnLaunch = false; result.audioEnabled = false; result.systemAudioEnabled = false; result.apiEnabled = false
         result.routinesEnabled = false;result.automaticMaintenance = false; result.ai.allowRemote = false; result.ai.provider = .evidence
         result.ai.endpoint = AIConfiguration().endpoint; result.search.provider = .apple; result.search.endpoint = SearchConfiguration().endpoint
+        // Restored archives cannot select a machine-local model or start inference.
+        // Verified derived vectors remain usable after explicit trusted setup.
+        result.search.visual = VisualSearchConfiguration(); result.search.visual.automaticIndex = false
         result.whisperBinary = AppSettings().whisperBinary; result.whisperModel = AppSettings().whisperModel
         return result
     }

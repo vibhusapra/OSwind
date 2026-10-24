@@ -125,6 +125,7 @@ struct SettingsView: View {
                 if m.indexing { ProgressView(value:m.indexProgress) }
                 Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)
             }
+            VisualModelSettingsView()
             Section("Local model library") {
                 HStack { Button(m.startingModelServer ? "Starting…" : "Start local server") { m.startModelServer() }.disabled(m.startingModelServer); Button("Check local server") { m.inspectLocalModels() }; Text(m.modelStatus).font(.caption).foregroundStyle(.secondary) }
                 ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }

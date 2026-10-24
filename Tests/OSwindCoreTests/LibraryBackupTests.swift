@@ -72,7 +72,9 @@ final class LibraryBackupTests: XCTestCase {
     }
     func testRestoredSettingsAreQuietAndMachineConnectionsNeedSetup() throws {
         var settings = AppSettings(); settings.captureOnLaunch = true; settings.apiEnabled = true; settings.audioEnabled = true; settings.systemAudioEnabled = true; settings.ai.allowRemote = true; settings.ai.provider = .compatible; settings.ai.endpoint = "https://example.invalid"; settings.search.provider = .ollama; settings.whisperBinary = "/tmp/untrusted-program"
+        settings.search.visual.enabled=true;settings.search.visual.automaticIndex=true;settings.search.visual.modelDirectory="/tmp/archive-supplied-model"
         let quiet = LibraryBackup.quietSettings(settings)
+        XCTAssertFalse(quiet.search.visual.enabled);XCTAssertFalse(quiet.search.visual.automaticIndex);XCTAssertEqual(quiet.search.visual.modelDirectory,"")
         XCTAssertFalse(quiet.captureOnLaunch || quiet.apiEnabled || quiet.audioEnabled || quiet.systemAudioEnabled || quiet.automaticMaintenance || quiet.ai.allowRemote)
         XCTAssertEqual(quiet.ai.provider,.evidence); XCTAssertEqual(quiet.search.provider,.apple); XCTAssertEqual(quiet.ai.endpoint,AIConfiguration().endpoint); XCTAssertEqual(quiet.whisperBinary,AppSettings().whisperBinary)
         var object = try JSONSerialization.jsonObject(with:JSONEncoder().encode(AppSettings())) as! [String:Any]; object.removeValue(forKey:"automaticMaintenance")

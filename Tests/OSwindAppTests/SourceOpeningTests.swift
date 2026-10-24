@@ -1,5 +1,5 @@
 import XCTest
-import OSwindCore
+@testable import OSwindCore
 @testable import OSwind
 
 @MainActor final class SourceOpeningTests:XCTestCase {
@@ -38,6 +38,21 @@ import OSwindCore
     func testDeletingPendingSourceCancelsItsOpening() async throws {
         let memory=try preview();app.openMemory(memory,query:"word");app.delete(memory)
         try await Task.sleep(nanoseconds:100_000_000);XCTAssertNil(app.selected);XCTAssertNil(app.openingMemoryID)
+    }
+    func testVisualOpeningPreservesProofAndClearsItWhenLeavingSource() async throws {
+        let memory=Memory(id:"image",app:"Fixture",text:"",imagePath:"images/one.dat")
+        try Data("owned sample pixels".utf8).write(to:root.appendingPathComponent(memory.imagePath!));try app.store.insert(memory)
+        let snapshot=try XCTUnwrap(VisualImageSnapshot.make(store:app.store,id:memory.id))
+        _ = try app.store.saveVisualVectors([.init(point:snapshot.plan.points[0],decodedTime:nil,vector:[1,0])],snapshot:snapshot,modelID:"fixture");snapshot.release()
+        let hit=try XCTUnwrap(app.store.searchVisual(SearchFilter(),vector:[1,0],modelID:"fixture").hits.first),match=try XCTUnwrap(hit.visual)
+        app.openMemory(hit.memory,query:"appearance",visual:match);try await finish()
+        XCTAssertEqual(app.selected?.id,memory.id);XCTAssertEqual(app.selectedVisual,match)
+        app.focusSearch();XCTAssertNil(app.selectedVisual)
+        try Data("replacement".utf8).write(to:root.appendingPathComponent(memory.imagePath!))
+        app.errorMessage=nil;app.openMemory(hit.memory,query:"stale",visual:match);try await finish()
+        XCTAssertNil(app.selected);XCTAssertNil(app.selectedVisual);XCTAssertNotNil(app.errorMessage)
+        app.openMemory(hit.memory,query:"cancelled",visual:match);app.prepareForLibrarySwitch()
+        try await Task.sleep(nanoseconds:50_000_000);XCTAssertNil(app.selectedVisual);XCTAssertNil(app.selected)
     }
     func testChangedOrErasedSourceFailsWithoutOpeningStaleText() async throws {
         let memory=try preview();_ = try app.store.renameAudioSpeaker(memory.id,from:"Maya",to:"Theo")

@@ -29,6 +29,7 @@ struct SemanticCandidate {
     var similarity: Double
     var timestamp: Double
     var passage: PassageRange? = nil
+    var visual:VisualMatch? = nil
     static func better(_ a: Self, _ b: Self) -> Bool {
         if a.similarity != b.similarity { return a.similarity > b.similarity }
         if a.timestamp != b.timestamp { return a.timestamp > b.timestamp }

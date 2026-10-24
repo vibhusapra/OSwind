@@ -45,6 +45,9 @@ public final class RetrievalEngine: @unchecked Sendable {
         let resolution = try store.resolveQueryScope(input,interpret:interpretQuery,now:now,timeZone:timeZone)
         let filter = resolution.filter
         let expression = try expressionPlan ?? SearchExpressionPlan.make(filter.query,interpret:interpretQuery)
+        if mode == .visual {
+            return try await VisualRetrievalEngine(store:store).search(input,configuration:configuration.visual,policy:AppSettings.load(root:store.root).privacy,interpretQuery:interpretQuery,now:now,timeZone:timeZone,expressionPlan:expressionPlan)
+        }
         if filter.query.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty || mode == .keyword {
             return RetrievalResult(hits:try store.search(filter,mode:.keyword,detail:detail,expression:expression),warnings:[],modelID:nil,duration:Date().timeIntervalSince(start),resolution:resolution)
         }

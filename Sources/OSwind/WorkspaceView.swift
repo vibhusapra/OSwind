@@ -78,12 +78,12 @@ struct WorkspaceView: View {
                 if m.range == "Choose day" { DatePicker("Date",selection:$m.date,displayedComponents:.date).labelsHidden().frame(width:120) }
                 Picker("Application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
-                Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.segmented).labelsHidden().frame(width:250)
+                Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.menu).labelsHidden().frame(width:125)
             }
             QueryScopeControls(query:$m.query,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.searchInputError)
             ForEach(m.searchWarnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
-            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { m.openMemory($0,query:m.activeSearchQuery) } }
+            if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { memory in let hit=m.hits.first {$0.id==memory.id};m.openMemory(memory,query:m.activeSearchQuery,passage:hit?.passage,visual:hit?.visual) } }
             if let error = m.searchInputError {
                 ContentUnavailableView { Label("Adjust query filters",systemImage:"line.3.horizontal.decrease.circle") } description: { Text(error) } actions: { Button("Use as search text") { m.interpretQuery = false } }.frame(maxWidth:.infinity,maxHeight:.infinity)
             } else if m.hits.isEmpty {
@@ -101,21 +101,22 @@ struct MemoryCard: View {
     var memory: Memory { hit.memory }
     var body: some View {
         VStack(alignment:.leading,spacing:0) {
-            Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) } label: {
+            Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage,visual:hit.visual) } label: {
                 ZStack(alignment:.topLeading) {
-                    if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
+                    if hit.visual != nil {VisualHitImage(hit:hit)}
+                    else if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
                     else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
                     Text(memory.recap != nil ? "LINKED RECAP":memory.visualRecording == nil ? memory.kind.rawValue.uppercased():"REPLAY").font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
                 HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent); Spacer(); Text(memory.timestamp,style:.time).font(.caption2).foregroundStyle(.secondary) }
-                Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
-                if memory.imagePath != nil && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
+                Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage,visual:hit.visual) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
+                if memory.imagePath != nil && !memory.text.isEmpty && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
             }.padding(15)
         }.background(.background,in:RoundedRectangle(cornerRadius:12)).clipShape(RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.07)))
-        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) }.disabled(m.deletingID != nil || m.maintenanceBusy) }
+        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage,visual:hit.visual) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) }.disabled(m.deletingID != nil || m.maintenanceBusy) }
     }
 }
 struct TimelineStrip: View {
@@ -135,6 +136,7 @@ struct MemoryDetail: View {
     var body: some View {
         VStack(alignment:.leading,spacing:18) {
             HStack { VStack(alignment:.leading,spacing:4) { Text(memory.title).font(.title2.weight(.semibold)); Text("\(memory.app) · \(memory.timestamp.formatted())").font(.caption).foregroundStyle(.secondary) }; Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
+            if let match=m.selectedVisual {Label(match.decodedTime.map {"Visual match at \($0.formatted(.number.precision(.fractionLength(1)))) s"} ?? "Matched image appearance",systemImage:"photo").font(.caption).foregroundStyle(.secondary)}
             ScrollView {
                 if memory.kind == .summary {RecapEvidenceView(memory:memory)}
                 if !query.isEmpty && memory.visualRecording == nil {
@@ -144,7 +146,8 @@ struct MemoryDetail: View {
                         Text("Ellipses mark omitted text. The complete source follows.").font(.caption2).foregroundStyle(.secondary)
                     }.frame(maxWidth:.infinity,alignment:.leading).padding(14).background(accent.opacity(0.06),in:RoundedRectangle(cornerRadius:8))
                 }
-                if let recording=memory.visualRecording { VideoReplayView(recording:recording,url:memory.videoPath.flatMap {m.store.assetURL($0)},initialTime:recording.frameTime(passage:m.selectedPassage,query:query),boxes:$boxes) }
+                if let recording=memory.visualRecording { VideoReplayView(recording:recording,url:memory.videoPath.flatMap {m.store.assetURL($0)},initialTime:m.selectedVisual?.decodedTime ?? recording.frameTime(passage:m.selectedPassage,query:query),boxes:$boxes).id("\(memory.id)-\(m.selectedVisual?.frameOrdinal ?? -1)") }
+                else if let match=m.selectedVisual {VisualHitImage(hit:SearchHit(memory:memory,score:0,match:"visual similarity",visual:match),height:380,contentMode:.fit,maxDimension:2048)}
                 else if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).overlay { if boxes { GeometryReader { geo in ForEach(Array(memory.regions.enumerated()),id:\.offset) { _,r in Rectangle().stroke(accent,lineWidth:1).frame(width:geo.size.width*r.width,height:geo.size.height*r.height).position(x:geo.size.width*(r.x+r.width/2),y:geo.size.height*(1-r.y-r.height/2)) } } } }.clipShape(RoundedRectangle(cornerRadius:9)) }
                 if memory.kind == .audio { AudioPlaybackView(memory:memory,url:memory.audioPath.flatMap { m.store.assetURL($0) }) }
                 if memory.visualRecording==nil && ((memory.transcript?.segments.isEmpty ?? true) || memory.transcript?.segments.allSatisfy({$0.text == "[REDACTED]"}) == true) { Text(memory.text).textSelection(.enabled).font(.system(size:14)).frame(maxWidth:.infinity,alignment:.leading).padding(.top,12) }
@@ -230,7 +233,7 @@ struct AnswerCard: View {
             if !answer.sources.isEmpty {
                 DisclosureGroup("Check \(answer.sources.count) sources") {
                     ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in
-                        Button { m.openMemory(hit.memory,query:question,passage:hit.passage) } label: {
+                        Button { m.openMemory(hit.memory,query:question,passage:hit.passage,visual:hit.visual) } label: {
                             VStack(alignment:.leading,spacing:7) {
                                 HStack { Text("[\(i+1)]").monospaced(); Text(hit.memory.title).lineLimit(1); Spacer(); Text(hit.memory.app).foregroundStyle(.secondary) }
                                 EvidenceSnippetView(text:hit.memory.text,query:question,passage:hit.passage).foregroundStyle(.secondary).lineLimit(3).frame(maxWidth:.infinity,alignment:.leading)

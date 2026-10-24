@@ -36,7 +36,10 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     }
     public var searchableText: String { [title, app, url ?? "", text].joined(separator: "\n") }
 }
-public enum SearchMode: String, Codable, CaseIterable { case hybrid, keyword, semantic }
+public enum SearchMode: String, Codable, CaseIterable {
+    case hybrid,keyword,semantic,visual
+    public static let textModes:[Self]=[.hybrid,.keyword,.semantic]
+}
 public struct SearchFilter: Codable, Equatable, Sendable {
     public var query = ""
     public var app: String?
@@ -55,8 +58,9 @@ public struct SearchHit: Identifiable, Codable, Sendable {
     public var score: Double
     public var match: String
     public var passage: PassageRange?
+    public var visual:VisualMatch?
     public var id: String { memory.id }
-    public init(memory: Memory, score: Double, match: String, passage: PassageRange? = nil) { self.memory = memory; self.score = score; self.match = match; self.passage = passage }
+    public init(memory: Memory, score: Double, match: String, passage: PassageRange? = nil,visual:VisualMatch?=nil) { self.memory = memory; self.score = score; self.match = match; self.passage = passage;self.visual=visual }
 }
 public struct StoreStats: Codable, Sendable {
     public var count: Int = 0

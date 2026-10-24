@@ -75,6 +75,13 @@ final class VisualEncoderTests:XCTestCase {
         let active=await runtime.resident;XCTAssertTrue(active)
         await runtime.unload();let released=await runtime.resident;XCTAssertFalse(released)
         await runtime.setRetention(.afterUse)
+        let firstBatch=await runtime.beginBatch(),secondBatch=await runtime.beginBatch()
+        _ = try await runtime.embed(text:"a red car",directory:directory,compute:.cpuOnly)
+        try await Task.sleep(for:.milliseconds(30));let held=await runtime.resident;XCTAssertTrue(held)
+        await runtime.endBatch(firstBatch);try await Task.sleep(for:.milliseconds(30));let overlapHeld=await runtime.resident;XCTAssertTrue(overlapHeld)
+        await runtime.endBatch(secondBatch)
+        for _ in 0..<100 {if !(await runtime.resident) {break};try await Task.sleep(for:.milliseconds(10))}
+        let batchExpired=await runtime.resident;XCTAssertFalse(batchExpired)
         _ = try await runtime.embed(text:"a blue car",directory:directory,compute:.cpuOnly)
         for _ in 0..<100 {if !(await runtime.resident) {break};try await Task.sleep(for:.milliseconds(10))}
         let expired=await runtime.resident;XCTAssertFalse(expired)

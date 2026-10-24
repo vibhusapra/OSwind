@@ -1,6 +1,6 @@
-# Local visual encoder foundation
+# Local visual models and qualification
 
-OSwind can convert and run a pinned Google SigLIP2 image/text pair locally through Core ML. This increment provides an encoder and an explicit qualification CLI. **It does not yet index screenshots/replay frames, add visual search to the workspace, or give Ask image understanding.** Those are the next integration gates. Existing text search works without this optional model.
+OSwind can convert and run a pinned Google SigLIP2 image/text pair locally through Core ML. The encoder and qualification CLI also support [persisted screenshot/replay visual search](VISUAL-SEARCH.md). That integration adds no image understanding to text-only Ask. Existing text search works without this optional model.
 
 The [source catalog](../models/siglip2-source.json) fixes the original repository revision, eight file sizes and SHA-256 hashes. Google's [pinned model card](https://huggingface.co/google/siglip2-base-patch16-224/blob/75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2/README.md) declares Apache-2.0. Weights are downloaded separately and are absent from this repository and the app bundle. Native tokenization uses pinned Hugging Face Swift code; [third-party notices](../ThirdParty/NOTICES.txt) and transitive licenses are packaged with the app.
 
@@ -62,11 +62,8 @@ The first natural-photo run failed an end-to-end 0.999 cosine gate (worst 0.9909
 
 This small photo subset is **not the standard COCO 5k benchmark, a desktop-history relevance study, a proven unseen training holdout or a comparison with competitor apps**. It establishes a local implementation baseline. No threshold is tuned against its labels.
 
-## Next integration gates
+## Integration and remaining gates
 
-- Media-byte and frame identity, with revalidation before vector admission; text-only hashes are insufficient.
-- Privacy admission before indexing, cooperative media leases and no plaintext scratch outside managed vaults.
-- Screenshot and timed replay-frame coverage, scopes, retention/deletion, backup/restore and full wipe.
-- Search results that open the matched image/frame; a visual match must not become an invented caption or unsupported text-only Ask claim.
-- Native model setup, resumable downloads, power-aware background indexing, lag/coverage, idle release and accessibility review.
-- Labeled desktop retrieval, cold starts, realistic archive scaling, energy and matched competitor runs.
+[Visual search](VISUAL-SEARCH.md) now connects source/media/frame identities, privacy rules, private replay workspaces, persisted vectors, scoped CLI/HTTP/MCP queries, protected previews, matched-time opening, native settings, background catch-up and backup/restore. These are separate from the frozen encoder-only measurements above.
+
+One-click model preparation/download, labeled desktop relevance, cold starts, realistic archive scaling, energy, native interaction and matched competitor measurements remain open. Visual similarity does not establish a caption or factual image-grounded Ask answer.

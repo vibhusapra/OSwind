@@ -83,6 +83,7 @@ struct LibraryTransferView: View {
             if let info = transfer.inspected {
                 VStack(alignment:.leading,spacing:6) {
                     Text("\(info.memories) memories · \(info.conversations) conversations · \(info.mediaFiles) media files").font(.callout.weight(.medium))
+                    if let discarded=info.discardedVisualIndexes,discarded>0 {Text("\(discarded) changed or unsupported visual indexes need rebuilding. Original history was restored.").font(.caption).foregroundStyle(.secondary)}
                     Text("Created \(info.createdAt) · \(ByteCountFormatter.string(fromByteCount:info.payloadBytes,countStyle:.file))").font(.caption).foregroundStyle(.secondary)
                     Button("Restore a new library…") { transfer.chooseRestoreLocation() }.disabled(transfer.busy)
                 }.padding(12).frame(maxWidth:.infinity,alignment:.leading).background(.primary.opacity(0.04),in:RoundedRectangle(cornerRadius:8))

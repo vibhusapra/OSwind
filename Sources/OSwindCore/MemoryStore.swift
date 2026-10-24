@@ -3,7 +3,7 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 18
+    public static let schemaVersion = 19
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var managedCloseDirectory:BackupFileTree?
@@ -107,6 +107,14 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(SearchScopeSchema.sql)
         try exec(SpeakerSearchSchema.sql)
         try exec(SearchPreviewSchema.sql)
+        try exec(VisualIndexSchema.sql)
+        if version<19 {
+            let sources=try prepare("SELECT payload FROM memories WHERE kind='screen'")
+            defer {sqlite3_finalize(sources)}
+            var code=sqlite3_step(sources)
+            while code==SQLITE_ROW {try autoreleasepool {try replaceVisualProjection(decode(sources))};code=sqlite3_step(sources)}
+            guard code==SQLITE_DONE else {throw failure()}
+        }
         if version < 11 {
             let audio=try prepare("SELECT payload FROM memories WHERE kind='audio'")
             defer { sqlite3_finalize(audio) }
@@ -191,7 +199,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
-        try replaceSpeakerProjection(memory);try replaceSearchPreview(memory);try replaceRecapLinks(memory,deferred:deferRecapLinks)
+        try replaceSpeakerProjection(memory);try replaceSearchPreview(memory);try replaceVisualProjection(memory);try replaceRecapLinks(memory,deferred:deferRecapLinks)
         try Task.checkCancellation();try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
         if ownsTransaction {_ = finishRecapInvalidation()}
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
@@ -219,6 +227,8 @@ public final class MemoryStore: @unchecked Sendable {
     /// Revalidate and load complete evidence in one read snapshot. Deleted or
     /// revised sources fail explicitly, rather than silently retargeting offsets.
     public func hydrate(_ hits:[SearchHit]) throws -> [SearchHit] {
+        let activity=try hits.contains(where:{$0.visual != nil}) ? mediaWriteLease():nil
+        defer {activity?.release()}
         lock.lock();defer {lock.unlock()};try Task.checkCancellation()
         try exec("SAVEPOINT hydrate_sources");defer {try? exec("RELEASE hydrate_sources")}
         return try hits.map { hit in
@@ -226,7 +236,8 @@ public final class MemoryStore: @unchecked Sendable {
             let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
             guard let current=try get(hit.id),current.searchPreview==nil,current.evidenceHash==expected else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
             guard hit.passage.map({$0.text(in:current.text) != nil}) ?? true else {throw OSwindError.invalid("The source passage is no longer valid")}
-            return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage)
+            if let visual=hit.visual {try validateVisualMatch(visual,memory:current)}
+            return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage,visual:hit.visual)
         }
     }
     public func hydrate(_ memory:Memory) throws -> Memory {try hydrate([SearchHit(memory:memory,score:0,match:"")])[0].memory}
@@ -265,7 +276,7 @@ public final class MemoryStore: @unchecked Sendable {
     public func get(_ id: String) throws -> Memory? {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
-    private func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil) -> (String, [String]) {
+    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil) -> (String, [String]) {
         var parts = ["1=1"]; var values = [String]()
         if let app = filter.app, !app.isEmpty { parts.append("\(prefix)app=?"); values.append(app) }
         if let kind = filter.kind { parts.append("\(prefix)kind=?"); values.append(kind.rawValue) }
@@ -313,6 +324,7 @@ public final class MemoryStore: @unchecked Sendable {
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
     public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, expression:SearchExpressionPlan? = nil, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
+        guard mode != .visual else {throw OSwindError.invalid("Use the visual retrieval engine for appearance search")}
         try Task.checkCancellation()
         var queryPlan = try expression ?? SearchExpressionPlan.make(filter.query)
         var indexStatus: SearchIndexStatus?
@@ -514,7 +526,7 @@ public final class MemoryStore: @unchecked Sendable {
         } catch { try? exec("ROLLBACK"); throw error }
     }
     private func updateMetadata(_ m: Memory) throws {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m)
+        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m)
     }
     @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
     public func diskBytes(includeStaging:Bool=true) -> Int64 {

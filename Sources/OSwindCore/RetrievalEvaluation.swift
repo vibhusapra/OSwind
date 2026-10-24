@@ -28,7 +28,7 @@ public enum RetrievalEvaluation {
             let before = Date(); _ = try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,allowLowPower:configuration.indexOnLowPower); annSeconds = Date().timeIntervalSince(before)
         }
         var reports = [String:Any](), modelIDs = Set<String>()
-        for mode in SearchMode.allCases {
+        for mode in SearchMode.textModes {
             var times = [Double](), recall = 0.0, hitRate = 0.0, reciprocal = 0.0, positives = 0, emptyCorrect = 0, negatives = 0
             var perQuery = [[String:Any]](), categories = [String:(count:Int,recall:Double,mrr:Double)]()
             for repetition in 0..<max(1,min(10,repetitions)) {
