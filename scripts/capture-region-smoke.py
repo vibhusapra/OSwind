@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Owned settings compatibility/portability checks; no screen access or capture."""
+import contextlib
 import argparse,hashlib,json,pathlib,sqlite3,subprocess
 p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-cli',type=pathlib.Path);a=p.parse_args()
 binary=a.binary.resolve();base=a.root.resolve();base.mkdir(mode=0o700,exist_ok=False);library=base/'library';report={'format':'OSwind capture-region compatibility v1','scope':'Owned synthetic source/settings, library compatibility refusal and quiet backup/restore. No pixels, normal library, credentials or native input.','binarySHA256':hashlib.sha256(binary.read_bytes()).hexdigest(),'checks':[]}
@@ -9,14 +10,14 @@ def run(cli,*args,ok=True):
  assert (r.returncode==0)==ok,(args,r.returncode,r.stderr);return r
 
 def snapshot():
- with sqlite3.connect(library/'memory.sqlite') as db:return {'schema':db.execute('PRAGMA user_version').fetchone()[0],'ids':db.execute('SELECT id,text FROM memories ORDER BY id').fetchall()}
+ with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:return {'schema':db.execute('PRAGMA user_version').fetchone()[0],'ids':db.execute('SELECT id,text FROM memories ORDER BY id').fetchall()}
 try:
  creator=a.old_cli.resolve() if a.old_cli else binary
  identifier=run(creator,'--data',library,'note','Owned capture scope marker').stdout.strip()
  if a.old_cli:
   report['olderBinarySHA256']=hashlib.sha256(creator.read_bytes()).hexdigest();assert snapshot()['schema']==19;report['actualOlderSchema19Creator']=True
  else:
-  with sqlite3.connect(library/'memory.sqlite') as db:db.execute('PRAGMA user_version=19')
+  with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:db.execute('PRAGMA user_version=19');db.commit()
   report['actualOlderSchema19Creator']=False
  region={'selectedDisplays':['11111111-1111-4111-8111-111111111111'],'displayCrops':{'11111111-1111-4111-8111-111111111111':{'x':0.1,'y':0.2,'width':0.6,'height':0.5}},'focusedWindowCrop':{'x':0.5,'y':0,'width':0.5,'height':1}}
  settings={'allDisplays':True,'snapshotRegions':region,'captureOnLaunch':True,'apiEnabled':True,'automaticMaintenance':False}

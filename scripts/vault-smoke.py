@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Owned encrypted-library process checks. Retain private fixtures; never use a normal library."""
+import contextlib
 import argparse,hashlib,json,os,pathlib,plistlib,secrets,sqlite3,subprocess,wave
 p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-cli',type=pathlib.Path);a=p.parse_args();binary=a.binary.resolve();base=a.root.resolve();base.mkdir(mode=0o700,exist_ok=False);package=base/'Fixture.oswindvault';alias=package/'Library';secret=secrets.token_urlsafe(32).encode();held=None;migrated=base/'Migrated.oswindvault';moved=base/'Moved.oswindvault';report={'state':'running','scope':'Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.','checks':[],'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'schema_version':None}
 def save():(base/'report.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -20,7 +21,7 @@ try:
  opened=json.loads(run('vault','unlock',package,'--passphrase-stdin',password=secret));assert opened['state']=='unlocked' and alias.is_dir() and alias.is_symlink();assert len(mounted())==1
  identifier=run('--vault',package,'note','Owned encrypted memory marker').strip();assert json.loads(run('--vault',package,'get',identifier))['text']=='Owned encrypted memory marker';report['checks'].append('managed handle writes and retrieves on verified volume');save()
  library=alias.resolve()
- with sqlite3.connect(library/'memory.sqlite') as database:report['schema_version']=database.execute('PRAGMA user_version').fetchone()[0]
+ with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as database:report['schema_version']=database.execute('PRAGMA user_version').fetchone()[0]
  save()
  if a.old_cli:
   old=a.old_cli.resolve();before=hashlib.sha256((library/'memory.sqlite').read_bytes()).hexdigest();r=subprocess.run([str(old),'--data',str(alias),'note','Old writer must fail'],capture_output=True,text=True,timeout=30);assert r.returncode!=0 and 'newer OSwind' in r.stderr and hashlib.sha256((library/'memory.sqlite').read_bytes()).hexdigest()==before;report['checks'].append('supplied actual older writer refuses the current schema without changing DB bytes');report['old_binary_sha256']=hashlib.sha256(old.read_bytes()).hexdigest()
