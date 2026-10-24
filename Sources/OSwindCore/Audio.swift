@@ -83,10 +83,16 @@ private final class AudioAccumulator: @unchecked Sendable {
     func start() async throws { try await stream.startCapture() }
     func stop() async throws { try await stream.stopCapture() }
 }
+private struct AudioPrivacyFailure:LocalizedError {
+    var message:String
+    var errorDescription:String? {message}
+}
 // Tests substitute suspended authorization/stream startup without TCC or devices.
 @MainActor struct AudioStartupEnvironment {
     var locked: () -> Bool = { SessionState.locked }
-    var context: () -> WindowContext? = { AccessibilityContext.current() }
+    var context: () async -> WindowContext? = { await AccessibilityContext.read() }
+    var identityCurrent:(WindowContext)->Bool = {AccessibilityContext.identityCurrent($0,targetBundleID:nil)}
+    var privacyInterval:TimeInterval=1
     var authorizeMicrophone: () async -> Bool = { await AVCaptureDevice.requestAccess(for: .audio) }
     var makeEngine: () throws -> AVAudioEngine = { AVAudioEngine() }
     var systemAvailable: () -> Bool = { CGPreflightScreenCaptureAccess() }
@@ -117,7 +123,10 @@ private final class AudioAccumulator: @unchecked Sendable {
     private var micSink: AudioAccumulator?
     private var systemSink: AudioAccumulator?
     fileprivate let audioQueue = DispatchQueue(label: "com.oswind.system-audio", qos: .utility)
-    private var pending: [(samples: [Float], date: Date, source: String)] = []
+    private struct Chunk {var samples:[Float],date:Date,source:String,epoch:UUID,sessionID:String}
+    private var pending:[Chunk]=[]
+    private var privacyJob:(id:UUID,task:Task<Void,Never>)?
+    private var contextSession:AccessibilityReadSession
     private var processing = false
     private var finishing = false
     private var preparationTask: Task<Void,Error>?
@@ -143,6 +152,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     }
     init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings, startup: AudioStartupEnvironment, recognizer:SpeechRecognizer=SpeechRecognizer()) {
         self.store=store; self.embedder=embedder; self.settings=settings; self.startup=startup; self.recognizer=recognizer
+        contextSession=AccessibilityReadSession(operation:{_ in await startup.context()})
         super.init();applyNativeModelRetention()
     }
     private func applyNativeModelRetention() {
@@ -160,23 +170,24 @@ private final class AudioAccumulator: @unchecked Sendable {
             else if !FileManager.default.isExecutableFile(atPath:settings.whisperBinary) || !FileManager.default.fileExists(atPath:settings.whisperModel) { throw OSwindError.unavailable("Choose a local Whisper model first") }
         } catch { status=error.localizedDescription; return }
         guard settings.audioEnabled || settings.systemAudioEnabled else { status="Enable an audio source in Settings"; return }
+        if finishing || processing || !pending.isEmpty {stop()}
         epoch=UUID(); let token=epoch, config=settings
         sessionID=UUID().uuidString; finishing=false; starting=true; running=true
         status="Starting local audio…"
-        privacyTimer=Timer.scheduledTimer(withTimeInterval:1,repeats:true) { [weak self] _ in Task { @MainActor in self?.checkPrivacy() } }
+        privacyTimer=Timer.scheduledTimer(withTimeInterval:startup.privacyInterval,repeats:true) { [weak self] _ in Task { @MainActor in self?.requestPrivacyCheck() } }
         await withTaskCancellationHandler {
             do {
-                try validateStartup(token)
+                try await validateStartup(token)
                 if config.speech.engine == .parakeet {
                     status="Preparing local speech model…"
                     let task=Task { try await recognizer.prepare(settings:config) }; preparationTask=task
                     try await task.value
-                    try validateStartup(token); preparationTask=nil
+                    try await validateStartup(token); preparationTask=nil
                     status="Starting local audio…"
                 }
                 if config.audioEnabled {
                     let authorized=await startup.authorizeMicrophone()
-                    try validateStartup(token)
+                    try await validateStartup(token)
                     guard authorized else { throw OSwindError.unavailable("Microphone access required") }
                     let sink=AudioAccumulator { [weak self] samples,date in Task { @MainActor in
                         guard let self,self.epoch==token else { return }; self.enqueue(samples,date:date,source:"Microphone")
@@ -195,13 +206,13 @@ private final class AudioAccumulator: @unchecked Sendable {
                 if config.systemAudioEnabled {
                     guard startup.systemAvailable() else { throw OSwindError.unavailable("Screen Recording permission is needed for system audio") }
                     let capture=try await startup.makeSystemCapture(config.privacy,self)
-                    try validateStartup(token)
+                    try await validateStartup(token)
                     let sink=AudioAccumulator { [weak self] samples,date in Task { @MainActor in
                         guard let self,self.epoch==token else { return }; self.enqueue(samples,date:date,source:"System audio")
                     } }; systemSink=sink; systemCapture=capture
                     do {
                         try await capture.start()
-                        try validateStartup(token)
+                        try await validateStartup(token)
                     } catch {
                         // stop() may have run before startCapture actually completed.
                         // Always stop this local resource again after a stale completion.
@@ -209,7 +220,7 @@ private final class AudioAccumulator: @unchecked Sendable {
                         throw error
                     }
                 }
-                try validateStartup(token)
+                try await validateStartup(token)
                 starting=false; status="Transcribing locally · 30 s segments"
             } catch {
                 // An older denial/error cannot stop or overwrite a newer attempt.
@@ -220,13 +231,27 @@ private final class AudioAccumulator: @unchecked Sendable {
             Task { @MainActor in guard let self,self.epoch==token else { return }; self.stop() }
         }
     }
-    private func validateStartup(_ token: UUID) throws {
-        guard token==epoch,running,!Task.isCancelled else { throw CancellationError() }
-        if startup.locked() { throw OSwindError.unavailable("Locked · audio stopped") }
-        if let context=startup.context(), let reason=settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) { throw OSwindError.unavailable("Audio stopped · "+reason) }
+    private func current(_ token:UUID) throws {
+        guard token==epoch,(running || finishing),!Task.isCancelled else {throw CancellationError()}
+        guard !startup.locked() else {throw AudioPrivacyFailure(message:"Locked · audio stopped")}
+        guard !store.isClosed else {throw AudioPrivacyFailure(message:"Library closed · audio stopped")}
+    }
+    private func privacyContext(_ token:UUID) async throws ->WindowContext {
+        try current(token);let session=contextSession
+        guard let context=await session.read(nil) else {try current(token);throw AudioPrivacyFailure(message:"Application privacy context unavailable · audio stopped")}
+        try current(token)
+        guard startup.identityCurrent(context) else {throw AudioPrivacyFailure(message:"Application changed during privacy check · audio stopped")}
+        guard !context.secure else {throw AudioPrivacyFailure(message:"Secure input · audio stopped")}
+        if let reason=settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {throw AudioPrivacyFailure(message:"Audio stopped · "+reason)}
+        return context
+    }
+    private func validateStartup(_ token:UUID) async throws {_ = try await privacyContext(token)}
+    private func validateStorage() throws {
+        do {try store.validateDirectoryIdentity()}
+        catch {throw AudioPrivacyFailure(message:"Library moved or changed · audio stopped")}
     }
     public func stop() {
-        privacyTimer?.invalidate(); privacyTimer=nil; preparationTask?.cancel(); preparationTask=nil; transcriptionTask?.cancel(); finishing=false; starting=false; running=false; epoch=UUID()
+        privacyTimer?.invalidate(); privacyTimer=nil; privacyJob?.task.cancel();privacyJob=nil;contextSession.cancel();contextSession=AccessibilityReadSession(operation:{[startup] _ in await startup.context()}); preparationTask?.cancel(); preparationTask=nil; transcriptionTask?.cancel(); finishing=false; starting=false; running=false; epoch=UUID()
         engine?.inputNode.removeTap(onBus:0); engine?.stop(); engine=nil
         if let capture=systemCapture { Task { try? await capture.stop() } }; systemCapture=nil
         micSink?.stop(); systemSink?.stop(); micSink=nil; systemSink=nil; pending.removeAll(); status="Audio off"
@@ -234,7 +259,7 @@ private final class AudioAccumulator: @unchecked Sendable {
     public func finish() {
         guard running else { return }
         if starting { stop(); return }
-        privacyTimer?.invalidate(); privacyTimer = nil; finishing = true
+        privacyTimer?.invalidate(); privacyTimer = nil; privacyJob?.task.cancel();privacyJob=nil;finishing = true
         let microphone = micSink?.finish() ?? [], system = systemSink?.finish() ?? []
         for (samples, source) in [(microphone,"Microphone"),(system,"System audio")] where samples.count >= 1600 && WAV.rms(samples) > 0.003 {
             enqueue(samples,date:Date().addingTimeInterval(-Double(samples.count)/16000),source:source)
@@ -255,39 +280,51 @@ private final class AudioAccumulator: @unchecked Sendable {
             self.systemSink?.add(samples)
         }
     }
-    private func checkPrivacy() {
-        guard running else { return }
-        if startup.locked() { stop(); status = "Locked · audio stopped"; return }
-        if let context = startup.context(), let reason = settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {
-            stop(); status = "Audio stopped · " + reason
+    func requestPrivacyCheck() {
+        guard running,privacyJob==nil else {return}
+        let id=UUID(),token=epoch
+        let task=Task {[weak self] in
+            guard let self else {return}
+            defer {if self.privacyJob?.id==id {self.privacyJob=nil}}
+            do {_ = try await self.privacyContext(token)}
+            catch {guard token==self.epoch,!Task.isCancelled else {return};self.stop();self.status=error.localizedDescription}
         }
+        privacyJob=(id,task)
     }
-    private func enqueue(_ samples: [Float], date: Date, source: String) {
-        guard running || finishing, !startup.locked() else { return }
-        if let c = startup.context(), settings.privacy.exclusion(app: c.bundle, title: c.title, url: c.url, isBrowser: c.browser) != nil { status = "Audio segment discarded by privacy rule"; return }
-        guard pending.count < 3 else { status = "Transcription backpressure · dropped segment"; return }
-        pending.append((samples,date,source)); if !processing { Task { await drain() } }
+    func enqueue(_ samples:[Float],date:Date,source:String) {
+        // PCM stays in memory and the waiting queue is bounded. Fresh privacy
+        // is required before WAV processing and again at save.
+        guard running || finishing,!starting,!startup.locked() else {return}
+        guard pending.count<3 else {status="Transcription backpressure · dropped segment";return}
+        pending.append(Chunk(samples:samples,date:date,source:source,epoch:epoch,sessionID:sessionID))
+        if !processing {Task {await drain()}}
     }
     private func drain() async {
         guard !processing else { return }; processing = true; defer { processing = false }
         while !pending.isEmpty {
-            let chunk = pending.removeFirst(), token = epoch, config = settings
+            let chunk=pending.removeFirst(),token=chunk.epoch,config=settings
+            guard token==epoch else {continue}
             guard let operation=try? await store.libraryWorkspaceAsync("oswind-audio-chunk") else { status="Cannot create private audio workspace"; continue }
             defer { withExtendedLifetime(operation) {} }
             guard token==epoch,!startup.locked() else {continue}
             let file=operation.url.appendingPathComponent("capture.wav")
             do {
+                let initial=try await privacyContext(token)
+                try current(token);guard startup.identityCurrent(initial) else {throw AudioPrivacyFailure(message:"Application changed before audio processing")}
+                try validateStorage()
                 try WAV.data(samples: chunk.samples).write(to:file,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path); defer { try? FileManager.default.removeItem(at: file) }
                 let task = Task { try await recognizer.transcribe(file:file,settings:config,workspaceParent:operation.url) }; transcriptionTask = task
                 var transcript = try await task.value; transcriptionTask = nil
-                guard token == epoch && !startup.locked() else { continue }
-                if let context=startup.context(),settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) != nil { continue }
+                guard token==epoch else {continue}
+                let context=try await privacyContext(token)
+                try current(token);guard startup.identityCurrent(context) else {throw AudioPrivacyFailure(message:"Application changed before transcript admission")}
+                try validateStorage()
                 transcript=try transcript.bounded(toSourceDuration:Double(chunk.samples.count)/16000)
-                let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:sessionID,embedder:embedder,admission:operation.mediaActivity)
+                let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:chunk.sessionID,embedder:embedder,admission:operation.mediaActivity)
                 transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
                 do { if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) } }
                 catch { status="Transcript saved · additional indexing pending" }
-            } catch { if token==epoch && !(error is CancellationError) { status = error.localizedDescription }; try? FileManager.default.removeItem(at: file) }
+            } catch {if token==epoch {transcriptionTask=nil;if !(error is CancellationError) {if error is AudioPrivacyFailure {stop()};status=error.localizedDescription}};try? FileManager.default.removeItem(at:file)}
         }
     }
 }

@@ -1,10 +1,10 @@
-# Bounded accessibility for screen capture
+# Bounded accessibility for capture and audio
 
-Snapshot and replay capture perform cross-process accessibility reads in a utility worker. The main actor selects the foreground or explicitly targeted application using `NSWorkspace`, then checks its PID/bundle after the worker returns. It does not traverse the application's accessibility tree. Snapshot reserves its busy flag and generation before the first suspension, so pause, capture-setting changes, task cancellation and another manual request cannot turn a delayed initial context into a new capture.
+Snapshot, replay and live audio perform cross-process accessibility reads in a utility worker. The main actor selects the foreground or explicitly targeted application using `NSWorkspace`, then checks its PID/bundle after the worker returns. It does not traverse the application's accessibility tree. Snapshot reserves its busy flag and generation before the first suspension, so pause, capture-setting changes, task cancellation and another manual request cannot turn a delayed initial context into a new capture.
 
 ## Traversal and cancellation
 
-The worker has one active slot and no waiting queue. An overlapping independent request defers rather than spawning another traversal. Replay's supervisor and frame consumer share a read only while it is in flight, for the same target. Completed results are not cached. Canceling one observer suppresses its own result; stopping the replay session cancels the shared operation.
+The worker has one active IPC slot. A coordinator shares only currently running observations of the same PID/bundle across capture, replay and audio, with at most eight observers per read. A different/cancelled preceding observation must actually finish before another traversal starts. Completed results are not cached. Each consumer releases its own lease; cancelling a replay or audio session does not cancel a still-observed screen/audio read. The producer is cancelled only after its final observer leaves. Budgets remain cooperative, with no hard process-kill guarantee.
 
 Each native AX object gets its own message timeout before a read. The requested timeout is at most 40 ms, bounded by the remaining traversal budget. OSwind does not change the process-wide timeout. Apple's [timeout documentation](https://developer.apple.com/documentation/applicationservices/1459345-axuielementsetmessagingtimeout) and the installed SDK specify that setting an application object alone does not configure other equal objects; therefore each root, window and descendant is configured individually.
 
@@ -18,7 +18,7 @@ Accessibility remains optional for native applications. Without that permission,
 
 Snapshots repeat the bounded reads around discovery, image receipt and recognition. The final complete read precedes the private JPEG write. A cheap identity/session/permission/generation check and SQLite admission then run without actor suspension; no AX IPC is performed between file creation and source insertion. Failure removes the unadmitted file. Accessibility and pixels remain separate observations, not an atomic screenshot of a URL or protection against all sensitive overlays. See [snapshot privacy](CAPTURE-PRIVACY.md).
 
-Audio still uses the existing synchronous accessibility reader. Migrating startup, timer checks, segment queues, final flush and cancellation together is an open follow-up. This increment does not claim that every accessibility call in the application has moved off the UI thread.
+Audio now uses the same bounded utility reader throughout startup, timer checks, PCM processing, final flush and admission. Independent consumers can share only a currently running same-application observation; consumer cancellation does not cancel other observers. No synchronous AX traversal remains. See [audio lifecycle, shared-read ownership and limits](AUDIO-PRIVACY.md).
 
 ## Verification
 
