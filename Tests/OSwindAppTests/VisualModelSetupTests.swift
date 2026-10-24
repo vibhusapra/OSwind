@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 @testable import OSwindCore
 @testable import OSwind
 
@@ -13,8 +14,10 @@ private actor VisualSetupGate {
     func wait(_ model:VisualModelSetupModel) async throws {for _ in 0..<500 where model.busy {try await Task.sleep(for:.milliseconds(10))};XCTAssertFalse(model.busy)}
     func testSuccessPublishesOneVerifiedSelectionAndBusyGuardBlocksSecondJob() async throws {
         let gate=VisualSetupGate(),model=VisualModelSetupModel(installer:{progress in progress(.init(phase:"Fixture download",completedBytes:1,totalBytes:10,completedFiles:0,totalFiles:1,file:nil));await gate.wait();return .init(directory:URL(fileURLWithPath:"/owned/model"),modelID:"fixture",bytes:10,reused:false)})
+        let published=XCTestExpectation(description:"owned preparation progress published")
+        let observation=model.$progress.compactMap {$0}.first().sink {_ in published.fulfill()};defer {observation.cancel()}
         var completions=0;model.start {_ in completions+=1};model.start {_ in completions+=100}
-        await fulfillment(of:[gate.entered],timeout:5);try await Task.sleep(for:.milliseconds(150))
+        await fulfillment(of:[gate.entered,published],timeout:10)
         XCTAssertTrue(model.busy);XCTAssertEqual(model.progress?.phase,"Fixture download");await gate.release();try await wait(model)
         XCTAssertEqual(completions,1);let calls=await gate.calls;XCTAssertEqual(calls,1);XCTAssertNil(model.error)
     }
