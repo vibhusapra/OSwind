@@ -308,7 +308,7 @@
     "axis": "Audio",
     "feature": "Local GPU transcription",
     "status": "live verified",
-    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance LibriSpeech selection/2190 imports running with independent JiWER and failed-import accounting after an observed Whisper timestamp/admission failure; natural ASR result pending",
+    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance selected LibriSpeech corpus completes2190imports: Parakeet NE/GPU WER2.62%clean,3.73/3.80%challenging, zero failedimports. OriginalWhisper34failedattempts retained, end-to-end WER7.00/15.02%. Independent JiWER, all hashes stable; read English speech, not meetings or competitor apps",
     "references": "Screenpipe, TimeScroll"
   },
   {
