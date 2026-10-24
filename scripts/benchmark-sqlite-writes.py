@@ -9,7 +9,8 @@ p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary',type=path
 assert 100<=a.records<=10000 and 1<=a.repetitions<=10
 binary=a.binary.resolve();root=a.root.resolve();root.mkdir(mode=0o700,exist_ok=False);results={}
 for case,text_bytes,tags in [('untagged1k',1024,[]),('tagged1k',1024,['release','shared']),('tagged64k',65536,['release','shared'])]:
-    trials=[];text=('Owned synthetic SQLite source. '*((text_bytes+31)//32))[:text_bytes]
+    trials=[];phrase='Owned synthetic SQLite source. ';text=(phrase*((text_bytes+len(phrase)-1)//len(phrase)))[:text_bytes]
+    assert len(text.encode())==text_bytes
     for repetition in range(a.repetitions):
         library=root/(case+'-'+str(repetition));prefix=[str(binary),'--data',str(library)]
         boot=time.monotonic();subprocess.run(prefix+['stats','--json'],capture_output=True,check=True,timeout=120);boot_ms=(time.monotonic()-boot)*1000
@@ -32,6 +33,7 @@ for case,text_bytes,tags in [('untagged1k',1024,[]),('tagged1k',1024,['release',
             measure('tagAndPayloadUpdate','UPDATE memories SET payload=? WHERE id=?',edits)
             measure('deleteHalf','DELETE FROM memories WHERE id=?',identifiers[:a.records//2])
             remaining=a.records-a.records//2;assert db.execute('SELECT COUNT(*) FROM memories').fetchone()[0]==remaining
+            assert db.execute('SELECT MIN(length(CAST(text AS BLOB))),MAX(length(CAST(text AS BLOB))) FROM memories').fetchone()==(text_bytes,text_bytes)
             assert db.execute("SELECT COUNT(*) FROM memories WHERE favorite=1 AND json_extract(CAST(payload AS TEXT),'$.favorite')=1").fetchone()[0]==remaining
             if indexed:
                 oracle="SELECT DISTINCT m.id,t.value,m.timestamp,m.app,m.kind,m.favorite FROM memories m,json_each(CAST(m.payload AS TEXT),'$.tags') t WHERE t.type='text'"
