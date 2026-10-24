@@ -61,6 +61,24 @@ class PreparationContracts(unittest.TestCase):
         plan['clips']=clips[:-1]
         with self.assertRaisesRegex(ValueError,'does not equal'):module.prepare(annotations,plan,self.root/'incomplete',audio)
         self.assertEqual(json.loads((self.root/'incomplete/manifest.json').read_text())['state'],'failed')
+    def testExplicitTestSplitUsesOnlyTestReferencesAndExactCoverage(self):
+        audio=self.root/'test-audio.zip';audio.write_bytes(self.payload);refs=self.root/'split-refs.zip'
+        member='joonson-voxconverse-aaaaaaa/test/abcde.rttm';data=b'SPEAKER abcde 1 0 1 <NA> <NA> A <NA> <NA>\n'
+        with zipfile.ZipFile(refs,'w') as z:
+            z.writestr(member,data);z.writestr(member.replace('/test/','/dev/'),b'not the selected reference')
+        plan={'annotation_commit':'a'*40,'selection':'frozen generated test split','clips':[{'id':'abcde','annotation_member':member,'annotation_sha256':hashlib.sha256(data).hexdigest()}]}
+        with contextlib.redirect_stdout(io.StringIO()):result=module.prepare(refs,plan,self.root/'test-prepared',audio,split='test',coverage='full-test-set')
+        self.assertEqual(result['dataset'],'VoxConverse test');self.assertEqual(result['split'],'test');self.assertEqual(result['coverage'],'full-test-set');self.assertEqual(result['available_reference_clips'],1)
+        self.assertIn('voxconverse_test_wav.zip',result['source_audio_url']);self.assertEqual(len(result['selection_plan_canonical_sha256']),64)
+        self.assertEqual((self.root/'test-prepared/reference/abcde.rttm').read_bytes(),data)
+        plan['clips'][0]['annotation_member']=member.replace('/test/','/dev/')
+        with self.assertRaisesRegex(ValueError,'does not match'):module.prepare(refs,plan,self.root/'mixed-reference',audio,split='test',coverage='full-test-set')
+    def testCrossSplitCoverageAndUnknownSplitFailBeforeOutput(self):
+        plan={'annotation_commit':'a'*40,'selection':'generated','clips':[{'id':'abcde'}]}
+        for split,coverage in [('test','full-development-set'),('dev','full-test-set'),('train','fixed-subset')]:
+            output=self.root/(split+'-'+coverage)
+            with self.assertRaises(ValueError):module.prepare(self.root/'unused',plan,output,split=split,coverage=coverage)
+            self.assertFalse(output.exists())
     def testOversizedSelectionFailsBeforeCreatingOutput(self):
         def identifier(number):
             letters=[]

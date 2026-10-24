@@ -2,6 +2,7 @@
 import contextlib,hashlib,io,json,os,pathlib,sys,tempfile,unittest,wave
 sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from speaker_eval import *
+from unittest import mock
 class MetricContracts(unittest.TestCase):
     def annotation(self,rows):
         result=Annotation(uri='fixture')
@@ -27,6 +28,12 @@ class MetricContracts(unittest.TestCase):
         score(self.annotation([(0,1,'A')]),self.annotation([]),1,metric=metric)
         score(self.annotation([(0,3,'A')]),self.annotation([(0,3,'x')]),3,metric=metric)
         self.assertAlmostEqual(abs(metric),.25)
+    def testReferenceTailIsCroppedByDeclaredUEMWithoutDroppingTheClip(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=pathlib.Path(folder)/'reference.rttm';path.write_text('SPEAKER fixture 1 0 1.026 <NA> <NA> A <NA> <NA>\n')
+            reference=read_reference(path,'fixture',1);self.assertAlmostEqual(reference.get_timeline().extent().end,1.026)
+            detail=score(reference,self.annotation([(0,1,'predicted')]),1)
+            self.assertAlmostEqual(detail['total'],1);self.assertAlmostEqual(detail['diarization error rate'],0)
     def testInvalidTimelinesAndReferenceIdentityAreRejected(self):
         with self.assertRaises(ValueError):read_hypothesis({'scope':'global','duration':1,'turns':[]},'fixture',1)
         with self.assertRaises(ValueError):read_hypothesis({'scope':'recording','duration':1,'turns':[{'start':0,'end':float('nan'),'speaker':'A'}]},'fixture',1)
@@ -54,6 +61,39 @@ class EvaluationProcessContracts(unittest.TestCase):
             self.assertEqual(report['state'],'completed');self.assertTrue(report['source_stability_verified']);self.assertEqual(len(report['clips']),2)
             self.assertEqual(sha(output/'runner/oswindctl'),sha(binary));self.assertEqual((output/'runner/oswindctl').stat().st_mode&0o777,0o500)
             self.assertTrue(all(row['micro_der']==1 for row in report['aggregate']));self.assertFalse((output/'forbidden-library').exists())
+    def testTestSplitIsLabelledAndReferencesAreParsedOnlyAfterPrediction(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=pathlib.Path(folder);binary,model,dataset=self.fixture(root);output=root/'evaluation'
+            manifest=json.loads((dataset/'manifest.json').read_text());manifest.update(split='test',coverage='full-test-set',planned_clips=2,available_reference_clips=2);(dataset/'manifest.json').write_text(json.dumps(manifest))
+            original=read_reference
+            def after_inference(path,identifier,duration):
+                self.assertTrue((output/'predictions'/(identifier+'.json')).exists());return original(path,identifier,duration)
+            with contextlib.redirect_stdout(io.StringIO()),mock.patch('speaker_eval.read_reference',side_effect=after_inference):report=evaluate(binary,model,dataset,output)
+            self.assertEqual(report['dataset']['split'],'test');self.assertEqual(report['selection_coverage']['kind'],'full-test-set');self.assertIn('upstream model-training overlap is unaudited',report['scope']);self.assertTrue(report['settings']['reference_labels_parsed_after_inference'])
+    def testIncompleteFullTestAndDuplicateIDsFailBeforeRunnerLaunch(self):
+        for duplicate in [False,True]:
+            with tempfile.TemporaryDirectory() as folder:
+                root=pathlib.Path(folder);binary,model,dataset=self.fixture(root);output=root/'evaluation';manifest=json.loads((dataset/'manifest.json').read_text());manifest.update(split='test',coverage='full-test-set',planned_clips=2,available_reference_clips=3)
+                if duplicate:manifest['clips'][1]['id']=manifest['clips'][0]['id'];manifest['available_reference_clips']=2
+                (dataset/'manifest.json').write_text(json.dumps(manifest))
+                with self.assertRaises(ValueError):evaluate(binary,model,dataset,output)
+                self.assertFalse(output.exists())
+    def testTerminationRecordsFailureAndStopsActiveInferenceGroup(self):
+        import subprocess,signal,time
+        with tempfile.TemporaryDirectory() as folder:
+            root=pathlib.Path(folder);binary,model,dataset=self.fixture(root);output=root/'evaluation'
+            code=binary.read_text().replace("runs=[", "import os,time\nout.with_suffix('.pid').write_text(str(os.getpid()))\ntime.sleep(30)\nruns=[");binary.write_text(code)
+            process=subprocess.Popen([sys.executable,str(pathlib.Path(__file__).with_name('speaker_eval.py')),'--binary',str(binary),'--model',str(model),'--dataset',str(dataset),'--output',str(output)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+            pidfile=output/'predictions/abcde.pid';deadline=time.monotonic()+10
+            while not pidfile.exists() and time.monotonic()<deadline:
+                if process.poll() is not None:break
+                time.sleep(.02)
+            try:
+                self.assertTrue(pidfile.exists());child=int(pidfile.read_text());process.send_signal(signal.SIGTERM);process.communicate(timeout=10)
+                self.assertNotEqual(process.returncode,0);self.assertEqual(json.loads((output/'report.json').read_text())['state'],'failed')
+                with self.assertRaises(ProcessLookupError):os.kill(child,0)
+            finally:
+                if process.poll() is None:process.kill();process.communicate()
     def testEarlierSourceChangedByLaterInferenceCannotPass(self):
         with tempfile.TemporaryDirectory() as folder:
             root=pathlib.Path(folder);binary,model,dataset=self.fixture(root,corrupt=True);output=root/'evaluation'

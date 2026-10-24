@@ -1,0 +1,84 @@
+{
+  "format": "OSwind frozen held-out evaluation protocol v1",
+  "state": "completed",
+  "created_utc": "2026-10-24T03:49:13.916736+00:00",
+  "harness_source_commit": "53a69c428cb487c3a05f029534319c39d0b6e81a",
+  "product_source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
+  "speaker": {
+    "selection_plan_sha256": "7089cefc391b66c376da4bee65c408d9e9dbefa005878fc6610ccceeca3a4e34",
+    "prepared_manifest_sha256": "2188993faa56abccc10bb8416fa51a2f889926d84bf9119b2fadbd3c5b30cd8e",
+    "model_tree_sha256": "b74540837ba0e49f065e82ac17d441c35d61e1c4a7e3ab03d10fe4769ac1834b",
+    "harness_sha256": "5817701f8643271c1bb84007a6aad8e0be932d4fb68c09ef4bc7025836af1824",
+    "split": "test",
+    "coverage": "full-test-set",
+    "clips": 232,
+    "repetitions": 2,
+    "collars": [
+      0,
+      0.25
+    ],
+    "skip_overlap": false,
+    "oracle_speaker_count": false,
+    "reference_labels_parsed_after_inference": true,
+    "scope": "Original model profiles/settings/232 IDs unchanged. The first attempt stopped after four scored clips/five predictions because an annotation ended 26 ms beyond its WAV. This scorer honors the originally declared full-WAV UEM rather than rejecting beyond-audio tails. Both complete profiles are rerun; no clips excluded or model settings tuned.",
+    "profiles": [
+      {
+        "name": "current",
+        "source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
+        "binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a"
+      },
+      {
+        "name": "baseline",
+        "source_commit": "5b2a39d456eda441d1aeafaf0bf9ead3cd19eb12",
+        "binary_sha256": "dcd5e34e362e2bb977e6962d8753acc18435ecce84b4b5ceaf9201543bdb59f7"
+      }
+    ],
+    "asset_provenance": {
+      "audio_archive_sha256": "472ebf1eaeb1dcb5c311b07a8b5c31bcedcccbf98f386d90a88cde2452da8c68",
+      "audio_archive_bytes": 4272764397,
+      "annotation_zip_sha256": "6ab3405448fbf5ebe0c3b48811b098e22f7069b1b43d6f002027a4fce9f9a3ac",
+      "selection_plan_canonical_sha256": "7d48aa1ce212eaeb4c51ebf13239d1e5e0a2d4167feb0d6ce2cf0886afbea207"
+    },
+    "state": "completed",
+    "result": "benchmarks/speaker-test-v1.json"
+  },
+  "asr": {
+    "harness_sha256": "9a02f9365673b6cbc8e1841f97db98cd134f6bad04389ee8ab161edf43717ec0",
+    "manifest_sha256": "9ba4bb1f716447812a8bbc7c2d54b1ee91a22049f270983676a58151923fa11c",
+    "clips": 365,
+    "trials": 2,
+    "profiles": [
+      "parakeet-neuralEngine",
+      "parakeet-gpu",
+      "whisper-default"
+    ],
+    "product_binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a",
+    "native_model_tree_sha256": "39ad9f5a542fb5ebbac746e6e0a013b905e0b019668e31a17b6e315c31f2402d",
+    "whisper_binary_sha256": "0471dc453d03200ef45ab8d6329475824e864af9aa4232a89cc81e6fc3c9478d",
+    "whisper_model_sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002",
+    "scope": "All ASR IDs, normalization/scorer and profiles frozen before any natural ASR inference. Read English audiobook speech, OSwind imports/configurations rather than competitor apps.",
+    "harness_source_commit": "d47bdc17135842bd11a76ffadff44ae6674cd515",
+    "state": "completed",
+    "prior_attempt": {
+      "state": "failed",
+      "successful_imports": 70,
+      "failure": "test-clean-121-121726-0001-whisper-default-0 import exited 1; logs retained",
+      "report_sha256": "48bfd0adbdae41f55eb22b36c980f3f0cade9b5196951bf799e277e65ded3c78"
+    },
+    "failure_policy": "Only harness failure accounting: nonzero/timeout imports remain attempted rows, end-to-end WER all-deletions and successful-only WER separately. Exact same product/model/IDs/text normalization, no input exclusions/model tuning. Both failed attempts retained; this is a full new pass, not an unseen initial run.",
+    "result": "benchmarks/speech-imports-v1.json",
+    "attempts": 2190,
+    "failed_imports": 34,
+    "failed_unique_clips": 17,
+    "source_stability_verified": true,
+    "repetition_outcomes_and_counts_identical": true
+  },
+  "execution": "Serial complete speaker configurations; retained first ASR attempt stopped on a real import failure after70 successful attempts; complete new2190-attempt pass uses unchanged product/models/IDs/text normalization and disclosed failure accounting. No local Swift builds during timed passes. Separate pinned Qwen component soak and uncontrolled OS/model caches/background remain.",
+  "limits": [
+    "No complete result until all declared inputs and final source stability checks finish",
+    "Held out from OSwind tuning, upstream model pretraining overlap unaudited; not competitor app ranking",
+    "ASR subset is selected English audiobook speech, not full LibriSpeech or meeting acceptance",
+    "Initial speaker attempt retained: four scored/five inferred clips before rejecting a 26ms annotation tail; no model settings or IDs changed; explicit full-WAV UEM correction is tested and disclosed"
+  ],
+  "all_imports_succeeded": false
+}
