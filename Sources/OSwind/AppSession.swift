@@ -48,7 +48,8 @@ import OSwindCore
     deinit {watcher?.cancel();lockMonitor?.invalidate();operation?.cancel()}
     func retry() {
         guard !terminationRequested,!busy else {return}
-        if vaultPackage != nil {run {try await self.loadVault(startServices:false)}} else {open(selection.url,persist:false)}
+        if vaultPackage != nil {run {try await self.loadVault(startServices:false)}}
+        else if model==nil {run {try self.selection.validate();self.model=try await self.preparedModel(root:self.selection.url,startServices:false)}}
     }
     func open(_ url:URL,persist:Bool=true) {
         guard maySwitch else {return}

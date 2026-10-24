@@ -75,6 +75,15 @@ private final class OpeningAttempt:@unchecked Sendable {
         defer {try? cleanup(app)};try await finish(app);XCTAssertNil(app.model);XCTAssertNotNil(app.failure)
         app.retry();try await finish(app);XCTAssertNil(app.failure);XCTAssertEqual(try app.model?.store.get("keep")?.text,"Owned history");XCTAssertFalse(app.model?.isCapturing ?? true);XCTAssertEqual(app.model?.apiStatus,"API off")
     }
+    func testInitialNewLibraryFailureCanRetryBeforeAnyDatabaseExists() async throws {
+        let library=root.appendingPathComponent("new-library"),attempt=OpeningAttempt()
+        let app=AppSession(selection:.init(url:library,requiresExisting:false,origin:"owned"),defaults:defaults,locked:{false},openStore:{try attempt.open($0)})
+        defer {try? cleanup(app)};try await finish(app)
+        XCTAssertNil(app.model);XCTAssertNotNil(app.failure);XCTAssertFalse(FileManager.default.fileExists(atPath:library.path))
+        app.retry();try await finish(app)
+        XCTAssertNil(app.failure);XCTAssertEqual(app.model?.store.root,library);XCTAssertEqual(try app.model?.store.stats(includeDiskUsage:false).count,0)
+        XCTAssertFalse(app.model?.isCapturing ?? true);XCTAssertEqual(app.model?.apiStatus,"API off")
+    }
     func testNativeVaultLockDuringPreparationClosesLateStoreAndDetaches() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned encrypted opening fixture; no normal history or Keychain")}
         let package=root.appendingPathComponent("Opening.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
