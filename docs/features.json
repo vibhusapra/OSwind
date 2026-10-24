@@ -300,7 +300,7 @@
     "axis": "Audio",
     "feature": "System audio capture",
     "status": "partial",
-    "evidence": "Per-stream owned sink/output/delegate, exact 16 kHz packed mono Float32/frame-byte validation, interruption refusal and shared case-insensitive app exclusions; live input, new-app filters and device recovery pending",
+    "evidence": "Production background-inclusive inventory, excluded-app launch stop/restart and per-stream sinks. Real owned hidden-tone apps pass native 16 kHz mono PCM/known-other-tone suppression in normal/TSan fixtures. Direct-shell mixed-source failures retained; actual signed-GUI/controller/ASR capture, arbitrary app/helper privacy and device recovery pending",
     "references": "Screenpipe, TimeScroll, Granola"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "728-case normal suite (699 pass/29 opt-in skips),231-case native/model run adds23 cases (722 distinct pass/six remaining skips),233 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "732-case normal suite (702 pass/30 opt-in skips),234-case native/model run adds23 cases and one physical native case (726 distinct pass/six remaining skips),236 focused plus one physical TSan case; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

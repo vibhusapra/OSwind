@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 @testable import OSwindCore
 
 private func ownedAudioContext(secure:Bool=false,bundle:String="org.fixture")->WindowContext {WindowContext(app:"Owned",bundle:bundle,pid:8123,title:"Owned",accessibilityText:"",secure:secure)}
@@ -21,14 +22,14 @@ private struct OwnedAudioBackend:NativeSpeechBackend {
 @MainActor final class AudioPrivacyTests:XCTestCase {
     private struct Fixture {var root:URL,store:MemoryStore,audio:AudioController,capture:OwnedSystemAudio}
     nonisolated private static func transcript(_ text:String="Owned words")->SpeechTranscript {.init(text:text,duration:1,segments:[.init(start:0,end:1,text:text)],model:"owned")}
-    private func fixture(context:@escaping () async ->WindowContext?={ownedAudioContext()},identity:@escaping (WindowContext)->Bool={_ in true},locked:@escaping ()->Bool={false},backend:@escaping @Sendable (URL) async throws ->SpeechTranscript={_ in AudioPrivacyTests.transcript()}) throws ->Fixture {
+    private func fixture(launches:AnyPublisher<String,Never>=Empty().eraseToAnyPublisher(),context:@escaping () async ->WindowContext?={ownedAudioContext()},identity:@escaping (WindowContext)->Bool={_ in true},locked:@escaping ()->Bool={false},backend:@escaping @Sendable (URL) async throws ->SpeechTranscript={_ in AudioPrivacyTests.transcript()}) throws ->Fixture {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-audio-privacy-"+UUID().uuidString);try Paths.ensure(root)
         let models=root.appendingPathComponent("synthetic-model");try Paths.ensure(models)
         for name in ["Preprocessor.mlmodelc","Encoder.mlmodelc","Decoder.mlmodelc","JointDecisionv3.mlmodelc"] {try Paths.ensure(models.appendingPathComponent(name))}
         try Data("{}".utf8).write(to:models.appendingPathComponent("parakeet_vocab.json"))
         var settings=AppSettings();settings.systemAudioEnabled=true;settings.speech.engine = .parakeet;settings.speech.modelDirectory=models.path;settings.retainAudio=true
         let capture=OwnedSystemAudio(),store=try MemoryStore(root:root.appendingPathComponent("library"))
-        let environment=AudioStartupEnvironment(locked:locked,context:context,identityCurrent:identity,privacyInterval:3600,authorizeMicrophone:{XCTFail("Never request real microphone access");return false},makeEngine:{throw OSwindError.unavailable("Never construct hardware")},systemAvailable:{true},makeSystemCapture:{_,sink in capture.sink=sink;return capture})
+        let environment=AudioStartupEnvironment(locked:locked,context:context,identityCurrent:identity,privacyInterval:3600,authorizeMicrophone:{XCTFail("Never request real microphone access");return false},makeEngine:{throw OSwindError.unavailable("Never construct hardware")},systemAvailable:{true},makeSystemCapture:{_,sink in capture.sink=sink;return capture},applicationLaunches:launches)
         let recognizer=SpeechRecognizer(loader:{_ in OwnedAudioBackend(operation:backend)})
         return Fixture(root:root,store:store,audio:AudioController(store:store,embedder:LocalEmbedder(),settings:settings,startup:environment,recognizer:recognizer),capture:capture)
     }
@@ -41,6 +42,24 @@ private struct OwnedAudioBackend:NativeSpeechBackend {
     private func feed(_ sink:AudioAccumulator,count:Int) {
         var left=count
         while left>0 {let size=min(left,AudioAccumulator.maximumCallbackSamples);sink.add(Array(repeating:Float(0.05),count:size));left-=size}
+    }
+    func testExcludedApplicationLaunchStopsSystemCaptureThroughInjectedPublisher() async throws {
+        let launches=PassthroughSubject<String,Never>(),f=try fixture(launches:launches.eraseToAnyPublisher())
+        await f.audio.start();let sink=try XCTUnwrap(f.capture.sink)
+        launches.send("org.allowed.application");await Task.yield();XCTAssertTrue(f.audio.running)
+        launches.send("COM.APPLE.PASSWORDS")
+        try await wait {!f.audio.hasActiveWork && !f.capture.active}
+        XCTAssertTrue(f.audio.status.contains("Excluded application started"));feed(sink,count:480000)
+        XCTAssertEqual(sink.snapshot.partialSamples,0);XCTAssertEqual(try f.store.stats(includeDiskUsage:false).count,0)
+        await f.audio.start();XCTAssertTrue(f.audio.running);XCTAssertEqual(f.capture.starts,2);try await cleanup(f)
+    }
+    func testExcludedApplicationLaunchLeavesIdleOrAlreadyStoppedControllerUnchanged() async throws {
+        let f=try fixture();f.audio.applicationLaunched("com.apple.Passwords");XCTAssertEqual(f.audio.status,"Audio off")
+        await f.audio.start();f.audio.settings.systemAudioEnabled=false
+        // The settings change already stops the system source. A later launch
+        // must not replace this reason or start a resource.
+        let status=f.audio.status;f.audio.applicationLaunched("COM.APPLE.PASSWORDS");XCTAssertEqual(f.audio.status,status);XCTAssertEqual(f.capture.starts,1)
+        try await cleanup(f)
     }
     func testIngressFailureStopsItsResourceAndLateOldSinkCannotStopRestart() async throws {
         let f=try fixture();await f.audio.start();let old=try XCTUnwrap(f.capture.sink)

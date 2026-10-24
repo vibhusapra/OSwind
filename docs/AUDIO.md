@@ -96,3 +96,5 @@ The retention choice persists per library, applies to the existing speech and sp
 [Idle policy evidence](../benchmarks/native-model-idle-v1.json) records queue/stale-timer/controller contracts, an actual default-timeout/reload trial with local models, release process checks and package identity. This is not an energy benchmark.
 
 Live capture uses [bounded per-source ingress](AUDIO-INGRESS.md), with format validation, source-owned callbacks and visible capacity-drop duration. This bounds application queues; it does not establish physical capture, latency, power or automatic device-recovery acceptance.
+
+An opt-in [native system-audio fixture](NATIVE-SYSTEM-AUDIO.md) checks generated tones through real ScreenCaptureKit and the production PCM decoder. System inventory includes background apps; an excluded-app launch invalidates active system-audio work and requires restart. This does not establish microphone or complete controller/device acceptance.

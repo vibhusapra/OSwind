@@ -1,0 +1,424 @@
+{
+  "format": "OSwind owned native system-audio qualification v1",
+  "codeCommit": "07cb8de5acc1aaec5cb08cb9046910336443206f",
+  "schema": 20,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "scope": "Explicitly registered generated-tone apps, production background-inclusive inventory and PCM decoder/sink in SwiftPM normal/TSan fixtures; synthetic controller launch events; native model/encrypted-volume and signed release process regression groups. Not physical signed-GUI/controller/ASR/permission-flow, microphone, route recovery, general app/child-process privacy, energy or competitor acceptance.",
+  "implementation": {
+    "systemInventoryIncludesOffscreenApps": true,
+    "excludedAppLaunchPublisher": "NSWorkspace in live defaults; injected Empty/subject in synthetic environments",
+    "newExcludedLaunchInvalidatesActiveSystemAudio": true,
+    "explicitRestartRebuildsFilter": true,
+    "idleAndMicrophoneOnlyGuardsTested": true,
+    "firstSoundAtomicGuarantee": false,
+    "automaticDeviceOrSourceResume": false,
+    "productionPCMFormatValidatorRelaxed": false,
+    "nativeRawCapturePersisted": false,
+    "sourceLaunch": "LaunchServices open -n; actual PID/bundle readiness bound to SCK application"
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 732,
+      "passed": 702,
+      "optInSkipped": 30,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 234,
+      "additionalPreviouslySkipped": 23,
+      "failures": 0
+    },
+    "normalNativeUnion": 725,
+    "physicalNormal": {
+      "passed": 1,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 726,
+    "remainingOptInSkips": 6,
+    "threadSanitizerFocused": {
+      "passed": 236,
+      "failures": 0,
+      "racesReported": 0
+    },
+    "threadSanitizerPhysical": {
+      "passed": 1,
+      "failures": 0,
+      "racesReported": 0
+    },
+    "threadSanitizerDistinctCases": 237,
+    "newControllerCases": 3,
+    "newOptInNativeCase": 1
+  },
+  "physicalNormal": {
+    "format": "OSwind owned native system-audio observations v1",
+    "observations": [
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310973345609661,
+        "intendedFrequencyHz": 440,
+        "intendedToOtherAmplitudeRatio": 1239468.9902217637,
+        "otherOwnedSourceAmplitude": 9.125660613409876e-09,
+        "passed": true,
+        "samples": 48640,
+        "source": "A",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      },
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.01131038164307243,
+        "intendedFrequencyHz": 997,
+        "intendedToOtherAmplitudeRatio": 332519.66391727066,
+        "otherOwnedSourceAmplitude": 3.4014173808038014e-08,
+        "passed": true,
+        "samples": 48640,
+        "source": "B",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      }
+    ],
+    "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+    "threadSanitizer": false,
+    "sourceCommit": "07cb8de5acc1aaec5cb08cb9046910336443206f",
+    "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+    "harnessSHA256": "20b874239c4a3253af92d8f39bdc8ecc2f5b91046d6d5ad4bbfa3e991b219a95",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max",
+    "testLogSHA256": "cc045726c5f22062067ee9908c9c5b701720d1c8d7032ae13bfeb2b07d1b41c8",
+    "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+    "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+    "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+    "permissionChanges": false,
+    "rawCapturedAudioPersisted": false,
+    "systemVolumeChanged": false
+  },
+  "physicalThreadSanitizer": {
+    "format": "OSwind owned native system-audio observations v1",
+    "observations": [
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310984776264198,
+        "intendedFrequencyHz": 440,
+        "intendedToOtherAmplitudeRatio": 2269098.1972938427,
+        "otherOwnedSourceAmplitude": 4.984792985051873e-09,
+        "passed": true,
+        "samples": 48640,
+        "source": "A",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      },
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310410175929623,
+        "intendedFrequencyHz": 997,
+        "intendedToOtherAmplitudeRatio": 975080.772830391,
+        "otherOwnedSourceAmplitude": 1.1599459748445882e-08,
+        "passed": true,
+        "samples": 48640,
+        "source": "B",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      }
+    ],
+    "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+    "threadSanitizer": true,
+    "sourceCommit": "07cb8de5acc1aaec5cb08cb9046910336443206f",
+    "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+    "harnessSHA256": "20b874239c4a3253af92d8f39bdc8ecc2f5b91046d6d5ad4bbfa3e991b219a95",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max",
+    "testLogSHA256": "47ba8e31b31db6f86b70cbf6b5665a859d9828e587e1e990d5dd96484e636674",
+    "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+    "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+    "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+    "permissionChanges": false,
+    "rawCapturedAudioPersisted": false,
+    "systemVolumeChanged": false
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema20 background audio inventory and native PCM fixture qualification; no installation or native capture/input acceptance",
+    "codeCommit": "07cb8de5acc1aaec5cb08cb9046910336443206f",
+    "schema": 20,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "df96468dd33f687ae93cb94bfa1be24f58e28766976311fc5eab60c993d5168e",
+        "signedSHA256": "775c0fdb545858b0eb142e47aa9a9a0944a08ea17c424fe09503524b652fc78b",
+        "normalizedPayloadSHA256": "ea1cc7ebb49f917b78b76a2d04bbfd5c6c11443977700263fb6fd1e14de19403"
+      },
+      "oswindctl": {
+        "rawSHA256": "533f4d708df066ac5be4369eceb9c61049ddf7c57a12a4d2c75223a08ba3e967",
+        "signedSHA256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+        "normalizedPayloadSHA256": "0b4d6b8a2cb3f3c600e0c1dcfab552ffd3398b57fcba894f61da99707120e221"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "dfc02b257374d943a1fe534014cef23f6f4ca1edcf9a1a1ec1ba15d4720fe041",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "b667d0733feb2c29c7eaa44f9f6f92b6d8cc513de7edef70343c9b1851c04027",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalQualificationRuns": [
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 16.524277624906972
+    },
+    {
+      "name": "native-optin-v1",
+      "exitCode": 0,
+      "wallSeconds": 126.54543887497857
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 48.72512508393265
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8204017088282853
+    },
+    {
+      "name": "calendar-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 3.301880915882066
+    },
+    {
+      "name": "tag-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.2170597498770803
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.32577695907093585
+    },
+    {
+      "name": "audio-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.0478803340811282
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8351430830080062
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4270444998983294
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1564898330252618
+    },
+    {
+      "name": "capture-region-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4445928749628365
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 14.880352125037462
+    },
+    {
+      "name": "wipe-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.7282123339828104
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1064217081293464
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 78.2110001668334
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 22.902678499929607
+    }
+  ],
+  "calendarProcess": {
+    "scope": "Owned synthetic imports and live CLI/HTTP/MCP counts; no capture, native input, energy or competitor claim.",
+    "binarySHA256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+    "harnessSHA256": "8233563be88978bcba9134db89f3f3586ea37aa959b61a0f4a9b5dcf402c30ed",
+    "sources": 600,
+    "passed": true,
+    "checks": [
+      "complete counts exceed search caps",
+      "CLI HTTP MCP identical metadata scopes",
+      "repeated clock hour distinct UTC ranges",
+      "23 hour DST day and leap month",
+      "inclusive start exclusive end",
+      "invalid relevance and malformed parameters rejected",
+      "HTTP token origin host guards",
+      "external writer visible to persistent HTTP connection"
+    ]
+  },
+  "tagCompatibilityProcess": {
+    "format": "OSwind transactionally indexed tags v1",
+    "scope": "Owned synthetic source/tag mutations, schema20 compatibility, exact search and quiet portability. No capture, normal history or credentials.",
+    "binarySHA256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+    "olderBinarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+    "actualOlderSchema20Writer": true,
+    "harnessSHA256": "839948d6ae25e40a6571b21bf2635bc68f500daf7a5661835a088c0a0220e541",
+    "schema": 20,
+    "passed": true,
+    "checks": [
+      "schema20 upgrade preserves exact source payloads",
+      "duplicate tags count once; case stays exact",
+      "older writer insertion and replacement maintain projection",
+      "old JSON and new indexed searches agree",
+      "source metadata and tag rows match independent SQL JSON oracle",
+      "quiet backup restore rebuilds counts",
+      "JSON round trip rebuilds counts"
+    ]
+  },
+  "domainPrivacyProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "vaultProcess": {
+    "state": "completed",
+    "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+    "checks": [
+      "create initializes and detaches, public handle closed",
+      "closed handle refuses plaintext fallback",
+      "wrong passphrase refused without attachment",
+      "managed handle writes and retrieves on verified volume",
+      "supplied actual older writer refuses the current schema without changing DB bytes",
+      "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+      "explicit plaintext backup/Markdown export, private source staging cleaned",
+      "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+      "retry detaches after reader closes",
+      "verified native migration remounts with history and retains original",
+      "missing source refuses before destination creation",
+      "renamed attached package remains visibly attached despite stale OS image path",
+      "relocatable public handle still reaches the current schema and fences supplied older writer after rename",
+      "moved package closes public handle and normally unmounts/ejects verified backing device",
+      "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+    ],
+    "binary_sha256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+    "schema_version": 20,
+    "old_binary_sha256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+    "verified_detached": true,
+    "passphrase_persisted": false,
+    "normal_library_opened": false,
+    "cleanup_detached": true
+  },
+  "audioImportProcess": {
+    "binarySHA256": "8a027cda1b21fdfc8661c0d8e77b4ed959ef455f6261912d4255b0474dda9f4f",
+    "report": {
+      "passed": true,
+      "fixture": "generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment",
+      "checks": [
+        "CLI file preparation, timestamp/session persistence and keyword retrieval",
+        "crossing decoder segment ends clipped to independently measured source duration; wholly outside segments refused without partial admission",
+        "original clip retained privately, source never changed",
+        "detected secret suppresses complete raw clip and redacts both text representations",
+        "full media backup/restore preserves transcript/session and audio bytes",
+        "erasure removes owned clip only; malformed input fails"
+      ],
+      "limits": [
+        "mock ASR does not establish recognition quality",
+        "native capture/panels/playback acceptance remains separate"
+      ]
+    },
+    "recognitionQualityEvidence": false
+  },
+  "retainedDevelopmentAttempts": {
+    "v1v2": "Direct-shell source identities absent from onscreen-only discovery; no PCM result",
+    "v3": "Broader discovery found direct-shell sources but each requested single-source stream contained both tones at almost equal amplitude; failure retained",
+    "v4v5": "Independently launched LaunchServices sources passed known-tone isolation; background fixture was then made explicit",
+    "v6": "Explicitly hidden LaunchServices sources absent from onscreen-only inventory; production inventory/decoder and known-other-tone suppression pass",
+    "interpretation": "Changing launch method changed the isolation result. Shared process responsibility is a possible explanation, not a measured diagnosis. Initial failed captures cannot support a claim that user-app audio was excluded. Only aggregate measurements persisted."
+  },
+  "nativeBoundary": {
+    "freshSignedCLIdoctor": {
+      "screenLocked": false,
+      "accessibility": true,
+      "screenRecording": true
+    },
+    "captureTestRuntime": "SwiftPM debug and ThreadSanitizer; not staged signed GUI",
+    "GUIViewSourcesUnchanged": true,
+    "newGUIInputOrRenderClaimed": false,
+    "realMicrophonePermissionRequested": false,
+    "installedSchema17Unchanged": true,
+    "normalHistoryOpenedByQualification": false,
+    "realKeychainCredentialsUsed": false,
+    "authenticationOrPermissionChanges": false,
+    "systemVolumeChanged": false
+  },
+  "remainingGates": [
+    "Actual signed-GUI/controller startup, microphone and end-to-end local ASR capture",
+    "Device/route interruption and physical source restart",
+    "Arbitrary app/helper/shell-child audio attribution and new-launch first-sound boundary",
+    "Private browser tabs/background domains and source timestamps under gaps",
+    "Native warning visibility and broader keyboard/VoiceOver/OS/hardware acceptance",
+    "Vault identity-preserving detach-settling retry follow-up from preceding candidate",
+    "Sustained capture CPU/disk/power and matched whole-app competitor benchmarks",
+    "Broad competitive feature parity and ranking"
+  ]
+}

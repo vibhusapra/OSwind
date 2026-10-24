@@ -27,7 +27,7 @@ System audio requires ready, valid, mono, packed native-endian Float32 LPCM at e
 
 Microphone conversion is owned by its serialized AVAudioEngine tap. It accepts the originally configured format, bounds converted capacity before allocation, downmixes/resamples to 16 kHz mono and refuses changed formats or conversion errors. Zero-output conversion buffers are allowed. No audio device or microphone permission is needed to exercise the converter with generated PCM.
 
-System-audio application filtering uses the same case-insensitive bundle-ID exclusion helper as foreground privacy. This does not isolate private background tabs or establish atomic privacy across a foreground transition. The source filter is created from the shareable-content inventory at startup; physical background/app-launch behavior remains an acceptance gate.
+System-audio application filtering uses the same case-insensitive bundle-ID exclusion helper as foreground privacy. This does not isolate private background tabs or establish atomic privacy across a foreground transition. The source filter is created from the background-inclusive shareable-content inventory at startup. A matching excluded-app launch stops active system-audio work and requires explicit restart with a fresh filter. Notification handling is cooperative; first-sound atomicity, child-process attribution and broader application behavior remain acceptance gates. See the [native two-source fixture](NATIVE-SYSTEM-AUDIO.md).
 
 ## Verification and remaining work
 

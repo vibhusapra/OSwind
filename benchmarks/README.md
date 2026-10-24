@@ -2,6 +2,14 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Real owned system-audio buffers
+
+[Native system-audio evidence](native-system-audio-v1.json) binds runtime07cb8de and a separately signed 33-file package to 702 normal passes/30 opt-in skips, 234 native/model passes, one distinct physical case and 726 distinct passes/six remaining opt-in cases. All 236 focused TSan cases plus the physical case pass, giving 237 distinct race checks. All seventeen final qualification operations pass, including eleven signed process groups.
+
+Two independently registered generated-tone apps are explicitly hidden, playing concurrently while one source is requested per stream. Four final selections (normal/TSan, A/B) each produce 48,640 samples in 152 callbacks, exact 16 kHz mono Float32, flags41, maximum 320 samples per callback and no format rejection/interruption. Intended-to-other-known-tone amplitude ratios range from 332,519 to 2,269,098. The onscreen-only inventory omits both sources; the production background-inclusive inventory finds them. This establishes short controlled format/known-tone checks on one M5 Max/macOS26.6.2 host. SwiftPM normal/instrumented code performs capture, not the signed GUI. It is not speech quality, broad application privacy, whole-controller acceptance, latency, power or a competitor benchmark.
+
+Earlier direct-shell fixture attempts failed discovery and then mixed both tones. LaunchServices registration changed that result. The failed measurements remain retained; process responsibility is a possible explanation, not a captured diagnosis. Raw captured audio stays in memory, no permission or system-volume changes occur, and owned sources are terminated after each probe. [Protocol and limitations](../docs/NATIVE-SYSTEM-AUDIO.md).
+
 ## Bounded live PCM ingress
 
 [Ingress evidence](audio-ingress-v1.json) binds runtime 20a51c8 to 699 normal passes/29 skips, 231 native/model passes adding 23 distinct cases, 722 distinct passes/six remaining opt-in cases, 233 TSan passes and a separately verified 33-file signed package. All eleven final process groups pass. Twelve new ingress and three controller cases cover bounded stalled-actor storage/delivery, exact concurrent callback accounting, final-segment handoff, old-source isolation, actual generated CoreMedia buffers, device-free microphone conversion and per-run capacity-drop reporting.

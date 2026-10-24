@@ -29,6 +29,14 @@ import AVFoundation
         configure(&environment)
         return (AudioController(store:try MemoryStore(root:root.appendingPathComponent("library")),embedder:LocalEmbedder(),settings:settings,startup:environment,recognizer:recognizer ?? SpeechRecognizer()),root)
     }
+    func testBackgroundExcludedAppDoesNotStopMicrophoneOnlyAuthorization() async throws {
+        let gate=Gate();var acquired=0
+        let (audio,root)=try fixture(gate) {acquired+=1};defer {audio.stop();try? FileManager.default.removeItem(at:root)}
+        let attempt=Task {await audio.start()};await fulfillment(of:[gate.entered],timeout:5)
+        XCTAssertFalse(audio.settings.systemAudioEnabled);audio.applicationLaunched("COM.APPLE.PASSWORDS")
+        XCTAssertTrue(audio.running);XCTAssertEqual(audio.status,"Starting local audio…")
+        audio.stop();gate.resolve();await attempt.value;XCTAssertEqual(acquired,0)
+    }
     func testStopDuringAuthorizationCannotAcquireDevice() async throws {
         let gate=Gate(); var acquired=0
         let (audio,root)=try fixture(gate) { acquired += 1 }; defer { audio.stop(); try? FileManager.default.removeItem(at:root) }
