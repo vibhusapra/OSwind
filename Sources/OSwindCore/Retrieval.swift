@@ -8,7 +8,8 @@ public extension Memory {
     var evidenceHash: String {
         let encoder=JSONEncoder(); encoder.outputFormatting = .sortedKeys
         let audio=transcript.flatMap { try? encoder.encode($0) }.map { SHA256.hash(data:$0).map { String(format:"%02x",$0) }.joined() } ?? ""
-        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio
+        let linked=recap.flatMap {try? encoder.encode($0)}.map {":"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()} ?? ""
+        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio + linked
         guard let visualRecording else {return base}
         return base+":"+SHA256.hash(data:(try? encoder.encode(visualRecording)) ?? Data()).map {String(format:"%02x",$0)}.joined()
     }

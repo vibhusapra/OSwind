@@ -74,7 +74,7 @@ final class MediaDeletionTests:XCTestCase {
         store=nil;store=try MemoryStore(root:root)
         try store.withRoutineDatabase {db in
             let row=try db.statement("SELECT value FROM store_metadata WHERE key='identity'");defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(db.text(row,0),identity)
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),14)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),MemoryStore.schemaVersion)
             try db.execute("DELETE FROM memories WHERE id='old'");XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),1)
         }
         XCTAssertEqual(store.retryErasureCleanup().removedMedia,1)

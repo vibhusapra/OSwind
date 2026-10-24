@@ -222,7 +222,9 @@ struct SettingsView: View {
                 if ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"] != nil { Text("Your launcher selects a library with OSWIND_DATA_DIR. It takes priority on the next launch.").font(.caption).foregroundStyle(.secondary) }
             }
             Section("Text interchange") {
-                HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() } }
+                HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() }.disabled(m.importingJSON || m.libraryTransfer.busy) }
+                if m.importingJSON {HStack {ProgressView().controlSize(.small);Button("Cancel import") {m.cancelJSONImport()}}}
+                if !m.importStatus.isEmpty {Text(m.importStatus).font(.caption).textSelection(.enabled)}
                 Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Delete") { Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy); Button("Delete all local memories…",role:.destructive) { deleteConfirm = true }.disabled(m.maintenanceBusy || m.deletingID != nil || m.libraryTransfer.busy) }

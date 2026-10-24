@@ -57,6 +57,7 @@ public struct Answer: Codable, Sendable {
     public var duration: Double
     public var warnings: [String] = []
     public var resolution: QueryResolution? = nil
+    public init(text:String,sources:[SearchHit],provider:String,duration:Double,warnings:[String]=[],resolution:QueryResolution?=nil) {self.text=text;self.sources=sources;self.provider=provider;self.duration=duration;self.warnings=warnings;self.resolution=resolution}
 }
 public final class AnswerEngine {
     private let store: MemoryStore
@@ -119,8 +120,10 @@ public final class AnswerEngine {
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800
         let passages = hits.map { hit in
-            "\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + hit.answerEvidence(query:excerptQuery,budget:excerptBudget,summary:summarize,speaker:resolution.filter.speaker)
+            let origin=hit.memory.recap==nil ? "":"AI-generated saved recap. This timestamp is save time, not the date of the original evidence. Verify facts and dates against its linked originals.\n"
+            return "\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + origin + hit.answerEvidence(query:excerptQuery,budget:excerptBudget,summary:summarize,speaker:resolution.filter.speaker)
         }
+        if hits.contains(where:{$0.memory.recap != nil}) {retrievalWarnings.append("Saved recaps are AI-generated copies. Their timestamps show when saved; open linked originals to verify facts and dates.")}
         let context = passages.enumerated().map { "[\($0.offset+1)] \($0.element)" }.joined(separator:"\n\n")
         if hits.contains(where:{ ($0.memory.text as NSString).length > excerptBudget }) { retrievalWarnings.append("Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records.") }
         if summarize { retrievalWarnings.append("This recap uses a distributed sample of the selected timeline, not every recorded moment.") }

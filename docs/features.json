@@ -108,7 +108,7 @@
     "axis": "Retrieval",
     "feature": "Full-text search + ranking",
     "status": "tested",
-    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 425 tests, actual 20k Metal exact-top10 checks and stable FTS maintenance keys (paired synthetic erasure 17.43/8.77 s to 2.89/4.09 s); regex/NEAR and native keyboard/help acceptance remain open",
+    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 452 tests, actual 20k Metal exact-top10 checks and stable FTS maintenance keys (paired synthetic erasure 17.43/8.77 s to 2.89/4.09 s); regex/NEAR and native keyboard/help acceptance remain open",
     "references": "Most visual tools"
   },
   {
@@ -251,8 +251,8 @@
     "id": "F032",
     "axis": "AI",
     "feature": "Day recap / standup / action templates",
-    "status": "implemented",
-    "evidence": "Manual template prompts and save recap",
+    "status": "partial",
+    "evidence": "Manual templates and source-linked saved recaps: ordered originals/anchors, revision checks, dependent erasure, saved-date warning and filtered import/export/full restore; 452 tests/84 TSan plus actual local-Qwen chain. Native clicks, natural recap quality and legacy independent-copy cleanup remain open",
     "references": "Screenpipe, Pieces, Littlebird"
   },
   {
@@ -412,7 +412,7 @@
     "axis": "Privacy",
     "feature": "Fine-grained history erasure",
     "status": "partial",
-    "evidence": "Schema14 universal media queue covers individual delete, age/budget retention and native/CLI scope erasure; canonical aliases, actual partial outcomes, async status and retry. 425 tests/57 TSan, old-writer refusal and 20k age-retention 2.29/3.41 s, all IDs/shared bytes. Native clicks, legacy recap provenance and broader scan/power gates remain",
+    "evidence": "Schema15 adds transitive source-linked recap erasure, scope closure counts and privacy-aware portability over the schema14 shared-media queue. 452 tests/84 TSan, actual older-writer refusal and local-Qwen chain; earlier 20k age-retention 2.29/3.41 s, all IDs/shared bytes. Native clicks, legacy independent copies, whole-wipe UX and broader scan/power gates remain",
     "references": "Recall, Littlebird"
   },
   {

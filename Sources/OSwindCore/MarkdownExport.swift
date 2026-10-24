@@ -41,6 +41,7 @@ public enum MarkdownExport {
         let reader = try BackupDataReader(scratch.url.appendingPathComponent("memory.sqlite")); defer { reader.close() }
         let index = try BackupDatabase(scratch.url.appendingPathComponent("links.sqlite"),createPrivate:true); defer { index.close() }
         try index.execute("CREATE TABLE sources(id TEXT PRIMARY KEY,member TEXT NOT NULL,title TEXT NOT NULL); BEGIN IMMEDIATE;")
+        let recapPolicy=try prepareRecapPolicy(reader:reader,index:index,policy:policy)
         let total = try reader.counts().0
         var info = MarkdownExportInfo(createdAt:try ISOTime.string(Date()),sourceSchema:reader.schema,includeMedia:includeMedia)
         try output.tree.withNewFile("index.md") { descriptor in
@@ -56,12 +57,13 @@ public enum MarkdownExport {
                 let id = try reader.db.text(rows,0)
                 let original = try JSONDecoder().decode(Memory.self,from:payload(rows,1))
                 guard original.id == id else { throw OSwindError.invalid("Source identity differs from its stored record") }
-                if policy.exclusion(app:original.bundleID,title:original.title,url:original.url) != nil {
+                let hidden=recapPolicy ? try recapHidden(id,index:index):false
+                if hidden || policy.exclusion(app:original.bundleID,title:original.title,url:original.url) != nil {
                     info.excludedMemories += 1
                 } else {
                     let (memory,suppressMedia) = try sanitized(original,policy:policy)
                     let key = digest(id), member = "sources/"+key+".md"
-                    let insert = try index.prepare("INSERT INTO sources(id,member,title) VALUES(?,?,?)"); defer { sqlite3_finalize(insert) }
+                    let insert = try index.prepare("INSERT OR REPLACE INTO sources(id,member,title) VALUES(?,?,?)"); defer { sqlite3_finalize(insert) }
                     index.bind(insert,1,id); index.bind(insert,2,member); index.bind(insert,3,memory.title)
                     guard sqlite3_step(insert) == SQLITE_DONE else { throw index.error("Cannot index exported source") }
                     var media = [(String,String)]()
@@ -84,6 +86,7 @@ public enum MarkdownExport {
                     try output.tree.withNewFile(member) { file in
                         let page = MarkdownSink(file)
                         var metadata: [String:Any] = ["oswind_id":policy.sanitize(id).text,"kind":memory.kind.rawValue,"created":try ISOTime.string(memory.timestamp),"title":memory.title,"app":memory.app,"bundle_id":memory.bundleID,"favorite":memory.favorite,"tags":memory.tags,"aliases":[memory.title]]
+                        if let recap=memory.recap {metadata["recap_provider"]=policy.sanitize(recap.provider).text;metadata["linked_source_ids"]=recap.sources.map(\.id)}
                         if let end = memory.endTimestamp { metadata["ended"] = try ISOTime.string(end) }
                         if let session = memory.audioSessionID { metadata["audio_session_id"] = session }
                         try page.write("---\n")
@@ -93,6 +96,14 @@ public enum MarkdownExport {
                         for (label,path) in media { try page.write("[Open retained \(label)](\(path))\n\n") }
                         if includeMedia && suppressMedia { try page.write("Retained media omitted because this source contains redacted material.\n\n") }
                         try page.write("## Source text\n\n"+literal(memory.text))
+                        if let recap=memory.recap {
+                            try page.write("## Linked originals\n\nThis is an AI-generated saved recap. Its timestamp records saving, not the date of its originals. This exported folder is an independent snapshot.\n\n")
+                            for (ordinal,reference) in recap.sources.enumerated() {
+                                let link=try index.prepare("SELECT member,title FROM sources WHERE id=?");defer {sqlite3_finalize(link)};index.bind(link,1,reference.id)
+                                guard sqlite3_step(link)==SQLITE_ROW else {throw OSwindError.invalid("Linked recap has an unavailable export source")}
+                                try page.write("[\(ordinal+1)] ["+inline(try index.text(link,1))+"](../"+(try index.text(link,0))+")\n\n")
+                            }
+                        }
                         if let transcript = memory.transcript {
                             try page.write("## Timed transcript\n\nTimes are seconds within the recording. Speaker names are recording-local labels, not verified identities.\n\n")
                             for segment in transcript.segments {
@@ -181,9 +192,58 @@ public enum MarkdownExport {
         guard size > 0,size <= MemoryStore.maximumRecordBytes,let data = sqlite3_column_blob(row,column) else { throw OSwindError.invalid("Invalid export record size") }
         return Data(bytes:data,count:size)
     }
+    private static func recapHidden(_ id:String,index:BackupDatabase) throws -> Bool {
+        let row=try index.prepare("SELECT 1 FROM recap_hidden WHERE id=?");defer {sqlite3_finalize(row)};index.bind(row,1,id)
+        let status=sqlite3_step(row);guard status==SQLITE_ROW || status==SQLITE_DONE else {throw index.error("Cannot read recap privacy scope")};return status==SQLITE_ROW
+    }
+    /// Only linked nodes need a prepass. Plain libraries keep the previous streaming path.
+    private static func prepareRecapPolicy(reader:BackupDataReader,index:BackupDatabase,policy:PrivacyPolicy) throws -> Bool {
+        guard reader.schema>=15,try reader.db.integer("SELECT COUNT(*) FROM (SELECT 1 FROM recap_sources LIMIT 1)")>0 else {return false}
+        try index.execute("CREATE TABLE recap_edges(recap_id TEXT,source_id TEXT,revision TEXT,ordinal INTEGER,PRIMARY KEY(recap_id,ordinal)); CREATE INDEX recap_parent ON recap_edges(source_id); CREATE TABLE recap_nodes(id TEXT PRIMARY KEY,revision TEXT,member TEXT,title TEXT,unsafe INTEGER,excluded INTEGER); CREATE TABLE recap_hidden(id TEXT PRIMARY KEY) WITHOUT ROWID")
+        let edges=try reader.db.prepare("SELECT recap_id,source_id,revision,ordinal FROM recap_sources");defer {sqlite3_finalize(edges)}
+        let put=try index.prepare("INSERT INTO recap_edges VALUES(?,?,?,?)");defer {sqlite3_finalize(put)};var status=sqlite3_step(edges)
+        while status==SQLITE_ROW {
+            try Task.checkCancellation();sqlite3_reset(put);sqlite3_clear_bindings(put)
+            for column:Int32 in 0...2 {let text=try reader.db.text(edges,column);guard !text.isEmpty,text.utf8.count<=512 else {throw OSwindError.invalid("Invalid recap export metadata")};index.bind(put,column+1,text)}
+            let ordinal=sqlite3_column_int(edges,3);guard (0..<60).contains(ordinal) else {throw OSwindError.invalid("Invalid recap source order")};sqlite3_bind_int(put,4,ordinal)
+            guard sqlite3_step(put)==SQLITE_DONE else {throw index.error("Cannot index recap links")};status=sqlite3_step(edges)
+        }
+        guard status==SQLITE_DONE else {throw reader.db.error("Cannot read recap links")}
+        let nodes=try index.prepare("SELECT recap_id FROM recap_edges UNION SELECT source_id FROM recap_edges");defer {sqlite3_finalize(nodes)};status=sqlite3_step(nodes)
+        while status==SQLITE_ROW {
+            try autoreleasepool {
+                try Task.checkCancellation();let id=try index.text(nodes,0),row=try reader.db.prepare("SELECT payload FROM memories WHERE id=?");defer {sqlite3_finalize(row)};reader.db.bind(row,1,id)
+                guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Recap export is missing an original source")}
+                let original=try JSONDecoder().decode(Memory.self,from:payload(row,0));guard original.id==id else {throw OSwindError.invalid("Recap source identity differs")}
+                let (clean,suppressed)=try sanitized(original,policy:policy),excluded=policy.exclusion(app:original.bundleID,title:original.title,url:original.url) != nil
+                let refs=try index.prepare("SELECT source_id,revision,ordinal FROM recap_edges WHERE recap_id=? ORDER BY ordinal");defer {sqlite3_finalize(refs)};index.bind(refs,1,id);var refStatus=sqlite3_step(refs),count=0
+                if let recap=original.recap {_ = try recap.validated()}
+                while refStatus==SQLITE_ROW {
+                    guard let recap=original.recap,count<recap.sources.count,Int(sqlite3_column_int(refs,2))==count,try index.text(refs,0)==recap.sources[count].id,try index.text(refs,1)==recap.sources[count].revision else {throw OSwindError.invalid("Recap metadata and source links differ")}
+                    count+=1;refStatus=sqlite3_step(refs)
+                }
+                guard refStatus==SQLITE_DONE,count==(original.recap?.sources.count ?? 0) else {throw OSwindError.invalid("Incomplete recap source links")}
+                let save=try index.prepare("INSERT INTO recap_nodes VALUES(?,?,?,?,?,?)");defer {sqlite3_finalize(save)};index.bind(save,1,id);index.bind(save,2,original.evidenceHash);index.bind(save,3,"sources/"+digest(id)+".md");index.bind(save,4,clean.title);sqlite3_bind_int(save,5,suppressed || excluded || clean.evidenceHash != original.evidenceHash ? 1:0);sqlite3_bind_int(save,6,excluded ? 1:0)
+                guard sqlite3_step(save)==SQLITE_DONE else {throw index.error("Cannot index recap privacy")}
+            }
+            status=sqlite3_step(nodes)
+        }
+        guard status==SQLITE_DONE else {throw index.error("Cannot read recap nodes")}
+        try index.execute("""
+        INSERT OR IGNORE INTO recap_hidden SELECT id FROM recap_nodes WHERE excluded=1;
+        INSERT OR IGNORE INTO recap_hidden SELECT e.recap_id FROM recap_edges e JOIN recap_nodes n ON n.id=e.source_id WHERE n.revision<>e.revision;
+        INSERT OR IGNORE INTO recap_hidden WITH RECURSIVE unsafe(id) AS (
+            SELECT id FROM recap_nodes WHERE unsafe=1 UNION SELECT id FROM recap_hidden
+            UNION SELECT e.recap_id FROM recap_edges e JOIN unsafe u ON u.id=e.source_id
+        ) SELECT e.recap_id FROM recap_edges e JOIN unsafe u ON u.id=e.source_id;
+        INSERT INTO sources(id,member,title) SELECT id,member,title FROM recap_nodes WHERE id NOT IN (SELECT id FROM recap_hidden);
+        """)
+        return true
+    }
     private static func sanitized(_ original: Memory,policy: PrivacyPolicy) throws -> (Memory,Bool) {
         var memory = original, suppressed = false
         func clean(_ text: String) -> String { let value = policy.sanitize(text); suppressed = suppressed || value.redacted || text.contains("[REDACTED"); return value.text }
+        if var recap=memory.recap {recap.provider=clean(recap.provider);memory.recap=recap}
         memory.title = clean(original.title); memory.app = clean(original.app); memory.bundleID = clean(original.bundleID)
         memory.url = original.url.map(clean); memory.audioSessionID = original.audioSessionID.map(clean); memory.tags = original.tags.map(clean); memory.text = clean(original.text)
         if let transcript = original.transcript {

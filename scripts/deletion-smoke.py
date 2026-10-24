@@ -18,10 +18,11 @@ with tempfile.TemporaryDirectory(prefix='oswind-unified-deletion-') as temporary
     fixture=[('a','1970-01-01T00:01:40Z'),('b','2099-01-01T00:00:00Z'),('c','1970-01-01T00:01:40Z'),('d','2099-01-01T00:00:00Z'),('e','2099-01-01T00:00:00Z')]
     source=root/'input.json';source.write_text(json.dumps([dict(id=i,timestamp=at,kind='screen',app='Owned fixture',bundleID='com.oswind.fixture',title=i,text='owned '+i,favorite=i=='b',tags=[],regions=[]) for i,at in fixture]))
     cli('import',source,runner=older or binary)
-    with connect(library/'memory.sqlite') as db:identity=db.execute("SELECT value FROM store_metadata WHERE key='identity'").fetchone()[0]
+    with connect(library/'memory.sqlite') as db:
+        identity=db.execute("SELECT value FROM store_metadata WHERE key='identity'").fetchone()[0];initial_schema=db.execute('PRAGMA user_version').fetchone()[0]
     assert cli('stats')['count']==5
     with connect(library/'memory.sqlite') as db:
-        assert db.execute('PRAGMA user_version').fetchone()[0]==14;assert db.execute("SELECT value FROM store_metadata WHERE key='identity'").fetchone()[0]==identity
+        schema=db.execute('PRAGMA user_version').fetchone()[0];assert schema>=14;assert db.execute("SELECT value FROM store_metadata WHERE key='identity'").fetchone()[0]==identity
     if older:
         before=hashlib.sha256((library/'memory.sqlite').read_bytes()).hexdigest()
         error=cli('delete','b',runner=older,ok=False);assert 'newer' in error.lower()
@@ -46,7 +47,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-unified-deletion-') as temporary
     assert cli('stats')['count']==0
     with connect(library/'memory.sqlite') as db:assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok' and not db.execute('PRAGMA foreign_key_check').fetchall()
 assert all(hashlib.sha256(pathlib.Path(b).read_bytes()).hexdigest()==s for b,s in pins.items())
-report=dict(format='OSwind unified media deletion process v1',binary_sha256=pins[str(binary)],schema_version=14,single_shared_dot_alias_and_unique_deletion=True,retention_preserves_newer_favorite_shared_bytes=True,postcommit_unsafe_directory_warning_and_retry=True,direct_sql_queue_admission=True,invalid_inputs_preserve_sources=True,sqlite_integrity_pass=True,actual_older_writer=dict(binary_sha256=pins[str(older)],schema13_to14_upgrade_identity_preserved=True,refusal_database_bytes_preserved=True) if older else None,limits=['Owned generated fixture; not secure wipe, crash/power-loss, arbitrary already-open older-writer or natural capture evidence'])
+report=dict(format='OSwind unified media deletion process v1',binary_sha256=pins[str(binary)],schema_version=schema,single_shared_dot_alias_and_unique_deletion=True,retention_preserves_newer_favorite_shared_bytes=True,postcommit_unsafe_directory_warning_and_retry=True,direct_sql_queue_admission=True,invalid_inputs_preserve_sources=True,sqlite_integrity_pass=True,actual_older_writer=dict(binary_sha256=pins[str(older)],source_schema=initial_schema,target_schema=schema,upgrade_identity_preserved=True,refusal_database_bytes_preserved=True) if older else None,limits=['Owned generated fixture; not secure wipe, crash/power-loss, arbitrary already-open older-writer or natural capture evidence'])
 if o.output:
     output=pathlib.Path(o.output).resolve();output.parent.mkdir(parents=True,exist_ok=True);output.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

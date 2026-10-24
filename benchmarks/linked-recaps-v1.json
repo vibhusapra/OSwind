@@ -1,0 +1,211 @@
+{
+  "format": "OSwind source-linked saved recaps v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "219ca0aea564d305d313b5c8405fb8efd1f26ed5",
+  "schema_version": 15,
+  "features": [
+    "Atomic complete-source revision and current-privacy checks; 1\u201360 bounded ordered original links and optional anchors",
+    "Native Ask/chat linked-save and inspector; CLI specific-turn save beyond the recent 1,000-turn window",
+    "Transitive revision/deletion of derived recaps and cited conversations; shared parents and separate branches preserved",
+    "Scope preview closure and committed deletion counts include dependent recaps outside filters",
+    "Reversed-order JSON and trusted-schema full restore preserve links; excluded/redacted/stale originals omit dependent imported recaps",
+    "Disk-backed Markdown dependency filtering and relative source links; hidden parents suppress derived copies and cited turns",
+    "Detached native import/save, busy guards, cancellation and library-switch late-publication protection",
+    "Explicit independent-copy legacy notice and generated-text/save-date warnings"
+  ],
+  "validation": {
+    "full_suite": {
+      "total": 452,
+      "passed": 446,
+      "opt_in_skipped": 6,
+      "failures": 0
+    },
+    "focused_thread_sanitizer": {
+      "passed": 84,
+      "failures": 0
+    },
+    "deep_chain_levels": 110,
+    "specific_turn_after_later_turns": 1001,
+    "installed_process": {
+      "format": "OSwind linked recap process v1",
+      "answers": [
+        {
+          "text": "Recorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 1:00\u202fPM \u00b7 note \u00b7 Notes \u00b7 Release decision\nLunar release. Maya owns the checklist. The deadline is Friday.",
+          "provider": "evidence",
+          "duration": 0.010937094688415527,
+          "warnings": []
+        },
+        {
+          "text": "Recorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 8:03\u202fPM \u00b7 summary \u00b7 OSwind \u00b7 Saved release\nAI-generated saved recap. This timestamp is save time, not the date of the original evidence. Verify facts and dates against its linked originals.\nRecorded evidence (no language model used):\n\n[1] Oct 23, 2026 at 1:00\u202fPM \u00b7 note \u00b7 Notes \u00b7 Release decision\nLunar release. Maya owns the checklist. The deadline is Friday.",
+          "provider": "evidence",
+          "duration": 0.013041019439697266,
+          "warnings": [
+            "Saved recaps are AI-generated copies. Their timestamps show when saved; open linked originals to verify facts and dates."
+          ]
+        }
+      ],
+      "binary_sha256": "062bdb2180c022ae9fa358bd1c5c619191d33eff101545725e41176943b9c798",
+      "schema_version": 15,
+      "provider": "evidence",
+      "specific_turn_save_and_second_level_chain": true,
+      "saved_time_warning": true,
+      "scope_preview_closure": true,
+      "json_roundtrip_links_preserved": true,
+      "filtered_import_omits_dependent_recaps": true,
+      "markdown_links_resolve": true,
+      "filtered_markdown_omits_recaps_and_cited_turns": true,
+      "full_backup_restores_links": true,
+      "source_revision_and_erasure_remove_chain": true,
+      "sqlite_integrity_pass": true,
+      "older_writer": {
+        "binary_sha256": "2b24ebaf824645b361210167b553b451e01a33f166ef534a671d47e331f7d98d",
+        "source_schema": 14,
+        "target_schema": 15,
+        "upgrade_identity_preserved": true,
+        "refusal_database_bytes_preserved": true
+      },
+      "limits": [
+        "Owned fixtures and pinned executables; not native clicks, natural answer quality, secure SSD wiping or already-open older-process fencing"
+      ]
+    },
+    "actual_local_qwen_process": {
+      "format": "OSwind linked recap process v1",
+      "answers": [
+        {
+          "text": "Maya owns the checklist, and it is due on Friday [1].",
+          "provider": "ollama",
+          "duration": 0.25338995456695557,
+          "warnings": []
+        },
+        {
+          "text": "The recorded content in \"Saved release\" is an AI-generated saved recap of a summary, noting that Maya owns a checklist due on Friday [1]. No specific details about what was recorded beyond this summary are provided.",
+          "provider": "ollama",
+          "duration": 0.5115599632263184,
+          "warnings": [
+            "Saved recaps are AI-generated copies. Their timestamps show when saved; open linked originals to verify facts and dates."
+          ]
+        }
+      ],
+      "binary_sha256": "062bdb2180c022ae9fa358bd1c5c619191d33eff101545725e41176943b9c798",
+      "schema_version": 15,
+      "provider": "ollama",
+      "specific_turn_save_and_second_level_chain": true,
+      "saved_time_warning": true,
+      "scope_preview_closure": true,
+      "json_roundtrip_links_preserved": true,
+      "filtered_import_omits_dependent_recaps": true,
+      "markdown_links_resolve": true,
+      "filtered_markdown_omits_recaps_and_cited_turns": true,
+      "full_backup_restores_links": true,
+      "source_revision_and_erasure_remove_chain": true,
+      "sqlite_integrity_pass": true,
+      "older_writer": null,
+      "limits": [
+        "Owned fixtures and pinned executables; not native clicks, natural answer quality, secure SSD wiping or already-open older-process fencing"
+      ]
+    },
+    "release_regressions": [
+      {
+        "name": "recap-process",
+        "passed": true
+      },
+      {
+        "name": "recap-qwen",
+        "passed": true
+      },
+      {
+        "name": "deletion",
+        "passed": true
+      },
+      {
+        "name": "erasure",
+        "passed": true
+      },
+      {
+        "name": "backup",
+        "passed": true
+      },
+      {
+        "name": "search",
+        "passed": true
+      },
+      {
+        "name": "routines",
+        "passed": true
+      },
+      {
+        "name": "markdown",
+        "passed": true
+      }
+    ]
+  },
+  "model_runtime": {
+    "model": {
+      "name": "qwen3:4b-instruct-2507-q4_K_M",
+      "size": 2497293803,
+      "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "4.0B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 2560,
+        "runner": "ggml"
+      }
+    },
+    "ollama_version": "0.40.8",
+    "loaded_runtime": [
+      {
+        "name": "qwen3:4b-instruct-2507-q4_K_M",
+        "size": 3311423979,
+        "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+        "size_vram": 3311423979,
+        "context_length": 8192
+      }
+    ]
+  },
+  "render": {
+    "source_commit": "219ca0aea564d305d313b5c8405fb8efd1f26ed5",
+    "binary_sha256": "0cc3fc449014166c6cd3130cf25c3be0a6892989088e7a8f63003f9c4732fb5d",
+    "owned_synthetic_libraries": true,
+    "native_click_acceptance": false,
+    "normal_library_opened": false
+  },
+  "package_install_binding": {
+    "source_commit": "219ca0aea564d305d313b5c8405fb8efd1f26ed5",
+    "schema_version": 15,
+    "installed_path": "/Applications/OSwind.app",
+    "prior_version_backup": ".artifacts/installed-before-linked-recaps-219ca0a.app",
+    "strict_signature_verified": true,
+    "installed_launched": false,
+    "normal_library_opened": false,
+    "binaries": {
+      "OSwind": "54cd1760bc2263f4371591bc8651df111a6c75019588e952511420d97da6bc8b",
+      "oswindctl": "062bdb2180c022ae9fa358bd1c5c619191d33eff101545725e41176943b9c798"
+    },
+    "raw_build_binaries": {
+      "OSwind": "c581a7310e858b936c22cd29f3e032c4075010ac790248aca4bc8bd7f22c65a8",
+      "oswindctl": "96218918b6e435f18ce17143209c28caaece8d4bb2dd257efb3eededd32d23bb"
+    },
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures from disposable copies; normalize only __LINKEDIT vmsize. Compare all remaining bytes.",
+    "zip_sha256": "66870ea02e8f8afd15b7b918cdbda013b64d23e935e001791193c51d169dddc9",
+    "zip_binary_equality_verified": true
+  },
+  "limits": [
+    "Owned authored fixtures; no natural recap accuracy or competitor ranking established",
+    "Mac locked: native clicks, focus and accessibility acceptance remain pending; renders and controller tests are separate evidence",
+    "Already-open older executables and arbitrary manual SQLite writes are not fully fenced",
+    "Legacy recaps saved without links remain independent copies; no inferred destructive provenance migration",
+    "Exports and backups are independent external copies; no secure SSD wiping claim",
+    "Whole-library wipe failure UX, encrypted vault/migration, natural capture/power and continuous 24h completion remain open"
+  ]
+}

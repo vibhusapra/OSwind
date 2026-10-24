@@ -18,8 +18,8 @@ extension HistoryErasureResult {
 }
 private extension RoutineDatabase {
     func deletedSources(_ body:() throws -> Void) throws -> (sources:Int,turns:Int) {
-        let turns=try eraseCount("SELECT COUNT(*) FROM chat_turns")
-        try body();let count=Int(sqlite3_changes(handle)),removed=turns-(try eraseCount("SELECT COUNT(*) FROM chat_turns"))
+        let turns=try eraseCount("SELECT COUNT(*) FROM chat_turns"),before=try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")
+        try body();let count=before-(try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")),removed=turns-(try eraseCount("SELECT COUNT(*) FROM chat_turns"))
         if count>0 {try execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
         return (count,removed)
     }
@@ -44,16 +44,16 @@ extension MemoryStore {
         guard before.timeIntervalSince1970.isFinite,maxBytes.map({$0>0}) ?? true else {throw OSwindError.invalid("Use a finite retention date and positive storage budget")}
         return try withRoutineDatabase {db in
             let initial=try erasureCancellable(db) {try db.transaction { () -> (sources:Int,turns:Int) in
-                let beforeTurns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns")
+                let beforeTurns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns"),beforeSources=try db.eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")
                 let titles=try db.statement("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE timestamp<?)");defer {sqlite3_finalize(titles)};sqlite3_bind_double(titles,1,before.timeIntervalSince1970);try db.done(titles)
                 let chats=try db.statement("DELETE FROM chat_turns WHERE timestamp<?");defer {sqlite3_finalize(chats)};sqlite3_bind_double(chats,1,before.timeIntervalSince1970);try db.done(chats)
-                let row=try db.statement("DELETE FROM memories WHERE timestamp<?");defer {sqlite3_finalize(row)};sqlite3_bind_double(row,1,before.timeIntervalSince1970);try db.done(row);let count=Int(sqlite3_changes(db.handle))
+                let row=try db.statement("DELETE FROM memories WHERE timestamp<?");defer {sqlite3_finalize(row)};sqlite3_bind_double(row,1,before.timeIntervalSince1970);try db.done(row);let count=beforeSources-(try db.eraseCount("SELECT total FROM memory_statistics WHERE singleton=1"))
                 if count>0 {try db.execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
                 return (count,beforeTurns-(try db.eraseCount("SELECT COUNT(*) FROM chat_turns")))
             }}
             var result=HistoryErasureResult.empty
-            let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets")
-            if initial.sources>0 || pending>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns)}
+            let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),dirty=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")
+            if initial.sources>0 || pending>0 || dirty>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns)}
             else {result = .init(sources:0,conversationTurns:initial.turns,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:true,warnings:[])}
             var bytes=diskBytes(),stopped=false
             if let maxBytes,bytes>maxBytes,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
