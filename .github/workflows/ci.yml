@@ -119,3 +119,19 @@ jobs:
             .artifacts/passages-apple-ci.json
             .artifacts/backup-process-ci.json
             .artifacts/audio-process-ci.json
+
+  benchmark-harnesses:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Verify generated ASR assets without corpus downloads
+        run: python3 scripts/test-prepare-asr-eval.py
+      - name: Verify independent scorers and process boundaries on generated fixtures
+        run: |
+          python3 -m venv "$RUNNER_TEMP/oswind-scorers"
+          "$RUNNER_TEMP/oswind-scorers/bin/python" -m pip install -r benchmarks/requirements-speaker-eval.txt -r benchmarks/requirements-speech-eval.txt
+          "$RUNNER_TEMP/oswind-scorers/bin/python" scripts/test-speaker-eval.py
+          "$RUNNER_TEMP/oswind-scorers/bin/python" scripts/test-asr-corpus-eval.py

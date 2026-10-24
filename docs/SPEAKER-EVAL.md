@@ -83,3 +83,8 @@ The six asset-preparation contracts include complete-reference coverage and sele
 Mac process RSS excludes device allocation and other services; model compute is Core ML eligible units with CPU-only FBank, not measured per-operation placement. Timings retain uncontrolled caches and concurrent component-soak/download activity. No isolated energy/speed, whole-competitor, word-error or natural-meeting acceptance claim follows from these numbers.
 
 The official test split is being staged separately, with its 232 reference IDs/hashes frozen before any OSwind test-split inference. Separately, checksum-verified LibriSpeech assets and a fixed five-utterance-per-speaker clean/challenging selection are prepared for future ASR evaluation; no WER score is claimed. [VoxConverse provenance/license](https://github.com/joonson/voxconverse/blob/24bf60be297701cd7e4ef18550c6d390c1b87365/README.md) and [LibriSpeech provenance/license](https://www.openslr.org/12/) remain authoritative; no source audio or human transcript text is committed.
+
+
+## Official test split — running frozen evaluation
+
+The [held-out protocol](HELDOUT-EVALUATION.md) and [232-ID test plan](../benchmarks/fixtures/voxconverse-test-v1.json) are separate from every development result above. Current overlap-aware and preceding exclusive-output configurations run unchanged with the same model files, two repetitions, complete overlap-inclusive full-WAV coverage, and 0/250 ms collars. Upstream model-training overlap is unaudited. A 26 ms official annotation tail first triggered an overly strict parser; the preserved failed attempt is followed by a complete rerun using the declared evaluation map, with no recording exclusions or model tuning. Partial reports do not establish a result or ranking.
