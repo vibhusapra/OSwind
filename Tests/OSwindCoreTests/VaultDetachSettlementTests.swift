@@ -26,6 +26,32 @@ private actor DetachPause {
 }
 
 @MainActor final class VaultDetachSettlementTests:XCTestCase {
+    func testLongIncompleteIntervalCanSettleWithinExpandedBoundedBudget() async throws {
+        let state=DetachObservations(Array(repeating:.pending,count:14)+[.detached,.detached])
+        try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()})
+        let counts=await state.counts();XCTAssertEqual(counts,[16,15])
+    }
+    func testExpandedDefaultStillRefusesPermanentAttachmentWithBoundedBackoff() async throws {
+        let state=DetachObservations([.pending])
+        do {try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()});XCTFail("Permanent incomplete attachment accepted")}
+        catch {XCTAssertTrue(error.localizedDescription.contains("could not be verified"))}
+        let counts=await state.counts();XCTAssertEqual(counts,[16,15])
+        let delays=(0..<15).map(VaultDetachSettlement.delayMilliseconds)
+        XCTAssertEqual(delays.first,50);XCTAssertEqual(delays.reduce(0,+),11550);XCTAssertLessThanOrEqual(delays.max()!,1000)
+    }
+    func testOneAbsenceAtFinalObservationCannotReportDetached() async throws {
+        let state=DetachObservations(Array(repeating:.pending,count:15)+[.detached])
+        do {try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()});XCTFail("Only one absence accepted")}
+        catch {XCTAssertTrue(error.localizedDescription.contains("could not be verified"))}
+        let counts=await state.counts();XCTAssertEqual(counts,[16,15])
+    }
+    func testInvalidVerificationBudgetsNeverInspect() async throws {
+        for budget in [0,17] {
+            let state=DetachObservations([.detached])
+            do {try await VaultDetachSettlement.confirm(attempts:budget,inspect:{try await state.inspect()});XCTFail("Unbounded observation budget accepted")}catch {}
+            let counts=await state.counts();XCTAssertEqual(counts,[0,0])
+        }
+    }
     func testIncompleteThenAttachedThenAbsentNeedsFreshConfirmation() async throws {
         let state=DetachObservations([.pending,.pending,.attached,.detached])
         try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()})
