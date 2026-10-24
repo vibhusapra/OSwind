@@ -12,7 +12,7 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 ## Build & run
 
-macOS 14+, Apple Silicon recommended, Swift 6.2+ / Xcode 26+ to build. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. SwiftPM resolves pinned USearch/NumKong search and FluidAudio speech dependencies; third-party notices are bundled.
+macOS 14+, Apple Silicon recommended, Swift 6.2+ / Xcode 26+ to build. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. SwiftPM resolves pinned USearch/NumKong search, FluidAudio speech and Hugging Face tokenizer dependencies; third-party notices are bundled.
 
 ```bash
 swift test
@@ -29,6 +29,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).
 - [Source-linked saved recaps](docs/RECAPS.md), with original evidence anchors, revision checks, transitive erasure and privacy-aware JSON/Markdown portability.
 - [Frozen natural-speech evaluation](docs/HELDOUT-EVALUATION.md): public plans, independent DER/WER scorers and model-free CI contracts. Both frozen test runs are complete with retained failures and regressions; this is not a competitor ranking.
+- [Local visual encoder foundation](docs/VISUAL-MODELS.md): pinned SigLIP2 conversion, native Core ML image/text embeddings and explicit qualification CLI. Screenshot/replay indexing and visual-search UI are still pending.
 - [Encrypted libraries](docs/VAULT.md): managed AES-256 APFS images, passphrase/optional user-presence Keychain, native setup and lock screens, verified source-preserving copy, closed-handle refusal and volume-detach truthfulness. Real authentication and native acceptance remain open.
 - [Full-library erasure and recovery](docs/WIPE.md), including orphan media, coordinated file writers, background progress, durable retry and explicit compaction outcomes.
 - [Selective history erasure](docs/HISTORY-ERASURE.md) by time, app, bundle ID and website, with preview guards and retryable retained-media cleanup. [Individual deletion and retention](docs/DELETION.md) also preserve shared files and report partial cleanup.

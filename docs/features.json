@@ -131,8 +131,8 @@
     "id": "F017",
     "axis": "Retrieval",
     "feature": "Visual / image semantic search",
-    "status": "todo",
-    "evidence": "No CLIP/VLM embeddings yet",
+    "status": "partial",
+    "evidence": "Qualified native SigLIP2 image/text encoder and CLI; exact tokenizer/resize fixtures and CPU/GPU reference gates. Library media indexing, scopes, frame opening, visual-search UI and privacy/erasure integration remain TODO; this is an encoder foundation, not delivered desktop visual search",
     "references": "TimeScroll, Recall"
   },
   {
