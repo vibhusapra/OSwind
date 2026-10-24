@@ -18,8 +18,10 @@ import UniformTypeIdentifiers
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
-        if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
-        if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
+        if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
+        // Visual model controls do not invalidate the independent text index.
+        var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
+        if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
     @Published var section = "Memories"
@@ -453,6 +455,12 @@ import UniformTypeIdentifiers
         } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.startHousekeeping()}
     }
     func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
+    func pauseForHistoryErasure() {
+        // Stop readers holding media reservations before asking erasure to take
+        // an exclusive reservation. Wake/power callbacks must not restart them.
+        visualAutoResumeAllowed=false;cancelVisualIndexing()
+        pauseAll(discardReplay:true);cancelAnswer();routines.cancel();cancelOpeningMemory();selected=nil;answer=nil
+    }
     func pauseFor(minutes: Int) {
         let screenWasRunning = capture.running, audioWasRunning = audio.running
         pauseAll(); pauseUntil = Date().addingTimeInterval(Double(minutes)*60)

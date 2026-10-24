@@ -102,7 +102,7 @@ struct HistoryErasureView:View {
         .alert("Erase the previewed history?",isPresented:$confirm) {
             Button("Cancel",role:.cancel) {}
             Button("Erase sources",role:.destructive) {
-                m.pauseAll(discardReplay:true);m.cancelAnswer();m.routines.cancel();m.cancelOpeningMemory();m.selected=nil;m.answer=nil
+                m.pauseForHistoryErasure()
                 model.apply(store:m.store) {m.refreshChats();m.routines.reload();m.invalidateStorageEstimate();m.refresh(forceStatistics:true)}
             }
         } message: {Text("Matching sources, retained media and entire answers that cite them will be removed. Shared media stays when another source still uses it. If history changed, you will need a new preview.")}
