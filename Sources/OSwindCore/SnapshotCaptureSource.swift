@@ -14,7 +14,8 @@ struct SnapshotCaptureDeferral:Error {var reason:String}
 @MainActor struct SnapshotCaptureEnvironment {
     var locked:()->Bool = {SessionState.locked}
     var permitted:()->Bool = {CGPreflightScreenCaptureAccess()}
-    var context:(String?)->WindowContext? = {AccessibilityContext.current(targetBundleID:$0)}
+    var context:(String?) async -> WindowContext? = {await AccessibilityContext.read(targetBundleID:$0)}
+    var identityCurrent:(WindowContext,String?)->Bool = {AccessibilityContext.identityCurrent($0,targetBundleID:$1)}
     var frames:(AppSettings,WindowContext) async throws -> [SnapshotCaptureFrame] = {try await NativeSnapshotSource.frames(settings:$0,context:$1)}
     var recognize:@Sendable (CGImage) throws -> [TextRegion] = {image in
         try Task.checkCancellation()

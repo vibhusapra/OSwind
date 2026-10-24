@@ -35,13 +35,55 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         return try XCTUnwrap(context.makeImage())
     }
     private func environment(_ world:SnapshotWorld,frame:SnapshotCaptureFrame)->SnapshotCaptureEnvironment {
-        var environment=SnapshotCaptureEnvironment();environment.locked={world.locked};environment.permitted={world.permitted};environment.context={_ in world.context}
+        var environment=SnapshotCaptureEnvironment();environment.locked={world.locked};environment.permitted={world.permitted};environment.context={_ in world.context};environment.identityCurrent={context,_ in world.context.map {context.pid==$0.pid && context.bundle==$0.bundle} ?? false}
         environment.frames={_,_ in [frame]};environment.recognize={_ in [.init(text:"Owned screen region",x:0.1,y:0.2,width:0.5,height:0.1)]}
         return environment
     }
     func files() throws -> [String] {try FileManager.default.contentsOfDirectory(atPath:root.appendingPathComponent("images").path)}
     func assertEmpty(_ controller:CaptureController,file:StaticString=#filePath,line:UInt=#line) throws {
         XCTAssertEqual(try store.stats().count,0,file:file,line:line);XCTAssertEqual(try files(),[],file:file,line:line);XCTAssertEqual(controller.metrics.saved,0,file:file,line:line)
+    }
+    func testPauseAndSettingsDuringInitialContextReadPreventPixelsAndKeepStatus() async throws {
+        for pause in [true,false] {
+            let world=SnapshotWorld(),bitmap=try image(),entered=XCTestExpectation(description:"Initial context read suspended")
+            var resume:CheckedContinuation<WindowContext?,Never>?
+            var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap}))
+            environment.context={_ in await withCheckedContinuation {resume=$0;entered.fulfill()}}
+            let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
+            let attempt=Task {await controller.captureOnce(manual:true)}
+            await fulfillment(of:[entered],timeout:5)
+            // A second manual capture must defer without starting another read.
+            await controller.captureOnce(manual:true)
+            if pause {controller.pause()} else {controller.settings.privacy.retainImages=false}
+            resume?.resume(returning:world.context);await attempt.value
+            try assertEmpty(controller);XCTAssertEqual(world.captured,0)
+            if pause {XCTAssertEqual(controller.status,"Paused")}
+        }
+    }
+    func testCancelledOrLockedInitialContextReadCannotStartCapture() async throws {
+        for cancel in [true,false] {
+            let world=SnapshotWorld(),bitmap=try image(),entered=XCTestExpectation(description:"Initial context read suspended")
+            var resume:CheckedContinuation<WindowContext?,Never>?,sawCancellation=false
+            var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap}))
+            environment.context={_ in let result=await withCheckedContinuation {resume=$0;entered.fulfill()};sawCancellation=Task.isCancelled;return result}
+            let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
+            let attempt=Task {await controller.captureOnce(manual:true)}
+            await fulfillment(of:[entered],timeout:5)
+            if cancel {attempt.cancel()} else {world.locked=true}
+            resume?.resume(returning:world.context);await attempt.value
+            try assertEmpty(controller);XCTAssertEqual(world.captured,0)
+            if cancel {XCTAssertTrue(sawCancellation)}
+        }
+    }
+    func testLastIdentityFenceRemovesWrittenButUnadmittedJPEG() async throws {
+        let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap})),checks=0,sawWritten=false
+        environment.identityCurrent={_,_ in
+            checks+=1
+            if checks==6 {sawWritten = (try? self.files().count)==1;return false}
+            return true
+        }
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
+        await controller.captureOnce(manual:true);XCTAssertEqual(checks,6);XCTAssertTrue(sawWritten);try assertEmpty(controller)
     }
     func testStableContextAdmitsPrivateJPEGAndUsesPostImageAccessibilityText() async throws {
         let world=SnapshotWorld(),bitmap=try image()
