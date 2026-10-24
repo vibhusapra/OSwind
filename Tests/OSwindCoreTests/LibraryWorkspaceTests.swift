@@ -83,6 +83,20 @@ final class LibraryWorkspaceTests:XCTestCase {
         try store.close();XCTAssertTrue(store.isClosed)
         XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:location.path).isEmpty)
     }
+    func testCloseOfMovedConnectionDoesNotChangeReplacementDatabaseOrWAL() throws {
+        try store.insert(Memory(id:"original",text:"Owned original"))
+        let location=store.root,moved=root.appendingPathComponent("moved-original")
+        try FileManager.default.moveItem(at:location,to:moved)
+        let replacement=try MemoryStore(root:location);defer {try? replacement.close()}
+        try replacement.insert(Memory(id:"replacement",text:String(repeating:"Owned replacement ",count:10000)))
+        var before=[String:Data]()
+        for name in ["memory.sqlite","memory.sqlite-wal","memory.sqlite-shm"] {let file=location.appendingPathComponent(name);if FileManager.default.fileExists(atPath:file.path) {before[name]=try Data(contentsOf:file)}}
+        XCTAssertNotNil(before["memory.sqlite-wal"])
+        try store.close();XCTAssertTrue(store.isClosed)
+        for (name,data) in before {XCTAssertEqual(try Data(contentsOf:location.appendingPathComponent(name)),data,name)}
+        XCTAssertNotNil(try replacement.get("replacement"));try replacement.close()
+        let original=try MemoryStore(root:moved);defer {try? original.close()};XCTAssertEqual(try original.get("original")?.text,"Owned original")
+    }
     func testWorkspaceParentIdentityRejectsReplacement() throws {
         let parent=root.appendingPathComponent("parent");try Paths.ensure(parent);let tree=try BackupFileTree(root:parent),identity=try tree.identity()
         try FileManager.default.moveItem(at:parent,to:root.appendingPathComponent("old-parent"));try Paths.ensure(parent)

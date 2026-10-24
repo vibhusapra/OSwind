@@ -16,7 +16,7 @@ import AVFoundation
         func resolve(_ granted: Bool = true) { continuation?.resume(returning:granted); continuation=nil }
     }
     private func fixture(_ gate: Gate, locked: @escaping () -> Bool = { false },
-                         context: @escaping () -> WindowContext? = { nil },
+                         context: @escaping () -> WindowContext? = {WindowContext(app:"Owned",bundle:"org.fixture",pid:8123,title:"Owned",accessibilityText:"",secure:false)},
                          recognizer:SpeechRecognizer?=nil,
                          configure: (inout AudioStartupEnvironment) -> Void = { _ in },
                          acquire: @escaping () -> Void) throws -> (AudioController, URL) {
@@ -25,7 +25,7 @@ import AVFoundation
         var settings=AppSettings(); settings.audioEnabled=true
         settings.whisperBinary="/usr/bin/true"; settings.whisperModel=root.appendingPathComponent("fixture-model").path
         try Data("not a real model".utf8).write(to:URL(fileURLWithPath:settings.whisperModel))
-        var environment=AudioStartupEnvironment(locked:locked,context:context,authorizeMicrophone:{ await gate.authorize() },makeEngine:{ acquire(); throw OSwindError.unavailable("test stops before device acquisition") })
+        var environment=AudioStartupEnvironment(locked:locked,context:{context()},identityCurrent:{_ in true},authorizeMicrophone:{ await gate.authorize() },makeEngine:{ acquire(); throw OSwindError.unavailable("test stops before device acquisition") })
         configure(&environment)
         return (AudioController(store:try MemoryStore(root:root.appendingPathComponent("library")),embedder:LocalEmbedder(),settings:settings,startup:environment,recognizer:recognizer ?? SpeechRecognizer()),root)
     }
@@ -52,7 +52,7 @@ import AVFoundation
         XCTAssertEqual(acquired,0); XCTAssertFalse(audio.running); XCTAssertTrue(audio.status.contains("Locked"))
     }
     func testExcludedForegroundAfterAuthorizationRequestPreventsAcquisition() async throws {
-        let gate=Gate(); var acquired=0; var context:WindowContext?
+        let gate=Gate(); var acquired=0; var context:WindowContext?=WindowContext(app:"Owned",bundle:"org.fixture",pid:8123,title:"Owned",accessibilityText:"",secure:false)
         let (audio,root)=try fixture(gate,context:{context}) { acquired += 1 }; defer { audio.stop(); try? FileManager.default.removeItem(at:root) }
         let attempt=Task { await audio.start() }; await fulfillment(of:[gate.entered],timeout:5)
         context=WindowContext(app:"Synthetic excluded",bundle:"com.apple.keychainaccess",pid:0,title:"Fixture",accessibilityText:"",secure:false)

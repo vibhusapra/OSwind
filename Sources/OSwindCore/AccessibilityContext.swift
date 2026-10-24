@@ -22,6 +22,48 @@ final class AccessibilityWorker:@unchecked Sendable {
 
 }
 enum AccessibilityReadFailure:Error {case exhausted,unavailable}
+/// Share only currently running observations of the same application. A stopped
+/// consumer releases its own lease; it cannot cancel another consumer's read.
+@MainActor final class AccessibilityContextCoordinator {
+    private struct Read {
+        var id:UUID,identity:WindowContext,task:Task<WindowContext?,Never>,observers:Set<UUID>
+    }
+    private var active:Read?
+    var observerCount:Int {active?.observers.count ?? 0}
+    private let operation:(WindowContext) async ->WindowContext?
+    init(operation:@escaping (WindowContext) async ->WindowContext?) {self.operation=operation}
+    func read(_ identity:WindowContext) async ->WindowContext? {
+        guard !Task.isCancelled else {return nil}
+        if let previous=active,previous.task.isCancelled || previous.identity.pid != identity.pid || previous.identity.bundle != identity.bundle {
+            // Do not queue more IPC while a different/cancelled observation is
+            // releasing its slot. Recheck admission after its actual completion.
+            _=await previous.task.value
+            guard !Task.isCancelled else {return nil}
+        }
+        let observer=UUID(),id:UUID,task:Task<WindowContext?,Never>
+        if let current=active {
+            guard current.identity.pid==identity.pid,current.identity.bundle==identity.bundle,!current.task.isCancelled else {return nil}
+            guard current.observers.count<8 else {return nil}
+            id=current.id;task=current.task;active?.observers.insert(observer)
+        }else {
+            id=UUID();let operation=self.operation
+            task=Task { [weak self] in
+                let value=await operation(identity)
+                if self?.active?.id==id {self?.active=nil}
+                return Task.isCancelled ? nil:value
+            }
+            active=Read(id:id,identity:identity,task:task,observers:[observer])
+        }
+        defer {release(observer,id:id)}
+        let value=await withTaskCancellationHandler {await task.value} onCancel:{Task {@MainActor [weak self] in self?.release(observer,id:id)}}
+        return Task.isCancelled || task.isCancelled ? nil:value
+    }
+    private func release(_ observer:UUID,id:UUID) {
+        guard active?.id==id else {return};active?.observers.remove(observer)
+        if active?.observers.isEmpty == true {active?.task.cancel()}
+    }
+    deinit {active?.task.cancel()}
+}
 final class AccessibilityReadBudget {
     let maximumNodes:Int,maximumText:Int
     private let maximumMessages:Int,deadline:Double,now:()->Double,cancelled:()->Bool
@@ -125,6 +167,9 @@ private struct NativeAccessibilityTree:AccessibilityTreeSource {
     }
 }
 public enum AccessibilityContext {
+    @MainActor private static let coordinator=AccessibilityContextCoordinator {identity in
+        await AccessibilityWorker.shared.run {try? AccessibilityTraversal.read(NativeAccessibilityTree(pid:identity.pid),identity:identity,budget:AccessibilityReadBudget())}
+    }
     @MainActor private static func identity(targetBundleID:String?)->WindowContext? {
         let application=targetBundleID.flatMap {bundle in NSWorkspace.shared.runningApplications.first {$0.bundleIdentifier==bundle}} ?? (targetBundleID==nil ? NSWorkspace.shared.frontmostApplication:nil)
         guard let app=application,!app.isTerminated else {return nil}
@@ -140,43 +185,11 @@ public enum AccessibilityContext {
         // policy and unambiguous ScreenCaptureKit binding still apply; without
         // AX permission, secure-field detection and accessible text are absent.
         if !AXIsProcessTrusted() {return selected}
-        let context=await AccessibilityWorker.shared.run {try? AccessibilityTraversal.read(NativeAccessibilityTree(pid:selected.pid),identity:selected,budget:AccessibilityReadBudget())}
+        let context=await coordinator.read(selected)
         guard !Task.isCancelled,let context,identityCurrent(context,targetBundleID:targetBundleID) else {return nil}
         return context
     }
-    // Audio keeps its existing synchronous reader until its startup, segment
-    // and finish lifecycle can migrate together. It does not consume or bypass
-    // the bounded asynchronous worker slot.
-    @MainActor public static func current(targetBundleID: String? = nil) -> WindowContext? {
-        let application = targetBundleID.flatMap { bundle in NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundle } } ?? (targetBundleID == nil ? NSWorkspace.shared.frontmostApplication : nil)
-        guard let app = application else { return nil }
-        let root = AXUIElementCreateApplication(app.processIdentifier)
-        var windowRef: CFTypeRef?; AXUIElementCopyAttributeValue(root, kAXFocusedWindowAttribute as CFString, &windowRef)
-        var title = "", url: String?, texts = [String](), secure = false, bounds: CGRect?
-        func value(_ element: AXUIElement, _ name: String) -> CFTypeRef? { var out: CFTypeRef?; AXUIElementCopyAttributeValue(element, name as CFString, &out); return out }
-        if let windowRef, CFGetTypeID(windowRef) == AXUIElementGetTypeID() {
-            let window = unsafeBitCast(windowRef, to: AXUIElement.self); title = value(window, kAXTitleAttribute) as? String ?? ""
-            if let position=value(window,kAXPositionAttribute),let size=value(window,kAXSizeAttribute),CFGetTypeID(position)==AXValueGetTypeID(),CFGetTypeID(size)==AXValueGetTypeID() {
-                var point=CGPoint.zero,dimensions=CGSize.zero
-                if AXValueGetValue(unsafeBitCast(position,to:AXValue.self),.cgPoint,&point),AXValueGetValue(unsafeBitCast(size,to:AXValue.self),.cgSize,&dimensions) {bounds=CGRect(origin:point,size:dimensions)}
-            }
-            var queue: [AXUIElement] = [window], visited = 0, textSize = 0
-            while !queue.isEmpty && visited < 600 && textSize < 16000 {
-                let element = queue.removeFirst(); visited += 1
-                let role = value(element, kAXRoleAttribute) as? String ?? ""
-                let subrole = value(element, kAXSubroleAttribute) as? String ?? ""
-                if subrole == kAXSecureTextFieldSubrole { secure = true; continue }
-                if let u = value(element, kAXURLAttribute) as? URL { url = url ?? u.absoluteString }
-                else if let u = value(element, kAXURLAttribute) as? String, u.hasPrefix("http") { url = url ?? u }
-                if let text = value(element, kAXValueAttribute) as? String, !text.isEmpty {
-                    if role == kAXTextFieldRole, url == nil, text.hasPrefix("http://") || text.hasPrefix("https://") { url = text }
-                    if [kAXStaticTextRole,kAXTextAreaRole,kAXTextFieldRole].contains(role) { texts.append(String(text.prefix(4000))); textSize += text.count }
-                }
-                if let children = value(element, kAXChildrenAttribute) as? [AXUIElement] { queue.append(contentsOf: children.prefix(100)) }
-            }
-        }
-        return WindowContext(app: app.localizedName ?? "Unknown", bundle: app.bundleIdentifier ?? "", pid: app.processIdentifier, title: title, url: url, accessibilityText: texts.joined(separator: "\n"), secure: secure,bounds:bounds)
-    }
+    @MainActor public static func current(targetBundleID:String?=nil) async ->WindowContext? {await read(targetBundleID:targetBundleID)}
 }
 
 /// One replay session coalesces concurrent observations only while its read is
