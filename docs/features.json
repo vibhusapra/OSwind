@@ -108,7 +108,7 @@
     "axis": "Retrieval",
     "feature": "Full-text search + ranking",
     "status": "tested",
-    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 385 tests, actual 20k Metal exact-top10 checks; regex/NEAR and native keyboard/help acceptance remain open",
+    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 410 tests, actual 20k Metal exact-top10 checks and stable FTS maintenance keys (paired synthetic erasure 17.43/8.77 s to 2.89/4.09 s); regex/NEAR and native keyboard/help acceptance remain open",
     "references": "Most visual tools"
   },
   {

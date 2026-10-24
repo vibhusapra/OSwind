@@ -113,6 +113,7 @@ public final class MemoryStore: @unchecked Sendable {
         sqlite3_finalize(statisticsState)
         if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
+        try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
