@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Visual memory index — work in progress
+
+The separate `codex/visual-memory-index` branch adds logical image/replay plans whose vector revisions include source context, retained-file SHA-256, frame time, model and preprocessing. It also adds an in-memory retained-image reader with a cooperative media reservation, descriptor-based path checks and source/pixel revalidation. Releasing its directory descriptor before its reservation lets library shutdown finish while the snapshot object remains referenced. All 13 focused tests and 13 ThreadSanitizer cases pass, including changed pixels/context, symlink refusal, an exclusive-lease conflict and deferred close.
+
+These helpers are not yet connected to a persisted visual-vector table, indexing worker, search endpoint or native UI. Next: source-checked SQLite admission and erasure/backup contracts, owned replay decoding, scoped retrieval and matched-frame opening. PR #37's encoder foundation passed [both independent CI jobs](https://github.com/vibhusapra/OSwind/actions/runs/40081839328) at f14ecb9 and remains a separate draft.
+
 ## Native visual encoder foundation — source f42736a
 
 Optional Google SigLIP2 base-patch16-224 now runs through native Core ML with an explicit local tokenizer, bounded ImageIO input, validated content-addressed bundles, serial inference, cancellation/load fencing and idle/manual release. A pinned offline-first converter qualifies FP32 image / FP16 text encoders before publishing its manifest. Weights are separate (968,536,703-byte payload here); no Python is used for native inference, no model credential is read and no library is opened by the qualification CLI. [Contract and setup](VISUAL-MODELS.md), [sanitized evidence](../benchmarks/visual-encoder-v1.json).
