@@ -100,7 +100,7 @@
     "axis": "Energy",
     "feature": "Long-run battery and CPU budget",
     "status": "todo",
-    "evidence": "Paused debug RSS sampled; full capture power and 24h soak missing",
+    "evidence": "Paused debug RSS sampled. Older schema11 synthetic MCP/storage/local-answer component soak completed with four retained gaps; current uninterrupted desktop capture and measured power remain missing",
     "references": "Screenpipe, all always-on tools"
   },
   {
@@ -523,8 +523,8 @@
     "id": "F066",
     "axis": "UX",
     "feature": "Keyboard and accessibility review",
-    "status": "todo",
-    "evidence": "Native controls; full VoiceOver/focus/dynamic-type pass missing",
+    "status": "partial",
+    "evidence": "Native Cmd-K section/scope transitions and typed phrase filtering observed on signed synthetic library; source focus/cancellation regressions and23 focused TSan pass. Full VoiceOver/focus/dynamic-type/global shortcut review missing",
     "references": "Quality bar"
   },
   {
@@ -564,7 +564,7 @@
     "axis": "Quality",
     "feature": "Real competitor benchmarks",
     "status": "todo",
-    "evidence": "No competitor binary run; source-feature comparison only",
+    "evidence": "Pinned rem database-method component comparison exists; no matched full competitor application workload or overall ranking",
     "references": "Required before top-three claim"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "745-case normal suite (714 pass/31 opt-in skips),247-case native/model run adds24 cases and one physical native case (739 distinct pass/six remaining skips),283 focused plus one physical TSan case; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "a91f25b:783 normal cases(752 pass/31 opt-in skips),305 native/model/Metal passes,777 distinct/six remaining opt-in cases and23 focused TSan. Parent0a5cad1 separately has318 distinct race checks and live capture/physical audio; signed CLI identical. Authored retrieval/Metal, pinned rem component and frozen natural speech/speaker evaluations retain limitations; no full-competitor rank",
     "references": "OSwind quality bar"
   },
   {
@@ -580,7 +580,7 @@
     "axis": "Quality",
     "feature": "24-hour soak and fault recovery",
     "status": "partial",
-    "evidence": "Eight harness contracts and short local-model rehearsal pass; a pinned synthetic MCP/storage/erasure/answer run has started. 24-hour completion and full capture/power/device/fault gates remain unproved",
+    "evidence": "Pinned older schema11 component soak completed86400s with4291 writer/read cycles,4091 deletions and144 local Qwen answers. Four retained gaps (82\u2013248s), normal MCP shutdown. Current uninterrupted desktop capture/power/device/fault gates remain unproved",
     "references": "OSwind quality bar"
   },
   {

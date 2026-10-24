@@ -1,0 +1,269 @@
+{
+  "format": "OSwind search shortcut navigation qualification v1",
+  "codeCommit": "a91f25b339113af1f9147d29318672b254fb8bdb",
+  "schema": 21,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "problem": "Cmd-K changed the effective section/filter but reused cached hits when query text did not change.",
+  "change": "Refresh search in AppModel.focusSearch after selecting Memories and requesting field focus; preserve explicit query, app, date, mode and entity scope controls.",
+  "scope": "Synthetic library model regressions, native/model/Metal test selections, actual staged signed GUI navigation, package/ZIP identity and signed CLI entity/API/MCP smoke; no installation, normal history, new permission grants, capture/controller/microphone/ASR/power or competitor claim.",
+  "regression": {
+    "beforeFix": {
+      "cases": 4,
+      "failures": 3,
+      "passes": 1,
+      "logSHA256": "5298b12404f56d9c7631b0750d545598873d1b418ba356a9b14eb882bc0ece2c"
+    },
+    "afterFix": {
+      "focusedPasses": 23,
+      "logSHA256": "f1550edf2d4b07afcc9ff6c632ff6d7e6f17a902cf92ec410d80a65681bbde1b"
+    }
+  },
+  "tests": {
+    "fullCases": 783,
+    "normalPasses": 752,
+    "normalOptInSkips": 31,
+    "nativeModelMetalPasses": 305,
+    "additionalNativePasses": 25,
+    "distinctFunctionalPasses": 777,
+    "remainingOptInCases": [
+      "-[OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured]",
+      "-[OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle]",
+      "-[OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder]",
+      "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]"
+    ],
+    "focusedThreadSanitizerPasses": 23,
+    "threadSanitizerRacesReported": false,
+    "logs": {
+      "full-normal-v1.log": "1fc967afb05f6a2651e1497f699fa1e9b7195e97ae6ce6cfa0cc6753c2816798",
+      "native-model-metal-v1.log": "111a67b6051b37c13989d61fb1de4873dee2b589ca63fff0773c0a6b8d9d5f07",
+      "focused-tsan-v1.log": "81605e7f542a61fd86a54ea28fae2bfc4c3964c6a89fe0300b115a6fec8c4973"
+    }
+  },
+  "package": {
+    "scope": "Separately staged schema21 desktop memory with keyboard navigation refresh; no installation; native input accepted only where separately reported",
+    "codeCommit": "a91f25b339113af1f9147d29318672b254fb8bdb",
+    "schema": 21,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "cacfc65ab5966d26797653863975293847c8eeb379d81780701045bedfa1323f",
+        "signedSHA256": "30a0b21225099ae0e511c56cd398d5220247151e54f18a326b8987fa0686f8ad",
+        "normalizedPayloadSHA256": "410de81511ed9e656f414c329a43a3e10af826b0e2a836e4144282610ff44faf"
+      },
+      "oswindctl": {
+        "rawSHA256": "c5220e5d1c3424f1a545a43ee2b711142357962aaf9d8a3ca32364c828132b89",
+        "signedSHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+        "normalizedPayloadSHA256": "c140cec322d965eb41824bdd637e417afa6c89f6e2636e87bc059c34e15c9ba6"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "648c38193c38a6a4f16bf22a51673cf54361dc15a4a787f9975653c6966b7588",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "0e941e5e0ed6579dafd17c7094622986bd54ae635932ce35d369000175706c6d",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalOperations": [
+    {
+      "name": "full-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 109.34187270794064
+    },
+    {
+      "name": "native-model-metal-v1",
+      "exitCode": 0,
+      "wallSeconds": 201.70496304193512
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 19.925705333938822
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.623926084022969
+    },
+    {
+      "name": "entity-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 10.052340124966577
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4248876250348985
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.081422874936834
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 36.85591191682033
+    }
+  ],
+  "entityProcess": {
+    "format": "OSwind source-linked entity memory qualification v1",
+    "binarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+    "olderSchema20BinarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "olderClientRefusalChecked": true,
+    "harnessSHA256": "80423eb46e35639a785278e1447f221e13d6b30e32a9db0df759b9483807b8b1",
+    "schema": 21,
+    "passed": true,
+    "sources": 1000,
+    "projectOracleSources": 667,
+    "projectPrecision": 1.0,
+    "projectRecall": 1.0,
+    "automaticSpansVerified": 1335,
+    "firstIndexWallSeconds": 0.7099558329209685,
+    "resumeWallSeconds": 0.06488429196178913,
+    "observedNLPAndProjectGroups": [
+      {
+        "kind": "organization",
+        "name": "Apollo",
+        "sources": 334
+      },
+      {
+        "kind": "person",
+        "name": "Chen",
+        "sources": 334
+      },
+      {
+        "kind": "project",
+        "name": "Apollo Launch",
+        "sources": 667
+      }
+    ],
+    "checks": [
+      "exact project alias oracle",
+      "UTF16 source anchors",
+      "scoped keyword retrieval",
+      "correction survives rule-rescan",
+      "read-only MCP membership and validation",
+      "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+      "quiet backup restore retains definitions, aliases and links",
+      "restored completion reset",
+      "source erasure",
+      "full wipe erases curated definitions",
+      "schema20 client refusal"
+    ],
+    "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+  },
+  "nativeUI": {
+    "result": "pass",
+    "codeCommit": "a91f25b339113af1f9147d29318672b254fb8bdb",
+    "guiSHA256": "30a0b21225099ae0e511c56cd398d5220247151e54f18a326b8987fa0686f8ad",
+    "library": "Six owned synthetic notes in temporary sample library; capture paused, audio off, entity automatic indexing visibly off",
+    "input": "CUA native AX actions, Cmd-K and native typing; observed current AX state after each action",
+    "checks": [
+      {
+        "sequence": "Release Review Search sources",
+        "expected": 2,
+        "observed": 2,
+        "scopeChip": "Release Review"
+      },
+      {
+        "sequence": "People & projects then Cmd-K",
+        "expected": 6,
+        "observed": 6,
+        "scopeChip": null,
+        "searchFieldFocused": true
+      },
+      {
+        "sequence": "Conversations",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "sequence": "Cmd-K from Conversations",
+        "expected": 6,
+        "observed": 6,
+        "searchFieldFocused": true
+      },
+      {
+        "sequence": "Release Review Ask about sources then Cmd-K",
+        "expected": 2,
+        "observed": 2,
+        "scopeChip": "Release Review",
+        "searchFieldFocused": true
+      },
+      {
+        "sequence": "Type quoted release-check in focused search",
+        "expected": 1,
+        "observed": 1,
+        "scopeChip": "Release Review"
+      }
+    ],
+    "visualInspection": "Native window screenshot shows scope chip, focused phrase, one matching note, controls/footer with no observed clipping; one size/light appearance only",
+    "cleanup": "Owned staged GUI quit through Cmd-Q; exact executable absent from process inventory",
+    "permissionChanges": false,
+    "captureStarted": false,
+    "normalHistoryAccessed": false,
+    "notAccepted": [
+      "Full VoiceOver/dynamic type/global shortcut review",
+      "GUI/controller/microphone-to-ASR",
+      "Documents-root startup",
+      "Uninterrupted capture/power and competitors"
+    ]
+  },
+  "parentEvidence": {
+    "path": "entity-memory-v1.json",
+    "codeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+    "scope": "Separate preceding-runtime qualification; not added to this runtime test/race counts.",
+    "distinctFunctionalPasses": 773,
+    "threadSanitizerPasses": 318,
+    "successfulOperations": 22,
+    "physicalIngressSourceUnchangedSinceThatRun": true
+  },
+  "unchangedCoreFiles": {
+    "audioIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+    "entityStoreSHA256": "a07883aee7bb00db15e38e8bdcb7d0e05b0c6718f2f2f8fcdc2a30e1bef9551e"
+  },
+  "cleanup": {
+    "noOwnedImagesInIndependentInventory": true,
+    "installed17Unchanged": true
+  },
+  "limitations": [
+    "Opt-in real local-runtime/ASR/speaker/native-weight cases and physical system-audio are not executed in this run. The preceding report includes physical audio with unchanged ingress source, separately attributed.",
+    "Entity identity quality, million-source extraction/index lag, metadata-only project invalidation, Documents-root startup, microphone-to-ASR, uninterrupted latest desktop capture/power, full accessibility/keyboard review and matched competitor application workloads remain open.",
+    "This small fix does not alter curated data or schema and does not establish feature completeness or a top-three rank."
+  ],
+  "metalRequiredExpressionTrial": {
+    "sources": 20000,
+    "dimensions": 32,
+    "syntheticVectors": true,
+    "timings": [
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 36.622047424316406,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 29.211997985839844,
+        "query": "\"odd branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 25.593996047973633,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      }
+    ],
+    "scope": "Three sequential queries after index preparation; exact top10 oracle and changed-source check. Uncontrolled caches/host activity; excludes embedding inference, capture and power. Not a latency distribution or competitor score."
+  }
+}
