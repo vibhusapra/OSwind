@@ -12,6 +12,8 @@ Four light/dark owned component renders pass visual review ([window crop](../ass
 
 The preceding [AX performance PR #42](https://github.com/vibhusapra/OSwind/pull/42) passed both independent jobs in [run 40105965131](https://github.com/vibhusapra/OSwind/actions/runs/40105965131) at test-only7d2d95d; its runtime remained d9eb6c7.
 
+Independent CI run 40107950341 passed the full build/tests, owned encrypted-volume sessions, packaging, crop portability and preceding process groups, then failed a stale archive-statistics assertion expecting schema19. The CI-only follow-up expects schema20 and retains the 1,000-source/all-three-modes assertions. The exact signed schema20 CLI reproduces the indexed fixture and passes the corrected statistics check. Runtime and package inputs remain unchanged from 0c15f09.
+
 ## Bounded snapshot/replay accessibility — runtime d9eb6c7
 
 [Snapshot and replay AX traversal](ACCESSIBILITY-CAPTURE.md) now runs in a utility worker with one active slot, no independent waiting queue, per-object message timeouts, a cooperative total deadline and bounded nodes/messages/text. Cycles and duplicate nodes are removed with a set. Reaching the text limit does not stop the later secure-field/URL scan. Incomplete trusted-AX contexts defer; the explicit optional-permission native-app identity-only path is preserved. Replay supervisor/frame observers share only an in-flight same-target read and never cache completed context. Snapshot reserves generation/busy state before its first await and rechecks it after each read. Its final private-file/SQL fence uses cheap identity/session checks without AX IPC or actor suspension. Audio's synchronous reader is unchanged and remains a follow-up.

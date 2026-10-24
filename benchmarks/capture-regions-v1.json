@@ -247,5 +247,12 @@
     "Cropped/all-display replay",
     "Audio synchronous AX lifecycle migration",
     "Broad feature parity and matched competitor ranking"
-  ]
+  ],
+  "ciOnlyFollowup": {
+    "initialRun": 40107950341,
+    "failure": "Archive statistics assertion still expected schema19; actual report correctly returned20",
+    "fix": "Update expected compatibility schema to20, retaining1000-source count and all three statistics modes",
+    "localReproduction": "Exact signed schema20 CLI recreates indexed1000x128 fixture and passes corrected statistics assertions",
+    "productSourceAndPackageInputsUnchanged": true
+  }
 }
