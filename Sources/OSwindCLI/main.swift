@@ -93,6 +93,8 @@ do {
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
           native-model list             List pinned native model downloads
           native-model install|verify parakeet|speakers [--cache-root PATH]
+          vision status|probe FIXTURE_JSON --model-dir DIR [--compute cpuAndGPU|cpuOnly]
+                                        Local image/text encoder qualification; no capture or library write
           wipe --confirm DELETE-ALL [--json]  Erase the entire local library; report pending cleanup
           wipe retry [--json]            Retry sealed pending work; preserve new recordings
           delete ID [--json]             Delete one source; report shared/pending media
@@ -149,6 +151,8 @@ do {
                 else {try encoded(await runVaultCLI {try await vault.status()})}
             } catch is CancellationError {FileHandle.standardError.write(Data("Vault operation cancelled. Use vault status before retrying.\n".utf8));exit(130)}
         }
+    } else if command == "vision" {
+        try await runVisualModelCLI()
     } else if command == "wipe" {
         let retry=args.first=="retry";if retry {args.removeFirst()}
         let confirmation=try validatedOption("--confirm"),json=args.contains("--json")

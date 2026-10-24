@@ -39,3 +39,19 @@ https://huggingface.co/FluidInference/speaker-diarization-coreml
 The installer retains NOTICE.md, README.md citations, LICENSE, PROVENANCE.md
 and provenance.json. Legacy lowercase online models are excluded. Reconstructed
 provenance does not establish a fully attested reproducible conversion build.
+
+Visual encoder foundation (optional weights are not bundled):
+Google SigLIP2 base-patch16-224 — Apache-2.0 publisher model declaration
+https://huggingface.co/google/siglip2-base-patch16-224
+Original revision: 75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2.
+The local conversion recipe records all source and compiled-file hashes.
+A locally authored checksum manifest is integrity evidence, not a Google signature.
+
+Hugging Face swift-transformers 1.3.5 and transitive tokenizer dependencies:
+See VisualRuntime/PINNED.txt and the original license files in VisualRuntime/.
+The native runtime constructs the tokenizer from bounded local Config values. It does not fetch
+models, use a Hugging Face credential, or send visual inputs to a service.
+
+Pillow 11.3.0 resize coefficient convention — Pillow/HPND license.
+https://github.com/python-pillow/Pillow/tree/11.3.0
+See VisualRuntime/Pillow-LICENSE (also Pillow/LICENSE in the source tree).

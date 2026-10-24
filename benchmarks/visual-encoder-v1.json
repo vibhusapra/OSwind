@@ -1,0 +1,751 @@
+{
+  "format": "OSwind native visual encoder qualification v1",
+  "createdUTC": "2026-10-24T09:23:08.347202+00:00",
+  "codeCommit": "f42736ac761b404ac73293e654670176472b2d8e",
+  "schema": 18,
+  "scope": "Optional local encoder foundation. NO library visual indexing, scoped image search, visual Ask grounding, or new native search UI yet.",
+  "model": {
+    "repository": "google/siglip2-base-patch16-224",
+    "revision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+    "license": "Apache-2.0 publisher declaration",
+    "recipe": "oswind-siglip2-fp32-image-fp16-text-v1",
+    "payloadBytes": 968536703,
+    "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+    "weightsBundled": false
+  },
+  "tests": {
+    "preDiagnosticFullSuite": {
+      "codeCommit": "2fcd4236c851fd5151e46ea61fe0bff1c99bb4aa",
+      "total": 528,
+      "passed": 504,
+      "skipped": 24,
+      "failed": 0,
+      "logSHA256": "94dad1b756f79dc79f2e00d447109aecd9367d9571933e736308a1ff01aafd45"
+    },
+    "separateNativeVault": {
+      "total": 20,
+      "passed": 20,
+      "previouslySkippedCasesCovered": 18,
+      "repeatCases": 2,
+      "logSHA256": "d18c4ddb281794ce9dbeb3e72d591fa9bbe9acd7fbcc359e4434129d3c02a30a"
+    },
+    "finalVisualTests": {
+      "codeCommit": "f42736ac761b404ac73293e654670176472b2d8e",
+      "total": 6,
+      "passed": 6,
+      "tokenizerGoldenCases": 54,
+      "resizeByteGoldenShapes": 8,
+      "logSHA256": "f68aba293eda95e0ed8ca040168e370d0a5d02e6744f56f25311840397d43c18"
+    },
+    "finalVisualThreadSanitizer": {
+      "total": 6,
+      "passed": 6,
+      "reportedRaces": 0,
+      "logSHA256": "25a594459392675e70da524f4a53d49e4e857e0c5e063840dab7e9474cc10d19"
+    },
+    "preDiagnosticModelLifecycleTSan": {
+      "total": 13,
+      "passed": 12,
+      "skipped": 1,
+      "reportedRaces": 0,
+      "logSHA256": "256d5e0bb981920bffb4c8327bcc0037de5f3e9def03f60db1093ee22853c6f5"
+    },
+    "offlinePythonContracts": {
+      "total": 7,
+      "passed": 7,
+      "dependenciesOrModelsRequired": false
+    }
+  },
+  "package": {
+    "scope": "Separately staged signed schema18 app; no installation or native click acceptance",
+    "codeCommit": "f42736ac761b404ac73293e654670176472b2d8e",
+    "schema": 18,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "527b16e4eb198803cef2454f2caa4006f8db3c2c9ee3105e12cbfe047c190a9c",
+        "signedSHA256": "3b9718e6583500a917f321c489f37c74cdd534ea9e286ab812ae655afebbb8e6",
+        "normalizedPayloadSHA256": "0ee48bc343cf2403319cd2cea5c1aee30aa4846116121dd477a1c7f0788dc62b"
+      },
+      "oswindctl": {
+        "rawSHA256": "570410bcc1bfee896ed8c46ae625e8d2e9a7d0dccfaa02c796a734cc2dbff44e",
+        "signedSHA256": "231bbe69581ce6b8415e729dc71838aa14604582249bc4d0b1d01f68f6b5f81c",
+        "normalizedPayloadSHA256": "a4b6f4e77da66aaa9f39be8385ab65603596a73b2ee2c504916404efc7c9884c"
+      }
+    },
+    "zipSHA256": "55aeaa8cea253e399c4a8f3885f7f9bf0bab17fc0b477cfb4f26a8df45849c3e",
+    "bundleFiles": 28,
+    "bundleTreeSHA256": "be3603c665e28073363877619bb56f0a25c784b9175d9c8694df0a3b3f25da43",
+    "entireExtractedZipMatches": true,
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "releaseNotThreadSanitized": true,
+    "relocatedLocalTokenizerWithoutBuildResources": true,
+    "installed17Unchanged": true,
+    "designatedLibraryCreated": false,
+    "checks": [
+      {
+        "case": "missing model does not create model or library",
+        "passed": true
+      },
+      {
+        "case": "invalid compute refused",
+        "passed": true
+      },
+      {
+        "case": "duplicate model option refused",
+        "passed": true
+      },
+      {
+        "case": "unknown options refused",
+        "passed": true
+      },
+      {
+        "case": "exact COW bundle validates",
+        "passed": true
+      },
+      {
+        "case": "unsupported recipe refused",
+        "passed": true
+      },
+      {
+        "case": "extra directories refused",
+        "passed": true
+      },
+      {
+        "case": "changed compiled bytes refused",
+        "passed": true
+      },
+      {
+        "case": "missing compiled file refused",
+        "passed": true
+      },
+      {
+        "case": "symlink member refused without changing target",
+        "passed": true
+      },
+      {
+        "case": "restored bundle retains identity",
+        "passed": true
+      }
+    ]
+  },
+  "computePlan": [
+    {
+      "encoder": "image",
+      "requested": "CPU_ONLY",
+      "preferredOperationCounts": {
+        "MLCPUComputeDevice": 307
+      },
+      "estimatedCostWeights": {
+        "MLCPUComputeDevice": 1.000000000000003
+      },
+      "scope": "Static Core ML compute plan, not observed hardware counters or energy"
+    },
+    {
+      "encoder": "image",
+      "requested": "CPU_AND_GPU",
+      "preferredOperationCounts": {
+        "MLGPUComputeDevice": 307
+      },
+      "estimatedCostWeights": {
+        "MLGPUComputeDevice": 0.9999999999999986
+      },
+      "scope": "Static Core ML compute plan, not observed hardware counters or energy"
+    },
+    {
+      "encoder": "text",
+      "requested": "CPU_ONLY",
+      "preferredOperationCounts": {
+        "MLCPUComputeDevice": 285
+      },
+      "estimatedCostWeights": {
+        "MLCPUComputeDevice": 0.9999999999999997
+      },
+      "scope": "Static Core ML compute plan, not observed hardware counters or energy"
+    },
+    {
+      "encoder": "text",
+      "requested": "CPU_AND_GPU",
+      "preferredOperationCounts": {
+        "MLGPUComputeDevice": 285
+      },
+      "estimatedCostWeights": {
+        "MLGPUComputeDevice": 0.9999999999999919
+      },
+      "scope": "Static Core ML compute plan, not observed hardware counters or energy"
+    }
+  ],
+  "conversionNumericalQualification": {
+    "recipe": "oswind-siglip2-fp32-image-fp16-text-v1",
+    "measurements": [
+      {
+        "encoder": "image",
+        "requestedCompute": "CPU_ONLY",
+        "minimumCosine": 1.0,
+        "maximumNormalizedError": 5.364418029785156e-07,
+        "predictionSeconds": [
+          0.07602995820343494,
+          0.03683604206889868,
+          0.034544916125014424,
+          0.04239333397708833,
+          0.04168374999426305,
+          0.03917458304204047,
+          0.039689583936706185,
+          0.034417999908328056
+        ],
+        "passed": true
+      },
+      {
+        "encoder": "text",
+        "requestedCompute": "CPU_ONLY",
+        "minimumCosine": 0.9998705387115479,
+        "maximumNormalizedError": 0.0021032094955444336,
+        "predictionSeconds": [
+          0.020371124846860766,
+          0.006037416867911816,
+          0.005743167130276561,
+          0.006825749995186925,
+          0.005811084061861038,
+          0.006094624986872077,
+          0.006338249891996384,
+          0.005353249842301011,
+          0.005810917122289538,
+          0.006547082914039493,
+          0.007542583858594298,
+          0.006606208859011531,
+          0.007038916926831007,
+          0.007399125024676323,
+          0.00875500007532537,
+          0.00663454202003777
+        ],
+        "passed": true
+      },
+      {
+        "encoder": "image",
+        "requestedCompute": "CPU_AND_GPU",
+        "minimumCosine": 0.9999999403953552,
+        "maximumNormalizedError": 4.2654573917388916e-07,
+        "predictionSeconds": [
+          2.9862804578151554,
+          0.011921208119019866,
+          0.009902375051751733,
+          0.010806416859850287,
+          0.010972041869536042,
+          0.018604665994644165,
+          0.005988624878227711,
+          0.005410249810665846
+        ],
+        "passed": true
+      },
+      {
+        "encoder": "text",
+        "requestedCompute": "CPU_AND_GPU",
+        "minimumCosine": 0.9999986290931702,
+        "maximumNormalizedError": 0.0002313479781150818,
+        "predictionSeconds": [
+          2.475601959042251,
+          0.0038770418614149094,
+          0.004246582975611091,
+          0.00420516706071794,
+          0.004065583925694227,
+          0.003798917168751359,
+          0.004507250152528286,
+          0.004270333098247647,
+          0.004665124928578734,
+          0.0042866249568760395,
+          0.003970165969803929,
+          0.003983082948252559,
+          0.004633375210687518,
+          0.00736579205840826,
+          0.005077708046883345,
+          0.004248959012329578
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "naturalPhotoEvaluation": [
+    {
+      "schema": 2,
+      "state": "passed",
+      "images": 100,
+      "queries": 501,
+      "seed": 1729,
+      "scope": "Encoder agreement gate >=0.999 on IDENTICAL preprocessed tensors. Platform JPEG/ICC preprocessing differences are reported separately; full pipeline equivalence is not claimed.",
+      "dataset": "COCO 2017 validation, deterministic 100-image subset; NOT the standard 5k benchmark",
+      "source": "https://cocodataset.org/#download",
+      "annotationSHA256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+      "selectionSHA256": "41fbeb3cd5d1aad40dfac48bf9aea220f29587ab41c47d66630e8d41d38e0715",
+      "sourceRevision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+      "harnessSHA256": "df1c21d8b40581d831439d873c66a9abff2f1c5063ef8ba66fb62b3ed0ffc112",
+      "sourceStabilityVerified": true,
+      "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+      "cliSHA256": "231bbe69581ce6b8415e729dc71838aa14604582249bc4d0b1d01f68f6b5f81c",
+      "requestedCompute": "cpuAndGPU",
+      "host": {
+        "cpu": "Apple M5 Max",
+        "macOS": "26.6.2"
+      },
+      "peakProcessResidentBytes": 1528954880,
+      "designatedLibraryCreated": false,
+      "parity": {
+        "tokenIDsExact": true,
+        "minimumImageCosine": 0.9999999999620347,
+        "minimumTextCosine": 0.9999939975442383
+      },
+      "native": {
+        "textToImage": {
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "pytorch": {
+        "textToImage": {
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "pytorchNativePixels": {
+        "textToImage": {
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "originalImagePipelineAgreement": {
+        "minimumCosine": 0.9909046743649295,
+        "meetsOriginal0999Gate": false
+      },
+      "timings": {
+        "image": {
+          "firstMilliseconds": 86.55703067779541,
+          "warmMedianMilliseconds": 18.106937408447266,
+          "warmP95Milliseconds": 21.55731916427612
+        },
+        "text": {
+          "firstMilliseconds": 78.46391201019287,
+          "warmMedianMilliseconds": 1.9979476928710938,
+          "warmP95Milliseconds": 2.2759437561035156
+        },
+        "preparationAndFirstTextSeconds": 5.526821970939636,
+        "processWallSeconds": 9.152819707989693
+      },
+      "limits": [
+        "Public natural photos/captions, not desktop screenshots, unseen training holdout, or competitor execution.",
+        "No claim of actual GPU placement from a requested compute policy; no power or 24h capture measurement.",
+        "Native image timing includes decode/resize/inference; text includes tokenization/inference. First text preparation includes bundle verification/loading.",
+        "No threshold tuned against these labels. Existing model and OS caches may be warm; concurrent host activity is uncontrolled."
+      ],
+      "licenseCounts": {
+        "2": 11,
+        "4": 13,
+        "3": 24,
+        "1": 30,
+        "6": 8,
+        "5": 13,
+        "7": 1
+      }
+    },
+    {
+      "schema": 2,
+      "state": "passed",
+      "images": 100,
+      "queries": 501,
+      "seed": 1729,
+      "scope": "Encoder agreement gate >=0.999 on IDENTICAL preprocessed tensors. Platform JPEG/ICC preprocessing differences are reported separately; full pipeline equivalence is not claimed.",
+      "dataset": "COCO 2017 validation, deterministic 100-image subset; NOT the standard 5k benchmark",
+      "source": "https://cocodataset.org/#download",
+      "annotationSHA256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+      "selectionSHA256": "41fbeb3cd5d1aad40dfac48bf9aea220f29587ab41c47d66630e8d41d38e0715",
+      "sourceRevision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+      "harnessSHA256": "df1c21d8b40581d831439d873c66a9abff2f1c5063ef8ba66fb62b3ed0ffc112",
+      "sourceStabilityVerified": true,
+      "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+      "cliSHA256": "231bbe69581ce6b8415e729dc71838aa14604582249bc4d0b1d01f68f6b5f81c",
+      "requestedCompute": "cpuOnly",
+      "host": {
+        "cpu": "Apple M5 Max",
+        "macOS": "26.6.2"
+      },
+      "peakProcessResidentBytes": 1162297344,
+      "designatedLibraryCreated": false,
+      "parity": {
+        "tokenIDsExact": true,
+        "minimumImageCosine": 0.9999999999533097,
+        "minimumTextCosine": 0.9995187016873172
+      },
+      "native": {
+        "textToImage": {
+          "recallAt1": 0.9181636726546906,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "pytorch": {
+        "textToImage": {
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "pytorchNativePixels": {
+        "textToImage": {
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041
+        },
+        "imageToText": {
+          "recallAt1": 1.0,
+          "recallAt5": 1.0,
+          "recallAt10": 1.0
+        }
+      },
+      "originalImagePipelineAgreement": {
+        "minimumCosine": 0.9909047209908991,
+        "meetsOriginal0999Gate": false
+      },
+      "timings": {
+        "image": {
+          "firstMilliseconds": 63.149094581604004,
+          "warmMedianMilliseconds": 36.14199161529541,
+          "warmP95Milliseconds": 39.793479442596436
+        },
+        "text": {
+          "firstMilliseconds": 15.938043594360352,
+          "warmMedianMilliseconds": 4.086971282958984,
+          "warmP95Milliseconds": 4.258990287780762
+        },
+        "preparationAndFirstTextSeconds": 5.931173920631409,
+        "processWallSeconds": 12.28978066612035
+      },
+      "limits": [
+        "Public natural photos/captions, not desktop screenshots, unseen training holdout, or competitor execution.",
+        "No claim of actual GPU placement from a requested compute policy; no power or 24h capture measurement.",
+        "Native image timing includes decode/resize/inference; text includes tokenization/inference. First text preparation includes bundle verification/loading.",
+        "No threshold tuned against these labels. Existing model and OS caches may be warm; concurrent host activity is uncontrolled."
+      ],
+      "licenseCounts": {
+        "2": 11,
+        "4": 13,
+        "3": 24,
+        "1": 30,
+        "6": 8,
+        "5": 13,
+        "7": 1
+      }
+    }
+  ],
+  "retainedFailures": [
+    {
+      "case": "Full FP16 image graph on CPU",
+      "minimumCosine": 0.9823604822158813,
+      "gate": 0.999,
+      "tracingMatchedOriginal": true,
+      "mixedLayerNormSoftmaxPrecisionDidNotRepair": true,
+      "resolution": "Use full FP32 image compute; text remains FP16",
+      "diagnosis": {
+        "torchSingleVsBatch": {
+          "minCosine": 0.9999998807907104,
+          "maxError": 1.1324882507324219e-06
+        },
+        "traceVsTorch": {
+          "minCosine": 0.9999998807907104,
+          "maxError": 0.0
+        },
+        "measurements": [
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_ONLY",
+            "precision": "float16",
+            "loadSeconds": 0.5689029172062874,
+            "predictionSeconds": [
+              0.06332666706293821,
+              0.01830345788039267,
+              0.017518792068585753,
+              0.01779083302244544,
+              0.017141500022262335,
+              0.018183083971962333
+            ],
+            "minCosine": 0.9823604822158813,
+            "maxError": 0.04854661598801613
+          },
+          {
+            "encoder": "text",
+            "requestedUnits": "CPU_ONLY",
+            "precision": "float16",
+            "loadSeconds": 1.9479218749329448,
+            "predictionSeconds": [
+              0.020028166938573122,
+              0.005239207996055484,
+              0.00588258309289813,
+              0.005368500016629696,
+              0.005627291975542903,
+              0.0056466658134013414,
+              0.005333667155355215,
+              0.00553566706366837,
+              0.005500208120793104,
+              0.0052964158821851015,
+              0.006104874890297651,
+              0.0052685418631881475,
+              0.00547154201194644,
+              0.005513624986633658,
+              0.00526245916262269,
+              0.005710582947358489
+            ],
+            "minCosine": 0.9999461770057678,
+            "maxError": 0.0016554594039916992
+          },
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_AND_GPU",
+            "precision": "float16",
+            "loadSeconds": 0.5309239169582725,
+            "predictionSeconds": [
+              2.5239882089663297,
+              0.005606207996606827,
+              0.006185833131894469,
+              0.0053960829973220825,
+              0.00537695805542171,
+              0.005246791988611221
+            ],
+            "minCosine": 0.9999920129776001,
+            "maxError": 0.0005397200584411621
+          },
+          {
+            "encoder": "text",
+            "requestedUnits": "CPU_AND_GPU",
+            "precision": "float16",
+            "loadSeconds": 2.5363065421115607,
+            "predictionSeconds": [
+              0.6470187499653548,
+              0.007128750206902623,
+              0.005442457972094417,
+              0.010619499953463674,
+              0.0049667079001665115,
+              0.007967333076521754,
+              0.006257666973397136,
+              0.003980166045948863,
+              0.004794999957084656,
+              0.008892917074263096,
+              0.004832708043977618,
+              0.0035093750339001417,
+              0.004805499920621514,
+              0.003980332985520363,
+              0.008920166175812483,
+              0.004347292007878423
+            ],
+            "minCosine": 0.9999991059303284,
+            "maxError": 0.0004876852035522461
+          },
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_ONLY",
+            "precision": "float32",
+            "predictionSeconds": [
+              0.0621261668857187,
+              0.03301708400249481,
+              0.03077699989080429,
+              0.03360991692170501,
+              0.03329125000163913,
+              0.03385120793245733
+            ],
+            "minCosine": 0.9999999403953552,
+            "maxError": 1.0738149285316467e-06
+          },
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_AND_GPU",
+            "precision": "float32",
+            "predictionSeconds": [
+              1.60581179196015,
+              0.00909833307377994,
+              0.00947066699154675,
+              0.012135375058278441,
+              0.010780374985188246,
+              0.008314582984894514
+            ],
+            "minCosine": 0.9999998807907104,
+            "maxError": 1.8514692783355713e-06
+          },
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_ONLY",
+            "precision": "mixed",
+            "predictionSeconds": [
+              0.03281425009481609,
+              0.016234457958489656,
+              0.01718125003390014,
+              0.017590250121429563,
+              0.01692845905199647,
+              0.01654695812612772
+            ],
+            "minCosine": 0.9827473163604736,
+            "maxError": 0.04826400429010391
+          },
+          {
+            "encoder": "image",
+            "requestedUnits": "CPU_AND_GPU",
+            "precision": "mixed",
+            "predictionSeconds": [
+              1.0081844590604305,
+              0.002854874823242426,
+              0.002888833172619343,
+              0.002868165960535407,
+              0.0027941660955548286,
+              0.0028112090658396482
+            ],
+            "minCosine": 0.999995231628418,
+            "maxError": 0.00041988492012023926
+          }
+        ],
+        "scope": "Seeded numerical fixtures, not retrieval quality or proof of actual device assignment"
+      }
+    },
+    {
+      "case": "First natural JPEG pipeline comparison",
+      "originalReport": {
+        "schema": 1,
+        "state": "failed",
+        "images": 100,
+        "queries": 501,
+        "seed": 1729,
+        "dataset": "COCO 2017 validation, deterministic 100-image subset; NOT the standard 5k benchmark",
+        "source": "https://cocodataset.org/#download",
+        "annotationSHA256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+        "selectionSHA256": "41fbeb3cd5d1aad40dfac48bf9aea220f29587ab41c47d66630e8d41d38e0715",
+        "sourceRevision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+        "harnessSHA256": "1524e861f4c3e36d2fff8ae21e94c283180b3d8bb32ca4d2fa7fd7a97970991c",
+        "sourceStabilityVerified": true,
+        "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+        "cliSHA256": "345a885b090c7ab97ff2b7b3720a55ec8facf172a43f9d9cbe82a33a828907b3",
+        "requestedCompute": "cpuAndGPU",
+        "host": {
+          "cpu": "Apple M5 Max",
+          "macOS": "26.6.2"
+        },
+        "peakProcessResidentBytes": 1529020416,
+        "designatedLibraryCreated": false,
+        "parity": {
+          "tokenIDsExact": true,
+          "minimumImageCosine": 0.9909046743649295,
+          "minimumTextCosine": 0.9999939975442383
+        },
+        "native": {
+          "textToImage": {
+            "recallAt1": 0.9161676646706587,
+            "recallAt5": 0.9940119760479041,
+            "recallAt10": 0.9940119760479041
+          },
+          "imageToText": {
+            "recallAt1": 1.0,
+            "recallAt5": 1.0,
+            "recallAt10": 1.0
+          }
+        },
+        "pytorch": {
+          "textToImage": {
+            "recallAt1": 0.9161676646706587,
+            "recallAt5": 0.9940119760479041,
+            "recallAt10": 0.9940119760479041
+          },
+          "imageToText": {
+            "recallAt1": 1.0,
+            "recallAt5": 1.0,
+            "recallAt10": 1.0
+          }
+        },
+        "timings": {
+          "image": {
+            "firstMilliseconds": 1546.989917755127,
+            "warmMedianMilliseconds": 16.71600341796875,
+            "warmP95Milliseconds": 19.66172456741333
+          },
+          "text": {
+            "firstMilliseconds": 1090.0830030441284,
+            "warmMedianMilliseconds": 2.039015293121338,
+            "warmP95Milliseconds": 2.7080059051513663
+          },
+          "preparationAndFirstTextSeconds": 7.000380039215088,
+          "processWallSeconds": 11.826934667071328
+        },
+        "limits": [
+          "Public natural photos/captions, not desktop screenshots, unseen training holdout, or competitor execution.",
+          "No claim of actual GPU placement from a requested compute policy; no power or 24h capture measurement.",
+          "Native image timing includes decode/resize/inference; text includes tokenization/inference. First text preparation includes bundle verification/loading.",
+          "No threshold tuned against these labels. Existing model and OS caches may be warm; concurrent host activity is uncontrolled."
+        ],
+        "licenseCounts": {
+          "2": 11,
+          "4": 13,
+          "3": 24,
+          "1": 30,
+          "6": 8,
+          "5": 13,
+          "7": 1
+        }
+      },
+      "selectedPhotosAndLabelsUnchanged": true,
+      "eightWorstCasesOnCommonDecodedRGBMinimumCosine": 0.9999999372632133,
+      "resolution": "Separate encoder agreement on identical tensors from ImageIO/Pillow JPEG and ICC differences; retain both original pipeline agreement and original/native-input retrieval baselines",
+      "encoderGateStill": 0.999,
+      "fullJPEGEquivalent": false
+    },
+    {
+      "case": "Initial SwiftPM resource placement at app root",
+      "result": "Strict signing rejected unsealed root contents",
+      "resolution": "Place resources in Contents/Resources; construct explicit local tokenizer Config instead of Hub/fallback resources",
+      "relocatedFinalPackageWithoutBuildResourcesPassed": true
+    }
+  ],
+  "privacy": {
+    "normalLibraryOpened": false,
+    "designatedProbeLibraryCreated": false,
+    "modelCredentialUsed": false,
+    "cloudModelUsed": false,
+    "publicMediaCaptionsOrVectorsIncluded": false,
+    "diagnosticPixelExport": "Explicit flag only; private work directory; raw Float32 image content",
+    "installedSchema17Unchanged": true
+  },
+  "limits": [
+    "100 COCO photos /501 captions are not standard COCO5k, desktop screenshots, unseen training holdout, or competitor apps.",
+    "Core ML plan indicates preferred placement, not hardware-counter, ANE or energy qualification.",
+    "Warm cache/process order and concurrent host activity are uncontrolled; diagnostic pixel export was enabled. Per-image timing excludes export I/O; process wall/RSS includes it.",
+    "CPU and GPU policies run once each, sequentially on this host; no generalized Mac speed, cold-start or daily capture claim.",
+    "The full unit suite above is explicitly the pre-diagnostic parent. Final diagnostic/tensor changes pass targeted units/TSan and signed release checks; independent final CI follows.",
+    "JPEG/color-profile preprocessing differs from the original default Pillow pipeline; the original full-pipeline 0.999 gate remains failed.",
+    "Semantic media revisions, privacy admission, erasure, scopes, replay-frame opening, background indexing, setup UI and grounded visual Ask are still integration work."
+  ],
+  "completionClaim": {
+    "encoderFoundation": true,
+    "desktopVisualSearch": false,
+    "broadFeatureParity": false,
+    "topThreeOrCompetitorSuperiority": false
+  }
+}

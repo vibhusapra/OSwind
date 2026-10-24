@@ -1,0 +1,72 @@
+# Local visual encoder foundation
+
+OSwind can convert and run a pinned Google SigLIP2 image/text pair locally through Core ML. This increment provides an encoder and an explicit qualification CLI. **It does not yet index screenshots/replay frames, add visual search to the workspace, or give Ask image understanding.** Those are the next integration gates. Existing text search works without this optional model.
+
+The [source catalog](../models/siglip2-source.json) fixes the original repository revision, eight file sizes and SHA-256 hashes. Google's [pinned model card](https://huggingface.co/google/siglip2-base-patch16-224/blob/75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2/README.md) declares Apache-2.0. Weights are downloaded separately and are absent from this repository and the app bundle. Native tokenization uses pinned Hugging Face Swift code; [third-party notices](../ThirdParty/NOTICES.txt) and transitive licenses are packaged with the app.
+
+## Prepare once
+
+On Apple Silicon macOS, with [uv](https://docs.astral.sh/uv/) installed:
+
+```bash
+uv run --python 3.12 scripts/convert-visual-model.py \
+  --source "$HOME/Library/Caches/OSwind/siglip2-source" \
+  --output "$HOME/Library/Caches/OSwind/siglip2-native" --download
+```
+
+This explicitly installs the pinned Python conversion dependencies and downloads approximately 1.5 GB of original public weights plus tokenizer/config files. It uses no Hugging Face credential. Omit `--download` for source verification and conversion with no model fetch. Python is used for preparation and evaluation; native inference uses Swift/Core ML and does not require Python or a model server.
+
+The output must be new. Failed downloads leave `.partial` files for inspection; existing partial files and destinations are never overwritten. The converter retains an adjacent `.conversion` directory containing packages, original-reference fixtures and numerical results. Preserve it for verification, then remove it manually if desired. Conversion can require several GB of working storage beyond the final **968,536,703-byte model payload** observed here. Do not place conversion jobs inside a memory library or an encrypted vault if you intend them to remain available while that vault is locked.
+
+A successful conversion publishes `OSWIND-VISION.json` only after both encoders pass the fixed numerical gate under CPU-only and CPU/GPU policies. The app validates the file inventory and hashes before model loading. The model identity hashes the entire manifest, so different compiled artifacts cannot silently share vectors. This is local integrity evidence, **not a signature or an attestation from Google**. Treat the selected bundle as immutable while loaded; release and reload after replacing it.
+
+## Inspect and probe
+
+```bash
+.build/release/oswindctl vision status --model-dir /absolute/model/bundle
+.build/release/oswindctl vision probe /absolute/fixture.json \
+  --model-dir /absolute/model/bundle --compute cpuAndGPU
+```
+
+The fixture contains `queries` (strings) and `images` (absolute local file paths). The probe emits token IDs, normalized embeddings, text/image cosine similarities and timings to stdout. **Its output contains information derived from the supplied inputs; keep real-history probes private.** It never opens an OSwind library, reads saved provider keys, starts capture or contacts a model service. It is a developer qualification surface, not a visual-search UI.
+
+For numerical diagnosis, `--pixel-output /absolute/NEW-directory` explicitly exports private, little-endian Float32 NCHW inputs as `input-N.f32`. These arrays contain the decoded image content. The directory must be new and outside the model bundle. Ordinary inference writes no image scratch; this diagnostic export is optional and must remain private for real inputs.
+
+Only upright, single-frame images of at most 16 megapixels / 64 MiB are admitted. ImageIO decodes into sRGB; transparency is composited onto white. The native resize matches the pinned Pillow antialiased bilinear convention, then converts to 224×224 normalized NCHW RGB. Exact byte fixtures cover eight resize shapes. Arbitrary ICC profiles, HDR, EXIF rotation and transparent images are outside the exact PyTorch pixel-parity claim; rotated input is rejected. Retained desktop images are normally opaque and upright.
+
+The tokenizer preserves case, whitespace and Unicode composition. Queries are limited to 32 KiB, truncated to 63 content tokens, terminated with EOS=1 and right-padded with PAD=0 to 64 positions. Truncation is reported. Do not lowercase, trim or apply a CLIP prompt template silently. SigLIP's final pooled position makes padding part of the model contract.
+
+## Precision and lifecycle
+
+The first full-FP16 image candidate failed the CPU numerical gate: minimum cosine agreement **0.98236**, below **0.999**. Tracing itself matched the original model. Full-FP32 image compute passes both tested policies. Keeping only layer normalization/softmax/reductions in FP32 did not repair the CPU discrepancy. The initial recipe therefore uses **FP32 image compute and FP16 text compute**. The failed measurements are retained in the qualification evidence; the gate was not relaxed.
+
+`VisualEncoder` serializes inference, shares a generation-fenced load, rejects a conflicting preparation, and supports idle release / explicit release. Explicit release cancels and awaits outstanding preparation so stale work cannot repopulate the cache. Inference already executing finishes before the actor can release it; cancellation is checked before and after Core ML prediction. Encoders and tokenizer are released together; model files remain. No image temporary file is written.
+
+CPU/GPU is the default allowed compute policy, with an explicitly tested CPU-only alternative. A Core ML static plan on this M5 Max prefers GPU for all 307 image and 285 text operations with CPU/GPU enabled. This is not an observed GPU hardware trace, ANE qualification, energy measurement or support claim for every Mac. Minimum macOS 14 is the model/API deployment target; this qualification ran on macOS 26.6.2.
+
+## Reproduce qualification
+
+```bash
+python3 scripts/test-visual-model-tools.py
+OSWIND_VISUAL_MODEL_DIR=/absolute/model/bundle swift test --filter VisualEncoderTests
+uv run --python 3.12 scripts/evaluate-visual-model.py --prepare \
+  --work /absolute/new-evaluation-directory
+uv run --python 3.12 scripts/evaluate-visual-model.py \
+  --work /absolute/new-evaluation-directory --cli /absolute/oswindctl \
+  --model-dir /absolute/model/bundle --source /absolute/pinned-source
+```
+
+The evaluator downloads official COCO annotations over certificate-verified HTTPS through the dataset's S3 bucket and checks the public TensorFlow Datasets [annotation checksum](https://raw.githubusercontent.com/tensorflow/datasets/master/tensorflow_datasets/url_checksums/coco_captions.txt). It selects 100 validation images using seed 1729 and runs their captions through the native CLI and original local PyTorch model. It reports both retrieval directions, tokenizer/numerical agreement, timings and peak process RSS. Images, captions and raw vectors remain in the private work directory; only sanitized aggregate evidence is published.
+
+The first natural-photo run failed an end-to-end 0.999 cosine gate (worst 0.9909), despite identical aggregate retrieval scores. All eight worst cases agree above 0.9999999 after both runtimes receive the same decoded RGB pixels. Native ImageIO/sRGB decoding differs from Pillow's JPEG/ICC handling. The revised evaluator therefore exports the actual native input tensors and measures **encoder** agreement against PyTorch on those identical tensors. It separately retains the original Pillow pipeline agreement and both retrieval baselines. The original failed report remains evidence; no full JPEG-pipeline equivalence or lowered encoder threshold is claimed.
+
+This small photo subset is **not the standard COCO 5k benchmark, a desktop-history relevance study, a proven unseen training holdout or a comparison with competitor apps**. It establishes a local implementation baseline. No threshold is tuned against its labels.
+
+## Next integration gates
+
+- Media-byte and frame identity, with revalidation before vector admission; text-only hashes are insufficient.
+- Privacy admission before indexing, cooperative media leases and no plaintext scratch outside managed vaults.
+- Screenshot and timed replay-frame coverage, scopes, retention/deletion, backup/restore and full wipe.
+- Search results that open the matched image/frame; a visual match must not become an invented caption or unsupported text-only Ask claim.
+- Native model setup, resumable downloads, power-aware background indexing, lag/coverage, idle release and accessibility review.
+- Labeled desktop retrieval, cold starts, realistic archive scaling, energy and matched competitor runs.

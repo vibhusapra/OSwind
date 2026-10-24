@@ -57,6 +57,12 @@ install -m 644 ThirdParty/NOTICES.txt "$app/Contents/Resources/ThirdParty/NOTICE
 install -m 644 ThirdParty/Apache-2.0.txt "$app/Contents/Resources/ThirdParty/Apache-2.0.txt"
 mkdir -p "$app/Contents/Resources/ThirdParty/FluidAudio"
 ditto ThirdParty/FluidAudio "$app/Contents/Resources/ThirdParty/FluidAudio"
+ditto ThirdParty/VisualRuntime "$app/Contents/Resources/ThirdParty/VisualRuntime"
+# Preserve dependency resources in the signed resource area. VisualTokenizer
+# constructs explicit local Config values and never uses Hub's fallback bundle.
+for resource in swift-transformers_Hub.bundle swift-crypto_Crypto.bundle; do
+    ditto ".build/$configuration/$resource" "$app/Contents/Resources/$resource"
+done
 codesign --force --deep --sign - --identifier com.oswind.desktop "$app"
 codesign --verify --deep --strict "$app"
 printf '%s\n' "$app"
