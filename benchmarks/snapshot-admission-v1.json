@@ -1,0 +1,290 @@
+{
+  "format": "OSwind snapshot admission and domain privacy qualification v1",
+  "reviewed": "2026-10-24 America/Los_Angeles",
+  "runtimeCodeCommit": "7ef1e2444d7d20cfd37222152cb2bae2df79ee8f",
+  "testFollowupCommit": "9ff6111fd162efa873418fc0876a8ce340c931df",
+  "productSourceUnchangedByTestFollowup": true,
+  "schema": 19,
+  "hardware": "Apple M5 Max",
+  "os": "macOS 26.6.2 (25G83)",
+  "scope": "Owned CGImages, synthetic context/OCR seams driving actual capture controller/JPEG/SQLite, actual owned encrypted volumes, public local-model fixture and synthetic CLI/HTTP/MCP imports. No normal history, Keychain credential, native authentication, TCC change, real desktop acquisition or input acceptance.",
+  "tests": {
+    "fullNormal": {
+      "commit": "9ff6111fd162efa873418fc0876a8ce340c931df",
+      "total": 611,
+      "passed": 584,
+      "optInSkipped": 27,
+      "failures": 0
+    },
+    "nativeModelAndVaultRun": {
+      "runtimeCode": "7ef1e2444d7d20cfd37222152cb2bae2df79ee8f",
+      "passed": 62,
+      "additionalPreviouslySkipped": 21,
+      "failures": 0,
+      "scope": "Actual encrypted volume/app-session lifecycle, visual tokenizer/model, snapshot admission and context/domain cases; no real credentials"
+    },
+    "distinctPassingCasesAcrossRuns": 605,
+    "remainingOptInSkips": 6,
+    "threadSanitizer": {
+      "primaryCode": "7ef1e2444d7d20cfd37222152cb2bae2df79ee8f",
+      "primaryPassed": 71,
+      "additionalRollbackTestCommit": "9ff6111fd162efa873418fc0876a8ce340c931df",
+      "additionalPassed": 1,
+      "distinctPassed": 72,
+      "races": 0
+    }
+  },
+  "testedContracts": [
+    "Stable context admits a private decodable JPEG and source exactly once",
+    "Accessibility text is refreshed after image receipt",
+    "Changed app/PID/title/URL/bounds or missing context after awaits discards delayed work",
+    "Secure field, lock or permission loss prevents admission",
+    "Pause/settings invalidation cancels recognition workers and suppresses late rows and callbacks",
+    "Caller cancellation waits for the recognition worker and prevents late publication",
+    "New uncovered background exclusion discards despite stable foreground",
+    "Secret recognition suppresses JPEG and OCR regions",
+    "Actual Vision operation runs on explicitly owned pixels without device acquisition",
+    "Closed/replaced libraries and symlink image directories cannot receive the delayed image",
+    "Unshareable focused source defers without alternate-window fallback or error inflation",
+    "Whole-app mask covers recognized browsers, case-insensitive app rules and excluded background window titles",
+    "Window owners absent from the separate application list still participate in masks",
+    "Unmaskable excluded window defers; a new excluded application invalidates old mask coverage",
+    "Host root dots, escaped spelling and Unicode/IDNA aliases cannot bypass configured domain matches",
+    "Missing/invalid/non-web browser context fails when required; explicit opt-out remains",
+    "Long-source callback sees completed native capture passages before automatic catch-up",
+    "Forced passage-index SQL failure preserves admitted source/JPEG and recovers without recapture",
+    "Forced source SQL rejection removes the unadmitted JPEG and a later capture succeeds",
+    "Owned encrypted JPEG survives lock/unlock; delayed paused source is absent and backing device detaches with controllers still referenced"
+  ],
+  "sourceObservations": {
+    "nativeFocusedSource": "Fresh ScreenCaptureKit inventory must retain same unique window ID, title and geometry after acquisition and recognition",
+    "nativeDisplayMask": "Applications plus window owners; new exclusions outside original mask reject frame",
+    "atomicAXPixelGuarantee": false,
+    "learnedVisualPIIModel": false,
+    "contextInvalidationDoesNotEraseHistoricalText": true,
+    "applicationScreenshotFileWritesBeginOnlyAfterPostRecognitionChecks": true,
+    "privateFileMode": "0600",
+    "descriptorBoundExclusiveWrites": true
+  },
+  "signedDomainProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "8fca9d8cac016f2a0d8271fe62989bbab73f617d92f021767ddf1993609e5fec",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "signedPreparationRegression": {
+    "scope": "Offline explicit qualified public-model container; copied packaged app; no model download, normal history, capture or UI input",
+    "binarySHA256": "8fca9d8cac016f2a0d8271fe62989bbab73f617d92f021767ddf1993609e5fec",
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "checks": [
+      {
+        "case": "relocated bundled assets and qualified reuse",
+        "passed": true
+      },
+      {
+        "case": "ready-model reuse cleans abandoned owned conversion scratch",
+        "passed": true
+      },
+      {
+        "case": "unknown option refuses before history",
+        "passed": true
+      },
+      {
+        "case": "duplicate enable flag refuses",
+        "passed": true
+      },
+      {
+        "case": "wrong receipt identity refuses",
+        "passed": true
+      },
+      {
+        "case": "failed qualification refuses",
+        "passed": true
+      },
+      {
+        "case": "duplicate qualification policy refuses",
+        "passed": true
+      },
+      {
+        "case": "restored receipt revalidates",
+        "passed": true
+      },
+      {
+        "case": "changed bundled script refuses before cache reuse",
+        "passed": true
+      },
+      {
+        "case": "missing bundled guardian refuses",
+        "passed": true
+      },
+      {
+        "case": "prepare without use-model preserves existing settings",
+        "passed": true
+      },
+      {
+        "case": "explicit use-model selects qualified model",
+        "passed": true
+      },
+      {
+        "case": "cache inside history refuses before creation",
+        "passed": true
+      },
+      {
+        "case": "explicit selection preserves source history and private settings",
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "signedReleaseProcessGroups": {
+    "binarySHA256": "8fca9d8cac016f2a0d8271fe62989bbab73f617d92f021767ddf1993609e5fec",
+    "groups": [
+      {
+        "name": "integration",
+        "script": "scripts/integration-smoke.py",
+        "scriptSHA256": "91e4de45d9f86aa06b2d9010df3f96974a672987010c11a38468839036c39465",
+        "exit": 0,
+        "wallSeconds": 0.3653467500116676
+      },
+      {
+        "name": "integration-indexed",
+        "script": "scripts/integration-smoke.py",
+        "scriptSHA256": "91e4de45d9f86aa06b2d9010df3f96974a672987010c11a38468839036c39465",
+        "exit": 0,
+        "wallSeconds": 1.030874083051458
+      },
+      {
+        "name": "visual-replay",
+        "script": "scripts/visual-replay-smoke.py",
+        "scriptSHA256": "d0afde8d19c28de9e39a1d3199a4f66669d4627a08dc9b109f0f4a208e349e69",
+        "exit": 0,
+        "wallSeconds": 1.4904504171572626
+      },
+      {
+        "name": "wipe",
+        "script": "scripts/wipe-smoke.py",
+        "scriptSHA256": "131aa0ea03e88b17892a439564ca23fdb4bd97036c59c36b6ecc55a166153530",
+        "exit": 0,
+        "wallSeconds": 0.6249404589179903
+      },
+      {
+        "name": "vault",
+        "script": "scripts/vault-smoke.py",
+        "scriptSHA256": "a5a7a595a909d4cb53ad607ec4eaf1b8443ac219a63cd67004a0565bae904155",
+        "exit": 0,
+        "wallSeconds": 14.495523374993354
+      },
+      {
+        "name": "backup-interruptions",
+        "script": "scripts/backup-smoke.py",
+        "scriptSHA256": "9a16dda2fd2fa86892a82a49f5ebd6a6f033036c6cf9c92ed7a77bd611ac35f2",
+        "exit": 0,
+        "wallSeconds": 0.8098194999620318
+      }
+    ],
+    "passed": true
+  },
+  "package": {
+    "scope": "Separately staged schema19 snapshot admission and privacy; no installation or native click acceptance",
+    "codeCommit": "7ef1e2444d7d20cfd37222152cb2bae2df79ee8f",
+    "schema": 19,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "3b79463d3b9e67a63664cc9dc3cd7383d1ad828af1635b9250c98e48f2ca2da0",
+        "signedSHA256": "c9715952e81caf4c45da8df0645236709c373d3a60086ef04ce39e483a7fdcbb",
+        "normalizedPayloadSHA256": "f685dd2110e0ee6a094a05fd28176f23d9aa8459fb463249c65739de3fe73e93"
+      },
+      "oswindctl": {
+        "rawSHA256": "bc95c0fa3316c3975342e8acd2e5e5a2915fc909380147f328149dac89ae5a9a",
+        "signedSHA256": "8fca9d8cac016f2a0d8271fe62989bbab73f617d92f021767ddf1993609e5fec",
+        "normalizedPayloadSHA256": "cf117273027f92570059e2204d7f6706c3f44fcf5871a7a12bcc2b30ca0ca10c"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "963874140554db53a80471549acb675a69aa5eabf3aec49d65dfc85d0533a163",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "3e1d9628dd7e633aa3cc8e09baf3b5b76f838edf02ff258e65a237d3f42b25ac",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "retainedFailures": [
+    {
+      "case": "Browser context/domain baseline",
+      "cases": 3,
+      "assertionFailures": 9,
+      "scope": "Before host/context policy repair; fixed suite also covers Unicode/IDNA aliases"
+    },
+    {
+      "case": "Prior signed CLI import baseline",
+      "binarySHA256": "1d1908413031f2d67876de4f80a8a6eca7670b9c41a21e1d697520660c10be9f",
+      "observed": {
+        "excluded": 4,
+        "imported": 6,
+        "skippedLinkedRecaps": 0
+      },
+      "expected": {
+        "imported": 3,
+        "excluded": 7
+      },
+      "outcome": "Failed before HTTP/MCP assertions; seven excluded inputs are omitted by final package"
+    },
+    {
+      "case": "Early save callback before native passages",
+      "initialCode": "1dc3ea20d878be2bb80a1fdfc110976cf0b4be2e",
+      "observedCallbackPassagesCurrent": false,
+      "expectedTrue": true,
+      "outcome": "Actual local Apple model regression failed; callback reordered after capture passages and invalidated workers cancelled. Final normal/TSan runs pass."
+    }
+  ],
+  "design": {
+    "componentCode": "1dc3ea20d878be2bb80a1fdfc110976cf0b4be2e",
+    "unchangedByWorkerOrderingFix": true,
+    "ownAppSyntheticRenders": 4,
+    "appearances": [
+      "light",
+      "dark"
+    ],
+    "panels": [
+      "Capture",
+      "Privacy"
+    ],
+    "visuallyReviewed": true,
+    "screenLocked": true,
+    "nativeInputAcceptance": false
+  },
+  "remaining": [
+    "AX context currently refreshes several times on main actor; bound/move appropriate AX work and measure physical capture/UI latency",
+    "Native unlocked browser/window transitions, fast inter-observation changes and secure overlays unverified",
+    "Recognized browser detection is incomplete; unknown browsers/arbitrary app webviews are outside a universal claim",
+    "No atomic AX/pixel observation, comprehensive DLP or learned image-sensitive-content model",
+    "No sustained capture/energy/device/older-OS or top-three competitor qualification",
+    "Capture exclusions do not retrospectively hide old text or replace history erasure; import process checks concern omitted inputs only"
+  ],
+  "primaryProtocolReferences": [
+    "https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2"
+  ],
+  "laterGUIFollowup": {
+    "reason": "Independent CI caught a queued audio timer updating position after pause",
+    "ciRun": 40103872146,
+    "ciOutcome": "native full suite: 611 cases, 27 skips, one muted-player pause failure; benchmark harness passed",
+    "fix": "Pause synchronizes actual player time and invalidates stale timer callbacks",
+    "localVerification": "One actual muted-player seek/pause/finish/deletion case passed",
+    "packageBoundary": "This GUI follow-up is not included in runtime7ef1e24 package hashes"
+  }
+}

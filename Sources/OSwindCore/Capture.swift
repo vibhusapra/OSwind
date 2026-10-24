@@ -67,6 +67,7 @@ public struct CaptureMetrics: Sendable {
         didSet {
             guard settings.profile != oldValue.profile || settings.visualCaptureMode != oldValue.visualCaptureMode || settings.allDisplays != oldValue.allDisplays || settings.privacy != oldValue.privacy else {return}
             epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
+            cancelSnapshotWork()
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
         }
     }
@@ -75,6 +76,10 @@ public struct CaptureMetrics: Sendable {
     public var onCapture: ((Memory) -> Void)?
     private let store: MemoryStore
     private let embedder: LocalEmbedder
+    private let snapshots:SnapshotCaptureEnvironment
+    private var snapshotWorker:Task<(Memory,Data?,MediaAdmissionLease?),Error>?
+    private var snapshotPassages:Task<Void,Error>?
+    private func cancelSnapshotWork(){snapshotWorker?.cancel();snapshotPassages?.cancel()}
     private var timer: Timer?
     private var observers = [NSObjectProtocol]()
     private var busy = false
@@ -82,11 +87,12 @@ public struct CaptureMetrics: Sendable {
     private var suspended = false
     private var fingerprints = [String: [UInt8]]()
     private var lastCapture = Date.distantPast
-    public init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {
-        self.store = store; self.embedder = embedder; self.settings = settings
+    public convenience init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {self.init(store:store,embedder:embedder,settings:settings,snapshots:SnapshotCaptureEnvironment())}
+    init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings,snapshots:SnapshotCaptureEnvironment) {
+        self.store = store; self.embedder = embedder; self.settings = settings;self.snapshots=snapshots
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in guard let self, self.running, Date().timeIntervalSince(self.lastCapture) > 1 else { return }; await self.captureOnce() } })
-        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.cancelSnapshotWork();self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
@@ -97,7 +103,7 @@ public struct CaptureMetrics: Sendable {
             replay=session;session.start()
         } else {replay?.stop();replay=nil;schedule();Task {await captureOnce()}}
     }
-    public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID(); timer?.invalidate(); timer = nil; status = "Paused" }
+    public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID();cancelSnapshotWork();timer?.invalidate(); timer = nil; status = "Paused" }
     /// Explicit bounded replay, including a chosen app. Existing permissions
     /// only; never prompts or falls through to a different app when absent.
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
@@ -117,64 +123,96 @@ public struct CaptureMetrics: Sendable {
         let interval = settings.profile.effectiveInterval(lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled, thermalLimited: ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical, idleSeconds: idle) ?? 20
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in Task { @MainActor in guard let self, self.running else { return }; await self.captureOnce(); self.schedule() } }
     }
+    private func snapshotContext(_ original:WindowContext,token:UUID,manual:Bool,target:String?)->WindowContext? {
+        guard !Task.isCancelled,epoch==token,running || manual,!suspended else {return nil}
+        guard !snapshots.locked(),snapshots.permitted(),let now=snapshots.context(target),SnapshotContextBinding.matches(original,now),
+              settings.privacy.exclusion(app:now.bundle,title:now.title,url:now.url,isBrowser:now.browser)==nil else {
+            metrics.excluded+=1;status="Context changed · snapshot discarded";return nil
+        }
+        return now
+    }
     public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
         guard manual || settings.visualCaptureMode != .replay || settings.allDisplays else {return}
         guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
-        guard !busy, !suspended, running || manual else { return }
-        guard !SessionState.locked else { status = "Locked · capture suspended"; return }
-        guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }
-        if !manual, CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .null) > 120 { metrics.idle += 1; status = "Idle · saving energy"; return }
-        guard let context = AccessibilityContext.current(targetBundleID:targetBundleID) else { status = "Application context unavailable"; return }
-        if context.bundle == "com.oswind.desktop" || context.bundle == Bundle.main.bundleIdentifier { status = "OSwind window · skipped"; return }
-        if context.secure { metrics.excluded += 1; status = "Protected text field · skipped"; return }
-        if let reason = settings.privacy.exclusion(app: context.bundle, title: context.title, url: context.url, isBrowser: context.browser) { metrics.excluded += 1; status = reason; return }
-        busy = true; defer { busy = false }; let token = epoch; let begin = Date(); lastCapture = begin
+        guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
+        guard !snapshots.locked() else {status="Locked · capture suspended";return}
+        guard snapshots.permitted() else {status="Screen Recording permission required";return}
+        if !manual,CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)>120 {metrics.idle+=1;status="Idle · saving energy";return}
+        guard let context=snapshots.context(targetBundleID) else {status="Application context unavailable";return}
+        if context.bundle=="com.oswind.desktop" || context.bundle==Bundle.main.bundleIdentifier {status="OSwind window · skipped";return}
+        if context.secure {metrics.excluded+=1;status="Protected text field · skipped";return}
+        if let reason=settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {metrics.excluded+=1;status=reason;return}
+        busy=true;defer {busy=false};let token=epoch,begin=Date();lastCapture=begin
         do {
-            let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: true)
-            var captures = [(SCContentFilter, String, String)]()
-            if settings.allDisplays {
-                // Domain privacy cannot be established for background browser tabs. Mask all browsers in display mode.
-                let blocked = content.applications.filter { app in settings.privacy.excludedApps.contains(app.bundleIdentifier) || app.bundleIdentifier == Bundle.main.bundleIdentifier || ["safari","chrome","firefox","arc","brave","edge","vivaldi","orion"].contains(where: { app.bundleIdentifier.lowercased().contains($0) }) }
-                for display in content.displays { captures.append((SCContentFilter(display: display, excludingApplications: blocked, exceptingWindows: []), "display-\(display.displayID)", "Display \(display.displayID)")) }
-            } else {
-                let candidates=content.windows.filter {$0.owningApplication?.processID==context.pid && $0.windowLayer==0 && $0.frame.width>100 && $0.frame.height>100}
-                guard let selected=FocusedWindowBinding.select(candidates.map {CaptureWindowDescriptor(frame:$0.frame,title:$0.title)},context:context) else {status="Waiting for an unambiguous focused window";return}
-                let window=candidates[selected]
-                guard settings.privacy.exclusion(app:context.bundle,title:window.title ?? context.title,url:context.url,isBrowser:context.browser)==nil else {metrics.excluded+=1;status="Excluded window";return}
-                captures.append((SCContentFilter(desktopIndependentWindow:window),"window-\(window.windowID)",window.title ?? context.title))
-            }
-            for (filter, displayID, title) in captures {
-                let config = SCStreamConfiguration(); let rect = filter.contentRect; let scale = min(2.0, Double(settings.profile.maxDimension) / max(rect.width, rect.height)); config.width = max(1, Int(rect.width * scale)); config.height = max(1, Int(rect.height * scale)); config.showsCursor = false; config.captureResolution = .best
-                let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
-                let pixels = Self.fingerprint(image)
-                if !manual, let old = fingerprints[displayID], Self.difference(old, pixels) < 2.0 { metrics.unchanged += 1; status = "Unchanged · skipped"; continue }
-                let policy = settings.privacy, quality = settings.profile.jpegQuality, root = store.root, localEmbedder = embedder, mediaStore=store
-                let admission = try await Task.detached(priority: .utility) {
-                    let request = VNRecognizeTextRequest(); request.recognitionLevel = .accurate; request.usesLanguageCorrection = true; request.automaticallyDetectsLanguage = true
-                    try VNImageRequestHandler(cgImage: image).perform([request])
-                    let regions = (request.results ?? []).compactMap { observation -> TextRegion? in guard let text = observation.topCandidates(1).first?.string else { return nil }; let b = observation.boundingBox; return TextRegion(text: text, x: b.minX, y: b.minY, width: b.width, height: b.height) }
-                    let ocr = regions.map(\.text).joined(separator: "\n")
-                    let text = policy.sanitize(ocr + (context.accessibilityText.isEmpty ? "" : "\n\n" + context.accessibilityText))
-                    let safeTitle = policy.sanitize(title), safeURL = policy.sanitize(context.url ?? "")
-                    var m = Memory(app: context.app, bundleID: context.bundle, title: safeTitle.text, url: safeURL.text.isEmpty ? nil : safeURL.text, text: text.text, display: displayID, regions: text.redacted ? [] : regions)
-                    var lease:MediaAdmissionLease?
-                    // A text redaction also suppresses the raw image; never retain secrets in screenshot pixels.
+            let frames=try await snapshots.frames(settings,context)
+            if frames.isEmpty {if epoch==token {status="Waiting for an eligible capture source"};return}
+            for frame in frames {
+                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                let image=try await frame.capture()
+                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
+                guard let captured=snapshotContext(context,token:token,manual:manual,target:targetBundleID) else {return}
+                let pixels=Self.fingerprint(image)
+                if !manual,let old=fingerprints[frame.display],Self.difference(old,pixels)<2.0 {metrics.unchanged+=1;status="Unchanged · skipped";continue}
+                let policy=settings.privacy,quality=settings.profile.jpegQuality,recognize=snapshots.recognize,localEmbedder=embedder,mediaStore=store,title=frame.title,display=frame.display
+                let worker=Task.detached(priority:.utility) {() throws -> (Memory,Data?,MediaAdmissionLease?) in
+                    try Task.checkCancellation();let regions=try recognize(image);try Task.checkCancellation()
+                    let ocr=regions.map(\.text).joined(separator:"\n"),text=policy.sanitize(ocr+(captured.accessibilityText.isEmpty ? "":"\n\n"+captured.accessibilityText))
+                    let safeTitle=policy.sanitize(title),safeURL=policy.sanitize(captured.url ?? "")
+                    var memory=Memory(app:captured.app,bundleID:captured.bundle,title:safeTitle.text,url:safeURL.text.isEmpty ? nil:safeURL.text,text:text.text,display:display,regions:text.redacted ? []:regions)
+                    var data:Data?,lease:MediaAdmissionLease?
                     if policy.retainImages && !text.redacted && !safeTitle.redacted && !safeURL.redacted {
-                        lease=try mediaStore.mediaWriteLease()
-                        let relative = "images/\(m.id).jpg"; let dest = root.appendingPathComponent(relative)
-                        if let output = CGImageDestinationCreateWithURL(dest as CFURL, UTType.jpeg.identifier as CFString, 1, nil) { CGImageDestinationAddImage(output, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary); guard CGImageDestinationFinalize(output) else { throw OSwindError.unavailable("Cannot save screenshot") }; m.imagePath = relative }
+                        // Encoding stays off the main actor. No raw bytes reach
+                        // disk until context is checked after recognition.
+                        let bytes=NSMutableData()
+                        guard let output=CGImageDestinationCreateWithData(bytes,UTType.jpeg.identifier as CFString,1,nil) else {throw OSwindError.unavailable("Cannot encode screenshot")}
+                        CGImageDestinationAddImage(output,image,[kCGImageDestinationLossyCompressionQuality:quality] as CFDictionary)
+                        guard CGImageDestinationFinalize(output),bytes.length<=64*1024*1024 else {throw OSwindError.unavailable("Cannot encode a bounded screenshot")}
+                        data=bytes as Data;try Task.checkCancellation();lease=try mediaStore.mediaWriteLease()
                     }
-                    m.embedding = localEmbedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : localEmbedder.modelID; return (m,lease)
-                }.value
-                var memory=admission.0;defer {admission.1?.release()}
-                guard epoch == token, running || manual, !suspended, !SessionState.locked else { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; return }
-                memory.timestamp = begin
-                do { try store.insert(memory) } catch { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; throw error }
-                let saved = memory, passageStore = store
-                if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try await Task.detached(priority:.utility) { try passageStore.indexApplePassages(saved,embedder:localEmbedder) }.value }
-                fingerprints[displayID] = pixels; metrics.saved += 1; metrics.lastLatencyMS = Date().timeIntervalSince(begin) * 1000; status = "Saved \(context.app) · \(Int(metrics.lastLatencyMS)) ms"; onCapture?(memory)
+                    memory.embedding=localEmbedder.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:localEmbedder.modelID
+                    do {try Task.checkCancellation();return (memory,data,lease)} catch {lease?.release();throw error}
+                }
+                snapshotWorker=worker;defer {snapshotWorker=nil}
+                let prepared=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+                defer {prepared.2?.release()}
+                guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
+                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                var memory=prepared.0;memory.timestamp=begin
+                var imageTree:BackupFileTree?,written:String?,admitted=false
+                defer {if !admitted,let written {try? imageTree?.remove(written)}}
+                if let data=prepared.1,let lease=prepared.2 {
+                    let tree=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true),identity=try tree.identity()
+                    guard identity.device==store.mediaRootIdentity.device,identity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before screenshot admission")}
+                    let relative="images/\(memory.id).jpg";imageTree=tree
+                    try lease.withActive(for:store.mediaRootIdentity) {try tree.requireRootIdentity(at:store.root);try tree.write(data,as:relative)}
+                    written=relative;memory.imagePath=relative
+                }
+                // No actor suspension between this final context check, retained
+                // file validation and SQLite admission. AX/pixel reads remain
+                // separate OS observations, not an atomic capture guarantee.
+                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                try imageTree?.requireRootIdentity(at:store.root);try store.insert(memory);admitted=true
+                fingerprints[frame.display]=pixels;metrics.saved+=1
+                let saved=memory,passageStore=store
+                var pending:String?
+                if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled {
+                    let indexing=Task.detached(priority:.utility) {try passageStore.indexApplePassages(saved,embedder:localEmbedder)}
+                    snapshotPassages=indexing;defer {snapshotPassages=nil}
+                    do {try await withTaskCancellationHandler {try await indexing.value} onCancel:{indexing.cancel()}}
+                    catch {pending=error.localizedDescription}
+                }
+                guard epoch==token,!Task.isCancelled else {return}
+                metrics.lastLatencyMS=Date().timeIntervalSince(begin)*1000
+                if let pending {metrics.errors+=1;status="Saved \(captured.app) · search indexing pending: "+pending}
+                else {status="Saved \(captured.app) · \(Int(metrics.lastLatencyMS)) ms"}
+                // Automatic catch-up sees completed native passages instead of
+                // racing the capture worker to build the same long source.
+                onCapture?(memory)
             }
-        } catch { metrics.errors += 1; status = error.localizedDescription }
+        } catch is CancellationError {if epoch==token {status="Snapshot cancelled"}}
+        catch let deferral as SnapshotCaptureDeferral {if epoch==token {metrics.excluded+=1;status=deferral.reason}}
+        catch {if epoch==token {metrics.errors+=1;status=error.localizedDescription}}
     }
     nonisolated public static func fingerprint(_ image: CGImage) -> [UInt8] {
         var pixels = [UInt8](repeating: 0, count: 32 * 18)

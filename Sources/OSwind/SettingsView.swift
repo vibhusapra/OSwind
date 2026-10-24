@@ -41,7 +41,7 @@ struct SettingsView: View {
                 Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(m.settings.visualCaptureMode == .replay ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }
                 Text(m.settings.visualCaptureMode == .replay ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Capture all displays",isOn:$m.settings.allDisplays)
-                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "All-display replay is not available yet; this combination uses snapshots. Turn off all displays for replay." : "Default: focused window only. Full-display mode masks all browser windows and excluded applications; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
+                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "All-display replay is not available yet; this combination uses snapshots. Turn off all displays for replay." : "Default: focused window only. Full-display mode masks recognized browser apps, excluded apps and any app with an excluded window title. Safe windows of the same app are also masked; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Resume capture when OSwind opens",isOn:$m.settings.captureOnLaunch)
                 Toggle("Open at login",isOn:Binding(get:{SMAppService.mainApp.status == .enabled},set:{m.login($0)}))
             }
@@ -61,6 +61,7 @@ struct SettingsView: View {
                 multiline("Website domains",value:Binding(get:{m.settings.privacy.excludedDomains.joined(separator:"\n")},set:{m.settings.privacy.excludedDomains = entries($0)}))
                 multiline("Window title contains",value:Binding(get:{m.settings.privacy.excludedTitles.joined(separator:"\n")},set:{m.settings.privacy.excludedTitles = entries($0)}))
                 Toggle("Skip browser capture if URL is unavailable",isOn:$m.settings.privacy.requireBrowserContext)
+                Text("With website exclusions, recognized browsers need an HTTP(S) URL with a hostname. Missing, invalid and internal-page URLs are skipped unless you turn this off.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Erase recorded history") {
                 Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy || m.libraryWipe.busy)

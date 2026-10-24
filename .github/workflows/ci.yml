@@ -54,6 +54,10 @@ jobs:
         run: python3 scripts/recap-smoke.py .build/release/oswindctl --output .artifacts/recap-ci.json
       - name: Exercise query scopes, literal mode and saved time bounds
         run: python3 scripts/query-scope-smoke.py .build/release/oswindctl --output .artifacts/query-scope-ci.json
+      - name: Verify normalized domain import filtering across CLI HTTP and MCP
+        run: |
+          python3 scripts/domain-privacy-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-domain-privacy"
+          cp "$RUNNER_TEMP/oswind-domain-privacy/report.json" .artifacts/domain-privacy-ci.json
       - name: Exercise complete backup, restore and interruption recovery
         run: python3 scripts/backup-smoke.py .build/release/oswindctl --interruptions --output .artifacts/backup-process-ci.json
       - name: Exercise audio normalization, timestamp persistence and privacy
@@ -126,6 +130,7 @@ jobs:
             .artifacts/vector-indexed-ci.json
             .artifacts/statistics-ci.json
             .artifacts/query-scope-ci.json
+            .artifacts/domain-privacy-ci.json
             .artifacts/passages-apple-ci.json
             .artifacts/backup-process-ci.json
             .artifacts/audio-process-ci.json
