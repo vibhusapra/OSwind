@@ -32,10 +32,6 @@ protocol VisualEmbeddingService:Sendable {
     func embed(image:Data,directory:URL,compute:VisualCompute) async throws -> VisualEmbedding
     func embed(pixels:[Float],directory:URL,compute:VisualCompute) async throws -> VisualEmbedding
 }
-extension VisualEmbeddingService {
-    func beginBatch() async -> UUID {UUID()}
-    func endBatch(_ token:UUID) async {}
-}
 extension VisualEncoder:VisualEmbeddingService {}
 private enum VisualIndexInterruption:LocalizedError {
     case modelChanged

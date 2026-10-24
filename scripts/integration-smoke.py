@@ -29,11 +29,17 @@ with tempfile.TemporaryDirectory(prefix='oswind-smoke-') as directory:
         indexed=json.loads(cli('search','--mode','semantic','--details','socket'))
         assert indexed['strategy']=='ann-exact-rerank' and not indexed['warnings']
     assert json.loads(cli('search','--mode','keyword','socket'))[0]['memory']['id']==identifier
+    visual=json.loads(cli('search','--mode','visual','--details'))
+    assert visual['hits']==[] and visual['strategy']=='visual-recent'
+    missing_visual=subprocess.run(prefix+['search','--mode','visual','--details','a red window'],capture_output=True,text=True,timeout=30)
+    assert missing_visual.returncode!=0 and 'visual memory' in missing_visual.stderr.lower()
     requests=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-11-25'}},{'jsonrpc':'2.0','method':'notifications/initialized'},{'jsonrpc':'2.0','id':2,'method':'tools/list'},{'jsonrpc':'2.0','id':3,'method':'tools/call','params':{'name':'search_memory','arguments':{'query':'socket','mode':mode}}}]
     process=subprocess.run(prefix+['mcp'],input='\n'.join(json.dumps(r) for r in requests)+'\n',text=True,capture_output=True,timeout=30,check=True)
     responses=[json.loads(line) for line in process.stdout.splitlines()]
     assert len(responses)==3
     assert len(responses[1]['result']['tools'])==3
+    visual_tool=next(tool for tool in responses[1]['result']['tools'] if tool['name']=='search_memory')
+    assert 'visual' in visual_tool['inputSchema']['properties']['mode']['enum']
     assert identifier in responses[2]['result']['content'][0]['text']
     if runtime: assert json.loads(responses[2]['result']['content'][0]['text'])['strategy']=='ann-exact-rerank'
     server=subprocess.Popen(prefix+['serve'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)

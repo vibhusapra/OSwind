@@ -16,8 +16,8 @@ private actor FixtureVisualEncoder:VisualEmbeddingService {
     let changedIdentity:Bool
     init(gate:VisualTestGate?=nil,changedIdentity:Bool=false) {self.gate=gate;self.changedIdentity=changedIdentity}
     func identity(directory:URL,compute:VisualCompute) -> String {identities+=1;return "fixture-visual"}
-    func beginBatch() -> UUID {batches+=1;return UUID()}
-    func endBatch(_ token:UUID) {completedBatches+=1}
+    func beginBatch() async -> UUID {batches+=1;return UUID()}
+    func endBatch(_ token:UUID) async {completedBatches+=1}
     func setRetention(_ value:NativeModelRetention) {}
     func embed(text:String,directory:URL,compute:VisualCompute) -> VisualEmbedding {VisualEmbedding(modelID:"fixture-visual",vector:text.contains("blue") ? [0,1]:[1,0],seconds:0,truncated:false)}
     func embed(image:Data,directory:URL,compute:VisualCompute) async throws -> VisualEmbedding {

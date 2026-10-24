@@ -61,8 +61,8 @@ public actor VisualEncoder {
     public var resident:Bool {loaded != nil || loading != nil || !retiring.isEmpty}
     public func setRetention(_ value:NativeModelRetention) {retention=value;if loading==nil {scheduleRelease()}}
     // A complete indexing job is one use, including gaps while decoding frames.
-    public func beginBatch() -> UUID {let token=UUID();batches.insert(token);idle.cancel();return token}
-    public func endBatch(_ token:UUID) {batches.remove(token);if batches.isEmpty {scheduleRelease()}}
+    public func beginBatch() async -> UUID {let token=UUID();batches.insert(token);idle.cancel();return token}
+    public func endBatch(_ token:UUID) async {batches.remove(token);if batches.isEmpty {scheduleRelease()}}
     public func unload() async {
         batches.removeAll()
         idle.cancel();loaded=nil;loadedKey=nil;loadedID=nil

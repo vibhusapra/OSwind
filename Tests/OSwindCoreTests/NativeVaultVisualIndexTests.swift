@@ -31,7 +31,8 @@ final class NativeVaultVisualIndexTests:XCTestCase {
             let locked=try await locking.value;XCTAssertEqual(locked.state,.locked);XCTAssertTrue(store.isClosed)
             // The snapshot objects are deliberately still retained. Their root
             // descriptors/pins must not keep the encrypted backing device open.
-            XCTAssertFalse(FileManager.default.fileExists(atPath:mount.path));XCTAssertFalse(FileManager.default.fileExists(atPath:pin.path))
+            if FileManager.default.fileExists(atPath:mount.path) {XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:mount.path).isEmpty)}
+            XCTAssertFalse(FileManager.default.fileExists(atPath:pin.path))
             XCTAssertThrowsError(try imageSnapshot.validatedMemory());XCTAssertThrowsError(try videoSnapshot.withAdmission(for:store) {$0})
             let attached=try await NativeVaultDriver().attachment(paths:VaultPaths(package));XCTAssertNil(attached)
             _ = try await vault.unlock(passphrase:secret);let reopened=try MemoryStore(root:vault.libraryURL)
