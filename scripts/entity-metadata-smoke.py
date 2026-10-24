@@ -22,6 +22,7 @@ def qualify(label,binary,preserves):
    anchors=list(db.execute("SELECT memory_id,origin,revision,start,length,surface,method FROM entity_mentions WHERE entity_id=? AND origin='automatic' ORDER BY memory_id",(project['id'],)))
    manual=db.execute("SELECT COUNT(*) FROM entity_mentions WHERE entity_id=? AND origin='manual'",(project['id'],)).fetchone()[0]
    ignored=db.execute('SELECT COUNT(*) FROM entity_ignored WHERE memory_id=?',(rows[-1]['id'],)).fetchone()[0]
+   if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='entity_project_ignored'").fetchone():ignored+=db.execute('SELECT COUNT(*) FROM entity_project_ignored WHERE memory_id=?',(rows[-1]['id'],)).fetchone()[0]
    return dict(revision=revision,automatic=len(anchors),manual=manual,ignored=ignored,anchorSHA256=hashlib.sha256(json.dumps(anchors,separators=(',',':')).encode()).hexdigest())
  assert cmd('import',inputFile,'--json')['imported']==a.sources
  project=cmd('entity','create','project','Apollo Launch')

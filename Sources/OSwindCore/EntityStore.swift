@@ -25,7 +25,24 @@ extension RoutineDatabase {
         guard sqlite3_step(row)==SQLITE_ROW,let kind=EntityKind(rawValue:text(row,0)) else {throw OSwindError.invalid("Entity no longer exists")}
         return(kind,text(row,1),sqlite3_column_int(row,2)==1)
     }
+    func entityNotes(_ id:String)throws->String {
+        let row=try statement("SELECT detail FROM memory_entities WHERE id=?");defer {sqlite3_finalize(row)};bind(row,1,id)
+        guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Entity no longer exists")};return text(row,0)
+    }
     func entityKind(_ id:String)throws->EntityKind {try entityDefinition(id).kind}
+    func projectIsIgnored(_ id:String,source:String)throws->Bool {
+        let legacy=try statement("SELECT 1 FROM entity_ignored WHERE memory_id=? AND kind='project' LIMIT 1");bind(legacy,1,source)
+        let code=sqlite3_step(legacy);sqlite3_finalize(legacy);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw error()}
+        if code==SQLITE_ROW {
+            // An unmapped legacy name may acquire an explicit alias later.
+            // Bind at most this project's 32 aliases to the stable project ID.
+            let bindLegacy=try statement("INSERT OR IGNORE INTO entity_project_ignored SELECT ?,a.entity_id FROM entity_aliases a WHERE a.entity_id=? AND a.kind='project' AND EXISTS(SELECT 1 FROM entity_ignored i WHERE i.memory_id=? AND i.kind='project' AND i.key=a.key)");defer {sqlite3_finalize(bindLegacy)}
+            bind(bindLegacy,1,source);bind(bindLegacy,2,id);bind(bindLegacy,3,source);try done(bindLegacy)
+            let clear=try statement("DELETE FROM entity_ignored WHERE memory_id=? AND kind='project' AND key IN (SELECT key FROM entity_aliases WHERE entity_id=? AND kind='project')");defer {sqlite3_finalize(clear)};bind(clear,1,source);bind(clear,2,id);try done(clear)
+        }
+        let row=try statement("SELECT 1 FROM entity_project_ignored WHERE memory_id=? AND entity_id=?");defer {sqlite3_finalize(row)};bind(row,1,source);bind(row,2,id)
+        let result=sqlite3_step(row);guard result==SQLITE_ROW || result==SQLITE_DONE else {throw error()};return result==SQLITE_ROW
+    }
 }
 extension MemoryStore {
     private func entityWrite<T>(_ body:(RoutineDatabase)throws->T)throws->T {
@@ -91,12 +108,14 @@ extension MemoryStore {
         try entityWrite {db in
             let kind=try db.entityKind(sourceID)
             guard try db.entityKind(destinationID)==kind else {throw OSwindError.invalid("Merge entities of the same kind")}
-            guard let source=try entity(sourceID),let destination=try entity(destinationID) else {throw OSwindError.invalid("Entity no longer exists")}
-            let details=[destination.detail,source.detail].filter {!$0.isEmpty};let detail=Array(NSOrderedSet(array:details)).compactMap {$0 as? String}.joined(separator:"\n\n")
+            let details=try [db.entityNotes(destinationID),db.entityNotes(sourceID)].filter {!$0.isEmpty};let detail=Array(NSOrderedSet(array:details)).compactMap {$0 as? String}.joined(separator:"\n\n")
             guard detail.utf8.count<=8000 else {throw OSwindError.invalid("Merged notes would exceed 8 KiB; edit notes first")}
             let aliases=try db.entityAliases(sourceID)+db.entityAliases(destinationID)
             guard Set(aliases.map(EntityLabel.key)).count<=32 else {throw OSwindError.invalid("Merged entity would exceed 32 aliases")}
             let mentions=try db.statement("INSERT OR IGNORE INTO entity_mentions SELECT memory_id,?,origin,revision,start,length,surface,method FROM entity_mentions WHERE entity_id=?");defer {sqlite3_finalize(mentions)};db.bind(mentions,1,destinationID);db.bind(mentions,2,sourceID);try db.done(mentions)
+            if kind == .project {
+                let negatives=try db.statement("INSERT OR IGNORE INTO entity_project_ignored SELECT memory_id,? FROM entity_project_ignored WHERE entity_id=?");defer {sqlite3_finalize(negatives)};db.bind(negatives,1,destinationID);db.bind(negatives,2,sourceID);try db.done(negatives)
+            }
             let move=try db.statement("UPDATE entity_aliases SET entity_id=? WHERE entity_id=?");defer {sqlite3_finalize(move)};db.bind(move,1,destinationID);db.bind(move,2,sourceID);try db.done(move)
             let curate=try db.statement("UPDATE memory_entities SET curated=1,detail=? WHERE id=?");defer {sqlite3_finalize(curate)};db.bind(curate,1,detail);db.bind(curate,2,destinationID);try db.done(curate)
             let remove=try db.statement("DELETE FROM memory_entities WHERE id=?");defer {sqlite3_finalize(remove)};db.bind(remove,1,sourceID);try db.done(remove)
@@ -110,16 +129,22 @@ extension MemoryStore {
     }
     public func linkEntity(_ id:String,to memoryID:String)throws {
         try entityWrite {db in
-            _=try db.entityKind(id);guard let memory=try get(memoryID),memory.searchPreview==nil else {throw OSwindError.invalid("Source no longer exists")}
+            let previous=try db.entityDefinition(id);guard let memory=try get(memoryID),memory.searchPreview==nil else {throw OSwindError.invalid("Source no longer exists")}
             let row=try db.statement("INSERT INTO entity_mentions VALUES(?,?,'manual',?,-1,0,'','manual') ON CONFLICT(memory_id,entity_id,origin) DO UPDATE SET revision=excluded.revision");defer {sqlite3_finalize(row)};db.bind(row,1,memoryID);db.bind(row,2,id);db.bind(row,3,memory.entityRevision);try db.done(row)
             let unignore=try db.statement("DELETE FROM entity_ignored WHERE memory_id=? AND (kind,key) IN (SELECT kind,key FROM entity_aliases WHERE entity_id=?)");defer {sqlite3_finalize(unignore)};db.bind(unignore,1,memoryID);db.bind(unignore,2,id);try db.done(unignore)
+            let projectIgnore=try db.statement("DELETE FROM entity_project_ignored WHERE memory_id=? AND entity_id=?");defer {sqlite3_finalize(projectIgnore)};db.bind(projectIgnore,1,memoryID);db.bind(projectIgnore,2,id);try db.done(projectIgnore)
             let curate=try db.statement("UPDATE memory_entities SET curated=1 WHERE id=?");defer {sqlite3_finalize(curate)};db.bind(curate,1,id);try db.done(curate)
+            if previous.kind == .project && !previous.curated {try db.bumpEntityRules()}
         }
     }
     public func unlinkEntity(_ id:String,from memoryID:String)throws {
         try entityWrite {db in
             let kind=try db.entityKind(id)
+            if kind == .project {
+                let ignore=try db.statement("INSERT OR IGNORE INTO entity_project_ignored VALUES(?,?)");defer {sqlite3_finalize(ignore)};db.bind(ignore,1,memoryID);db.bind(ignore,2,id);try db.done(ignore)
+            } else {
             let ignore=try db.statement("INSERT OR IGNORE INTO entity_ignored SELECT ?,kind,key FROM entity_aliases WHERE entity_id=?");defer {sqlite3_finalize(ignore)};db.bind(ignore,1,memoryID);db.bind(ignore,2,id);try db.done(ignore)
+            }
             let row=try db.statement("DELETE FROM entity_mentions WHERE memory_id=? AND entity_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,memoryID);db.bind(row,2,id);try db.done(row)
             if kind != .project {let prune=try db.statement("DELETE FROM memory_entities WHERE id=? AND curated=0 AND NOT EXISTS(SELECT 1 FROM entity_mentions WHERE entity_id=?)");defer {sqlite3_finalize(prune)};db.bind(prune,1,id);db.bind(prune,2,id);try db.done(prune)}
         }

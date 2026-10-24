@@ -48,20 +48,49 @@ enum EntitySchema {
     CREATE TRIGGER IF NOT EXISTS entity_scope_update AFTER UPDATE ON entity_mentions BEGIN UPDATE search_scope_revision SET revision=randomblob(16) WHERE singleton=1; END;
     CREATE TABLE IF NOT EXISTS entity_index_state(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE,processor TEXT NOT NULL,limited INTEGER NOT NULL CHECK(limited IN (0,1)));
     CREATE TABLE IF NOT EXISTS entity_ignored(memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,kind TEXT NOT NULL,key TEXT NOT NULL,PRIMARY KEY(memory_id,kind,key));
+    CREATE TABLE IF NOT EXISTS entity_project_ignored(memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,entity_id TEXT NOT NULL REFERENCES memory_entities(id) ON DELETE CASCADE,PRIMARY KEY(memory_id,entity_id));
+    CREATE INDEX IF NOT EXISTS entity_project_ignored_owner ON entity_project_ignored(entity_id,memory_id);
+    DROP TRIGGER IF EXISTS entity_project_source_revision;
+    CREATE TRIGGER IF NOT EXISTS entity_project_rejection_insert BEFORE INSERT ON entity_mentions
+    WHEN new.origin='automatic' AND EXISTS(SELECT 1 FROM entity_project_ignored WHERE memory_id=new.memory_id AND entity_id=new.entity_id)
+    BEGIN SELECT RAISE(IGNORE); END;
+    CREATE TRIGGER IF NOT EXISTS entity_project_rejection_update BEFORE UPDATE OF memory_id,entity_id,origin ON entity_mentions
+    WHEN new.origin='automatic' AND EXISTS(SELECT 1 FROM entity_project_ignored WHERE memory_id=new.memory_id AND entity_id=new.entity_id)
+    BEGIN SELECT RAISE(IGNORE); END;
+    CREATE TRIGGER IF NOT EXISTS entity_project_rejection_apply AFTER INSERT ON entity_project_ignored
+    BEGIN DELETE FROM entity_mentions WHERE memory_id=new.memory_id AND entity_id=new.entity_id AND origin='automatic'; END;
     INSERT INTO store_metadata(key,value) VALUES('entity_rules_revision',lower(hex(randomblob(16)))) ON CONFLICT(key) DO NOTHING;
-    CREATE TRIGGER IF NOT EXISTS entity_source_delete BEFORE DELETE ON memories BEGIN
-        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
+    DROP TRIGGER IF EXISTS entity_source_delete;
+    CREATE TRIGGER entity_source_delete BEFORE DELETE ON memories BEGIN
+        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id UNION SELECT entity_id FROM entity_project_ignored WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id) AND NOT EXISTS(SELECT 1 FROM entity_project_ignored e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
         DELETE FROM entity_mentions WHERE memory_id=old.id;
         DELETE FROM entity_index_state WHERE memory_id=old.id;
         DELETE FROM entity_ignored WHERE memory_id=old.id;
+        DELETE FROM entity_project_ignored WHERE memory_id=old.id;
     END;
-    CREATE TRIGGER IF NOT EXISTS entity_source_revision BEFORE UPDATE OF id,title,app,text,url,timestamp,kind ON memories
+    DROP TRIGGER IF EXISTS entity_source_revision;
+    CREATE TRIGGER entity_source_revision BEFORE UPDATE OF id,title,app,text,url,timestamp,kind ON memories
     WHEN old.id IS NOT new.id OR old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind
     BEGIN
-        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
+        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id UNION SELECT entity_id FROM entity_project_ignored WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id) AND NOT EXISTS(SELECT 1 FROM entity_project_ignored e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
         DELETE FROM entity_mentions WHERE memory_id=old.id;
         DELETE FROM entity_index_state WHERE memory_id=old.id;
         DELETE FROM entity_ignored WHERE memory_id=old.id;
+        DELETE FROM entity_project_ignored WHERE memory_id=old.id;
     END;
+    """
+    // Legacy labels have a unique owner within a kind. Bind only known project
+    // aliases, leaving unmapped legacy feedback intact rather than guessing IDs.
+    static let migrateProjectRejections="""
+    INSERT OR IGNORE INTO entity_project_ignored(memory_id,entity_id)
+        SELECT i.memory_id,a.entity_id FROM entity_ignored i
+        JOIN entity_aliases a ON a.kind=i.kind AND a.key=i.key
+        JOIN memory_entities e ON e.id=a.entity_id AND e.kind='project'
+        WHERE i.kind='project';
+    DELETE FROM entity_ignored WHERE kind='project' AND EXISTS(
+        SELECT 1 FROM entity_aliases a JOIN memory_entities e ON e.id=a.entity_id AND e.kind='project'
+        WHERE a.kind='project' AND a.key=entity_ignored.key);
+    DELETE FROM entity_mentions WHERE origin='automatic' AND (memory_id,entity_id) IN
+        (SELECT memory_id,entity_id FROM entity_project_ignored);
     """
 }
