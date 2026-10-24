@@ -1,0 +1,195 @@
+{
+  "format": "OSwind full-library wipe and recovery v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
+  "schema_version": 16,
+  "features": [
+    "Streaming descriptor-relative retained-media inventory includes orphan files before atomic history deletion",
+    "Durable queue and wipe completion marker preserve partial file/cache/directory/compaction failures",
+    "Counts sources, derived recaps, conversation turns/sessions, routines and routine runs separately",
+    "Stop before commit rolls back; stop after commit returns actual erased counts and sealed pending work",
+    "Retry preserves new sources, live shared references and new orphan files rather than resweeping the library",
+    "Cross-process shared media leases cover screenshot retention, audio admission and replay final copies; full wipe/retry reserve exclusively before database locks",
+    "Native background progress, stop/retry, busy guards, quiet settings, service shutdown and cancellation of old note/import/answer/index work",
+    "Pinned root identity and postcommit replacement guard preserve unrelated replacement folders",
+    "Interrupted wipe recovery does not synchronously drain files in store initialization; automatic services and maintenance wait for pending cleanup"
+  ],
+  "validation": {
+    "full_suite": {
+      "total": 467,
+      "passed": 461,
+      "opt_in_skipped": 6,
+      "failures": 0
+    },
+    "focused_thread_sanitizer": {
+      "passed": 138,
+      "failures": 0
+    },
+    "actual_process": {
+      "format": "OSwind full-library wipe process v1",
+      "binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a",
+      "schema_version": 16,
+      "older_writer": {
+        "binary_sha256": "062bdb2180c022ae9fa358bd1c5c619191d33eff101545725e41176943b9c798",
+        "source_schema": 15,
+        "target_schema": 16,
+        "upgrade_identity_preserved": true,
+        "refusal_database_bytes_preserved": true
+      },
+      "invalid_inputs_preserve_history": true,
+      "shared_admission_delays_wipe_without_blocking_reads_or_note_writes": true,
+      "referenced_and_orphan_media_deleted": 4,
+      "unsafe_symlink_queued_target_preserved": true,
+      "retry_preserves_new_sources_live_media_and_orphans": true,
+      "sigint_before_commit_preserves_history": true,
+      "integrity_and_foreign_keys_pass": true,
+      "interruptions": [
+        {
+          "signal": "SIGINT",
+          "remaining_files_equal_durable_queue": 10000,
+          "retry_complete": true,
+          "source_deletion_committed": true
+        },
+        {
+          "signal": "SIGKILL",
+          "remaining_files_equal_durable_queue": 10000,
+          "retry_complete": true,
+          "source_deletion_committed": true
+        }
+      ],
+      "limits": [
+        "Owned fixture and cooperative admission protocol; raw SQLite/manual file writers and already-open older executables are outside fencing",
+        "SIGINT/SIGKILL are process interruption tests, not storage-power failure or secure SSD wiping",
+        "Not native clicks, capture power or competitor evidence"
+      ]
+    },
+    "release_regressions": [
+      {
+        "name": "wipe-process",
+        "passed": true
+      },
+      {
+        "name": "recap-process",
+        "passed": true
+      },
+      {
+        "name": "recap-qwen",
+        "passed": true
+      },
+      {
+        "name": "deletion",
+        "passed": true
+      },
+      {
+        "name": "erasure",
+        "passed": true
+      },
+      {
+        "name": "backup",
+        "passed": true
+      },
+      {
+        "name": "search",
+        "passed": true
+      },
+      {
+        "name": "routines",
+        "passed": true
+      },
+      {
+        "name": "markdown",
+        "passed": true
+      },
+      {
+        "name": "audio",
+        "passed": true
+      },
+      {
+        "name": "visual",
+        "passed": true
+      }
+    ],
+    "actual_local_qwen_recap_regression": {
+      "format": "OSwind linked recap process v1",
+      "answers": [
+        {
+          "text": "Maya owns the checklist, and it is due on Friday [1].",
+          "provider": "ollama",
+          "duration": 0.2633860111236572,
+          "warnings": []
+        },
+        {
+          "text": "The recorded content in \"Saved release\" is an AI-generated saved recap of a summary, noting that Maya owns a checklist due on Friday [1]. No specific details about what was recorded beyond this summary are provided.",
+          "provider": "ollama",
+          "duration": 0.45787692070007324,
+          "warnings": [
+            "Saved recaps are AI-generated copies. Their timestamps show when saved; open linked originals to verify facts and dates."
+          ]
+        }
+      ],
+      "binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a",
+      "schema_version": 16,
+      "provider": "ollama",
+      "specific_turn_save_and_second_level_chain": true,
+      "saved_time_warning": true,
+      "scope_preview_closure": true,
+      "json_roundtrip_links_preserved": true,
+      "filtered_import_omits_dependent_recaps": true,
+      "markdown_links_resolve": true,
+      "filtered_markdown_omits_recaps_and_cited_turns": true,
+      "full_backup_restores_links": true,
+      "source_revision_and_erasure_remove_chain": true,
+      "sqlite_integrity_pass": true,
+      "older_writer": null,
+      "limits": [
+        "Owned fixtures and pinned executables; not native clicks, natural answer quality, secure SSD wiping or already-open older-process fencing"
+      ]
+    },
+    "controlled_regressions_retained": {
+      "before_fix_opening_killed_recap_wipe_drained_queue_synchronously": true,
+      "fault_injection_unit_and_actual_SIGKILL_reproductions": true,
+      "fixed_final_unit_and_signed_release_process_pass": true
+    }
+  },
+  "render": {
+    "source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
+    "binary_sha256": "f355e30cfeb5de9518cf3ce270a49e657b5a70eddf3e6c0a6932a8578a12bf9b",
+    "owned_synthetic_libraries": true,
+    "actual_controller_success_and_pending_operations": true,
+    "light_and_dark": true,
+    "native_click_acceptance": false,
+    "normal_library_opened": false
+  },
+  "package_install_binding": {
+    "source_commit": "184efd602b151b2b93b3fc6e1ce5f4e36ddec0e0",
+    "schema_version": 16,
+    "installed_path": "/Applications/OSwind.app",
+    "prior_version_backup": ".artifacts/installed-before-library-wipe-184efd6.app",
+    "strict_signature_verified": true,
+    "installed_launched": false,
+    "normal_library_opened": false,
+    "binaries": {
+      "OSwind": "9c720d24618931f412ded717c970b60adbf25c88103235a071f114949463fbe6",
+      "oswindctl": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a"
+    },
+    "raw_build_binaries": {
+      "OSwind": "0a58c29421a5dfcfc9470193695609a8a393dbfef7bf27872ac921350070e240",
+      "oswindctl": "5c7c592a42d043b9d0d90e4e3d7aae870ae7d9691dcfd6a8051ebec5a0a2a78c"
+    },
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures from disposable copies; normalize only __LINKEDIT vmsize. Compare all remaining bytes.",
+    "zip_sha256": "44d5e673054ca45366e70217963e99367be9106890ad7e83f56bce8e52df6993",
+    "zip_binary_equality_verified": true
+  },
+  "limits": [
+    "Owned synthetic fixtures and cooperative admission; manual producers must use mediaWriteLease, fresh older writers refuse schema16 but already-open older processes/raw SQL or files are not fully fenced",
+    "Cutoff is the database deletion transaction; later independent client writes are new history, CLI does not remotely stop other apps",
+    "Keys/settings/downloaded models/external exports/backups remain; native action turns capture-on-launch/API/scheduler off",
+    "Native clicks/focus/accessibility acceptance pending while locked; controller tests and offscreen renders are separate evidence",
+    "Process SIGINT/SIGKILL recovery is not a storage power-loss or secure SSD wipe proof",
+    "No natural capture power, completed24h, competitor/topthree or broad parity claim"
+  ]
+}
