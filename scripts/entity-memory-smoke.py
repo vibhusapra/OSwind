@@ -4,7 +4,7 @@
 Project-alias matching has an independent deterministic oracle. Native NLP names
 are observed, not scored as verified identities or a representative benchmark.
 """
-import argparse,contextlib,hashlib,json,pathlib,select,sqlite3,subprocess,time
+import argparse,contextlib,hashlib,http.client,json,pathlib,select,socket,sqlite3,subprocess,time,urllib.parse
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',required=True,type=pathlib.Path)
@@ -66,6 +66,33 @@ finally:
     process.stdin.close()
     try:assert process.wait(timeout=15)==0
     except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10);raise
+# Authenticated loopback HTTP binds only after an independent vacancy check.
+with socket.socket() as probe:assert probe.connect_ex(('127.0.0.1',47831))!=0,'Test API port already in use'
+server=subprocess.Popen([str(binary),'--data',str(library),'serve'],stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,text=True)
+try:
+    deadline=time.monotonic()+15
+    def http(path,authorized=True):
+        token=(library/'api-token').read_text()
+        connection=http.client.HTTPConnection('127.0.0.1',47831,timeout=3)
+        try:
+            connection.request('GET',path,headers={'Host':'127.0.0.1:47831',**({'Authorization':'Bearer '+token} if authorized else {})})
+            response=connection.getresponse();return response.status,json.loads(response.read())
+        finally:connection.close()
+    while True:
+        assert server.poll() is None,'Owned API server exited'
+        try:
+            if http('/health')[0]==200:break
+        except (OSError,FileNotFoundError):pass
+        assert time.monotonic()<deadline,'Owned API startup timeout';time.sleep(.05)
+    status,groups=http('/v1/entities?kind=project');assert status==200 and groups[0]['id']==project['id']
+    status,linked=http('/v1/entity-sources?'+urllib.parse.urlencode({'id':project['id']}));assert status==200 and len(linked)==100
+    status,result=http('/v1/search?'+urllib.parse.urlencode({'entity':project['id'],'mode':'keyword','literal':'true','limit':100}))
+    assert status==200 and {h['memory']['id'] for h in result['hits']}<=expected-{rejected}
+    assert http('/v1/entities',authorized=False)[0]==401
+finally:
+    server.terminate()
+    try:server.wait(timeout=10)
+    except subprocess.TimeoutExpired:server.kill();server.wait(timeout=10);raise
 archive=root/'archive.oswindbackup';restored=root/'restored'
 run('--data',library,'backup','create',archive);run('backup','restore',archive,'--to',restored)
 assert members(restored)==expected-{rejected}
@@ -76,5 +103,5 @@ assert cmd('entity','progress',data=restored)['indexed']==0
 assert cmd('entity','index',data=restored)['indexed']==1000;assert members(restored)==expected-{rejected}
 cmd('delete',sorted(expected)[1]);assert sorted(expected)[1] not in members()
 cmd('wipe','--confirm','DELETE-ALL');assert cmd('entity','list')==[]
-report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old),harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','schema20 client refusal','correction survives rule-rescan','read-only MCP membership and validation','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
+report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old),harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','schema20 client refusal','correction survives rule-rescan','read-only MCP membership and validation','authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
 (root/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

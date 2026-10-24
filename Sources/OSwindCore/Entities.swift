@@ -26,9 +26,9 @@ public struct ProjectEntityRule:Codable,Sendable {public var id:String,name:Stri
 public struct EntityIndexPlan:Sendable {public var revision:String,projects:[ProjectEntityRule]}
 public enum EntityLabel {
     public static func clean(_ value:String) throws ->String {
-        let result=value.components(separatedBy:.whitespacesAndNewlines).filter {!$0.isEmpty}.joined(separator:" ")
+        let result=value.components(separatedBy:.whitespacesAndNewlines).filter {!$0.isEmpty}.joined(separator:" ").precomposedStringWithCanonicalMapping
         guard !result.isEmpty,result.utf8.count<=240,!result.unicodeScalars.contains(where:{$0.properties.generalCategory == .control}) else {throw OSwindError.invalid("Use an entity name of 1–240 UTF-8 bytes")}
-        return result.precomposedStringWithCanonicalMapping
+        return result
     }
     public static func key(_ value:String)->String {value.precomposedStringWithCanonicalMapping.lowercased(with:Locale(identifier:"en_US_POSIX"))}
 }

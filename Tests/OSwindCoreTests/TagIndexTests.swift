@@ -63,7 +63,7 @@ final class TagIndexTests:XCTestCase {
         _=try store.saveVectors([VectorRecord(memory:try XCTUnwrap(before),vector:[1,0])],modelID:"fixture")
         let chat=try store.createChat();_=try store.appendChatTurn(sessionID:chat.id,question:"What?",answer:Answer(text:"Owned [1]",sources:[SearchHit(memory:try XCTUnwrap(before),score:1,match:"fixture")],provider:"fixture",duration:0))
         try removeProjection();try store.close();store=try MemoryStore(root:store.root)
-        XCTAssertEqual(try store.get("owned"),before);XCTAssertEqual(try scalar("PRAGMA user_version"),"20");XCTAssertEqual(try scalar("SELECT value FROM store_metadata WHERE key='identity'"),identity)
+        XCTAssertEqual(try store.get("owned"),before);XCTAssertEqual(try scalar("PRAGMA user_version"),String(MemoryStore.schemaVersion));XCTAssertEqual(try scalar("SELECT value FROM store_metadata WHERE key='identity'"),identity)
         XCTAssertEqual(try store.vectorCount(modelID:"fixture"),1);XCTAssertEqual(try store.chatTurns(chat.id).count,1);try aligned()
     }
     func removeProjection() throws {

@@ -164,7 +164,7 @@ private final class RestoreRows {
         })
         _ = try copy("entity_ignored",columns:["memory_id","kind","key"],into:handle,validate:{row in
             _ = try self.cachedMemory(self.source.db.text(row,0));let key=try self.source.db.text(row,2)
-            guard EntityKind(rawValue:try self.source.db.text(row,1)) != nil,try EntityLabel.clean(key)==key,EntityLabel.key(key)==key else {throw BackupFileError.invalid("Invalid rejected entity label")}
+            guard EntityKind(rawValue:try self.source.db.text(row,1)) != nil,!key.isEmpty,key.utf8.count<=720,!key.unicodeScalars.contains(where:{$0.properties.generalCategory == .control}),EntityLabel.key(key)==key else {throw BackupFileError.invalid("Invalid rejected entity label")}
         })
         // Index completion is derived and is rebuilt under this machine's NLP
         // version and fresh project-rule revision. Curated metadata is retained.

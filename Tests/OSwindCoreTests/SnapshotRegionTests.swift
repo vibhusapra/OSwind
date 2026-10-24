@@ -88,7 +88,7 @@ final class SnapshotRegionTests:XCTestCase {
         XCTAssertEqual(MemoryStore.schemaVersion,21);XCTAssertEqual(try reopened.get("owned-scope-fence")?.text,"Owned source remains");XCTAssertEqual(AppSettings.load(root:root),settings)
         try reopened.withRoutineDatabase {db in
             let statement=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(statement)}
-            XCTAssertEqual(sqlite3_step(statement),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(statement,0),20)
+            XCTAssertEqual(sqlite3_step(statement),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(statement,0),Int32(MemoryStore.schemaVersion))
         }
     }
     func testQuietRestorationPreservesScopeWithoutStartingCapture() throws {

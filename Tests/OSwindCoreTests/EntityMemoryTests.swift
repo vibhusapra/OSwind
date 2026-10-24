@@ -188,4 +188,19 @@ final class EntityMemoryTests:XCTestCase {
         let found=try EntityExtractor.extract(long,plan:.init(revision:"owned",projects:[.init(id:"long",name:long,aliases:[long])]))
         XCTAssertTrue(found.candidates.contains {$0.projectID=="long"})
     }
+    func testUnicodeCaseExpansionCorrectionSurvivesBackupRestore() throws {
+        let name=String(repeating:"İ",count:120),m=try source(text:name)
+        XCTAssertEqual(name.utf8.count,240);XCTAssertEqual(EntityLabel.key(name).utf8.count,360)
+        try store.saveEntityExtraction(memory:m,plan:store.entityIndexPlan(),result:.init(candidates:[candidate(m,name:name)]))
+        let e=try XCTUnwrap(store.entities().first);try store.unlinkEntity(e.id,from:m.id)
+        let parent=root.deletingLastPathComponent().appendingPathComponent("entity-unicode-"+UUID().uuidString);try Paths.ensure(parent);defer {try? FileManager.default.removeItem(at:parent)}
+        let archive=parent.appendingPathComponent("archive.oswindbackup"),destination=parent.appendingPathComponent("restored")
+        _=try LibraryBackup.create(store:store,destination:archive);_=try LibraryBackup.restore(archive,to:destination)
+        let copy=try MemoryStore(root:destination);defer {try? copy.close()}
+        try copy.saveEntityExtraction(memory:m,plan:copy.entityIndexPlan(),result:.init(candidates:[candidate(m,name:name)]));XCTAssertTrue(try copy.entities().isEmpty)
+    }
+    func testNameBoundAppliesAfterCanonicalNormalization() throws {
+        XCTAssertThrowsError(try EntityLabel.clean(String(repeating:"\u{0344}",count:120)))
+        let clean=try EntityLabel.clean(" Cafe\u{301}\nLaunch ");XCTAssertEqual(clean,"Café Launch")
+    }
 }
