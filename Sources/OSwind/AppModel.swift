@@ -209,6 +209,9 @@ import UniformTypeIdentifiers
     func focusSearch() {
         cancelOpeningMemory(); section = "Memories"; showSettings = false; selected = nil
         searchFocusRequest = UUID()
+        // Returning from a non-search section can change the effective scope
+        // without changing query text, so the cached hits must be refreshed.
+        refresh()
     }
     @Published var selectedPassage: PassageRange?
     @Published var selectedVisual:VisualMatch?
