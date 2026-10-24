@@ -3,8 +3,8 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version20 fences older capture clients that would ignore region settings.
-    public static let schemaVersion = 20
+    // Version21 fences clients that cannot preserve or erase curated entity data.
+    public static let schemaVersion = 21
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -135,6 +135,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
+        try exec(EntitySchema.sql)
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
@@ -291,6 +292,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let end = filter.end { parts.append("\(prefix)timestamp<?"); values.append(String(end.timeIntervalSince1970)) }
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM memory_tags t WHERE t.memory_id=\(prefix)id AND t.tag=?)"); values.append(tag) }
+        if let entity=filter.entityID { parts.append("EXISTS (SELECT 1 FROM entity_mentions e WHERE e.memory_id=\(prefix)id AND e.entity_id=?)"); values.append(entity) }
         if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
         if let constraint = expression?.constraint {
             if expression?.materialized == true { parts.append("\(prefix)id IN (SELECT id FROM temp.search_expression_scope)") }

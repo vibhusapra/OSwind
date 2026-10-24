@@ -25,7 +25,7 @@ func emit(_ object: Any) throws { let data = try JSONSerialization.data(withJSON
 func encoded<T: Encodable>(_ object: T) throws { try emit(Integration.json(object)) }
 func searchFilter() throws -> SearchFilter {
     var values = [String:Any]()
-    let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--speaker","speaker"),("--limit","limit")]
+    let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--speaker","speaker"),("--entity","entity"),("--limit","limit")]
     for (flag,name) in fields {
         guard args.filter({$0 == flag}).count <= 1 else { throw OSwindError.invalid("Use \(flag) only once") }
         if args.contains(flag) {
@@ -73,6 +73,9 @@ do {
           routine template|put FILE|list|history [ID]  Configure scheduled source-linked recaps
           routine run ID|tick [--at ISO8601]           Run once or process one due occurrence
           routine scheduler on|off|preview ID|delete ID
+          entity list|sources ID|create KIND NAME|edit ID --name NAME  Local people/project labels
+          entity index|progress|link ID SOURCE|unlink ID SOURCE|merge ID --into ID|delete ID
+          search --entity ID WORDS        Retrieve only sources linked to that entity
           note TEXT                      Save a redacted, searchable note
           activity --month YYYY-MM [--day YYYY-MM-DD] [--time-zone ID]  Complete daily/hourly saved-source counts
           stats                          Storage and capture counts
@@ -352,6 +355,7 @@ do {
     } else {
         let store = try MemoryStore(root:root), embedder = LocalEmbedder()
         switch command {
+        case "entity":try emit(await entitiesCLI(args,store:store))
         case "routine":
             try emit(await routinesCLI(args,store:store,embedder:embedder))
         case "index-search":

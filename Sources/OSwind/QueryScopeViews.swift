@@ -63,6 +63,7 @@ struct RecordedScopeView: View {
         if let kind = filter.kind { parts.append(kind.rawValue.capitalized) }
         if filter.favoritesOnly { parts.append("Saved") }
         if let tag = filter.tag { parts.append("#"+tag) }
+        if let entity=filter.entityID {parts.append("Entity: "+entity)}
         if let speaker=filter.speaker { parts.append("Speaker: "+speaker) }
         if let start = filter.start { parts.append("From "+formatter.string(from:start)) }
         if let end = filter.end { parts.append("Before "+formatter.string(from:end)) }

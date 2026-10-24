@@ -16,7 +16,7 @@ struct WorkspaceView: View {
                 ScrollViewReader {navigation in
                     ScrollView {
                         VStack(spacing:0) {
-                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Calendar","calendar"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
+                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Calendar","calendar"),("People & projects","person.2"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
                     Button { m.section = item.0; m.refresh() } label: { HStack(spacing:12) { Image(systemName:item.1).frame(width:20); Text(item.0); Spacer(); if item.0 == "Memories" { Text("\(m.stats.count)").font(.caption).monospacedDigit() } }.padding(.horizontal,14).padding(.vertical,11).background(m.section == item.0 ? accent.opacity(0.16) : .clear,in:RoundedRectangle(cornerRadius:9)) }.buttonStyle(.plain).padding(.horizontal,12).padding(.bottom,3).id(item.0)
                 }
                         }
@@ -48,13 +48,15 @@ struct WorkspaceView: View {
                     Button { m.toggleCapture() } label: { Label(m.isCapturing ? "Pause" : "Resume",systemImage:m.isCapturing ? "pause.fill" : "play.fill") }.buttonStyle(.bordered)
                 }.padding(.horizontal,30).padding(.vertical,18)
                 Divider().opacity(0.5)
-                if m.section == "Ask" { AskView() }
+                if let scope=m.entityScope {HStack {Label("Sources linked to "+scope.name,systemImage:"person.crop.rectangle.stack").font(.caption);Spacer();Button("Clear scope") {m.entityScope=nil;m.refresh()}}.padding(.horizontal,28).padding(.vertical,10).background(accent.opacity(0.08))}
+                if m.section == "People & projects" {EntityMemoryView(model:m.entityMemory).environmentObject(m)}
+                else if m.section == "Ask" { AskView() }
                 else if m.section == "Routines" { RoutinesView(model:m.routines) }
                 else if m.section == "Insights" { InsightsView() }
                 else if m.section == "Calendar" {ActivityCalendarView(model:m.activity).environmentObject(m)}
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "Calendar" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="People & projects" {Text("Local suggestions · source-linked")}else if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "People & projects" && m.section != "Calendar" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
@@ -137,6 +139,7 @@ struct TimelineStrip: View {
     var body: some View { VStack(spacing:8) { HStack(spacing:2) { ForEach(Array(ordered.enumerated()),id:\.element.id) { index,memory in Button { position = Double(index); open(memory) } label: { RoundedRectangle(cornerRadius:2).fill(memory.kind == .audio ? Color.orange.opacity(0.5) : accent.opacity(0.6)).frame(minWidth:2,maxWidth:.infinity).frame(height:CGFloat(16 + (index % 4)*6)) }.buttonStyle(.plain).help(memory.title) } }.frame(height:36); Slider(value:$position,in:0...Double(max(1,ordered.count-1)),step:1) { editing in if !editing { open(ordered[min(Int(position),ordered.count-1)]) } }; HStack { Text(ordered.first!.timestamp,style:.time); Spacer(); Text("\(ordered.count) captured moments"); Spacer(); Text(ordered.last!.timestamp,style:.time) }.font(.caption2).foregroundStyle(.secondary) }.padding(15).background(.quaternary.opacity(0.4),in:RoundedRectangle(cornerRadius:12)) }
 }
 struct MemoryDetail: View {
+    @State private var showEntityLink=false
     @EnvironmentObject var m: AppModel
     @Environment(\.dismiss) var dismiss
     let memory: Memory
@@ -163,9 +166,9 @@ struct MemoryDetail: View {
                 if memory.visualRecording==nil && ((memory.transcript?.segments.isEmpty ?? true) || memory.transcript?.segments.allSatisfy({$0.text == "[REDACTED]"}) == true) { Text(memory.text).textSelection(.enabled).font(.system(size:14)).frame(maxWidth:.infinity,alignment:.leading).padding(.top,12) }
             }
             if let url = memory.url, let parsed = URL(string:url), ["https","http"].contains(parsed.scheme) { Link(url,destination:parsed).font(.caption).lineLimit(1) }
-            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() }.disabled(m.deletingID != nil || m.maintenanceBusy) }
+            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Link to entity") {showEntityLink=true}; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() }.disabled(m.deletingID != nil || m.maintenanceBusy) }
             Text("Source \(memory.id)").font(.system(size:10,design:.monospaced)).foregroundStyle(.tertiary).textSelection(.enabled)
-        }.padding(24).frame(width:850,height:760).onAppear { tags = memory.tags.joined(separator:", ") }
+        }.padding(24).frame(width:850,height:760).onAppear { tags = memory.tags.joined(separator:", ") }.sheet(isPresented:$showEntityLink) {EntityLinkSheet(sourceID:memory.id).environmentObject(m)}
     }
 }
 struct AskView: View {
