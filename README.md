@@ -1,8 +1,10 @@
 # OSwind
 
-Source schema19 adds [local visual memory search](docs/VISUAL-SEARCH.md): retained screenshots and replay frames, source-validated image/frame matches, CLI/HTTP/MCP, native setup/search controls and background catch-up. Optional [SigLIP2 Core ML models](docs/VISUAL-MODELS.md) can be prepared from native settings or the packaged CLI, with pinned public downloads, local CPU/GPU qualification, cancel/crash cleanup and idle-release controls. Labeled desktop relevance, energy, native interaction and full competitor ranking remain open.
+Source schema20 adds [persistent display selection and snapshot crop regions](docs/CAPTURE-REGIONS.md): selected display UUIDs, window/display percentage crops, no substitution for disconnected screens, and explicit refusal of wider replay fallbacks. Empty selections idle before app-context reads; malformed saved areas block capture. The compatibility fence prevents older clients that ignore crops from opening the library. Snapshot/replay accessibility traversal is [bounded and off the UI thread](docs/ACCESSIBILITY-CAPTURE.md).
 
-The latest [snapshot-admission increment](benchmarks/snapshot-admission-v1.json) has **605 distinct passing tests / six remaining opt-in skips**, 72 focused TSan passes and six signed-release regression groups. [Context and domain checks](docs/CAPTURE-PRIVACY.md) cover delayed snapshots, private file admission and normalized host rules; native browser/device/energy gates remain open. Model setup retains its 14 packaged checks and real conversion interruption/retry evidence. The earlier [100-photo/501-query visual trial](benchmarks/visual-memory-v1.json) achieves 91.62% R@1 and 99.40% R@5, with 14.27/16.10 ms median/p95 source-validating queries on M5 Max. This is a small fixture, with no desktop or competitor-ranking claim. The installed schema17 app remains unchanged; native interaction, physical capture/power and broader acceptance remain open.
+The latest [qualified capture candidate](benchmarks/capture-regions-v1.json) has **643 distinct passing cases / six remaining opt-in cases**, **142 TSan passes** and **eight signed process groups**, with a separately staged signed package. Physical crop alignment, mixed-DPI/hotplug, native interaction and energy remain acceptance gates; the installed schema17 app is unchanged.
+
+[Local visual memory](docs/VISUAL-SEARCH.md) indexes retained screenshots and replay frames with validated source/image/frame matches, CLI/HTTP/MCP and native background controls. Optional [SigLIP2 Core ML models](docs/VISUAL-MODELS.md) use pinned public preparation tools, local CPU/GPU qualification and cancellation/retry. The earlier [100-photo/501-query trial](benchmarks/visual-memory-v1.json) reaches 91.62% R@1 and 99.40% R@5 with 14.27/16.10 ms median/p95 queries on M5 Max. This small fixture does not establish desktop relevance or competitor placement.
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
@@ -12,7 +14,6 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 *Native sample workspace rendered for layout review; these are synthetic memories.*
 
-Latest screen-capture performance increment: **624 distinct passing cases / six opt-in cases remaining**, **111 TSan passes**, with a separately staged signed package and process checks. Snapshot/replay AX traversal is bounded and off the UI thread; see the [evidence and remaining gates](benchmarks/accessibility-capture-v1.json). Native capture availability and energy are still unmeasured for this increment.
 
 ## Build & run
 
@@ -31,6 +32,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 ## What v0 contains
 
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).
+- [Display selection and crop regions](docs/CAPTURE-REGIONS.md) preserve chosen display identities, crop window/display snapshots before OCR, and refuse wider replay fallbacks. Native crop alignment and hardware acceptance remain open.
 - [Bounded accessibility reads](docs/ACCESSIBILITY-CAPTURE.md) keep snapshot/replay tree traversal off the UI thread; cancellation and fail-closed work budgets preserve capture boundaries. Audio-reader migration and physical availability/energy measurements remain open.
 - [Source-linked saved recaps](docs/RECAPS.md), with original evidence anchors, revision checks, transitive erasure and privacy-aware JSON/Markdown portability.
 - [Frozen natural-speech evaluation](docs/HELDOUT-EVALUATION.md): public plans, independent DER/WER scorers and model-free CI contracts. Both frozen test runs are complete with retained failures and regressions; this is not a competitor ranking.

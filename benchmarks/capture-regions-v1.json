@@ -1,0 +1,251 @@
+{
+  "format": "OSwind selected-display and snapshot-region v1",
+  "codeCommit": "0c15f09b4ec392aee02ec5a23a1830ba2ba8c2a7",
+  "schema": 20,
+  "hardware": "Apple M5 Max",
+  "os": "26.6.2",
+  "scope": "Owned source/settings/pixel fixtures, native model/encrypted-library runs, render-only sample components and separately staged signed app. No installation, native input, physical crop/energy or competitor acceptance.",
+  "implementation": {
+    "displaySelection": "Canonical macOS display UUIDs; nil means all, empty means none; no substitution for unavailable identities",
+    "regionCoordinates": "Normalized fractions from top-left; display-local point rectangles; inward complete-pixel window bitmap crops",
+    "displayMasksRetained": true,
+    "newInventoryChecksSourceAndMaskTogether": true,
+    "fullWindowAXTextOmittedFromRegionsAndDisplaySnapshots": true,
+    "appTitleURLMetadataStillAttached": true,
+    "windowCropCapturesFullWindowInMemoryBeforeCropping": true,
+    "croppedOrDisplayReplayImplemented": false,
+    "uncroppedReplayFallbackRefused": true,
+    "emptyDisplayScopeIdlesBeforeContextAndDiscovery": true,
+    "malformedSavedRegionPolicyBlocked": true,
+    "unreadableExistingSettingsBlockScreenCaptureAndAutomaticMaintenance": true,
+    "olderSchema19ClientRefusesSchema20": true
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 649,
+      "passed": 622,
+      "optInSkipped": 27,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 113,
+      "additionalPreviouslySkipped": 21,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 643,
+    "remainingOptInSkips": 6,
+    "threadSanitizer": {
+      "passed": 142,
+      "failures": 0,
+      "racesReported": 0
+    }
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema20 display selection/crop snapshot source; no installation or native capture/input acceptance",
+    "codeCommit": "0c15f09b4ec392aee02ec5a23a1830ba2ba8c2a7",
+    "schema": 20,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "6ce84defddc689b332be5bf7a0d22f25be831c625914f8ca8a055235ea662c93",
+        "signedSHA256": "bd293ee0bb14a1497e678d8f6f531cc4d8816a08732fcb7209f3397280080c7d",
+        "normalizedPayloadSHA256": "1242876fcc516701eeb38785c83f9a081aab65b6f311958be59ef31f8ce641bc"
+      },
+      "oswindctl": {
+        "rawSHA256": "b3c64823253ba56fa7dbe50737dcb5e812e739615850ae2b97c1f54705e58e83",
+        "signedSHA256": "6bb726f9de3fe823366ecf8ecf3e8a24e4d0d4a075a762efda84df24c9543c75",
+        "normalizedPayloadSHA256": "84d05f1912243bd5b3eacff1f584c68a6fbd2a278ecc5d470b059806ac300b7f"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "0e57f497484350a8e9acec3a28c8d97b7936f804e5782864d42923518d04373a",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "c9df0355de284ee58a8b38bba4e42ad1af20607ef3baf6f52620cf4c0432774d",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalQualificationRuns": [
+    {
+      "name": "native-optin-v2",
+      "exitCode": 0,
+      "wallSeconds": 109.27640445809811
+    },
+    {
+      "name": "release-build-v2",
+      "exitCode": 0,
+      "wallSeconds": 41.048322667134926
+    },
+    {
+      "name": "package-proof-v2",
+      "exitCode": 0,
+      "wallSeconds": 1.5351931671611965
+    },
+    {
+      "name": "domain-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 0.6645375420339406
+    },
+    {
+      "name": "replay-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 1.5274156250525266
+    },
+    {
+      "name": "integration-v2",
+      "exitCode": 0,
+      "wallSeconds": 0.3795757500920445
+    },
+    {
+      "name": "integration-indexed-v2",
+      "exitCode": 0,
+      "wallSeconds": 1.0604621248785406
+    },
+    {
+      "name": "capture-region-process-v3",
+      "exitCode": 0,
+      "wallSeconds": 0.32161225005984306
+    },
+    {
+      "name": "vault-process-v3",
+      "exitCode": 0,
+      "wallSeconds": 14.26681337505579
+    },
+    {
+      "name": "wipe-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 0.6577130840159953
+    },
+    {
+      "name": "backup-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 0.8774807918816805
+    },
+    {
+      "name": "tsan-v2",
+      "exitCode": 0,
+      "wallSeconds": 54.5195589158684
+    }
+  ],
+  "captureRegionCompatibilityProcess": {
+    "format": "OSwind capture-region compatibility v1",
+    "scope": "Owned synthetic source/settings, library compatibility refusal and quiet backup/restore. No pixels, normal library, credentials or native input.",
+    "binarySHA256": "6bb726f9de3fe823366ecf8ecf3e8a24e4d0d4a075a762efda84df24c9543c75",
+    "checks": [
+      "schema19 upgrades to20 with exact source identity/text and unchanged settings bytes",
+      "actual signed schema19 CLI refuses read/write with unchanged logical schema, sources and region settings",
+      "quiet backup restore preserves exact selected identities and both crop scopes without starting capture or API"
+    ],
+    "olderBinarySHA256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+    "actualOlderSchema19Creator": true,
+    "state": "completed",
+    "sourceSchema": 19,
+    "targetSchema": 20,
+    "physicalCaptureClaimed": false
+  },
+  "domainImportProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "6bb726f9de3fe823366ecf8ecf3e8a24e4d0d4a075a762efda84df24c9543c75",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "vaultProcess": {
+    "state": "completed",
+    "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+    "checks": [
+      "create initializes and detaches, public handle closed",
+      "closed handle refuses plaintext fallback",
+      "wrong passphrase refused without attachment",
+      "managed handle writes and retrieves on verified volume",
+      "supplied actual older writer refuses the current schema without changing DB bytes",
+      "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+      "explicit plaintext backup/Markdown export, private source staging cleaned",
+      "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+      "retry detaches after reader closes",
+      "verified native migration remounts with history and retains original",
+      "missing source refuses before destination creation",
+      "renamed attached package remains visibly attached despite stale OS image path",
+      "relocatable public handle still reaches the current schema and fences supplied older writer after rename",
+      "moved package closes public handle and normally unmounts/ejects verified backing device",
+      "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+    ],
+    "binary_sha256": "6bb726f9de3fe823366ecf8ecf3e8a24e4d0d4a075a762efda84df24c9543c75",
+    "schema_version": 20,
+    "old_binary_sha256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+    "verified_detached": true,
+    "passphrase_persisted": false,
+    "normal_library_opened": false,
+    "cleanup_detached": true
+  },
+  "renders": {
+    "source": "7030c55b4b5735e9d3d1d106315008cc85757ce7",
+    "relevantRenderInputsByteIdenticalToFinal": true,
+    "runs": [
+      {
+        "section": "SnapshotRegions",
+        "appearance": "light",
+        "exitCode": 0,
+        "sha256": "4fe9882bd41d13fea53feb5f6972e0fcbba1137dcad88941308c31e23b8dfaf9"
+      },
+      {
+        "section": "SnapshotRegions",
+        "appearance": "dark",
+        "exitCode": 0,
+        "sha256": "0cbbd3eefeec3033ae7c97fba3427c0be760cfc1dd1897ca3a1bf59617e318d8"
+      },
+      {
+        "section": "SnapshotDisplayRegions",
+        "appearance": "light",
+        "exitCode": 0,
+        "sha256": "b2368a7a2c76f8f2e05fae531ff17d1981ee4f0b60ac00fa473af25012013928"
+      },
+      {
+        "section": "SnapshotDisplayRegions",
+        "appearance": "dark",
+        "exitCode": 0,
+        "sha256": "d1e7e5ab635ba3ec3069613feef7aa4eb7809b14961a68d7c84f9a179b2f3dc3"
+      }
+    ],
+    "allFourVisuallyReviewed": true,
+    "nativeInputClaimed": false
+  },
+  "retainedFailure": {
+    "attempt": "vault process v1 on earlier candidate7030c55",
+    "cause": "Harness schema probe retained a SQLite connection because the transaction context manager did not close it; vault correctly refused detach",
+    "fix": "Use explicit closing context managers in both public process harnesses",
+    "harnessFixCommit": "33bc4ac",
+    "ownedFailedFixtureCleanup": "Normal lock retried after harness exit; backing-device absence independently verified; no forced detach",
+    "freshVaultReruns": "Both subsequent owned fixtures pass including current source"
+  },
+  "nativeBoundary": {
+    "freshDoctorScreenLocked": true,
+    "newPhysicalCropOrInputAcceptance": false,
+    "installedSchema17Unchanged": true,
+    "normalHistoryOpened": false,
+    "realKeychainCredentialsUsed": false,
+    "authenticationOrPermissionChanges": false
+  },
+  "remainingGates": [
+    "Physical ScreenCaptureKit crop alignment and negative-origin/mixed-DPI/portrait displays",
+    "Hotplug/rotation/virtual-display behavior",
+    "Unlocked native picker/fields/keyboard acceptance",
+    "Active capture latency, energy and window-crop acquisition cost",
+    "Cropped/all-display replay",
+    "Audio synchronous AX lifecycle migration",
+    "Broad feature parity and matched competitor ranking"
+  ]
+}

@@ -33,7 +33,8 @@ public struct CaptureMetrics: Sendable {
     @Published public private(set) var metrics = CaptureMetrics()
     public var settings: AppSettings {
         didSet {
-            guard settings.profile != oldValue.profile || settings.visualCaptureMode != oldValue.visualCaptureMode || settings.allDisplays != oldValue.allDisplays || settings.privacy != oldValue.privacy else {return}
+            guard settings.profile != oldValue.profile || settings.visualCaptureMode != oldValue.visualCaptureMode || settings.allDisplays != oldValue.allDisplays || settings.snapshotRegions != oldValue.snapshotRegions || settings.privacy != oldValue.privacy else {return}
+            if settings.snapshotRegions != oldValue.snapshotRegions {fingerprints.removeAll()}
             epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
             cancelSnapshotWork()
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
@@ -65,8 +66,11 @@ public struct CaptureMetrics: Sendable {
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
+    private var noDisplaysSelected:Bool {settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true}
     private func configureMode() {
-        if settings.visualCaptureMode == .replay && !settings.allDisplays {
+        guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
+        guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
+        if settings.visualCaptureMode == .replay && !settings.allDisplays && settings.snapshotRegions.focusedWindowCrop==nil {
             timer?.invalidate();timer=nil;replay?.stop();
             let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
             replay=session;session.start()
@@ -76,6 +80,9 @@ public struct CaptureMetrics: Sendable {
     /// Explicit bounded replay, including a chosen app. Existing permissions
     /// only; never prompts or falls through to a different app when absent.
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
+        guard settings.snapshotRegions.valid else {throw OSwindError.invalid("Invalid capture area; choose a new area in Settings")}
+        guard !settings.allDisplays else {throw OSwindError.invalid("Replay requires focused-window mode; turn off display capture first")}
+        guard settings.snapshotRegions.focusedWindowCrop==nil else {throw OSwindError.invalid("Focused-window replay cannot use a crop; choose snapshots or clear the crop")}
         guard seconds.isFinite,seconds>=1,seconds<=120,!running,!busy,!suspended else {throw OSwindError.invalid("Replay requires 1–120 seconds and an idle controller")}
         guard !SessionState.locked,CGPreflightScreenCaptureAccess() else {throw OSwindError.unavailable("Replay needs an unlocked session and existing Screen Recording access")}
         let previousSaved=metrics.saved,previousErrors=metrics.errors
@@ -112,8 +119,11 @@ public struct CaptureMetrics: Sendable {
         return now
     }
     public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
-        guard manual || settings.visualCaptureMode != .replay || settings.allDisplays else {return}
+        guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
+        guard manual || settings.visualCaptureMode != .replay || settings.allDisplays || settings.snapshotRegions.focusedWindowCrop != nil else {return}
+        guard targetBundleID==nil || !settings.allDisplays else {status="Targeted app capture requires focused-window mode";return}
         guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
+        guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
         guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
         guard !snapshots.locked() else {status="Locked · capture suspended";return}
         guard snapshots.permitted() else {status="Screen Recording permission required";return}
@@ -135,7 +145,8 @@ public struct CaptureMetrics: Sendable {
                 let image=try await frame.capture()
                 guard await snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
                 guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
-                guard let captured=await snapshotContext(context,token:token,manual:manual,target:targetBundleID) else {return}
+                guard var captured=await snapshotContext(context,token:token,manual:manual,target:targetBundleID) else {return}
+                if !frame.includeAccessibilityText {captured.accessibilityText=""}
                 let pixels=Self.fingerprint(image)
                 if !manual,let old=fingerprints[frame.display],Self.difference(old,pixels)<2.0 {metrics.unchanged+=1;status="Unchanged · skipped";continue}
                 let policy=settings.privacy,quality=settings.profile.jpegQuality,recognize=snapshots.recognize,localEmbedder=embedder,mediaStore=store,title=frame.title,display=frame.display
