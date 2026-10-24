@@ -179,8 +179,8 @@
     "id": "F023",
     "axis": "Retrieval",
     "feature": "Calendar heatmap",
-    "status": "todo",
-    "evidence": "Date picker present, month heatmap absent",
+    "status": "partial",
+    "evidence": "Complete Gregorian month and selected-day hour counts, app/kind/saved scope, exact UTC search/Ask drilldown and metadata-only CLI/HTTP/MCP. DST repeated/skipped dates and partial-hour transitions; utility cancellation, active revision refresh and vault/erasure clearing. Synthetic count-oracle and native component renders; tag JSON scans, first-open index progress, native keyboard/VoiceOver and energy acceptance remain open",
     "references": "ScreenMemory"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "649-case normal suite (622 pass/27 opt-in skips), separate native/model run adds21 cases (643 distinct pass/six remaining skips),142 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "676-case normal suite (648 pass/28 opt-in skips),140-case native/model run adds22 cases (670 distinct pass/six remaining skips),169 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

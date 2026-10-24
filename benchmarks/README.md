@@ -2,6 +2,27 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Complete calendar counts
+
+[Activity calendar evidence](activity-calendar-v1.json) covers complete month and selected-day hour counts on 100k/year, 100k/month and one-million/year synthetic archives, with 1 KiB source text. An independent Python zoneinfo oracle checks every count and exact 23-hour-day boundary. Each sample starts a fresh CLI process; aggregation time includes validation, utility scheduling and SQL, while wall time and process peak RSS include startup. Caches and background activity are uncontrolled. Tag scope still reads JSON payloads and is slower; no capture, inference, battery or competitor ranking follows from these counts.
+
+```bash
+python3 scripts/benchmark-activity.py /absolute/path/oswindctl \
+  --root /new/owned/benchmark-directory --sources 1000000 --repetitions 7
+```
+
+The harness refuses an existing unmarked root. `--reuse-owned` requires the exact generated marker/workload; a new `--output` preserves earlier results. Derived indexes add a one-time first-open cost; evidence retains separately cloned pre-index archives, logical payload checks and first/repeated open timings. Those trials hash the payloads before opening and therefore do not measure cold caches.
+
+Release aggregation medians/p95 (milliseconds; seven fresh CLI processes per scope):
+
+| Archive | All | App | Kind | Saved | Tag |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 100k across year | 1.53 / 2.65 | 0.96 / 1.84 | 0.88 / 1.31 | 0.77 / 1.13 | 16.75 / 149.94 |
+| 100k across month | 11.62 / 45.70 | 4.38 / 20.92 | 3.42 / 6.85 | 2.22 / 3.59 | 173.59 / 2666.66 |
+| 1m across year | 9.98 / 29.55 | 3.98 / 12.50 | 3.07 / 3.54 | 1.98 / 2.54 | 199.96 / 2968.66 |
+
+The one-million/year query matches 84,574 March sources. All-scope CLI wall median is 56.98 ms; tag wall median is 249.43 ms. Across the seven samples p95 is the maximum, a weak tail estimate. Slow first tag samples remain included. Broad tags still need indexed projection; repeated fast samples do not resolve the observed multi-second tail. Raw timing/RSS samples and wide-time-bound cases are in the evidence. The separate one-million-source first-open trial took 1906 ms with index construction and 47 ms on repeat, adding 26,050,560 bytes; logical payload hashes and schema were preserved. These are single warm-cache observations, not startup percentiles.
+
 ## Reproduce retrieval
 
 ```bash

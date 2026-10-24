@@ -139,6 +139,7 @@ jobs:
             .artifacts/statistics-ci.json
             .artifacts/query-scope-ci.json
             .artifacts/domain-privacy-ci.json
+            .artifacts/activity-calendar-ci.json
             .artifacts/passages-apple-ci.json
             .artifacts/backup-process-ci.json
             .artifacts/audio-process-ci.json
