@@ -41,6 +41,8 @@ public final class MemoryStore: @unchecked Sendable {
         );
         CREATE INDEX IF NOT EXISTS memories_time ON memories(timestamp DESC);
         CREATE INDEX IF NOT EXISTS memories_app_time ON memories(app, timestamp DESC);
+        CREATE INDEX IF NOT EXISTS memories_kind_time ON memories(kind, timestamp DESC);
+        CREATE INDEX IF NOT EXISTS memories_favorite_time ON memories(timestamp DESC) WHERE favorite=1;
         CREATE INDEX IF NOT EXISTS memories_embedding_model ON memories(embedding_model);
         CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(id UNINDEXED, title, app, text, tokenize='unicode61 remove_diacritics 2');
         CREATE TRIGGER IF NOT EXISTS memory_insert AFTER INSERT ON memories BEGIN

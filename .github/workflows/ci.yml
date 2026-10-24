@@ -58,6 +58,10 @@ jobs:
         run: |
           python3 scripts/domain-privacy-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-domain-privacy"
           cp "$RUNNER_TEMP/oswind-domain-privacy/report.json" .artifacts/domain-privacy-ci.json
+      - name: Verify complete calendar counts across CLI HTTP and MCP
+        run: |
+          python3 scripts/activity-calendar-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-calendar"
+          cp "$RUNNER_TEMP/oswind-calendar/report.json" .artifacts/activity-calendar-ci.json
       - name: Verify capture area compatibility and quiet portability
         run: |
           python3 scripts/capture-region-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-capture-regions"

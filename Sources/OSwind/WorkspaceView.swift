@@ -13,10 +13,16 @@ struct WorkspaceView: View {
             VStack(alignment:.leading,spacing:0) {
                 HStack(spacing:10) { Image(systemName:"wind").font(.system(size:26,weight:.semibold)).foregroundStyle(accent); Text("OSwind").font(.system(size:24,weight:.semibold,design:.rounded)) }.padding(.horizontal,22).padding(.top,28).padding(.bottom,6)
                 Text("A little more of your memory.").font(.caption).foregroundStyle(.secondary).padding(.horizontal,22).padding(.bottom,30)
-                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
-                    Button { m.section = item.0; m.refresh() } label: { HStack(spacing:12) { Image(systemName:item.1).frame(width:20); Text(item.0); Spacer(); if item.0 == "Memories" { Text("\(m.stats.count)").font(.caption).monospacedDigit() } }.padding(.horizontal,14).padding(.vertical,11).background(m.section == item.0 ? accent.opacity(0.16) : .clear,in:RoundedRectangle(cornerRadius:9)) }.buttonStyle(.plain).padding(.horizontal,12).padding(.bottom,3)
+                ScrollViewReader {navigation in
+                    ScrollView {
+                        VStack(spacing:0) {
+                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Calendar","calendar"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
+                    Button { m.section = item.0; m.refresh() } label: { HStack(spacing:12) { Image(systemName:item.1).frame(width:20); Text(item.0); Spacer(); if item.0 == "Memories" { Text("\(m.stats.count)").font(.caption).monospacedDigit() } }.padding(.horizontal,14).padding(.vertical,11).background(m.section == item.0 ? accent.opacity(0.16) : .clear,in:RoundedRectangle(cornerRadius:9)) }.buttonStyle(.plain).padding(.horizontal,12).padding(.bottom,3).id(item.0)
                 }
-                Spacer()
+                        }
+                    }.scrollIndicators(.hidden)
+                    .onChange(of:m.section) {_,section in navigation.scrollTo(section,anchor:.center)}
+                }
                 VStack(alignment:.leading,spacing:10) {
                     Label(m.demo ? "Sample workspace" : "Stored on this Mac",systemImage:"internaldrive").font(.caption.weight(.medium))
                     Text(m.storageUpdatedAt == nil ? "Measuring storage…" : ByteCountFormatter.string(fromByteCount:m.stats.bytes,countStyle:.file) + " of \(m.settings.privacy.maxStorageGB) GB").font(.caption2).foregroundStyle(.secondary)
@@ -45,9 +51,10 @@ struct WorkspaceView: View {
                 if m.section == "Ask" { AskView() }
                 else if m.section == "Routines" { RoutinesView(model:m.routines) }
                 else if m.section == "Insights" { InsightsView() }
+                else if m.section == "Calendar" {ActivityCalendarView(model:m.activity).environmentObject(m)}
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit(); if !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "Calendar" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
@@ -74,13 +81,16 @@ struct WorkspaceView: View {
                 Text("⌘K").font(.caption).foregroundStyle(.tertiary)
             }.padding(17).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.08)))
             HStack(spacing:12) {
-                Picker("Time",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"],id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
+                Picker("Time",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"]+(m.calendarSlice == nil ? []:["Calendar slice"]),id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
                 if m.range == "Choose day" { DatePicker("Date",selection:$m.date,displayedComponents:.date).labelsHidden().frame(width:120) }
                 Picker("Application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
                 Picker("Search mode",selection:$m.mode) { ForEach(SearchMode.allCases,id:\.self) { Text($0.rawValue.capitalized).tag($0) } }.pickerStyle(.menu).labelsHidden().frame(width:125)
             }
             QueryScopeControls(query:$m.query,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.searchInputError)
+            if m.range=="Calendar slice" {
+                HStack {RecordedScopeView(filter:m.filter,timeZone:m.calendarSliceZone);Spacer();Button("Clear calendar slice") {m.range="All time"}}.font(.caption)
+            }
             ForEach(m.searchWarnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Conversations" { Label(m.audio.status,systemImage:"waveform").font(.caption).foregroundStyle(.secondary) }
             if m.section == "Timeline" && !m.hits.isEmpty { TimelineStrip(hits:m.hits) { memory in let hit=m.hits.first {$0.id==memory.id};m.openMemory(memory,query:m.activeSearchQuery,passage:hit?.passage,visual:hit?.visual) } }
@@ -191,7 +201,7 @@ struct AskView: View {
             if !compact { HStack { Text(m.settings.ai.provider.label).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Choose model") { m.showSettings = true } } }
             HStack(spacing:12) {
                 Text("Search within").font(.caption).foregroundStyle(.secondary)
-                Picker("Answer time range",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"],id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
+                Picker("Answer time range",selection:$m.range) { ForEach(["All time","Today","Yesterday","7 days","Choose day"]+(m.calendarSlice == nil ? []:["Calendar slice"]),id:\.self) { Text($0) } }.labelsHidden().frame(width:125)
                 if m.range == "Choose day" { DatePicker("Answer date",selection:$m.date,displayedComponents:.date).labelsHidden().frame(width:120) }
                 Picker("Answer application",selection:$m.appFilter) { Text("All apps").tag("All apps"); ForEach(m.stats.apps.keys.sorted(),id:\.self) { Text($0).tag($0) } }.labelsHidden().frame(width:160)
                 Spacer()
