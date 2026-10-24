@@ -1,3 +1,4 @@
+import Combine
 import AppKit
 import ScreenCaptureKit
 import Vision
@@ -51,19 +52,19 @@ public struct CaptureMetrics: Sendable {
     private var snapshotPassages:Task<Void,Error>?
     private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel()}
     private var timer: Timer?
-    private var observers = [NSObjectProtocol]()
+    private var observers = [AnyCancellable]()
     private var busy = false
     private var epoch = UUID()
     private var suspended = false
     private var fingerprints = [String: [UInt8]]()
     private var lastCapture = Date.distantPast
-    public convenience init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {self.init(store:store,embedder:embedder,settings:settings,snapshots:SnapshotCaptureEnvironment())}
-    init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings,snapshots:SnapshotCaptureEnvironment) {
+    public convenience init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {self.init(store:store,embedder:embedder,settings:settings,snapshots:SnapshotCaptureEnvironment(),workspaceNotifications:NSWorkspace.shared.notificationCenter)}
+    init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings,snapshots:SnapshotCaptureEnvironment,workspaceNotifications:NotificationCenter=NotificationCenter()) {
         self.store = store; self.embedder = embedder; self.settings = settings;self.snapshots=snapshots
-        let center = NSWorkspace.shared.notificationCenter
-        observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in guard let self, self.running, Date().timeIntervalSince(self.lastCapture) > 1 else { return }; await self.captureOnce() } })
-        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.cancelSnapshotWork();self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
-        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
+        let center = workspaceNotifications
+        observers.append(center.publisher(for:NSWorkspace.didActivateApplicationNotification).sink { [weak self] _ in Task { @MainActor in guard let self, self.running, Date().timeIntervalSince(self.lastCapture) > 1 else { return }; await self.captureOnce() } })
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.publisher(for:name).sink { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.cancelSnapshotWork();self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
+        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.publisher(for:name).sink { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
     private var noDisplaysSelected:Bool {settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true}
