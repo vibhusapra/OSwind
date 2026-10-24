@@ -122,6 +122,14 @@ final class BackupFileTree {
               parts.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." && $0.utf8.count <= 1024 }) else { throw BackupFileError.invalid("Invalid relative backup member path") }
         return parts
     }
+    func privateDirectory(_ relative:String) throws -> BackupFileTree {
+        guard writable else {throw BackupFileError.invalid("Workspace root is read-only")}
+        let parts=try Self.components(relative),file=try directory(parts[...],create:true)
+        return try BackupFileTree(takingDirectory:file,root:root.appendingPathComponent(relative),writable:true)
+    }
+    func identity() throws -> BackupFileStamp {
+        var metadata=stat();guard fstat(descriptor,&metadata)==0 else {throw Self.failure("Cannot inspect workspace directory")};return BackupFileStamp(metadata)
+    }
     private func directory(_ parts: ArraySlice<String>, create: Bool = false) throws -> Int32 {
         var current = openat(descriptor,".",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
         guard current >= 0 else { throw Self.failure("Cannot retain backup directory") }

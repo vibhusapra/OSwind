@@ -98,7 +98,9 @@ with tempfile.TemporaryDirectory(prefix="oswind-markdown-contract-") as temporar
                 else:
                     assert list(root.glob(".oswind-markdown-*")), "Expected unpublished killed job"
                     cli("backup", "cleanup", "--directory", root)
+                    source_cleanup=json.loads(cli("backup", "cleanup", "--directory", library / "audio/.staging"));assert source_cleanup["removed_jobs"]>=1
                 assert not list(root.glob(".oswind-markdown-*")) and not list(root.glob(".oswind-job-*"))
+                assert not list((library / "audio/.staging").iterdir())
             finally:
                 if process.poll() is None:
                     process.kill(); process.wait(timeout=5)

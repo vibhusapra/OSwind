@@ -3,6 +3,7 @@ import AppKit
 import AVFoundation
 import ScreenCaptureKit
 import CoreMedia
+import Darwin
 
 public enum WAV {
     public static func data(samples: [Float], sampleRate: UInt32 = 16000) -> Data {
@@ -18,23 +19,35 @@ public enum Whisper {
     public static func transcribe(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120) async throws -> String {
         try await detailed(file:file,binary:binary,model:model,language:language,timeout:timeout).text
     }
-    public static func detailed(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120) async throws -> SpeechTranscript {
+    public static func detailed(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120,workspaceParent:URL?=nil) async throws -> SpeechTranscript {
         guard timeout.isFinite,timeout>0,FileManager.default.isExecutableFile(atPath:binary),FileManager.default.fileExists(atPath:model) else { throw OSwindError.unavailable("Install whisper.cpp and choose a downloaded ggml model in Settings → Audio") }
         let task=Task.detached(priority:.utility) {
-            _ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-transcription","oswind-audio-chunk"])
-            let scratch=try BackupWorkspace(label:"oswind-transcription"), prefix=scratch.url.appendingPathComponent("transcript")
+            let parent=workspaceParent ?? FileManager.default.temporaryDirectory
+            _ = try BackupWorkspace.cleanupAbandoned(in:parent,labels:["oswind-transcription","oswind-audio-chunk"])
+            let scratch=try BackupWorkspace(in:parent,label:"oswind-transcription"), prefix=scratch.url.appendingPathComponent("transcript")
             defer { withExtendedLifetime(scratch) {} }
             let log=prefix.appendingPathExtension("log"); try Data().write(to:log); let handle=try FileHandle(forWritingTo:log); defer { try? handle.close() }
             let process=Process(); process.executableURL=URL(fileURLWithPath:binary); process.arguments=["-m",model,"-f",file.path,"-l",language,"-oj","-of",prefix.path,"-np","-t","4"]; process.standardOutput=handle; process.standardError=handle
-            try Task.checkCancellation(); try process.run(); defer { if process.isRunning { process.terminate() } }
+            try Task.checkCancellation(); try process.run(); defer { stopOwnedProcess(process) }
             let deadline=ContinuousClock.now.advanced(by:.seconds(timeout))
             while process.isRunning && ContinuousClock.now<deadline { try await Task.sleep(nanoseconds:100_000_000) }
-            if process.isRunning { process.terminate(); throw OSwindError.unavailable("Transcription exceeded its time budget") }
+            if process.isRunning { throw OSwindError.unavailable("Transcription exceeded its time budget") }
             try Task.checkCancellation()
             guard process.terminationStatus==0 else { throw OSwindError.unavailable("whisper.cpp could not transcribe the segment; verify the model and input format") }
             return try parseJSON(scratch.tree.read("transcript.json",limit:32*1024*1024),model:"whisper:"+URL(fileURLWithPath:model).lastPathComponent)
         }
         return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
+    }
+    /// A cancelled subprocess must exit before its plaintext workspace and
+    /// library reservation are released. Runs only in the detached worker.
+    private static func stopOwnedProcess(_ process:Process) {
+        if process.isRunning {
+            process.terminate()
+            let deadline=ProcessInfo.processInfo.systemUptime+2
+            while process.isRunning,ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.01)}
+            if process.isRunning {kill(process.processIdentifier,SIGKILL)}
+        }
+        process.waitUntilExit()
     }
     public static func parseJSON(_ data: Data, model: String) throws -> SpeechTranscript {
         struct Document: Decodable {
@@ -261,17 +274,18 @@ private final class AudioAccumulator: @unchecked Sendable {
         guard !processing else { return }; processing = true; defer { processing = false }
         while !pending.isEmpty {
             let chunk = pending.removeFirst(), token = epoch, config = settings
-            guard let operation=try? BackupWorkspace(label:"oswind-audio-chunk") else { status="Cannot create private audio workspace"; continue }
+            guard let operation=try? await store.libraryWorkspaceAsync("oswind-audio-chunk") else { status="Cannot create private audio workspace"; continue }
             defer { withExtendedLifetime(operation) {} }
+            guard token==epoch,!startup.locked() else {continue}
             let file=operation.url.appendingPathComponent("capture.wav")
             do {
                 try WAV.data(samples: chunk.samples).write(to:file,options:.atomic); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:file.path); defer { try? FileManager.default.removeItem(at: file) }
-                let task = Task { try await recognizer.transcribe(file:file,settings:config) }; transcriptionTask = task
+                let task = Task { try await recognizer.transcribe(file:file,settings:config,workspaceParent:operation.url) }; transcriptionTask = task
                 var transcript = try await task.value; transcriptionTask = nil
                 guard token == epoch && !startup.locked() else { continue }
                 if let context=startup.context(),settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) != nil { continue }
                 transcript=try transcript.bounded(toSourceDuration:Double(chunk.samples.count)/16000)
-                let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:sessionID,embedder:embedder)
+                let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:sessionID,embedder:embedder,admission:operation.mediaActivity)
                 transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
                 do { if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) } }
                 catch { status="Transcript saved · additional indexing pending" }

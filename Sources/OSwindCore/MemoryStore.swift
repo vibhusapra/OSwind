@@ -3,7 +3,7 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 16
+    public static let schemaVersion = 17
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     let mediaRootIdentity:BackupFileStamp
@@ -125,15 +125,29 @@ public final class MemoryStore: @unchecked Sendable {
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
         _ = finishRecapInvalidation()
     }
+    public var isClosed:Bool {lock.lock();defer {lock.unlock()};return db==nil}
+    /// Closes this connection only after supported retained/staging media work
+    /// releases its reservations. Other readers may still prevent volume detach.
+    public func close() throws {
+        if isClosed {return}
+        annCache.stopForClose()
+        let activity:MediaAdmissionLease
+        do {activity=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity)} catch {if isClosed {return};throw error}
+        defer {activity.release()};lock.lock();defer {lock.unlock()}
+        guard let handle=db else {return}
+        metalScopeCache=nil;coverageCache.removeAll()
+        guard sqlite3_close(handle)==SQLITE_OK else {throw OSwindError.unavailable("The library still has active database work. Wait for it to finish and retry closing.")}
+        db=nil
+    }
     deinit { annCache.cancel(); sqlite3_close(db) }
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
         lock.lock();defer {lock.unlock()}
         guard let db else {throw OSwindError.database("Library connection closed")}
         return try body(RoutineDatabase(handle:db))
     }
-    private func exec(_ sql: String) throws { if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
-    private func failure() -> OSwindError { .database(String(cString: sqlite3_errmsg(db))) }
-    private func prepare(_ sql: String) throws -> OpaquePointer { var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
+    private func exec(_ sql: String) throws {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
+    private func failure() -> OSwindError {guard db != nil else {return .unavailable("The library connection is closed")};return .database(String(cString: sqlite3_errmsg(db))) }
+    private func prepare(_ sql: String) throws -> OpaquePointer {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
     private func bind(_ stmt: OpaquePointer, _ index: Int32, _ value: String?) { if let value { sqlite3_bind_text64(stmt,index,value,UInt64(value.utf8.count),transient,UInt8(SQLITE_UTF8)) } else { sqlite3_bind_null(stmt, index) } }
     private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {
@@ -153,6 +167,7 @@ public final class MemoryStore: @unchecked Sendable {
         for path in [memory.imagePath, memory.audioPath,memory.videoPath].compactMap({$0}) { guard assetURL(path) != nil else { throw OSwindError.invalid("Asset path must stay inside the memory store") } }
         // Reserve the writer before reading old evidence. A deferred read then
         // write can fail immediately with SQLITE_BUSY across store connections.
+        guard db != nil else {throw OSwindError.unavailable("The library connection is closed")}
         let ownsTransaction=sqlite3_get_autocommit(db) != 0
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
@@ -494,9 +509,12 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m)
     }
     @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
-    public func diskBytes() -> Int64 {
+    public func diskBytes(includeStaging:Bool=true) -> Int64 {
         guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey]) else { return 0 }
-        var total: Int64 = 0; for case let url as URL in enumerator { if let values = try? url.resourceValues(forKeys: [.fileSizeKey,.isRegularFileKey]), values.isRegularFile == true { total += Int64(values.fileSize ?? 0) } }; return total
+        let staged=["images","audio","video"].map {root.appendingPathComponent($0).appendingPathComponent(".staging").standardizedFileURL.path}
+        var total: Int64 = 0; for case let url as URL in enumerator {
+            if !includeStaging,staged.contains(url.standardizedFileURL.path) {enumerator.skipDescendants();continue}
+            if let values = try? url.resourceValues(forKeys: [.fileSizeKey,.isRegularFileKey]), values.isRegularFile == true { total += Int64(values.fileSize ?? 0) } }; return total
     }
     /// Counts and extrema are a short consistent SQL snapshot. File traversal
     /// runs after releasing the store lock, so it cannot stall capture/search.
@@ -581,7 +599,7 @@ extension MemoryStore {
     }
     public func cancelSearchIndexBuild(pauseAutomatic: Bool = false) { annCache.cancel(pauseAutomatic:pauseAutomatic) }
     public func releaseSearchIndex() { lock.lock(); metalScopeCache = nil; coverageCache.removeAll(); lock.unlock(); annCache.reset() }
-    public func checkpointSearchIndexIfIdle(allowLowPower: Bool = false) throws { try annCache.checkpointIfIdle(allowLowPower:allowLowPower) }
+    public func checkpointSearchIndexIfIdle(allowLowPower: Bool = false) throws {try withRoutineDatabase {_ in try annCache.checkpointIfIdle(allowLowPower:allowLowPower)}}
 }
 
 extension MemoryStore {
@@ -611,6 +629,7 @@ extension MemoryStore {
     @discardableResult public func appendChatTurn(sessionID: String, question: String, answer: Answer, filter: SearchFilter = SearchFilter(), policy: PrivacyPolicy = PrivacyPolicy()) throws -> ChatTurn {
         lock.lock(); defer { lock.unlock() }
         guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, question.count <= 8000, answer.text.count <= 100000, answer.sources.count <= 60 else { throw OSwindError.invalid("Invalid conversation turn size") }
+        guard db != nil else {throw OSwindError.unavailable("The library connection is closed")}
         let ownsTransaction=sqlite3_get_autocommit(db) != 0
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT chat_append")
         do {

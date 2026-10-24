@@ -28,10 +28,10 @@ actor VisualChunkRecorder {
         let interval:Double
         var frames=[VisualFrame]()
         var lastSourceTime:Double
-        init(first:ReplayFrameInput,interval:Double,codec:String,hardware:Bool) throws {
+        init(store:MemoryStore,first:ReplayFrameInput,interval:Double,codec:String,hardware:Bool) throws {
             self.first=first;self.interval=interval;lastSourceTime=first.time
-            workspace=try BackupWorkspace(label:"oswind-visual-recording")
-            encoder=try ReplayVideoEncoder(url:workspace.url.appendingPathComponent("clip.mov"),width:CVPixelBufferGetWidth(first.buffer),height:CVPixelBufferGetHeight(first.buffer),frameInterval:interval,codec:codec,hardwareRequired:hardware)
+            workspace=try store.libraryWorkspace("oswind-visual-recording",bucket:.video)
+            encoder=try ReplayVideoEncoder(url:workspace.url.appendingPathComponent("clip.mov"),width:CVPixelBufferGetWidth(first.buffer),height:CVPixelBufferGetHeight(first.buffer),frameInterval:interval,codec:codec,hardwareRequired:hardware,workspace:workspace)
         }
     }
     private let store:MemoryStore
@@ -74,7 +74,7 @@ actor VisualChunkRecorder {
             if changed || gap || frame.time-current.first.time>=max(5,interval*2) || current.frames.count>=120 || current.frames.reduce(0,{$0+$1.text.count})+clean.text.count>900000 {try await finishCurrent(endAt:frame.time)}
         }
         guard !closed else {return}
-        if chunk==nil {var admitted=frame;admitted.app=privacy.sanitize(frame.app).text;admitted.title=title.text;admitted.url=url.text.isEmpty ? nil:url.text;chunk=try Chunk(first:admitted,interval:interval,codec:codec,hardware:hardware)}
+        if chunk==nil {var admitted=frame;admitted.app=privacy.sanitize(frame.app).text;admitted.title=title.text;admitted.url=url.text.isEmpty ? nil:url.text;chunk=try Chunk(store:store,first:admitted,interval:interval,codec:codec,hardware:hardware)}
         guard let current=chunk else {return}
         let time=frame.time-current.first.time
         let entry=VisualFrame(time:time,text:clean.text,regions:frame.regions)
@@ -88,9 +88,10 @@ actor VisualChunkRecorder {
     func boundary(at time:Double) async throws {await acquire();defer {release()};guard !closed else {return};try await finishCurrent(endAt:time)}
     func close(commit:Bool=true) async throws {
         closed=true
-        if !commit {discarded=true;chunk?.encoder.cancel();pending?.encoder.cancel()}
+        let cancelled=commit ? []:[chunk,pending].compactMap {$0}
+        if !commit {discarded=true;for current in cancelled {current.encoder.cancel()}}
         await acquire();defer {release()}
-        if !commit {chunk=nil;return}
+        if !commit {chunk=nil;for current in cancelled {await current.encoder.waitForCancellation()};return}
         try await finishCurrent(endAt:nil)
     }
     private func finishCurrent(endAt:Double?) async throws {
@@ -106,9 +107,10 @@ actor VisualChunkRecorder {
         var memory=Memory(id:current.id,timestamp:current.first.capturedAt,endTimestamp:current.first.capturedAt.addingTimeInterval(actual),kind:.screen,app:current.first.app,bundleID:current.first.bundle,title:current.first.title,url:current.first.url,text:visual.text,display:current.first.display,regions:current.frames[0].regions)
         memory.visualRecording=visual;memory.videoPath="video/"+current.id+".mov"
         memory.embedding=embedder?.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:embedder?.modelID
-        let lease=try store.mediaWriteLease();defer {lease.release()}
         try gate.commit {
-        let output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+        try store.requireMediaRootIdentity()
+        let output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true),outputIdentity=try output.identity()
+        guard outputIdentity.device==store.mediaRootIdentity.device,outputIdentity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before replay retention")}
         var copied=[String](),committed=false
         defer {if !committed {for path in copied {try? output.remove(path)}}}
         _ = try current.workspace.tree.copy("clip.mov",to:output,as:memory.videoPath!);copied.append(memory.videoPath!)
@@ -123,7 +125,7 @@ actor VisualChunkRecorder {
             }
         }
         guard !discarded else {throw CancellationError()}
-        try store.insert(memory);committed=true
+        try store.requireMediaRootIdentity();try store.insert(memory);committed=true
         }
         await onMemory(memory)
     }

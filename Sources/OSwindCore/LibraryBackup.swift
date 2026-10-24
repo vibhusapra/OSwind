@@ -97,7 +97,7 @@ public enum LibraryBackup {
         _ = try BackupWorkspace.cleanupAbandoned(in:destination.deletingLastPathComponent())
         let source = try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath()), outputParent = try BackupFileTree(root:destination.deletingLastPathComponent())
         guard try !source.isAncestor(of:outputParent) else { throw BackupFileError.invalid("Save the backup outside its source library") }
-        let scratch = try BackupWorkspace(label:"oswind-backup-pins"), output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-backup-partial")
+        let scratch = try store.libraryWorkspace("oswind-backup-pins"), output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-backup-partial")
         defer { withExtendedLifetime(scratch) {} }
         let index = try BackupManifestIndex(scratch.url.appendingPathComponent("manifest-index.sqlite"))
         defer { index.close(); withExtendedLifetime(scratch) {} }
@@ -162,18 +162,18 @@ public enum LibraryBackup {
         let headerData = try encoder.encode(header)
         try output.tree.write(headerData,as:"header.json")
         try progress(LibraryBackupProgress(phase:"Verifying package",completedItems:files,totalItems:total,copiedBytes:copied,attempt:completedAttempt))
-        _ = try inspect(output.url)
+        _ = try inspect(output.url,workspaceParent:scratch.url)
         try progress(LibraryBackupProgress(phase:"Publishing backup",completedItems:files,totalItems:total,copiedBytes:copied,attempt:completedAttempt))
         try source.requireRootIdentity(at:store.root)
         try output.publish(as:destination)
         var result = info; result.archiveFingerprint = BackupSHA256.hex(headerData)
         return result
     }
-    public static func inspect(_ archive: URL, progress: (LibraryBackupProgress) throws -> Void = { _ in }) throws -> LibraryBackupInfo {
+    public static func inspect(_ archive: URL,workspaceParent:URL?=nil, progress: (LibraryBackupProgress) throws -> Void = { _ in }) throws -> LibraryBackupInfo {
         _ = try BackupWorkspace.cleanupAbandoned()
         let tree = try BackupFileTree(root:archive), headerData = try tree.read("header.json",limit:65536)
         let header = try JSONDecoder().decode(LibraryBackupHeader.self,from:headerData); try header.validate()
-        let scratch = try BackupWorkspace(label:"oswind-backup-inspect"), index = try BackupManifestIndex(scratch.url.appendingPathComponent("manifest-index.sqlite"))
+        let scratch = try BackupWorkspace(in:workspaceParent ?? FileManager.default.temporaryDirectory,label:"oswind-backup-inspect"), index = try BackupManifestIndex(scratch.url.appendingPathComponent("manifest-index.sqlite"))
         defer { index.close(); withExtendedLifetime(scratch) {} }
         try index.load(from:tree,expectedCount:header.info.mediaFiles,expectedDigest:header.manifest)
         guard try tree.digest("settings.json") == header.settings else { throw BackupFileError.invalid("Backup settings checksum differs") }

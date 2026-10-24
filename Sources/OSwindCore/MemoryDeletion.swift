@@ -55,7 +55,7 @@ extension MemoryStore {
             let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),dirty=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")
             if initial.sources>0 || pending>0 || dirty>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns)}
             else {result = .init(sources:0,conversationTurns:initial.turns,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:true,warnings:[])}
-            var bytes=diskBytes(),stopped=false
+            var bytes=diskBytes(includeStaging:false),stopped=false
             if let maxBytes,bytes>maxBytes,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
                 // Rebuildable graph storage goes first, before sacrificing source evidence.
                 do {
@@ -63,7 +63,7 @@ extension MemoryStore {
                     result=result.adding(cleanupErasedAssets(db,sources:0,turns:0))
                     if result.searchCacheRemoved {try db.execute("PRAGMA wal_checkpoint(TRUNCATE); VACUUM")}
                 } catch {result=result.warning("Storage compaction did not finish; remaining history was retained.");stopped=true}
-                bytes=diskBytes()
+                bytes=diskBytes(includeStaging:false)
             }
             while let maxBytes,bytes>maxBytes,!stopped,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
                 do {
@@ -75,7 +75,7 @@ extension MemoryStore {
                     // drains once; a failed queue stops further destructive budget trimming.
                     result=result.adding(cleanupErasedAssets(db,sources:batch.sources,turns:batch.turns))
                     if result.pendingMedia==0 {try db.execute("PRAGMA wal_checkpoint(TRUNCATE); VACUUM")}
-                    bytes=diskBytes()
+                    bytes=diskBytes(includeStaging:false)
                 } catch is CancellationError {stopped=true}
                 catch {result=result.warning("Storage cleanup stopped after committed deletions; remaining history was retained.");stopped=true}
             }

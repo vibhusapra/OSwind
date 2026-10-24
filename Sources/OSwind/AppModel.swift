@@ -477,16 +477,16 @@ import UniformTypeIdentifiers
                     guard SpeakerDiarizer.supported else { throw OSwindError.unavailable("Speaker labels require macOS 15 or later") }
                     _ = try configuration.diarization.localDirectory()
                 }
-                let clip=try await AudioClipSnapshot.prepare(file); defer { withExtendedLifetime(clip) {} }
+                let clip=try await AudioClipSnapshot.prepare(file,store:store); defer { withExtendedLifetime(clip) {} }
                 audioImportStatus="Transcribing locally…"
-                var transcript=try await audio.recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800)
+                var transcript=try await audio.recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800,workspaceParent:clip.speechFile.deletingLastPathComponent())
                 try Task.checkCancellation(); transcript=try transcript.bounded(toSourceDuration:clip.duration)
                 if configuration.diarization.enabled {
                     audioImportStatus="Identifying speakers locally…"
                     transcript=try await audio.speakers.annotate(transcript,file:clip.speechFile,configuration:configuration.diarization)
                 }
                 try Task.checkCancellation()
-                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder)
+                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder,admission:clip.mediaActivity)
                 captured(memory); audioImportStatus="Transcript saved · find it in Conversations"
             } catch is CancellationError { audioImportStatus="Import cancelled" }
             catch { audioImportStatus=error.localizedDescription }

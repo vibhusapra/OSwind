@@ -1,5 +1,7 @@
 # OSwind
 
+The installed schema-17 build includes library-scoped temporary work, coordinated close/wipe and source-bounded audio imports. [Release checks and limits](docs/LIBRARY-WORKSPACES.md): 481 unit passes / six opt-in skips, 80 focused TSan passes / one skip, 14 signed process groups. All 17 observed Whisper import failures recover in the repaired build. The [frozen natural evaluations](docs/HELDOUT-EVALUATION.md) retain original results and failures. Vault/migration, physical capture/power, native acceptance and matched competitor ranking remain open.
+
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
 **v0 is in active development.** Broad competitive parity and a top-three ranking are goals; they are not verified claims. See [delivery ledger](docs/PROGRESS.md), [competitive research](docs/landscape.html), and [benchmarks](benchmarks/README.md).

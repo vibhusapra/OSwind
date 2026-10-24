@@ -71,7 +71,7 @@ public enum AudioAdmission {
     /// insert removes only this operation's newly created retained copy.
     public static func save(_ transcript: SpeechTranscript, file: URL, store: MemoryStore, settings: AppSettings,
                             timestamp: Date, source: String, title: String? = nil, sessionID: String? = nil, recordedLive: Bool = true,
-                            embedder: LocalEmbedder? = nil) throws -> Memory {
+                            embedder: LocalEmbedder? = nil,admission:MediaAdmissionLease?=nil) throws -> Memory {
         try Task.checkCancellation()
         let clean=try transcript.sanitized(policy:settings.privacy)
         guard timestamp.timeIntervalSince1970.isFinite,source.count<=512,sessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio source metadata") }
@@ -79,17 +79,25 @@ public enum AudioAdmission {
         var memory=Memory(timestamp:timestamp,endTimestamp:recordedLive ? timestamp.addingTimeInterval(clean.transcript.duration):nil,kind:.audio,app:settings.privacy.sanitize(source).text,title:label,text:clean.transcript.text)
         memory.transcript=clean.transcript; memory.audioSessionID=sessionID
         if let embedder { memory.embedding=embedder.embed(memory.searchableText); memory.embeddingModel=memory.embedding == nil ? nil : embedder.modelID }
-        let lease=try store.mediaWriteLease();defer {lease.release()}
-        var retained: String?, committed=false
-        defer { if !committed,let retained,let url=store.assetURL(retained) { try? FileManager.default.removeItem(at:url) } }
+        let owned:MediaAdmissionLease?
+        if admission==nil {owned=try store.mediaWriteLease()} else {owned=nil}
+        defer {owned?.release()}
+        guard let lease=admission ?? owned else {throw OSwindError.invalid("Audio requires a media reservation")}
+        return try lease.withActive(for:store.mediaRootIdentity) {
+        try store.requireMediaRootIdentity()
+        var retained: String?, committed=false;var ownedOutput:BackupFileTree?
+        defer {if !committed,let retained {try? ownedOutput?.remove(retained)}}
         if settings.retainAudio && !clean.suppressAudio {
             let input=try BackupFileTree(root:file.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
+            let outputIdentity=try output.identity();guard outputIdentity.device==store.mediaRootIdentity.device,outputIdentity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before audio retention")}
+            ownedOutput=output
             let suffix=file.pathExtension.lowercased(); guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio clip needs a supported filename extension") }
             let member="audio/"+UUID().uuidString+"."+suffix; retained=member
             _ = try input.copy(file.lastPathComponent,to:output,as:member)
             memory.audioPath=member
         }
-        try Task.checkCancellation(); try store.insert(memory); committed=true; return memory
+        try Task.checkCancellation();try store.requireMediaRootIdentity();try store.insert(memory);committed=true;return memory
+        }
     }
 }
 
@@ -100,20 +108,22 @@ public final class AudioClipSnapshot: @unchecked Sendable {
     public let file: URL
     public let speechFile: URL
     public let duration: Double
-    public init(source: URL) throws {
+    public var mediaActivity:MediaAdmissionLease? {workspace.mediaActivity}
+    public init(source: URL,store:MemoryStore?=nil) throws {
         guard source.isFileURL else { throw OSwindError.invalid("Choose a local audio file") }
         let suffix=source.pathExtension.lowercased()
         guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio file needs a supported extension") }
-        _ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-audio-import"])
-        let workspace=try BackupWorkspace(label:"oswind-audio-import")
+        let workspace:BackupWorkspace
+        if let store {workspace=try store.libraryWorkspace("oswind-audio-import")}
+        else {_ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-audio-import"]);workspace=try BackupWorkspace(label:"oswind-audio-import")}
         let tree=try BackupFileTree(root:source.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath())
         _ = try tree.pin(source.lastPathComponent,to:workspace.tree,as:"input."+suffix)
         let original=workspace.url.appendingPathComponent("input."+suffix)
         duration=try AudioNormalization.convert(original,to:workspace.tree,as:"speech.wav")
         self.workspace=workspace; file=original; speechFile=workspace.url.appendingPathComponent("speech.wav")
     }
-    public static func prepare(_ source: URL) async throws -> AudioClipSnapshot {
-        let task=Task.detached(priority:.utility) { try AudioClipSnapshot(source:source) }
+    public static func prepare(_ source: URL,store:MemoryStore?=nil) async throws -> AudioClipSnapshot {
+        let task=Task.detached(priority:.utility) { try AudioClipSnapshot(source:source,store:store) }
         return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
     }
 }

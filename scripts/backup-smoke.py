@@ -90,15 +90,18 @@ with tempfile.TemporaryDirectory(prefix='oswind-backup-smoke-') as temporary:
                     if 'Verifying media' in line:
                         active = json.loads(cli('backup','cleanup','--directory',work).stdout)
                         assert active['removed_jobs']==0
+                        active_scratch=json.loads(cli('backup','cleanup','--directory',source/'audio/.staging').stdout);assert active_scratch['removed_jobs']==0
+                        assert list((source/'audio/.staging').glob('.oswind-job-*'))
                         process.send_signal(interrupt); break
                     assert time.monotonic()-started<60, lines
                 output, error = process.communicate(timeout=30)
                 assert process.returncode==(130 if interrupt==signal.SIGINT else -signal.SIGKILL), (process.returncode,lines,error,output)
                 assert not destination.exists()
                 cleanup = json.loads(cli('backup','cleanup','--directory',work).stdout)
-                scratch_cleanup = json.loads(cli('backup','cleanup').stdout)
+                scratch_cleanup = json.loads(cli('backup','cleanup','--directory',source/'audio/.staging').stdout)
+                legacy_cleanup = json.loads(cli('backup','cleanup').stdout)
                 if interrupt==signal.SIGKILL: assert cleanup['removed_jobs']>=1 and scratch_cleanup['removed_jobs']>=1
-                assert not list(work.glob('.oswind-job-*')) and not list(temp.glob('.oswind-job-*'))
+                assert not list(work.glob('.oswind-job-*')) and not list(temp.glob('.oswind-job-*')) and not list((source/'audio/.staging').iterdir())
                 checks.append({'interrupt':signal.Signals(interrupt).name,'elapsed_s':time.monotonic()-started,'destination_jobs_removed':cleanup['removed_jobs'],'scratch_jobs_removed':scratch_cleanup['removed_jobs']})
             finally:
                 if process.poll() is None: process.kill(); process.wait()

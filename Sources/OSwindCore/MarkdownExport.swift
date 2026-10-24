@@ -29,7 +29,7 @@ public enum MarkdownExport {
         let source = try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath())
         let parent = try BackupFileTree(root:destination.deletingLastPathComponent())
         guard try !source.isAncestor(of:parent) else { throw OSwindError.invalid("Save the export outside its source library") }
-        let scratch = try BackupWorkspace(label:"oswind-markdown-snapshot")
+        let scratch = try store.libraryWorkspace("oswind-markdown-snapshot")
         let output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-markdown-partial")
         defer { withExtendedLifetime(scratch) {}; withExtendedLifetime(output) {} }
         try source.requireRootIdentity(at:store.root)

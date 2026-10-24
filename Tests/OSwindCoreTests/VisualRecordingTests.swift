@@ -67,7 +67,7 @@ final class VisualRecordingTests:XCTestCase {
         let recorder=VisualChunkRecorder(store:store,codec:"h264",hardwareRequired:false)
         var excluded=try input(time:0);excluded.secure=true;try await recorder.append(excluded,privacy:PrivacyPolicy(),interval:1)
         try await recorder.append(input(time:1),privacy:PrivacyPolicy(),interval:1);try await recorder.close(commit:false)
-        XCTAssertEqual(try store.matchingCount(),0);XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:directory.appendingPathComponent("video").path).isEmpty)
+        XCTAssertEqual(try store.matchingCount(),0);XCTAssertTrue((FileManager.default.enumerator(at:directory.appendingPathComponent("video"),includingPropertiesForKeys:[.isRegularFileKey])?.allObjects as? [URL] ?? []).allSatisfy { (try? $0.resourceValues(forKeys:[.isRegularFileKey]).isRegularFile) != true })
     }
     func testVideoPathsAndTextMetadataMustAgreeAndRevisionProtectsChats() throws {
         let directory=root();defer {try? FileManager.default.removeItem(at:directory)};let store=try MemoryStore(root:directory)
@@ -83,8 +83,11 @@ final class VisualRecordingTests:XCTestCase {
         let directory=root();defer {try? FileManager.default.removeItem(at:directory)};let store=try MemoryStore(root:directory),gate=ReplayCommitGate()
         let recorder=VisualChunkRecorder(store:store,codec:"h264",hardwareRequired:false,gate:gate)
         try await recorder.append(input(time:0),privacy:PrivacyPolicy(),interval:1)
-        gate.invalidate();try store.deleteAll()
+        gate.invalidate();let waiting=expectation(description:"wipe waits for recorder")
+        let wipe=Task.detached {try store.wipeLibrary {if $0.phase=="Waiting for active media writers" {waiting.fulfill()}}}
+        await fulfillment(of:[waiting],timeout:1)
         do {try await recorder.close();XCTFail("Late commit should be rejected")} catch is CancellationError {}
+        let wiped=try await wipe.value;XCTAssertTrue(wiped.cleanupComplete)
         XCTAssertEqual(try store.matchingCount(),0)
         for folder in ["video","images"] {XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:directory.appendingPathComponent(folder).path).isEmpty)}
         let textOnly=VisualChunkRecorder(store:store,codec:"h264",hardwareRequired:false,gate:gate)
@@ -114,7 +117,7 @@ final class VisualRecordingTests:XCTestCase {
         try await clip.append(input(time:2),privacy:PrivacyPolicy(),interval:1);try await clip.flush()
         let memories=try store.search(SearchFilter(),mode:.keyword).map(\.memory)
         XCTAssertEqual(memories.count,2);XCTAssertEqual(memories.first {$0.videoPath != nil}?.visualRecording?.frames.count,1)
-        try store.deleteAll();XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:directory.appendingPathComponent("video").path).isEmpty)
+        try store.deleteAll();XCTAssertTrue((FileManager.default.enumerator(at:directory.appendingPathComponent("video"),includingPropertiesForKeys:[.isRegularFileKey])?.allObjects as? [URL] ?? []).allSatisfy { (try? $0.resourceValues(forKeys:[.isRegularFileKey]).isRegularFile) != true })
     }
 
     func testCancelledFinalizationNeverCallsWriterAfterCancellation() async throws {
