@@ -77,7 +77,7 @@
       "license": "Proprietary Windows feature; no macOS app.",
       "features": "Opt-in snapshots, timeline, semantic recall and source re-entry; on-device storage; Windows Hello/enclave security; app/site exclusions; private-browsing and sensitive-data filters; time/app/site deletion; storage management and enterprise policy.",
       "difference": "Reference for OS-level security, authentication and local inference. It does not record audio or continuous video.",
-      "caveat": "Browser filtering is browser-dependent. NPU/security requirements limit hardware. Snapshot storage can pause below free-space thresholds. OSwind lacks enclave/vault parity.",
+      "caveat": "Browser filtering is browser-dependent. NPU/security requirements limit hardware. Snapshot storage can pause below free-space thresholds. OSwind now has a managed disk-image vault; enclave security parity remains unproved.",
       "sources": [
         "https://support.microsoft.com/en-us/windows/ai/ai-features/retrace-your-steps-with-recall",
         "https://support.microsoft.com/en-us/windows/privacy/privacy-and-control-over-your-recall-experience",
@@ -103,7 +103,7 @@
       "price": "Free, open source.",
       "license": "Repository linked by publisher; verify exact license before code reuse.",
       "features": "Native Swift; local keyword and AI image/meaning search; highlights and app/date filtering; timeline; Accessibility direct mode; duplicate suppression; thermal backoff; MobileCLIP2 or Ollama embeddings; mic/system Whisper audio; MCP; app exclusions; encrypted vault with Touch ID/password (beta).",
-      "difference": "A particularly relevant native, local, multimodal and energy-conscious competitor. Vault and visual embeddings are meaningful OSwind gaps.",
+      "difference": "A particularly relevant native, local, multimodal and energy-conscious competitor. Vault acceptance and visual embeddings remain meaningful OSwind gaps.",
       "caveat": "macOS 14+, Intel/Apple Silicon per publisher. Vault is beta. No downloaded binary or battery benchmark evaluated here.",
       "sources": [
         "https://timescroll.muzhen.org/",

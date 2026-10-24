@@ -379,8 +379,8 @@
     "id": "F048",
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
-    "status": "todo",
-    "evidence": "Local permissions and FileVault recommendation only",
+    "status": "partial",
+    "evidence": "Schema18 managed AES256 APFS images, fail-closed handles, MEMORY SQLite temps, source-preserving verified encrypted migration, native setup/lock screens and optional user-presence Keychain. Owned native-image/core/session tests; real authentication, native clicks/sleep, package release qualification and platform matrix remain open",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -428,7 +428,7 @@
     "axis": "Data",
     "feature": "Library-scoped transient work and close",
     "status": "tested",
-    "evidence": "Schema17 audio/replay/import/source export scratch, shared lifetime reservations, fullwipe/close waits, explicit SQLite BUSY retry, root identity and deterministic subprocess cleanup.487tests/81TSan plus14signed process groups pass; encrypted vault and SQLite file-temp strategy remain open",
+    "evidence": "Schema17 audio/replay/import/source export scratch, shared lifetime reservations, fullwipe/close waits, explicit SQLite BUSY retry, root identity and deterministic subprocess cleanup.487tests/81TSan plus14signed process groups pass; schema18 encrypted volume and per-connection MEMORY temp policy added; native authentication/release qualification remain open",
     "references": "Library privacy and lifecycle"
   },
   {

@@ -101,6 +101,7 @@ do {
                  Requires a selector; whole overlapping sources, dependent answers and media
           erase retry-media              Retry pending retained-media cleanup
           vault create|unlock|lock|status PACKAGE  Encrypted APFS library; secrets through stdin
+          vault migrate SOURCE --to NEW_PACKAGE --passphrase-stdin  Copy verified history; retain original
           --vault PACKAGE <command>               Use an already-unlocked managed library
           prune [--days N] [--max-gb N] [--json]   Retention with explicit file/budget outcome
           capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
@@ -118,14 +119,21 @@ do {
         """)
     } else if command == "vault" {
         guard selectedVault==nil,let action=args.first else {throw OSwindError.invalid("Use vault create|unlock|lock|status PACKAGE")};args.removeFirst()
-        if action=="create" {
-            let name=try validatedOption("--name") ?? "Private Library",capacityText=try validatedOption("--capacity-gb") ?? "128"
+        if action=="create" || action=="migrate" {
+            let name=try validatedOption("--name") ?? "Private Library",capacityText=try validatedOption("--capacity-gb") ?? "128",target=try validatedOption("--to")
+            guard action=="migrate" ? target != nil:target==nil else {throw OSwindError.invalid("Use vault migrate SOURCE --to NEW_PACKAGE, or vault create NEW_PACKAGE")}
             let keep=args.contains("--keep-unlocked");guard args.filter({$0=="--keep-unlocked"}).count<=1 else {throw OSwindError.invalid("Use --keep-unlocked only once")};args.removeAll {$0=="--keep-unlocked"}
             guard let capacity=Int(capacityText),(1...4096).contains(capacity),args.filter({!$0.hasPrefix("--")}).count==1 else {throw OSwindError.invalid("Use vault create PACKAGE [--name NAME] [--capacity-gb N] --passphrase-stdin [--keep-unlocked]")}
             var secret=try vaultPassphrase();defer {secret.resetBytes(in:0..<secret.count)}
             guard args.count==1 else {throw OSwindError.invalid("Unknown vault option")}
-            let destination=URL(fileURLWithPath:args[0],isDirectory:true),payload=secret
-            do {try encoded(await runVaultCLI {try await LibraryVault.create(at:destination,name:name,capacityGiB:capacity,passphrase:payload,keepUnlocked:keep)})}
+            let destination=URL(fileURLWithPath:target ?? args[0],isDirectory:true),payload=secret
+            do {
+                if action=="migrate" {
+                    let location=LibraryLocationSelection(url:URL(fileURLWithPath:args[0],isDirectory:true),requiresExisting:true,origin:"migration");try location.validate()
+                    let source=try MemoryStore(root:location.url),reporter=BackupCLIProgress();defer {try? source.close()}
+                    try encoded(await runVaultCLI {try await LibraryVault.migrate(from:source,to:destination,name:name,capacityGiB:capacity,passphrase:payload,keepUnlocked:keep,progress:{reporter.update($0)})})
+                } else {try encoded(await runVaultCLI {try await LibraryVault.create(at:destination,name:name,capacityGiB:capacity,passphrase:payload,keepUnlocked:keep)})}
+            }
             catch is CancellationError {FileHandle.standardError.write(Data("Vault operation cancelled. Use vault status before retrying.\n".utf8));exit(130)}
         } else {
             guard ["unlock","lock","status"].contains(action) else {throw OSwindError.invalid("Use vault create, unlock, lock or status")}

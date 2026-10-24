@@ -11,6 +11,10 @@ final class VaultTests:XCTestCase {
         let path=root.appendingPathComponent(name);try Paths.ensure(path);let paths=try VaultPaths(path)
         try paths.write(LibraryVaultInfo(name:"Synthetic vault",capacityGiB:1,volumeUUID:UUID().uuidString),as:VaultPaths.manifestName);try paths.closeAlias();return paths
     }
+    func testMissingManifestInReservedPackageRefusesPlaintextFallback() throws {
+        let package=root.appendingPathComponent("Broken.oswindvault");try Paths.ensure(package)
+        XCTAssertThrowsError(try MemoryStore(root:package));XCTAssertThrowsError(try MemoryStore(root:package.appendingPathComponent("Library")));XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:package.path).isEmpty)
+    }
     func testLockedManagedHandleRefusesStoreBeforeCreatingAnything() throws {
         let paths=try manifest();let before=try FileManager.default.contentsOfDirectory(atPath:paths.package.path).sorted()
         XCTAssertThrowsError(try MemoryStore(root:paths.library));XCTAssertThrowsError(try MemoryStore(root:paths.package))
@@ -82,6 +86,28 @@ final class VaultTests:XCTestCase {
 }
 
 final class NativeVaultTests:XCTestCase {
+    func testOptionalCredentialLifecycleUsesVerifiedPassphraseAndPreservesFallback() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned encrypted fixture with fake credential provider; no real Keychain access")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-vault-credential-"+UUID().uuidString);try Paths.ensure(root)
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8),provider=FixtureVaultSecrets()
+        _=try await LibraryVault.create(at:package,name:"Owned credentials",capacityGiB:1,passphrase:secret)
+        let vault=try LibraryVault(package:package)
+        do {
+            do {_=try await vault.unlockUsingKeychain(using:provider);XCTFail("Unsaved credential was loaded")} catch {}
+            XCTAssertEqual(provider.loads,0)
+            _=try await vault.unlock(passphrase:secret)
+            do {try await vault.rememberPassphrase(Data(UUID().uuidString.utf8),using:provider);XCTFail("Unverified credential was saved")} catch {}
+            XCTAssertEqual(provider.saves,0)
+            provider.failSave=true
+            do {try await vault.rememberPassphrase(secret,using:provider);XCTFail("Failed credential save succeeded")} catch {}
+            let failed=try await vault.status();XCTAssertFalse(failed.info.keychainEnabled)
+            provider.failSave=false;try await vault.rememberPassphrase(secret,using:provider)
+            let saved=try await vault.status();XCTAssertTrue(saved.info.keychainEnabled)
+            _=try await vault.lock();_=try await vault.unlockUsingKeychain(using:provider);XCTAssertEqual(provider.loads,1)
+            try await vault.forgetPassphrase(using:provider);let forgotten=try await vault.status();XCTAssertFalse(forgotten.info.keychainEnabled);XCTAssertNil(provider.secret)
+            _=try await vault.lock();_=try await vault.unlock(passphrase:secret);_=try await vault.lock();try FileManager.default.removeItem(at:root)
+        } catch {_=try? await vault.lock();throw error}
+    }
     func testOwnedEncryptedVolumeAndSQLiteTemporaryPolicies() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Opt in to create an owned local encrypted APFS fixture; no Keychain or normal-library access")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-native-vault-"+UUID().uuidString);try Paths.ensure(root)
@@ -99,7 +125,13 @@ final class NativeVaultTests:XCTestCase {
             let database=try BackupDatabase(workspace!.url.appendingPathComponent("scratch.sqlite"),createPrivate:true);XCTAssertEqual(try database.integer("PRAGMA temp_store"),2);database.close()
             workspace=nil
             print("Owned native vault: close store and detach")
-            let locked=try await vault.lock(store:store);XCTAssertEqual(locked.state,.locked);XCTAssertTrue(store.isClosed);XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
+            let other=try MemoryStore(root:vault.libraryURL)
+            do {_=try await vault.lock(store:store);XCTFail("A competing store must prevent detach")} catch {}
+            XCTAssertTrue(store.isClosed);XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
+            // A closed public alias must not prevent an existing cooperative
+            // reader from releasing its own SQLite connection and media lease.
+            try other.close();XCTAssertTrue(other.isClosed)
+            let locked=try await vault.lock();XCTAssertEqual(locked.state,.locked)
             _=try await vault.unlock(passphrase:secret);let reopened=try MemoryStore(root:vault.libraryURL);XCTAssertEqual(try reopened.get("owned")?.text,"Owned encrypted fixture");_=try await vault.lock(store:reopened)
             try FileManager.default.removeItem(at:root)
         } catch {
@@ -109,4 +141,11 @@ final class NativeVaultTests:XCTestCase {
             throw error
         }
     }
+}
+
+private final class FixtureVaultSecrets:VaultSecretProvider,@unchecked Sendable {
+    var secret:Data?,loads=0,saves=0,failSave=false
+    func save(_ passphrase:Data,vaultID:String) throws {saves+=1;if failSave {throw OSwindError.unavailable("Synthetic credential-save failure")};secret=passphrase}
+    func load(vaultID:String) throws -> Data {loads+=1;guard let secret else {throw OSwindError.unavailable("No synthetic credential")};return secret}
+    func remove(vaultID:String) throws {secret=nil}
 }

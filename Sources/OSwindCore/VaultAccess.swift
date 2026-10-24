@@ -33,7 +33,10 @@ enum VaultAccess {
         // Bind the public handle to its enclosing package before following a
         // marker through a symlink. A redirected handle must not choose a
         // different vault's manifest just because its target has a valid marker.
-        for current in original {var metadata=stat();if lstat(current.appendingPathComponent(VaultPaths.manifestName).path,&metadata)==0 {return try VaultPaths(current)}}
+        for current in original {
+            var metadata=stat();if lstat(current.appendingPathComponent(VaultPaths.manifestName).path,&metadata)==0 {return try VaultPaths(current)}
+            if current.pathExtension.lowercased()=="oswindvault" {throw OSwindError.unavailable("This encrypted-library package has no readable manifest. Its files were preserved; no plaintext library was created.")}
+        }
         let canonical=ancestors(try vaultResolvedURL(url))
         for current in canonical {var metadata=stat();if lstat(current.appendingPathComponent(VaultPaths.manifestName).path,&metadata)==0 {return try VaultPaths(current)}}
         for current in original+canonical {
@@ -73,7 +76,7 @@ enum VaultAccess {
         guard URL(fileURLWithPath:point).standardizedFileURL==root.standardizedFileURL else {throw OSwindError.unavailable("The vault directory is not the verified mounted volume")}
         let values=try root.resourceValues(forKeys:[.volumeUUIDStringKey]);guard values.volumeUUIDString?.caseInsensitiveCompare(info.volumeUUID) == .orderedSame else {throw OSwindError.invalid("The mounted volume identity does not match this vault")}
     }
-    static func temporaryPolicy(at url:URL) throws -> SQLiteTemporaryPolicy {try context(at:url)==nil ? .file:.memory}
+    static func temporaryPolicy(at url:URL) throws -> SQLiteTemporaryPolicy {let context=try context(at:url);return context != nil || initialization != nil ? .memory:.file}
     static func workspace(source:URL,label:String,parent:URL?=nil,allowExternalParent:Bool=false) throws -> BackupWorkspace {
         let sourceContext=try context(at:source)
         if let parent {

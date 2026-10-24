@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 configuration="${1:-release}"
 swift build -c "$configuration"
-app="$PWD/dist/OSwind.app"
+app="${OSWIND_APP_OUTPUT:-$PWD/dist/OSwind.app}"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp ".build/$configuration/OSwind" "$app/Contents/MacOS/OSwind"
 cp ".build/$configuration/oswindctl" "$app/Contents/MacOS/oswindctl"
@@ -29,12 +29,23 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>UTTypeDescription</key><string>OSwind Library Backup</string>
 <key>UTTypeConformsTo</key><array><string>com.apple.package</string></array>
 <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>oswindbackup</string></array></dict>
+</dict><dict>
+<key>UTTypeIdentifier</key><string>com.oswind.vault</string>
+<key>UTTypeDescription</key><string>OSwind Encrypted Library</string>
+<key>UTTypeConformsTo</key><array><string>com.apple.package</string></array>
+<key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>oswindvault</string></array></dict>
 </dict></array>
 <key>CFBundleDocumentTypes</key><array><dict>
 <key>CFBundleTypeName</key><string>OSwind Library Backup</string>
 <key>CFBundleTypeRole</key><string>Viewer</string>
 <key>LSHandlerRank</key><string>Owner</string>
 <key>LSItemContentTypes</key><array><string>com.oswind.backup</string></array>
+<key>LSTypeIsPackage</key><true/>
+</dict><dict>
+<key>CFBundleTypeName</key><string>OSwind Encrypted Library</string>
+<key>CFBundleTypeRole</key><string>Editor</string>
+<key>LSHandlerRank</key><string>Owner</string>
+<key>LSItemContentTypes</key><array><string>com.oswind.vault</string></array>
 <key>LSTypeIsPackage</key><true/>
 </dict></array>
 <key>CFBundleIconFile</key><string>OSwind.icns</string>

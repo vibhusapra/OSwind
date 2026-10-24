@@ -91,13 +91,21 @@ public enum LibraryBackup {
     }
     @discardableResult public static func create(store: MemoryStore, destination: URL, maxAttempts: Int = 3,
                                                  progress: (LibraryBackupProgress) throws -> Void = { _ in }) throws -> LibraryBackupInfo {
+        try createImpl(store:store,destination:destination,maxAttempts:maxAttempts,workspace:nil,progress:progress)
+    }
+    static func createForVaultMigration(store:MemoryStore,destination:URL,workspace:BackupWorkspace,progress:(LibraryBackupProgress) throws -> Void) throws -> LibraryBackupInfo {
+        try createImpl(store:store,destination:destination,maxAttempts:3,workspace:workspace,progress:progress)
+    }
+    private static func createImpl(store:MemoryStore,destination:URL,maxAttempts:Int,workspace supplied:BackupWorkspace?,progress:(LibraryBackupProgress) throws -> Void) throws -> LibraryBackupInfo {
         guard (1...10).contains(maxAttempts), destination.isFileURL else { throw BackupFileError.invalid("Invalid backup destination or retry bound") }
         try BackupWorkspace.requireNewDestination(destination)
         _ = try BackupWorkspace.cleanupAbandoned()
         _ = try BackupWorkspace.cleanupAbandoned(in:destination.deletingLastPathComponent())
         let source = try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath()), outputParent = try BackupFileTree(root:destination.deletingLastPathComponent())
         guard try !source.isAncestor(of:outputParent) else { throw BackupFileError.invalid("Save the backup outside its source library") }
-        let scratch = try store.libraryWorkspace("oswind-backup-pins"), output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-backup-partial")
+        let scratch:BackupWorkspace
+        if let supplied {scratch=supplied} else {scratch=try store.libraryWorkspace("oswind-backup-pins")}
+        let output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-backup-partial")
         defer { withExtendedLifetime(scratch) {} }
         let index = try BackupManifestIndex(scratch.url.appendingPathComponent("manifest-index.sqlite"))
         defer { index.close(); withExtendedLifetime(scratch) {} }

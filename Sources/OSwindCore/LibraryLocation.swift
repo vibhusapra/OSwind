@@ -20,7 +20,14 @@ public enum LibraryLocationPreferences {
         return LibraryLocationSelection(url:Paths.data,requiresExisting:false,origin:"default")
     }
     public static func save(_ url: URL, defaults: UserDefaults = .standard) throws {
-        let selection = LibraryLocationSelection(url:url,requiresExisting:true,origin:"selected"); try selection.validate()
-        defaults.set(url.standardizedFileURL.resolvingSymlinksInPath().path,forKey:key)
+        if let paths=try VaultAccess.package(containing:url) {
+            _=try paths.info()
+            // Retain the stable managed handle even when the image is detached.
+            // Canonicalizing here would save a temporary mount that cannot reopen.
+            defaults.set(paths.library.path,forKey:key)
+        } else {
+            let selection = LibraryLocationSelection(url:url,requiresExisting:true,origin:"selected");try selection.validate()
+            defaults.set(url.standardizedFileURL.resolvingSymlinksInPath().path,forKey:key)
+        }
     }
 }

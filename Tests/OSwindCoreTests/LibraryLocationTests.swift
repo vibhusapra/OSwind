@@ -25,6 +25,13 @@ final class LibraryLocationTests: XCTestCase {
         defaults.removeObject(forKey:LibraryLocationPreferences.key)
         XCTAssertEqual(LibraryLocationPreferences.selection(environment:[:],defaults:defaults).origin,"default")
     }
+    func testLockedVaultSelectionPersistsStableHandleWithoutOpeningDatabase() throws {
+        let package=root.appendingPathComponent("Locked.oswindvault");try Paths.ensure(package);let paths=try VaultPaths(package)
+        try paths.write(LibraryVaultInfo(name:"Owned locked fixture",capacityGiB:1,volumeUUID:UUID().uuidString),as:VaultPaths.manifestName);try paths.closeAlias()
+        try LibraryLocationPreferences.save(package,defaults:defaults);XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),paths.library.path)
+        try LibraryLocationPreferences.save(paths.library,defaults:defaults);XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),paths.library.path)
+        XCTAssertThrowsError(try LibraryLocationPreferences.selection(environment:[:],defaults:defaults).validate());XCTAssertFalse(FileManager.default.fileExists(atPath:package.appendingPathComponent("memory.sqlite").path))
+    }
     func testBackupPackagesCannotBeSelectedAsLiveLibraries() throws {
         let package = root.appendingPathComponent("backup.oswindbackup"); _ = try MemoryStore(root:package)
         try Data("header".utf8).write(to:package.appendingPathComponent("header.json"))

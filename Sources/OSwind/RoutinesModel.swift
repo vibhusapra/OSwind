@@ -37,6 +37,7 @@ import OSwindCore
         timer?.tolerance=min(15,interval/2);tick()
     }
     func stop() {timer?.invalidate();timer=nil;task?.cancel()}
+    func clearForLock() {stop();items.removeAll();history.removeAll();onChange=nil}
     func tick() {guard settings.routinesEnabled else {return};execute(id:nil)}
     func runNow(_ id:String) {execute(id:id)}
     func cancel() {task?.cancel()}

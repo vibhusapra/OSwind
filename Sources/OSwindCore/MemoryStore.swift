@@ -6,6 +6,7 @@ public final class MemoryStore: @unchecked Sendable {
     public static let schemaVersion = 18
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
+    private let managedCloseRoot:URL?
     let mediaRootIdentity:BackupFileStamp
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
@@ -14,6 +15,8 @@ public final class MemoryStore: @unchecked Sendable {
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
+        let managed=try VaultAccess.context(at:root)
+        managedCloseRoot=managed == nil ? nil:try vaultResolvedURL(root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
@@ -133,7 +136,7 @@ public final class MemoryStore: @unchecked Sendable {
         if isClosed {return}
         annCache.stopForClose()
         let activity:MediaAdmissionLease
-        do {activity=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity)} catch {if isClosed {return};throw error}
+        do {activity=try MediaAdmissionLease.acquire(root:managedCloseRoot ?? root,exclusive:true,expectedRoot:mediaRootIdentity)} catch {if isClosed {return};throw error}
         defer {activity.release()};lock.lock();defer {lock.unlock()}
         guard let handle=db else {return}
         metalScopeCache=nil;coverageCache.removeAll()

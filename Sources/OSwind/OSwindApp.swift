@@ -47,6 +47,11 @@ import OSwindCore
         }; return noErr },1,&spec,nil,nil)
     }
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
+    func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
+        guard let session=AppSession.current,session.vaultPackage != nil || session.busy else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
+        Task {@MainActor in let locked=await session.lockForTermination();sender.reply(toApplicationShouldTerminate:locked)}
+        return .terminateLater
+    }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
 @main struct OSwindApp: App {
@@ -55,12 +60,20 @@ import OSwindCore
     var body: some Scene {
         Window("OSwind",id:"main") {
             Group {
-                if let model = session.model { WorkspaceView().environmentObject(model) }
-                else { LibraryRecoveryView(session:session) }
+                if let model=session.model {VStack(spacing:0) {
+                    if !session.message.isEmpty {HStack {Text(session.message).font(.callout);if session.snapshotNeedsReview,let snapshot=session.createdVault {Button("Open snapshot…") {session.open(snapshot)}};Spacer();Button {session.message=""} label:{Image(systemName:"xmark")}.buttonStyle(.plain)}.padding(12).background(OSwindTheme.accent.opacity(0.1))}
+                    WorkspaceView().environmentObject(model).disabled(session.busy)
+                }} else if session.vaultPackage != nil {VaultLockedView(session:session)}
+                else {LibraryRecoveryView(session:session)}
             }.frame(minWidth:1000,minHeight:680).tint(OSwindTheme.accent)
                 .onReceive(NotificationCenter.default.publisher(for:.oswindOpenLibrary)) { event in if let url = event.object as? URL { session.open(url) } }
-                .onReceive(NotificationCenter.default.publisher(for:.oswindChooseLibrary)) { _ in session.choose() }
+                .onReceive(NotificationCenter.default.publisher(for:.oswindChooseLibrary)) {_ in session.choose()}
+                .onReceive(NotificationCenter.default.publisher(for:.oswindCreateVault)) {_ in session.failure=nil;session.message="";session.showVaultSetup=true}
+                .onReceive(NotificationCenter.default.publisher(for:.oswindLockVault)) {_ in session.requestLock()}
+                .onReceive(NotificationCenter.default.publisher(for:.oswindForgetVaultSecret)) {_ in session.forgetKeychain()}
+                .sheet(isPresented:$session.showVaultSetup) {VaultSetupView(session:session)}
                 .onOpenURL { url in
+                    if url.pathExtension.lowercased()=="oswindvault" || (try? LibraryVault.package(containing:url)) != nil {session.open(url);return}
                     if let model = session.model { model.settingsTab = "Data"; model.showSettings = true; model.libraryTransfer.inspect(url) }
                     else { session.recoveryTransfer.inspect(url) }
                 }
@@ -73,7 +86,7 @@ import OSwindCore
             } }
         MenuBarExtra {
             if let model = session.model { LibraryMenuContent().environmentObject(model) }
-            else { VStack(alignment:.leading,spacing:12) { Text("Library unavailable").font(.headline); Button("Open OSwind") {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)}; Button("Quit OSwind") {NSApp.terminate(nil)} }.padding() }
+            else { VStack(alignment:.leading,spacing:12) { Text(session.vaultPackage == nil ? "Library unavailable":"Encrypted library").font(.headline); Button("Open OSwind") {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)}; Button("Quit OSwind") {NSApp.terminate(nil)} }.padding() }
         } label: {
             if let model = session.model { MenuBarIcon().environmentObject(model) }
             else { RecoveryMenuIcon() }
@@ -91,7 +104,8 @@ struct LibraryMenuContent: View {
             Button("Capture now") { Task { await model.captureNow() } }
             Button(model.audio.running ? "Stop audio" : "Start audio") { Task {await model.toggleAudio()} }
             Divider(); Text("\(model.stats.count) memories · stored on this Mac").font(.caption)
-            Button("Quit OSwind") { model.prepareForLibrarySwitch(); NSApp.terminate(nil) }
+            if (try? LibraryVault.package(containing:model.store.root)) != nil {Button("Lock library") {NotificationCenter.default.post(name:.oswindLockVault,object:nil)}}
+            Button("Quit OSwind") {NSApp.terminate(nil)}
         }.padding().frame(width:280)
     }
 }
@@ -106,6 +120,9 @@ extension Notification.Name {
     static let oswindOpenMain = Notification.Name("OSwindOpenMain")
     static let oswindFocusSearch = Notification.Name("OSwindFocusSearch")
     static let oswindOpenLibrary = Notification.Name("OSwindOpenLibrary")
+    static let oswindCreateVault=Notification.Name("OSwindCreateVault")
+    static let oswindLockVault=Notification.Name("OSwindLockVault")
+    static let oswindForgetVaultSecret=Notification.Name("OSwindForgetVaultSecret")
     static let oswindChooseLibrary = Notification.Name("OSwindChooseLibrary")
 }
 struct MenuBarIcon: View {

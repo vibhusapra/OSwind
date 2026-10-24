@@ -23,7 +23,15 @@ public struct LibraryVaultStatus:Codable,Sendable {
     public var state:LibraryVaultState
     public var libraryPath:String
     public var message:String
+    public var volumeMounted:Bool=false
 }
+public struct LibraryVaultMigrationResult:Codable,Sendable {
+    public var status:LibraryVaultStatus
+    public var snapshot:LibraryBackupInfo
+    public var sourceStable:Bool
+    public var originalRetained:Bool=true
+}
+struct VaultMigrationDetails:Sendable {var snapshot:LibraryBackupInfo;var sourceStable:Bool}
 struct VaultSession:Codable,Sendable {
     var version=1
     var vaultID:String
