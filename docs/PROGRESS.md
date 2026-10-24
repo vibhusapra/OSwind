@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Visual indexing controls — source abf9691
+
+Visual model settings preserve active text indexing; changing the actual text model still stops that text job. Changing the shared Low Power indexing policy also cancels a visual job using its earlier policy. Scoped history erasure now cancels manual and automatic visual workers, clears their queue and blocks wake/power catch-up until capture or an explicit rebuild resumes work. The native erase action uses the shared pause helper.
+
+All **16 focused cases and 16 TSan cases pass**, including two real retained-image reservations released by worker cancellation before scoped erasure removes the row and media. [Signed staging evidence](../benchmarks/visual-coordination-v1.json) binds the new GUI to abf9691 with strict signatures, signature-normalized raw payloads and complete 28-file ZIP/bundle equality. Its CLI, resources and Info.plist are byte-identical to the qualified earlier package, so the exact CLI's frozen 100-photo benchmark and ten process groups are retained. The installed schema17 app remains unchanged; new native click/keyboard acceptance remains open.
+
+The preceding [PR #38](https://github.com/vibhusapra/OSwind/pull/38) is mergeable and passed [both independent CI jobs](https://github.com/vibhusapra/OSwind/actions/runs/40088679754) at 83074f2, covering full build/test, actual encrypted-volume/app-session tests, packaging, process regressions, evaluation, rendering and artifact upload. This coordination follow-up has its own CI track.
+
 ## Visual memory index — source 2bc65e7
 
 [Visual search](VISUAL-SEARCH.md) now indexes image-only screenshots and every declared replay frame using the qualified local SigLIP2 model. Schema19 stores complete visual manifests/vectors separately from text embeddings. Current source metadata, real media SHA-256, processor, model and frame revisions are checked before atomic admission and on search/open. Native cards and image detail use protected matched previews; replay detail seeks to the actual matched time. Scoped CLI/HTTP/MCP, native model controls, bounded background indexing/catch-up, power deferral, cancellation, batch/idle release, cascading deletion and validated backup/restore are implemented. Restored archives cannot select a local model or automatically start visual processing.

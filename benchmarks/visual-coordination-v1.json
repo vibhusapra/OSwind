@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "state": "Focused app coordination tests and signed staging passed; native interaction acceptance remains open",
+  "codeCommit": "abf9691700791a921abff6a4dbc8f7a0508d8242",
+  "basePR": 38,
+  "baseCommit": "83074f2ae7f33f57c941bc407ba29a12b99b6c81",
+  "behavior": [
+    "Visual-only model settings preserve active text indexing; real text model changes still cancel that text job",
+    "A shared power-policy change cancels visual work using the earlier policy",
+    "Scoped erasure cancels manual and automatic visual workers, clears queued sources and prevents wake/power callbacks from restarting them until capture or an explicit rebuild",
+    "Two real image reservations release after worker cancellation, then scoped erasure removes their source and retained file"
+  ],
+  "tests": {
+    "focusedNormal": 16,
+    "focusedThreadSanitizer": 16,
+    "failures": 0,
+    "reportedRaces": 0
+  },
+  "signedStaging": {
+    "scope": "Separately staged schema19 native app coordination fix; no installation or native click acceptance",
+    "codeCommit": "abf9691700791a921abff6a4dbc8f7a0508d8242",
+    "schema": 19,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "06ff67c06fd595c9cd85b6cd66939650182118c97ff6e9b535cd62c19e317213",
+        "signedSHA256": "6366523b5fca60da887db5bef001bbd7104269169d3dbe6def866268f77b3c33",
+        "normalizedPayloadSHA256": "e9a4338c07d4de6aa8bb0c70515eb62e5bd8d9bcfd3ae17f93b5becb77b2a27d"
+      },
+      "oswindctl": {
+        "rawSHA256": "17479020ac920f7c6b4f39840f1dc4391d2729b7255e8c6a008568cd19370437",
+        "signedSHA256": "e566f2d797204ebe1168093e474facd795987ba00987e45e8b5d2f1e241e61c4",
+        "normalizedPayloadSHA256": "92d42106bcc361cd2ef11d86f2b0f31ac3ede2ecedefb3320c8e135616eed4b5"
+      }
+    },
+    "zipSHA256": "2ab39ce915d6b67b890574c03495554957b9ac905371a2cdffe91eba7c674b43",
+    "bundleFiles": 28,
+    "bundleTreeSHA256": "27f503f8e31d3c873d420937b65bd517f4504b30ba843cccc121c5a53af587c9",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "resourcesAndInfoByteIdenticalToQualifiedPriorPackage": true,
+    "CLIByteIdenticalToQualifiedPriorPackage": true,
+    "priorCLIQualification": {
+      "codeCommit": "2bc65e71a035a874880d659db5267b60712e9b45",
+      "signedSHA256": "e566f2d797204ebe1168093e474facd795987ba00987e45e8b5d2f1e241e61c4",
+      "evidence": "benchmarks/visual-memory-v1.json",
+      "modelIntegrityCases": 11,
+      "processGroups": 10,
+      "retainedWithoutRerunning": true
+    },
+    "changedAppTests": {
+      "normal": 16,
+      "threadSanitizer": 16,
+      "failures": 0,
+      "races": 0
+    },
+    "installed17Unchanged": true
+  },
+  "inheritedRetrievalEvidence": "visual-memory-v1.json",
+  "nativeClickKeyboardAcceptance": false,
+  "installedSchema17Unchanged": true
+}
