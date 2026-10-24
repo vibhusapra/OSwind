@@ -28,6 +28,12 @@ class MetricContracts(unittest.TestCase):
         score(self.annotation([(0,1,'A')]),self.annotation([]),1,metric=metric)
         score(self.annotation([(0,3,'A')]),self.annotation([(0,3,'x')]),3,metric=metric)
         self.assertAlmostEqual(abs(metric),.25)
+    def testReferenceTailIsCroppedByDeclaredUEMWithoutDroppingTheClip(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=pathlib.Path(folder)/'reference.rttm';path.write_text('SPEAKER fixture 1 0 1.026 <NA> <NA> A <NA> <NA>\n')
+            reference=read_reference(path,'fixture',1);self.assertAlmostEqual(reference.get_timeline().extent().end,1.026)
+            detail=score(reference,self.annotation([(0,1,'predicted')]),1)
+            self.assertAlmostEqual(detail['total'],1);self.assertAlmostEqual(detail['diarization error rate'],0)
     def testInvalidTimelinesAndReferenceIdentityAreRejected(self):
         with self.assertRaises(ValueError):read_hypothesis({'scope':'global','duration':1,'turns':[]},'fixture',1)
         with self.assertRaises(ValueError):read_hypothesis({'scope':'recording','duration':1,'turns':[{'start':0,'end':float('nan'),'speaker':'A'}]},'fixture',1)

@@ -19,8 +19,8 @@ def read_reference(path,identifier,duration):
         fields=line.split()
         if len(fields)!=10 or fields[0]!='SPEAKER' or fields[1]!=identifier:raise ValueError('Invalid reference RTTM')
         start,length=float(fields[3]),float(fields[4]);end=start+length
-        if not all(map(math.isfinite,[start,end])) or start<0 or length<=0 or end>duration+0.02:raise ValueError('Reference interval outside source audio')
-        result[Segment(start,min(duration,end)),index]=fields[7]
+        if not all(map(math.isfinite,[start,end])) or start<0 or length<=0:raise ValueError('Reference interval outside source audio')
+        result[Segment(start,end),index]=fields[7]
     return result
 
 def read_hypothesis(timeline,identifier,duration):
@@ -69,6 +69,7 @@ def evaluate(binary,model,dataset,output,repetitions=2):
     if manifest.get('coverage')=='full-development-set':report['scope']=report['scope'].replace('Predetermined development clips, not held-out/corpus-wide or competitor app quality.','Complete pinned development selection, not held-out/test-set or competitor app quality. Includes previously evaluated development clips.')
     report['dataset'].update(split=split,selection_plan_canonical_sha256=manifest.get('selection_plan_canonical_sha256'),source_audio_url=manifest.get('source_audio_url'))
     report['settings']['reference_labels_parsed_after_inference']=True
+    report['settings']['reference_time_domain']='Complete RTTM intervals; explicit full-WAV UEM crops any beyond-audio annotation tails. No extra boundary forgiveness.'
     if split=='test':report['scope']='Official pinned test selection, held out from OSwind tuning until this frozen evaluation; upstream model-training overlap is unaudited. No model/reference counts supplied. Not competitor-app quality or a directly comparable upstream model-card score. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML caches and background activity are uncontrolled; process RSS excludes device allocation and power.'
     metrics={(run,collar):DiarizationErrorRate(collar=collar,skip_overlap=False) for run in range(repetitions) for collar in [0,0.25]}
     private_json(output/'report.json',report)
@@ -97,7 +98,7 @@ def evaluate(binary,model,dataset,output,repetitions=2):
             reference=read_reference(reference_path,identifier,duration)
             measured=re.search(r'^\s*(\d+)\s+maximum resident set size',stderr.read_text(),re.M)
             if not measured:raise ValueError('macOS peak RSS measurement unavailable')
-            entry={'id':identifier,'source_audio_seconds':duration,'audio_sha256':clip['audio_sha256'],'reference_sha256':clip['reference_sha256'],'reference_speakers':len(reference.labels()),'process_wall_seconds':time.monotonic()-started,'process_peak_rss_bytes':int(measured.group(1)),'preparation_seconds':data['preparation_seconds'],'policy':data.get('policy','legacy-exclusive-default'),'runs':[]}
+            entry={'id':identifier,'source_audio_seconds':duration,'audio_sha256':clip['audio_sha256'],'reference_sha256':clip['reference_sha256'],'reference_speakers':len(reference.crop(Timeline([Segment(0,duration)]),mode='intersection').labels()),'reference_seconds_outside_uem':sum(max(0,s.end-max(duration,s.start)) for s,_,_ in reference.itertracks(yield_label=True)),'reference_intervals_outside_uem':sum(s.end>duration for s,_,_ in reference.itertracks(yield_label=True)),'process_wall_seconds':time.monotonic()-started,'process_peak_rss_bytes':int(measured.group(1)),'preparation_seconds':data['preparation_seconds'],'policy':data.get('policy','legacy-exclusive-default'),'runs':[]}
             for index,run in enumerate(data['runs']):
                 if run['index']!=index or run['resident_backend_reused']!=(index>0) or not math.isfinite(run['seconds']) or run['seconds']<=0:raise ValueError('Invalid inference timing/residency')
                 hypothesis=read_hypothesis(run['timeline'],identifier,duration)

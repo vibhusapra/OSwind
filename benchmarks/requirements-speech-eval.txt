@@ -1,0 +1,2 @@
+# Independent word alignment scorer; benchmark-only, not app runtime.
+jiwer==4.0.0
