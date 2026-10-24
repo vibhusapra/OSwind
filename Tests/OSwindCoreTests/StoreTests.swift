@@ -34,7 +34,13 @@ final class StoreTests: XCTestCase {
     }
     func testFTSSyntaxAndInjectionAreData() throws {
         try add("a",text:"hello quote OR test")
-        for query in ["\"", "*", "' OR 1=1 --", "NEAR(foo)", "\" AND", "hello: world", "日本語"] { XCTAssertNoThrow(try store.search(SearchFilter(query:query),mode:.keyword)) }
+        for query in ["\"", "*", "' OR 1=1 --", "NEAR(foo)", "\" AND", "hello: world", "日本語"] {
+            // Advanced syntax may reject malformed expressions, but never as SQL.
+            do { _ = try store.search(SearchFilter(query:query),mode:.keyword) }
+            catch { XCTAssertTrue(error is QuerySyntaxError,"Unexpected error: \(error)") }
+            let literal = try SearchExpressionPlan.make(query,interpret:false)
+            XCTAssertNoThrow(try store.search(SearchFilter(query:query),mode:.keyword,expression:literal))
+        }
         XCTAssertEqual(try store.stats().count,1)
     }
     func testAssetPathTraversalAndSymlinks() throws {

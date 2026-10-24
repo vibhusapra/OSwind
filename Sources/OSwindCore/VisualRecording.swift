@@ -44,12 +44,23 @@ public struct VisualRecording:Codable,Equatable,Sendable {
     }
     public func frameTime(passage:PassageRange?=nil,query:String="") -> Double {
         let entries=ranges()
-        if let passage,let entry=entries.first(where:{NSIntersectionRange(NSRange(location:$0.range.start,length:$0.range.length),NSRange(location:passage.start,length:passage.length)).length>0}) {return entry.frame.time}
+        func words(_ text:String)->[String] {text.folding(options:[.caseInsensitive,.diacriticInsensitive],locale:Locale(identifier:"en_US_POSIX")).split(whereSeparator:{!$0.isLetter && !$0.isNumber}).map(String.init)}
+        let phrases=((try? SearchExpressionPlan.make(query))?.positivePhrases ?? []).map(words)
+        let passageEntry=passage.flatMap { passage in entries.first(where:{NSIntersectionRange(NSRange(location:$0.range.start,length:$0.range.length),NSRange(location:passage.start,length:passage.length)).length>0}) }
+        if phrases.isEmpty,let passageEntry {return passageEntry.frame.time}
         let terms=MemoryStore.queryTerms(query)
-        return entries.max { a,b in
-            let first=terms.filter {a.frame.text.localizedCaseInsensitiveContains($0)}.count,second=terms.filter {b.frame.text.localizedCaseInsensitiveContains($0)}.count
-            return first==second ? a.frame.time>b.frame.time:first<second
-        }?.frame.time ?? 0
+        let ranked=entries.map { entry -> (time:Double,phrases:Int,terms:Int) in
+            let tokens=phrases.isEmpty ? []:words(entry.frame.text)
+            let matches=phrases.filter { phrase in
+                guard !phrase.isEmpty,phrase.count<=tokens.count else {return false}
+                return (0...(tokens.count-phrase.count)).contains { start in tokens[start..<(start+phrase.count)].elementsEqual(phrase) }
+            }.count
+            return (entry.frame.time,matches,terms.filter {entry.frame.text.localizedCaseInsensitiveContains($0)}.count)
+        }
+        let bestPhraseCount=ranked.map(\.phrases).max() ?? 0
+        // A semantic passage must not override a stronger required-phrase frame.
+        if let passageEntry,ranked.first(where:{$0.time==passageEntry.frame.time})?.phrases==bestPhraseCount {return passageEntry.frame.time}
+        return ranked.max {a,b in a.phrases != b.phrases ? a.phrases<b.phrases:a.terms != b.terms ? a.terms<b.terms:a.time>b.time}?.time ?? 0
     }
 }
 public enum VisualCaptureMode:String,Codable,CaseIterable,Sendable {case snapshots,replay}

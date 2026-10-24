@@ -1,0 +1,282 @@
+{
+  "format": "OSwind required search expressions v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "8fdb32cc0e9e67d4e8e847d4db7105260ef10552",
+  "schema_version": 13,
+  "features": [
+    "Required straight/curly quoted FTS token phrases; no numeric-prefix sibling matches",
+    "Uppercase AND/OR/NOT, grouped content, implicit conjunction, positive-anchor bounds; ordinary questions stay soft",
+    "Source title/application/text and recording-local speaker label operands; metadata scope intersection",
+    "Hard eligibility before keyword/full/preview/hybrid/exhaustive/indexed scoring; model-failure fallback preserves constraints",
+    "Current Ask expression only; historical questions provide ranking cues without imposing old constraints",
+    "Literal escape, typed pre-model validation, UI badge/help, required replay frame preference",
+    "Snapshot-scoped temporary ID table; expression-aware Metal masks; SQL cancellation and cleanup"
+  ],
+  "checks": {
+    "full_suite": {
+      "source_commit": "4ecdfc5cdb7ebe145e7812e1d58e2ab3e176aa0d",
+      "total": 385,
+      "passed": 379,
+      "skipped_opt_in": 6,
+      "failed": 0
+    },
+    "thread_sanitizer": {
+      "source_commit": "4ecdfc5cdb7ebe145e7812e1d58e2ab3e176aa0d",
+      "total": 57,
+      "passed": 56,
+      "skipped_opt_in": 1,
+      "failed": 0
+    },
+    "final_smart_quote_edges": {
+      "source_commit": "8fdb32cc0e9e67d4e8e847d4db7105260ef10552",
+      "total": 39,
+      "passed": 38,
+      "skipped_opt_in": 1,
+      "failed": 0
+    },
+    "metal_opt_in_actually_exercised": true,
+    "cli_http_mcp_ask_process_contracts": true,
+    "scope_preview_replay_chat_provider_regressions": true,
+    "installed_process_contracts": true,
+    "no_main_source_record_mutation": true,
+    "actual_local_qwen_conversation": {
+      "fixture": "Lunar release; Maya checklist; Friday deadline",
+      "provider": "ollama",
+      "first": {
+        "text": "Maya owns the Lunar release checklist [1].",
+        "provider": "ollama",
+        "duration": 1.5074260234832764,
+        "warnings": [],
+        "source_ids": [
+          "87923473-A146-44E4-B9F2-9B700762A30E"
+        ]
+      },
+      "followup": {
+        "text": "The deadline is Friday [1].",
+        "provider": "ollama",
+        "duration": 0.174172043800354,
+        "warnings": [],
+        "source_ids": [
+          "87923473-A146-44E4-B9F2-9B700762A30E"
+        ]
+      }
+    },
+    "syntax_error_transport": {
+      "HTTP": 400,
+      "MCP": "tools/call result.isError true, with error text"
+    },
+    "invalid_expression_model_requests": 0
+  },
+  "performance": {
+    "workload": "Owned20,000 normalized synthetic32D vectors, equal alternating phrase groups, seeded query row42; exact float32 top10 ground truth",
+    "initial_uncommitted_worktree_diagnostic": [
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 2482.9589128494263,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 2656.546950340271,
+        "query": "\"odd branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 2161.1279249191284,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      }
+    ],
+    "corrected_materialization_trial": [
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 55.364012718200684,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 56.95700645446777,
+        "query": "\"odd branch\"",
+        "strategy": "metal-exact-rerank"
+      },
+      {
+        "exact_top10_equal": true,
+        "milliseconds": 46.01001739501953,
+        "query": "\"even branch\"",
+        "strategy": "metal-exact-rerank"
+      }
+    ],
+    "corrected_product_core_commit": "4ecdfc5cdb7ebe145e7812e1d58e2ab3e176aa0d",
+    "correctness": "Both phrase switches, repeat cache use and a deliberately unreplayed content edit matched exhaustive top10",
+    "initial_failure": "2.16\u20132.66s despite correct source sets; FTS IN subqueries re-ran during candidate validation. Retained as an uncommitted development diagnostic, not a pinned release baseline.",
+    "limits": [
+      "Three single debug query measurements per diagnostic; not latency percentiles or an isolated causal experiment",
+      "Random vectors and generated text; no embedding-model, natural relevance, energy or competitor result",
+      "No constant-memory, all-device or top-three claim"
+    ]
+  },
+  "quality_regression": {
+    "apple": {
+      "baseline_file": "benchmarks/relevance-apple-ranked.json",
+      "baseline_sha256": "d6b8de9ea7712ab7a38f8f7e2592d3767f5554ede1cd8ca2c26c8c7b6a7d429d",
+      "fixture_sha256": "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+      "documents": 32,
+      "queries": 35,
+      "repetitions": 3,
+      "model_ids": [
+        "apple-nl-sentence-en-v1"
+      ],
+      "modes": {
+        "keyword": {
+          "before": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "after": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 0.10895729064941406,
+          "current_p95_ms": 0.1519918441772461
+        },
+        "hybrid": {
+          "before": {
+            "hit_rate_at_5": 0.8709677419354839,
+            "recall_at_5": 0.8709677419354839,
+            "mrr_at_5": 0.7204301075268817,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 0.8709677419354839,
+            "recall_at_5": 0.8709677419354839,
+            "mrr_at_5": 0.7204301075268817,
+            "no_evidence_empty_rate": 0
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 4.073977470397949,
+          "current_p95_ms": 6.778955459594727
+        },
+        "semantic": {
+          "before": {
+            "hit_rate_at_5": 0.5806451612903226,
+            "recall_at_5": 0.5645161290322581,
+            "mrr_at_5": 0.35752688172043,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 0.5806451612903226,
+            "recall_at_5": 0.5645161290322581,
+            "mrr_at_5": 0.35752688172043,
+            "no_evidence_empty_rate": 0
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 3.909945487976074,
+          "current_p95_ms": 4.804015159606934
+        }
+      },
+      "scope": "Authored32-document/35-query regression, not held-out, natural capture or a competitor benchmark. Timings uncontrolled; no-evidence empty rate remains an open weakness."
+    },
+    "qwen": {
+      "baseline_file": "benchmarks/relevance-qwen3-ranked.json",
+      "baseline_sha256": "9a0e6f255207609518d837cf72ef38420d127e0e36091aac02883a30b2b66d48",
+      "fixture_sha256": "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+      "documents": 32,
+      "queries": 35,
+      "repetitions": 3,
+      "model_ids": [
+        "ollama:qwen3-embedding:0.6b@ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d:desktop-v1:d1024"
+      ],
+      "modes": {
+        "keyword": {
+          "before": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "after": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 0.11396408081054688,
+          "current_p95_ms": 0.1659393310546875
+        },
+        "hybrid": {
+          "before": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 91.27092361450195,
+          "current_p95_ms": 146.50297164916992
+        },
+        "semantic": {
+          "before": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "all_quality_components_equal": true,
+          "current_p50_ms": 90.90495109558105,
+          "current_p95_ms": 142.03405380249023
+        }
+      },
+      "scope": "Authored32-document/35-query regression, not held-out, natural capture or a competitor benchmark. Timings uncontrolled; no-evidence empty rate remains an open weakness."
+    }
+  },
+  "retained_failures": [
+    "Initial required-frame selector chose Frame210 for quoted Frame21; fixed with positive phrase preference including semantic passage override",
+    "Initial Ask path bypassed current expression because historical scope interpretation was disabled; fixed by separate current plan plus soft context",
+    "First MCP smoke expected JSONRPC invalid-params, but existing correct protocol uses tool result.isError; harness corrected",
+    "Original injection test assumed all inputs are ordinary text. Default now allows only typed syntax errors; literal path remains nonthrowing and safe; source counts preserved"
+  ],
+  "ui": {
+    "light_dark_sample_renders_inspected": true,
+    "render_source_commit": "4ecdfc5cdb7ebe145e7812e1d58e2ab3e176aa0d",
+    "representative_query": "\"Frame 21\"",
+    "rendered_result_count": 1,
+    "prior_token_only_result_count": 4,
+    "native_input_help_keyboard_acceptance": "Pending: read-only doctor reported locked before this new UI could be exercised. No unlock/TCC/normal capture attempted."
+  },
+  "installed_binaries": {
+    "OSwind": "f7ec190ae623e2aacc5416535e404717a047fa57f14eeddab78af5dfd2c6e8b7",
+    "oswindctl": "78ab891b394ff8b8be21366bf9b01ed36447151f3ae126b21fbebf98131b5599"
+  },
+  "strict_signature_build_package_installed_zip_binding": true,
+  "zip_sha256": "676f46678014e247424fcaed0fcaafe7b379cb04ae38683f60fdeb6c313fd6ed",
+  "harness_sha256": "291a9b0939390504a5b393050dc5ee02e5bc902c4bf317a17b2bf887cf9a455a",
+  "sources": [
+    "https://www.sqlite.org/fts5.html"
+  ],
+  "limits": [
+    "Content eligibility is at whole source/clip granularity; frame date bounds still use clip start",
+    "Token normalization is not byte-exact or regex matching; URLs are not a separate keyword column",
+    "No regex/NEAR/arbitrarySQL/Boolean metadata-scope grammar; full keyboard/device/power and natural workload gates remain open"
+  ]
+}

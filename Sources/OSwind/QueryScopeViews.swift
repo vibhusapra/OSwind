@@ -10,13 +10,15 @@ struct QueryScopeControls: View {
     var knownApps = [String]()
     var executionError: String? = nil
     @State private var showHelp = false
-    private var preview: (QueryResolution?,String?) {
+    private var preview: (QueryResolution?,SearchExpressionPlan?,String?) {
         var input = filter; input.query = query
-        do { return (try QueryScopeResolver.resolve(input,interpret:enabled,canonicalApp:{ try QueryScopeResolver.canonicalAppName($0,names:knownApps) }),nil) }
-        catch { return (nil,error.localizedDescription) }
+        do {
+            let resolution = try QueryScopeResolver.resolve(input,interpret:enabled,canonicalApp:{ try QueryScopeResolver.canonicalAppName($0,names:knownApps) })
+            return (resolution,try SearchExpressionPlan.make(resolution.filter.query,interpret:enabled),nil)
+        } catch { return (nil,nil,error.localizedDescription) }
     }
     var body: some View {
-        let (resolution,error) = preview
+        let (resolution,expression,error) = preview
         VStack(alignment:.leading,spacing:7) {
             HStack(spacing:10) {
                 Toggle("Query filters",isOn:$enabled).toggleStyle(.checkbox).controlSize(.small).fixedSize()
@@ -38,10 +40,13 @@ struct QueryScopeControls: View {
                             Text("Find a specific moment.").font(.headline)
                             Text("Speaker filters select recordings containing that local label; they do not match voices across recordings. Dates narrow when a memory was captured. Selected controls and query filters apply together. Weeks start Monday; dates use this Mac’s time zone.")
                             Text("yesterday · last week · past 3 hours\non:2026-10-22 · since:2026-10-01\napp:\"Google Chrome\" · kind:audio\nspeaker:\"Maya\" · tag:work · is:favorite").font(.system(.caption,design:.monospaced)).textSelection(.enabled)
-                            Text("Use double quotes around date words/operators, or turn Query filters off, to search them as content. since: includes its boundary; until: excludes it.").foregroundStyle(.secondary)
+                            Text("\"archive launch\" · alpha AND (beta OR gamma)\nalpha NOT beta").font(.system(.caption,design:.monospaced)).textSelection(.enabled)
+                            Text("Quoted phrases require adjacent words, without a prefix on the last word. Other words remain ranking cues unless uppercase AND, OR or NOT enables Boolean content filters. Each OR branch needs a positive word or phrase.")
+                            Text("Quotes also protect date words/operators as content. Turn Query filters off for ordinary token ranking with no syntax interpretation. since: includes its boundary; until: excludes it.").foregroundStyle(.secondary)
                         }.font(.caption).padding(18).frame(width:340)
                     }
             }.font(.caption)
+            if let summary = expression?.summary { Label(summary,systemImage:"text.magnifyingglass").font(.caption2).foregroundStyle(OSwindTheme.accent) }
             if let message = error ?? executionError { Label(message,systemImage:"exclamationmark.circle").font(.caption).foregroundStyle(.orange).accessibilityLabel("Query filter error: \(message)") }
             else if let resolution, !resolution.clauses.isEmpty { RecordedScopeView(filter:resolution.filter,timeZone:resolution.timeZone) }
         }
