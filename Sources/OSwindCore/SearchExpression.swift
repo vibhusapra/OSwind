@@ -67,7 +67,7 @@ public struct SearchExpressionPlan: Sendable {
         var result = Self(constraint:nil,keywordFTS:MemoryStore.ftsQuery(input),speakerFTS:SpeakerLabel.ftsQuery(input),semanticText:input,summary:nil)
         guard interpret else { return result }
         let operatorWord = input.split(whereSeparator:{$0.isWhitespace || $0 == "(" || $0 == ")"}).contains { ["AND","OR","NOT"].contains(String($0)) }
-        guard operatorWord || input.contains("\"") || input.contains("“") else { return result }
+        guard operatorWord || input.contains("\"") || input.contains("“") || input.contains("”") else { return result }
         let tokens = try lex(input)
         let boolean = tokens.contains(.and) || tokens.contains(.or) || tokens.contains(.not)
         if boolean {
@@ -106,6 +106,7 @@ public struct SearchExpressionPlan: Sendable {
             let character = input[cursor]
             if character.isWhitespace { cursor = input.index(after:cursor); continue }
             if character == "(" || character == ")" { tokens.append(character == "(" ? .open:.close); cursor = input.index(after:cursor); continue }
+            if character == "”" { throw QuerySyntaxError("Open the quoted phrase with a matching quote, or turn Query filters off.") }
             if character == "\"" || character == "“" {
                 let end: Character = character == "“" ? "”":"\""; cursor = input.index(after:cursor)
                 var value = "", closed = false
@@ -122,7 +123,7 @@ public struct SearchExpressionPlan: Sendable {
                 tokens.append(.phrase(value)); continue
             }
             let start = cursor
-            while cursor < input.endIndex,!input[cursor].isWhitespace,!"()\"“".contains(input[cursor]) { cursor = input.index(after:cursor) }
+            while cursor < input.endIndex,!input[cursor].isWhitespace,!"()\"“”".contains(input[cursor]) { cursor = input.index(after:cursor) }
             let text = String(input[start..<cursor])
             switch text {
             case "AND": tokens.append(.and)

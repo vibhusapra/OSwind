@@ -105,6 +105,7 @@ with tempfile.TemporaryDirectory(prefix="oswind-expression-contract-") as tempor
         result = json.loads(responses[i]["result"]["content"][0]["text"])
         assert ids(result["hits"]) == expected
     assert ids(json.loads(responses[20]["result"]["content"][0]["text"])["hits"]) == {"exact", "gap", "prefix"}
-    assert responses[21]["error"]["code"] == -32602
+    assert responses[21]["result"]["isError"] is True
+    assert "operator" in responses[21]["result"]["content"][0]["text"].lower()
     assert json.loads(cli("stats"))["count"] == 4
 print("PASS: strict phrases/Boolean precedence/scopes/literal escape and typed errors across CLI/HTTP/MCP; current Ask constraint plus follow-up without inherited old constraints; source counts preserved")

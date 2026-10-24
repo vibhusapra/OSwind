@@ -87,7 +87,7 @@ final class SearchExpressionTests: XCTestCase {
         XCTAssertEqual(Set(try store.search(SearchFilter(query:#""alpha beta" AND beta"#),mode:.keyword,expression:plan).map(\.id)),["first","second"])
     }
     func testMalformedOrExcessiveExpressionsFailWithoutBroadening() throws {
-        for query in [#""unclosed"#, "AND alpha", "alpha AND", "alpha OR OR beta", "alpha AND (beta", "alpha AND ()", #""***""#, "alpha\0beta",String(repeating:"x",count:4001)] {
+        for query in [#""unclosed"#, "alpha”", "”alpha", "AND alpha", "alpha AND", "alpha OR OR beta", "alpha AND (beta", "alpha AND ()", #""***""#, "alpha\0beta",String(repeating:"x",count:4001)] {
             XCTAssertThrowsError(try SearchExpressionPlan.make(query),query)
         }
         XCTAssertThrowsError(try SearchExpressionPlan.make(String(repeating:"NOT ",count:14)+"alpha"))
