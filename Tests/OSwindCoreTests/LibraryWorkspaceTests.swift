@@ -61,6 +61,11 @@ final class LibraryWorkspaceTests:XCTestCase {
         try FileManager.default.createSymbolicLink(at:store.root.appendingPathComponent("audio/.staging"),withDestinationURL:outside)
         XCTAssertThrowsError(try store.libraryWorkspace("oswind-audio-import"));XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath:outside.path),["keep"])
     }
+    func testMovedLibraryCannotCreateScratchInReplacement() throws {
+        let location=store.root;try FileManager.default.moveItem(at:location,to:root.appendingPathComponent("moved-library"));try Paths.ensure(location)
+        XCTAssertThrowsError(try store.libraryWorkspace("oswind-audio-import"));XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:location.path).isEmpty)
+        XCTAssertThrowsError(try store.close());XCTAssertFalse(store.isClosed)
+    }
     func testWorkspaceParentIdentityRejectsReplacement() throws {
         let parent=root.appendingPathComponent("parent");try Paths.ensure(parent);let tree=try BackupFileTree(root:parent),identity=try tree.identity()
         try FileManager.default.moveItem(at:parent,to:root.appendingPathComponent("old-parent"));try Paths.ensure(parent)
