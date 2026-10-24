@@ -26,10 +26,11 @@ public struct ActivitySourceScope:Codable,Equatable,Sendable {
     public var favoritesOnly:Bool
     public var tag:String?
     public var speaker:String?
+    public var entityID:String?
     public var start:Date?
     public var end:Date?
-    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;start=filter.start;end=filter.end}
-    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker)}
+    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;start=filter.start;end=filter.end}
+    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID)}
 }
 public struct ActivityCalendarRequest:Equatable,Sendable {
     public var month:String
@@ -69,7 +70,7 @@ extension ActivityCalendarRequest {
         guard filter.query.isEmpty else {throw OSwindError.invalid("Calendar counts saved sources by metadata, not search relevance; remove the query")}
         guard filter.start?.timeIntervalSince1970.isFinite != false,filter.end?.timeIntervalSince1970.isFinite != false else {throw OSwindError.invalid("Invalid calendar scope timestamp")}
         if let start=filter.start,let end=filter.end,start>=end {throw OSwindError.invalid("Calendar time filters do not overlap")}
-        for value in [filter.app,filter.tag,filter.speaker].compactMap({$0}) {guard !value.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,value.count<=4000,!value.utf8.contains(0) else {throw OSwindError.invalid("Invalid calendar metadata filter")}}
+        for value in [filter.app,filter.tag,filter.speaker,filter.entityID].compactMap({$0}) {guard !value.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,value.count<=4000,!value.utf8.contains(0) else {throw OSwindError.invalid("Invalid calendar metadata filter")}}
         var calendar=Calendar(identifier:.gregorian);calendar.timeZone=timeZone
         guard let anchor=calendar.date(from:DateComponents(year:year,month:number,day:15,hour:12)),let interval=calendar.dateInterval(of:.month,for:anchor),let range=calendar.range(of:.day,in:.month,for:anchor),interval.duration>0,interval.duration<35*86400 else {throw OSwindError.invalid("The requested calendar month is unavailable")}
         var days=[ActivityCalendarDay]()
@@ -121,7 +122,7 @@ extension MemoryStore {
         let source:String
         if filter.tag != nil {
             source="(SELECT memory_id AS id,tag,timestamp,app,kind,favorite FROM memory_tags INDEXED BY memory_tags_scope) m"
-        }else if [filter.app != nil,filter.kind != nil,filter.favoritesOnly].filter({$0}).count>1 || filter.speaker != nil {
+        }else if [filter.app != nil,filter.kind != nil,filter.favoritesOnly].filter({$0}).count>1 || filter.speaker != nil || filter.entityID != nil {
             // A single-filter index omits the other metadata; combining them
             // otherwise fetches large source pages just to inspect flags.
             source="memories m INDEXED BY memories_activity_time"

@@ -54,7 +54,7 @@ public enum QueryScopeResolver {
             if token.quoted { masked.replaceCharacters(in:token.range,with:String(repeating:" ",count:token.range.length)); continue }
             guard let separator = token.raw.firstIndex(of:":") else { continue }
             let name = String(token.raw[..<separator]).lowercased()
-            guard ["app","kind","tag","speaker","is","on","date","since","until"].contains(name) else {
+            guard ["app","kind","tag","speaker","entity","is","on","date","since","until"].contains(name) else {
                 masked.replaceCharacters(in:token.range,with:String(repeating:" ",count:token.range.length)); continue
             }
             var rawValue = String(token.raw[token.raw.index(after:separator)...])
@@ -79,6 +79,10 @@ public enum QueryScopeResolver {
             case "tag":
                 if let existing = filter.tag, !existing.isEmpty, existing != value { throw QuerySyntaxError("The query and selected tags conflict.") }
                 filter.tag = value; clause(name,"#"+value,token.range)
+            case "entity":
+                try Integration.validateEntityID(value)
+                if let existing=filter.entityID,existing != value {throw QuerySyntaxError("The query and selected entity scopes conflict.")}
+                filter.entityID=value;clause(name,"Entity: "+value,token.range)
             case "speaker":
                 guard value.count<=128,!value.utf8.contains(0) else { throw QuerySyntaxError("Keep speaker labels within 128 characters.") }
                 if let existing=filter.speaker,SpeakerLabel.key(existing) != SpeakerLabel.key(value) { throw QuerySyntaxError("The query and selected speaker labels conflict.") }

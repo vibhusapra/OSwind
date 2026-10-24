@@ -4,7 +4,7 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 **v0 is in active development.** Broad competitive parity and a top-three ranking are goals; they are not verified claims. See [delivery ledger](docs/PROGRESS.md), [competitive research](docs/landscape.html), and [benchmarks](benchmarks/README.md).
 
-The current staged candidate has **739 distinct passing cases**, **284 distinct Thread Sanitizer passes**, strict signed-package verification and twelve signed process groups. The full suite has 714 passes/31 opt-in skips; native/model and physical runs leave six opt-in cases. [Detach verification](docs/VAULT-DETACH.md) requires two consecutive absent observations with the original package/image identity. [Signed evidence](benchmarks/vault-detach-settling-v1.json) includes three fresh vault runs, real targeted OCR/privacy capture and native generated-tone audio. A host-sleep-aligned test failure and its lifecycle-fixture correction remain recorded. Actual GUI/controller/microphone-to-ASR, broader device/privacy behavior, power and matched competitors remain open.
+The current staged candidate has **773 distinct functional passes**, **318 Thread Sanitizer passes**, strict signed-package verification and fifteen signed process groups. [People & projects](docs/ENTITY-MEMORY.md) adds local suggestions, curated aliases, original source links and scoped search/Ask. [Signed evidence](benchmarks/entity-memory-v1.json) includes a 1,000-source project oracle and real encrypted entity portability. Native detach confirmation now accommodates an observed long APFS settling state while preserving identity checks. The older [24-hour component soak](benchmarks/reliability-soak-24h-v1.json) completed with four retained gaps; it does not qualify current desktop capture. An unlocked continuation passes targeted live capture and normal/TSan physical audio; native entity creation, editing, source links, incremental indexing and cited Ask work on synthetic history. A reproduced ⌘K stale-results defect and Documents-root startup remain open. NLP quality, power, broad parity and matched competitor ranking are still open.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 
@@ -26,6 +26,8 @@ For an isolated sample workspace: `open dist/OSwind.app --args --demo`. Demo rec
 To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-hoc signed, not Developer ID notarized. Permission grants attach to the app's identity and location; rebuilds may require granting access again.
 
 ## What v0 contains
+
+- [People & projects](docs/ENTITY-MEMORY.md): on-device suggestions and explicit project aliases, source-linked curation/merges, scoped search/Ask and read-only integrations. Full backup preserves this layer; source JSON/Markdown currently do not.
 
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).
 - [Display selection and crop regions](docs/CAPTURE-REGIONS.md) preserve chosen display identities, crop window/display snapshots before OCR, and refuse wider replay fallbacks. Native crop alignment and hardware acceptance remain open.

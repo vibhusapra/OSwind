@@ -50,8 +50,10 @@ public struct SearchFilter: Codable, Equatable, Sendable {
     public var tag: String?
     /// Matches a label within each recording; does not establish identity across recordings.
     public var speaker: String?
+    /// Source membership in a local suggested or curated entity; never proof of identity.
+    public var entityID: String?
     public var limit = 100
-    public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, limit: Int = 100) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.limit = limit }
+    public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, entityID: String? = nil, limit: Int = 100) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.entityID = entityID; self.limit = limit }
 }
 public struct SearchHit: Identifiable, Codable, Sendable {
     public var memory: Memory

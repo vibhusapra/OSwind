@@ -9,10 +9,13 @@ enum VaultAttachmentObservationError:LocalizedError {
 
 /// Retry observation only, after a successful normal detach. It never performs
 /// another detach or turns an unknown/changed identity into a locked state.
-/// Success requires two consecutive fresh absent observations.
+/// Success requires two consecutive fresh absent observations. The first retry
+/// remains 50 ms; later pauses back off to 1 second, totaling at most 11.55 s
+/// across 16 observations. Native inspections retain their separate deadlines.
 enum VaultDetachSettlement {
-    static func confirm(attempts:Int=8,
-                        pause:@Sendable (Int) async throws ->Void={_ in try await Task.sleep(for:.milliseconds(50))},
+    static func delayMilliseconds(_ attempt:Int)->Int {min(1000,50 << min(5,max(0,attempt)))}
+    static func confirm(attempts:Int=16,
+                        pause:@Sendable (Int) async throws ->Void={attempt in try await Task.sleep(for:.milliseconds(delayMilliseconds(attempt)))},
                         inspect:@Sendable () async throws ->Bool) async throws {
         guard (1...16).contains(attempts) else {throw OSwindError.invalid("Invalid detach verification budget")}
         var consecutiveAbsences=0

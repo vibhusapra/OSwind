@@ -54,7 +54,7 @@ private final class RestoreRows {
         guard result.allSatisfy(\.isFinite) else { throw BackupFileError.invalid("Invalid restored vector values") }; return result
     }
     func rows(_ table: String, columns: String, _ body: (OpaquePointer) throws -> Void) throws -> Int64 {
-        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests"]
+        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests","memory_entities","entity_aliases","entity_mentions","entity_ignored"]
         guard allowed.contains(table) else { throw BackupFileError.invalid("Unsupported restore table") }
         let statement = try source.db.prepare("SELECT \(columns) FROM \(table) NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(statement) }
         var count: Int64 = 0, status = sqlite3_step(statement)
@@ -142,10 +142,43 @@ private final class RestoreRows {
             }
         }
     }
+    func restoreEntities(into handle:OpaquePointer)throws {
+        guard source.schema>=21 else {return}
+        _ = try copy("memory_entities",columns:["id","kind","name","detail","curated","created"],into:handle,validate:{row in
+            try Integration.validateEntityID(self.source.db.text(row,0))
+            guard EntityKind(rawValue:try self.source.db.text(row,1)) != nil else {throw BackupFileError.invalid("Invalid entity kind")}
+            let name=try self.source.db.text(row,2),detail=try self.source.db.text(row,3),curated=try self.integer(row,4)
+            guard try EntityLabel.clean(name)==name,detail.utf8.count<=8000,[0,1].contains(curated) else {throw BackupFileError.invalid("Invalid entity definition")}
+            _ = try self.number(row,5)
+        })
+        _ = try copy("entity_aliases",columns:["entity_id","kind","key","label"],into:handle,validate:{row in
+            let id=try self.source.db.text(row,0),kind=try self.source.db.text(row,1),key=try self.source.db.text(row,2),label=try self.source.db.text(row,3)
+            guard let entity=try self.destination.entity(id),entity.kind.rawValue==kind,try EntityLabel.clean(label)==label,EntityLabel.key(label)==key else {throw BackupFileError.invalid("Invalid entity alias")}
+            guard entity.aliases.count<32 else {throw BackupFileError.invalid("Too many entity aliases")}
+        })
+        _ = try copy("entity_mentions",columns:["memory_id","entity_id","origin","revision","start","length","surface","method"],into:handle,validate:{row in
+            let memory=try self.cachedMemory(self.source.db.text(row,0)),id=try self.source.db.text(row,1),origin=try self.source.db.text(row,2),revision=try self.source.db.text(row,3),start=try self.integer(row,4),length=try self.integer(row,5),surface=try self.source.db.text(row,6),method=try self.source.db.text(row,7)
+            guard try self.destination.entity(id) != nil,revision==memory.entityRevision else {throw BackupFileError.invalid("Entity mention references a changed source")}
+            if origin=="manual" {guard start == -1,length==0,surface.isEmpty,method=="manual" else {throw BackupFileError.invalid("Invalid manual entity link")}}
+            else {guard origin=="automatic",["apple-nameType","project-alias"].contains(method),start>=0,length>0,length<=2048,start<=Int64(Int.max)-length,PassageRange(start:Int(start),length:Int(length)).text(in:memory.text)==surface else {throw BackupFileError.invalid("Invalid entity source span")}}
+        })
+        _ = try copy("entity_ignored",columns:["memory_id","kind","key"],into:handle,validate:{row in
+            _ = try self.cachedMemory(self.source.db.text(row,0));let key=try self.source.db.text(row,2)
+            guard EntityKind(rawValue:try self.source.db.text(row,1)) != nil,!key.isEmpty,key.utf8.count<=720,!key.unicodeScalars.contains(where:{$0.properties.generalCategory == .control}),EntityLabel.key(key)==key else {throw BackupFileError.invalid("Invalid rejected entity label")}
+        })
+        // Index completion is derived and is rebuilt under this machine's NLP
+        // version and fresh project-rule revision. Curated metadata is retained.
+        try destination.withRoutineDatabase {db in
+            let rows=try db.statement("SELECT id,name FROM memory_entities");defer {sqlite3_finalize(rows)};var code=sqlite3_step(rows)
+            while code==SQLITE_ROW {let id=db.text(rows,0),name=db.text(rows,1);guard try db.entityAliases(id).contains(where:{EntityLabel.key($0)==EntityLabel.key(name)}) else {throw BackupFileError.invalid("Entity has no canonical alias")};code=sqlite3_step(rows)}
+            guard code==SQLITE_DONE else {throw db.error()}
+        }
+    }
     func restore(into handle: OpaquePointer, progress: (LibraryBackupProgress) throws -> Void) throws {
         _ = try memories { try progress(LibraryBackupProgress(phase:"Restoring sources",completedItems:$0,unit:"records")) }
         try destination.rebuildRecapLinks()
         try restoreVisualIndexes(into:handle)
+        try restoreEntities(into:handle)
         _ = try copy("semantic_vectors",columns:["memory_id","model","dimension","vector","content_hash"],into:handle,validate:{ row in
             let id = try self.source.db.text(row,0), hash = try self.source.db.text(row,4), dimension = try self.integer(row,2)
             guard (1...8192).contains(dimension), hash == (try self.hashes.hash(id)) else { throw BackupFileError.invalid("Restored vector source hash differs") }

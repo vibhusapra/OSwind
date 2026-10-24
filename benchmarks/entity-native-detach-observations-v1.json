@@ -1,0 +1,421 @@
+{
+  "format": "OSwind independent APFS detach observation v1",
+  "baselineCodeCommit": "53bfef11c8c2579e0dd63e926c3812ee954b4725",
+  "candidateCodeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+  "baselineNativeGroup": {
+    "cases": 277,
+    "passes": 274,
+    "failures": 3,
+    "error": "Encrypted image detach could not be verified yet; retry locking"
+  },
+  "probes": [
+    {
+      "name": "v1",
+      "testExitCode": 1,
+      "elapsedWallSeconds": 18.819464791100472,
+      "samples": 285,
+      "rawEvidenceSHA256": "3b49f5675bd6fa5e18b63fe4620aa035f31966e902f24f5cf88aed8919abb687",
+      "stateTransitions": [
+        {
+          "elapsedSeconds": 0.018060916103422642,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 6.123700666008517,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 6.190467207925394,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 6.379312583012506,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 7.1550473750103265,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 7.287572500063106,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 7.937291250098497,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 8.00430233310908,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 8.45290150004439,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 8.633085750043392,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 9.360349375056103,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 9.515660125063732,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 9.966841666027904,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 10.03408750006929,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 10.115289875073358,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 10.828742915997282,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 10.905730541097,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 11.419838791014627,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 11.492852499941364,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 12.30163004109636,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 12.446354415966198,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 12.89476608298719,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 13.045939832925797,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 13.7778366249986,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 13.851110707968473,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 13.916145249968395,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 14.292261000024155,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 14.358844375004992,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 14.46722749993205,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 15.04632700001821,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 15.195111457956955,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 15.637965082889423,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 15.77111266599968,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 16.491359000094235,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 16.638521916000172,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 17.086773083079606,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 17.275341165950522,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 17.977170665981248,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 18.136168458033353,
+          "state": "APFS-volume-missing-image-listed"
+        }
+      ],
+      "longestObservedMissingVolumeRun": {
+        "firstObservedSeconds": 18.136168458033353,
+        "lastObservedSeconds": 18.764378749998286,
+        "observedSpanSeconds": 0.6282102919649333,
+        "nextObservedState": "observation-ended"
+      }
+    },
+    {
+      "name": "v2",
+      "testExitCode": 1,
+      "elapsedWallSeconds": 17.44873470813036,
+      "samples": 253,
+      "rawEvidenceSHA256": "ef485ab58c16139540cd699a319953904b410809d9fa26692cb1d51b14c7e4ab",
+      "stateTransitions": [
+        {
+          "elapsedSeconds": 0.011989250080659986,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 4.1883097919635475,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 4.261956624919549,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 4.328179500065744,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 5.194082957925275,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 5.265010582981631,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 5.3409760419745,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 6.033632625127211,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 6.252048958092928,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 6.656504292041063,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 6.825219625141472,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 7.580298958113417,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 7.7297403330449015,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 8.187763541936874,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 8.252010083058849,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 8.32696866709739,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 9.280162082985044,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 9.358639291953295,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 9.888774583116174,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 9.99147320794873,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 10.676809708122164,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 10.920050000073388,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 11.39546654210426,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 11.50563820800744,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 12.168797875056043,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 12.260366833070293,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 12.716917958110571,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 12.965576292015612,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 13.578759875148535,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 13.652484375052154,
+          "state": "APFS-volume-missing-image-listed"
+        }
+      ],
+      "longestObservedMissingVolumeRun": {
+        "firstObservedSeconds": 13.652484375052154,
+        "lastObservedSeconds": 17.388646708102897,
+        "observedSpanSeconds": 3.7361623330507427,
+        "nextObservedState": "observation-ended"
+      }
+    },
+    {
+      "name": "v3",
+      "testExitCode": 1,
+      "elapsedWallSeconds": 23.639956083148718,
+      "samples": 369,
+      "rawEvidenceSHA256": "08eb7e4245fa025a5a11d9782c92bfcbe5ba589f59aa3f350c639e1aa26ec814",
+      "stateTransitions": [
+        {
+          "elapsedSeconds": 0.01216941699385643,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 6.15689183305949,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 6.282045083120465,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 6.3479485001880676,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 7.2396794580854475,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 7.365289792185649,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 8.017092208145186,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 8.10852870810777,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 8.174854208016768,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 8.558601792203262,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 8.62236262508668,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 9.30283712502569,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 9.385387875139713,
+          "state": "absent"
+        },
+        {
+          "elapsedSeconds": 9.828656542114913,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 9.968633917160332,
+          "state": "mounted"
+        },
+        {
+          "elapsedSeconds": 10.69045937503688,
+          "state": "APFS-volume-unmounted"
+        },
+        {
+          "elapsedSeconds": 10.835473833139986,
+          "state": "APFS-volume-missing-image-listed"
+        },
+        {
+          "elapsedSeconds": 20.79708691709675,
+          "state": "absent"
+        }
+      ],
+      "longestObservedMissingVolumeRun": {
+        "firstObservedSeconds": 10.835473833139986,
+        "lastObservedSeconds": 20.732671458041295,
+        "observedSpanSeconds": 9.89719762490131,
+        "nextObservedState": "absent",
+        "nextObservedAtSeconds": 20.79708691709675
+      }
+    }
+  ],
+  "candidatePolicy": {
+    "maximumObservations": 16,
+    "maximumConfiguredPauseMilliseconds": 11550,
+    "firstPauseMilliseconds": 50,
+    "maximumPauseMilliseconds": 1000,
+    "requiredConsecutiveAbsentReplies": 2,
+    "extraDetachCommands": false,
+    "forceFlags": false,
+    "identityGuardsRetained": true,
+    "unknownErrorsStillRefuse": true
+  },
+  "candidateFocusedNativeCases": 24,
+  "candidateFocusedNativePasses": 24,
+  "scope": "Fresh owned encrypted APFS fixtures and extra independent hdiutil inventory. These are not the verifier callback observations. Additional IPC may change timing, and the OS cause is unproven. Missing-volume spans are between sampled replies, not exact physical transition times. Inventory errors remain unknown, never absence. Baseline failures are retained; broader candidate requalification is recorded separately."
+}

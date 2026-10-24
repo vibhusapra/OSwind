@@ -7,7 +7,7 @@ import argparse,hashlib,json,math,os,pathlib,plistlib,struct,subprocess,time,uui
 p=argparse.ArgumentParser();p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--cli',type=pathlib.Path,required=True);p.add_argument('--sanitize-thread',action='store_true');a=p.parse_args()
 project=pathlib.Path(__file__).resolve().parents[1];root=a.root.resolve();root.mkdir(mode=0o700,parents=True,exist_ok=False)
 cli=a.cli.resolve();doctor=json.loads(subprocess.check_output([str(cli),'--data',str(root/'doctor-library'),'doctor'],text=True));assert not doctor['screenLocked'] and doctor['screenRecording'],'Requires unlocked Mac and existing capture access'
-env=os.environ.copy();env.update(OSWIND_TEST_NATIVE_SYSTEM_AUDIO='1',OSWIND_AUDIO_PROBE_ROOT=str(root));processes=[];sources=[]
+env=os.environ.copy();env.update(OSWIND_TEST_NATIVE_SYSTEM_AUDIO='1',OSWIND_AUDIO_PROBE_ROOT=str(root));processes=[];sources=[];ownedExecutables=set()
 try:
  executable=root/'AudioSource';subprocess.run(['swiftc',str(project/'Tests/Fixtures/AudioSourceFixture.swift'),'-o',str(executable)],check=True,capture_output=True)
  for name,frequency in [('A',440),('B',997)]:
@@ -16,6 +16,7 @@ try:
    file.setnchannels(1);file.setsampwidth(2);file.setframerate(48000);file.writeframes(b''.join(struct.pack('<h',int(0.08*32767*math.sin(2*math.pi*frequency*i/48000))) for i in range(48000)))
   bundle='com.oswind.fixture.audio.'+uuid.uuid4().hex;app=root/(name+'.app');macos=app/'Contents/MacOS';macos.mkdir(parents=True);__import__('shutil').copy2(executable,macos/'AudioSource')
   (app/'Contents/Info.plist').write_bytes(plistlib.dumps({'CFBundleIdentifier':bundle,'CFBundleExecutable':'AudioSource','CFBundleName':'OSwind Owned Audio '+name,'CFBundlePackageType':'APPL'}));subprocess.run(['codesign','--force','--deep','--sign','-',str(app)],check=True,capture_output=True)
+  ownedExecutables.add(str(macos/'AudioSource'))
   log=(root/(name+'.log')).open('wb');ready=root/(name+'.ready.json');process=subprocess.Popen(['/usr/bin/open','-n','-g','-W','-a',str(app),'--args',str(audio),str(root/(name+'.play')),str(ready)],stdout=log,stderr=log);log.close();processes.append(process)
   deadline=time.monotonic()+10
   while not ready.exists() and process.poll() is None and time.monotonic()<deadline:time.sleep(0.05)
@@ -29,7 +30,12 @@ try:
  (root/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 finally:
  for name in ['A','B']:(root/(name+'.play')).unlink(missing_ok=True)
- for pid,path in sources:
+ # Readiness can stall before a PID is reported. Reap only exact executable
+ # paths created in this run, even when LaunchServices outlives open -W.
+ for row in subprocess.check_output(['ps','-axo','pid=,comm='],text=True).splitlines():
+  fields=row.strip().split(None,1)
+  if len(fields)==2 and fields[1] in ownedExecutables:sources.append((int(fields[0]),fields[1]))
+ for pid,path in set(sources):
   check=subprocess.run(['ps','-p',str(pid),'-o','comm='],capture_output=True,text=True)
   if check.returncode==0 and check.stdout.strip()==path:
    try:os.kill(pid,__import__('signal').SIGTERM)

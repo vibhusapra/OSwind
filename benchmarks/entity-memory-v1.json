@@ -1,0 +1,536 @@
+{
+  "format": "OSwind source-linked entity memory and native lifecycle qualification v1",
+  "codeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+  "schema": 21,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "scope": "Owned synthetic entity memory and encrypted lifecycle, signed package, source-bound tests, targeted live capture/OCR/privacy, production PCM known-tone isolation normal/TSan and native entity/editor/source/Ask input. No normal history, real credentials, Keychain/authentication/TCC changes, microphone-to-ASR, representative NLP accuracy, power or competitor ranking.",
+  "features": [
+    "Apple on-device person/organization/place suggestions with UTF16 source spans",
+    "explicit project aliases and manually curated source links",
+    "editable labels/notes/aliases and deliberate same-kind merges",
+    "revision-bound admission, correction suppression and erasure of derived orphan labels",
+    "entity-scoped keyword/semantic/indexed/visual/Ask/calendar filtering through shared SQL scope",
+    "Metal membership masks invalidated across connections",
+    "one resumable utility extractor and bounded 256-source catch-up queue",
+    "prepared immutable project rules per indexing run",
+    "quiet schema21 backup restore validates definitions, aliases, source revisions/spans and corrections",
+    "schema21 refusal by actual older schema20 clients",
+    "native list page, editor/source-link controls and visible removable Ask/search scope"
+  ],
+  "tests": {
+    "fullCases": 779,
+    "normalPasses": 748,
+    "normalOptInSkips": 31,
+    "nativeModelPasses": 281,
+    "additionalNativePasses": 24,
+    "distinctFunctionalPasses": 773,
+    "remainingOptInCases": [
+      "-[OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured]",
+      "-[OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle]",
+      "-[OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange]",
+      "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]"
+    ],
+    "threadSanitizerPasses": 318,
+    "threadSanitizerRacesReported": false,
+    "physicalAudioAdditionalDistinctCases": 1
+  },
+  "package": {
+    "scope": "Separately staged schema21 source-linked entity memory and existing desktop memory; no installation or native capture/input acceptance",
+    "codeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+    "schema": 21,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "477917f7715023f61cf8f978412f18eda4cb1227387a0b7b49dfc22804262625",
+        "signedSHA256": "3d6c19371e8123542a10f1456869c13c19c25c5609a499be6c5341646a44729d",
+        "normalizedPayloadSHA256": "9d404a216a49bbb8480b9affca83ca08b942df9fbfd3b9032d7ace8956f0343c"
+      },
+      "oswindctl": {
+        "rawSHA256": "c5220e5d1c3424f1a545a43ee2b711142357962aaf9d8a3ca32364c828132b89",
+        "signedSHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+        "normalizedPayloadSHA256": "c140cec322d965eb41824bdd637e417afa6c89f6e2636e87bc059c34e15c9ba6"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "cd3a6bb2b160ea47836c052676246d11edecf258dd54ee00f271a0bd7ce50a45",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "02decb96bf5fb598382741bf41bce0db7b25c7663b82aa8037227a2e4062d120",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalOperations": [
+    {
+      "name": "native-optin-v2",
+      "exitCode": 0,
+      "wallSeconds": 204.623182709096
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 55.26172941713594
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8363260000478476
+    },
+    {
+      "name": "entity-process-v4",
+      "exitCode": 0,
+      "wallSeconds": 9.756684709107503
+    },
+    {
+      "name": "calendar-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.6813001669943333
+    },
+    {
+      "name": "tag-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.064585791900754
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.3158185000065714
+    },
+    {
+      "name": "audio-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.9499083331320435
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.6766071249730885
+    },
+    {
+      "name": "integration-v2",
+      "exitCode": 0,
+      "wallSeconds": 0.5197898328769952
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.0942331671249121
+    },
+    {
+      "name": "capture-region-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.42584854178130627
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 16.81613029190339
+    },
+    {
+      "name": "vault-process-v2",
+      "exitCode": 0,
+      "wallSeconds": 16.77931429212913
+    },
+    {
+      "name": "entity-vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 8.5452205829788
+    },
+    {
+      "name": "wipe-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.694297333015129
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1034471250604838
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 225.03723745793104
+    },
+    {
+      "name": "speaker-search-process-v2",
+      "exitCode": 0,
+      "scope": "Signed CLI/HTTP/MCP recording-local speaker schema, Unicode filter, rename and erasure; no standalone timing recorded."
+    },
+    {
+      "name": "live-snapshot-v2",
+      "exitCode": 0,
+      "wallSeconds": 4.3570602079853415
+    },
+    {
+      "name": "physical-normal-v3",
+      "exitCode": 0,
+      "wallSeconds": 37.07164370804094
+    },
+    {
+      "name": "physical-tsan-v3",
+      "exitCode": 0,
+      "wallSeconds": 43.75074916705489
+    }
+  ],
+  "successfulFinalOperations": 22,
+  "uniqueSignedProcessGroups": 15,
+  "entityProcess": {
+    "format": "OSwind source-linked entity memory qualification v1",
+    "binarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+    "olderSchema20BinarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "olderClientRefusalChecked": true,
+    "harnessSHA256": "80423eb46e35639a785278e1447f221e13d6b30e32a9db0df759b9483807b8b1",
+    "schema": 21,
+    "passed": true,
+    "sources": 1000,
+    "projectOracleSources": 667,
+    "projectPrecision": 1.0,
+    "projectRecall": 1.0,
+    "automaticSpansVerified": 1335,
+    "firstIndexWallSeconds": 0.7138101658783853,
+    "resumeWallSeconds": 0.061795041197910905,
+    "observedNLPAndProjectGroups": [
+      {
+        "kind": "organization",
+        "name": "Apollo",
+        "sources": 334
+      },
+      {
+        "kind": "person",
+        "name": "Chen",
+        "sources": 334
+      },
+      {
+        "kind": "project",
+        "name": "Apollo Launch",
+        "sources": 667
+      }
+    ],
+    "checks": [
+      "exact project alias oracle",
+      "UTF16 source anchors",
+      "scoped keyword retrieval",
+      "correction survives rule-rescan",
+      "read-only MCP membership and validation",
+      "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+      "quiet backup restore retains definitions, aliases and links",
+      "restored completion reset",
+      "source erasure",
+      "full wipe erases curated definitions",
+      "schema20 client refusal"
+    ],
+    "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+  },
+  "nativeEntityVault": {
+    "format": "OSwind native entity vault v1",
+    "state": "completed",
+    "binarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+    "checks": [
+      "native local NLP/project indexing and explicit person link on verified encrypted library",
+      "rejected project mention survives native encrypted rule-rescan",
+      "labels, notes, correction and deliberate source link survive normal lock/remount",
+      "full backup and quiet restore retain entity metadata/correction with native rescan"
+    ],
+    "scope": "Synthetic source and entity metadata on one newly-created encrypted APFS volume. No normal library, real credentials, Keychain, authentication or TCC changes. No Apple-framework temporary-memory zeroization or power claim.",
+    "schema": 21,
+    "sourceCount": 1,
+    "entityCount": 4,
+    "verifiedDetached": true,
+    "passphrasePersisted": false,
+    "cleanupDetached": true
+  },
+  "detachObservationEvidence": "entity-native-detach-observations-v1.json",
+  "soakEvidence": "reliability-soak-24h-v1.json",
+  "layout": {
+    "codeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+    "source": "immutable debug app; existing app-owned NSHosting renderer",
+    "size": "1100x760",
+    "syntheticSources": 5,
+    "lightSHA256": "0b50ac8fa421a45be645d6b41108fa4bbdb3f5f5ebeb03166abee2e1c054203e",
+    "darkSHA256": "2b75dd2f2d04f948e92ffa61b643f4136a2c1cd989e993748953bf634c52679d",
+    "screensCapturedFromDesktop": false,
+    "nativeInputAccepted": false
+  },
+  "cleanup": {
+    "noOwnedImagesInIndependentInventory": true,
+    "installed17Unchanged": true
+  },
+  "retainedFailures": [
+    {
+      "scope": "first full suite",
+      "cases": 773,
+      "failedCases": 3,
+      "reason": "Three stale migration assertions expected20; refreshed to current schema."
+    },
+    {
+      "scope": "second full suite",
+      "cases": 775,
+      "failedCases": 1,
+      "reason": "Adversarial Unicode normalization exposed Foundation truncation; lossy labels now rejected. Unicode-case-expanded rejected labels also round-trip through restore."
+    },
+    {
+      "scope": "initial native/model run on53bfef1",
+      "cases": 277,
+      "failedCases": 3,
+      "reason": "Earlier eight-observation detach budget exhausted. Three isolated diagnostic failures and independent sampled inventory remain retained; approximately ten seconds of image-listed/volume-missing replies motivated bounded adaptive backoff."
+    },
+    {
+      "scope": "new process harness development",
+      "failedOperations": 5,
+      "reason": "Input omitted required bundleID; HTTP helper shadowed a Python module; delete/wipe needed JSON output flags; older integration tool list expected four rather than six; CI speaker harness selected a schema by list position rather than tool name. Fresh final process runs pass; prior fixtures/logs retained. No application guard/assertion was removed."
+    },
+    {
+      "scope": "Documents-root native launch continuation",
+      "failedOperations": 1,
+      "reason": "Owned audio source readiness timed out before a PCM test ran; GUI also stalled on owned Documents fixture file opens. Exact owned processes stopped. Temporary fixture retry passed without permission changes; protected-folder cause unproven."
+    },
+    {
+      "scope": "Signed native entity UI",
+      "reason": "Cmd-K after returning from an entity scope leaves stale results without a scope chip. Reproduced on six synthetic sources; query changes refresh correctly. Fix follows in a separate reviewable change."
+    }
+  ],
+  "limitations": [
+    "Project precision/recall1.0 refers only to the authored exact-alias oracle on1000 repeated synthetic sources. Apple NLP has no representative quality score; it suggested Chen without Maya and Apollo as an organization in this fixture. These are not verified identities.",
+    "Automatic extraction uses body text, not title-only or recording speaker metadata; curated speaker-to-person linkage and cross-recording voice/face recognition are not implemented.",
+    "Project-note-only edits currently conservatively invalidate project automatic links/index completion; optimize this metadata-only path with explicit preservation tests. Source JSON/Markdown omit the entity layer; use full backup. Explicit forced re-extraction and entity-layer portable export remain follow-ups.",
+    "Multilingual, million-source entity performance, latest continuous24h desktop capture/power and matched full competitor runtime remain open.",
+    "The independent completed24h component soak uses an older pinned schema11 binary and retains four gaps; it is not an uninterrupted or latest-runtime result.",
+    "Release is ad-hoc signed and staged, not installed/notarized. Native entity/editor/source/Ask input is observed on a temporary synthetic library, with a retained Cmd-K stale-result defect. Documents-root startup, capture GUI/controller/microphone-to-ASR and destructive UI acceptance remain open."
+  ],
+  "harnesses": {
+    "speaker-search-smoke.py": "f220483245c2d2d9cabdf7d8d2593f94a8d6897f6c122e5e165f40992deceea0",
+    "entity-memory-smoke.py": "80423eb46e35639a785278e1447f221e13d6b30e32a9db0df759b9483807b8b1",
+    "entity-vault-smoke.py": "39ad228ce248f21ee2ae3fe646df09a0fb5f9b1c9845f934a1214ad791a37c01",
+    "integration-smoke.py": "784ba6897ae693d9c77c517b9cff168ca34b739d65d9fcacd9003049ac1f5df2",
+    "activity-calendar-smoke.py": "8233563be88978bcba9134db89f3f3586ea37aa959b61a0f4a9b5dcf402c30ed",
+    "tag-index-smoke.py": "e56c94f3c41a678389b53141d437e42683b558cbfe9def152105cf619cf41028",
+    "domain-privacy-smoke.py": "09023e1356726ce56e09a9d1270db0564a236c54892b9de4108423d3fc049dae",
+    "audio-smoke.py": "69c52f2fb9e802b4a4c049dad2006d1b1fe7298f09a7af36c61170755512adfd",
+    "visual-replay-smoke.py": "d0afde8d19c28de9e39a1d3199a4f66669d4627a08dc9b109f0f4a208e349e69",
+    "capture-region-smoke.py": "9940a5487d24df96d3a3e82a4ebc545cd775b63c318c3203ec3a9b2054945be3",
+    "vault-smoke.py": "50e5c550edcddfcd7c642849ea4bd1c7e19596038aa6ee6cd14f3ee0ee8f7bb3",
+    "wipe-smoke.py": "131aa0ea03e88b17892a439564ca23fdb4bd97036c59c36b6ecc55a166153530",
+    "backup-smoke.py": "9a16dda2fd2fa86892a82a49f5ebd6a6f033036c6cf9c92ed7a77bd611ac35f2",
+    "native-system-audio-smoke.py": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+    "live-capture-smoke.py": "3c2ee55d0e912c6cc9b11de6990cb669a019a177f1fd8c67a4c5f6f8d1451de1"
+  },
+  "initialNativeDeferral": {
+    "checkedAtUTC": "2026-10-24T20:57:36.743013+00:00",
+    "screenLocked": true,
+    "screenRecordingPreflight": true,
+    "accessibilityPreflight": true,
+    "operations": [
+      "real signed targeted capture/OCR/privacy",
+      "native physical system-audio normal/TSan",
+      "native click/keyboard and source-detail/editor UI acceptance"
+    ],
+    "reason": "Locked session. No attempt to unlock or bypass authentication/permissions."
+  },
+  "unlockedContinuation": {
+    "signedCodeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+    "harnessHeadCommit": "3e8d436ac628e990f13b47a3771d94148ea08114",
+    "screenLockedAtPreflight": false,
+    "permissionChanges": false,
+    "liveCapture": {
+      "result": "PASS",
+      "normalStatusMilliseconds": 700,
+      "secretStatusMilliseconds": 550,
+      "ocrRegions": 5,
+      "verified": [
+        "target identity",
+        "live OCR marker",
+        "retained normal image",
+        "secret redaction",
+        "secret image suppression",
+        "app exclusion",
+        "title exclusion",
+        "delete image/FTS"
+      ],
+      "logSHA256": "6f2fce45ac6dae0957091d0567951f8b9833fd386eb90af11ad59ec10ccf86b9",
+      "scope": "Signed CLI targeting an owned synthetic window; one normal and one secret capture, uncontrolled host activity; no sustained latency/energy or GUI capture/controller claim."
+    },
+    "physicalAudio": [
+      {
+        "format": "OSwind owned native system-audio observations v1",
+        "observations": [
+          {
+            "adapterFailure": null,
+            "intendedAmplitude": 0.011310983930671805,
+            "intendedFrequencyHz": 440,
+            "intendedToOtherAmplitudeRatio": 13696249.323952377,
+            "otherOwnedSourceAmplitude": 8.258453583267388e-10,
+            "passed": true,
+            "samples": 48000,
+            "source": "A",
+            "sourceIdentityVerified": true,
+            "sourcePresentInOnscreenOnlyInventory": false,
+            "stream": {
+              "callbacks": 150,
+              "formats": [
+                "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+              ],
+              "interrupted": false,
+              "invalidFormats": 0,
+              "maximumCallbackSamples": 320
+            }
+          },
+          {
+            "adapterFailure": null,
+            "intendedAmplitude": 0.011310414790222727,
+            "intendedFrequencyHz": 997,
+            "intendedToOtherAmplitudeRatio": 3868781.0806638715,
+            "otherOwnedSourceAmplitude": 2.9235086075953134e-09,
+            "passed": true,
+            "samples": 48640,
+            "source": "B",
+            "sourceIdentityVerified": true,
+            "sourcePresentInOnscreenOnlyInventory": false,
+            "stream": {
+              "callbacks": 152,
+              "formats": [
+                "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+              ],
+              "interrupted": false,
+              "invalidFormats": 0,
+              "maximumCallbackSamples": 320
+            }
+          }
+        ],
+        "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+        "threadSanitizer": false,
+        "sourceCommit": "3e8d436ac628e990f13b47a3771d94148ea08114",
+        "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+        "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+        "os": "Version 26.6.2 (Build 25G83)",
+        "gpu": "Apple M5 Max",
+        "testLogSHA256": "9e55914b054c717759125924052365781fe628e75629bf3f4783e073c7407b74",
+        "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+        "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+        "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+        "permissionChanges": false,
+        "rawCapturedAudioPersisted": false,
+        "systemVolumeChanged": false,
+        "productionCodeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+        "productionSourcesMatchCompiledCandidate": true
+      },
+      {
+        "format": "OSwind owned native system-audio observations v1",
+        "observations": [
+          {
+            "adapterFailure": null,
+            "intendedAmplitude": 0.011310982016930694,
+            "intendedFrequencyHz": 440,
+            "intendedToOtherAmplitudeRatio": 8175155.759317453,
+            "otherOwnedSourceAmplitude": 1.383580001401105e-09,
+            "passed": true,
+            "samples": 48000,
+            "source": "A",
+            "sourceIdentityVerified": true,
+            "sourcePresentInOnscreenOnlyInventory": false,
+            "stream": {
+              "callbacks": 150,
+              "formats": [
+                "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+              ],
+              "interrupted": false,
+              "invalidFormats": 0,
+              "maximumCallbackSamples": 320
+            }
+          },
+          {
+            "adapterFailure": null,
+            "intendedAmplitude": 0.011310415965272456,
+            "intendedFrequencyHz": 997,
+            "intendedToOtherAmplitudeRatio": 8609790.076967357,
+            "otherOwnedSourceAmplitude": 1.3136691910212456e-09,
+            "passed": true,
+            "samples": 48640,
+            "source": "B",
+            "sourceIdentityVerified": true,
+            "sourcePresentInOnscreenOnlyInventory": false,
+            "stream": {
+              "callbacks": 152,
+              "formats": [
+                "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+              ],
+              "interrupted": false,
+              "invalidFormats": 0,
+              "maximumCallbackSamples": 320
+            }
+          }
+        ],
+        "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+        "threadSanitizer": true,
+        "sourceCommit": "3e8d436ac628e990f13b47a3771d94148ea08114",
+        "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+        "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+        "os": "Version 26.6.2 (Build 25G83)",
+        "gpu": "Apple M5 Max",
+        "testLogSHA256": "6be14945100ce64a4784dbf47e4145ed2f69759ae4f2b0e11ba2201b7e0a9b6c",
+        "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+        "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+        "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+        "permissionChanges": false,
+        "rawCapturedAudioPersisted": false,
+        "systemVolumeChanged": false,
+        "productionCodeCommit": "0a5cad1131070ed736121f11e52b5d48ad143ab4",
+        "productionSourcesMatchCompiledCandidate": true
+      }
+    ],
+    "nativeUI": {
+      "result": "partial_with_retained_defect",
+      "app": "immutable signed release-v1/OSwind.app",
+      "library": "six synthetic notes restored into an owned temporary sample library; recording paused, audio off",
+      "input": "CUA native AX actions and keyboard; observed controls/results after actions",
+      "accepted": [
+        "Project search scope shows only its three original sources; keyword budget narrows to one; clear scope restores all five initial sources",
+        "Evidence-only scoped Ask cites three original sources; opening a citation shows complete source text",
+        "Create curated project with alias and notes",
+        "Link original source manually in the native picker; project count becomes one",
+        "Save Quick note matching a project alias; automatic catch-up indexes only the new source, six of six complete and project count two",
+        "Edit project aliases and notes; conservative invalidation clears automatic links, Build / resume restores six of six and project count two",
+        "Disable automatic indexing; state visibly off",
+        "Type a quoted phrase in focused native search after Cmd-K; only the matching Quick note remains"
+      ],
+      "retainedDefect": {
+        "trigger": "Search a two-source project, return to People & projects (clearing scope), then Cmd-K",
+        "expected": "Global Memories results refresh to all six sources with existing all-time/all-app filters",
+        "observed": "Scope chip disappears and focus is in search, but two old scoped results remain until query/refresh changes",
+        "cause": "AppModel.focusSearch does not call refresh; People & projects intentionally stops ordinary search refresh",
+        "followUp": "Focused regression and product fix next; this package retains the defect."
+      },
+      "notAccepted": [
+        "Native microphone/system-audio/controller/ASR end-to-end",
+        "Destructive merge/delete/wipe UI",
+        "Documents-root startup permission acceptance",
+        "Uninterrupted desktop capture and power"
+      ]
+    },
+    "startupObservations": {
+      "retainedFailures": [
+        "Documents-root tone fixture did not register readiness before deadline; no PCM test executed",
+        "Documents-root sample-library GUI remained Opening; UI event loop remained responsive"
+      ],
+      "samples": [
+        "Owned tone app blocked in AVAudioPlayer/AudioFileOpenURL/open",
+        "Owned GUI opening worker blocked in BackupFileTree/open"
+      ],
+      "cause": "Possible protected-folder access interaction; not proven. No authorization/TCC change attempted.",
+      "retry": "Restore only synthetic fixture to temporary storage; GUI and normal/TSan physical audio pass there. Documents-root startup remains unqualified.",
+      "cleanup": "Exact owned executable paths verified before SIGTERM. Harness now also discovers its exact created paths if readiness never reports a PID."
+    }
+  },
+  "ci": {
+    "headCommit": "3e8d436ac628e990f13b47a3771d94148ea08114",
+    "runID": 40134405348,
+    "conclusion": "success",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40134405348"
+  }
+}

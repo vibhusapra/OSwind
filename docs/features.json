@@ -275,8 +275,8 @@
     "id": "F035",
     "axis": "AI",
     "feature": "Structured people/project memory",
-    "status": "todo",
-    "evidence": "Tags only; entity extraction/curation missing",
+    "status": "partial",
+    "evidence": "On-device Apple name suggestions; explicit project aliases; source-linked pages, curation/merges, scoped search/Ask and read-only integrations. NLP quality is unmeasured; the authored fixture fragments a person name. Curated speaker-to-person links, entity JSON/Markdown export and cross-recording voice/face identity are not implemented",
     "references": "Minne, Omi"
   },
   {

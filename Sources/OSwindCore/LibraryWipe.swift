@@ -58,7 +58,7 @@ public extension MemoryStore {
                     if scanned%100==0 {progress(.init(phase:"Inventorying retained media",completedItems:scanned,unit:"files"))}
                 },removeEmpty:false)
                 progress(.init(phase:"Deleting local history",completedItems:scanned,unit:"files"))
-                try db.execute("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+                try db.execute("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM memory_entities; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
                 return (sources,turns,chats,routines,runs)
             }}
             progress(.init(phase:"Removing retained media"))

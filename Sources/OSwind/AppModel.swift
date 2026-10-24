@@ -10,6 +10,8 @@ import UniformTypeIdentifiers
     let embedder = LocalEmbedder()
     let capture: CaptureController
     let audio: AudioController
+    let entityMemory:EntityMemoryModel
+    @Published var entityScope:MemoryEntity?
     let activity:ActivityCalendarModel
     @Published var calendarSlice:DateInterval?
     @Published var calendarSliceZone:String?
@@ -28,7 +30,7 @@ import UniformTypeIdentifiers
         if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
-    @Published var section = "Memories"
+    @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
     @Published var searchFocusRequest: UUID?
     @Published var query = ""
     @Published var mode: SearchMode = .hybrid
@@ -128,11 +130,13 @@ import UniformTypeIdentifiers
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)
         audio = AudioController(store:store, embedder:embedder, settings:loaded)
+        entityMemory=EntityMemoryModel(store:store)
         activity=ActivityCalendarModel(store:store)
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
         routines.onChange = {[weak self] in self?.refreshChats()}
         libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
         visualModelSetup.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
+        entityMemory.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         libraryWipe.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
@@ -140,7 +144,7 @@ import UniformTypeIdentifiers
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
             NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop() }.store(in:&cancellables)
         }
-        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick(); self?.resumeAutomaticVisualIndex() }.store(in:&cancellables)
+        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick();if self?.settings.entityAutomaticIndex==true {self?.entityMemory.build()}; self?.resumeAutomaticVisualIndex() }.store(in:&cancellables)
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
@@ -151,13 +155,14 @@ import UniformTypeIdentifiers
         startHousekeeping()
     }
     private func startHousekeeping() {housekeeping?.invalidate();housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }}
-    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };resumeAutomaticVisualIndex() }
+    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };if settings.entityAutomaticIndex && !demo {entityMemory.build()};resumeAutomaticVisualIndex() }
     func selectPreparedVisualModel(_ installed:VisualModelInstallation) {
         guard !store.isClosed else {return}
         settings.search.visual.modelDirectory=installed.directory.path
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
@@ -180,7 +185,10 @@ import UniformTypeIdentifiers
         case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
         default: break
         }
-        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",limit:200)
+        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",entityID:entityScope?.id,limit:200)
+    }
+    func browseEntity(_ entity:MemoryEntity,ask:Bool) {
+        cancelOpeningMemory();selected=nil;hits=[];resolvedSearch=nil;entityScope=entity;query="";appFilter="All apps";range="All time";section=ask ? "Ask":"Memories";refresh()
     }
     func browseActivity(start:Date,end:Date,snapshot:ActivityCalendarSnapshot) {
         guard !store.isClosed else {return}
@@ -211,6 +219,10 @@ import UniformTypeIdentifiers
         let store=self.store
         openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)])[0].memory}
     }
+    func openEntitySource(_ source:EntitySource) {
+        let store=self.store
+        openSource(id:source.id,query:source.surface,passage:source.passage) {try store.entitySourceMemory(source)}
+    }
     func openRecapSource(_ card:RecapSourceCard) {
         let store=self.store
         openSource(id:card.id,query:"",passage:card.passage) {
@@ -236,6 +248,7 @@ import UniformTypeIdentifiers
     }
     func refresh(forceStatistics: Bool = false) {
         refreshStatistics(force:forceStatistics)
+        if section=="People & projects" {refreshTask?.cancel();refreshing=false;entityMemory.reload();return}
         if section=="Calendar" {refreshTask?.cancel();refreshing=false;activity.resumeAndInvalidate();return}
         searchInputError = nil
         refreshTask?.cancel(); let now = Date(), mode = self.mode
@@ -344,6 +357,7 @@ import UniformTypeIdentifiers
         }
     }
     private func captured(_ memory: Memory) {
+        if settings.entityAutomaticIndex {entityMemory.enqueue(memory)}
         queueVisualIndex(memory)
         refreshStatistics(force:true)
         if refreshing { pendingRefresh = true } else { refresh() }
@@ -483,7 +497,7 @@ import UniformTypeIdentifiers
     func wipeLocalLibrary(retry:Bool=false) {
         guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
         prepareForLibrarySwitch()
-        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false
+        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false
         let generation=libraryOperationGeneration
         libraryWipe.run(store:store,retry:retry) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
@@ -493,6 +507,7 @@ import UniformTypeIdentifiers
     }
     func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
     func pauseForHistoryErasure() {
+        entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         // Stop readers holding media reservations before asking erasure to take
         // an exclusive reservation. Wake/power callbacks must not restart them.

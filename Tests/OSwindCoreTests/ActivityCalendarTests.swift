@@ -115,7 +115,7 @@ final class ActivityCalendarTests:XCTestCase {
                 while sqlite3_step(statement)==SQLITE_ROW {plans.append(String(cString:sqlite3_column_text(statement,3)))}
                 XCTAssertTrue(plans.contains {$0.contains(name)},plans.joined(separator:"; "))
             }
-            let version=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(version)};XCTAssertEqual(sqlite3_step(version),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(version,0),20)
+            let version=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(version)};XCTAssertEqual(sqlite3_step(version),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(version,0),Int32(MemoryStore.schemaVersion))
         }
         XCTAssertEqual(try store.activityCalendar(request(filter:SearchFilter(kind:.screen,favoritesOnly:true,tag:"release"))).totalSources,1)
     }

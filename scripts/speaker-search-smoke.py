@@ -15,7 +15,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-speaker-search-') as directory:
     requests=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-11-25'}},{'jsonrpc':'2.0','method':'notifications/initialized'},{'jsonrpc':'2.0','id':2,'method':'tools/list'},{'jsonrpc':'2.0','id':3,'method':'tools/call','params':{'name':'search_memory','arguments':{'query':'archive','speaker':'MAYA CHEN','mode':'keyword'}}}]
     mcp=subprocess.run(prefix+['mcp'],input='\n'.join(map(json.dumps,requests))+'\n',text=True,capture_output=True,check=True,timeout=60)
     responses={r['id']:r for r in map(json.loads,mcp.stdout.splitlines())}
-    schema=responses[2]['result']['tools'][0]['inputSchema']['properties'];assert 'speaker' in schema
+    schema=next(tool for tool in responses[2]['result']['tools'] if tool['name']=='search_memory')['inputSchema']['properties'];assert 'speaker' in schema
     assert json.loads(responses[3]['result']['content'][0]['text'])['hits'][0]['memory']['id']==identifier
     server=subprocess.Popen(prefix+['serve'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
     try:
