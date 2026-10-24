@@ -28,7 +28,7 @@
     "axis": "Capture",
     "feature": "Accessibility context and text",
     "status": "implemented",
-    "evidence": "Bounded tree traversal; secure-field suppression; app/window metadata",
+    "evidence": "Snapshot/replay AX uses a single cancellable utility worker, per-object 40ms message timeouts, cooperative 350ms/1000-node/8192-message budgets, cycle checks and continued security scanning after text truncation. Incomplete trusted-AX trees defer. Optional-permission identity-only path preserved; audio reader remains synchronous. Native latency/availability/energy and broader browser acceptance remain open",
     "references": "Screenpipe, TimeScroll, Minne"
   },
   {

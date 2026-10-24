@@ -16,38 +16,6 @@ public struct WindowContext: Sendable {
     public var bounds: CGRect? = nil
     public var browser: Bool { ["safari", "chrome", "firefox", "arc", "brave", "edge", "vivaldi", "orion"].contains { bundle.lowercased().contains($0) } }
 }
-public enum AccessibilityContext {
-    @MainActor public static func current(targetBundleID: String? = nil) -> WindowContext? {
-        let application = targetBundleID.flatMap { bundle in NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundle } } ?? (targetBundleID == nil ? NSWorkspace.shared.frontmostApplication : nil)
-        guard let app = application else { return nil }
-        let root = AXUIElementCreateApplication(app.processIdentifier)
-        var windowRef: CFTypeRef?; AXUIElementCopyAttributeValue(root, kAXFocusedWindowAttribute as CFString, &windowRef)
-        var title = "", url: String?, texts = [String](), secure = false, bounds: CGRect?
-        func value(_ element: AXUIElement, _ name: String) -> CFTypeRef? { var out: CFTypeRef?; AXUIElementCopyAttributeValue(element, name as CFString, &out); return out }
-        if let windowRef, CFGetTypeID(windowRef) == AXUIElementGetTypeID() {
-            let window = unsafeBitCast(windowRef, to: AXUIElement.self); title = value(window, kAXTitleAttribute) as? String ?? ""
-            if let position=value(window,kAXPositionAttribute),let size=value(window,kAXSizeAttribute),CFGetTypeID(position)==AXValueGetTypeID(),CFGetTypeID(size)==AXValueGetTypeID() {
-                var point=CGPoint.zero,dimensions=CGSize.zero
-                if AXValueGetValue(unsafeBitCast(position,to:AXValue.self),.cgPoint,&point),AXValueGetValue(unsafeBitCast(size,to:AXValue.self),.cgSize,&dimensions) {bounds=CGRect(origin:point,size:dimensions)}
-            }
-            var queue: [AXUIElement] = [window], visited = 0, textSize = 0
-            while !queue.isEmpty && visited < 600 && textSize < 16000 {
-                let element = queue.removeFirst(); visited += 1
-                let role = value(element, kAXRoleAttribute) as? String ?? ""
-                let subrole = value(element, kAXSubroleAttribute) as? String ?? ""
-                if subrole == kAXSecureTextFieldSubrole { secure = true; continue }
-                if let u = value(element, kAXURLAttribute) as? URL { url = url ?? u.absoluteString }
-                else if let u = value(element, kAXURLAttribute) as? String, u.hasPrefix("http") { url = url ?? u }
-                if let text = value(element, kAXValueAttribute) as? String, !text.isEmpty {
-                    if role == kAXTextFieldRole, url == nil, text.hasPrefix("http://") || text.hasPrefix("https://") { url = text }
-                    if [kAXStaticTextRole,kAXTextAreaRole,kAXTextFieldRole].contains(role) { texts.append(String(text.prefix(4000))); textSize += text.count }
-                }
-                if let children = value(element, kAXChildrenAttribute) as? [AXUIElement] { queue.append(contentsOf: children.prefix(100)) }
-            }
-        }
-        return WindowContext(app: app.localizedName ?? "Unknown", bundle: app.bundleIdentifier ?? "", pid: app.processIdentifier, title: title, url: url, accessibilityText: texts.joined(separator: "\n"), secure: secure,bounds:bounds)
-    }
-}
 public enum SessionState {
     public static var locked: Bool {
         guard let dictionary = CGSessionCopyCurrentDictionary() as? [String: Any] else { return true }
@@ -77,9 +45,10 @@ public struct CaptureMetrics: Sendable {
     private let store: MemoryStore
     private let embedder: LocalEmbedder
     private let snapshots:SnapshotCaptureEnvironment
+    private var snapshotContextWorker:Task<WindowContext?,Never>?
     private var snapshotWorker:Task<(Memory,Data?,MediaAdmissionLease?),Error>?
     private var snapshotPassages:Task<Void,Error>?
-    private func cancelSnapshotWork(){snapshotWorker?.cancel();snapshotPassages?.cancel()}
+    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel()}
     private var timer: Timer?
     private var observers = [NSObjectProtocol]()
     private var busy = false
@@ -123,9 +92,20 @@ public struct CaptureMetrics: Sendable {
         let interval = settings.profile.effectiveInterval(lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled, thermalLimited: ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical, idleSeconds: idle) ?? 20
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in Task { @MainActor in guard let self, self.running else { return }; await self.captureOnce(); self.schedule() } }
     }
-    private func snapshotContext(_ original:WindowContext,token:UUID,manual:Bool,target:String?)->WindowContext? {
-        guard !Task.isCancelled,epoch==token,running || manual,!suspended else {return nil}
-        guard !snapshots.locked(),snapshots.permitted(),let now=snapshots.context(target),SnapshotContextBinding.matches(original,now),
+    private func readSnapshotContext(_ target:String?) async -> WindowContext? {
+        let read=snapshots.context
+        let worker=Task {await read(target)}
+        snapshotContextWorker=worker;defer {snapshotContextWorker=nil}
+        return await withTaskCancellationHandler {await worker.value} onCancel:{worker.cancel()}
+    }
+    private func snapshotCurrent(token:UUID,manual:Bool)->Bool {
+        !Task.isCancelled && epoch==token && (running || manual) && !suspended && !snapshots.locked() && snapshots.permitted()
+    }
+    private func snapshotContext(_ original:WindowContext,token:UUID,manual:Bool,target:String?) async -> WindowContext? {
+        guard snapshotCurrent(token:token,manual:manual) else {return nil}
+        let now=await readSnapshotContext(target)
+        guard snapshotCurrent(token:token,manual:manual) else {return nil}
+        guard let now,SnapshotContextBinding.matches(original,now),snapshots.identityCurrent(now,target),
               settings.privacy.exclusion(app:now.bundle,title:now.title,url:now.url,isBrowser:now.browser)==nil else {
             metrics.excluded+=1;status="Context changed · snapshot discarded";return nil
         }
@@ -138,20 +118,24 @@ public struct CaptureMetrics: Sendable {
         guard !snapshots.locked() else {status="Locked · capture suspended";return}
         guard snapshots.permitted() else {status="Screen Recording permission required";return}
         if !manual,CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)>120 {metrics.idle+=1;status="Idle · saving energy";return}
-        guard let context=snapshots.context(targetBundleID) else {status="Application context unavailable";return}
+        // Reserve the operation before the first suspension: pause, a settings
+        // change and a second manual request must invalidate or defer this read.
+        busy=true;defer {busy=false};let token=epoch,begin=Date();lastCapture=begin
+        let initial=await readSnapshotContext(targetBundleID)
+        guard snapshotCurrent(token:token,manual:manual) else {return}
+        guard let context=initial,snapshots.identityCurrent(context,targetBundleID) else {status="Application context unavailable or busy";return}
         if context.bundle=="com.oswind.desktop" || context.bundle==Bundle.main.bundleIdentifier {status="OSwind window · skipped";return}
         if context.secure {metrics.excluded+=1;status="Protected text field · skipped";return}
         if let reason=settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {metrics.excluded+=1;status=reason;return}
-        busy=true;defer {busy=false};let token=epoch,begin=Date();lastCapture=begin
         do {
             let frames=try await snapshots.frames(settings,context)
             if frames.isEmpty {if epoch==token {status="Waiting for an eligible capture source"};return}
             for frame in frames {
-                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                guard await snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
                 let image=try await frame.capture()
-                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                guard await snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
                 guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
-                guard let captured=snapshotContext(context,token:token,manual:manual,target:targetBundleID) else {return}
+                guard let captured=await snapshotContext(context,token:token,manual:manual,target:targetBundleID) else {return}
                 let pixels=Self.fingerprint(image)
                 if !manual,let old=fingerprints[frame.display],Self.difference(old,pixels)<2.0 {metrics.unchanged+=1;status="Unchanged · skipped";continue}
                 let policy=settings.privacy,quality=settings.profile.jpegQuality,recognize=snapshots.recognize,localEmbedder=embedder,mediaStore=store,title=frame.title,display=frame.display
@@ -177,7 +161,7 @@ public struct CaptureMetrics: Sendable {
                 let prepared=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
                 defer {prepared.2?.release()}
                 guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
-                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                guard await snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
                 var memory=prepared.0;memory.timestamp=begin
                 var imageTree:BackupFileTree?,written:String?,admitted=false
                 defer {if !admitted,let written {try? imageTree?.remove(written)}}
@@ -188,10 +172,10 @@ public struct CaptureMetrics: Sendable {
                     try lease.withActive(for:store.mediaRootIdentity) {try tree.requireRootIdentity(at:store.root);try tree.write(data,as:relative)}
                     written=relative;memory.imagePath=relative
                 }
-                // No actor suspension between this final context check, retained
-                // file validation and SQLite admission. AX/pixel reads remain
-                // separate OS observations, not an atomic capture guarantee.
-                guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
+                // The complete AX check preceded the file write. Only a cheap
+                // app identity/session check runs here; no actor suspension or
+                // cross-process AX call occurs between file and SQL admission.
+                guard snapshotCurrent(token:token,manual:manual),snapshots.identityCurrent(context,targetBundleID) else {return}
                 try imageTree?.requireRootIdentity(at:store.root);try store.insert(memory);admitted=true
                 fingerprints[frame.display]=pixels;metrics.saved+=1
                 let saved=memory,passageStore=store

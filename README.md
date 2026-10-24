@@ -12,6 +12,8 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 *Native sample workspace rendered for layout review; these are synthetic memories.*
 
+Latest screen-capture performance increment: **624 distinct passing cases / six opt-in cases remaining**, **111 TSan passes**, with a separately staged signed package and process checks. Snapshot/replay AX traversal is bounded and off the UI thread; see the [evidence and remaining gates](benchmarks/accessibility-capture-v1.json). Native capture availability and energy are still unmeasured for this increment.
+
 ## Build & run
 
 macOS 14+, Apple Silicon recommended, Swift 6.2+ / Xcode 26+ to build. Building the Apple Intelligence integration requires an SDK with FoundationModels (Xcode 26+); it runs only on macOS 26+ with Apple Intelligence enabled. SwiftPM resolves pinned USearch/NumKong search, FluidAudio speech and Hugging Face tokenizer dependencies; third-party notices are bundled.
@@ -29,6 +31,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 ## What v0 contains
 
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).
+- [Bounded accessibility reads](docs/ACCESSIBILITY-CAPTURE.md) keep snapshot/replay tree traversal off the UI thread; cancellation and fail-closed work budgets preserve capture boundaries. Audio-reader migration and physical availability/energy measurements remain open.
 - [Source-linked saved recaps](docs/RECAPS.md), with original evidence anchors, revision checks, transitive erasure and privacy-aware JSON/Markdown portability.
 - [Frozen natural-speech evaluation](docs/HELDOUT-EVALUATION.md): public plans, independent DER/WER scorers and model-free CI contracts. Both frozen test runs are complete with retained failures and regressions; this is not a competitor ranking.
 - [Local visual memory search](docs/VISUAL-SEARCH.md): screenshots and all declared replay frames, protected matched previews/time seek, scoped queries, resumable background indexing, complete-frame backup/restore and CLI/HTTP/MCP. Optional pinned SigLIP2 models, one-click local preparation and manual bundle selection; no image cloud fallback.

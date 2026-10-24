@@ -1,0 +1,172 @@
+{
+  "format": "OSwind bounded snapshot/replay accessibility v1",
+  "codeCommit": "d9eb6c7fecc0feb7b8496303a9e800c5be5b141a",
+  "schema": 19,
+  "hardware": "Apple M5 Max",
+  "os": "26.6.2",
+  "scope": "Owned traversal/controller/native-model/encrypted-library fixtures and separately staged signed package; no installation, native clicks, physical AX latency, energy or competitor claims",
+  "implementation": {
+    "asyncPaths": [
+      "snapshot",
+      "focused-window replay"
+    ],
+    "audioSynchronousReaderUnchanged": true,
+    "nativeAXObjectsRetainedAcrossTraversals": false,
+    "processGlobalTimeoutChanged": false,
+    "workerSlots": 1,
+    "independentWaitingQueue": false,
+    "perObjectTimeoutMaximumMS": 40,
+    "cooperativeTraversalMS": 350,
+    "maximumDistinctNodes": 1000,
+    "maximumAttributeMessages": 8192,
+    "maximumTextCharactersIncludingSeparators": 16000,
+    "maximumCharactersPerValue": 4000,
+    "textTruncationStillScansSecurityAndURL": true,
+    "cyclesAndQueueBoundedWithSet": true,
+    "incompleteTrustedAXReadDefers": true,
+    "optionalPermissionIdentityOnlyPathPreserved": true,
+    "replayCoalescesOnlyInFlightSameTarget": true,
+    "cancelledIPCSlotRetainedUntilReturn": true,
+    "lastFileSQLFenceHasNoAXIPCOrActorSuspension": true,
+    "atomicAXPixelGuarantee": false,
+    "hardOSCallDeadlineClaimed": false
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 630,
+      "passed": 603,
+      "optInSkipped": 27,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 82,
+      "additionalPreviouslySkipped": 21,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 624,
+    "remainingOptInSkips": 6,
+    "threadSanitizer": {
+      "passed": 111,
+      "failures": 0,
+      "racesReported": 0
+    }
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema19 bounded asynchronous snapshot/replay AX plus paused-player fix; no installation or native click acceptance",
+    "codeCommit": "d9eb6c7fecc0feb7b8496303a9e800c5be5b141a",
+    "schema": 19,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "31ab67d6b37a6ada3ecf3bbcb1604c7bc1d55c7eb9ce429f1a303d4dc17d6d95",
+        "signedSHA256": "45f90b67d9f71dfd7ee8238618ddd4c14dfb8c811919ef0b7bcf58a8ae051b0e",
+        "normalizedPayloadSHA256": "b69d4cb3673a9520bb911c0114aa710b1285347d5317d931fdaca8c0f4f9b54d"
+      },
+      "oswindctl": {
+        "rawSHA256": "1a5441441ac4acec62685017c6460c3c263f8698d1b99c224f39b79daa942421",
+        "signedSHA256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+        "normalizedPayloadSHA256": "e1f5eb54bcc3a0f601a5a4ffd36139db268fb73f479b4d2f51a9c7dd31c7eece"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "34e4fb5a4ebc85dfcd6bb9e57af2b808b6ea75ce568c99053e6953a99fa73685",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "96e016874d3be04322f1c425325d3f7f2579645c7d960dd2a3d4a1fdbd861ad7",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "qualificationProcesses": [
+    {
+      "name": "native-optin-v1",
+      "exitCode": 0,
+      "wallSeconds": 108.79688970791176
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 51.47425812506117
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8013724589254707
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.8033060831949115
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.6517276249360293
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.40979179204441607
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.0916656251065433
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 55.62208587490022
+    }
+  ],
+  "domainImportProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "nativeBoundary": {
+    "screenLockedAtFreshDoctor": true,
+    "screenRecordingPreflight": true,
+    "accessibilityPreflight": true,
+    "newNativeInputAcceptance": false,
+    "normalHistoryOpened": false,
+    "realKeychainCredentialsUsed": false,
+    "permissionOrAuthenticationChanges": false,
+    "installedSchema17AppUnchanged": true
+  },
+  "inheritedGUIRepair": {
+    "commit": "56d1bbbc8727df44547ccd1efbb2a36ac879645f",
+    "behavior": "Pause publishes actual player time synchronously; stale playback timer epochs are ignored",
+    "actualMutedPlaybackIncludedInNormalAndTSan": true,
+    "initialIndependentCIFailureRun": 40103872146
+  },
+  "remainingGates": [
+    "Audio AX startup/segment/finish lifecycle migration",
+    "Actual browser and dense-tree availability under the default budgets",
+    "Unlocked native interaction and rapid context changes",
+    "Physical active-capture latency, slow-disk responsiveness and energy",
+    "Broader hardware/OS and competitor benchmarks"
+  ],
+  "testOnlyCIFollowup": {
+    "initialRun": 40105119203,
+    "initialFailure": "Whisper cancellation fixture observed an existing but not-yet-populated PID file",
+    "fix": "Atomic readiness rename and positive parsed-PID observation before cancellation; existing five-second bound retained",
+    "localWorkspaceCasesPassed": 15,
+    "productSourceAndBuildInputsUnchangedFromCodeCommit": true,
+    "signedAndTSanEvidencePrecedesTestOnlyFollowup": true
+  }
+}

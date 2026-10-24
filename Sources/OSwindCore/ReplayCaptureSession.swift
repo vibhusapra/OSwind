@@ -19,6 +19,7 @@ import Vision
     private var recorder:VisualChunkRecorder?
     private var consumer:Task<Void,Never>?
     private var supervisor:Task<Void,Never>?
+    private let contextReads=AccessibilityReadSession()
     private var generation=UUID()
     private var binding=""
     private var currentInterval=0.0
@@ -39,6 +40,7 @@ import Vision
     /// Synchronous invalidation prevents a late OCR result publishing after a
     /// settings/library boundary. Discard is used for library switches/erasure.
     func stop(discard:Bool=false) {
+        contextReads.cancel()
         stopped=true;generation=UUID();if discard {supervisor?.cancel()};supervisor=nil
         retire(discard:discard)
     }
@@ -54,9 +56,11 @@ import Vision
     }
     func waitUntilStopped() async {for task in Array(retiring.values) {await task.value}}
     private static func key(_ context:WindowContext)->String {[String(context.pid),context.bundle,context.title,context.url ?? "",context.bounds.map {NSStringFromRect($0)} ?? ""].joined(separator:"\u{0}")}
-    private func eligible()->WindowContext? {
-        guard !stopped,!SessionState.locked,CGPreflightScreenCaptureAccess(),(targetBundleID != nil || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120),
-              let context=AccessibilityContext.current(targetBundleID:targetBundleID),!context.secure,context.bundle != Bundle.main.bundleIdentifier,context.bundle != "com.oswind.desktop",
+    private func eligible() async ->WindowContext? {
+        guard !stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),(targetBundleID != nil || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120) else {return nil}
+        let result=await contextReads.read(targetBundleID)
+        guard !stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),let context=result,
+              AccessibilityContext.identityCurrent(context,targetBundleID:targetBundleID),!context.secure,context.bundle != Bundle.main.bundleIdentifier,context.bundle != "com.oswind.desktop",
               settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser)==nil else {return nil}
         return context
     }
@@ -67,14 +71,15 @@ import Vision
             do {try await recorder?.flush()} catch {guard !stopped else {return};retire(discard:true);retryAfter=Date().addingTimeInterval(10);onFailure(error.localizedDescription);onStatus("Replay finalization: "+error.localizedDescription);return}
         }
         guard !stopped else {return}
-        guard let context=eligible() else {if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
+        guard let context=await eligible() else {guard !stopped else {return};if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
         let interval=settings.profile.replayInterval(lowPower:ProcessInfo.processInfo.isLowPowerModeEnabled,thermalLimited:ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical)
         let key=Self.key(context)
         guard source==nil || binding != key || currentInterval != interval else {return}
         retire();let token=generation;binding=key;currentInterval=interval
         do {
             let content=try await SCShareableContent.excludingDesktopWindows(true,onScreenWindowsOnly:true)
-            guard !stopped,generation==token,let now=eligible(),Self.key(now)==key else {return}
+            guard !stopped,generation==token,let now=await eligible(),Self.key(now)==key else {return}
+            guard !stopped,generation==token else {return}
             let candidates=content.windows.filter {$0.owningApplication?.processID==context.pid && $0.windowLayer==0 && $0.frame.width>100 && $0.frame.height>100}
             guard let selected=FocusedWindowBinding.select(candidates.map {CaptureWindowDescriptor(frame:$0.frame,title:$0.title)},context:context) else {onStatus("Replay waiting for an unambiguous focused window");return}
             let window=candidates[selected]
@@ -91,12 +96,14 @@ import Vision
                 do {
                     for try await frame in source.frames {
                         try Task.checkCancellation()
-                        guard let self,self.generation==token,let before=self.eligible(),Self.key(before)==key else {break}
+                        guard let self,self.generation==token,let before=await self.eligible(),Self.key(before)==key else {break}
+                        guard self.generation==token,!self.stopped else {break}
                         let extracted=try await Task.detached(priority:.utility) {
                             try VisualOCR.regions(frame.buffer)
                         }.value
                         try Task.checkCancellation()
-                        guard self.generation==token,let after=self.eligible(),Self.key(after)==key else {break}
+                        guard self.generation==token,let after=await self.eligible(),Self.key(after)==key else {break}
+                        guard self.generation==token,!self.stopped else {break}
                         let text=extracted.map(\.text).joined(separator:"\n")+(before.accessibilityText.isEmpty ? "":"\n\n"+before.accessibilityText)
                         let input=ReplayFrameInput(buffer:frame.buffer,time:frame.time,capturedAt:frame.capturedAt,app:before.app,bundle:before.bundle,title:before.title,url:before.url,display:display,text:text,regions:extracted,secure:before.secure,browser:before.browser)
                         try await writer.append(input,privacy:policy,interval:interval)
