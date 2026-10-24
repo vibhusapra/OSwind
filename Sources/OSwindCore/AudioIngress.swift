@@ -76,6 +76,14 @@ final class AudioAccumulator: @unchecked Sendable {
     func stop() {lock.withLock {active=false;samples.removeAll();pending.removeAll();start=nil;failure=nil}}
 }
 
+/// Audio sources can be hidden or live on another Space. The onscreen-window
+/// inventory omits those application identities and cannot build their excludes.
+enum SystemAudioInventory {
+    static func read() async throws ->SCShareableContent {
+        try await SCShareableContent.excludingDesktopWindows(true,onScreenWindowsOnly:false)
+    }
+}
+
 /// A new adapter is retained by each stream. Late callbacks can only reach the
 /// old inactive sink; stream object addresses never select a later controller.
 final class SystemAudioOutput:NSObject,SCStreamOutput,SCStreamDelegate,@unchecked Sendable {

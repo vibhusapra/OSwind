@@ -4,6 +4,7 @@ import AVFoundation
 import ScreenCaptureKit
 import CoreMedia
 import Darwin
+import Combine
 
 public enum WAV {
     public static func data(samples: [Float], sampleRate: UInt32 = 16000) -> Data {
@@ -86,7 +87,7 @@ private struct AudioPrivacyFailure:LocalizedError {
     var makeEngine: () throws -> AVAudioEngine = { AVAudioEngine() }
     var systemAvailable: () -> Bool = { CGPreflightScreenCaptureAccess() }
     var makeSystemCapture: (PrivacyPolicy, AudioAccumulator) async throws -> any AudioSystemCapture = { policy, sink in
-        let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly:true)
+        let content = try await SystemAudioInventory.read()
         guard let display=content.displays.first else { throw OSwindError.unavailable("No display for audio capture") }
         let excluded=content.applications.filter { app in policy.excludesApplication(app.bundleIdentifier) || Bundle.main.bundleIdentifier.map {app.bundleIdentifier.caseInsensitiveCompare($0) == .orderedSame} == true }
         let filter=SCContentFilter(display:display,excludingApplications:excluded,exceptingWindows:[])
@@ -97,6 +98,14 @@ private struct AudioPrivacyFailure:LocalizedError {
         let stream=SCStream(filter:filter,configuration:config,delegate:output)
         try stream.addStreamOutput(output,type:.audio,sampleHandlerQueue:output.queue)
         return NativeAudioSystemCapture(stream:stream,output:output)
+    }
+    var applicationLaunches:AnyPublisher<String,Never>=Empty().eraseToAnyPublisher()
+    static var live:Self {
+        var value=Self()
+        value.applicationLaunches=NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didLaunchApplicationNotification).compactMap {event in
+            (event.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication)?.bundleIdentifier
+        }.eraseToAnyPublisher()
+        return value
     }
 }
 @MainActor public final class AudioController: NSObject, ObservableObject {
@@ -111,6 +120,7 @@ private struct AudioPrivacyFailure:LocalizedError {
     public var onCapture: ((Memory) -> Void)?
     private var engine: AVAudioEngine?
     private var systemCapture: (any AudioSystemCapture)?
+    private var launchObserver:AnyCancellable?
     private var starting = false
     private var micSink: AudioAccumulator?
     private var systemSink: AudioAccumulator?
@@ -139,12 +149,19 @@ private struct AudioPrivacyFailure:LocalizedError {
         }
     }
     public convenience init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings) {
-        self.init(store:store,embedder:embedder,settings:settings,startup:AudioStartupEnvironment())
+        self.init(store:store,embedder:embedder,settings:settings,startup:.live)
     }
     init(store: MemoryStore, embedder: LocalEmbedder, settings: AppSettings, startup: AudioStartupEnvironment, recognizer:SpeechRecognizer=SpeechRecognizer()) {
         self.store=store; self.embedder=embedder; self.settings=settings; self.startup=startup; self.recognizer=recognizer
         contextSession=AccessibilityReadSession(operation:{_ in await startup.context()})
         super.init();applyNativeModelRetention()
+        launchObserver=startup.applicationLaunches.sink {[weak self] bundle in
+            Task {@MainActor [weak self] in self?.applicationLaunched(bundle)}
+        }
+    }
+    func applicationLaunched(_ bundle:String) {
+        guard hasActiveWork,settings.systemAudioEnabled,settings.privacy.excludesApplication(bundle) else {return}
+        stop();status="Excluded application started · restart audio to refresh source filtering"
     }
     private func applyNativeModelRetention() {
         Task { [weak self] in
