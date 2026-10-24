@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Score raw anonymous speaker timelines with pinned pyannote.metrics.
 Install benchmarks/requirements-speaker-eval.txt in a separate environment.
-This measures a declared development subset, never a product leaderboard.
+This measures a declared development/test selection, never a product leaderboard.
 """
 import argparse,hashlib,importlib.metadata,json,math,os,pathlib,re,shutil,signal,subprocess,time,wave
 from pyannote.core import Annotation,Segment,Timeline
@@ -54,14 +54,22 @@ def model_hash(directory):
 def evaluate(binary,model,dataset,output,repetitions=2):
     manifest=json.loads((dataset/'manifest.json').read_text())
     if manifest['state']!='prepared':raise ValueError('Dataset preparation is not complete')
+    split=manifest.get('split','dev');coverage=manifest.get('coverage','fixed-subset')
+    if split not in ['dev','test'] or coverage not in ['fixed-subset','full-development-set','full-test-set'] or coverage=='full-development-set' and split!='dev' or coverage=='full-test-set' and split!='test':raise ValueError('Invalid split/coverage declaration')
+    identifiers=[clip['id'] for clip in manifest['clips']]
+    if not 1<=len(identifiers)<=512 or len(set(identifiers))!=len(identifiers) or not all(re.fullmatch('[a-z]{5}',i) for i in identifiers):raise ValueError('Invalid or duplicate selection IDs')
+    if coverage in ['full-development-set','full-test-set'] and (manifest.get('planned_clips')!=len(identifiers) or manifest.get('available_reference_clips')!=len(identifiers)):raise ValueError('Incomplete declared full-split coverage')
     if output.exists():raise ValueError('Evaluation directory must be new')
     output.mkdir(parents=True,mode=0o700);(output/'predictions').mkdir(mode=0o700);(output/'runner').mkdir(mode=0o700)
     original_sha=sha(binary);pinned=output/'runner/oswindctl';shutil.copy2(binary,pinned);os.chmod(pinned,0o500)
     if sha(pinned)!=original_sha or sha(binary)!=original_sha:raise ValueError('Executable changed during pinning')
     binary=pinned
-    report={'format':'OSwind natural speaker development evaluation v1','state':'running','dataset':{key:manifest[key] for key in ['dataset','annotation_commit','selection','license','attribution','license_source']},'binary_sha256':original_sha,'pinned_runner':'runner/oswindctl','model_tree_sha256':model_hash(model),'repetitions':repetitions,'scorer':{name:importlib.metadata.version(name) for name in ['pyannote.metrics','pyannote.core','numpy','scipy']},'settings':{'collars_seconds':[0,0.25],'skip_overlap':False,'uem':'Entire source WAV duration, including unannotated silence','oracle_speaker_count':False},'clips':[],'scope':'Predetermined development clips, not held-out/corpus-wide or competitor app quality. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML compilation caches uncontrolled. macOS process RSS excludes device allocation, background daemons and system power.'}
+    report={'format':'OSwind natural speaker '+('test' if split=='test' else 'development')+' evaluation v1','state':'running','dataset':{key:manifest[key] for key in ['dataset','annotation_commit','selection','license','attribution','license_source']},'binary_sha256':original_sha,'pinned_runner':'runner/oswindctl','harness_sha256':sha(pathlib.Path(__file__)),'model_tree_sha256':model_hash(model),'repetitions':repetitions,'scorer':{name:importlib.metadata.version(name) for name in ['pyannote.metrics','pyannote.core','numpy','scipy']},'settings':{'collars_seconds':[0,0.25],'skip_overlap':False,'uem':'Entire source WAV duration, including unannotated silence','oracle_speaker_count':False},'clips':[],'scope':'Predetermined development clips, not held-out/corpus-wide or competitor app quality. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML compilation caches uncontrolled. macOS process RSS excludes device allocation, background daemons and system power.'}
     report['selection_coverage']={'kind':manifest.get('coverage','fixed-subset'),'planned_clips':len(manifest['clips']),'available_reference_clips':manifest.get('available_reference_clips')}
     if manifest.get('coverage')=='full-development-set':report['scope']=report['scope'].replace('Predetermined development clips, not held-out/corpus-wide or competitor app quality.','Complete pinned development selection, not held-out/test-set or competitor app quality. Includes previously evaluated development clips.')
+    report['dataset'].update(split=split,selection_plan_canonical_sha256=manifest.get('selection_plan_canonical_sha256'),source_audio_url=manifest.get('source_audio_url'))
+    report['settings']['reference_labels_parsed_after_inference']=True
+    if split=='test':report['scope']='Official pinned test selection, held out from OSwind tuning until this frozen evaluation; upstream model-training overlap is unaudited. No model/reference counts supplied. Not competitor-app quality or a directly comparable upstream model-card score. Raw diarization before ASR projection. Each clip uses a fresh process; later repetitions reuse its backend. OS/Core ML caches and background activity are uncontrolled; process RSS excludes device allocation and power.'
     metrics={(run,collar):DiarizationErrorRate(collar=collar,skip_overlap=False) for run in range(repetitions) for collar in [0,0.25]}
     private_json(output/'report.json',report)
     try:
@@ -72,7 +80,6 @@ def evaluate(binary,model,dataset,output,repetitions=2):
             if sha(audio)!=clip['audio_sha256'] or sha(reference_path)!=clip['reference_sha256']:raise ValueError('Dataset source hash drift')
             with wave.open(str(audio),'rb') as wav:duration=wav.getnframes()/wav.getframerate()
             if not math.isfinite(duration) or duration<=0:raise ValueError('Invalid source duration')
-            reference=read_reference(reference_path,identifier,duration)
             prediction=output/'predictions'/(identifier+'.json');stderr=output/(identifier+'.stderr.log')
             command=['/usr/bin/time','-l',str(binary),'--data',str(output/'forbidden-library'),'diarize',str(audio),'--speaker-model',str(model),'--repetitions',str(repetitions),'--output',str(prediction)]
             started=time.monotonic()
@@ -87,6 +94,7 @@ def evaluate(binary,model,dataset,output,repetitions=2):
             if code!=0:raise RuntimeError(f'{identifier} inference exited {code}; see retained logs')
             data=json.loads(prediction.read_text())
             if data['format']!='OSwind raw speaker timeline v1' or len(data['runs'])!=repetitions:raise ValueError('Incomplete timeline response')
+            reference=read_reference(reference_path,identifier,duration)
             measured=re.search(r'^\s*(\d+)\s+maximum resident set size',stderr.read_text(),re.M)
             if not measured:raise ValueError('macOS peak RSS measurement unavailable')
             entry={'id':identifier,'source_audio_seconds':duration,'audio_sha256':clip['audio_sha256'],'reference_sha256':clip['reference_sha256'],'reference_speakers':len(reference.labels()),'process_wall_seconds':time.monotonic()-started,'process_peak_rss_bytes':int(measured.group(1)),'preparation_seconds':data['preparation_seconds'],'policy':data.get('policy','legacy-exclusive-default'),'runs':[]}
@@ -96,6 +104,7 @@ def evaluate(binary,model,dataset,output,repetitions=2):
                 entry['runs'].append({'index':index,'seconds':run['seconds'],'real_time_factor':run['seconds']/duration,'resident_backend_reused':index>0,'model':run['timeline']['model'],'detected_speakers':len(hypothesis.labels()),'scores':{str(collar):score(reference,hypothesis,duration,collar,metrics[index,collar]) for collar in [0,0.25]}})
             if sha(audio)!=clip['audio_sha256'] or sha(reference_path)!=clip['reference_sha256'] or (output/'forbidden-library').exists():raise ValueError('Input mutation or unexpected library write')
             report['clips'].append(entry);private_json(output/'report.json',report);print('Scored',identifier,entry['runs'][0]['scores'],flush=True)
+        if sha(pathlib.Path(__file__))!=report['harness_sha256']:raise ValueError('Evaluation harness changed during inference')
         if sha(binary)!=report['binary_sha256']:raise ValueError('Pinned executable changed during evaluation')
         if model_hash(model)!=report['model_tree_sha256']:raise ValueError('Model files changed during inference')
         for clip in manifest['clips']:
@@ -107,6 +116,8 @@ def evaluate(binary,model,dataset,output,repetitions=2):
         report.update(state='failed',failure=str(error));private_json(output/'report.json',report);raise
 
 if __name__=='__main__':
+    def terminated(signum,frame):raise KeyboardInterrupt('Evaluation terminated')
+    signal.signal(signal.SIGTERM,terminated)
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--binary',type=pathlib.Path,required=True);parser.add_argument('--model',type=pathlib.Path,required=True);parser.add_argument('--dataset',type=pathlib.Path,required=True);parser.add_argument('--output',type=pathlib.Path,required=True);parser.add_argument('--repetitions',type=int,default=2)
     a=parser.parse_args()
     if not 1<=a.repetitions<=10:parser.error('repetitions must be 1–10')
