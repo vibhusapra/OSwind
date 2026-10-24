@@ -380,7 +380,7 @@
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
     "status": "partial",
-    "evidence": "Schema18 managed AES256 APFS images, fail-closed handles, MEMORY SQLite temps, source-preserving verified encrypted migration, native setup/lock screens and optional user-presence Keychain. 522 tests: 516 pass / 6 skips; 79 TSan and 15 signed-release groups pass. Actual older-writer, relocation, partial-unmount and Ctrl-C checks pass. Ad-hoc Keychain controls are disabled; real authentication, native clicks/sleep, platform matrix and physical workload gates remain open",
+    "evidence": "Schema18 managed AES256 APFS images, fail-closed handles, MEMORY SQLite temps, source-preserving verified encrypted migration, native setup/lock screens and optional user-presence Keychain. 522 tests: 516 pass / 6 skips; 79 TSan and 15 signed-release groups pass. Actual older-writer, relocation, partial-unmount and Ctrl-C checks pass. Post-detach confirmation now requires two consecutive absent observations with original package/manifest/image identity and bounded typed settling; rapid native source-preservation and replacement/cancellation cases pass. Original inventory failure remains undiagnosed. Ad-hoc Keychain controls are disabled; real authentication, native clicks/sleep, platform matrix and physical workload gates remain open",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "732-case normal suite (702 pass/30 opt-in skips),234-case native/model run adds23 cases and one physical native case (726 distinct pass/six remaining skips),236 focused plus one physical TSan case; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "745-case normal suite (714 pass/31 opt-in skips),247-case native/model run adds24 cases and one physical native case (739 distinct pass/six remaining skips),283 focused plus one physical TSan case; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

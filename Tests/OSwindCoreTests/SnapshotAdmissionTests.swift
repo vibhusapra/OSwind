@@ -140,6 +140,18 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         XCTAssertEqual((try FileManager.default.attributesOfItem(atPath:url.path)[.posixPermissions] as? NSNumber)?.intValue,0o600)
         let source=try XCTUnwrap(CGImageSourceCreateWithURL(url as CFURL,nil));XCTAssertEqual(try XCTUnwrap(CGImageSourceCreateImageAtIndex(source,0,nil)).width,480)
     }
+    func testInjectedWorkspaceSleepStillCancelsAnOwnedSnapshotBeforeAdmission() async throws {
+        let world=SnapshotWorld(),bitmap=try image(),gate=SnapshotRecognitionGate(),center=NotificationCenter()
+        var snapshots=environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap}));snapshots.recognize={try gate.recognize($0)}
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:snapshots,workspaceNotifications:center)
+        let attempt=Task {await controller.captureOnce(manual:true)}
+        await fulfillment(of:[gate.entered],timeout:5);center.post(name:NSWorkspace.willSleepNotification,object:nil)
+        let deadline=ContinuousClock.now.advanced(by:.seconds(5))
+        while controller.status != "Sleeping / locked",ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(2))}
+        XCTAssertEqual(controller.status,"Sleeping / locked");gate.release();await attempt.value
+        try assertEmpty(controller);XCTAssertTrue(gate.sawCancellation)
+        center.post(name:NSWorkspace.didWakeNotification,object:nil)
+    }
     func testLongSourceCallbackWaitsForCapturePassagesBeforeAutomaticCatchupCanStart() async throws {
         let embedder=LocalEmbedder();guard embedder.available else {throw XCTSkip("Local Apple embeddings unavailable; no download")}
         let world=SnapshotWorld(),bitmap=try image();world.context?.accessibilityText=String(repeating:"Owned release checklist and project context. ",count:180)

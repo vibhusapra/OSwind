@@ -5,12 +5,12 @@ Only explicitly targeted synthetic windows are captured. The temporary store is 
 import json,pathlib,plistlib,shutil,subprocess,sys,tempfile,time,uuid
 project=pathlib.Path(__file__).resolve().parents[1]
 binary=(project/(sys.argv[1] if len(sys.argv)>1 else '.build/release/oswindctl')).resolve()
-capabilities=json.loads(subprocess.check_output([str(binary),'doctor'],text=True))
-if capabilities.get('screenLocked') or not capabilities.get('screenRecording'):
-    raise SystemExit('Real capture smoke requires an unlocked Mac and Screen Recording permission for this process.')
 processes=[]
 with tempfile.TemporaryDirectory(prefix='oswind-live-fixtures-') as directory:
     root=pathlib.Path(directory); data=root/'store'; prefix=[str(binary),'--data',str(data)]
+    capabilities=json.loads(subprocess.check_output(prefix+['doctor'],text=True))
+    if capabilities.get('screenLocked') or not capabilities.get('screenRecording'):
+        raise SystemExit('Real capture smoke requires an unlocked Mac and existing Screen Recording permission for this process.')
     def cli(*args): return subprocess.check_output(prefix+list(args),text=True,timeout=30)
     def capture(bundle): return cli('capture','--app-bundle',bundle).strip()
     bundle='com.oswind.fixture.smoke.'+uuid.uuid4().hex

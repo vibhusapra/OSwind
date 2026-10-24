@@ -4,7 +4,7 @@ A native, local-first memory for your Mac. Capture the windows you choose, searc
 
 **v0 is in active development.** Broad competitive parity and a top-three ranking are goals; they are not verified claims. See [delivery ledger](docs/PROGRESS.md), [competitive research](docs/landscape.html), and [benchmarks](benchmarks/README.md).
 
-The current staged candidate has **726 distinct passing cases**, **237 distinct Thread Sanitizer passes**, strict signed-package verification and eleven signed process groups. The full suite has 702 passes/30 opt-in skips; native/model and physical runs leave six opt-in cases. A [native system-audio probe](docs/NATIVE-SYSTEM-AUDIO.md) passes generated tones through real ScreenCaptureKit and the production decoder in normal and instrumented runs. [Evidence](benchmarks/native-system-audio-v1.json) preserves fixture failures and their correction. Actual signed-GUI/controller capture, microphone/devices, power and a matched competitor ranking remain open. [Audio ingress](docs/AUDIO-INGRESS.md), [calendar](docs/ACTIVITY-CALENDAR.md), [indexed tags](docs/TAG-INDEX.md) and [visual memory](docs/VISUAL-SEARCH.md) have separate protocols and limitations.
+The current staged candidate has **739 distinct passing cases**, **284 distinct Thread Sanitizer passes**, strict signed-package verification and twelve signed process groups. The full suite has 714 passes/31 opt-in skips; native/model and physical runs leave six opt-in cases. [Detach verification](docs/VAULT-DETACH.md) requires two consecutive absent observations with the original package/image identity. [Signed evidence](benchmarks/vault-detach-settling-v1.json) includes three fresh vault runs, real targeted OCR/privacy capture and native generated-tone audio. A host-sleep-aligned test failure and its lifecycle-fixture correction remain recorded. Actual GUI/controller/microphone-to-ASR, broader device/privacy behavior, power and matched competitors remain open.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 
@@ -21,7 +21,7 @@ scripts/build-app.sh release
 open dist/OSwind.app
 ```
 
-For an isolated sample workspace: `open dist/OSwind.app --args --demo`. Demo records are labeled sample data and stored separately.
+For an isolated sample workspace: `open dist/OSwind.app --args --demo`. Demo records are labeled sample data; the default demo library is separate. `OSWIND_DATA_DIR` takes priority, so use a fresh explicit directory when testing with that variable.
 
 To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-hoc signed, not Developer ID notarized. Permission grants attach to the app's identity and location; rebuilds may require granting access again.
 
