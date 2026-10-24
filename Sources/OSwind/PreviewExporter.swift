@@ -73,6 +73,9 @@ import OSwindCore
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
         } else if model.section == "LibraryRecovery" {
             size = NSSize(width:1000,height:760); content = AnyView(LibraryRecoveryView(session:AppSession(selection:LibraryLocationSelection(url:model.store.root.appendingPathComponent("disconnected-drive"),requiresExisting:true,origin:"preview"))))
+        } else if model.section == "SettingsVisualMemory" {
+            size=NSSize(width:760,height:780)
+            content=AnyView(Form {VisualModelSettingsView()}.formStyle(.grouped).padding(12).environmentObject(model))
         } else if model.section == "SettingsModels" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Models").environmentObject(model))
         } else if model.section == "MemoryDetail", let candidate = model.hits.first?.memory,let memory=try? model.store.hydrate(candidate) {

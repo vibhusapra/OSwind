@@ -18,10 +18,42 @@ struct VisualProbeOutput:Encodable {
     var pixelExported:Bool
 }
 @MainActor func runVisualModelCLI() async throws {
-    guard let directory=try validatedOption("--model-dir"),let action=args.first else {throw OSwindError.invalid("Use vision status|probe FIXTURE_JSON --model-dir DIRECTORY [--compute cpuAndGPU|cpuOnly]")}
+    let directory=try validatedOption("--model-dir")
+    guard let action=args.first else {throw OSwindError.invalid("Use vision index|search|status|probe [--model-dir DIRECTORY]")}
     args.removeFirst()
     let pixelPath=try validatedOption("--pixel-output")
-    let computeText=try validatedOption("--compute") ?? "cpuAndGPU"
+    let computeOverride=try validatedOption("--compute")
+    if action=="index" || action=="search" {
+        guard pixelPath==nil else {throw OSwindError.invalid("Pixel export is available only in an explicit probe")}
+        let useModel=args.contains("--use-model")
+        guard args.filter({$0=="--use-model"}).count<=1,action=="index" || !useModel else {throw OSwindError.invalid("Use --use-model once, with vision index")}
+        args.removeAll {$0=="--use-model"}
+        var settings=AppSettings.load(root:root),configuration=settings.search.visual
+        configuration.enabled=true
+        if let directory {configuration.modelDirectory=URL(fileURLWithPath:directory,isDirectory:true).path}
+        if let computeOverride {guard let compute=VisualCompute(rawValue:computeOverride) else {throw OSwindError.invalid("Visual compute must be cpuAndGPU or cpuOnly")};configuration.compute=compute}
+        _ = try configuration.selectedDirectory()
+        if action=="index",!args.isEmpty {throw OSwindError.invalid("Use vision index [--model-dir DIRECTORY] [--use-model]")}
+        let filter=action=="search" ? try searchFilter():SearchFilter()
+        let store=try MemoryStore(root:root);defer {try? store.close()}
+        let engine=VisualRetrievalEngine(store:store),config=configuration,policy=settings.privacy
+        if action=="search" {
+            try encoded(await engine.search(filter,configuration:configuration,policy:policy,interpretQuery:!literalQuery));return
+        }
+        let reporter=BackupCLIProgress(),allowLowPower=settings.search.indexOnLowPower
+        do {
+            let result=try await runAsyncCLI(cancellationMessage:"Stopping visual indexing; completed sources are saved.") {
+                try await engine.rebuild(configuration:config,policy:policy,shouldContinue:{
+                    (allowLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled) && ![.serious,.critical].contains(ProcessInfo.processInfo.thermalState)
+                }) {state in reporter.update(LibraryBackupProgress(phase:"Indexing visuals",completedItems:Int64(state.processedSources),totalItems:Int64(state.totalSources),unit:"sources"))}
+            }
+            if useModel {settings.search.visual=configuration;try settings.save(root:root)}
+            try encoded(result);if result.failedSources>0 {exit(2)}
+        } catch is CancellationError {FileHandle.standardError.write(Data("Visual indexing cancelled; completed sources remain.\n".utf8));exit(130)}
+        return
+    }
+    guard let directory else {throw OSwindError.invalid("Use --model-dir DIRECTORY for vision status or probe")}
+    let computeText=computeOverride ?? "cpuAndGPU"
     guard let compute=VisualCompute(rawValue:computeText) else {throw OSwindError.invalid("Visual compute must be cpuAndGPU or cpuOnly")}
     let location=URL(fileURLWithPath:directory,isDirectory:true)
     if action=="status" {

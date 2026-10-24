@@ -56,17 +56,22 @@ public actor VisualEncoder {
     private var retiring=[UUID:Task<LoadedVisualModels,Error>]()
     private var idle=NativeModelIdleTimer()
     private var retention:NativeModelRetention = .twoMinutes
+    private var batches=Set<UUID>()
     public init() {}
     public var resident:Bool {loaded != nil || loading != nil || !retiring.isEmpty}
     public func setRetention(_ value:NativeModelRetention) {retention=value;if loading==nil {scheduleRelease()}}
+    // A complete indexing job is one use, including gaps while decoding frames.
+    public func beginBatch() -> UUID {let token=UUID();batches.insert(token);idle.cancel();return token}
+    public func endBatch(_ token:UUID) {batches.remove(token);if batches.isEmpty {scheduleRelease()}}
     public func unload() async {
+        batches.removeAll()
         idle.cancel();loaded=nil;loadedKey=nil;loadedID=nil
         if let active=loading {retiring[active.id]=active.task;active.task.cancel();loading=nil}
         let pending=retiring
         for (id,task) in pending {_ = await task.result;retiring[id]=nil}
     }
-    private func scheduleRelease() {idle.schedule(retention) { [weak self] token in await self?.expire(token)}}
-    private func expire(_ token:UUID) {guard token==idle.generation,loading==nil else {return};loaded=nil;loadedKey=nil;loadedID=nil}
+    private func scheduleRelease() {guard batches.isEmpty else {idle.cancel();return};idle.schedule(retention) { [weak self] token in await self?.expire(token)}}
+    private func expire(_ token:UUID) {guard token==idle.generation,loading==nil,batches.isEmpty else {return};loaded=nil;loadedKey=nil;loadedID=nil}
     private func prepare(_ directory:URL,compute:VisualCompute) async throws -> LoadedVisualModels {
         try Task.checkCancellation();idle.cancel()
         let key=directory.standardizedFileURL.path+":"+compute.rawValue
@@ -97,6 +102,9 @@ public actor VisualEncoder {
         guard query.utf8.count<=32768 else {throw OSwindError.invalid("Visual queries must fit in 32 KiB")}
         let model=try await prepare(directory,compute:compute);defer {scheduleRelease()}
         return try model.tokens(query).ids
+    }
+    public func identity(directory:URL,compute:VisualCompute = .cpuAndGPU) async throws -> String {
+        let model=try await prepare(directory,compute:compute);defer {scheduleRelease()};return model.verified.modelID
     }
     public func embed(text query:String,directory:URL,compute:VisualCompute = .cpuAndGPU) async throws -> VisualEmbedding {
         guard query.utf8.count<=32768 else {throw OSwindError.invalid("Visual queries must fit in 32 KiB")}

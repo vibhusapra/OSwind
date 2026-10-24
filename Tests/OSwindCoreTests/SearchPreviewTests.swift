@@ -30,7 +30,7 @@ final class SearchPreviewTests:XCTestCase {
         _ = try store.saveVectors([VectorRecord(memory:original,vector:[1,0])],modelID:"fixture")
         let plan=SemanticPassagePlan.make(original)
         XCTAssertTrue(try store.savePassages(memory:original,modelID:"fixture",records:plan.enumerated().map {PassageVector(range:$0.element.range,vector:$0.offset==1 ? [0,1]:[1,0])}))
-        for mode in SearchMode.allCases {
+        for mode in SearchMode.textModes {
             let filter=SearchFilter(query:"word",speaker:"Maya")
             let full=try store.search(filter,mode:mode,vector:[0,1],modelID:"fixture")
             let light=try store.search(filter,mode:mode,vector:[0,1],modelID:"fixture",detail:.preview)

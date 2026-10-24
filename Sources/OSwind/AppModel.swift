@@ -18,6 +18,7 @@ import UniformTypeIdentifiers
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
+        if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         if oldValue.search != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
@@ -25,13 +26,22 @@ import UniformTypeIdentifiers
     @Published var searchFocusRequest: UUID?
     @Published var query = ""
     @Published var mode: SearchMode = .hybrid
+    @Published var visualIndexing=false
+    @Published var visualAutomaticIndexing=false
+    var visualAutoResumeAllowed=true
+    @Published var visualIndexProgress=0.0
+    @Published var visualIndexStatus="Enable a local visual model to index retained screenshots and replay frames."
+    var visualGeneration=UUID()
+    var visualIndexTask:Task<Void,Never>?
+    var visualAutomaticTask:Task<Void,Never>?
+    var pendingVisualIDs=[String]()
     @Published var appFilter = "All apps"
     @Published var range = "All time"
     @Published var date = Date()
     @Published var hits = [SearchHit]()
     @Published var stats = StoreStats()
     @Published var storageUpdatedAt: Date?
-    @Published var selected: Memory?
+    @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil}}}
     @Published private(set) var openingMemoryID:String?
     private var detailTask:Task<Void,Never>?
     private var detailGeneration=UUID()
@@ -117,21 +127,26 @@ import UniformTypeIdentifiers
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
             NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop() }.store(in:&cancellables)
         }
-        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick() }.store(in:&cancellables)
+        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick(); self?.resumeAutomaticVisualIndex() }.store(in:&cancellables)
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
+        for name in [Notification.Name.NSProcessInfoPowerStateDidChange,ProcessInfo.thermalStateDidChangeNotification] {
+            NotificationCenter.default.publisher(for:name).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
+        }
+        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.sessionDidBecomeActiveNotification).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
         startHousekeeping()
     }
     private func startHousekeeping() {housekeeping?.invalidate();housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }}
-    func startConfiguredServices() {guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() } }
+    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };resumeAutomaticVisualIndex() }
     func prepareForLibrarySwitch() {
+        visualAutoResumeAllowed=false;cancelVisualIndexing()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil;apiStatus="API off"
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
-        hits.removeAll();selected=nil;answer=nil;chats.removeAll();chatTurns.removeAll();currentChatID=nil;query="";question="";resolvedSearch=nil;selectedEvidenceQuery="";errorMessage=nil
+        hits.removeAll();selected=nil;selectedVisual=nil;answer=nil;chats.removeAll();chatTurns.removeAll();currentChatID=nil;query="";question="";resolvedSearch=nil;selectedEvidenceQuery="";errorMessage=nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -151,12 +166,13 @@ import UniformTypeIdentifiers
         searchFocusRequest = UUID()
     }
     @Published var selectedPassage: PassageRange?
+    @Published var selectedVisual:VisualMatch?
     func cancelOpeningMemory() {
         detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
     }
-    func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil) {
+    func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil,visual:VisualMatch?=nil) {
         let store=self.store
-        openSource(id:memory.id,query:query,passage:passage) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage)])[0].memory}
+        openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)])[0].memory}
     }
     func openRecapSource(_ card:RecapSourceCard) {
         let store=self.store
@@ -166,7 +182,7 @@ import UniformTypeIdentifiers
             return current
         }
     }
-    private func openSource(id:String,query:String,passage:PassageRange?,load:@escaping @Sendable () throws -> Memory) {
+    private func openSource(id:String,query:String,passage:PassageRange?,visual:VisualMatch?=nil,load:@escaping @Sendable () throws -> Memory) {
         cancelOpeningMemory();let generation=detailGeneration
         openingMemoryID=id
         detailTask=Task { [weak self] in
@@ -174,7 +190,7 @@ import UniformTypeIdentifiers
             do {
                 let full=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
                 guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
-                self.selectedEvidenceQuery=query;self.selectedPassage=passage;self.selected=full;self.openingMemoryID=nil;self.detailTask=nil
+                self.selectedEvidenceQuery=query;self.selectedPassage=passage;self.selectedVisual=visual;self.selected=full;self.openingMemoryID=nil;self.detailTask=nil
             } catch {
                 guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
                 self.openingMemoryID=nil;self.detailTask=nil;self.errorMessage=error.localizedDescription
@@ -194,7 +210,7 @@ import UniformTypeIdentifiers
                 guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.resolvedSearch = result.resolution; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
             } catch is CancellationError { }
             catch let error as QuerySyntaxError { guard !Task.isCancelled else { return }; self?.hits = []; self?.resolvedSearch = nil; self?.searchWarnings = []; self?.searchInputError = error.localizedDescription; self?.searchMS = 0; self?.searchStrategy = ""; self?.refreshing = false }
-            catch { guard !Task.isCancelled else { return }; self?.errorMessage = error.localizedDescription; self?.refreshing = false }
+            catch { guard !Task.isCancelled else { return };if mode == .visual {self?.hits=[];self?.searchWarnings=[error.localizedDescription]} else {self?.errorMessage = error.localizedDescription}; self?.refreshing = false }
         }
     }
     private func refreshStatistics(force: Bool) {
@@ -290,6 +306,7 @@ import UniformTypeIdentifiers
         }
     }
     private func captured(_ memory: Memory) {
+        queueVisualIndex(memory)
         refreshStatistics(force:true)
         if refreshing { pendingRefresh = true } else { refresh() }
         guard settings.search.provider == .ollama || memory.text.utf16.count > 2400 else { return }

@@ -8,8 +8,9 @@ public struct SearchConfiguration: Codable, Equatable, Sendable {
     public var model = "qwen3-embedding:0.6b"
     public var indexOnLowPower = false
     public var indexPolicy: SearchIndexPolicy = .automatic
+    public var visual=VisualSearchConfiguration()
     public init() {}
-    enum CodingKeys: String, CodingKey { case provider,endpoint,model,indexOnLowPower,indexPolicy }
+    enum CodingKeys: String, CodingKey { case provider,endpoint,model,indexOnLowPower,indexPolicy,visual }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         provider = try c.decodeIfPresent(EmbeddingProvider.self,forKey:.provider) ?? provider
@@ -17,6 +18,7 @@ public struct SearchConfiguration: Codable, Equatable, Sendable {
         model = try c.decodeIfPresent(String.self,forKey:.model) ?? model
         indexOnLowPower = try c.decodeIfPresent(Bool.self,forKey:.indexOnLowPower) ?? indexOnLowPower
         indexPolicy = (try? c.decodeIfPresent(SearchIndexPolicy.self,forKey:.indexPolicy)) ?? indexPolicy
+        visual=try c.decodeIfPresent(VisualSearchConfiguration.self,forKey:.visual) ?? visual
     }
 }
 public struct InstalledModel: Codable, Identifiable, Sendable {

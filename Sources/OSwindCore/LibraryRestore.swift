@@ -25,6 +25,7 @@ private final class RestoreRows {
     let hashes: RestoreContentIndex
     var lastMemory: Memory?
     var lastRanges = [PassageRange]()
+    var discardedVisualIndexes:Int64=0
     init(source: BackupDataReader, destination: MemoryStore, index: BackupManifestIndex, hashes: RestoreContentIndex) { self.source = source; self.destination = destination; self.index = index; self.hashes = hashes }
     func mappedPath(_ path: String?) throws -> String? {
         guard let path else { return nil }
@@ -53,7 +54,7 @@ private final class RestoreRows {
         guard result.allSatisfy(\.isFinite) else { throw BackupFileError.invalid("Invalid restored vector values") }; return result
     }
     func rows(_ table: String, columns: String, _ body: (OpaquePointer) throws -> Void) throws -> Int64 {
-        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs"]
+        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests"]
         guard allowed.contains(table) else { throw BackupFileError.invalid("Unsupported restore table") }
         let statement = try source.db.prepare("SELECT \(columns) FROM \(table) NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(statement) }
         var count: Int64 = 0, status = sqlite3_step(statement)
@@ -93,9 +94,58 @@ private final class RestoreRows {
             count = try BackupMath.add(count,1); if count%64==0 { try progress(count) }
         }
     }
+    func restoreVisualIndexes(into handle:OpaquePointer) throws {
+        guard source.schema>=19 else {return}
+        let destinationDB=RoutineDatabase(handle:handle)
+        _ = try rows("visual_manifests",columns:"memory_id,model,processor,source_revision,media_sha,media_bytes,dimension") { row in
+            let id=try self.source.db.text(row,0),model=try self.source.db.text(row,1),processor=try self.source.db.text(row,2),revision=try self.source.db.text(row,3),sha=try self.source.db.text(row,4),bytes=try self.integer(row,5),dimension=try self.integer(row,6)
+            guard !model.isEmpty,model.utf8.count<=512,!model.utf8.contains(0),(1...8192).contains(dimension),bytes>=0 else {throw BackupFileError.invalid("Invalid visual model manifest")}
+            let original=try self.source.db.prepare("SELECT payload FROM memories NOT INDEXED WHERE id=?");defer {sqlite3_finalize(original)};self.source.db.bind(original,1,id)
+            guard sqlite3_step(original)==SQLITE_ROW else {throw BackupFileError.invalid("Visual index references missing source")}
+            let originalMemory=try JSONDecoder().decode(Memory.self,from:self.payload(original,0))
+            // Derived indexes can legitimately be stale after an independent
+            // media replacement. Preserve history and explicitly count rebuilds.
+            guard processor==VisualSourcePlan.preprocessingID,let oldPlan=try? VisualSourcePlan.make(originalMemory),oldPlan.revision==revision,
+                  let media=try self.index.entry(for:oldPlan.path),media.sha256==sha,media.bytes==bytes else {
+                self.discardedVisualIndexes=try BackupMath.add(self.discardedVisualIndexes,1);return
+            }
+            let restored=try self.cachedMemory(id)
+            guard let newPlan=try VisualSourcePlan.make(restored),newPlan.points==oldPlan.points else {throw BackupFileError.invalid("Restored visual frame plan differs")}
+            let vectors=try self.source.db.prepare("SELECT ordinal,frame_time,decoded_time,revision,vector FROM visual_vectors NOT INDEXED WHERE memory_id=? AND model=? AND processor=? ORDER BY ordinal")
+            defer {sqlite3_finalize(vectors)}
+            for (index,value) in [id,model,processor].enumerated() {self.source.db.bind(vectors,Int32(index+1),value)}
+            var records=[VisualFrameVector](),code=sqlite3_step(vectors)
+            while code==SQLITE_ROW {
+                try Task.checkCancellation();let ordinal=try self.integer(vectors,0)
+                guard ordinal==records.count,ordinal<oldPlan.points.count else {throw BackupFileError.invalid("Incomplete visual frame index")}
+                let point=oldPlan.points[Int(ordinal)],time=sqlite3_column_type(vectors,1)==SQLITE_NULL ? nil:try self.number(vectors,1),decoded=sqlite3_column_type(vectors,2)==SQLITE_NULL ? nil:try self.number(vectors,2)
+                guard time==point.time,(time==nil ? decoded==nil:(decoded.map {$0>=0 && abs($0-(time ?? 0))<=0.1} ?? false)),
+                      try self.source.db.text(vectors,3)==oldPlan.vectorRevision(mediaSHA256:sha,modelID:model,point:point,preprocessingID:processor)
+                else {throw BackupFileError.invalid("Visual frame identity or timing differs")}
+                let vector=try self.vector(vectors,4,dimension:Int(dimension));guard CosineScorer(vector) != nil else {throw BackupFileError.invalid("Invalid visual embedding")}
+                records.append(VisualFrameVector(point:point,decodedTime:decoded,vector:vector));code=sqlite3_step(vectors)
+            }
+            guard code==SQLITE_DONE,records.count==oldPlan.points.count else {throw BackupFileError.invalid("Visual frame index is incomplete")}
+            let manifest=try destinationDB.statement("INSERT INTO visual_manifests(memory_id,model,processor,source_revision,media_sha,media_bytes,dimension) VALUES(?,?,?,?,?,?,?)")
+            defer {sqlite3_finalize(manifest)}
+            for (index,value) in [id,model,processor,newPlan.revision,sha].enumerated() {destinationDB.bind(manifest,Int32(index+1),value)}
+            sqlite3_bind_int64(manifest,6,bytes);sqlite3_bind_int64(manifest,7,dimension);try destinationDB.done(manifest)
+            let insert=try destinationDB.statement("INSERT INTO visual_vectors(memory_id,model,processor,ordinal,frame_time,decoded_time,revision,vector) VALUES(?,?,?,?,?,?,?,?)")
+            defer {sqlite3_finalize(insert)}
+            for record in records {
+                sqlite3_reset(insert);sqlite3_clear_bindings(insert)
+                destinationDB.bind(insert,1,id);destinationDB.bind(insert,2,model);destinationDB.bind(insert,3,processor);sqlite3_bind_int(insert,4,Int32(record.point.ordinal))
+                if let time=record.point.time {sqlite3_bind_double(insert,5,time)} else {sqlite3_bind_null(insert,5)}
+                if let time=record.decodedTime {sqlite3_bind_double(insert,6,time)} else {sqlite3_bind_null(insert,6)}
+                destinationDB.bind(insert,7,try newPlan.vectorRevision(mediaSHA256:sha,modelID:model,point:record.point))
+                _ = record.vector.withUnsafeBytes {sqlite3_bind_blob(insert,8,$0.baseAddress,Int32($0.count),destinationDB.transient)};try destinationDB.done(insert)
+            }
+        }
+    }
     func restore(into handle: OpaquePointer, progress: (LibraryBackupProgress) throws -> Void) throws {
         _ = try memories { try progress(LibraryBackupProgress(phase:"Restoring sources",completedItems:$0,unit:"records")) }
         try destination.rebuildRecapLinks()
+        try restoreVisualIndexes(into:handle)
         _ = try copy("semantic_vectors",columns:["memory_id","model","dimension","vector","content_hash"],into:handle,validate:{ row in
             let id = try self.source.db.text(row,0), hash = try self.source.db.text(row,4), dimension = try self.integer(row,2)
             guard (1...8192).contains(dimension), hash == (try self.hashes.hash(id)) else { throw BackupFileError.invalid("Restored vector source hash differs") }
@@ -209,6 +259,6 @@ extension LibraryBackup {
         try target.sealRestoredLibrary()
         try progress(LibraryBackupProgress(phase:"Publishing restored library",completedItems:completed,totalItems:header.info.mediaFiles))
         try output.publish(as:destination)
-        var result = header.info; result.archiveFingerprint = fingerprint; return result
+        var result = header.info; result.archiveFingerprint = fingerprint;result.discardedVisualIndexes=rows.discardedVisualIndexes; return result
     }
 }

@@ -59,7 +59,7 @@ do {
         OSwind 0.1.0 · local desktop memory
         Usage: oswindctl [--data DIRECTORY] COMMAND
           doctor                         Inspect local permissions, GPU and models
-          search [--preview] [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
+          search [--preview] [--mode hybrid|keyword|semantic|visual] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
                  Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
                  Content: "archive launch"; alpha AND (beta OR gamma); alpha NOT beta
@@ -95,6 +95,10 @@ do {
           native-model install|verify parakeet|speakers [--cache-root PATH]
           vision status|probe FIXTURE_JSON --model-dir DIR [--compute cpuAndGPU|cpuOnly]
                                         Local image/text encoder qualification; no capture or library write
+          vision index [--model-dir DIR] [--compute cpuAndGPU|cpuOnly] [--use-model]
+                                        Resume retained screenshot/replay vectors; --use-model saves selection
+          vision search [--model-dir DIR] [--app NAME] [--from ISO8601] DESCRIPTION
+                                        Search image appearance; main search --mode visual uses saved model
           wipe --confirm DELETE-ALL [--json]  Erase the entire local library; report pending cleanup
           wipe retry [--json]            Retry sealed pending work; preserve new recordings
           delete ID [--json]             Delete one source; report shared/pending media
@@ -112,6 +116,8 @@ do {
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
           benchmark [--count N]          Isolated synthetic retrieval benchmark
+          benchmark-visual --fixture JSON --root NEW_DIR --model-dir DIR
+                                        Real visual index/query/source-validation benchmark on explicit images
           probe-visual-replay --output NEW_DIR [--frames 12] [--software]  Synthetic OCR/video/decode probe
           benchmark-audio-search --archive DIR [--prepare] [--detail full|preview]  Timed-transcript performance
           benchmark-vectors [--count N] [--dimensions N]  Vector scaling / optional --indexed --quality-queries N
@@ -151,6 +157,17 @@ do {
                 else {try encoded(await runVaultCLI {try await vault.status()})}
             } catch is CancellationError {FileHandle.standardError.write(Data("Vault operation cancelled. Use vault status before retrying.\n".utf8));exit(130)}
         }
+    } else if command == "benchmark-visual" {
+        guard let fixture=try validatedOption("--fixture"),let directory=try validatedOption("--model-dir"),let destination=try validatedOption("--root") else {throw OSwindError.invalid("Use benchmark-visual --fixture JSON --root NEW_DIR --model-dir DIR")}
+        let computeText=try validatedOption("--compute") ?? "cpuAndGPU",output=try validatedOption("--output")
+        guard args.isEmpty,let compute=VisualCompute(rawValue:computeText) else {throw OSwindError.invalid("Unknown benchmark option or compute policy")}
+        var visual=VisualSearchConfiguration();visual.enabled=true;visual.modelDirectory=URL(fileURLWithPath:directory).path;visual.compute=compute
+        let configuration=visual,reporter=BackupCLIProgress()
+        let report=try await runAsyncCLI(cancellationMessage:"Stopping visual benchmark; its isolated fixture library is retained.") {
+            try await VisualMemoryEvaluation.run(fixtureURL:URL(fileURLWithPath:fixture),newRoot:URL(fileURLWithPath:destination),configuration:configuration) {state in reporter.update(LibraryBackupProgress(phase:"Indexing visual fixture",completedItems:Int64(state.processedSources),totalItems:Int64(state.totalSources),unit:"sources"))}
+        }
+        if let output {try writeNewPrivateJSON(Integration.json(report),to:output)}
+        try encoded(report)
     } else if command == "vision" {
         try await runVisualModelCLI()
     } else if command == "wipe" {
@@ -314,7 +331,7 @@ do {
         let ingest = Date().timeIntervalSince(start)
         let queries: [(String,String)] = [("when do we ship OSwind","release"),("save laptop energy during inactivity","battery"),("Italian restaurant reservation","lunch"),("login cookie redirect","auth"),("what did Jamie request","meeting"),("mint typography timeline","design"),("reciprocal rank fusion","vector"),("delete old screenshots and exclude banks","privacy"),("offline speech recognition GPU","audio"),("Acme invoice due","invoice"),("tahini cauliflower recipe","recipe"),("Seattle flight hotel","travel")]
         var modes = [String:Any]()
-        for mode in SearchMode.allCases {
+        for mode in SearchMode.textModes {
             var times = [Double](), recall = 0.0, reciprocal = 0.0
             for _ in 0..<3 { for (query,expected) in queries { let before = Date(); let vector = mode == .keyword ? nil : embedder.embed(query); let hits = try store.search(SearchFilter(query:query,limit:5),mode:mode,vector:vector,modelID:embedder.modelID); times.append(Date().timeIntervalSince(before)*1000); if let rank = hits.firstIndex(where:{$0.id.hasPrefix(expected+"-")}) { recall += 1; reciprocal += 1/Double(rank+1) } } }
             let latency = try BenchmarkLatency(samples:times); let total = Double(queries.count*3)

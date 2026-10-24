@@ -4,10 +4,11 @@ import CryptoKit
 /// Keeps a cooperative media reservation through image inference/admission.
 /// Bytes stay in memory. Revalidation checks the current source and file, rather
 /// than accepting an old embedding after a path or pixel replacement.
-final class VisualImageSnapshot:@unchecked Sendable {
+final class VisualImageSnapshot:VisualMediaSnapshot,@unchecked Sendable {
     let plan:VisualSourcePlan
     let data:Data
     let sha256:String
+    var bytes:Int64 {Int64(data.count)}
     private let store:MemoryStore
     private let activity:MediaAdmissionLease
     private let state=NSLock()
@@ -30,8 +31,10 @@ final class VisualImageSnapshot:@unchecked Sendable {
         let snapshot=VisualImageSnapshot(store:store,plan:plan,data:data,activity:activity,tree:tree)
         retained=true;return snapshot
     }
-    func validatedMemory() throws -> Memory {
+    func validatedMemory() throws -> Memory {try withAdmission(for:store) {$0}}
+    func withAdmission<T>(for destination:MemoryStore,_ body:(Memory) throws -> T) throws -> T {
         state.lock();defer {state.unlock()}
+        guard destination === store else {throw OSwindError.invalid("Use the original library's visual reservation")}
         guard let tree else {throw OSwindError.unavailable("The visual source reservation has ended")}
         return try activity.withActive(for:store.mediaRootIdentity) {
             try Task.checkCancellation();try tree.requireRootIdentity(at:store.root)
@@ -40,7 +43,7 @@ final class VisualImageSnapshot:@unchecked Sendable {
             guard currentBytes.count==data.count,SHA256.hash(data:currentBytes).map({String(format:"%02x",$0)}).joined()==sha256 else {throw OSwindError.unavailable("The retained image pixels changed")}
             try tree.requireRootIdentity(at:store.root)
             guard let final=try store.get(plan.memoryID),try VisualSourcePlan.make(final)?.revision==plan.revision else {throw OSwindError.unavailable("The visual source changed during validation")}
-            return final
+            return try body(final)
         }
     }
     /// Release the directory descriptor before the reservation, so a completed

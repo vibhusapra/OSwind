@@ -37,7 +37,7 @@ final class SpeakerEvidenceTests:XCTestCase {
         let first=memory("one"),second=memory("two",names:["Robin","Theo"])
         try store.insert(first);try store.insert(second)
         _ = try store.saveVectors([first,second].map {VectorRecord(memory:$0,vector:[1,0])},modelID:"fixture")
-        for mode in SearchMode.allCases {
+        for mode in SearchMode.textModes {
             let hits=try store.search(SearchFilter(query:"archive",speaker:"Maya"),mode:mode,vector:[1,0],modelID:"fixture")
             XCTAssertEqual(hits.map(\.id),["one"])
         }
