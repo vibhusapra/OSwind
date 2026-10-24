@@ -10,11 +10,27 @@ public struct PrivacyPolicy: Codable, Equatable, Sendable {
     public var maxStorageGB = 20
     public var requireBrowserContext = true
     public init() {}
+    private static func hostKey(_ value:String)->String {
+        value.lowercased().trimmingCharacters(in:CharacterSet(charactersIn:"."))
+    }
+    private static func domainKey(_ value:String)->String? {
+        let value=value.trimmingCharacters(in:.whitespacesAndNewlines).lowercased()
+        // Common hostname rules need no second URL parse on the capture/search
+        // hot path. IDNA, escapes and IP literals use Foundation below.
+        if !value.isEmpty,value.utf8.allSatisfy({(97...122).contains($0) || (48...57).contains($0) || [45,46,95].contains($0)}) {
+            let key=hostKey(value);return key.isEmpty ? nil:key
+        }
+        guard !value.isEmpty,let components=URLComponents(string:"https://"+value),components.user==nil,components.password==nil,components.port==nil,
+              components.path.isEmpty,components.query==nil,components.fragment==nil,let host=components.url?.host else {return nil}
+        let key=hostKey(host);return key.isEmpty ? nil:key
+    }
     public func exclusion(app: String, title: String, url: String?, isBrowser: Bool = false) -> String? {
         if excludedApps.contains(where: { app.caseInsensitiveCompare($0) == .orderedSame }) { return "Excluded application" }
         if excludedTitles.contains(where: { !$0.isEmpty && title.localizedCaseInsensitiveContains($0) }) { return "Excluded window" }
-        if isBrowser && requireBrowserContext && !excludedDomains.isEmpty && url == nil { return "Browser URL unavailable; privacy rules require context" }
-        if let host = url.flatMap({ URL(string: $0)?.host?.lowercased() }), excludedDomains.contains(where: { let domain = $0.lowercased().trimmingCharacters(in: .whitespaces); return !domain.isEmpty && (host == domain || host.hasSuffix("." + domain)) }) { return "Excluded website" }
+        let parsed=url.flatMap {URL(string:$0)},host=parsed?.host.map(Self.hostKey)
+        let webContext=["http","https"].contains(parsed?.scheme?.lowercased() ?? "") && !(host ?? "").isEmpty
+        if isBrowser && requireBrowserContext && !excludedDomains.isEmpty && !webContext { return "Browser URL unavailable; privacy rules require context" }
+        if let host,excludedDomains.contains(where:{value in guard let domain=Self.domainKey(value) else {return false};return host==domain || host.hasSuffix("."+domain)}) {return "Excluded website"}
         return nil
     }
     public func sanitize(_ text: String) -> (text: String, redacted: Bool) {

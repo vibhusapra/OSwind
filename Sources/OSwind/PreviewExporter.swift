@@ -75,6 +75,8 @@ import OSwindCore
             size = NSSize(width:760,height:800); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
         } else if model.section == "SettingsAudio" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
+        } else if model.section == "SettingsCapture" || model.section == "SettingsPrivacy" {
+            size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:model.section == "SettingsCapture" ? "Capture":"Privacy").environmentObject(model))
         } else if model.section == "SettingsData" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
         } else if model.section == "LibraryRecovery" {
