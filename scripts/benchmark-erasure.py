@@ -25,10 +25,15 @@ for name,domain in [('shared','alpha.test'),('unique','beta.test')]:
     assert result['sources']==o.records//2 and result['pendingMedia']==0 and not result['warnings']
     assert result['sharedMedia']==(o.records//2 if name=='shared' else 0) and result['removedMedia']==(0 if name=='shared' else o.records//2)
     expected=o.records//2 if name=='shared' else 0
-    assert len(list((library/'images').iterdir()))==expected
+    assert {f.name for f in (library/'images').iterdir()}==({'pair-'+str(i) for i in range(o.records//2)} if name=='shared' else set())
+    if name=='shared':
+        for i in range(o.records//2):assert (library/'images'/('pair-'+str(i))).read_bytes()==('Owned generated media '+str(i)).encode()
+    with sqlite3.connect(library/'memory.sqlite') as db:
+        ids={row[0] for row in db.execute('SELECT id FROM memories')}
+        assert ids==({'generated-'+str(i) for i in range(1,o.records,2)} if name=='shared' else set())
     stats,_=run(name+'-stats','stats');assert stats['count']==expected
 with sqlite3.connect(library/'memory.sqlite') as db:
     assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok';assert not db.execute('PRAGMA foreign_key_check').fetchall();assert db.execute('SELECT COUNT(*) FROM erasure_assets').fetchone()[0]==0
 assert hashlib.sha256(binary.read_bytes()).hexdigest()==digest,'Runner changed during evaluation'
-report=dict(format='OSwind generated erasure scaling v1',records=o.records,media_files=o.records//2,binary_sha256=digest,measurements=measurements,sqlite_integrity_pass=True,all_media_identities_accounted=True,limits=['One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence','Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only'])
+report=dict(format='OSwind generated erasure scaling v1',records=o.records,media_files=o.records//2,binary_sha256=digest,measurements=measurements,sqlite_integrity_pass=True,all_media_identities_accounted=True,all_remaining_source_ids_verified=True,harness_sha256=hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),limits=['One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence','Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only'])
 (root/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

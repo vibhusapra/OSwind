@@ -1,0 +1,326 @@
+{
+  "format": "OSwind direct full-text maintenance v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "0ae37d6518bc1e5581685733a9e3b3374329387b",
+  "schema_version": 13,
+  "change": "Stable integer FTS key map, direct row lookup for content updates/deletes; snapshot migration of disposable cache only; trigger checks avoid repeated rebuilds",
+  "source_identity_vector_highwater_payloads_preserved": true,
+  "checks": {
+    "full_suite": {
+      "total": 410,
+      "passed": 404,
+      "skipped_opt_in": 6,
+      "failed": 0
+    },
+    "thread_sanitizer": {
+      "total": 37,
+      "passed": 37,
+      "failed": 0
+    },
+    "legacy_unaligned_cache_migration": true,
+    "no_repeat_rebuild": true,
+    "unexpected_trigger_repair": true,
+    "source_rowid_renumber_and_vacuum": true,
+    "actual_installed_erasure_concurrent_writer_contract": true,
+    "complete_backup_restore_and_interruptions": true,
+    "required_search_cli_http_mcp_ask": true
+  },
+  "actual_previous_release_writer": {
+    "source_commit": "8fdb32cc0e9e67d4e8e847d4db7105260ef10552",
+    "report": {
+      "format": "OSwind actual legacy FTS-writer compatibility v1",
+      "binary_sha256": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435",
+      "legacy_binary_sha256": "78ab891b394ff8b8be21366bf9b01ed36447151f3ae126b21fbebf98131b5599",
+      "legacy_seed_then_new_migration": true,
+      "legacy_insert_upsert_delete": true,
+      "exact_phrase_retrieval": true,
+      "source_rowid_renumber_and_vacuum": true,
+      "source_identity_preserved": true,
+      "sqlite_integrity_pass": true,
+      "limits": [
+        "Owned fixture and this pinned legacy executable only; not arbitrary/future writer compatibility"
+      ]
+    }
+  },
+  "scaling": {
+    "baseline_source_commit": "e70291e2f4a65b4236c8955e794483759523dd42",
+    "baseline": {
+      "format": "OSwind generated erasure scaling v1",
+      "records": 20000,
+      "media_files": 10000,
+      "binary_sha256": "408e73f2f1c0a7c8078d1db1ff4c75916ff1b4242f2bb48291baaf43356f0e69",
+      "measurements": {
+        "shared_preview": {
+          "wall_seconds": 0.09212904190644622,
+          "peak_rss_bytes": 24788992,
+          "sources": 10000
+        },
+        "shared_apply": {
+          "wall_seconds": 17.43106387509033,
+          "peak_rss_bytes": 31260672,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "unique_preview": {
+          "wall_seconds": 0.06268737488426268,
+          "peak_rss_bytes": 24756224,
+          "sources": 10000
+        },
+        "unique_apply": {
+          "wall_seconds": 8.767841584049165,
+          "peak_rss_bytes": 30851072,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        }
+      },
+      "sqlite_integrity_pass": true,
+      "all_media_identities_accounted": true,
+      "limits": [
+        "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+        "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+      ]
+    },
+    "first_current_release_trial": {
+      "format": "OSwind generated erasure scaling v1",
+      "records": 20000,
+      "media_files": 10000,
+      "binary_sha256": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435",
+      "measurements": {
+        "shared_preview": {
+          "wall_seconds": 0.11545070819556713,
+          "peak_rss_bytes": 24723456,
+          "sources": 10000
+        },
+        "shared_apply": {
+          "wall_seconds": 2.8864737499970943,
+          "peak_rss_bytes": 32342016,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "unique_preview": {
+          "wall_seconds": 0.07481925003230572,
+          "peak_rss_bytes": 24690688,
+          "sources": 10000
+        },
+        "unique_apply": {
+          "wall_seconds": 4.086357583990321,
+          "peak_rss_bytes": 32047104,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        }
+      },
+      "sqlite_integrity_pass": true,
+      "all_media_identities_accounted": true,
+      "limits": [
+        "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+        "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+      ]
+    },
+    "second_current_release_trial_with_full_id_and_byte_verification": {
+      "format": "OSwind generated erasure scaling v1",
+      "records": 20000,
+      "media_files": 10000,
+      "binary_sha256": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435",
+      "measurements": {
+        "shared_preview": {
+          "wall_seconds": 0.11662587500177324,
+          "peak_rss_bytes": 24674304,
+          "sources": 10000
+        },
+        "shared_apply": {
+          "wall_seconds": 2.8224701669532806,
+          "peak_rss_bytes": 32342016,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "unique_preview": {
+          "wall_seconds": 0.07159045804291964,
+          "peak_rss_bytes": 24788992,
+          "sources": 10000
+        },
+        "unique_apply": {
+          "wall_seconds": 4.349747915985063,
+          "peak_rss_bytes": 32014336,
+          "result": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        }
+      },
+      "sqlite_integrity_pass": true,
+      "all_media_identities_accounted": true,
+      "all_remaining_source_ids_verified": true,
+      "harness_sha256": "f5d9c35db225628bb87af11e6161de3e97435844fd81205af6e2519a9a5f1c27",
+      "limits": [
+        "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+        "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+      ]
+    },
+    "limits": [
+      "All measured trials retained; uncontrolled cache/background activity; not release percentiles, isolated causal experiment, energy or competitor evidence",
+      "Current second trial also independently verifies every surviving source ID, media filename and shared-file byte string outside timed CLI operations; original baseline checked counts, with small byte-identity process contracts",
+      "Bulk apply wall time includes source transaction plus retained-media cleanup; per-process RSS is CLI only"
+    ]
+  },
+  "quality_regression": {
+    "apple": {
+      "fixture_sha256": "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+      "documents": 32,
+      "queries": 35,
+      "repetitions": 3,
+      "all_aggregate_quality_components_unchanged": true,
+      "modes": {
+        "hybrid": {
+          "before": {
+            "hit_rate_at_5": 0.8709677419354839,
+            "recall_at_5": 0.8709677419354839,
+            "mrr_at_5": 0.7204301075268817,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 0.8709677419354839,
+            "recall_at_5": 0.8709677419354839,
+            "mrr_at_5": 0.7204301075268817,
+            "no_evidence_empty_rate": 0
+          }
+        },
+        "keyword": {
+          "before": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "after": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          }
+        },
+        "semantic": {
+          "before": {
+            "hit_rate_at_5": 0.5806451612903226,
+            "recall_at_5": 0.5645161290322581,
+            "mrr_at_5": 0.35752688172043,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 0.5806451612903226,
+            "recall_at_5": 0.5645161290322581,
+            "mrr_at_5": 0.35752688172043,
+            "no_evidence_empty_rate": 0
+          }
+        }
+      },
+      "limits": "Authored regression, not held-out quality; absent-evidence weakness remains."
+    },
+    "qwen": {
+      "fixture_sha256": "422ac06ba2f1cc432da3e4fe02986e79b6c051e20a93703b44a6d109b385b3b1",
+      "documents": 32,
+      "queries": 35,
+      "repetitions": 3,
+      "all_aggregate_quality_components_unchanged": true,
+      "modes": {
+        "hybrid": {
+          "before": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          }
+        },
+        "keyword": {
+          "before": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          },
+          "after": {
+            "hit_rate_at_5": 0.8387096774193549,
+            "recall_at_5": 0.8387096774193549,
+            "mrr_at_5": 0.7634408602150538,
+            "no_evidence_empty_rate": 0.5
+          }
+        },
+        "semantic": {
+          "before": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          },
+          "after": {
+            "hit_rate_at_5": 1,
+            "recall_at_5": 1,
+            "mrr_at_5": 1,
+            "no_evidence_empty_rate": 0
+          }
+        }
+      },
+      "limits": "Authored regression, not held-out quality; absent-evidence weakness remains."
+    }
+  },
+  "implementation_limits": [
+    "Source rowids are not used as durable identity. INTEGER PRIMARY KEY map remains stable across compaction; native vector keys stay separate.",
+    "No payload format change; only the pinned previous schema-13 writer was actually exercised, not arbitrary/future writers",
+    "Native clicks/focus, saved-recap provenance, vault/migration, natural capture/power, full 24h and competitor goals remain open"
+  ],
+  "installed_binaries": {
+    "OSwind": "1e62f9d0b81c6256126365ed2af53703ac93f98ef017914d03793f292b8b8971",
+    "oswindctl": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435"
+  },
+  "zip_sha256": "8b085f5ae9fd168418974cca770cc9cccbe69e8d27ced720e98baa97cbb8da76",
+  "strict_signature_build_package_installed_zip_binding": true,
+  "sources": [
+    "https://www.sqlite.org/lang_vacuum.html",
+    "https://www.sqlite.org/fts5.html"
+  ]
+}
