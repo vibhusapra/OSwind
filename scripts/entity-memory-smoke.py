@@ -4,12 +4,13 @@
 Project-alias matching has an independent deterministic oracle. Native NLP names
 are observed, not scored as verified identities or a representative benchmark.
 """
-import argparse,contextlib,hashlib,http.client,json,pathlib,select,socket,sqlite3,subprocess,time,urllib.parse
+import http.client as http_client
+import argparse,contextlib,hashlib,json,pathlib,select,socket,sqlite3,subprocess,time,urllib.parse
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',required=True,type=pathlib.Path)
-p.add_argument('--old-cli',required=True,type=pathlib.Path);a=p.parse_args()
-binary=a.binary.resolve();old=a.old_cli.resolve();root=a.root.resolve();root.mkdir(mode=0o700,exist_ok=False)
+p.add_argument('--old-cli',type=pathlib.Path);a=p.parse_args()
+binary=a.binary.resolve();old=a.old_cli.resolve() if a.old_cli else None;root=a.root.resolve();root.mkdir(mode=0o700,exist_ok=False)
 library=root/'library'
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def cmd(*args,data=library,cli=binary):
@@ -26,8 +27,8 @@ for i in range(1000):
     if i%3==0:text='Maya Chen reviewed Apollo Launch. Next: accessibility review.';expected.add(id)
     elif i%3==1:text='Work on ALPHA42 with the platform team.';expected.add(id)
     else:text='Apollonian launcher notes. This is unrelated synthetic work.'
-    rows.append(dict(id=id,timestamp='2026-10-24T12:00:00Z',kind='note',app='Owned entity fixture',title='Synthetic source '+str(i),text=text,tags=[],favorite=False,regions=[]))
-input_file=root/'sources.json';input_file.write_text(json.dumps(rows));assert cmd('import',input_file)['imported']==1000
+    rows.append(dict(id=id,timestamp='2026-10-24T12:00:00Z',kind='note',app='Owned entity fixture',bundleID='org.oswind.entity-fixture',title='Synthetic source '+str(i),text=text,tags=[],favorite=False,regions=[]))
+input_file=root/'sources.json';input_file.write_text(json.dumps(rows));assert cmd('import',input_file,'--json')['imported']==1000
 project=cmd('entity','create','project','Apollo Launch','--notes','Explicit synthetic project definition')
 cmd('entity','edit',project['id'],'--aliases','Apollo Launch,ALPHA42')
 first=time.monotonic();progress=cmd('entity','index');first=time.monotonic()-first
@@ -44,8 +45,9 @@ with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:
     for text,start,length,surface in db.execute("SELECT m.text,e.start,e.length,e.surface FROM entity_mentions e JOIN memories m ON m.id=e.memory_id WHERE e.origin='automatic'"):
         assert text.encode('utf-16-le')[2*start:2*(start+length)].decode('utf-16-le')==surface;count+=1
     observed=[dict(kind=k,name=n,sources=c) for k,n,c in db.execute("SELECT e.kind,e.name,COUNT(DISTINCT m.memory_id) FROM memory_entities e LEFT JOIN entity_mentions m ON m.entity_id=e.id GROUP BY e.id ORDER BY e.kind,e.name")]
-refusal=subprocess.run([str(old),'--data',str(library),'stats'],capture_output=True,text=True,timeout=30)
-assert refusal.returncode!=0 and 'newer OSwind' in refusal.stderr
+if old:
+    refusal=subprocess.run([str(old),'--data',str(library),'stats'],capture_output=True,text=True,timeout=30)
+    assert refusal.returncode!=0 and 'newer OSwind' in refusal.stderr
 # Rejected automatic link stays rejected when project-rule changes require a rescan.
 rejected=sorted(expected)[0];cmd('entity','unlink',project['id'],rejected)
 cmd('entity','edit',project['id'],'--notes','Rebuild after deliberate rule revision')
@@ -73,7 +75,7 @@ try:
     deadline=time.monotonic()+15
     def http(path,authorized=True):
         token=(library/'api-token').read_text()
-        connection=http.client.HTTPConnection('127.0.0.1',47831,timeout=3)
+        connection=http_client.HTTPConnection('127.0.0.1',47831,timeout=3)
         try:
             connection.request('GET',path,headers={'Host':'127.0.0.1:47831',**({'Authorization':'Bearer '+token} if authorized else {})})
             response=connection.getresponse();return response.status,json.loads(response.read())
@@ -101,7 +103,8 @@ assert restored_project['detail']=='Rebuild after deliberate rule revision' and 
 assert not json.loads((restored/'settings.json').read_text())['entityAutomaticIndex']
 assert cmd('entity','progress',data=restored)['indexed']==0
 assert cmd('entity','index',data=restored)['indexed']==1000;assert members(restored)==expected-{rejected}
-cmd('delete',sorted(expected)[1]);assert sorted(expected)[1] not in members()
-cmd('wipe','--confirm','DELETE-ALL');assert cmd('entity','list')==[]
-report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old),harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','schema20 client refusal','correction survives rule-rescan','read-only MCP membership and validation','authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
+cmd('delete',sorted(expected)[1],'--json');assert sorted(expected)[1] not in members()
+cmd('wipe','--confirm','DELETE-ALL','--json');assert cmd('entity','list')==[]
+report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old) if old else None,olderClientRefusalChecked=old is not None,harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','correction survives rule-rescan','read-only MCP membership and validation','authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
+if old:report['checks'].append('schema20 client refusal')
 (root/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
