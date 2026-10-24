@@ -23,6 +23,14 @@ import OSwindCore
                         try await Task.sleep(nanoseconds:120_000_000_000);throw CancellationError()
                     })
                     preview=try AppModel(startServices:false,nativeModelSetup:setup)
+                } else if let section=CommandLine.arguments.firstIndex(of:"--preview-section"),section+1<CommandLine.arguments.count,["VisualPreparationBusy","VisualPreparationError"].contains(CommandLine.arguments[section+1]) {
+                    let failed=CommandLine.arguments[section+1]=="VisualPreparationError"
+                    let setup=VisualModelSetupModel(installer:{progress in
+                        if failed {throw OSwindError.network("The public model download was interrupted. Check the connection and retry.")}
+                        progress(.init(phase:"Downloading public model weights",completedBytes:735_000_000,totalBytes:1_539_456_768,completedFiles:5,totalFiles:8,file:nil))
+                        try await Task.sleep(for:.seconds(120));throw CancellationError()
+                    })
+                    preview=try AppModel(startServices:false,visualSetup:setup)
                 } else {preview=try AppModel()}
             } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)); NSApp.terminate(nil); return }
             let path = CommandLine.arguments[index+1]

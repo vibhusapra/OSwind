@@ -7,6 +7,7 @@ app="${OSWIND_APP_OUTPUT:-$PWD/dist/OSwind.app}"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp ".build/$configuration/OSwind" "$app/Contents/MacOS/OSwind"
 cp ".build/$configuration/oswindctl" "$app/Contents/MacOS/oswindctl"
+cp ".build/$configuration/oswind-preparation-guardian" "$app/Contents/MacOS/oswind-preparation-guardian"
 cat > "$app/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -58,6 +59,12 @@ install -m 644 ThirdParty/Apache-2.0.txt "$app/Contents/Resources/ThirdParty/Apa
 mkdir -p "$app/Contents/Resources/ThirdParty/FluidAudio"
 ditto ThirdParty/FluidAudio "$app/Contents/Resources/ThirdParty/FluidAudio"
 ditto ThirdParty/VisualRuntime "$app/Contents/Resources/ThirdParty/VisualRuntime"
+# Public preparation tools are copied into an isolated model-cache workspace
+# only after their embedded hashes pass. Weights and Python are separate downloads.
+mkdir -p "$app/Contents/Resources/scripts" "$app/Contents/Resources/models"
+install -m 644 scripts/convert-visual-model.py scripts/convert-visual-model.py.lock "$app/Contents/Resources/scripts/"
+install -m 644 models/siglip2-source.json "$app/Contents/Resources/models/"
+ditto ThirdParty/VisualPreparation "$app/Contents/Resources/ThirdParty/VisualPreparation"
 # Preserve dependency resources in the signed resource area. VisualTokenizer
 # constructs explicit local Config values and never uses Hub's fallback bundle.
 for resource in swift-transformers_Hub.bundle swift-crypto_Crypto.bundle; do

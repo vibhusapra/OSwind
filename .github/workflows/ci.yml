@@ -19,7 +19,9 @@ jobs:
       - name: Verify evaluation asset integrity contracts offline
         run: python3 scripts/test-prepare-speaker-eval.py
       - name: Verify visual model tools without downloads
-        run: python3 scripts/test-visual-model-tools.py
+        run: |
+          python3 scripts/test-visual-model-tools.py
+          python3 scripts/visual-preparation-catalog.py --check
       - name: Package app
         run: scripts/build-app.sh release
       - name: CLI smoke test

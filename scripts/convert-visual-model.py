@@ -9,14 +9,22 @@ Run with `uv run scripts/convert-visual-model.py --help` on Apple Silicon macOS.
 """
 import argparse
 import hashlib
+import fcntl
 import json
 import os
+import stat
 from pathlib import Path
 import platform
 import shutil
 import sys
 import time
 import urllib.request
+
+PROGRESS = False
+
+def event(phase, **values):
+    if PROGRESS:
+        print("OSWIND_SETUP " + json.dumps(dict(phase=phase, **values), sort_keys=True), flush=True)
 
 RECIPE = "oswind-siglip2-fp32-image-fp16-text-v1"
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,32 +39,83 @@ def digest(path):
     return h.hexdigest()
 
 
-def source_files(directory, download):
+def source_files(directory, download, retry_partials=False):
+    if not download:
+        if not directory.is_dir():
+            raise ValueError("Missing public source directory")
+        return _source_files(directory, False, False)
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    descriptor = os.open(directory / ".oswind-source.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    try:
+        stamp = os.fstat(descriptor)
+        if not stat.S_ISREG(stamp.st_mode) or stamp.st_nlink != 1 or stamp.st_uid != os.getuid():
+            raise ValueError("Unsafe source-cache lock")
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise ValueError("The public source cache is already being prepared") from error
+        _source_files(directory, download, retry_partials)
+    finally:
+        os.close(descriptor)
+
+
+def _source_files(directory, download, retry_partials):
     if download:
         directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    completed = 0
+    total = sum(file["bytes"] for file in SOURCE["files"])
     for file in SOURCE["files"]:
         path = directory / file["path"]
+        event("Verifying public source", completedBytes=completed, totalBytes=total, file=file["path"])
         if not path.exists() and download:
             url = f"https://huggingface.co/{SOURCE['repository']}/resolve/{SOURCE['revision']}/{file['path']}"
             partial = path.with_name(path.name + ".partial")
+            # A previous cancelled app job may leave an unfinished regular file.
+            # Never follow a link or truncate an unrelated/oversized hard link.
+            if partial.exists() or partial.is_symlink():
+                if not retry_partials:
+                    raise FileExistsError("Source partial exists; retry only an owned source cache explicitly")
+                stamp = partial.lstat()
+                if not stat.S_ISREG(stamp.st_mode) or stamp.st_nlink != 1 or stamp.st_uid != os.getuid() or stamp.st_size > file["bytes"]:
+                    raise ValueError("Unsafe source partial: " + file["path"])
+                partial.unlink()
             print("Downloading", file["path"], flush=True)
-            # Refuse to truncate pre-existing partial files, links or destinations.
-            with partial.open("xb") as out, urllib.request.urlopen(url, timeout=120) as response:
-                received = 0
-                while chunk := response.read(1024 * 1024):
-                    received += len(chunk)
-                    if received > file["bytes"]:
-                        raise ValueError("Source exceeds pinned size: " + file["path"])
-                    out.write(chunk)
-            if partial.stat().st_size != file["bytes"] or digest(partial) != file["sha256"]:
-                raise ValueError("Source download checksum mismatch: " + file["path"])
-            os.link(partial, path, follow_symlinks=False)
-            partial.unlink()
+            try:
+                with partial.open("xb") as out, urllib.request.urlopen(url, timeout=120) as response:
+                    received = 0
+                    while chunk := response.read(1024 * 1024):
+                        received += len(chunk)
+                        if received > file["bytes"]:
+                            raise ValueError("Source exceeds pinned size: " + file["path"])
+                        out.write(chunk)
+                        event("Downloading public source", completedBytes=completed+received, totalBytes=total, file=file["path"])
+                if partial.stat().st_size != file["bytes"] or digest(partial) != file["sha256"]:
+                    raise ValueError("Source download checksum mismatch: " + file["path"])
+                os.link(partial, path, follow_symlinks=False)
+            finally:
+                if partial.exists() and not partial.is_symlink():
+                    partial.unlink()
         if path.is_symlink() or not path.is_file() or path.stat().st_size != file["bytes"] or digest(path) != file["sha256"]:
             raise ValueError("Missing or changed source: " + str(path))
+        # Recover a crash between publishing a fully verified hard link and
+        # removing its .partial name. The pinned destination always wins.
+        partial = path.with_name(path.name + ".partial")
+        if retry_partials and (partial.exists() or partial.is_symlink()):
+            stamp, target = partial.lstat(), path.stat()
+            paired = stamp.st_nlink == 2 and (stamp.st_dev, stamp.st_ino) == (target.st_dev, target.st_ino)
+            if not stat.S_ISREG(stamp.st_mode) or stamp.st_uid != os.getuid() or stamp.st_size > file["bytes"] or not (stamp.st_nlink == 1 or paired):
+                raise ValueError("Unsafe completed source partial: " + file["path"])
+            partial.unlink()
+        completed += file["bytes"]
+        event("Verified public source", completedBytes=completed, totalBytes=total, file=file["path"])
+    allowed = {file["path"] for file in SOURCE["files"]} | {".oswind-source.lock"}
+    for entry in directory.iterdir():
+        if entry.name not in allowed:
+            raise ValueError("Unexpected public source member: " + entry.name)
 
 
 def convert(source, output):
+    event("Preparing local encoders")
     import coremltools as ct
     import numpy as np
     import torch
@@ -73,9 +132,9 @@ def convert(source, output):
     torch.set_num_threads(4)
     torch.manual_seed(1729)
     torch.backends.mha.set_fastpath_enabled(False)
-    model = AutoModel.from_pretrained(source, local_files_only=True, use_safetensors=True,
+    model = AutoModel.from_pretrained(source, local_files_only=True, trust_remote_code=False, use_safetensors=True,
                                      attn_implementation="eager", torch_dtype=torch.float32).eval()
-    processor = AutoProcessor.from_pretrained(source, local_files_only=True, use_fast=False)
+    processor = AutoProcessor.from_pretrained(source, local_files_only=True, trust_remote_code=False, use_fast=False)
 
     class ImageEncoder(torch.nn.Module):
         def __init__(self):
@@ -109,6 +168,7 @@ def convert(source, output):
     references = {}
     for name, wrapper, data, precision in [("image", ImageEncoder(), pixels, ct.precision.FLOAT32),
                                            ("text", TextEncoder(), ids, ct.precision.FLOAT16)]:
+        event("Converting " + name + " encoder")
         before = time.monotonic()
         with torch.inference_mode():
             # Evaluate individually, matching static Core ML batch size.
@@ -140,6 +200,7 @@ def convert(source, output):
 
     for policy in [ct.ComputeUnit.CPU_ONLY, ct.ComputeUnit.CPU_AND_GPU]:
         for name, data in [("image", pixels.numpy()), ("text", ids.numpy())]:
+            event("Checking " + name + " encoder", compute=policy.name)
             runtime = ct.models.CompiledMLModel(str(output / (name + ".mlmodelc")), compute_units=policy)
             predictions, durations = [], []
             for row in data:
@@ -176,6 +237,7 @@ def convert(source, output):
     for p in output.rglob("*"):
         p.chmod(0o700 if p.is_dir() else 0o600)
     (output / "OSWIND-VISION.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    event("Qualified local model")
     print("Qualified bundle:", output, flush=True)
 
 
@@ -183,13 +245,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True, help="Pinned Hugging Face source directory")
     parser.add_argument("--output", type=Path, required=True, help="NEW converted bundle directory")
+    parser.add_argument("--retry-partials", action="store_true", help="Under the exclusive source-cache lock, restart only bounded regular unfinished public downloads")
+    parser.add_argument("--progress-json", action="store_true", help="Emit bounded public setup progress lines for the native app")
     parser.add_argument("--download", action="store_true", help="Explicitly download missing public source files; no credentials")
     args = parser.parse_args()
+    global PROGRESS
+    PROGRESS = args.progress_json
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         parser.error("Native conversion qualification requires Apple Silicon macOS")
     if args.output.exists() or args.output.with_name(args.output.name + ".conversion").exists():
         parser.error("Output or conversion workspace already exists; choose a new name")
-    source_files(args.source, args.download)
+    source_files(args.source, args.download, args.retry_partials)
     convert(args.source.resolve(), args.output.resolve())
 
 

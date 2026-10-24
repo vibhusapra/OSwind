@@ -55,3 +55,14 @@ models, use a Hugging Face credential, or send visual inputs to a service.
 Pillow 11.3.0 resize coefficient convention — Pillow/HPND license.
 https://github.com/python-pillow/Pillow/tree/11.3.0
 See VisualRuntime/Pillow-LICENSE (also Pillow/LICENSE in the source tree).
+
+Optional local visual-model preparation:
+uv 0.13.5 — Astral Software Inc. and contributors (MIT OR Apache-2.0)
+https://github.com/astral-sh/uv/releases/tag/0.13.5
+The app fetches the checksum-pinned official Apple Silicon executable separately;
+it is not bundled. Its MIT license is packaged in VisualPreparation/ and retained
+with the cached executable. Managed CPython 3.12.15 and the frozen Python package
+environment are separate cache downloads with their own installed licenses.
+See scripts/convert-visual-model.py.lock for exact dependency artifacts and hashes.
+The local conversion scripts are OSwind source; downloaded Python dependencies
+and model weights are not linked into or redistributed with the application.

@@ -16,7 +16,7 @@ struct BackupWorkspaceMarker: Codable {
 /// The private companion holds its lease/marker outside the package payload.
 /// A successful atomic publication never ships these operation-control files.
 final class BackupWorkspace {
-    static let operationLabels = ["oswind-visual-index","oswind-vault-migration","oswind-markdown-snapshot","oswind-markdown-partial","oswind-visual-recording","oswind-model-download","oswind-audio-import","oswind-audio-chunk","oswind-transcription","oswind-backup","oswind-backup-pins","oswind-backup-inspect","oswind-backup-partial","oswind-restore-input","oswind-restore-partial"]
+    static let operationLabels = ["oswind-visual-prepare","oswind-visual-index","oswind-vault-migration","oswind-markdown-snapshot","oswind-markdown-partial","oswind-visual-recording","oswind-model-download","oswind-audio-import","oswind-audio-chunk","oswind-transcription","oswind-backup","oswind-backup-pins","oswind-backup-inspect","oswind-backup-partial","oswind-restore-input","oswind-restore-partial"]
     let mediaActivity:MediaAdmissionLease?
     let tree: BackupFileTree
     let url: URL
@@ -71,6 +71,11 @@ final class BackupWorkspace {
         var metadata = stat()
         if lstat(destination.path,&metadata)==0 { throw BackupFileError.invalid("Choose a new destination; an existing file or folder will not be overwritten") }
         guard errno==ENOENT else { throw BackupFileError.io("Cannot inspect backup destination") }
+    }
+    func retainedLifetimeDescriptor() throws -> Int32 {
+        let descriptor=fcntl(lease,F_DUPFD_CLOEXEC,0)
+        guard descriptor>=0 else {throw BackupFileError.io("Cannot retain the preparation workspace reservation")}
+        return descriptor
     }
     deinit { try? cleanup(); mediaActivity?.release(); flock(lease,LOCK_UN); close(lease); close(parent) }
     func cleanup() throws {

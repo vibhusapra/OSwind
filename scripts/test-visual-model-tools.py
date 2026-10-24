@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Offline safety contracts; requires neither model dependencies nor weights."""
 import hashlib
+import fcntl
+import os
 import importlib.util
 import io
 from pathlib import Path
@@ -70,6 +72,69 @@ class VisualToolContracts(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 convert.source_files(self.root, True)
         self.assertEqual((self.root / "model.bin").read_bytes(), b"concurrent destination")
+
+    def test_explicit_retry_restarts_only_an_owned_regular_partial(self):
+        partial = self.root / "model.bin.partial"
+        partial.write_bytes(b"unfinished")
+        with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", return_value=io.BytesIO(self.body)):
+            convert.source_files(self.root, True, retry_partials=True)
+        self.assertEqual((self.root / "model.bin").read_bytes(), self.body)
+        self.assertFalse(partial.exists())
+
+    def test_retry_refuses_partial_links_and_preserves_their_targets(self):
+        outside = self.root / "outside"
+        outside.write_bytes(b"keep")
+        partial = self.root / "model.bin.partial"
+        for hard in [False, True]:
+            if hard:
+                os.link(outside, partial)
+            else:
+                partial.symlink_to(outside)
+            with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", side_effect=AssertionError("network")):
+                with self.assertRaises(ValueError):
+                    convert.source_files(self.root, True, retry_partials=True)
+            self.assertEqual(outside.read_bytes(), b"keep")
+            partial.unlink()
+
+    def test_unverified_optional_loader_config_is_refused(self):
+        (self.root / "model.bin").write_bytes(self.body)
+        extra = self.root / "adapter_config.json"
+        extra.write_text("{}")
+        with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", side_effect=AssertionError("network")):
+            with self.assertRaisesRegex(ValueError, "Unexpected public source member"):
+                convert.source_files(self.root, False)
+        self.assertEqual(extra.read_text(), "{}")
+
+    def test_retry_recovers_verified_publish_before_partial_unlink(self):
+        target, partial = self.root / "model.bin", self.root / "model.bin.partial"
+        target.write_bytes(self.body)
+        os.link(target, partial)
+        with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", side_effect=AssertionError("network")):
+            convert.source_files(self.root, True, retry_partials=True)
+        self.assertEqual(target.read_bytes(), self.body)
+        self.assertFalse(partial.exists())
+        self.assertEqual(target.stat().st_nlink, 1)
+
+    def test_completed_target_does_not_allow_deleting_an_unrelated_hardlink(self):
+        target, partial, outside = self.root / "model.bin", self.root / "model.bin.partial", self.root / "outside"
+        target.write_bytes(self.body)
+        outside.write_bytes(b"keep")
+        os.link(outside, partial)
+        with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", side_effect=AssertionError("network")):
+            with self.assertRaises(ValueError):
+                convert.source_files(self.root, True, retry_partials=True)
+        self.assertEqual(outside.read_bytes(), b"keep")
+        self.assertEqual(target.read_bytes(), self.body)
+
+    def test_source_cache_writer_lock_refuses_concurrent_prepare(self):
+        descriptor = os.open(self.root / ".oswind-source.lock", os.O_CREAT | os.O_RDWR, 0o600)
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", side_effect=AssertionError("network")):
+                with self.assertRaisesRegex(ValueError, "already being prepared"):
+                    convert.source_files(self.root, True, retry_partials=True)
+        finally:
+            os.close(descriptor)
 
     def test_downloader_uses_pinned_url_without_headers(self):
         with patch.object(convert, "SOURCE", self.catalog), patch.object(convert.urllib.request, "urlopen", return_value=io.BytesIO(self.body)) as request:
