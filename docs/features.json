@@ -28,7 +28,7 @@
     "axis": "Capture",
     "feature": "Accessibility context and text",
     "status": "implemented",
-    "evidence": "Snapshot/replay AX uses a single cancellable utility worker, per-object 40ms message timeouts, cooperative 350ms/1000-node/8192-message budgets, cycle checks and continued security scanning after text truncation. Incomplete trusted-AX trees defer. Optional-permission identity-only path preserved; audio reader remains synchronous. Native latency/availability/energy and broader browser acceptance remain open",
+    "evidence": "Snapshot/replay/audio AX uses a single cancellable utility worker, per-object 40ms message timeouts, cooperative 350ms/1000-node/8192-message budgets, cycle checks and continued security scanning after text truncation. Incomplete trusted-AX trees defer. Same-PID/bundle in-flight reads share independent cancellation leases (eight observers); completed observations are not cached. Audio startup/poll/pre-WAV/post-ASR renew privacy, epoch, storage and session guards. Optional-permission identity-only path preserved; no synchronous AX traversal remains. Native latency/availability/energy and broader browser acceptance remain open",
     "references": "Screenpipe, TimeScroll, Minne"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "695-case normal suite (666 pass/29 opt-in skips),159-case native/model run adds23 cases (689 distinct pass/six remaining skips),188 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "713-case normal suite (684 pass/29 opt-in skips),216-case native/model run adds23 cases (707 distinct pass/six remaining skips),218 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

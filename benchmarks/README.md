@@ -2,6 +2,22 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Audio privacy and shared-reader regression checks
+
+[Bounded audio evidence](audio-privacy-v1.json) binds runtime 0118243 and a separate signed package to 713 normal cases (684 pass / 29 opt-in skips), 216 native/model cases and 218 race-check passes. The normal/native union has 707 distinct passes and six remaining opt-in cases. Eleven actual signed process groups pass; the audio process uses generated PCM and a deterministic ASR executable to test contracts, not recognition quality.
+
+Six coordinator cases establish one producer for concurrent same-application observers, independent cancellation, fresh reads after completion, target separation and an eight-observer cap. Eleven audio cases cover suspended-start responsiveness, privacy before WAV/after ASR, finish/restart/session ownership, bounded waiting chunks and ordinary recognizer-error recovery. A real replacement SQLite database/WAL/SHM stays unchanged when the original moved connection closes.
+
+No live-AX latency, microphone/system capture, CPU/power improvement or competitor result is inferred from these fixtures. The configured 350 ms / 40 ms / 1,000-node / 8,192-message traversal limits remain cooperative. Different/cancelled operations can add a wait for actual preceding completion; this is not a global hard deadline. GUI view sources are unchanged, and a fresh doctor check confirms a locked session.
+
+```bash
+swift test --filter 'AccessibilityCoordinatorTests|AccessibilityReaderTests|AudioPrivacyTests|AudioLifecycleTests|LibraryWorkspaceTests'
+OSWIND_TEST_NATIVE_VAULT=1 swift test --sanitize=thread \
+  --filter 'AccessibilityCoordinatorTests|AudioPrivacyTests|AudioMemoryTests|AudioLifecycleTests|SnapshotAdmissionTests|Replay'
+```
+
+See [audio lifecycle and limitations](../docs/AUDIO-PRIVACY.md). Physical-device, dense-browser, permission, format/backlog and end-to-end energy acceptance remain open.
+
 ## Indexed tags and opening tradeoffs
 
 [Indexed-tag evidence](indexed-tags-v1.json) compares a pinned signed schema20 CLI with the new signed candidate on APFS clones of the same owned archives. The same Python civil-time oracle checks all day/hour counts. Seven fresh processes per scope run after a separately measured first open. Caches and host activity are uncontrolled; initial index construction can warm later queries. These are paired observations, not a controlled cold-cache or competitor experiment.

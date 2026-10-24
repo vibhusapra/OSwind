@@ -128,3 +128,10 @@ Normal pause drains already admitted work. Privacy/settings/library/erasure boun
 
 
 `TagIndexSchema` backfills exact string membership and metadata in the opening transaction, with SQLite progress cancellation, readiness/trigger validation and repair. SQL triggers preserve schema20 older-writer coherence. Restore ignores this derived table and rebuilds from sources. Native `AppSession` constructs the store on a utility worker, then validates its selected directory before creating a model. Cancel/termination/lock reject and close late results; ordinary and managed close retain the original directory lease. See [tag index consistency, costs and opening lifecycle](TAG-INDEX.md).
+
+
+## Shared Accessibility observations and live audio
+
+`AccessibilityContextCoordinator` shares one in-flight same-PID/bundle read across at most eight consumers, with independent cancellation leases. It keeps the shared worker occupied until actual completion and never reuses completed results. All native AX attribute IPC is within the bounded utility traversal; the former synchronous helper is now async.
+
+`AudioController` renews context at startup boundaries, through one poll job, before WAV creation and after ASR. Epoch/session ownership is captured with each queued chunk. Stop/source/privacy changes cancel the current context session, while old replies cannot affect a new run. Directory identity is rechecked before file work and admission. Recognition errors retain allowed capture; privacy errors stop it. See [lifecycle limits and evidence](AUDIO-PRIVACY.md).

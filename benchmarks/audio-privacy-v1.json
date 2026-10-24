@@ -1,0 +1,268 @@
+{
+  "format": "OSwind bounded audio privacy and shared Accessibility observations v1",
+  "codeCommit": "0118243f867c5b995616979da20712223daa4a7a",
+  "schema": 20,
+  "hardware": "Apple M5 Max",
+  "os": "26.6.2",
+  "scope": "Synthetic contexts, PCM, permission/stream factories, local fake speech backends, owned encrypted/model runs and signed CLI/import/API/MCP/portability processes. No real microphone/system-audio capture, physical input, energy, AX latency or competitor acceptance.",
+  "implementation": {
+    "synchronousAXTraversalRemoved": true,
+    "legacySwiftCurrentHelperNowAsync": true,
+    "IPCWorker": "Shared utility worker, no process-wide AX timeout",
+    "configuredBudget": {
+      "seconds": 0.35,
+      "perObjectMessageSeconds": 0.04,
+      "nodes": 1000,
+      "messages": 8192,
+      "textCharacters": 16000,
+      "hardRealtimeGuarantee": false
+    },
+    "sameApplicationInflightOnlyCoalescing": true,
+    "maximumObserversPerRead": 8,
+    "independentCancellationLeases": true,
+    "lastObserverCancellationWaitsForActualCompletion": true,
+    "completedContextCaching": false,
+    "audioPrivacyPollSeconds": 1,
+    "controllerPollJobsMaximum": 1,
+    "queuedTranscriptionChunksMaximum": 3,
+    "startupAndProcessingEpochLockIdentityChecks": true,
+    "unknownSecureExcludedContextStopsAudio": true,
+    "optionalAXNativeIdentityOnlyPathPreserved": true,
+    "renewedPrivacyAndDirectoryBeforeWAVAndAdmission": true,
+    "queuedChunksBindOriginalEpochAndSession": true,
+    "restartDiscardsOldPendingWork": true,
+    "ordinaryRecognizerErrorPreservesAllowedCapture": true,
+    "noUIResourceConstructionInFixtures": true
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 713,
+      "passed": 684,
+      "optInSkipped": 29,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 216,
+      "additionalPreviouslySkipped": 23,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 707,
+    "remainingOptInSkips": 6,
+    "threadSanitizer": {
+      "passed": 218,
+      "failures": 0,
+      "racesReported": 0
+    }
+  },
+  "newCoverage": {
+    "coordinatorCases": 6,
+    "audioPrivacyCases": 11,
+    "replacementDatabaseWALCase": 1,
+    "sharedProducer": "Two independent live consumers use one producer; cancelling one preserves the other; completed reads start a new producer; ninth observer refused",
+    "audio": "Suspended startup/UI responsiveness; unknown/secure/excluded/stale identity; post-ASR stop/lock/settings/root replacement; no premature WAV; explicit finish; old queued-session rejection; three waiting chunks; recognizer-error recovery",
+    "directoryClose": "Original moved connection closes without changing a separate replacement database/WAL/SHM; original source survives reopen"
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema20 bounded audio privacy and shared AX observations; no installation or native capture/input acceptance",
+    "codeCommit": "0118243f867c5b995616979da20712223daa4a7a",
+    "schema": 20,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "d0fe0f816c3686532f624d14cba471d3b00fce512188ba5a51f1d0c769b2ff5f",
+        "signedSHA256": "54cb52b1f928b6cd2ec7a1d6ffec74d59604e92afaf566de9cb5263c451bb29f",
+        "normalizedPayloadSHA256": "816ca273729242471e867756e8237084be5a59f0bff973acf4d3f07c3e6fb457"
+      },
+      "oswindctl": {
+        "rawSHA256": "62395d29346942f0df9c9ce6926375552301289ebeebcbefe8e28cc5f5ac1a53",
+        "signedSHA256": "fc461cc3d863e26f903a62744a0812e612125c75172add2c9acddab2c8e8ebba",
+        "normalizedPayloadSHA256": "6b89bf733dc42948f3299b2ee957e74207d6b2aa13a7d3e7e07733df9f1ab4b6"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "f042730df983f97a14a0a950975f25a002846cb9ada62d60fe737dbe7266be56",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "e1e007573158ad944fca1b664416fc6d1f411a21640aecdba54cb125632925e2",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalQualificationRuns": [
+    {
+      "name": "native-optin-v1",
+      "exitCode": 0,
+      "wallSeconds": 134.40470354189165
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 58.29952933313325
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.870202667079866
+    },
+    {
+      "name": "calendar-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 3.2180572079960257
+    },
+    {
+      "name": "tag-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.508127458859235
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4769550838973373
+    },
+    {
+      "name": "audio-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.3001124998554587
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.494812082964927
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4176367081236094
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1180717500392348
+    },
+    {
+      "name": "capture-region-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.37580433394759893
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 15.15869070822373
+    },
+    {
+      "name": "wipe-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.7495595419313759
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.0005894999485463
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 83.73890366591513
+    }
+  ],
+  "calendarProcess": {
+    "scope": "Owned synthetic imports and live CLI/HTTP/MCP counts; no capture, native input, energy or competitor claim.",
+    "binarySHA256": "fc461cc3d863e26f903a62744a0812e612125c75172add2c9acddab2c8e8ebba",
+    "harnessSHA256": "8233563be88978bcba9134db89f3f3586ea37aa959b61a0f4a9b5dcf402c30ed",
+    "sources": 600,
+    "passed": true,
+    "checks": [
+      "complete counts exceed search caps",
+      "CLI HTTP MCP identical metadata scopes",
+      "repeated clock hour distinct UTC ranges",
+      "23 hour DST day and leap month",
+      "inclusive start exclusive end",
+      "invalid relevance and malformed parameters rejected",
+      "HTTP token origin host guards",
+      "external writer visible to persistent HTTP connection"
+    ]
+  },
+  "tagCompatibilityProcess": {
+    "format": "OSwind transactionally indexed tags v1",
+    "scope": "Owned synthetic source/tag mutations, schema20 compatibility, exact search and quiet portability. No capture, normal history or credentials.",
+    "binarySHA256": "fc461cc3d863e26f903a62744a0812e612125c75172add2c9acddab2c8e8ebba",
+    "olderBinarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+    "actualOlderSchema20Writer": true,
+    "harnessSHA256": "839948d6ae25e40a6571b21bf2635bc68f500daf7a5661835a088c0a0220e541",
+    "schema": 20,
+    "passed": true,
+    "checks": [
+      "schema20 upgrade preserves exact source payloads",
+      "duplicate tags count once; case stays exact",
+      "older writer insertion and replacement maintain projection",
+      "old JSON and new indexed searches agree",
+      "source metadata and tag rows match independent SQL JSON oracle",
+      "quiet backup restore rebuilds counts",
+      "JSON round trip rebuilds counts"
+    ]
+  },
+  "domainPrivacyProcess": {
+    "scope": "Synthetic imported notes; domain/app/title filtering before admission and resulting CLI/HTTP/MCP consistency. No capture/device, retrospective text hiding or energy claim.",
+    "binarySHA256": "fc461cc3d863e26f903a62744a0812e612125c75172add2c9acddab2c8e8ebba",
+    "imported": 3,
+    "excluded": 7,
+    "checks": [
+      "root-dot, encoded, IDNA and configured domain spelling",
+      "case-insensitive app and title exclusions",
+      "CLI/HTTP/MCP search agree",
+      "excluded imports absent by direct HTTP/MCP id",
+      "owned stats preserve admission counts",
+      "HTTP token required"
+    ],
+    "passed": true
+  },
+  "audioImportProcess": {
+    "binarySHA256": "fc461cc3d863e26f903a62744a0812e612125c75172add2c9acddab2c8e8ebba",
+    "harnessSHA256": "69c52f2fb9e802b4a4c049dad2006d1b1fe7298f09a7af36c61170755512adfd",
+    "report": {
+      "passed": true,
+      "fixture": "generated 2-second 16 kHz PCM; deterministic external ASR emits one timestamped segment",
+      "checks": [
+        "CLI file preparation, timestamp/session persistence and keyword retrieval",
+        "crossing decoder segment ends clipped to independently measured source duration; wholly outside segments refused without partial admission",
+        "original clip retained privately, source never changed",
+        "detected secret suppresses complete raw clip and redacts both text representations",
+        "full media backup/restore preserves transcript/session and audio bytes",
+        "erasure removes owned clip only; malformed input fails"
+      ],
+      "limits": [
+        "mock ASR does not establish recognition quality",
+        "native capture/panels/playback acceptance remains separate"
+      ]
+    }
+  },
+  "nativeBoundary": {
+    "freshDoctorScreenLocked": false,
+    "GUIViewSourcesUnchanged": true,
+    "newRenderOrPhysicalInputClaimed": false,
+    "realMicrophonePermissionRequestedByUnitFixtures": false,
+    "realInputDeviceConstructedByUnitFixtures": false,
+    "installedSchema17Unchanged": true,
+    "normalHistoryOpened": false,
+    "realKeychainCredentialsUsed": false,
+    "authenticationOrPermissionChanges": false
+  },
+  "retainedDevelopmentCorrections": {
+    "initialTestBuild": "Async test static helper isolation and SearchHit.memory access corrected before final full/native/race runs",
+    "transientASRError": "Scoped privacy error type keeps ordinary ASR failure from disabling allowed capture",
+    "restartTest": "Wait for the new run to be active before releasing the old fake backend; avoids scheduling-dependent assertions"
+  },
+  "remainingGates": [
+    "Unlocked physical microphone/system-audio capture and permission flow",
+    "Actual AX latency, dense-browser availability and capture/power measurements",
+    "Brief foreground transitions and background/tab audio scoping",
+    "System-audio app-filter normalization and device/format recovery",
+    "PCM delivery/backlog hardening and source-stream handoff ownership",
+    "Native Stop/keyboard/VoiceOver and broader OS/hardware acceptance",
+    "Broad feature parity and matched competitor ranking"
+  ]
+}
