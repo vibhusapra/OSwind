@@ -29,7 +29,7 @@ import OSwindCore
     }
     func testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Encrypted.oswindvault"),secret=UUID().uuidString
-        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false})
+        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try await finish(session)
         let old=try XCTUnwrap(session.model);try old.store.insert(Memory(id:"keep",text:"Synthetic native session history"));old.query="sensitive query";old.question="sensitive question"
         session.createVault(at:package,name:"Owned session",capacityGiB:1,passphrase:secret,copyHistory:true,remember:false);try await finish(session)
         XCTAssertNil(session.failure);XCTAssertEqual(session.vaultStatus?.state,.unlocked);XCTAssertNotNil(try session.model?.store.get("keep"));XCTAssertTrue(old.store.isClosed)
@@ -50,7 +50,7 @@ import OSwindCore
     }
     func testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Snapshot.oswindvault")
-        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false}),source=try XCTUnwrap(session.model?.store)
+        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try await finish(session);let source=try XCTUnwrap(session.model?.store)
         try source.insert(Memory(id:"keep",text:"Original source"));let mutation=SessionMigrationMutation(store:source)
         session.createVault(at:package,name:"Changed source snapshot",capacityGiB:1,passphrase:UUID().uuidString,copyHistory:true,remember:false,observeMigration:{mutation.observe($0)})
         try await finish(session);XCTAssertNil(session.failure);XCTAssertNil(session.vaultPackage);XCTAssertTrue(session.snapshotNeedsReview);XCTAssertNotNil(session.createdVault)
@@ -114,7 +114,7 @@ import OSwindCore
     }
     func testNormalTerminationAwaitsCancelledSetupBeforeReturning() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Terminated.oswindvault")
-        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false})
+        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try await finish(session)
         try session.model?.store.insert(Memory(id:"keep",text:"Original at termination"))
         session.createVault(at:package,name:"Quit fixture",capacityGiB:1,passphrase:UUID().uuidString,copyHistory:true,remember:false)
         let safe=await session.lockForTermination();XCTAssertTrue(safe);XCTAssertFalse(session.busy);XCTAssertNotNil(try session.model?.store.get("keep"));XCTAssertNil(session.vaultPackage)
@@ -122,7 +122,7 @@ import OSwindCore
     }
     func testNativeCancelledSetupKeepsOriginalSelectedAndQuiet() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Cancelled.oswindvault")
-        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try session.model?.store.insert(Memory(id:"keep",text:"Original after cancellation"))
+        let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try await finish(session);try session.model?.store.insert(Memory(id:"keep",text:"Original after cancellation"))
         session.createVault(at:package,name:"Cancelled",capacityGiB:1,passphrase:UUID().uuidString,copyHistory:true,remember:false);session.cancelOperation();try await finish(session)
         XCTAssertNotNil(try session.model?.store.get("keep"));XCTAssertNil(session.vaultPackage);XCTAssertNil(defaults.string(forKey:LibraryLocationPreferences.key));XCTAssertFalse(session.model?.isCapturing ?? true)
         session.model?.prepareForLibrarySwitch();try session.model?.store.close();session.model=nil

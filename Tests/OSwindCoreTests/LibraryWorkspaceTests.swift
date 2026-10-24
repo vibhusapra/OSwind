@@ -78,7 +78,10 @@ final class LibraryWorkspaceTests:XCTestCase {
     func testMovedLibraryCannotCreateScratchInReplacement() throws {
         let location=store.root;try FileManager.default.moveItem(at:location,to:root.appendingPathComponent("moved-library"));try Paths.ensure(location)
         XCTAssertThrowsError(try store.libraryWorkspace("oswind-audio-import"));XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:location.path).isEmpty)
-        XCTAssertThrowsError(try store.close());XCTAssertFalse(store.isClosed)
+        // Closing uses the original retained directory and lease, so it need
+        // not reopen or create lock files in the replacement pathname.
+        try store.close();XCTAssertTrue(store.isClosed)
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:location.path).isEmpty)
     }
     func testWorkspaceParentIdentityRejectsReplacement() throws {
         let parent=root.appendingPathComponent("parent");try Paths.ensure(parent);let tree=try BackupFileTree(root:parent),identity=try tree.identity()

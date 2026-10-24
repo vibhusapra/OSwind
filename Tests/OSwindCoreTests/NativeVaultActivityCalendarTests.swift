@@ -9,8 +9,8 @@ final class NativeVaultActivityCalendarTests:XCTestCase {
         do {
             _ = try await LibraryVault.create(at:package,name:"Owned calendar fixture",capacityGiB:1,passphrase:secret)
             _ = try await vault.unlock(passphrase:secret);let store=try MemoryStore(root:vault.libraryURL)
-            try store.insert(Memory(id:"owned",timestamp:try QueryScopeResolver.instant("2024-11-03T01:30:00-04:00"),text:"Owned synthetic source"))
-            let request=ActivityCalendarRequest(month:"2024-11",timeZone:TimeZone(identifier:"America/New_York")!,selectedDay:"2024-11-03")
+            try store.insert(Memory(id:"owned",timestamp:try QueryScopeResolver.instant("2024-11-03T01:30:00-04:00"),text:"Owned synthetic source",favorite:true,tags:["owned-tag"]))
+            let request=ActivityCalendarRequest(month:"2024-11",timeZone:TimeZone(identifier:"America/New_York")!,selectedDay:"2024-11-03",filter:.init(favoritesOnly:true,tag:"owned-tag"))
             let snapshot=try await Integration.activity(request,store:store);XCTAssertEqual(snapshot.totalSources,1);XCTAssertEqual(snapshot.hours.count,25)
             let locked=try await vault.lock(store:store);XCTAssertEqual(locked.state,.locked);XCTAssertTrue(store.isClosed)
             let attached=try await NativeVaultDriver().attachment(paths:VaultPaths(package));XCTAssertNil(attached)

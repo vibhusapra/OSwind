@@ -104,8 +104,10 @@ import OSwindCore
             size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:model.section == "SettingsCapture" ? "Capture":"Privacy").environmentObject(model))
         } else if model.section == "SettingsData" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
+        } else if model.section == "LibraryOpening" {
+            size=NSSize(width:1000,height:680);content=AnyView(LibraryRecoveryView(session:AppSession.previewOpening(in:model.store.root),locationLabel:"Sample library · stored on this Mac"))
         } else if model.section == "LibraryRecovery" {
-            size = NSSize(width:1000,height:760); content = AnyView(LibraryRecoveryView(session:AppSession(selection:LibraryLocationSelection(url:model.store.root.appendingPathComponent("disconnected-drive"),requiresExisting:true,origin:"preview"))))
+            size = NSSize(width:1000,height:760); content = AnyView(LibraryRecoveryView(session:AppSession(selection:LibraryLocationSelection(url:model.store.root.appendingPathComponent("disconnected-drive"),requiresExisting:true,origin:"preview")),locationLabel:"External volume / sample OSwind library"))
         } else if ["SettingsVisualMemory","VisualPreparationBusy","VisualPreparationError"].contains(model.section) {
             if model.section != "SettingsVisualMemory" {
                 model.visualModelSetup.start {_ in}
