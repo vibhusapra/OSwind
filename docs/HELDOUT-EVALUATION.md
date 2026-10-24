@@ -1,6 +1,6 @@
 # Frozen natural-speech evaluation
 
-The [public protocol](../benchmarks/heldout-protocol-v1.json) records a running evaluation, not a completed quality result or product ranking. The current product runner is the signed schema-16 release at `184efd6`. Product binaries are unchanged by the benchmark tooling.
+The [public protocol](../benchmarks/heldout-protocol-v1.json) records a complete speaker evaluation and a running ASR evaluation. This is not a product ranking. The current product runner is the signed schema-16 release at `184efd6`. Product binaries are unchanged by the benchmark tooling.
 
 Two independent reference scorers measure different things: pyannote.metrics measures anonymous speaker diarization before ASR word attribution; JiWER measures text errors after a complete audio import. Neither metric by itself establishes meeting quality, natural live capture, named-person recognition, word alignment accuracy or parity with another desktop app.
 
@@ -13,6 +13,8 @@ Two immutable OSwind configurations use the same verified Community-1 model file
 The primary micro DER includes overlapping speech with no collar; a separately labelled 250 ms collar result is also retained. Both use an explicit evaluation map spanning the complete WAV, including unannotated silence. Components are accumulated across recordings, rather than averaging recording percentages. Empty detections remain missed-speech errors. False-alarm DER can exceed 100%; those cases are not clipped or excluded.
 
 The first test attempt stopped after four scored recordings and five predictions: one official annotation ended at 515.930 seconds while its WAV ended at 515.904. The earlier parser rejected that 26 ms tail. The corrected scorer preserves the annotation and lets the already-declared full-WAV evaluation map crop it, using [pyannote's standard evaluation-map behavior](https://pyannote.github.io/pyannote-metrics/reference.html). Out-of-audio reference intervals are reported. The failed attempt is retained; both complete profiles restart with unchanged model settings and IDs. No recording is removed or model parameter tuned in response to test results.
+
+The [complete test report](../benchmarks/speaker-test-v1.json) covers **232 recordings / 43.54 hours**, both configurations and both repetitions, with final source/model/runner/harness stability verified. Overlap-inclusive micro DER improves from **14.16% to 13.67%** without collars and **11.34% to 10.85%** with 250 ms collars. Both repetitions give identical scores in each configuration. At zero collar, 111 recordings improve, 58 regress and 63 are unchanged. Both configurations undercount speakers in 150 recordings. Every recording, error component and timing is retained. This modest gain does not establish meeting readiness or parity with another app.
 
 ```bash
 python3 scripts/prepare-speaker-eval.py \

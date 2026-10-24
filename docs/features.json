@@ -308,7 +308,7 @@
     "axis": "Audio",
     "feature": "Local GPU transcription",
     "status": "live verified",
-    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance LibriSpeech selection/2190 planned imports now running with independent JiWER; natural quality result pending",
+    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance LibriSpeech selection/2190 imports running with independent JiWER and failed-import accounting after an observed Whisper timestamp/admission failure; natural ASR result pending",
     "references": "Screenpipe, TimeScroll"
   },
   {
@@ -324,7 +324,7 @@
     "axis": "Audio",
     "feature": "Speaker diarization / names",
     "status": "partial",
-    "evidence": "Overlap-preserving native turns, local labels/manual names, exact speaker scopes and timed evidence. All 216 VoxConverse dev clips (20.30h), two runs/policy: independent DER 11.27\u219210.08% no collar, 8.94\u21927.79% at .25s; regressions and undercounts retained, not held-out/competitor quality. Actual GPU-requested ASR/import/mixed-word safeguard exercised. Separate all232 official test recordings now run under a frozen full-WAV protocol; no test result claimed yet. Full meetings, live continuity and native UI acceptance remain open",
+    "evidence": "Overlap-preserving native turns, local labels/manual names, exact speaker scopes and timed evidence. All 216 VoxConverse dev clips (20.30h), two runs/policy: independent DER 11.27\u219210.08% no collar, 8.94\u21927.79% at .25s; regressions and undercounts retained, not held-out/competitor quality. Actual GPU-requested ASR/import/mixed-word safeguard exercised. Separate frozen test completes all232 recordings/43.54h twice: DER14.16\u219213.67% no collar,11.34\u219210.85% at .25s;58 zero-collar regressions and150 undercounted recordings retained. Upstream pretraining overlap unaudited, not competitor ranking. Full meetings, live continuity and native UI acceptance remain open",
     "references": "Granola, Omi, Limitless"
   },
   {
