@@ -32,9 +32,11 @@ private actor DetachPause {
         let counts=await state.counts();XCTAssertEqual(counts,[5,4])
     }
     func testOneAbsentObservationDoesNotHideAReappearingAttachment() async throws {
-        let state=DetachObservations([.detached,.attached,.detached,.detached])
-        try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()})
-        let counts=await state.counts();XCTAssertEqual(counts,[4,3])
+        for gap in [DetachObservations.Value.attached,.pending] {
+            let state=DetachObservations([.detached,gap,.detached,.detached])
+            try await VaultDetachSettlement.confirm(pause:{_ in await state.pause()},inspect:{try await state.inspect()})
+            let counts=await state.counts();XCTAssertEqual(counts,[4,3])
+        }
     }
     func testUnknownInspectionOrChangedIdentityFailsWithoutConsumingRemainingBudget() async throws {
         for value in [DetachObservations.Value.changed,.unavailable] {
@@ -89,6 +91,20 @@ private actor DetachPause {
         try Data("replacement".utf8).write(to:paths.package.appendingPathComponent("keep"));XCTAssertThrowsError(try identity.validate())
         XCTAssertEqual(try String(contentsOf:paths.package.appendingPathComponent("keep"),encoding:.utf8),"replacement")
         XCTAssertEqual(try String(contentsOf:moved.appendingPathComponent("contents.sparsebundle/keep"),encoding:.utf8),"owned image marker")
+    }
+    func testPrecreatedPathsStillPinPackageEvenWhenSameImageAndManifestMoveToReplacement() throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-precreated-detach-"+UUID().uuidString);try Paths.ensure(root);defer {try? FileManager.default.removeItem(at:root)}
+        let paths=try VaultPaths(root.appendingPathComponent("Future.oswindvault"))
+        try Paths.ensure(paths.package);let info=LibraryVaultInfo(name:"Owned precreated identity",capacityGiB:1,volumeUUID:UUID().uuidString)
+        try paths.write(info,as:VaultPaths.manifestName);try Paths.ensure(paths.image);try Data("original image".utf8).write(to:paths.image.appendingPathComponent("keep"))
+        let identity=try VaultDetachIdentity(paths:paths,image:BackupFileTree(root:paths.image).identity())
+        let moved=root.appendingPathComponent("OriginalPackage");try FileManager.default.moveItem(at:paths.package,to:moved);try Paths.ensure(paths.package)
+        // Preserve the image inode and exact manifest. Only the package itself
+        // changed; a VaultPaths made before creation has no initial root stamp.
+        try FileManager.default.moveItem(at:moved.appendingPathComponent("contents.sparsebundle"),to:paths.image)
+        try paths.write(info,as:VaultPaths.manifestName)
+        XCTAssertThrowsError(try identity.validate());XCTAssertEqual(try paths.info(),info)
+        XCTAssertEqual(try String(contentsOf:paths.image.appendingPathComponent("keep"),encoding:.utf8),"original image")
     }
     func testManifestVaultOrVolumeIdentityChangesRefuse() throws {
         for field in 0..<3 {

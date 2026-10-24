@@ -33,14 +33,16 @@ enum VaultDetachSettlement {
 /// The image directory can change its contents during detach, but its inode,
 /// package and manifest identity cannot change during a verified operation.
 struct VaultDetachIdentity:Sendable {
-    let paths:VaultPaths,image:BackupFileStamp,vaultID:String,volumeUUID:String,setupComplete:Bool
+    let paths:VaultPaths,image:BackupFileStamp,package:BackupFileStamp,vaultID:String,volumeUUID:String,setupComplete:Bool
     init(paths:VaultPaths,image:BackupFileStamp) throws {
-        self.paths=paths;self.image=image
+        self.paths=paths;self.image=image;package=try paths.tree().identity()
         let info=try paths.info();vaultID=info.id;volumeUUID=info.volumeUUID;setupComplete=info.setupComplete
         try validate()
     }
     func validate() throws {
-        _ = try paths.tree();let info=try paths.info(),current=try BackupFileTree(root:paths.image).identity()
+        let currentPackage=try paths.tree().identity()
+        guard currentPackage.device==package.device,currentPackage.inode==package.inode else {throw OSwindError.invalid("The vault package changed during detach verification")}
+        let info=try paths.info(),current=try BackupFileTree(root:paths.image).identity()
         guard info.id==vaultID,info.volumeUUID.caseInsensitiveCompare(volumeUUID) == .orderedSame,info.setupComplete==setupComplete,
               current.device==image.device,current.inode==image.inode else {throw OSwindError.invalid("The vault identity changed during detach verification")}
     }
