@@ -292,7 +292,7 @@
     "axis": "Audio",
     "feature": "Microphone capture",
     "status": "partial",
-    "evidence": "AVAudioEngine conversion; live mic test gated by locked Mac",
+    "evidence": "AVAudioEngine conversion and bounded async privacy checks; actual microphone/device permission and capture acceptance pending",
     "references": "Screenpipe, TimeScroll, Omi"
   },
   {

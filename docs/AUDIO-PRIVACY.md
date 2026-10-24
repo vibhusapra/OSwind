@@ -39,3 +39,9 @@ OSWIND_TEST_NATIVE_VAULT=1 swift test --sanitize=thread \
 ```
 
 Physical microphone/system-audio, mixed foreground transitions, dense browser availability, interruption/device recovery, actual AX latency, energy and VoiceOver/input acceptance remain open. Sharing one in-flight producer removes duplicate observations by contract; it does not establish a measured power or capture-performance improvement. Broader feature parity and a competitor ranking remain unverified.
+
+## Native sample interaction
+
+On 24 October the signed candidate was exercised through native automation in an explicitly selected sample library with capture paused. Calendar day/hour counts, four-source hour browsing, preservation of that interval in evidence-only Ask, citation expansion and original-source opening were observed. Audio with both sources disabled refuses to start; Escape dismisses settings and ⌘K focuses search. These are interaction checks, not live-device or VoiceOver acceptance.
+
+Fresh CLI doctor reports unlocked, correcting earlier lock-state prose. The staged GUI shows ungranted capture controls despite CLI preflights passing; no permission change was attempted. The initial automation selection launched before its isolated environment was set and displayed onboarding only. It was terminated, then relaunched with an explicit sample root; the initial default-library open cannot be excluded. Aggregate evidence records this boundary.

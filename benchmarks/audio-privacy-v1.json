@@ -4,7 +4,7 @@
   "schema": 20,
   "hardware": "Apple M5 Max",
   "os": "26.6.2",
-  "scope": "Synthetic contexts, PCM, permission/stream factories, local fake speech backends, owned encrypted/model runs and signed CLI/import/API/MCP/portability processes. No real microphone/system-audio capture, physical input, energy, AX latency or competitor acceptance.",
+  "scope": "Synthetic contexts, PCM, permission/stream factories, local fake speech backends, owned encrypted/model runs and signed CLI/import/API/MCP/portability processes. No real microphone/system-audio capture, energy, AX latency or competitor acceptance; isolated native sample interactions are reported separately.",
   "implementation": {
     "synchronousAXTraversalRemoved": true,
     "legacySwiftCurrentHelperNowAsync": true,
@@ -243,11 +243,64 @@
   "nativeBoundary": {
     "freshDoctorScreenLocked": false,
     "GUIViewSourcesUnchanged": true,
-    "newRenderOrPhysicalInputClaimed": false,
+    "nativeSampleInteractions": {
+      "format": "OSwind isolated native interaction observations v1",
+      "codeCommit": "0118243f867c5b995616979da20712223daa4a7a",
+      "applicationSHA256": "54cb52b1f928b6cd2ec7a1d6ffec74d59604e92afaf566de9cb5263c451bb29f",
+      "dateUTC": "2026-10-24",
+      "library": "Explicit isolated sample library; six generated sample sources; capture paused",
+      "freshDoctorScreenLocked": false,
+      "checks": [
+        {
+          "action": "Calendar month and selected day",
+          "observed": "Six sources on October 24; hourly rows 09:00=1,10:00=4,11:00=1 with -07:00 offsets"
+        },
+        {
+          "action": "Select 10:00 hour",
+          "observed": "Four matching sources; From 10:00 / Before 11:00 scope; keyword mode"
+        },
+        {
+          "action": "Ask within selected interval",
+          "observed": "Calendar slice retained; evidence-only response with three cited sources and explicit interval"
+        },
+        {
+          "action": "Expand and open citation",
+          "observed": "Original sample source text and source identity displayed in detail sheet"
+        },
+        {
+          "action": "Audio settings with both sources off",
+          "observed": "Start audio refuses with Enable an audio source in Settings; no permission prompt/device capture"
+        },
+        {
+          "action": "Escape from settings",
+          "observed": "Settings dismissed"
+        },
+        {
+          "action": "Command-K from Ask",
+          "observed": "Switched to Memories and focused memory-search while preserving interval"
+        }
+      ],
+      "limitations": [
+        "Staged GUI showed capture permission controls ungranted despite CLI preflights true; no permission changes attempted",
+        "Keyboard text paste subsequently returned external state change and was not credited; refreshed state showed empty query",
+        "No real capture, latency, VoiceOver, pause-during-capture, permission recovery or energy acceptance"
+      ],
+      "launchCorrection": {
+        "initialSelectionLaunchedWithoutIsolatedEnvironment": true,
+        "observedInitialScreen": "Onboarding sheet only; no recorded source displayed",
+        "initialDefaultLibraryMayHaveOpened": true,
+        "action": "Terminated that owned candidate process, then relaunched exact staged path with explicit OSWIND_DATA_DIR and --demo",
+        "claim": "Do not claim no default library was opened during the initial native selection"
+      },
+      "installedBundleUnchanged": true,
+      "authenticationOrPermissionChanges": false
+    },
+    "newComponentRenderClaimed": false,
     "realMicrophonePermissionRequestedByUnitFixtures": false,
     "realInputDeviceConstructedByUnitFixtures": false,
     "installedSchema17Unchanged": true,
-    "normalHistoryOpened": false,
+    "normalHistoryOpenedDuringAutomatedQualification": false,
+    "initialNativeSelectionMayHaveOpenedDefaultLibrary": true,
     "realKeychainCredentialsUsed": false,
     "authenticationOrPermissionChanges": false
   },
@@ -257,12 +310,12 @@
     "restartTest": "Wait for the new run to be active before releasing the old fake backend; avoids scheduling-dependent assertions"
   },
   "remainingGates": [
-    "Unlocked physical microphone/system-audio capture and permission flow",
+    "Physical microphone/system-audio capture and permission flow",
     "Actual AX latency, dense-browser availability and capture/power measurements",
     "Brief foreground transitions and background/tab audio scoping",
     "System-audio app-filter normalization and device/format recovery",
     "PCM delivery/backlog hardening and source-stream handoff ownership",
-    "Native Stop/keyboard/VoiceOver and broader OS/hardware acceptance",
+    "Native Stop during actual capture, broader keyboard/VoiceOver and OS/hardware acceptance",
     "Broad feature parity and matched competitor ranking"
   ]
 }
