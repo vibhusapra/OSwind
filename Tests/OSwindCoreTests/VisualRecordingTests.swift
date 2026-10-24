@@ -87,7 +87,7 @@ final class VisualRecordingTests:XCTestCase {
         let wipe=Task.detached {try store.wipeLibrary {if $0.phase=="Waiting for active media writers" {waiting.fulfill()}}}
         await fulfillment(of:[waiting],timeout:1)
         do {try await recorder.close();XCTFail("Late commit should be rejected")} catch is CancellationError {}
-        XCTAssertTrue(try await wipe.value.cleanupComplete)
+        let wiped=try await wipe.value;XCTAssertTrue(wiped.cleanupComplete)
         XCTAssertEqual(try store.matchingCount(),0)
         for folder in ["video","images"] {XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:directory.appendingPathComponent(folder).path).isEmpty)}
         let textOnly=VisualChunkRecorder(store:store,codec:"h264",hardwareRequired:false,gate:gate)
