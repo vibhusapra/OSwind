@@ -16,13 +16,13 @@ import OSwindCore
     var visible=false
     private var pendingIDs=Set<String>()
     private var indexSlot:UUID?
-    private let indexSource:@Sendable (String,EntityIndexPlan)throws->Bool
+    private let indexSource:(@Sendable (String,EntityIndexPlan)throws->Bool)?
     private let canIndex:@Sendable ()->Bool
     private let store:MemoryStore
     private var readTask:Task<Void,Never>?,indexTask:Task<Void,Never>?,editTask:Task<Void,Never>?
     private var clearing=false
     private var generation=UUID(),readGeneration=UUID(),pending=false
-    init(store:MemoryStore,indexSource:(@Sendable (String,EntityIndexPlan)throws->Bool)?=nil,canIndex:@escaping @Sendable ()->Bool = { !SessionState.locked && !ProcessInfo.processInfo.isLowPowerModeEnabled && ProcessInfo.processInfo.thermalState.rawValue<ProcessInfo.ThermalState.serious.rawValue }) {self.store=store;self.canIndex=canIndex;self.indexSource=indexSource ?? {try store.indexEntities($0,plan:$1)}}
+    init(store:MemoryStore,indexSource:(@Sendable (String,EntityIndexPlan)throws->Bool)?=nil,canIndex:@escaping @Sendable ()->Bool = { !SessionState.locked && !ProcessInfo.processInfo.isLowPowerModeEnabled && ProcessInfo.processInfo.thermalState.rawValue<ProcessInfo.ThermalState.serious.rawValue }) {self.store=store;self.canIndex=canIndex;self.indexSource=indexSource}
     func reload() {
         readTask?.cancel();readGeneration=UUID();let token=readGeneration,scope=kind,query=self.query,id=selectedID,store=self.store
         readTask=Task {[weak self] in
@@ -63,15 +63,15 @@ import OSwindCore
             let report:@Sendable (Int) async->Void = { [weak self] count in await self?.recordProgress(count,token:token) }
             let worker=Task.detached(priority:.utility) {
                 try Task.checkCancellation()
-                let plan=try store.entityIndexPlan(),processor=EntityExtractor.processor(plan);var cursor="",count=0
+                let plan=try store.entityIndexPlan(),processor=EntityExtractor.processor(plan),prepared=try EntityExtractor.prepare(plan);var cursor="",count=0
                 if let ids {
-                    for id in ids {try Task.checkCancellation();guard canIndex() else {throw OSwindError.unavailable("Entity indexing deferred for lock, power or temperature. Build / resume to catch up.")};if try indexSource(id,plan) {count+=1;if count%64==0 {await report(count)}}}
+                    for id in ids {try Task.checkCancellation();guard canIndex() else {throw OSwindError.unavailable("Entity indexing deferred for lock, power or temperature. Build / resume to catch up.")};if try (indexSource?(id,plan) ?? store.indexEntities(id,prepared:prepared)) {count+=1;if count%64==0 {await report(count)}}}
                 }else {
                     while true {
                         try Task.checkCancellation();guard canIndex() else {throw OSwindError.unavailable("Entity indexing deferred for lock, power or temperature. Build / resume to catch up.")}
                         let batch=try store.pendingEntitySourceIDs(processor:processor,after:cursor,limit:16)
                         if batch.isEmpty {break}
-                        for id in batch {try Task.checkCancellation();guard canIndex() else {throw OSwindError.unavailable("Entity indexing deferred for lock, power or temperature. Build / resume to catch up.")};if try indexSource(id,plan) {count+=1;if count%64==0 {await report(count)}};cursor=id}
+                        for id in batch {try Task.checkCancellation();guard canIndex() else {throw OSwindError.unavailable("Entity indexing deferred for lock, power or temperature. Build / resume to catch up.")};if try (indexSource?(id,plan) ?? store.indexEntities(id,prepared:prepared)) {count+=1;if count%64==0 {await report(count)}};cursor=id}
                     }
                 }
                 return count

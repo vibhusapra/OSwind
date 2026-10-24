@@ -8,15 +8,27 @@ public enum EntityExtractor {
     public static let maximumEntitiesPerSource=256
     public static var version:String {let os=ProcessInfo.processInfo.operatingSystemVersion;return "apple-nameType-v1:\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"}
     public static func processor(_ plan:EntityIndexPlan)->String {version+":"+plan.revision}
-    private final class Node {var children=[String:Node](),rules=[ProjectEntityRule]()}
-    public static func extract(_ text:String,plan:EntityIndexPlan)throws->EntityExtraction {
+    fileprivate final class Node {var children=[String:Node](),rules=[ProjectEntityRule]()}
+    /// Immutable rule trie shared by a single indexing run. Native taggers remain
+    /// source-local; no captured text is retained in the prepared rules.
+    public final class Prepared:@unchecked Sendable {
+        public let plan:EntityIndexPlan
+        fileprivate let root:Node
+        fileprivate init(plan:EntityIndexPlan,root:Node) {self.plan=plan;self.root=root}
+    }
+    public static func prepare(_ plan:EntityIndexPlan)throws->Prepared {
         try Task.checkCancellation()
         guard plan.projects.count<=1000,plan.projects.allSatisfy({$0.aliases.count<=32}) else {throw OSwindError.invalid("Use at most 1,000 projects with 32 aliases each")}
         let root=Node();var nodes=1
-        for rule in plan.projects {for alias in rule.aliases {
+        for rule in plan.projects {try Task.checkCancellation();for alias in rule.aliases {
             let words=words(alias);guard !words.isEmpty,words.count<=128 else {continue};var node=root
             for word in words {let key=EntityLabel.key(word.0);if node.children[key]==nil {nodes+=1;guard nodes<=262144 else {throw OSwindError.invalid("Project rules exceed the 262,144-token trie budget; reduce aliases")};node.children[key]=Node()};node=node.children[key]!};node.rules.append(rule)
         }}
+        return Prepared(plan:plan,root:root)
+    }
+    public static func extract(_ text:String,plan:EntityIndexPlan)throws->EntityExtraction {try extract(text,prepared:prepare(plan))}
+    public static func extract(_ text:String,prepared:Prepared)throws->EntityExtraction {
+        try Task.checkCancellation();let root=prepared.root
         let source=text as NSString;var cursor=0,found=[String:EntityCandidate](),limited=false
         while cursor<source.length {
             try Task.checkCancellation()
@@ -75,10 +87,13 @@ extension MemoryStore {
     /// One plaintext source reservation spans native work and cancellation. A
     /// fresh write admission at save refuses an already-closing library.
     @discardableResult public func indexEntities(_ id:String,plan:EntityIndexPlan)throws->Bool {
+        try indexEntities(id,prepared:EntityExtractor.prepare(plan))
+    }
+    @discardableResult public func indexEntities(_ id:String,prepared:EntityExtractor.Prepared)throws->Bool {
         let activity=try mediaWriteLease();defer {activity.release()}
         guard let memory=try get(id),memory.kind != .summary else {return false}
-        try Task.checkCancellation();let result=try EntityExtractor.extract(memory.text,plan:plan)
-        try saveEntityExtraction(memory:memory,plan:plan,result:result);return true
+        try Task.checkCancellation();let result=try EntityExtractor.extract(memory.text,prepared:prepared)
+        try saveEntityExtraction(memory:memory,plan:prepared.plan,result:result);return true
     }
     public func saveEntityExtraction(memory:Memory,plan:EntityIndexPlan,result:EntityExtraction)throws {
         guard memory.searchPreview==nil,memory.kind != .summary,result.candidates.count<=EntityExtractor.maximumEntitiesPerSource else {throw OSwindError.invalid("Use a complete non-summary source and bounded entity results")}

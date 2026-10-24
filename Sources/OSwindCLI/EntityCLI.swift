@@ -38,11 +38,12 @@ func entitiesCLI(_ arguments:[String],store:MemoryStore) async throws -> Any {
         let plan=try store.entityIndexPlan(),processor=EntityExtractor.processor(plan)
         if action=="index" {
             let worker=Task.detached(priority:.utility) {
+                let prepared=try EntityExtractor.prepare(plan)
                 var cursor=""
                 while true {
                     try Task.checkCancellation();let ids=try store.pendingEntitySourceIDs(processor:processor,after:cursor)
                     guard !ids.isEmpty else {break}
-                    for id in ids {try Task.checkCancellation();try store.indexEntities(id,plan:plan);cursor=id}
+                    for id in ids {try Task.checkCancellation();try store.indexEntities(id,prepared:prepared);cursor=id}
                 }
             }
             try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
