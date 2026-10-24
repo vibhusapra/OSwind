@@ -111,3 +111,27 @@ struct LibraryTransferStatusView: View {
         }
     }
 }
+
+/// Observe the nested transfer model here, so a background completion and its
+/// busy/cancel state invalidate these controls independently of AppModel.
+struct MarkdownLibraryTransferView: View {
+    @ObservedObject var transfer: LibraryTransferModel
+    let store: MemoryStore
+    let policy: PrivacyPolicy
+    @State private var includeMedia = false
+    var body: some View {
+        VStack(alignment:.leading,spacing:12) {
+            Toggle("Include retained screenshots, replay and audio",isOn:$includeMedia).disabled(transfer.busy)
+            Button("Export Markdown library…") { transfer.chooseMarkdown(store:store,policy:policy,includeMedia:includeMedia) }.disabled(transfer.busy)
+            Text("A portable folder with an index, every allowed source, timed transcripts and source-linked conversations. Current exclusions and redaction apply; dependent conversation turns are omitted. Captured text stays literal. Exports are independent snapshots and are not encrypted.").font(.caption).foregroundStyle(.secondary)
+            if transfer.markdownOperation { LibraryTransferStatusView(transfer:transfer) }
+        }
+    }
+}
+
+struct LibrarySelectionButton: View {
+    @ObservedObject var transfer: LibraryTransferModel
+    var body: some View {
+        Button("Choose another library…") { NotificationCenter.default.post(name:.oswindChooseLibrary,object:nil) }.disabled(transfer.busy)
+    }
+}

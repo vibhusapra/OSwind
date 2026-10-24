@@ -12,7 +12,6 @@ struct SettingsView: View {
     @State private var key = ""
     @State private var keyStatus = ""
     @State private var deleteConfirm = false
-    @State private var exportMedia = false
     @State private var downloadName = "qwen3-embedding:0.6b"
     init(initialTab: String = "Capture") { _tab = State(initialValue:initialTab) }
     var body: some View {
@@ -207,16 +206,11 @@ struct SettingsView: View {
                 Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Clean up now") { m.maintain() }; Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
             }
-            Section("Markdown & Obsidian") {
-                Toggle("Include retained screenshots, replay and audio",isOn:$exportMedia).disabled(m.libraryTransfer.busy)
-                Button("Export Markdown library…") { m.libraryTransfer.chooseMarkdown(store:m.store,policy:m.settings.privacy,includeMedia:exportMedia) }.disabled(m.libraryTransfer.busy)
-                Text("A portable folder with an index, every allowed source, timed transcripts and source-linked conversations. Current exclusions and redaction apply; dependent conversation turns are omitted. Captured text stays literal. Exports are independent snapshots and are not encrypted.").font(.caption).foregroundStyle(.secondary)
-                if m.libraryTransfer.markdownOperation { LibraryTransferStatusView(transfer:m.libraryTransfer) }
-            }
+            Section("Markdown & Obsidian") { MarkdownLibraryTransferView(transfer:m.libraryTransfer,store:m.store,policy:m.settings.privacy) }
             Section("Complete backup & restore") { LibraryTransferView(transfer:m.libraryTransfer,store:m.store) }
             Section("This library") {
                 Text(m.store.root.path).font(.system(.caption,design:.monospaced)).textSelection(.enabled)
-                Button("Choose another library…") { NotificationCenter.default.post(name:.oswindChooseLibrary,object:nil) }.disabled(m.libraryTransfer.busy)
+                LibrarySelectionButton(transfer:m.libraryTransfer)
                 if ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"] != nil { Text("Your launcher selects a library with OSWIND_DATA_DIR. It takes priority on the next launch.").font(.caption).foregroundStyle(.secondary) }
             }
             Section("Text interchange") {
