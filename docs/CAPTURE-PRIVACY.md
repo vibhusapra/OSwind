@@ -21,6 +21,8 @@ For focused windows, fresh ScreenCaptureKit inventories must still identify the 
 
 ## Full-display masks
 
+[Display selection and crop regions](CAPTURE-REGIONS.md) can narrow the snapshot source. Display snapshots and cropped windows omit full-window AX text; app/window/URL metadata remains context. Source and mask coverage are rechecked from the same renewed inventory.
+
 Full-display snapshots mask recognized browser applications because background URLs cannot be verified. They also mask configured excluded applications and the whole application owning any window with an excluded title. Safe windows belonging to that application are masked too. Case-insensitive application rules use the same policy as focused capture.
 
 If an excluded window has no application identity that can be masked, capture defers. Window-owner application objects are included even if absent from the separate application list. After pixel acquisition and recognition, OSwind refreshes the inventory: a newly excluded application outside the original mask discards the frame. The next capture can build a new mask. This coverage check does not establish complete sensitive-content detection.

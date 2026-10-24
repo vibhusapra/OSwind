@@ -42,3 +42,7 @@ On Apple M5 Max/macOS 26.6.2, the initial 12-frame 1280×720 probe preserved all
 A retained probe diagnostic initially failed strict heading equality because the decoded heading read numeral “0” as letter “O”; ownership and the unique `visual-000` frame token remained intact. The identity gate now uses the authored unique token with exact digits and the known global frame index. No numeric substitutions or fuzzy token matches are accepted.
 
 The broad parity and top-three product goals remain open. The separate 24-hour synthetic component soak is not a replay/device/power trial.
+
+## Capture area constraints
+
+[Window crops and display selection](CAPTURE-REGIONS.md) use snapshots. Explicit replay refuses a configured window crop or display capture mode; it cannot silently record an uncropped window instead. Clear the crop and choose focused-window capture for continuous replay. This does not add cropped or all-display replay.

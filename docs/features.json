@@ -12,7 +12,7 @@
     "axis": "Capture",
     "feature": "All displays",
     "status": "partial",
-    "evidence": "Display filters implemented; browser windows intentionally masked; hardware test pending",
+    "evidence": "Masked snapshots of all or selected display UUIDs, per-display crops and renewed source/mask checks; outside-window AX text omitted. Browser apps intentionally masked. Physical device/crop/hotplug acceptance pending",
     "references": "ScreenMemory, TimeScroll, Pensieve"
   },
   {
@@ -59,8 +59,8 @@
     "id": "F008",
     "axis": "Capture",
     "feature": "Screen selection and crop regions",
-    "status": "todo",
-    "evidence": "Focused window/all display toggle only",
+    "status": "partial",
+    "evidence": "Schema20 persistent display-UUID selection, empty/missing-screen deferral, per-display and focused-window percentage crops, inward bitmap cropping before OCR, no outside-window AX text and explicit uncropped replay refusal. Native controls, corruption blocking and compatibility/quiet restore fixtures implemented; physical crop alignment, mixed-DPI/hotplug and native input acceptance pending",
     "references": "Recall, visual recorders"
   },
   {
@@ -348,7 +348,7 @@
     "axis": "Privacy",
     "feature": "App/domain/title exclusions",
     "status": "tested",
-    "evidence": "Snapshot context/source rechecks, RAM JPEG then private descriptor-bound admission; full-display app masks include excluded background titles. Root-dot/escaped/IDNA host rules and 3-admit/7-exclude CLI/HTTP/MCP import fixture pass. 605 distinct cases/72 TSan; real browser transitions and complete visual PII protection remain open. Capture exclusions do not retroactively hide old text",
+    "evidence": "Snapshot context/source rechecks, RAM JPEG then private descriptor-bound admission; full-display app masks include excluded background titles. Root-dot/escaped/IDNA host rules and 3-admit/7-exclude CLI/HTTP/MCP import fixture pass. 643 distinct cases/142 TSan; real browser transitions and complete visual PII protection remain open. Capture exclusions do not retroactively hide old text",
     "references": "Recall, Screenpipe, Littlebird"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "611-case normal suite (584 pass/27 opt-in skips), separate native/model run adds21 cases (605 distinct pass/six remaining skips),72 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "649-case normal suite (622 pass/27 opt-in skips), separate native/model run adds21 cases (643 distinct pass/six remaining skips),142 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {
