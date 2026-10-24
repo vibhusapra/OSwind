@@ -210,8 +210,10 @@ struct SettingsView: View {
                 Stepper("Retain \(m.settings.privacy.retentionDays) days",value:$m.settings.privacy.retentionDays,in:1...3650)
                 Stepper("Storage budget: \(m.settings.privacy.maxStorageGB) GB",value:$m.settings.privacy.maxStorageGB,in:1...1000)
                 Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
-                HStack { Button("Clean up now") { m.maintain() }; Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
+                HStack { Button("Clean up now") { m.maintain() }.disabled(m.maintenanceBusy || m.deletingID != nil || m.libraryTransfer.busy); Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
             }
+            if m.maintenanceBusy {ProgressView("Cleaning up…")}
+            if !m.maintenanceStatus.isEmpty {Text(m.maintenanceStatus).font(.caption).textSelection(.enabled)}
             Section("Markdown & Obsidian") { MarkdownLibraryTransferView(transfer:m.libraryTransfer,store:m.store,policy:m.settings.privacy) }
             Section("Complete backup & restore") { LibraryTransferView(transfer:m.libraryTransfer,store:m.store) }
             Section("This library") {
@@ -223,7 +225,7 @@ struct SettingsView: View {
                 HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() } }
                 Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
             }
-            Section("Delete") { Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy); Button("Delete all local memories…",role:.destructive) { deleteConfirm = true } }
+            Section("Delete") { Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy); Button("Delete all local memories…",role:.destructive) { deleteConfirm = true }.disabled(m.maintenanceBusy || m.deletingID != nil || m.libraryTransfer.busy) }
         }
     }
     private var mcpConfiguration: String {

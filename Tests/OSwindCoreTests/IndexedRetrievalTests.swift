@@ -26,7 +26,10 @@ final class IndexedRetrievalTests: XCTestCase {
     func testLiveSQLRejectsStaleGraphRowsAndSearchesUnreplayedUpdatesExactly() async throws {
         try seed(); _ = try await store.buildSearchIndex(modelID:"fixture",dimensions:32)
         let query = VectorScalingEvaluation.vector(row:42,dimensions:32), scorer = try XCTUnwrap(CosineScorer(query))
-        let other = try MemoryStore(root:root); try other.delete("row-42")
+        let other = try MemoryStore(root:root)
+        // Bypass public erasure's deliberate cache invalidation to exercise the live SQL
+        // guard against an unreplayed external mutation. No media is attached to this fixture.
+        try other.withRoutineDatabase {try $0.execute("DELETE FROM memories WHERE id='row-42'")}
         var fresh = Memory(id:"fresh",text:"New evidence after the cache snapshot"); fresh.embedding = query; fresh.embeddingModel = "fixture"; try other.insert(fresh)
         var revised = try XCTUnwrap(other.get("row-12")); revised.embedding = query.map { -$0 }; revised.text = "Changed after cache snapshot"; try other.insert(revised)
         // Deliberately use the old graph without its normal prepare/replay pass.
@@ -58,4 +61,16 @@ final class IndexedRetrievalTests: XCTestCase {
         XCTAssertNotNil(IndexPowerPolicy.blockedReason(lowPower:false,thermal:.serious,allowLowPower:true))
         XCTAssertNil(IndexPowerPolicy.blockedReason(lowPower:false,thermal:.fair,allowLowPower:false))
     }
+    func testPublicErasureInvalidatesOldGraphThenRebuildRestoresIndexedResults() async throws {
+        try seed();_ = try await store.buildSearchIndex(modelID:"fixture",dimensions:32)
+        let query=VectorScalingEvaluation.vector(row:42,dimensions:32),scorer=try XCTUnwrap(CosineScorer(query)),other=try MemoryStore(root:root)
+        XCTAssertTrue(try other.delete("row-42").searchCacheRemoved)
+        XCTAssertNil(try store.indexedCandidates(SearchFilter(query:"meaning",limit:5),modelID:"fixture",dimensions:32,scorer:scorer,minimumSimilarity:-1,limit:100))
+        let fallback=try store.search(.init(query:"meaning",limit:5),mode:.semantic,vector:query,modelID:"fixture",minimumSimilarity:-1,indexPolicy:.indexed)
+        XCTAssertFalse(fallback.contains {$0.id=="row-42"})
+        _ = try await store.buildSearchIndex(modelID:"fixture",dimensions:32)
+        let ready=try XCTUnwrap(store.indexedCandidates(SearchFilter(query:"meaning",limit:5),modelID:"fixture",dimensions:32,scorer:scorer,minimumSimilarity:-1,limit:100))
+        XCTAssertFalse(ready.contains {$0.id=="row-42"});XCTAssertFalse(ready.isEmpty)
+    }
+
 }

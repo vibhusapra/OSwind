@@ -54,10 +54,18 @@ public struct HistoryErasureResult: Codable, Sendable {
     public let warnings:[String]
 }
 enum HistoryErasureSchema {
-    // Additive queue: older writers preserve it. No source text or credentials are stored.
-    static let sql="CREATE TABLE IF NOT EXISTS erasure_assets(path TEXT PRIMARY KEY) WITHOUT ROWID;"
+    // Schema 14 requires queue admission for every source delete. Older executable
+    // versions must refuse this library instead of unlinking shared paths directly.
+    static let sql="""
+    CREATE TABLE IF NOT EXISTS erasure_assets(path TEXT PRIMARY KEY) WITHOUT ROWID;
+    CREATE TRIGGER IF NOT EXISTS erasure_stage_assets BEFORE DELETE ON memories BEGIN
+        INSERT OR IGNORE INTO erasure_assets SELECT json_extract(CAST(old.payload AS TEXT),'$.imagePath') WHERE json_extract(CAST(old.payload AS TEXT),'$.imagePath') IS NOT NULL;
+        INSERT OR IGNORE INTO erasure_assets SELECT json_extract(CAST(old.payload AS TEXT),'$.audioPath') WHERE json_extract(CAST(old.payload AS TEXT),'$.audioPath') IS NOT NULL;
+        INSERT OR IGNORE INTO erasure_assets SELECT json_extract(CAST(old.payload AS TEXT),'$.videoPath') WHERE json_extract(CAST(old.payload AS TEXT),'$.videoPath') IS NOT NULL;
+    END;
+    """
 }
-private extension RoutineDatabase {
+extension RoutineDatabase {
     func eraseCount(_ sql:String) throws -> Int {let row=try statement(sql);defer {sqlite3_finalize(row)};guard sqlite3_step(row)==SQLITE_ROW else {throw error()};return Int(sqlite3_column_int64(row,0))}
     func prepareErasure(_ scope:HistoryErasureScope) throws {
         try execute("CREATE TEMP TABLE IF NOT EXISTS erasure_ids(id TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.erasure_ids;")
@@ -100,7 +108,7 @@ private extension RoutineDatabase {
         return HistoryErasurePreview(scope:scope,token:hash.finalize().map {String(format:"%02x",$0)}.joined(),sources:try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids"),conversationTurns:try eraseCount("SELECT COUNT(*) FROM (\(Self.affectedTurns))"),mediaReferences:try eraseCount("SELECT COUNT(*) FROM (\(Self.selectedAssets)) WHERE path IS NOT NULL"),samples:samples)
     }
 }
-private func erasureCancellable<T>(_ db:RoutineDatabase,_ body:() throws -> T) throws -> T {
+func erasureCancellable<T>(_ db:RoutineDatabase,_ body:() throws -> T) throws -> T {
     try Task.checkCancellation()
     sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)
     defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
@@ -125,7 +133,6 @@ extension MemoryStore {
             let preview=try erasureCancellable(db) {try db.transaction {
                 try db.prepareErasure(scope);let preview=try db.erasurePreview(scope)
                 guard preview.token==expectedToken else {throw OSwindError.invalid("History changed after preview. Pause capture and preview again before erasing.")}
-                try db.execute("INSERT OR IGNORE INTO erasure_assets SELECT path FROM (\(RoutineDatabase.selectedAssets)) WHERE path IS NOT NULL")
                 try db.execute("DELETE FROM memories WHERE id IN (SELECT id FROM temp.erasure_ids)")
                 // Existing source triggers remove entire cited turns, labels, previews, passages and vectors.
                 if preview.sources>0 {try db.execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
@@ -148,7 +155,7 @@ extension MemoryStore {
             return canonical
         } catch let error as NSError where error.domain==NSCocoaErrorDomain && [NSFileNoSuchFileError,NSFileReadNoSuchFileError].contains(error.code) {return url.standardizedFileURL.path}
     }
-    private func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int) -> HistoryErasureResult {
+    func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int) -> HistoryErasureResult {
         var removed=0,shared=0,warnings=[String](),cursor=""
         do {
             try db.execute("BEGIN IMMEDIATE")
@@ -180,7 +187,7 @@ extension MemoryStore {
                     for path in paths {
                         cursor=path
                         do {
-                            let ref=try db.statement("SELECT 1 FROM temp.erasure_live_assets WHERE path=?");db.bind(ref,1,try erasureAssetKey(path));let code=sqlite3_step(ref);sqlite3_finalize(ref);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
+                            let key=try erasureAssetKey(path);let ref=try db.statement("SELECT 1 FROM temp.erasure_live_assets WHERE path=?");db.bind(ref,1,key);let code=sqlite3_step(ref);sqlite3_finalize(ref);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
                             if code==SQLITE_ROW {shared+=1}
                             else if let url=assetURL(path) {
                                 do {

@@ -27,6 +27,9 @@ struct WorkspaceView: View {
             }.frame(width:230).frame(maxHeight:.infinity).background(Color(nsColor:.controlBackgroundColor))
             Divider()
             VStack(spacing:0) {
+                if let status=m.deletionStatus {
+                    HStack {if m.deletingID != nil {ProgressView().controlSize(.small)};Text(status).font(.caption);Spacer();if m.deletingID==nil {Button {m.deletionStatus=nil} label: {Image(systemName:"xmark")}.accessibilityLabel("Dismiss deletion status")}}.padding(10).background(accent.opacity(0.06))
+                }
                 if m.openingMemoryID != nil { HStack { ProgressView().controlSize(.small); Text("Opening complete source…").font(.caption); Spacer(); Button("Cancel") { m.cancelOpeningMemory() } }.padding(10) }
                 HStack {
                     HStack(spacing:7) { Circle().fill(m.isCapturing ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running && m.audio.running ? "SCREEN + AUDIO" : m.capture.running ? "CAPTURING" : m.audio.running ? "AUDIO" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
@@ -109,7 +112,7 @@ struct MemoryCard: View {
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
             }.padding(15)
         }.background(.background,in:RoundedRectangle(cornerRadius:12)).clipShape(RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.07)))
-        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) } }
+        .contextMenu { Button("Open memory") { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage) }; Button(memory.favorite ? "Unsave" : "Save") { m.favorite(memory) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Delete memory",role:.destructive) { m.delete(memory) }.disabled(m.deletingID != nil || m.maintenanceBusy) }
     }
 }
 struct TimelineStrip: View {
@@ -143,7 +146,7 @@ struct MemoryDetail: View {
                 if memory.visualRecording==nil && ((memory.transcript?.segments.isEmpty ?? true) || memory.transcript?.segments.allSatisfy({$0.text == "[REDACTED]"}) == true) { Text(memory.text).textSelection(.enabled).font(.system(size:14)).frame(maxWidth:.infinity,alignment:.leading).padding(.top,12) }
             }
             if let url = memory.url, let parsed = URL(string:url), ["https","http"].contains(parsed.scheme) { Link(url,destination:parsed).font(.caption).lineLimit(1) }
-            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() } }
+            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() }.disabled(m.deletingID != nil || m.maintenanceBusy) }
             Text("Source \(memory.id)").font(.system(size:10,design:.monospaced)).foregroundStyle(.tertiary).textSelection(.enabled)
         }.padding(24).frame(width:850,height:760).onAppear { tags = memory.tags.joined(separator:", ") }
     }

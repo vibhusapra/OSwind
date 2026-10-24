@@ -10,6 +10,8 @@ with tempfile.TemporaryDirectory(prefix='oswind-fts-legacy-') as temporary:
     # Seed with the older release first, then open/migrate through the new reader.
     source=cli(legacy,'note','legacy seed phrase');snapshot=cli(legacy,'get',source)
     cli(binary,'stats')
+    with sqlite3.connect(library/'memory.sqlite') as schema_check:
+        if schema_check.execute('PRAGMA user_version').fetchone()[0]!=13:p.error('This historical cache-compatibility harness requires pinned schema-13 executables; use deletion-smoke.py --older-binary for the current refusal contract')
     with sqlite3.connect(library/'memory.sqlite') as db:identity=db.execute("SELECT value FROM store_metadata WHERE key='identity'").fetchone()[0]
     old=cli(legacy,'note','old writer insertion')
     snapshot['text']='updated exact phrase';snapshot['title']='Updated owned fixture';input_path=root/'input.json';input_path.write_text(json.dumps([snapshot]));cli(legacy,'import',input_path)

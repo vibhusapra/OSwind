@@ -2,7 +2,7 @@ import Foundation
 import CSQLite
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 13
+    public static let schemaVersion = 14
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var db: OpaquePointer?
@@ -480,34 +480,6 @@ public final class MemoryStore: @unchecked Sendable {
     }
     private func updateMetadata(_ m: Memory) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m)
-    }
-    public func delete(_ id: String) throws {
-        lock.lock(); defer { lock.unlock() }; let m = try get(id); let stmt = try prepare("DELETE FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
-        for path in [m?.imagePath, m?.audioPath,m?.videoPath].compactMap({$0}) { if let url = assetURL(path) { try? FileManager.default.removeItem(at: url) } }
-    }
-    @discardableResult public func prune(before: Date, maxBytes: Int64? = nil) throws -> Int {
-        lock.lock(); defer { lock.unlock() }; var ids = [String](); let stmt = try prepare("SELECT id FROM memories WHERE timestamp<?"); sqlite3_bind_double(stmt, 1, before.timeIntervalSince1970); while sqlite3_step(stmt) == SQLITE_ROW { ids.append(string(stmt,0)) }; sqlite3_finalize(stmt)
-        let titles = try prepare("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE timestamp<?)"); sqlite3_bind_double(titles,1,before.timeIntervalSince1970); guard sqlite3_step(titles) == SQLITE_DONE else { sqlite3_finalize(titles); throw failure() }; sqlite3_finalize(titles)
-        let chats = try prepare("DELETE FROM chat_turns WHERE timestamp<?"); sqlite3_bind_double(chats,1,before.timeIntervalSince1970); guard sqlite3_step(chats) == SQLITE_DONE else { sqlite3_finalize(chats); throw failure() }; sqlite3_finalize(chats)
-        for id in ids { try delete(id) }; var deleted = ids.count
-        if let maxBytes, diskBytes() > maxBytes {
-            // Drop rebuildable graph storage before sacrificing recorded evidence.
-            try exec("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
-            metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
-            if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
-        }
-        if let maxBytes, diskBytes() > maxBytes { try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;"); var size = diskBytes(); let stmt = try prepare("SELECT id FROM memories ORDER BY timestamp"); var oldest = [String](); while sqlite3_step(stmt) == SQLITE_ROW { oldest.append(string(stmt,0)) }; sqlite3_finalize(stmt)
-            for (index,id) in oldest.enumerated() {
-                guard size > maxBytes else { break }
-                try delete(id); deleted += 1
-                // Reclaim freed SQLite pages periodically, rather than deleting the entire
-                // archive against an allocated database file that never shrinks.
-                if index % 16 == 15 || index == oldest.count-1 { try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;") }
-                size = diskBytes()
-            }
-        }
-        if deleted > 0 { try exec("PRAGMA wal_checkpoint(TRUNCATE);") }
-        return deleted
     }
     public func deleteAll() throws {
         lock.lock(); defer { lock.unlock() }
