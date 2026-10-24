@@ -59,27 +59,16 @@ public enum Whisper {
         return try SpeechTranscript(text:text,duration:duration,segments:segments,model:model).validated()
     }
 }
-private final class AudioAccumulator: @unchecked Sendable {
-    private let queue = DispatchQueue(label: "com.oswind.audio-buffer", qos: .utility)
-    private var samples = [Float]()
-    private var active = true
-    let emit: ([Float], Date) -> Void
-    init(emit: @escaping ([Float], Date) -> Void) { self.emit = emit }
-    func add(_ input: [Float]) { queue.async { guard self.active else { return }; self.samples.append(contentsOf: input); if self.samples.count >= 480000 { let chunk = Array(self.samples.prefix(480000)); self.samples.removeFirst(480000); if WAV.rms(chunk) > 0.003 { self.emit(chunk, Date().addingTimeInterval(-30)) } } } }
-    func finish() -> [Float] { queue.sync { active = false; let remaining = samples; samples.removeAll(); return remaining } }
-    func stop() { queue.sync { active = false; samples.removeAll(keepingCapacity: false) } }
-}
 // Startup can suspend across both TCC and ScreenCaptureKit. Each resource belongs
 // to one epoch; late completions must release their own resources, never a new run.
 @MainActor protocol AudioSystemCapture: AnyObject {
-    var streamID: ObjectIdentifier? { get }
     func start() async throws
     func stop() async throws
 }
 @MainActor private final class NativeAudioSystemCapture: AudioSystemCapture {
     let stream: SCStream
-    var streamID: ObjectIdentifier? { ObjectIdentifier(stream) }
-    init(stream: SCStream) { self.stream=stream }
+    let output:SystemAudioOutput
+    init(stream: SCStream,output:SystemAudioOutput) { self.stream=stream;self.output=output }
     func start() async throws { try await stream.startCapture() }
     func stop() async throws { try await stream.stopCapture() }
 }
@@ -96,23 +85,26 @@ private struct AudioPrivacyFailure:LocalizedError {
     var authorizeMicrophone: () async -> Bool = { await AVCaptureDevice.requestAccess(for: .audio) }
     var makeEngine: () throws -> AVAudioEngine = { AVAudioEngine() }
     var systemAvailable: () -> Bool = { CGPreflightScreenCaptureAccess() }
-    var makeSystemCapture: (PrivacyPolicy, AudioController) async throws -> any AudioSystemCapture = { policy, output in
+    var makeSystemCapture: (PrivacyPolicy, AudioAccumulator) async throws -> any AudioSystemCapture = { policy, sink in
         let content = try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly:true)
         guard let display=content.displays.first else { throw OSwindError.unavailable("No display for audio capture") }
-        let excluded=content.applications.filter { policy.excludedApps.contains($0.bundleIdentifier) || $0.bundleIdentifier==Bundle.main.bundleIdentifier }
+        let excluded=content.applications.filter { app in policy.excludesApplication(app.bundleIdentifier) || Bundle.main.bundleIdentifier.map {app.bundleIdentifier.caseInsensitiveCompare($0) == .orderedSame} == true }
         let filter=SCContentFilter(display:display,excludingApplications:excluded,exceptingWindows:[])
         let config=SCStreamConfiguration(); config.capturesAudio=true; config.excludesCurrentProcessAudio=true
         config.sampleRate=16000; config.channelCount=1; config.width=2; config.height=2
         config.minimumFrameInterval=CMTime(seconds:1,preferredTimescale:1)
-        let stream=SCStream(filter:filter,configuration:config,delegate:nil)
-        try stream.addStreamOutput(output,type:.audio,sampleHandlerQueue:output.audioQueue)
-        return NativeAudioSystemCapture(stream:stream)
+        let output=SystemAudioOutput(sink:sink)
+        let stream=SCStream(filter:filter,configuration:config,delegate:output)
+        try stream.addStreamOutput(output,type:.audio,sampleHandlerQueue:output.queue)
+        return NativeAudioSystemCapture(stream:stream,output:output)
     }
 }
-@MainActor public final class AudioController: NSObject, ObservableObject, SCStreamOutput {
+@MainActor public final class AudioController: NSObject, ObservableObject {
     @Published public private(set) var running = false
     @Published public private(set) var status = "Audio off"
     @Published public private(set) var transcribed = 0
+    @Published public private(set) var ingressStatus = ""
+    private var ingressDrops=[String:Int](),transcriptionDrops=0
     public let speakers=SpeakerDiarizer()
     public let recognizer: SpeechRecognizer
     public var hasActiveWork:Bool { running || processing || !pending.isEmpty }
@@ -122,7 +114,6 @@ private struct AudioPrivacyFailure:LocalizedError {
     private var starting = false
     private var micSink: AudioAccumulator?
     private var systemSink: AudioAccumulator?
-    fileprivate let audioQueue = DispatchQueue(label: "com.oswind.system-audio", qos: .utility)
     private struct Chunk {var samples:[Float],date:Date,source:String,epoch:UUID,sessionID:String}
     private var pending:[Chunk]=[]
     private var privacyJob:(id:UUID,task:Task<Void,Never>)?
@@ -173,6 +164,7 @@ private struct AudioPrivacyFailure:LocalizedError {
         if finishing || processing || !pending.isEmpty {stop()}
         epoch=UUID(); let token=epoch, config=settings
         sessionID=UUID().uuidString; finishing=false; starting=true; running=true
+        ingressDrops.removeAll();transcriptionDrops=0;ingressStatus=""
         status="Starting local audio…"
         privacyTimer=Timer.scheduledTimer(withTimeInterval:startup.privacyInterval,repeats:true) { [weak self] _ in Task { @MainActor in self?.requestPrivacyCheck() } }
         await withTaskCancellationHandler {
@@ -189,27 +181,19 @@ private struct AudioPrivacyFailure:LocalizedError {
                     let authorized=await startup.authorizeMicrophone()
                     try await validateStartup(token)
                     guard authorized else { throw OSwindError.unavailable("Microphone access required") }
-                    let sink=AudioAccumulator { [weak self] samples,date in Task { @MainActor in
-                        guard let self,self.epoch==token else { return }; self.enqueue(samples,date:date,source:"Microphone")
-                    } }; micSink=sink
+                    let sink=makeSink(source:"Microphone",token:token); micSink=sink
                     let engine=try startup.makeEngine(); let input=engine.inputNode; let source=input.outputFormat(forBus:0)
-                    guard source.sampleRate>0, let target=AVAudioFormat(commonFormat:.pcmFormatFloat32,sampleRate:16000,channels:1,interleaved:false), let converter=AVAudioConverter(from:source,to:target) else { throw OSwindError.unavailable("Microphone audio format unavailable") }
-                    input.installTap(onBus:0,bufferSize:4096,format:source) { buffer,_ in
-                        guard let output=AVAudioPCMBuffer(pcmFormat:target,frameCapacity:AVAudioFrameCount(Double(buffer.frameLength)*16000/source.sampleRate+16)) else { return }
-                        var supplied=false; var error:NSError?
-                        converter.convert(to:output,error:&error) { _,status in if supplied { status.pointee = .noDataNow; return nil }; supplied=true; status.pointee = .haveData; return buffer }
-                        if error==nil, let floats=output.floatChannelData?[0] { sink.add(Array(UnsafeBufferPointer(start:floats,count:Int(output.frameLength)))) }
-                    }
+                    let converter=try MicrophoneAudioInput(source:source,sink:sink)
+                    input.installTap(onBus:0,bufferSize:4096,format:source) {buffer,_ in converter.consume(buffer)}
                     self.engine=engine // Own the installed tap even if start throws.
                     try engine.start()
                 }
                 if config.systemAudioEnabled {
                     guard startup.systemAvailable() else { throw OSwindError.unavailable("Screen Recording permission is needed for system audio") }
-                    let capture=try await startup.makeSystemCapture(config.privacy,self)
+                    let sink=makeSink(source:"System audio",token:token);systemSink=sink
+                    let capture=try await startup.makeSystemCapture(config.privacy,sink)
                     try await validateStartup(token)
-                    let sink=AudioAccumulator { [weak self] samples,date in Task { @MainActor in
-                        guard let self,self.epoch==token else { return }; self.enqueue(samples,date:date,source:"System audio")
-                    } }; systemSink=sink; systemCapture=capture
+                    systemCapture=capture
                     do {
                         try await capture.start()
                         try await validateStartup(token)
@@ -261,24 +245,25 @@ private struct AudioPrivacyFailure:LocalizedError {
         if starting { stop(); return }
         privacyTimer?.invalidate(); privacyTimer = nil; privacyJob?.task.cancel();privacyJob=nil;finishing = true
         let microphone = micSink?.finish() ?? [], system = systemSink?.finish() ?? []
-        for (samples, source) in [(microphone,"Microphone"),(system,"System audio")] where samples.count >= 1600 && WAV.rms(samples) > 0.003 {
-            enqueue(samples,date:Date().addingTimeInterval(-Double(samples.count)/16000),source:source)
+        for (segments, source) in [(microphone,"Microphone"),(system,"System audio")] {
+            for segment in segments where segment.samples.count>=1600 && AudioAccumulator.audible(segment.samples) {enqueue(segment.samples,date:segment.date,source:source)}
         }
         engine?.inputNode.removeTap(onBus:0); engine?.stop(); engine = nil
         if let capture=systemCapture { Task { try? await capture.stop() } }; systemCapture=nil; micSink=nil; systemSink=nil
         running = false; status = pending.isEmpty && !processing ? "Audio off" : "Finishing local transcript…"
     }
-    nonisolated public func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of outputType: SCStreamOutputType) {
-        guard outputType == .audio, sampleBuffer.isValid, let description = sampleBuffer.formatDescription, let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(description)?.pointee, asbd.mFormatID == kAudioFormatLinearPCM, asbd.mBitsPerChannel == 32, asbd.mChannelsPerFrame == 1 else { return }
-        var list = AudioBufferList(mNumberBuffers: 1, mBuffers: AudioBuffer(mNumberChannels: 1, mDataByteSize: 0, mData: nil)); var block: CMBlockBuffer?
-        let result = CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(sampleBuffer, bufferListSizeNeededOut: nil, bufferListOut: &list, bufferListSize: MemoryLayout<AudioBufferList>.size, blockBufferAllocator: nil, blockBufferMemoryAllocator: nil, flags: 0, blockBufferOut: &block)
-        guard result == noErr, let pointer = list.mBuffers.mData else { return }
-        let samples = Array(UnsafeBufferPointer(start: pointer.assumingMemoryBound(to: Float.self), count: Int(list.mBuffers.mDataByteSize)/4))
-        let identifier=ObjectIdentifier(stream)
-        Task { @MainActor in
-            guard self.systemCapture?.streamID==identifier else { return }
-            self.systemSink?.add(samples)
-        }
+    private func makeSink(source:String,token:UUID)->AudioAccumulator {
+        AudioAccumulator(emit:{[weak self] samples,date in
+            guard let self,self.epoch==token else {return};self.enqueue(samples,date:date,source:source)
+        },report:{[weak self] report in
+            guard let self,self.epoch==token else {return}
+            self.ingressDrops[source]=report.droppedSamples;self.refreshIngressStatus()
+            if let failure=report.failure {self.stop();self.status=failure}
+        })
+    }
+    private func refreshIngressStatus() {
+        let lost=ingressDrops.values.reduce(transcriptionDrops,+)
+        ingressStatus=lost==0 ? "":"Audio busy · \(String(format:"%.1f",Double(lost)/16000)) s dropped before transcription"
     }
     func requestPrivacyCheck() {
         guard running,privacyJob==nil else {return}
@@ -295,7 +280,7 @@ private struct AudioPrivacyFailure:LocalizedError {
         // PCM stays in memory and the waiting queue is bounded. Fresh privacy
         // is required before WAV processing and again at save.
         guard running || finishing,!starting,!startup.locked() else {return}
-        guard pending.count<3 else {status="Transcription backpressure · dropped segment";return}
+        guard pending.count<3 else {transcriptionDrops+=samples.count;refreshIngressStatus();status="Transcription backpressure · dropped segment";return}
         pending.append(Chunk(samples:samples,date:date,source:source,epoch:epoch,sessionID:sessionID))
         if !processing {Task {await drain()}}
     }
