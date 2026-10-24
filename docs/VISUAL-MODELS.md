@@ -6,17 +6,36 @@ The [source catalog](../models/siglip2-source.json) fixes the original repositor
 
 ## Prepare once
 
-On Apple Silicon macOS, with [uv](https://docs.astral.sh/uv/) installed:
+On Apple Silicon macOS, open Settings → Models → Visual memory and choose **Prepare visual model on this Mac**. OSwind downloads the pinned public tools and source files, converts both encoders locally, checks CPU/GPU numerical agreement, then atomically installs the qualified bundle. Selecting it preserves the visual-memory enable switch; enable visual memory and build the index when ready. Preparation uses no recorded history or provider credential.
+
+The packaged CLI offers the same path:
 
 ```bash
-uv run --python 3.12 scripts/convert-visual-model.py \
+/Applications/OSwind.app/Contents/MacOS/oswindctl vision prepare
+# Explicitly select and enable the prepared model for the chosen library:
+/Applications/OSwind.app/Contents/MacOS/oswindctl --data /absolute/library \
+  vision prepare --use-model
+```
+
+Without `--use-model`, preparation does not open or create a history library or change its settings. `--cache-root /absolute/cache` overrides the preparation cache; `--assets-root /absolute/resources` is a developer override for the bundled, checksum-verified preparation assets. Keep caches outside libraries, backups, vaults and model bundles. Normal users need neither override.
+
+Allow **10 GB free disk space**. The final model payload is **968,536,703 bytes**; the cache also holds approximately 1.54 GB of original public weights/configs, Python and conversion packages. The measured warm-cache preparation used approximately **8.6 GB peak RSS**, substantially more than native search. Lower-memory Macs can select an already prepared bundle from another compatible Mac. Downloads and first-time tool installation can take several minutes. A measured 26-second conversion with cached tools/source is not a first-download or cold-start promise.
+
+Preparation pins [uv 0.13.5](https://github.com/astral-sh/uv/releases/tag/0.13.5), managed Python 3.12.15 and a [48-package frozen script lock](../scripts/convert-visual-model.py.lock). The [runtime catalog](../models/visual-preparation-runtime.json) and generated Swift catalog bind the official uv archive, extracted executable and five bundled assets to their sizes/SHA-256 hashes. Python and packages are installed into the private preparation cache; no shell profile or global tool installation is needed. Conversion runs with an explicit environment, empty credential directory, disabled keyring, `/dev/null` netrc, offline Hugging Face settings and no ambient provider keys. Public downloads use HTTPS. The native search runtime uses Swift/Core ML and needs no Python or server.
+
+Cancel waits for the owned process group to stop. A bundled native guardian also watches for abrupt parent death, retains cache/workspace reservations and stops descendants after the owner is killed. A later attempt cleans abandoned owned workspaces and reuses verified public files. Unfinished owned downloads restart on retry; **byte-range resume is not implemented**. The installed container includes a qualification receipt bound to the bundle model identity and preparation build; reuse rechecks the model bytes and all four recorded numerical gates. This receipt is local evidence, not an upstream signature. If a cache is corrupt, use a fresh cache rather than silently trusting or overwriting it.
+
+For manual conversion with [uv](https://docs.astral.sh/uv/) already installed:
+
+```bash
+uv run --frozen --python 3.12.15 scripts/convert-visual-model.py \
   --source "$HOME/Library/Caches/OSwind/siglip2-source" \
   --output "$HOME/Library/Caches/OSwind/siglip2-native" --download
 ```
 
 This explicitly installs the pinned Python conversion dependencies and downloads approximately 1.5 GB of original public weights plus tokenizer/config files. It uses no Hugging Face credential. Omit `--download` for source verification and conversion with no model fetch. Python is used for preparation and evaluation; native inference uses Swift/Core ML and does not require Python or a model server.
 
-The output must be new. Failed downloads leave `.partial` files for inspection; existing partial files and destinations are never overwritten. The converter retains an adjacent `.conversion` directory containing packages, original-reference fixtures and numerical results. Preserve it for verification, then remove it manually if desired. Conversion can require several GB of working storage beyond the final **968,536,703-byte model payload** observed here. Do not place conversion jobs inside a memory library or an encrypted vault if you intend them to remain available while that vault is locked.
+The output must be new. An abruptly interrupted download can leave `.partial` files for inspection; manual conversion refuses them by default. `--retry-partials` explicitly restarts bounded, owned regular partial files and safely recovers a verified target/partial publication pair. Symlinks, unrelated hard links and extra unverified source files are refused. The converter retains an adjacent `.conversion` directory containing packages, original-reference fixtures and numerical results. Preserve it for verification, then remove it manually if desired. The app retains the qualification receipt with the installed model and cleans its conversion scratch. Do not place conversion jobs inside a memory library or an encrypted vault if you intend them to remain available while that vault is locked.
 
 A successful conversion publishes `OSWIND-VISION.json` only after both encoders pass the fixed numerical gate under CPU-only and CPU/GPU policies. The app validates the file inventory and hashes before model loading. The model identity hashes the entire manifest, so different compiled artifacts cannot silently share vectors. This is local integrity evidence, **not a signature or an attestation from Google**. Treat the selected bundle as immutable while loaded; release and reload after replacing it.
 
@@ -48,6 +67,10 @@ CPU/GPU is the default allowed compute policy, with an explicitly tested CPU-onl
 
 ```bash
 python3 scripts/test-visual-model-tools.py
+python3 scripts/visual-preparation-catalog.py --check
+# Offline package contracts; requires an already qualified public-model cache:
+python3 scripts/visual-preparation-smoke.py /absolute/OSwind.app \
+  --cache-root /absolute/qualified-cache --root /absolute/NEW-contract-directory
 OSWIND_VISUAL_MODEL_DIR=/absolute/model/bundle swift test --filter VisualEncoderTests
 uv run --python 3.12 scripts/evaluate-visual-model.py --prepare \
   --work /absolute/new-evaluation-directory
@@ -66,4 +89,4 @@ This small photo subset is **not the standard COCO 5k benchmark, a desktop-histo
 
 [Visual search](VISUAL-SEARCH.md) now connects source/media/frame identities, privacy rules, private replay workspaces, persisted vectors, scoped CLI/HTTP/MCP queries, protected previews, matched-time opening, native settings, background catch-up and backup/restore. These are separate from the frozen encoder-only measurements above.
 
-One-click model preparation/download, labeled desktop relevance, cold starts, realistic archive scaling, energy, native interaction and matched competitor measurements remain open. Visual similarity does not establish a caption or factual image-grounded Ask answer.
+One-click preparation is implemented and exercised through the CLI. Native click/keyboard acceptance, byte-range resume, labeled desktop relevance, cold starts, realistic archive scaling, energy and matched competitor measurements remain open. Visual similarity does not establish a caption or factual image-grounded Ask answer.

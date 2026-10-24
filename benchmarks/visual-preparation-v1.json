@@ -1,0 +1,436 @@
+{
+  "format": "OSwind native visual-model preparation qualification v1",
+  "reviewed": "2026-10-24 America/Los_Angeles",
+  "codeCommit": "ea9bd94f0987f6eebaba3059bd4f5ef9dc74c179",
+  "schema": 19,
+  "hardware": "Apple M5 Max",
+  "os": "macOS 26.6.2 (25G83)",
+  "scope": "Optional public-model/tool preparation, owned caches and synthetic history only. No real history, Keychain, authentication, capture, energy, competitor or native input acceptance.",
+  "runtime": {
+    "version": "0.13.5",
+    "source": "https://github.com/astral-sh/uv/releases/tag/0.13.5",
+    "url": "https://github.com/astral-sh/uv/releases/download/0.13.5/uv-aarch64-apple-darwin.tar.gz",
+    "bytes": 14365303,
+    "sha256": "743f85035a1996ecb350659e01cd9faea9709829be09b1b4b03c73eaf3c9cd73",
+    "member": "uv-aarch64-apple-darwin/uv",
+    "executableBytes": 27897472,
+    "executableSHA256": "7dad6047467a9d6b081c033cb3efed9ba39a4799c698d09e6cd598f3a6a32338",
+    "license": "MIT OR Apache-2.0",
+    "python": "3.12.15"
+  },
+  "tests": {
+    "fullNormal": {
+      "codeCommit": "ea9bd94f0987f6eebaba3059bd4f5ef9dc74c179",
+      "total": 589,
+      "passed": 563,
+      "optInSkipped": 26,
+      "failures": 0
+    },
+    "additionalNativeRun": {
+      "codeCommit": "fbf5b3ff96de35cb31faf905e8cb65f162931bb8",
+      "passed": 65,
+      "previouslySkipped": 20,
+      "scope": "Actual owned APFS volumes, app session lifecycle, native visual model/tokenizer and preparation controls; no real credentials"
+    },
+    "distinctPassedAcrossRuns": 583,
+    "remainingOptInSkips": 6,
+    "focusedThreadSanitizer": {
+      "codeCommit": "fbf5b3ff96de35cb31faf905e8cb65f162931bb8",
+      "passed": 24,
+      "races": 0,
+      "note": "Before final abandoned-cleanup reorder; native guardian/process implementation identical"
+    },
+    "focusedAfterCleanupFix": {
+      "codeCommit": "ea9bd94f0987f6eebaba3059bd4f5ef9dc74c179",
+      "passed": 31
+    },
+    "offlinePythonContracts": 13,
+    "generatedCatalogCheck": true
+  },
+  "preparation": {
+    "freshCache": {
+      "wallSeconds": 229.1,
+      "maximumRSSBytes": 8571912192,
+      "modelBytes": 968536703,
+      "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+      "receipt": {
+        "buildID": "5b980d94952bbfd1",
+        "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+        "pythonVersion": "3.12.15",
+        "qualification": {
+          "measurements": [
+            {
+              "encoder": "image",
+              "minimumCosine": 1,
+              "passed": true,
+              "requestedCompute": "CPU_ONLY"
+            },
+            {
+              "encoder": "text",
+              "minimumCosine": 0.9998705387115479,
+              "passed": true,
+              "requestedCompute": "CPU_ONLY"
+            },
+            {
+              "encoder": "image",
+              "minimumCosine": 0.9999999403953552,
+              "passed": true,
+              "requestedCompute": "CPU_AND_GPU"
+            },
+            {
+              "encoder": "text",
+              "minimumCosine": 0.9999986290931702,
+              "passed": true,
+              "requestedCompute": "CPU_AND_GPU"
+            }
+          ],
+          "recipe": "oswind-siglip2-fp32-image-fp16-text-v1"
+        },
+        "runtimeVersion": "0.13.5"
+      },
+      "initialCacheEmpty": true,
+      "allPublicDownloads": true,
+      "noAssetsOverride": true,
+      "historyCreated": false,
+      "leftoverOwnedWorkspaces": 0,
+      "limits": "One network-inclusive run; OS/CDN caches and background work uncontrolled, including separately owned fault checks. Maximum RSS is BSD time process-hierarchy accounting, not native-parent footprint or energy."
+    },
+    "warmSignedEarlier": {
+      "codeCommit": "fbf5b3ff96de35cb31faf905e8cb65f162931bb8",
+      "wallSeconds": 28.41,
+      "maximumRSSBytes": 8559378432,
+      "modelBytes": 968536703
+    },
+    "modelComparison": {
+      "learnedWeightsAndTokenizerByteIdenticalToOriginal": true,
+      "changedCompiledMetadataFiles": [
+        "image.mlmodelc/analytics/coremldata.bin",
+        "image.mlmodelc/coremldata.bin",
+        "text.mlmodelc/analytics/coremldata.bin",
+        "text.mlmodelc/coremldata.bin"
+      ]
+    },
+    "nativeInferenceNeedsPython": false,
+    "byteRangeResume": false,
+    "unfinishedOwnedDownloadsRestart": true
+  },
+  "packagedChecks": {
+    "scope": "Offline explicit qualified public-model container; copied packaged app; no model download, normal history, capture or UI input",
+    "binarySHA256": "1d1908413031f2d67876de4f80a8a6eca7670b9c41a21e1d697520660c10be9f",
+    "modelID": "siglip2:d12929c88be8dbc0ec9afac300c67e42f179e79ec4896252d4c827f1063fd622",
+    "checks": [
+      {
+        "case": "relocated bundled assets and qualified reuse",
+        "passed": true
+      },
+      {
+        "case": "ready-model reuse cleans abandoned owned conversion scratch",
+        "passed": true
+      },
+      {
+        "case": "unknown option refuses before history",
+        "passed": true
+      },
+      {
+        "case": "duplicate enable flag refuses",
+        "passed": true
+      },
+      {
+        "case": "wrong receipt identity refuses",
+        "passed": true
+      },
+      {
+        "case": "failed qualification refuses",
+        "passed": true
+      },
+      {
+        "case": "duplicate qualification policy refuses",
+        "passed": true
+      },
+      {
+        "case": "restored receipt revalidates",
+        "passed": true
+      },
+      {
+        "case": "changed bundled script refuses before cache reuse",
+        "passed": true
+      },
+      {
+        "case": "missing bundled guardian refuses",
+        "passed": true
+      },
+      {
+        "case": "prepare without use-model preserves existing settings",
+        "passed": true
+      },
+      {
+        "case": "explicit use-model selects qualified model",
+        "passed": true
+      },
+      {
+        "case": "cache inside history refuses before creation",
+        "passed": true
+      },
+      {
+        "case": "explicit selection preserves source history and private settings",
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "actualSignedInterruptions": {
+    "scope": "Owned COW public-model/tool caches, actual conversion; no history or credentials",
+    "binarySHA256": "1d1908413031f2d67876de4f80a8a6eca7670b9c41a21e1d697520660c10be9f",
+    "checks": [
+      {
+        "case": "interrupt",
+        "exit": 130,
+        "ownedProcesses": 4,
+        "allProcessesGone": true,
+        "cacheLockReleased": true,
+        "noPartialPublishedModel": true
+      },
+      {
+        "case": "abrupt-death",
+        "exit": -9,
+        "ownedProcesses": 4,
+        "allProcessesGone": true,
+        "cacheLockReleased": true,
+        "noPartialPublishedModel": true
+      },
+      {
+        "case": "retry after abrupt death",
+        "qualified": true,
+        "noHistoryCreated": true,
+        "noAbandonedWorkspace": true
+      }
+    ],
+    "passed": true
+  },
+  "package": {
+    "scope": "Separately staged schema19 native visual-model preparation; no installation or native click acceptance",
+    "codeCommit": "ea9bd94f0987f6eebaba3059bd4f5ef9dc74c179",
+    "schema": 19,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "3a93d81103443289902afff710005f417f73cbe5449e678f2f8c7455887b4630",
+        "signedSHA256": "6433f8f4955e8b581d53e53bb918f1d42d88c4c63678579ac5898d02862d6163",
+        "normalizedPayloadSHA256": "d81b729ee48354ab2e0297e1e570763b717bd0e1b45dc973d96900e40d8a7f34"
+      },
+      "oswindctl": {
+        "rawSHA256": "caa5dfc7e9d23843f6de3946ed4249e7be4bb7ddcdcbb352fb5281161e2e6485",
+        "signedSHA256": "1d1908413031f2d67876de4f80a8a6eca7670b9c41a21e1d697520660c10be9f",
+        "normalizedPayloadSHA256": "5da4b37190c80d7e0ffed30053ae918d8e145b08b09850265d67487c0ec9f5ac"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "7ef5ad0af77598ef02d3e4d26ac7109bdf861e0bb2dd857d4513ff0a79f859af",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "833384320f0f14d066ba0e2bffc63fe4eef670c11942b0bbad5ecc5bb83e10dd",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "visualIntegration": {
+    "benchmark": {
+      "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+      "gpu": "Apple M5 Max",
+      "images": 100,
+      "indexedFrames": 100,
+      "indexingSeconds": 6.390888929367065,
+      "limits": [
+        "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+        "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+        "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+        "No image, caption, source path or raw vector is included in this aggregate report."
+      ],
+      "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "queries": 501,
+      "queryMedianMilliseconds": 11.763930320739746,
+      "queryP95Milliseconds": 14.345049858093262,
+      "recallAt1": 0.9161676646706587,
+      "recallAt5": 0.9940119760479041,
+      "recallAt10": 0.9940119760479041,
+      "reopenedIndexSources": 100,
+      "schema": 19,
+      "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+      "scopedResultsVerified": true
+    },
+    "processPeakRSSBytes": 1986691072,
+    "processSeconds": 13.64,
+    "processChecks": {
+      "scope": "Explicit isolated photo fixture; real local model; CLI, HTTP and MCP visual retrieval. No capture/UI/energy/competitor claim.",
+      "binarySHA256": "1d1908413031f2d67876de4f80a8a6eca7670b9c41a21e1d697520660c10be9f",
+      "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+      "checks": [
+        "main CLI and explicit vision search agree",
+        "MCP preserves model and source identities",
+        "HTTP agrees with CLI/MCP",
+        "HTTP app/tag scopes",
+        "HTTP authentication required",
+        "changed source bytes omitted with warning"
+      ],
+      "passed": true
+    },
+    "subsequentSameBundleProcess": {
+      "benchmark": {
+        "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+        "gpu": "Apple M5 Max",
+        "images": 100,
+        "indexedFrames": 100,
+        "indexingSeconds": 6.041809916496277,
+        "limits": [
+          "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+          "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+          "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+          "No image, caption, source path or raw vector is included in this aggregate report."
+        ],
+        "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+        "os": "Version 26.6.2 (Build 25G83)",
+        "queries": 501,
+        "queryMedianMilliseconds": 11.901021003723145,
+        "queryP95Milliseconds": 14.434099197387695,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "recallAt10": 0.9940119760479041,
+        "reopenedIndexSources": 100,
+        "schema": 19,
+        "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+        "scopedResultsVerified": true
+      },
+      "peakRSSBytes": 1583382528,
+      "processSeconds": 13.26,
+      "note": "Sequential repeat after the first native pipeline; no cache reset or causal attribution. The higher first-process memory remains reported."
+    }
+  },
+  "retainedPerformanceTrials": {
+    "codeCommit": "fbf5b3ff96de35cb31faf905e8cb65f162931bb8",
+    "signedCLI_SHA256": "e9cd352f611eb316051265574887b9eba1d60436cba1a1d8a4dbaf4a829b62b7",
+    "firstPipeline": {
+      "benchmark": {
+        "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+        "gpu": "Apple M5 Max",
+        "images": 100,
+        "indexedFrames": 100,
+        "indexingSeconds": 6.410311937332153,
+        "limits": [
+          "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+          "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+          "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+          "No image, caption, source path or raw vector is included in this aggregate report."
+        ],
+        "modelID": "siglip2:38fc826f9c9b37ea05ddfdc407451861681ea307304c5aae06561bf2cf2f1f88",
+        "os": "Version 26.6.2 (Build 25G83)",
+        "queries": 501,
+        "queryMedianMilliseconds": 12.094974517822266,
+        "queryP95Milliseconds": 14.945030212402344,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "recallAt10": 0.9940119760479041,
+        "reopenedIndexSources": 100,
+        "schema": 19,
+        "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+        "scopedResultsVerified": true
+      },
+      "peakRSSBytes": 1984839680
+    },
+    "orderedPairedTrials": [
+      {
+        "trial": "paired-1-original",
+        "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+        "indexingSeconds": 6.990342974662781,
+        "queryMedianMilliseconds": 11.659979820251465,
+        "queryP95Milliseconds": 14.083027839660645,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "peakRSSBytes": 1580007424
+      },
+      {
+        "trial": "paired-2-prepared",
+        "modelID": "siglip2:38fc826f9c9b37ea05ddfdc407451861681ea307304c5aae06561bf2cf2f1f88",
+        "indexingSeconds": 6.106109023094177,
+        "queryMedianMilliseconds": 11.738061904907227,
+        "queryP95Milliseconds": 14.3049955368042,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "peakRSSBytes": 1580056576
+      },
+      {
+        "trial": "paired-3-prepared",
+        "modelID": "siglip2:38fc826f9c9b37ea05ddfdc407451861681ea307304c5aae06561bf2cf2f1f88",
+        "indexingSeconds": 6.075407981872559,
+        "queryMedianMilliseconds": 11.371016502380371,
+        "queryP95Milliseconds": 13.822078704833984,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "peakRSSBytes": 1580285952
+      },
+      {
+        "trial": "paired-4-original",
+        "modelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+        "indexingSeconds": 6.447900056838989,
+        "queryMedianMilliseconds": 11.278033256530762,
+        "queryP95Milliseconds": 13.291001319885254,
+        "recallAt1": 0.9161676646706587,
+        "recallAt5": 0.9940119760479041,
+        "peakRSSBytes": 1580089344
+      }
+    ],
+    "limits": "All retained; sequential uncontrolled-cache samples, no cache reset, energy/hardware trace or causal attribution. No latency or memory improvement claim."
+  },
+  "design": {
+    "ownAppSyntheticRenders": 6,
+    "appearances": [
+      "light",
+      "dark"
+    ],
+    "states": [
+      "idle",
+      "busy",
+      "error"
+    ],
+    "componentSource": "fbf5b3ff96de35cb31faf905e8cb65f162931bb8",
+    "unchangedByFinalCleanupFix": true,
+    "visuallyReviewed": true,
+    "screenLocked": true,
+    "nativeInputAcceptance": false
+  },
+  "retainedFailures": [
+    {
+      "case": "Invalid empty uv preview environment",
+      "outcome": "Tool exited 2; unsupported empty variable removed and explicit allowlist tested."
+    },
+    {
+      "case": "Earlier uv wrapper stalled after numerical qualification",
+      "outcome": "Preserved completed public output for diagnosis, then SIGINT 130 and all processes gone. Not counted as unattended success; later signal reset/guardian runs pass. Root cause not uniquely isolated."
+    },
+    {
+      "case": "Guardian watch descriptor closed by spawn defaults",
+      "outcome": "Initial exit 125; explicit Darwin descriptor inheritance repairs watch and lease passing; parent-death tests pass."
+    },
+    {
+      "case": "Cached license repair used read-only tree",
+      "outcome": "Immediate preparation refusal; narrowly writable owned tool tree and cached-license regression pass."
+    },
+    {
+      "case": "Ready-model fast reuse bypassed abandoned scratch cleanup",
+      "outcome": "New packaged process regression failed against earlier signed binary. Cleanup now precedes reuse/free-space check; final 14 package cases pass."
+    }
+  ],
+  "remaining": [
+    "Native click/keyboard/accessibility acceptance; Mac locked during these checks",
+    "Interrupted-file restart is implemented; byte-range resume is not",
+    "Fresh-cache setup can need approximately 9 GB RAM and 10 GB available disk",
+    "Fixed 100-photo/501-query subset is not standard COCO 5k, desktop relevance or proven unseen holdout",
+    "Original ImageIO versus Pillow JPEG decoding discrepancy remains; encoder gates use identical tensors",
+    "No physical GPU/ANE trace, energy, whole-desktop capture or broad hardware/OS qualification",
+    "No whole competitor-app or top-three ranking; broad feature parity remains in progress"
+  ]
+}
