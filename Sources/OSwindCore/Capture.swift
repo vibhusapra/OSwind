@@ -67,6 +67,7 @@ public struct CaptureMetrics: Sendable {
         didSet {
             guard settings.profile != oldValue.profile || settings.visualCaptureMode != oldValue.visualCaptureMode || settings.allDisplays != oldValue.allDisplays || settings.privacy != oldValue.privacy else {return}
             epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
+            cancelSnapshotWork()
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
         }
     }
@@ -76,6 +77,9 @@ public struct CaptureMetrics: Sendable {
     private let store: MemoryStore
     private let embedder: LocalEmbedder
     private let snapshots:SnapshotCaptureEnvironment
+    private var snapshotWorker:Task<(Memory,Data?,MediaAdmissionLease?),Error>?
+    private var snapshotPassages:Task<Void,Error>?
+    private func cancelSnapshotWork(){snapshotWorker?.cancel();snapshotPassages?.cancel()}
     private var timer: Timer?
     private var observers = [NSObjectProtocol]()
     private var busy = false
@@ -88,7 +92,7 @@ public struct CaptureMetrics: Sendable {
         self.store = store; self.embedder = embedder; self.settings = settings;self.snapshots=snapshots
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in guard let self, self.running, Date().timeIntervalSince(self.lastCapture) > 1 else { return }; await self.captureOnce() } })
-        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.cancelSnapshotWork();self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
@@ -99,7 +103,7 @@ public struct CaptureMetrics: Sendable {
             replay=session;session.start()
         } else {replay?.stop();replay=nil;schedule();Task {await captureOnce()}}
     }
-    public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID(); timer?.invalidate(); timer = nil; status = "Paused" }
+    public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID();cancelSnapshotWork();timer?.invalidate(); timer = nil; status = "Paused" }
     /// Explicit bounded replay, including a chosen app. Existing permissions
     /// only; never prompts or falls through to a different app when absent.
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
@@ -169,6 +173,7 @@ public struct CaptureMetrics: Sendable {
                     memory.embedding=localEmbedder.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:localEmbedder.modelID
                     do {try Task.checkCancellation();return (memory,data,lease)} catch {lease?.release();throw error}
                 }
+                snapshotWorker=worker;defer {snapshotWorker=nil}
                 let prepared=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
                 defer {prepared.2?.release()}
                 guard try await frame.privacyStillMasked() else {metrics.excluded+=1;status="Source privacy changed · snapshot discarded";return}
@@ -188,10 +193,22 @@ public struct CaptureMetrics: Sendable {
                 // separate OS observations, not an atomic capture guarantee.
                 guard snapshotContext(context,token:token,manual:manual,target:targetBundleID) != nil else {return}
                 try imageTree?.requireRootIdentity(at:store.root);try store.insert(memory);admitted=true
-                fingerprints[frame.display]=pixels;metrics.saved+=1;metrics.lastLatencyMS=Date().timeIntervalSince(begin)*1000
-                status="Saved \(captured.app) · \(Int(metrics.lastLatencyMS)) ms";onCapture?(memory)
+                fingerprints[frame.display]=pixels;metrics.saved+=1
                 let saved=memory,passageStore=store
-                if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled {try await Task.detached(priority:.utility) {try passageStore.indexApplePassages(saved,embedder:localEmbedder)}.value}
+                var pending:String?
+                if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled {
+                    let indexing=Task.detached(priority:.utility) {try passageStore.indexApplePassages(saved,embedder:localEmbedder)}
+                    snapshotPassages=indexing;defer {snapshotPassages=nil}
+                    do {try await withTaskCancellationHandler {try await indexing.value} onCancel:{indexing.cancel()}}
+                    catch {pending=error.localizedDescription}
+                }
+                guard epoch==token,!Task.isCancelled else {return}
+                metrics.lastLatencyMS=Date().timeIntervalSince(begin)*1000
+                if let pending {metrics.errors+=1;status="Saved \(captured.app) · search indexing pending: "+pending}
+                else {status="Saved \(captured.app) · \(Int(metrics.lastLatencyMS)) ms"}
+                // Automatic catch-up sees completed native passages instead of
+                // racing the capture worker to build the same long source.
+                onCapture?(memory)
             }
         } catch is CancellationError {if epoch==token {status="Snapshot cancelled"}}
         catch let deferral as SnapshotCaptureDeferral {if epoch==token {metrics.excluded+=1;status=deferral.reason}}

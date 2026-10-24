@@ -7,10 +7,12 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
     let entered=XCTestExpectation(description:"owned recognition entered")
     private let condition=NSCondition()
     private var released=false
+    private var cancelled=false
+    var sawCancellation:Bool {condition.lock();defer {condition.unlock()};return cancelled}
     func recognize(_ image:CGImage) throws -> [TextRegion] {
         condition.lock();entered.fulfill();let deadline=Date().addingTimeInterval(15)
         while !released {guard condition.wait(until:deadline) else {condition.unlock();throw OSwindError.unavailable("Owned recognition gate timed out")}}
-        condition.unlock();try Task.checkCancellation()
+        cancelled=Task.isCancelled;condition.unlock();try Task.checkCancellation()
         return [.init(text:"Owned screen region",x:0.1,y:0.2,width:0.5,height:0.1)]
     }
     func release(){condition.lock();released=true;condition.broadcast();condition.unlock()}
@@ -54,6 +56,30 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         XCTAssertEqual((try FileManager.default.attributesOfItem(atPath:url.path)[.posixPermissions] as? NSNumber)?.intValue,0o600)
         let source=try XCTUnwrap(CGImageSourceCreateWithURL(url as CFURL,nil));XCTAssertEqual(try XCTUnwrap(CGImageSourceCreateImageAtIndex(source,0,nil)).width,480)
     }
+    func testLongSourceCallbackWaitsForCapturePassagesBeforeAutomaticCatchupCanStart() async throws {
+        let embedder=LocalEmbedder();guard embedder.available else {throw XCTSkip("Local Apple embeddings unavailable; no download")}
+        let world=SnapshotWorld(),bitmap=try image();world.context?.accessibilityText=String(repeating:"Owned release checklist and project context. ",count:180)
+        var settings=AppSettings();settings.search.indexOnLowPower=true
+        let controller=CaptureController(store:store,embedder:embedder,settings:settings,snapshots:environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap})))
+        var coverage:Bool?,callbacks=0
+        controller.onCapture={memory in callbacks+=1;coverage=try? self.store.passagesCurrent(memory,modelID:embedder.modelID)}
+        await controller.captureOnce(manual:true)
+        XCTAssertEqual(callbacks,1);XCTAssertEqual(coverage,true);XCTAssertEqual(controller.metrics.saved,1)
+    }
+    func testPassageFailureKeepsCommittedSourceAndCanRecoverWithoutRecapture() async throws {
+        let embedder=LocalEmbedder();guard embedder.available else {throw XCTSkip("Local Apple embeddings unavailable; no download")}
+        try store.withRoutineDatabase {try $0.execute("CREATE TRIGGER owned_snapshot_passage_failure BEFORE INSERT ON semantic_passages BEGIN SELECT RAISE(ABORT,'Owned passage failure'); END;")}
+        let world=SnapshotWorld(),bitmap=try image();world.context?.accessibilityText=String(repeating:"Owned release checklist and project context. ",count:180)
+        var settings=AppSettings();settings.search.indexOnLowPower=true
+        let controller=CaptureController(store:store,embedder:embedder,settings:settings,snapshots:environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap})))
+        var notified:Memory?;controller.onCapture={notified=$0}
+        await controller.captureOnce(manual:true)
+        let memory=try XCTUnwrap(notified);XCTAssertNotNil(try store.get(memory.id));XCTAssertNotNil(memory.imagePath)
+        XCTAssertEqual(controller.metrics.saved,1);XCTAssertEqual(controller.metrics.errors,1);XCTAssertTrue(controller.status.contains("search indexing pending"))
+        XCTAssertFalse(try store.passagesCurrent(memory,modelID:embedder.modelID))
+        try store.withRoutineDatabase {try $0.execute("DROP TRIGGER owned_snapshot_passage_failure")}
+        try store.indexApplePassages(memory,embedder:embedder);XCTAssertTrue(try store.passagesCurrent(memory,modelID:embedder.modelID));XCTAssertEqual(try store.stats().count,1)
+    }
     func testContextTransitionWhileDiscoveringSourcesNeverCapturesPixels() async throws {
         let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap}))
         environment.frames={_,_ in world.context?.url="https://accounts.google.com/private";await Task.yield();return [.init(display:"owned",title:"Owned",capture:{world.captured+=1;return bitmap})]}
@@ -91,6 +117,7 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
             await fulfillment(of:[gate.entered],timeout:10)
             if pause {controller.pause()} else {controller.settings.privacy.retainImages=false}
             gate.release();await task.value;try assertEmpty(controller)
+            XCTAssertTrue(gate.sawCancellation)
             if pause {XCTAssertEqual(controller.status,"Paused")}
         }
     }
