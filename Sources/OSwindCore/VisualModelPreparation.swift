@@ -107,6 +107,10 @@ public enum VisualModelPreparation {
         let lock=try parent.withRootDirectory {openat($0,".visual-prepare.lock",O_CREAT | O_RDWR | O_NOFOLLOW | O_CLOEXEC,0o600)}
         guard lock>=0 else {throw OSwindError.unavailable("Cannot reserve the visual model cache")};defer {flock(lock,LOCK_UN);close(lock)}
         var stamp=stat();guard fstat(lock,&stamp)==0,stamp.st_mode&S_IFMT==S_IFREG,stamp.st_nlink==1,stamp.st_uid==getuid(),flock(lock,LOCK_EX | LOCK_NB)==0 else {throw OSwindError.unavailable("Visual model setup is already running, or its cache lock is invalid")}
+        // A crash after atomic model publication can still leave conversion
+        // scratch. Clean dead, unlocked jobs even on the ready-model path,
+        // and before requiring additional free space for new preparation.
+        _ = try BackupWorkspace.cleanupAbandoned(in:canonical,labels:["oswind-visual-prepare"])
         let destination=canonical.appendingPathComponent("siglip2-qualified-"+runtime.buildID)
         if try NativeModelInstaller.exists(destination) {
             progress(.init(phase:"Verifying local visual models",completedBytes:0,totalBytes:0,completedFiles:0,totalFiles:1,file:nil))
@@ -116,7 +120,6 @@ public enum VisualModelPreparation {
             return .init(directory:directory,modelID:verified.modelID,bytes:verified.bundle.model.bytes,reused:true)
         }
         if let available=try? canonical.resourceValues(forKeys:[.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,available<10*1024*1024*1024 {throw OSwindError.unavailable("Allow at least 10 GB of free space to prepare the visual model and its local tools")}
-        _ = try BackupWorkspace.cleanupAbandoned(in:canonical,labels:["oswind-visual-prepare"])
         let workspace=try BackupWorkspace(in:canonical,label:"oswind-visual-prepare");defer {withExtendedLifetime(workspace){}}
         for (path,data) in assets {try workspace.tree.write(data,as:"runner/"+path)}
         let temporary=workspace.url.appendingPathComponent("temporary");try FileManager.default.createDirectory(at:temporary,withIntermediateDirectories:false,attributes:[.posixPermissions:0o700])
