@@ -138,11 +138,11 @@ public actor SpeechRecognizer {
         guard let backend else { throw OSwindError.unavailable("Native recognizer is unavailable") }
         return backend
     }
-    public func transcribe(file:URL,settings:AppSettings,timeout:Double=120) async throws -> SpeechTranscript {
+    public func transcribe(file:URL,settings:AppSettings,timeout:Double=120,workspaceParent:URL?=nil) async throws -> SpeechTranscript {
         try Task.checkCancellation()
         guard timeout.isFinite,timeout>0,timeout<=86400 else { throw OSwindError.invalid("Speech time budget must be between zero and 24 hours") }
         if settings.speech.engine == .whisper {
-            return try await Whisper.detailed(file:file,binary:settings.whisperBinary,model:settings.whisperModel,language:settings.transcriptionLanguage,timeout:timeout)
+            return try await Whisper.detailed(file:file,binary:settings.whisperBinary,model:settings.whisperModel,language:settings.transcriptionLanguage,timeout:timeout,workspaceParent:workspaceParent)
         }
         let deadline=ContinuousClock.now.advanced(by:.seconds(timeout))
         try await acquire(UUID()); defer { release() }; try Task.checkCancellation()

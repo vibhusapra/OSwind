@@ -175,12 +175,12 @@ extension LibraryBackup {
         try BackupWorkspace.requireNewDestination(destination)
         _ = try BackupWorkspace.cleanupAbandoned()
         _ = try BackupWorkspace.cleanupAbandoned(in:destination.deletingLastPathComponent())
-        let checked = try inspect(archive,progress:progress), source = try BackupFileTree(root:archive), parent = try BackupFileTree(root:destination.deletingLastPathComponent())
+        let checked = try inspect(archive,workspaceParent:destination.deletingLastPathComponent(),progress:progress), source = try BackupFileTree(root:archive), parent = try BackupFileTree(root:destination.deletingLastPathComponent())
         guard try !source.isAncestor(of:parent) else { throw BackupFileError.invalid("Restore outside the backup package") }
         let headerData = try source.read("header.json",limit:65536), fingerprint = BackupSHA256.hex(headerData)
         guard fingerprint == (expectedFingerprint ?? checked.archiveFingerprint) else { throw BackupFileError.changed("Backup changed after inspection") }
         let header = try JSONDecoder().decode(LibraryBackupHeader.self,from:headerData); try header.validate()
-        let scratch = try BackupWorkspace(label:"oswind-restore-input"), output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-restore-partial")
+        let scratch = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-restore-input"), output = try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-restore-partial")
         defer { withExtendedLifetime(scratch) {} }
         let index = try BackupManifestIndex(scratch.url.appendingPathComponent("manifest-index.sqlite")), hashes = try RestoreContentIndex(scratch.url.appendingPathComponent("content-index.sqlite"))
         defer { index.close(); hashes.close(); withExtendedLifetime(scratch) {} }

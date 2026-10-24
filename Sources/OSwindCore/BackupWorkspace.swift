@@ -17,6 +17,7 @@ struct BackupWorkspaceMarker: Codable {
 /// A successful atomic publication never ships these operation-control files.
 final class BackupWorkspace {
     static let operationLabels = ["oswind-markdown-snapshot","oswind-markdown-partial","oswind-visual-recording","oswind-model-download","oswind-audio-import","oswind-audio-chunk","oswind-transcription","oswind-backup","oswind-backup-pins","oswind-backup-inspect","oswind-backup-partial","oswind-restore-input","oswind-restore-partial"]
+    let mediaActivity:MediaAdmissionLease?
     let tree: BackupFileTree
     let url: URL
     private let parent: Int32
@@ -29,11 +30,15 @@ final class BackupWorkspace {
     private let controlInode: UInt64
     private let lease: Int32
     private var published = false
-    init(in parentURL: URL = FileManager.default.temporaryDirectory, label: String = "oswind-backup") throws {
+    init(in parentURL: URL = FileManager.default.temporaryDirectory, label: String = "oswind-backup",mediaActivity:MediaAdmissionLease?=nil,parentIdentity:BackupFileStamp?=nil) throws {
         guard parentURL.isFileURL, !parentURL.path.utf8.contains(0), try BackupFileTree.components(label).count == 1 else { throw BackupFileError.invalid("Invalid backup workspace parent") }
         guard let canonical = realpath(parentURL.path,nil) else { throw BackupFileError.invalid("Backup destination directory is unavailable") }; defer { free(canonical) }
         let parentPath = String(cString:canonical), directory = open(canonical,O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
         guard directory >= 0 else { throw BackupFileError.io("Cannot open backup workspace parent") }
+        if let parentIdentity {
+            var current=stat();guard fstat(directory,&current)==0,current.st_dev==parentIdentity.device,current.st_ino==parentIdentity.inode else {close(directory);throw BackupFileError.changed("Workspace parent changed before creation")}
+        }
+        self.mediaActivity=mediaActivity
         let id = UUID().uuidString.lowercased(), member = "."+label+"-"+id, companion = ".oswind-job-"+id
         guard mkdirat(directory,member,0o700)==0 else { close(directory); throw BackupFileError.io("Cannot create private backup workspace") }
         let file = openat(directory,member,O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
@@ -67,7 +72,7 @@ final class BackupWorkspace {
         if lstat(destination.path,&metadata)==0 { throw BackupFileError.invalid("Choose a new destination; an existing file or folder will not be overwritten") }
         guard errno==ENOENT else { throw BackupFileError.io("Cannot inspect backup destination") }
     }
-    deinit { try? cleanup(); flock(lease,LOCK_UN); close(lease); close(parent) }
+    deinit { try? cleanup(); mediaActivity?.release(); flock(lease,LOCK_UN); close(lease); close(parent) }
     func cleanup() throws {
         if !published {
             var current = stat()
@@ -98,9 +103,10 @@ final class BackupWorkspace {
     /// Only recognized, private, unlocked jobs whose creator is gone qualify.
     /// A published payload is absent at its old name, so only its lease is removed.
     @discardableResult static func cleanupAbandoned(in parentURL: URL = FileManager.default.temporaryDirectory,
-                                                    labels: [String] = operationLabels) throws -> Int {
+                                                    labels: [String] = operationLabels,expectedParent:BackupFileStamp?=nil) throws -> Int {
         guard try labels.allSatisfy({ try BackupFileTree.components($0).count==1 }) else { throw BackupFileError.invalid("Invalid backup cleanup label") }
         let parentTree = try BackupFileTree(root:parentURL); var removed = 0
+        if let expectedParent {let actual=try parentTree.identity();guard actual.device==expectedParent.device,actual.inode==expectedParent.inode else {throw BackupFileError.changed("Workspace cleanup parent changed")}}
         try parentTree.forEachEntry(ignoreInvalidNames:true) { name in
             try Task.checkCancellation()
             guard name.hasPrefix(".oswind-job-"),let uuid = UUID(uuidString:String(name.dropFirst(12))),name==".oswind-job-"+uuid.uuidString.lowercased() else { return }

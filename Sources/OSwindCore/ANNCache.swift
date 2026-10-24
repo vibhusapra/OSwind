@@ -54,6 +54,7 @@ final class ANNCache: @unchecked Sendable {
     private var requested = ""
     private var activeIdentity = ""
     private var automaticBuildPaused = false
+    private var closed = false
     private var attemptedLoad = false
     private var retryAfter = Date.distantPast
     private var currentStatus = SearchIndexStatus(state:"idle",message:"Search index has not been prepared",indexed:0,total:0,sequence:0)
@@ -144,6 +145,7 @@ final class ANNCache: @unchecked Sendable {
     }
     @discardableResult func prepare(modelID: String, dimensions: Int, count: Int, force: Bool = false, allowLowPower: Bool = false, replayAll: Bool = false, resumeBuild: Bool = false) -> SearchIndexStatus {
         lock.lock(); defer { lock.unlock() }
+        guard !closed else {return currentStatus}
         let request = "\(modelID)\n\(dimensions)"
         if requested != request { generation = UUID(); job?.cancel(); job = nil; session = nil; attemptedLoad = false; requested = request; retryAfter = .distantPast; automaticBuildPaused = false }
         if resumeBuild { automaticBuildPaused = false; retryAfter = .distantPast }
@@ -165,7 +167,7 @@ final class ANNCache: @unchecked Sendable {
             if (force || self.session == nil), job == nil, force || Date() >= retryAfter {
                 if automaticBuildPaused { currentStatus = SearchIndexStatus(state:"paused",message:"Fast index preparation paused; use Prepare fast retrieval to resume",indexed:0,total:count,sequence:0) }
                 else if let reason = IndexPowerPolicy.blockedReason(allowLowPower:allowLowPower) { currentStatus = SearchIndexStatus(state:"deferred",message:reason,indexed:0,total:count,sequence:0) }
-                else { startBuild(modelID:modelID,dimensions:dimensions,total:count,identity:state.identity,allowLowPower:allowLowPower) }
+                else { try startBuild(modelID:modelID,dimensions:dimensions,total:count,identity:state.identity,allowLowPower:allowLowPower) }
             }
         } catch is CancellationError {
             attemptedLoad = false; retryAfter = .distantPast
@@ -176,11 +178,15 @@ final class ANNCache: @unchecked Sendable {
         }
         return currentStatus
     }
-    private func startBuild(modelID: String, dimensions: Int, total: Int, identity: String, allowLowPower: Bool) {
+    private func startBuild(modelID: String, dimensions: Int, total: Int, identity: String, allowLowPower: Bool) throws {
+        let rootIdentity=try BackupFileTree(root:root).identity()
         let token = generation, root = self.root
         currentStatus = SearchIndexStatus(state:"building",message:"Building fast search index",indexed:0,total:total,sequence:0)
         job = Task.detached(priority:.utility) { [self] in
             do {
+                let activity=try MediaAdmissionLease.acquire(root:root,exclusive:false,expectedRoot:rootIdentity)
+                defer {activity.release()}
+                try Task.checkCancellation()
                 try ensureDirectory()
                 let source = try VectorIndexSource(root:root,modelID:modelID,dimensions:dimensions), initial = try source.state()
                 guard initial.identity == identity else { throw CancellationError() }
@@ -233,7 +239,7 @@ final class ANNCache: @unchecked Sendable {
     }
     func checkpointIfIdle(allowLowPower: Bool = false) throws {
         lock.lock(); defer { lock.unlock() }
-        guard job == nil, let session, IndexPowerPolicy.blockedReason(allowLowPower:allowLowPower) == nil, Date().timeIntervalSince(session.lastQuery) >= 30, Date().timeIntervalSince(session.lastCheckpoint) >= 60 else { return }
+        guard !closed, job == nil, let session, IndexPowerPolicy.blockedReason(allowLowPower:allowLowPower) == nil, Date().timeIntervalSince(session.lastQuery) >= 30, Date().timeIntervalSince(session.lastCheckpoint) >= 60 else { return }
         try catchUp(session,deadline:Date().addingTimeInterval(0.15))
         if session.sequence > session.checkpointSequence { try checkpoint(session) }
     }
@@ -242,5 +248,6 @@ final class ANNCache: @unchecked Sendable {
         else { DispatchQueue.global(qos:.utility).async { [weak self] in self?.cancelSynchronously(pauseAutomatic:pauseAutomatic) } }
     }
     private func cancelSynchronously(pauseAutomatic: Bool) { lock.lock(); if pauseAutomatic { automaticBuildPaused = true }; let task = job; lock.unlock(); task?.cancel() }
+    func stopForClose() {lock.lock();defer {lock.unlock()};closed=true;generation=UUID();job?.cancel();job=nil;session=nil;currentStatus=SearchIndexStatus(state:"closed",message:"Library connection closed",indexed:0,total:0,sequence:0)}
     func reset() { lock.lock(); defer { lock.unlock() }; generation = UUID(); job?.cancel(); job = nil; session = nil; requested = ""; activeIdentity = ""; attemptedLoad = false; retryAfter = .distantPast; currentStatus = SearchIndexStatus(state:"idle",message:"Search cache cleared",indexed:0,total:0,sequence:0) }
 }
