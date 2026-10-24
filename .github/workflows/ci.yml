@@ -58,6 +58,10 @@ jobs:
         run: |
           python3 scripts/domain-privacy-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-domain-privacy"
           cp "$RUNNER_TEMP/oswind-domain-privacy/report.json" .artifacts/domain-privacy-ci.json
+      - name: Verify capture area compatibility and quiet portability
+        run: |
+          python3 scripts/capture-region-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-capture-regions"
+          cp "$RUNNER_TEMP/oswind-capture-regions/report.json" .artifacts/capture-regions-ci.json
       - name: Exercise complete backup, restore and interruption recovery
         run: python3 scripts/backup-smoke.py .build/release/oswindctl --interruptions --output .artifacts/backup-process-ci.json
       - name: Exercise audio normalization, timestamp persistence and privacy
@@ -102,7 +106,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 19
+          assert report['count'] == 1000 and report['schema_version'] == 20
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes

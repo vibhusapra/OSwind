@@ -75,6 +75,17 @@ import OSwindCore
             size = NSSize(width:760,height:800); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
         } else if model.section == "SettingsAudio" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Audio").environmentObject(model))
+        } else if model.section == "SnapshotRegions" || model.section == "SnapshotDisplayRegions" {
+            let displayMode=model.section=="SnapshotDisplayRegions"
+            let first="11111111-1111-4111-8111-111111111111",second="22222222-2222-4222-8222-222222222222"
+            model.settings.snapshotRegions.focusedWindowCrop=SnapshotRegion(x:0.1,y:0.15,width:0.7,height:0.65)
+            if displayMode {model.settings.snapshotRegions.selectedDisplays=[first];model.settings.snapshotRegions.displayCrops[first]=SnapshotRegion(x:0.1,y:0.15,width:0.7,height:0.65)}
+            size=NSSize(width:760,height:displayMode ? 640:470)
+            content=AnyView(VStack(alignment:.leading,spacing:20) {
+                Text(displayMode ? "Choose your displays.":"Remember just this region.").font(.title2.weight(.medium))
+                SnapshotRegionsView(configuration:Binding(get:{model.settings.snapshotRegions},set:{model.settings.snapshotRegions=$0}),displayMode:displayMode,replay:true,displays:[.init(id:first,name:"Built-in display · sample",size:CGSize(width:1512,height:982)),.init(id:second,name:"Studio display · sample",size:CGSize(width:2560,height:1440))])
+                Spacer(minLength:0)
+            }.padding(28))
         } else if model.section == "SettingsCapture" || model.section == "SettingsPrivacy" {
             size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:model.section == "SettingsCapture" ? "Capture":"Privacy").environmentObject(model))
         } else if model.section == "SettingsData" {

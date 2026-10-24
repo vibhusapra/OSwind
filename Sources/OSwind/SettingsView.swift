@@ -34,16 +34,20 @@ struct SettingsView: View {
         .alert("Delete all local memories?",isPresented:$deleteConfirm) {Button("Cancel",role:.cancel) {};Button("Delete everything",role:.destructive) {m.wipeLocalLibrary()}} message: {Text("Deletes local sources, notes, recaps, routines, conversations and retained screenshots, replay and audio. Capture, API access and scheduling stop. Exports, backups, settings, downloaded models and saved provider keys remain. File cleanup failures stay available to retry.")}
 
     }
+    private var replayCaptureActive:Bool {m.settings.visualCaptureMode == .replay && !m.settings.allDisplays && m.settings.snapshotRegions.focusedWindowCrop==nil && m.settings.snapshotRegions.valid}
     private var capture: some View {
         Group {
             Section("Capture profile") {
                 Picker("Visual memory",selection:$m.settings.visualCaptureMode) { Text("Snapshots").tag(VisualCaptureMode.snapshots); Text("Replay · HEVC clips").tag(VisualCaptureMode.replay) }
-                Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(m.settings.visualCaptureMode == .replay ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }
-                Text(m.settings.visualCaptureMode == .replay ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
-                Toggle("Capture all displays",isOn:$m.settings.allDisplays)
-                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "All-display replay is not available yet; this combination uses snapshots. Turn off all displays for replay." : "Default: focused window only. Full-display mode masks recognized browser apps, excluded apps and any app with an excluded window title. Safe windows of the same app are also masked; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
+                Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(replayCaptureActive ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }
+                Text(replayCaptureActive ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
+                Toggle("Capture displays instead of the focused window",isOn:$m.settings.allDisplays)
+                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "Display recording uses snapshots. Turn off display capture and clear the window crop for replay." : "Default: focused window only. Full-display mode masks recognized browser apps, excluded apps and any app with an excluded window title. Safe windows of the same app are also masked; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Resume capture when OSwind opens",isOn:$m.settings.captureOnLaunch)
                 Toggle("Open at login",isOn:Binding(get:{SMAppService.mainApp.status == .enabled},set:{m.login($0)}))
+            }
+            Section("Capture area") {
+                SnapshotRegionsView(configuration:$m.settings.snapshotRegions,displayMode:m.settings.allDisplays,replay:m.settings.visualCaptureMode == .replay)
             }
             Section("macOS access") {
                 permissionRow("Screen Recording",ready:CGPreflightScreenCaptureAccess(),detail:"Required to capture screen pixels and system audio.",url:"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")

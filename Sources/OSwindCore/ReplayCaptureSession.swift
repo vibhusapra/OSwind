@@ -57,7 +57,7 @@ import Vision
     func waitUntilStopped() async {for task in Array(retiring.values) {await task.value}}
     private static func key(_ context:WindowContext)->String {[String(context.pid),context.bundle,context.title,context.url ?? "",context.bounds.map {NSStringFromRect($0)} ?? ""].joined(separator:"\u{0}")}
     private func eligible() async ->WindowContext? {
-        guard !stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),(targetBundleID != nil || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120) else {return nil}
+        guard settings.snapshotRegions.valid,settings.snapshotRegions.focusedWindowCrop==nil,!stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),(targetBundleID != nil || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120) else {return nil}
         let result=await contextReads.read(targetBundleID)
         guard !stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),let context=result,
               AccessibilityContext.identityCurrent(context,targetBundleID:targetBundleID),!context.secure,context.bundle != Bundle.main.bundleIdentifier,context.bundle != "com.oswind.desktop",

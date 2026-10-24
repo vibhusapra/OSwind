@@ -3,7 +3,8 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 19
+    // Version20 fences older capture clients that would ignore region settings.
+    public static let schemaVersion = 20
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var managedCloseDirectory:BackupFileTree?
