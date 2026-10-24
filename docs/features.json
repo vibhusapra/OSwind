@@ -108,7 +108,7 @@
     "axis": "Retrieval",
     "feature": "Full-text search + ranking",
     "status": "tested",
-    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. FTS5 BM25, safely quoted individual terms and Unicode; strict multiword phrases, Boolean and regex syntax remain open",
+    "evidence": "Explicit timed-audio previews preserve text/ranking; paired 32\u00d710k-token release query p50 371\u219225 ms, process peak RSS105\u219229MB, not a general/competitor result. Required straight/curly phrases and bounded uppercase Boolean content across keyword/hybrid/semantic/Ask; literal escape, speaker labels, current-question isolation and source-snapshot masks. 385 tests, actual 20k Metal exact-top10 checks; regex/NEAR and native keyboard/help acceptance remain open",
     "references": "Most visual tools"
   },
   {
