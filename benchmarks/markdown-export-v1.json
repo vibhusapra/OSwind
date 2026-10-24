@@ -1,0 +1,241 @@
+{
+  "format": "OSwind portable Markdown export validation v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "78962aee2b9fcb57d7d5fdeb423af0f166c73525",
+  "core_optimization_commit": "dffc180847d6b22a2f3ea10dd7423bac2cbdb8da",
+  "earlier_memory_failure_commit": "db5f0801c04a6acbbf19d19b6ce4026b6b45130d",
+  "schema": 13,
+  "features": [
+    "Whole SQLite snapshot: all permitted source records and conversation turns; no display/search limits",
+    "Stable SHA256 ID filenames; YAML properties, title aliases and portable relative index/source/media links",
+    "Timed speech/speaker labels and sampled visual frame text",
+    "Optional retained media, off by default; current exclusions/redaction and dependent-turn removal",
+    "Private staged publication, no replacement/inside-library destination; nofollow changed-media checks",
+    "Async native progress/Cancel/completion; backup and library-switch controls observe busy state",
+    "SIGINT graceful cancellation and killed-job lease recovery; no embeddings/model load needed to export"
+  ],
+  "checks": {
+    "full_suite": {
+      "source_commit": "dffc180847d6b22a2f3ea10dd7423bac2cbdb8da",
+      "total": 371,
+      "passed": 366,
+      "skipped_opt_in": 5,
+      "failed": 0
+    },
+    "final_focused": {
+      "source_commit": "78962aee2b9fcb57d7d5fdeb423af0f166c73525",
+      "total": 24,
+      "failed": 0
+    },
+    "focused_thread_sanitizer": {
+      "source_commit": "dffc180847d6b22a2f3ea10dd7423bac2cbdb8da",
+      "total": 17,
+      "failed": 0
+    },
+    "signed_packaged_process_smoke": true,
+    "actual_sigint_exits_130_no_destination": true,
+    "actual_sigkill_cleanup_preserves_source_count": true,
+    "backup_create_restore_interrupt_regression": true,
+    "independent_parser": {
+      "binary_sha256": "bf976aa587ef06836989762e29649caab32b0fe113616fc309917aeca25410f5",
+      "sources": 1,
+      "files_checked": [
+        "index.md",
+        "sources/c503b2dccd66325f1619375b416a1fffc1b0191197c865011762239754b26f3a.md"
+      ],
+      "yaml_title_aliases_tags_roundtrip": true,
+      "commonmark_html_enabled_no_active_external_images_scripts_iframes_or_urls": true,
+      "pathological_130_backtick_fence_fallback_exercised": true,
+      "parser_versions": {
+        "markdown_it": "4.2.0",
+        "PyYAML": "6.0.3"
+      },
+      "scope": "Owned synthetic malicious-looking payload; standalone parser behavior only. No browser content executed or network requests made. Not Obsidian interactive acceptance."
+    },
+    "strict_signature": true,
+    "build_package_installed_zip_bound": true
+  },
+  "native": {
+    "source_commit": "78962ae",
+    "replay_interaction_source_commit": "dffc180847d6b22a2f3ea10dd7423bac2cbdb8da",
+    "native_export": {
+      "conversations": 0,
+      "createdAt": "2026-10-24T00:07:48.431545Z",
+      "excludedMemories": 0,
+      "excludedTurns": 0,
+      "format": "OSwind portable Markdown library",
+      "includeMedia": true,
+      "mediaBytes": 163756,
+      "mediaFiles": 8,
+      "memories": 20004,
+      "sourceSchema": 13,
+      "turns": 0,
+      "version": 1
+    },
+    "source_files_verified": 20004,
+    "relative_links_resolved": 40016,
+    "retained_media_byte_identity_checks": 8,
+    "native_cancellation_output_absent": true,
+    "staging_removed": true,
+    "native_busy_controls_and_library_switch_disabled": true,
+    "native_progress_and_completed_status_observed": true,
+    "earlier_completion_ui_bug_on_dffc180": "Export wrote4sources8media but Settings did not observe nested transfer completion; fixed by observed child view78962ae. Before-fix AX retained.",
+    "replay": {
+      "matching_frame_21_visible_immediately": true,
+      "ocr_boxes_aligned_to_video_image": true,
+      "play_advanced_from_zero": true,
+      "pause_position_seconds": 4.270116333,
+      "paused_position_stable_on_subsequent_observation": true,
+      "end_time_seconds": 5.001666666666667,
+      "visible_end_frame": 23,
+      "restart_position_seconds": 0.300033917,
+      "playback_stopped_by_closing_source": true
+    },
+    "keyboard": "In-app Cmd-K focused search. Global shortcut from owned fixture did not yield a stable enough focus observation to close its acceptance gate; no global-success claim.",
+    "scope": "Actual Cua UI on owned synthetic libraries only, using copies of signed product app. Existing permissions; no normal capture/library, TCC, unlock, external network or account changes. Actual Obsidian interaction not tested."
+  },
+  "performance": {
+    "baseline_2000": {
+      "format": "OSwind synthetic Markdown export scaling v1",
+      "records": 2000,
+      "binary_sha256": "03e573ee9ce50cf385f85a0966dc60601c2737070b45a5e14970370660e62667",
+      "limits": [
+        "One run; uncontrolled caches and concurrent machine activity",
+        "Generated English text, no media, chats, models or natural desktop content",
+        "Process RSS includes store open and SQLite snapshot; excludes harness",
+        "No power, population tail or competitor result"
+      ],
+      "database_bytes": 26337280,
+      "wall_seconds": 1.740358249982819,
+      "peak_rss_bytes": 241008640,
+      "result": {
+        "conversations": 0,
+        "createdAt": "2026-10-23T23:56:54.062903Z",
+        "excludedMemories": 0,
+        "excludedTurns": 0,
+        "format": "OSwind portable Markdown library",
+        "includeMedia": false,
+        "mediaBytes": 0,
+        "mediaFiles": 0,
+        "memories": 2000,
+        "sourceSchema": 13,
+        "turns": 0,
+        "version": 1
+      },
+      "all_record_identity_checks_passed": 2000,
+      "export_bytes": 7812979,
+      "passed": true
+    },
+    "baseline_20000": {
+      "format": "OSwind synthetic Markdown export scaling v1",
+      "records": 20000,
+      "binary_sha256": "03e573ee9ce50cf385f85a0966dc60601c2737070b45a5e14970370660e62667",
+      "limits": [
+        "One run; uncontrolled caches and concurrent machine activity",
+        "Generated English text, no media, chats, models or natural desktop content",
+        "Process RSS includes store open and SQLite snapshot; excludes harness",
+        "No power, population tail or competitor result"
+      ],
+      "database_bytes": 260546560,
+      "wall_seconds": 17.24074887507595,
+      "peak_rss_bytes": 2187788288,
+      "result": {
+        "conversations": 0,
+        "createdAt": "2026-10-23T23:56:59.095014Z",
+        "excludedMemories": 0,
+        "excludedTurns": 0,
+        "format": "OSwind portable Markdown library",
+        "includeMedia": false,
+        "mediaBytes": 0,
+        "mediaFiles": 0,
+        "memories": 20000,
+        "sourceSchema": 13,
+        "turns": 0,
+        "version": 1
+      },
+      "all_record_identity_checks_passed": 20000,
+      "export_bytes": 78000981,
+      "passed": true
+    },
+    "corrected_2000": {
+      "format": "OSwind synthetic Markdown export scaling v1",
+      "records": 2000,
+      "binary_sha256": "bf976aa587ef06836989762e29649caab32b0fe113616fc309917aeca25410f5",
+      "limits": [
+        "One run; uncontrolled caches and concurrent machine activity",
+        "Generated English text, no media, chats, models or natural desktop content",
+        "Process RSS includes store open and SQLite snapshot; excludes harness",
+        "No power, population tail or competitor result"
+      ],
+      "database_bytes": 26337280,
+      "wall_seconds": 1.5769463749602437,
+      "peak_rss_bytes": 51822592,
+      "result": {
+        "conversations": 0,
+        "createdAt": "2026-10-23T23:59:54.386527Z",
+        "excludedMemories": 0,
+        "excludedTurns": 0,
+        "format": "OSwind portable Markdown library",
+        "includeMedia": false,
+        "mediaBytes": 0,
+        "mediaFiles": 0,
+        "memories": 2000,
+        "sourceSchema": 13,
+        "turns": 0,
+        "version": 1
+      },
+      "all_record_identity_checks_passed": 2000,
+      "export_bytes": 7800979,
+      "passed": true
+    },
+    "corrected_20000": {
+      "format": "OSwind synthetic Markdown export scaling v1",
+      "records": 20000,
+      "binary_sha256": "bf976aa587ef06836989762e29649caab32b0fe113616fc309917aeca25410f5",
+      "limits": [
+        "One run; uncontrolled caches and concurrent machine activity",
+        "Generated English text, no media, chats, models or natural desktop content",
+        "Process RSS includes store open and SQLite snapshot; excludes harness",
+        "No power, population tail or competitor result"
+      ],
+      "database_bytes": 260546560,
+      "wall_seconds": 15.53574537509121,
+      "peak_rss_bytes": 112541696,
+      "result": {
+        "conversations": 0,
+        "createdAt": "2026-10-23T23:59:58.725564Z",
+        "excludedMemories": 0,
+        "excludedTurns": 0,
+        "format": "OSwind portable Markdown library",
+        "includeMedia": false,
+        "mediaBytes": 0,
+        "mediaFiles": 0,
+        "memories": 20000,
+        "sourceSchema": 13,
+        "turns": 0,
+        "version": 1
+      },
+      "all_record_identity_checks_passed": 20000,
+      "export_bytes": 78040981,
+      "passed": true
+    },
+    "retained_failure": "First 20k export peaked at 2.04 GiB despite correct files. Foundation temporaries accumulated in the long worker. Corrected per-record/turn pools plus removal of unused CLI embedding model reduced measured peak to 107.33 MiB. These changes were not isolated individually.",
+    "limits": [
+      "Single generated English-text run per size; uncontrolled caches/concurrent component soak and downloads",
+      "CLI peak RSS includes store open and database snapshot, excludes fixture harness and native app",
+      "No large-media/real-library/Obsidian/competitor/power result; no constant-memory or top-three claim"
+    ]
+  },
+  "installed_binaries": {
+    "OSwind": "6029277e734b9aaedc614052176b68ca99709198f08a499d22dcee532d2f4f07",
+    "oswindctl": "bf976aa587ef06836989762e29649caab32b0fe113616fc309917aeca25410f5"
+  },
+  "zip_sha256": "6a69eaeec2256b5db4ee5c00cbf064447249937d48668dab9b2688a2446461b1",
+  "limits": [
+    "Independent unencrypted exports; later source/privacy changes never rewrite existing exports",
+    "Missing/changed retained media fails the whole operation; retry or text only",
+    "Opaque filenames with title aliases/index; custom vault layouts, incremental sync and Obsidian plugin absent",
+    "Source 128 MiB bound; scratch SQLite snapshot can include large vectors despite omitting them from output",
+    "Actual Obsidian interaction, full keyboard/VoiceOver/save-panel failure matrix, global shortcut and broad device/reliability/power gates open"
+  ]
+}

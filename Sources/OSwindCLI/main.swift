@@ -66,6 +66,7 @@ do {
           backup inspect PATH            Verify a complete .oswindbackup package
           backup restore PATH --to DIR   Restore into a new, quiet library
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
+          export-markdown NEW_DIR [--include-media]  Export portable Markdown sources and conversations
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           diarize PATH --speaker-model DIR [--repetitions N] [--output NEW_JSON]  Anonymous raw timeline, no library write
@@ -102,6 +103,13 @@ do {
             do {try encoded(await runNativeModelCLI(kind,cache:cache,verifyOnly:operation=="verify"))}
             catch is CancellationError {FileHandle.standardError.write(Data("Model setup cancelled.\n".utf8));exit(130)}
         }
+    } else if command == "export-markdown" {
+        guard args.filter({$0 == "--include-media"}).count <= 1 else { throw OSwindError.invalid("Use --include-media only once") }
+        let media = args.contains("--include-media"); args.removeAll {$0 == "--include-media"}
+        guard args.count == 1,!args[0].hasPrefix("--") else { throw OSwindError.invalid("Enter a new output folder and optional --include-media") }
+        guard FileManager.default.fileExists(atPath:root.appendingPathComponent("memory.sqlite").path) else { throw OSwindError.invalid("The source library does not exist") }
+        let store = try MemoryStore(root:root), destination = URL(fileURLWithPath:args[0]), policy = AppSettings.load(root:root).privacy, reporter = BackupCLIProgress()
+        try encoded(await runBackupCLI { try MarkdownExport.create(store:store,destination:destination,policy:policy,includeMedia:media,progress:reporter.update) })
     } else if command == "backup" {
         guard let action = args.first else { throw OSwindError.invalid("Use backup create PATH, inspect PATH, restore PATH --to NEW_DIRECTORY, or cleanup") }; args.removeFirst()
         let reporter = BackupCLIProgress()
@@ -354,5 +362,5 @@ do {
         default: throw OSwindError.invalid("Unknown command \(command). Run oswindctl help.")
         }
     }
-} catch is CancellationError { FileHandle.standardError.write(Data("Backup cancelled.\n".utf8)); exit(130) }
+} catch is CancellationError { FileHandle.standardError.write(Data("Operation cancelled.\n".utf8)); exit(130) }
 catch { FileHandle.standardError.write(Data(("OSwind: " + error.localizedDescription + "\n").utf8)); exit(1) }

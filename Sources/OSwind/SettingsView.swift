@@ -206,10 +206,11 @@ struct SettingsView: View {
                 Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Clean up now") { m.maintain() }; Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
             }
+            Section("Markdown & Obsidian") { MarkdownLibraryTransferView(transfer:m.libraryTransfer,store:m.store,policy:m.settings.privacy) }
             Section("Complete backup & restore") { LibraryTransferView(transfer:m.libraryTransfer,store:m.store) }
             Section("This library") {
                 Text(m.store.root.path).font(.system(.caption,design:.monospaced)).textSelection(.enabled)
-                Button("Choose another library…") { NotificationCenter.default.post(name:.oswindChooseLibrary,object:nil) }.disabled(m.libraryTransfer.busy)
+                LibrarySelectionButton(transfer:m.libraryTransfer)
                 if ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"] != nil { Text("Your launcher selects a library with OSWIND_DATA_DIR. It takes priority on the next launch.").font(.caption).foregroundStyle(.secondary) }
             }
             Section("Text interchange") {

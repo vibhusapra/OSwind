@@ -163,7 +163,7 @@
     "packaged_cli_http_mcp_backup_restore_erase_smoke": true,
     "strict_signature": true,
     "build_package_installed_zip_agree": true,
-    "final_native_retest": "Pending: Mac locked before corrected QA app could open. No unlock or permission change attempted."
+    "final_native_retest": "Passed follow-up on dffc180 with unchanged replay UI sources: player first, Frame21 visible, boxes aligned, seek/play/pause/stableclock/endFrame23/restart."
   },
   "installed_binaries": {
     "OSwind": "3e25ae3b48f635d013bb9c9ce411e9b98c59bf1ebe6f72b772868213d9563733",
@@ -172,7 +172,20 @@
   "zip_sha256": "cc15dff54da422d2361b69e88674a5c864fe2bcb5a03a5e9344c7de2f69bb77e",
   "limits": [
     "Synthetic targeted window; no natural desktop, all-display or automatic focus-transition acceptance",
-    "Final corrected visual layout, OCR alignment and native end/restart/pause still require unlocked device",
     "No power, sustained capture or competitor win demonstrated"
-  ]
+  ],
+  "followup_native_acceptance": {
+    "source_commit": "dffc180847d6b22a2f3ea10dd7423bac2cbdb8da",
+    "replay_ui_sources_unchanged_since_fix": true,
+    "matching_frame_21_visible_immediately": true,
+    "ocr_boxes_aligned_to_video_image": true,
+    "play_advanced_from_zero": true,
+    "pause_position_seconds": 4.270116333,
+    "paused_position_stable_on_subsequent_observation": true,
+    "end_time_seconds": 5.001666666666667,
+    "visible_end_frame": 23,
+    "restart_position_seconds": 0.300033917,
+    "playback_stopped_by_closing_source": true,
+    "scope": "Actual Cua on owned12-frame synthetic captured source; existing permissions and unlocked Mac; no normal capture/library. No natural workload or power result."
+  }
 }

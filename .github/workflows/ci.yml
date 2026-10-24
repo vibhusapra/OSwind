@@ -42,6 +42,8 @@ jobs:
         run: python3 scripts/test-reliability-soak.py .build/release/oswindctl
       - name: Verify synthetic visual replay across processes
         run: python3 scripts/visual-replay-smoke.py .build/release/oswindctl
+      - name: Exercise portable Markdown and media export
+        run: python3 scripts/markdown-export-smoke.py .build/release/oswindctl --interruptions
       - name: Exercise scheduled routines and quiet backup restore
         run: python3 scripts/routines-smoke.py .build/release/oswindctl --output .artifacts/routines-ci.json
       - name: Verify long-transcript preview contracts

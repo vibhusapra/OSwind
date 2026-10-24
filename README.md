@@ -32,6 +32,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 - Evidence-only answers without downloads; on-device Apple Intelligence; local Ollama; optional OpenAI-compatible and Anthropic BYOK. Keys live in Keychain. Cloud context is opt-in.
 - Optional microphone and system-audio capture, 30-second bounded chunks, Whisper.cpp or resident Parakeet v3 Core ML transcription, ANE/GPU/CPU policies, timed transcripts, separate source labels and a silence gate. Raw clip retention is opt-in.
 - App/domain/window exclusions, common-secret pattern redaction with raw-image suppression, retention and storage pruning, deletion, JSON export/import.
+- [Whole-library Markdown / Obsidian export](docs/EXPORT.md): complete timed sources, source-linked conversations, optional retained media, current privacy rules, progress and cancellation.
 - Menu bar controls, global search shortcut ⇧⌘Space, pause ⇧⌘P, login item support, setup and permissions UI.
 - Read-only, token-authenticated localhost API; MCP stdio server for trusted local assistants.
 
