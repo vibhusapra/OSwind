@@ -50,7 +50,12 @@ if old:
     assert refusal.returncode!=0 and 'newer OSwind' in refusal.stderr
 # Rejected automatic link stays rejected when project-rule changes require a rescan.
 rejected=sorted(expected)[0];cmd('entity','unlink',project['id'],rejected)
-cmd('entity','edit',project['id'],'--notes','Rebuild after deliberate rule revision')
+# Notes alone preserve completed work and every surviving source link.
+cmd('entity','edit',project['id'],'--notes','Metadata-only update')
+assert cmd('entity','progress')['indexed']==1000 and members()==expected-{rejected}
+# An explicit matching-rule change, rather than a notes edit, requires a rescan.
+cmd('entity','edit',project['id'],'--notes','Rebuild after deliberate rule revision','--aliases','Apollo Launch,ALPHA42,RESCANFIXTURE42')
+assert cmd('entity','progress')['indexed']==0
 cmd('entity','index');assert members()==expected-{rejected}
 # Live MCP exposes the same membership and rejects unknown write parameters.
 process=subprocess.Popen([str(binary),'--data',str(library),'mcp'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
@@ -99,12 +104,12 @@ archive=root/'archive.oswindbackup';restored=root/'restored'
 run('--data',library,'backup','create',archive);run('backup','restore',archive,'--to',restored)
 assert members(restored)==expected-{rejected}
 restored_project=next(r for r in cmd('entity','list',data=restored) if r['id']==project['id'])
-assert restored_project['detail']=='Rebuild after deliberate rule revision' and set(restored_project['aliases'])=={'Apollo Launch','ALPHA42'}
+assert restored_project['detail']=='Rebuild after deliberate rule revision' and set(restored_project['aliases'])=={'Apollo Launch','ALPHA42','RESCANFIXTURE42'}
 assert not json.loads((restored/'settings.json').read_text())['entityAutomaticIndex']
 assert cmd('entity','progress',data=restored)['indexed']==0
 assert cmd('entity','index',data=restored)['indexed']==1000;assert members(restored)==expected-{rejected}
 cmd('delete',sorted(expected)[1],'--json');assert sorted(expected)[1] not in members()
 cmd('wipe','--confirm','DELETE-ALL','--json');assert cmd('entity','list')==[]
-report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old) if old else None,olderClientRefusalChecked=old is not None,harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','correction survives rule-rescan','read-only MCP membership and validation','authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
+report=dict(format='OSwind source-linked entity memory qualification v1',binarySHA256=sha(binary),olderSchema20BinarySHA256=sha(old) if old else None,olderClientRefusalChecked=old is not None,harnessSHA256=sha(pathlib.Path(__file__)),schema=21,passed=True,sources=1000,projectOracleSources=len(expected),projectPrecision=1.0,projectRecall=1.0,automaticSpansVerified=count,firstIndexWallSeconds=first,resumeWallSeconds=resume,observedNLPAndProjectGroups=observed,checks=['exact project alias oracle','UTF16 source anchors','scoped keyword retrieval','metadata-only edit preserves completion and source links','correction survives actual alias-rule rescan','read-only MCP membership and validation','authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal','quiet backup restore retains definitions, aliases and links','restored completion reset','source erasure','full wipe erases curated definitions'],scope='Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim.')
 if old:report['checks'].append('schema20 client refusal')
 (root/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

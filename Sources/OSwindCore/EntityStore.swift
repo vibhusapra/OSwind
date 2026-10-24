@@ -61,7 +61,7 @@ extension MemoryStore {
             if let id=try db.entityID(kind:kind,key:EntityLabel.key(name)) {
                 let oldAliases=try db.entityAliases(id);guard Set(oldAliases.map(EntityLabel.key)).union(supplied.keys).count<=32 else {throw OSwindError.invalid("Use at most 32 aliases")}
                 for (key,label) in supplied {if let owner=try db.entityID(kind:kind,key:key) {guard owner==id else {throw OSwindError.invalid("Alias belongs to another entity")}}else {try db.addEntityAlias(id:id,kind:kind,name:label)}}
-                if kind == .project {try db.bumpEntityRules()}
+                if kind == .project,!Set(supplied.keys).isSubset(of:Set(oldAliases.map(EntityLabel.key))) {try db.bumpEntityRules()}
                 let row=try db.statement("UPDATE memory_entities SET curated=1,detail=CASE WHEN ?='' THEN detail ELSE ? END WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,detail);db.bind(row,2,detail);db.bind(row,3,id);try db.done(row);return id
             }
             let id=UUID().uuidString.lowercased(),row=try db.statement("INSERT INTO memory_entities VALUES(?,?,?,?,1,?)");defer {sqlite3_finalize(row)}
@@ -72,12 +72,16 @@ extension MemoryStore {
     public func editEntity(_ id:String,name:String,detail:String,aliases:[String])throws {
         let name=try EntityLabel.clean(name);var byKey=[String:String]();for value in aliases+[name] {let label=try EntityLabel.clean(value);byKey[EntityLabel.key(label)]=label};let aliases=byKey.values.sorted();guard aliases.count<=32,detail.utf8.count<=8000 else {throw OSwindError.invalid("Use at most 32 aliases and 8 KiB of notes")}
         try entityWrite {db in
-            let kind=try db.entityKind(id)
+            let previous=try db.statement("SELECT kind,name FROM memory_entities WHERE id=?");defer {sqlite3_finalize(previous)};db.bind(previous,1,id)
+            guard sqlite3_step(previous)==SQLITE_ROW,let kind=EntityKind(rawValue:db.text(previous,0)) else {throw OSwindError.invalid("Entity no longer exists")}
+            // Notes and display-only alias edits do not change matching rules.
+            // A primary rename still invalidates prepared work bound to its name.
+            let rulesChanged=try kind == .project && (db.text(previous,1) != name || Set(db.entityAliases(id).map(EntityLabel.key)) != Set(byKey.keys))
             for alias in aliases {if let owner=try db.entityID(kind:kind,key:EntityLabel.key(alias)),owner != id {throw OSwindError.invalid("An alias belongs to another entity; merge explicitly")}}
             let remove=try db.statement("DELETE FROM entity_aliases WHERE entity_id=?");defer {sqlite3_finalize(remove)};db.bind(remove,1,id);try db.done(remove)
             for alias in aliases {try db.addEntityAlias(id:id,kind:kind,name:alias)}
             let row=try db.statement("UPDATE memory_entities SET name=?,detail=?,curated=1 WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);db.bind(row,2,detail);db.bind(row,3,id);try db.done(row)
-            if kind == .project {let clear=try db.statement("DELETE FROM entity_mentions WHERE entity_id=? AND origin='automatic'");defer {sqlite3_finalize(clear)};db.bind(clear,1,id);try db.done(clear);try db.bumpEntityRules()}
+            if rulesChanged {let clear=try db.statement("DELETE FROM entity_mentions WHERE entity_id=? AND origin='automatic'");defer {sqlite3_finalize(clear)};db.bind(clear,1,id);try db.done(clear);try db.bumpEntityRules()}
         }
     }
     /// Curator-directed same-kind merge. No model infers that two people are identical.
