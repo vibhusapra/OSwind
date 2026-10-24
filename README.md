@@ -1,8 +1,10 @@
 # OSwind
 
+[Activity Calendar](docs/ACTIVITY-CALENDAR.md) adds complete month heatmaps, hourly source counts and exact date/hour search and Ask scopes. Local-time DST boundaries, app/type/saved filters and the same metadata counts are available through CLI, HTTP and MCP. Counts describe saved sources, not recorded duration or productivity. The [calendar candidate](benchmarks/activity-calendar-v1.json) has 670 distinct passing cases, 169 TSan passes and nine signed process groups; physical interaction and energy acceptance remain open.
+
 Source schema20 adds [persistent display selection and snapshot crop regions](docs/CAPTURE-REGIONS.md): selected display UUIDs, window/display percentage crops, no substitution for disconnected screens, and explicit refusal of wider replay fallbacks. Empty selections idle before app-context reads; malformed saved areas block capture. The compatibility fence prevents older clients that ignore crops from opening the library. Snapshot/replay accessibility traversal is [bounded and off the UI thread](docs/ACCESSIBILITY-CAPTURE.md).
 
-The latest [qualified capture candidate](benchmarks/capture-regions-v1.json) has **643 distinct passing cases / six remaining opt-in cases**, **142 TSan passes** and **eight signed process groups**, with a separately staged signed package. Physical crop alignment, mixed-DPI/hotplug, native interaction and energy remain acceptance gates; the installed schema17 app is unchanged.
+The earlier [qualified capture candidate](benchmarks/capture-regions-v1.json) has **643 distinct passing cases / six remaining opt-in cases**, **142 TSan passes** and **eight signed process groups**, with a separately staged signed package. Physical crop alignment, mixed-DPI/hotplug, native interaction and energy remain acceptance gates; the installed schema17 app is unchanged.
 
 [Local visual memory](docs/VISUAL-SEARCH.md) indexes retained screenshots and replay frames with validated source/image/frame matches, CLI/HTTP/MCP and native background controls. Optional [SigLIP2 Core ML models](docs/VISUAL-MODELS.md) use pinned public preparation tools, local CPU/GPU qualification and cancellation/retry. The earlier [100-photo/501-query trial](benchmarks/visual-memory-v1.json) reaches 91.62% R@1 and 99.40% R@5 with 14.27/16.10 ms median/p95 queries on M5 Max. This small fixture does not establish desktop relevance or competitor placement.
 
@@ -42,6 +44,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 - [Selective history erasure](docs/HISTORY-ERASURE.md) by time, app, bundle ID and website, with preview guards and retryable retained-media cleanup. [Individual deletion and retention](docs/DELETION.md) also preserve shared files and report partial cleanup.
 - Light / Balanced / Detailed capture profiles, perceptual duplicate suppression, idle/sleep/lock suspension and thermal/low-power backoff.
 - SQLite WAL + FTS5 keyword search, Apple sentence embeddings or optional local GPU Qwen3 embeddings, model-versioned indexes, optional HNSW retrieval with live source validation and hybrid ranking.
+- [Activity calendar](docs/ACTIVITY-CALENDAR.md), with complete daily/hourly counts, exact repeated-hour search scopes and cancellable background refresh.
 - Native timeline, app/date filters, saved memories, notes/tags, query-matched excerpts/highlights, OCR region inspection, source URLs, capture health and storage insights.
 - [Required phrases and Boolean content search](docs/SEARCH-EXPRESSIONS.md) across keyword, semantic, hybrid and Ask, with literal escape and scope-safe follow-ups.
 - Durable local Ask conversations, follow-up subject context, per-turn evidence cards/scope, cancellation, chat deletion and Markdown export. Deleting or revising a source removes chat answers that cited it.
@@ -86,6 +89,7 @@ swift run oswindctl index-search --model qwen3-embedding:0.6b --use-index
 swift run oswindctl eval-retrieval --model qwen3-embedding:0.6b
 swift run oswindctl benchmark --count 1000
 swift run oswindctl benchmark-vectors --count 100000 --indexed --quality-queries 16
+swift run oswindctl activity --month 2024-11 --day 2024-11-03 --time-zone America/New_York
 swift run oswindctl help
 ```
 

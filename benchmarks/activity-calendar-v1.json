@@ -1,0 +1,2176 @@
+{
+  "format": "OSwind complete activity calendar v1",
+  "codeCommit": "7a84bcfe2ade752bd7dafde5cee76d20eb7a9a97",
+  "schema": 20,
+  "hardware": "Apple M5 Max",
+  "os": "26.6.2",
+  "scope": "Synthetic source metadata, civil-time count oracle, actual CLI HTTP MCP processes, owned encrypted volumes and native component renders. Separately staged ad-hoc signed release. No normal history, capture/input/energy or competitor acceptance.",
+  "implementation": {
+    "completeMonthAndHourCounts": true,
+    "countsSourcesNotDurationOrCoverage": true,
+    "gregorianTimeZoneAndFirstWeekday": true,
+    "dstRepeatedAndSkippedDates": true,
+    "exactUTCNativeSearchAndAskScope": true,
+    "metadataOnlyNoRelevanceQuery": true,
+    "singleStatementReadSnapshot": true,
+    "noModelOrMediaDependency": true,
+    "tagPredicateReadsJSONPayload": true,
+    "sameSchema20DerivedIndexes": true,
+    "sourceHydrationRequired": false,
+    "visibleActiveUnlockedRevisionMonitorSeconds": 3,
+    "lowPowerMonitorSeconds": 10,
+    "captureInvalidationsCoalesced": true,
+    "scopeLibraryErasureAndVaultCancellation": true
+  },
+  "tests": {
+    "fullNormal": {
+      "total": 676,
+      "passed": 648,
+      "optInSkipped": 28,
+      "failures": 0
+    },
+    "nativeModelAndVault": {
+      "passed": 140,
+      "additionalPreviouslySkipped": 22,
+      "failures": 0
+    },
+    "distinctPassingCasesAcrossRuns": 670,
+    "remainingOptInSkips": 6,
+    "threadSanitizer": {
+      "passed": 169,
+      "failures": 0,
+      "racesReported": 0
+    }
+  },
+  "signedPackage": {
+    "scope": "Separately staged schema20 activity calendar source; no installation or native capture/input acceptance",
+    "codeCommit": "7a84bcfe2ade752bd7dafde5cee76d20eb7a9a97",
+    "schema": 20,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "ba9673948da124a3666818230d0d67b5c913ac725fe8fd4d90a5929499c34732",
+        "signedSHA256": "5145bbfd4c63f0c9125d2a5d351d92ecd6ad5a692247beb067f12408997fc505",
+        "normalizedPayloadSHA256": "cc1c40870e189072a90b3de75b0cf47678c0f599d89f74a7666f4b82090c78d3"
+      },
+      "oswindctl": {
+        "rawSHA256": "b233f0811a233378c298d40df99fe52f34d7369057d2421ab768bc22cce593e6",
+        "signedSHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+        "normalizedPayloadSHA256": "0d9f6bc9fab1cc1fcb9cfe21599bcb85c404884b5b97033a546a6753f07ca629"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "9bbf1ce7ece2399a928516aef3252e1a97ef2194580924baa549cd5be3166058",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "59cb503316ae43a1cd9fd8e03a5ba4a9762ee4460a022f6311ff08fcc79b88e7",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalQualificationRuns": [
+    {
+      "name": "native-optin-v1",
+      "exitCode": 0,
+      "wallSeconds": 126.15597141697071
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 45.543393958127126
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.5660307919606566
+    },
+    {
+      "name": "calendar-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.813153292052448
+    },
+    {
+      "name": "domain-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.29225204116664827
+    },
+    {
+      "name": "replay-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.5282361670397222
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.38088487507775426
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.057092583971098
+    },
+    {
+      "name": "capture-region-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.35119141708128154
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 14.083159416913986
+    },
+    {
+      "name": "wipe-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.6932528750039637
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.879706250037998
+    },
+    {
+      "name": "release-bench-indexed-100k-year-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.365096958121285
+    },
+    {
+      "name": "release-bench-indexed-100k-month-v1",
+      "exitCode": 0,
+      "wallSeconds": 6.425378582905978
+    },
+    {
+      "name": "release-bench-indexed-1m-year-v1",
+      "exitCode": 0,
+      "wallSeconds": 7.192138749873266
+    },
+    {
+      "name": "tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 64.34835512493737
+    }
+  ],
+  "calendarProcess": {
+    "scope": "Owned synthetic imports and live CLI/HTTP/MCP counts; no capture, native input, energy or competitor claim.",
+    "binarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+    "harnessSHA256": "8233563be88978bcba9134db89f3f3586ea37aa959b61a0f4a9b5dcf402c30ed",
+    "sources": 600,
+    "passed": true,
+    "checks": [
+      "complete counts exceed search caps",
+      "CLI HTTP MCP identical metadata scopes",
+      "repeated clock hour distinct UTC ranges",
+      "23 hour DST day and leap month",
+      "inclusive start exclusive end",
+      "invalid relevance and malformed parameters rejected",
+      "HTTP token origin host guards",
+      "external writer visible to persistent HTTP connection"
+    ]
+  },
+  "releaseArchiveBenchmarks": {
+    "indexed-100k-year-v1": {
+      "format": "OSwind activity calendar synthetic benchmark v1",
+      "fixture": {
+        "format": "OSwind owned activity benchmark fixture v1",
+        "sources": 100000,
+        "textBytes": 1024,
+        "distribution": "year",
+        "seed": 1729,
+        "normalHistory": false
+      },
+      "binarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+      "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+      "independentPythonZoneinfoOraclePass": true,
+      "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+      "cases": {
+        "all": {
+          "matchedMonthSources": 8447,
+          "measurements": [
+            {
+              "aggregationMS": 2.64625,
+              "wallMS": 59.981165919452906,
+              "processPeakRSSBytes": 19054592
+            },
+            {
+              "aggregationMS": 1.525083,
+              "wallMS": 48.29070810228586,
+              "processPeakRSSBytes": 19005440
+            },
+            {
+              "aggregationMS": 1.508875,
+              "wallMS": 47.202917048707604,
+              "processPeakRSSBytes": 19005440
+            },
+            {
+              "aggregationMS": 1.558208,
+              "wallMS": 47.221167013049126,
+              "processPeakRSSBytes": 19038208
+            },
+            {
+              "aggregationMS": 1.45925,
+              "wallMS": 47.131208004429936,
+              "processPeakRSSBytes": 19005440
+            },
+            {
+              "aggregationMS": 1.478041,
+              "wallMS": 46.46600014530122,
+              "processPeakRSSBytes": 19021824
+            },
+            {
+              "aggregationMS": 1.54775,
+              "wallMS": 47.410500003024936,
+              "processPeakRSSBytes": 19005440
+            }
+          ],
+          "medianAggregationMS": 1.525083,
+          "p95AggregationMS": 2.64625
+        },
+        "application": {
+          "matchedMonthSources": 2816,
+          "measurements": [
+            {
+              "aggregationMS": 1.840875,
+              "wallMS": 49.09720807336271,
+              "processPeakRSSBytes": 18743296
+            },
+            {
+              "aggregationMS": 0.95475,
+              "wallMS": 47.876917058601975,
+              "processPeakRSSBytes": 18726912
+            },
+            {
+              "aggregationMS": 0.963833,
+              "wallMS": 47.033957904204726,
+              "processPeakRSSBytes": 18726912
+            },
+            {
+              "aggregationMS": 1.076542,
+              "wallMS": 47.80845809727907,
+              "processPeakRSSBytes": 18726912
+            },
+            {
+              "aggregationMS": 0.944,
+              "wallMS": 47.655917005613446,
+              "processPeakRSSBytes": 18743296
+            },
+            {
+              "aggregationMS": 0.935292,
+              "wallMS": 47.1391670871526,
+              "processPeakRSSBytes": 18792448
+            },
+            {
+              "aggregationMS": 0.964084,
+              "wallMS": 46.9881659373641,
+              "processPeakRSSBytes": 18743296
+            }
+          ],
+          "medianAggregationMS": 0.963833,
+          "p95AggregationMS": 1.840875
+        },
+        "kind": {
+          "matchedMonthSources": 2109,
+          "measurements": [
+            {
+              "aggregationMS": 1.3085,
+              "wallMS": 47.27179207839072,
+              "processPeakRSSBytes": 18710528
+            },
+            {
+              "aggregationMS": 0.885916,
+              "wallMS": 47.51504096202552,
+              "processPeakRSSBytes": 18726912
+            },
+            {
+              "aggregationMS": 0.884292,
+              "wallMS": 46.53937486000359,
+              "processPeakRSSBytes": 18710528
+            },
+            {
+              "aggregationMS": 0.851625,
+              "wallMS": 47.0228751655668,
+              "processPeakRSSBytes": 18743296
+            },
+            {
+              "aggregationMS": 0.867833,
+              "wallMS": 47.08120785653591,
+              "processPeakRSSBytes": 18726912
+            },
+            {
+              "aggregationMS": 0.829917,
+              "wallMS": 46.99479113332927,
+              "processPeakRSSBytes": 18710528
+            },
+            {
+              "aggregationMS": 0.898708,
+              "wallMS": 48.1490409001708,
+              "processPeakRSSBytes": 18710528
+            }
+          ],
+          "medianAggregationMS": 0.884292,
+          "p95AggregationMS": 1.3085
+        },
+        "saved": {
+          "matchedMonthSources": 1209,
+          "measurements": [
+            {
+              "aggregationMS": 1.132625,
+              "wallMS": 48.106583999469876,
+              "processPeakRSSBytes": 18595840
+            },
+            {
+              "aggregationMS": 0.785958,
+              "wallMS": 47.38020780496299,
+              "processPeakRSSBytes": 18595840
+            },
+            {
+              "aggregationMS": 0.769417,
+              "wallMS": 46.930791810154915,
+              "processPeakRSSBytes": 18612224
+            },
+            {
+              "aggregationMS": 0.772209,
+              "wallMS": 46.91766598261893,
+              "processPeakRSSBytes": 18595840
+            },
+            {
+              "aggregationMS": 0.754625,
+              "wallMS": 46.84379184618592,
+              "processPeakRSSBytes": 18595840
+            },
+            {
+              "aggregationMS": 0.706334,
+              "wallMS": 45.95983400940895,
+              "processPeakRSSBytes": 18595840
+            },
+            {
+              "aggregationMS": 0.737625,
+              "wallMS": 47.29300015605986,
+              "processPeakRSSBytes": 18612224
+            }
+          ],
+          "medianAggregationMS": 0.769417,
+          "p95AggregationMS": 1.132625
+        },
+        "tag": {
+          "matchedMonthSources": 1690,
+          "measurements": [
+            {
+              "aggregationMS": 149.939583,
+              "wallMS": 197.363292099908,
+              "processPeakRSSBytes": 27574272
+            },
+            {
+              "aggregationMS": 16.303458,
+              "wallMS": 63.1885000038892,
+              "processPeakRSSBytes": 27541504
+            },
+            {
+              "aggregationMS": 16.595709,
+              "wallMS": 64.28491603583097,
+              "processPeakRSSBytes": 27541504
+            },
+            {
+              "aggregationMS": 16.8775,
+              "wallMS": 64.61854209192097,
+              "processPeakRSSBytes": 27541504
+            },
+            {
+              "aggregationMS": 16.747084,
+              "wallMS": 62.65262491069734,
+              "processPeakRSSBytes": 27541504
+            },
+            {
+              "aggregationMS": 16.852375,
+              "wallMS": 62.795541947707534,
+              "processPeakRSSBytes": 27574272
+            },
+            {
+              "aggregationMS": 16.491208,
+              "wallMS": 62.25162511691451,
+              "processPeakRSSBytes": 27541504
+            }
+          ],
+          "medianAggregationMS": 16.747084,
+          "p95AggregationMS": 149.939583
+        },
+        "wideTimeBounds": {
+          "matchedMonthSources": 8447,
+          "measurements": [
+            {
+              "aggregationMS": 1.989,
+              "wallMS": 48.77266590483487,
+              "processPeakRSSBytes": 19103744
+            },
+            {
+              "aggregationMS": 1.877708,
+              "wallMS": 47.9710828512907,
+              "processPeakRSSBytes": 19103744
+            },
+            {
+              "aggregationMS": 1.823041,
+              "wallMS": 46.81270895525813,
+              "processPeakRSSBytes": 19103744
+            },
+            {
+              "aggregationMS": 1.848084,
+              "wallMS": 47.545457957312465,
+              "processPeakRSSBytes": 19136512
+            },
+            {
+              "aggregationMS": 1.840583,
+              "wallMS": 48.06812503375113,
+              "processPeakRSSBytes": 19136512
+            },
+            {
+              "aggregationMS": 1.852166,
+              "wallMS": 47.4261250346899,
+              "processPeakRSSBytes": 19103744
+            },
+            {
+              "aggregationMS": 1.895625,
+              "wallMS": 47.61812509968877,
+              "processPeakRSSBytes": 19103744
+            }
+          ],
+          "medianAggregationMS": 1.852166,
+          "p95AggregationMS": 1.989
+        }
+      }
+    },
+    "indexed-100k-month-v1": {
+      "format": "OSwind activity calendar synthetic benchmark v1",
+      "fixture": {
+        "format": "OSwind owned activity benchmark fixture v1",
+        "sources": 100000,
+        "textBytes": 1024,
+        "distribution": "month",
+        "seed": 1729,
+        "normalHistory": false
+      },
+      "binarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+      "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+      "independentPythonZoneinfoOraclePass": true,
+      "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+      "cases": {
+        "all": {
+          "matchedMonthSources": 99329,
+          "measurements": [
+            {
+              "aggregationMS": 45.696416,
+              "wallMS": 101.77937499247491,
+              "processPeakRSSBytes": 26001408
+            },
+            {
+              "aggregationMS": 11.351208,
+              "wallMS": 59.189500054344535,
+              "processPeakRSSBytes": 26034176
+            },
+            {
+              "aggregationMS": 11.61675,
+              "wallMS": 58.710332959890366,
+              "processPeakRSSBytes": 26001408
+            },
+            {
+              "aggregationMS": 11.9035,
+              "wallMS": 58.45887493342161,
+              "processPeakRSSBytes": 26001408
+            },
+            {
+              "aggregationMS": 11.595042,
+              "wallMS": 58.84058400988579,
+              "processPeakRSSBytes": 26034176
+            },
+            {
+              "aggregationMS": 11.754708,
+              "wallMS": 59.283416951075196,
+              "processPeakRSSBytes": 26001408
+            },
+            {
+              "aggregationMS": 11.624417,
+              "wallMS": 58.175374986603856,
+              "processPeakRSSBytes": 26001408
+            }
+          ],
+          "medianAggregationMS": 11.624417,
+          "p95AggregationMS": 45.696416
+        },
+        "application": {
+          "matchedMonthSources": 33111,
+          "measurements": [
+            {
+              "aggregationMS": 20.920583,
+              "wallMS": 67.06849997863173,
+              "processPeakRSSBytes": 20660224
+            },
+            {
+              "aggregationMS": 4.381667,
+              "wallMS": 50.40254211053252,
+              "processPeakRSSBytes": 20660224
+            },
+            {
+              "aggregationMS": 4.331583,
+              "wallMS": 50.22041709162295,
+              "processPeakRSSBytes": 20627456
+            },
+            {
+              "aggregationMS": 4.422042,
+              "wallMS": 50.728209083899856,
+              "processPeakRSSBytes": 20627456
+            },
+            {
+              "aggregationMS": 4.313458,
+              "wallMS": 50.23533292114735,
+              "processPeakRSSBytes": 20627456
+            },
+            {
+              "aggregationMS": 4.368292,
+              "wallMS": 52.68791597336531,
+              "processPeakRSSBytes": 20627456
+            },
+            {
+              "aggregationMS": 4.383084,
+              "wallMS": 50.66012521274388,
+              "processPeakRSSBytes": 20627456
+            }
+          ],
+          "medianAggregationMS": 4.381667,
+          "p95AggregationMS": 20.920583
+        },
+        "kind": {
+          "matchedMonthSources": 24832,
+          "measurements": [
+            {
+              "aggregationMS": 6.850958,
+              "wallMS": 52.87579190917313,
+              "processPeakRSSBytes": 20103168
+            },
+            {
+              "aggregationMS": 3.423,
+              "wallMS": 49.85695891082287,
+              "processPeakRSSBytes": 20054016
+            },
+            {
+              "aggregationMS": 3.49375,
+              "wallMS": 49.97595795430243,
+              "processPeakRSSBytes": 20054016
+            },
+            {
+              "aggregationMS": 3.397209,
+              "wallMS": 50.039583118632436,
+              "processPeakRSSBytes": 20054016
+            },
+            {
+              "aggregationMS": 3.456792,
+              "wallMS": 50.185250118374825,
+              "processPeakRSSBytes": 20070400
+            },
+            {
+              "aggregationMS": 3.38775,
+              "wallMS": 50.20420788787305,
+              "processPeakRSSBytes": 20021248
+            },
+            {
+              "aggregationMS": 3.356,
+              "wallMS": 49.74966589361429,
+              "processPeakRSSBytes": 20070400
+            }
+          ],
+          "medianAggregationMS": 3.423,
+          "p95AggregationMS": 6.850958
+        },
+        "saved": {
+          "matchedMonthSources": 14187,
+          "measurements": [
+            {
+              "aggregationMS": 3.585541,
+              "wallMS": 49.86466700211167,
+              "processPeakRSSBytes": 19333120
+            },
+            {
+              "aggregationMS": 2.14875,
+              "wallMS": 48.461084021255374,
+              "processPeakRSSBytes": 19300352
+            },
+            {
+              "aggregationMS": 2.117292,
+              "wallMS": 48.12379088252783,
+              "processPeakRSSBytes": 19333120
+            },
+            {
+              "aggregationMS": 2.117083,
+              "wallMS": 47.6433748845011,
+              "processPeakRSSBytes": 19300352
+            },
+            {
+              "aggregationMS": 2.223,
+              "wallMS": 47.67749994061887,
+              "processPeakRSSBytes": 19316736
+            },
+            {
+              "aggregationMS": 2.304542,
+              "wallMS": 48.71104098856449,
+              "processPeakRSSBytes": 19333120
+            },
+            {
+              "aggregationMS": 2.216167,
+              "wallMS": 48.832583939656615,
+              "processPeakRSSBytes": 19333120
+            }
+          ],
+          "medianAggregationMS": 2.216167,
+          "p95AggregationMS": 3.585541
+        },
+        "tag": {
+          "matchedMonthSources": 19865,
+          "measurements": [
+            {
+              "aggregationMS": 2666.662375,
+              "wallMS": 2721.978540997952,
+              "processPeakRSSBytes": 28164096
+            },
+            {
+              "aggregationMS": 172.361917,
+              "wallMS": 219.6457909885794,
+              "processPeakRSSBytes": 28131328
+            },
+            {
+              "aggregationMS": 171.024209,
+              "wallMS": 218.3429158758372,
+              "processPeakRSSBytes": 28164096
+            },
+            {
+              "aggregationMS": 173.161417,
+              "wallMS": 220.5446669831872,
+              "processPeakRSSBytes": 28131328
+            },
+            {
+              "aggregationMS": 174.579292,
+              "wallMS": 222.36404195427895,
+              "processPeakRSSBytes": 28131328
+            },
+            {
+              "aggregationMS": 178.100542,
+              "wallMS": 227.82308398745954,
+              "processPeakRSSBytes": 28098560
+            },
+            {
+              "aggregationMS": 173.594084,
+              "wallMS": 222.62408304959536,
+              "processPeakRSSBytes": 28098560
+            }
+          ],
+          "medianAggregationMS": 173.594084,
+          "p95AggregationMS": 2666.662375
+        },
+        "wideTimeBounds": {
+          "matchedMonthSources": 99329,
+          "measurements": [
+            {
+              "aggregationMS": 15.052583,
+              "wallMS": 61.78395915776491,
+              "processPeakRSSBytes": 26116096
+            },
+            {
+              "aggregationMS": 15.261292,
+              "wallMS": 63.115542056038976,
+              "processPeakRSSBytes": 26066944
+            },
+            {
+              "aggregationMS": 15.234834,
+              "wallMS": 62.1930412016809,
+              "processPeakRSSBytes": 26083328
+            },
+            {
+              "aggregationMS": 15.445833,
+              "wallMS": 64.02937485836446,
+              "processPeakRSSBytes": 26083328
+            },
+            {
+              "aggregationMS": 15.147833,
+              "wallMS": 62.79674987308681,
+              "processPeakRSSBytes": 26116096
+            },
+            {
+              "aggregationMS": 15.247792,
+              "wallMS": 63.086333917453885,
+              "processPeakRSSBytes": 26099712
+            },
+            {
+              "aggregationMS": 15.145125,
+              "wallMS": 62.57870909757912,
+              "processPeakRSSBytes": 26083328
+            }
+          ],
+          "medianAggregationMS": 15.234834,
+          "p95AggregationMS": 15.445833
+        }
+      }
+    },
+    "indexed-1m-year-v1": {
+      "format": "OSwind activity calendar synthetic benchmark v1",
+      "fixture": {
+        "format": "OSwind owned activity benchmark fixture v1",
+        "sources": 1000000,
+        "textBytes": 1024,
+        "distribution": "year",
+        "seed": 1729,
+        "normalHistory": false
+      },
+      "binarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+      "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+      "independentPythonZoneinfoOraclePass": true,
+      "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+      "cases": {
+        "all": {
+          "matchedMonthSources": 84574,
+          "measurements": [
+            {
+              "aggregationMS": 29.552666,
+              "wallMS": 81.2508340459317,
+              "processPeakRSSBytes": 25280512
+            },
+            {
+              "aggregationMS": 10.16925,
+              "wallMS": 58.70833294466138,
+              "processPeakRSSBytes": 25247744
+            },
+            {
+              "aggregationMS": 9.854625,
+              "wallMS": 57.30662518180907,
+              "processPeakRSSBytes": 25231360
+            },
+            {
+              "aggregationMS": 9.994083,
+              "wallMS": 56.98087508790195,
+              "processPeakRSSBytes": 25231360
+            },
+            {
+              "aggregationMS": 9.907542,
+              "wallMS": 56.632667081430554,
+              "processPeakRSSBytes": 25264128
+            },
+            {
+              "aggregationMS": 9.754291,
+              "wallMS": 56.79783411324024,
+              "processPeakRSSBytes": 25231360
+            },
+            {
+              "aggregationMS": 9.98025,
+              "wallMS": 56.61562504246831,
+              "processPeakRSSBytes": 25231360
+            }
+          ],
+          "medianAggregationMS": 9.98025,
+          "p95AggregationMS": 29.552666
+        },
+        "application": {
+          "matchedMonthSources": 28199,
+          "measurements": [
+            {
+              "aggregationMS": 12.498625,
+              "wallMS": 60.511874966323376,
+              "processPeakRSSBytes": 20316160
+            },
+            {
+              "aggregationMS": 4.000625,
+              "wallMS": 51.926624961197376,
+              "processPeakRSSBytes": 20332544
+            },
+            {
+              "aggregationMS": 4.06875,
+              "wallMS": 50.99754105322063,
+              "processPeakRSSBytes": 20348928
+            },
+            {
+              "aggregationMS": 3.921917,
+              "wallMS": 52.06591682508588,
+              "processPeakRSSBytes": 20348928
+            },
+            {
+              "aggregationMS": 3.751458,
+              "wallMS": 51.22920800931752,
+              "processPeakRSSBytes": 20316160
+            },
+            {
+              "aggregationMS": 3.917125,
+              "wallMS": 55.42104202322662,
+              "processPeakRSSBytes": 20398080
+            },
+            {
+              "aggregationMS": 3.976292,
+              "wallMS": 51.650458946824074,
+              "processPeakRSSBytes": 20348928
+            }
+          ],
+          "medianAggregationMS": 3.976292,
+          "p95AggregationMS": 12.498625
+        },
+        "kind": {
+          "matchedMonthSources": 21143,
+          "measurements": [
+            {
+              "aggregationMS": 3.543208,
+              "wallMS": 49.752917140722275,
+              "processPeakRSSBytes": 19890176
+            },
+            {
+              "aggregationMS": 3.098,
+              "wallMS": 51.083457889035344,
+              "processPeakRSSBytes": 19873792
+            },
+            {
+              "aggregationMS": 3.070709,
+              "wallMS": 50.2407921012491,
+              "processPeakRSSBytes": 19857408
+            },
+            {
+              "aggregationMS": 2.990375,
+              "wallMS": 50.12887506745756,
+              "processPeakRSSBytes": 19873792
+            },
+            {
+              "aggregationMS": 2.981667,
+              "wallMS": 48.50737494416535,
+              "processPeakRSSBytes": 19857408
+            },
+            {
+              "aggregationMS": 3.066583,
+              "wallMS": 52.726166089996696,
+              "processPeakRSSBytes": 19890176
+            },
+            {
+              "aggregationMS": 3.122583,
+              "wallMS": 51.63350002840161,
+              "processPeakRSSBytes": 19873792
+            }
+          ],
+          "medianAggregationMS": 3.070709,
+          "p95AggregationMS": 3.543208
+        },
+        "saved": {
+          "matchedMonthSources": 12083,
+          "measurements": [
+            {
+              "aggregationMS": 2.53975,
+              "wallMS": 59.79650001972914,
+              "processPeakRSSBytes": 19349504
+            },
+            {
+              "aggregationMS": 1.994167,
+              "wallMS": 49.400500021874905,
+              "processPeakRSSBytes": 19202048
+            },
+            {
+              "aggregationMS": 1.967208,
+              "wallMS": 48.68329199962318,
+              "processPeakRSSBytes": 19218432
+            },
+            {
+              "aggregationMS": 1.976833,
+              "wallMS": 48.43991715461016,
+              "processPeakRSSBytes": 19251200
+            },
+            {
+              "aggregationMS": 1.982084,
+              "wallMS": 48.27366699464619,
+              "processPeakRSSBytes": 19202048
+            },
+            {
+              "aggregationMS": 1.915959,
+              "wallMS": 48.61837485805154,
+              "processPeakRSSBytes": 19251200
+            },
+            {
+              "aggregationMS": 2.021875,
+              "wallMS": 49.1269170306623,
+              "processPeakRSSBytes": 19202048
+            }
+          ],
+          "medianAggregationMS": 1.982084,
+          "p95AggregationMS": 2.53975
+        },
+        "tag": {
+          "matchedMonthSources": 16915,
+          "measurements": [
+            {
+              "aggregationMS": 2968.6555829999998,
+              "wallMS": 3022.52229093574,
+              "processPeakRSSBytes": 28065792
+            },
+            {
+              "aggregationMS": 194.613,
+              "wallMS": 245.23208290338516,
+              "processPeakRSSBytes": 28082176
+            },
+            {
+              "aggregationMS": 201.108583,
+              "wallMS": 250.11366698890924,
+              "processPeakRSSBytes": 28082176
+            },
+            {
+              "aggregationMS": 200.969333,
+              "wallMS": 249.42479119636118,
+              "processPeakRSSBytes": 28065792
+            },
+            {
+              "aggregationMS": 199.958458,
+              "wallMS": 249.43379103206098,
+              "processPeakRSSBytes": 28082176
+            },
+            {
+              "aggregationMS": 197.4545,
+              "wallMS": 247.6206251885742,
+              "processPeakRSSBytes": 28065792
+            },
+            {
+              "aggregationMS": 198.183584,
+              "wallMS": 246.82754091918468,
+              "processPeakRSSBytes": 28049408
+            }
+          ],
+          "medianAggregationMS": 199.958458,
+          "p95AggregationMS": 2968.6555829999998
+        },
+        "wideTimeBounds": {
+          "matchedMonthSources": 84574,
+          "measurements": [
+            {
+              "aggregationMS": 13.136333,
+              "wallMS": 62.75195814669132,
+              "processPeakRSSBytes": 25346048
+            },
+            {
+              "aggregationMS": 13.275458,
+              "wallMS": 61.10629206523299,
+              "processPeakRSSBytes": 25313280
+            },
+            {
+              "aggregationMS": 13.063958,
+              "wallMS": 60.50970801152289,
+              "processPeakRSSBytes": 25346048
+            },
+            {
+              "aggregationMS": 13.152917,
+              "wallMS": 59.62720909155905,
+              "processPeakRSSBytes": 25346048
+            },
+            {
+              "aggregationMS": 13.02375,
+              "wallMS": 60.26020785793662,
+              "processPeakRSSBytes": 25313280
+            },
+            {
+              "aggregationMS": 12.935042,
+              "wallMS": 61.493333196267486,
+              "processPeakRSSBytes": 25313280
+            },
+            {
+              "aggregationMS": 13.09975,
+              "wallMS": 62.21237499266863,
+              "processPeakRSSBytes": 25346048
+            }
+          ],
+          "medianAggregationMS": 13.09975,
+          "p95AggregationMS": 13.275458
+        }
+      }
+    }
+  },
+  "oneTimeIndexOpen": {
+    "scope": "Owned APFS-cloned pre-index archives, one first open and one repeat each; hashing warmed the cache. Includes CLI startup, no controlled cold-start or causal latency claim. Logical source payloads and schema preserved.",
+    "binarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+    "measurements": [
+      {
+        "fixture": "100k-year",
+        "before": {
+          "logicalSourceSHA256": "123b88b936672fab5520d2c933b9a0ab3d0d22978bf6e00c0f94f9577dc4e650",
+          "count": 100000,
+          "schema": 20,
+          "indexes": [],
+          "databaseBytes": 580485120
+        },
+        "after": {
+          "logicalSourceSHA256": "123b88b936672fab5520d2c933b9a0ab3d0d22978bf6e00c0f94f9577dc4e650",
+          "count": 100000,
+          "schema": 20,
+          "indexes": [
+            "memories_favorite_time",
+            "memories_kind_time"
+          ],
+          "databaseBytes": 583069696
+        },
+        "firstOpenWithIndexBuildWallMS": 220.76670895330608,
+        "secondOpenWallMS": 50.93929194845259
+      },
+      {
+        "fixture": "100k-month",
+        "before": {
+          "logicalSourceSHA256": "e8b2027fc011bdd76e631f4b210c77abdef02a77f77e1c3bf191c8f4abb2a45f",
+          "count": 100000,
+          "schema": 20,
+          "indexes": [],
+          "databaseBytes": 580460544
+        },
+        "after": {
+          "logicalSourceSHA256": "e8b2027fc011bdd76e631f4b210c77abdef02a77f77e1c3bf191c8f4abb2a45f",
+          "count": 100000,
+          "schema": 20,
+          "indexes": [
+            "memories_favorite_time",
+            "memories_kind_time"
+          ],
+          "databaseBytes": 583045120
+        },
+        "firstOpenWithIndexBuildWallMS": 214.01945920661092,
+        "secondOpenWallMS": 47.91891691274941
+      },
+      {
+        "fixture": "1m-year",
+        "before": {
+          "logicalSourceSHA256": "8fa1d82b7000bf356a801c396bbf5875cf7413a58463148ba9f26ca088766a74",
+          "count": 1000000,
+          "schema": 20,
+          "indexes": [],
+          "databaseBytes": 5806133248
+        },
+        "after": {
+          "logicalSourceSHA256": "8fa1d82b7000bf356a801c396bbf5875cf7413a58463148ba9f26ca088766a74",
+          "count": 1000000,
+          "schema": 20,
+          "indexes": [
+            "memories_favorite_time",
+            "memories_kind_time"
+          ],
+          "databaseBytes": 5832183808
+        },
+        "firstOpenWithIndexBuildWallMS": 1906.376208877191,
+        "secondOpenWallMS": 47.28137492202222
+      }
+    ],
+    "harnessSHA256": "f5342f29e8abff8a99dbe59f88ad489e37942d11d14aa937e146420e147dbd9a"
+  },
+  "developmentProbes": {
+    "scope": "Retained developmental debug binaries on original pre-index archives and APFS clones; uncontrolled cache/background activity. Exploratory diagnostics, not release timings or causal energy/competitor evidence. Initial smoke harness omitted required bundleID and failed before import; corrected synthetic fixture passes.",
+    "trials": {
+      "100k-year": {
+        "beforeIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 100000,
+            "textBytes": 1024,
+            "distribution": "year",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "1e9f0697267314e104e4177df97c6bc4317ac5f7f5416d85f98ef72e7be2b806",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 8447,
+              "measurements": [
+                {
+                  "aggregationMS": 1.772292,
+                  "wallMS": 53.762542083859444,
+                  "processPeakRSSBytes": 20316160
+                },
+                {
+                  "aggregationMS": 1.629333,
+                  "wallMS": 51.05591705068946,
+                  "processPeakRSSBytes": 20365312
+                },
+                {
+                  "aggregationMS": 1.635125,
+                  "wallMS": 49.9870830681175,
+                  "processPeakRSSBytes": 20348928
+                }
+              ],
+              "medianAggregationMS": 1.635125,
+              "p95AggregationMS": 1.772292
+            },
+            "application": {
+              "matchedMonthSources": 2816,
+              "measurements": [
+                {
+                  "aggregationMS": 0.968542,
+                  "wallMS": 48.38025011122227,
+                  "processPeakRSSBytes": 20070400
+                },
+                {
+                  "aggregationMS": 0.970125,
+                  "wallMS": 49.059417098760605,
+                  "processPeakRSSBytes": 20119552
+                },
+                {
+                  "aggregationMS": 1.041334,
+                  "wallMS": 49.40712498500943,
+                  "processPeakRSSBytes": 20086784
+                }
+              ],
+              "medianAggregationMS": 0.970125,
+              "p95AggregationMS": 1.041334
+            },
+            "kind": {
+              "matchedMonthSources": 2109,
+              "measurements": [
+                {
+                  "aggregationMS": 12.354459,
+                  "wallMS": 61.61995814181864,
+                  "processPeakRSSBytes": 28934144
+                },
+                {
+                  "aggregationMS": 12.066125,
+                  "wallMS": 61.018750071525574,
+                  "processPeakRSSBytes": 28934144
+                },
+                {
+                  "aggregationMS": 12.241458,
+                  "wallMS": 60.87741605006158,
+                  "processPeakRSSBytes": 28934144
+                }
+              ],
+              "medianAggregationMS": 12.241458,
+              "p95AggregationMS": 12.354459
+            },
+            "saved": {
+              "matchedMonthSources": 1209,
+              "measurements": [
+                {
+                  "aggregationMS": 12.751458,
+                  "wallMS": 61.66512495838106,
+                  "processPeakRSSBytes": 28819456
+                },
+                {
+                  "aggregationMS": 11.866917,
+                  "wallMS": 60.95670908689499,
+                  "processPeakRSSBytes": 28835840
+                },
+                {
+                  "aggregationMS": 12.13975,
+                  "wallMS": 61.70958420261741,
+                  "processPeakRSSBytes": 28819456
+                }
+              ],
+              "medianAggregationMS": 12.13975,
+              "p95AggregationMS": 12.751458
+            },
+            "tag": {
+              "matchedMonthSources": 1690,
+              "measurements": [
+                {
+                  "aggregationMS": 16.447375,
+                  "wallMS": 65.2709580026567,
+                  "processPeakRSSBytes": 28901376
+                },
+                {
+                  "aggregationMS": 16.405958,
+                  "wallMS": 65.14987489208579,
+                  "processPeakRSSBytes": 28901376
+                },
+                {
+                  "aggregationMS": 16.497375,
+                  "wallMS": 65.08079217746854,
+                  "processPeakRSSBytes": 28901376
+                }
+              ],
+              "medianAggregationMS": 16.447375,
+              "p95AggregationMS": 16.497375
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 8447,
+              "measurements": [
+                {
+                  "aggregationMS": 2.037,
+                  "wallMS": 50.93012494035065,
+                  "processPeakRSSBytes": 20545536
+                },
+                {
+                  "aggregationMS": 1.992417,
+                  "wallMS": 49.670750042423606,
+                  "processPeakRSSBytes": 20529152
+                },
+                {
+                  "aggregationMS": 2.009792,
+                  "wallMS": 50.056332955136895,
+                  "processPeakRSSBytes": 20545536
+                }
+              ],
+              "medianAggregationMS": 2.009792,
+              "p95AggregationMS": 2.037
+            }
+          }
+        },
+        "afterIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 100000,
+            "textBytes": 1024,
+            "distribution": "year",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "fb48c0744c7af81a83fa5dd728d476c7e731e6909b0fe0b782e75633705a5109",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 8447,
+              "measurements": [
+                {
+                  "aggregationMS": 1.581208,
+                  "wallMS": 1000.4095421172678,
+                  "processPeakRSSBytes": 35373056
+                },
+                {
+                  "aggregationMS": 1.664875,
+                  "wallMS": 51.75466602668166,
+                  "processPeakRSSBytes": 20365312
+                },
+                {
+                  "aggregationMS": 1.60525,
+                  "wallMS": 50.182499922811985,
+                  "processPeakRSSBytes": 20398080
+                },
+                {
+                  "aggregationMS": 1.602666,
+                  "wallMS": 49.78425009176135,
+                  "processPeakRSSBytes": 20365312
+                },
+                {
+                  "aggregationMS": 1.644834,
+                  "wallMS": 51.35091696865857,
+                  "processPeakRSSBytes": 20398080
+                }
+              ],
+              "medianAggregationMS": 1.60525,
+              "p95AggregationMS": 1.664875
+            },
+            "application": {
+              "matchedMonthSources": 2816,
+              "measurements": [
+                {
+                  "aggregationMS": 1.286416,
+                  "wallMS": 49.86687493510544,
+                  "processPeakRSSBytes": 20103168
+                },
+                {
+                  "aggregationMS": 1.042209,
+                  "wallMS": 48.90487506054342,
+                  "processPeakRSSBytes": 20103168
+                },
+                {
+                  "aggregationMS": 1.038959,
+                  "wallMS": 50.0022501219064,
+                  "processPeakRSSBytes": 20086784
+                },
+                {
+                  "aggregationMS": 1.012292,
+                  "wallMS": 49.81416603550315,
+                  "processPeakRSSBytes": 20119552
+                },
+                {
+                  "aggregationMS": 0.991542,
+                  "wallMS": 49.088750034570694,
+                  "processPeakRSSBytes": 20103168
+                }
+              ],
+              "medianAggregationMS": 1.038959,
+              "p95AggregationMS": 1.286416
+            },
+            "kind": {
+              "matchedMonthSources": 2109,
+              "measurements": [
+                {
+                  "aggregationMS": 0.963375,
+                  "wallMS": 50.13870797120035,
+                  "processPeakRSSBytes": 20070400
+                },
+                {
+                  "aggregationMS": 0.9955,
+                  "wallMS": 50.20616692490876,
+                  "processPeakRSSBytes": 20135936
+                },
+                {
+                  "aggregationMS": 1.013583,
+                  "wallMS": 49.65229192748666,
+                  "processPeakRSSBytes": 20103168
+                },
+                {
+                  "aggregationMS": 0.9855,
+                  "wallMS": 49.32554182596505,
+                  "processPeakRSSBytes": 20103168
+                },
+                {
+                  "aggregationMS": 0.952792,
+                  "wallMS": 48.84858289733529,
+                  "processPeakRSSBytes": 20070400
+                }
+              ],
+              "medianAggregationMS": 0.9855,
+              "p95AggregationMS": 1.013583
+            },
+            "saved": {
+              "matchedMonthSources": 1209,
+              "measurements": [
+                {
+                  "aggregationMS": 0.809375,
+                  "wallMS": 48.907625023275614,
+                  "processPeakRSSBytes": 19988480
+                },
+                {
+                  "aggregationMS": 0.908417,
+                  "wallMS": 48.70091681368649,
+                  "processPeakRSSBytes": 19988480
+                },
+                {
+                  "aggregationMS": 0.850833,
+                  "wallMS": 49.14900008589029,
+                  "processPeakRSSBytes": 19988480
+                },
+                {
+                  "aggregationMS": 0.869167,
+                  "wallMS": 49.558375030756,
+                  "processPeakRSSBytes": 19988480
+                },
+                {
+                  "aggregationMS": 0.83225,
+                  "wallMS": 49.60533301346004,
+                  "processPeakRSSBytes": 19988480
+                }
+              ],
+              "medianAggregationMS": 0.850833,
+              "p95AggregationMS": 0.908417
+            },
+            "tag": {
+              "matchedMonthSources": 1690,
+              "measurements": [
+                {
+                  "aggregationMS": 17.34025,
+                  "wallMS": 66.80212495848536,
+                  "processPeakRSSBytes": 28934144
+                },
+                {
+                  "aggregationMS": 17.185041,
+                  "wallMS": 68.45975015312433,
+                  "processPeakRSSBytes": 28934144
+                },
+                {
+                  "aggregationMS": 17.485375,
+                  "wallMS": 67.07837502472103,
+                  "processPeakRSSBytes": 28884992
+                },
+                {
+                  "aggregationMS": 17.58725,
+                  "wallMS": 68.7802080065012,
+                  "processPeakRSSBytes": 28901376
+                },
+                {
+                  "aggregationMS": 17.432667,
+                  "wallMS": 66.83187512680888,
+                  "processPeakRSSBytes": 28901376
+                }
+              ],
+              "medianAggregationMS": 17.432667,
+              "p95AggregationMS": 17.58725
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 8447,
+              "measurements": [
+                {
+                  "aggregationMS": 2.033292,
+                  "wallMS": 50.43170810677111,
+                  "processPeakRSSBytes": 20512768
+                },
+                {
+                  "aggregationMS": 2.129125,
+                  "wallMS": 50.61583290807903,
+                  "processPeakRSSBytes": 20545536
+                },
+                {
+                  "aggregationMS": 1.933166,
+                  "wallMS": 51.16004101000726,
+                  "processPeakRSSBytes": 20512768
+                },
+                {
+                  "aggregationMS": 1.935375,
+                  "wallMS": 50.34441710449755,
+                  "processPeakRSSBytes": 20480000
+                },
+                {
+                  "aggregationMS": 2.136,
+                  "wallMS": 50.94487499445677,
+                  "processPeakRSSBytes": 20545536
+                }
+              ],
+              "medianAggregationMS": 2.033292,
+              "p95AggregationMS": 2.136
+            }
+          }
+        }
+      },
+      "100k-month": {
+        "beforeIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 100000,
+            "textBytes": 1024,
+            "distribution": "month",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "1e9f0697267314e104e4177df97c6bc4317ac5f7f5416d85f98ef72e7be2b806",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 99329,
+              "measurements": [
+                {
+                  "aggregationMS": 12.198042,
+                  "wallMS": 80.1478330977261,
+                  "processPeakRSSBytes": 27344896
+                },
+                {
+                  "aggregationMS": 12.216042,
+                  "wallMS": 68.71062493883073,
+                  "processPeakRSSBytes": 27328512
+                },
+                {
+                  "aggregationMS": 12.347416,
+                  "wallMS": 68.01020912826061,
+                  "processPeakRSSBytes": 27312128
+                }
+              ],
+              "medianAggregationMS": 12.216042,
+              "p95AggregationMS": 12.347416
+            },
+            "application": {
+              "matchedMonthSources": 33111,
+              "measurements": [
+                {
+                  "aggregationMS": 4.496958,
+                  "wallMS": 61.43579096533358,
+                  "processPeakRSSBytes": 21921792
+                },
+                {
+                  "aggregationMS": 4.710958,
+                  "wallMS": 58.20608278736472,
+                  "processPeakRSSBytes": 21970944
+                },
+                {
+                  "aggregationMS": 4.821875,
+                  "wallMS": 60.848499881103635,
+                  "processPeakRSSBytes": 21970944
+                }
+              ],
+              "medianAggregationMS": 4.710958,
+              "p95AggregationMS": 4.821875
+            },
+            "kind": {
+              "matchedMonthSources": 24832,
+              "measurements": [
+                {
+                  "aggregationMS": 129.990375,
+                  "wallMS": 185.23916602134705,
+                  "processPeakRSSBytes": 29638656
+                },
+                {
+                  "aggregationMS": 133.044708,
+                  "wallMS": 191.71708403155208,
+                  "processPeakRSSBytes": 29655040
+                },
+                {
+                  "aggregationMS": 156.7165,
+                  "wallMS": 207.4790420010686,
+                  "processPeakRSSBytes": 29687808
+                }
+              ],
+              "medianAggregationMS": 133.044708,
+              "p95AggregationMS": 156.7165
+            },
+            "saved": {
+              "matchedMonthSources": 14187,
+              "measurements": [
+                {
+                  "aggregationMS": 132.9435,
+                  "wallMS": 183.6986660491675,
+                  "processPeakRSSBytes": 29294592
+                },
+                {
+                  "aggregationMS": 140.497167,
+                  "wallMS": 192.00037489645183,
+                  "processPeakRSSBytes": 29327360
+                },
+                {
+                  "aggregationMS": 140.277833,
+                  "wallMS": 190.097542013973,
+                  "processPeakRSSBytes": 29245440
+                }
+              ],
+              "medianAggregationMS": 140.277833,
+              "p95AggregationMS": 140.497167
+            },
+            "tag": {
+              "matchedMonthSources": 19865,
+              "measurements": [
+                {
+                  "aggregationMS": 192.581333,
+                  "wallMS": 245.3034999780357,
+                  "processPeakRSSBytes": 29474816
+                },
+                {
+                  "aggregationMS": 191.410875,
+                  "wallMS": 242.37666581757367,
+                  "processPeakRSSBytes": 29523968
+                },
+                {
+                  "aggregationMS": 187.459,
+                  "wallMS": 238.2861659862101,
+                  "processPeakRSSBytes": 29491200
+                }
+              ],
+              "medianAggregationMS": 191.410875,
+              "p95AggregationMS": 192.581333
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 99329,
+              "measurements": [
+                {
+                  "aggregationMS": 15.783875,
+                  "wallMS": 65.06083300337195,
+                  "processPeakRSSBytes": 27525120
+                },
+                {
+                  "aggregationMS": 15.417958,
+                  "wallMS": 65.6911248806864,
+                  "processPeakRSSBytes": 27475968
+                },
+                {
+                  "aggregationMS": 15.555083,
+                  "wallMS": 65.65066683106124,
+                  "processPeakRSSBytes": 27525120
+                }
+              ],
+              "medianAggregationMS": 15.555083,
+              "p95AggregationMS": 15.783875
+            }
+          }
+        },
+        "afterIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 100000,
+            "textBytes": 1024,
+            "distribution": "month",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "fb48c0744c7af81a83fa5dd728d476c7e731e6909b0fe0b782e75633705a5109",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 99329,
+              "measurements": [
+                {
+                  "aggregationMS": 11.802166,
+                  "wallMS": 1494.790457887575,
+                  "processPeakRSSBytes": 35274752
+                },
+                {
+                  "aggregationMS": 11.790125,
+                  "wallMS": 62.73129186592996,
+                  "processPeakRSSBytes": 27361280
+                },
+                {
+                  "aggregationMS": 11.649834,
+                  "wallMS": 61.4314170088619,
+                  "processPeakRSSBytes": 27394048
+                },
+                {
+                  "aggregationMS": 11.761583,
+                  "wallMS": 61.13429204560816,
+                  "processPeakRSSBytes": 27361280
+                },
+                {
+                  "aggregationMS": 11.746666,
+                  "wallMS": 61.10166618600488,
+                  "processPeakRSSBytes": 27394048
+                }
+              ],
+              "medianAggregationMS": 11.761583,
+              "p95AggregationMS": 11.802166
+            },
+            "application": {
+              "matchedMonthSources": 33111,
+              "measurements": [
+                {
+                  "aggregationMS": 4.807459,
+                  "wallMS": 53.51083306595683,
+                  "processPeakRSSBytes": 21987328
+                },
+                {
+                  "aggregationMS": 4.453292,
+                  "wallMS": 53.03670815192163,
+                  "processPeakRSSBytes": 21987328
+                },
+                {
+                  "aggregationMS": 4.461542,
+                  "wallMS": 52.407416980713606,
+                  "processPeakRSSBytes": 22020096
+                },
+                {
+                  "aggregationMS": 4.452583,
+                  "wallMS": 52.40554083138704,
+                  "processPeakRSSBytes": 22020096
+                },
+                {
+                  "aggregationMS": 4.389709,
+                  "wallMS": 52.437542006373405,
+                  "processPeakRSSBytes": 22020096
+                }
+              ],
+              "medianAggregationMS": 4.453292,
+              "p95AggregationMS": 4.807459
+            },
+            "kind": {
+              "matchedMonthSources": 24832,
+              "measurements": [
+                {
+                  "aggregationMS": 3.280875,
+                  "wallMS": 50.43262499384582,
+                  "processPeakRSSBytes": 21397504
+                },
+                {
+                  "aggregationMS": 3.428292,
+                  "wallMS": 52.779083140194416,
+                  "processPeakRSSBytes": 21413888
+                },
+                {
+                  "aggregationMS": 3.583292,
+                  "wallMS": 52.51037492416799,
+                  "processPeakRSSBytes": 21381120
+                },
+                {
+                  "aggregationMS": 3.407833,
+                  "wallMS": 52.459375001490116,
+                  "processPeakRSSBytes": 21413888
+                },
+                {
+                  "aggregationMS": 3.419959,
+                  "wallMS": 52.564541110768914,
+                  "processPeakRSSBytes": 21381120
+                }
+              ],
+              "medianAggregationMS": 3.419959,
+              "p95AggregationMS": 3.583292
+            },
+            "saved": {
+              "matchedMonthSources": 14187,
+              "measurements": [
+                {
+                  "aggregationMS": 2.24475,
+                  "wallMS": 50.909458193928,
+                  "processPeakRSSBytes": 20660224
+                },
+                {
+                  "aggregationMS": 2.277458,
+                  "wallMS": 50.73904199525714,
+                  "processPeakRSSBytes": 20627456
+                },
+                {
+                  "aggregationMS": 2.353459,
+                  "wallMS": 51.54720810241997,
+                  "processPeakRSSBytes": 20692992
+                },
+                {
+                  "aggregationMS": 2.193958,
+                  "wallMS": 53.401750046759844,
+                  "processPeakRSSBytes": 20643840
+                },
+                {
+                  "aggregationMS": 2.214916,
+                  "wallMS": 52.15733288787305,
+                  "processPeakRSSBytes": 20643840
+                }
+              ],
+              "medianAggregationMS": 2.24475,
+              "p95AggregationMS": 2.353459
+            },
+            "tag": {
+              "matchedMonthSources": 19865,
+              "measurements": [
+                {
+                  "aggregationMS": 182.093917,
+                  "wallMS": 232.14058415032923,
+                  "processPeakRSSBytes": 29491200
+                },
+                {
+                  "aggregationMS": 177.961291,
+                  "wallMS": 230.25374999269843,
+                  "processPeakRSSBytes": 29523968
+                },
+                {
+                  "aggregationMS": 177.576625,
+                  "wallMS": 228.7601251155138,
+                  "processPeakRSSBytes": 29523968
+                },
+                {
+                  "aggregationMS": 180.94975,
+                  "wallMS": 234.76550006307662,
+                  "processPeakRSSBytes": 29523968
+                },
+                {
+                  "aggregationMS": 178.283917,
+                  "wallMS": 228.8039168342948,
+                  "processPeakRSSBytes": 29523968
+                }
+              ],
+              "medianAggregationMS": 178.283917,
+              "p95AggregationMS": 182.093917
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 99329,
+              "measurements": [
+                {
+                  "aggregationMS": 15.9365,
+                  "wallMS": 65.75987511314452,
+                  "processPeakRSSBytes": 27508736
+                },
+                {
+                  "aggregationMS": 15.739958,
+                  "wallMS": 65.59525011107326,
+                  "processPeakRSSBytes": 27508736
+                },
+                {
+                  "aggregationMS": 15.465166,
+                  "wallMS": 72.19995791092515,
+                  "processPeakRSSBytes": 27492352
+                },
+                {
+                  "aggregationMS": 15.623875,
+                  "wallMS": 70.11729199439287,
+                  "processPeakRSSBytes": 27508736
+                },
+                {
+                  "aggregationMS": 15.163,
+                  "wallMS": 64.38320805318654,
+                  "processPeakRSSBytes": 27541504
+                }
+              ],
+              "medianAggregationMS": 15.623875,
+              "p95AggregationMS": 15.9365
+            }
+          }
+        }
+      },
+      "1m-year": {
+        "beforeIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 1000000,
+            "textBytes": 1024,
+            "distribution": "year",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "1e9f0697267314e104e4177df97c6bc4317ac5f7f5416d85f98ef72e7be2b806",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 84574,
+              "measurements": [
+                {
+                  "aggregationMS": 9.778916,
+                  "wallMS": 103.9774171076715,
+                  "processPeakRSSBytes": 26525696
+                },
+                {
+                  "aggregationMS": 10.447208,
+                  "wallMS": 62.46050004847348,
+                  "processPeakRSSBytes": 26558464
+                },
+                {
+                  "aggregationMS": 9.812667,
+                  "wallMS": 58.14887513406575,
+                  "processPeakRSSBytes": 26542080
+                }
+              ],
+              "medianAggregationMS": 9.812667,
+              "p95AggregationMS": 10.447208
+            },
+            "application": {
+              "matchedMonthSources": 28199,
+              "measurements": [
+                {
+                  "aggregationMS": 5.710083,
+                  "wallMS": 54.14324998855591,
+                  "processPeakRSSBytes": 21626880
+                },
+                {
+                  "aggregationMS": 4.060833,
+                  "wallMS": 54.44245878607035,
+                  "processPeakRSSBytes": 21610496
+                },
+                {
+                  "aggregationMS": 3.921834,
+                  "wallMS": 51.98416695930064,
+                  "processPeakRSSBytes": 21626880
+                }
+              ],
+              "medianAggregationMS": 4.060833,
+              "p95AggregationMS": 5.710083
+            },
+            "kind": {
+              "matchedMonthSources": 21143,
+              "measurements": [
+                {
+                  "aggregationMS": 624.623,
+                  "wallMS": 673.7896248232573,
+                  "processPeakRSSBytes": 29573120
+                },
+                {
+                  "aggregationMS": 156.677584,
+                  "wallMS": 206.66370796971023,
+                  "processPeakRSSBytes": 29540352
+                },
+                {
+                  "aggregationMS": 151.847958,
+                  "wallMS": 202.65679084695876,
+                  "processPeakRSSBytes": 29540352
+                }
+              ],
+              "medianAggregationMS": 156.677584,
+              "p95AggregationMS": 624.623
+            },
+            "saved": {
+              "matchedMonthSources": 12083,
+              "measurements": [
+                {
+                  "aggregationMS": 152.701084,
+                  "wallMS": 202.60258298367262,
+                  "processPeakRSSBytes": 29196288
+                },
+                {
+                  "aggregationMS": 154.592083,
+                  "wallMS": 203.5634161438793,
+                  "processPeakRSSBytes": 29196288
+                },
+                {
+                  "aggregationMS": 152.756959,
+                  "wallMS": 203.33304186351597,
+                  "processPeakRSSBytes": 29196288
+                }
+              ],
+              "medianAggregationMS": 152.756959,
+              "p95AggregationMS": 154.592083
+            },
+            "tag": {
+              "matchedMonthSources": 16915,
+              "measurements": [
+                {
+                  "aggregationMS": 197.751167,
+                  "wallMS": 248.540333006531,
+                  "processPeakRSSBytes": 29409280
+                },
+                {
+                  "aggregationMS": 198.236625,
+                  "wallMS": 248.25266702100635,
+                  "processPeakRSSBytes": 29442048
+                },
+                {
+                  "aggregationMS": 198.849292,
+                  "wallMS": 248.31370799802244,
+                  "processPeakRSSBytes": 29442048
+                }
+              ],
+              "medianAggregationMS": 198.236625,
+              "p95AggregationMS": 198.849292
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 84574,
+              "measurements": [
+                {
+                  "aggregationMS": 13.124375,
+                  "wallMS": 61.85729196295142,
+                  "processPeakRSSBytes": 26738688
+                },
+                {
+                  "aggregationMS": 12.959708,
+                  "wallMS": 61.42245791852474,
+                  "processPeakRSSBytes": 26722304
+                },
+                {
+                  "aggregationMS": 13.067333,
+                  "wallMS": 61.889291973784566,
+                  "processPeakRSSBytes": 26738688
+                }
+              ],
+              "medianAggregationMS": 13.067333,
+              "p95AggregationMS": 13.124375
+            }
+          }
+        },
+        "afterIndexesDebug": {
+          "format": "OSwind activity calendar synthetic benchmark v1",
+          "fixture": {
+            "format": "OSwind owned activity benchmark fixture v1",
+            "sources": 1000000,
+            "textBytes": 1024,
+            "distribution": "year",
+            "seed": 1729,
+            "normalHistory": false
+          },
+          "binarySHA256": "fb48c0744c7af81a83fa5dd728d476c7e731e6909b0fe0b782e75633705a5109",
+          "harnessSHA256": "d021567620ad7d66d9d25e9b4694933d74ad4b7b10ab2adf0540c00fa1047f5d",
+          "independentPythonZoneinfoOraclePass": true,
+          "scope": "Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.",
+          "cases": {
+            "all": {
+              "matchedMonthSources": 84574,
+              "measurements": [
+                {
+                  "aggregationMS": 9.706542,
+                  "wallMS": 14852.201709058136,
+                  "processPeakRSSBytes": 53100544
+                },
+                {
+                  "aggregationMS": 9.862833,
+                  "wallMS": 59.420499950647354,
+                  "processPeakRSSBytes": 26673152
+                },
+                {
+                  "aggregationMS": 9.873667,
+                  "wallMS": 58.71225008741021,
+                  "processPeakRSSBytes": 26607616
+                },
+                {
+                  "aggregationMS": 9.975542,
+                  "wallMS": 57.95079190284014,
+                  "processPeakRSSBytes": 26574848
+                },
+                {
+                  "aggregationMS": 10.015334,
+                  "wallMS": 58.27112519182265,
+                  "processPeakRSSBytes": 26574848
+                }
+              ],
+              "medianAggregationMS": 9.873667,
+              "p95AggregationMS": 10.015334
+            },
+            "application": {
+              "matchedMonthSources": 28199,
+              "measurements": [
+                {
+                  "aggregationMS": 4.281625,
+                  "wallMS": 52.35241702757776,
+                  "processPeakRSSBytes": 21643264
+                },
+                {
+                  "aggregationMS": 4.134166,
+                  "wallMS": 52.10650013759732,
+                  "processPeakRSSBytes": 21643264
+                },
+                {
+                  "aggregationMS": 3.853792,
+                  "wallMS": 51.800666842609644,
+                  "processPeakRSSBytes": 21643264
+                },
+                {
+                  "aggregationMS": 3.880708,
+                  "wallMS": 50.979250110685825,
+                  "processPeakRSSBytes": 21643264
+                },
+                {
+                  "aggregationMS": 4.01425,
+                  "wallMS": 51.69541691429913,
+                  "processPeakRSSBytes": 21643264
+                }
+              ],
+              "medianAggregationMS": 4.01425,
+              "p95AggregationMS": 4.281625
+            },
+            "kind": {
+              "matchedMonthSources": 21143,
+              "measurements": [
+                {
+                  "aggregationMS": 3.026875,
+                  "wallMS": 50.889624981209636,
+                  "processPeakRSSBytes": 21184512
+                },
+                {
+                  "aggregationMS": 2.966916,
+                  "wallMS": 50.21454207599163,
+                  "processPeakRSSBytes": 21217280
+                },
+                {
+                  "aggregationMS": 3.070542,
+                  "wallMS": 50.57937512174249,
+                  "processPeakRSSBytes": 21184512
+                },
+                {
+                  "aggregationMS": 3.074458,
+                  "wallMS": 50.45508383773267,
+                  "processPeakRSSBytes": 21217280
+                },
+                {
+                  "aggregationMS": 2.92875,
+                  "wallMS": 50.757165998220444,
+                  "processPeakRSSBytes": 21168128
+                }
+              ],
+              "medianAggregationMS": 3.026875,
+              "p95AggregationMS": 3.074458
+            },
+            "saved": {
+              "matchedMonthSources": 12083,
+              "measurements": [
+                {
+                  "aggregationMS": 2.158167,
+                  "wallMS": 50.254083005711436,
+                  "processPeakRSSBytes": 20545536
+                },
+                {
+                  "aggregationMS": 2.081334,
+                  "wallMS": 50.75204209424555,
+                  "processPeakRSSBytes": 20545536
+                },
+                {
+                  "aggregationMS": 2.0645,
+                  "wallMS": 49.86525001004338,
+                  "processPeakRSSBytes": 20578304
+                },
+                {
+                  "aggregationMS": 2.039583,
+                  "wallMS": 50.1805420499295,
+                  "processPeakRSSBytes": 20545536
+                },
+                {
+                  "aggregationMS": 2.0205,
+                  "wallMS": 49.91479101590812,
+                  "processPeakRSSBytes": 20545536
+                }
+              ],
+              "medianAggregationMS": 2.0645,
+              "p95AggregationMS": 2.158167
+            },
+            "tag": {
+              "matchedMonthSources": 16915,
+              "measurements": [
+                {
+                  "aggregationMS": 196.343167,
+                  "wallMS": 244.07970788888633,
+                  "processPeakRSSBytes": 29409280
+                },
+                {
+                  "aggregationMS": 196.659042,
+                  "wallMS": 245.16283301636577,
+                  "processPeakRSSBytes": 29409280
+                },
+                {
+                  "aggregationMS": 228.408458,
+                  "wallMS": 276.6829580068588,
+                  "processPeakRSSBytes": 29409280
+                },
+                {
+                  "aggregationMS": 198.419125,
+                  "wallMS": 247.06695810891688,
+                  "processPeakRSSBytes": 29392896
+                },
+                {
+                  "aggregationMS": 199.352792,
+                  "wallMS": 248.36658290587366,
+                  "processPeakRSSBytes": 29442048
+                }
+              ],
+              "medianAggregationMS": 198.419125,
+              "p95AggregationMS": 228.408458
+            },
+            "wideTimeBounds": {
+              "matchedMonthSources": 84574,
+              "measurements": [
+                {
+                  "aggregationMS": 13.338916,
+                  "wallMS": 61.29391700960696,
+                  "processPeakRSSBytes": 26722304
+                },
+                {
+                  "aggregationMS": 13.22525,
+                  "wallMS": 60.98816706798971,
+                  "processPeakRSSBytes": 26722304
+                },
+                {
+                  "aggregationMS": 13.172708,
+                  "wallMS": 60.54562493227422,
+                  "processPeakRSSBytes": 26722304
+                },
+                {
+                  "aggregationMS": 13.21075,
+                  "wallMS": 61.57162506133318,
+                  "processPeakRSSBytes": 26722304
+                },
+                {
+                  "aggregationMS": 13.074542,
+                  "wallMS": 62.554625095799565,
+                  "processPeakRSSBytes": 26755072
+                }
+              ],
+              "medianAggregationMS": 13.21075,
+              "p95AggregationMS": 13.338916
+            }
+          }
+        }
+      }
+    }
+  },
+  "renders": {
+    "codeCommit": "7a84bcfe2ade752bd7dafde5cee76d20eb7a9a97",
+    "debugBinarySHA256": "cd95102d3bdc14a2bfe264aa3959df626cfaf75b3eed5d4d4ebfadc219870e4b",
+    "runs": [
+      {
+        "appearance": "dark",
+        "size": "1320x850",
+        "exitCode": 0,
+        "sha256": "c2393d6cd7cefc65eb2e9b2224085c3d9445bd79e4343a088202b4637f43846d"
+      },
+      {
+        "appearance": "light",
+        "size": "1000x680",
+        "exitCode": 0,
+        "sha256": "6a5f47eec8dc7896bf35c6f8ac549a5110fd2ab295fde3fb3a002d28940ecc7f"
+      }
+    ],
+    "bothVisuallyReviewed": true,
+    "nativeInputClaimed": false
+  },
+  "remainingGates": [
+    "Unlocked native keyboard/picker/scroll/VoiceOver acceptance",
+    "Tag index instead of JSON payload scans",
+    "Large-library first-open index progress and interruption experience",
+    "Calendar refresh and capture active energy measurements",
+    "Continuous coverage/duration analytics if separately implemented",
+    "Broad competitive parity and matched competitor ranking"
+  ],
+  "nativeBoundary": {
+    "doctorScreenLocked": true,
+    "installedSchema17Unchanged": true,
+    "normalHistoryOpened": false,
+    "realKeychainCredentialUsed": false,
+    "authenticationOrPermissionChanges": false
+  }
+}

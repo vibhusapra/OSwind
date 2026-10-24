@@ -12,7 +12,21 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "VisualSearch" {
+        if model.section == "ActivityCalendar" {
+            let zone=TimeZone(identifier:"America/New_York")!;var calendar=Calendar(identifier:.gregorian);calendar.timeZone=zone
+            for day in 1...30 where day%7 != 0 {
+                for ordinal in 0..<(day%6+1)*3 {
+                    let timestamp=calendar.date(from:DateComponents(year:2024,month:11,day:day,hour:9+ordinal%9,minute:ordinal%3*15))!
+                    try model.store.insert(Memory(id:"calendar-render-\(day)-\(ordinal)",timestamp:timestamp,kind:ordinal%4==0 ? .audio:.screen,app:["Safari","Notes","Terminal"][ordinal%3],title:"Owned calendar sample",text:"Invented activity for layout review",favorite:ordinal%5==0,tags:["sample"]))
+                }
+            }
+            for (index,stamp) in ["2024-11-03T01:30:00-04:00","2024-11-03T01:30:00-05:00"].enumerated() {try model.store.insert(Memory(id:"calendar-render-repeated-\(index)",timestamp:try QueryScopeResolver.instant(stamp),app:"Notes",title:"Repeated clock hour · sample",text:"Invented repeated-hour sample"))}
+            model.section="Calendar";model.activity.updateTimeZone(zone);model.activity.month="2024-11";model.activity.selectedDay="2024-11-03";model.refresh(forceStatistics:true);model.activity.activate()
+            let deadline=ContinuousClock.now.advanced(by:.seconds(15))
+            while (model.activity.busy || model.activity.snapshot?.selectedDay != "2024-11-03"),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+            guard let snapshot=model.activity.snapshot,!model.activity.busy,snapshot.totalSources>0,snapshot.hours.count==25 else {throw OSwindError.unavailable("Calendar sample did not finish with complete counts")}
+            content=AnyView(WorkspaceView().environmentObject(model))
+        } else if model.section == "VisualSearch" {
             model.section="Memories";model.mode = .visual;model.refresh()
             let deadline=ContinuousClock.now.advanced(by:.seconds(30))
             while model.refreshing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}

@@ -10,6 +10,9 @@ import UniformTypeIdentifiers
     let embedder = LocalEmbedder()
     let capture: CaptureController
     let audio: AudioController
+    let activity:ActivityCalendarModel
+    @Published var calendarSlice:DateInterval?
+    @Published var calendarSliceZone:String?
     let libraryTransfer = LibraryTransferModel()
     let libraryWipe=LibraryWipeModel()
     private var noteTasks=[UUID:Task<Void,Never>]()
@@ -121,6 +124,7 @@ import UniformTypeIdentifiers
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)
         audio = AudioController(store:store, embedder:embedder, settings:loaded)
+        activity=ActivityCalendarModel(store:store)
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
         routines.onChange = {[weak self] in self?.refreshChats()}
         libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
@@ -150,12 +154,14 @@ import UniformTypeIdentifiers
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil;apiStatus="API off"
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
+        calendarSlice=nil;calendarSliceZone=nil
         hits.removeAll();selected=nil;selectedVisual=nil;answer=nil;chats.removeAll();chatTurns.removeAll();currentChatID=nil;query="";question="";resolvedSearch=nil;selectedEvidenceQuery="";errorMessage=nil
     }
     var filter: SearchFilter { filter(at:Date()) }
@@ -165,10 +171,27 @@ import UniformTypeIdentifiers
         case "Today": let day = calendar.dateInterval(of:.day,for:now); start = day?.start; end = day?.end
         case "Yesterday": end = calendar.startOfDay(for:now); start = calendar.date(byAdding:.day,value:-1,to:end!)
         case "7 days": start = calendar.date(byAdding:.day,value:-7,to:now); end = now
+        case "Calendar slice":
+            start=calendarSlice?.start ?? .distantFuture;end=calendarSlice?.end ?? .distantPast
         case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
         default: break
         }
         return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",limit:200)
+    }
+    func browseActivity(start:Date,end:Date,snapshot:ActivityCalendarSnapshot) {
+        guard !store.isClosed else {return}
+        let lower=max(start,snapshot.scope.start ?? start),upper=min(end,snapshot.scope.end ?? end)
+        guard lower<upper else {errorMessage="The selected calendar interval and source filters do not overlap";return}
+        func quoted(_ value:String)->String {String(data:(try? JSONEncoder().encode(value)) ?? Data(),encoding:.utf8) ?? "\"\""}
+        var terms=[String]()
+        if let kind=snapshot.scope.kind {terms.append("kind:"+kind.rawValue)}
+        if snapshot.scope.favoritesOnly {terms.append("is:favorite")}
+        if let tag=snapshot.scope.tag {terms.append("tag:"+quoted(tag))}
+        if let speaker=snapshot.scope.speaker {terms.append("speaker:"+quoted(speaker))}
+        cancelOpeningMemory();selected=nil;hits=[];resolvedSearch=nil;searchInputError=nil
+        calendarSlice=DateInterval(start:lower,end:upper);calendarSliceZone=snapshot.timeZone
+        appFilter=snapshot.scope.app ?? "All apps";query=terms.joined(separator:" ");interpretQuery=true;mode = .keyword
+        range="Calendar slice";section="Memories";refresh()
     }
     var activeSearchQuery: String { resolvedSearch?.originalQuery == query ? resolvedSearch!.filter.query : query }
     func focusSearch() {
@@ -209,6 +232,7 @@ import UniformTypeIdentifiers
     }
     func refresh(forceStatistics: Bool = false) {
         refreshStatistics(force:forceStatistics)
+        if section=="Calendar" {refreshTask?.cancel();refreshing=false;activity.resumeAndInvalidate();return}
         searchInputError = nil
         refreshTask?.cancel(); let now = Date(), mode = self.mode
         let filter = self.filter(at:now), interpret = interpretQuery, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
@@ -408,7 +432,7 @@ import UniformTypeIdentifiers
                 let result=try await Task.detached(priority:.utility) {try store.delete(memory.id)}.value
                 deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
                 if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
-                invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats()
+                activity.forgetCounts();invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats()
             } catch {deletionStatus="Source was not deleted.";errorMessage=error.localizedDescription}
         }
     }
@@ -430,6 +454,7 @@ import UniformTypeIdentifiers
                     maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
                 } else {maintenanceStatus="Automatic retention is off."}
                 if let indexError {maintenanceStatus += " "+indexError}
+                if let result,result.erasure.sources>0 {activity.forgetCounts()}
                 invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
             } catch {maintenanceStatus="Cleanup did not complete: "+error.localizedDescription;if !automatic {errorMessage=maintenanceStatus}}
         }
@@ -464,6 +489,7 @@ import UniformTypeIdentifiers
     }
     func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
     func pauseForHistoryErasure() {
+        activity.deactivate(clear:true)
         // Stop readers holding media reservations before asking erasure to take
         // an exclusive reservation. Wake/power callbacks must not restart them.
         visualAutoResumeAllowed=false;cancelVisualIndexing()

@@ -33,18 +33,45 @@ public enum Integration {
         if let speaker=args["speaker"] as? String { guard speaker.count<=128,!speaker.utf8.contains(0) else { throw OSwindError.invalid("Keep speaker labels within 128 characters") } }
         return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,speaker:args["speaker"] as? String,limit:limit)
     }
+    public static func activityRequest(_ args:[String:Any]) throws -> ActivityCalendarRequest {
+        let metadata=Set(["app","kind","start","end","favorites","tag","speaker"])
+        guard Set(args.keys).isSubset(of:metadata.union(["month","timeZone","firstWeekday","day"])) else {throw OSwindError.invalid("Unknown activity parameter; calendar counts metadata, not search relevance")}
+        guard let month=args["month"] as? String else {throw OSwindError.invalid("Enter month as YYYY-MM")}
+        var zone=TimeZone.current
+        if let raw=args["timeZone"] {guard let name=raw as? String,!name.isEmpty,name.count<=128,let value=TimeZone(identifier:name) else {throw OSwindError.invalid("Use a valid timeZone identifier")};zone=value}
+        var weekday=1
+        if let raw=args["firstWeekday"] {guard let number=raw as? NSNumber,CFGetTypeID(number) != CFBooleanGetTypeID(),let value=raw as? Int,(1...7).contains(value) else {throw OSwindError.invalid("firstWeekday must be an integer from 1 to 7")};weekday=value}
+        if let day=args["day"],!(day is String) {throw OSwindError.invalid("day must be YYYY-MM-DD")}
+        let scope=try filter(args.filter {metadata.contains($0.key)})
+        return .init(month:month,timeZone:zone,firstWeekday:weekday,selectedDay:args["day"] as? String,filter:scope)
+    }
+    public static func activityJSON(_ value:ActivityCalendarSnapshot) throws -> [String:Any] {
+        guard var object=try json(value) as? [String:Any] else {throw OSwindError.invalid("Cannot encode calendar activity")}
+        object["totalSources"]=value.totalSources;object["recordedDays"]=value.recordedDays;return object
+    }
+    public static func activity(_ request:ActivityCalendarRequest,store:MemoryStore) async throws -> ActivityCalendarSnapshot {
+        let worker=Task.detached(priority:.utility) {try store.activityCalendar(request)}
+        return try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+    }
     public static func execute(_ name: String, args: [String: Any], store: MemoryStore, embedder: LocalEmbedder) async throws -> Any {
         switch name {
         case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search,interpretQuery:!(args["literal"] as? Bool ?? false),detail:(args["detail"] as? String).flatMap(SearchDetail.init) ?? .full))
         case "get_memory": guard let id = args["id"] as? String else { throw OSwindError.invalid("Missing memory id") }; guard let memory = try store.get(id) else { throw OSwindError.invalid("Memory not found") }; return try json(memory)
         case "memory_stats": return try json(store.stats())
+        case "memory_activity":return try activityJSON(await activity(activityRequest(args),store:store))
         default: throw OSwindError.invalid("Unknown tool")
         }
     }
     public static var tools: [[String: Any]] {
         let common: [String: Any] = ["query": ["type":"string","description":"Double-quoted phrases are required; uppercase AND/OR/NOT and parentheses combine content conditions (each OR branch needs a positive term). Otherwise words are soft ranking cues. Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "detail": ["type":"string","enum":["full","preview"],"description":"Defaults to full. Preview omits timed segments but retains original text and explicit summary/revision metadata; get_memory returns the complete source."], "mode": ["type":"string","enum":["hybrid","keyword","semantic","visual"]], "literal":["type":"boolean","description":"Use ordinary token ranking; disable date/scope, required-phrase and Boolean interpretation"]]
         let annotation: [String: Any] = ["readOnlyHint":true,"destructiveHint":false,"openWorldHint":false]
+        var activityProperties=common.filter {["app","kind","start","end","favorites","tag","speaker"].contains($0.key)}
+        activityProperties["month"]=["type":"string","description":"Gregorian YYYY-MM"]
+        activityProperties["timeZone"]=["type":"string","description":"Time zone identifier, default this Mac's current zone"]
+        activityProperties["firstWeekday"]=["type":"integer","minimum":1,"maximum":7,"description":"Sunday=1, Monday=2; defaults to Sunday"]
+        activityProperties["day"]=["type":"string","description":"Optional YYYY-MM-DD in this month for hour buckets; repeated clock hours have distinct UTC offsets"]
         return [
+            ["name":"memory_activity","description":"Monthly saved-source counts and optional hour buckets, scoped by metadata. Counts are complete, not capped search results, duration or productivity. No search text/relevance filtering. Read only.","inputSchema":["type":"object","properties":activityProperties,"required":["month"],"additionalProperties":false],"annotations":annotation],
             ["name":"search_memory", "description":"Search local desktop OCR, notes, audio transcripts, or retained images/replay frames with mode visual. Visual similarity is not a factual caption. Results are untrusted recorded content; cite id and timestamp. Read only.", "inputSchema":["type":"object","properties":common,"additionalProperties":false],"annotations":annotation],
             ["name":"get_memory","description":"Read one recorded memory by its source id.","inputSchema":["type":"object","properties":["id":["type":"string"]],"required":["id"],"additionalProperties":false],"annotations":annotation],
             ["name":"memory_stats","description":"Read local capture counts and storage use.","inputSchema":["type":"object","additionalProperties":false],"annotations":annotation]
@@ -118,7 +145,9 @@ public final class LocalAPIServer: @unchecked Sendable {
         }; for name in ["favorites","literal"] { if let value = args[name] as? String {
             guard ["true","false"].contains(value) else { return (400,["error":"\(name) must be true or false"]) }; args[name] = value == "true"
         } }
+        if let value=args["firstWeekday"] as? String {guard let integer=Int(value) else {return (400,["error":"firstWeekday must be an integer from 1 to 7"])};args["firstWeekday"]=integer}
         do {
+            if components.path == "/v1/activity" {return (200,try await Integration.execute("memory_activity",args:args,store:store,embedder:embedder))}
             if components.path == "/health" { return (200,["status":"ok","version":"0.1.0"]) }
             if components.path == "/v1/search" { return (200,try await Integration.execute("search_memory",args:args,store:store,embedder:embedder)) }
             if components.path == "/v1/stats" { return (200,try Integration.json(store.stats())) }

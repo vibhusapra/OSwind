@@ -37,7 +37,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-smoke-') as directory:
     process=subprocess.run(prefix+['mcp'],input='\n'.join(json.dumps(r) for r in requests)+'\n',text=True,capture_output=True,timeout=30,check=True)
     responses=[json.loads(line) for line in process.stdout.splitlines()]
     assert len(responses)==3
-    assert len(responses[1]['result']['tools'])==3
+    assert {tool['name'] for tool in responses[1]['result']['tools']}=={'search_memory','get_memory','memory_stats','memory_activity'}
     visual_tool=next(tool for tool in responses[1]['result']['tools'] if tool['name']=='search_memory')
     assert 'visual' in visual_tool['inputSchema']['properties']['mode']['enum']
     assert identifier in responses[2]['result']['content'][0]['text']

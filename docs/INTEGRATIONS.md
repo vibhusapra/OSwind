@@ -14,6 +14,7 @@ The server binds to `127.0.0.1:47831` only. Every request, including health, req
 
 - `GET /health`
 - `GET /v1/stats`
+- `GET /v1/activity?month=2024-11&day=2024-11-03&timeZone=America%2FNew_York`
 - `GET /v1/search?query=release&mode=hybrid&limit=20`
 - `GET /v1/memories/{id}`
 
@@ -36,9 +37,13 @@ CLI search prints the hit array by default, with warnings on stderr. Add `--deta
 
 For an isolated database use `args: ["--data", "/absolute/data/path", "mcp"]`.
 
-Tools: `search_memory`, `get_memory`, `memory_stats`. Search arguments match the HTTP fields, except `favorites` is a Boolean and `limit` an integer. Supports newline-delimited JSON-RPC over stdio and negotiates protocol versions 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25. Only protocol responses go to stdout. OS user/file access is the stdio authorization boundary; the HTTP token is not used by stdio.
+Tools: `search_memory`, `get_memory`, `memory_stats`, `memory_activity`. Search arguments match the HTTP fields, except `favorites` is a Boolean and `limit` an integer. Supports newline-delimited JSON-RPC over stdio and negotiates protocol versions 2024-11-05, 2025-03-26, 2025-06-18, 2025-11-25. Only protocol responses go to stdout. OS user/file access is the stdio authorization boundary; the HTTP token is not used by stdio.
 
 Configure a trusted client yourself in its supported configuration. OSwind does not silently add itself to other applications.
+
+## Calendar counts
+
+HTTP `/v1/activity` and MCP `memory_activity` count all saved sources in a Gregorian month, with optional selected-day hour buckets. Accept `month` (required), `day`, `timeZone`, `firstWeekday` (Sunday=1), and metadata scopes `app`, `kind`, `favorites`, `tag`, `speaker`, `start`, `end`. They reject search text, relevance modes and result limits. Counts are sources, not duration or recording coverage. Repeated clock hours have distinct UTC boundaries and offsets. See [calendar semantics and examples](ACTIVITY-CALENDAR.md).
 
 ## BYOK
 

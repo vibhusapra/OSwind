@@ -74,6 +74,7 @@ do {
           routine run ID|tick [--at ISO8601]           Run once or process one due occurrence
           routine scheduler on|off|preview ID|delete ID
           note TEXT                      Save a redacted, searchable note
+          activity --month YYYY-MM [--day YYYY-MM-DD] [--time-zone ID]  Complete daily/hourly saved-source counts
           stats                          Storage and capture counts
           config                         Print settings (no API keys)
           models list|status|pull NAME    Inspect/download local Ollama models
@@ -411,6 +412,23 @@ do {
             guard args.count==1 else {throw OSwindError.invalid("Use get MEMORY_ID")}
             guard let memory=try store.get(args[0]) else {throw OSwindError.invalid("Memory not found")}
             try encoded(memory)
+        case "activity":
+            guard args.filter({$0=="--diagnostics"}).count<=1 else {throw OSwindError.invalid("Use --diagnostics only once")}
+            let diagnostics=args.contains("--diagnostics");args.removeAll {$0=="--diagnostics"}
+            var values=[String:Any]()
+            for (flag,key) in [("--month","month"),("--day","day"),("--time-zone","timeZone"),("--first-weekday","firstWeekday"),("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--speaker","speaker")] {
+                if let value=try validatedOption(flag) {
+                    if key=="firstWeekday" {guard let integer=Int(value) else {throw OSwindError.invalid("first-weekday must be an integer from 1 to 7")};values[key]=integer}else {values[key]=value}
+                }
+            }
+            guard args.filter({$0=="--favorites"}).count<=1 else {throw OSwindError.invalid("Use --favorites only once")}
+            values["favorites"]=args.contains("--favorites");args.removeAll {$0=="--favorites" || $0=="--json"}
+            guard args.isEmpty else {throw OSwindError.invalid("Use activity --month YYYY-MM with metadata filters, not search text")}
+            let started=ContinuousClock.now,result=try await Integration.activity(Integration.activityRequest(values),store:store)
+            let elapsed=started.duration(to:.now).components
+            var object=try Integration.activityJSON(result)
+            if diagnostics {var usage=rusage();getrusage(RUSAGE_SELF,&usage);object["diagnostics"]=["aggregation_ms":Double(elapsed.seconds)*1000+Double(elapsed.attoseconds)/1e15,"process_peak_rss_bytes":usage.ru_maxrss,"scope":"Fresh CLI process peak includes startup; aggregation includes validation, utility dispatch and SQL. Excludes JSON encoding and models/media. Uncontrolled caches and host activity; no energy or competitor claim."]}
+            try emit(object)
         case "stats": try encoded(store.stats())
         case "search": let detail:SearchDetail=args.contains("--preview") ? .preview:.full;args.removeAll {$0=="--preview"};let modeValue = try validatedOption("--mode") ?? "hybrid"; guard let mode = SearchMode(rawValue:modeValue) else { throw OSwindError.invalid("Unknown search mode") }; let details = args.contains("--details"); args.removeAll { $0 == "--details" }; let filter = try searchFilter()
             let result = try await RetrievalEngine(store:store,apple:embedder).search(filter,mode:mode,configuration:AppSettings.load(root:root).search,interpretQuery:!literalQuery,detail:detail)
