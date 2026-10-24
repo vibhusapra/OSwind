@@ -10,16 +10,16 @@ final class LibraryWorkspaceTests:XCTestCase {
     func testAudioInputAndNormalizationStayInsideLibraryAndAreRemoved() throws {
         let input=root.appendingPathComponent("source.wav"),bytes=WAV.data(samples:[Float](repeating:0.1,count:16000));try bytes.write(to:input)
         var clip:AudioClipSnapshot?=try AudioClipSnapshot(source:input,store:store)
-        let folder=clip!.file.deletingLastPathComponent();XCTAssertTrue(folder.path.hasPrefix(store.root.appendingPathComponent("audio/.staging").path+"/"));XCTAssertEqual(clip!.duration,1,accuracy:0.001)
+        let folder=clip!.file.deletingLastPathComponent();XCTAssertTrue(folder.path.hasPrefix(store.root.appendingPathComponent("audio/.staging").resolvingSymlinksInPath().path+"/"));XCTAssertEqual(clip!.duration,1,accuracy:0.001)
         XCTAssertEqual(try Data(contentsOf:clip!.file),bytes);XCTAssertTrue(FileManager.default.fileExists(atPath:clip!.speechFile.path));XCTAssertNotNil(clip!.mediaActivity)
         clip=nil;XCTAssertFalse(FileManager.default.fileExists(atPath:folder.path));XCTAssertEqual(try Data(contentsOf:input),bytes)
-        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:store.root.appendingPathComponent("audio/.staging").path).isEmpty)
+        XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:store.root.appendingPathComponent("audio/.staging").resolvingSymlinksInPath().path).isEmpty)
     }
     func testEachBucketUsesPrivateOwnedStagingAndCleansOnlyItsPayload() throws {
         let outside=root.appendingPathComponent("keep");try Data([9]).write(to:outside)
         for bucket in [LibraryWorkspaceBucket.audio,.video] {
             var workspace:BackupWorkspace?=try store.libraryWorkspace("oswind-visual-recording",bucket:bucket);let path=workspace!.url
-            XCTAssertTrue(path.path.hasPrefix(store.root.appendingPathComponent(bucket.rawValue+"/.staging").path+"/"));try workspace!.tree.write(Data([1]),as:"private")
+            XCTAssertTrue(path.path.hasPrefix(store.root.appendingPathComponent(bucket.rawValue+"/.staging").resolvingSymlinksInPath().path+"/"));try workspace!.tree.write(Data([1]),as:"private")
             let mode=try FileManager.default.attributesOfItem(atPath:path.path)[.posixPermissions] as! NSNumber;XCTAssertEqual(mode.intValue&0o077,0)
             workspace=nil;XCTAssertFalse(FileManager.default.fileExists(atPath:path.path))
         }

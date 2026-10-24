@@ -7,7 +7,6 @@ extension MemoryStore {
     func libraryWorkspace(_ label:String,bucket:LibraryWorkspaceBucket = .audio) throws -> BackupWorkspace {
         let activity=try mediaWriteLease()
         do {
-            guard assetURL(bucket.rawValue+"/.staging") != nil else {throw OSwindError.invalid("The media staging path is unsafe")}
             let base=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath(),writable:true),identity=try base.identity()
             guard identity.device==mediaRootIdentity.device,identity.inode==mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before workspace creation")}
             let parent=try base.privateDirectory(bucket.rawValue+"/.staging"),parentStamp=try parent.identity()

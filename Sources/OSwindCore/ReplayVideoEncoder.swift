@@ -12,12 +12,14 @@ final class ReplayVideoEncoder:@unchecked Sendable {
     let height:Int
     let codec:String
     let hardwareRequired:Bool
+    private let workspace:BackupWorkspace?
     private let writer:AVAssetWriter
     private let input:AVAssetWriterInput
     private var lastTime = -Double.infinity
     private var finished=false
-    init(url:URL,width:Int,height:Int,frameInterval:Double,codec:String="hevc",hardwareRequired:Bool=true) throws {
+    init(url:URL,width:Int,height:Int,frameInterval:Double,codec:String="hevc",hardwareRequired:Bool=true,workspace:BackupWorkspace?=nil) throws {
         guard (2...4096).contains(width),(2...4096).contains(height),width%2==0,height%2==0,frameInterval.isFinite,frameInterval>=0.25,frameInterval<=45,["hevc","h264"].contains(codec),!FileManager.default.fileExists(atPath:url.path) else {throw OSwindError.invalid("Invalid video dimensions, interval, codec or output")}
+        self.workspace=workspace
         self.url=url;self.width=width;self.height=height;self.codec=codec;self.hardwareRequired=hardwareRequired
         writer=try AVAssetWriter(outputURL:url,fileType:.mov)
         let rate=max(0.1,1/frameInterval)
@@ -70,6 +72,7 @@ final class ReplayVideoEncoder:@unchecked Sendable {
         return actual
     }
     func cancel() {finished=true;finalizationQueue.async {[self] in writer.cancelWriting()}}
+    func waitForCancellation() async {await withCheckedContinuation {continuation in finalizationQueue.async {continuation.resume()}}}
     deinit {if writer.status == .writing {writer.cancelWriting()}}
 }
 

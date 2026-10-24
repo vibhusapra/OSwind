@@ -31,7 +31,7 @@ actor VisualChunkRecorder {
         init(store:MemoryStore,first:ReplayFrameInput,interval:Double,codec:String,hardware:Bool) throws {
             self.first=first;self.interval=interval;lastSourceTime=first.time
             workspace=try store.libraryWorkspace("oswind-visual-recording",bucket:.video)
-            encoder=try ReplayVideoEncoder(url:workspace.url.appendingPathComponent("clip.mov"),width:CVPixelBufferGetWidth(first.buffer),height:CVPixelBufferGetHeight(first.buffer),frameInterval:interval,codec:codec,hardwareRequired:hardware)
+            encoder=try ReplayVideoEncoder(url:workspace.url.appendingPathComponent("clip.mov"),width:CVPixelBufferGetWidth(first.buffer),height:CVPixelBufferGetHeight(first.buffer),frameInterval:interval,codec:codec,hardwareRequired:hardware,workspace:workspace)
         }
     }
     private let store:MemoryStore
@@ -88,9 +88,10 @@ actor VisualChunkRecorder {
     func boundary(at time:Double) async throws {await acquire();defer {release()};guard !closed else {return};try await finishCurrent(endAt:time)}
     func close(commit:Bool=true) async throws {
         closed=true
-        if !commit {discarded=true;chunk?.encoder.cancel();pending?.encoder.cancel()}
+        let cancelled=commit ? []:[chunk,pending].compactMap {$0}
+        if !commit {discarded=true;for current in cancelled {current.encoder.cancel()}}
         await acquire();defer {release()}
-        if !commit {chunk=nil;return}
+        if !commit {chunk=nil;for current in cancelled {await current.encoder.waitForCancellation()};return}
         try await finishCurrent(endAt:nil)
     }
     private func finishCurrent(endAt:Double?) async throws {
