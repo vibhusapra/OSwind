@@ -21,7 +21,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON;")
+        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=FILE; PRAGMA temp.cache_size=-4096;")
         try exec("BEGIN IMMEDIATE")
         do {
         try exec("""
@@ -228,7 +228,7 @@ public final class MemoryStore: @unchecked Sendable {
     public func get(_ id: String) throws -> Memory? {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
-    private func conditions(_ filter: SearchFilter, prefix: String = "m.") -> (String, [String]) {
+    private func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil) -> (String, [String]) {
         var parts = ["1=1"]; var values = [String]()
         if let app = filter.app, !app.isEmpty { parts.append("\(prefix)app=?"); values.append(app) }
         if let kind = filter.kind { parts.append("\(prefix)kind=?"); values.append(kind.rawValue) }
@@ -237,7 +237,28 @@ public final class MemoryStore: @unchecked Sendable {
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM json_each(CAST(\(prefix)payload AS TEXT), '$.tags') WHERE value=?)"); values.append(tag) }
         if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
+        if let constraint = expression?.constraint {
+            if expression?.materialized == true { parts.append("\(prefix)id IN (SELECT id FROM temp.search_expression_scope)") }
+            else { parts.append(constraint.predicate(prefix:prefix,values:&values)) }
+        }
         return (parts.joined(separator: " AND "), values)
+    }
+    /// FTS operands can match many rows. Re-running their IN subqueries for
+    /// every native candidate made a 20k Metal query take seconds. Keep a private
+    /// disk-backed ID set for this one SQLite snapshot, then use indexed lookups.
+    private func materializeExpression(_ input: SearchExpressionPlan) throws -> SearchExpressionPlan {
+        guard let constraint = input.constraint,!input.materialized else { return input }
+        try Task.checkCancellation()
+        sqlite3_progress_handler(db,1000,{ _ in Task.isCancelled ? 1:0 },nil)
+        defer { sqlite3_progress_handler(db,0,nil,nil) }
+        do {
+            try exec("CREATE TEMP TABLE IF NOT EXISTS search_expression_scope(id TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.search_expression_scope; PRAGMA temp.cache_size=-4096;")
+            var values = [String](); let predicate = constraint.predicate(prefix:"m.",values:&values)
+            let statement = try prepare("INSERT INTO temp.search_expression_scope SELECT m.id FROM memories m WHERE "+predicate); defer { sqlite3_finalize(statement) }
+            for (offset,value) in values.enumerated() { bind(statement,Int32(offset+1),value) }
+            guard sqlite3_step(statement) == SQLITE_DONE else { throw failure() }
+        } catch { if Task.isCancelled { throw CancellationError() }; throw error }
+        var result = input; result.materialized = true; return result
     }
     public static func queryTerms(_ input: String) -> [String] {
         let stopwords: Set<String> = ["a","an","the","and","or","is","are","was","were","be","been","being","to","of","for","in","on","at","by","from","with","as","it","its","s","t","do","does","did","can","could","would","should","will","we","our","i","my","me","you","your","they","their","this","that","these","those","what","which","who","when","where","how","why","about","before","after","la","le","les","el","los","las","de","del","du","des","un","une","en","et","y","que","qui","comment","por","para"]
@@ -254,21 +275,26 @@ public final class MemoryStore: @unchecked Sendable {
         // single matching question word overwhelm a cross-language match.
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
-    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
+    public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, expression:SearchExpressionPlan? = nil, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
         try Task.checkCancellation()
+        var queryPlan = try expression ?? SearchExpressionPlan.make(filter.query)
         var indexStatus: SearchIndexStatus?
-        let scoped = conditions(filter).0 != "1=1"
+        let scoped = conditions(filter,expression:queryPlan).0 != "1=1"
         // Current measured native predicate callbacks cost more than a scoped
         // exact scan. Keep Automatic conservative until scoped indexing improves.
-        if mode != .keyword, !Self.ftsQuery(filter.query).isEmpty, let vector, let modelID, indexPolicy != .exact, indexPolicy == .indexed || !scoped {
+        if mode != .keyword, !queryPlan.keywordFTS.isEmpty, let vector, let modelID, indexPolicy != .exact, indexPolicy == .indexed || !scoped {
             let count = try vectorEntityCount(modelID:modelID)
             if indexPolicy == .indexed || count >= 20_000 { indexStatus = annCache.prepare(modelID:modelID,dimensions:vector.count,count:count,allowLowPower:allowIndexOnLowPower) }
         }
         lock.lock(); defer { lock.unlock() }
-        try exec("SAVEPOINT search_snapshot"); defer { try? exec("RELEASE search_snapshot") }
+        try exec("SAVEPOINT search_snapshot"); defer {
+            if queryPlan.hasConstraints { try? exec("DELETE FROM temp.search_expression_scope") }
+            try? exec("RELEASE search_snapshot")
+        }
+        queryPlan = try materializeExpression(queryPlan)
         var strategy = "exact", diagnostics = [String]()
-        let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter)
-        let query = Self.ftsQuery(filter.query)
+        let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter,expression:queryPlan)
+        let query = queryPlan.keywordFTS
         let payload=detail == .preview ? "COALESCE(preview.payload,m.payload)":"m.payload"
         let previewJoin=detail == .preview ? " LEFT JOIN audio_search_previews preview ON preview.memory_id=m.id":""
         var keyword = [Memory](); var scored = [String: SearchHit]()
@@ -277,27 +303,32 @@ public final class MemoryStore: @unchecked Sendable {
             let stmt = try prepare(sql); defer { sqlite3_finalize(stmt) }; var index: Int32 = 1
             if !query.isEmpty { bind(stmt, index, query); index += 1 }
             for value in values { bind(stmt, index, value); index += 1 }; sqlite3_bind_int(stmt, index, Int32(query.isEmpty || mode == .keyword ? limit : max(limit, 100)))
-            while sqlite3_step(stmt) == SQLITE_ROW { keyword.append(try decode(stmt)) }
+            var keywordStatus = sqlite3_step(stmt)
+            while keywordStatus == SQLITE_ROW { try Task.checkCancellation(); keyword.append(try decode(stmt)); keywordStatus = sqlite3_step(stmt) }
+            guard keywordStatus == SQLITE_DONE else { throw failure() }
             for (rank, memory) in keyword.enumerated() { scored[memory.id] = SearchHit(memory: memory, score: query.isEmpty ? memory.timestamp.timeIntervalSince1970 : (similarityFusion && mode == .hybrid ? Self.keywordBonus(query:filter.query,memory:memory,rank:rank) : 1 / Double(60 + rank)), match: query.isEmpty ? "recent" : "keyword") }
             if !query.isEmpty {
                 let names=try prepare("SELECT m.id FROM speaker_fts f JOIN memories m ON m.id=f.memory_id WHERE speaker_fts MATCH ? AND \(whereSQL) GROUP BY m.id ORDER BY m.timestamp DESC,m.id LIMIT ?")
-                defer { sqlite3_finalize(names) }; bind(names,1,SpeakerLabel.ftsQuery(filter.query))
+                defer { sqlite3_finalize(names) }; bind(names,1,queryPlan.speakerFTS)
                 for (offset,value) in values.enumerated() { bind(names,Int32(offset+2),value) }; sqlite3_bind_int(names,Int32(values.count+2),Int32(max(limit,100)))
                 var rank=0
-                while sqlite3_step(names)==SQLITE_ROW {
+                var speakerStatus = sqlite3_step(names)
+                while speakerStatus == SQLITE_ROW {
+                    try Task.checkCancellation()
                     let id=string(names,0)
                     let score=similarityFusion && mode == .hybrid ? 0.08/(1+Double(rank)*0.1):1/Double(60+rank)
                     if var hit=scored[id] { hit.score += score*0.25; hit.match="keyword + speaker"; scored[id]=hit }
                     else if let memory=try getForSearch(id,detail:detail) { scored[id]=SearchHit(memory:memory,score:score,match:"speaker name") }
-                    rank += 1
+                    rank += 1; speakerStatus = sqlite3_step(names)
                 }
+                guard speakerStatus == SQLITE_DONE else { throw failure() }
             }
         }
         if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
             var indexed: [SemanticCandidate]?
             var candidateStrategy = "ann-exact-rerank"
             if indexStatus != nil {
-                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100),strategy:{ candidateStrategy = $0 }) }
+                do { indexed = try indexedCandidates(filter,modelID:modelID,dimensions:vector.count,scorer:scorer,minimumSimilarity:minimumSimilarity,limit:max(limit,100),expression:queryPlan,strategy:{ candidateStrategy = $0 }) }
                 catch { diagnostics.append("Fast index unavailable; exact search used. "+error.localizedDescription) }
                 if indexed == nil && diagnostics.isEmpty {
                     diagnostics.append(indexStatus!.state == "ready" ? "Fast index is catching up; exact search used." : indexStatus!.message + " · exact search used.")
@@ -313,12 +344,15 @@ public final class MemoryStore: @unchecked Sendable {
             for (i,v) in values.enumerated() { bind(stmt,Int32(2*values.count+3+i),v) }; bind(stmt,Int32(3*values.count+3),modelID)
             var candidates = SemanticTopK(capacity:max(limit,100))
             var scanned = 0
-            while sqlite3_step(stmt) == SQLITE_ROW {
+            var vectorStatus = sqlite3_step(stmt)
+            while vectorStatus == SQLITE_ROW {
+                defer { vectorStatus = sqlite3_step(stmt) }
                 scanned += 1; if scanned % 256 == 0 { try Task.checkCancellation() }
                 let size = Int(sqlite3_column_bytes(stmt, 1)); guard size == vector.count * MemoryLayout<Float>.size, let bytes = sqlite3_column_blob(stmt, 1) else { continue }
                 let similarity = scorer.score(bytes.assumingMemoryBound(to:Float.self),count:vector.count)
                 if similarity > minimumSimilarity, candidates.mayImprove(similarity) { candidates.offer(SemanticCandidate(id:string(stmt,0),similarity:similarity,timestamp:sqlite3_column_double(stmt,2),passage:sqlite3_column_int64(stmt,3) < 0 ? nil : PassageRange(start:Int(sqlite3_column_int64(stmt,3)),length:Int(sqlite3_column_int64(stmt,4))))) }
             }
+            guard vectorStatus == SQLITE_DONE else { throw failure() }
             best = candidates.sorted
             }
             for (rank, pair) in best.enumerated() {
@@ -618,26 +652,33 @@ extension MemoryStore {
 extension MemoryStore {
     /// Called inside the search's SQL snapshot. Only current, matching rows can
     /// become evidence. Mutations newer than the graph are searched exactly.
-    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int, strategy: (String) -> Void = { _ in }) throws -> [SemanticCandidate]? {
+    func indexedCandidates(_ filter: SearchFilter, modelID: String, dimensions: Int, scorer: CosineScorer, minimumSimilarity: Double, limit: Int, expression:SearchExpressionPlan? = nil, strategy: (String) -> Void = { _ in }) throws -> [SemanticCandidate]? {
         lock.lock(); defer { lock.unlock() }
-        try exec("SAVEPOINT index_candidate_snapshot"); defer { try? exec("RELEASE index_candidate_snapshot") }
+        let ownsExpression = expression?.hasConstraints == true && expression?.materialized == false
+        var scopedExpression = expression
+        try exec("SAVEPOINT index_candidate_snapshot"); defer {
+            if ownsExpression { try? exec("DELETE FROM temp.search_expression_scope") }
+            try? exec("RELEASE index_candidate_snapshot")
+        }
+        if let expression { scopedExpression = try materializeExpression(expression) }
         let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),(SELECT hex(revision) FROM search_scope_revision WHERE singleton=1)")
         defer { sqlite3_finalize(state) }
         guard sqlite3_step(state) == SQLITE_ROW else { throw failure() }
-        let identity = string(state,0), head = sqlite3_column_int64(state,1), scopeRevision = string(state,2), (whereSQL,values) = conditions(filter)
+        let identity = string(state,0), head = sqlite3_column_int64(state,1), scopeRevision = string(state,2), (whereSQL,values) = conditions(filter,expression:scopedExpression)
         return try annCache.withReady(modelID:modelID,dimensions:dimensions,identity:identity,snapshotHead:head) { native,sequence -> [SemanticCandidate]? in
             strategy(native.strategy)
             let keyCount = min(2000,max(100,limit*2))
             var keys: [UInt64]
             if whereSQL == "1=1" { keys = try native.search(scorer.queryVector,count:keyCount) }
             else if native is MetalFlatIndex {
-                let scopeKey = MetalScopeKey(identity:identity,model:modelID,sequence:sequence,revision:scopeRevision,predicate:whereSQL,values:values)
+                let scopeKey = MetalScopeKey(identity:identity,model:modelID,sequence:sequence,revision:scopeRevision,predicate:whereSQL,values:values,expression:scopedExpression?.cacheIdentity)
                 let allowedKeys: Set<UInt64>
                 if !scopeRevision.isEmpty, let cached = metalScopeCache?.lookup(scopeKey) { allowedKeys = cached }
                 else {
                     // One bounded mask, invalidated by transactional metadata
-                    // nonce and graph replay sequence. Query words are excluded
-                    // so typing/follow-ups reuse the same scope safely.
+                    // nonce and graph replay sequence. Soft ranking words are
+                    // excluded; required phrase/Boolean predicates and values
+                    // are part of the key, so constraints never reuse a wrong mask.
                     let allowed = try prepare("SELECT r.key FROM vector_keys r JOIN memories m ON m.id=r.memory_id WHERE r.model=? AND r.revision<=? AND \(whereSQL)")
                     defer { sqlite3_finalize(allowed) }; bind(allowed,1,modelID); sqlite3_bind_int64(allowed,2,sequence)
                     for (i,value) in values.enumerated() { bind(allowed,Int32(i+3),value) }

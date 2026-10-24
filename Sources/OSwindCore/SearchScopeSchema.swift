@@ -29,6 +29,7 @@ struct MetalScopeKey: Equatable {
     var revision: String
     var predicate: String
     var values: [String]
+    var expression: String? = nil
 }
 struct MetalScopeSnapshot {
     var key: MetalScopeKey

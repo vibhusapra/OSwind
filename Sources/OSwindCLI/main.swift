@@ -47,6 +47,8 @@ do {
           search [--preview] [--mode hybrid|keyword|semantic] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
                  Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
+                 Content: "archive launch"; alpha AND (beta OR gamma); alpha NOT beta
+                 --literal disables both scope and content syntax; ordinary words rank softly
           get ID                         Read one complete source, including timed transcript
           ask [--provider evidence|apple|ollama|compatible|anthropic] QUESTION
           chat list|new|show ID|delete ID  Manage saved local conversations

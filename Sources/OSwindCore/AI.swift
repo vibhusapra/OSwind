@@ -105,11 +105,13 @@ public final class AnswerEngine {
         let resolution = try store.resolveQueryScope(current,interpret:interpretQuery,now:now,timeZone:timeZone)
         // Resolve the current question once. Earlier questions can help retrieve
         // a subject, but their old relative dates/operators cannot change scope.
+        let contentPlan = try SearchExpressionPlan.make(summarize ? "":resolution.filter.query,interpret:interpretQuery)
+            .addingRankingContext(ConversationContext.retrievalQuery("",previousQuestions:previousQuestions))
         var f = resolution.filter; f.query = summarize ? "" : ConversationContext.retrievalQuery(f.query,previousQuestions:previousQuestions); f.limit = 60
         let candidates: [SearchHit]
         var retrievalWarnings = [String]()
         if summarize { candidates = try store.timelineSample(f, limit: configuration.provider == .apple ? 12 : 24,detail:.preview).map { SearchHit(memory:$0, score:0, match:"timeline sample") } }
-        else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone,detail:.preview); candidates = result.hits; retrievalWarnings = result.warnings }
+        else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone,detail:.preview,expressionPlan:contentPlan); candidates = result.hits; retrievalWarnings = result.warnings }
         var fingerprints = Set<String>()
         let selected = Array(candidates.filter { fingerprints.insert($0.memory.kind == .audio ? ($0.memory.searchPreview?.sourceRevision ?? $0.memory.evidenceHash):$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
         let hits=try store.hydrate(selected)
