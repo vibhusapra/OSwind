@@ -11,6 +11,7 @@ import OSwindCore
     private var player: AVAudioPlayer?
     private var timer: Timer?
     private var sourceURL: URL?
+    private var epoch=UUID()
     func load(_ url: URL) {
         stop(); duration=0; position=0; error=nil; sourceURL=nil
         do { let player=try AVAudioPlayer(contentsOf:url); guard player.duration.isFinite,player.duration>0 else { throw OSwindError.invalid("Invalid audio duration") }; sourceURL=url; player.volume=max(0,min(volume,1)); player.delegate=self; player.prepareToPlay(); self.player=player; duration=player.duration; position=0; error=nil }
@@ -19,11 +20,11 @@ import OSwindCore
     func toggle() {
         guard let player else { return }
         guard let sourceURL,FileManager.default.fileExists(atPath:sourceURL.path) else { stop(); error="This recording is no longer available"; return }
-        if playing { player.pause(); playing=false; timer?.invalidate(); timer=nil }
-        else { if player.currentTime>=player.duration { player.currentTime=0 }; playing=player.play(); if !playing { error="Audio output could not start" }; if playing { timer=Timer.scheduledTimer(withTimeInterval:0.1,repeats:true) { [weak self] _ in Task { @MainActor in guard let self,let player=self.player else { return }; if let url=self.sourceURL,!FileManager.default.fileExists(atPath:url.path) { self.stop(); self.error="This recording is no longer available"; return }; self.position=player.currentTime } } } }
+        if playing { epoch=UUID();player.pause();position=player.currentTime;playing=false;timer?.invalidate();timer=nil }
+        else { epoch=UUID();let token=epoch;if player.currentTime>=player.duration { player.currentTime=0 }; playing=player.play(); if !playing { error="Audio output could not start" }; if playing { timer=Timer.scheduledTimer(withTimeInterval:0.1,repeats:true) { [weak self] _ in Task { @MainActor in guard let self,self.playing,self.epoch==token,let player=self.player else { return }; if let url=self.sourceURL,!FileManager.default.fileExists(atPath:url.path) { self.stop(); self.error="This recording is no longer available"; return }; self.position=player.currentTime } } } }
     }
     func seek(_ seconds: Double) { guard seconds.isFinite,let player else { return }; player.currentTime=max(0,min(seconds,player.duration)); position=player.currentTime }
-    func stop() { timer?.invalidate(); timer=nil; player?.stop(); player=nil; playing=false }
+    func stop() { epoch=UUID();timer?.invalidate(); timer=nil; player?.stop(); player=nil; playing=false }
     nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         Task { @MainActor [weak self,weak player] in guard let self,let player,self.player === player else { return }; self.playing=false; self.position=self.duration; self.timer?.invalidate(); self.timer=nil; if !flag { self.error="Audio playback did not finish successfully" } }
     }

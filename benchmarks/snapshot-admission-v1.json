@@ -278,5 +278,13 @@
   ],
   "primaryProtocolReferences": [
     "https://www.rfc-editor.org/rfc/rfc3986#section-3.2.2"
-  ]
+  ],
+  "laterGUIFollowup": {
+    "reason": "Independent CI caught a queued audio timer updating position after pause",
+    "ciRun": 40103872146,
+    "ciOutcome": "native full suite: 611 cases, 27 skips, one muted-player pause failure; benchmark harness passed",
+    "fix": "Pause synchronizes actual player time and invalidates stale timer callbacks",
+    "localVerification": "One actual muted-player seek/pause/finish/deletion case passed",
+    "packageBoundary": "This GUI follow-up is not included in runtime7ef1e24 package hashes"
+  }
 }
