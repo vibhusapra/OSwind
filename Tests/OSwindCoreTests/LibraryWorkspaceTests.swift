@@ -53,6 +53,16 @@ final class LibraryWorkspaceTests:XCTestCase {
         await fulfillment(of:[waiting],timeout:1);await fulfillment(of:[done],timeout:0.1);XCTAssertTrue(FileManager.default.fileExists(atPath:folder.path));XCTAssertEqual(try store.stats().count,1)
         workspace=nil;let result=try await worker.value;XCTAssertTrue(result.cleanupComplete);XCTAssertEqual(result.erasure.sources,1);XCTAssertFalse(FileManager.default.fileExists(atPath:abandoned.path))
     }
+    func testSchema16UpgradePreservesHistoryWithoutTreatingScratchAsRetentionDebt() throws {
+        try store.insert(Memory(id:"keep",text:"Preserve history through the workspace format upgrade"));let location=store.root;try store.close();store=nil
+        var handle:OpaquePointer?;XCTAssertEqual(sqlite3_open(location.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK)
+        XCTAssertEqual(sqlite3_exec(handle,"PRAGMA user_version=16",nil,nil,nil),SQLITE_OK);XCTAssertEqual(sqlite3_close(handle),SQLITE_OK)
+        let scratch=location.appendingPathComponent("audio/.staging/orphan");try Paths.ensure(scratch);let bytes=Data(repeating:3,count:8_000_000);try bytes.write(to:scratch.appendingPathComponent("private-snapshot"))
+        store=try MemoryStore(root:location);XCTAssertNotNil(try store.get("keep"))
+        try store.withRoutineDatabase {db in let row=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),17)}
+        let result=try store.pruneHistory(before:.distantPast,maxBytes:store.diskBytes(includeStaging:false)+1_000_000)
+        XCTAssertEqual(result.erasure.sources,0);XCTAssertEqual(result.budgetMet,true);XCTAssertNotNil(try store.get("keep"));XCTAssertEqual(try Data(contentsOf:scratch.appendingPathComponent("private-snapshot")),bytes)
+    }
     func testBudgetDoesNotDeleteHistoryToOffsetTemporaryWorkspaceCopies() throws {
         try store.insert(Memory(id:"keep",text:"A fresh source"));let budget=store.diskBytes()+1_000_000
         let workspace=try store.libraryWorkspace("oswind-backup-pins");defer {withExtendedLifetime(workspace){}}

@@ -3,7 +3,7 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 16
+    public static let schemaVersion = 17
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     let mediaRootIdentity:BackupFileStamp
