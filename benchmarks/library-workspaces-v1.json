@@ -1,0 +1,221 @@
+{
+  "format": "OSwind library-scoped intermediates and store-close evidence v1",
+  "state": "completed scoped release checks; broad product goal remains open",
+  "source_commit": "9b425b3a5e9092404858d29e35759a3875ff450a",
+  "schema_version": 17,
+  "unit_tests": {
+    "total": 487,
+    "passed": 481,
+    "opt_in_skips": 6
+  },
+  "focused_thread_sanitizer": {
+    "total": 81,
+    "passed": 80,
+    "opt_in_skips": 1
+  },
+  "release_process_checks": [
+    {
+      "name": "schema17-compat",
+      "passed": true,
+      "elapsed_seconds": 6.2067585829645395
+    },
+    {
+      "name": "observed-17-recovery",
+      "passed": true,
+      "elapsed_seconds": 22.435687749879435
+    },
+    {
+      "name": "whole-wipe",
+      "passed": true,
+      "elapsed_seconds": 7.350761333014816
+    },
+    {
+      "name": "backup",
+      "passed": true,
+      "elapsed_seconds": 0.8409801670350134
+    },
+    {
+      "name": "markdown",
+      "passed": true,
+      "elapsed_seconds": 1.8167321670334786
+    },
+    {
+      "name": "audio",
+      "passed": true,
+      "elapsed_seconds": 1.7475811671465635
+    },
+    {
+      "name": "replay",
+      "passed": true,
+      "elapsed_seconds": 1.5445652501657605
+    },
+    {
+      "name": "deletion",
+      "passed": true,
+      "elapsed_seconds": 0.48638204112648964
+    },
+    {
+      "name": "erasure",
+      "passed": true,
+      "elapsed_seconds": 0.86514633288607
+    },
+    {
+      "name": "search",
+      "passed": true,
+      "elapsed_seconds": 0.9624691661447287
+    },
+    {
+      "name": "protocols",
+      "passed": true,
+      "elapsed_seconds": 0.2765422919765115
+    },
+    {
+      "name": "indexed-protocols",
+      "passed": true,
+      "elapsed_seconds": 0.9467230830341578
+    },
+    {
+      "name": "linked-recaps-qwen",
+      "passed": true,
+      "elapsed_seconds": 2.095972833922133
+    },
+    {
+      "name": "routines",
+      "passed": true,
+      "elapsed_seconds": 1.5577930838335305
+    }
+  ],
+  "final_runner_and_harness_hashes_verified": true,
+  "harness_sha256": {
+    "check-schema17-compat.py": "e735f0b13777851fe3a77e969d9eca17c3e2fb9e4d79790a53c4d5d38a2642f4",
+    "recover-observed-imports.py": "832927cabdc36ef84f4341829a8ed792f7a77220848ce8248e6baf5b5d46581a",
+    "wipe-smoke.py": "131aa0ea03e88b17892a439564ca23fdb4bd97036c59c36b6ecc55a166153530",
+    "backup-smoke.py": "9a16dda2fd2fa86892a82a49f5ebd6a6f033036c6cf9c92ed7a77bd611ac35f2",
+    "markdown-export-smoke.py": "b3ef3e63617e01d92e7d3c2aa894018420a9a4dfc7441e24aa71b412b1d8a366",
+    "audio-smoke.py": "69c52f2fb9e802b4a4c049dad2006d1b1fe7298f09a7af36c61170755512adfd",
+    "visual-replay-smoke.py": "d0afde8d19c28de9e39a1d3199a4f66669d4627a08dc9b109f0f4a208e349e69",
+    "deletion-smoke.py": "8bde92edbe2c5d40791c4ac42e5fbeed910ffecf47797730ea448b671fcd42c5",
+    "erasure-smoke.py": "4ed7daac5ac2f0605a4941ec82f7170ba39fcb67c90807345b5f635f7f934f46",
+    "search-expression-smoke.py": "291a9b0939390504a5b393050dc5ee02e5bc902c4bf317a17b2bf887cf9a455a",
+    "integration-smoke.py": "0667605665d931c50b5a1c6ea374fdc10bb30f349ffb69cf0d84747b36b9ef97",
+    "recap-smoke.py": "f3a24918ca0b7de54867da07a437cbbfd250e3189d6b57d0cbebbbdb2aaff67f",
+    "routines-smoke.py": "68b19f182db0e160cdf8e772382dccc8bb90b0ae8ce37c382e5495adcc045076"
+  },
+  "prototype_schema16_accounting_failure": {
+    "state": "reproduced",
+    "fixture": "One synthetic note; private sparse2GiB library staging file, shared media reservation held; old schema16 prune budget1GB",
+    "old_binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a",
+    "current_fixture_binary_sha256": "17915741d1cc64ff4b87b5b0e901e9fa309f9f89931ec54e13d8f76607232f85",
+    "sources_before": 1,
+    "sources_after": 0,
+    "old_writer_result": {
+      "budgetBytes": 1000000000,
+      "budgetMet": false,
+      "bytesAfter": 2148140864,
+      "cancelled": false,
+      "erasure": {
+        "conversationTurns": 0,
+        "pendingMedia": 0,
+        "removedMedia": 0,
+        "searchCacheRemoved": true,
+        "sharedMedia": 0,
+        "sources": 1,
+        "warnings": [
+          "The storage target was not reached. Check pending media, file access or other library files before removing more history."
+        ]
+      }
+    },
+    "scope": "Owned synthetic compatibility proof. Logical sparse-file size, not real allocated storage or user history. New library format must refuse old schema16 writers before they can apply staging-unaware retention."
+  },
+  "schema17_compatibility": {
+    "state": "passed",
+    "format": "OSwind schema17 staging writer compatibility v1",
+    "old_schema": 16,
+    "new_schema": 17,
+    "old_binary_sha256": "a6a64074fface92ab9798706ff16cdc60f2b78f2da31340f349d637e3582183a",
+    "new_binary_sha256": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe",
+    "upgrade_preserved_source": true,
+    "older_reader_writer_retention_refusals": [
+      {
+        "command": "stats",
+        "exit_code": 1,
+        "all_library_file_bytes_unchanged": true
+      },
+      {
+        "command": "note",
+        "exit_code": 1,
+        "all_library_file_bytes_unchanged": true
+      },
+      {
+        "command": "prune",
+        "exit_code": 1,
+        "all_library_file_bytes_unchanged": true
+      }
+    ],
+    "staging_aware_retention": {
+      "budgetBytes": 1000000000,
+      "budgetMet": true,
+      "bytesAfter": 356432,
+      "cancelled": false,
+      "erasure": {
+        "conversationTurns": 0,
+        "pendingMedia": 0,
+        "removedMedia": 0,
+        "searchCacheRemoved": true,
+        "sharedMedia": 0,
+        "sources": 0,
+        "warnings": []
+      }
+    },
+    "staging_bytes_unchanged": true,
+    "fixture": "One synthetic note and private sparse2GiB staging file, shared media reservation held,1GB retention budget. All hashes stream without reading complete media into memory.",
+    "limits": [
+      "No normal capture library accessed",
+      "Sparse logical size is not real allocated storage, capture/power, or a performance measurement",
+      "Already-open old clients still need to stop before upgrading a shared library"
+    ]
+  },
+  "signed_product": {
+    "source_commit": "9b425b3a5e9092404858d29e35759a3875ff450a",
+    "schema_version": 17,
+    "strict_signature_verified": true,
+    "installed_launched": false,
+    "normal_library_opened": false,
+    "binaries": {
+      "OSwind": "22fa18945187ef4811c87f97ca52b2ef69eb5ac3acce130d3319041779ff3fb3",
+      "oswindctl": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe"
+    },
+    "raw_build_binaries": {
+      "OSwind": "e6e2290a38a446ef9707f4af464d78a896ff305179a2d0c47e0379d05c26a4ac",
+      "oswindctl": "bdc71bff60090bb41b8aeeab4b349cd10612ceed4370930a5e57bba457335085"
+    },
+    "signature_normalized_build_package_equal": {
+      "OSwind": true,
+      "oswindctl": true
+    },
+    "signature_normalization": "Remove signatures only from disposable copies; normalize only __LINKEDIT vmsize and compare remaining bytes.",
+    "entire_bundle_tree_sha256": "fa59604567d0ff0a1aeb204efa6ac7c346e32664d03c1f16a47cec27f9354e47",
+    "source_installed_dist_zip_entire_bundle_equal": true,
+    "zip_sha256": "f2ee86a6d13aa98ea635d8d0e264b6d2f5c850a5feaedb6e790f8631e780e861",
+    "zip_binary_equality_verified": true
+  },
+  "targeted_natural_recovery": {
+    "report": "audio-source-recovery-release-v1.json",
+    "total_unique_clips": 17,
+    "recovered": 17,
+    "actual_saved_records_and_bounds_verified": true,
+    "staging_empty_after_every_operation": true
+  },
+  "native_acceptance": {
+    "fresh_doctor_screen_locked": true,
+    "normal_library_opened": false,
+    "native_clicks_permissions_keyboard_devices_verified": false
+  },
+  "limits": [
+    "Library-scoped intermediates and explicit store close are not an encrypted vault; SQLite file-backed temporaries, standalone context-free APIs, managed roots, Keychain, migration and native lock/unlock still need work.",
+    "Explicit backup/Markdown output remains unencrypted; legacy independent copies remain outside erasure.",
+    "Old schema16 readers/writers/retention refuse new libraries; already-open old clients and raw manual writers still need to stop before upgrade.",
+    "Original frozen natural speech reports remain unchanged; this targeted known-failure recovery is not a new corpus or unseen evaluation.",
+    "The independent pinned schema11 synthetic24h component soak is still running; no physical capture, battery/power,24h completion or competitor/top-three claim."
+  ]
+}

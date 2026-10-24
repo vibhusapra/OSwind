@@ -308,7 +308,7 @@
     "axis": "Audio",
     "feature": "Local GPU transcription",
     "status": "live verified",
-    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance selected LibriSpeech corpus completes2190imports: Parakeet NE/GPU WER2.62%clean,3.73/3.80%challenging, zero failedimports. OriginalWhisper34failedattempts retained, end-to-end WER7.00/15.02%. Independent JiWER, all hashes stable; read English speech, not meetings or competitor apps",
+    "evidence": "Whisper base.en Metal and integrated Parakeet v3 Core ML JFK import pass; resident native runtime supports ANE/GPU/CPU policies, FIFO cancellation and word timings; native app/CLI streaming setup, progress/cancel/hash/no-replace/recovery verified. Frozen365-utterance selected LibriSpeech corpus completes2190imports: Parakeet NE/GPU WER2.62%clean,3.73/3.80%challenging, zero failedimports. OriginalWhisper34failedattempts retained, end-to-end WER7.00/15.02%; signed schema17 recovers all17known failures in targeted checks, not a new corpus result. Independent JiWER, stable hashes; read English speech, not meetings or competitor apps",
     "references": "Screenpipe, TimeScroll"
   },
   {
@@ -420,11 +420,19 @@
     "axis": "Data",
     "feature": "Retention + storage budget",
     "status": "tested",
-    "evidence": "Age prune tested; auto every 5 minutes; disk compaction refinement pending",
+    "evidence": "Age/budget outcomes, oldest-first batches, shared-media cleanup and unmet targets; schema17 excludes temporary staging from history deletion budget while physical disk reporting includes it. Old schema16 writer refusal verified",
     "references": "Recall, ScreenMemory"
   },
   {
     "id": "F054",
+    "axis": "Data",
+    "feature": "Library-scoped transient work and close",
+    "status": "tested",
+    "evidence": "Schema17 audio/replay/import/source export scratch, shared lifetime reservations, fullwipe/close waits, explicit SQLite BUSY retry, root identity and deterministic subprocess cleanup.487tests/81TSan plus14signed process groups pass; encrypted vault and SQLite file-temp strategy remain open",
+    "references": "Library privacy and lifecycle"
+  },
+  {
+    "id": "F055",
     "axis": "Data",
     "feature": "JSON export/import",
     "status": "tested",
@@ -432,7 +440,7 @@
     "references": "Most memory tools"
   },
   {
-    "id": "F055",
+    "id": "F056",
     "axis": "Data",
     "feature": "Media backup / restore",
     "status": "tested",
@@ -440,7 +448,7 @@
     "references": "Rewind Desktop S3, Retrace"
   },
   {
-    "id": "F056",
+    "id": "F057",
     "axis": "Data",
     "feature": "Rewind / Limitless migration",
     "status": "todo",
@@ -448,7 +456,7 @@
     "references": "Retrace (haseab)"
   },
   {
-    "id": "F057",
+    "id": "F058",
     "axis": "Data",
     "feature": "Markdown / Obsidian export",
     "status": "tested",
@@ -456,7 +464,7 @@
     "references": "Minne, Screenpipe"
   },
   {
-    "id": "F058",
+    "id": "F059",
     "axis": "Data",
     "feature": "Personal device sync",
     "status": "todo",
@@ -464,7 +472,7 @@
     "references": "Screenpipe Business"
   },
   {
-    "id": "F059",
+    "id": "F060",
     "axis": "Developer",
     "feature": "Authenticated localhost API",
     "status": "tested",
@@ -472,7 +480,7 @@
     "references": "Screenpipe, Pensieve"
   },
   {
-    "id": "F060",
+    "id": "F061",
     "axis": "Developer",
     "feature": "MCP stdio integration",
     "status": "tested",
@@ -480,7 +488,7 @@
     "references": "Pieces, TimeScroll, Screenpipe"
   },
   {
-    "id": "F061",
+    "id": "F062",
     "axis": "Developer",
     "feature": "Plugin / collector SDK",
     "status": "todo",
@@ -488,7 +496,7 @@
     "references": "Pensieve, Screenpipe, Retrace (jhammant)"
   },
   {
-    "id": "F062",
+    "id": "F063",
     "axis": "UX",
     "feature": "Native macOS UI + menu bar",
     "status": "partial",
@@ -496,7 +504,7 @@
     "references": "TimeScroll, rem, ScreenMemory"
   },
   {
-    "id": "F063",
+    "id": "F064",
     "axis": "UX",
     "feature": "Onboarding and permission health",
     "status": "implemented",
@@ -504,7 +512,7 @@
     "references": "All polished apps"
   },
   {
-    "id": "F064",
+    "id": "F065",
     "axis": "UX",
     "feature": "Global shortcut + login item",
     "status": "partial",
@@ -512,7 +520,7 @@
     "references": "Most native tools"
   },
   {
-    "id": "F065",
+    "id": "F066",
     "axis": "UX",
     "feature": "Keyboard and accessibility review",
     "status": "todo",
@@ -520,7 +528,7 @@
     "references": "Quality bar"
   },
   {
-    "id": "F066",
+    "id": "F067",
     "axis": "UX",
     "feature": "Signed/notarized installer + updates",
     "status": "todo",
@@ -528,7 +536,7 @@
     "references": "Commercial apps"
   },
   {
-    "id": "F067",
+    "id": "F068",
     "axis": "Enterprise",
     "feature": "SSO / MDM / audit / org controls",
     "status": "out of v0 desktop scope",
@@ -536,7 +544,7 @@
     "references": "Screenpipe, Pieces, Granola"
   },
   {
-    "id": "F068",
+    "id": "F069",
     "axis": "Platform",
     "feature": "macOS Apple Silicon",
     "status": "partial",
@@ -544,7 +552,7 @@
     "references": "All macOS tools"
   },
   {
-    "id": "F069",
+    "id": "F070",
     "axis": "Platform",
     "feature": "Windows / Linux / mobile",
     "status": "out of v0 desktop scope",
@@ -552,7 +560,7 @@
     "references": "Screenpipe, Pieces, Omi"
   },
   {
-    "id": "F070",
+    "id": "F071",
     "axis": "Quality",
     "feature": "Real competitor benchmarks",
     "status": "todo",
@@ -560,7 +568,7 @@
     "references": "Required before top-three claim"
   },
   {
-    "id": "F071",
+    "id": "F072",
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
@@ -568,7 +576,7 @@
     "references": "OSwind quality bar"
   },
   {
-    "id": "F072",
+    "id": "F073",
     "axis": "Quality",
     "feature": "24-hour soak and fault recovery",
     "status": "partial",
@@ -576,7 +584,7 @@
     "references": "OSwind quality bar"
   },
   {
-    "id": "F073",
+    "id": "F074",
     "axis": "Retrieval",
     "feature": "Complete-source semantic passages",
     "status": "tested",
@@ -584,7 +592,7 @@
     "references": "Long-source retrieval quality"
   },
   {
-    "id": "F074",
+    "id": "F075",
     "axis": "Audio",
     "feature": "Retained clips / imports / playback",
     "status": "tested",
@@ -592,7 +600,7 @@
     "references": "Screenpipe, Omi, Limitless"
   },
   {
-    "id": "F075",
+    "id": "F076",
     "axis": "Energy",
     "feature": "Idle native model release",
     "status": "tested",
