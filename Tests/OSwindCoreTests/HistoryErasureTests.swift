@@ -112,4 +112,25 @@ final class HistoryErasureTests:XCTestCase {
         let second=store.retryErasureCleanup();XCTAssertEqual(second.pendingMedia,0);XCTAssertTrue(second.warnings.isEmpty)
     }
 
+    func testDotPathAliasKeepsSharedFileUntilLastReferenceIsErased() throws {
+        let file=root.appendingPathComponent("images/alias");try Data([3]).write(to:file)
+        try add("selected",path:"images/alias");try add("keep",app:"Notes",path:"images/./alias")
+        let first=try erase(.init(app:"Safari"));XCTAssertEqual(first.sharedMedia,1);XCTAssertEqual(first.removedMedia,0);XCTAssertEqual(try Data(contentsOf:file),Data([3]))
+        XCTAssertEqual(try erase(.init(app:"Notes")).removedMedia,1);XCTAssertFalse(FileManager.default.fileExists(atPath:file.path))
+    }
+    func testCaseAliasOnInsensitiveVolumeKeepsSharedFile() throws {
+        let file=root.appendingPathComponent("images/MiXeD");try Data([4]).write(to:file)
+        guard FileManager.default.fileExists(atPath:root.appendingPathComponent("images/mixed").path) else {throw XCTSkip("Volume is case sensitive")}
+        try add("selected",path:"images/MiXeD");try add("keep",app:"Notes",path:"images/mixed")
+        let first=try erase(.init(app:"Safari"));XCTAssertEqual(first.sharedMedia,1);XCTAssertEqual(first.removedMedia,0);XCTAssertEqual(try Data(contentsOf:file),Data([4]))
+        XCTAssertEqual(try erase(.init(app:"Notes")).removedMedia,1)
+    }
+
+    func testSeparateHardLinkEntryCanBeRemovedWithoutDeletingOtherEntry() throws {
+        let selected=root.appendingPathComponent("images/selected"),keep=root.appendingPathComponent("images/keep")
+        try Data([5]).write(to:selected);try FileManager.default.linkItem(at:selected,to:keep)
+        try add("selected",path:"images/selected");try add("keep",app:"Notes",path:"images/keep")
+        let result=try erase(.init(app:"Safari"));XCTAssertEqual(result.removedMedia,1);XCTAssertEqual(result.sharedMedia,0);XCTAssertFalse(FileManager.default.fileExists(atPath:selected.path));XCTAssertEqual(try Data(contentsOf:keep),Data([5]))
+    }
+
 }

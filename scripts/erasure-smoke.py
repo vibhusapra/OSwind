@@ -14,7 +14,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-erasure-contract-') as temporary
     (library/'images/shared').write_bytes(b'shared owned bytes');(library/'images/unique').write_bytes(b'unique owned bytes')
     # Owned fixture attaches media to imported sources; normal interchange deliberately strips raw paths.
     with sqlite3.connect(library/'memory.sqlite') as db:
-        for identifier,path in [('a','images/shared'),('b','images/shared'),('c','images/unique')]:
+        for identifier,path in [('a','images/shared'),('b','images/./shared'),('c','images/unique')]:
             payload=json.loads(db.execute('SELECT payload FROM memories WHERE id=?',(identifier,)).fetchone()[0]);payload['imagePath']=path;db.execute('UPDATE memories SET payload=? WHERE id=?',(json.dumps(payload).encode(),identifier))
     scope=['--from',stamp(20),'--to',stamp(30),'--app','Safari','--domain','ALPHA.test']
     preview=cli('erase','preview',*scope);assert preview['sources']==2 and {x['id'] for x in preview['samples']}=={'a','c'} and preview['mediaReferences']==2

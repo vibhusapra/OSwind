@@ -139,6 +139,15 @@ extension MemoryStore {
     public func retryErasureCleanup() -> HistoryErasureResult {
         (try? withRoutineDatabase {cleanupErasedAssets($0,sources:0,turns:0)}) ?? .init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:false,warnings:["Could not open erasure cleanup state."])
     }
+    private func erasureAssetKey(_ path:String) throws -> String {
+        guard let url=assetURL(path) else {throw OSwindError.invalid("An asset reference could not be safely resolved")}
+        do {
+            // Foundation resolves actual on-disk spelling, including APFS case aliases. Different
+            // hard-link directory entries retain different paths, so unlinking one remains safe.
+            guard let canonical=try url.resourceValues(forKeys:[.canonicalPathKey]).canonicalPath else {throw OSwindError.invalid("An asset reference has no canonical path")}
+            return canonical
+        } catch let error as NSError where error.domain==NSCocoaErrorDomain && [NSFileNoSuchFileError,NSFileReadNoSuchFileError].contains(error.code) {return url.standardizedFileURL.path}
+    }
     private func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int) -> HistoryErasureResult {
         var removed=0,shared=0,warnings=[String](),cursor=""
         do {
@@ -146,23 +155,32 @@ extension MemoryStore {
             do {
                 // One source scan and indexed lookups, rather than decoding the entire archive per asset.
                 // This writer reservation protects a shared path against concurrent reference admission.
-                try db.execute("""
-                CREATE TEMP TABLE IF NOT EXISTS erasure_live_assets(path TEXT PRIMARY KEY) WITHOUT ROWID;
-                DELETE FROM temp.erasure_live_assets;
-                INSERT OR IGNORE INTO temp.erasure_live_assets
-                SELECT path FROM (
-                    SELECT json_extract(CAST(payload AS TEXT),'$.imagePath') AS path FROM memories
-                    UNION ALL SELECT json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories
-                    UNION ALL SELECT json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories
-                ) WHERE path IN (SELECT path FROM erasure_assets);
-                """)
+                try db.execute("CREATE TEMP TABLE IF NOT EXISTS erasure_live_assets(path TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.erasure_live_assets")
+                if try db.eraseCount("SELECT COUNT(*) FROM erasure_assets")>0 {
+                    let live=try db.statement("""
+                    SELECT path FROM (
+                        SELECT json_extract(CAST(payload AS TEXT),'$.imagePath') AS path FROM memories
+                        UNION SELECT json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories
+                        UNION SELECT json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories
+                    ) WHERE path IS NOT NULL
+                    """)
+                    defer {sqlite3_finalize(live)}
+                    let put=try db.statement("INSERT OR IGNORE INTO temp.erasure_live_assets VALUES(?)");defer {sqlite3_finalize(put)}
+                    var status=sqlite3_step(live)
+                    while status==SQLITE_ROW {
+                        let key=try erasureAssetKey(db.text(live,0))
+                        sqlite3_reset(put);sqlite3_clear_bindings(put);db.bind(put,1,key);try db.done(put)
+                        status=sqlite3_step(live)
+                    }
+                    guard status==SQLITE_DONE else {throw db.error()}
+                }
                 while true {
                     let row=try db.statement("SELECT path FROM erasure_assets WHERE path>? ORDER BY path LIMIT 100");db.bind(row,1,cursor);var paths=[String]();var status=sqlite3_step(row)
                     while status==SQLITE_ROW {paths.append(db.text(row,0));status=sqlite3_step(row)};sqlite3_finalize(row);guard status==SQLITE_DONE else {throw db.error()};guard !paths.isEmpty else {break}
                     for path in paths {
                         cursor=path
                         do {
-                            let ref=try db.statement("SELECT 1 FROM temp.erasure_live_assets WHERE path=?");db.bind(ref,1,path);let code=sqlite3_step(ref);sqlite3_finalize(ref);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
+                            let ref=try db.statement("SELECT 1 FROM temp.erasure_live_assets WHERE path=?");db.bind(ref,1,try erasureAssetKey(path));let code=sqlite3_step(ref);sqlite3_finalize(ref);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
                             if code==SQLITE_ROW {shared+=1}
                             else if let url=assetURL(path) {
                                 do {
