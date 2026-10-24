@@ -1,5 +1,7 @@
 # Portable Markdown and Obsidian export
 
+Entity definitions, aliases, notes and membership corrections currently require a [full library backup](BACKUP.md); source JSON and Markdown exports do not preserve that entity layer.
+
 Choose **Settings → Data → Markdown & Obsidian → Export Markdown library…**. Retained media is off by default. The export runs on a utility worker, shows progress beside the export control and supports Cancel. Other library transfers and library switching wait for that operation.
 
 ```bash

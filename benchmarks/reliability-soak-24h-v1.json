@@ -1,0 +1,74 @@
+{
+  "format": "OSwind synthetic component soak v1",
+  "state": "completed_with_gaps",
+  "binary_sha256": "16d195c1ced3d0ec741a5d6fed3bee0be1021e2532eb16c32203b0c3f28c9c78",
+  "harness_sha256": "ee2e711ada0af48ab2c011264c9ea0e199e0866d8edeb72679a4a4fcf65e0b3f",
+  "os": "26.6.2",
+  "hardware": "Apple M5 Max",
+  "requested_wall_seconds": 86400.0,
+  "interval_seconds": 20.0,
+  "max_notes": 200,
+  "chat_model": "qwen3:4b-instruct-2507-q4_K_M",
+  "chat_every_seconds": 600.0,
+  "started_utc": "2026-10-23T20:15:47.026103+00:00",
+  "finished_utc": "2026-10-24T20:15:48.691169+00:00",
+  "cycles": 4291,
+  "writes": 4291,
+  "deletions": 4091,
+  "answers": 144,
+  "writer_live_read_cycles": 4291,
+  "oversize_wall_gaps": [
+    {
+      "after_cycle": 2460,
+      "wall_seconds": 82.12681603431702
+    },
+    {
+      "after_cycle": 2577,
+      "wall_seconds": 91.90528678894043
+    },
+    {
+      "after_cycle": 2664,
+      "wall_seconds": 113.52900218963623
+    },
+    {
+      "after_cycle": 4113,
+      "wall_seconds": 248.29783082008362
+    }
+  ],
+  "expected_warning_policy": "Bounded-excerpt notices are retained; all other answer warnings fail the run",
+  "gap_interpretation": "An oversized wall gap may be sleep, clock change or slow work; none is treated as uninterrupted coverage",
+  "resource_scope": "Sampled RSS/lifetime CPU of persistent MCP only, excluding writer/model daemons; no power estimate",
+  "scope": "Persistent MCP client/server, concurrent CLI writer, keyword/full/preview retrieval, complete source reads, erasure and optional local Qwen answers. No capture/device/UI/power/competitor claim.",
+  "elapsed_wall_seconds": 86400.00250887871,
+  "peak_sampled_mcp_rss_bytes": 24363008,
+  "mcp_shutdown": {
+    "exit_code": 0,
+    "forced": false
+  },
+  "schema": 11,
+  "finalSourceCount": 202,
+  "measuredSamples": 4291,
+  "uninterruptedPass": false,
+  "latestRuntimeQualified": false,
+  "processShutdownVerified": true,
+  "sampleFileSHA256": "da40e941c15db3a90c5a36c92c4d5ef8b4215a3c2b17b07bdcce07ba276a15c4",
+  "cycleWallSeconds": {
+    "count": 4291,
+    "median": 0.12665616697631776,
+    "p95": 0.27605941612273455,
+    "maximum": 113.52691320795566
+  },
+  "localAnswerWallSeconds": {
+    "count": 144,
+    "median": 1.274857999989763,
+    "p95": 19.425497957970947,
+    "maximum": 113.41520491684787
+  },
+  "mcpRSSBytes": {
+    "count": 4291,
+    "median": 22347776,
+    "p95": 22773760,
+    "maximum": 24363008
+  },
+  "notes": "The exit classification is completed_with_gaps (harness exit3), with no contract failure or forced shutdown. Four oversized wall intervals remain retained; one aligns with separately observed OS sleep. This synthetic schema11 component run excludes capture, device/UI acceptance, per-process power and model-daemon resources. It is not an uninterrupted 24-hour capture result or qualification of schema21."
+}

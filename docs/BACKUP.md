@@ -2,9 +2,9 @@
 
 Use **Settings → Data → Complete backup & restore** to create a `.oswindbackup` package, inspect one, or restore a new library. After restoration, choose **Open restored library**. **Choose another library** opens an existing library; a missing selected drive shows a recovery screen on the next launch. The current library is left intact.
 
-A package contains its source database, notes, tags, favorites, timestamps, retained screenshots/audio, saved conversations and source anchors, supported search vectors/passages, and settings. It excludes Keychain credentials, the local API bearer token, downloaded model weights and disposable search caches. Hashes detect corruption; they do not establish who created a package.
+A package contains its source database, notes, tags, favorites, timestamps, retained screenshots/audio, saved conversations and source anchors, supported search vectors/passages, people/project definitions and aliases, source links and rejected matches, and settings. Entity index completion is rebuilt on restore; entity catch-up stays off. See [entity portability and erasure](ENTITY-MEMORY.md). It excludes Keychain credentials, the local API bearer token, downloaded model weights and disposable search caches. Hashes detect corruption; they do not establish who created a package.
 
-**Backups are plaintext and not encrypted.** Package directories/files are created with private permissions. Keep them on trusted storage. Encrypted vault and password/biometric backup support remain open requirements.
+**Backups are plaintext and not encrypted.** Package directories/files are created with private permissions. Keep them on trusted storage. Encrypted live libraries are available separately; encrypted backup packages and password/biometric backup opening remain open requirements.
 
 The command line works independently of the app:
 
