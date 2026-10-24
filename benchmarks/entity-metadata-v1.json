@@ -1,0 +1,626 @@
+{
+  "format": "OSwind entity metadata preservation qualification v1",
+  "codeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+  "schema": 21,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "change": "Curated project notes and canonical-key-equivalent alias edits preserve completed extraction, source links and valid prepared work. Genuine matching-rule changes, primary renames and uncurated-to-curated activation still invalidate.",
+  "scope": "Owned synthetic entity metadata/correction/backup contracts, paired signed CLIs, actual encrypted entity lifecycle, native editor/input, all defined normal/opt-in cases including cached local models and physical production PCM, signed package/ZIP verification. No normal history, real credentials, TCC/authentication changes, microphone-to-ASR, latest uninterrupted capture/power or competitor ranking.",
+  "tests": {
+    "fullCases": 791,
+    "normalPasses": 760,
+    "normalOptInSkips": 31,
+    "nativeModelMetalPasses": 313,
+    "additionalNativePasses": 25,
+    "realModelRuntimePasses": 5,
+    "physicalAudioPasses": 1,
+    "distinctFunctionalPasses": 791,
+    "allDefinedCasesExercised": true,
+    "remainingOptInCases": [],
+    "focusedThreadSanitizerPasses": 42,
+    "physicalThreadSanitizerPasses": 1,
+    "distinctThreadSanitizerPasses": 43,
+    "threadSanitizerRacesReported": false,
+    "passedCaseNamesSHA256": "c86307ba108aa6119e113f2e9dca9928d0244f5d052853b8fdb9fa684fd8c956",
+    "logs": {
+      "full-normal-v1.log": "3d8db152c18115f6dcf56750a0fa3d924f8244dc21a9f4ea8488a33b6f1e4362",
+      "native-model-metal-v1.log": "89ecababdaa52f5c2325a2b6754576d62aa3f911c2024b9d4e5fe39b2f4d168a",
+      "focused-tsan-v1.log": "487fcecb447711f5c840e54a36b06f88cef20014a41328c7192844d20807178d",
+      "real-models-runtime-v1.log": "a9bf14d8a58b70c761ccd5ced2523416028d5fd395bbc91d5a45268383e8c67a",
+      "physical-normal-v1/test.log": "b8d43b5f2fc0616c6e9f6612843cedef9e3e6ff76323fdef1e380097c80d91ca",
+      "physical-tsan-v1/test.log": "ec81ea64b216082ba67184c0b778266f393b66d5c8f66f987d2adac5b50ceb41"
+    }
+  },
+  "package": {
+    "scope": "Separately staged schema21 desktop memory with metadata-only entity preservation; no installation; native input accepted only where separately reported",
+    "codeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+    "schema": 21,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "dfe403ff12e16bb1a50f298887d58fef61d139dace10ac8481cde8b308d9e2c3",
+        "signedSHA256": "f338a0828e2cbc6ff3e76a251f5973124a141afeb6c9c96b8f69e75d4d1d1120",
+        "normalizedPayloadSHA256": "166a266ec8c0250968639516ee9dd6ec671b4ec9ccdf84270ca75a4795653579"
+      },
+      "oswindctl": {
+        "rawSHA256": "9a144774d0e6dba36a2cd912cae52426ac7aa4fb404147e3d8da496582b3753b",
+        "signedSHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "normalizedPayloadSHA256": "844588f69ed9596d22566952a799be7ffbdcd68e4f84500d5755752ef1828812"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "8f952b981336f965bab5685c1022bbf034afebc090bb6fa23a6a1966c8a8450d",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "3e657dd4bf63590a5c1e8ed8b4a42787e2659a8446c33a7d3e02acb682168c08",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalOperations": [
+    {
+      "name": "full-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 129.4876766668167
+    },
+    {
+      "name": "native-model-metal-v1",
+      "exitCode": 0,
+      "wallSeconds": 223.5554807500448
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 54.873686332954094
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8014452080242336
+    },
+    {
+      "name": "entity-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 11.32448104210198
+    },
+    {
+      "name": "metadata-paired-v1",
+      "exitCode": 0,
+      "wallSeconds": 40.31161425006576
+    },
+    {
+      "name": "entity-vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 9.181031000101939
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4972396248485893
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1951613330747932
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 44.63011729181744
+    },
+    {
+      "name": "real-models-runtime-v1",
+      "exitCode": 0,
+      "wallSeconds": 176.3710499999579
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 15.445610041962937
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 47.10678287502378
+    },
+    {
+      "name": "live-capture-v1",
+      "exitCode": 0,
+      "wallSeconds": 4.215408750111237
+    }
+  ],
+  "successfulFinalOperations": 14,
+  "metadataObservation": {
+    "format": "OSwind project metadata preservation observations v1",
+    "passed": true,
+    "sources": 1000,
+    "repetitions": 3,
+    "syntheticInputSHA256": "f5ea5501bd3ab44c2e10d7dcfd6ebad428db5396e290a58979fc67d6891d94bc",
+    "harnessSHA256": "cee70ed0ab6d1e0ca8770123b86e4c3efc761f9163091fe84776a1573c92b079",
+    "results": [
+      {
+        "label": "baseline",
+        "binarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+        "metadataPreserved": false,
+        "trials": [
+          {
+            "editWallSeconds": 0.06641425006091595,
+            "resumeWallSeconds": 1.1576303748879582,
+            "totalWallSeconds": 1.2240446249488741,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.061461125034838915,
+            "resumeWallSeconds": 1.1721627090591937,
+            "totalWallSeconds": 1.2336238340940326,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.06842612498439848,
+            "resumeWallSeconds": 1.0682809171266854,
+            "totalWallSeconds": 1.1367070421110839,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          }
+        ],
+        "medianEditWallSeconds": 0.06641425006091595,
+        "medianResumeWallSeconds": 1.1576303748879582,
+        "medianTotalWallSeconds": 1.2240446249488741,
+        "checks": [
+          "source anchors unchanged after resume",
+          "manual link retained",
+          "rejected automatic source remains suppressed",
+          "real alias change invalidates completion/automatic links",
+          "quiet full backup preserves edited definitions and memberships",
+          "restored completion resets and resumed extraction retains correction",
+          "restored uncurated project activation by edit/create invalidates its completed plan"
+        ]
+      },
+      {
+        "label": "candidate",
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "metadataPreserved": true,
+        "trials": [
+          {
+            "editWallSeconds": 0.052555124973878264,
+            "resumeWallSeconds": 0.06421712506562471,
+            "totalWallSeconds": 0.11677225003950298,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.08048987505026162,
+            "resumeWallSeconds": 0.060769000090658665,
+            "totalWallSeconds": 0.14125887514092028,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.061401958111673594,
+            "resumeWallSeconds": 0.05492387502454221,
+            "totalWallSeconds": 0.1163258331362158,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          }
+        ],
+        "medianEditWallSeconds": 0.061401958111673594,
+        "medianResumeWallSeconds": 0.060769000090658665,
+        "medianTotalWallSeconds": 0.11677225003950298,
+        "checks": [
+          "source anchors unchanged after resume",
+          "manual link retained",
+          "rejected automatic source remains suppressed",
+          "real alias change invalidates completion/automatic links",
+          "quiet full backup preserves edited definitions and memberships",
+          "restored completion resets and resumed extraction retains correction",
+          "restored uncurated project activation by edit/create invalidates its completed plan"
+        ]
+      }
+    ],
+    "scope": "Owned short synthetic sources and project metadata/alias/correction/backup contracts. Sequential CLI trials include startup, SQLite and extraction/resume with uncontrolled caches and host activity. Required rescan counts are exact for this fixture; no representative workload, energy or competitor claim."
+  },
+  "comparison": {
+    "baselineCodeCommit": "a91f25b339113af1f9147d29318672b254fb8bdb",
+    "baselineCLIByteIdenticalToEarlierEntityRuntime": true,
+    "baselinePendingSourcesPerNotesEdit": 1000,
+    "candidatePendingSourcesPerNotesEdit": 0,
+    "baselineMedianEditPlusResumeSeconds": 1.2240446249488741,
+    "candidateMedianEditPlusResumeSeconds": 0.11677225003950298,
+    "timingDefinition": "Median of three sums: edit subprocess wall time + index/resume subprocess wall time. Excludes intervening validation/progress queries, initial import/index setup and backup/alias/curation controls. Uncontrolled host activity and caches; not UI-save-only speed, representative scale, power or competitors."
+  },
+  "entityProcess": {
+    "format": "OSwind source-linked entity memory qualification v1",
+    "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+    "olderSchema20BinarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "olderClientRefusalChecked": true,
+    "harnessSHA256": "3afe85eef34a874f0924bc131d4c5c4c476bd91477082c6fabbb8d3271d334bd",
+    "schema": 21,
+    "passed": true,
+    "sources": 1000,
+    "projectOracleSources": 667,
+    "projectPrecision": 1.0,
+    "projectRecall": 1.0,
+    "automaticSpansVerified": 1335,
+    "firstIndexWallSeconds": 0.7671382499393076,
+    "resumeWallSeconds": 0.05821241717785597,
+    "observedNLPAndProjectGroups": [
+      {
+        "kind": "organization",
+        "name": "Apollo",
+        "sources": 334
+      },
+      {
+        "kind": "person",
+        "name": "Chen",
+        "sources": 334
+      },
+      {
+        "kind": "project",
+        "name": "Apollo Launch",
+        "sources": 667
+      }
+    ],
+    "checks": [
+      "exact project alias oracle",
+      "UTF16 source anchors",
+      "scoped keyword retrieval",
+      "metadata-only edit preserves completion and source links",
+      "correction survives actual alias-rule rescan",
+      "read-only MCP membership and validation",
+      "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+      "quiet backup restore retains definitions, aliases and links",
+      "restored completion reset",
+      "source erasure",
+      "full wipe erases curated definitions",
+      "schema20 client refusal"
+    ],
+    "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+  },
+  "encryptedEntityProcess": {
+    "format": "OSwind native entity vault v1",
+    "state": "completed",
+    "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+    "checks": [
+      "native local NLP/project indexing and explicit person link on verified encrypted library",
+      "rejected project mention survives native encrypted rule-rescan",
+      "labels, notes, correction and deliberate source link survive normal lock/remount",
+      "full backup and quiet restore retain entity metadata/correction with native rescan"
+    ],
+    "scope": "Synthetic source and entity metadata on one newly-created encrypted APFS volume. No normal library, real credentials, Keychain, authentication or TCC changes. No Apple-framework temporary-memory zeroization or power claim.",
+    "schema": 21,
+    "sourceCount": 1,
+    "entityCount": 4,
+    "verifiedDetached": true,
+    "passphrasePersisted": false,
+    "cleanupDetached": true
+  },
+  "liveCapture": {
+    "observations": {
+      "result": "PASS",
+      "normal_capture": "Saved OSwind Synthetic Fixture \u00b7 760 ms",
+      "secret_capture": "Saved OSwind Synthetic Fixture \u00b7 624 ms",
+      "ocr_regions": 5,
+      "verified": [
+        "target identity",
+        "live OCR marker",
+        "image saved",
+        "secret text redacted",
+        "secret image absent",
+        "app exclusion",
+        "window-title exclusion",
+        "delete removes image and FTS entry"
+      ]
+    },
+    "logSHA256": "3283c046d0858c4cabcf7ab2e7267ea2a6196d47d0747bf42272d30e5061f758",
+    "scope": "Signed CLI targeting two owned synthetic windows; actual OCR, normal image, secret suppression, exclusions and image/FTS deletion. One-shot statuses exclude sustained latency, energy and GUI/controller/microphone acceptance."
+  },
+  "nativeUI": {
+    "result": "pass",
+    "codeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+    "guiSHA256": "f338a0828e2cbc6ff3e76a251f5973124a141afeb6c9c96b8f69e75d4d1d1120",
+    "library": "Fresh quiet restored copy of exactly six text-verified synthetic notes; no normal history; capture/audio and automatic entity indexing remain off",
+    "input": "CUA native AX actions with observed state after each action",
+    "checks": [
+      {
+        "action": "Quiet restore opened",
+        "indexed": 0,
+        "eligible": 6,
+        "projectSources": 2
+      },
+      {
+        "action": "Explicit Build / resume",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2
+      },
+      {
+        "action": "Save only project notes, without requesting another build",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2,
+        "automaticSourcePresent": true,
+        "manualSourcePresent": true,
+        "notesPersisted": true
+      },
+      {
+        "action": "Add unused project alias",
+        "indexed": 0,
+        "eligible": 6,
+        "projectSources": 1,
+        "manualSourcePresent": true
+      },
+      {
+        "action": "Build / resume after real rule change",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2
+      },
+      {
+        "action": "Search sources",
+        "results": 2,
+        "visibleProjectScope": true
+      },
+      {
+        "action": "People & projects then Cmd-K",
+        "results": 6,
+        "visibleProjectScope": false,
+        "searchFieldFocused": true
+      }
+    ],
+    "postQuitReadOnlyVerification": {
+      "progress": {
+        "eligible": 6,
+        "indexed": 6,
+        "limited": 0
+      },
+      "sourceCount": 2,
+      "notesMatch": true
+    },
+    "cleanup": "Owned staged GUI quit via Cmd-Q and exact executable absent from process inventory; earlier sample library not modified",
+    "permissionChanges": false,
+    "captureStarted": false,
+    "limitations": [
+      "One synthetic sample and existing native layout; no full accessibility/global shortcut or Documents-root startup acceptance",
+      "Build status still displays the previous Updated count when rules change; progress count and source links correctly invalidate; wording polish remains",
+      "No GUI/controller/microphone-to-ASR, uninterrupted capture/power or competitor acceptance"
+    ]
+  },
+  "cachedModelChecks": {
+    "inputs": {
+      "codeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+      "cacheVerification": {
+        "parakeet": {
+          "bytes": 483106120,
+          "files": 22,
+          "kind": "parakeet",
+          "revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe",
+          "reused": true
+        },
+        "speakers": {
+          "bytes": 21816863,
+          "files": 28,
+          "kind": "speakers",
+          "revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232",
+          "reused": true
+        }
+      },
+      "ASRFixtureSHA256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+      "speakerFixtureSHA256": "9edaeed2566521d67262f1f35118403afe925324818c102ac2ece71283a33419",
+      "speakerFixtureScope": "Existing 32.225-second synthetic alternating stock af_heart/am_echo segments; not natural meeting accuracy",
+      "ASRFixtureScope": "Existing public JFK country speech fixture; repeated text/segments equality is a contract check, not an ASR quality corpus",
+      "downloads": false,
+      "normalLibraryOpened": false
+    },
+    "passedCases": [
+      "-[OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured]",
+      "-[OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle]",
+      "-[OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]"
+    ],
+    "scope": "Pinned Parakeet and speaker-cache verification, explicit-cache app setup without capture, public JFK repeated ASR, synthetic alternating stock-voice attribution, real default idle expiry/reload and after-use backend release, isolated managed local-server lifecycle. Contract tests, not refreshed natural-corpus accuracy, operation placement or power.",
+    "MPSGraphCacheLoadDiagnostics": 2,
+    "diagnosticScope": "Apple MPSGraph cache-load diagnostics remain in the retained log despite passing outputs/contracts; cause and per-operation compute placement unmeasured."
+  },
+  "physicalAudio": [
+    {
+      "format": "OSwind owned native system-audio observations v1",
+      "observations": [
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.01131098231869065,
+          "intendedFrequencyHz": 440,
+          "intendedToOtherAmplitudeRatio": 9547990.281404989,
+          "otherOwnedSourceAmplitude": 1.184645353139827e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "A",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        },
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310415424790988,
+          "intendedFrequencyHz": 997,
+          "intendedToOtherAmplitudeRatio": 3245715.5566417747,
+          "otherOwnedSourceAmplitude": 3.4847216976996803e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "B",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        }
+      ],
+      "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+      "threadSanitizer": false,
+      "sourceCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+      "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+      "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "gpu": "Apple M5 Max",
+      "testLogSHA256": "b8d43b5f2fc0616c6e9f6612843cedef9e3e6ff76323fdef1e380097c80d91ca",
+      "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+      "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+      "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+      "permissionChanges": false,
+      "rawCapturedAudioPersisted": false,
+      "systemVolumeChanged": false
+    },
+    {
+      "format": "OSwind owned native system-audio observations v1",
+      "observations": [
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310983147915671,
+          "intendedFrequencyHz": 440,
+          "intendedToOtherAmplitudeRatio": 5762566.644035977,
+          "otherOwnedSourceAmplitude": 1.9628377156595802e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "A",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        },
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310415067367083,
+          "intendedFrequencyHz": 997,
+          "intendedToOtherAmplitudeRatio": 5493494.10109997,
+          "otherOwnedSourceAmplitude": 2.058874526706488e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "B",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        }
+      ],
+      "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+      "threadSanitizer": true,
+      "sourceCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+      "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+      "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "gpu": "Apple M5 Max",
+      "testLogSHA256": "ec81ea64b216082ba67184c0b778266f393b66d5c8f66f987d2adac5b50ceb41",
+      "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+      "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+      "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+      "permissionChanges": false,
+      "rawCapturedAudioPersisted": false,
+      "systemVolumeChanged": false
+    }
+  ],
+  "retainedFailures": [
+    {
+      "scope": "Before metadata optimization",
+      "testVariant": "Seven-case development regression variant; final variant strengthens uppercase alias display and adds restored curation coverage.",
+      "failedCases": 5,
+      "passedCases": 2,
+      "logSHA256": "774a2f1d58a23f97681af9b3c18845dae112898622b1ba809e2939b981fbd983",
+      "variantSourceSHA256": "eadf74932cf9578ecb30152c9895407cdc89070c3e97e0bd70737ec910738afc",
+      "reason": "Notes and equivalent aliases unnecessarily changed processor revision, removed automatic links and rejected already extracted work."
+    },
+    {
+      "scope": "First frozen metadata candidate7c15dfa",
+      "failedCases": 1,
+      "failedAssertions": 6,
+      "logSHA256": "efd6838785e1f5552c759ac23acdd18ad5ca9c28f94d08ae9cc9c750ecb856fa",
+      "reason": "Actual data-only backup/restore of uncurated project: edit/create promotion failed to change rules, kept completed state and admitted an older plan. Curated-state transition now explicitly invalidates.",
+      "earlierPackageAndQualificationRetained": true,
+      "supplementalModelAndPhysicalWorkCancelledBeforeExecution": true
+    }
+  ],
+  "harnesses": {
+    "entity-metadata-smoke.py": "cee70ed0ab6d1e0ca8770123b86e4c3efc761f9163091fe84776a1573c92b079",
+    "entity-memory-smoke.py": "3afe85eef34a874f0924bc131d4c5c4c476bd91477082c6fabbb8d3271d334bd",
+    "entity-vault-smoke.py": "39ad228ce248f21ee2ae3fe646df09a0fb5f9b1c9845f934a1214ad791a37c01",
+    "native-system-audio-smoke.py": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+    "live-capture-smoke.py": "3c2ee55d0e912c6cc9b11de6990cb669a019a177f1fd8c67a4c5f6f8d1451de1",
+    "integration-smoke.py": "784ba6897ae693d9c77c517b9cff168ca34b739d65d9fcacd9003049ac1f5df2"
+  },
+  "cleanup": {
+    "ownedSampleGUIExited": true,
+    "noOwnedAudioFixtureExecutablesPresent": true,
+    "noOwnedImagesInIndependentInventory": true,
+    "installed17Unchanged": true
+  },
+  "limitations": [
+    "Exploratory check after qualification: a rejected automatic project link reappears after renaming that same project while retaining its alias, then rescanning. Reproduced in both the previous signed CLI and this one; a stable-project-ID correction fix is next. The791 defined tests do not cover this contract.",
+    "All defined cases passing does not establish broad feature completeness or top-three placement. Entity NLP gold accuracy, curated speaker identity, entity JSON/Markdown and force-re-extraction remain open.",
+    "Primary renames and real project alias changes conservatively invalidate global extraction completion. Million-source extraction/index lag and note-edit/no-op-resume membership/query aggregation need measurement.",
+    "Native build-status wording retains the previous Updated count after rules change; progress and memberships correctly invalidate. Full keyboard/VoiceOver review remains open.",
+    "Documents-root GUI startup, full GUI/controller/microphone-to-ASR, current uninterrupted24h desktop capture and measured power remain open. The completed older component soak retains four gaps.",
+    "Ad-hoc signed and staged; not installed/notarized. Physical observations cover two generated tones per normal/instrumented run, not arbitrary app privacy, speech recognition or device recovery."
+  ],
+  "knownUnresolvedCounterexamples": [
+    {
+      "codeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+      "scope": "One synthetic source and curated project; remove its automatic link, rename the same project while retaining its matching alias, then rescan",
+      "expectedLinkedSources": 0,
+      "observedLinkedSources": 1,
+      "state": "reproduced",
+      "possibleCause": "Project rejection is keyed by display name; project extraction candidates use the new display name after rename",
+      "followUp": "Preserve project corrections across label/merge identity changes with source-edit/erase/backup compatibility tests",
+      "baselineCodeCommit": "a91f25b339113af1f9147d29318672b254fb8bdb",
+      "baselineBinarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+      "baselineObservedLinkedSources": 1,
+      "preexistingInBaseline": true,
+      "contractPassed": false
+    }
+  ],
+  "allKnownContractsPass": false
+}

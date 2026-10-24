@@ -32,7 +32,7 @@ Cancel in the app or press Ctrl-C once in the CLI to clean unfinished work. A se
 
 Cleanup never removes a published backup or restored library. PID reuse, changed stage identity or unrecognized files can cause a stale directory to be retained rather than guessed at.
 
-Format v1 accepts source database schema 6–9. Older normal libraries upgrade when opened for creation; records are limited to 128 MiB of serialized payload. Schema 7 prevents older app versions from opening a restored library and ignoring its cleanup-off setting. The schema-6 upgrade preserves existing cache identity/keys.
+This build accepts format v1 source database schemas **6–21** and reconstructs them into compiled schema21. Older normal libraries upgrade when opened for creation; records are limited to 128 MiB of serialized payload. Older clients refuse the reconstructed schema rather than ignoring cleanup-off or entity data. The schema-6 upgrade preserves existing cache identity/keys. Uncurated project definitions are accepted as data; deliberately curating one later activates matching rules and invalidates extraction completion.
 
 See [design and validation](BACKUP-DESIGN.md), [raw benchmark evidence](../benchmarks/README.md), and [remaining product work](PROGRESS.md). Cross-volume/non-APFS integration, disk-full/power-loss fault injection, native panel/keyboard acceptance and encrypted backup remain open.
 

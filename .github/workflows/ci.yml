@@ -36,6 +36,8 @@ jobs:
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise source-linked entity scopes, corrections and quiet backup
         run: python3 scripts/entity-memory-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-entity-memory"
+      - name: Verify project metadata preserves completed extraction
+        run: python3 scripts/entity-metadata-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-entity-metadata"
       - name: Exercise indexed API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl --indexed
       - name: Exercise durable conversation processes
