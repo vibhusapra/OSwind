@@ -480,7 +480,7 @@ import UniformTypeIdentifiers
                 let clip=try await AudioClipSnapshot.prepare(file,store:store); defer { withExtendedLifetime(clip) {} }
                 audioImportStatus="Transcribing locally…"
                 var transcript=try await audio.recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800,workspaceParent:clip.speechFile.deletingLastPathComponent())
-                try Task.checkCancellation(); transcript.duration=clip.duration
+                try Task.checkCancellation(); transcript=try transcript.bounded(toSourceDuration:clip.duration)
                 if configuration.diarization.enabled {
                     audioImportStatus="Identifying speakers locally…"
                     transcript=try await audio.speakers.annotate(transcript,file:clip.speechFile,configuration:configuration.diarization)

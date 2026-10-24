@@ -284,7 +284,7 @@ private final class AudioAccumulator: @unchecked Sendable {
                 var transcript = try await task.value; transcriptionTask = nil
                 guard token == epoch && !startup.locked() else { continue }
                 if let context=startup.context(),settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) != nil { continue }
-                transcript.duration=Double(chunk.samples.count)/16000
+                transcript=try transcript.bounded(toSourceDuration:Double(chunk.samples.count)/16000)
                 let m=try AudioAdmission.save(transcript,file:file,store:store,settings:settings,timestamp:chunk.date,source:chunk.source,sessionID:sessionID,embedder:embedder,admission:operation.mediaActivity)
                 transcribed += 1; status = "\(transcribed) segments transcribed locally"; onCapture?(m)
                 do { if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled { try store.indexApplePassages(m,embedder:embedder) } }

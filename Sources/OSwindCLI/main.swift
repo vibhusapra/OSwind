@@ -395,7 +395,7 @@ do {
             let retain=args.contains("--retain-audio"); args.removeAll { $0=="--retain-audio" }; guard args.count==1 else { throw OSwindError.invalid("Use import-audio PATH [--engine whisper|parakeet] [--model PATH] [--native-model DIRECTORY] [--compute neuralEngine|gpu|cpu] [--diarize --speaker-model DIRECTORY] [--retain-audio]") }
             let file=URL(fileURLWithPath:args[0]), clip=try await AudioClipSnapshot.prepare(file,store:store); defer { withExtendedLifetime(clip) {} }
             var transcript=try await SpeechRecognizer().transcribe(file:clip.speechFile,settings:settings,timeout:1800,workspaceParent:clip.speechFile.deletingLastPathComponent())
-            transcript.duration=clip.duration
+            transcript=try transcript.bounded(toSourceDuration:clip.duration)
             if settings.diarization.enabled { transcript=try await SpeakerDiarizer().annotate(transcript,file:clip.speechFile,configuration:settings.diarization) }
             var admission=settings; admission.retainAudio=retain
             let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:admission,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder,admission:clip.mediaActivity)

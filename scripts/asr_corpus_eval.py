@@ -54,7 +54,7 @@ def evaluate(binary,dataset,native_model,whisper_binary,whisper_model,output,tri
     models={}
     if any(PROFILES[p][0]=='parakeet' for p in profiles):models['parakeet_model_tree_sha256']=tree_hash(native_model)
     if 'whisper-default' in profiles:models.update(whisper_model_sha256=sha(whisper_model),whisper_executable_sha256=sha(whisper_binary))
-    report={'format':'OSwind frozen natural ASR import evaluation v1','state':'running','binary_sha256':binary_digest,'pinned_runner':'runner/oswindctl','harness_sha256':sha(pathlib.Path(__file__)),'dataset':{k:manifest.get(k) for k in ['source','license','selection','created_utc','splits']},'selection_manifest_sha256':pinned[str(dataset/'manifest.json')],'models':models,'scorer':{name:importlib.metadata.version(name) for name in ['jiwer','rapidfuzz']},'platform':{'machine':platform.machine(),'macos':platform.mac_ver()[0]},'profiles':profiles,'trials':trials,'normalization':"Casefold, curly apostrophe to ASCII, ASCII alphanumeric words with internal apostrophes; punctuation discarded, no number expansion, spelling correction or NIST equivalence claim",'reference_access':'Reference bytes hashed before inference; reference text read for scoring only after the import subprocess completed; no transcript/reference prompts supplied','measurements':[],'scope_limits':['Frozen selected English audiobook utterances, not full LibriSpeech or meeting/noise/streaming recognition','Held out from OSwind tuning until this frozen run; upstream model-training overlap is unaudited','Complete CLI import per fresh process/library, including normalization, model load, admission and Apple embedding; not resident throughput','Core ML compute policy is requested, not proof every operation ran on that processor; whisper uses its default backend','Caches/background activity uncontrolled; process RSS excludes device allocations and child processes; no power/battery or competitor app ranking','No corpus audio, reference text or predictions are redistributed']}
+    report={'format':'OSwind frozen natural ASR import evaluation v2','state':'running','binary_sha256':binary_digest,'pinned_runner':'runner/oswindctl','harness_sha256':sha(pathlib.Path(__file__)),'dataset':{k:manifest.get(k) for k in ['source','license','selection','created_utc','splits']},'selection_manifest_sha256':pinned[str(dataset/'manifest.json')],'models':models,'scorer':{name:importlib.metadata.version(name) for name in ['jiwer','rapidfuzz']},'platform':{'machine':platform.machine(),'macos':platform.mac_ver()[0]},'profiles':profiles,'trials':trials,'normalization':"Casefold, curly apostrophe to ASCII, ASCII alphanumeric words with internal apostrophes; punctuation discarded, no number expansion, spelling correction or NIST equivalence claim",'import_failure_policy':'Nonzero exit or per-import timeout is retained as a failed attempt. End-to-end WER scores missing delivered text as all reference-word deletions; successful-import WER is also reported separately. No failed clips are excluded or retried within a run.', 'reference_access':'Reference bytes hashed before inference; reference text read for scoring only after the import subprocess completed; no transcript/reference prompts supplied','measurements':[],'scope_limits':['Frozen selected English audiobook utterances, not full LibriSpeech or meeting/noise/streaming recognition','Held out from OSwind tuning until this frozen run; upstream model-training overlap is unaudited','Complete CLI import per fresh process/library, including normalization, model load, admission and Apple embedding; not resident throughput','Core ML compute policy is requested, not proof every operation ran on that processor; whisper uses its default backend','Caches/background activity uncontrolled; process RSS excludes device allocations and child processes; no power/battery or competitor app ranking','No corpus audio, reference text or predictions are redistributed']}
     private_json(output/'report.json',report)
     try:
         for clip in clips:
@@ -73,20 +73,31 @@ def evaluate(binary,dataset,native_model,whisper_binary,whisper_model,output,tri
                         started=time.monotonic()
                         with stdout_path.open('w') as stdout,stderr_path.open('w') as stderr:
                             stdout_path.chmod(0o600);stderr_path.chmod(0o600);process=subprocess.Popen(command,stdout=stdout,stderr=stderr,start_new_session=True)
+                            timed_out=False
                             try:code=process.wait(timeout=600)
+                            except subprocess.TimeoutExpired:
+                                timed_out=True;os.killpg(process.pid,signal.SIGTERM)
+                                try:code=process.wait(timeout=5)
+                                except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);code=process.wait()
                             except BaseException:
                                 os.killpg(process.pid,signal.SIGTERM)
                                 try:process.wait(timeout=5)
                                 except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);process.wait()
                                 raise
-                        elapsed=time.monotonic()-started;require(code==0,f'{key} import exited {code}; logs retained')
-                        memory=json.loads(stdout_path.read_text());require(memory['text']==memory['transcript']['text'] and memory.get('audioPath') is None,'Invalid text or unexpected retained audio');require(abs(memory['transcript']['duration']-duration)<.001,'Import source duration mismatch')
-                        database=library/'memory.sqlite';require(database.is_file(),'Import did not create its isolated library');conn=sqlite3.connect(database)
-                        try:
-                            rows=conn.execute('SELECT id,payload FROM memories').fetchall();require(len(rows)==1 and rows[0][0]==memory['id'] and json.loads(rows[0][1])['text']==memory['text'],'Actual saved record differs from the response')
-                        finally:conn.close()
-                    counts=word_counts(reference.read_text(),memory['text']);require(counts['reference_words']>0,'Empty normalized reference');rss=re.search(r'^\s*(\d+)\s+maximum resident set size',stderr_path.read_text(),re.M);require(rss is not None,'macOS peak RSS missing')
-                    report['measurements'].append({'id':clip['id'],'split':clip['split'],'profile':profile,'trial':trial,'source_audio_seconds':duration,'wav_sha256':clip['wav_sha256'],'reference_sha256':clip['reference_sha256'],'prediction_sha256':sha(stdout_path),'model':memory['transcript']['model'],'scores':counts,'process_wall_seconds':elapsed,'real_time_factor':elapsed/duration,'process_peak_rss_bytes':int(rss[1]),'saved_record_verified':True})
+                        elapsed=time.monotonic()-started;success=code==0 and not timed_out
+                        database=library/'memory.sqlite';saved_count=0;memory=None
+                        if success:
+                            memory=json.loads(stdout_path.read_text());require(memory['text']==memory['transcript']['text'] and memory.get('audioPath') is None,'Invalid text or unexpected retained audio');require(abs(memory['transcript']['duration']-duration)<.001,'Import source duration mismatch')
+                            require(database.is_file(),'Import did not create its isolated library')
+                        if database.is_file():
+                            conn=sqlite3.connect('file:'+str(database)+'?mode=ro',uri=True)
+                            try:
+                                rows=conn.execute('SELECT id,payload FROM memories').fetchall();saved_count=len(rows)
+                                if success:require(len(rows)==1 and rows[0][0]==memory['id'] and json.loads(rows[0][1])['text']==memory['text'],'Actual saved record differs from the response')
+                            finally:conn.close()
+                    counts=word_counts(reference.read_text(),memory['text'] if success else '');require(counts['reference_words']>0,'Empty normalized reference');rss=re.search(r'^\s*(\d+)\s+maximum resident set size',stderr_path.read_text(),re.M)
+                    require(rss is not None or timed_out,'macOS peak RSS missing')
+                    report['measurements'].append({'id':clip['id'],'split':clip['split'],'profile':profile,'trial':trial,'source_audio_seconds':duration,'wav_sha256':clip['wav_sha256'],'reference_sha256':clip['reference_sha256'],'prediction_sha256':sha(stdout_path),'stderr_sha256':sha(stderr_path),'model':memory['transcript']['model'] if success else None,'scores':counts,'import_succeeded':success,'exit_code':code,'timed_out':timed_out,'saved_record_count':saved_count,'process_wall_seconds':elapsed,'real_time_factor':elapsed/duration,'process_peak_rss_bytes':int(rss[1]) if rss else None,'saved_record_verified':success})
                     require(sha(audio)==clip['wav_sha256'] and sha(reference)==clip['reference_sha256'],'Input changed during import');private_json(output/'report.json',report)
             print('Scored',clip['split'],clip['id'],flush=True)
         verify_sources(dataset,clips,pinned);require(sha(runner)==binary_digest and sha(pathlib.Path(__file__))==report['harness_sha256'],'Pinned runner or harness drift')
@@ -96,8 +107,8 @@ def evaluate(binary,dataset,native_model,whisper_binary,whisper_model,output,tri
         for split in [x['split'] for x in manifest['splits']]:
             for profile in profiles:
                 for trial in range(trials):
-                    rows=[x for x in report['measurements'] if (x['split'],x['profile'],x['trial'])==(split,profile,trial)];report['aggregate'].append({'split':split,'profile':profile,'trial':trial,'utterances':len(rows),**micro([r['scores'] for r in rows]),'combined_import_real_time_factor':sum(r['process_wall_seconds'] for r in rows)/sum(r['source_audio_seconds'] for r in rows),'peak_process_rss_bytes':max(r['process_peak_rss_bytes'] for r in rows)})
-        report.update(state='completed',source_stability_verified=True);private_json(output/'report.json',report);return report
+                    rows=[x for x in report['measurements'] if (x['split'],x['profile'],x['trial'])==(split,profile,trial)];report['aggregate'].append({'split':split,'profile':profile,'trial':trial,'utterances':len(rows),'successful_imports':sum(r['import_succeeded'] for r in rows),'failed_imports':sum(not r['import_succeeded'] for r in rows),'successful_import_scores':micro([r['scores'] for r in rows if r['import_succeeded']]) if any(r['import_succeeded'] for r in rows) else None,**micro([r['scores'] for r in rows]),'combined_import_real_time_factor':sum(r['process_wall_seconds'] for r in rows)/sum(r['source_audio_seconds'] for r in rows),'peak_process_rss_bytes':max((r['process_peak_rss_bytes'] for r in rows if r['process_peak_rss_bytes'] is not None),default=None)})
+        report.update(state='completed',source_stability_verified=True,all_imports_succeeded=all(r['import_succeeded'] for r in report['measurements']),failed_imports=sum(not r['import_succeeded'] for r in report['measurements']));private_json(output/'report.json',report);return report
     except BaseException as error:report.update(state='failed',failure=str(error));private_json(output/'report.json',report);raise
 
 if __name__=='__main__':
