@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-audio-smoke-') as temporary:
     speech('Synthetic crossing-end speech',end=3700)
     bounded=json.loads(cli('import-audio',audio));assert bounded['transcript']['duration']==2 and bounded['transcript']['segments'][0]['end']==2 and bounded['text']=='Synthetic crossing-end speech'
     speech('Synthetic wholly-outside speech',start=2200,end=3700)
-    cli('import-audio',audio,ok=False);assert not json.loads(cli('search','--mode','keyword','wholly-outside'))
+    before=json.loads(cli('stats'))['count'];cli('import-audio',audio,ok=False);assert json.loads(cli('stats'))['count']==before
     speech('password=synthetic123')
     redacted=json.loads(cli('import-audio',audio,'--retain-audio'))
     assert redacted.get('audioPath') is None and redacted['text']=='[REDACTED]' and redacted['transcript']['segments'][0]['text']=='[REDACTED]'
