@@ -98,7 +98,7 @@ struct VaultPaths:Sendable {
         };committed=true
     }
     func openAlias(session:VaultSession) throws {
-        let tree=try tree(),temporary=".opened-"+UUID().uuidString.lowercased(),destination=mount(session).appendingPathComponent("Library").path
+        let tree=try tree(),temporary=".opened-"+UUID().uuidString.lowercased(),destination=".mounts/"+session.mountLeaf+"/Library"
         try tree.withRootDirectory {fd in
             guard symlinkat(destination,fd,temporary)==0 else {throw OSwindError.unavailable("Cannot prepare the encrypted-library handle")}
             defer {unlinkat(fd,temporary,0)}

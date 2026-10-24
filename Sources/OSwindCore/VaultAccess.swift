@@ -59,7 +59,7 @@ enum VaultAccess {
         if isPublic {
             var link=stat();guard lstat(paths.library.path,&link)==0,link.st_mode & S_IFMT==S_IFLNK else {throw OSwindError.unavailable("The encrypted-library handle is closed")}
             let target=try FileManager.default.destinationOfSymbolicLink(atPath:paths.library.path)
-            guard target==mount.appendingPathComponent("Library").path else {throw OSwindError.invalid("The encrypted-library handle points somewhere else")}
+            guard target==mount.appendingPathComponent("Library").path || target==".mounts/"+session.mountLeaf+"/Library" else {throw OSwindError.invalid("The encrypted-library handle points somewhere else")}
         }
         let resolved=try vaultResolvedURL(requested)
         guard resolved.path==mount.path || resolved.path.hasPrefix(mount.path+"/") else {throw OSwindError.invalid("This path is outside the verified encrypted volume")}

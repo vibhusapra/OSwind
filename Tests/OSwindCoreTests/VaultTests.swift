@@ -108,6 +108,7 @@ final class NativeVaultTests:XCTestCase {
         try FileManager.default.moveItem(at:original,to:moved);let vault=try LibraryVault(package:moved)
         do {
             let visible=try await vault.status();XCTAssertTrue(visible.volumeMounted);XCTAssertTrue(visible.imageAttached);XCTAssertNotEqual(visible.state,.locked)
+            let client=try MemoryStore(root:vault.libraryURL);XCTAssertEqual(try client.get("keep")?.text,"Owned history across package rename");try client.close()
             let closed=try await vault.lock(store:store);XCTAssertTrue(store.isClosed);XCTAssertEqual(closed.state,.locked);XCTAssertFalse(closed.imageAttached)
             _=try await vault.unlock(passphrase:secret);let reopened=try MemoryStore(root:vault.libraryURL);XCTAssertEqual(try reopened.get("keep")?.text,"Owned history across package rename");_=try await vault.lock(store:reopened);try FileManager.default.removeItem(at:root)
         } catch {try? store.close();_=try? await vault.lock();throw error}

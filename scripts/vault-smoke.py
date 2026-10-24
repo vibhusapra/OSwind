@@ -36,6 +36,9 @@ try:
  missing=base/'Missing';bad=base/'MustNotExist.oswindvault';run('vault','migrate',missing,'--to',bad,'--passphrase-stdin',password=secret,ok=False);assert not missing.exists() and not bad.exists();report['checks'].append('missing source refuses before destination creation')
  run('vault','unlock',package,'--passphrase-stdin',password=secret);package.rename(moved)
  visible=json.loads(run('vault','status',moved));assert visible['imageAttached'] and visible['volumeMounted'] and visible['state']!='locked' and mounted();report['checks'].append('renamed attached package remains visibly attached despite stale OS image path')
+ assert json.loads(run('--vault',moved,'get',identifier))['text']=='Owned encrypted memory marker'
+ if a.old_cli:
+  db=moved/'Library/memory.sqlite';before=hashlib.sha256(db.read_bytes()).hexdigest();r=subprocess.run([str(a.old_cli.resolve()),'--data',str(moved/'Library'),'note','Older writer must also fail after rename'],capture_output=True,text=True,timeout=30);assert r.returncode!=0 and 'newer OSwind' in r.stderr and hashlib.sha256(db.read_bytes()).hexdigest()==before;report['checks'].append('relocatable public handle still reaches schema18 and fences supplied older writer after rename')
  closed=json.loads(run('vault','lock',moved));assert closed['state']=='locked' and not closed['imageAttached'] and not mounted();report['checks'].append('moved package closes public handle and normally unmounts/ejects verified backing device')
  run('vault','unlock',moved,'--passphrase-stdin',password=secret);assert json.loads(run('--vault',moved,'get',identifier))['text']=='Owned encrypted memory marker'
  image=mounted();assert len(image)==1;volume=next(e for e in image[0]['system-entities'] if 'mount-point' in e);mount=pathlib.Path(volume['mount-point']);assert mount.is_relative_to(moved)
