@@ -1,0 +1,12 @@
+{
+  "version": "0.13.5",
+  "source": "https://github.com/astral-sh/uv/releases/tag/0.13.5",
+  "url": "https://github.com/astral-sh/uv/releases/download/0.13.5/uv-aarch64-apple-darwin.tar.gz",
+  "bytes": 14365303,
+  "sha256": "743f85035a1996ecb350659e01cd9faea9709829be09b1b4b03c73eaf3c9cd73",
+  "member": "uv-aarch64-apple-darwin/uv",
+  "executableBytes": 27897472,
+  "executableSHA256": "7dad6047467a9d6b081c033cb3efed9ba39a4799c698d09e6cd598f3a6a32338",
+  "license": "MIT OR Apache-2.0",
+  "python": "3.12.15"
+}

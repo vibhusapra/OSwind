@@ -93,6 +93,8 @@ do {
           name-speaker ID --from LABEL --name NAME  Name a recording-local speaker
           native-model list             List pinned native model downloads
           native-model install|verify parakeet|speakers [--cache-root PATH]
+          vision prepare [--cache-root DIR] [--assets-root DIR] [--use-model]
+                                        Prepare and qualify local visual models without opening history
           vision status|probe FIXTURE_JSON --model-dir DIR [--compute cpuAndGPU|cpuOnly]
                                         Local image/text encoder qualification; no capture or library write
           vision index [--model-dir DIR] [--compute cpuAndGPU|cpuOnly] [--use-model]

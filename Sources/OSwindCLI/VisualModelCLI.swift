@@ -19,10 +19,24 @@ struct VisualProbeOutput:Encodable {
 }
 @MainActor func runVisualModelCLI() async throws {
     let directory=try validatedOption("--model-dir")
-    guard let action=args.first else {throw OSwindError.invalid("Use vision index|search|status|probe [--model-dir DIRECTORY]")}
+    guard let action=args.first else {throw OSwindError.invalid("Use vision prepare|index|search|status|probe [--model-dir DIRECTORY]")}
     args.removeFirst()
     let pixelPath=try validatedOption("--pixel-output")
     let computeOverride=try validatedOption("--compute")
+    if action=="prepare" {
+        guard directory==nil,pixelPath==nil,computeOverride==nil else {throw OSwindError.invalid("Use vision prepare [--cache-root DIRECTORY] [--assets-root DIRECTORY] [--use-model]")}
+        let cache=try validatedOption("--cache-root").map {URL(fileURLWithPath:$0,isDirectory:true)},assets=try validatedOption("--assets-root").map {URL(fileURLWithPath:$0,isDirectory:true)}
+        let useModel=args.contains("--use-model");guard args.filter({$0=="--use-model"}).count<=1 else {throw OSwindError.invalid("Use --use-model once")};args.removeAll {$0=="--use-model"};guard args.isEmpty else {throw OSwindError.invalid("Unknown visual preparation option")}
+        let reporter=BackupCLIProgress()
+        do {
+            let installation=try await runAsyncCLI(cancellationMessage:"Stopping visual model preparation and its child processes; verified public downloads remain cached.") {
+                try await VisualModelPreparation.prepare(cache:cache,assetsRoot:assets) {state in reporter.update(.init(phase:state.phase,completedItems:state.completedBytes,totalItems:state.totalBytes,unit:"bytes"))}
+            }
+            if useModel {var settings=AppSettings.load(root:root);settings.search.visual.enabled=true;settings.search.visual.modelDirectory=installation.directory.path;try settings.save(root:root)}
+            try encoded(installation)
+        } catch is CancellationError {FileHandle.standardError.write(Data("Visual model preparation cancelled.\n".utf8));exit(130)}
+        return
+    }
     if action=="index" || action=="search" {
         guard pixelPath==nil else {throw OSwindError.invalid("Pixel export is available only in an explicit probe")}
         let useModel=args.contains("--use-model")

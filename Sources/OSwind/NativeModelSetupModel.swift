@@ -2,7 +2,7 @@ import Foundation
 import Combine
 import OSwindCore
 
-private final class NativeModelProgressRelay:@unchecked Sendable {
+final class NativeModelProgressRelay:@unchecked Sendable {
     private let lock=NSLock();private var value:NativeModelProgress?
     func set(_ value:NativeModelProgress){lock.lock();self.value=value;lock.unlock()}
     func get()->NativeModelProgress?{lock.lock();defer{lock.unlock()};return value}

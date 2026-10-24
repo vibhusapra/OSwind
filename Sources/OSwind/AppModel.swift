@@ -15,6 +15,7 @@ import UniformTypeIdentifiers
     private var noteTasks=[UUID:Task<Void,Never>]()
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
+    let visualModelSetup:VisualModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
@@ -108,8 +109,9 @@ import UniformTypeIdentifiers
     @Published var audioImportStatus=""
     private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil) throws {
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
+        visualModelSetup=visualSetup ?? VisualModelSetupModel()
         demo = CommandLine.arguments.contains("--demo")
         let resolved = LibraryLocationPreferences.selection(demo:demo)
         let root = selectedRoot ?? resolved.url
@@ -122,6 +124,7 @@ import UniformTypeIdentifiers
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
         routines.onChange = {[weak self] in self?.refreshChats()}
         libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
+        visualModelSetup.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         libraryWipe.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
@@ -141,8 +144,13 @@ import UniformTypeIdentifiers
     }
     private func startHousekeeping() {housekeeping?.invalidate();housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }}
     func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };resumeAutomaticVisualIndex() }
+    func selectPreparedVisualModel(_ installed:VisualModelInstallation) {
+        guard !store.isClosed else {return}
+        settings.search.visual.modelDirectory=installed.directory.path
+        visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
+    }
     func prepareForLibrarySwitch() {
-        visualAutoResumeAllowed=false;cancelVisualIndexing()
+        visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil;apiStatus="API off"
     }

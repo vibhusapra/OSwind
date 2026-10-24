@@ -91,11 +91,11 @@ public enum NativeModelInstaller {
             throw OSwindError.unavailable(message)
         }
     }
-    private static func requireCacheOutsideLibraries(_ cache:URL) throws {
+    static func requireCacheOutsideLibraries(_ cache:URL) throws {
         var directory=cache.standardizedFileURL.resolvingSymlinksInPath()
         guard directory.pathComponents.count<=128 else {throw OSwindError.invalid("Choose a shallower model cache location")}
         for _ in 0..<128 {
-            if directory.pathExtension.lowercased()=="mlmodelc" || (try? exists(directory.appendingPathComponent("OSWIND-MODEL.json")))==true || (try? exists(directory.appendingPathComponent("Preprocessor.mlmodelc")))==true || (try? exists(directory.appendingPathComponent("Segmentation.mlmodelc")))==true {throw OSwindError.invalid("Choose a model cache outside installed model packages")}
+            if (try? exists(directory.appendingPathComponent("OSWIND-VISION.json")))==true || directory.pathExtension.lowercased()=="mlmodelc" || (try? exists(directory.appendingPathComponent("OSWIND-MODEL.json")))==true || (try? exists(directory.appendingPathComponent("Preprocessor.mlmodelc")))==true || (try? exists(directory.appendingPathComponent("Segmentation.mlmodelc")))==true {throw OSwindError.invalid("Choose a model cache outside installed model packages")}
             if try exists(directory.appendingPathComponent("memory.sqlite")) {throw OSwindError.invalid("Choose a model cache outside OSwind memory libraries")}
             if directory.pathExtension.lowercased()=="oswindbackup" {throw OSwindError.invalid("Choose a model cache outside backup packages")}
             if (try? exists(directory.appendingPathComponent("header.json")))==true,
@@ -104,11 +104,11 @@ public enum NativeModelInstaller {
             let parent=directory.deletingLastPathComponent();if parent.path==directory.path {return};directory=parent
         }
     }
-    private static func exists(_ url:URL) throws -> Bool {
+    static func exists(_ url:URL) throws -> Bool {
         var metadata=stat();if lstat(url.path,&metadata)==0 { return true }
         if errno==ENOENT { return false };throw OSwindError.unavailable("Model cache is unavailable: "+String(cString:strerror(errno)))
     }
-    private static func download(_ file:NativeModelManifest.File,from url:URL,to tree:BackupFileTree,transport:any NativeModelTransport,progress:@escaping @Sendable (Int64)->Void) async throws {
+    static func download(_ file:NativeModelManifest.File,from url:URL,to tree:BackupFileTree,transport:any NativeModelTransport,progress:@escaping @Sendable (Int64)->Void) async throws {
         var descriptor:Int32 = -1
         do {
             try tree.withNewFile(file.path) { original in
