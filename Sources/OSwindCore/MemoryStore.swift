@@ -3,9 +3,10 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    public static let schemaVersion = 17
+    public static let schemaVersion = 18
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
+    private var managedCloseDirectory:BackupFileTree?
     let mediaRootIdentity:BackupFileStamp
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
@@ -14,10 +15,13 @@ public final class MemoryStore: @unchecked Sendable {
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
+        let managed=try VaultAccess.context(at:root)
+        let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
         try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
         let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
+        managedCloseDirectory=managed == nil ? nil:directory
         mediaRootIdentity=try directory.withRootDirectory {file in var metadata=stat();guard fstat(file,&metadata)==0 else {throw OSwindError.unavailable("Cannot inspect the library directory")};return BackupFileStamp(metadata)}
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
@@ -25,7 +29,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=FILE; PRAGMA temp.cache_size=-4096;")
+        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
         try exec("BEGIN IMMEDIATE")
         do {
         try exec("""
@@ -132,12 +136,16 @@ public final class MemoryStore: @unchecked Sendable {
         if isClosed {return}
         annCache.stopForClose()
         let activity:MediaAdmissionLease
-        do {activity=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity)} catch {if isClosed {return};throw error}
+        lock.lock();let retained=managedCloseDirectory;lock.unlock()
+        do {
+            if let retained {activity=try retained.withRootDirectory {try MediaAdmissionLease.acquire(directory:$0,exclusive:true,expectedRoot:mediaRootIdentity)}}
+            else {activity=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity)}
+        } catch {if isClosed {return};throw error}
         defer {activity.release()};lock.lock();defer {lock.unlock()}
         guard let handle=db else {return}
         metalScopeCache=nil;coverageCache.removeAll()
         guard sqlite3_close(handle)==SQLITE_OK else {throw OSwindError.unavailable("The library still has active database work. Wait for it to finish and retry closing.")}
-        db=nil
+        db=nil;managedCloseDirectory=nil
     }
     deinit { annCache.cancel(); sqlite3_close(db) }
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {

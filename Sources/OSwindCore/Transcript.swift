@@ -115,7 +115,7 @@ public final class AudioClipSnapshot: @unchecked Sendable {
         guard !suffix.isEmpty,suffix.count<=12,suffix.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)}) else { throw OSwindError.invalid("Audio file needs a supported extension") }
         let workspace:BackupWorkspace
         if let store {workspace=try store.libraryWorkspace("oswind-audio-import")}
-        else {_ = try BackupWorkspace.cleanupAbandoned(labels:["oswind-audio-import"]);workspace=try BackupWorkspace(label:"oswind-audio-import")}
+        else {workspace=try VaultAccess.workspace(source:source,label:"oswind-audio-import")}
         let tree=try BackupFileTree(root:source.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath())
         _ = try tree.pin(source.lastPathComponent,to:workspace.tree,as:"input."+suffix)
         let original=workspace.url.appendingPathComponent("input."+suffix)

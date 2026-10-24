@@ -59,7 +59,7 @@ final class LibraryWorkspaceTests:XCTestCase {
         XCTAssertEqual(sqlite3_exec(handle,"PRAGMA user_version=16",nil,nil,nil),SQLITE_OK);XCTAssertEqual(sqlite3_close(handle),SQLITE_OK)
         let scratch=location.appendingPathComponent("audio/.staging/orphan");try Paths.ensure(scratch);let bytes=Data(repeating:3,count:8_000_000);try bytes.write(to:scratch.appendingPathComponent("private-snapshot"))
         store=try MemoryStore(root:location);XCTAssertNotNil(try store.get("keep"))
-        try store.withRoutineDatabase {db in let row=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),17)}
+        try store.withRoutineDatabase {db in let row=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),Int32(MemoryStore.schemaVersion))}
         let result=try store.pruneHistory(before:.distantPast,maxBytes:store.diskBytes(includeStaging:false)+1_000_000)
         XCTAssertEqual(result.erasure.sources,0);XCTAssertEqual(result.budgetMet,true);XCTAssertNotNil(try store.get("keep"));XCTAssertEqual(try Data(contentsOf:scratch.appendingPathComponent("private-snapshot")),bytes)
     }

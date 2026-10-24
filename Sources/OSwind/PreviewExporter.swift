@@ -12,7 +12,13 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "LibraryWipeResult" || model.section == "LibraryWipePending" {
+        if model.section == "VaultLocked" || model.section == "VaultClosing" {
+            let session=try await AppSession.previewVault(in:model.store.root,state:model.section == "VaultClosing" ? .closing:.locked)
+            size=NSSize(width:1000,height:850);content=AnyView(VaultLockedView(session:session))
+        } else if model.section == "VaultSetup" {
+            let session=AppSession(selection:.init(url:model.store.root,requiresExisting:true,origin:"preview"),locked:{false})
+            size=NSSize(width:600,height:620);content=AnyView(VaultSetupView(session:session))
+        } else if model.section == "LibraryWipeResult" || model.section == "LibraryWipePending" {
             let pending=model.section=="LibraryWipePending"
             if pending {let target=model.store.root.appendingPathComponent("owned-keep");try Data([1]).write(to:target);try FileManager.default.createSymbolicLink(at:model.store.root.appendingPathComponent("images/owned-pending"),withDestinationURL:target)}
             model.wipeLocalLibrary();while model.libraryWipe.busy {try await Task.sleep(nanoseconds:10_000_000)}

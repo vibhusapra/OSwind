@@ -2,13 +2,16 @@ import Foundation
 import OSwindCore
 import AppKit
 import Metal
+import Darwin
 #if canImport(FoundationModels)
 import FoundationModels
 #endif
 
 var args = Array(CommandLine.arguments.dropFirst())
 func option(_ name: String) -> String? { guard let i = args.firstIndex(of:name), i+1 < args.count else { return nil }; let value = args[i+1]; args.removeSubrange(i...i+1); return value }
-let root = option("--data").map { URL(fileURLWithPath:$0) } ?? ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"].map { URL(fileURLWithPath:$0) } ?? Paths.data
+let selectedVault = option("--vault")
+let explicitData = option("--data")
+var root = explicitData.map { URL(fileURLWithPath:$0) } ?? ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"].map { URL(fileURLWithPath:$0) } ?? Paths.data
 let command = args.first ?? "help"
 if !args.isEmpty { args.removeFirst() }
 let literalQuery = args.contains("--literal")
@@ -38,7 +41,19 @@ func searchFilter() throws -> SearchFilter {
     return try Integration.filter(values)
 }
 
+func vaultPassphrase() throws -> Data {
+    guard args.filter({$0=="--passphrase-stdin"}).count==1,isatty(STDIN_FILENO)==0 else {throw OSwindError.invalid("Use --passphrase-stdin with a pipe, or unlock in the app")}
+    args.removeAll {$0=="--passphrase-stdin"};var data=Data()
+    while let chunk=try FileHandle.standardInput.read(upToCount:4097),!chunk.isEmpty {data.append(chunk);guard data.count<=4097 else {throw OSwindError.invalid("Passphrase input is too large")}}
+    if data.last==0 || data.last==10 {data.removeLast()}
+    return data
+}
 do {
+    guard selectedVault==nil || explicitData==nil else {throw OSwindError.invalid("Choose --vault or --data, not both")}
+    if let selectedVault,command != "vault" {
+        let vault=try LibraryVault(package:URL(fileURLWithPath:selectedVault,isDirectory:true)),status=try await vault.status()
+        guard status.state == .unlocked else {throw OSwindError.unavailable("Unlock the selected vault before accessing its library")};root=vault.libraryURL
+    }
     if command == "help" || command == "--help" {
         print("""
         OSwind 0.1.0 · local desktop memory
@@ -85,6 +100,9 @@ do {
                  [--domain HOST] [--exact-host] [--kind KIND] [--token PREVIEW_TOKEN]
                  Requires a selector; whole overlapping sources, dependent answers and media
           erase retry-media              Retry pending retained-media cleanup
+          vault create|unlock|lock|status PACKAGE  Encrypted APFS library; secrets through stdin
+          vault migrate SOURCE --to NEW_PACKAGE --passphrase-stdin  Copy verified history; retain original
+          --vault PACKAGE <command>               Use an already-unlocked managed library
           prune [--days N] [--max-gb N] [--json]   Retention with explicit file/budget outcome
           capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
           capture [--app-bundle ID]      Capture a chosen/current window once
@@ -99,6 +117,38 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "vault" {
+        guard selectedVault==nil,let action=args.first else {throw OSwindError.invalid("Use vault create|unlock|lock|status PACKAGE")};args.removeFirst()
+        if action=="create" || action=="migrate" {
+            let name=try validatedOption("--name") ?? "Private Library",capacityText=try validatedOption("--capacity-gb") ?? "128",target=try validatedOption("--to")
+            guard action=="migrate" ? target != nil:target==nil else {throw OSwindError.invalid("Use vault migrate SOURCE --to NEW_PACKAGE, or vault create NEW_PACKAGE")}
+            let keep=args.contains("--keep-unlocked");guard args.filter({$0=="--keep-unlocked"}).count<=1 else {throw OSwindError.invalid("Use --keep-unlocked only once")};args.removeAll {$0=="--keep-unlocked"}
+            guard let capacity=Int(capacityText),(1...4096).contains(capacity),args.filter({!$0.hasPrefix("--")}).count==1 else {throw OSwindError.invalid("Use vault create PACKAGE [--name NAME] [--capacity-gb N] --passphrase-stdin [--keep-unlocked]")}
+            var secret=try vaultPassphrase();defer {secret.resetBytes(in:0..<secret.count)}
+            guard args.count==1 else {throw OSwindError.invalid("Unknown vault option")}
+            let destination=URL(fileURLWithPath:target ?? args[0],isDirectory:true),payload=secret
+            do {
+                if action=="migrate" {
+                    let location=LibraryLocationSelection(url:URL(fileURLWithPath:args[0],isDirectory:true),requiresExisting:true,origin:"migration");try location.validate()
+                    let source=try MemoryStore(root:location.url),reporter=BackupCLIProgress();defer {try? source.close()}
+                    try encoded(await runVaultCLI {try await LibraryVault.migrate(from:source,to:destination,name:name,capacityGiB:capacity,passphrase:payload,keepUnlocked:keep,progress:{reporter.update($0)})})
+                } else {try encoded(await runVaultCLI {try await LibraryVault.create(at:destination,name:name,capacityGiB:capacity,passphrase:payload,keepUnlocked:keep)})}
+            }
+            catch is CancellationError {FileHandle.standardError.write(Data("Vault operation cancelled. Use vault status before retrying.\n".utf8));exit(130)}
+        } else {
+            guard ["unlock","lock","status"].contains(action) else {throw OSwindError.invalid("Use vault create, unlock, lock or status")}
+            var secret:Data?
+            if action=="unlock" {secret=try vaultPassphrase()}
+            defer {if secret != nil {secret!.resetBytes(in:0..<secret!.count)}}
+            guard args.count==1,!args[0].hasPrefix("--") else {throw OSwindError.invalid("Use vault \(action) PACKAGE"+(action=="unlock" ? " --passphrase-stdin":""))}
+            let vault=try LibraryVault(package:URL(fileURLWithPath:args[0],isDirectory:true))
+            let payload=secret
+            do {
+                if action=="unlock" {try encoded(await runVaultCLI {try await vault.unlock(passphrase:payload!)})}
+                else if action=="lock" {try encoded(await runVaultCLI {try await vault.lock()})}
+                else {try encoded(await runVaultCLI {try await vault.status()})}
+            } catch is CancellationError {FileHandle.standardError.write(Data("Vault operation cancelled. Use vault status before retrying.\n".utf8));exit(130)}
+        }
     } else if command == "wipe" {
         let retry=args.first=="retry";if retry {args.removeFirst()}
         let confirmation=try validatedOption("--confirm"),json=args.contains("--json")

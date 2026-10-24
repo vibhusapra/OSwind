@@ -22,9 +22,7 @@ public enum Whisper {
     public static func detailed(file: URL, binary: String, model: String, language: String = "en", timeout: Double = 120,workspaceParent:URL?=nil) async throws -> SpeechTranscript {
         guard timeout.isFinite,timeout>0,FileManager.default.isExecutableFile(atPath:binary),FileManager.default.fileExists(atPath:model) else { throw OSwindError.unavailable("Install whisper.cpp and choose a downloaded ggml model in Settings → Audio") }
         let task=Task.detached(priority:.utility) {
-            let parent=workspaceParent ?? FileManager.default.temporaryDirectory
-            _ = try BackupWorkspace.cleanupAbandoned(in:parent,labels:["oswind-transcription","oswind-audio-chunk"])
-            let scratch=try BackupWorkspace(in:parent,label:"oswind-transcription"), prefix=scratch.url.appendingPathComponent("transcript")
+            let scratch=try VaultAccess.workspace(source:file,label:"oswind-transcription",parent:workspaceParent),prefix=scratch.url.appendingPathComponent("transcript")
             defer { withExtendedLifetime(scratch) {} }
             let log=prefix.appendingPathExtension("log"); try Data().write(to:log); let handle=try FileHandle(forWritingTo:log); defer { try? handle.close() }
             let process=Process(); process.executableURL=URL(fileURLWithPath:binary); process.arguments=["-m",model,"-f",file.path,"-l",language,"-oj","-of",prefix.path,"-np","-t","4"]; process.standardOutput=handle; process.standardError=handle

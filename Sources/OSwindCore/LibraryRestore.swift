@@ -177,7 +177,7 @@ extension LibraryBackup {
         _ = try BackupWorkspace.cleanupAbandoned(in:destination.deletingLastPathComponent())
         let source = try BackupFileTree(root:archive), parent = try BackupFileTree(root:destination.deletingLastPathComponent())
         guard try !source.isAncestor(of:parent) else { throw BackupFileError.invalid("Restore outside the backup package") }
-        let checked = try inspect(archive,workspaceParent:destination.deletingLastPathComponent(),progress:progress)
+        let checked = try inspect(archive,workspaceParent:destination.deletingLastPathComponent(),allowExternalWorkspace:true,progress:progress)
         let headerData = try source.read("header.json",limit:65536), fingerprint = BackupSHA256.hex(headerData)
         guard fingerprint == (expectedFingerprint ?? checked.archiveFingerprint) else { throw BackupFileError.changed("Backup changed after inspection") }
         let header = try JSONDecoder().decode(LibraryBackupHeader.self,from:headerData); try header.validate()

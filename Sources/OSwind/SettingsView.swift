@@ -205,13 +205,14 @@ struct SettingsView: View {
     }
     private var data: some View {
         Group {
+            Section("Encrypted library") {VaultStorageControls(root:m.store.root).disabled(m.libraryTransfer.busy || m.libraryWipe.busy)}
             Section("Your storage") {
                 Text(m.store.root.path).font(.caption).textSelection(.enabled)
                 Toggle("Automatic retention and storage cleanup",isOn:$m.settings.automaticMaintenance)
                 Stepper("Retain \(m.settings.privacy.retentionDays) days",value:$m.settings.privacy.retentionDays,in:1...3650)
                 Text("The history budget excludes temporary import and export workspaces. They use additional disk space until the operation finishes.").font(.caption).foregroundStyle(.secondary)
                 Stepper("Storage budget: \(m.settings.privacy.maxStorageGB) GB",value:$m.settings.privacy.maxStorageGB,in:1...1000)
-                Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. Keep FileVault enabled for disk encryption.").font(.caption).foregroundStyle(.secondary)
+                Text("When enabled, cleanup runs every five minutes while the app is open and removes the oldest memories. Clean up now applies these limits explicitly. Restored libraries start with automatic cleanup off. FileVault protects the rest of your Mac’s disk.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Clean up now") { m.maintain() }.disabled(m.maintenanceBusy || m.deletingID != nil || m.libraryTransfer.busy || m.libraryWipe.busy); Button("Open data folder") { NSWorkspace.shared.open(m.store.root) } }
             }
             if m.maintenanceBusy {ProgressView("Cleaning up…")}
