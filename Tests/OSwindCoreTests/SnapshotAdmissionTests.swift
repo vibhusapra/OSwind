@@ -85,6 +85,41 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
         await controller.captureOnce(manual:true);XCTAssertEqual(checks,6);XCTAssertTrue(sawWritten);try assertEmpty(controller)
     }
+    func testDisplayScopeRefusesTargetedWindowOverridesBeforeContextOrDevices() async throws {
+        let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{XCTFail("Display scope widened to window pixels");return bitmap}));environment.context={_ in XCTFail("Scope rejection reached context");return world.context}
+        var settings=AppSettings();settings.allDisplays=true;settings.snapshotRegions.selectedDisplays=[]
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:settings,snapshots:environment)
+        await controller.captureOnce(manual:true,targetBundleID:"org.fixture.chrome");try assertEmpty(controller);XCTAssertTrue(controller.status.contains("focused-window mode"))
+        do {try await controller.captureReplay(seconds:1);XCTFail("Display scope widened to replay")}catch {XCTAssertTrue(error.localizedDescription.contains("focused-window mode"))}
+    }
+    func testInvalidAreaBlocksFocusedSnapshotAndReplayBeforeContextOrDevices() async throws {
+        let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{XCTFail("Blocked area reached pixels");return bitmap}));environment.context={_ in XCTFail("Blocked area reached context");return world.context}
+        var settings=AppSettings();settings.snapshotRegions = .disabled
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:settings,snapshots:environment)
+        await controller.captureOnce(manual:true);try assertEmpty(controller);XCTAssertTrue(controller.status.contains("Invalid capture area"))
+        do {try await controller.captureReplay(seconds:1);XCTFail("Blocked area reached replay")}catch {XCTAssertTrue(error.localizedDescription.contains("Invalid capture area"))}
+    }
+    func testRegionFrameNeverMergesFullWindowAccessibilityText() async throws {
+        let world=SnapshotWorld(),bitmap=try image();world.context?.accessibilityText="Outside selected region marker"
+        var environment=environment(world,frame:.init(display:"owned-crop",title:"Owned",capture:{bitmap},includeAccessibilityText:false))
+        environment.recognize={_ in [.init(text:"Inside crop marker",x:0,y:0,width:1,height:1)]}
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
+        await controller.captureOnce(manual:true)
+        let memory=try XCTUnwrap(store.search(SearchFilter(query:"Inside"),mode:.keyword).first?.memory)
+        XCTAssertTrue(memory.text.contains("Inside crop marker"));XCTAssertFalse(memory.text.contains("Outside selected region marker"));XCTAssertEqual(try store.search(SearchFilter(query:"Outside"),mode:.keyword).count,0)
+    }
+    func testRegionChangeDuringRecognitionCancelsPreviousScope() async throws {
+        let world=SnapshotWorld(),bitmap=try image(),gate=SnapshotRecognitionGate();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{bitmap}));environment.recognize={try gate.recognize($0)}
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
+        let attempt=Task {await controller.captureOnce(manual:true)};await fulfillment(of:[gate.entered],timeout:5)
+        controller.settings.snapshotRegions.focusedWindowCrop=SnapshotRegion(x:0.5,width:0.5);gate.release();await attempt.value;try assertEmpty(controller);XCTAssertTrue(gate.sawCancellation)
+    }
+    func testExplicitReplayRefusesConfiguredWindowCropBeforeDevices() async throws {
+        var settings=AppSettings();settings.snapshotRegions.focusedWindowCrop=SnapshotRegion(x:0.5,width:0.5)
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:settings)
+        do {try await controller.captureReplay(seconds:1);XCTFail("Cropped scope fell through to full-window replay")}catch {XCTAssertTrue(error.localizedDescription.contains("crop"))}
+        try assertEmpty(controller)
+    }
     func testStableContextAdmitsPrivateJPEGAndUsesPostImageAccessibilityText() async throws {
         let world=SnapshotWorld(),bitmap=try image()
         let frame=SnapshotCaptureFrame(display:"window-owned",title:"Owned public page",capture:{world.captured+=1;world.context?.accessibilityText="Fresh accessible text";return bitmap})
