@@ -25,6 +25,15 @@ import XCTest
         XCTAssertFalse(worker.isCancelled);XCTAssertEqual(app.visualGeneration,generation);XCTAssertTrue(app.visualIndexing)
         app.cancelVisualIndexing();await worker.value
     }
+    func testChangedPowerPolicyCancelsWorkUsingItsEarlierPolicy() async throws {
+        app.settings.search.indexOnLowPower=true
+        let generation=app.visualGeneration,worker=Task {do {try await Task.sleep(for:.seconds(60))}catch{}}
+        app.visualIndexTask=worker;app.visualIndexing=true
+        app.settings.search.indexOnLowPower=false
+        XCTAssertTrue(worker.isCancelled);await worker.value
+        XCTAssertNotEqual(app.visualGeneration,generation);XCTAssertFalse(app.visualIndexing)
+        XCTAssertFalse(AppSettings.load(root:root).search.indexOnLowPower)
+    }
     func testScopedErasureCancelsBothVisualReadersReleasesMediaAndPreventsWakeRestart() async throws {
         app.settings.search.visual.enabled=true
         let memory=Memory(id:"erase",app:"Owned fixture",text:"",imagePath:"images/one.dat")
