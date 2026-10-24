@@ -117,7 +117,8 @@ struct NativeVaultDriver:Sendable {
             root=try BackupFileTree(root:url).identity()
         } else {
             let volumes=entities.filter {$0["content-hint"] as? String=="41504653-0000-11AA-AA11-00306543ECAC"}
-            guard volumes.count==1 else {throw OSwindError.invalid("Cannot identify the attached unmounted APFS volume")}
+            guard !volumes.isEmpty else {throw VaultAttachmentObservationError.unmountedVolumePending}
+            guard volumes.count==1 else {throw OSwindError.invalid("The attached unmounted APFS volume is ambiguous")}
             volume=volumes[0];url=saved.map {paths.mount($0)} ?? paths.mounts;root=nil
         }
         guard let device=volume["dev-entry"] as? String,device.hasPrefix("/dev/disk") else {throw OSwindError.invalid("Cannot identify the encrypted volume device")}
@@ -155,6 +156,7 @@ struct NativeVaultDriver:Sendable {
     func eject(paths:VaultPaths,proof:VaultVolumeProof) async throws {
         guard let verified=try await attachment(paths:paths) else {return}
         guard same(proof,verified) else {throw OSwindError.invalid("The image changed before detach; no volume was detached")}
+        let identity=try VaultDetachIdentity(paths:paths,image:verified.image)
         let first=try await VaultProcess.run("/usr/bin/hdiutil",["detach",verified.attachmentDevice],timeout:30)
         if first.status != 0 {
             // A renamed mounted package can have a stale Disk Arbitration path.
@@ -167,6 +169,14 @@ struct NativeVaultDriver:Sendable {
             let final=try await VaultProcess.run("/usr/bin/hdiutil",["detach",unmounted.attachmentDevice],timeout:30)
             guard final.status==0 else {throw OSwindError.unavailable("The filesystem is unmounted but its encrypted image is still attached. Retry locking.")}
         }
-        guard try await attachment(paths:paths)==nil else {throw OSwindError.unavailable("The encrypted image is still attached. Retry locking.")}
+        try await VaultDetachSettlement.confirm {
+            try identity.validate()
+            let observed=try await attachment(paths:paths)
+            // Revalidate after native IPC even when the OS now reports absent.
+            try identity.validate()
+            guard let observed else {return true}
+            guard same(verified,observed,allowUnmounted:true) else {throw OSwindError.invalid("The attachment changed during detach verification")}
+            return false
+        }
     }
 }
