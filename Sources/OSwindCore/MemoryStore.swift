@@ -7,7 +7,7 @@ public final class MemoryStore: @unchecked Sendable {
     public static let schemaVersion = 20
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
-    private var managedCloseDirectory:BackupFileTree?
+    private var closeDirectory:BackupFileTree?
     let mediaRootIdentity:BackupFileStamp
     private var db: OpaquePointer?
     private let lock = NSRecursiveLock()
@@ -16,13 +16,13 @@ public final class MemoryStore: @unchecked Sendable {
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     public init(root: URL = Paths.data) throws {
-        let managed=try VaultAccess.context(at:root)
+        _ = try VaultAccess.context(at:root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
         try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
         let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
-        managedCloseDirectory=managed == nil ? nil:directory
+        closeDirectory=directory
         mediaRootIdentity=try directory.withRootDirectory {file in var metadata=stat();guard fstat(file,&metadata)==0 else {throw OSwindError.unavailable("Cannot inspect the library directory")};return BackupFileStamp(metadata)}
         let path = root.appendingPathComponent("memory.sqlite").path
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
@@ -134,6 +134,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 || statisticsNeedRepair { try exec(StatisticsSchema.backfill) }
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
+        try TagIndexSchema.install(RoutineDatabase(handle:db!))
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
@@ -141,13 +142,16 @@ public final class MemoryStore: @unchecked Sendable {
         _ = finishRecapInvalidation()
     }
     public var isClosed:Bool {lock.lock();defer {lock.unlock()};return db==nil}
+    /// Revalidate a prepared connection before attaching it to a visible model.
+    /// This checks the current directory, not just its saved pathname.
+    public func validateDirectoryIdentity() throws {try requireMediaRootIdentity()}
     /// Closes this connection only after supported retained/staging media work
     /// releases its reservations. Other readers may still prevent volume detach.
     public func close() throws {
         if isClosed {return}
         annCache.stopForClose()
         let activity:MediaAdmissionLease
-        lock.lock();let retained=managedCloseDirectory;lock.unlock()
+        lock.lock();let retained=closeDirectory;lock.unlock()
         do {
             if let retained {activity=try retained.withRootDirectory {try MediaAdmissionLease.acquire(directory:$0,exclusive:true,expectedRoot:mediaRootIdentity)}}
             else {activity=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity)}
@@ -156,7 +160,7 @@ public final class MemoryStore: @unchecked Sendable {
         guard let handle=db else {return}
         metalScopeCache=nil;coverageCache.removeAll()
         guard sqlite3_close(handle)==SQLITE_OK else {throw OSwindError.unavailable("The library still has active database work. Wait for it to finish and retry closing.")}
-        db=nil;managedCloseDirectory=nil
+        db=nil;closeDirectory=nil
     }
     deinit { annCache.cancel(); sqlite3_close(db) }
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
@@ -286,7 +290,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let start = filter.start { parts.append("\(prefix)timestamp>=?"); values.append(String(start.timeIntervalSince1970)) }
         if let end = filter.end { parts.append("\(prefix)timestamp<?"); values.append(String(end.timeIntervalSince1970)) }
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
-        if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM json_each(CAST(\(prefix)payload AS TEXT), '$.tags') WHERE value=?)"); values.append(tag) }
+        if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM memory_tags t WHERE t.memory_id=\(prefix)id AND t.tag=?)"); values.append(tag) }
         if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
         if let constraint = expression?.constraint {
             if expression?.materialized == true { parts.append("\(prefix)id IN (SELECT id FROM temp.search_expression_scope)") }

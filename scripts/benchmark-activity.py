@@ -26,15 +26,17 @@ else:
   connection.commit();connection.execute('PRAGMA wal_checkpoint(TRUNCATE)');assert connection.execute('SELECT COUNT(*) FROM memories').fetchone()[0]==a.sources
  finally:connection.close()
  marker.write_text(json.dumps(parameters,sort_keys=True)+'\n');(base/'generation.json').write_text(json.dumps({'wallSeconds':time.monotonic()-began})+'\n')
-cases=[('all',[]),('application',['--app','Safari']),('kind',['--kind','screen']),('saved',['--favorites']),('tag',['--tag','release']),('wideTimeBounds',['--from','2024-01-01T00:00:00Z','--to','2025-01-01T00:00:00Z'])]
+cases=[('all',[]),('application',['--app','Safari']),('kind',['--kind','screen']),('saved',['--favorites']),('tag',['--tag','release']),('combined',['--app','Safari','--kind','screen','--favorites']),('tagCombined',['--app','Safari','--kind','screen','--favorites','--tag','release']),('missingTag',['--tag','missing']),('wideTimeBounds',['--from','2024-01-01T00:00:00Z','--to','2025-01-01T00:00:00Z'])]
 expected={name:{'days':collections.Counter(),'hours':collections.Counter()} for name,_ in cases};day_start=datetime.datetime(2024,3,10,tzinfo=zone).timestamp();day_end=datetime.datetime(2024,3,11,tzinfo=zone).timestamp()
 for i in range(a.sources):
  stamp,app,kind,favorite,tags=metadata(i);local=datetime.datetime.fromtimestamp(stamp,zone)
  if local.year!=2024 or local.month!=3:continue
- names=['all','wideTimeBounds']+(['application'] if app=='Safari' else [])+(['kind'] if kind=='screen' else [])+(['saved'] if favorite else [])+(['tag'] if 'release' in tags else [])
+ names=['all','wideTimeBounds']+(['application'] if app=='Safari' else [])+(['kind'] if kind=='screen' else [])+(['saved'] if favorite else [])+(['tag'] if 'release' in tags else [])+(['combined'] if app=='Safari' and kind=='screen' and favorite else [])+(['tagCombined'] if app=='Safari' and kind=='screen' and favorite and 'release' in tags else [])
  for name in names:
   expected[name]['days'][local.strftime('%Y-%m-%d')]+=1
   if day_start<=stamp<day_end:expected[name]['hours'][int((stamp-day_start)//3600)]+=1
+opened=time.monotonic();startup=json.loads(run('stats','--json'));initial_open_ms=(time.monotonic()-opened)*1000
+assert startup['count']==a.sources
 results={}
 for name,flags in cases:
  measurements=[]
@@ -48,5 +50,5 @@ for name,flags in cases:
   assert response['totalSources']==sum(expected[name]['days'].values())
   measurements.append({'aggregationMS':response['diagnostics']['aggregation_ms'],'wallMS':wall,'processPeakRSSBytes':response['diagnostics']['process_peak_rss_bytes']})
  ordered=sorted(m['aggregationMS'] for m in measurements);results[name]={'matchedMonthSources':sum(expected[name]['days'].values()),'measurements':measurements,'medianAggregationMS':ordered[len(ordered)//2],'p95AggregationMS':ordered[min(len(ordered)-1,int(len(ordered)*.95))]}
-report={'format':'OSwind activity calendar synthetic benchmark v1','fixture':parameters,'binarySHA256':hashlib.sha256(binary.read_bytes()).hexdigest(),'harnessSHA256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'independentPythonZoneinfoOraclePass':True,'scope':'Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.','cases':results}
+report={'format':'OSwind activity calendar synthetic benchmark v2','fixture':parameters,'binarySHA256':hashlib.sha256(binary.read_bytes()).hexdigest(),'harnessSHA256':hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),'initialOpenWallMS':initial_open_ms,'initialOpenScope':'First stats CLI open before timed queries; includes derived-cache installation if needed. Not a controlled cold-start measurement. Fresh fixture generation already opens the store; reused older fixtures may require migration.','independentPythonZoneinfoOraclePass':True,'scope':'Synthetic metadata archive, complete month and23-hour DST day. Fresh CLI processes, uncontrolled caches/background activity; aggregation includes scheduling/validation/SQL, excludes encoding. Peak RSS includes process startup. No capture, inference, power or competitor claim.','cases':results}
 assert not output.exists();output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({name:{'medianMS':r['medianAggregationMS'],'p95MS':r['p95AggregationMS']} for name,r in results.items()},indent=2))

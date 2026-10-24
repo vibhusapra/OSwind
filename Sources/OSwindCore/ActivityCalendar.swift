@@ -110,19 +110,30 @@ extension MemoryStore {
         }
     }
     /// A single bounded statement counts all records in indexed UTC ranges;
-    /// embeddings, media and the result limit are unused. Tag predicates may
-    /// inspect JSON tags in SQLite; complete sources are never hydrated.
+    /// embeddings, media and the result limit are unused. Tag scopes use a
+    /// transactionally maintained covering metadata projection, not payloads.
     public func activityCalendar(_ request:ActivityCalendarRequest) throws -> ActivityCalendarSnapshot {
         try Task.checkCancellation();var snapshot=try request.layout(),buckets=[ActivityBucket]()
         for (slot,day) in snapshot.days.enumerated() {if let start=day.start,let end=day.end {buckets.append(.init(kind:0,slot:slot,start:start,end:end))}}
         for (slot,hour) in snapshot.hours.enumerated() {buckets.append(.init(kind:1,slot:slot,start:hour.start,end:hour.end))}
         guard !buckets.isEmpty,buckets.count<=128 else {throw OSwindError.invalid("Calendar bucket limit exceeded")}
-        let predicate=conditions(request.filter)
+        var filter=request.filter
+        let source:String
+        if filter.tag != nil {
+            source="(SELECT memory_id AS id,tag,timestamp,app,kind,favorite FROM memory_tags INDEXED BY memory_tags_scope) m"
+        }else if [filter.app != nil,filter.kind != nil,filter.favoritesOnly].filter({$0}).count>1 || filter.speaker != nil {
+            // A single-filter index omits the other metadata; combining them
+            // otherwise fetches large source pages just to inspect flags.
+            source="memories m INDEXED BY memories_activity_time"
+        }else {source="memories m"}
+        let tag=filter.tag;filter.tag=nil
+        var predicate=conditions(filter)
+        if let tag {predicate.0 += " AND m.tag=?";predicate.1.append(tag)}
         return try withRoutineDatabase {database in
             try Task.checkCancellation()
             sqlite3_progress_handler(database.handle,1000,{_ in Task.isCancelled ? 1:0},nil);defer {sqlite3_progress_handler(database.handle,0,nil,nil)}
             let rows=Array(repeating:"(?,?,?,?)",count:buckets.count).joined(separator:",")
-            let sql="WITH buckets(kind,slot,start,end) AS (VALUES "+rows+") SELECT b.kind,b.slot,COUNT(m.timestamp) FROM buckets b LEFT JOIN memories m ON m.timestamp>=b.start AND m.timestamp<b.end AND "+predicate.0+" GROUP BY b.kind,b.slot ORDER BY b.kind,b.slot"
+            let sql="WITH buckets(kind,slot,start,end) AS (VALUES "+rows+") SELECT b.kind,b.slot,COUNT(m.timestamp) FROM buckets b LEFT JOIN "+source+" ON m.timestamp>=b.start AND m.timestamp<b.end AND "+predicate.0+" GROUP BY b.kind,b.slot ORDER BY b.kind,b.slot"
             let row=try database.statement(sql);defer {sqlite3_finalize(row)}
             var index:Int32=1
             for bucket in buckets {

@@ -112,14 +112,18 @@ import UniformTypeIdentifiers
     @Published var audioImportStatus=""
     private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,preparedStore:MemoryStore?=nil) throws {
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
         demo = CommandLine.arguments.contains("--demo")
         let resolved = LibraryLocationPreferences.selection(demo:demo)
         let root = selectedRoot ?? resolved.url
         if selectedRoot == nil { try resolved.validate() }
-        store = try MemoryStore(root:root)
+        if let preparedStore {
+            guard !preparedStore.isClosed,preparedStore.root.standardizedFileURL==root.standardizedFileURL else {throw OSwindError.invalid("Prepared library does not match the selected location")}
+            try preparedStore.validateDirectoryIdentity()
+            store=preparedStore
+        }else {store = try MemoryStore(root:root)}
         let loaded = AppSettings.load(root:root)
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)

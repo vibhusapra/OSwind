@@ -30,14 +30,15 @@ import OSwindCore
     private var lockMonitor:Timer?
     private var watchFD:Int32?
     private var watchedVaultID:String?
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked}) {
+    private let openStore:@Sendable (URL) throws -> MemoryStore
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)}) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;requested=resolved.url
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;requested=resolved.url
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
                 vaultPackage=package;requested=package.appendingPathComponent("Library");watch(package)
                 run {try await self.loadVault(startServices:true)}
-            } else {try resolved.validate();model=try AppModel(root:resolved.url)}
+            } else {try resolved.validate();run {self.model=try await self.preparedModel(root:resolved.url,startServices:true)}}
         } catch {failure=error.localizedDescription}
         for name in [NSWorkspace.willSleepNotification,NSWorkspace.screensDidSleepNotification,NSWorkspace.sessionDidResignActiveNotification] {
             NSWorkspace.shared.notificationCenter.publisher(for:name).sink {[weak self] _ in Task {@MainActor in self?.requestLock()}}.store(in:&workspaceSubscriptions)
@@ -47,7 +48,8 @@ import OSwindCore
     deinit {watcher?.cancel();lockMonitor?.invalidate();operation?.cancel()}
     func retry() {
         guard !terminationRequested,!busy else {return}
-        if vaultPackage != nil {run {try await self.loadVault(startServices:false)}} else {open(selection.url,persist:false)}
+        if vaultPackage != nil {run {try await self.loadVault(startServices:false)}}
+        else if model==nil {run {try self.selection.validate();self.model=try await self.preparedModel(root:self.selection.url,startServices:false)}}
     }
     func open(_ url:URL,persist:Bool=true) {
         guard maySwitch else {return}
@@ -63,7 +65,7 @@ import OSwindCore
                 if persist {try LibraryLocationPreferences.save(package,defaults:self.defaults)}
                 try await self.loadVault(startServices:false)
             } else {
-                let candidate=try AppModel(root:url,startServices:false)
+                let candidate=try await self.preparedModel(root:url,startServices:false)
                 if persist {try LibraryLocationPreferences.save(url,defaults:self.defaults)}
                 self.model=candidate
             }
@@ -82,7 +84,8 @@ import OSwindCore
         run {
             try await self.departCurrent()
             let next=LibraryLocationSelection(url:Paths.data,requiresExisting:false,origin:"default");try next.validate()
-            let candidate=try AppModel(root:next.url,startServices:false)
+            self.selection=next;self.requested=next.url;self.vaultPackage=nil;self.vaultStatus=nil;self.watch(nil)
+            let candidate=try await self.preparedModel(root:next.url,startServices:false)
             self.defaults.removeObject(forKey:LibraryLocationPreferences.key);self.selection=next;self.requested=next.url;self.vaultPackage=nil;self.vaultStatus=nil;self.watch(nil);self.model=candidate
         }
     }
@@ -91,7 +94,7 @@ import OSwindCore
         let vault=try LibraryVault(package:package);vaultStatus=try await vault.status()
         if vaultStatus?.state == .unlocked {
             if terminationRequested || locked() {try await performLock();return}
-            if model==nil {model=try AppModel(root:vault.libraryURL,startServices:startServices)}
+            if model==nil {model=try await preparedModel(root:vault.libraryURL,startServices:startServices)}
         } else if let previous=model {
             previous.clearForVaultLock();closingStore=previous.store;model=nil
             // A competing CLI may have already replaced the public handle. The
@@ -111,7 +114,7 @@ import OSwindCore
                 catch {self.message="Library unlocked. Keychain was not updated: "+error.localizedDescription}
             }
             if self.locked() {try await self.performLock();return}
-            self.model=try AppModel(root:vault.libraryURL,startServices:false)
+            self.model=try await self.preparedModel(root:vault.libraryURL,startServices:false)
             if self.message.isEmpty {self.message="Library unlocked. Recording starts when you resume it."}
         }
     }
@@ -121,7 +124,7 @@ import OSwindCore
         run {
             let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlockUsingKeychain(using:provider);try Task.checkCancellation()
             if self.locked() {try await self.performLock();return}
-            self.model=try AppModel(root:vault.libraryURL,startServices:false)
+            self.model=try await self.preparedModel(root:vault.libraryURL,startServices:false)
             self.message="Library unlocked. Recording starts when you resume it."
         }
     }
@@ -178,7 +181,7 @@ import OSwindCore
                 let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlock(passphrase:secret)
                 try Task.checkCancellation()
                 if remember {do {try await vault.rememberPassphrase(secret);self.vaultStatus=try await vault.status()} catch {self.message="Encrypted library created. Keychain was not updated: "+error.localizedDescription}}
-                if self.locked() {try await self.performLock()} else {self.model=try AppModel(root:vault.libraryURL,startServices:false)}
+                if self.locked() {try await self.performLock()} else {self.model=try await self.preparedModel(root:vault.libraryURL,startServices:false)}
                 if self.message.isEmpty {self.message=copyHistory ? "Encrypted copy verified. The original library is still on disk; recording starts when you resume it.":"Encrypted library ready. Recording starts when you resume it."}
                 self.showVaultSetup=false
             } catch {
@@ -191,7 +194,31 @@ import OSwindCore
     }
     private func restorePreparedOriginal(_ original:AppModel) async throws {
         let store=original.store;try await Task.detached(priority:.utility) {try store.close()}.value
-        model=try AppModel(root:store.root,startServices:false)
+        // Restoring the original is cancellation cleanup: a stopped migration
+        // still needs a quiet original workspace, with no resumed services.
+        model=try await preparedModel(root:store.root,startServices:false,restoringOriginal:true)
+    }
+    private func preparedModel(root:URL,startServices:Bool,restoringOriginal:Bool=false) async throws -> AppModel {
+        let opener=openStore,previousProgress=progress
+        progress = .init(phase:"Preparing local search")
+        defer {progress=previousProgress}
+        let worker=Task.detached(priority:.utility) {try opener(root)}
+        let store:MemoryStore
+        if restoringOriginal {store=try await worker.value}
+        else {store=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
+        do {
+            if !restoringOriginal {
+                try Task.checkCancellation()
+                if terminationRequested || pendingLock {throw CancellationError()}
+            }
+            if vaultPackage != nil && (locked() || pendingLock || terminationRequested) {throw CancellationError()}
+            let candidate=try AppModel(root:root,startServices:false,preparedStore:store)
+            if startServices {candidate.startConfiguredServices()}
+            return candidate
+        } catch {
+            try? await Task.detached(priority:.utility) {try store.close()}.value
+            throw error
+        }
     }
     func cancelOperation() {if vaultPackage != nil {pendingLock=true};operation?.cancel()}
     func lockForTermination() async -> Bool {
@@ -207,7 +234,7 @@ import OSwindCore
         guard !busy else {return};busy=true;failure=nil
         operation=Task {
             do {try await work()}
-            catch is CancellationError {self.message="Operation stopped. Existing libraries were preserved. Check vault status before retrying."}
+            catch is CancellationError {self.message=self.vaultPackage == nil ? "Opening stopped. Existing history was preserved.":"Operation stopped. Existing libraries were preserved. Check vault status before retrying.";if self.vaultPackage != nil,self.locked() {self.pendingLock=true}}
             catch {self.failure=error.localizedDescription}
             do {
                 if try self.reconcileMovedPackage() {
@@ -224,6 +251,11 @@ import OSwindCore
         }
     }
     #if DEBUG
+    static func previewOpening(in root:URL)->AppSession {
+        let session=AppSession(selection:.init(url:root.appendingPathComponent("Sample-library-being-prepared"),requiresExisting:true,origin:"preview"))
+        session.failure=nil;session.busy=true;session.progress = .init(phase:"Preparing local search")
+        return session
+    }
     static func previewVault(in root:URL,state:LibraryVaultState) async throws -> AppSession {
         let package=root.appendingPathComponent("Preview-"+UUID().uuidString+".oswindvault");try Paths.ensure(package)
         let info=LibraryVaultInfo(name:"Private memory · sample",capacityGiB:128,volumeUUID:UUID().uuidString,keychainEnabled:true)
@@ -286,16 +318,19 @@ import OSwindCore
 }
 struct LibraryRecoveryView:View {
     @ObservedObject var session:AppSession
+    var locationLabel:String?=nil
     var body:some View {
         ScrollView {VStack(alignment:.leading,spacing:22) {
-            Image(systemName:"externaldrive.badge.exclamationmark").font(.system(size:42)).foregroundStyle(OSwindTheme.accent)
-            Text("Your library is unavailable.").font(.largeTitle.weight(.semibold))
-            Text(session.failure ?? "Reconnect its drive or choose another library.").foregroundStyle(.secondary).textSelection(.enabled)
-            Text(session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
-            if session.busy {ProgressView("Opening library…")}
+            Image(systemName:session.busy ? "externaldrive.badge.timemachine":"externaldrive.badge.exclamationmark").font(.system(size:42)).foregroundStyle(OSwindTheme.accent)
+            Text(session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
+            Text(session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
+            Text(locationLabel ?? session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
+            if session.busy {HStack {ProgressView(session.progress?.phase ?? "Opening library…");Button("Stop") {session.cancelOperation()}}}
+            if !session.busy {
             HStack {Button("Try again") {session.retry()};Button("Choose library…") {session.choose()};Button("Open default library") {session.openDefault()}}.disabled(session.busy || session.recoveryTransfer.busy)
             Button("Create encrypted library…") {session.showVaultSetup=true}.disabled(session.busy)
             Divider();Text("Restore from a backup").font(.title2.weight(.medium));LibraryTransferView(transfer:session.recoveryTransfer,store:nil).disabled(session.busy)
+            }
         }.padding(40).frame(maxWidth:800,alignment:.leading).frame(maxWidth:.infinity)}
     }
 }
