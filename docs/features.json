@@ -156,7 +156,7 @@
     "axis": "Retrieval",
     "feature": "App/date/kind/favorite/tag filters",
     "status": "tested",
-    "evidence": "Inclusive start/exclusive end; bound SQL parameters",
+    "evidence": "Inclusive start/exclusive end; bound parameters and transactionally indexed exact tags. Schema20 older writers, rollback/repair, independent JSON oracle, quiet JSON/backup restore and tagged calendar no-source-table guards pass; combined metadata uses a covering index. Paired million-source tag median/p95 2.67/2.76ms; initial install 18.74s and write amplification retained",
     "references": "Most visual tools"
   },
   {
@@ -180,7 +180,7 @@
     "axis": "Retrieval",
     "feature": "Calendar heatmap",
     "status": "partial",
-    "evidence": "Complete Gregorian month and selected-day hour counts, app/kind/saved scope, exact UTC search/Ask drilldown and metadata-only CLI/HTTP/MCP. DST repeated/skipped dates and partial-hour transitions; utility cancellation, active revision refresh and vault/erasure clearing. Synthetic count-oracle and native component renders; tag JSON scans, first-open index progress, native keyboard/VoiceOver and energy acceptance remain open",
+    "evidence": "Complete Gregorian month and selected-day hour counts, app/kind/saved scope, exact UTC search/Ask drilldown and metadata-only CLI/HTTP/MCP. DST repeated/skipped dates and partial-hour transitions; utility cancellation, active revision refresh and vault/erasure clearing. Independent count oracles and native component renders. Indexed tags and combined metadata use covering paths; responsive utility preparation and Stop/late close are tested. First-install cost, native keyboard/VoiceOver and energy acceptance remain open",
     "references": "ScreenMemory"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "676-case normal suite (648 pass/28 opt-in skips),140-case native/model run adds22 cases (670 distinct pass/six remaining skips),169 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
+    "evidence": "695-case normal suite (666 pass/29 opt-in skips),159-case native/model run adds23 cases (689 distinct pass/six remaining skips),188 focused TSan; authored retrieval/long-source/Metal fixtures, pinned rem keyword component comparison and frozen natural speech/speaker evaluations with retained failures. No whole-competitor ranking",
     "references": "OSwind quality bar"
   },
   {

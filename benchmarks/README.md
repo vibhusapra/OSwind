@@ -2,7 +2,30 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
-## Complete calendar counts
+## Indexed tags and opening tradeoffs
+
+[Indexed-tag evidence](indexed-tags-v1.json) compares a pinned signed schema20 CLI with the new signed candidate on APFS clones of the same owned archives. The same Python civil-time oracle checks all day/hour counts. Seven fresh processes per scope run after a separately measured first open. Caches and host activity are uncontrolled; initial index construction can warm later queries. These are paired observations, not a controlled cold-cache or competitor experiment.
+
+| Archive | Tag median/p95 before → after | Combined app/type/saved | Combined with tag |
+| --- | ---: | ---: | ---: |
+| 100k/year | 17.62/576.09 → 0.89/0.91 ms | 4.46/4.72 → 1.10/1.29 ms | 4.55/5.03 → 0.80/0.83 ms |
+| 100k/month | 174.47/2653.09 → 3.01/3.21 ms | 35.11/39.91 → 5.65/5.82 ms | 35.77/36.47 → 1.80/1.86 ms |
+| 1m/year | 195.43/5331.07 → 2.67/2.76 ms | 46.69/47.71 → 4.74/4.90 ms | 45.98/47.13 → 1.63/1.69 ms |
+
+Missing-tag million-source median is 0.66 ms. Unfiltered aggregation median remains about 10 ms. The first million-source installation took 18.74 seconds and added 172,412,928 bytes (about 3%) to the 5.83 GB database. The native opening window stays responsive with cooperative Stop; installation still reserves the SQLite writer and is a latency/contention TODO. A separate actual SIGKILL/retry fixture preserves all million source payload hashes, leaves no partial index visible, and matches the full SQL/JSON projection oracle after retry. Pre-hashing warmed its cache; that retry's 5.56 seconds is not a controlled startup comparison.
+
+The exact 1 KiB/64 KiB SQLite write fixture has three repetitions of 1,000 source operations. Tagged 1 KiB insert medians increase 76.84→87.53 ms, favorite/payload updates 9.02→29.66 ms and tag/payload updates 8.75→18.48 ms. Tagged 64 KiB inserts 956.14→1016.21 ms and tag/payload updates 412.79→561.92 ms. JSON encoding, application admission, capture and inference are excluded. Write amplification is retained in the evidence; faster reads do not imply faster ingestion or lower power.
+
+```bash
+python3 scripts/benchmark-sqlite-writes.py /absolute/path/oswindctl \
+  --root /new/owned/write-directory --records 1000 --repetitions 3
+python3 scripts/tag-index-interruption-smoke.py /absolute/path/oswindctl \
+  --fixture /marked/pre-tag/activity-fixture --root /new/owned/kill-retry-directory
+```
+
+The kill/retry harness requires a marked pre-tag archive from the calendar generator, copies its closed SQLite file using APFS clone, observes uncommitted WAL growth and kills only its own child. It never modifies the input archive or opens normal history. See [tag consistency and opening lifecycle](../docs/TAG-INDEX.md).
+
+## Complete calendar counts (earlier candidate)
 
 [Activity calendar evidence](activity-calendar-v1.json) covers complete month and selected-day hour counts on 100k/year, 100k/month and one-million/year synthetic archives, with 1 KiB source text. An independent Python zoneinfo oracle checks every count and exact 23-hour-day boundary. Each sample starts a fresh CLI process; aggregation time includes validation, utility scheduling and SQL, while wall time and process peak RSS include startup. Caches and background activity are uncontrolled. Tag scope still reads JSON payloads and is slower; no capture, inference, battery or competitor ranking follows from these counts.
 
