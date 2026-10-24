@@ -1,0 +1,185 @@
+{
+  "format": "OSwind unified source-media deletion v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "8d45d112242db8905f116b20c4855179caa36ad0",
+  "schema_version": 14,
+  "features": [
+    "Universal before-delete media queue admission in source transaction; image/audio/replay paths, even direct SQL source deletion",
+    "Canonical shared-file, dot/case alias protection; separate hard-link entries, regular-file-only cleanup and durable pending retry",
+    "Individual public deletion returns actual committed counts and file warnings; asynchronous native progress/result",
+    "Time retention uses one source transaction and one surviving-reference projection for its cleanup",
+    "Drop disposable search files first; oldest-first storage batches at most16 with cleanup/compaction before remeasurement; pending file failures stop further budget sacrifice",
+    "Cancellation before commit rolls back; after partial budget commit returns actual work and cancellation state",
+    "Detailed pruneHistory report, native busy/result/budget status; CLI JSON and strict numeric options without unused embedding-model initialization",
+    "Schema13 upgrade retains identity; newly opening old executables refuse14 before deletion"
+  ],
+  "checks": {
+    "final_full_suite": {
+      "total": 425,
+      "passed": 419,
+      "skipped_opt_in": 6,
+      "failed": 0
+    },
+    "thread_sanitizer": {
+      "total": 57,
+      "passed": 57,
+      "failed": 0,
+      "source_note": "Same backend/controller concurrency as final source, before a copy-only singular/plural label correction. Final full suite exercises corrected copy."
+    },
+    "actual_partial_cancellation_after_16_deletions": true,
+    "single_reference_scan_for_20_expired_sources": true,
+    "pending_media_stops_budget_deletion": true,
+    "all_asset_kinds_staged": true,
+    "queue_rollback_and_retry": true,
+    "ann_erasure_invalidation_fallback_rebuild": true,
+    "metal_path_restored_after_rebuild": true,
+    "final_installed_process": {
+      "format": "OSwind unified media deletion process v1",
+      "binary_sha256": "2b24ebaf824645b361210167b553b451e01a33f166ef534a671d47e331f7d98d",
+      "schema_version": 14,
+      "single_shared_dot_alias_and_unique_deletion": true,
+      "retention_preserves_newer_favorite_shared_bytes": true,
+      "postcommit_unsafe_directory_warning_and_retry": true,
+      "direct_sql_queue_admission": true,
+      "invalid_inputs_preserve_sources": true,
+      "sqlite_integrity_pass": true,
+      "actual_older_writer": {
+        "binary_sha256": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435",
+        "schema13_to14_upgrade_identity_preserved": true,
+        "refusal_database_bytes_preserved": true
+      },
+      "limits": [
+        "Owned generated fixture; not secure wipe, crash/power-loss, arbitrary already-open older-writer or natural capture evidence"
+      ]
+    },
+    "backup_restore_sigint_sigkill": true,
+    "selective_erasure_eight_writer": true,
+    "required_search_cli_http_mcp_ask": true,
+    "routine_process_contracts": 6,
+    "actual_local_ollama_conversation": {
+      "first": {
+        "text": "Maya owns the Lunar release checklist [1].",
+        "provider": "ollama",
+        "duration": 1.4086649417877197,
+        "warnings": []
+      },
+      "followup": {
+        "text": "The deadline is Friday [1].",
+        "provider": "ollama",
+        "duration": 0.2825559377670288,
+        "warnings": []
+      },
+      "source_erasure_and_session_delete_pass": true
+    }
+  },
+  "previous_release": {
+    "source_commit": "0ae37d6518bc1e5581685733a9e3b3374329387b",
+    "binary_sha256": "3bca3f069d4bfb6b3e0882345261e947113a2bd66d333de9cce768cc454f5435"
+  },
+  "generated_age_retention": {
+    "format": "OSwind generated retention scaling v1",
+    "records": 20000,
+    "media_files": 10000,
+    "binary_sha256": "2b24ebaf824645b361210167b553b451e01a33f166ef534a671d47e331f7d98d",
+    "measurements": {
+      "shared_apply": {
+        "wall_seconds": 2.291425291914493,
+        "peak_rss_bytes": 30638080,
+        "retention": {
+          "budgetBytes": 20000000000,
+          "budgetMet": true,
+          "bytesAfter": 15823690,
+          "cancelled": false,
+          "erasure": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "result": {
+          "conversationTurns": 0,
+          "pendingMedia": 0,
+          "removedMedia": 0,
+          "searchCacheRemoved": true,
+          "sharedMedia": 10000,
+          "sources": 10000,
+          "warnings": []
+        }
+      },
+      "unique_apply": {
+        "wall_seconds": 3.4149212918709964,
+        "peak_rss_bytes": 30441472,
+        "retention": {
+          "budgetBytes": 20000000000,
+          "budgetMet": true,
+          "bytesAfter": 15564800,
+          "cancelled": false,
+          "erasure": {
+            "conversationTurns": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "result": {
+          "conversationTurns": 0,
+          "pendingMedia": 0,
+          "removedMedia": 10000,
+          "searchCacheRemoved": true,
+          "sharedMedia": 0,
+          "sources": 10000,
+          "warnings": []
+        }
+      }
+    },
+    "sqlite_integrity_pass": true,
+    "all_media_identities_accounted": true,
+    "all_remaining_source_ids_verified": true,
+    "harness_sha256": "264842cc7b1308c420316119aec743c80f771cf355131c1301e05079caed38ab",
+    "limits": [
+      "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+      "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+    ],
+    "measurement_note": "Age-retention CLI includes source transaction, queue/file cleanup and disk measurement. No preview call or storage-pressure trimming occurred in this trial."
+  },
+  "retained_failures": [
+    {
+      "source_commit": "99960eb64836eaaded8e5c39842f9490b95b16f6",
+      "scenario": "Individual delete and time retention unlinked a still-shared dot-alias file",
+      "regression": "Both new cases fail with missing bytes before queue unification, then pass"
+    },
+    {
+      "scenario": "Development full420 suite had four cache assertions fail after deliberate public-erasure invalidation",
+      "resolution": "Preserve direct-SQL stale-graph guards; separately require public cache invalidation, correct fallback and successful ANN/Metal rebuild"
+    },
+    {
+      "scenario": "First old-writer harness compared raw database bytes while Python connections remained open and WAL checkpoint state could change",
+      "resolution": "Explicitly close connections before fingerprint/refusal; actual prior executable refusal preserves bytes"
+    }
+  ],
+  "ui": {
+    "final_render_source_commit": "8d45d112242db8905f116b20c4855179caa36ad0",
+    "actual_owned_controller_light_dark_deletion_and_cleanup_renders_inspected": true,
+    "native_click_focus_accessibility": "Pending: fresh doctor reported locked; no unlock/TCC/normal capture or normal library attempted"
+  },
+  "installed_binaries": {
+    "OSwind": "8946a2f2a2d88f23780d87198ab577dc5e02b16adbb1d56e76d13c86a599a14a",
+    "oswindctl": "2b24ebaf824645b361210167b553b451e01a33f166ef534a671d47e331f7d98d"
+  },
+  "zip_sha256": "c405abb19e2238c064916c700a231adb39452ca927ef2e91e951a407fe40ff9b",
+  "strict_signature_build_installed_zip_binding": true,
+  "limits": [
+    "Generated cached age-retention trial with concurrent activity, tiny text/media and no source vectors; not storage-budget scale, natural archive, percentiles, energy or competitor evidence",
+    "Individual delete still scans surviving media; budget cleanup scans per at-most16 batch. A batch may remove more than the smallest possible set needed for a target.",
+    "Public erasure invalidates indexes; correct fallback may be used until rebuild. Incremental private cache compaction remains open.",
+    "Logical deletion, not SSD secure wiping, power-loss/disk-full durability, external-copy removal or a fence against already-open older processes/manual SQLite access",
+    "Independent earlier saved recaps still lack source provenance; whole-library wipe failure UX, vault/migration, native/natural/power/24h and competitor/top-three gates remain open"
+  ]
+}
