@@ -85,6 +85,13 @@ private final class SnapshotRecognitionGate:@unchecked Sendable {
         let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:AppSettings(),snapshots:environment)
         await controller.captureOnce(manual:true);XCTAssertEqual(checks,6);XCTAssertTrue(sawWritten);try assertEmpty(controller)
     }
+    func testEmptyDisplaySelectionDoesNotReadContextOrDiscoverSources() async throws {
+        let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{XCTFail("Empty display selection reached pixels");return bitmap}))
+        environment.context={_ in XCTFail("Empty display selection read app context");return world.context};environment.frames={_,_ in XCTFail("Empty display selection enumerated sources");return []}
+        var settings=AppSettings();settings.allDisplays=true;settings.snapshotRegions.selectedDisplays=[]
+        let controller=CaptureController(store:store,embedder:LocalEmbedder(),settings:settings,snapshots:environment)
+        await controller.captureOnce(manual:true);await controller.captureOnce(manual:true);try assertEmpty(controller);XCTAssertTrue(controller.status.contains("No displays selected"))
+    }
     func testDisplayScopeRefusesTargetedWindowOverridesBeforeContextOrDevices() async throws {
         let world=SnapshotWorld(),bitmap=try image();var environment=environment(world,frame:.init(display:"owned",title:"Owned",capture:{XCTFail("Display scope widened to window pixels");return bitmap}));environment.context={_ in XCTFail("Scope rejection reached context");return world.context}
         var settings=AppSettings();settings.allDisplays=true;settings.snapshotRegions.selectedDisplays=[]

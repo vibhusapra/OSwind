@@ -66,7 +66,9 @@ public struct CaptureMetrics: Sendable {
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
+    private var noDisplaysSelected:Bool {settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true}
     private func configureMode() {
+        guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
         guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
         if settings.visualCaptureMode == .replay && !settings.allDisplays && settings.snapshotRegions.focusedWindowCrop==nil {
             timer?.invalidate();timer=nil;replay?.stop();
@@ -121,6 +123,7 @@ public struct CaptureMetrics: Sendable {
         guard manual || settings.visualCaptureMode != .replay || settings.allDisplays || settings.snapshotRegions.focusedWindowCrop != nil else {return}
         guard targetBundleID==nil || !settings.allDisplays else {status="Targeted app capture requires focused-window mode";return}
         guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
+        guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
         guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
         guard !snapshots.locked() else {status="Locked · capture suspended";return}
         guard snapshots.permitted() else {status="Screen Recording permission required";return}
