@@ -153,6 +153,9 @@ extension MemoryStore {
     }
     @discardableResult func finishRecapInvalidation() -> HistoryErasureResult? {
         try? withRoutineDatabase {db in
+            // A killed full wipe owns this queue. Opening the library must not
+            // synchronously drain its orphan inventory or bypass its admission barrier.
+            guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")==0 else {return nil}
             guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")>0 else {return nil}
             return cleanupErasedAssets(db,sources:0,turns:0)
         }

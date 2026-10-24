@@ -12,7 +12,12 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "LinkedRecapDetail" {
+        if model.section == "LibraryWipeResult" || model.section == "LibraryWipePending" {
+            let pending=model.section=="LibraryWipePending"
+            if pending {let target=model.store.root.appendingPathComponent("owned-keep");try Data([1]).write(to:target);try FileManager.default.createSymbolicLink(at:model.store.root.appendingPathComponent("images/owned-pending"),withDestinationURL:target)}
+            model.wipeLocalLibrary();while model.libraryWipe.busy {try await Task.sleep(nanoseconds:10_000_000)}
+            size=NSSize(width:760,height:520);content=AnyView(VStack(alignment:.leading,spacing:18) {Text("Your local library.").font(.title2);LibraryWipeStatusView(model:model.libraryWipe,retry:{});Text("Capture, audio, API access and scheduling stay off. Resume when you are ready.").foregroundStyle(.secondary);Spacer()}.padding(28))
+        } else if model.section == "LinkedRecapDetail" {
             let source=Memory(id:"recap-preview-source",app:"Notes",title:"Release decision · sample",text:"Maya owns the release. The deadline is Friday.")
             try model.store.insert(source)
             let recap=try model.store.saveRecap(Answer(text:"Maya owns the release, due Friday [1].",sources:[SearchHit(memory:source,score:1,match:"fixture")],provider:"evidence",duration:0),title:"Release recap · sample")

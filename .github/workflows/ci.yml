@@ -38,6 +38,8 @@ jobs:
         run: python3 scripts/erasure-smoke.py .build/release/oswindctl
       - name: Exercise single-delete and retention media safety
         run: python3 scripts/deletion-smoke.py .build/release/oswindctl --output .artifacts/deletion-ci.json
+      - name: Exercise full-library wipe admission and durable retry
+        run: python3 scripts/wipe-smoke.py .build/release/oswindctl --output .artifacts/wipe-ci.json
       - name: Exercise source-linked recap chains and portability
         run: python3 scripts/recap-smoke.py .build/release/oswindctl --output .artifacts/recap-ci.json
       - name: Exercise query scopes, literal mode and saved time bounds
@@ -86,7 +88,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 15
+          assert report['count'] == 1000 and report['schema_version'] == 16
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes

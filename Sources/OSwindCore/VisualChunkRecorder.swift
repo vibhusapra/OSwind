@@ -106,6 +106,7 @@ actor VisualChunkRecorder {
         var memory=Memory(id:current.id,timestamp:current.first.capturedAt,endTimestamp:current.first.capturedAt.addingTimeInterval(actual),kind:.screen,app:current.first.app,bundleID:current.first.bundle,title:current.first.title,url:current.first.url,text:visual.text,display:current.first.display,regions:current.frames[0].regions)
         memory.visualRecording=visual;memory.videoPath="video/"+current.id+".mov"
         memory.embedding=embedder?.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:embedder?.modelID
+        let lease=try store.mediaWriteLease();defer {lease.release()}
         try gate.commit {
         let output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
         var copied=[String](),committed=false

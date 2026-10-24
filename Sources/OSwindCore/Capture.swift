@@ -148,8 +148,8 @@ public struct CaptureMetrics: Sendable {
                 let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
                 let pixels = Self.fingerprint(image)
                 if !manual, let old = fingerprints[displayID], Self.difference(old, pixels) < 2.0 { metrics.unchanged += 1; status = "Unchanged · skipped"; continue }
-                let policy = settings.privacy, quality = settings.profile.jpegQuality, root = store.root, localEmbedder = embedder
-                var memory = try await Task.detached(priority: .utility) {
+                let policy = settings.privacy, quality = settings.profile.jpegQuality, root = store.root, localEmbedder = embedder, mediaStore=store
+                let admission = try await Task.detached(priority: .utility) {
                     let request = VNRecognizeTextRequest(); request.recognitionLevel = .accurate; request.usesLanguageCorrection = true; request.automaticallyDetectsLanguage = true
                     try VNImageRequestHandler(cgImage: image).perform([request])
                     let regions = (request.results ?? []).compactMap { observation -> TextRegion? in guard let text = observation.topCandidates(1).first?.string else { return nil }; let b = observation.boundingBox; return TextRegion(text: text, x: b.minX, y: b.minY, width: b.width, height: b.height) }
@@ -157,13 +157,16 @@ public struct CaptureMetrics: Sendable {
                     let text = policy.sanitize(ocr + (context.accessibilityText.isEmpty ? "" : "\n\n" + context.accessibilityText))
                     let safeTitle = policy.sanitize(title), safeURL = policy.sanitize(context.url ?? "")
                     var m = Memory(app: context.app, bundleID: context.bundle, title: safeTitle.text, url: safeURL.text.isEmpty ? nil : safeURL.text, text: text.text, display: displayID, regions: text.redacted ? [] : regions)
+                    var lease:MediaAdmissionLease?
                     // A text redaction also suppresses the raw image; never retain secrets in screenshot pixels.
                     if policy.retainImages && !text.redacted && !safeTitle.redacted && !safeURL.redacted {
+                        lease=try mediaStore.mediaWriteLease()
                         let relative = "images/\(m.id).jpg"; let dest = root.appendingPathComponent(relative)
                         if let output = CGImageDestinationCreateWithURL(dest as CFURL, UTType.jpeg.identifier as CFString, 1, nil) { CGImageDestinationAddImage(output, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary); guard CGImageDestinationFinalize(output) else { throw OSwindError.unavailable("Cannot save screenshot") }; m.imagePath = relative }
                     }
-                    m.embedding = localEmbedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : localEmbedder.modelID; return m
+                    m.embedding = localEmbedder.embed(m.searchableText); m.embeddingModel = m.embedding == nil ? nil : localEmbedder.modelID; return (m,lease)
                 }.value
+                var memory=admission.0;defer {admission.1?.release()}
                 guard epoch == token, running || manual, !suspended, !SessionState.locked else { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; return }
                 memory.timestamp = begin
                 do { try store.insert(memory) } catch { if let path = memory.imagePath { try? FileManager.default.removeItem(at: root.appendingPathComponent(path)) }; throw error }

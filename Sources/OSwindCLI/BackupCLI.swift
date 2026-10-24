@@ -16,13 +16,13 @@ final class BackupCLIProgress: @unchecked Sendable {
         FileHandle.standardError.write(Data((value.phase+count+bytes+"\n").utf8))
     }
 }
-func runBackupCLI<T: Sendable>(_ operation: @escaping @Sendable () throws -> T) async throws -> T {
+func runBackupCLI<T: Sendable>(cancellationMessage:String="Cancelling; cleaning temporary data. Press Ctrl-C again to exit immediately.",_ operation: @escaping @Sendable () throws -> T) async throws -> T {
     let task = Task.detached(priority:.utility,operation:operation)
     let queue = DispatchQueue(label:"OSwind.backup.interrupt"), source = DispatchSource.makeSignalSource(signal:SIGINT,queue:queue)
     let previous = signal(SIGINT,SIG_IGN); let interrupts = BackupCLIInterrupts()
     source.setEventHandler {
         if interrupts.add(source.data)>1 { _exit(130) }
-        FileHandle.standardError.write(Data("Cancelling; cleaning temporary data. Press Ctrl-C again to exit immediately.\n".utf8)); task.cancel()
+        FileHandle.standardError.write(Data((cancellationMessage+"\n").utf8)); task.cancel()
     }
     source.resume()
     defer { source.setEventHandler(handler:nil); source.cancel(); signal(SIGINT,previous) }

@@ -88,8 +88,8 @@ struct LibraryMenuContent: View {
             Button("Open OSwind  ⇧⌘Space") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }
             Button(model.isCapturing ? "Pause capture" : "Resume capture") { model.toggleCapture() }
             Menu("Pause for…") { ForEach([5,15,30,60],id:\.self) { minutes in Button("\(minutes) minutes") { model.pauseFor(minutes:minutes) } } }
-            Button("Capture now") { Task { await model.capture.captureOnce(manual:true) } }
-            Button(model.audio.running ? "Stop audio" : "Start audio") { if model.audio.running { model.audio.finish() } else { Task { await model.audio.start() } } }
+            Button("Capture now") { Task { await model.captureNow() } }
+            Button(model.audio.running ? "Stop audio" : "Start audio") { Task {await model.toggleAudio()} }
             Divider(); Text("\(model.stats.count) memories · stored on this Mac").font(.caption)
             Button("Quit OSwind") { model.prepareForLibrarySwitch(); NSApp.terminate(nil) }
         }.padding().frame(width:280)

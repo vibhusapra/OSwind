@@ -149,7 +149,7 @@ extension MemoryStore {
     }
     /// Retries durable pending media work after an interruption or file-system failure.
     public func retryErasureCleanup() -> HistoryErasureResult {
-        (try? withRoutineDatabase {cleanupErasedAssets($0,sources:0,turns:0)}) ?? .init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:false,warnings:["Could not open erasure cleanup state."])
+        (try? {let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()};return try withRoutineDatabase {cleanupErasedAssets($0,sources:0,turns:0)}}()) ?? .init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:false,warnings:["Could not open erasure cleanup state."])
     }
     private func erasureAssetKey(_ path:String) throws -> String {
         guard let url=assetURL(path) else {throw OSwindError.invalid("An asset reference could not be safely resolved")}
@@ -160,7 +160,7 @@ extension MemoryStore {
             return canonical
         } catch let error as NSError where error.domain==NSCocoaErrorDomain && [NSFileNoSuchFileError,NSFileReadNoSuchFileError].contains(error.code) {return url.standardizedFileURL.path}
     }
-    func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int) -> HistoryErasureResult {
+    func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,stopOnCancellation:Bool=false) -> HistoryErasureResult {
         var removed=0,shared=0,warnings=[String](),cursor=""
         do {
             try db.execute("BEGIN IMMEDIATE")
@@ -187,9 +187,11 @@ extension MemoryStore {
                     guard status==SQLITE_DONE else {throw db.error()}
                 }
                 while true {
+                    if stopOnCancellation && Task.isCancelled {break}
                     let row=try db.statement("SELECT path FROM erasure_assets WHERE path>? ORDER BY path LIMIT 100");db.bind(row,1,cursor);var paths=[String]();var status=sqlite3_step(row)
                     while status==SQLITE_ROW {paths.append(db.text(row,0));status=sqlite3_step(row)};sqlite3_finalize(row);guard status==SQLITE_DONE else {throw db.error()};guard !paths.isEmpty else {break}
                     for path in paths {
+                        if stopOnCancellation && Task.isCancelled {break}
                         cursor=path
                         do {
                             let key=try erasureAssetKey(path);let ref=try db.statement("SELECT 1 FROM temp.erasure_live_assets WHERE path=?");db.bind(ref,1,key);let code=sqlite3_step(ref);sqlite3_finalize(ref);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
