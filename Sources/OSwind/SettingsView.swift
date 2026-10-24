@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var key = ""
     @State private var keyStatus = ""
     @State private var deleteConfirm = false
+    @State private var showHistoryErasure=false
     @State private var downloadName = "qwen3-embedding:0.6b"
     init(initialTab: String = "Capture") { _tab = State(initialValue:initialTab) }
     var body: some View {
@@ -29,6 +30,7 @@ struct SettingsView: View {
                 }
             }.formStyle(.grouped) }
         }.padding(24).frame(width:760,height:720)
+        .sheet(isPresented:$showHistoryErasure) {HistoryErasureView().environmentObject(m)}
         .alert("Delete all local memories?",isPresented:$deleteConfirm) { Button("Cancel",role:.cancel) {}; Button("Delete everything",role:.destructive) { m.pauseAll(discardReplay:true); m.cancelAnswer();m.routines.cancel(); do { try m.store.deleteAll();m.routines.reload(); m.refreshChats(); m.answer = nil; m.invalidateStorageEstimate(); m.refresh(forceStatistics:true) } catch { m.errorMessage = error.localizedDescription } } } message: { Text("Deletes the local index, screenshots, replay clips, audio, saved notes, recaps, routines, routine results, and conversations. Exports you saved elsewhere remain.") }
     }
     private var capture: some View {
@@ -58,6 +60,10 @@ struct SettingsView: View {
                 multiline("Website domains",value:Binding(get:{m.settings.privacy.excludedDomains.joined(separator:"\n")},set:{m.settings.privacy.excludedDomains = entries($0)}))
                 multiline("Window title contains",value:Binding(get:{m.settings.privacy.excludedTitles.joined(separator:"\n")},set:{m.settings.privacy.excludedTitles = entries($0)}))
                 Toggle("Skip browser capture if URL is unavailable",isOn:$m.settings.privacy.requireBrowserContext)
+            }
+            Section("Erase recorded history") {
+                Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy)
+                Text("Preview matching records, then erase their text, retained media and dependent answers. Capture pauses before preview.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Protect stored evidence") {
                 Toggle("Redact common secrets and sensitive numbers",isOn:$m.settings.privacy.redactSecrets)
@@ -217,7 +223,7 @@ struct SettingsView: View {
                 HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() } }
                 Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
             }
-            Section("Delete") { Button("Delete all local memories…",role:.destructive) { deleteConfirm = true } }
+            Section("Delete") { Button("Erase by time, app or website…") {showHistoryErasure=true}.disabled(m.libraryTransfer.busy); Button("Delete all local memories…",role:.destructive) { deleteConfirm = true } }
         }
     }
     private var mcpConfiguration: String {

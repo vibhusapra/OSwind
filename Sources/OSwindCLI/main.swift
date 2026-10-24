@@ -78,6 +78,10 @@ do {
           native-model list             List pinned native model downloads
           native-model install|verify parakeet|speakers [--cache-root PATH]
           delete ID                      Delete one memory and its media
+          erase preview|apply [--from ISO8601] [--to ISO8601] [--app NAME] [--bundle ID]
+                 [--domain HOST] [--exact-host] [--kind KIND] [--token PREVIEW_TOKEN]
+                 Requires a selector; whole overlapping sources, dependent answers and media
+          erase retry-media              Retry pending retained-media cleanup
           prune [--days N] [--max-gb N]   Apply retention
           capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
           capture [--app-bundle ID]      Capture a chosen/current window once
@@ -92,6 +96,21 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "erase" {
+        let action=args.first ?? "preview";if !args.isEmpty {args.removeFirst()}
+        let store=try MemoryStore(root:root)
+        if action == "retry-media" {guard args.isEmpty else {throw OSwindError.invalid("Use erase retry-media without selectors")};try encoded(store.retryErasureCleanup())}
+        else {
+            guard ["preview","apply"].contains(action) else {throw OSwindError.invalid("Use erase preview, apply or retry-media")}
+            func dateOption(_ flag:String) throws -> Date? {guard let text=try validatedOption(flag) else {return nil};return try QueryScopeResolver.instant(text)}
+            let start=try dateOption("--from"),end=try dateOption("--to"),app=try validatedOption("--app"),bundle=try validatedOption("--bundle"),domain=try validatedOption("--domain"),kindText=try validatedOption("--kind"),token=try validatedOption("--token")
+            let kind=kindText.flatMap(MemoryKind.init(rawValue:));guard kindText==nil || kind != nil else {throw OSwindError.invalid("Unknown source kind")}
+            let exactHost=args.contains("--exact-host");args.removeAll {$0 == "--exact-host"}
+            guard args.isEmpty else {throw OSwindError.invalid("Unknown erasure option")}
+            let scope=HistoryErasureScope(start:start,end:end,app:app,bundleID:bundle,domain:domain,includeSubdomains:!exactHost,kind:kind)
+            if action == "preview" {guard token==nil else {throw OSwindError.invalid("Tokens are only used with erase apply")};try encoded(store.previewErasure(scope))}
+            else {guard let token else {throw OSwindError.invalid("Use --token from an unchanged erase preview")};try encoded(store.eraseHistory(scope,expectedToken:token))}
+        }
     } else if command == "native-model" {
         let operation=args.first ?? "list";if !args.isEmpty {args.removeFirst()}
         let cache=try validatedOption("--cache-root").map{URL(fileURLWithPath:$0)}

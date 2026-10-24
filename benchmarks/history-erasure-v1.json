@@ -1,0 +1,114 @@
+{
+  "format": "OSwind selective history erasure v1",
+  "date_local": "2026-10-23 America/Los_Angeles",
+  "source_commit": "e70291e2f4a65b4236c8955e794483759523dd42",
+  "schema_version": 13,
+  "features": [
+    "Half-open source/clip overlap, exact app/bundle, normalized hostname/subdomain and type intersections; no empty scope",
+    "Library/source/dependent-turn preview token; stale cross-process previews rejected before write",
+    "Transactional source deletion plus durable media queue, cancellation before commit, accurate postcommit outcome",
+    "Canonical shared-file references including dot/case aliases; distinct hard-link entries unlinked separately; unsafe paths/symlinks/directories refused",
+    "Cited conversation turns, speaker/preview/vector/passage source projections and disposable cache invalidation",
+    "Native pause-preview-review-confirm-result/retry flow, detached work and CLI; no remote destructive tools"
+  ],
+  "checks": {
+    "full_suite": {
+      "total": 404,
+      "passed": 398,
+      "skipped_opt_in": 6,
+      "failed": 0
+    },
+    "focused_thread_sanitizer": {
+      "total": 31,
+      "passed": 31,
+      "failed": 0
+    },
+    "actual_sql_delete_cancellation_rollback": true,
+    "source_and_new_cited_turn_stale_preview_rejection": true,
+    "eight_process_same_preview_exactly_one_commit": true,
+    "installed_cli_contracts": true,
+    "queue_reopen_and_retry": true,
+    "shared_missing_unsafe_directory_dot_case_hardlink_tests": true,
+    "backup_and_search_process_regressions": {
+      "source_commit": "248d8ca",
+      "complete_backup_restore_sigint_sigkill": true,
+      "required_phrase_boolean_cli_http_mcp_ask": true
+    }
+  },
+  "scaling": {
+    "format": "OSwind generated erasure scaling v1",
+    "records": 20000,
+    "media_files": 10000,
+    "binary_sha256": "408e73f2f1c0a7c8078d1db1ff4c75916ff1b4242f2bb48291baaf43356f0e69",
+    "measurements": {
+      "shared_preview": {
+        "wall_seconds": 0.09212904190644622,
+        "peak_rss_bytes": 24788992,
+        "sources": 10000
+      },
+      "shared_apply": {
+        "wall_seconds": 17.43106387509033,
+        "peak_rss_bytes": 31260672,
+        "result": {
+          "conversationTurns": 0,
+          "pendingMedia": 0,
+          "removedMedia": 0,
+          "searchCacheRemoved": true,
+          "sharedMedia": 10000,
+          "sources": 10000,
+          "warnings": []
+        }
+      },
+      "unique_preview": {
+        "wall_seconds": 0.06268737488426268,
+        "peak_rss_bytes": 24756224,
+        "sources": 10000
+      },
+      "unique_apply": {
+        "wall_seconds": 8.767841584049165,
+        "peak_rss_bytes": 30851072,
+        "result": {
+          "conversationTurns": 0,
+          "pendingMedia": 0,
+          "removedMedia": 10000,
+          "searchCacheRemoved": true,
+          "sharedMedia": 0,
+          "sources": 10000,
+          "warnings": []
+        }
+      }
+    },
+    "sqlite_integrity_pass": true,
+    "all_media_identities_accounted": true,
+    "limits": [
+      "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+      "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+    ]
+  },
+  "retained_failures": [
+    {
+      "source_commit": "248d8ca",
+      "scenario": "Raw-path equality missed dot/case aliases and removed a still-referenced shared file",
+      "regression": "Two tests: eight failed assertions including missing bytes; canonical path fix plus separate hard-link test passes"
+    }
+  ],
+  "ui": {
+    "render_source_commit": "248d8ca",
+    "light_dark_form_renders_inspected": true,
+    "native_click_confirmation_focus_accessibility": "Pending while Mac locked; no unlock/TCC/normal capture attempted"
+  },
+  "installed_binaries": {
+    "OSwind": "9147f946ac467cf16e4055557f5852aa1503056242f5eb51bf1110d097d18f68",
+    "oswindctl": "408e73f2f1c0a7c8078d1db1ff4c75916ff1b4242f2bb48291baaf43356f0e69"
+  },
+  "zip_sha256": "77969456fbac624076f662d99c631605817d77520ca0949ed2dddbb046c55b88",
+  "strict_signature_build_installed_zip_binding": true,
+  "limits": [
+    "Whole sources/recordings, not interval trimming; website requires a recorded HTTP(S) URL",
+    "External exports/backups/copied text and earlier independent saved recap copies remain unless matching these filters",
+    "Logical live-data deletion, not secure SSD wiping/snapshot eradication; active readers/processes may hold memory/WAL/disposable files",
+    "Queued retry tested through reopen and seeded unfinished work, not a full crash/power-loss/disk-full durability claim",
+    "Original FTS identifier scans remain a bulk-delete scaling follow-up",
+    "Native clicks/full keyboard/device, natural 24h capture/power and competitor/top-three goals remain open"
+  ]
+}

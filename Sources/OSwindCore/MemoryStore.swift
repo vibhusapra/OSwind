@@ -88,6 +88,7 @@ public final class MemoryStore: @unchecked Sendable {
         }
         if version >= 4 && version < 6 { try exec(VectorJournalSchema.migrateV5) }
         try exec(RoutineSchema.sql)
+        try exec(HistoryErasureSchema.sql)
         try exec(VectorJournalSchema.sql)
         try exec(PassageSchema.sql)
         try exec(VectorStatisticsSchema.sql)
@@ -510,7 +511,7 @@ public final class MemoryStore: @unchecked Sendable {
     public func deleteAll() throws {
         lock.lock(); defer { lock.unlock() }
         try exec("BEGIN IMMEDIATE")
-        do { try exec("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
+        do { try exec("DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM erasure_assets; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; COMMIT") } catch { try? exec("ROLLBACK"); throw error }
         metalScopeCache = nil; coverageCache.removeAll(); annCache.reset(); let cache = root.appendingPathComponent("indexes")
         if FileManager.default.fileExists(atPath:cache.path) { try FileManager.default.removeItem(at:cache) }
         try exec("PRAGMA wal_checkpoint(TRUNCATE); VACUUM;")
