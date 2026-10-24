@@ -73,7 +73,7 @@ rows=[
 ('Privacy','No telemetry / accounts','implemented','No analytics SDK or account system in original code','rem, Minne, Retrace'),
 ('Privacy','Pause all capture','implemented','Pausing screen also stops audio; independent audio start remains available','All serious memory tools'),
 ('Privacy','Timed pause','implemented','Menu bar 5/15/30/60 minute pause; pending runtime review','Littlebird, Retrace (jhammant)'),
-('Privacy','Fine-grained history erasure','partial','Single row/all/retention; delete date/app/site range UI missing','Recall, Littlebird'),
+('Privacy','Fine-grained history erasure','partial','Native/CLI date-overlap, exact app/bundle, normalized website/subdomain and type selectors; preview token rejects concurrent changes, source transaction plus durable media queue/shared-file protection, dependent cited turns and cache invalidation. 404 tests/31 TSan and 8-process admission; native clicks pending locked, earlier independent recap copies remain','Recall, Littlebird'),
 ('Data','Retention + storage budget','tested','Age prune tested; auto every 5 minutes; disk compaction refinement pending','Recall, ScreenMemory'),
 ('Data','JSON export/import','tested','Redaction/exclusions, transaction rollback, path stripping; text+metadata','Most memory tools'),
 ('Data','Media backup / restore','tested','Full media/chat/vector packages, data-only safe restore, CLI and app/recovery controls; process SIGINT/SIGKILL and 100k/1k-media concurrent and million-1024D-vector round trips pass. Plaintext; native panels, disk faults and non-APFS integration remain open','Rewind Desktop S3, Retrace'),

@@ -412,7 +412,7 @@
     "axis": "Privacy",
     "feature": "Fine-grained history erasure",
     "status": "partial",
-    "evidence": "Single row/all/retention; delete date/app/site range UI missing",
+    "evidence": "Native/CLI date-overlap, exact app/bundle, normalized website/subdomain and type selectors; preview token rejects concurrent changes, source transaction plus durable media queue/shared-file protection, dependent cited turns and cache invalidation. 404 tests/31 TSan and 8-process admission; native clicks pending locked, earlier independent recap copies remain",
     "references": "Recall, Littlebird"
   },
   {
