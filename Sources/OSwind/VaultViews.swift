@@ -19,9 +19,9 @@ struct VaultLockedView:View {
                         Text(finishing ? "Locking needs attention":state == .unlocked ? "Library is mounted":"Your history stays with you.").foregroundStyle(.secondary)
                     }
                 }
-                Text(session.vaultStatus?.message ?? "Checking the encrypted library…").textSelection(.enabled)
+                Text(finishing ? "Recording and local access are stopped. The encrypted volume is still attached.":session.vaultStatus?.message ?? "Checking the encrypted library…").textSelection(.enabled)
                 if finishing {
-                    Label("The encrypted volume is still attached. Close other readers and retry locking.",systemImage:"exclamationmark.circle").foregroundStyle(.orange)
+                    if session.failure==nil {Label("Close other readers and retry locking.",systemImage:"exclamationmark.circle").foregroundStyle(.orange)}
                     Button("Retry locking") {session.requestLock()}.buttonStyle(.borderedProminent).disabled(session.busy)
                 } else if state == .unlocked {
                     HStack {Button("Open library") {session.retry()}.buttonStyle(.borderedProminent);Button("Lock library") {session.requestLock()}}.disabled(session.busy)
@@ -81,7 +81,7 @@ struct VaultSetupView:View {
                 }.textFieldStyle(.roundedBorder)
                 Toggle("Remember in Keychain with Mac authentication",isOn:$remember).disabled(UserPresenceVaultSecrets.unavailabilityReason != nil)
                 if let reason=UserPresenceVaultSecrets.unavailabilityReason {Text(reason).font(.caption).foregroundStyle(.secondary)}
-                Text("Optional. The saved unlock requires Touch ID or your Mac password. OSwind never requests authentication at launch.").font(.caption).foregroundStyle(.secondary)
+                else {Text("Optional. The saved unlock requires Touch ID or your Mac password. OSwind never requests authentication at launch.").font(.caption).foregroundStyle(.secondary)}
                 Stepper("Maximum volume size: \(capacity) GB",value:$capacity,in:1...4096,step:16)
                 Text("The sparse image grows as you save history; it does not reserve the full maximum. Recording, local API access and automatic cleanup start off in a copied library.").font(.caption).foregroundStyle(.secondary)
                 if session.busy {VStack(alignment:.leading,spacing:7) {ProgressView(session.progress?.phase ?? "Preparing encrypted storage…");if let p=session.progress,p.totalItems>0 {Text("\(p.completedItems) / \(p.totalItems) \(p.unit)").font(.caption).monospacedDigit()}}}
