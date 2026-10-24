@@ -86,6 +86,44 @@ final class VaultTests:XCTestCase {
 }
 
 final class NativeVaultTests:XCTestCase {
+    func testMissingOrUnencryptedImageCannotReportAProtectedLockedLibrary() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned missing/replaced image fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-replaced-vault-"+UUID().uuidString);try Paths.ensure(root)
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        _=try await LibraryVault.create(at:package,name:"Replacement fixture",capacityGiB:1,passphrase:secret)
+        let vault=try LibraryVault(package:package),image=package.appendingPathComponent("contents.sparsebundle")
+        try FileManager.default.removeItem(at:image)
+        do {_=try await vault.status();XCTFail("A missing image reported protected/locked")} catch {}
+        let plain=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","1g","-type","SPARSEBUNDLE","-fs","APFS",image.path]);XCTAssertEqual(plain.status,0)
+        do {_=try await vault.status();XCTFail("An unencrypted replacement reported protected/locked")} catch {}
+        do {_=try await vault.lock();XCTFail("An unencrypted replacement was accepted as protected")} catch {}
+        try FileManager.default.removeItem(at:root)
+    }
+    func testMovedAttachedPackageRemainsVisibleAndCanCloseThroughRetainedDirectory() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned moved encrypted fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-moved-vault-"+UUID().uuidString);try Paths.ensure(root)
+        let original=root.appendingPathComponent("Original.oswindvault"),moved=root.appendingPathComponent("Moved.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        _=try await LibraryVault.create(at:original,name:"Moved fixture",capacityGiB:1,passphrase:secret)
+        let first=try LibraryVault(package:original);_=try await first.unlock(passphrase:secret);let store=try MemoryStore(root:first.libraryURL);try store.insert(Memory(id:"keep",text:"Owned history across package rename"))
+        try FileManager.default.moveItem(at:original,to:moved);let vault=try LibraryVault(package:moved)
+        do {
+            let visible=try await vault.status();XCTAssertTrue(visible.volumeMounted);XCTAssertTrue(visible.imageAttached);XCTAssertNotEqual(visible.state,.locked)
+            let closed=try await vault.lock(store:store);XCTAssertTrue(store.isClosed);XCTAssertEqual(closed.state,.locked);XCTAssertFalse(closed.imageAttached)
+            _=try await vault.unlock(passphrase:secret);let reopened=try MemoryStore(root:vault.libraryURL);XCTAssertEqual(try reopened.get("keep")?.text,"Owned history across package rename");_=try await vault.lock(store:reopened);try FileManager.default.removeItem(at:root)
+        } catch {try? store.close();_=try? await vault.lock();throw error}
+    }
+    func testUnmountedImageIsNotCryptographicallyLockedUntilBackingDeviceDetaches() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned unmounted encrypted-image fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-unmounted-vault-"+UUID().uuidString);try Paths.ensure(root)
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        _=try await LibraryVault.create(at:package,name:"Unmounted fixture",capacityGiB:1,passphrase:secret,keepUnlocked:true);let vault=try LibraryVault(package:package)
+        do {
+            let attachment=try await NativeVaultDriver().attachment(paths:VaultPaths(package));let proof=try XCTUnwrap(attachment)
+            let unmount=try await VaultProcess.run("/sbin/umount",[proof.mount.path]);XCTAssertEqual(unmount.status,0)
+            let visible=try await vault.status();XCTAssertEqual(visible.state,.closing);XCTAssertFalse(visible.volumeMounted);XCTAssertTrue(visible.imageAttached);XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
+            let closed=try await vault.lock();XCTAssertEqual(closed.state,.locked);XCTAssertFalse(closed.imageAttached);try FileManager.default.removeItem(at:root)
+        } catch {_=try? await vault.lock();throw error}
+    }
     func testOptionalCredentialLifecycleUsesVerifiedPassphraseAndPreservesFallback() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned encrypted fixture with fake credential provider; no real Keychain access")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-vault-credential-"+UUID().uuidString);try Paths.ensure(root)

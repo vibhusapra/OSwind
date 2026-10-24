@@ -19,6 +19,10 @@ public final class MediaAdmissionLease:@unchecked Sendable {
         try Task.checkCancellation()
         let directory=open(root.standardizedFileURL.resolvingSymlinksInPath().path,O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard directory>=0 else {throw OSwindError.unavailable("Cannot open the media admission directory")};defer {close(directory)}
+        return try acquire(directory:directory,exclusive:exclusive,timeout:timeout,expectedRoot:expectedRoot)
+    }
+    static func acquire(directory:Int32,exclusive:Bool,timeout:TimeInterval=30,expectedRoot:BackupFileStamp?=nil) throws -> MediaAdmissionLease {
+        try Task.checkCancellation()
         var rootMetadata=stat();guard fstat(directory,&rootMetadata)==0 else {throw OSwindError.unavailable("Cannot inspect the media directory")}
         if let expectedRoot {guard rootMetadata.st_dev==expectedRoot.device,rootMetadata.st_ino==expectedRoot.inode else {throw OSwindError.invalid("The library directory changed. Reopen the intended library before writing or wiping.")}}
         let name=".media-admission.lock",file=openat(directory,name,O_RDWR | O_CREAT | O_NOFOLLOW | O_CLOEXEC,0o600)

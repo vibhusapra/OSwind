@@ -75,6 +75,18 @@ import OSwindCore
         let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{true});try await finish(session)
         XCTAssertNil(session.model);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
     }
+    func testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback() async throws {
+        try native();let package=root.appendingPathComponent("Before.oswindvault"),moved=root.appendingPathComponent("After.oswindvault"),secret=UUID().uuidString
+        _=try await LibraryVault.create(at:package,name:"Moved session",capacityGiB:1,passphrase:Data(secret.utf8))
+        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+        session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model);try active.store.insert(Memory(id:"keep",text:"Moved session history"))
+        try FileManager.default.moveItem(at:package,to:moved)
+        let deadline=ContinuousClock.now.advanced(by:.seconds(15))
+        while session.model != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertFalse(session.vaultStatus?.imageAttached ?? true);XCTAssertNil(session.failure)
+        XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),try LibraryVault(package:moved).libraryURL.path)
+        session.unlock(passphrase:secret,remember:false);try await finish(session);XCTAssertNotNil(try session.model?.store.get("keep"));session.requestLock();try await finish(session)
+    }
     func testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent() async throws {
         try native();let package=root.appendingPathComponent("Monitor.oswindvault"),secret=UUID().uuidString
         _=try await LibraryVault.create(at:package,name:"Monitored fixture",capacityGiB:1,passphrase:Data(secret.utf8))

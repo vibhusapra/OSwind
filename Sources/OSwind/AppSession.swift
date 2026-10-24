@@ -28,6 +28,8 @@ import OSwindCore
     private var workspaceSubscriptions=Set<AnyCancellable>()
     private var watcher:DispatchSourceFileSystemObject?
     private var lockMonitor:Timer?
+    private var watchFD:Int32?
+    private var watchedVaultID:String?
     init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked}) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
         self.selection=resolved;self.defaults=defaults;self.locked=locked;requested=resolved.url
@@ -197,7 +199,7 @@ import OSwindCore
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
         guard vaultPackage != nil else {model?.prepareForLibrarySwitch();return true}
         if vaultStatus?.state != .locked {requestLock();while busy {if let operation {await operation.value} else {break}}}
-        let detached=vaultStatus?.volumeMounted == false
+        let detached=vaultStatus?.imageAttached == false
         if !detached {terminationRequested=false}
         return detached
     }
@@ -207,6 +209,12 @@ import OSwindCore
             do {try await work()}
             catch is CancellationError {self.message="Operation stopped. Existing libraries were preserved. Check vault status before retrying."}
             catch {self.failure=error.localizedDescription}
+            do {
+                if try self.reconcileMovedPackage() {
+                    if let previous=self.model {previous.clearForVaultLock();self.closingStore=previous.store;self.model=nil}
+                    self.pendingLock=true
+                }
+            } catch {self.failure=error.localizedDescription}
             if let package=self.vaultPackage {
                 let status=Task.detached {try await LibraryVault(package:package).status()}
                 if let fresh=try? await status.value {self.vaultStatus=fresh}
@@ -218,18 +226,33 @@ import OSwindCore
     #if DEBUG
     static func previewVault(in root:URL,state:LibraryVaultState) async throws -> AppSession {
         let package=root.appendingPathComponent("Preview-"+UUID().uuidString+".oswindvault");try Paths.ensure(package)
-        var info=LibraryVaultInfo(name:"Private memory · sample",capacityGiB:128,volumeUUID:UUID().uuidString,keychainEnabled:true);info.setupComplete=true
+        let info=LibraryVaultInfo(name:"Private memory · sample",capacityGiB:128,volumeUUID:UUID().uuidString,keychainEnabled:true)
         try JSONEncoder().encode(info).write(to:package.appendingPathComponent("oswind-vault.json"));try Data("Owned closed preview handle".utf8).write(to:package.appendingPathComponent("Library"))
         let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"preview"),locked:{false})
         while session.busy {try await Task.sleep(for:.milliseconds(10))}
-        session.vaultStatus?.state=state;session.vaultStatus?.volumeMounted=state == .closing
-        session.vaultStatus?.message=state == .closing ? "The encrypted volume is still mounted. Finish the current operation or retry locking.":"Encrypted volume is detached"
+        session.vaultStatus = .init(info:info,state:state,libraryPath:package.appendingPathComponent("Library").path,message:state == .closing ? "The encrypted volume is still mounted. Finish the current operation or retry locking.":"Encrypted image is detached",volumeMounted:state == .closing,imageAttached:state == .closing)
+        session.failure=nil
         if state == .closing {session.failure="The vault is still mounted because files are in use. Close other readers and retry locking."}
         return session
     }
     #endif
+    private func reconcileMovedPackage() throws -> Bool {
+        guard let package=vaultPackage,let fd=watchFD else {return false}
+        var buffer=[CChar](repeating:0,count:Int(MAXPATHLEN))
+        guard fcntl(fd,F_GETPATH,&buffer)==0 else {throw OSwindError.unavailable("The encrypted-library location is unavailable. Its lock could not be verified.")}
+        let current=URL(fileURLWithPath:String(cString:buffer),isDirectory:true).standardizedFileURL
+        guard current.path != package.standardizedFileURL.path else {return false}
+        var retained=stat(),named=stat()
+        guard fstat(fd,&retained)==0,lstat(current.path,&named)==0,retained.st_dev==named.st_dev,retained.st_ino==named.st_ino else {throw OSwindError.invalid("The moved library path no longer matches its retained directory")}
+        let info=try LibraryVault.metadata(at:current)
+        guard info.id==watchedVaultID else {throw OSwindError.invalid("The moved directory does not match this encrypted library")}
+        vaultPackage=current;requested=current.appendingPathComponent("Library");selection = .init(url:requested,requiresExisting:true,origin:"selected")
+        try LibraryLocationPreferences.save(current,defaults:defaults);watch(current)
+        message="The library moved while open. Recording stopped; OSwind is locking it at its new location."
+        return true
+    }
     private func watch(_ package:URL?) {
-        watcher?.cancel();watcher=nil;lockMonitor?.invalidate();lockMonitor=nil
+        watcher?.cancel();watcher=nil;watchFD=nil;watchedVaultID=nil;lockMonitor?.invalidate();lockMonitor=nil
         guard let package else {return}
         // Workspace sleep/session events are the fast path. This bounded check
         // also covers a locked session that produces no workspace notification.
@@ -238,11 +261,25 @@ import OSwindCore
         }}
         lockMonitor?.tolerance=0.25
         let fd=Darwin.open(package.path,O_EVTONLY | O_CLOEXEC);guard fd>=0 else {return}
+        watchFD=fd;watchedVaultID=try? LibraryVault.metadata(at:package).id
         let source=DispatchSource.makeFileSystemObjectSource(fileDescriptor:fd,eventMask:[.write,.rename,.delete],queue:.main)
         source.setCancelHandler {close(fd)}
         source.setEventHandler {[weak self] in
             guard let self,!self.busy,self.vaultPackage==package else {return}
-            self.run {try await self.loadVault(startServices:false)}
+            self.run {
+                do {
+                    if try self.reconcileMovedPackage() {try await self.performLock()}
+                    else {try await self.loadVault(startServices:false)}
+                } catch {
+                    if let previous=self.model {
+                        previous.clearForVaultLock();self.closingStore=previous.store;self.model=nil
+                        let store=previous.store;try? await Task.detached(priority:.utility) {try store.close()}.value
+                    }
+                    self.vaultStatus?.state = .unavailable
+                    self.vaultStatus?.message="The library location is unavailable. Detach has not been verified."
+                    throw error
+                }
+            }
         }
         watcher=source;source.resume()
     }

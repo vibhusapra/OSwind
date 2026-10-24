@@ -24,6 +24,8 @@ public struct LibraryVaultStatus:Codable,Sendable {
     public var libraryPath:String
     public var message:String
     public var volumeMounted:Bool=false
+    public var imageAttached:Bool=false
+    public init(info:LibraryVaultInfo,state:LibraryVaultState,libraryPath:String,message:String,volumeMounted:Bool=false,imageAttached:Bool=false) {self.info=info;self.state=state;self.libraryPath=libraryPath;self.message=message;self.volumeMounted=volumeMounted;self.imageAttached=imageAttached}
 }
 public struct LibraryVaultMigrationResult:Codable,Sendable {
     public var status:LibraryVaultStatus

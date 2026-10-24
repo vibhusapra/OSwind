@@ -8,7 +8,7 @@ struct VaultLockedView:View {
     @State private var passphrase=""
     @State private var remember=false
     private var state:LibraryVaultState? {session.vaultStatus?.state}
-    private var finishing:Bool {state == .closing || state == .opening || (state == .unavailable && session.vaultStatus?.volumeMounted == true)}
+    private var finishing:Bool {state == .closing || state == .opening || (state == .unavailable && session.vaultStatus?.imageAttached == true)}
     var body:some View {
         ScrollView {
             VStack(alignment:.leading,spacing:22) {

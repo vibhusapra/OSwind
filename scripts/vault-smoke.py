@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Owned encrypted-library process checks. Retain private fixtures; never use a normal library."""
 import argparse,hashlib,json,os,pathlib,plistlib,secrets,sqlite3,subprocess,wave
-p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-cli',type=pathlib.Path);a=p.parse_args();binary=a.binary.resolve();base=a.root.resolve();base.mkdir(mode=0o700,exist_ok=False);package=base/'Fixture.oswindvault';alias=package/'Library';secret=secrets.token_urlsafe(32).encode();held=None;migrated=base/'Migrated.oswindvault';report={'state':'running','scope':'Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.','checks':[],'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'schema_version':18}
+p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-cli',type=pathlib.Path);a=p.parse_args();binary=a.binary.resolve();base=a.root.resolve();base.mkdir(mode=0o700,exist_ok=False);package=base/'Fixture.oswindvault';alias=package/'Library';secret=secrets.token_urlsafe(32).encode();held=None;migrated=base/'Migrated.oswindvault';moved=base/'Moved.oswindvault';report={'state':'running','scope':'Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.','checks':[],'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest(),'schema_version':18}
 def save():(base/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 def run(*args,password=None,ok=True):
  r=subprocess.run([str(binary),*map(str,args)],input=(password+b'\0') if password is not None else b'',capture_output=True,timeout=90)
  assert (r.returncode==0)==ok,(args,r.returncode,r.stderr.decode(errors='replace'));assert secret not in r.stdout and secret not in r.stderr
  return r.stdout.decode()
 def mounted(candidate=None):
- v=plistlib.loads(subprocess.check_output(['/usr/bin/hdiutil','info','-plist']));return [i for i in v.get('images',[]) if pathlib.Path(i.get('image-path','/nonexistent')).resolve()==((candidate or package)/'contents.sparsebundle').resolve()]
+ # All fixtures are inside this newly created private root. Checking every owned
+ # attachment independently catches stale image paths after a package rename,
+ # including an image whose filesystem is already unmounted.
+ v=plistlib.loads(subprocess.check_output(['/usr/bin/hdiutil','info','-plist']));return [i for i in v.get('images',[]) if i.get('image-path','').startswith(str(base)+'/')]
 save()
 try:
  created=json.loads(run('vault','create',package,'--name','Owned CLI fixture','--capacity-gb','1','--passphrase-stdin',password=secret));assert created['state']=='locked' and not mounted() and alias.is_file() and not alias.is_symlink();report['checks'].append('create initializes and detaches, public handle closed');save()
@@ -31,13 +34,21 @@ try:
  run('vault','unlock',package,'--passphrase-stdin',password=secret);assert json.loads(run('--vault',package,'get',identifier))['text']=='Owned encrypted memory marker';run('vault','lock',package);assert not mounted();source=base/'Original';run('--data',source,'note','Owned migration source');copied=json.loads(run('vault','migrate',source,'--to',migrated,'--capacity-gb','1','--passphrase-stdin',password=secret));assert copied['sourceStable'] and copied['originalRetained'] and copied['status']['state']=='locked' and not mounted(migrated)
  run('vault','unlock',migrated,'--passphrase-stdin',password=secret);assert json.loads(run('--vault',migrated,'stats','--json'))['count']==1;run('vault','lock',migrated);assert not mounted(migrated);assert json.loads(run('--data',source,'stats','--json'))['count']==1;report['checks'].append('verified native migration remounts with history and retains original')
  missing=base/'Missing';bad=base/'MustNotExist.oswindvault';run('vault','migrate',missing,'--to',bad,'--passphrase-stdin',password=secret,ok=False);assert not missing.exists() and not bad.exists();report['checks'].append('missing source refuses before destination creation')
+ run('vault','unlock',package,'--passphrase-stdin',password=secret);package.rename(moved)
+ visible=json.loads(run('vault','status',moved));assert visible['imageAttached'] and visible['volumeMounted'] and visible['state']!='locked' and mounted();report['checks'].append('renamed attached package remains visibly attached despite stale OS image path')
+ closed=json.loads(run('vault','lock',moved));assert closed['state']=='locked' and not closed['imageAttached'] and not mounted();report['checks'].append('moved package closes public handle and normally unmounts/ejects verified backing device')
+ run('vault','unlock',moved,'--passphrase-stdin',password=secret);assert json.loads(run('--vault',moved,'get',identifier))['text']=='Owned encrypted memory marker'
+ image=mounted();assert len(image)==1;volume=next(e for e in image[0]['system-entities'] if 'mount-point' in e);mount=pathlib.Path(volume['mount-point']);assert mount.is_relative_to(moved)
+ subprocess.run(['/sbin/umount',str(mount)],check=True,capture_output=True,timeout=30)
+ visible=json.loads(run('vault','status',moved));assert visible['imageAttached'] and not visible['volumeMounted'] and visible['state']=='closing';run('--vault',moved,'stats','--json',ok=False)
+ closed=json.loads(run('vault','lock',moved));assert not closed['imageAttached'] and not mounted();report['checks'].append('unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount')
  report.update(state='completed',verified_detached=True,passphrase_persisted=False,normal_library_opened=False);save();print(json.dumps(report,indent=2))
 except BaseException as error:report.update(state='failed',failure=str(error));save();raise
 finally:
  if held:held.close()
  try:
-  for candidate in [package,migrated]:
-   if mounted(candidate):run('vault','lock',candidate)
-  report['cleanup_detached']=not any(mounted(candidate) for candidate in [package,migrated])
+  for candidate in [package,migrated,moved]:
+   if candidate.exists() and mounted(candidate):run('vault','lock',candidate)
+  report['cleanup_detached']=not bool(mounted())
  except BaseException as error:report['cleanup_failure']=str(error)
  save()
