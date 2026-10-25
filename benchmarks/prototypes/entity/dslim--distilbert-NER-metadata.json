@@ -1,0 +1,228 @@
+{
+  "_id": "65b2cc3db389ca2de18ecb0f",
+  "id": "dslim/distilbert-NER",
+  "private": false,
+  "pipeline_tag": "token-classification",
+  "library_name": "transformers",
+  "tags": [
+    "transformers",
+    "tensorboard",
+    "onnx",
+    "safetensors",
+    "distilbert",
+    "token-classification",
+    "en",
+    "dataset:conll2003",
+    "arxiv:1810.04805",
+    "arxiv:1910.01108",
+    "base_model:distilbert/distilbert-base-cased",
+    "base_model:quantized:distilbert/distilbert-base-cased",
+    "license:apache-2.0",
+    "endpoints_compatible",
+    "region:us"
+  ],
+  "downloads": 131028,
+  "likes": 54,
+  "modelId": "dslim/distilbert-NER",
+  "author": "dslim",
+  "sha": "dfa2838a127384aabb82ed7719e16dab84c42a2a",
+  "lastModified": "2024-10-08T07:52:51.000Z",
+  "gated": false,
+  "disabled": false,
+  "mask_token": "[MASK]",
+  "widgetData": [
+    {
+      "text": "My name is Wolfgang and I live in Berlin"
+    },
+    {
+      "text": "My name is Sarah and I live in London"
+    },
+    {
+      "text": "My name is Clara and I live in Berkeley, California."
+    }
+  ],
+  "model-index": [
+    {
+      "name": "distilbert-NER",
+      "results": []
+    }
+  ],
+  "config": {
+    "architectures": [
+      "DistilBertForTokenClassification"
+    ],
+    "model_type": "distilbert",
+    "tokenizer_config": {
+      "cls_token": "[CLS]",
+      "mask_token": "[MASK]",
+      "pad_token": "[PAD]",
+      "sep_token": "[SEP]",
+      "unk_token": "[UNK]"
+    }
+  },
+  "cardData": {
+    "license": "apache-2.0",
+    "base_model": "distilbert-base-cased",
+    "metrics": [
+      "precision",
+      "recall",
+      "f1",
+      "accuracy"
+    ],
+    "model-index": [
+      {
+        "name": "distilbert-NER",
+        "results": []
+      }
+    ],
+    "datasets": [
+      "conll2003"
+    ],
+    "language": [
+      "en"
+    ],
+    "pipeline_tag": "token-classification"
+  },
+  "transformersInfo": {
+    "auto_model": "AutoModelForTokenClassification",
+    "pipeline_tag": "token-classification",
+    "processor": "AutoTokenizer"
+  },
+  "siblings": [
+    {
+      "rfilename": ".gitattributes",
+      "blobId": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+      "size": 1519
+    },
+    {
+      "rfilename": "README.md",
+      "blobId": "0cc2db5b71a5d708b3c185de175c3f2ad10e34e6",
+      "size": 6170
+    },
+    {
+      "rfilename": "config.json",
+      "blobId": "8f34a873ec20f0e84bbd0eaeffdc02dc93c71e0a",
+      "size": 926
+    },
+    {
+      "rfilename": "model.safetensors",
+      "blobId": "f9f20d54d1960b4ae67e966e5cebd48e5fe262f1",
+      "size": 260803668,
+      "lfs": {
+        "sha256": "235ecd699f650ca36513b122d11ce5a80339be1388f06c33c2278368b99914e1",
+        "size": 260803668,
+        "pointerSize": 134
+      }
+    },
+    {
+      "rfilename": "onnx/config.json",
+      "blobId": "2da8f32b7d5b464ed0f9e3ddb30c71e06b6bf6a4",
+      "size": 925
+    },
+    {
+      "rfilename": "onnx/model.onnx",
+      "blobId": "c32355b22d769711f657ffb2f14373f8f3226129",
+      "size": 260926482,
+      "lfs": {
+        "sha256": "4440f9fc64cd28ac75d83a38d89716f25947799640cd0e5f1f9f6e57b9c14160",
+        "size": 260926482,
+        "pointerSize": 134
+      }
+    },
+    {
+      "rfilename": "onnx/special_tokens_map.json",
+      "blobId": "9bbecc17cabbcbd3112c14d6982b51403b264bfa",
+      "size": 695
+    },
+    {
+      "rfilename": "onnx/tokenizer.json",
+      "blobId": "de7ac9b6bda3ed337df237120512a771c1c3f519",
+      "size": 669021
+    },
+    {
+      "rfilename": "onnx/tokenizer_config.json",
+      "blobId": "e709285648f59a5ed96a549120a1791bc4e1105d",
+      "size": 1305
+    },
+    {
+      "rfilename": "onnx/vocab.txt",
+      "blobId": "2ea941cc79a6f3d7985ca6991ef4f67dad62af04",
+      "size": 213450
+    },
+    {
+      "rfilename": "runs/Jan25_20-44-33_2320f22f76d4/events.out.tfevents.1706215489.2320f22f76d4.240.0",
+      "blobId": "c4325d9c71e491b35154eae5e2372a865899fcb5",
+      "size": 7044,
+      "lfs": {
+        "sha256": "2c1042dee9e6154ca224d114e4c88cd8c9e0607b56efc3e14110a8260b40cc90",
+        "size": 7044,
+        "pointerSize": 129
+      }
+    },
+    {
+      "rfilename": "runs/Jan25_20-44-33_2320f22f76d4/events.out.tfevents.1706216274.2320f22f76d4.240.1",
+      "blobId": "0502119bc60c01cadd54d8b22565e9c8c9ef9f78",
+      "size": 560,
+      "lfs": {
+        "sha256": "7cfcd444853cab1e03a06950b4c7f27b38881227609b0dca1cbe2fd7db6c0483",
+        "size": 560,
+        "pointerSize": 128
+      }
+    },
+    {
+      "rfilename": "special_tokens_map.json",
+      "blobId": "a8b3208c2884c4efb86e49300fdd3dc877220cdf",
+      "size": 125
+    },
+    {
+      "rfilename": "tokenizer.json",
+      "blobId": "de7ac9b6bda3ed337df237120512a771c1c3f519",
+      "size": 669021
+    },
+    {
+      "rfilename": "tokenizer_config.json",
+      "blobId": "91498bfdd0faa1f7bf8dafe83782cb2edef3118d",
+      "size": 1197
+    },
+    {
+      "rfilename": "training_args.bin",
+      "blobId": "224c1472134d446b1e774343939a9d32d43ece2b",
+      "size": 4536,
+      "lfs": {
+        "sha256": "2fea728bc1262878cb9e5fec0154073ab508564d4c470a6ad72082a3f706fe4b",
+        "size": 4536,
+        "pointerSize": 129
+      }
+    },
+    {
+      "rfilename": "vocab.txt",
+      "blobId": "2ea941cc79a6f3d7985ca6991ef4f67dad62af04",
+      "size": 213450
+    }
+  ],
+  "spaces": [
+    "dslim/NER",
+    "MikeTangoEcho/asrnersbx",
+    "ShravanSunder/dslim-distilbert-NER",
+    "georad/mediNER",
+    "adsurkasur/arina-hf-spaces-api",
+    "meera21-sy/Named_Entity_Recognition_",
+    "DeveloperNav/dslim-distilbert-NER",
+    "sudormrfbin/basic-name-recognition",
+    "prathamesh788/pravaah",
+    "cmbtest/NER",
+    "raheman0706/resumeai-platform",
+    "sameer2026/iris_backend",
+    "hitanshuagrawal/NER_EXERCISE2",
+    "peripuri/NER-Application",
+    "ANUSTUP55/RedactX"
+  ],
+  "createdAt": "2024-01-25T21:01:49.000Z",
+  "safetensors": {
+    "parameters": {
+      "F32": 65197833
+    },
+    "total": 65197833
+  },
+  "usedStorage": 521742290
+}

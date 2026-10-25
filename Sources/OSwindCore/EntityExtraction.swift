@@ -99,7 +99,7 @@ extension MemoryStore {
         guard memory.searchPreview==nil,memory.kind != .summary,result.candidates.count<=EntityExtractor.maximumEntitiesPerSource else {throw OSwindError.invalid("Use a complete non-summary source and bounded entity results")}
         let source=memory.text as NSString
         for candidate in result.candidates {
-            guard candidate.start>=0,candidate.length>0,candidate.length<=2048,["apple-nameType","project-alias"].contains(candidate.method),candidate.start<=source.length,candidate.length<=source.length-candidate.start,Range(NSRange(location:candidate.start,length:candidate.length),in:memory.text) != nil else {throw OSwindError.invalid("Entity span is outside its source")}
+            guard candidate.start>=0,candidate.length>0,candidate.length<=2048,["apple-nameType","project-alias"].contains(candidate.method),candidate.start<=source.length,candidate.length<=source.length-candidate.start,PassageRange(start:candidate.start,length:candidate.length).text(in:memory.text) != nil else {throw OSwindError.invalid("Entity span is outside its source")}
             _ = try EntityLabel.clean(candidate.name)
             if candidate.projectID==nil {guard candidate.method == "apple-nameType", try EntityLabel.clean(source.substring(with:NSRange(location:candidate.start,length:candidate.length)))==candidate.name,candidate.kind != .project else {throw OSwindError.invalid("Automatic entity name must match its recorded text")}}
         }

@@ -1,0 +1,412 @@
+{
+  "format": "OSwind whole Unicode entity admission qualification v1",
+  "state": "incomplete; independent cancelled-lock counterexample retained",
+  "codeCommit": "681676fc89ea284353e9ea93ffc38341325696a0",
+  "verificationCommit": "4a765be121f8e8bb81375e832a8e25beec94fb9b",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "macOS26.6.2 build25G83",
+  "change": "Reject malformed composed-character entity anchors before mutation. Bounded cased WordPiece/window/decoder groundwork; learned recognizer is not integrated.",
+  "tests": {
+    "definedCases": 844,
+    "newCases": 26,
+    "focusedEntityProjectPassageBackupPasses": 158,
+    "initialFullPasses": 842,
+    "initialFullSkips": 1,
+    "initialFullFailedCases": 1,
+    "initialFullReportedFailures": 2,
+    "initialFullSuitePassed": false,
+    "distinctFunctionalPassingObservations": 844,
+    "allDefinedCasesHavePassingObservation": true,
+    "focusedTSanDefinedCases": 432,
+    "focusedTSanPassingCases": 431,
+    "focusedTSanFailedCases": 1,
+    "focusedTSanReportedFailures": 1,
+    "threadSanitizerRacesReported": false,
+    "physicalNormalPasses": 1,
+    "physicalTSanRun": false
+  },
+  "retainedFailures": [
+    {
+      "kind": "Native session fixture overlaps host sleep",
+      "case": "VaultSessionTests.testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent",
+      "caseElapsedSeconds": 773.82,
+      "overlappingMaintenanceSleepSeconds": 763,
+      "failures": 2,
+      "modelClearingAssertionPassed": true,
+      "failedAssertions": [
+        "Busy operation exceeds fixture deadline",
+        "Cached status not yet locked"
+      ],
+      "unchangedRetryPassed": true,
+      "clockObservedAwakeRetries": [
+        {
+          "trial": 0,
+          "exitCode": 0,
+          "continuousElapsedSeconds": 53.33658329166666,
+          "awakeElapsedSeconds": 53.33658174999999,
+          "suspendedDifferenceSeconds": 1.5416666698797599e-06,
+          "logSHA256": "9d002b9544a0f39cbc5c7832482c4275145708d94ce3ef9cc1e8ffc7cce6b648"
+        },
+        {
+          "trial": 1,
+          "exitCode": 0,
+          "continuousElapsedSeconds": 17.506138749999998,
+          "awakeElapsedSeconds": 17.506135333333333,
+          "suspendedDifferenceSeconds": 3.41666666514584e-06,
+          "logSHA256": "e4f4d38e64bbdefb1afb046fe4da002c3eba8f9328712dbbb48e54d9f6f91d01"
+        },
+        {
+          "trial": 2,
+          "exitCode": 0,
+          "continuousElapsedSeconds": 23.126103875,
+          "awakeElapsedSeconds": 23.126106333333333,
+          "suspendedDifferenceSeconds": 0,
+          "logSHA256": "21b1384fe5f1a30aea2718790804304df9433f5b20058202b8ccfcc2fb681bc1"
+        }
+      ],
+      "postRunOwnedImageInventoryEmpty": true,
+      "scope": "Continuous fixture budget includes suspension. Overlap and passing awake trials do not establish physical sleep/wake acceptance."
+    },
+    {
+      "kind": "Independent cancelled-lock observation fails while awake",
+      "case": "NativeVaultCancellationTests.testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact",
+      "caseElapsedSeconds": 12.572,
+      "failures": 1,
+      "observedOwnedImageCountAfterCancellation": 1,
+      "expectedOwnedImageCount": 0,
+      "laterStatusAndHistoryAssertionsPass": true,
+      "postRunOwnedImageInventoryEmpty": true,
+      "runAwakeMonotonicSeconds": 784.6175623750314,
+      "runElapsedSystemClockSeconds": 784.5620400905609,
+      "scope": "An independent hdiutil inventory still lists the owned image after cancellation returns. Kernel readability and exact metadata/cancellation cause are not yet isolated. Later absence and passing retries cannot qualify this boundary."
+    }
+  ],
+  "writerBaseline": {
+    "precedingProductCommit": "266f552a3e0fd156edc6da061033650e5b72153e",
+    "malformedCases": 3,
+    "failedTestCases": 1,
+    "failedAssertions": 6,
+    "originalLinksReplaced": true,
+    "logSHA256": "fe6e59e1f0a64d6201c784892c7d80ff29ef4678277d0bde7441282ce5abbf9c"
+  },
+  "tokenizerReferences": {
+    "rows": 262,
+    "validationRows": 256,
+    "authoredRows": 6,
+    "exactTokenIDsAndUTF16OffsetsMatch": true,
+    "referenceSHA256": "4a37be51c00dde8318a734f8db95be5614f420a5ec8218088f6a8846b1cf9407",
+    "publicPreparationMatched": true,
+    "modelInference": false
+  },
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 1,
+      "wallSeconds": 487.5096666668542
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 293.09144970797934,
+      "elapsedSystemClockSeconds": 293.0970768928528
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 22.227223000023514,
+      "elapsedSystemClockSeconds": 22.22765278816223
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 26.494713250081986,
+      "elapsedSystemClockSeconds": 26.495221853256226
+    },
+    {
+      "name": "cli-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 44.282926708925515,
+      "elapsedSystemClockSeconds": 44.28377914428711
+    },
+    {
+      "name": "terminal-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 15.25856479187496,
+      "elapsedSystemClockSeconds": 15.258860111236572
+    },
+    {
+      "name": "entity-vault-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 21.93613720801659,
+      "elapsedSystemClockSeconds": 21.936561822891235
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 10.745416833087802,
+      "elapsedSystemClockSeconds": 10.745625972747803
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.5267745000310242,
+      "elapsedSystemClockSeconds": 1.5268049240112305
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 2.4883406669832766,
+      "elapsedSystemClockSeconds": 2.4883880615234375
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 23.891718625091016,
+      "elapsedSystemClockSeconds": 23.892176866531372
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 1,
+      "awakeMonotonicSeconds": 784.6175623750314,
+      "elapsedSystemClockSeconds": 784.5620400905609
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 with whole Unicode entity-anchor admission and bounded tokenizer/decoder groundwork; learned model integration remains unfinished; no installation; native input accepted only where separately reported",
+    "codeCommit": "681676fc89ea284353e9ea93ffc38341325696a0",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "80b226f3b57b6ada03b9e0e623f684618ef292ea88f6de2b8f315c2f2a1f5041",
+        "signedSHA256": "12f9cac58d2e63f2205e3c7106e49abd835b2a6bc9d195680cb4ed445c7c186b",
+        "normalizedPayloadSHA256": "0ecf22b303ef93bc1bdcafbdba266300221b3827c98ad17b89918202bbc14f0e"
+      },
+      "oswindctl": {
+        "rawSHA256": "eb88a8a0bae1b300948c437ff2c8e8f8ab3749bd6deaa4e8dbac3a36b9fa5c53",
+        "signedSHA256": "aa97d31def6a8c5019c90c59cc64a16cc3fd942c4fe2a50e8606bd937fe0c2e0",
+        "normalizedPayloadSHA256": "afb75b4538128c817c230328f6a656f1d497b17f390bebdbe23e9ced839350f6"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "d54e690bf04873ac50f6bbe380b7535329baef5985c2067d52bc2787aa0b3bd4",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "f0110340d0939534d43929ed507a7028052d64256772f74370c22a993a1736d0",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "processSIGINT": {
+    "format": "Repeated actual fixed-candidate SIGINT observations",
+    "binarySHA256": "aa97d31def6a8c5019c90c59cc64a16cc3fd942c4fe2a50e8606bd937fe0c2e0",
+    "trials": [
+      {
+        "repetition": 0,
+        "exitCode": 0,
+        "wallSeconds": 12.333012874936685,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "267d66d258df64a12d28557b63cdfe28ee7a88adaecbc24eed339ad411919567",
+        "recovery": []
+      },
+      {
+        "repetition": 1,
+        "exitCode": 0,
+        "wallSeconds": 9.166419500019401,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "267d66d258df64a12d28557b63cdfe28ee7a88adaecbc24eed339ad411919567",
+        "recovery": []
+      },
+      {
+        "repetition": 2,
+        "exitCode": 0,
+        "wallSeconds": 7.994171000085771,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "267d66d258df64a12d28557b63cdfe28ee7a88adaecbc24eed339ad411919567",
+        "recovery": []
+      },
+      {
+        "repetition": 3,
+        "exitCode": 0,
+        "wallSeconds": 8.32843487500213,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "267d66d258df64a12d28557b63cdfe28ee7a88adaecbc24eed339ad411919567",
+        "recovery": []
+      },
+      {
+        "repetition": 4,
+        "exitCode": 0,
+        "wallSeconds": 6.113043624907732,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "267d66d258df64a12d28557b63cdfe28ee7a88adaecbc24eed339ad411919567",
+        "recovery": []
+      }
+    ],
+    "scope": "Existing smoke on five separate owned packages; no normal library, real credentials, Keychain, TCC, forced detach or broad helper kill. A local pass does not erase the initial CI failure."
+  },
+  "terminalCtrlC": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "aa97d31def6a8c5019c90c59cc64a16cc3fd942c4fe2a50e8606bd937fe0c2e0",
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0564367908518761,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 29871,
+          "helperGroup": 29871,
+          "foregroundGroup": 29869,
+          "CLIGroup": 29869
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 1.2923827078193426,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 29997,
+          "helperGroup": 29997,
+          "foregroundGroup": 29991,
+          "CLIGroup": 29991
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 1.0381342500913888,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 30049,
+          "CLIGroup": 30049
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "state": "completed",
+    "immediateRecoveryPassed": true,
+    "sourceHistoryPreserved": true,
+    "noOwnedImagesAfterFinalLock": true,
+    "passphrasePersisted": false
+  },
+  "physicalAudio": {
+    "format": "OSwind owned native system-audio observations v1",
+    "observations": [
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.01131096760340044,
+        "intendedFrequencyHz": 440,
+        "intendedToOtherAmplitudeRatio": 719359.7362493854,
+        "otherOwnedSourceAmplitude": 1.5723659573127942e-08,
+        "passed": true,
+        "samples": 48640,
+        "source": "A",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      },
+      {
+        "adapterFailure": null,
+        "intendedAmplitude": 0.011310403133961557,
+        "intendedFrequencyHz": 997,
+        "intendedToOtherAmplitudeRatio": 754194.6553279357,
+        "otherOwnedSourceAmplitude": 1.4996663068427097e-08,
+        "passed": true,
+        "samples": 48640,
+        "source": "B",
+        "sourceIdentityVerified": true,
+        "sourcePresentInOnscreenOnlyInventory": false,
+        "stream": {
+          "callbacks": 152,
+          "formats": [
+            "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+          ],
+          "interrupted": false,
+          "invalidFormats": 0,
+          "maximumCallbackSamples": 320
+        }
+      }
+    ],
+    "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+    "threadSanitizer": false,
+    "sourceCommit": "4a765be121f8e8bb81375e832a8e25beec94fb9b",
+    "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+    "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max",
+    "testLogSHA256": "8ef6718d9b763ae95de13cfb0ac5158f19c30e1f082769019de7904be684b408",
+    "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+    "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+    "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+    "permissionChanges": false,
+    "rawCapturedAudioPersisted": false,
+    "systemVolumeChanged": false
+  },
+  "ci": {
+    "commit": "681676fc89ea284353e9ea93ffc38341325696a0",
+    "run": 40169221550,
+    "conclusion": "success",
+    "bothJobsPass": true
+  },
+  "logs": {
+    "focused-tsan-v1.log": "bb3b279ef1cddb9fe3e506fc7c80cbc82854686483b561784b656338ea919963",
+    "session-lock-retry-v1.log": "d2dfe6c8f65c9858a164645fa6c6abc21235ca530348ba51aa5fc83ba08b3d6e",
+    "integration-indexed-v1.log": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "release-build-v1.log": "ff8711d0134b0704ea3a44721cc13127a1134a70ae9e066d3f33cda6eb5ba354",
+    "project-process-v1.log": "3b577defbe553b5cb64bd087f9a1aedf0ee28a0a81c30d313a3767f1c7623078",
+    "entity-vault-v1.log": "a081dbd1fbfd718de20a747b65267735f28dae7dd258e99be9fef851e02278c9",
+    "session-lock-retry-observed-2.log": "21b1384fe5f1a30aea2718790804304df9433f5b20058202b8ccfcc2fb681bc1",
+    "session-lock-retry-observed-1.log": "e4f4d38e64bbdefb1afb046fe4da002c3eba8f9328712dbbb48e54d9f6f91d01",
+    "session-lock-retry-observed-0.log": "9d002b9544a0f39cbc5c7832482c4275145708d94ce3ef9cc1e8ffc7cce6b648",
+    "integration-v1.log": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "vault-process-v1.log": "f8de24a5b1af07f39fd7c222aa64280794b4aa0911451a3ca05cd8955f364174",
+    "cli-interruption-v1.log": "9fabc274795c9c057e37b74ac325fc3025be775244f0f8d9ffd615cd64704a59",
+    "physical-normal-v1.log": "291ce1c85c39f68e1e2036342ea4a958c63b5b7e497200d065a806e959c5053a",
+    "terminal-interruption-v1.log": "971ecd919f3f694598c7276b979f0273c8d6b55470bcdc6f5ed30e0b600a224a",
+    "full-most-optins-v1.log": "75ebdc49f7acab250dabfc92ab37d36e08863b950a6bd419c4cec124f144942e",
+    "package-proof-v1.log": "7bca2cd06ebd8b5046de0584d8522090b3d0be4d02fc5a0da0201585292771c1"
+  },
+  "prototypeFailures": [
+    {
+      "kind": "Initial fixture trailing-control expectation",
+      "logSHA256": "38f4eeebd235082840713852bba92f43c800fabc4cb86dad775e240a081f3b68"
+    },
+    {
+      "kind": "Initial decoder accepted split surrogate",
+      "logSHA256": "ca5044f2a0c8e5fc932f6877a59e2d6443e305aa2817b890b0adbd593cb90934"
+    }
+  ],
+  "scope": "Owned synthetic sources, encrypted packages and generated tones only. Default Apple recognizer remains; neural-model validation is separate. No normal history, real credentials/authentication, permissions or installation change.",
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "remaining": [
+    "Diagnose and repair cancelled locking across the complete closing transition and device settlement.",
+    "Protect session-fixture cleanup and distinguish awake waits from elapsed suspension; actual sleep/wake remains unqualified.",
+    "Instrumented physical audio and targeted live-capture continuation were not run after the failing TSan stage.",
+    "Arbitrary historical/raw malformed database rows are not migrated by the writer guard.",
+    "Learned recognizer runtime/index/setup/fresh held-out acceptance, broad native/device/power and matched competitor ranking remain unfinished."
+  ]
+}
