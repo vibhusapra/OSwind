@@ -2,9 +2,11 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
-## Complete vault closing transition: qualification in progress
+## Complete vault closing transition: retained CI unlock failure
 
-[Source2cc11a9 evidence](vault-close-transition-v1.json) retains the preceding code's seven failed assertions in a three-cycle held-media-lease cancellation regression. All three cycles return with the store open; two independently retain an attached image. The fix protects metadata, media drain, public-handle closure and verified normal detach as one cancellation-independent transition. Already-cancelled public requests leave the package unchanged. Forty-five focused cases and twelve app-session cases pass. Broader frozen-source/model/package/interruption/TSan qualification is running. The prior awake cancellation failure remains retained separately; no complete release or competitor acceptance is inferred.
+[Source2cc11a9 partial qualification](vault-close-transition-v1.json) retains seven preceding-code failures in a three-cycle held-media-lease cancellation regression. The fix protects the entire closing transition and rejects already-cancelled requests before reservation. All846 functional and435 distinct instrumented cases have passing observations across runs. The full functional run passes845 with one separately exercised physical skip. Broad TSan retains430 passes, one skip, three failed cases/four failures overlapping host sleep; all four cases pass in each of three unchanged clock-observed awake trials. No race report is observed. These observations do not convert the failed broad run into a passing suite.
+
+Strict signed bundle/ZIP proof, five signed CLI SIGINT repetitions, terminal Ctrl-C create/unlock/lock, encrypted entity/project flows, ordinary/indexed integrations and normal/instrumented physical-tone plus targeted live capture checks pass. Source2cc CI passes, but later unchanged-product head a377 CI exposes a **cancelled-unlock attached-image/retry failure**. That separate counterexample remains a blocker. Native attach through complete proof acquisition is the next fix; release acceptance and all-known-contract acceptance remain false. Installed app unchanged.
 
 ## Whole Unicode entity admission: retained lock counterexample
 
