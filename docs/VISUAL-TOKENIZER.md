@@ -2,25 +2,27 @@
 
 This increment changes local loading of the pinned SigLIP2 tokenizer and fixes
 two Unicode comparisons in its BPE frontend. Model weights, conversion recipe,
-compute policies and image-vector identity remain unchanged. Performance
-measurements and full release qualification are pending.
+compute policies and image-vector identity remain unchanged. [Frozen sourcea5627ab qualification](../benchmarks/visual-tokenizer-loader-v1.json)
+passes 874 functional cases (one physical-audio skip),57 focused visual TSan
+cases, all 12 signed operations and both CI jobs. Broader release acceptance
+remains open.
 
 The existing generic `Hub.Config` JSON decoder probes several types at each
-value. The pinned input has256,000 vocabulary entries and580,604 ordered merge
-pairs. A full-test point observation showed about14 GB RSS; it is not an
+value. The pinned input has 256,000 vocabulary entries and 580,604 ordered merge
+pairs. A full-test point observation showed about 14 GB RSS; it is not an
 isolated peak-memory or energy measurement. A native two-key regression also
 shows keyed JSON decoding loses a canonically equivalent Unicode spelling.
-The source vocabulary has61 additional entries in such equivalence classes.
+The source vocabulary has 61 additional entries in such equivalence classes.
 
 The new bounded loader preserves exact keys through Foundation dictionaries
 and handles the large integer vocabulary/string pairs directly. Small metadata
 keeps the existing `Config` decoder, including token-tuple/null/Boolean behavior.
 Foundation's JSON string parser also strips a leading U+FEFF: a rejected first
-candidate retained255,994 entries. Every JSON string is now marked before
+candidate retained 255,994 entries. Every JSON string is now marked before
 parsing and the exact marker byte removed afterward, preserving BOMs and leading
 combining marks. No normalization or vocabulary-key rewriting is accepted.
 
-Input is limited to36 MiB. Root/model objects, vocabulary/merge counts, token
+Input is limited to 36 MiB. Root/model objects, vocabulary/merge counts, token
 bytes, metadata depth/nodes/encoded size and IDs are bounded. Cancellation is
 checked before/after Foundation parsing and throughout the marker/conversion
 loops. Foundation parsing and Core ML calls remain non-preemptible; this is a
@@ -30,15 +32,15 @@ constructed by this path.
 The pinned Tokenizers module used canonical Swift String equality for BPE
 merge keys, allowing a merge for `▁Å` to consume `▁Å` and fall back to bytes for a
 nonexistent token. Literal space replacement also missed a space followed by a
-combining mark. The local12-file [OSwindTokenizers target](../Vendor/OSwindTokenizers/README.md)
+combining mark. The local 12-file [OSwindTokenizers target](../Vendor/OSwindTokenizers/README.md)
 has two narrow patches: exact UTF-8 BPE key equality/hashing and literal String
-normalizer replacement. All original Apache2.0 headers/license, full source
+normalizer replacement. All original Apache 2.0 headers/license, full source
 hashes, modified-file notices and a minimal patch are retained. Hub and Jinja
 remain unchanged pinned package dependencies. Runtime notices ship with the app.
 
 ## Current evidence
 
-All11 data/BPE cases and the complete17-case tokenizer/model-lifecycle selection
+All11 data/BPE cases and the complete 17-case tokenizer/model-lifecycle selection
 pass. The small canonical-key regression fails before the loader change; the
 space/combining-mark regression fails before literal replacement. Rejected
 parser/BPE candidates remain in the local evidence.
@@ -46,8 +48,8 @@ parser/BPE candidates remain in the local evidence.
 An independent pinned Rust/Python `tokenizers==0.22.2` preparation reads the
 exact local source without weights or inference. Disable its source-declared
 fixed padding before applying OSwind's truncate63 + EOS + right-pad64 contract.
-All54 existing golden queries match that preparation. Another19 fixed inputs
-and366 probes from all canonical-equivalent vocabulary classes give439 exact
+All 54 existing golden queries match that preparation. Another 19 fixed inputs
+and 366 probes from all canonical-equivalent vocabulary classes give 439 exact
 ID/truncation/padding matches. These are tokenizer correctness checks, not
 held-out visual retrieval accuracy or exhaustive Unicode/language validation.
 
@@ -86,9 +88,44 @@ downloads; complete model/reference checks require the two explicit variables.
 [Frozen plan](../benchmarks/visual-loader-plan-v1.json) fixes three authored
 solid-color images, three queries and three alternating old/new pairs. The
 CLI runs actual visual index/query/source validation/reopen in a fresh process
-and library each time, requesting CPU+GPU. Baseline is the signed5aa58b9 build.
+and library each time, requesting CPU+GPU. Baseline is the signed 5aa58b9 build.
 The harness records per-child CPU/maxRSS and awake/system clocks, retains failed
 trials, refuses known concurrent build/test/CLI jobs and checks identical model,
 corpus, recall, scope and reopened-source results. OS/Core ML caches and other
 background activity remain uncontrolled. This is not cache-cold startup,
 sustained desktop capture, measured physical power or a competitor comparison.
+
+## Signed paired observations
+
+Three alternating baseline/candidate pairs use the frozen three-image/three-query
+workload, with all recall/scope/reopen results equal and recall@1 equal to1.
+Times include the work described in the plan; caches and host activity are
+uncontrolled. These are component observations, not a broad performance ranking.
+
+| Median across 3 processes each | Signed5aa58b9 baseline | Signeda5627ab candidate |
+| --- | ---: | ---: |
+| Index including model preparation |4.532 s |1.949 s |
+| Whole process awake elapsed |4.654 s |2.071 s |
+| Child user+system CPU |4.584 s |2.013 s |
+| Process maximum resident memory |1,538,654,208 B |1,538,785,280 B |
+| Resident-query median |3.592 ms |3.541 ms |
+
+Index time is about 2.3× faster on this workload. **Median process peak RSS is
+effectively unchanged at about 1.43 GiB**; this does not establish a release-memory
+reduction. The earlier 14 GB point sample was from a debug full-test process and
+is not the signed baseline comparison. Query latency is roughly unchanged.
+Per-operation GPU placement, shared-daemon costs, physical watts/battery,
+cache-cold startup and representative desktop quality remain unmeasured here.
+
+```sh
+python3 scripts/benchmark-visual-loader.py /absolute/candidate/oswindctl \
+  --baseline /absolute/baseline/oswindctl --model-dir /absolute/qualified-model \
+  --fixture benchmarks/fixtures/visual-loader-v1/fixture.json \
+  --protocol benchmarks/visual-loader-plan-v1.json --root /absolute/new-run
+```
+
+The published plan pins the author's signed baseline bytes. For a separately
+built baseline, freeze your own copy of the plan with its exact executable hash
+before timing, retain the build provenance and keep the workload/order unchanged.
+The harness resolves relative fixture-image paths into a new private input file.
+No installer, capture, system setting, service or normal library is used.

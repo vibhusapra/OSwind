@@ -1,0 +1,517 @@
+{
+  "format": "OSwind byte-exact visual tokenizer and loading qualification v1",
+  "codeCommit": "a5627abbe52a42a81b2768d0aaa7c21f054756cb",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "macOS26.6.2 build25G83",
+  "state": "874 functional passes,57 focused visual TSan passes,12 signed operations and both CI jobs pass; broader release acceptance remains open",
+  "changes": [
+    "Bounded local tokenizer-data loading preserves exact vocabulary keys/BOMs, validates shapes/IDs/bounds and retains existing small metadata semantics.",
+    "Pinned12-file Apache2 Tokenizers target: byte-exact BPE merge keys and literal String normalization before combining marks. Complete provenance and minimal patch checked offline.",
+    "Weights, conversion recipe, compute policies and image-vector identity unchanged; no model/tokenizer download path added."
+  ],
+  "tests": {
+    "newCases": 11,
+    "full": {
+      "defined": 875,
+      "passed": 874,
+      "skipped": 1,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "logSHA256": "52be6384124b806437ed42ef4c5999a962ab0b46630645cdd0fcc4ccc7b0000c"
+    },
+    "focusedVisualTSan": {
+      "defined": 57,
+      "passed": 57,
+      "skipped": 0,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "logSHA256": "4a5693ac620c307db5803c074c26ecef0c2242d22b82890fb0c6186e7f8e8723"
+    },
+    "threadSanitizerRacesReported": false,
+    "focusedTokenizerLifecycleCases": 17,
+    "allDefinedFunctionalCasesExercised": false
+  },
+  "correctness": {
+    "vocabularyEntries": 256000,
+    "vocabularySHA256": "f57390f3a17769b135b2f59728f6c310d0835308f65843053208463f36955eda",
+    "orderedMergePairs": 580604,
+    "orderedMergesSHA256": "4bdea648ea809879e4da3be6d25b28bffd60e5bbbeac784638e106b0c1145f67",
+    "independentQueries": 439,
+    "originalQueries": 54,
+    "additionalFixedQueries": 19,
+    "canonicalClassProbes": 366,
+    "referenceSHA256": "bfe39a039eb3b372433f8db1218d2bbf25d20db21659e70c644291e10e86e964",
+    "tokenizersVersion": "0.22.2",
+    "framing": "Vocab sorted raw UTF8: uint32BE length+bytes+uint64BE ID. Ordered pairs: uint32BE length+bytes for each component.",
+    "exhaustiveTokenizerOrVisualQualityClaim": false
+  },
+  "vendor": {
+    "revision": "48473106a93b2d8dfb114b82f0628ebbb71734e7",
+    "version": "1.3.5",
+    "files": 12,
+    "modified": [
+      "BPETokenizer.swift",
+      "Normalizer.swift"
+    ],
+    "provenanceSHA256": "c3411045264a343dcfe3cf2176ed461134597d9dba5580c4c51cf31a56759321",
+    "patchSHA256": "f7ba2d969390d291ac7d9a1aaa667afb47d2ed6c0e7dd94e5965fa8c2ba3ed1b",
+    "licenseSHA256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+    "hubAndJinjaUnchanged": true
+  },
+  "retainedDevelopmentFailures": [
+    {
+      "kind": "Canonical-equivalent key loss on preceding loader boundary",
+      "cases": 1,
+      "assertions": 2,
+      "logSHA256": "48541f85bf2a194d4a2e3b3cb7438a5a5f89a52f401c46601584807aa27003d7"
+    },
+    {
+      "kind": "Rejected Foundation candidate retains255994 entries and fails source digests/token references",
+      "assertions": 58,
+      "logSHA256": "c1264e6dc84e86d3bfdc90d0df8c32dcab73dbd90f2d62ce49b77b8606230344",
+      "executedCases": 8,
+      "failedCases": 1
+    },
+    {
+      "kind": "Rejected marker removal consumed combining-mark grapheme; full input refused",
+      "logSHA256": "02e3209f477a756e62d707b5de93ba27588ab961bf14b2b2661ce726002dbf87"
+    },
+    {
+      "kind": "Correct data digests but upstream BPE merges Unicode lookalike",
+      "failedQuery": 58,
+      "logSHA256": "08a4d405075d77c9e401eca671b36d5ef52004b6d9cb2679dee43a0051c923e6"
+    },
+    {
+      "kind": "Bytewise BPE exposes12 literal-space/combining-mark query mismatches",
+      "logSHA256": "cf950655facf9bc0cba6aebbf90d29ce53e62c0c4ebf76655c15e497c049cdef"
+    },
+    {
+      "kind": "Isolated literal normalization regression",
+      "cases": 1,
+      "assertions": 1,
+      "logSHA256": "6529bb25bcf43856c81da5e36cedb96da4433d20200c9f8b7eeef541f9cad5ae"
+    }
+  ],
+  "workload": {
+    "protocol": "visual-loader-plan-v1.json",
+    "planSHA256": "4463511ca129013a6bb064f8fa4e319409d3d5274969576eaec1b34cb8ef013e",
+    "earlierUnusedPreimplementationPlanSHA256": "b43fe23cb9a9b4add1c2a9535db12a17f3faf3e14d7a4fb5c40b351ff43739d5",
+    "reportSHA256": "fb41e1b8456fee3bbfa41b9c9f525c1f9ef1b77618bd8d81e91b09a8472a05d8",
+    "summary": {
+      "baseline": {
+        "indexingMedianSeconds": 4.531823992729187,
+        "processAwakeMedianSeconds": 4.654089457821101,
+        "childCPUMedianSeconds": 4.583768999999999,
+        "childMaximumResidentMedianBytes": 1538654208,
+        "queryMedianMilliseconds": 3.5920143127441406,
+        "recallAt1": 1
+      },
+      "candidate": {
+        "indexingMedianSeconds": 1.9487210512161255,
+        "processAwakeMedianSeconds": 2.0709437080658972,
+        "childCPUMedianSeconds": 2.0131580000000002,
+        "childMaximumResidentMedianBytes": 1538785280,
+        "queryMedianMilliseconds": 3.5409927368164062,
+        "recallAt1": 1
+      }
+    },
+    "observations": {
+      "format": "OSwind paired visual-loader workload v1",
+      "state": "completed",
+      "protocolSHA256": "4463511ca129013a6bb064f8fa4e319409d3d5274969576eaec1b34cb8ef013e",
+      "fixtureSHA256": "62145aee9ada8618c1f135e5bbc33112651ef779d9d72bbebd28ecf19794eb45",
+      "normalizedFixtureSHA256": "fc3b6fe1cf1db457fd3072cf6e043533a77b32fc10b1192794880f780ce26edb",
+      "baselineSHA256": "bbf95f80a3d1ef195d72c6190351d0420a5cd32abf095c1949b9e33d02ff9047",
+      "candidateSHA256": "fa5fef20988b13d39d421cbce6ed15d3f2742ec5ca8ea1bc6e0bacc87c800ff5",
+      "order": [
+        "baseline",
+        "candidate",
+        "candidate",
+        "baseline",
+        "baseline",
+        "candidate"
+      ],
+      "trials": [
+        {
+          "index": 0,
+          "label": "baseline",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 5.067225124919787,
+          "systemElapsedSeconds": 5.067270994186401,
+          "childUserCPUSeconds": 4.573076,
+          "childSystemCPUSeconds": 0.334613,
+          "childMaximumResidentBytes": 1943977984,
+          "stdoutSHA256": "8d8a0a37d0c2522c1dbd3c12ade4b2db814e895ae7affc482596aadb7bc8a38f",
+          "stderrSHA256": "88faae0f11d6f5887b1daed04b0a40d6feead8fdc2bc5d86f19c1e285b0084b6",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 4.920898914337158,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.5920143127441406,
+            "queryP95Milliseconds": 53.266048431396484,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        },
+        {
+          "index": 1,
+          "label": "candidate",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 3.40164633304812,
+          "systemElapsedSeconds": 3.401676893234253,
+          "childUserCPUSeconds": 1.868827,
+          "childSystemCPUSeconds": 0.185055,
+          "childMaximumResidentBytes": 1537572864,
+          "stdoutSHA256": "64dae92ef47afebd872c97a3265c9993221db4c586b0983d54d2de569cb1f2b9",
+          "stderrSHA256": "d3cc0b6ac25fc77535e63d81d240e0f9d20a707673217c355e1064be238e86a4",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 1.9869389533996582,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.352999687194824,
+            "queryP95Milliseconds": 45.13990879058838,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        },
+        {
+          "index": 2,
+          "label": "candidate",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 2.0641616249922663,
+          "systemElapsedSeconds": 2.0641798973083496,
+          "childUserCPUSeconds": 1.825969,
+          "childSystemCPUSeconds": 0.174256,
+          "childMaximumResidentBytes": 1538850816,
+          "stdoutSHA256": "3577940a4efcd965a46328d8aff974dd3cfca10d55dd3d6979d6c7e2611e7eef",
+          "stderrSHA256": "d3cc0b6ac25fc77535e63d81d240e0f9d20a707673217c355e1064be238e86a4",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 1.9389779567718506,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.5409927368164062,
+            "queryP95Milliseconds": 44.738054275512695,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        },
+        {
+          "index": 3,
+          "label": "baseline",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 4.651281750062481,
+          "systemElapsedSeconds": 4.651321649551392,
+          "childUserCPUSeconds": 4.391116,
+          "childSystemCPUSeconds": 0.191651,
+          "childMaximumResidentBytes": 1538654208,
+          "stdoutSHA256": "a98692844436f67d2e12742ef08df0ae941bff7aced28ed2f03b752a76c3cf2b",
+          "stderrSHA256": "d3cc0b6ac25fc77535e63d81d240e0f9d20a707673217c355e1064be238e86a4",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 4.52713406085968,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.473997116088867,
+            "queryP95Milliseconds": 46.05603218078613,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        },
+        {
+          "index": 4,
+          "label": "baseline",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 4.654089457821101,
+          "systemElapsedSeconds": 4.6541359424591064,
+          "childUserCPUSeconds": 4.379477,
+          "childSystemCPUSeconds": 0.204292,
+          "childMaximumResidentBytes": 1538621440,
+          "stdoutSHA256": "021357e06ebf44af21f48b5c538d697162d0b784a890fc0ab5fb53e92e02b6b3",
+          "stderrSHA256": "d3cc0b6ac25fc77535e63d81d240e0f9d20a707673217c355e1064be238e86a4",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 4.531823992729187,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.6638975143432617,
+            "queryP95Milliseconds": 45.07601261138916,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        },
+        {
+          "index": 5,
+          "label": "candidate",
+          "exitCode": 0,
+          "timedOut": false,
+          "awakeElapsedSeconds": 2.0709437080658972,
+          "systemElapsedSeconds": 2.0709619522094727,
+          "childUserCPUSeconds": 1.826116,
+          "childSystemCPUSeconds": 0.18704199999999999,
+          "childMaximumResidentBytes": 1538785280,
+          "stdoutSHA256": "3610f907d3e6879ef5e64fa01083c4cb5d31395d62dd9b9f97b9afb760ef40a5",
+          "stderrSHA256": "d3cc0b6ac25fc77535e63d81d240e0f9d20a707673217c355e1064be238e86a4",
+          "benchmark": {
+            "corpusSHA256": "95f1bc03f34e80c02528e8c114e40836a901ad1b1ac91f88963b839d2f7a48e9",
+            "gpu": "Apple M5 Max",
+            "images": 3,
+            "indexedFrames": 3,
+            "indexingSeconds": 1.9487210512161255,
+            "limits": [
+              "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+              "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+              "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+              "No image, caption, source path or raw vector is included in this aggregate report."
+            ],
+            "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+            "os": "Version 26.6.2 (Build 25G83)",
+            "queries": 3,
+            "queryMedianMilliseconds": 3.63004207611084,
+            "queryP95Milliseconds": 45.127034187316895,
+            "recallAt1": 1,
+            "recallAt5": 1,
+            "recallAt10": 1,
+            "reopenedIndexSources": 3,
+            "schema": 22,
+            "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+            "scopedResultsVerified": true
+          },
+          "competingJobsAfter": []
+        }
+      ],
+      "scope": "Three solid-color authored PNGs and three fixed queries through actual signed CLI visual index/query/reopen. Fresh process/library each trial; uncontrolled OS/CoreML caches and background activity. No natural visual-quality, capture, cold-cache, physical-power or competitor ranking claim.",
+      "limits": [
+        "Child CPU excludes shared daemons; wait4 maximum RSS is macOS bytes, not total system memory.",
+        "No baseline/candidate build or model/test job may overlap; other background activity is uncontrolled.",
+        "Clock divergence over1 second stops the run and retains the trial. No replacement trials are silently added."
+      ]
+    },
+    "scope": "Three fixed solid-color PNGs and three queries through actual signed CLI index/query/reopen, requested CPU+GPU. Three alternating pairs. Process totals include startup/checks/inference/SQLite; index time includes model preparation. Cache/host activity uncontrolled; per-operation device placement and shared-daemon memory/CPU unmeasured.",
+    "comparison": {
+      "indexingMedianRatio": 2.325537557004909,
+      "processAwakeMedianRatio": 2.2473278436755115,
+      "childCPUMedianRatio": 2.276904743691255,
+      "maximumResidentMedianDifferenceBytes": 131072,
+      "interpretation": "On this tiny frozen workload, index/process/child CPU time decrease. Median process peak RSS is effectively unchanged at about1.43GiB, and query latency remains about3.6ms. Initial baseline RSS is higher, with uncontrolled caches. No release-memory reduction, physical energy, general workload or competitor claim."
+    }
+  },
+  "orderedOperations": [
+    {
+      "name": "vendor-integrity-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.0891629580873996,
+      "elapsedSystemClockSeconds": 0.08916401863098145
+    },
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 569.45245179208,
+      "elapsedSystemClockSeconds": 569.4095499515533
+    },
+    {
+      "name": "visual-tsan-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 276.4872906249948,
+      "elapsedSystemClockSeconds": 276.4897048473358
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 52.590651124948636,
+      "elapsedSystemClockSeconds": 52.591110944747925
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.5354709578678012,
+      "elapsedSystemClockSeconds": 1.535485029220581
+    },
+    {
+      "name": "paired-loader-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 22.40376512496732,
+      "elapsedSystemClockSeconds": 22.403961896896362
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 12.836630207952112,
+      "elapsedSystemClockSeconds": 12.836743116378784
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.3784634158946574,
+      "elapsedSystemClockSeconds": 0.3784668445587158
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.062237499980256,
+      "elapsedSystemClockSeconds": 1.062248945236206
+    },
+    {
+      "name": "terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 9.954990666825324,
+      "elapsedSystemClockSeconds": 9.955078840255737
+    },
+    {
+      "name": "busy-terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 5.823970875004306,
+      "elapsedSystemClockSeconds": 5.824022054672241
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 15.263775957981125,
+      "elapsedSystemClockSeconds": 15.263909816741943
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 with byte-preserving bounded visual tokenizer loading and two pinned/local Unicode tokenizer fixes; same model weights/recipe; no installation, measured power or competitive ranking claim",
+    "codeCommit": "a5627abbe52a42a81b2768d0aaa7c21f054756cb",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "54c99474404ba9bf7c537d1f1915028f65174b4e06a6625b5cbd1c8165833f0d",
+        "signedSHA256": "d3dd31e281f7aa97ae4568118c7804feb9dbf369a1ed658245a9296b3953def0",
+        "normalizedPayloadSHA256": "b22bb91b60f25ea1f09f418804ffe67f7218b63df79a3bc76fc0433cd36732de"
+      },
+      "oswindctl": {
+        "rawSHA256": "5800800f6df08cfa900f76a781c8c3fcfc86b0901957d3ace95658c82a2077fd",
+        "signedSHA256": "fa5fef20988b13d39d421cbce6ed15d3f2742ec5ca8ea1bc6e0bacc87c800ff5",
+        "normalizedPayloadSHA256": "0bb7c7184336d8afc2423271fbe2b04555d8428d59d11884b3c01234a12a7706"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "5bf026b35fcb55381d5a97dc543d2f9c09f51a1a0bd06ff34184adfcb0331199",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "1bb09dda8455aebf3292db8cef94a4852a33ce45b4226882f6d2943d297fdd8a",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "ci": {
+    "runID": 40191012763,
+    "codeCommit": "a5627abbe52a42a81b2768d0aaa7c21f054756cb",
+    "state": "completed",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40191012763",
+    "nativePass": true,
+    "benchmarkHarnessesPass": true,
+    "conclusion": "success"
+  },
+  "limits": [
+    "Token references/source digests establish these software contracts, not exhaustive Unicode/language parity, held-out retrieval accuracy or competitor ranking.",
+    "Only the frozen tiny visual workload supports its observed time/CPU/RSS comparisons; no cache-cold, sustained desktop workload or physical energy/battery claim.",
+    "No normal history, real credentials, auth/TCC/power changes, forced detach or installation.",
+    "Physical audio remains separately gated; the functional skip is not counted as passed. Broad native authentication/capture and release acceptance remain open."
+  ],
+  "allSelectedFrozenOperationsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "nativePreflight": {
+    "screenLocked": true,
+    "screenRecording": true,
+    "accessibility": true,
+    "physicalAudio": "deferred",
+    "liveCapture": "deferred",
+    "reportSHA256": "d2ec59263cd8f04cd3482dbb3d0af18b8fb06daef6db8137fe9c9d620bd31c15"
+  }
+}
