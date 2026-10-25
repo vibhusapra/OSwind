@@ -2,6 +2,10 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## CLI error preservation: frozen source5aa58b9
+
+[Signed qualification](cli-error-preservation-v1.json) passes all13 selected operations. The same real held-reader/Ctrl-C harness fails on signed269d4c9 (masked cancellation130) and passes on the fixed candidate (busy error1 with actionable instructions). Both preserve authored history through normal recovery after the reader closes. Ordinary terminal create/unlock/lock cancellation and five repeated SIGINT trials still detach/recover; backup/export SIGINT/SIGKILL, native/legacy access, encrypted SDK, APIs, erasure and wipe pass. Strict signed33-file app/ZIP payload/tree checks pass; installed app unchanged. Core/app/model/test/SDK inputs inherit the recorded863 functional/452 TSan component observations and were not rerun. CI is running. The earlier unheld terminal failure's exact native cause remains uncaptured; this is error preservation, not forced detach or complete release acceptance.
+
 ## Text collectors and Python SDK: frozen source269d4c9
 
 [Partial signed qualification](collector-sdk-v1.json) passes863 functional cases with one physical-audio skip,452 broad TSan cases with no race report, and16 offline Python contracts. The actual immutable CLI/SDK verifies stable retries and source updates, favorite/tag preservation, current privacy/redaction/browser-context rules, atomic refusal, six read tools, partial-pipe SIGINT and an encrypted admission/lock/refusal/remount round trip. Strict signed bundle/ZIP payload/tree checks pass. In-app plugin installation, scheduling, sandbox and a connector catalog remain unfinished.
