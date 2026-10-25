@@ -380,7 +380,7 @@
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
     "status": "partial",
-    "evidence": "Managed AES256 APFS images, closed handles, MEMORY SQLite temps, source-preserving migration, setup/lock screens and optional user-presence Keychain. Identity-bound detach settlement, rapid native lifecycle and ordinary CLI flow pass. Current f7e52a6 CI SIGINT unlock failed with an owned image still attached after exit 130; failure retained and cleanup investigation open. Ad-hoc Keychain controls disabled; real authentication/native sleep/physical workload/OS matrix remain open",
+    "evidence": "Managed AES256 APFS images, closed handles, MEMORY SQLite temps, source-preserving migration, setup/lock screens and optional user-presence Keychain. Identity-bound detach settlement, rapid native lifecycle and ordinary CLI flow pass. Preceding f7e52a6 CI SIGINT unlock leaves an owned image attached; failure retained. Current fbe6fac finishes bounded native mutations before acknowledging cancellation, including the complete lock confirmation. Three native regressions, five repeated signed CLI trials, terminal Ctrl-C create/unlock/lock and native Stop/recovery with intervening OS lock pass; final normal-lock screen observation interrupted by OS lock, detached state independently verified. Ad-hoc Keychain controls disabled; real authentication/native sleep/physical workload/OS matrix remain open",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "Signed f7e52a6 schema22 exercises all 810 defined cases: 779 normal passes/31 skips, 332 native/model/Metal adding 25, five cached model/runtime and one physical case. 399 distinct TSan passes; all 22 final operations, native correction lifecycle, targeted OCR/privacy and 18 paired scaling trials pass. Original CI SIGINT vault cleanup failure retained; schema-target harness/workflow fixes await fresh CI. Corpus and pinned rem component results remain separate; no overall competitor rank",
+    "evidence": "Signed fbe6fac schema22 exercises all 818 defined cases: 817 full/native/model/Metal passes and one physical case; 407 distinct TSan passes, thirteen qualification operations, five repeated CLI interruptions, terminal Ctrl-C and limited native Stop/recovery pass. Initial CI Python-startup timeout fixture corrected; verification301cbad CI passes both jobs. Preceding project qualification has 18 paired scaling trials; original cancellation failures remain retained. Corpus and pinned rem component results remain separate; no overall competitor rank",
     "references": "OSwind quality bar"
   },
   {
