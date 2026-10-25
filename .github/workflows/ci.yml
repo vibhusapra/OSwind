@@ -32,6 +32,7 @@ jobs:
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
           python3 scripts/vault-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-interruptions"
+          python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal"
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise source-linked entity scopes, corrections and quiet backup
