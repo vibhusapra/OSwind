@@ -3,6 +3,12 @@ import Darwin
 import CSQLite
 @testable import OSwindCore
 
+private final class LeaseDescriptorRaceLog:@unchecked Sendable {
+    private let lock=NSLock();private var entries=[String]()
+    var errors:[String] {lock.lock();defer {lock.unlock()};return entries}
+    func append(_ value:String) {lock.lock();defer {lock.unlock()};if entries.count<10 {entries.append(value)}}
+}
+
 final class VaultTests:XCTestCase {
     var root:URL!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-vault-contract-"+UUID().uuidString);try Paths.ensure(root)}
@@ -66,6 +72,35 @@ final class VaultTests:XCTestCase {
     func testPackageReplacementIsRejectedBeforeMetadataWrite() throws {
         let paths=try manifest();try FileManager.default.moveItem(at:paths.package,to:root.appendingPathComponent("moved"));try Paths.ensure(paths.package)
         XCTAssertThrowsError(try paths.closeAlias());XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:paths.package.path).isEmpty)
+    }
+    func testFailedReservationCannotCloseConcurrentManifestDescriptors() throws {
+        let paths=try manifest(),expected=try paths.info().id,held=try VaultOperationLease(paths:paths)
+        let log=LeaseDescriptorRaceLog(),group=DispatchGroup(),start=DispatchSemaphore(value:0)
+        for reader in 0..<2 {
+            group.enter();DispatchQueue.global(qos:.userInitiated).async {
+                defer {group.leave()};start.wait()
+                for _ in 0..<4000 {
+                    if !log.errors.isEmpty {break}
+                    do {if try paths.info().id != expected {log.append("Reader \(reader) observed a different manifest")}}
+                    catch {log.append("Reader \(reader): \(error.localizedDescription)")}
+                }
+            }
+        }
+        for _ in 0..<2 {
+            group.enter();DispatchQueue.global(qos:.userInitiated).async {
+                defer {group.leave()};start.wait()
+                for _ in 0..<2000 {
+                    if !log.errors.isEmpty {break}
+                    do {let unexpected=try VaultOperationLease(paths:paths);withExtendedLifetime(unexpected){};log.append("Contending reservation unexpectedly succeeded")}
+                    catch {}
+                }
+            }
+        }
+        for _ in 0..<4 {start.signal()}
+        // Join all owned workers before releasing the original reservation/root.
+        group.wait();withExtendedLifetime(held){}
+        XCTAssertTrue(log.errors.isEmpty,log.errors.joined(separator:"; "))
+        XCTAssertEqual(try paths.info().id,expected)
     }
     func testOperationReservationRejectsOtherActorsAndReleases() throws {
         let paths=try manifest();var lease:VaultOperationLease?=try VaultOperationLease(paths:paths);XCTAssertNotNil(lease);XCTAssertThrowsError(try VaultOperationLease(paths:paths));lease=nil

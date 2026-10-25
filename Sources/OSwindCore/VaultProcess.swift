@@ -86,6 +86,13 @@ struct NativeVaultDriver:Sendable {
     }
     func attach(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         guard try await encrypted(paths:paths) else {throw OSwindError.invalid("The selected disk image is not encrypted")}
+        return try await VaultAttachCompletion.run(action:{
+            try await self.attachAndProve(paths:paths,mount:mount,secret:secret)
+        },cancelled:{proof in
+            try await self.eject(paths:paths,proof:proof)
+        })
+    }
+    private func attachAndProve(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         do {
             let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
             guard r.status==0 else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}

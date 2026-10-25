@@ -1,5 +1,8 @@
 # Encrypted libraries
 
+Current candidate [PR #58](https://github.com/vibhusapra/OSwind/pull/58) acquires complete native attach proof before cancellation cleanup and transfers reservation descriptor ownership only after throwing checks. A concurrent stable-manifest read reproduces the preceding double-close defect; the fixed instrumented case completes8,000 reads/4,000 rejected reservations. [Frozen sourcef7d941f qualification](../benchmarks/vault-native-ownership-v1.json) passes all852 functional and441 instrumented cases,14 operations and both CI jobs. Earlier failures below remain historical evidence. Native Stop/reopen/normal-lock screens are observed on authored history, but later OS lock and missing per-action sampler transitions limit causal isolation; real authentication, physical sleep/wake and broad release acceptance remain open.
+
+
 Schema 18 adds a native encrypted-library package, separate from the ordinary library. The source includes setup, verified copy, passphrase/optional Keychain unlock, an explicit locked screen, menu/Settings lock controls and sleep/session-lock requests. The installed schema-17 app has not yet been replaced with this work. The separately staged ad-hoc signed package passes headless release qualification: 522 total tests (516 pass / six skips), 79 focused TSan passes and all 15 signed-release process groups. Native authentication and click/focus/device acceptance remain open. [Sanitized evidence](../benchmarks/encrypted-library-v1.json).
 
 ## Cooperative cancellation

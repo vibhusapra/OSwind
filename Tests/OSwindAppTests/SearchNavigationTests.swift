@@ -16,8 +16,9 @@ import XCTest
         try? FileManager.default.removeItem(at:root)
     }
     func settle() async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(3))
-        while app.refreshing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+        // The host cannot complete a UI refresh while suspended; retain the same awake budget.
+        let deadline=SuspendingClock.now.advanced(by:.seconds(3))
+        while app.refreshing,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
         XCTAssertFalse(app.refreshing);XCTAssertNil(app.errorMessage);XCTAssertNil(app.searchInputError)
     }
     func project()throws->MemoryEntity {
