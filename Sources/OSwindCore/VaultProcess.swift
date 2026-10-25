@@ -5,7 +5,14 @@ struct VaultProcessResult:Sendable {var status:Int32;var stdout:Data;var stderr:
 /// Native helper output may include paths, but never emit the passphrase or
 /// command output into public logs. No shell, environment password or key argv.
 enum VaultProcess {
-    static func run(_ executable:String,_ arguments:[String],secret:Data?=nil,timeout:Double=60) async throws -> VaultProcessResult {
+    enum CancellationPolicy:Sendable {
+        case terminateChild
+        // DiskImages can delegate a mutation beyond the hdiutil process. Let
+        // that bounded action finish before its caller performs safe cleanup.
+        case finishNativeAction
+    }
+    static func run(_ executable:String,_ arguments:[String],secret:Data?=nil,timeout:Double=60,cancellation:CancellationPolicy = .terminateChild) async throws -> VaultProcessResult {
+        try Task.checkCancellation()
         if let secret {guard !secret.isEmpty,secret.count<=4096,!secret.contains(0) else {throw OSwindError.invalid("Use a nonempty passphrase without NUL characters")}}
         let job=Task.detached(priority:.utility) {() throws -> VaultProcessResult in
             try Task.checkCancellation()
@@ -42,7 +49,11 @@ enum VaultProcess {
             guard !stdout.oversized,!stderr.oversized else {throw OSwindError.unavailable("Encrypted-library system output exceeded its limit")}
             try Task.checkCancellation();return .init(status:process.terminationStatus,stdout:stdout.data,stderr:stderr.data)
         }
-        return try await withTaskCancellationHandler {try await job.value} onCancel:{job.cancel()}
+        return try await withTaskCancellationHandler {
+            let result=try await job.value
+            try Task.checkCancellation()
+            return result
+        } onCancel:{if case .terminateChild=cancellation {job.cancel()}}
     }
 }
 private final class VaultPipeBuffer:@unchecked Sendable {
@@ -67,7 +78,7 @@ struct NativeVaultDriver:Sendable {
         guard r.status==0,let data=try PropertyListSerialization.propertyList(from:r.stdout,format:nil) as? [String:Any],let images=data["images"] as? [[String:Any]] else {throw OSwindError.unavailable("Cannot inspect encrypted disk attachments")};return images
     }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
-        let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120)
+        let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
         guard result.status==0 else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
@@ -76,7 +87,7 @@ struct NativeVaultDriver:Sendable {
     func attach(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         guard try await encrypted(paths:paths) else {throw OSwindError.invalid("The selected disk image is not encrypted")}
         do {
-            let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120)
+            let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
             guard r.status==0 else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}
             guard let proof=try await attachment(paths:paths),proof.mounted,proof.mount.standardizedFileURL==mount.standardizedFileURL else {throw OSwindError.invalid("The attached vault did not match its requested location")};return proof
         } catch {
@@ -157,16 +168,16 @@ struct NativeVaultDriver:Sendable {
         guard let verified=try await attachment(paths:paths) else {return}
         guard same(proof,verified) else {throw OSwindError.invalid("The image changed before detach; no volume was detached")}
         let identity=try VaultDetachIdentity(paths:paths,image:verified.image)
-        let first=try await VaultProcess.run("/usr/bin/hdiutil",["detach",verified.attachmentDevice],timeout:30)
+        let first=try await VaultProcess.run("/usr/bin/hdiutil",["detach",verified.attachmentDevice],timeout:30,cancellation:.finishNativeAction)
         if first.status != 0 {
             // A renamed mounted package can have a stale Disk Arbitration path.
             // A normal kernel unmount uses the freshly verified current mount.
             // EBUSY remains EBUSY; force flags are never used.
             guard verified.mounted,URL(fileURLWithPath:verified.reportedImagePath).standardizedFileURL.resolvingSymlinksInPath() != paths.image.standardizedFileURL.resolvingSymlinksInPath(),let current=try await attachment(paths:paths),same(verified,current) else {throw OSwindError.unavailable("The vault is still attached because files are in use. Close other readers and retry locking.")}
-            let unmount=try await VaultProcess.run("/sbin/umount",[current.mount.path],timeout:30)
+            let unmount=try await VaultProcess.run("/sbin/umount",[current.mount.path],timeout:30,cancellation:.finishNativeAction)
             guard unmount.status==0 else {throw OSwindError.unavailable("The moved vault is still mounted because files are in use. Close other readers and retry locking.")}
             guard let unmounted=try await attachment(paths:paths),!unmounted.mounted,same(verified,unmounted,allowUnmounted:true) else {throw OSwindError.invalid("The unmounted attachment changed. Its remaining device was preserved.")}
-            let final=try await VaultProcess.run("/usr/bin/hdiutil",["detach",unmounted.attachmentDevice],timeout:30)
+            let final=try await VaultProcess.run("/usr/bin/hdiutil",["detach",unmounted.attachmentDevice],timeout:30,cancellation:.finishNativeAction)
             guard final.status==0 else {throw OSwindError.unavailable("The filesystem is unmounted but its encrypted image is still attached. Retry locking.")}
         }
         try await VaultDetachSettlement.confirm {

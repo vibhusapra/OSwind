@@ -2,6 +2,17 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Cooperative encrypted-library cancellation
+
+[Signed qualification](vault-cancellation-v1.json) binds runtime fbe6fac/schema22 to **818 distinct functional passes and 407 distinct TSan passes**, five repeated actual CLI interruption trials and terminal-generated Ctrl-C for create/unlock/lock. Immediate recovery preserves an authored source and independent OS inventory confirms detachment. Native Stop during an owned helper hold, with intervening OS lock, is followed by an observed detached screen; native recovery shows the original note with recording paused. OS lock prevents final Settings Lock screen confirmation, while product/OS state verifies final detachment. The 33-file signed bundle and complete ZIP agree; installed schema17 stays unchanged.
+
+The identical native baseline has two failed cases/one pass and19 reported failures. The preceding signed CLI fails immediate recovery four of five times. Both remain retained, alongside a short-helper observation miss and CI's subsecond Python-startup fixture failure. The timeout probe is corrected and its five policy tests rerun normally/TSan; product files remain unchanged. CI run40151212798 passes both jobs. This qualifies cooperative cancellation on owned fixtures, not SIGKILL, Force Quit, native OS hangs, power loss, real authentication, broad feature parity, energy or competitive placement.
+
+```bash
+python3 scripts/vault-terminal-smoke.py /absolute/path/oswindctl \
+  --root /new/owned/vault-terminal-check
+```
+
 ## Bounded project indexing and restore
 
 [Paired signed evidence](project-index-scaling-v1.json) compares frozen schema21 `ea90902` and schema22 `f7e52a6` on one M5 Max/macOS26.6.2 host. All **18 trials** complete: three ordered baseline/candidate pairs at each of three sizes. Exact authored project membership, UTF-16 anchors and source revisions agree across builds and after restore; restored completion resets and automatic indexing stays off.
@@ -14,7 +25,7 @@ No overall ranking against other products has been established. Competitor featu
 
 ![Paired synthetic project indexing and restore](../assets/project-index-scaling-v1.svg)
 
-Wall times include process startup, SQLite and native NLP for indexing. Import, initial project creation, backup creation and validation are excluded; restore is timed separately. Raw per-trial child user/system CPU deltas, ranges and no-op resume are retained. Resume at 20,000 sources has median 0.095/0.092s, not the same large improvement. Caches/host activity are uncontrolled; text is short and repeated. No natural NLP quality, million-source scale, full capture, physical energy or competitor ranking is inferred. The separate [schema22 qualification](project-corrections-v1.json) exercises all 810 defined cases, 399 distinct TSan cases and 22 final operations, including native correction/rename/rebuild/manual override and scoped search. A retained CI SIGINT unlock failure remains unresolved; new schema expectations are corrected and fresh CI is pending. Passing defined cases does not establish every known contract, full product parity or top-three placement.
+Wall times include process startup, SQLite and native NLP for indexing. Import, initial project creation, backup creation and validation are excluded; restore is timed separately. Raw per-trial child user/system CPU deltas, ranges and no-op resume are retained. Resume at 20,000 sources has median 0.095/0.092s, not the same large improvement. Caches/host activity are uncontrolled; text is short and repeated. No natural NLP quality, million-source scale, full capture, physical energy or competitor ranking is inferred. The separate [schema22 qualification](project-corrections-v1.json) exercises all 810 defined cases, 399 distinct TSan cases and 22 final operations, including native correction/rename/rebuild/manual override and scoped search. The preceding CI SIGINT counterexample remains retained; the later cancellation qualification above repairs its cooperative native-action boundary. Final project-correction CI passes both jobs. Passing defined cases does not establish every known contract, full product parity or top-three placement.
 
 ## Project metadata without unnecessary extraction
 

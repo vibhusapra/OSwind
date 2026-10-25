@@ -137,14 +137,19 @@ public actor LibraryVault {
         guard let proof=try await driver.attachment(paths:paths) else {
             if info.setupComplete {guard try await driver.encrypted(paths:paths) else {throw OSwindError.invalid("The library image is missing or is not encrypted. Its protected state could not be verified.")}}
             try paths.closeAlias();if (try paths.session(info:info)) != nil {try paths.tree().remove("session.json")}
+            try Task.checkCancellation()
             return .init(info:info,state:.locked,libraryPath:paths.library.path,message:"Encrypted image is detached")
         }
         guard proof.volumeUUID.caseInsensitiveCompare(info.volumeUUID) == .orderedSame else {throw OSwindError.invalid("The attached volume does not match. No volume was detached.")}
         guard let mountedRoot=proof.root else {
             guard store?.isClosed != false else {throw OSwindError.unavailable("Release the existing library connection before finishing this unmounted image lock")}
             if var previous=try? paths.session(info:info) {previous.phase = .closing;try paths.write(previous,as:"session.json")}
-            try paths.closeAlias();try await driver.eject(paths:paths,proof:proof)
+            try paths.closeAlias()
+            let driver=self.driver,paths=self.paths
+            let finishing=Task.detached(priority:.utility) {try await driver.eject(paths:paths,proof:proof)}
+            try await finishing.value
             do {try paths.tree().remove("session.json")} catch BackupFileError.missing {}
+            try Task.checkCancellation()
             return .init(info:info,state:.locked,libraryPath:paths.library.path,message:"Encrypted image is detached")
         }
         var session=VaultSession(vaultID:info.id,nonce:proof.mount.lastPathComponent,phase:.closing,mountLeaf:proof.mount.lastPathComponent,device:proof.device,volumeUUID:proof.volumeUUID,rootDevice:mountedRoot.device,rootInode:mountedRoot.inode,imageDevice:proof.image.device,imageInode:proof.image.inode)
@@ -160,7 +165,13 @@ public actor LibraryVault {
         }
         // Close the public handle before detaching its target. Old executables
         // following that handle encounter a regular file, never a fresh folder.
-        try paths.closeAlias();try await driver.detach(paths:paths,expected:session);try paths.tree().remove("session.json")
+        try paths.closeAlias()
+        // Once locking has closed the public handle, finish its normal detach
+        // and identity-bound absence confirmation even if the caller cancels.
+        let driver=self.driver,paths=self.paths,expected=session
+        let finishing=Task.detached(priority:.utility) {try await driver.detach(paths:paths,expected:expected)}
+        try await finishing.value;try paths.tree().remove("session.json")
+        try Task.checkCancellation()
         return .init(info:info,state:.locked,libraryPath:paths.library.path,message:"Encrypted volume is detached")
     }
     private func copyHistory(source:MemoryStore,mount:URL,destination:URL,progress:@escaping @Sendable (LibraryBackupProgress)->Void) throws -> VaultMigrationDetails {
