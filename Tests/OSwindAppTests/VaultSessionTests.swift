@@ -1,17 +1,46 @@
 import XCTest
 import AppKit
-import OSwindCore
+@testable import OSwindCore
 @testable import OSwind
 
 @MainActor final class VaultSessionTests:XCTestCase {
     var root:URL!,defaults:UserDefaults!,suite:String!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-session-"+UUID().uuidString);try Paths.ensure(root);suite="com.oswind.tests.vault."+UUID().uuidString;defaults=UserDefaults(suiteName:suite)!}
-    override func tearDownWithError() throws {defaults.removePersistentDomain(forName:suite);try? FileManager.default.removeItem(at:root)}
+    override func tearDown() async throws {
+        defer {if let defaults,let suite {defaults.removePersistentDomain(forName:suite)}}
+        guard let root else {return}
+        let prefix=root.resolvingSymlinksInPath().path+"/"
+        let current=AppSession.current
+        let owned=current.flatMap {$0.requested.resolvingSymlinksInPath().path.hasPrefix(prefix) ? $0:nil}
+        do {
+            if let current=owned {
+                if current.vaultPackage != nil {current.requestLock()}
+                else if current.busy {current.cancelOperation()}
+                try await finish(current)
+                guard !current.busy else {XCTFail("Owned fixture still busy; directory preserved");return}
+                if let model=current.model {
+                    model.prepareForLibrarySwitch();let store=model.store
+                    try await Task.detached(priority:.utility) {try store.close()}.value
+                    current.model=nil
+                }
+            }
+            let result=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"])
+            guard result.status==0,let inventory=try PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any],inventory["images"]==nil || inventory["images"] is [[String:Any]] else {throw OSwindError.unavailable("Owned fixture inventory unavailable")}
+            for image in inventory["images"] as? [[String:Any]] ?? [] {
+                guard let path=image["image-path"] as? String else {throw OSwindError.unavailable("Owned fixture image identity unavailable")}
+                if URL(fileURLWithPath:path).resolvingSymlinksInPath().path.hasPrefix(prefix) {XCTFail("Owned encrypted fixture remains attached; directory preserved");return}
+            }
+            guard owned?.busy != true else {XCTFail("Owned fixture resumed work during inventory; directory preserved");return}
+            if FileManager.default.fileExists(atPath:root.path) {try FileManager.default.removeItem(at:root)}
+        } catch {XCTFail("Owned fixture cleanup could not verify safe removal; directory preserved")}
+    }
     func native() throws {guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned encrypted APFS session fixture; no normal library or real Keychain access")}}
+    // A fixture cannot require MainActor progress while the host is asleep.
+    // Keep the 60-second awake budget; production helper deadlines are unchanged.
     func finish(_ session:AppSession) async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(60))
-        while session.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
-        XCTAssertFalse(session.busy,"Session operation exceeded bounded test wait")
+        let deadline=SuspendingClock.now.advanced(by:.seconds(60))
+        while session.busy,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        XCTAssertFalse(session.busy,"Session operation exceeded the 60-second awake test wait")
     }
     func testBrokenReservedVaultCannotCreatePlaintextFromExplicitEnvironment() throws {
         let package=root.appendingPathComponent("Missing.oswindvault")
@@ -64,8 +93,8 @@ import OSwindCore
         let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
         session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model)
         do {_=try await LibraryVault(package:package).lock()} catch {}
-        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
-        while session.model != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        let deadline=SuspendingClock.now.advanced(by:.seconds(10))
+        while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
         try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed)
         session.requestLock();try await finish(session);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
     }
@@ -81,8 +110,8 @@ import OSwindCore
         let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
         session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model);try active.store.insert(Memory(id:"keep",text:"Moved session history"))
         try FileManager.default.moveItem(at:package,to:moved)
-        let deadline=ContinuousClock.now.advanced(by:.seconds(15))
-        while session.model != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        let deadline=SuspendingClock.now.advanced(by:.seconds(15))
+        while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
         try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertFalse(session.vaultStatus?.imageAttached ?? true);XCTAssertNil(session.failure)
         XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),try LibraryVault(package:moved).libraryURL.path)
         session.unlock(passphrase:secret,remember:false);try await finish(session);XCTAssertNotNil(try session.model?.store.get("keep"));session.requestLock();try await finish(session)
@@ -94,8 +123,8 @@ import OSwindCore
         let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{locked});try await finish(session)
         session.unlock(passphrase:secret,remember:false);try await finish(session);XCTAssertNotNil(session.model)
         locked=true
-        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
-        while session.model != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        let deadline=SuspendingClock.now.advanced(by:.seconds(10))
+        while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
         try await finish(session);XCTAssertNil(session.model);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
     }
     func testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes() async throws {
@@ -107,8 +136,8 @@ import OSwindCore
         let app=NSApplication.shared
         XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateCancel)
         XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateCancel)
-        let deadline=ContinuousClock.now.advanced(by:.seconds(15))
-        while exits==0,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+        let deadline=SuspendingClock.now.advanced(by:.seconds(15))
+        while exits==0,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
         XCTAssertEqual(exits,1);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.model);XCTAssertEqual(delegate.applicationShouldTerminate(app),.terminateNow)
         session.unlock(passphrase:secret,remember:false);XCTAssertFalse(session.busy);XCTAssertNil(session.model)
     }

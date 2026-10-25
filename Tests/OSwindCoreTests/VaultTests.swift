@@ -11,6 +11,18 @@ final class VaultTests:XCTestCase {
         let path=root.appendingPathComponent(name);try Paths.ensure(path);let paths=try VaultPaths(path)
         try paths.write(LibraryVaultInfo(name:"Synthetic vault",capacityGiB:1,volumeUUID:UUID().uuidString),as:VaultPaths.manifestName);try paths.closeAlias();return paths
     }
+    func testAlreadyCancelledLockDoesNotAcquireReservationOrChangeHandle() async throws {
+        let paths=try manifest(),vault=try LibraryVault(package:paths.package)
+        let before=try FileManager.default.contentsOfDirectory(atPath:paths.package.path).sorted(),handle=try Data(contentsOf:paths.library)
+        let worker=Task {
+            withUnsafeCurrentTask {$0?.cancel()}
+            return try await vault.lock()
+        }
+        do {_ = try await worker.value;XCTFail("Already cancelled lock published success")}
+        catch is CancellationError {} catch {throw error}
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath:paths.package.path).sorted(),before)
+        XCTAssertEqual(try Data(contentsOf:paths.library),handle)
+    }
     func testMissingManifestInReservedPackageRefusesPlaintextFallback() throws {
         let package=root.appendingPathComponent("Broken.oswindvault");try Paths.ensure(package)
         XCTAssertThrowsError(try MemoryStore(root:package));XCTAssertThrowsError(try MemoryStore(root:package.appendingPathComponent("Library")));XCTAssertTrue(try FileManager.default.contentsOfDirectory(atPath:package.path).isEmpty)

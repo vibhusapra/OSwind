@@ -120,4 +120,47 @@ final class NativeVaultCancellationTests:XCTestCase {
             try await removeDetachedFixture(root,package:package)
         } catch {try? activeStore?.close();_ = try? await vault.lock();throw error}
     }
+    func testCancellationDuringMediaDrainStillClosesStoreAliasAndOwnedImage() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned media-drain cancellation fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-drain-cancel-"+UUID().uuidString);try Paths.ensure(root)
+        let package=root.appendingPathComponent("Owned.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
+        var activeStore:MemoryStore?
+        do {
+            _=try await LibraryVault.create(at:package,name:"Owned cancelled media drain",capacityGiB:1,passphrase:secret)
+            for iteration in 0..<3 {
+                _=try await vault.unlock(passphrase:secret)
+                let store=try MemoryStore(root:vault.libraryURL);activeStore=store
+                if iteration==0 {try store.insert(Memory(id:"owned-drain-keep",text:"Owned source survives cancellation during media drain"))}
+                XCTAssertEqual(try store.get("owned-drain-keep")?.text,"Owned source survives cancellation during media drain")
+                let admission=try store.mediaWriteLease()
+                let worker=Task {try await vault.lock(store:store)}
+                do {
+                    let paths=try VaultPaths(package),info=try paths.info(),deadline=SuspendingClock.now.advanced(by:.seconds(5))
+                    var observed=false
+                    while SuspendingClock.now<deadline {
+                        if (try? paths.session(info:info))?.phase == .closing {observed=true;break}
+                        try await Task.sleep(for:.milliseconds(1))
+                    }
+                    guard observed else {throw OSwindError.unavailable("Owned closing phase not observed while media admission is held")}
+                    // The supported writer lease prevents close from completing.
+                    // Cancellation must not abort its drain and skip alias/detach.
+                    XCTAssertFalse(store.isClosed)
+                    worker.cancel();try await Task.sleep(for:.milliseconds(100))
+                    admission.release()
+                    do {_ = try await worker.value;XCTFail("Cancelled media-drain lock published success")}
+                    catch is CancellationError {} catch {throw error}
+                    XCTAssertTrue(store.isClosed,"Cancellation returned before the store closed")
+                    let count=try await ownedAttachmentCount(package);XCTAssertEqual(count,0,"Cancellation returned before independent image absence")
+                    XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
+                    let status=try await vault.status();XCTAssertEqual(status.state,.locked)
+                    if !store.isClosed {_ = try await vault.lock(store:store)}
+                    activeStore=nil
+                } catch {
+                    admission.release();worker.cancel();_ = try? await worker.value;throw error
+                }
+            }
+            try await removeDetachedFixture(root,package:package)
+        } catch {try? activeStore?.close();_ = try? await vault.lock();throw error}
+    }
+
 }
