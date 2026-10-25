@@ -1,0 +1,262 @@
+{
+  "format": "OSwind Few-NERD projected membership baseline v1",
+  "productCommit": "fbe6fac9aae43d11a57bae5af25457a08c0090f9",
+  "protocolCommit": "48201e72acc56a2c01d5831f5b88c75b00b85016",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "method": "Actual signed CLI automatic apple-nameType source memberships; unchanged default privacy; no tuned product or corpus selection",
+  "planSHA256": "b5b1bc805fdb4780602a15520714ff38aab7c8a56e5f965031c817635c922340",
+  "protocolFrozenBeforeInference": true,
+  "baselineTunedOnSelectedCorpora": false,
+  "corpusAttribution": "Ding et al., Few-NERD, ACL2021, doi:10.18653/v1/2021.acl-long.248; DFKI-SLT pinned card declares CC-BY-SA-4.0. No raw corpus text is included.",
+  "preparation": {
+    "python": "3.12.15",
+    "pyarrow": "19.0.1",
+    "requirementSHA256": "f04552564164fdd5c76b5927e8c52ec055ae7305d4036c6505347bd52d63e8a7",
+    "wheelSHA256": "80b2ad2b193e7d19e81008a96e313fbd53157945c7be9ac65f44f8937a55427b",
+    "wheelURL": "https://files.pythonhosted.org/packages/78/b4/94e828704b050e723f67d67c3535cf7076c7432cd4cf046e4bb3b96a9c9d/pyarrow-19.0.1-cp312-cp312-macosx_12_0_arm64.whl",
+    "modelInference": false
+  },
+  "generatedBoundaryTests": {
+    "passed": 12,
+    "scriptSHA256": "ebff61a5271f5d5c956ee6a1a5129a8fbb629613ca7f4bd129a26100d026605f"
+  },
+  "splits": [
+    {
+      "format": "OSwind independent entity membership evaluation v1",
+      "state": "completed",
+      "binarySHA256": "5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18",
+      "planSHA256": "b5b1bc805fdb4780602a15520714ff38aab7c8a56e5f965031c817635c922340",
+      "selectionSHA256": "4548cc513f36d7eef30c240169b0d83fa33a1da125037181666473f7e4a0484d",
+      "scorerSHA256": "172d3abc1f36022e29c3f63b0fbe95c92991a8ee9467194f9cb24c8fe092d002",
+      "evaluatorSHA256": "1d93f9dbb929384e4f046ddabe29e0bdf59e6cb9a68e0c88356a86dea2067013",
+      "split": "validation",
+      "sources": 256,
+      "operations": [
+        {
+          "name": "import",
+          "exitCode": 0,
+          "wallSeconds": 3.1574670830741525,
+          "stdoutSHA256": "093236bc97d8e7da496f727848000d3e550c14a837c8ec6c15cb397cbdbebe70",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "index",
+          "exitCode": 0,
+          "wallSeconds": 0.3745638330001384,
+          "stdoutSHA256": "08b4906a9bfc7e7d02e81b670c09291a821044b6f55447dff4fcd8d6b77499c5",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Fresh actual CLI import/index library on pinned public Few-NERD projection. Default source privacy; exact text equivalence required. No normal history, capture, provider, downloads, token-level NER or competitor claim.",
+      "schema": 22,
+      "sourceTextMismatches": [],
+      "indexProgress": {
+        "eligible": 256,
+        "indexed": 256,
+        "limited": 0
+      },
+      "predictionsSHA256": "7c06a21e181f865ce9da4775a57685975aa0840fe31d940dfc6071700c579c9d",
+      "metrics": {
+        "sources": 256,
+        "predictions": 442,
+        "invalidSourceAnchors": 0,
+        "membership": {
+          "micro": {
+            "truePositive": 264,
+            "falsePositive": 178,
+            "falseNegative": 232,
+            "precision": 0.5972850678733032,
+            "recall": 0.532258064516129,
+            "F1": 0.5628997867803838
+          },
+          "byKind": {
+            "person": {
+              "truePositive": 110,
+              "falsePositive": 75,
+              "falseNegative": 34,
+              "precision": 0.5945945945945946,
+              "recall": 0.7638888888888888,
+              "F1": 0.668693009118541
+            },
+            "organization": {
+              "truePositive": 39,
+              "falsePositive": 62,
+              "falseNegative": 73,
+              "precision": 0.38613861386138615,
+              "recall": 0.3482142857142857,
+              "F1": 0.36619718309859156
+            },
+            "place": {
+              "truePositive": 115,
+              "falsePositive": 41,
+              "falseNegative": 125,
+              "precision": 0.7371794871794872,
+              "recall": 0.4791666666666667,
+              "F1": 0.5808080808080808
+            }
+          }
+        },
+        "anchoredMembership": {
+          "micro": {
+            "truePositive": 263,
+            "falsePositive": 179,
+            "falseNegative": 233,
+            "precision": 0.5950226244343891,
+            "recall": 0.530241935483871,
+            "F1": 0.5607675906183369
+          },
+          "byKind": {
+            "person": {
+              "truePositive": 110,
+              "falsePositive": 75,
+              "falseNegative": 34,
+              "precision": 0.5945945945945946,
+              "recall": 0.7638888888888888,
+              "F1": 0.668693009118541
+            },
+            "organization": {
+              "truePositive": 39,
+              "falsePositive": 62,
+              "falseNegative": 73,
+              "precision": 0.38613861386138615,
+              "recall": 0.3482142857142857,
+              "F1": 0.36619718309859156
+            },
+            "place": {
+              "truePositive": 114,
+              "falsePositive": 42,
+              "falseNegative": 126,
+              "precision": 0.7307692307692307,
+              "recall": 0.475,
+              "F1": 0.5757575757575758
+            }
+          }
+        }
+      }
+    },
+    {
+      "format": "OSwind independent entity membership evaluation v1",
+      "state": "completed",
+      "binarySHA256": "5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18",
+      "planSHA256": "b5b1bc805fdb4780602a15520714ff38aab7c8a56e5f965031c817635c922340",
+      "selectionSHA256": "0ae4c032a2e1e0d348633891f1eb630e0e659121ae1522e98670b775f9f3591f",
+      "scorerSHA256": "172d3abc1f36022e29c3f63b0fbe95c92991a8ee9467194f9cb24c8fe092d002",
+      "evaluatorSHA256": "1d93f9dbb929384e4f046ddabe29e0bdf59e6cb9a68e0c88356a86dea2067013",
+      "split": "test",
+      "sources": 1024,
+      "operations": [
+        {
+          "name": "import",
+          "exitCode": 0,
+          "wallSeconds": 10.80297008389607,
+          "stdoutSHA256": "884c482a552e9d246949e5baa72924f6847a24da79433482fa1c3b026809a9c3",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "index",
+          "exitCode": 0,
+          "wallSeconds": 1.2459221249446273,
+          "stdoutSHA256": "6f5ecaa1e58b5f9c38e6f0f09e2601bbae6091ce30698444d53d4caa18ba0d9a",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Fresh actual CLI import/index library on pinned public Few-NERD projection. Default source privacy; exact text equivalence required. No normal history, capture, provider, downloads, token-level NER or competitor claim.",
+      "schema": 22,
+      "sourceTextMismatches": [],
+      "indexProgress": {
+        "eligible": 1024,
+        "indexed": 1024,
+        "limited": 0
+      },
+      "predictionsSHA256": "5152dce170df355889caf012a37c77bbe70a25a0e5138147920bf42ff36fda10",
+      "metrics": {
+        "sources": 1024,
+        "predictions": 1583,
+        "invalidSourceAnchors": 0,
+        "membership": {
+          "micro": {
+            "truePositive": 973,
+            "falsePositive": 610,
+            "falseNegative": 813,
+            "precision": 0.6146557169930512,
+            "recall": 0.5447928331466966,
+            "F1": 0.5776194716533096
+          },
+          "byKind": {
+            "person": {
+              "truePositive": 411,
+              "falsePositive": 236,
+              "falseNegative": 135,
+              "precision": 0.6352395672333848,
+              "recall": 0.7527472527472527,
+              "F1": 0.6890192791282481
+            },
+            "organization": {
+              "truePositive": 185,
+              "falsePositive": 208,
+              "falseNegative": 296,
+              "precision": 0.4707379134860051,
+              "recall": 0.38461538461538464,
+              "F1": 0.4233409610983982
+            },
+            "place": {
+              "truePositive": 377,
+              "falsePositive": 166,
+              "falseNegative": 382,
+              "precision": 0.6942909760589319,
+              "recall": 0.49670619235836627,
+              "F1": 0.5791090629800307
+            }
+          }
+        },
+        "anchoredMembership": {
+          "micro": {
+            "truePositive": 969,
+            "falsePositive": 614,
+            "falseNegative": 817,
+            "precision": 0.6121288692356286,
+            "recall": 0.5425531914893617,
+            "F1": 0.5752448797862867
+          },
+          "byKind": {
+            "person": {
+              "truePositive": 410,
+              "falsePositive": 237,
+              "falseNegative": 136,
+              "precision": 0.633693972179289,
+              "recall": 0.7509157509157509,
+              "F1": 0.6873428331936295
+            },
+            "organization": {
+              "truePositive": 184,
+              "falsePositive": 209,
+              "falseNegative": 297,
+              "precision": 0.4681933842239186,
+              "recall": 0.38253638253638256,
+              "F1": 0.42105263157894735
+            },
+            "place": {
+              "truePositive": 375,
+              "falsePositive": 168,
+              "falseNegative": 384,
+              "precision": 0.6906077348066298,
+              "recall": 0.49407114624505927,
+              "F1": 0.576036866359447
+            }
+          }
+        }
+      }
+    }
+  ],
+  "observations": [
+    "All selected sources imported unchanged and indexed; no limited sources or invalid UTF-16 source anchors.",
+    "Test micro membership precision61.47%, recall54.48%, F1 57.76%; exact anchored membership F1 57.52%.",
+    "Test organization F1 42.33% is lower than person68.90% and place57.91%. Suggestions need review; lifecycle correctness is not recognition accuracy.",
+    "Four test memberships match a typed normalized surface but fail exact gold-anchor matching. Their source slices are valid; no out-of-bounds/surrogate anchors occur.",
+    "Test results are now opened; future model or threshold development must not call this selection an unseen holdout."
+  ],
+  "scope": "English Wikipedia projected typed-name membership, not the published66-type task, desktop/OCR/ASR or multilingual quality, person identity, PII detection, energy or competitor placement. Source projection/annotation differences and artificial punctuation spaces limit interpretation.",
+  "overallQualityAcceptanceEstablished": false
+}

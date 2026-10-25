@@ -1,6 +1,6 @@
 # Independent entity membership evaluation
 
-This protocol is frozen before running the actual entity indexer on the selected corpus. It measures the people, organization and place memberships shown by OSwind, including their evidence anchors. It is separate from the authored lifecycle tests and project-alias scaling fixtures. No quality result or acceptance threshold is claimed by preparing the data.
+This protocol is frozen before running the actual entity indexer on the selected corpus. It measures the people, organization and place memberships shown by OSwind, including their evidence anchors. It is separate from the authored lifecycle tests and project-alias scaling fixtures. Preparation itself establishes neither quality nor an acceptance threshold; the subsequent frozen baseline result is reported below.
 
 ## Corpus and selection
 
@@ -22,6 +22,22 @@ The evaluator requires explicit binary and plan SHA-256 values, verifies the sel
 
 Frozen baseline: product commit `fbe6fac9aae43d11a57bae5af25457a08c0090f9`, staged signed CLI SHA-256 `5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18`, schema22. No product changes are made to improve results before this baseline. CLI wall times include startup and SQLite; imports and indexing are recorded separately. They are observations with uncontrolled caches/host activity, not isolated tagger throughput or energy.
 
+## Frozen baseline result
+
+[Actual signed-CLI results](../benchmarks/entity-membership-baseline-v1.json) complete both splits with every selected source unchanged under default privacy, every source indexed, no limited sources and zero invalid source anchors. No product tuning occurs between the frozen protocol and either run.
+
+| Split / kind | Precision | Recall | Membership F1 | Anchored F1 |
+| --- | ---: | ---: | ---: | ---: |
+| Validation, 256 sources, micro | 59.73% | 53.23% | 56.29% | 56.08% |
+| Test, 1,024 sources, micro | 61.47% | 54.48% | 57.76% | 57.52% |
+| Test person | 63.52% | 75.27% | 68.90% | 68.73% |
+| Test organization | 47.07% | 38.46% | 42.33% | 42.11% |
+| Test place | 69.43% | 49.67% | 57.91% | 57.60% |
+
+The test has 973 correct typed memberships, 610 false positives and 813 false negatives. Exact anchored scoring has 969/614/817 respectively. Four normalized-name matches use valid source slices that do not match a gold occurrence. Valid anchors therefore do not imply that the recognizer chose the right entity or name boundary. Organization suggestions are the weakest measured category and need improvement before stronger quality claims.
+
+Single-run CLI import/index times are 3.157/0.375s for validation and 10.803/1.246s for test. These include process startup/SQLite and are not percentile, isolated inference, physical power or competitor measurements. All raw operation and prediction hashes remain in the report. The selected test is now opened; future changes can use it as regression evidence, **not a fresh holdout**. New model/threshold selection should use validation and reserve a separately frozen test selection before inference.
+
 ## Reproduce
 
 The scorer and its twelve generated-data admission/process checks use only Python's standard library:
@@ -31,7 +47,7 @@ python3 scripts/entity_quality.py
 python3 scripts/test-entity-eval.py
 ```
 
-Preparation alone needs PyArrow. The supplied lock pins the Python 3.12/macOS arm64 wheel; it is intentionally not a universal dependency lock. The recorded preparation used Python3.12.15 and PyArrow19.0.1. No Hugging Face loader script executes. Downloading requires an explicit flag and exact pinned lengths/hashes; existing different assets refuse replacement.
+Preparation alone needs PyArrow. The supplied lock pins the Python 3.12/macOS arm64 wheel; it is intentionally not a universal dependency lock. The recorded preparation used Python 3.12.15 and PyArrow 19.0.1. No Hugging Face loader script executes. Downloading requires an explicit flag and exact pinned lengths/hashes; existing different assets refuse replacement.
 
 ```bash
 python3.12 -m venv .local/entity-eval
