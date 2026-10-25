@@ -1,0 +1,581 @@
+{
+  "format": "OSwind learned entity validation prototype v1",
+  "state": "experimental; not integrated into application",
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "applicationRecognizer": "Existing Apple name tagging; optional learned runtime/indexing/setup unfinished",
+  "scope": "Public pinned model, frozen256-source Few-NERD validation projection and authored numerical fixtures. Model/decode development uses validation only; no fresh held-out/test evaluation, PII, person identity, desktop/ASR/OCR, physical power or competitor claim.",
+  "source": {
+    "repository": "dslim/distilbert-NER",
+    "revision": "dfa2838a127384aabb82ed7719e16dab84c42a2a",
+    "license": "Apache-2.0 per pinned publisher card",
+    "sourceMetadataSHA256": "8db0cbdc64689d585d360d3ecf640506a0fd217e5bdd058bbaa07cc58a97235a",
+    "files": [
+      {
+        "path": "README.md",
+        "bytes": 6170,
+        "sha256": "83ca9ccd4197f04f329c3d3f649c84388a92d19aae3dd108e98d5040397e0e53"
+      },
+      {
+        "path": "config.json",
+        "bytes": 926,
+        "sha256": "50c882556c3e52ce6112a5685c260030118f7a278261f4f3f0020dd9cf533957"
+      },
+      {
+        "path": "model.safetensors",
+        "bytes": 260803668,
+        "sha256": "235ecd699f650ca36513b122d11ce5a80339be1388f06c33c2278368b99914e1"
+      },
+      {
+        "path": "special_tokens_map.json",
+        "bytes": 125,
+        "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 669021,
+        "sha256": "cb26b43c98e8266ae3e99c2a583cf8315d73b33a17e6b20b4df7ff1f22392d34"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 1197,
+        "sha256": "691492f0a7e19d8dbfe3faa984eb5cba80237c54b2d54cbd264d478d83dddb0d"
+      },
+      {
+        "path": "vocab.txt",
+        "bytes": 213450,
+        "sha256": "eeaa9875b23b04b4c54ef759d03db9d1ba1554838f8fb26c5d96fa551df93d02"
+      }
+    ],
+    "scope": "Public pinned source weights/tokenizer only. No remote model code, credential, provider or normal history."
+  },
+  "validation": {
+    "planSHA256": "b5b1bc805fdb4780602a15520714ff38aab7c8a56e5f965031c817635c922340",
+    "selectionSHA256": "4548cc513f36d7eef30c240169b0d83fa33a1da125037181666473f7e4a0484d",
+    "sources": 256,
+    "testEvaluated": false,
+    "AppleBaseline": {
+      "sources": 256,
+      "predictions": 442,
+      "invalidSourceAnchors": 0,
+      "membership": {
+        "micro": {
+          "truePositive": 264,
+          "falsePositive": 178,
+          "falseNegative": 232,
+          "precision": 0.5972850678733032,
+          "recall": 0.532258064516129,
+          "F1": 0.5628997867803838
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 110,
+            "falsePositive": 75,
+            "falseNegative": 34,
+            "precision": 0.5945945945945946,
+            "recall": 0.7638888888888888,
+            "F1": 0.668693009118541
+          },
+          "organization": {
+            "truePositive": 39,
+            "falsePositive": 62,
+            "falseNegative": 73,
+            "precision": 0.38613861386138615,
+            "recall": 0.3482142857142857,
+            "F1": 0.36619718309859156
+          },
+          "place": {
+            "truePositive": 115,
+            "falsePositive": 41,
+            "falseNegative": 125,
+            "precision": 0.7371794871794872,
+            "recall": 0.4791666666666667,
+            "F1": 0.5808080808080808
+          }
+        }
+      },
+      "anchoredMembership": {
+        "micro": {
+          "truePositive": 263,
+          "falsePositive": 179,
+          "falseNegative": 233,
+          "precision": 0.5950226244343891,
+          "recall": 0.530241935483871,
+          "F1": 0.5607675906183369
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 110,
+            "falsePositive": 75,
+            "falseNegative": 34,
+            "precision": 0.5945945945945946,
+            "recall": 0.7638888888888888,
+            "F1": 0.668693009118541
+          },
+          "organization": {
+            "truePositive": 39,
+            "falsePositive": 62,
+            "falseNegative": 73,
+            "precision": 0.38613861386138615,
+            "recall": 0.3482142857142857,
+            "F1": 0.36619718309859156
+          },
+          "place": {
+            "truePositive": 114,
+            "falsePositive": 42,
+            "falseNegative": 126,
+            "precision": 0.7307692307692307,
+            "recall": 0.475,
+            "F1": 0.5757575757575758
+          }
+        }
+      }
+    },
+    "initialIncorrectSubwordDecoder": {
+      "sources": 256,
+      "predictions": 940,
+      "invalidSourceAnchors": 0,
+      "membership": {
+        "micro": {
+          "truePositive": 241,
+          "falsePositive": 699,
+          "falseNegative": 255,
+          "precision": 0.25638297872340426,
+          "recall": 0.48588709677419356,
+          "F1": 0.33565459610027853
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 89,
+            "falsePositive": 196,
+            "falseNegative": 55,
+            "precision": 0.312280701754386,
+            "recall": 0.6180555555555556,
+            "F1": 0.4149184149184149
+          },
+          "organization": {
+            "truePositive": 49,
+            "falsePositive": 276,
+            "falseNegative": 63,
+            "precision": 0.15076923076923077,
+            "recall": 0.4375,
+            "F1": 0.2242562929061785
+          },
+          "place": {
+            "truePositive": 103,
+            "falsePositive": 227,
+            "falseNegative": 137,
+            "precision": 0.31212121212121213,
+            "recall": 0.42916666666666664,
+            "F1": 0.36140350877192984
+          }
+        }
+      },
+      "anchoredMembership": {
+        "micro": {
+          "truePositive": 240,
+          "falsePositive": 700,
+          "falseNegative": 256,
+          "precision": 0.2553191489361702,
+          "recall": 0.4838709677419355,
+          "F1": 0.3342618384401114
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 89,
+            "falsePositive": 196,
+            "falseNegative": 55,
+            "precision": 0.312280701754386,
+            "recall": 0.6180555555555556,
+            "F1": 0.4149184149184149
+          },
+          "organization": {
+            "truePositive": 49,
+            "falsePositive": 276,
+            "falseNegative": 63,
+            "precision": 0.15076923076923077,
+            "recall": 0.4375,
+            "F1": 0.2242562929061785
+          },
+          "place": {
+            "truePositive": 102,
+            "falsePositive": 228,
+            "falseNegative": 138,
+            "precision": 0.3090909090909091,
+            "recall": 0.425,
+            "F1": 0.35789473684210527
+          }
+        }
+      }
+    },
+    "correctedFirstSubwordDecoder": {
+      "sources": 256,
+      "predictions": 603,
+      "invalidSourceAnchors": 0,
+      "membership": {
+        "micro": {
+          "truePositive": 364,
+          "falsePositive": 239,
+          "falseNegative": 132,
+          "precision": 0.603648424543947,
+          "recall": 0.7338709677419355,
+          "F1": 0.6624203821656051
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 131,
+            "falsePositive": 51,
+            "falseNegative": 13,
+            "precision": 0.7197802197802198,
+            "recall": 0.9097222222222222,
+            "F1": 0.803680981595092
+          },
+          "organization": {
+            "truePositive": 77,
+            "falsePositive": 118,
+            "falseNegative": 35,
+            "precision": 0.39487179487179486,
+            "recall": 0.6875,
+            "F1": 0.501628664495114
+          },
+          "place": {
+            "truePositive": 156,
+            "falsePositive": 70,
+            "falseNegative": 84,
+            "precision": 0.6902654867256637,
+            "recall": 0.65,
+            "F1": 0.6695278969957081
+          }
+        }
+      },
+      "anchoredMembership": {
+        "micro": {
+          "truePositive": 362,
+          "falsePositive": 241,
+          "falseNegative": 134,
+          "precision": 0.6003316749585407,
+          "recall": 0.7298387096774194,
+          "F1": 0.6587807097361238
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 130,
+            "falsePositive": 52,
+            "falseNegative": 14,
+            "precision": 0.7142857142857143,
+            "recall": 0.9027777777777778,
+            "F1": 0.7975460122699386
+          },
+          "organization": {
+            "truePositive": 77,
+            "falsePositive": 118,
+            "falseNegative": 35,
+            "precision": 0.39487179487179486,
+            "recall": 0.6875,
+            "F1": 0.501628664495114
+          },
+          "place": {
+            "truePositive": 155,
+            "falsePositive": 71,
+            "falseNegative": 85,
+            "precision": 0.6858407079646017,
+            "recall": 0.6458333333333334,
+            "F1": 0.6652360515021459
+          }
+        }
+      }
+    },
+    "convertedCoreML": {
+      "sources": 256,
+      "predictions": 603,
+      "invalidSourceAnchors": 0,
+      "membership": {
+        "micro": {
+          "truePositive": 364,
+          "falsePositive": 239,
+          "falseNegative": 132,
+          "precision": 0.603648424543947,
+          "recall": 0.7338709677419355,
+          "F1": 0.6624203821656051
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 131,
+            "falsePositive": 51,
+            "falseNegative": 13,
+            "precision": 0.7197802197802198,
+            "recall": 0.9097222222222222,
+            "F1": 0.803680981595092
+          },
+          "organization": {
+            "truePositive": 77,
+            "falsePositive": 118,
+            "falseNegative": 35,
+            "precision": 0.39487179487179486,
+            "recall": 0.6875,
+            "F1": 0.501628664495114
+          },
+          "place": {
+            "truePositive": 156,
+            "falsePositive": 70,
+            "falseNegative": 84,
+            "precision": 0.6902654867256637,
+            "recall": 0.65,
+            "F1": 0.6695278969957081
+          }
+        }
+      },
+      "anchoredMembership": {
+        "micro": {
+          "truePositive": 362,
+          "falsePositive": 241,
+          "falseNegative": 134,
+          "precision": 0.6003316749585407,
+          "recall": 0.7298387096774194,
+          "F1": 0.6587807097361238
+        },
+        "byKind": {
+          "person": {
+            "truePositive": 130,
+            "falsePositive": 52,
+            "falseNegative": 14,
+            "precision": 0.7142857142857143,
+            "recall": 0.9027777777777778,
+            "F1": 0.7975460122699386
+          },
+          "organization": {
+            "truePositive": 77,
+            "falsePositive": 118,
+            "falseNegative": 35,
+            "precision": 0.39487179487179486,
+            "recall": 0.6875,
+            "F1": 0.501628664495114
+          },
+          "place": {
+            "truePositive": 155,
+            "falsePositive": 71,
+            "falseNegative": 85,
+            "precision": 0.6858407079646017,
+            "recall": 0.6458333333333334,
+            "F1": 0.6652360515021459
+          }
+        }
+      }
+    },
+    "correctedAndConvertedPredictionBytesIdentical": true,
+    "predictionsSHA256": "459b8de6c9aa53eae34f442b9b0d1d5a18153304dd6f0ab843f831af0a127abc"
+  },
+  "prototypeRuntime": {
+    "distilbert-mps-validation-v1": {
+      "torch": "2.7.0",
+      "transformers": "4.57.1",
+      "actualParameterDevice": "mps",
+      "actualLogitDevice": "mps",
+      "fallbackEnabled": false,
+      "loadSeconds": 4.230476207798347,
+      "validationWallSeconds": 1.9588548748288304,
+      "windows": 256,
+      "currentMPSBytes": 263154944,
+      "driverMPSBytes": 1093353472,
+      "processPeakRSSBytes": 652476416
+    },
+    "distilbert-mps-validation-v2": {
+      "torch": "2.7.0",
+      "transformers": "4.57.1",
+      "actualParameterDevice": "mps",
+      "actualLogitDevice": "mps",
+      "fallbackEnabled": false,
+      "loadSeconds": 4.702363207936287,
+      "validationWallSeconds": 1.5051082090940326,
+      "windows": 256,
+      "currentMPSBytes": 263154944,
+      "driverMPSBytes": 1093353472,
+      "processPeakRSSBytes": 652197888
+    },
+    "distilbert-coreml-validation-v1": {
+      "coremltools": "9.0",
+      "transformers": "4.57.1",
+      "computePolicy": "CPU_AND_GPU",
+      "actualPerOperationPlacementMeasured": false,
+      "loadSeconds": 0.8271609998773783,
+      "validationWallSeconds": 0.8460308751091361,
+      "windows": 256,
+      "processPeakRSSBytes": 1035026432
+    }
+  },
+  "conversion": {
+    "recipe": {
+      "recipe": "oswind-distilbert-ner-256-fp16-v1",
+      "sourceManifestSHA256": "b47df01feff9c7ca92acee953567e7d9f7320c40d6ed0cbac644212a396f5449",
+      "scriptSHA256": "4e11f81f34407d27505371a17396d013d198f9e9ecba365caa2ed306cd51d304",
+      "input": "input_ids and attention_mask int32[1,256]",
+      "output": "logits float32[1,256,9]",
+      "precision": "FP16 graph, FP32 output",
+      "minimumDeployment": "macOS14",
+      "validation": "Four authored sentences, CPU-only and CPU/GPU policies; before-quality numeric comparison to FP32 PyTorch CPU, maximum active logit difference<=0.1 and identical active argmax labels. Corpus validation remains separately measured. No test split, provider or product change."
+    },
+    "coremltools": "9.0",
+    "torch": "2.7.0",
+    "transformers": "4.57.1",
+    "compiledModelFiles": [
+      {
+        "path": "entity.mlmodelc/analytics/coremldata.bin",
+        "bytes": 243,
+        "sha256": "5710582eac6d63e6a29567ff309bb262c0f09218a0fd143357ba09bfa4e85884"
+      },
+      {
+        "path": "entity.mlmodelc/coremldata.bin",
+        "bytes": 406,
+        "sha256": "2531556f6c0a725e9c6f25b8cd5fa907491eb84dcbbd7028e7b2c0bfe32d9e19"
+      },
+      {
+        "path": "entity.mlmodelc/model.mil",
+        "bytes": 85390,
+        "sha256": "67b4d9c890643078ba7cdcc7251a36092e3c23d2853989ad21fdd0bc76bbd318"
+      },
+      {
+        "path": "entity.mlmodelc/weights/weight.bin",
+        "bytes": 130008960,
+        "sha256": "61d5e0e9cb5ec5025da5b642d34ddf7c6122cf5749e5cea5739e697c04ed8c8c"
+      }
+    ],
+    "numericObservations": [
+      {
+        "computePolicy": "CPU_ONLY",
+        "authoredTextSHA256": "56b882a212eda7cd06e5d8b13c79b4ad9f2efde65e7e730af8f893d58e7724a5",
+        "activeTokens": 11,
+        "maximumActiveLogitDifference": 0.08109879493713379,
+        "activeLabelsIdentical": true,
+        "seconds": 0.03203941602259874
+      },
+      {
+        "computePolicy": "CPU_ONLY",
+        "authoredTextSHA256": "1890e9f5fea86212ff24d5254847433740a2f69cbf1dd4f402268e598a413a76",
+        "activeTokens": 12,
+        "maximumActiveLogitDifference": 0.0736246109008789,
+        "activeLabelsIdentical": true,
+        "seconds": 0.017612250056117773
+      },
+      {
+        "computePolicy": "CPU_ONLY",
+        "authoredTextSHA256": "44f7379fd56f4ce4fed981626d4eb500d1243e836d97444515f0af50f498d037",
+        "activeTokens": 8,
+        "maximumActiveLogitDifference": 0.05260133743286133,
+        "activeLabelsIdentical": true,
+        "seconds": 0.011924167163670063
+      },
+      {
+        "computePolicy": "CPU_ONLY",
+        "authoredTextSHA256": "7431927e81c3dfa3b8dd545cdb593071ff6af937d0fc350af3c82f59689f6c02",
+        "activeTokens": 13,
+        "maximumActiveLogitDifference": 0.04691600799560547,
+        "activeLabelsIdentical": true,
+        "seconds": 0.01145620783790946
+      },
+      {
+        "computePolicy": "CPU_AND_GPU",
+        "authoredTextSHA256": "56b882a212eda7cd06e5d8b13c79b4ad9f2efde65e7e730af8f893d58e7724a5",
+        "activeTokens": 11,
+        "maximumActiveLogitDifference": 0.012193918228149414,
+        "activeLabelsIdentical": true,
+        "seconds": 0.9190846660640091
+      },
+      {
+        "computePolicy": "CPU_AND_GPU",
+        "authoredTextSHA256": "1890e9f5fea86212ff24d5254847433740a2f69cbf1dd4f402268e598a413a76",
+        "activeTokens": 12,
+        "maximumActiveLogitDifference": 0.0050351619720458984,
+        "activeLabelsIdentical": true,
+        "seconds": 0.007764041889458895
+      },
+      {
+        "computePolicy": "CPU_AND_GPU",
+        "authoredTextSHA256": "44f7379fd56f4ce4fed981626d4eb500d1243e836d97444515f0af50f498d037",
+        "activeTokens": 8,
+        "maximumActiveLogitDifference": 0.0024671554565429688,
+        "activeLabelsIdentical": true,
+        "seconds": 0.005585416918620467
+      },
+      {
+        "computePolicy": "CPU_AND_GPU",
+        "authoredTextSHA256": "7431927e81c3dfa3b8dd545cdb593071ff6af937d0fc350af3c82f59689f6c02",
+        "activeTokens": 13,
+        "maximumActiveLogitDifference": 0.008117390796542168,
+        "activeLabelsIdentical": true,
+        "seconds": 0.003510999958962202
+      }
+    ],
+    "warning": "FP16 conversion emits an overflow-in-cast warning for the attention-mask constant. All inspected outputs are finite; authored numerical contracts and full validation prediction equality pass. No general numerical or compiler-platform guarantee."
+  },
+  "nativeSwiftComponent": {
+    "optimized": true,
+    "policyOrder": [
+      "CPU_ONLY",
+      "CPU_AND_GPU"
+    ],
+    "inputFixturesSHA256": "1216cb432184838b70119abfecaeb65ee1f2fe978bb1c550792cc22dbac8c719",
+    "binarySHA256": "24aa8e190330173c05af1d62630964d07067ba99d9de89862870f5066c8087af",
+    "sourceSHA256": "f005a133a617ff5140d663d07429a91ca7b7846252c99503267f2c828eaa2388",
+    "results": [
+      {
+        "actualPerOperationPlacementMeasured": false,
+        "beforePhysicalFootprintBytes": 8831360,
+        "beforeResidentBytes": 13598720,
+        "loadSeconds": 0.1968545,
+        "maximumObservedPhysicalFootprintBytes": 21463904,
+        "maximumObservedResidentBytes": 144850944,
+        "policy": "cpu",
+        "processPeakRSSBytes": 289226752,
+        "scope": "New standalone optimized Swift process, pinned public model and validation token tensors. Policy permits GPU; actual placement, power, idle release and app/capture behavior are not established. No Python runtime or normal history in this process.",
+        "predictions": 768,
+        "repetitions": 3,
+        "windowsPerRepetition": 256,
+        "activeArgmaxDifferencesFromGPUReference": 15,
+        "predictionMedianSeconds": 0.0120776875,
+        "predictionP95Seconds": 0.022588042,
+        "p95Definition": "Sorted element floor((n-1)*0.95), no interpolation",
+        "firstPredictionSeconds": 0.01765475,
+        "rawReportSHA256": "1b1cf986d8a10e279343bfa9d5fb423bc8f715b16751f7ba38fcb65488a34c7a"
+      },
+      {
+        "actualPerOperationPlacementMeasured": false,
+        "beforePhysicalFootprintBytes": 8831360,
+        "beforeResidentBytes": 13598720,
+        "loadSeconds": 0.144128375,
+        "maximumObservedPhysicalFootprintBytes": 373949520,
+        "maximumObservedResidentBytes": 251019264,
+        "policy": "gpu",
+        "processPeakRSSBytes": 337985536,
+        "scope": "New standalone optimized Swift process, pinned public model and validation token tensors. Policy permits GPU; actual placement, power, idle release and app/capture behavior are not established. No Python runtime or normal history in this process.",
+        "predictions": 768,
+        "repetitions": 3,
+        "windowsPerRepetition": 256,
+        "activeArgmaxDifferencesFromGPUReference": 0,
+        "predictionMedianSeconds": 0.002156292,
+        "predictionP95Seconds": 0.002500834,
+        "p95Definition": "Sorted element floor((n-1)*0.95), no interpolation",
+        "firstPredictionSeconds": 0.065540833,
+        "rawReportSHA256": "ce69c2059fb22ad0e731fe897ec466ce93036d3c74f609fc1ef5814185590ded"
+      }
+    ],
+    "scope": "Fresh optimized standalone Swift process per policy, three repeats of256 fixed token tensors. Prediction timings exclude fixture JSON load, tokenization, label decoding and storage. No Python runtime in measured processes. Model load and first prediction reported separately; caches/host activity uncontrolled. RSS peak and sampled physical footprint are different metrics; actual per-operation CoreML placement and watts unmeasured."
+  },
+  "files": {
+    "probe-distilbert.py": "410315d62c599a0bfbf3161cad3ecc8d7295c8377a92428d5c9a2624cfac4a65",
+    "probe-distilbert-v2.py": "48a8bdcc66f908bcedc7d227434678e31b58aaaa681c2ca220654c82a5f2eca1",
+    "probe-coreml.py": "9fef23c13bed6bb07cc6917fcad92d4e65136099e1c1d9f135e20e4276d9c282",
+    "convert-distilbert.py": "4e11f81f34407d27505371a17396d013d198f9e9ecba365caa2ed306cd51d304",
+    "check-distilbert.py": "b5b84146a980514e27fd87419b77b0705caeabd8b7ca3f19055ef25f2b78bd08",
+    "check-distilbert-v1.log": "1f2de0e4b20f9b0d1219bd6cc8765fd3307e14c4964fe0c4494b795bfcb57256",
+    "native-ner-probe-build-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-profile-runs-v1.json": "dc174e606c8007b5665c9a168ed26cc48966a1d7148d8cbd7f5067d98b612d9f"
+  },
+  "remaining": [
+    "Residency, cancellation, idle/manual release and model-bundle runtime ownership.",
+    "Native indexing, source/model revision admission, corrections, backup and compatibility.",
+    "Verified installer and native setup/user interaction.",
+    "Fresh pre-registered held-out acceptance after validation-only choices.",
+    "Complete desktop workload, older Macs, capture interaction, physical power and competitor evaluation."
+  ],
+  "shippedApplicationQualityImprovementEstablished": false
+}

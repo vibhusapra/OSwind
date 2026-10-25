@@ -101,13 +101,14 @@
       "name": "TimeScroll",
       "category": "Open-source visual memory",
       "price": "Free, open source.",
-      "license": "Repository linked by publisher; verify exact license before code reuse.",
+      "license": "GNU GPL v3 license text in the publisher repository (checked 24 October 2026); no TimeScroll code is embedded in OSwind.",
       "features": "Native Swift; local keyword and AI image/meaning search; highlights and app/date filtering; timeline; Accessibility direct mode; duplicate suppression; thermal backoff; MobileCLIP2 or Ollama embeddings; mic/system Whisper audio; MCP; app exclusions; encrypted vault with Touch ID/password (beta).",
       "difference": "A particularly relevant native, local, multimodal and energy-conscious competitor. OSwind has a managed vault and optional verified visual indexing; native authentication, energy and side-by-side acceptance remain open.",
       "caveat": "macOS 14+, Intel/Apple Silicon per publisher. Vault is beta. No downloaded binary or battery benchmark evaluated here.",
       "sources": [
         "https://timescroll.muzhen.org/",
-        "https://github.com/XInTheDark/TimeScrollApp"
+        "https://github.com/XInTheDark/TimeScrollApp",
+        "https://github.com/XInTheDark/TimeScrollApp/blob/main/LICENSE"
       ]
     },
     {
