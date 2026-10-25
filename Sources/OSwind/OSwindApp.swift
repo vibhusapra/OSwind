@@ -46,6 +46,9 @@ import OSwindCore
                     NSApp.terminate(nil)
                 }
             }
+            // Component-only renders never register a desktop hotkey or its
+            // destination-reading callback while their sample view is open.
+            return
         }
         #endif
         NSApp.setActivationPolicy(.regular)

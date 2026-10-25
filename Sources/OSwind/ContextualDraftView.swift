@@ -19,7 +19,7 @@ struct ContextualDraftView:View {
                 VStack(alignment:.leading,spacing:4) {
                     if let target=draft.destination {
                         Text(target.app+" · "+target.title).font(.headline).lineLimit(2)
-                        Text(target.selectionLength==0 ? "Insert at the selected caret" : "Replace \(target.selectionLength) selected UTF-16 units").font(.caption).foregroundStyle(.secondary)
+                        Text(target.selectionLength==0 ? "Insert at the selected caret" : "Replace the selected text").font(.caption).foregroundStyle(.secondary)
                     }else {Text("Choose a destination").font(.headline)}
                     Text(draft.destinationStatus).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
                 }
