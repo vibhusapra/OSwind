@@ -1,0 +1,418 @@
+{
+  "format": "OSwind native vault proof and descriptor ownership qualification v1",
+  "codeCommit": "f7d941ff6f530be4c607e223029ccd47391c7806",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "macOS26.6.2 build25G83",
+  "state": "Defined local contracts and CI pass; broader release acceptance remains incomplete",
+  "changes": [
+    "Acquire a complete verified native attach proof independently of caller cancellation; await exact-proof normal cleanup before acknowledging cancellation, and expose cleanup failure.",
+    "Transfer operation-descriptor ownership only after every throwing validation and reservation succeeds; prevent double close on failed initialization.",
+    "Safe owned-fixture phase/device diagnostics and awake-budget waits; no production deadline or identity relaxation."
+  ],
+  "tests": {
+    "definedCases": 852,
+    "newCases": 6,
+    "fullPassingCases": 851,
+    "fullSkippedCases": 1,
+    "fullFailedCases": 0,
+    "physicalNormalPassingCases": 1,
+    "allDefinedCasesExercised": true,
+    "broadTSanPassingCases": 440,
+    "broadTSanFailedCases": 0,
+    "broadTSanSkippedCases": 0,
+    "physicalTSanPassingCases": 1,
+    "distinctTSanPassingCases": 441,
+    "threadSanitizerRacesReported": false,
+    "focusedNativeOwnershipTSanPassingCases": 42
+  },
+  "descriptorBaseline": {
+    "productCommit": "a999f3222690e3aca5cc5a31aa34898f99a829cb",
+    "vaultTypesSHA256": "9b7048717ce08c9e37d4e390a23a1c4092cab98883b2f2bc63a18cadbc63c4a0",
+    "testSHA256": "e51d498fae19cb32738f97965cf0145f97e82b4c0b207ccff9afffb6aec4e7f7",
+    "baselineLogSHA256": "f6272eaa74197516110994e53490d876ca5981070a4be8976d0b658d3e255360",
+    "cases": 1,
+    "failedAssertions": 1,
+    "failure": "Concurrent stable manifest read fails with Bad file descriptor during failed reservation contention",
+    "languageProbeSHA256": "9e96af6b883269425b13bd421795372ecfd6b5e1a0606fe27284e88d9b9aff05"
+  },
+  "descriptorAfterFix": {
+    "manifestReads": 8000,
+    "rejectedContendingReservations": 4000,
+    "failures": 0,
+    "instrumented": true,
+    "logSHA256": "afcde5523024c35d3127de5286cfbefc215fcf40eb8d299fe82cf90c40c799fc"
+  },
+  "precedingAttachCandidate": {
+    "codeCommit": "a999f3222690e3aca5cc5a31aa34898f99a829cb",
+    "functionalPasses": 851,
+    "distinctTSanPasses": 440,
+    "localOperationsPass": 14,
+    "ciRunID": 40180600334,
+    "ciNativePass": false,
+    "case": "VaultSessionTests.testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore",
+    "error": "Cannot read backup member: missing file; owned attached fixture preserved",
+    "sourceInference": "Test control flow narrows the thrown error to initial fixture creation. The exact internal read/descriptor is not captured in original CI.",
+    "ciLogSHA256": "31dbbb19418daca8cc6237e0a45f9494c0901e024ce4554cc9ce6f69188cdc18",
+    "unchangedExternalFixtureTrials": [
+      {
+        "trial": 0,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 16.54998308333333,
+        "awakeElapsedSeconds": 16.549983416666667,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "51b53cec08c1180c95ca5f0b6df87c95355eb706154b8768712c0ca89b81fc3f"
+      },
+      {
+        "trial": 1,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.573027541666665,
+        "awakeElapsedSeconds": 11.573028291666665,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "f2074505fc9f5616e74855bf5c3e5b160e647913d8bbd8f785187f2bda008db1"
+      },
+      {
+        "trial": 2,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.638555958333333,
+        "awakeElapsedSeconds": 11.638556958333332,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "1f19bb318a00d8e0166d0ded51f0b666542fee8e513ef1b80a61feaf9eee9bb6"
+      },
+      {
+        "trial": 3,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.496902583333332,
+        "awakeElapsedSeconds": 11.496903249999999,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "ec08eaf717883d73bbcbd66c0ada578d55b19670cae98bafe5611e7c45cccaa2"
+      },
+      {
+        "trial": 4,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.557560333333333,
+        "awakeElapsedSeconds": 11.557561166666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "f359dd1bb60fc8c443479a6154d70e4e7ed96f3a1d90ce5fa5d42573c0f550e4"
+      },
+      {
+        "trial": 5,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.662233624999999,
+        "awakeElapsedSeconds": 11.662234541666665,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "22be5eb2381adcf0ab5323d0e29a97f6041355de68eda0396622e36de64d0f28"
+      },
+      {
+        "trial": 6,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.573142791666665,
+        "awakeElapsedSeconds": 11.573143291666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "a97d6e2632d540170da1f9e6ba76b99d66e96ceffcc6b218fdd486897dffae1d"
+      },
+      {
+        "trial": 7,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.629804708333332,
+        "awakeElapsedSeconds": 11.629805666666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "e8590135cec86b64153d070f5853461593604fdd18b94e759073d2e6635fd4a7"
+      },
+      {
+        "trial": 8,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.602357,
+        "awakeElapsedSeconds": 11.602357958333332,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "e073b69a15add704a7512be5385404b4fd8034f0a52be47a82af6c92341a1259"
+      },
+      {
+        "trial": 9,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.728953375,
+        "awakeElapsedSeconds": 11.728954583333332,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "9b8a19a255a83fdbaadc40d62114ed2578cd9fa6f7c3fb755aaa3cfdbeeb5de6"
+      },
+      {
+        "trial": 10,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.640901708333333,
+        "awakeElapsedSeconds": 11.640902541666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "cbef45931027fa4811322f59d2d0741483e68dd78fe69e5cb8beb34ef2c87c00"
+      },
+      {
+        "trial": 11,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.720052583333333,
+        "awakeElapsedSeconds": 11.720053374999999,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "7e1afb2ec294a34707298d0418ed53c7c3ea606ffbfc2cc4f364dcf55f364712"
+      },
+      {
+        "trial": 12,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.609319,
+        "awakeElapsedSeconds": 11.609319583333333,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "bf7a1e97573d8a83c914c0a0d67b17557425ce4118a50fe240b61ad874f0bcf7"
+      },
+      {
+        "trial": 13,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.6356065,
+        "awakeElapsedSeconds": 11.635607166666665,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "611fb6a20a44016904742db7fc7e3c74ca6afb269ea685e918ed758a6ab50af6"
+      },
+      {
+        "trial": 14,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.737126083333331,
+        "awakeElapsedSeconds": 11.737126916666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "c80adead5f6bf3790104763bbf675d031d0ea2e7754f82326568c69445c0a84f"
+      },
+      {
+        "trial": 15,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.605056374999998,
+        "awakeElapsedSeconds": 11.605056791666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "b5a61bf3a675aa31d108d76874845cc16969bce72534a772bc0aec96530f9757"
+      },
+      {
+        "trial": 16,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 12.053249583333333,
+        "awakeElapsedSeconds": 12.053250458333332,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "49f47194ac634331ca2cb8696bac060f1aca21391412452613c82cd113b5d649"
+      },
+      {
+        "trial": 17,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.616838999999999,
+        "awakeElapsedSeconds": 11.616840041666666,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "72e1059a5c3fffb1e688634972affe4ea78aa0b891ff09ff1a0d6851b97e1cf0"
+      },
+      {
+        "trial": 18,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.628990791666666,
+        "awakeElapsedSeconds": 11.628991458333331,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "1e80ab86e8da0ec9b436a1227b7f181be0555c05615b743f1ffb1ffeff2f9597"
+      },
+      {
+        "trial": 19,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 11.608886541666665,
+        "awakeElapsedSeconds": 11.608887458333331,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "bf1ffd3765f304541d0f8d8dd0da70d30f5f94fef02422d34b876e4a537e96b1"
+      }
+    ],
+    "allTwentyPassWithoutMeasuredSuspension": true
+  },
+  "priorRetainedEvidence": [
+    "vault-close-transition-v1.json retains cancelled-unlock CI failure, sleep-overlapping local failures, and their unchanged awake retries.",
+    "entity-unicode-v1.json retains the earlier independent awake cancelled-lock attachment-count counterexample.",
+    "Descriptor regression reproduces a concrete cross-thread release bug and spurious read. This mechanism does not prove the descriptor identity of the earlier CI event."
+  ],
+  "package": {
+    "scope": "Separately staged schema22 with proof-complete native attach, cancellation-independent closing and single-owner operation descriptors; learned model integration remains unfinished; no installation; native input accepted only where separately reported",
+    "codeCommit": "f7d941ff6f530be4c607e223029ccd47391c7806",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "85996e77ab888d614a2760d16858e18f4eaba7db140daec9fab3ae4b06f399c9",
+        "signedSHA256": "64cf51de224d0b2667213cbfb3c8933c648a3ff3c0ada62d745baa51781eda31",
+        "normalizedPayloadSHA256": "1d0c53e2d95750ea95bc5bddd405370a2e0f922ec4f12f08f0470691d9f7b1ed"
+      },
+      "oswindctl": {
+        "rawSHA256": "247ff06b119674cb11dee05d3d45b55c3dd22e7e591dd6032128669aa4e275a6",
+        "signedSHA256": "a8caa7bb30230a4800b7a34d1f048d42ba83b2ff695b6dc3d9ee9516f8769ee8",
+        "normalizedPayloadSHA256": "e32c489a50fa09ea1eba59744acfe0188a2d9c3c39828fecb710352913e1eb66"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "bbcd7aa18af336a389e6e582e2b6d5b7aca2df15c6e098b4464505fd3d445079",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "ae9e3e4a97a1a4b585642106c6ce1496c3230b1fdff940834e3dc2343b1a6a08",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 414.59365529194474,
+      "elapsedSystemClockSeconds": 414.58017587661743
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 37.42597041698173,
+      "elapsedSystemClockSeconds": 37.42519998550415
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.5822380420286208,
+      "elapsedSystemClockSeconds": 1.5822069644927979
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 15.418599457945675,
+      "elapsedSystemClockSeconds": 15.41828179359436
+    },
+    {
+      "name": "cli-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 27.76797429099679,
+      "elapsedSystemClockSeconds": 27.767401933670044
+    },
+    {
+      "name": "terminal-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 9.849721083883196,
+      "elapsedSystemClockSeconds": 9.8495192527771
+    },
+    {
+      "name": "entity-vault-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 8.264308749930933,
+      "elapsedSystemClockSeconds": 8.264140129089355
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 2.917685791151598,
+      "elapsedSystemClockSeconds": 2.917625904083252
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.4166468749754131,
+      "elapsedSystemClockSeconds": 0.4166390895843506
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.1409400419797748,
+      "elapsedSystemClockSeconds": 1.1409180164337158
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 13.913253541104496,
+      "elapsedSystemClockSeconds": 13.912966012954712
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 225.0563174590934,
+      "elapsedSystemClockSeconds": 225.05167698860168
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 20.932456084061414,
+      "elapsedSystemClockSeconds": 20.93202495574951
+    },
+    {
+      "name": "live-capture-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 4.289887082995847,
+      "elapsedSystemClockSeconds": 4.289799213409424
+    }
+  ],
+  "logSHA256": {
+    "full-most-optins-v1": "cdeae33f96a6191fd7e379860042fd7fea4981fba96a8ffc364b459908c51479",
+    "release-build-v1": "45647ab0315f5caaf2da2f1fbde8498be1395cdb64494665ca307be7f5be33d9",
+    "package-proof-v1": "b3e3389acdda83560aa368256bc519e81b9a34136cf36eb7720b968ac0fdff88",
+    "vault-process-v1": "f9340315a141174eb65175c8f376c388a2ef0bdcfcd58bc0cef4f4d2a827b5d2",
+    "cli-interruption-v1": "e2cd0280dacef37caf43fc61c45a15e1ead9ee017918da52a547c99a58c0c022",
+    "terminal-interruption-v1": "70a5cf972c4076bec45f5c2cef353e142627f4391d43d06c5593218b851a3451",
+    "entity-vault-v1": "8877e3ab983119ff22815614f6ee2dd8556877d26cd59c676d5dd0d731bc8462",
+    "project-process-v1": "90c5ed0b1227cac8ea4abf43c59cd67b2cc5563a86f578cc6cbc1229d756c91b",
+    "integration-v1": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "integration-indexed-v1": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "physical-normal-v1": "8af4b9e900815c4a2762c4500fd66941cc121b7e3dfd9d295ea54ee37fdb7b60",
+    "focused-tsan-v1": "b60ca2b450075cb9e3305c6ed14c8fafc769fc2abcea047a5bb0f6673312b729",
+    "physical-tsan-v1": "77242b26738a53bbf4465929789c1e69745d3fe3322145b7bcd252d89a476816",
+    "live-capture-v1": "21b748b18f402afa55b0bbd806f62aa0930d636bac948720e64b999dc13abe52"
+  },
+  "interruption": {
+    "signedCLIRepetitions": 5,
+    "allPass": true,
+    "allAfterExitInventoriesEmpty": true,
+    "actualTerminalCtrlC": [
+      "create",
+      "unlock",
+      "lock"
+    ],
+    "allTerminalExit130": true,
+    "immediateRecoveryAndSourcePreservation": true
+  },
+  "nativeUI": {
+    "guiSHA256": "64cf51de224d0b2667213cbfb3c8933c648a3ff3c0ada62d745baa51781eda31",
+    "fixtureUsesPublicTestPassphrase": true,
+    "normalHistoryOpened": false,
+    "permissionOrAuthenticationChanges": false,
+    "observedStopDuringOwnedHelperHold": true,
+    "observedHistoryAbsentWhileHeld": true,
+    "observedDetachedScreenAfterStop": true,
+    "observedNativeReopenWithOneAuthoredNotePaused": true,
+    "observedNativeDataLockAndDetachedScreen": true,
+    "finalLockedStateAndIndependentAbsence": true,
+    "postGUIReopenPreservesSourceAndQuietSettings": true,
+    "ownedGUIExited": true,
+    "termination": "SIGTERM to verified exact owned GUI PID after independent locked-state verification",
+    "limits": [
+      "Sampler eventually observes OS lock. Initial sampler records have zero locked samples through helper release, but v1 lacks transition/per-action timestamps; complete isolated Stop/normal-lock causal acceptance is not claimed.",
+      "Native observation and backend final state are retained separately. No Keychain/Touch ID/real credentials or capture of normal desktop history.",
+      "App capture permissions remain a separate signing/setup gate; no permission settings changed."
+    ],
+    "isolatedStopAndNormalLockWithoutOSLockAccepted": false,
+    "lockSampler": {
+      "elapsedSeconds": 162.10036599636078,
+      "initialLocked": false,
+      "lastLocked": true,
+      "lockedSamples": 206,
+      "maxSystemClockGapSeconds": 0.4377659559249878,
+      "sampleIntervalSeconds": 0.1,
+      "samples": 1523
+    }
+  },
+  "ci": {
+    "commit": "f7d941ff6f530be4c607e223029ccd47391c7806",
+    "runID": 40182909700,
+    "nativePass": true,
+    "benchmarkHarnessesPass": true
+  },
+  "allKnownContractsPass": true,
+  "contractScope": "Defined owned synthetic/public-corpus, native helper, storage, CLI, model and targeted capture contracts in this report; not comprehensive product/physical/authentication acceptance.",
+  "releaseAcceptanceComplete": false,
+  "limits": [
+    "GUI Stop/reopen/Data Lock and detached screens are observed, but the lock sampler later detects OS lock and lacks per-action transitions; complete isolated causal acceptance is not claimed.",
+    "Real Keychain/Touch ID and distribution signing/notarization remain unaccepted; installed schema17 and launch binding are preserved.",
+    "Physical sleep/wake, SIGKILL/Force Quit/power loss, OS hangs, old-macOS/device matrix and current sustained desktop capture/power remain separate gates.",
+    "Physical audio uses owned hidden generated-tone sources; this does not establish full signed-GUI microphone/system-controller/ASR behavior or arbitrary-device privacy.",
+    "Targeted live OCR/privacy/erasure uses an authored foreground fixture; no natural OCR or general browser-quality claim.",
+    "Learned entity recognizer remains an isolated prototype; current application uses Apple name tagging. No SOTA quality, full parity or competitor ranking is claimed.",
+    "No normal history, real credentials, TCC/power/authentication changes, forced detach or external provider calls in this qualification."
+  ]
+}

@@ -2,6 +2,12 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Native proof and descriptor ownership: frozen source f7d941f
+
+[Signed qualification](vault-native-ownership-v1.json) passes **852 functional cases,441 distinct TSan cases,14 operations and both CI jobs**. Cancellation waits through complete native attach proof and exact-proof normal cleanup. Failed reservation construction transfers descriptor ownership only after validation, fixing a reproduced double-close: the preceding concurrent stable-manifest read fails with Bad file descriptor in0.608s; the fixed instrumented workload completes8,000 reads and4,000 rejected reservations. A language probe confirms destructor behavior; original CI descriptor identity is not captured, so its precise event is not claimed.
+
+Strict signed app/ZIP payload/tree proof, repeated actual SIGINT and terminal Ctrl-C, encrypted entity/project and legacy flows, ordinary/indexed APIs, normal/instrumented physical tones and targeted live OCR/privacy/erasure pass. Native owned-note Stop/reopen/Data Lock and detached screens are observed, while later OS lock and v1 sampler limitations prevent complete causal isolation. Installed app/launch binding remain unchanged. Earlier CI/local failures remain retained; complete product parity, authentication, sustained physical power and competitor ranking are outside this qualification.
+
 ## Complete vault closing transition: retained CI unlock failure
 
 [Source2cc11a9 partial qualification](vault-close-transition-v1.json) retains seven preceding-code failures in a three-cycle held-media-lease cancellation regression. The fix protects the entire closing transition and rejects already-cancelled requests before reservation. All846 functional and435 distinct instrumented cases have passing observations across runs. The full functional run passes845 with one separately exercised physical skip. Broad TSan retains430 passes, one skip, three failed cases/four failures overlapping host sleep; all four cases pass in each of three unchanged clock-observed awake trials. No race report is observed. These observations do not convert the failed broad run into a passing suite.
