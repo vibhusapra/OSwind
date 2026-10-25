@@ -17,6 +17,8 @@ python3 scripts/vault-terminal-smoke.py /absolute/path/oswindctl \
   --root /new/owned/vault-terminal-check
 ```
 
+A later source 681676f qualification retains an additional cancelled-lock counterexample under TSan: an independent inventory lists one owned image after cancellation returns, before later status reports detached. No image remains attached after the run. This occurs without a measured suspension gap and leaves the complete closing transition/settlement boundary unqualified. [Partial evidence](../benchmarks/entity-unicode-v1.json) preserves it; earlier passing trials remain observations rather than a universal cancellation guarantee.
+
 ## Storage and locking
 
 Read-only status also checks that a detached completed image is still encrypted; a missing or unencrypted replacement is unavailable. Each `.oswindvault` package contains an AES-256 encrypted APFS sparse disk image, a small non-secret manifest, an operation lease and managed session metadata. The image grows up to its selected maximum; available physical disk space still limits writes. The manifest exposes the library name, capacity, UUIDs, creation time and whether a Keychain credential was saved. It contains no history or passphrase.

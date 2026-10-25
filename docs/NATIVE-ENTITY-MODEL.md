@@ -28,7 +28,7 @@ OSWIND_TEST_ENTITY_TOKENIZER_REFERENCES="$PWD/.artifacts/entity-tokenizer-refere
 swift test --filter 'EntityWordPieceTests|EntityNERDecodingTests'
 ```
 
-The input references hash to `4a37be51c00dde8318a734f8db95be5614f420a5ec8218088f6a8846b1cf9407`. Twelve tokenizer cases, thirteen window/decoder cases and one writer regression are added. The 158-case entity/project/passage/backup selection passes with the real reference enabled. Full opt-in/model/Metal, signed-process/package and broad Thread Sanitizer qualification of frozen source 681676f is in progress.
+The input references hash to `4a37be51c00dde8318a734f8db95be5614f420a5ec8218088f6a8846b1cf9407`. Twelve tokenizer cases, thirteen window/decoder cases and one writer regression are added. The 158-case entity/project/passage/backup selection passes with the real reference enabled. [Partial qualification](../benchmarks/entity-unicode-v1.json) has passing observations for all 844 cases across runs but retains a sleep-interrupted session failure and an awake cancelled-lock counterexample under TSan. The latter blocks release acceptance; later absence does not erase it.
 
 ## Learned model candidate
 

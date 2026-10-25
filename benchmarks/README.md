@@ -2,6 +2,12 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Whole Unicode entity admission: retained lock counterexample
+
+[Partial source 681676f qualification](entity-unicode-v1.json) fixes admission of malformed surrogate/composed-character spans and verifies 262 exact tokenizer references. All 844 defined cases have passing observations across runs, but the initial full run retains a session failure spanning 763 seconds of sleep. Four unchanged awake retries pass. The broader TSan selection has 431 passes and one **awake cancelled-lock failure**: independent inventory still lists the owned image after cancellation returns. Later status/history and final absence checks pass; the failing observation remains a release blocker. No data race is reported.
+
+The signed 33-file package/ZIP and completed process/normal-tone checks pass. Instrumented physical audio and live capture are not run after the failure. The optional learned recognizer remains separate. Source labels and case coverage are not equivalent to every known lifecycle contract passing.
+
 ## Independent entity quality
 
 [Pre-inference protocol](../docs/ENTITY-EVALUATION.md), [fixed selection/hash plan](entity-membership-plan-v1.json) and [actual baseline](entity-membership-baseline-v1.json) separate recognition quality from lifecycle tests. Actual signed fbe6fac CLI on M5 Max/macOS26.6.2 admits/indexes all 256 validation / 1,024 test Wikipedia sources unchanged under default privacy. No model/threshold tuning precedes the baseline; no raw corpus text is committed.
