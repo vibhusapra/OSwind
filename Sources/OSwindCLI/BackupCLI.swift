@@ -26,8 +26,8 @@ func runBackupCLI<T: Sendable>(cancellationMessage:String="Cancelling; cleaning 
     }
     source.resume()
     defer { source.setEventHandler(handler:nil); source.cancel(); signal(SIGINT,previous) }
-    do { return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() } }
-    catch { if task.isCancelled { throw CancellationError() }; throw error }
+    // Do not hide cleanup or storage failures merely because Ctrl-C arrived.
+    return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
 }
 
 private final class BackupCLIInterrupts: @unchecked Sendable {

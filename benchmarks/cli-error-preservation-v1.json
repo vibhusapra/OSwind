@@ -1,0 +1,292 @@
+{
+  "format": "OSwind CLI operation-error preservation qualification v1",
+  "codeCommit": "5aa58b9ff2a32282b25b48c554b3beafb459a6d1",
+  "schema": 22,
+  "state": "All13 selected signed CLI/package operations pass; broader release acceptance remains open",
+  "scope": "CLI wrapper result propagation only: preserve operation/cleanup failures after cancellation. Native detach, identity checks, Core/app/model/test/SDK sources are unchanged.",
+  "before": {
+    "binarySHA256": "21f42a3552b1cc12f5bc872a968ab887901f0c5b942e4c444a81a84d377dec1a",
+    "trials": [
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.667816124856472,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": true
+      }
+    ],
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "logSHA256": "ca7fc99cefe9835cc5c5e72e8c94fd261c1c66dfc2263ae6e89498b29fcb31a6",
+    "reportSHA256": "56325796ee139652099358bfdd3dd73dc623150f0963706320c55cf28ed67545",
+    "failure": "Controlled held SQLite reader plus actual terminal Ctrl-C masks expected busy error1 as cancellation130"
+  },
+  "after": {
+    "binarySHA256": "bbf95f80a3d1ef195d72c6190351d0420a5cd32abf095c1949b9e33d02ff9047",
+    "trials": [
+      {
+        "action": "lock",
+        "exitCode": 1,
+        "wallSeconds": 0.5338084590621293,
+        "terminalCtrlC": true,
+        "outputSHA256": "94430ac2fa6138c7b42872590ccfaf868033682d2c3833a8ca89c17a8db048d3",
+        "ownedImageAttachedAfterExit": true
+      }
+    ],
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "reportSHA256": "010292c52ba0d6ed05b1344f4253af0d35c70d93b2b787cceac0e6c944cff18d",
+    "busyFailurePreserved": true,
+    "actionableFilesInUseMessage": true
+  },
+  "ordinaryTerminal": {
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0515814998652786,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 1.0485096669290215,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.7880903750192374,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      }
+    ],
+    "reportSHA256": "db12859352ba9942b65d2b4a6f0450451a4f706642075cbafcf0544cb97127c9",
+    "immediateRecoveryPassed": true,
+    "sourceHistoryPreserved": true,
+    "noOwnedImagesAfterFinalLock": true
+  },
+  "orderedOperations": [
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 19.23592383414507,
+      "elapsedSystemClockSeconds": 19.23633313179016
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.908026749966666,
+      "elapsedSystemClockSeconds": 1.908069133758545
+    },
+    {
+      "name": "busy-terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 6.868740542093292,
+      "elapsedSystemClockSeconds": 6.868887662887573
+    },
+    {
+      "name": "terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 10.739220000104979,
+      "elapsedSystemClockSeconds": 10.739444017410278
+    },
+    {
+      "name": "repeated-signal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 31.183712207945064,
+      "elapsedSystemClockSeconds": 31.18435573577881
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 16.836536458926275,
+      "elapsedSystemClockSeconds": 16.836882829666138
+    },
+    {
+      "name": "backup-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.2065845411270857,
+      "elapsedSystemClockSeconds": 1.2066099643707275
+    },
+    {
+      "name": "markdown-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 2.2321932499762625,
+      "elapsedSystemClockSeconds": 2.232241153717041
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 7.498803416965529,
+      "elapsedSystemClockSeconds": 7.4989588260650635
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.585846166824922,
+      "elapsedSystemClockSeconds": 0.5858609676361084
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.3199589170981199,
+      "elapsedSystemClockSeconds": 1.3199868202209473
+    },
+    {
+      "name": "erasure-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.2590316249988973,
+      "elapsedSystemClockSeconds": 1.259058952331543
+    },
+    {
+      "name": "wipe-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.8799357921816409,
+      "elapsedSystemClockSeconds": 0.8799550533294678
+    }
+  ],
+  "repeatedSIGINT": {
+    "format": "Repeated actual fixed-candidate SIGINT observations",
+    "binarySHA256": "bbf95f80a3d1ef195d72c6190351d0420a5cd32abf095c1949b9e33d02ff9047",
+    "trials": [
+      {
+        "repetition": 0,
+        "exitCode": 0,
+        "wallSeconds": 6.20650004199706,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "56681e7405c5aaa634c107468bd0e2398ff58ab392c3cd1dd6d5ff5483949f34",
+        "recovery": []
+      },
+      {
+        "repetition": 1,
+        "exitCode": 0,
+        "wallSeconds": 6.108639792073518,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "56681e7405c5aaa634c107468bd0e2398ff58ab392c3cd1dd6d5ff5483949f34",
+        "recovery": []
+      },
+      {
+        "repetition": 2,
+        "exitCode": 0,
+        "wallSeconds": 6.281404832843691,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "56681e7405c5aaa634c107468bd0e2398ff58ab392c3cd1dd6d5ff5483949f34",
+        "recovery": []
+      },
+      {
+        "repetition": 3,
+        "exitCode": 0,
+        "wallSeconds": 6.130877458956093,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "56681e7405c5aaa634c107468bd0e2398ff58ab392c3cd1dd6d5ff5483949f34",
+        "recovery": []
+      },
+      {
+        "repetition": 4,
+        "exitCode": 0,
+        "wallSeconds": 6.204845207976177,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "56681e7405c5aaa634c107468bd0e2398ff58ab392c3cd1dd6d5ff5483949f34",
+        "recovery": []
+      }
+    ],
+    "scope": "Existing smoke on five separate owned packages; no normal library, real credentials, Keychain, TCC, forced detach or broad helper kill. A local pass does not erase the initial CI failure."
+  },
+  "backup": {
+    "fixture": "synthetic note, 1px PNG, silent PCM WAV, saved evidence chat",
+    "checks": [
+      "media/chat/metadata round trip, fingerprint, private permissions, quiet settings, isolated routing and reusable library",
+      "existing destinations, fingerprint mismatch and corrupted media refused without target publication",
+      {
+        "interrupt": "SIGINT",
+        "elapsed_s": 0.11395400017499924,
+        "destination_jobs_removed": 0,
+        "scratch_jobs_removed": 0
+      },
+      {
+        "interrupt": "SIGKILL",
+        "elapsed_s": 0.11069137486629188,
+        "destination_jobs_removed": 1,
+        "scratch_jobs_removed": 1
+      }
+    ],
+    "passed": true,
+    "interruptions": true
+  },
+  "collector": {
+    "checks": [
+      "six read-only tools, exact fractional source, search/calendar and recoverable missing source; retry does not duplicate",
+      "stable update replaces searchable evidence while preserving favorite and user tags",
+      "unsupported last record refuses the whole batch before replacing an earlier source",
+      "default app/domain/browser-context exclusions and secret redaction; excluded updates preserve previously admitted history",
+      "SIGINT while partial stdin remains open exits without admission and subsequent SDK read succeeds",
+      "actual SDK encrypted admission, reader close, lock refusal without plaintext fallback and exact remount history"
+    ],
+    "encryptedCleanupDetached": true,
+    "reportSHA256": "526d8bdcf0a4e9014e5057acfb9cee03a05b7abbfc890766baf7cfb2ab7b03ee"
+  },
+  "package": {
+    "scope": "Separately staged schema22 preserving actual CLI operation failures after cancellation; unchanged Core/app/test source inherits its recorded component evidence; no installation, full release acceptance or competitive ranking claim",
+    "codeCommit": "5aa58b9ff2a32282b25b48c554b3beafb459a6d1",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "49a69b0486e3df33727d695c2bb58bd183751e767bcbb218b846d42b2f3f1138",
+        "signedSHA256": "b9149292d66dadd65939adc967f1623863a25d06ceff839c9fb199b5ff767560",
+        "normalizedPayloadSHA256": "eba3daac3da52dfc1327870a62750c241876a84278a27ec7d4cff80c1380a10b"
+      },
+      "oswindctl": {
+        "rawSHA256": "8078c95ce4ac10bd79a7ce5c3834aabd3cb332fe6c43a578d6ffff8f36431b68",
+        "signedSHA256": "bbf95f80a3d1ef195d72c6190351d0420a5cd32abf095c1949b9e33d02ff9047",
+        "normalizedPayloadSHA256": "d49b9321e1624f7db1ab0855fcdda233c5f03598026ada5ea13f723bcc5daa9b"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "e50a8cf414ecd6d227fc4deef5f89707a32fb4a4b2037333885791b9d0a084da",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "329d2d846f9cbf5bde4d6c53eed092270da391cc41e6fb3b7ab8adc43daa885b",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "inheritedComponentEvidence": {
+    "codeCommit": "269d4c90aeb617b9174cbf1e8a10c732a7bf6867",
+    "report": "collector-sdk-v1.json",
+    "coreAppTestsModelAndSDKInputsUnchanged": true,
+    "fullPassed": 863,
+    "fullSkipped": 1,
+    "broadTSanPassed": 452,
+    "offlinePythonContracts": 16,
+    "rerunAtThisCLISource": false,
+    "sourceCIJobsPass": true,
+    "sourceCIRunID": 40186390367
+  },
+  "ci": {
+    "runID": 40187982568,
+    "codeCommit": "5aa58b9ff2a32282b25b48c554b3beafb459a6d1",
+    "state": "in_progress at report generation",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40187982568"
+  },
+  "limits": [
+    "A busy lock is a failure with its owned image retained; close readers and retry. No force detach or conversion to success.",
+    "The earlier unheld terminal failure retained in collector-sdk-v1.json did not capture its underlying native error. This controlled regression establishes masking behavior, not exact historical causality.",
+    "No normal library, real credentials, auth/TCC/power changes, installation or measured energy/competitor claim.",
+    "Physical audio/live capture and broad native acceptance are not rerun for this CLI-only change. Inherited passing component observations are distinguished from current signed process checks."
+  ],
+  "allSelectedCLIContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false
+}

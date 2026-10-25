@@ -6,8 +6,8 @@ The random passphrase travels only over a separate stdin pipe. Existing user
 terminals, libraries, Keychain and permission settings are never selected.
 Packages and raw synthetic output stay under --root for inspection.
 """
-import argparse,pathlib,os,pty,termios,fcntl,subprocess,plistlib,json,secrets,signal,time,errno,hashlib,sys
-parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('binary',type=pathlib.Path);parser.add_argument('--root',type=pathlib.Path,required=True);args=parser.parse_args()
+import argparse,pathlib,os,pty,termios,fcntl,subprocess,plistlib,json,secrets,signal,time,errno,hashlib,sys,sqlite3
+parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('binary',type=pathlib.Path);parser.add_argument('--root',type=pathlib.Path,required=True);parser.add_argument('--held-reader',action='store_true',help='Verify Ctrl-C preserves a deliberate busy error, then recover normally');args=parser.parse_args()
 if sys.platform!='darwin':parser.error('Requires macOS encrypted APFS disk-image tools')
 cli=args.binary.resolve(strict=True);base=args.root.resolve();base.mkdir(mode=0o700,exist_ok=False);secret=secrets.token_urlsafe(32).encode();results=[]
 def run(*args,password=None):
@@ -27,7 +27,7 @@ def child_helper(pid,action,package):
   fields=line.strip().split(None,3)
   if len(fields)==4 and fields[1]==str(pid) and fields[3].startswith('/usr/bin/hdiutil '+action+' ') and str(package/'contents.sparsebundle') in fields[3]:return dict(pid=int(fields[0]),group=int(fields[2]))
  return None
-def interrupt(action,package):
+def interrupt(action,package,expectBusy=False):
  command=['vault',action,str(package),'--passphrase-stdin'] if action!='lock' else ['vault','lock',str(package)]
  if action=='create':command+=['--capacity-gb','1']
  master,slave=pty.openpty();attributes=termios.tcgetattr(slave);attributes[3]=(attributes[3]|termios.ISIG)&~(termios.ECHO|termios.TOSTOP);attributes[6][termios.VINTR]=b'\x03';termios.tcsetattr(slave,termios.TCSANOW,attributes)
@@ -74,8 +74,12 @@ def interrupt(action,package):
   code=os.waitstatus_to_exitcode(status);outputFile=base/(action+'.pty-output');outputFile.write_bytes(output)
   record=dict(action=action,exitCode=code,wallSeconds=time.monotonic()-start,terminalCtrlC=signalled,observed=observed,outputSHA256=hashlib.sha256(output).hexdigest(),ownedImageAttachedAfterExit=bool(images(package)))
   results.append(record);save()
-  assert signalled and code==130,(action,record)
-  assert b'Stopping vault work safely' in output and not record['ownedImageAttachedAfterExit'],record
+  assert signalled and code==(1 if expectBusy else 130),(action,record)
+  assert b'Stopping vault work safely' in output,record
+  if expectBusy:
+   assert record['ownedImageAttachedAfterExit'] and b'files are in use' in output,record
+   assert b'Vault operation cancelled.' not in output,record
+  else:assert not record['ownedImageAttachedAfterExit'],record
   # Raw process and PTY details are preserved in the owned fixture report.
  finally:
   if status is None:
@@ -86,6 +90,28 @@ def interrupt(action,package):
   os.close(master)
 def save():
  (base/'report.json').write_text(json.dumps(dict(format='OSwind private controlling-PTY cooperative cancellation v1',binarySHA256=hashlib.sha256(cli.read_bytes()).hexdigest(),trials=results,scope='Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.'),indent=2)+'\n')
+if args.held_reader:
+ package=base/'Busy.oswindvault';held=None;identifier=None
+ try:
+  run('vault','create',package,'--capacity-gb','1','--passphrase-stdin',password=secret)
+  run('vault','unlock',package,'--passphrase-stdin',password=secret)
+  identifier=subprocess.run([str(cli),'--data',str(package/'Library'),'note','Owned cancellation must preserve busy failure'],capture_output=True,text=True,check=True).stdout.strip()
+  held=sqlite3.connect(package/'Library'/'memory.sqlite');held.execute('BEGIN');held.execute('SELECT COUNT(*) FROM memories').fetchone()
+  interrupt('lock',package,expectBusy=True)
+  assert run('vault','status',package)['state']=='closing' and images(package)
+  assert (package/'Library').is_file() and not (package/'Library').is_symlink()
+ finally:
+  if held is not None:held.rollback();held.close()
+  # Only normal product recovery, even if the error-visibility assertion fails.
+  # Preserve all packages and keep the original failed trial in its report.
+  run('vault','lock',package);assert not images(package)
+  if identifier is not None:
+   run('vault','unlock',package,'--passphrase-stdin',password=secret)
+   assert run('--data',package/'Library','get',identifier)['text']=='Owned cancellation must preserve busy failure'
+   run('vault','lock',package);assert not images(package)
+  if (base/'report.json').exists():
+   report=json.loads((base/'report.json').read_text());report.update(normalRecoveryDetached=True,recoveredHistoryPreserved=identifier is not None);(base/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+ report=json.loads((base/'report.json').read_text());report.update(state='completed',busyFailurePreserved=True);(base/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));raise SystemExit(0)
 created=base/'Create.oswindvault';interrupt('create',created);run('vault','unlock',created,'--passphrase-stdin',password=secret);run('vault','lock',created);assert not images(created)
 opened=base/'Unlock.oswindvault';run('vault','create',opened,'--capacity-gb','1','--passphrase-stdin',password=secret)
 run('vault','unlock',opened,'--passphrase-stdin',password=secret);identifier=subprocess.run([str(cli),'--data',str(opened/'Library'),'note','Owned PTY history survives cooperative interruption'],capture_output=True,text=True,check=True).stdout.strip();run('vault','lock',opened)

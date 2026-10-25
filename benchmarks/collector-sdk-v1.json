@@ -227,8 +227,11 @@
   "ci": {
     "runID": 40186390367,
     "codeCommit": "269d4c90aeb617b9174cbf1e8a10c732a7bf6867",
-    "state": "See exact workflow; pending at report generation unless separately updated",
-    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40186390367"
+    "state": "completed",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40186390367",
+    "nativePass": true,
+    "benchmarkHarnessesPass": true,
+    "conclusion": "success"
   },
   "limits": [
     "No normal library, real credentials, provider/API calls, Keychain, TCC/auth changes, forced detach or installation.",
