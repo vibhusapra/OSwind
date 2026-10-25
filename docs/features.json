@@ -4,7 +4,7 @@
     "axis": "Capture",
     "feature": "Focused-window snapshots",
     "status": "live verified",
-    "evidence": "Latest ea90902 signed CLI targets owned synthetic windows: identity,5-region Vision OCR, normal image, secret suppression, app/title exclusions and image/FTS erasure pass. One-shot normal/secret status760/624ms; no continuous energy or full GUI/controller acceptance",
+    "evidence": "Signed f7e52a6 CLI targets two owned synthetic windows: identity, 5-region Vision OCR, normal image, secret suppression, app/title exclusions and image/FTS erasure pass. One-shot normal/secret status 1832/771ms; not sustained capture, GUI/controller, energy or competitor acceptance",
     "references": "Screenpipe, Littlebird, Recall"
   },
   {
@@ -100,7 +100,7 @@
     "axis": "Energy",
     "feature": "Long-run battery and CPU budget",
     "status": "todo",
-    "evidence": "Paused debug RSS sampled. Older schema11 synthetic MCP/storage/local-answer component soak completed with four retained gaps; current uninterrupted desktop capture and measured power remain missing",
+    "evidence": "Paired signed CPU/wall indexing/restore observations published; no watts or battery drain. Noninteractive read-only powermetrics probe refused because sudo needs a password; settings unchanged. Older schema11 component soak completed with four gaps; current uninterrupted desktop capture and physical power remain missing",
     "references": "Screenpipe, all always-on tools"
   },
   {
@@ -276,7 +276,7 @@
     "axis": "AI",
     "feature": "Structured people/project memory",
     "status": "partial",
-    "evidence": "Source-linked on-device suggestions and explicit projects, curation/merges, scoped retrieval and native editors. Notes-only/equivalent-alias edits now preserve completion and anchors; real rules and restored curation invalidate. Paired signed1000-source rescan count1000\u21920; native6/6 retained. Known follow-up: rejected project links return after rename/rescan (old/new signed CLIs reproduce). Stable-ID corrections, NLP gold quality, curated speaker identity, entity JSON/Markdown and force re-extraction remain open",
+    "evidence": "Schema22 stable project-ID corrections survive rename/merge/rescan and quiet backup. Native rejection\u2192rename\u2192rebuild stays excluded; manual relink plus a real rule rescan restores automatic matching. Actual old21 migration repairs contradictory links without NLP or source changes. Bounded validation: 18 signed paired trials; at 20k median index 245.055\u219214.756s and restore 267.532\u219213.825s on repeated text, caches uncontrolled. NLP gold, speaker identity and entity JSON/Markdown remain open",
     "references": "Minne, Omi"
   },
   {
@@ -380,7 +380,7 @@
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
     "status": "partial",
-    "evidence": "Schema18 managed AES256 APFS images, fail-closed handles, MEMORY SQLite temps, source-preserving verified encrypted migration, native setup/lock screens and optional user-presence Keychain. 522 tests: 516 pass / 6 skips; 79 TSan and 15 signed-release groups pass. Actual older-writer, relocation, partial-unmount and Ctrl-C checks pass. Post-detach confirmation now requires two consecutive absent observations with original package/manifest/image identity and bounded typed settling; rapid native source-preservation and replacement/cancellation cases pass. Original inventory failure remains undiagnosed. Ad-hoc Keychain controls are disabled; real authentication, native clicks/sleep, platform matrix and physical workload gates remain open",
+    "evidence": "Managed AES256 APFS images, closed handles, MEMORY SQLite temps, source-preserving migration, setup/lock screens and optional user-presence Keychain. Identity-bound detach settlement, rapid native lifecycle and ordinary CLI flow pass. Current f7e52a6 CI SIGINT unlock failed with an owned image still attached after exit 130; failure retained and cleanup investigation open. Ad-hoc Keychain controls disabled; real authentication/native sleep/physical workload/OS matrix remain open",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -500,7 +500,7 @@
     "axis": "UX",
     "feature": "Native macOS UI + menu bar",
     "status": "partial",
-    "evidence": "Signed native sample search/replay/routines/export and entity editing/linking/Ask exercised. Latest notes-only save retains6/6 and both sources; real alias change invalidates and resume restores. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open",
+    "evidence": "Signed synthetic setup/search/replay/routines/export/entity flows exercised. Current schema22 native rejection/rename/rescan/manual override and scoped 2 \u2192 global 6 Cmd-K pass with capture off; owned GUI exits and earlier sample unchanged. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open",
     "references": "TimeScroll, rem, ScreenMemory"
   },
   {
@@ -524,7 +524,7 @@
     "axis": "UX",
     "feature": "Keyboard and accessibility review",
     "status": "partial",
-    "evidence": "Native project notes/alias editor and Cmd-K scope transitions observed on signed synthetic library; source focus/cancellation and42 focused TSan cases pass. Full VoiceOver/dynamic-type/global shortcut review and stale build-status wording remain open",
+    "evidence": "Current signed schema22 sample accepts project rename, explicit linking, alias edit and rescan; scoped 2 \u2192 global 6 Cmd-K restores search focus. Full VoiceOver/dynamic-type/global shortcut and stale build-status/singular wording remain open",
     "references": "Quality bar"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "ea90902:791 defined cases all exercised across760 normal passes/31 opt-in skips,313 native/model/Metal passes,5 cached model/runtime checks and1 physical case;43 focused/physical TSan pass. Actual latest capture/OCR/privacy, idle model expiry/reload and signed/native entity contracts pass. A new exploratory project-rename rejection failure is retained outside those791 defined tests. Frozen corpus and pinned rem component results remain separate; no overall competitor rank",
+    "evidence": "Signed f7e52a6 schema22 exercises all 810 defined cases: 779 normal passes/31 skips, 332 native/model/Metal adding 25, five cached model/runtime and one physical case. 399 distinct TSan passes; all 22 final operations, native correction lifecycle, targeted OCR/privacy and 18 paired scaling trials pass. Original CI SIGINT vault cleanup failure retained; schema-target harness/workflow fixes await fresh CI. Corpus and pinned rem component results remain separate; no overall competitor rank",
     "references": "OSwind quality bar"
   },
   {

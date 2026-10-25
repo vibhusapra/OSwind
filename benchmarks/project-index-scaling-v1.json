@@ -1,0 +1,1108 @@
+{
+  "format": "OSwind paired project indexing and quiet restore scaling v1",
+  "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+  "schema": 22,
+  "baselineCodeCommit": "ea909023a3ab045c03917170a2ffdd046ba01462",
+  "baselineSchema": 21,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "raw": {
+    "format": "OSwind paired project-index/restore observations v1",
+    "baselineBinarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+    "candidateBinarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+    "harnessSHA256": "c0243b9ea086495357362b150ab1bfee3e845e4731ab76fedd54bf3898576a06",
+    "sizes": [
+      1000,
+      5000,
+      20000
+    ],
+    "repetitions": 3,
+    "timeoutSeconds": 300,
+    "results": [
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7641348338220268,
+          "userCPUSeconds": 0.5624269999999996,
+          "systemCPUSeconds": 0.14132599999999984,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.050348417134955525,
+          "userCPUSeconds": 0.009540000000000326,
+          "systemCPUSeconds": 0.0060549999999999216,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.8399502080865204,
+          "userCPUSeconds": 0.6155379999999999,
+          "systemCPUSeconds": 0.2094509999999996,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.6156729999929667,
+          "userCPUSeconds": 0.42297600000000024,
+          "systemCPUSeconds": 0.1377290000000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04887720802798867,
+          "userCPUSeconds": 0.00882499999999986,
+          "systemCPUSeconds": 0.005459000000000103,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.6674097499344498,
+          "userCPUSeconds": 0.42526499999999956,
+          "systemCPUSeconds": 0.22838000000000047,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "da2ab0c50d1aeda6371dc7c494c79cf94c9bc0f3444f793b49faf41f4848bd5b",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7425747499801219,
+          "userCPUSeconds": 0.5455900000000007,
+          "systemCPUSeconds": 0.1418210000000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04953258321620524,
+          "userCPUSeconds": 0.008886000000000394,
+          "systemCPUSeconds": 0.005471999999999255,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.8630974579136819,
+          "userCPUSeconds": 0.6125450000000008,
+          "systemCPUSeconds": 0.23606899999999875,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.5938187919091433,
+          "userCPUSeconds": 0.4177040000000005,
+          "systemCPUSeconds": 0.1258739999999996,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05063866707496345,
+          "userCPUSeconds": 0.009153999999998774,
+          "systemCPUSeconds": 0.006005000000000038,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.6130570829845965,
+          "userCPUSeconds": 0.42112399999999894,
+          "systemCPUSeconds": 0.1812060000000013,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7423879171255976,
+          "userCPUSeconds": 0.5446919999999977,
+          "systemCPUSeconds": 0.145467,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04898270801641047,
+          "userCPUSeconds": 0.00894800000000373,
+          "systemCPUSeconds": 0.005743999999999971,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.7906154578085989,
+          "userCPUSeconds": 0.6092799999999983,
+          "systemCPUSeconds": 0.16497900000000065,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "39effc2e95790a53efc969946fdf6380e9b7fcb65d89cc3b83b68212c1769af1",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.5910071248654276,
+          "userCPUSeconds": 0.4161179999999973,
+          "systemCPUSeconds": 0.126100000000001,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.0497748339548707,
+          "userCPUSeconds": 0.009342000000003736,
+          "systemCPUSeconds": 0.005932999999998856,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.5716781669761986,
+          "userCPUSeconds": 0.4366279999999989,
+          "systemCPUSeconds": 0.12259399999999943,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 13.079187458846718,
+          "userCPUSeconds": 8.133703999999994,
+          "systemCPUSeconds": 4.763952999999997,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05896704108454287,
+          "userCPUSeconds": 0.012247000000002117,
+          "systemCPUSeconds": 0.009067000000001713,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.285069250036031,
+          "userCPUSeconds": 7.543289999999999,
+          "systemCPUSeconds": 0.685217999999999,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "c46f8dd179920bb1b6db9316d055bf253aa2d1ab110f0fb3c0029020cc2e41b5",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 2.8597817078698426,
+          "userCPUSeconds": 2.068708000000015,
+          "systemCPUSeconds": 0.6537390000000016,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.054738250095397234,
+          "userCPUSeconds": 0.012033999999999878,
+          "systemCPUSeconds": 0.008214000000002386,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 2.8055502499919385,
+          "userCPUSeconds": 2.055126999999999,
+          "systemCPUSeconds": 0.7237329999999957,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "d7e1e51461b91b2dca6f607853b462db973bbe33d3b3c74b224c17ea3e751724",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 13.224957375088707,
+          "userCPUSeconds": 8.208191999999997,
+          "systemCPUSeconds": 4.800324000000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.056980791967362165,
+          "userCPUSeconds": 0.011985000000009904,
+          "systemCPUSeconds": 0.0078060000000022,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.499865625053644,
+          "userCPUSeconds": 7.601257000000004,
+          "systemCPUSeconds": 0.8441709999999887,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "eff60a56edc67090f10aac992a2dccb432e86109b9a68f2d78438774193ca5d3",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 2.899930667132139,
+          "userCPUSeconds": 2.094897000000003,
+          "systemCPUSeconds": 0.6820409999999981,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05559629201889038,
+          "userCPUSeconds": 0.012384999999994761,
+          "systemCPUSeconds": 0.008442000000002281,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 2.798497499898076,
+          "userCPUSeconds": 2.119296999999989,
+          "systemCPUSeconds": 0.6484560000000101,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "7847e897333acfe74c1ecf6cd3f43afe1a114088043718afbb4aa85262ae2d4a",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 12.837796125095338,
+          "userCPUSeconds": 8.15593899999999,
+          "systemCPUSeconds": 4.475976000000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.06421175017021596,
+          "userCPUSeconds": 0.012939000000017131,
+          "systemCPUSeconds": 0.009649999999993497,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.949569415999576,
+          "userCPUSeconds": 8.151433999999995,
+          "systemCPUSeconds": 0.7063169999999985,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "6a32630cf9e7c0df55bf47a198856ec06a70fe784a4628505deeb45b4c1cb7ac",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 3.8388367500156164,
+          "userCPUSeconds": 2.6923360000000116,
+          "systemCPUSeconds": 0.9231430000000103,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.062100875191390514,
+          "userCPUSeconds": 0.014478999999994357,
+          "systemCPUSeconds": 0.010750999999999067,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 3.3353794580325484,
+          "userCPUSeconds": 2.3920970000000352,
+          "systemCPUSeconds": 0.8763220000000018,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "224d011bb1829646743494b02b59b12a5a55190da942661a9132d93b5dcca531",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 245.05536675010808,
+          "userCPUSeconds": 138.04271600000004,
+          "systemCPUSeconds": 99.15997900000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.08179962495341897,
+          "userCPUSeconds": 0.024831999999946675,
+          "systemCPUSeconds": 0.015577000000007502,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 229.1574860420078,
+          "userCPUSeconds": 171.35304700000006,
+          "systemCPUSeconds": 53.931938,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "5837aae603e33749389b2e79e364e49093bde673b47fc931e45f8d656040b9e9",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 14.417069917079061,
+          "userCPUSeconds": 10.40903400000002,
+          "systemCPUSeconds": 2.8591599999999744,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.13993020891211927,
+          "userCPUSeconds": 0.02707599999996546,
+          "systemCPUSeconds": 0.024228999999991174,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 11.372056332882494,
+          "userCPUSeconds": 9.146383000000014,
+          "systemCPUSeconds": 2.0153459999999654,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "20fe4478a6e32418297f1d9e9e67dd9310ba5e2f19b23dc513cea3e40b594df4",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 242.34995679208077,
+          "userCPUSeconds": 132.71623799999998,
+          "systemCPUSeconds": 104.43937499999998,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.10155824990943074,
+          "userCPUSeconds": 0.027444000000059532,
+          "systemCPUSeconds": 0.02069899999997915,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 267.53166750003584,
+          "userCPUSeconds": 201.866577,
+          "systemCPUSeconds": 61.094674,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "ee2a29476537371eee3d6a108885bbd8ff2495269f9e662ad61c84354ea6f279",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 14.75583679205738,
+          "userCPUSeconds": 10.737907999999834,
+          "systemCPUSeconds": 3.4912009999999327,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.08947070804424584,
+          "userCPUSeconds": 0.027989000000161468,
+          "systemCPUSeconds": 0.01875900000004549,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 13.82483824994415,
+          "userCPUSeconds": 10.169983000000002,
+          "systemCPUSeconds": 3.4542849999999135,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "a6d4dd7bac250f18c1ce4ef241d95608988817da8ed2a378a4c950a5de7d7a19",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 260.46079974994063,
+          "userCPUSeconds": 144.10021299999994,
+          "systemCPUSeconds": 110.09648500000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.09489812492392957,
+          "userCPUSeconds": 0.02947200000016892,
+          "systemCPUSeconds": 0.0191939999999704,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 278.2893448341638,
+          "userCPUSeconds": 206.24003700000003,
+          "systemCPUSeconds": 66.54258499999992,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "641086487073493db29a17ccc757ea5bd62c839d2af887bc7084e63b8ef711a7",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 15.028557291952893,
+          "userCPUSeconds": 10.931310999999823,
+          "systemCPUSeconds": 3.4657600000000457,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.09163366607390344,
+          "userCPUSeconds": 0.029007999999976164,
+          "systemCPUSeconds": 0.01832200000001194,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 14.202400875044987,
+          "userCPUSeconds": 10.19540199999983,
+          "systemCPUSeconds": 3.7554669999999533,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8f702e8dd8fe83b61f2061aea9fb0861c4c5e0424958a5c904d7a2a7a6bd92b2",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      }
+    ],
+    "scope": "Owned repeated short text with exact authored project membership/span oracle; fresh CLI calls include startup, SQLite and native NLP for indexing, plus separate quiet restore and no-op resume. Sequential baseline then candidate trials, caches and host activity uncontrolled. CPU is child user/system delta; shared daemons and system energy excluded. Timeouts are retained censored baseline observations, not successful completions. No natural NLP accuracy, capture, physical power or competitor ranking."
+  },
+  "summary": [
+    {
+      "sources": 1000,
+      "label": "baseline",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.7641348338220268,
+          "censored": false
+        },
+        {
+          "seconds": 0.7425747499801219,
+          "censored": false
+        },
+        {
+          "seconds": 0.7423879171255976,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.7425747499801219,
+      "minimumCompletedWallSeconds": 0.7423879171255976,
+      "maximumCompletedWallSeconds": 0.7641348338220268,
+      "medianCompletedChildUserCPUSeconds": 0.5455900000000007,
+      "medianCompletedChildSystemCPUSeconds": 0.1418210000000002
+    },
+    {
+      "sources": 1000,
+      "label": "baseline",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.050348417134955525,
+          "censored": false
+        },
+        {
+          "seconds": 0.04953258321620524,
+          "censored": false
+        },
+        {
+          "seconds": 0.04898270801641047,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.04953258321620524,
+      "minimumCompletedWallSeconds": 0.04898270801641047,
+      "maximumCompletedWallSeconds": 0.050348417134955525,
+      "medianCompletedChildUserCPUSeconds": 0.00894800000000373,
+      "medianCompletedChildSystemCPUSeconds": 0.005743999999999971
+    },
+    {
+      "sources": 1000,
+      "label": "baseline",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.8399502080865204,
+          "censored": false
+        },
+        {
+          "seconds": 0.8630974579136819,
+          "censored": false
+        },
+        {
+          "seconds": 0.7906154578085989,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.8399502080865204,
+      "minimumCompletedWallSeconds": 0.7906154578085989,
+      "maximumCompletedWallSeconds": 0.8630974579136819,
+      "medianCompletedChildUserCPUSeconds": 0.6125450000000008,
+      "medianCompletedChildSystemCPUSeconds": 0.2094509999999996
+    },
+    {
+      "sources": 1000,
+      "label": "candidate",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.6156729999929667,
+          "censored": false
+        },
+        {
+          "seconds": 0.5938187919091433,
+          "censored": false
+        },
+        {
+          "seconds": 0.5910071248654276,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.5938187919091433,
+      "minimumCompletedWallSeconds": 0.5910071248654276,
+      "maximumCompletedWallSeconds": 0.6156729999929667,
+      "medianCompletedChildUserCPUSeconds": 0.4177040000000005,
+      "medianCompletedChildSystemCPUSeconds": 0.126100000000001
+    },
+    {
+      "sources": 1000,
+      "label": "candidate",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.04887720802798867,
+          "censored": false
+        },
+        {
+          "seconds": 0.05063866707496345,
+          "censored": false
+        },
+        {
+          "seconds": 0.0497748339548707,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.0497748339548707,
+      "minimumCompletedWallSeconds": 0.04887720802798867,
+      "maximumCompletedWallSeconds": 0.05063866707496345,
+      "medianCompletedChildUserCPUSeconds": 0.009153999999998774,
+      "medianCompletedChildSystemCPUSeconds": 0.005932999999998856
+    },
+    {
+      "sources": 1000,
+      "label": "candidate",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.6674097499344498,
+          "censored": false
+        },
+        {
+          "seconds": 0.6130570829845965,
+          "censored": false
+        },
+        {
+          "seconds": 0.5716781669761986,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.6130570829845965,
+      "minimumCompletedWallSeconds": 0.5716781669761986,
+      "maximumCompletedWallSeconds": 0.6674097499344498,
+      "medianCompletedChildUserCPUSeconds": 0.42526499999999956,
+      "medianCompletedChildSystemCPUSeconds": 0.1812060000000013
+    },
+    {
+      "sources": 5000,
+      "label": "baseline",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 13.079187458846718,
+          "censored": false
+        },
+        {
+          "seconds": 13.224957375088707,
+          "censored": false
+        },
+        {
+          "seconds": 12.837796125095338,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 13.079187458846718,
+      "minimumCompletedWallSeconds": 12.837796125095338,
+      "maximumCompletedWallSeconds": 13.224957375088707,
+      "medianCompletedChildUserCPUSeconds": 8.15593899999999,
+      "medianCompletedChildSystemCPUSeconds": 4.763952999999997
+    },
+    {
+      "sources": 5000,
+      "label": "baseline",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.05896704108454287,
+          "censored": false
+        },
+        {
+          "seconds": 0.056980791967362165,
+          "censored": false
+        },
+        {
+          "seconds": 0.06421175017021596,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.05896704108454287,
+      "minimumCompletedWallSeconds": 0.056980791967362165,
+      "maximumCompletedWallSeconds": 0.06421175017021596,
+      "medianCompletedChildUserCPUSeconds": 0.012247000000002117,
+      "medianCompletedChildSystemCPUSeconds": 0.009067000000001713
+    },
+    {
+      "sources": 5000,
+      "label": "baseline",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 8.285069250036031,
+          "censored": false
+        },
+        {
+          "seconds": 8.499865625053644,
+          "censored": false
+        },
+        {
+          "seconds": 8.949569415999576,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 8.499865625053644,
+      "minimumCompletedWallSeconds": 8.285069250036031,
+      "maximumCompletedWallSeconds": 8.949569415999576,
+      "medianCompletedChildUserCPUSeconds": 7.601257000000004,
+      "medianCompletedChildSystemCPUSeconds": 0.7063169999999985
+    },
+    {
+      "sources": 5000,
+      "label": "candidate",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 2.8597817078698426,
+          "censored": false
+        },
+        {
+          "seconds": 2.899930667132139,
+          "censored": false
+        },
+        {
+          "seconds": 3.8388367500156164,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 2.899930667132139,
+      "minimumCompletedWallSeconds": 2.8597817078698426,
+      "maximumCompletedWallSeconds": 3.8388367500156164,
+      "medianCompletedChildUserCPUSeconds": 2.094897000000003,
+      "medianCompletedChildSystemCPUSeconds": 0.6820409999999981
+    },
+    {
+      "sources": 5000,
+      "label": "candidate",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.054738250095397234,
+          "censored": false
+        },
+        {
+          "seconds": 0.05559629201889038,
+          "censored": false
+        },
+        {
+          "seconds": 0.062100875191390514,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.05559629201889038,
+      "minimumCompletedWallSeconds": 0.054738250095397234,
+      "maximumCompletedWallSeconds": 0.062100875191390514,
+      "medianCompletedChildUserCPUSeconds": 0.012384999999994761,
+      "medianCompletedChildSystemCPUSeconds": 0.008442000000002281
+    },
+    {
+      "sources": 5000,
+      "label": "candidate",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 2.8055502499919385,
+          "censored": false
+        },
+        {
+          "seconds": 2.798497499898076,
+          "censored": false
+        },
+        {
+          "seconds": 3.3353794580325484,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 2.8055502499919385,
+      "minimumCompletedWallSeconds": 2.798497499898076,
+      "maximumCompletedWallSeconds": 3.3353794580325484,
+      "medianCompletedChildUserCPUSeconds": 2.119296999999989,
+      "medianCompletedChildSystemCPUSeconds": 0.7237329999999957
+    },
+    {
+      "sources": 20000,
+      "label": "baseline",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 245.05536675010808,
+          "censored": false
+        },
+        {
+          "seconds": 242.34995679208077,
+          "censored": false
+        },
+        {
+          "seconds": 260.46079974994063,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 245.05536675010808,
+      "minimumCompletedWallSeconds": 242.34995679208077,
+      "maximumCompletedWallSeconds": 260.46079974994063,
+      "medianCompletedChildUserCPUSeconds": 138.04271600000004,
+      "medianCompletedChildSystemCPUSeconds": 104.43937499999998
+    },
+    {
+      "sources": 20000,
+      "label": "baseline",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.08179962495341897,
+          "censored": false
+        },
+        {
+          "seconds": 0.10155824990943074,
+          "censored": false
+        },
+        {
+          "seconds": 0.09489812492392957,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.09489812492392957,
+      "minimumCompletedWallSeconds": 0.08179962495341897,
+      "maximumCompletedWallSeconds": 0.10155824990943074,
+      "medianCompletedChildUserCPUSeconds": 0.027444000000059532,
+      "medianCompletedChildSystemCPUSeconds": 0.0191939999999704
+    },
+    {
+      "sources": 20000,
+      "label": "baseline",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 229.1574860420078,
+          "censored": false
+        },
+        {
+          "seconds": 267.53166750003584,
+          "censored": false
+        },
+        {
+          "seconds": 278.2893448341638,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 267.53166750003584,
+      "minimumCompletedWallSeconds": 229.1574860420078,
+      "maximumCompletedWallSeconds": 278.2893448341638,
+      "medianCompletedChildUserCPUSeconds": 201.866577,
+      "medianCompletedChildSystemCPUSeconds": 61.094674
+    },
+    {
+      "sources": 20000,
+      "label": "candidate",
+      "operation": "firstIndex",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 14.417069917079061,
+          "censored": false
+        },
+        {
+          "seconds": 14.75583679205738,
+          "censored": false
+        },
+        {
+          "seconds": 15.028557291952893,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 14.75583679205738,
+      "minimumCompletedWallSeconds": 14.417069917079061,
+      "maximumCompletedWallSeconds": 15.028557291952893,
+      "medianCompletedChildUserCPUSeconds": 10.737907999999834,
+      "medianCompletedChildSystemCPUSeconds": 3.4657600000000457
+    },
+    {
+      "sources": 20000,
+      "label": "candidate",
+      "operation": "resume",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 0.13993020891211927,
+          "censored": false
+        },
+        {
+          "seconds": 0.08947070804424584,
+          "censored": false
+        },
+        {
+          "seconds": 0.09163366607390344,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 0.09163366607390344,
+      "minimumCompletedWallSeconds": 0.08947070804424584,
+      "maximumCompletedWallSeconds": 0.13993020891211927,
+      "medianCompletedChildUserCPUSeconds": 0.027989000000161468,
+      "medianCompletedChildSystemCPUSeconds": 0.01875900000004549
+    },
+    {
+      "sources": 20000,
+      "label": "candidate",
+      "operation": "restore",
+      "completed": 3,
+      "censoredTimeouts": 0,
+      "notAttempted": 0,
+      "wallObservations": [
+        {
+          "seconds": 11.372056332882494,
+          "censored": false
+        },
+        {
+          "seconds": 13.82483824994415,
+          "censored": false
+        },
+        {
+          "seconds": 14.202400875044987,
+          "censored": false
+        }
+      ],
+      "medianCompletedWallSeconds": 13.82483824994415,
+      "minimumCompletedWallSeconds": 11.372056332882494,
+      "maximumCompletedWallSeconds": 14.202400875044987,
+      "medianCompletedChildUserCPUSeconds": 10.169983000000002,
+      "medianCompletedChildSystemCPUSeconds": 3.4542849999999135
+    }
+  ],
+  "sourceAnchorChecks": "Exact authored project membership and UTF16 span oracle; matching source/revision/span/method hashes across binaries and after every completed restore. Quiet restore resets completion and leaves automatic indexing off.",
+  "measurement": "Three sequential baseline-then-candidate pairs per size. Fresh libraries/processes, fixed repeated authored text/IDs/timestamps, startup/SQLite/native NLP included for index. Import, initial project creation, backup creation and validation excluded. Restore has its own timing; no-op resume separate. Caches and host activity uncontrolled.",
+  "limits": "Successful-only medians explicitly name completed trials. Censored baseline timeouts remain lower-bound observations, never successful completions or evidence of source-anchor parity for unfinished work. No natural NLP quality, million-source behavior, media, physical energy, full capture, competitor app or overall speed/ranking claim.",
+  "package": {
+    "scope": "Separately staged schema22 desktop memory with stable project corrections and bounded validation; no installation; native input accepted only where separately reported",
+    "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "1c931e744038d8670f6d4a1a1a9eddb86343f0f2e3b2229ea24c525e153989d2",
+        "signedSHA256": "108cec25fff755a2c132f2ff7f209c86ff480aafad3440d311ad2cec4e87d5de",
+        "normalizedPayloadSHA256": "4efa69cc53a46df981b0fa4e233089bc553a16a647b355101518c7d18466cb43"
+      },
+      "oswindctl": {
+        "rawSHA256": "327d22f808751624f9269c7ab48849d1afa658d98662d17722bc87edd4f4da1d",
+        "signedSHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "normalizedPayloadSHA256": "d733f2b78eb8c3320d14ae492e563b7bf64ca1d0f7014303010fd20762c2ef53"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "37481908042dd03a253f32e8dfb5223c88656b5be2f0592821f16672b006073d",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "c10dd301c1e8aced009269dc0b053d83cfc93b6de0f1b2113dab1948b0bcd4d2",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "chartRuntime": {
+    "library": "matplotlib",
+    "version": "3.11.2"
+  }
+}

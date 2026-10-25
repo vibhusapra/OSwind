@@ -3,8 +3,8 @@ import CSQLite
 import Darwin
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version21 fences clients that cannot preserve or erase curated entity data.
-    public static let schemaVersion = 21
+    // Version22 fences writers that cannot preserve/enforce project-ID corrections.
+    public static let schemaVersion = 22
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -136,6 +136,7 @@ public final class MemoryStore: @unchecked Sendable {
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try exec(EntitySchema.sql)
+        if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }

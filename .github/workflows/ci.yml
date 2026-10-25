@@ -36,6 +36,8 @@ jobs:
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise source-linked entity scopes, corrections and quiet backup
         run: python3 scripts/entity-memory-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-entity-memory"
+      - name: Verify stable project corrections and quiet portability
+        run: python3 scripts/project-corrections-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-project-corrections"
       - name: Verify project metadata preserves completed extraction
         run: python3 scripts/entity-metadata-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-entity-metadata"
       - name: Exercise indexed API and MCP processes
@@ -118,7 +120,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 21
+          assert report['count'] == 1000 and report['schema_version'] == 22
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes

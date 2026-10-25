@@ -1,0 +1,1543 @@
+{
+  "format": "OSwind stable project corrections and bounded validation qualification v1",
+  "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "change": "Project rejection follows stable identity through rename, alias changes, merge and quiet restore. Migration repairs legacy alias-owned automatic contradictions without reindexing. Extraction/restore validate bounded metadata instead of aggregating memberships per candidate.",
+  "scope": "Owned synthetic correction/migration/scaling/backup contracts, actual signed old/new CLI/HTTP/MCP and encrypted entity flow, native input, cached local models, short physical generated-tone probes and signed package proof. No normal history, real credentials, permission/authentication changes, current uninterrupted capture/power or overall competitor ranking.",
+  "tests": {
+    "fullCases": 810,
+    "normalPasses": 779,
+    "normalOptInSkips": 31,
+    "nativeModelMetalPasses": 332,
+    "additionalNativePasses": 25,
+    "realModelRuntimePasses": 5,
+    "physicalAudioPasses": 1,
+    "distinctFunctionalPasses": 810,
+    "allDefinedCasesExercised": true,
+    "remainingOptInCases": [],
+    "focusedThreadSanitizerPasses": 398,
+    "physicalThreadSanitizerPasses": 1,
+    "distinctThreadSanitizerPasses": 399,
+    "threadSanitizerRacesReported": false,
+    "newCorrectionCases": 19,
+    "passedCaseNamesSHA256": "322885c30986d9944b3253bd094ba1479cb9343338f5ae91f0e42264f488bbc8",
+    "logs": {
+      "full-normal-v1.log": "cca16bb3817b397708ecdecbdfd2a8a89b4255a9b7101b11963fa94e922612f7",
+      "native-model-metal-v1.log": "69bb74959af1f9376649756124c1cbd53fa834e949be95c5e50e231fc42594f0",
+      "focused-tsan-v1.log": "6f99cecc888e2c494794b06d65e3b3d2a64ff6abbda93be9b5f8b51881428122",
+      "real-models-runtime-v1.log": "3368e021c57857cf77f7a0602dbbb2fe95cb7ced63b4926e81689a7a200f1e9a",
+      "physical-normal-v1/test.log": "021d41b43368f8624cead735148078077c37e508a6c31b9677e85bfa03575da4",
+      "physical-tsan-v1/test.log": "e887e959754c10c86cc4e7c3f623370d3aaa915d0f5d58b96fee6d3c06c734a2"
+    }
+  },
+  "package": {
+    "scope": "Separately staged schema22 desktop memory with stable project corrections and bounded validation; no installation; native input accepted only where separately reported",
+    "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "1c931e744038d8670f6d4a1a1a9eddb86343f0f2e3b2229ea24c525e153989d2",
+        "signedSHA256": "108cec25fff755a2c132f2ff7f209c86ff480aafad3440d311ad2cec4e87d5de",
+        "normalizedPayloadSHA256": "4efa69cc53a46df981b0fa4e233089bc553a16a647b355101518c7d18466cb43"
+      },
+      "oswindctl": {
+        "rawSHA256": "327d22f808751624f9269c7ab48849d1afa658d98662d17722bc87edd4f4da1d",
+        "signedSHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "normalizedPayloadSHA256": "d733f2b78eb8c3320d14ae492e563b7bf64ca1d0f7014303010fd20762c2ef53"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "37481908042dd03a253f32e8dfb5223c88656b5be2f0592821f16672b006073d",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "c10dd301c1e8aced009269dc0b053d83cfc93b6de0f1b2113dab1948b0bcd4d2",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "finalOperations": [
+    {
+      "name": "full-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 135.0930191250518
+    },
+    {
+      "name": "native-model-metal-v1",
+      "exitCode": 0,
+      "wallSeconds": 212.52606533304788
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 52.06891816598363
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.7316362911369652
+    },
+    {
+      "name": "entity-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 9.83658383297734
+    },
+    {
+      "name": "metadata-paired-v1",
+      "exitCode": 0,
+      "wallSeconds": 33.058270416921005
+    },
+    {
+      "name": "entity-vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 8.797336916904896
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 2.8272359168622643
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.4007545409258455
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.0912107499316335
+    },
+    {
+      "name": "index-scaling-v1",
+      "exitCode": 0,
+      "wallSeconds": 2707.9086109581403
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 256.4426974998787
+    },
+    {
+      "name": "real-models-runtime-v1",
+      "exitCode": 0,
+      "wallSeconds": 164.60470904107206
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 14.655949000036344
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 51.586278582923114
+    },
+    {
+      "name": "tag-repair-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.4970604579430073
+    },
+    {
+      "name": "tag-legacy-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.4633236250374466
+    },
+    {
+      "name": "capture-region-legacy-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.6950461249798536
+    },
+    {
+      "name": "tag-interruption-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 4.015174082946032
+    },
+    {
+      "name": "statistics-vector-fixture-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1070957081392407
+    },
+    {
+      "name": "statistics-schema-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.02981808315962553
+    },
+    {
+      "name": "live-capture-v1",
+      "exitCode": 0,
+      "wallSeconds": 6.121585167013109
+    }
+  ],
+  "successfulFinalOperations": 22,
+  "projectCorrectionProcess": {
+    "format": "OSwind stable project correction process qualification v1",
+    "passed": true,
+    "schema": 22,
+    "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+    "harnessSHA256": "70ce507e78a34f97db5718c93d74c2d2f70ea24165e3a1e81ad810a217416c2f",
+    "legacy21": {
+      "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+      "sourceSchema": 21,
+      "priorWrongAutomaticLinks": 1,
+      "upgradedAutomaticLinks": 0,
+      "completedSourcesRetained": 1,
+      "sourcePayloadsUnchanged": true,
+      "olderClientRefused": true,
+      "legacyQuietRestoreAndRescanPreservesRejection": true
+    },
+    "checks": [
+      "rename and merge retain rejected project source",
+      "favorite/tags preserve exclusion",
+      "manual override restores automatic matching",
+      "deleting project erases its stable exclusions before name reuse",
+      "MCP/HTTP and scoped keyword retrieval omit rejected source",
+      "quiet22 backup resets completion and preserves correction after rescan",
+      "source deletion and full wipe erase stable exclusions"
+    ],
+    "scope": "Three authored notes and actual CLI/HTTP/MCP/storage processes; optional exact older21 binary covers native format migration/refusal and legacy archive repair. No normal history, representative NLP accuracy, native UI, device, power or competitor claim."
+  },
+  "entityProcess": {
+    "format": "OSwind source-linked entity memory qualification v1",
+    "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+    "olderSchema20BinarySHA256": "26bbaf16524077ff2b4f01f4dec74d3b89e719497756e6449653893e6dee1652",
+    "olderClientRefusalChecked": true,
+    "harnessSHA256": "2eff466eef98c022704c612f2d20ef69402e6084c13044d0477f88ff152185d8",
+    "schema": 22,
+    "passed": true,
+    "sources": 1000,
+    "projectOracleSources": 667,
+    "projectPrecision": 1.0,
+    "projectRecall": 1.0,
+    "automaticSpansVerified": 1335,
+    "firstIndexWallSeconds": 0.5816564590204507,
+    "resumeWallSeconds": 0.05453558289445937,
+    "observedNLPAndProjectGroups": [
+      {
+        "kind": "organization",
+        "name": "Apollo",
+        "sources": 334
+      },
+      {
+        "kind": "person",
+        "name": "Chen",
+        "sources": 334
+      },
+      {
+        "kind": "project",
+        "name": "Apollo Launch",
+        "sources": 667
+      }
+    ],
+    "checks": [
+      "exact project alias oracle",
+      "UTF16 source anchors",
+      "scoped keyword retrieval",
+      "metadata-only edit preserves completion and source links",
+      "correction survives actual alias-rule rescan",
+      "read-only MCP membership and validation",
+      "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+      "quiet backup restore retains definitions, aliases and links",
+      "restored completion reset",
+      "source erasure",
+      "full wipe erases curated definitions",
+      "schema20 client refusal"
+    ],
+    "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+  },
+  "encryptedEntityProcess": {
+    "format": "OSwind native entity vault v1",
+    "state": "completed",
+    "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+    "checks": [
+      "native local NLP/project indexing and explicit person link on verified encrypted library",
+      "rejected project mention survives native encrypted rule-rescan",
+      "labels, notes, correction and deliberate source link survive normal lock/remount",
+      "full backup and quiet restore retain entity metadata/correction with native rescan"
+    ],
+    "scope": "Synthetic source and entity metadata on one newly-created encrypted APFS volume. No normal library, real credentials, Keychain, authentication or TCC changes. No Apple-framework temporary-memory zeroization or power claim.",
+    "schema": 22,
+    "sourceCount": 1,
+    "entityCount": 4,
+    "verifiedDetached": true,
+    "passphrasePersisted": false,
+    "cleanupDetached": true
+  },
+  "metadataPreservationObservation": {
+    "format": "OSwind project metadata preservation observations v1",
+    "passed": true,
+    "sources": 1000,
+    "repetitions": 3,
+    "syntheticInputSHA256": "f5ea5501bd3ab44c2e10d7dcfd6ebad428db5396e290a58979fc67d6891d94bc",
+    "harnessSHA256": "484bf3d2b399696b071e9d30946aa770c536814619c979bd7374d923b54a5c8f",
+    "results": [
+      {
+        "label": "baseline",
+        "binarySHA256": "c77e8211de5ff2c79e4c831dfe492caff3f37ced6d41f3872dfea3957de9664a",
+        "metadataPreserved": false,
+        "trials": [
+          {
+            "editWallSeconds": 0.0595019580796361,
+            "resumeWallSeconds": 0.8290775408968329,
+            "totalWallSeconds": 0.888579498976469,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.056368083925917745,
+            "resumeWallSeconds": 0.8653702079318464,
+            "totalWallSeconds": 0.9217382918577641,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.05803700000979006,
+            "resumeWallSeconds": 0.9323544590733945,
+            "totalWallSeconds": 0.9903914590831846,
+            "pendingSourcesAfterEdit": 1000,
+            "automaticLinksAfterEdit": 0,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          }
+        ],
+        "medianEditWallSeconds": 0.05803700000979006,
+        "medianResumeWallSeconds": 0.8653702079318464,
+        "medianTotalWallSeconds": 0.9217382918577641,
+        "checks": [
+          "source anchors unchanged after resume",
+          "manual link retained",
+          "rejected automatic source remains suppressed",
+          "real alias change invalidates completion/automatic links",
+          "quiet full backup preserves edited definitions and memberships",
+          "restored completion resets and resumed extraction retains correction",
+          "restored uncurated project activation by edit/create invalidates its completed plan"
+        ]
+      },
+      {
+        "label": "candidate",
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "metadataPreserved": true,
+        "trials": [
+          {
+            "editWallSeconds": 0.05132141592912376,
+            "resumeWallSeconds": 0.05037404200993478,
+            "totalWallSeconds": 0.10169545793905854,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.04977404116652906,
+            "resumeWallSeconds": 0.050183917162939906,
+            "totalWallSeconds": 0.09995795832946897,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          },
+          {
+            "editWallSeconds": 0.049937957897782326,
+            "resumeWallSeconds": 0.0822794169653207,
+            "totalWallSeconds": 0.13221737486310303,
+            "pendingSourcesAfterEdit": 0,
+            "automaticLinksAfterEdit": 999,
+            "manualLinksAfterEdit": 1,
+            "rejectedSourceStillSuppressed": true
+          }
+        ],
+        "medianEditWallSeconds": 0.049937957897782326,
+        "medianResumeWallSeconds": 0.05037404200993478,
+        "medianTotalWallSeconds": 0.10169545793905854,
+        "checks": [
+          "source anchors unchanged after resume",
+          "manual link retained",
+          "rejected automatic source remains suppressed",
+          "real alias change invalidates completion/automatic links",
+          "quiet full backup preserves edited definitions and memberships",
+          "restored completion resets and resumed extraction retains correction",
+          "restored uncurated project activation by edit/create invalidates its completed plan"
+        ]
+      }
+    ],
+    "scope": "Owned short synthetic sources and project metadata/alias/correction/backup contracts. Sequential CLI trials include startup, SQLite and extraction/resume with uncontrolled caches and host activity. Required rescan counts are exact for this fixture; no representative workload, energy or competitor claim."
+  },
+  "scalingObservation": {
+    "format": "OSwind paired project-index/restore observations v1",
+    "baselineBinarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+    "candidateBinarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+    "harnessSHA256": "c0243b9ea086495357362b150ab1bfee3e845e4731ab76fedd54bf3898576a06",
+    "sizes": [
+      1000,
+      5000,
+      20000
+    ],
+    "repetitions": 3,
+    "timeoutSeconds": 300,
+    "results": [
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7641348338220268,
+          "userCPUSeconds": 0.5624269999999996,
+          "systemCPUSeconds": 0.14132599999999984,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.050348417134955525,
+          "userCPUSeconds": 0.009540000000000326,
+          "systemCPUSeconds": 0.0060549999999999216,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.8399502080865204,
+          "userCPUSeconds": 0.6155379999999999,
+          "systemCPUSeconds": 0.2094509999999996,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.6156729999929667,
+          "userCPUSeconds": 0.42297600000000024,
+          "systemCPUSeconds": 0.1377290000000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04887720802798867,
+          "userCPUSeconds": 0.00882499999999986,
+          "systemCPUSeconds": 0.005459000000000103,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.6674097499344498,
+          "userCPUSeconds": 0.42526499999999956,
+          "systemCPUSeconds": 0.22838000000000047,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "da2ab0c50d1aeda6371dc7c494c79cf94c9bc0f3444f793b49faf41f4848bd5b",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7425747499801219,
+          "userCPUSeconds": 0.5455900000000007,
+          "systemCPUSeconds": 0.1418210000000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04953258321620524,
+          "userCPUSeconds": 0.008886000000000394,
+          "systemCPUSeconds": 0.005471999999999255,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.8630974579136819,
+          "userCPUSeconds": 0.6125450000000008,
+          "systemCPUSeconds": 0.23606899999999875,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.5938187919091433,
+          "userCPUSeconds": 0.4177040000000005,
+          "systemCPUSeconds": 0.1258739999999996,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05063866707496345,
+          "userCPUSeconds": 0.009153999999998774,
+          "systemCPUSeconds": 0.006005000000000038,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.6130570829845965,
+          "userCPUSeconds": 0.42112399999999894,
+          "systemCPUSeconds": 0.1812060000000013,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 1000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.7423879171255976,
+          "userCPUSeconds": 0.5446919999999977,
+          "systemCPUSeconds": 0.145467,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.04898270801641047,
+          "userCPUSeconds": 0.00894800000000373,
+          "systemCPUSeconds": 0.005743999999999971,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.7906154578085989,
+          "userCPUSeconds": 0.6092799999999983,
+          "systemCPUSeconds": 0.16497900000000065,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "39effc2e95790a53efc969946fdf6380e9b7fcb65d89cc3b83b68212c1769af1",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "candidate",
+        "sources": 1000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "37057c913e99304320eea2b394e646caf0c09020b4ff9cbfefaaebdea7181b13",
+        "firstIndex": {
+          "wallSeconds": 0.5910071248654276,
+          "userCPUSeconds": 0.4161179999999973,
+          "systemCPUSeconds": 0.126100000000001,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.0497748339548707,
+          "userCPUSeconds": 0.009342000000003736,
+          "systemCPUSeconds": 0.005932999999998856,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 0.5716781669761986,
+          "userCPUSeconds": 0.4366279999999989,
+          "systemCPUSeconds": 0.12259399999999943,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8e30c497b578fe2487d82456fc2f8e9997869c2ec8664a279b28e07583aefe22",
+        "automaticAnchorsSHA256": "f5fe98e7221a3cfd08c84939940b357a2a5212c271c2f3c5665842357da18ff6"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 13.079187458846718,
+          "userCPUSeconds": 8.133703999999994,
+          "systemCPUSeconds": 4.763952999999997,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05896704108454287,
+          "userCPUSeconds": 0.012247000000002117,
+          "systemCPUSeconds": 0.009067000000001713,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.285069250036031,
+          "userCPUSeconds": 7.543289999999999,
+          "systemCPUSeconds": 0.685217999999999,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "c46f8dd179920bb1b6db9316d055bf253aa2d1ab110f0fb3c0029020cc2e41b5",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 2.8597817078698426,
+          "userCPUSeconds": 2.068708000000015,
+          "systemCPUSeconds": 0.6537390000000016,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.054738250095397234,
+          "userCPUSeconds": 0.012033999999999878,
+          "systemCPUSeconds": 0.008214000000002386,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 2.8055502499919385,
+          "userCPUSeconds": 2.055126999999999,
+          "systemCPUSeconds": 0.7237329999999957,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "d7e1e51461b91b2dca6f607853b462db973bbe33d3b3c74b224c17ea3e751724",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 13.224957375088707,
+          "userCPUSeconds": 8.208191999999997,
+          "systemCPUSeconds": 4.800324000000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.056980791967362165,
+          "userCPUSeconds": 0.011985000000009904,
+          "systemCPUSeconds": 0.0078060000000022,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.499865625053644,
+          "userCPUSeconds": 7.601257000000004,
+          "systemCPUSeconds": 0.8441709999999887,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "eff60a56edc67090f10aac992a2dccb432e86109b9a68f2d78438774193ca5d3",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 2.899930667132139,
+          "userCPUSeconds": 2.094897000000003,
+          "systemCPUSeconds": 0.6820409999999981,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.05559629201889038,
+          "userCPUSeconds": 0.012384999999994761,
+          "systemCPUSeconds": 0.008442000000002281,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 2.798497499898076,
+          "userCPUSeconds": 2.119296999999989,
+          "systemCPUSeconds": 0.6484560000000101,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "7847e897333acfe74c1ecf6cd3f43afe1a114088043718afbb4aa85262ae2d4a",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 5000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 12.837796125095338,
+          "userCPUSeconds": 8.15593899999999,
+          "systemCPUSeconds": 4.475976000000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.06421175017021596,
+          "userCPUSeconds": 0.012939000000017131,
+          "systemCPUSeconds": 0.009649999999993497,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 8.949569415999576,
+          "userCPUSeconds": 8.151433999999995,
+          "systemCPUSeconds": 0.7063169999999985,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "6a32630cf9e7c0df55bf47a198856ec06a70fe784a4628505deeb45b4c1cb7ac",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "candidate",
+        "sources": 5000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "93061bd8b0ef9e3d6980fc95088009d651e3ac9e6ca49ce9e5de69944d3cb804",
+        "firstIndex": {
+          "wallSeconds": 3.8388367500156164,
+          "userCPUSeconds": 2.6923360000000116,
+          "systemCPUSeconds": 0.9231430000000103,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.062100875191390514,
+          "userCPUSeconds": 0.014478999999994357,
+          "systemCPUSeconds": 0.010750999999999067,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 3.3353794580325484,
+          "userCPUSeconds": 2.3920970000000352,
+          "systemCPUSeconds": 0.8763220000000018,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "224d011bb1829646743494b02b59b12a5a55190da942661a9132d93b5dcca531",
+        "automaticAnchorsSHA256": "14c1088aebfa44ee36ba7e404d1ddf2893fffb019045fcc01db64ed539b81683"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 0,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 245.05536675010808,
+          "userCPUSeconds": 138.04271600000004,
+          "systemCPUSeconds": 99.15997900000002,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.08179962495341897,
+          "userCPUSeconds": 0.024831999999946675,
+          "systemCPUSeconds": 0.015577000000007502,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 229.1574860420078,
+          "userCPUSeconds": 171.35304700000006,
+          "systemCPUSeconds": 53.931938,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "5837aae603e33749389b2e79e364e49093bde673b47fc931e45f8d656040b9e9",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 0,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 14.417069917079061,
+          "userCPUSeconds": 10.40903400000002,
+          "systemCPUSeconds": 2.8591599999999744,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.13993020891211927,
+          "userCPUSeconds": 0.02707599999996546,
+          "systemCPUSeconds": 0.024228999999991174,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 11.372056332882494,
+          "userCPUSeconds": 9.146383000000014,
+          "systemCPUSeconds": 2.0153459999999654,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "20fe4478a6e32418297f1d9e9e67dd9310ba5e2f19b23dc513cea3e40b594df4",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 1,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 242.34995679208077,
+          "userCPUSeconds": 132.71623799999998,
+          "systemCPUSeconds": 104.43937499999998,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.10155824990943074,
+          "userCPUSeconds": 0.027444000000059532,
+          "systemCPUSeconds": 0.02069899999997915,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 267.53166750003584,
+          "userCPUSeconds": 201.866577,
+          "systemCPUSeconds": 61.094674,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "ee2a29476537371eee3d6a108885bbd8ff2495269f9e662ad61c84354ea6f279",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 1,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 14.75583679205738,
+          "userCPUSeconds": 10.737907999999834,
+          "systemCPUSeconds": 3.4912009999999327,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.08947070804424584,
+          "userCPUSeconds": 0.027989000000161468,
+          "systemCPUSeconds": 0.01875900000004549,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 13.82483824994415,
+          "userCPUSeconds": 10.169983000000002,
+          "systemCPUSeconds": 3.4542849999999135,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "a6d4dd7bac250f18c1ce4ef241d95608988817da8ed2a378a4c950a5de7d7a19",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "baseline",
+        "sources": 20000,
+        "repetition": 2,
+        "binarySHA256": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 260.46079974994063,
+          "userCPUSeconds": 144.10021299999994,
+          "systemCPUSeconds": 110.09648500000003,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.09489812492392957,
+          "userCPUSeconds": 0.02947200000016892,
+          "systemCPUSeconds": 0.0191939999999704,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 278.2893448341638,
+          "userCPUSeconds": 206.24003700000003,
+          "systemCPUSeconds": 66.54258499999992,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "641086487073493db29a17ccc757ea5bd62c839d2af887bc7084e63b8ef711a7",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      },
+      {
+        "label": "candidate",
+        "sources": 20000,
+        "repetition": 2,
+        "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+        "syntheticInputSHA256": "4ec895e8cf66b9947978d163279bf4f8810e49ff7ef176f3cb8bd39510e08eac",
+        "firstIndex": {
+          "wallSeconds": 15.028557291952893,
+          "userCPUSeconds": 10.931310999999823,
+          "systemCPUSeconds": 3.4657600000000457,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "indexStderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "resume": {
+          "wallSeconds": 0.09163366607390344,
+          "userCPUSeconds": 0.029007999999976164,
+          "systemCPUSeconds": 0.01832200000001194,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restore": {
+          "wallSeconds": 14.202400875044987,
+          "userCPUSeconds": 10.19540199999983,
+          "systemCPUSeconds": 3.7554669999999533,
+          "exitCode": 0,
+          "timedOut": false
+        },
+        "restoreStderrSHA256": "8f702e8dd8fe83b61f2061aea9fb0861c4c5e0424958a5c904d7a2a7a6bd92b2",
+        "automaticAnchorsSHA256": "340d3836c1d950d223c421145ddf3b77fdbcddbeeb6b594d3074ddcdf4d12669"
+      }
+    ],
+    "scope": "Owned repeated short text with exact authored project membership/span oracle; fresh CLI calls include startup, SQLite and native NLP for indexing, plus separate quiet restore and no-op resume. Sequential baseline then candidate trials, caches and host activity uncontrolled. CPU is child user/system delta; shared daemons and system energy excluded. Timeouts are retained censored baseline observations, not successful completions. No natural NLP accuracy, capture, physical power or competitor ranking."
+  },
+  "scalingMedians": [
+    {
+      "sources": 1000,
+      "label": "baseline",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.7425747499801219,
+        "medianChildUserCPUSeconds": 0.5455900000000007,
+        "medianChildSystemCPUSeconds": 0.1418210000000002
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.04953258321620524,
+        "medianChildUserCPUSeconds": 0.00894800000000373,
+        "medianChildSystemCPUSeconds": 0.005743999999999971
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.8399502080865204,
+        "medianChildUserCPUSeconds": 0.6125450000000008,
+        "medianChildSystemCPUSeconds": 0.2094509999999996
+      }
+    },
+    {
+      "sources": 1000,
+      "label": "candidate",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.5938187919091433,
+        "medianChildUserCPUSeconds": 0.4177040000000005,
+        "medianChildSystemCPUSeconds": 0.126100000000001
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.0497748339548707,
+        "medianChildUserCPUSeconds": 0.009153999999998774,
+        "medianChildSystemCPUSeconds": 0.005932999999998856
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.6130570829845965,
+        "medianChildUserCPUSeconds": 0.42526499999999956,
+        "medianChildSystemCPUSeconds": 0.1812060000000013
+      }
+    },
+    {
+      "sources": 5000,
+      "label": "baseline",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 13.079187458846718,
+        "medianChildUserCPUSeconds": 8.15593899999999,
+        "medianChildSystemCPUSeconds": 4.763952999999997
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.05896704108454287,
+        "medianChildUserCPUSeconds": 0.012247000000002117,
+        "medianChildSystemCPUSeconds": 0.009067000000001713
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 8.499865625053644,
+        "medianChildUserCPUSeconds": 7.601257000000004,
+        "medianChildSystemCPUSeconds": 0.7063169999999985
+      }
+    },
+    {
+      "sources": 5000,
+      "label": "candidate",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 2.899930667132139,
+        "medianChildUserCPUSeconds": 2.094897000000003,
+        "medianChildSystemCPUSeconds": 0.6820409999999981
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.05559629201889038,
+        "medianChildUserCPUSeconds": 0.012384999999994761,
+        "medianChildSystemCPUSeconds": 0.008442000000002281
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 2.8055502499919385,
+        "medianChildUserCPUSeconds": 2.119296999999989,
+        "medianChildSystemCPUSeconds": 0.7237329999999957
+      }
+    },
+    {
+      "sources": 20000,
+      "label": "baseline",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 245.05536675010808,
+        "medianChildUserCPUSeconds": 138.04271600000004,
+        "medianChildSystemCPUSeconds": 104.43937499999998
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.09489812492392957,
+        "medianChildUserCPUSeconds": 0.027444000000059532,
+        "medianChildSystemCPUSeconds": 0.0191939999999704
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 267.53166750003584,
+        "medianChildUserCPUSeconds": 201.866577,
+        "medianChildSystemCPUSeconds": 61.094674
+      }
+    },
+    {
+      "sources": 20000,
+      "label": "candidate",
+      "firstIndex": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 14.75583679205738,
+        "medianChildUserCPUSeconds": 10.737907999999834,
+        "medianChildSystemCPUSeconds": 3.4657600000000457
+      },
+      "resume": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 0.09163366607390344,
+        "medianChildUserCPUSeconds": 0.027989000000161468,
+        "medianChildSystemCPUSeconds": 0.01875900000004549
+      },
+      "restore": {
+        "completed": 3,
+        "timeouts": 0,
+        "medianWallSeconds": 13.82483824994415,
+        "medianChildUserCPUSeconds": 10.169983000000002,
+        "medianChildSystemCPUSeconds": 3.4542849999999135
+      }
+    }
+  ],
+  "comparisonBaselines": {
+    "scaling": "ea909023a3ab045c03917170a2ffdd046ba01462",
+    "scalingCLI": "0488b2585cafd4eee413222fe161811cd5dd3fe4ae065a4e523bf0a2787ce3b0",
+    "notesEditRegression": "Pre-notes optimization c77 CLI from the earlier search-navigation package; different from the scaling baseline"
+  },
+  "nativeUI": {
+    "result": "pass",
+    "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+    "guiSHA256": "108cec25fff755a2c132f2ff7f209c86ff480aafad3440d311ad2cec4e87d5de",
+    "library": "Fresh quiet schema22 restore of exactly six text-verified synthetic notes, created from a checkpointed21 copy; earlier sample not changed",
+    "input": "CUA native AX actions with observed state after each action",
+    "checks": [
+      {
+        "action": "Quiet restore opened",
+        "indexed": 0,
+        "eligible": 6,
+        "projectSources": 2
+      },
+      {
+        "action": "Initial explicit Build / resume",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2
+      },
+      {
+        "action": "Remove automatic Quick note link",
+        "projectSources": 1,
+        "remainingManualSource": "OSwind design review"
+      },
+      {
+        "action": "Rename Release Review to Release Handoff preserving release-check alias",
+        "indexed": 0,
+        "eligible": 6,
+        "projectSources": 1
+      },
+      {
+        "action": "Build / resume after rename",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 1,
+        "rejectedAutomaticSourceAbsent": true
+      },
+      {
+        "action": "Link source picker explicitly chooses Release Handoff",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2,
+        "quickNoteLinkedByUser": true
+      },
+      {
+        "action": "Add unused schema22-ui-unused alias",
+        "indexed": 0,
+        "eligible": 6,
+        "projectSources": 2,
+        "bothManualSourcesRetained": true
+      },
+      {
+        "action": "Build / resume after override and rule change",
+        "indexed": 6,
+        "eligible": 6,
+        "projectSources": 2,
+        "quickNoteTextMention": "release-check",
+        "designSourceStillManual": true
+      },
+      {
+        "action": "Search sources",
+        "results": 2,
+        "visibleProjectScope": true
+      },
+      {
+        "action": "People & projects then Command-K",
+        "results": 6,
+        "visibleProjectScope": false,
+        "searchFieldFocused": true
+      }
+    ],
+    "postQuitReadOnlyVerification": {
+      "progress": {
+        "eligible": 6,
+        "indexed": 6,
+        "limited": 0
+      },
+      "projectName": "Release Handoff",
+      "sourceCount": 2,
+      "projectExclusions": 0,
+      "automaticQuickNotePresent": true,
+      "earlierSampleDatabaseUnchanged": true
+    },
+    "cleanup": "Owned staged GUI quit through Command-Q; exact executable absent from process inventory",
+    "permissionChanges": false,
+    "captureStarted": false,
+    "limitations": [
+      "One synthetic sample; no full accessibility/global shortcut or Documents-root startup acceptance",
+      "Build status retains previous Updated count after rules change while progress/memberships correctly invalidate; singular wording1 recorded sources remains",
+      "No GUI/controller/microphone-to-ASR, uninterrupted capture/power or competitor acceptance"
+    ]
+  },
+  "liveCapture": {
+    "observations": {
+      "result": "PASS",
+      "normal_capture": "Saved OSwind Synthetic Fixture \u00b7 1832 ms",
+      "secret_capture": "Saved OSwind Synthetic Fixture \u00b7 771 ms",
+      "ocr_regions": 5,
+      "verified": [
+        "target identity",
+        "live OCR marker",
+        "image saved",
+        "secret text redacted",
+        "secret image absent",
+        "app exclusion",
+        "window-title exclusion",
+        "delete removes image and FTS entry"
+      ]
+    },
+    "logSHA256": "6914b867c67ed959777493dd74b16382a14d98c8e0cfd25aacfc37cf6ac80f9b",
+    "scope": "Two targeted owned synthetic windows: OCR, normal image, secret suppression, exclusions and image/FTS erasure. One-shot statuses, not sustained latency or complete GUI/controller/microphone acceptance."
+  },
+  "cachedModelChecks": {
+    "inputs": {
+      "codeCommit": "f7e52a618c1c55b396a2166d13af715312cef945",
+      "cacheVerification": {
+        "parakeet": {
+          "bytes": 483106120,
+          "files": 22,
+          "kind": "parakeet",
+          "revision": "7dd20fe6b1797d35f5e3307e8b1732d9a178edfe",
+          "reused": true
+        },
+        "speakers": {
+          "bytes": 21816863,
+          "files": 28,
+          "kind": "speakers",
+          "revision": "df2625ac79a7ac6b65ad868fee6d80f320da4232",
+          "reused": true
+        }
+      },
+      "ASRFixtureSHA256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e",
+      "speakerFixtureSHA256": "9edaeed2566521d67262f1f35118403afe925324818c102ac2ece71283a33419",
+      "speakerFixtureScope": "Existing 32.225-second synthetic alternating stock af_heart/am_echo segments; not natural meeting accuracy",
+      "ASRFixtureScope": "Existing public JFK country speech fixture; repeated text/segments equality is a contract check, not an ASR quality corpus",
+      "downloads": false,
+      "normalLibraryOpened": false
+    },
+    "passedCases": [
+      "-[OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured]",
+      "-[OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle]",
+      "-[OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+      "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]"
+    ],
+    "MPSGraphCacheLoadDiagnostics": 0,
+    "scope": "Pinned cache verification, isolated setup and local server lifecycle, public JFK repeated ASR, synthetic stock-voice attribution, actual default idle expiry/reload and after-use release. Not refreshed natural-corpus accuracy, measured hardware placement, RSS or energy. Cache diagnostics are retained despite output contracts passing."
+  },
+  "physicalAudio": [
+    {
+      "format": "OSwind owned native system-audio observations v1",
+      "observations": [
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310985208911498,
+          "intendedFrequencyHz": 440,
+          "intendedToOtherAmplitudeRatio": 1656459.255938962,
+          "otherOwnedSourceAmplitude": 6.828411364999062e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "A",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        },
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310413738278107,
+          "intendedFrequencyHz": 997,
+          "intendedToOtherAmplitudeRatio": 1575357.9629447097,
+          "otherOwnedSourceAmplitude": 7.179583310155311e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "B",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        }
+      ],
+      "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+      "threadSanitizer": false,
+      "sourceCommit": "bc13749ffadcbc565078e0a857334ddc8a6ccad5",
+      "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+      "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "gpu": "Apple M5 Max",
+      "testLogSHA256": "021d41b43368f8624cead735148078077c37e508a6c31b9677e85bfa03575da4",
+      "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+      "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+      "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+      "permissionChanges": false,
+      "rawCapturedAudioPersisted": false,
+      "systemVolumeChanged": false
+    },
+    {
+      "format": "OSwind owned native system-audio observations v1",
+      "observations": [
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310984907436941,
+          "intendedFrequencyHz": 440,
+          "intendedToOtherAmplitudeRatio": 1712287.2928424904,
+          "otherOwnedSourceAmplitude": 6.605775184291702e-09,
+          "passed": true,
+          "samples": 48960,
+          "source": "A",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 153,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        },
+        {
+          "adapterFailure": null,
+          "intendedAmplitude": 0.011310413937287989,
+          "intendedFrequencyHz": 997,
+          "intendedToOtherAmplitudeRatio": 2227213.578410034,
+          "otherOwnedSourceAmplitude": 5.0782798950796095e-09,
+          "passed": true,
+          "samples": 48640,
+          "source": "B",
+          "sourceIdentityVerified": true,
+          "sourcePresentInOnscreenOnlyInventory": false,
+          "stream": {
+            "callbacks": 152,
+            "formats": [
+              "16000.0 Hz / 1 ch / 32 bit / flags 41 / bytes 4"
+            ],
+            "interrupted": false,
+            "invalidFormats": 0,
+            "maximumCallbackSamples": 320
+          }
+        }
+      ],
+      "scope": "Two generated tone apps launched through LaunchServices; requested include-only source filter and production inventory/PCM decoder/sink. Known-other-tone isolation only; no general user-audio exclusion, microphone, recognition, controller privacy, device recovery, energy or competitor claim.",
+      "threadSanitizer": true,
+      "sourceCommit": "bc13749ffadcbc565078e0a857334ddc8a6ccad5",
+      "productionIngressSHA256": "e17b8c9ae59fb1cef1b802db04dcf560f5bdea04d47582e6e83ec8a1e1d665be",
+      "harnessSHA256": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+      "os": "Version 26.6.2 (Build 25G83)",
+      "gpu": "Apple M5 Max",
+      "testLogSHA256": "e887e959754c10c86cc4e7c3f623370d3aaa915d0f5d58b96fee6d3c06c734a2",
+      "testSourceSHA256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba",
+      "fixtureSourceSHA256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a",
+      "fixtureLaunch": "LaunchServices open -n; actual PID and bundle bound from private atomic readiness file",
+      "permissionChanges": false,
+      "rawCapturedAudioPersisted": false,
+      "systemVolumeChanged": false
+    }
+  ],
+  "retainedFailures": [
+    {
+      "scope": "Old schema21 seven-case correction regression",
+      "failedCases": 6,
+      "passedCases": 1,
+      "logSHA256": "27b37c77b0c5e7ba880ebdb46ac10278e9a315e433f1c4a5cc73e2c85ef97bd5"
+    },
+    {
+      "scope": "Prototype stable-ID table not protected by source orphan pruning",
+      "failedCases": 2,
+      "failedAssertions": 4,
+      "logSHA256": "a75dc5f52251e47cf53ced52b799b1eb3064756007c77f58a156d3b5a9edd5d3"
+    },
+    {
+      "scope": "CI headbc13749 with unchanged Swift product",
+      "run": 40145400351,
+      "job": 121025527900,
+      "failure": "Final archive-statistics workflow expected21 while CLI correctly emitted22. Workflow target corrected; exact count/schema/mode checks pass locally on signed runtime. Fresh CI pending.",
+      "logSHA256": "9c528a5134377aee6b5fac14825f87bb1939f1b369e9d95d504a310a5349cb37"
+    },
+    {
+      "scope": "CI rerun with unchanged product runtime",
+      "run": 40143101400,
+      "job": 121021875303,
+      "failure": "Tag harness expected21 after compiled schema advanced to22. Current tag, interruption and capture-region targets corrected; actual older input expectations retained.",
+      "logSHA256": "41648c304d96d51a6cd99beca306294bd46544db685bbe0c86c7c48b2952eaa1"
+    }
+  ],
+  "resolvedHistoricalCounterexample": {
+    "priorEvidence": "benchmarks/entity-metadata-v1.json",
+    "contract": "Reject automatic project/source pair, rename same project preserving alias, rescan",
+    "oldWrongAutomaticLinks": 1,
+    "migratedAutomaticLinks": 0,
+    "sourcePayloadsUnchanged": true,
+    "completedSourcesRetained": 1
+  },
+  "harnesses": {
+    "project-corrections-smoke.py": "70ce507e78a34f97db5718c93d74c2d2f70ea24165e3a1e81ad810a217416c2f",
+    "benchmark-project-index.py": "c0243b9ea086495357362b150ab1bfee3e845e4731ab76fedd54bf3898576a06",
+    "entity-metadata-smoke.py": "484bf3d2b399696b071e9d30946aa770c536814619c979bd7374d923b54a5c8f",
+    "entity-memory-smoke.py": "2eff466eef98c022704c612f2d20ef69402e6084c13044d0477f88ff152185d8",
+    "entity-vault-smoke.py": "2b7a3c184fd77ae256b4f0571b06456b1441118516a8328efbf95b249912ac33",
+    "native-system-audio-smoke.py": "e40d18228bd20a0b5d6b71166fa16419d28c6107c34fd2bea96df616558572f7",
+    "live-capture-smoke.py": "3c2ee55d0e912c6cc9b11de6990cb669a019a177f1fd8c67a4c5f6f8d1451de1",
+    "integration-smoke.py": "784ba6897ae693d9c77c517b9cff168ca34b739d65d9fcacd9003049ac1f5df2"
+  },
+  "cleanup": {
+    "ownedSampleGUIExited": true,
+    "noOwnedAudioFixtureExecutablesPresent": true,
+    "noOwnedImagesInIndependentInventory": true,
+    "installed17Unchanged": true,
+    "installed17FreshlyRechecked": true
+  },
+  "knownUnresolvedCounterexamples": [
+    {
+      "scope": "Independent CI SIGINT unlock",
+      "run": 40143101400,
+      "job": 121018758894,
+      "observed": "Owned encrypted image remained attached after cancelled unlock exit130; ordinary native vault and unit checks passed. Rerun tracked separately. Cancellation cleanup requires further investigation.",
+      "logSHA256": "34d2ab2245a454c6fae5a3be94731b65572aeadd20487193c12309a62a515d55",
+      "rerun": "Same source rerun passed SIGINT unlock and new correction/metadata steps, then failed the obsolete tag target. That pass does not erase the original attach observation."
+    }
+  ],
+  "allKnownContractsPass": false,
+  "limitations": [
+    "All defined cases exercised does not establish broad feature parity or top-three placement. Independent NLP accuracy, curated speaker identity, entity JSON/Markdown export and force re-extraction remain open.",
+    "New schema22 opens refuse older clients. Quit older clients before upgrading: already-open/raw older writers remain unsupported. SQL guards do not prove all old write paths safe.",
+    "Legacy unmatched feedback is preserved conservatively; only owned current aliases can bind it. No guessing historical identity.",
+    "Repeated short authored project text, fixed source identifiers and sequential baseline/candidate order. Caches and host activity uncontrolled; CPU excludes shared daemons. No representative natural NLP, energy or competitor result.",
+    "Global rule changes still invalidate extraction. Million-source extraction/query/aggregation, first-install/import costs and realistic backlog latency remain open.",
+    "Native status wording retains the previous Updated count after rules change. Full keyboard/VoiceOver, Documents-root startup and older supported Macs remain open.",
+    "Full GUI/controller/microphone-to-ASR, current uninterrupted24h capture/power and fault gates remain open. Older component soak retains gaps.",
+    "Ad-hoc signed and staged, not installed or notarized. Physical audio covers two generated tones per run, not arbitrary application/privacy/device recovery."
+  ],
+  "energyCapabilityProbe": {
+    "noninteractiveSoCSamplingAvailable": false,
+    "observedRefusal": "sudo requires a password",
+    "settingsChanged": false,
+    "energyOrBatteryDrainClaimed": false
+  },
+  "statisticsChecks": {
+    "schema": 22,
+    "sources": 1000,
+    "passed": true,
+    "reportSHA256": "55209b607ca44e122f46bb66690707680c80646a88402c5f52a382c75e6011f7",
+    "vectorFixtureReportSHA256": "2d7d3318808f34f350ee5a86608d2ed91665588c7d85fff78fb782214ef29b96",
+    "scope": "Exact corrected CI count/schema/mode assertions on signed1000-source vector fixture; no cold-cache or broader performance conclusion"
+  },
+  "portabilityProcesses": {
+    "tag-repair-process-v1": {
+      "format": "OSwind transactionally indexed tags v2",
+      "scope": "Owned synthetic source/tag mutations, schema20 upgrade and refusal, exact search and quiet portability. No capture, normal history or credentials.",
+      "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+      "olderBinarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+      "actualOlderSchema20Client": false,
+      "harnessSHA256": "1731663b205284d310164b2d85c37e97842fd9c4eddb044250409d86837f1bc8",
+      "schema": 22,
+      "passed": true,
+      "checks": [
+        "missing derived tag projection repairs without changing source payloads",
+        "duplicate tags count once; case stays exact",
+        "current writes maintain projection; older client not supplied",
+        "current indexed searches agree with explicit source/tag membership",
+        "source metadata and tag rows match independent SQL JSON oracle",
+        "quiet backup restore rebuilds counts",
+        "JSON round trip rebuilds counts"
+      ]
+    },
+    "tag-legacy-process-v1": {
+      "format": "OSwind transactionally indexed tags v2",
+      "scope": "Owned synthetic source/tag mutations, schema20 upgrade and refusal, exact search and quiet portability. No capture, normal history or credentials.",
+      "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+      "olderBinarySHA256": "593e68ee44c579f7a5d052e54a45ce23d942a3d60f19bc18804dfa934d54d028",
+      "actualOlderSchema20Client": true,
+      "harnessSHA256": "1731663b205284d310164b2d85c37e97842fd9c4eddb044250409d86837f1bc8",
+      "schema": 22,
+      "passed": true,
+      "checks": [
+        "schema20 to22 upgrade preserves exact source payloads",
+        "duplicate tags count once; case stays exact",
+        "schema20 client refuses schema22; current writes maintain projection",
+        "current indexed searches agree with explicit source/tag membership",
+        "source metadata and tag rows match independent SQL JSON oracle",
+        "quiet backup restore rebuilds counts",
+        "JSON round trip rebuilds counts"
+      ]
+    },
+    "capture-region-legacy-v1": {
+      "format": "OSwind capture-region compatibility v1",
+      "scope": "Owned synthetic source/settings, library compatibility refusal and quiet backup/restore. No pixels, normal library, credentials or native input.",
+      "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+      "checks": [
+        "schema19 upgrades to22 with exact source identity/text and unchanged settings bytes",
+        "actual signed schema19 CLI refuses read/write with unchanged logical schema, sources and region settings",
+        "quiet backup restore preserves exact selected identities and both crop scopes without starting capture or API"
+      ],
+      "olderBinarySHA256": "e18ddd637a69b7e2632d5d9880b60c46d5b97aba4ffac5d9206b09f2b800a817",
+      "actualOlderSchema19Creator": true,
+      "state": "completed",
+      "sourceSchema": 19,
+      "targetSchema": 22,
+      "physicalCaptureClaimed": false
+    },
+    "tag-interruption-process-v1": {
+      "format": "OSwind tag installation kill retry v1",
+      "binarySHA256": "43ae9e48040d239f9f835452223577f13fcd576f996b1985609c2445002acab5",
+      "harnessSHA256": "c2e4ad276e8d35e8d0bf26ca7a8af1926268e1a27309b9d4c2aa19297175df78",
+      "scope": "Marked owned APFS archive clone; actual SIGKILL after uncommitted WAL growth, SQLite recovery and successful first-open retry. Pre/post payload hashes warm caches; no UI, capture, power or competitor claim.",
+      "fixture": {
+        "distribution": "month",
+        "format": "OSwind owned activity benchmark fixture v1",
+        "normalHistory": false,
+        "seed": 1729,
+        "sources": 100000,
+        "textBytes": 1024
+      },
+      "observedMigrationWALBytes": 7860992,
+      "processExitCode": -9,
+      "uncommittedProjectionAbsentAfterRecovery": true,
+      "sourcePayloadsPreserved": true,
+      "logicalSourceSHA256": "e8b2027fc011bdd76e631f4b210c77abdef02a77f77e1c3bf191c8f4abb2a45f",
+      "fullProjectionSQLJSONOraclePass": true,
+      "retryWallSeconds": 0.6505441660992801,
+      "passed": true
+    }
+  }
+}

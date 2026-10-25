@@ -2,9 +2,23 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Bounded project indexing and restore
+
+[Paired signed evidence](project-index-scaling-v1.json) compares frozen schema21 `ea90902` and schema22 `f7e52a6` on one M5 Max/macOS26.6.2 host. All **18 trials** complete: three ordered baseline/candidate pairs at each of three sizes. Exact authored project membership, UTF-16 anchors and source revisions agree across builds and after restore; restored completion resets and automatic indexing stays off.
+
+| Sources | Median first index, before → after | Median quiet restore, before → after |
+| ---: | ---: | ---: |
+| 1,000 | 0.743 → 0.594 s | 0.840 → 0.613 s |
+| 5,000 | 13.079 → 2.900 s | 8.500 → 2.806 s |
+| 20,000 | 245.055 → 14.756 s | 267.532 → 13.825 s |
+
+![Paired synthetic project indexing and restore](../assets/project-index-scaling-v1.svg)
+
+Wall times include process startup, SQLite and native NLP for indexing. Import, initial project creation, backup creation and validation are excluded; restore is timed separately. Raw per-trial child user/system CPU deltas, ranges and no-op resume are retained. Resume at 20,000 sources has median 0.095/0.092s, not the same large improvement. Caches/host activity are uncontrolled; text is short and repeated. No natural NLP quality, million-source scale, full capture, physical energy or competitor ranking is inferred. The separate [schema22 qualification](project-corrections-v1.json) exercises all 810 defined cases, 399 distinct TSan cases and 22 final operations, including native correction/rename/rebuild/manual override and scoped search. A retained CI SIGINT unlock failure remains unresolved; new schema expectations are corrected and fresh CI is pending. Passing defined cases does not establish every known contract, full product parity or top-three placement.
+
 ## Project metadata without unnecessary extraction
 
-**Known unresolved counterexample:** outside the 791 defined tests, rejecting an automatic project link then renaming the same project and rescanning restores that link. Both old/new signed CLIs reproduce expected zero versus observed one. This passing metadata qualification does not establish that every known contract passes; stable-ID correction handling is the next fix.
+**Counterexample unresolved in this schema21 runtime:** outside the 791 defined tests, rejecting an automatic project link then renaming the same project and rescanning restores that link. Both old/new signed CLIs reproduce expected zero versus observed one. This passing metadata qualification does not establish that every known contract passes; the later schema22 implementation above repairs it with stable-ID exclusions. Historical schema21 evidence remains unchanged.
 
 [Metadata-preservation evidence](entity-metadata-v1.json) binds runtime ea90902/schema21 and a separately staged signed package to **791 defined cases all exercised**: 760 normal passes/31 opt-in skips, 313 native/model/Metal passes adding 25, five real cached-model/runtime checks and one physical-audio case. All 42 focused plus one distinct physical TSan cases pass; all fourteen final qualification operations pass. This is one-host test coverage, not feature completeness, energy or a ranking. Package, normalized executable payloads and complete ZIP agree; installed schema17 is unchanged.
 
