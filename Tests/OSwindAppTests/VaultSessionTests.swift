@@ -89,15 +89,27 @@ import AppKit
     }
     func testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore() async throws {
         try native();let package=root.appendingPathComponent("External.oswindvault"),secret=UUID().uuidString
-        _=try await LibraryVault.create(at:package,name:"External lock fixture",capacityGiB:1,passphrase:Data(secret.utf8))
-        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
-        session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model)
-        do {_=try await LibraryVault(package:package).lock()} catch {}
-        let deadline=SuspendingClock.now.advanced(by:.seconds(10))
-        while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
-        try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed)
-        session.requestLock();try await finish(session);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
+        var stage="create closed fixture"
+        do {
+            _=try await LibraryVault.create(at:package,name:"External lock fixture",capacityGiB:1,passphrase:Data(secret.utf8))
+            stage="initial session status"
+            let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+            stage="unlock and prepare model"
+            session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model)
+            stage="external lock"
+            do {_=try await LibraryVault(package:package).lock()} catch {}
+            stage="observe model clearance"
+            let deadline=SuspendingClock.now.advanced(by:.seconds(10))
+            while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+            try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed)
+            stage="final managed lock"
+            session.requestLock();try await finish(session);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertNil(session.failure)
+        } catch {
+            // Known fixture phase only; no source, package path or passphrase.
+            print("Owned external-lock fixture failed during: "+stage);throw error
+        }
     }
+
     func testNativeSessionLockAtStartupDetachesWithoutOpeningHistory() async throws {
         try native();let package=root.appendingPathComponent("Startup.oswindvault"),secret=Data(UUID().uuidString.utf8)
         _=try await LibraryVault.create(at:package,name:"Startup fixture",capacityGiB:1,passphrase:secret,keepUnlocked:true)

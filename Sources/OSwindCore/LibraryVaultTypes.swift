@@ -112,10 +112,14 @@ struct VaultPaths:Sendable {
 final class VaultOperationLease {
     private let file:Int32
     init(paths:VaultPaths) throws {
-        let tree=try paths.tree();file=tree.withRootDirectory {openat($0,".operation.lock",O_RDWR|O_CREAT|O_CLOEXEC|O_NOFOLLOW,0o600)}
-        guard file>=0 else {throw OSwindError.unavailable("Cannot reserve the encrypted library")}
-        var s=stat();guard fstat(file,&s)==0,s.st_mode & S_IFMT==S_IFREG,s.st_uid==getuid(),s.st_nlink==1,s.st_mode & 0o077==0 else {close(file);throw OSwindError.invalid("Unsafe encrypted-library operation lock")}
-        guard flock(file,LOCK_EX|LOCK_NB)==0 else {close(file);throw OSwindError.unavailable("Another encrypted-library operation is running. Wait for it to finish.")}
+        let tree=try paths.tree(),opened=tree.withRootDirectory {openat($0,".operation.lock",O_RDWR|O_CREAT|O_CLOEXEC|O_NOFOLLOW,0o600)}
+        guard opened>=0 else {throw OSwindError.unavailable("Cannot reserve the encrypted library")}
+        var s=stat();guard fstat(opened,&s)==0,s.st_mode & S_IFMT==S_IFREG,s.st_uid==getuid(),s.st_nlink==1,s.st_mode & 0o077==0 else {close(opened);throw OSwindError.invalid("Unsafe encrypted-library operation lock")}
+        guard flock(opened,LOCK_EX|LOCK_NB)==0 else {close(opened);throw OSwindError.unavailable("Another encrypted-library operation is running. Wait for it to finish.")}
+        // Publish ownership only after every throwing check. A fully initialized
+        // instance also runs deinit when init throws; an earlier assignment plus
+        // manual close can release an unrelated descriptor reused by a thread.
+        file=opened
     }
     deinit {flock(file,LOCK_UN);close(file)}
 }
