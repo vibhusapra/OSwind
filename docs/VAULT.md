@@ -2,6 +2,21 @@
 
 Schema 18 adds a native encrypted-library package, separate from the ordinary library. The source includes setup, verified copy, passphrase/optional Keychain unlock, an explicit locked screen, menu/Settings lock controls and sleep/session-lock requests. The installed schema-17 app has not yet been replaced with this work. The separately staged ad-hoc signed package passes headless release qualification: 522 total tests (516 pass / six skips), 79 focused TSan passes and all 15 signed-release process groups. Native authentication and click/focus/device acceptance remain open. [Sanitized evidence](../benchmarks/encrypted-library-v1.json).
 
+## Cooperative cancellation
+
+The current candidate in [PR #54](https://github.com/vibhusapra/OSwind/pull/54) waits for an owned mutating create/attach/detach action to finish before acknowledging cancellation. DiskImages can delegate work beyond the hdiutil process; killing that front-end early did not prove the image was detached. Unlock cancellation then performs the existing identity-checked cleanup. After locking closes the public handle, normal detach and fresh absence confirmation finish before cancellation returns. Existing helper deadlines apply, and read helpers remain cancellable. The UI can remain in its stopping state while native work completes.
+
+The preceding staged runtime has a reproduced cancellation defect even though its final CI is green. [Current signed qualification](../benchmarks/vault-cancellation-v1.json) exercises all 818 defined cases and 407 distinct TSan cases, five repeated actual CLI SIGINT trials and terminal-generated Ctrl-C during create/unlock/lock. Immediate recovery preserves an authored source; independent OS inventory confirms detachment. Native Stop during a bounded owned-helper hold and intervening OS lock are followed by an observed detached screen, and immediate native unlock shows only the original note with recording paused. OS lock interrupts the final Settings Lock observation; final product/OS state is verified independently. No real Keychain authentication is accepted by this fixture.
+
+Do not equate cooperative cancellation with a second Ctrl-C, Force Quit, SIGKILL, power loss or an OS-native hang. Those boundaries require separate fault/recovery evidence. No force-detach fallback or weaker identity check is added. Busy unlock still displays its last status sentence beside Working safely; wording polish remains open.
+
+The repeatable terminal fixture creates a new private controlling PTY, sends its actual VINTR character to the foreground CLI group and keeps the random passphrase on a separate closed pipe. It never uses the user's terminal. Foundation launches the observed hdiutil helpers in different process groups on this host, so this is not evidence that a signal delivered directly to a native helper is harmless. Raw synthetic output and encrypted packages remain under the explicitly new fixture root.
+
+```bash
+python3 scripts/vault-terminal-smoke.py /absolute/path/oswindctl \
+  --root /new/owned/vault-terminal-check
+```
+
 ## Storage and locking
 
 Read-only status also checks that a detached completed image is still encrypted; a missing or unencrypted replacement is unavailable. Each `.oswindvault` package contains an AES-256 encrypted APFS sparse disk image, a small non-secret manifest, an operation lease and managed session metadata. The image grows up to its selected maximum; available physical disk space still limits writes. The manifest exposes the library name, capacity, UUIDs, creation time and whether a Keychain credential was saved. It contains no history or passphrase.
@@ -32,7 +47,7 @@ Remembering is optional and is attempted only after a successful passphrase-base
 
 [Apple documents the app identifier and access-group requirements](https://developer.apple.com/documentation/security/sharing-access-to-keychain-items-among-a-collection-of-apps). The separate `com.oswind.vault-passphrases` service uses the macOS Data Protection Keychain, `WhenUnlockedThisDeviceOnly` and `userPresence` access control. It never falls back to an unprotected generic item. Retrieval uses a fresh LocalAuthentication context only for an explicit Unlock action, never at startup. The real provider refuses saving/retrieval while the Mac session is locked. A read-only signing preflight disables protected-Keychain controls when this executable has no app-identifier entitlement; the current ad-hoc build uses passphrase unlock. No provisioning entitlement is fabricated and there is no weaker-storage fallback. Mac authentication may use Touch ID or the Mac password; this is not a Touch-ID-only policy. Forgetting removes the saved unlock, not the disk-image password or history. Moving a package to another Mac does not transfer its Keychain credential.
 
-Tests cover the credential lifecycle with an injected fake provider and real owned encrypted images. Actual Data Protection Keychain entitlement/signing behavior and the real authentication dialog have **not** been accepted while the Mac is locked. No real user Keychain entry was created during these checks.
+Tests cover the credential lifecycle with an injected fake provider and real owned encrypted images. Actual Data Protection Keychain entitlement/signing behavior and the real authentication dialog have **not** been accepted. No real user Keychain entry was created during these checks.
 
 ## Copying an existing library
 

@@ -1,0 +1,356 @@
+{
+  "format": "OSwind cooperative native vault cancellation qualification v1",
+  "codeCommit": "fbe6fac9aae43d11a57bae5af25457a08c0090f9",
+  "verificationCommit": "301cbad35c2de4c53f7e72bb21ff84e345c969b3",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "scope": "Owned synthetic native encrypted create/unlock/lock and supported store closure, actual staged signed CLI, private controlling-PTY Ctrl-C and limited native input; cached models, generated-tone physical isolation and short targeted OCR/privacy checks. No normal history, real Keychain/authentication, permission changes, installed upgrade, uninterrupted capture, power or competitor ranking.",
+  "change": "Owned mutating helpers retain their deadlines and finish before cancellation is acknowledged. Once lock closes the public handle, normal detach plus identity-bound absence confirmation finish independently. Read helpers remain promptly cancellable; no force detach.",
+  "tests": {
+    "definedCases": 818,
+    "fullMostOptInsPasses": 817,
+    "fullMostOptInsSkips": 1,
+    "physicalAudioPasses": 1,
+    "distinctFunctionalPasses": 818,
+    "allDefinedCasesExercised": true,
+    "focusedThreadSanitizerPasses": 406,
+    "physicalThreadSanitizerPasses": 1,
+    "distinctThreadSanitizerPasses": 407,
+    "threadSanitizerRacesReported": false,
+    "newPolicyCases": 5,
+    "newNativeCases": 3,
+    "functionalNamesSHA256": "07e849d39e9e8fa07d4c2b5a3b6361a346162278d7167248b25d0807f4198720",
+    "testBinding": "Full/physical/broad race suites use fbe6fac tests. Subsequent test-only change replaces the subsecond Python timeout fixture with shell/exec sleep; all five policy cases pass again normally and under TSan. Product/package inputs remain identical.",
+    "logs": {
+      "full-most-optins-v1.log": "3ec13a9bfe8827bf50edc270ad53ccb0cbed943c6b9d993c3ed644a31b19ba3b",
+      "release-build-v1.log": "c1569c5442d5a3a340f056acdf4dd2407edb8ab7fa0f94854662f740453cff94",
+      "package-proof-v1.log": "d949342888c824e5ea000abc0308102b187b3073fce8f5f630c2357d85365701",
+      "vault-process-v1.log": "677a44eaac7c0355e1ae60dcdec71a43ca9fa8a7dbd27ac326f1fa64a2cd594f",
+      "cli-interruption-v1.log": "78d52cbbf9c8d27d0d3beeff857d4653319e2d0360c21e5592bae04d581ed2f2",
+      "entity-vault-v1.log": "f00ebec060effff88d0d3c39322549f76bf4e537b6ef6623f68c3a57d5961ff7",
+      "project-process-v1.log": "3e4349cc75283d230c2ac0b939f12b1332fcb327fadc17532a239d4e70ee9abb",
+      "integration-v1.log": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "integration-indexed-v1.log": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "physical-normal-v1.log": "1b6e1e10bc02c5e8f24c3fcb0f80d6592acaef6e2ac9a90562a7f03a0e773750",
+      "focused-tsan-v1.log": "912b6d23897d88741c84b0a5ddca7c1350396b0053b69726a2b9f409edd1307a",
+      "physical-tsan-v1.log": "8276c9ae8494b93c48eba849fc9642d1de50ad4207709389b339aca047468888",
+      "live-capture-v1.log": "8c79accb1d436f6c597dba31d0d0f6a82c5a8fe815af6291e5dc787a11cb5ef1",
+      "physical-normal-v1/test.log": "e31094cba221e0ddcbf2316b209d731c0552a91a4c892898e3685d7f51f8dce8",
+      "physical-tsan-v1/test.log": "8f5cf552ccc304b2d996bc81953ad30a75c073224e3a8e420ce003e75852ed38",
+      "native-regression-before-fix-v1.log": "8e0ebcb6aca612d3213ee5d054e620f3a8d2b510c7ede18b887de1c2b0b02c56",
+      "all-native-regression-before-fix-v1.log": "32ca30e54f4c2fdd43227afd8a7ba6ab522ee3e035c3f4e6dc2f9141ba57d037",
+      "focused-after-fix-v2.log": "137e29ba7d6d2515b9a02ffc7ef404ce7b89376c679834e8512b5d97ba88cd3f",
+      "focused-after-fix-v3.log": "6016e442d78754c8d020060c53a745d5dadaf449f578755f73e3b86a883023d7",
+      "process-policy-ci-fixture-v2.log": "3045a314bd43c32966b10cc2c938769e84236cb7a0f952beaef70fd8353f8004",
+      "process-policy-ci-fixture-tsan-v2.log": "6e3e4f5e5253fbeecfc366337b272d22fd7dfe5b3fa17b170fd5680e3e2ebc24",
+      "public-pty-signal-v1.log": "4cf6215ac58e766bffae735fc4bd5723904886867d1a28c90410db9e8dd292ad",
+      "ci-native-initial.json": "d69614c9631bf0f42040a11d69c2f288379958b3177073a8d397b9b475734d0f"
+    }
+  },
+  "package": {
+    "scope": "Separately staged schema22 desktop memory with bounded native-action cancellation and verified locking completion; no installation; native input accepted only where separately reported",
+    "codeCommit": "fbe6fac9aae43d11a57bae5af25457a08c0090f9",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "fa5b30bbb8c7a3c7a6f594d36584885de06d8dd46424393daa7e548883829531",
+        "signedSHA256": "6a2af2820d6203d8b6122d5eab89b70de56fb74228311ac3b94ca3c3489c3b67",
+        "normalizedPayloadSHA256": "a2230a253a92e776e71127c2784800491fbc4cd5f068a48b5331c6c3cccdf0c9"
+      },
+      "oswindctl": {
+        "rawSHA256": "57e1ad29e858008bd14e46f6207883cba047cf757e678d2683cdc1342a776d88",
+        "signedSHA256": "5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18",
+        "normalizedPayloadSHA256": "12d1650f007985a27c4737a3982282c966c9139bd6452fcf4e409fa790f4ae02"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "b0ed9db51943913a18d4eb22be1b8a4630abdbb35198a0c2d755e72f9d4c14b6",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "cb795c13bee6a78f65e89698adef4c98aae54cd0a91c419ca7892ca82d00cb52",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "qualificationOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "wallSeconds": 471.4396962081082
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "wallSeconds": 56.22252579196356
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.8370654170867056
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 18.981545582879335
+    },
+    {
+      "name": "cli-interruption-v1",
+      "exitCode": 0,
+      "wallSeconds": 35.13058879203163
+    },
+    {
+      "name": "entity-vault-v1",
+      "exitCode": 0,
+      "wallSeconds": 9.413041333900765
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "wallSeconds": 3.1148725000675768
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "wallSeconds": 0.42880287510342896
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "wallSeconds": 1.1523198338691145
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "wallSeconds": 15.520614584209397
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 257.72688254201785
+    },
+    {
+      "name": "physical-tsan-v1",
+      "exitCode": 0,
+      "wallSeconds": 22.63071220787242
+    },
+    {
+      "name": "live-capture-v1",
+      "exitCode": 0,
+      "wallSeconds": 3.6499104171525687
+    }
+  ],
+  "processSIGINT": {
+    "format": "Repeated actual fixed-candidate SIGINT observations",
+    "binarySHA256": "5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18",
+    "trials": [
+      {
+        "repetition": 0,
+        "exitCode": 0,
+        "wallSeconds": 6.779552832944319,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "4346ca75874bfceb2dc1415bf0736659079b813bcdc1de706f8fa72fd277e077",
+        "recovery": []
+      },
+      {
+        "repetition": 1,
+        "exitCode": 0,
+        "wallSeconds": 6.8345389580354095,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "4346ca75874bfceb2dc1415bf0736659079b813bcdc1de706f8fa72fd277e077",
+        "recovery": []
+      },
+      {
+        "repetition": 2,
+        "exitCode": 0,
+        "wallSeconds": 6.993968666065484,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "4346ca75874bfceb2dc1415bf0736659079b813bcdc1de706f8fa72fd277e077",
+        "recovery": []
+      },
+      {
+        "repetition": 3,
+        "exitCode": 0,
+        "wallSeconds": 6.796667749993503,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "4346ca75874bfceb2dc1415bf0736659079b813bcdc1de706f8fa72fd277e077",
+        "recovery": []
+      },
+      {
+        "repetition": 4,
+        "exitCode": 0,
+        "wallSeconds": 7.507361666066572,
+        "ownedInventoryAfterExit": [],
+        "logSHA256": "4346ca75874bfceb2dc1415bf0736659079b813bcdc1de706f8fa72fd277e077",
+        "recovery": []
+      }
+    ],
+    "scope": "Existing smoke on five separate owned packages; no normal library, real credentials, Keychain, TCC, forced detach or broad helper kill. A local pass does not erase the initial CI failure."
+  },
+  "terminalCtrlC": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "5413f69d336c16f161882a59b3e8f4e7c6a0851c91cfd24c9822071be21e0b18",
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0596882498357445,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 2430,
+          "helperGroup": 2430,
+          "foregroundGroup": 2427,
+          "CLIGroup": 2427
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 1.2011038751807064,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 2764,
+          "helperGroup": 2764,
+          "foregroundGroup": 2758,
+          "CLIGroup": 2758
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.6513666249811649,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 2813,
+          "CLIGroup": 2813
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "state": "completed",
+    "immediateRecoveryPassed": true,
+    "sourceHistoryPreserved": true,
+    "noOwnedImagesAfterFinalLock": true,
+    "passphrasePersisted": false
+  },
+  "nativeGUI": {
+    "guiSHA256": "6a2af2820d6203d8b6122d5eab89b70de56fb74228311ac3b94ca3c3489c3b67",
+    "fixtureUsesPublicTestPassphrase": true,
+    "normalHistoryUsed": false,
+    "credentialOrPermissionChanges": false,
+    "stopClickedDuringOwnedHelperHold": true,
+    "historyAbsentWhileHelperHeld": true,
+    "stopReturnedToObservedDetachedScreen": true,
+    "nativeRecoveryShowsOnlyAuthoredNote": true,
+    "recordingRemainedPaused": true,
+    "automaticServicesRemainOff": true,
+    "postQuitSourcePreserved": true,
+    "finalImageAbsent": true,
+    "ownedGUIExited": true,
+    "termination": "SIGTERM after independent verified locked state; no force detach",
+    "nativeFinalNormalLockObservation": "OS lock interrupted final Settings Lock click observation; final locked state independently verified",
+    "heldHelper": {
+      "parentPID": 98995,
+      "helperPID": 99444,
+      "ownedImageVerified": true,
+      "failSafeSeconds": 30,
+      "resumed": true,
+      "heldSeconds": 20.7802775001619
+    },
+    "limitations": [
+      "Two native observations were temporarily blocked by actual screen lock. Subsequent native observation confirmed detached screen and immediate recovery. Final normal lock verified with CLI/OS inventory, not final native screen.",
+      "Cached detached-status text remains during busy unlock; busy row says Working safely and Stop remains available.",
+      "Synthetic manual-passphrase flow only; no real Keychain, Touch ID, authentication or permission changes.",
+      "Actual OS screen locking also requests cancellation/lock, so this sequence does not isolate Stop from the system-lock path."
+    ],
+    "isolatedStopWithoutSystemLockAccepted": false
+  },
+  "baseline": {
+    "nativeComparison": {
+      "productRuntimeBase": "f7e52a618c1c55b396a2166d13af715312cef945",
+      "fileSourceCommit": "83f8fc7fd1f4c6ad0b16bff90898118cdbca2a24",
+      "exitCode": 1,
+      "wallSeconds": 35.21607091603801,
+      "productFiles": [
+        {
+          "file": "Sources/OSwindCore/LibraryVault.swift",
+          "fixedSHA256": "31ff187fe0fa7c33e457891471e1ffca5d51fceeacf97b8383f83f078f47c439",
+          "baselineSHA256": "b977c537553af7d812cff9040e80bad03ad978802c0801d30c0b3f2c939614be"
+        },
+        {
+          "file": "Sources/OSwindCore/VaultProcess.swift",
+          "fixedSHA256": "3517b1d4bc01efc32a73e957201d6f52b73cc46030f5e86cdfe324a4d66c88da",
+          "baselineSHA256": "d3b45c7600a480a8024794d75645678d6690dd34a8cddd1a17ee8dd0a1d7f00c"
+        }
+      ],
+      "nativeTestSHA256": "48e8d46b317b174299145b86148a66fc7e11f434b84e8cf3b9485893af6ae121",
+      "newPolicyUnitsExcludedBecauseAPIAbsent": true,
+      "fixedProductAndPolicyUnitsRestored": true
+    },
+    "identicalNativeCases": 3,
+    "failedCases": 2,
+    "passedCases": 1,
+    "reportedFailures": 19,
+    "earlierFiveCycleUnlockCaseAttachedAfterCancellation": 5,
+    "precedingSignedCLIImmediateRecoveryFailures": 4,
+    "precedingSignedCLITrials": 5,
+    "precedingSignedCLIReportSHA256": "7402eacdc6442e4fee0de8ede2ea9183d47f21efff4be5e9263dc5b95c50db3d",
+    "interpretation": "Create passed the exact preceding-product comparison. Unlock/lock fail; five-cycle earlier unlock probe retains attached images. Passing reruns never erase these counterexamples."
+  },
+  "retainedFixtureFailures": [
+    {
+      "kind": "Observation miss",
+      "detail": "Initial native lock test missed a short-lived detach helper and cancelled after completion. Final test observes persisted closing phase plus closed storage.",
+      "logSHA256": "137e29ba7d6d2515b9a02ffc7ef404ce7b89376c679834e8512b5d97ba88cd3f"
+    },
+    {
+      "kind": "Independent CI timeout fixture startup",
+      "run": 40149754239,
+      "job": 121038606303,
+      "failedCases": 1,
+      "reportedFailures": 2,
+      "detail": "Python startup exceeded the 750ms helper deadline before readiness. Replaced only this probe with shell/exec sleep and a 3s deadline; five policy cases rerun normally/TSan. Product unchanged.",
+      "logSHA256": "d69614c9631bf0f42040a11d69c2f288379958b3177073a8d397b9b475734d0f"
+    }
+  ],
+  "ci": {
+    "verificationCommit": "301cbad35c2de4c53f7e72bb21ff84e345c969b3",
+    "run": 40151212798,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 121042968958,
+        "conclusion": "success"
+      },
+      {
+        "id": 121042969191,
+        "conclusion": "success"
+      }
+    ],
+    "publicTerminalSmokeAdded": true
+  },
+  "cooperativeCancellationContractsPass": true,
+  "releaseAcceptanceComplete": false,
+  "remainingGates": [
+    "SIGKILL/second Ctrl-C, Force Quit, OS shutdown/power loss and native OS hangs are separate unqualified fault/recovery boundaries.",
+    "Relocation during unfinished opening needs a dedicated native fault matrix.",
+    "Busy unlock keeps its last detached-status sentence alongside Working safely; wording polish remains.",
+    "Real signed Keychain/Touch ID authentication, broad native/device/browser/macOS acceptance, sustained power/capture and matched competitor ranking remain open.",
+    "Final Settings Lock click observation was interrupted by OS lock. Independent product status/OS image inventory establish final detachment; no final native-screen claim."
+  ]
+}
