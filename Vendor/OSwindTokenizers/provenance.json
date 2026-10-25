@@ -1,0 +1,70 @@
+{
+  "repository": "https://github.com/huggingface/swift-transformers",
+  "version": "1.3.5",
+  "revision": "48473106a93b2d8dfb114b82f0628ebbb71734e7",
+  "license": "Apache-2.0",
+  "scope": "Only Tokenizers target; Hub and Jinja remain pinned SwiftPM dependencies. Original headers retained. Two narrow modifications: byte-exact BPE merge equality/hash, and literal String normalizer replacement before combining marks.",
+  "files": [
+    {
+      "path": "BPETokenizer.swift",
+      "upstreamSHA256": "44224f9b82b81534f651556cb9f33d9ad01954a2f691d7b0e077af60bb15e75f",
+      "vendoredSHA256": "b84cb7bdef47c99ffb4e4d0ce8e4e1941ab4721f5f05f58435684325f6cf2558"
+    },
+    {
+      "path": "BertTokenizer.swift",
+      "upstreamSHA256": "415177301b77dc5a9aa5500cf842041929d98e37ea957a8e3313da16619e421b",
+      "vendoredSHA256": "415177301b77dc5a9aa5500cf842041929d98e37ea957a8e3313da16619e421b"
+    },
+    {
+      "path": "ByteEncoder.swift",
+      "upstreamSHA256": "90170a15615c81e2065e65cb95e4c15f3c41be424cb3dd5620e735abeab2df89",
+      "vendoredSHA256": "90170a15615c81e2065e65cb95e4c15f3c41be424cb3dd5620e735abeab2df89"
+    },
+    {
+      "path": "Decoder.swift",
+      "upstreamSHA256": "5607e011b61b9027470ee134a3ea11d5ae3d55df4192e1a94ef234beb935081e",
+      "vendoredSHA256": "5607e011b61b9027470ee134a3ea11d5ae3d55df4192e1a94ef234beb935081e"
+    },
+    {
+      "path": "Normalizer.swift",
+      "upstreamSHA256": "88a8dc197e6efe08698ec0496603fedcf17a553a78f12f9fd8066402cfd9aebc",
+      "vendoredSHA256": "2fb7c52b10069d4d2eb03e481ccdddbc26ca30d3f80f09c39995588bdf45c165"
+    },
+    {
+      "path": "PostProcessor.swift",
+      "upstreamSHA256": "e2568da8adb55a5c0fcf48ef0ed5c065f38e0401b42dca5eaa4fad17b2f0d824",
+      "vendoredSHA256": "e2568da8adb55a5c0fcf48ef0ed5c065f38e0401b42dca5eaa4fad17b2f0d824"
+    },
+    {
+      "path": "PreTokenizer.swift",
+      "upstreamSHA256": "060a079b78583114485677927cf18e8d0fbe499c3c135e10dcb124a21ceb473f",
+      "vendoredSHA256": "060a079b78583114485677927cf18e8d0fbe499c3c135e10dcb124a21ceb473f"
+    },
+    {
+      "path": "String+PreTokenization.swift",
+      "upstreamSHA256": "89d189398e3bc94e458262c2821370c04e37f844c27aeaa9926ce19b80a1c831",
+      "vendoredSHA256": "89d189398e3bc94e458262c2821370c04e37f844c27aeaa9926ce19b80a1c831"
+    },
+    {
+      "path": "TokenLattice.swift",
+      "upstreamSHA256": "84a91faef99b1035629f63ee0ada985430f78b76b11118b6f6f7bbfd38c0b4d8",
+      "vendoredSHA256": "84a91faef99b1035629f63ee0ada985430f78b76b11118b6f6f7bbfd38c0b4d8"
+    },
+    {
+      "path": "Tokenizer.swift",
+      "upstreamSHA256": "5476cafa414278b2aae4748632632f1f0205d47122ee08e24bb9b9112ff98e7c",
+      "vendoredSHA256": "5476cafa414278b2aae4748632632f1f0205d47122ee08e24bb9b9112ff98e7c"
+    },
+    {
+      "path": "Trie.swift",
+      "upstreamSHA256": "7a40d98d252bfe161dd93334fb85e39ad113915ecc425c86be62b198c176de81",
+      "vendoredSHA256": "7a40d98d252bfe161dd93334fb85e39ad113915ecc425c86be62b198c176de81"
+    },
+    {
+      "path": "UnigramTokenizer.swift",
+      "upstreamSHA256": "5c73e6ca43bf6547c79c44f2d9c65ff3919758e3f4f64e4c5d81c7a50f7762cf",
+      "vendoredSHA256": "5c73e6ca43bf6547c79c44f2d9c65ff3919758e3f4f64e4c5d81c7a50f7762cf"
+    }
+  ],
+  "licenseSHA256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+}
