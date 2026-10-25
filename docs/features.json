@@ -283,8 +283,8 @@
     "id": "F036",
     "axis": "AI",
     "feature": "Draft insertion into other apps",
-    "status": "todo",
-    "evidence": "Copy only; no global contextual drafting",
+    "status": "partial",
+    "evidence": "Editable answer-to-draft review, explicit shortcut-bound native AX selected-text insertion and Copy. Evidence revision/privacy checks, protected-field/role/selection/process/expiry guards, bounded text, cancellation and single-attempt acknowledgement handling. Browser/terminal/IDE insertion, signed live delivery, undo and accessibility acceptance remain open. See docs/CONTEXTUAL-DRAFTS.md",
     "references": "Minne, Littlebird Hover"
   },
   {

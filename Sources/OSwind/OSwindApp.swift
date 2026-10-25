@@ -46,6 +46,9 @@ import OSwindCore
                     NSApp.terminate(nil)
                 }
             }
+            // Component-only renders never register a desktop hotkey or its
+            // destination-reading callback while their sample view is open.
+            return
         }
         #endif
         NSApp.setActivationPolicy(.regular)
@@ -53,8 +56,11 @@ import OSwindCore
         RegisterEventHotKey(UInt32(kVK_Space), UInt32(cmdKey | shiftKey),id,GetApplicationEventTarget(),0,&hotKey)
         var spec = EventTypeSpec(eventClass:OSType(kEventClassKeyboard),eventKind:UInt32(kEventHotKeyPressed))
         InstallEventHandler(GetApplicationEventTarget(), { _,_,_ in DispatchQueue.main.async {
+            // Capture explicit external focus before OSwind activates. Opening
+            // the app normally never inspects a different application's field.
+            if let session=AppSession.current,!session.busy,let model=session.model,!model.store.isClosed,!model.libraryWipe.busy,!model.libraryWipe.pendingCleanup {model.drafting.chooseDestination(privacy:model.settings.privacy)}
             NotificationCenter.default.post(name:.oswindOpenMain,object:nil)
-            NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)
+            if AppSession.current?.model?.drafting.showing != true {NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)}
         }; return noErr },1,&spec,nil,nil)
     }
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }

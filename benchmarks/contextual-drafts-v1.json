@@ -1,0 +1,327 @@
+{
+  "format": "OSwind contextual draft qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-25T13:44:36.128208+00:00",
+  "codeCommit": "d48fcbd564b4fef59a9d9be0abb99c80db2889be",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/63",
+  "scope": "Editable answer-to-draft review and explicit shortcut-bound native AX selected-text handoff; model/guard, owned-store, component-render, package and CLI contracts. No live editor delivery acceptance.",
+  "fullSuite": {
+    "defined": 892,
+    "passed": 891,
+    "skipped": 1,
+    "failed": 0
+  },
+  "focusedThreadSanitizer": {
+    "selection": "OSwindAppTests|BrowserPrivacyContextTests|FocusedWindowBindingTests",
+    "defined": 105,
+    "passed": 105,
+    "skipped": 0,
+    "failed": 0,
+    "reportedDataRace": false
+  },
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 685.0073613331188,
+      "elapsedSystemClockSeconds": 684.9451758861542
+    },
+    {
+      "name": "debug-package-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 10.474996665958315,
+      "elapsedSystemClockSeconds": 10.474844932556152
+    },
+    {
+      "name": "render-light-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 3.5637852081563324,
+      "elapsedSystemClockSeconds": 3.5637340545654297
+    },
+    {
+      "name": "render-dark-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 2.0756437920499593,
+      "elapsedSystemClockSeconds": 2.075613021850586
+    },
+    {
+      "name": "app-tsan-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 126.17981845815666,
+      "elapsedSystemClockSeconds": 126.17797207832336
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 125.81639887508936,
+      "elapsedSystemClockSeconds": 125.8145580291748
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 3.6281530000269413,
+      "elapsedSystemClockSeconds": 3.628100633621216
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.291309041902423,
+      "elapsedSystemClockSeconds": 1.2912898063659668
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 11.485442375065759,
+      "elapsedSystemClockSeconds": 11.485273838043213
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.9166257090400904,
+      "elapsedSystemClockSeconds": 0.9166121482849121
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.665384791791439,
+      "elapsedSystemClockSeconds": 1.6653618812561035
+    },
+    {
+      "name": "terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 13.52431104099378,
+      "elapsedSystemClockSeconds": 13.524113178253174
+    },
+    {
+      "name": "busy-terminal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 8.004759083967656,
+      "elapsedSystemClockSeconds": 8.004642009735107
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 20.17442833306268,
+      "elapsedSystemClockSeconds": 20.174132823944092
+    }
+  ],
+  "retainedDevelopmentCounterexamples": [
+    {
+      "name": "Initial integration compile failure",
+      "logSHA256": "d25fd7ddd42666570f55e6fa566afd00e8fac0d02611bddfb755a19c35b2cbd1",
+      "outcome": "Corrected optional initializer shadowing, inaccessible WindowContext initializer use and immutable nested SwiftUI binding"
+    },
+    {
+      "name": "Cancelled old handoff clears newly captured destination",
+      "logSHA256": "2052cd6a1253458a6af369fb6cdda238e6a108a7c4d83e9b0b00a47b487e6835",
+      "tests": 1,
+      "failedAssertions": 1,
+      "outcome": "Generation-bound cleanup preserves the newer binding; regression passes in the full suite and focused TSan"
+    }
+  ],
+  "componentRenders": {
+    "light": {
+      "widthPoints": 760,
+      "heightPoints": 710,
+      "pixelSize": [
+        1520,
+        1420
+      ],
+      "visuallyReviewed": true,
+      "SHA256": "82f1948a7557bed3d389e711e0102db4547d5e237a60619e0a4fb15051fed939",
+      "scope": "Authored synthetic own SwiftUI view only; no desktop capture or native input interaction"
+    },
+    "dark": {
+      "widthPoints": 760,
+      "heightPoints": 710,
+      "pixelSize": [
+        1520,
+        1420
+      ],
+      "visuallyReviewed": true,
+      "SHA256": "0e512854a3dd3bfb7b1ab1a0db55a3f20ac08906e3f7307fbd98742661563a1b",
+      "scope": "Authored synthetic own SwiftUI view only; no desktop capture or native input interaction"
+    }
+  },
+  "package": {
+    "scope": "Separately staged schema22 contextual draft review and guarded selected-text insertion; no installation, live editor acceptance, measured power or competitive ranking claim",
+    "codeCommit": "d48fcbd564b4fef59a9d9be0abb99c80db2889be",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "b318288faebab4b17d6bb89a1c5d8ede40fe01713cce5165c2fdb3913ac69122",
+        "signedSHA256": "9a6f4d333ece71403b178b9a1ac723b9d8eae68849732f16b656bc78c147cd04",
+        "normalizedPayloadSHA256": "73242684f042efba3198e4194d371303613e627bb3eb9492d4c086e66c1a07e6"
+      },
+      "oswindctl": {
+        "rawSHA256": "2097dd23daa27235e02ef59e30791c78059e19dee3625ad02ea3ce15bd210da2",
+        "signedSHA256": "ffbbc2db26eb5a626a6207f15f6c9a69d7d2f0dea92afc270fbe396f855d7b10",
+        "normalizedPayloadSHA256": "aec4ada07645227616bd8bf7ff0d34aba7fd67db37def807a0b65f8b18de9051"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "9ffdd0e732590470b552bbecd12f7b0de8b7929c25c0331a77adbec622b6f484",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "0f892d28358e15cf77da13194da3a8bb4b301e79fc68c14960bdca1206d1112e",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedLaunchBindingVerified": true
+  },
+  "logSHA256": {
+    "full-most-optins-v1": "5b95f4933d4ff9dcaa18ff3f6d7a41cf765b2cdce9742cb25bf427fe98ac1e3d",
+    "debug-package-v1": "515aba5187ef75ce4ebdd36be95e27a519a2fbfe1a04989b7eec4767576c26eb",
+    "render-light-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "render-dark-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app-tsan-v1": "0321c7163b1dcc40986b5083df472a225d024675d4e9cd36ffa84c481dabf5a6",
+    "release-build-v1": "ec6dfd4852e0a79b7e399c411774611d34c3456f9efaf9c185feff1b7fe9495a",
+    "package-proof-v1": "c5ef5a265bb4d4a4fa386dd632b7bf54a0efa30c1dd58be13a965e04d23e8745",
+    "doctor-v1": "953bf4d485fdae1e3a99f5b5b7669940ca8734fe82649a6ae923452eafdb25ca",
+    "collector-process-v1": "0c15574811cf2bd8b93387a73eb7f5d278a1c6cb12d0fa59815ca6509754e4f7",
+    "integration-v1": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "integration-indexed-v1": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "terminal-v1": "5a90f5e50b1666a3666cc06510edeecf95458917ed37037ab0e631e857ba56a8",
+    "busy-terminal-v1": "27b6f93e1e405ac865de2a550727f3dde334811023d7b4a1f8776b97fd7d5abb",
+    "vault-process-v1": "bad00ddfb8220609d1d2d4bd26017466da5b040689a203852136bdebdbe01ad7",
+    "installed-launch-binding-v1": "7ec49c0c025fa354b440d97c701f29731db794d7d22c610f54fd091a37867b63"
+  },
+  "ci": {
+    "codeCommit": "d48fcbd564b4fef59a9d9be0abb99c80db2889be",
+    "runID": 40197643994,
+    "jobs": {
+      "benchmark-harnesses": "success",
+      "native": "success"
+    },
+    "status": "Both original frozen-source CI jobs completed successfully; follow-up source has separate CI"
+  },
+  "scopedAutomatedContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "openGates": [
+    "Actual signed-app global shortcut and TextEdit caret/replacement delivery, read-only/protected fields, native undo and permission denial/recovery",
+    "OS lock/focus change during actual native activation and VoiceOver/keyboard acceptance",
+    "Browser URL/private-window insertion and terminal/IDE pane classification",
+    "The library-source preflight and external-app AX write are not one atomic transaction; same-length edits outside the selected span/final IPC focus races remain possible",
+    "Physical system-audio/live capture and broad hardware/OS acceptance",
+    "Sustained capture energy budget and matched competitor benchmarks"
+  ],
+  "claimsExcluded": [
+    "Universal editor support",
+    "A successful app acknowledgement proves downstream save/send",
+    "No possible sensitive-field miss in arbitrary custom accessibility implementations",
+    "Physical power, battery life or competitive ranking",
+    "A new AI/provider inference or remote credential/API test"
+  ],
+  "doctor": {
+    "screenLocked": true,
+    "screenRecording": true,
+    "accessibility": true,
+    "gpu": "Apple M5 Max",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "scope": "Fresh signed CLI check against an owned empty fixture; CLI TCC status does not establish signed-GUI permission or live editor delivery"
+  },
+  "followup": {
+    "codeCommit": "152c846ae154934f102694dd1fd3a7f6f1533e3f",
+    "scope": "Render-only DEBUG launches return before registering the desktop hotkey; selected-text replacement uses plain product wording. No core/model/transport/test/SwiftPM/vendor input changes from d48fcbd.",
+    "functional": {
+      "selection": "ContextualDraftTests",
+      "defined": 17,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    "operations": [
+      {
+        "name": "followup-focused-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 71.1405505829025,
+        "elapsedSystemClockSeconds": 71.13950896263123
+      },
+      {
+        "name": "followup-debug-package-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 10.481783249881119,
+        "elapsedSystemClockSeconds": 10.48163104057312
+      },
+      {
+        "name": "followup-render-light-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 2.8375297500751913,
+        "elapsedSystemClockSeconds": 2.837491035461426
+      },
+      {
+        "name": "followup-render-dark-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 1.8888587921392173,
+        "elapsedSystemClockSeconds": 1.8888320922851562
+      },
+      {
+        "name": "followup-release-build-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 40.36448874999769,
+        "elapsedSystemClockSeconds": 40.363898038864136
+      },
+      {
+        "name": "followup-package-proof-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 3.8636929581407458,
+        "elapsedSystemClockSeconds": 3.8636369705200195
+      },
+      {
+        "name": "followup-doctor-v1",
+        "exitCode": 0,
+        "awakeMonotonicSeconds": 1.0082312079612166,
+        "elapsedSystemClockSeconds": 1.0082170963287354
+      }
+    ],
+    "package": {
+      "scope": "Separately staged schema22 contextual draft review and guarded selected-text insertion; no installation, live editor acceptance, measured power or competitive ranking claim",
+      "codeCommit": "152c846ae154934f102694dd1fd3a7f6f1533e3f",
+      "schema": 22,
+      "executables": {
+        "OSwind": {
+          "rawSHA256": "0b1d16514fc1c734370a09efc059a1428eee302777faab1c3c938fc1acecbd4b",
+          "signedSHA256": "0317829604f59d8c631cf1c2c586c887ece7e9e750131780e006a04986d67c30",
+          "normalizedPayloadSHA256": "6145103dbc54925d3137b0e6c3f805840a2aa291a8dcd59e126c1b6620351424"
+        },
+        "oswindctl": {
+          "rawSHA256": "2097dd23daa27235e02ef59e30791c78059e19dee3625ad02ea3ce15bd210da2",
+          "signedSHA256": "ffbbc2db26eb5a626a6207f15f6c9a69d7d2f0dea92afc270fbe396f855d7b10",
+          "normalizedPayloadSHA256": "aec4ada07645227616bd8bf7ff0d34aba7fd67db37def807a0b65f8b18de9051"
+        },
+        "oswind-preparation-guardian": {
+          "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+          "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+          "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+        }
+      },
+      "zipSHA256": "88fd6ed213337f2a89d31f1c89b2c668d12a646221b1c04e6177bb6e8eefcac3",
+      "bundleFiles": 33,
+      "bundleTreeSHA256": "a958f49e05679640443a04e95a1ba346cb2453d82a4030a5312a0be24eb2187c",
+      "strictSignaturesPass": true,
+      "signatureNormalizedPayloadsMatch": true,
+      "entireExtractedZipMatches": true,
+      "releaseNotThreadSanitized": true,
+      "installed17Unchanged": true,
+      "installedLaunchBindingVerified": true
+    },
+    "logSHA256": {
+      "followup-focused-v1": "6ddc8b6df25ac75991b43ca4b2a4c003f6b9704a7bd05403cc10fa5ba11f25a8",
+      "followup-debug-package-v1": "39598a99a9bcde2170f891ff2c4dac484bdd4ba69d2c17b6dd96444db732ddab",
+      "followup-render-light-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followup-render-dark-v1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "followup-release-build-v1": "9076ea6d9472c93ea5a0e9f19ec1fc4eeb86d170c2f2be5c4742740d3adf4719",
+      "followup-package-proof-v1": "dede94a8d211ecdc71ab37aabd3a38409d652fd80ac939ecaadc4f824f5e254e",
+      "followup-doctor-v1": "980809188036ea4eb4cbcbc5134d084ae6e1c84dc9fd057ac9c7be25d3ec1f51"
+    },
+    "rendersByteIdenticalToReviewedSamples": true,
+    "qualificationTransfer": "Full892-case/105-TSan/14-operation receipts above remain pinned to d48fcbd; they were not rerun for this UI/DEBUG-launch-only follow-up. Current17 focused contracts, two renders and new strict package proof pass. Live native acceptance remains open."
+  }
+}
