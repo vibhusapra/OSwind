@@ -1,0 +1,252 @@
+{
+  "format": "OSwind bounded text collector and Python SDK qualification v1",
+  "codeCommit": "269d4c90aeb617b9174cbf1e8a10c732a7bf6867",
+  "schema": 22,
+  "hardware": "Apple M5 Max",
+  "os": "macOS26.6.2 build25G83",
+  "state": "Collector contracts pass; retained terminal cancellation counterexample prevents overall acceptance",
+  "changes": [
+    "Version1 text batches via explicit bounded stdin, complete validation before atomic transaction, stable collector/key source IDs and retry/update semantics.",
+    "Current privacy exclusions/redaction including known-browser required URL context; updates preserve favorite/tags and invalidate stale derived evidence.",
+    "Python3.10+ stdlib read-only MCP client and explicit collector submitter with bounded I/O, deadlines, serialized reads, response identity checks and owned child cleanup.",
+    "HTTP/MCP remain read-only. Managed plugin host, scheduling, sandbox and connector catalog remain unfinished."
+  ],
+  "tests": {
+    "newSwiftCases": 12,
+    "full": {
+      "defined": 864,
+      "passed": 863,
+      "skipped": 1,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "logSHA256": "ac628114ccfaa923dd97487d8fd476883312b41c77b95a90f248b5cc7c26647e"
+    },
+    "threadSanitizer": {
+      "defined": 452,
+      "passed": 452,
+      "skipped": 0,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "logSHA256": "68ca13540631a41de372bda9fd31eda3bdb2531fec645bcab47c1bb6b89b214b"
+    },
+    "threadSanitizerRacesReported": false,
+    "offlinePythonContracts": 16,
+    "offlinePythonExitCode": 0,
+    "offlinePythonLogSHA256": "a62d357e84032c1702f01168ff239d74fd806f79991a278c59502db46e857ca2",
+    "all864FunctionalCasesExercisedAtExactSource": false
+  },
+  "collectorProcesses": {
+    "binarySHA256": "21f42a3552b1cc12f5bc872a968ab887901f0c5b942e4c444a81a84d377dec1a",
+    "reportSHA256": "4f8c4eaeac4b612175cd77b1c4466b474bf000e67d0e5550480695e42f4e0491",
+    "checks": [
+      "six read-only tools, exact fractional source, search/calendar and recoverable missing source; retry does not duplicate",
+      "stable update replaces searchable evidence while preserving favorite and user tags",
+      "unsupported last record refuses the whole batch before replacing an earlier source",
+      "default app/domain/browser-context exclusions and secret redaction; excluded updates preserve previously admitted history",
+      "SIGINT while partial stdin remains open exits without admission and subsequent SDK read succeeds",
+      "actual SDK encrypted admission, reader close, lock refusal without plaintext fallback and exact remount history"
+    ],
+    "encryptedCleanupDetached": true
+  },
+  "retainedTerminalCounterexample": {
+    "binarySHA256": "21f42a3552b1cc12f5bc872a968ab887901f0c5b942e4c444a81a84d377dec1a",
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0300735000055283,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 1.1019826668780297,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.15385466604493558,
+        "terminalCtrlC": true,
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": true
+      }
+    ],
+    "reportSHA256": "2dddae3112cc4297b9f0f13b2d6c0fdb4f84aa187d9c0f3da80ddbdf216ed787",
+    "error": "Actual lock Ctrl-C returns130 while independent inventory still lists the owned mounted image; closed regular-file alias and closing session retained.",
+    "underlyingCause": "Not captured by original trace. Source audit finds the CLI wrapper converts any worker error into CancellationError once cancelled; a controlled held-reader reproduction and error-preservation fix follow separately.",
+    "recovery": {
+      "scope": "After retained terminal lock failure; normal product lock on exact owned fixture, independent image inventory. No force, no fixture deletion, no passphrase retained.",
+      "normalProductLockRequested": true,
+      "independentOwnedAttachmentsAfterRecovery": 0
+    }
+  },
+  "retainedDevelopmentFailures": [
+    {
+      "kind": "Known-browser/no-URL regression before fix",
+      "failedCases": 1,
+      "failedAssertions": 2,
+      "scope": "Pre-commit collector worktree; preceding public product had no collector API.",
+      "logSHA256": "068225ab5a2eb50056f20f419a097df4895c09bce1cf282e940235fefccac083"
+    },
+    {
+      "kind": "Incorrect process-harness assertion about locked alias",
+      "trial": 1,
+      "scope": "Expected a dangling/missing alias; product correctly preserves a closed regular-file marker. CLI refusal/normal cleanup passed. Harness corrected; failed trial retained.",
+      "logSHA256": "56cb670a8b4f6a53909a1ed6407803c74039d37c010d0e776f1636b6d752d6ce"
+    },
+    {
+      "kind": "Incorrect process-harness assertion about locked alias",
+      "trial": 2,
+      "scope": "Expected a dangling/missing alias; product correctly preserves a closed regular-file marker. CLI refusal/normal cleanup passed. Harness corrected; failed trial retained.",
+      "logSHA256": "9d3aab1e2c21c1512baed52c076df49db21ef4e261e580042498e5dddbc06cac"
+    }
+  ],
+  "orderedOperations": [
+    {
+      "name": "sdk-offline-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 5.256832666927949,
+      "elapsedSystemClockSeconds": 5.25689697265625
+    },
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 422.211988999974,
+      "elapsedSystemClockSeconds": 422.21710181236267
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 48.599419832928106,
+      "elapsedSystemClockSeconds": 48.600008964538574
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.6159476251341403,
+      "elapsedSystemClockSeconds": 1.6159679889678955
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 6.989378459053114,
+      "elapsedSystemClockSeconds": 6.989464044570923
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 14.8659077079501,
+      "elapsedSystemClockSeconds": 14.866089105606079
+    },
+    {
+      "name": "cli-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 28.420504375128075,
+      "elapsedSystemClockSeconds": 28.4304940700531
+    },
+    {
+      "name": "terminal-interruption-v1",
+      "exitCode": 1,
+      "awakeMonotonicSeconds": 7.982126958901063,
+      "elapsedSystemClockSeconds": 7.994829893112183
+    },
+    {
+      "name": "entity-vault-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 12.198720958083868,
+      "elapsedSystemClockSeconds": 12.198970079421997
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 5.99863670906052,
+      "elapsedSystemClockSeconds": 5.998762130737305
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 0.8147034998983145,
+      "elapsedSystemClockSeconds": 0.8147220611572266
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.7198026671539992,
+      "elapsedSystemClockSeconds": 1.719839096069336
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 310.25836424995214,
+      "elapsedSystemClockSeconds": 310.2647109031677
+    }
+  ],
+  "continuation": "Original ordered run stopped at terminal failure. Explicit continuation ran only remaining contracts without retrying or deleting the failed terminal trial.",
+  "nativePreflight": {
+    "screenLocked": true,
+    "normalPhysicalAudio": "deferred",
+    "instrumentedPhysicalAudio": "deferred",
+    "targetedLiveCapture": "deferred",
+    "reason": "Actual preflight reports locked session; no settings or session changes attempted."
+  },
+  "package": {
+    "scope": "Separately staged schema22 with bounded versioned text collectors, atomic privacy admission and user curation preservation; Python SDK separately qualified; no installation; full-product parity and competitive ranking unproved",
+    "codeCommit": "269d4c90aeb617b9174cbf1e8a10c732a7bf6867",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "49a69b0486e3df33727d695c2bb58bd183751e767bcbb218b846d42b2f3f1138",
+        "signedSHA256": "077a2e62b7e6e7af5e3c12434d9e39a19fb3c86b494f96616c4e65a4c30a89bb",
+        "normalizedPayloadSHA256": "eba3daac3da52dfc1327870a62750c241876a84278a27ec7d4cff80c1380a10b"
+      },
+      "oswindctl": {
+        "rawSHA256": "0bfd2af7583eb3b5c37de6acdfac109dc31e88c951a375d2af3542562898d0a9",
+        "signedSHA256": "21f42a3552b1cc12f5bc872a968ab887901f0c5b942e4c444a81a84d377dec1a",
+        "normalizedPayloadSHA256": "e46aaf21d8e48090ab8f4bce3adfc57a9ccc462c16d7a32897ed832d650d51aa"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "f101973eac00f815bd329f580a2a5b0d99141ada4584ccb06330205cf8408005",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "21add2cefa092031ec60b0b0afa1bd4890f63b7b8f5b66ff21e0b51f72c26d6f",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "ci": {
+    "runID": 40186390367,
+    "codeCommit": "269d4c90aeb617b9174cbf1e8a10c732a7bf6867",
+    "state": "See exact workflow; pending at report generation unless separately updated",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40186390367"
+  },
+  "limits": [
+    "No normal library, real credentials, provider/API calls, Keychain, TCC/auth changes, forced detach or installation.",
+    "Authored-source and native encrypted fixtures do not establish source authenticity, complete sandbox/plugin parity, sustained collection throughput or representative desktop retrieval quality.",
+    "Physical audio/live capture deferred at locked-session preflight; the sole full-suite physical skip is not counted as passed.",
+    "No measured power, full-product release acceptance or matched competitor/top-three claim. Earlier failures remain retained."
+  ],
+  "collectorContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "controlledBusyCancellationBeforeFix": {
+    "scope": "New owned encrypted fixture with an explicit live SQLite reader; actual terminal Ctrl-C after persisted closing phase. This establishes the wrapper failure mechanism, not the uncaptured cause of the earlier terminal failure.",
+    "expectedExitCode": 1,
+    "observedExitCode": 130,
+    "ownedImageAttachedAfterExit": true,
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "reportSHA256": "101bc0c6c542b3ebea2b643205c0319862b64891d50a632893120fc58e3b1efa",
+    "logSHA256": "e8c781d1a9e2bc03d91a0fce9c707a51b1fadb3c324722f049fe8694b0e7bd77"
+  }
+}

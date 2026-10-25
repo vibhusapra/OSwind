@@ -573,17 +573,28 @@ public final class MemoryStore: @unchecked Sendable {
     @discardableResult public func importJSON(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Int {try importJSONDetailed(from:url,embedder:embedder,policy:policy).imported}
     public func importJSONDetailed(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> JSONImportResult {
         try Task.checkCancellation()
-        let data=try Data(contentsOf:url);guard data.count<=100_000_000 else {throw OSwindError.invalid("Import exceeds 100 MB")}
+        return try importJSONDetailed(data:Data(contentsOf:url),embedder:embedder,policy:policy)
+    }
+    public func importJSONDetailed(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> JSONImportResult {
+        try Task.checkCancellation();guard data.count<=100_000_000 else {throw OSwindError.invalid("Import exceeds 100 MB")}
         let decoder=JSONDecoder();decoder.dateDecodingStrategy = .custom {try ISOTime.decode(from:$0)}
         let memories:[Memory]
         do {memories=try decoder.decode([Memory].self,from:data)} catch {memories=try JSONDecoder().decode([Memory].self,from:data)}
+        return try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy)
+    }
+    func importDecodedMemoriesDetailed(_ memories:[Memory],embedder:LocalEmbedder?,policy:PrivacyPolicy,collectorAdmission:Bool=false) throws -> JSONImportResult {
         let ordered=try RecapImport.ordered(memories),inputIDs=Set(memories.map(\.id))
         lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
         do {
             var report=JSONImportResult(),blocked=Set<String>()
             for var m in ordered {
                 try Task.checkCancellation()
-                if policy.exclusion(app:m.bundleID,title:m.title,url:m.url) != nil {blocked.insert(m.id);report.excluded+=1;continue}
+                let browser=collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
+                if policy.exclusion(app:m.bundleID,title:m.title,url:m.url,isBrowser:browser) != nil {blocked.insert(m.id);report.excluded+=1;continue}
+                if collectorAdmission,let previous=try get(m.id) {
+                    guard previous.kind == .note,previous.recap==nil else {throw OSwindError.invalid("Collector source ID belongs to incompatible content")}
+                    m.favorite=previous.favorite;m.tags=Array(Set(previous.tags+m.tags)).sorted()
+                }
                 if let recap=m.recap {
                     var omit=false
                     for reference in recap.sources {

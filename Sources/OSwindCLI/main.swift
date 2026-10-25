@@ -59,6 +59,7 @@ do {
         OSwind 0.1.0 · local desktop memory
         Usage: oswindctl [--data DIRECTORY] COMMAND
           doctor                         Inspect local permissions, GPU and models
+          collect --stdin                Admit a bounded version 1 text-collector batch
           search [--preview] [--mode hybrid|keyword|semantic|visual] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
                  Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
@@ -458,6 +459,13 @@ do {
             catch { FileHandle.standardError.write(Data(("Note saved; additional semantic indexing pending. " + error.localizedDescription + "\n").utf8)) }
             print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
+        case "collect":
+            guard args==["--stdin"] else {throw OSwindError.invalid("Use collect --stdin with a version 1 text batch")}
+            let policy=AppSettings.load(root:root).privacy
+            let report=try await runAsyncCLI(cancellationMessage:"Stopping collector admission; retry identical source keys if its result is unconfirmed.") {
+                try store.importCollectorBatch(await collectorStandardInput(),embedder:embedder,policy:policy)
+            }
+            try encoded(report)
         case "import":
             let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import PATH [--json]")}
             let report=try store.importJSONDetailed(from:URL(fileURLWithPath:args[0]),embedder:embedder,policy:AppSettings.load(root:root).privacy)

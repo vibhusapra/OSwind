@@ -2,6 +2,12 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Text collectors and Python SDK: frozen source269d4c9
+
+[Partial signed qualification](collector-sdk-v1.json) passes863 functional cases with one physical-audio skip,452 broad TSan cases with no race report, and16 offline Python contracts. The actual immutable CLI/SDK verifies stable retries and source updates, favorite/tag preservation, current privacy/redaction/browser-context rules, atomic refusal, six read tools, partial-pipe SIGINT and an encrypted admission/lock/refusal/remount round trip. Strict signed bundle/ZIP payload/tree checks pass. In-app plugin installation, scheduling, sandbox and a connector catalog remain unfinished.
+
+The ordered run retains a terminal lock cancellation counterexample: exit130 while independent inventory still lists the owned image. Normal product lock recovers it. A controlled held-reader trial reproduces masked busy failure and preserves history after normal recovery. The CLI error-propagation fix follows separately; exact underlying cause of the earlier terminal failure was not captured. Explicit continuation runs only remaining contracts;12 of13 listed operations pass. Physical normal/TSan audio and targeted capture are deferred at locked-session preflight. These checks establish neither sustained collector performance nor complete release acceptance; all-known-contract acceptance remains false.
+
 ## Native proof and descriptor ownership: frozen source f7d941f
 
 [Signed qualification](vault-native-ownership-v1.json) passes **852 functional cases,441 distinct TSan cases,14 operations and both CI jobs**. Cancellation waits through complete native attach proof and exact-proof normal cleanup. Failed reservation construction transfers descriptor ownership only after validation, fixing a reproduced double-close: the preceding concurrent stable-manifest read fails with Bad file descriptor in0.608s; the fixed instrumented workload completes8,000 reads and4,000 rejected reservations. A language probe confirms destructor behavior; original CI descriptor identity is not captured, so its precise event is not claimed.
