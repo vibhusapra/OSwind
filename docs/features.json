@@ -276,7 +276,7 @@
     "axis": "AI",
     "feature": "Structured people/project memory",
     "status": "partial",
-    "evidence": "Source-linked on-device suggestions and explicit projects, curation/merges, scoped retrieval and native editors. Notes-only/equivalent-alias edits now preserve completion and anchors; real rules and restored curation invalidate. Paired signed1000-source rescan count1000\u21920; native6/6 retained. Known follow-up: rejected project links return after rename/rescan (old/new signed CLIs reproduce). Stable-ID corrections, NLP gold quality, curated speaker identity, entity JSON/Markdown and force re-extraction remain open",
+    "evidence": "Source-linked local suggestions/projects, curation/merges and scoped retrieval. Schema22 preserves project-ID rejections across rename/merge/rescan and quiet backup; legacy21 contradictions repair without NLP or source changes. 19 new cases and actual signed old/new processes pass. Bounded extraction/restore reads replace per-match aggregation. Final 810-case union, scaling/native/race qualification pending; NLP gold, speaker identity and entity JSON/Markdown remain open",
     "references": "Minne, Omi"
   },
   {
@@ -380,7 +380,7 @@
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
     "status": "partial",
-    "evidence": "Schema18 managed AES256 APFS images, fail-closed handles, MEMORY SQLite temps, source-preserving verified encrypted migration, native setup/lock screens and optional user-presence Keychain. 522 tests: 516 pass / 6 skips; 79 TSan and 15 signed-release groups pass. Actual older-writer, relocation, partial-unmount and Ctrl-C checks pass. Post-detach confirmation now requires two consecutive absent observations with original package/manifest/image identity and bounded typed settling; rapid native source-preservation and replacement/cancellation cases pass. Original inventory failure remains undiagnosed. Ad-hoc Keychain controls are disabled; real authentication, native clicks/sleep, platform matrix and physical workload gates remain open",
+    "evidence": "Managed AES256 APFS images, closed handles, MEMORY SQLite temps, source-preserving migration, setup/lock screens and optional user-presence Keychain. Identity-bound detach settlement, rapid native lifecycle and ordinary CLI flow pass. Current f7e52a6 CI SIGINT unlock failed with an owned image still attached after exit 130; failure retained and cleanup investigation open. Ad-hoc Keychain controls disabled; real authentication/native sleep/physical workload/OS matrix remain open",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "ea90902:791 defined cases all exercised across760 normal passes/31 opt-in skips,313 native/model/Metal passes,5 cached model/runtime checks and1 physical case;43 focused/physical TSan pass. Actual latest capture/OCR/privacy, idle model expiry/reload and signed/native entity contracts pass. A new exploratory project-rename rejection failure is retained outside those791 defined tests. Frozen corpus and pinned rem component results remain separate; no overall competitor rank",
+    "evidence": "Frozen f7e52a6 schema22: 779 normal passes/31 opt-in skips (810 defined), 332 native/model/Metal passes; signed correction/migration/backup and encrypted entity flows pass. Broader race, real cached model/runtime, physical audio, native input and paired scaling still running/pending. CI vault SIGINT cleanup failure retained. Prior ea90902 exercised all 791 defined cases; corpus and pinned rem component results remain separate. No overall competitor rank",
     "references": "OSwind quality bar"
   },
   {
