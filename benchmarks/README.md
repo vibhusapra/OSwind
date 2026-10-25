@@ -1,5 +1,9 @@
 # Benchmark protocol and results
 
+## Matched-bundle text-encoder diagnostic
+
+[Six fixed-order probes](visual-query-components-v1.json) compare source5aa58b9 and152c846 against the exact same c538c66 bundle: all501 token arrays and text vectors match exactly. Medians excluding each process's first text remain about1.7–1.8ms. Preparation/first text is4.65→2.04s, consistent with the separate loader measurements. Total process CPU/resources include a second tokenization and JSON output, so they do not isolate inference. Three pairs with uncontrolled caches do not establish a small latency win. A separate low-coverage owned-process stack sample shows source validation/traversal/hashing; it does not establish their CPU percentage or explain the historical end-to-end timing difference. No vendor hashing change was made on speculation.
+
 ## Current natural-photo visual recheck
 
 [The current signed CLI](visual-tokenizer-natural-v1.json) preserves459/501 top1 and498/501 top5 on the previously opened100-photo/501-query fixture. Indexing, filtering and reopen pass. The frozen harness retains a **failed same-model-ID check**: four compiled metadata members differ from the old manual bundle, while graph/weights/tokenizer member hashes match. Current query median/p9528.49/35.66ms and peak RSS1.582GB are visible; older14.27ms is not a paired or matched-model baseline. No cause, speedup, fresh holdout, desktop or competitor claim is inferred.

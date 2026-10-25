@@ -197,9 +197,9 @@
     "runID": 40197643994,
     "jobs": {
       "benchmark-harnesses": "success",
-      "native": "in_progress"
+      "native": "success"
     },
-    "status": "Native source-commit job still running at this report update"
+    "status": "Both original frozen-source CI jobs completed successfully; follow-up source has separate CI"
   },
   "scopedAutomatedContractsPass": true,
   "allKnownContractsPass": false,
