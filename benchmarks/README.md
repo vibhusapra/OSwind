@@ -2,6 +2,12 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Complete vault closing transition: retained CI unlock failure
+
+[Source2cc11a9 partial qualification](vault-close-transition-v1.json) retains seven preceding-code failures in a three-cycle held-media-lease cancellation regression. The fix protects the entire closing transition and rejects already-cancelled requests before reservation. All846 functional and435 distinct instrumented cases have passing observations across runs. The full functional run passes845 with one separately exercised physical skip. Broad TSan retains430 passes, one skip, three failed cases/four failures overlapping host sleep; all four cases pass in each of three unchanged clock-observed awake trials. No race report is observed. These observations do not convert the failed broad run into a passing suite.
+
+Strict signed bundle/ZIP proof, five signed CLI SIGINT repetitions, terminal Ctrl-C create/unlock/lock, encrypted entity/project flows, ordinary/indexed integrations and normal/instrumented physical-tone plus targeted live capture checks pass. Source2cc CI passes, but later unchanged-product head a377 CI exposes a **cancelled-unlock attached-image/retry failure**. That separate counterexample remains a blocker. Native attach through complete proof acquisition is the next fix; release acceptance and all-known-contract acceptance remain false. Installed app unchanged.
+
 ## Whole Unicode entity admission: retained lock counterexample
 
 [Partial source 681676f qualification](entity-unicode-v1.json) fixes admission of malformed surrogate/composed-character spans and verifies 262 exact tokenizer references. All 844 defined cases have passing observations across runs, but the initial full run retains a session failure spanning 763 seconds of sleep. Four unchanged awake retries pass. The broader TSan selection has 431 passes and one **awake cancelled-lock failure**: independent inventory still lists the owned image after cancellation returns. Later status/history and final absence checks pass; the failing observation remains a release blocker. No data race is reported.

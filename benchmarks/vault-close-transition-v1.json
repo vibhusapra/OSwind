@@ -1,0 +1,336 @@
+{
+  "format": "OSwind complete vault closing transition qualification v1",
+  "state": "partial qualification complete; CI cancelled-unlock counterexample remains open",
+  "codeCommit": "2cc11a9db49b42aa5641f265b360e85df1b0edc4",
+  "schema": 22,
+  "baseline": {
+    "sourceCommit": "b8e6c6fb1de1132dc7e4864a8055dd341322ed60",
+    "vaultSourceSHA256": "31ff187fe0fa7c33e457891471e1ffca5d51fceeacf97b8383f83f078f47c439",
+    "nativeTestSHA256": "14eacd74fae1a4672779b48a43208c50565cd0b964c8c1df26f2f53f6e87bfec",
+    "logSHA256": "e9bbd8354ec69dec689c7f882a58d13f868941d48522c083be4fa286dd62074a",
+    "exitCode": 1,
+    "cases": 1,
+    "reportedFailures": 7,
+    "cycles": 3,
+    "storeClosedFailures": 3,
+    "imageAbsenceFailures": 2,
+    "lockedStatusFailures": 2
+  },
+  "change": "Protect the entire closing transition, including cancellation-aware metadata reads, media-writer drain and handle writes, before verified normal detach. Reject already-cancelled public lock before reservation.",
+  "focusedNormal": {
+    "cases": 45,
+    "failedCases": 0,
+    "logSHA256": "1301b8036b4a3b644b16ae7f18657368c9b1bbc2d3fe4087bfadd8cab0514e29"
+  },
+  "appSessionNormal": {
+    "cases": 12,
+    "failedCases": 0,
+    "logSHA256": "9dd9aafaad5f85c0eed0780fc391a0da192226949e434fdc0e7051c3470066e0"
+  },
+  "newDefinedCases": 2,
+  "priorCounterexample": "entity-unicode-v1.json retains one awake cancelled-lock assertion under TSan; this reproducible earlier-phase failure does not isolate its exact timing.",
+  "qualificationComplete": false,
+  "releaseAcceptanceComplete": false,
+  "allKnownContractsPass": false,
+  "limits": [
+    "Three broad TSan cases fail and one skips. All four then pass in each of three unchanged clock-observed trials; no measured suspension in those trials. The original failure remains.",
+    "Later head CI retains a cancelled-unlock attached-image/retry failure; allKnownContractsPass and release acceptance remain false.",
+    "Instrumented physical audio and targeted live capture pass in an explicit continuation after retaining the broad TSan failures. This does not turn the broad run into a passing suite.",
+    "No TSan race is reported; that is not a passing suite or lifecycle acceptance.",
+    "Earlier independent awake attachment-count counterexample remains in entity-unicode-v1.json; new controlled media-drain gap does not isolate its original timing.",
+    "Physical sleep/wake, forced termination, power-loss, real authentication and whole-product/competitor acceptance remain separate gates.",
+    "Installed app unchanged; only owned synthetic fixtures and pinned public model assets used."
+  ],
+  "verificationCommit": "a377c8fd58e7e400cd56c6cd266cb7f5cddfbaaa",
+  "tests": {
+    "definedCases": 846,
+    "newCases": 2,
+    "fullPassingCases": 845,
+    "fullSkippedCases": 1,
+    "fullFailedCases": 0,
+    "physicalNormalPassingCases": 1,
+    "distinctFunctionalPassingObservations": 846,
+    "allDefinedCasesHavePassingObservation": true,
+    "focusedTSanDefinedCases": 434,
+    "focusedTSanPassingCases": 430,
+    "focusedTSanSkippedCases": 1,
+    "focusedTSanFailedCases": 3,
+    "focusedTSanReportedFailures": 4,
+    "focusedTSanUnexpectedFailures": 2,
+    "threadSanitizerRacesReported": false,
+    "physicalTSanRun": true,
+    "distinctTSanPassingObservations": 435,
+    "allSelectedTSanCasesHavePassingObservationAcrossRuns": true,
+    "physicalTSanPassingCases": 1
+  },
+  "package": {
+    "scope": "Separately staged schema22 with cancellation-independent complete vault closing transition; learned model integration remains unfinished; no installation; native input accepted only where separately reported",
+    "codeCommit": "2cc11a9db49b42aa5641f265b360e85df1b0edc4",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "c6e81968c5242286015f298327478584a98c2cb3c86913f75d0f93a50d60a98a",
+        "signedSHA256": "17322b1fac4ea103953fde93bc0570b3d81af344858881861a8a3654532f151a",
+        "normalizedPayloadSHA256": "96de9112e3f822e6f46bbbd6eb84c3f48903997ad82ffa65155c812fd1f8bda8"
+      },
+      "oswindctl": {
+        "rawSHA256": "c0a51deb23bcf115ead62e7cd234d06e2aa79dad166ebca0c392d521c69d821f",
+        "signedSHA256": "94369a5411b864a8b1f19feaf7f472450dfd0182de6492d146bbdf1bb36ef217",
+        "normalizedPayloadSHA256": "489d1bee29091f31b3d79b1b223d07fcc74522aac1adcb943bf3ae3fa7a94bea"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "175cc93209b5d43bee746733aeb6d12ddc7f5af8eefd1bc3d576acc0e39157dc",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "6c4fd5dc835ef57f2c03e901896554aec90e5e6b521e92a786cb7fd9ddbe7fc1",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true
+  },
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1555.959382042056,
+      "elapsedSystemClockSeconds": 1556.0086300373077
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 286.79007045784965,
+      "elapsedSystemClockSeconds": 286.7927496433258
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 8.596924291923642,
+      "elapsedSystemClockSeconds": 8.597004890441895
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 105.82143304101191,
+      "elapsedSystemClockSeconds": 105.82242584228516
+    },
+    {
+      "name": "cli-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 180.31337754195556,
+      "elapsedSystemClockSeconds": 180.27106094360352
+    },
+    {
+      "name": "terminal-interruption-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 44.8518219999969,
+      "elapsedSystemClockSeconds": 44.85154104232788
+    },
+    {
+      "name": "entity-vault-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 29.788989667082205,
+      "elapsedSystemClockSeconds": 29.78885579109192
+    },
+    {
+      "name": "project-process-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 14.278497667051852,
+      "elapsedSystemClockSeconds": 14.278435945510864
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 1.6043405409436673,
+      "elapsedSystemClockSeconds": 1.6043410301208496
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 2.9018594580702484,
+      "elapsedSystemClockSeconds": 2.901848793029785
+    },
+    {
+      "name": "physical-normal-v1",
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 38.57917762501165,
+      "elapsedSystemClockSeconds": 38.57900905609131
+    },
+    {
+      "name": "focused-tsan-v1",
+      "exitCode": 1,
+      "awakeMonotonicSeconds": 549.9843169159722,
+      "elapsedSystemClockSeconds": 1641.5263738632202
+    },
+    {
+      "name": "physical-tsan-v1",
+      "run": true,
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 21.631247292039916,
+      "elapsedSystemClockSeconds": 21.63089609146118,
+      "continuedAfterRetainedBroadTSanFailure": true
+    },
+    {
+      "name": "live-capture-v1",
+      "run": true,
+      "exitCode": 0,
+      "awakeMonotonicSeconds": 3.2074567081872374,
+      "elapsedSystemClockSeconds": 3.2074060440063477,
+      "continuedAfterRetainedBroadTSanFailure": true
+    }
+  ],
+  "retainedFailures": [
+    {
+      "case": "NativeVaultCancellationTests.testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact",
+      "reportedFailures": 1,
+      "unexpected": true,
+      "elapsedSeconds": 81.377,
+      "observation": "Bounded native helper timeout; exact helper/action and phase are not isolated. No early attachment-count assertion fails in this run.",
+      "overlappingHostSleepSeconds": 72
+    },
+    {
+      "case": "SearchNavigationTests.testShortcutFromAskPreservesExplicitProjectAndAppFilters",
+      "reportedFailures": 2,
+      "unexpected": false,
+      "elapsedSeconds": 22.588,
+      "observation": "Three-second ContinuousClock fixture wait expires while refresh remains pending; expected source hit absent at assertion.",
+      "overlappingHostSleepSeconds": 24
+    },
+    {
+      "case": "VaultSessionTests.testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes",
+      "reportedFailures": 1,
+      "unexpected": true,
+      "elapsedSeconds": 120.661,
+      "observation": "Bounded native helper timeout; exact helper/action and phase are not isolated. A 122-second host sleep overlaps the case.",
+      "overlappingHostSleepSeconds": 122
+    }
+  ],
+  "retainedSkip": {
+    "case": "AudioPlaybackTests.testMutedRuntimeSeekPauseFinishAndDeletion",
+    "reason": "Audio output unavailable on host during the broad TSan run",
+    "normalFullPassingObservation": true
+  },
+  "hostTiming": {
+    "fullAwakeSeconds": 1555.959382042056,
+    "fullSystemClockSeconds": 1556.0086300373077,
+    "tsanAwakeSeconds": 549.9843169159722,
+    "tsanSystemClockSeconds": 1641.5263738632202,
+    "tsanClockDifferenceSeconds": 1091.542056947248,
+    "scope": "System logs place sleep in the native-lock and shortcut failures; this does not qualify physical sleep/wake or erase the prior independent awake counterexample. Timings are uncontrolled, not a performance comparison.",
+    "powerObservation": "One read-only point observed a charging 7-percent battery on AC and reported a 27 W adapter; nominal adapter metadata is not measured application watts or a proved slowdown cause."
+  },
+  "interruption": {
+    "signedCLIRepetitions": 5,
+    "allExitZero": true,
+    "allAfterExitInventoriesEmpty": true,
+    "actualTerminalCtrlC": [
+      "create",
+      "unlock",
+      "lock"
+    ],
+    "allTerminalExit130": true,
+    "immediateRecoveryAndSourcePreservation": true
+  },
+  "logSHA256": {
+    "full-most-optins-v1": "bb833d75e8dd2e8a871771b60510f1d559b1fb8bc6d99d93f18ad934fe6b187c",
+    "release-build-v1": "24d54e9af4f76b18bece5e8b395eb271756810c90771f61a2179261081750c5e",
+    "package-proof-v1": "0114b32479c5cd1c3dec9a7c3a4ed1fcdcaaa5e39041c2ff077f73f4e3a62d11",
+    "vault-process-v1": "4f0234bef79053f903b806d89bf90d93e55e5761c87ed83b146f3da71456c173",
+    "cli-interruption-v1": "56d211b584124776afada68e417917e7f73472395ce30bf52f62419ca49858fa",
+    "terminal-interruption-v1": "164a19bfd0ac28b7036af04703dca4b72ee7cc47221ca0662c266525a463129e",
+    "entity-vault-v1": "4daa5480e659db6775b28b940a01fb20ecda01e35db7ad826c0da70fec9985d1",
+    "project-process-v1": "1bb4202cc39f126e0ae20d6ec302a398bdd1de157965b4ace646967d89a407ba",
+    "integration-v1": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "integration-indexed-v1": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "physical-normal-v1": "b934c26628ef2c3ad7bfb880441878f99da331027ad37b2b33f8d3bf1bf3c062",
+    "focused-tsan-v1": "13097473145eb5d7c832f436dedac9f9137aa98da19fda22f754258cded383fe",
+    "physical-tsan-v1": "7c27d2574c6b19ba65b30cdcdc359d6596d6ebe8476734957658a98a3f06bce7",
+    "live-capture-v1": "0c69341c6e0b8ed1daa4fe1720dde107ce77bf1c9025c629d284104cfefb2e72"
+  },
+  "clockObservedRetries": {
+    "fixedTrialCount": 3,
+    "selection": [
+      "NativeVaultCancellationTests.testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact",
+      "SearchNavigationTests.testShortcutFromAskPreservesExplicitProjectAndAppFilters",
+      "VaultSessionTests.testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes",
+      "AudioPlaybackTests.testMutedRuntimeSeekPauseFinishAndDeletion"
+    ],
+    "trials": [
+      {
+        "trial": 0,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 26.667604708333332,
+        "awakeElapsedSeconds": 26.667605291666664,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "bc2a25ab0fc31752eff45f3515500de2f15ab345767aca6fc79536f3d58f5d01"
+      },
+      {
+        "trial": 1,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 21.964986541666665,
+        "awakeElapsedSeconds": 21.964987625,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "0b0000e3ea2bd64af1eee9e81d449bd54fadd50db6c4cc45fee262ea439f34ba"
+      },
+      {
+        "trial": 2,
+        "exitCode": 0,
+        "continuousElapsedSeconds": 21.49410758333333,
+        "awakeElapsedSeconds": 21.49410833333333,
+        "suspendedDifferenceSeconds": 0,
+        "logSHA256": "9cf0943fdf4069ff71d519da6d0672b90d995a2ea82948d411ac3dc7b7e73f44"
+      }
+    ],
+    "allFourCasesPassInEveryTrial": true,
+    "allTrialsHaveNoMeasuredSuspension": true,
+    "scope": "Unchanged product and tests, same instrumented binary. Original failed broad run is retained, not converted into a passing suite."
+  },
+  "ci": {
+    "source2cc11a9": {
+      "runID": 40174802375,
+      "bothJobsPass": true
+    },
+    "documentationHeadA377c8f": {
+      "runID": 40174861539,
+      "nativeJobID": 121113254430,
+      "benchmarkHarnessesPass": true,
+      "nativeJobPass": false,
+      "failingStage": "Verify owned encrypted APFS images and app sessions",
+      "case": "NativeVaultCancellationTests.testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory",
+      "observedAfterCancellationImageCount": 1,
+      "expectedAfterCancellationImageCount": 0,
+      "immediateRetryError": "The filesystem is unmounted but the image is still attached. Retry locking before unlocking it.",
+      "caseElapsedSeconds": 18.789,
+      "logSHA256": "dc5fea8489cba131f39e194315f92be90f4bff15fb9f8aef2e81f678103e4fd8",
+      "scope": "Independent CI cancellation failure with unchanged product inputs. No host-sleep explanation is established for CI. Attaching before complete proof/cancellation cleanup remains under investigation."
+    }
+  },
+  "nativeCapture": {
+    "targetedOwnedFixturePasses": true,
+    "normalOCRRegions": 5,
+    "checks": [
+      "target identity",
+      "live OCR marker",
+      "image saved",
+      "secret text redacted",
+      "secret image absent",
+      "app exclusion",
+      "window-title exclusion",
+      "delete removes image and FTS entry"
+    ],
+    "scope": "Explicit authored foreground fixture, not continuous desktop capture, arbitrary browser behavior or natural OCR quality."
+  },
+  "physicalAudio": {
+    "normalPass": true,
+    "threadSanitizerPass": true,
+    "fixtureSources": 2,
+    "permissionChanges": false,
+    "rawCapturedAudioPersisted": false,
+    "systemVolumeChanged": false,
+    "scope": "Production capture ingress and known-tone separation using owned hidden generated-tone sources. Not signed-GUI controller, microphone/ASR, arbitrary-device or energy acceptance."
+  }
+}

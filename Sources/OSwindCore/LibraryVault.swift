@@ -61,6 +61,7 @@ public actor LibraryVault {
         return try await openUnderLease(passphrase:passphrase,allowSetup:true)
     }
     public func lock(store:MemoryStore?=nil) async throws -> LibraryVaultStatus {
+        try Task.checkCancellation()
         let lease=try VaultOperationLease(paths:paths);defer {withExtendedLifetime(lease){}}
         return try await closeUnderLease(store:store)
     }
@@ -132,6 +133,18 @@ public actor LibraryVault {
         }
     }
     private func closeUnderLease(store:MemoryStore?) async throws -> LibraryVaultStatus {
+        // The operation lease stays with the awaiting caller. Once closing has
+        // begun, finish the complete transition independently: metadata reads,
+        // writer drain and alias writes also check Task cancellation. Protecting
+        // only detach leaves earlier cancellation points able to skip it.
+        // build() also uses this path after opening its own image; it must close
+        // that image even if its caller was cancelled just before this call.
+        let finishing=Task.detached(priority:.utility) {try await self.performCloseUnderLease(store:store)}
+        let status=try await finishing.value
+        try Task.checkCancellation()
+        return status
+    }
+    private func performCloseUnderLease(store:MemoryStore?) async throws -> LibraryVaultStatus {
         acceptedPassphraseDigest=nil
         let info=try paths.info()
         guard let proof=try await driver.attachment(paths:paths) else {
@@ -161,7 +174,7 @@ public actor LibraryVault {
             let desired=try BackupFileTree(root:proof.mount.appendingPathComponent("Library")).identity()
             guard store.mediaRootIdentity.device==desired.device,store.mediaRootIdentity.inode==desired.inode else {throw OSwindError.invalid("Close the store belonging to this vault")}
             let worker=Task.detached(priority:.utility) {try store.close()}
-            try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+            try await worker.value
         }
         // Close the public handle before detaching its target. Old executables
         // following that handle encounter a regular file, never a fresh folder.
