@@ -1,0 +1,41 @@
+{
+  "format": "OSwind complete vault closing transition qualification v1",
+  "state": "in progress; broader frozen-source qualification pending",
+  "codeCommit": "2cc11a9db49b42aa5641f265b360e85df1b0edc4",
+  "schema": 22,
+  "baseline": {
+    "sourceCommit": "b8e6c6fb1de1132dc7e4864a8055dd341322ed60",
+    "vaultSourceSHA256": "31ff187fe0fa7c33e457891471e1ffca5d51fceeacf97b8383f83f078f47c439",
+    "nativeTestSHA256": "14eacd74fae1a4672779b48a43208c50565cd0b964c8c1df26f2f53f6e87bfec",
+    "logSHA256": "e9bbd8354ec69dec689c7f882a58d13f868941d48522c083be4fa286dd62074a",
+    "exitCode": 1,
+    "cases": 1,
+    "reportedFailures": 7,
+    "cycles": 3,
+    "storeClosedFailures": 3,
+    "imageAbsenceFailures": 2,
+    "lockedStatusFailures": 2
+  },
+  "change": "Protect the entire closing transition, including cancellation-aware metadata reads, media-writer drain and handle writes, before verified normal detach. Reject already-cancelled public lock before reservation.",
+  "focusedNormal": {
+    "cases": 45,
+    "failedCases": 0,
+    "logSHA256": "1301b8036b4a3b644b16ae7f18657368c9b1bbc2d3fe4087bfadd8cab0514e29"
+  },
+  "appSessionNormal": {
+    "cases": 12,
+    "failedCases": 0,
+    "logSHA256": "9dd9aafaad5f85c0eed0780fc391a0da192226949e434fdc0e7051c3470066e0"
+  },
+  "newDefinedCases": 2,
+  "priorCounterexample": "entity-unicode-v1.json retains one awake cancelled-lock assertion under TSan; this reproducible earlier-phase failure does not isolate its exact timing.",
+  "qualificationComplete": false,
+  "releaseAcceptanceComplete": false,
+  "allKnownContractsPass": false,
+  "limits": [
+    "Full frozen-source and race-instrumented qualification pending",
+    "No forced detach, identity relaxation, real credentials or authentication",
+    "Physical sleep/wake, forced termination, power-loss and whole-product/competitor acceptance remain separate gates",
+    "Installed app unchanged"
+  ]
+}

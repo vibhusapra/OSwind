@@ -2,6 +2,10 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Complete vault closing transition: qualification in progress
+
+[Source2cc11a9 evidence](vault-close-transition-v1.json) retains the preceding code's seven failed assertions in a three-cycle held-media-lease cancellation regression. All three cycles return with the store open; two independently retain an attached image. The fix protects metadata, media drain, public-handle closure and verified normal detach as one cancellation-independent transition. Already-cancelled public requests leave the package unchanged. Forty-five focused cases and twelve app-session cases pass. Broader frozen-source/model/package/interruption/TSan qualification is running. The prior awake cancellation failure remains retained separately; no complete release or competitor acceptance is inferred.
+
 ## Whole Unicode entity admission: retained lock counterexample
 
 [Partial source 681676f qualification](entity-unicode-v1.json) fixes admission of malformed surrogate/composed-character spans and verifies 262 exact tokenizer references. All 844 defined cases have passing observations across runs, but the initial full run retains a session failure spanning 763 seconds of sleep. Four unchanged awake retries pass. The broader TSan selection has 431 passes and one **awake cancelled-lock failure**: independent inventory still lists the owned image after cancellation returns. Later status/history and final absence checks pass; the failing observation remains a release blocker. No data race is reported.
