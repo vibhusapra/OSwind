@@ -100,7 +100,7 @@
     "axis": "Energy",
     "feature": "Long-run battery and CPU budget",
     "status": "todo",
-    "evidence": "Paired signed CPU/wall indexing/restore observations published; no watts or battery drain. Noninteractive read-only powermetrics probe refused because sudo needs a password; settings unchanged. Older schema11 component soak completed with four gaps; current uninterrupted desktop capture and physical power remain missing",
+    "evidence": "Paired signed CPU/wall indexing/restore observations published; no watts or battery drain. Earlier noninteractive powermetrics probe refused because sudo needs a password. A pinned optional non-root macmon observer now passes8 offline contracts and20 finite hardware samples; a40-sample owned-CPU responsiveness probe is system-only with visible background GPU drift. No app energy or sustained battery result; settings unchanged. Older schema11 component soak completed with four gaps; current uninterrupted desktop capture and physical power remain missing",
     "references": "Screenpipe, all always-on tools"
   },
   {
