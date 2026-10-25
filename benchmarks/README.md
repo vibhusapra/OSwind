@@ -1,5 +1,9 @@
 # Benchmark protocol and results
 
+## Current natural-photo visual recheck
+
+[The current signed CLI](visual-tokenizer-natural-v1.json) preserves459/501 top1 and498/501 top5 on the previously opened100-photo/501-query fixture. Indexing, filtering and reopen pass. The frozen harness retains a **failed same-model-ID check**: four compiled metadata members differ from the old manual bundle, while graph/weights/tokenizer member hashes match. Current query median/p9528.49/35.66ms and peak RSS1.582GB are visible; older14.27ms is not a paired or matched-model baseline. No cause, speedup, fresh holdout, desktop or competitor claim is inferred.
+
 ## Reviewed contextual drafts
 
 [Source d48fcbd / schema22 qualification](contextual-drafts-v1.json) passes891 functional cases with one physical-audio skip,105 focused app/privacy TSan cases and all14 ordered package/CLI operations. The new17 draft cases cover evidence revision/deletion/privacy, bounds, selection/expiry/protected input, uncertain acknowledgements, cancellation and binding ownership. A reproduced stale cleanup counterexample remains retained. Light/dark synthetic views are visually checked. No live editor delivery, undo, global keyboard/VoiceOver, universal sensitive-field protection, sustained power or competitor ranking is inferred.

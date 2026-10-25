@@ -39,3 +39,17 @@ Background indexing respects Low Power Mode unless background indexing is allowe
 The [encoder evidence](../benchmarks/visual-encoder-v1.json) separates identical-tensor numerical agreement from the retained JPEG/Pillow decoding discrepancy. `benchmark-visual` measures the actual persisted index, source-validating retrieval, filters and reopen using explicit public/synthetic images. `scripts/visual-search-smoke.py` adds real CLI/HTTP/MCP identity, scope, authentication and changed-byte checks in a new isolated library. The [signed release trial](../benchmarks/visual-memory-v1.json) indexes 100 photos in 9.71 s, returns 459/501 correct top 1 and 498/501 top 5, and measures 14.27/16.10 ms median/p95 source-validating queries on one M5 Max. The process reaches 1.576 GB peak RSS. These fixtures bypass physical screen capture and do not establish desktop relevance or competitor superiority. Caches/background work are uncontrolled; no cold-start or energy claim is made.
 
 Remaining gates include labeled desktop tasks, realistic long-archive media I/O, cold start, physical capture/energy, broader hardware/OS coverage and native keyboard/accessibility acceptance. One-click preparation has process-level qualification; native interaction acceptance and byte-range download resume remain open. Current replay indexing is bounded to 240 declared frames, 120 seconds, 4096-pixel video dimensions and 512 MiB per clip; retained images use the encoder's 16-megapixel / 64 MiB limits. Very large or malformed media are reported as failures. Exact source checks can be expensive for large clips. No ANN scaling or top-three claim is made for this visual path.
+
+### Current tokenizer recheck: same quality, different bundle identity
+
+[Source152c846 / schema22](../benchmarks/visual-tokenizer-natural-v1.json)
+returns the same459/501 top1 and498/501 top5 results on the previously opened
+100-photo fixture. Indexing/filtering/reopen pass. One current process observes
+9.47s indexing,28.49/35.66ms query median/p95 and1.582GB peak RSS.
+The frozen harness **fails its same-model-ID check**: the old manual bundle and
+current automatic-preparation bundle have different four compiled metadata
+member hashes; MIL graph, weight and tokenizer member hashes match. This does
+not prove execution equivalence or retroactively pass that check. The old14.27ms
+query result is a different source/bundle and an unpaired observation. The
+larger current timing is retained; no tokenizer cause or speedup is inferred.
+No retry or model/threshold adjustment followed this recheck.

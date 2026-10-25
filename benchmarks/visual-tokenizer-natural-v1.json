@@ -1,0 +1,101 @@
+{
+  "format": "OSwind current natural-photo visual recheck",
+  "version": 1,
+  "codeCommit": "152c846ae154934f102694dd1fd3a7f6f1533e3f",
+  "schema": 22,
+  "protocolSHA256": "988da826c4aa64653561b22a6be339e718aaf1b445283a486e739f25b6d5107b",
+  "cliSHA256": "ffbbc2db26eb5a626a6207f15f6c9a69d7d2f0dea92afc270fbe396f855d7b10",
+  "fixtureSHA256": "073d535c9fc222f9c8b37a63602f5f961727557587875a0bf834a6f2f0c3fc34",
+  "modelManifestSHA256": "c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+  "tokenizerSHA256": "cb9140fae3ac5122c972d37adf83e1248471a38147ad76f8215c8872c6fd8322",
+  "scope": "One frozen current signed-CLI run on the previously developer-opened COCO2017 subset. Not a fresh training holdout, physical desktop capture, paired speedup or competitor benchmark.",
+  "planChecks": {
+    "sameCorpus": true,
+    "sameModelID": false,
+    "sameCorrectCounts": true,
+    "indexAndReopen": true,
+    "scoped": true,
+    "awakeClockAgreement": true,
+    "noOtherKnownJobsAfter": true
+  },
+  "allPlannedChecksPass": false,
+  "harnessExitCode": 1,
+  "cliExitCode": 0,
+  "result": {
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "gpu": "Apple M5 Max",
+    "images": 100,
+    "indexedFrames": 100,
+    "indexingSeconds": 9.474820017814636,
+    "limits": [
+      "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+      "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+      "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+      "No image, caption, source path or raw vector is included in this aggregate report."
+    ],
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "os": "Version 26.6.2 (Build 25G83)",
+    "queries": 501,
+    "queryMedianMilliseconds": 28.486967086791992,
+    "queryP95Milliseconds": 35.6600284576416,
+    "recallAt1": 0.9161676646706587,
+    "recallAt5": 0.9940119760479041,
+    "recallAt10": 0.9940119760479041,
+    "reopenedIndexSources": 100,
+    "schema": 22,
+    "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+    "scopedResultsVerified": true
+  },
+  "resources": {
+    "exitCode": 0,
+    "elapsedAwakeSeconds": 26.092621750198305,
+    "elapsedSystemSeconds": 26.092352151870728,
+    "childUserCPUSeconds": 17.768873,
+    "childSystemCPUSeconds": 4.514674,
+    "maxRSSBytes": 1582153728,
+    "otherKnownJobsAfter": []
+  },
+  "qualityCounts": {
+    "at1": 459,
+    "at5": 498,
+    "at10": 498
+  },
+  "retainedMismatch": {
+    "expectedHistoricalModelID": "siglip2:f75ea390d02744654329aa5bad8a97c6e6289ed34a1c4f767972bc4d0c3b5198",
+    "actualCurrentModelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "differentManifestMembers": [
+      "image.mlmodelc/analytics/coremldata.bin",
+      "image.mlmodelc/coremldata.bin",
+      "text.mlmodelc/analytics/coremldata.bin",
+      "text.mlmodelc/coremldata.bin"
+    ],
+    "identicalMembers": [
+      "LICENSE.txt",
+      "image.mlmodelc/model.mil",
+      "image.mlmodelc/weights/weight.bin",
+      "text.mlmodelc/model.mil",
+      "text.mlmodelc/weights/weight.bin",
+      "tokenizer.json",
+      "tokenizer_config.json"
+    ],
+    "sameSourceWeightsSHA256": true,
+    "sameConversionRecipe": true,
+    "interpretation": "The old manually prepared and current automatically prepared bundles have different integrity identities. Four compiled coremldata/analytics files differ; MIL graphs, weights, tokenizer/config and license member hashes match. This audit does not independently establish compiled execution equivalence or retroactively pass the planned same-ID check."
+  },
+  "limits": [
+    "Known developer-opened COCO2017 subset; model pretraining overlap unaudited",
+    "Single current-process quality recheck; no paired speedup or cold-cache claim",
+    "Private input hashes read before launch, warming file caches; ordinary system services/background activity uncontrolled",
+    "Child process resources exclude shared daemons; no power/desktop/competitor ranking claim",
+    "Historical schema19 query median14.27ms versus current28.49ms is not a matched-model/paired comparison. The larger current timing remains visible; its cause is not assigned to the tokenizer. No retry or model/threshold change followed this opened corpus."
+  ],
+  "fixture": {
+    "dataset": "Fixed official COCO2017 validation subset; same previously opened corpus",
+    "images": 100,
+    "queries": 501,
+    "seed": 1729,
+    "selectionSHA256": "41fbeb3cd5d1aad40dfac48bf9aea220f29587ab41c47d66630e8d41d38e0715",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "notProvenTrainingHoldout": true
+  }
+}
