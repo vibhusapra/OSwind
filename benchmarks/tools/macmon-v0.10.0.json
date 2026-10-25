@@ -1,0 +1,17 @@
+{
+  "format": "OSwind optional power tool receipt v1",
+  "url": "https://github.com/vladkens/macmon/releases/download/v0.10.0/macmon-v0.10.0.tar.gz",
+  "release": "v0.10.0",
+  "sourceRevision": "5df67a54e082e0b30a0aa2b48b7c7f78a36f1795",
+  "publisherArchiveSHA256": "0ccff60b7bf67bcb9e09cc8f804656a1cafa7eeae7297ee83d10e460ead7d43d",
+  "archiveBytes": 934099,
+  "executableSHA256": "57259ce6845d0904be247c8e860fcc923300bab52e28a01f476c22c852051286",
+  "executableBytes": 2329704,
+  "scope": "Official prebuilt release; GitHub asset digest verified. Source pipe path inspected; binary/source equivalence is not independently proved. Private tool path only; no global install or service.",
+  "license": "MIT",
+  "licensePath": "licenses/macmon-MIT.txt",
+  "purpose": "Optional development-only system telemetry. Not an OSwind application dependency; never auto-installed.",
+  "mode": "Explicit finite pipe only. Do not invoke TUI, serve/service installation, process inspection, stress or find-clpc for this protocol.",
+  "sourceMain": "https://github.com/vladkens/macmon/blob/5df67a54e082e0b30a0aa2b48b7c7f78a36f1795/src/app/main.rs",
+  "binarySourceEquivalenceIndependentlyProved": false
+}

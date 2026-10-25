@@ -1,0 +1,156 @@
+{
+  "format": "OSwind optional system telemetry qualification v1",
+  "scope": "Instrumentation availability and temporal counter response only. No OSwind process-attributed energy, calibrated physical/wall-plug power, battery budget, sustained capture or competitor result.",
+  "tool": {
+    "format": "OSwind optional power tool receipt v1",
+    "url": "https://github.com/vladkens/macmon/releases/download/v0.10.0/macmon-v0.10.0.tar.gz",
+    "release": "v0.10.0",
+    "sourceRevision": "5df67a54e082e0b30a0aa2b48b7c7f78a36f1795",
+    "publisherArchiveSHA256": "0ccff60b7bf67bcb9e09cc8f804656a1cafa7eeae7297ee83d10e460ead7d43d",
+    "archiveBytes": 934099,
+    "executableSHA256": "57259ce6845d0904be247c8e860fcc923300bab52e28a01f476c22c852051286",
+    "executableBytes": 2329704,
+    "scope": "Official prebuilt release; GitHub asset digest verified. Source pipe path inspected; binary/source equivalence is not independently proved. Private tool path only; no global install or service.",
+    "license": "MIT",
+    "licensePath": "licenses/macmon-MIT.txt",
+    "purpose": "Optional development-only system telemetry. Not an OSwind application dependency; never auto-installed.",
+    "mode": "Explicit finite pipe only. Do not invoke TUI, serve/service installation, process inspection, stress or find-clpc for this protocol.",
+    "sourceMain": "https://github.com/vladkens/macmon/blob/5df67a54e082e0b30a0aa2b48b7c7f78a36f1795/src/app/main.rs",
+    "binarySourceEquivalenceIndependentlyProved": false
+  },
+  "offlineContracts": {
+    "cases": 8,
+    "passed": 8,
+    "logSHA256": "aafc3217bd86c15c92f61401b3c1fe2b89401debdd56fc0897f29cbd87a96b4f",
+    "coverage": [
+      "finite nonnegative values; reject missing/NaN/infinite/negative/Boolean/string fields",
+      "aware timestamps and monotonic rows; refuse duplicates and partial/oversized/extra/incomplete streams",
+      "unknown future fields are dropped before persistence",
+      "pinned executable refuses before launch",
+      "actual generated protocol process round trip and own child reaping on main/worker thread failure"
+    ]
+  },
+  "actualFiniteCapture": {
+    "requestedSamples": 20,
+    "intervalMilliseconds": 1000,
+    "awakeElapsedSeconds": 20.966393790906295,
+    "systemElapsedSeconds": 20.966399908065796,
+    "childCPUSeconds": 0.34479299999999996,
+    "childMaximumResidentBytes": 19120128,
+    "maximumSampleGapSeconds": 1.0159988403320312,
+    "maximumArrivalClockDivergenceSeconds": 7.265480235219002e-06
+  },
+  "actualCaptureSHA256": "f78e5a5c0d65242e2bef5af601d502e118718f71412180015b66e1da94a0cfd3",
+  "responsiveness": {
+    "format": "OSwind system-counter responsiveness observations v1",
+    "scope": "Finite system telemetry and two owned CPU hash workers only. Check source availability and temporal responsiveness, not app-attributed energy, OSwind workload efficiency, idle system power or battery life. Host background activity uncontrolled. No root, service, user process details, device/settings changes, normal history or GPU stress.",
+    "protocolSHA256": "7cbe70edd166669e2638eb8813e59ab1567fefab3080816fa49cacee3a06f03e",
+    "samplerSHA256": "57259ce6845d0904be247c8e860fcc923300bab52e28a01f476c22c852051286",
+    "samples": 40,
+    "readFailures": [],
+    "awakeElapsedSeconds": 41.242136290995404,
+    "systemElapsedSeconds": 41.24215030670166,
+    "maximumGapSeconds": 1.0196189880371094,
+    "minimumGapSeconds": 1.0042009353637695,
+    "workerUsage": [
+      {
+        "userSeconds": 14.219821,
+        "systemSeconds": 0.300176,
+        "maxResidentBytes": 16482304
+      },
+      {
+        "userSeconds": 14.213954,
+        "systemSeconds": 0.295266,
+        "maxResidentBytes": 16498688
+      }
+    ],
+    "phaseSummary": {
+      "before": {
+        "samples": 6,
+        "medians": {
+          "cpu_power": 2.964028835296631,
+          "gpu_power": 10.375764846801758,
+          "ane_power": 0.0,
+          "all_power": 13.485353469848633,
+          "sys_power": 50.80708312988281,
+          "ram_power": 12.539990425109863,
+          "gpu_ram_power": 0.0,
+          "cpu_active_ratio": 0.14298345148563385,
+          "cpu_scaled_ratio": 0.06464198231697083,
+          "gpu_active_ratio": 0.9567652940750122
+        }
+      },
+      "ownedCPU": {
+        "samples": 11,
+        "medians": {
+          "cpu_power": 3.4000022411346436,
+          "gpu_power": 10.701891899108887,
+          "ane_power": 0.0,
+          "all_power": 14.107114791870117,
+          "sys_power": 51.69689178466797,
+          "ram_power": 12.237821578979492,
+          "gpu_ram_power": 0.0,
+          "cpu_active_ratio": 0.3220578730106354,
+          "cpu_scaled_ratio": 0.14459526538848877,
+          "gpu_active_ratio": 0.9319915175437927
+        }
+      },
+      "after": {
+        "samples": 6,
+        "medians": {
+          "cpu_power": 2.6741015911102295,
+          "gpu_power": 11.137255191802979,
+          "ane_power": 0.0,
+          "all_power": 13.754703521728516,
+          "sys_power": 51.12693977355957,
+          "ram_power": 12.479146957397461,
+          "gpu_ram_power": 0.0,
+          "cpu_active_ratio": 0.14164800196886063,
+          "cpu_scaled_ratio": 0.06362293846905231,
+          "gpu_active_ratio": 0.9517554938793182
+        }
+      }
+    },
+    "cpuPowerRisesDuringOwnedWork": true,
+    "allSamplesFiniteNonnegative": true,
+    "appAttributedEnergyMeasured": false,
+    "batteryBudgetMeasured": false
+  },
+  "responsivenessRawSHA256": "248cdaa1a71b3111a95a1ea5bfbb1e2b4cf82cbb401f62e2e3e34667613b94ea",
+  "responsivenessProtocol": {
+    "format": "OSwind telemetry responsiveness protocol v1",
+    "frozenUTC": "2026-10-25T12:48:10Z",
+    "samplerSHA256": "57259ce6845d0904be247c8e860fcc923300bab52e28a01f476c22c852051286",
+    "samplerVersion": "0.10.0",
+    "intervalMilliseconds": 1000,
+    "samples": 40,
+    "beforeSeconds": 10,
+    "workers": 2,
+    "workSeconds": 15,
+    "afterSeconds": 10,
+    "phaseTrimSeconds": 2,
+    "clockDivergenceLimitSeconds": 0.25,
+    "scope": "Finite system telemetry and two owned CPU hash workers only. Check source availability and temporal responsiveness, not app-attributed energy, OSwind workload efficiency, idle system power or battery life. Host background activity uncontrolled. No root, service, user process details, device/settings changes, normal history or GPU stress.",
+    "interpretation": "Use median power/active ratios from intervals at least2s inside each phase. A positive CPU rise is temporal evidence only; failed, missing, stale or irregular samples must remain explicit.",
+    "actualWorkerImplementation": {
+      "pythonVersion": "3.15.0",
+      "workers": 2,
+      "algorithm": "SHA256 in a busy loop until a15-second monotonic deadline",
+      "payload": "OSwind owned CPU calibration ",
+      "repetitions": 4096
+    }
+  },
+  "limits": [
+    "System counters are shared with all background activity. A positive response during an owned CPU load is temporal evidence, not isolated causality or app attribution.",
+    "GPU power drifts during the CPU-only probe, making uncontrolled background activity explicit.",
+    "Private APIs/tool outputs can be unavailable or stale on other OS/chip versions. Numeric zero is retained but does not prove a channel is available.",
+    "The sampler reports system power estimates; no external meter calibration, OSwind energy comparison, sustained desktop recording or battery discharge trial is performed.",
+    "No normal history, root, service, process/file inspection, auth/TCC/power setting changes or global installation. Official prebuilt bytes match the published archive digest; binary/source equivalence is not independently proved."
+  ],
+  "instrumentationAvailableOnThisHost": true,
+  "longRunBudgetComplete": false,
+  "appEnergyMeasured": false,
+  "releaseAcceptanceComplete": false,
+  "producerSHA256": "cbeac5b0d76fa9213391dc1926a48df59a14ef490c5348a820378e5d64b1d4b4",
+  "responseDriverSHA256": "5a8bce662dac8a6bc18eea6e867470725bcd2d53d43b1a415770137744118b4b"
+}
