@@ -57,7 +57,10 @@ final class VaultProcessCancellationTests:XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("ready").path))
     }
     func testCancelledNativeActionRetainsItsDeadlineAndReapsOnTimeout() async throws {
-        let script=try helper(),worker=Task {try await VaultProcess.run("/usr/bin/python3",[script.path],timeout:0.75,cancellation:.finishNativeAction)}
+        // Avoid making Python framework startup part of a subsecond deadline.
+        // exec preserves the PID recorded before the blocking native action.
+        let program="printf '%s' \"$$\" > \"$1/ready.pending\"; /bin/mv \"$1/ready.pending\" \"$1/ready\"; exec /bin/sleep 60"
+        let worker=Task {try await VaultProcess.run("/bin/sh",["-c",program,"owned-timeout",root.path],timeout:3,cancellation:.finishNativeAction)}
         let pid=try await ready(worker);worker.cancel()
         do {_ = try await worker.value;XCTFail("Timed out action succeeded")}
         catch {XCTAssertTrue(error.localizedDescription.contains("timed out"))}
