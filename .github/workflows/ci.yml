@@ -35,6 +35,7 @@ jobs:
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
           python3 scripts/vault-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-interruptions"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal"
+          python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal-busy" --held-reader
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise explicit text collectors and Python SDK on encrypted APFS

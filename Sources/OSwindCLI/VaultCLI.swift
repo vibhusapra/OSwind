@@ -10,8 +10,9 @@ func runAsyncCLI<T:Sendable>(cancellationMessage:String,_ operation:@escaping @S
         FileHandle.standardError.write(Data((cancellationMessage+" Press Ctrl-C again to exit immediately.\n").utf8));worker.cancel()
     }
     source.resume();defer {source.setEventHandler(handler:nil);source.cancel();signal(SIGINT,previous)}
-    do {return try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
-    catch {if worker.isCancelled {throw CancellationError()};throw error}
+    // Cancellation is a request, not the operation's result. In particular,
+    // native cleanup can fail after Ctrl-C; preserve that failure for recovery.
+    return try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
 }
 func runVaultCLI<T:Sendable>(_ operation:@escaping @Sendable () async throws -> T) async throws -> T {
     try await runAsyncCLI(cancellationMessage:"Stopping vault work safely; check vault status before retrying.",operation)

@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## CLI cancellation error propagation — controlled native busy regression
+
+The async and backup CLI wrappers now preserve the operation's actual error after Ctrl-C. Previously, any error from a cancelled worker was replaced by CancellationError, hiding cleanup/storage failures. The native held-reader terminal regression fails against the preceding signed269d4c9 CLI: expected busy exit1 becomes cancellation130 while the owned image remains attached. The fixed debug CLI returns1 with the actionable files-in-use error. Releasing the deliberate reader allows normal lock and exact authored history after remount in both trials. Genuine cancellation still uses130; no force detach, identity change or success claim for a busy lock is added. CI now runs this controlled regression. Signed/process qualification is pending; the previous partial qualification remains retained.
+
 ## Native proof and descriptor ownership — frozen source f7d941f / schema22
 
 [PR #58](https://github.com/vibhusapra/OSwind/pull/58) closes two concrete lifecycle boundaries. Native attach finishes through complete verified proof acquisition independently of caller cancellation; a cancelled caller waits for normal cleanup of that exact proof, with cleanup failures visible. A failed operation reservation no longer assigns its owned descriptor before throwing checks: Swift also ran its destructor after the earlier explicit close, potentially closing a descriptor another thread reused.
