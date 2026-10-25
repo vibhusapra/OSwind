@@ -47,6 +47,8 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 
 ## What v0 contains
 
+- [Review and insert drafts](docs/CONTEXTUAL-DRAFTS.md): edit an evidence-backed answer, then explicitly insert into a shortcut-selected native text field or Copy. Protected/changed fields and uncertain writes are guarded; browser/terminal/IDE insertion and live signed-app acceptance remain open.
+
 - [People & projects](docs/ENTITY-MEMORY.md): on-device suggestions and explicit project aliases, source-linked curation/merges, scoped search/Ask and read-only integrations. Full backup preserves this layer; source JSON/Markdown currently do not.
 
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).

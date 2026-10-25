@@ -60,6 +60,7 @@ struct WorkspaceView: View {
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
+        .sheet(isPresented:Binding(get:{m.drafting.showing},set:{m.drafting.showing=$0})) {ContextualDraftView(draft:m.drafting,privacy:m.settings.privacy)}
         .sheet(isPresented:$m.showOnboarding) { OnboardingView().environmentObject(m) }
         .sheet(item:$m.selected) { MemoryDetail(memory:$0,query:m.selectedEvidenceQuery).environmentObject(m) }
         .sheet(isPresented:$showNote) { VStack(alignment:.leading,spacing:16) { Text("Keep a thought").font(.title2.weight(.semibold)); TextEditor(text:$note).font(.body).frame(width:500,height:220); HStack { Button("Cancel") { showNote = false }; Spacer(); Button("Save note") { m.addNote(note); note = ""; showNote = false }.buttonStyle(.borderedProminent).disabled(note.isEmpty) } }.padding(24) }
@@ -242,7 +243,7 @@ struct AnswerCard: View {
         VStack(alignment:.leading,spacing:16) {
             ForEach(answer.warnings,id:\.self) { warning in Label(warning,systemImage:"info.circle").font(.caption).foregroundStyle(.secondary) }
             Text(answer.text).textSelection(.enabled).font(.system(size:15)).lineSpacing(5).frame(maxWidth:.infinity,alignment:.leading)
-            HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Save linked recap") {m.saveAnswer(answer)}.disabled(m.savingRecap || answer.sources.isEmpty); Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
+            HStack { Text("\(answer.provider) · \(String(format:"%.1f",answer.duration)) s · \(answer.sources.count) sources").font(.caption).foregroundStyle(.secondary); Spacer(); Button("Review draft…") {m.reviewDraft(answer)}; Button("Save linked recap") {m.saveAnswer(answer)}.disabled(m.savingRecap || answer.sources.isEmpty); Button("Copy") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(answer.text,forType:.string) } }
             if !answer.sources.isEmpty {
                 DisclosureGroup("Check \(answer.sources.count) sources") {
                     ForEach(Array(answer.sources.enumerated()),id:\.element.id) { i,hit in

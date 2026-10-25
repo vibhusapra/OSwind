@@ -12,7 +12,11 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "ActivityCalendar" {
+        if model.section == "ContextualDraft" {
+            let answer=Answer(text:"Yesterday, we finished the release checklist and agreed to keep the rollout small [1].\n\nToday, I’m checking the remaining regressions. Maya owns the release decision; the deadline is Friday [2].\n\nBlocker: the final device check is still open.",sources:[.init(memory:Memory(id:"draft-sample-1",app:"Notes",title:"Release checklist · sample",text:"We finished the release checklist and agreed to keep the rollout small."),score:1,match:"sample"),.init(memory:Memory(id:"draft-sample-2",app:"Notes",title:"Release owner · sample",text:"Maya owns the release decision. The deadline is Friday. The final device check is still open."),score:1,match:"sample")],provider:"Local model · sample",duration:0)
+            model.drafting.review(answer,validate:{})
+            size=NSSize(width:760,height:710);content=AnyView(ContextualDraftView(draft:model.drafting,privacy:model.settings.privacy))
+        } else if model.section == "ActivityCalendar" {
             let zone=TimeZone(identifier:"America/New_York")!;var calendar=Calendar(identifier:.gregorian);calendar.timeZone=zone
             for day in 1...30 where day%7 != 0 {
                 for ordinal in 0..<(day%6+1)*3 {

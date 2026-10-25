@@ -7,6 +7,7 @@ import UniformTypeIdentifiers
 
 @MainActor final class AppModel: ObservableObject {
     let store: MemoryStore
+    let drafting:ContextualDraftModel
     let embedder = LocalEmbedder()
     let capture: CaptureController
     let audio: AudioController
@@ -24,6 +25,7 @@ import UniformTypeIdentifiers
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
+        if oldValue.privacy != settings.privacy {drafting.clear()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -114,7 +116,8 @@ import UniformTypeIdentifiers
     @Published var audioImportStatus=""
     private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,preparedStore:MemoryStore?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil) throws {
+        self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
         demo = CommandLine.arguments.contains("--demo")
@@ -139,10 +142,11 @@ import UniformTypeIdentifiers
         entityMemory.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         libraryWipe.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
+        self.drafting.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
-            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop() }.store(in:&cancellables)
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.drafting.clear() }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick();if self?.settings.entityAutomaticIndex==true {self?.entityMemory.build()}; self?.resumeAutomaticVisualIndex() }.store(in:&cancellables)
         if demo { try? seedDemo() }
@@ -162,6 +166,7 @@ import UniformTypeIdentifiers
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
@@ -320,6 +325,24 @@ import UniformTypeIdentifiers
             asking = false
         }
     }
+    func reviewDraft(_ answer:Answer) {
+        guard !store.isClosed,answer.sources.count<=60 else {errorMessage="This answer cannot be drafted from the current library.";return}
+        let proofs=answer.sources.map {($0.id,$0.memory.evidenceHash)},store=self.store
+        drafting.review(answer) { [weak self] in
+            guard let self,!store.isClosed else {throw OSwindError.unavailable("The source library is closed.")}
+            let policy=self.settings.privacy
+            let validation=Task.detached(priority:.utility) {
+                for (id,revision) in proofs {
+                    try Task.checkCancellation()
+                    guard let source=try store.get(id),source.evidenceHash==revision,
+                          policy.exclusion(app:source.bundleID,title:source.title,url:source.url,isBrowser:WindowContext.isBrowser(bundle:source.bundleID))==nil else {
+                        throw OSwindError.unavailable("Draft evidence changed, was removed or is now excluded. Ask again before copying or inserting.")
+                    }
+                }
+            }
+            try await withTaskCancellationHandler {try await validation.value} onCancel:{validation.cancel()}
+        }
+    }
     func cancelAnswer() { answerTask?.cancel() }
     func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "" }
     func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = ""; refreshChats() }
@@ -444,7 +467,7 @@ import UniformTypeIdentifiers
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory:Memory) {
-        guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
+        guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};drafting.clear();deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
         if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
         let store=self.store
         Task {
@@ -475,7 +498,7 @@ import UniformTypeIdentifiers
                     maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
                 } else {maintenanceStatus="Automatic retention is off."}
                 if let indexError {maintenanceStatus += " "+indexError}
-                if let result,result.erasure.sources>0 {activity.forgetCounts()}
+                if let result,result.erasure.sources>0 {activity.forgetCounts();drafting.clear()}
                 invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
             } catch {maintenanceStatus="Cleanup did not complete: "+error.localizedDescription;if !automatic {errorMessage=maintenanceStatus}}
         }
@@ -510,6 +533,7 @@ import UniformTypeIdentifiers
     }
     func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
     func pauseForHistoryErasure() {
+        drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         // Stop readers holding media reservations before asking erasure to take

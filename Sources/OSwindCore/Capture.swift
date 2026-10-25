@@ -15,7 +15,8 @@ public struct WindowContext: Sendable {
     public var accessibilityText: String
     public var secure: Bool
     public var bounds: CGRect? = nil
-    public var browser: Bool { ["safari", "chrome", "firefox", "arc", "brave", "edge", "vivaldi", "orion"].contains { bundle.lowercased().contains($0) } }
+    public static func isBrowser(bundle:String)->Bool { ["safari", "chrome", "firefox", "arc", "brave", "edge", "vivaldi", "orion"].contains { bundle.lowercased().contains($0) } }
+    public var browser: Bool {Self.isBrowser(bundle:bundle)}
 }
 public enum SessionState {
     public static var locked: Bool {

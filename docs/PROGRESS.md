@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Contextual draft review — qualification in progress
+
+- Ask answers can become editable drafts; ⇧⌘Space binds an external native field before activation. Explicit selected-text AX insertion and Copy preserve citation markers. Browser/terminal/IDE insertion remains refused.
+- Seventeen focused model/guard tests pass. A reproduced recapture race initially fails one assertion: older cancellation cleanup clears a newer destination. Generation-bound cleanup fixes it; the failing receipt is retained. No keyboard-event/clipboard insertion fallback or automatic retry is used.
+- Evidence revision/privacy checks, bounds, protected input, selection identity, expiry, cancellation and library/session invalidation are implemented. Full frozen-source tests, focused TSan, packaging and synthetic layout checks are pending. Live signed-app insertion and native accessibility/undo remain unaccepted; F036 is partial.
+
 ## Optional power observation — bounded tooling, budget still open
 
 [System telemetry tooling](POWER-OBSERVATION.md) passes eight offline contracts and a20-sample finite run on this M5 Max without root or settings changes. A40-sample fixed responsiveness probe records CPU medians2.964→3.400→2.674W around two owned CPU workers; GPU readings also drift, exposing uncontrolled background activity. The tool whitelists fields, bounds input/time/counts, checks aware monotonic timestamps and reaps its owned child on failure. Publisher archive/executable hashes, pinned source and MIT license are recorded. This is optional development instrumentation, not an application/private-API dependency. F013 long-run budget remains TODO; no OSwind energy, battery or calibrated wall-plug claim. [Sanitized evidence](../benchmarks/power-telemetry-v1.json).
