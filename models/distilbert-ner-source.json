@@ -1,0 +1,46 @@
+{
+  "repository": "dslim/distilbert-NER",
+  "revision": "dfa2838a127384aabb82ed7719e16dab84c42a2a",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 6170,
+      "sha256": "83ca9ccd4197f04f329c3d3f649c84388a92d19aae3dd108e98d5040397e0e53"
+    },
+    {
+      "path": "config.json",
+      "bytes": 926,
+      "sha256": "50c882556c3e52ce6112a5685c260030118f7a278261f4f3f0020dd9cf533957"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 260803668,
+      "sha256": "235ecd699f650ca36513b122d11ce5a80339be1388f06c33c2278368b99914e1"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 125,
+      "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 669021,
+      "sha256": "cb26b43c98e8266ae3e99c2a583cf8315d73b33a17e6b20b4df7ff1f22392d34"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 1197,
+      "sha256": "691492f0a7e19d8dbfe3faa984eb5cba80237c54b2d54cbd264d478d83dddb0d"
+    },
+    {
+      "path": "vocab.txt",
+      "bytes": 213450,
+      "sha256": "eeaa9875b23b04b4c54ef759d03db9d1ba1554838f8fb26c5d96fa551df93d02"
+    }
+  ],
+  "license_url": "https://huggingface.co/dslim/distilbert-NER/blob/dfa2838a127384aabb82ed7719e16dab84c42a2a/README.md",
+  "publisher": "dslim",
+  "id": "distilbert-ner-cased",
+  "attribution": "dslim/distilbert-NER, fine-tuned on CoNLL-2003; underlying DistilBERT by Sanh et al. Publisher declares Apache-2.0 in the pinned model card."
+}
