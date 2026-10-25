@@ -1,10 +1,11 @@
 # OSwind delivery ledger
 
-## Contextual draft review — qualification in progress
+## Contextual draft review — frozen sourced48fcbd / schema22
 
-- Ask answers can become editable drafts; ⇧⌘Space binds an external native field before activation. Explicit selected-text AX insertion and Copy preserve citation markers. Browser/terminal/IDE insertion remains refused.
-- Seventeen focused model/guard tests pass. A reproduced recapture race initially fails one assertion: older cancellation cleanup clears a newer destination. Generation-bound cleanup fixes it; the failing receipt is retained. No keyboard-event/clipboard insertion fallback or automatic retry is used.
-- Evidence revision/privacy checks, bounds, protected input, selection identity, expiry, cancellation and library/session invalidation are implemented. Full frozen-source tests, focused TSan, packaging and synthetic layout checks are pending. Live signed-app insertion and native accessibility/undo remain unaccepted; F036 is partial.
+- [PR #63](https://github.com/vibhusapra/OSwind/pull/63): editable Ask answer drafts, explicit shortcut-bound native AX selected-text insertion and Copy. Evidence revision/privacy checks, protected input, window/field/selection/process/expiry guards, bounded text, cancellation and single-attempt handling. Browser/terminal/IDE insertion remains refused. [Scope and workflow](CONTEXTUAL-DRAFTS.md).
+- [Frozen qualification](../benchmarks/contextual-drafts-v1.json): **892 defined cases:891 pass / one physical-audio skip / zero failures**, **105 focused app/privacy TSan pass**, all **14 ordered operations pass**. Includes real local model/timer checks, strict staged app/ZIP payload proof, actual encrypted SDK and normal/busy terminal Ctrl-C, CLI/HTTP/MCP and legacy vault checks. Installed17 bytes and launch binding remain unchanged. CI is pending current verification.
+- A reproduced recapture race initially fails one assertion: older cancellation cleanup clears a newer destination. Generation-bound cleanup fixes it; the failing receipt is retained. Initial integration compiler errors also remain in private receipts.
+- Light/dark synthetic component renders are visually checked. Fresh signed-CLI doctor reports a locked M5Max session; CLI permissions do not establish signed-GUI TCC readiness. Live delivery/replacement, protected/read-only target behavior, actual lock/focus transitions, undo and VoiceOver remain unaccepted. F036 is **partial**; broader release/power/competitive acceptance stays open.
 
 ## Optional power observation — bounded tooling, budget still open
 

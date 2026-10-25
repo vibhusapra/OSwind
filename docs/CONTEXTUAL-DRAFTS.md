@@ -77,3 +77,10 @@ universally supported or release-qualified on the basis of model tests.
 The OSpr insertion transport was inspected as a behavioral reference. No OSpr
 source was copied; the implementation here uses one AX transport and explicit
 Copy, with no clipboard or keyboard-event insertion fallback.
+
+Frozen-source qualification is recorded in
+[the contract report](../benchmarks/contextual-drafts-v1.json):891 full-suite
+passes, one physical-audio skip,105 focused TSan passes and14 ordered operations.
+The [light](../assets/contextual-draft-light.png) and
+[dark](../assets/contextual-draft-dark.png) images are authored sample component
+renders, not live editor delivery evidence.

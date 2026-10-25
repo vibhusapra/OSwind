@@ -1,5 +1,9 @@
 # Benchmark protocol and results
 
+## Reviewed contextual drafts
+
+[Source d48fcbd / schema22 qualification](contextual-drafts-v1.json) passes891 functional cases with one physical-audio skip,105 focused app/privacy TSan cases and all14 ordered package/CLI operations. The new17 draft cases cover evidence revision/deletion/privacy, bounds, selection/expiry/protected input, uncertain acknowledgements, cancellation and binding ownership. A reproduced stale cleanup counterexample remains retained. Light/dark synthetic views are visually checked. No live editor delivery, undo, global keyboard/VoiceOver, universal sensitive-field protection, sustained power or competitor ranking is inferred.
+
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
 ## Byte-exact visual tokenizer/loading: frozen sourcea5627ab

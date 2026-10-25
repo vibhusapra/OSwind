@@ -152,5 +152,14 @@
   "appEnergyMeasured": false,
   "releaseAcceptanceComplete": false,
   "producerSHA256": "cbeac5b0d76fa9213391dc1926a48df59a14ef490c5348a820378e5d64b1d4b4",
-  "responseDriverSHA256": "5a8bce662dac8a6bc18eea6e867470725bcd2d53d43b1a415770137744118b4b"
+  "responseDriverSHA256": "5a8bce662dac8a6bc18eea6e867470725bcd2d53d43b1a415770137744118b4b",
+  "ci": {
+    "codeCommit": "6f479c32ccae0ef0e4add78eed0bcecdfc99f755",
+    "runID": 40196344942,
+    "jobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
+    "scope": "Both source-commit CI jobs pass; optional power tooling is not sustained capture or calibrated energy acceptance"
+  }
 }
