@@ -23,6 +23,17 @@ final class EntityMemoryTests:XCTestCase {
         XCTAssertFalse(entity.curated);XCTAssertEqual(mention.surface,"Maya Chen");XCTAssertEqual(mention.passage?.start,0)
         try indexed(m);XCTAssertEqual(try store.entities(kind:.person).first?.id,entity.id);XCTAssertEqual(try store.entity(entity.id)?.sourceCount,1)
     }
+    func testMalformedUnicodeAnchorRefusesBeforeReplacingExistingExtraction() throws {
+        let cases:[(String,String,Int,Int)]=[("😀 Maya","\u{fffd}",1,1),("😀 Maya e\u{301}","e",8,1),("👩‍💻 Maya","👩",0,2)]
+        for (number,value) in cases.enumerated() {
+            let memory=try source("unicode-\(number)",text:value.0),plan=try store.entityIndexPlan()
+            try store.saveEntityExtraction(memory:memory,plan:plan,result:.init(candidates:[candidate(memory,name:"Maya")]))
+            let before=try store.entities(),bad=EntityCandidate(kind:.person,name:value.1,start:value.2,length:value.3)
+            XCTAssertThrowsError(try store.saveEntityExtraction(memory:memory,plan:plan,result:.init(candidates:[bad])),"Malformed Unicode case \(number)")
+            XCTAssertEqual(try store.entities(),before,"Rejected extraction must retain earlier links")
+            XCTAssertEqual(try store.get(memory.id)?.text,memory.text)
+        }
+    }
     func testErasurePrunesDerivedNamesButKeepsExplicitCuration() throws {
         let a=try source("a"),b=try source("b");try indexed(a);try indexed(b)
         let entity=try XCTUnwrap(store.entities(kind:.person).first)
