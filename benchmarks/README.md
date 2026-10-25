@@ -2,6 +2,12 @@
 
 No overall ranking against other products has been established. Competitor features are documented in the research report. Pinned rem database-method timings are measured separately below; full competitor app runtime performance remains unmeasured.
 
+## Independent entity quality
+
+[Pre-inference protocol](../docs/ENTITY-EVALUATION.md), [fixed selection/hash plan](entity-membership-plan-v1.json) and [actual baseline](entity-membership-baseline-v1.json) separate recognition quality from lifecycle tests. Actual signed fbe6fac CLI on M5 Max/macOS26.6.2 admits/indexes all 256 validation / 1,024 test Wikipedia sources unchanged under default privacy. No model/threshold tuning precedes the baseline; no raw corpus text is committed.
+
+Test typed-membership precision/recall/F1: **61.47/54.48/57.76%**. Exact anchored F1: **57.52%**, with zero invalid source spans. Per-kind F1 is person 68.90%, organization42.33%, place 57.91%. The counts include negatives, repeated names once per source, partial-name false positives and missed full-name false negatives. This measured quality gap is preserved; suggestions are not verified identities. English corpus projection, artificial token spacing, annotation differences and unknown pretraining limit interpretation. No desktop, multilingual, PII, energy or competitor result follows. The test is now opened and must not be described as unseen in future tuning. Twelve generated-data scorer/admission/process tests pass and run offline in CI.
+
 ## Cooperative encrypted-library cancellation
 
 [Signed qualification](vault-cancellation-v1.json) binds runtime fbe6fac/schema22 to **818 distinct functional passes and 407 distinct TSan passes**, five repeated actual CLI interruption trials and terminal-generated Ctrl-C for create/unlock/lock. Immediate recovery preserves an authored source and independent OS inventory confirms detachment. Native Stop during an owned helper hold, with intervening OS lock, is followed by an observed detached screen; native recovery shows the original note with recording paused. OS lock prevents final Settings Lock screen confirmation, while product/OS state verifies final detachment. The 33-file signed bundle and complete ZIP agree; installed schema17 stays unchanged.

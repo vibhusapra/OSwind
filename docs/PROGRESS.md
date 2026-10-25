@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Independent entity membership baseline — frozen product fbe6fac / schema22
+
+[PR #55](https://github.com/vibhusapra/OSwind/pull/55) freezes the corpus, selection, scorer and baseline binary hashes before actual inference. Pinned Few-NERD English Wikipedia data projects person, organization and location/building labels into OSwind's membership schema. All rows, including negatives, are eligible; deterministic hash selection fixes 256 validation and 1,024 test examples. Default import privacy stays enabled and any source transformation refuses scoring. Raw corpus text/labels and predictions stay local with their CC BY-SA attribution; public artifacts contain hashes/IDs and aggregate metrics.
+
+[Actual signed-CLI baseline](../benchmarks/entity-membership-baseline-v1.json) completes both splits with all sources unchanged/indexed, no limited sources and zero invalid UTF-16 anchors. Test micro precision/recall/F1 is 61.47/54.48/57.76%; exact anchored F1 is 57.52%. Test person/organization/place F1 is 68.90/42.33/57.91%. Valid evidence anchors do not establish recognition accuracy; organizations are the weakest measured category. No quality threshold or competitive acceptance is claimed. Single-run test import/index is 10.803/1.246s including process startup/SQLite; caches/host activity are uncontrolled.
+
+Twelve standard-library generated-data checks pass, including repeated names, partial-name errors, negatives, surrogate splits, wrong source, changed import and binary/plan/selection refusal. They run offline in CI; no corpus download is added to CI. Product sources remain unchanged from the 818-case/407-TSan signed cancellation qualification. Fresh PR CI is running. These English encyclopedia metrics do not establish desktop/OCR/ASR, multilingual, PII, identity or competitor quality. Test predictions are now opened; future model/threshold selection must use validation and separately freeze fresh held-out examples. Next: evaluate a stronger bounded local recognizer on validation, verify real Mac execution/memory, then reserve new test data before acceptance.
+
 ## Vault cancellation completion — runtime fbe6fac / schema22
 
 [PR #54](https://github.com/vibhusapra/OSwind/pull/54) fixes a reproduced privacy/lifecycle failure. Four of five preceding signed-CLI trials fail immediate unlock recovery after cancellation. An initial native unlock case leaves the owned image attached in all five cycles. The expanded identical three native tests against the preceding product files have **two failed cases, one pass and 19 reported failures**; creation passes that comparison. Fixed files are restored by verified hash, and normal cleanup leaves no owned attachment. These observations remain retained.
