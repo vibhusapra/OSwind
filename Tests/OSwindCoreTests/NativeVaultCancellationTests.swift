@@ -10,7 +10,21 @@ final class NativeVaultCancellationTests:XCTestCase {
         let info=try XCTUnwrap(PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any])
         let images=try XCTUnwrap(info["images"] as? [[String:Any]])
         let image=package.appendingPathComponent("contents.sparsebundle").standardizedFileURL.resolvingSymlinksInPath()
-        return images.filter {item in (item["image-path"] as? String).map {URL(fileURLWithPath:$0).standardizedFileURL.resolvingSymlinksInPath()==image} ?? false}.count
+        let matched=images.filter {item in (item["image-path"] as? String).map {URL(fileURLWithPath:$0).standardizedFileURL.resolvingSymlinksInPath()==image} ?? false}
+        if !matched.isEmpty {
+            // Only this test's exact authored image. Distinguish stale inventory
+            // from a remaining backing device without logging paths or secrets.
+            let entities=matched.flatMap {($0["system-entities"] as? [[String:Any]] ?? []).map {entity -> [String:Any] in
+                let device=entity["dev-entry"] as? String ?? ""
+                let valid=device.hasPrefix("/dev/disk") && device.dropFirst(9).allSatisfy({$0.isNumber || $0=="s"})
+                var metadata=stat()
+                return ["contentHint":entity["content-hint"] as? String ?? "unknown","mounted":entity["mount-point"] != nil,"deviceNodeExists":valid && lstat(device,&metadata)==0]
+            }}
+            var metadata=stat();let aliasClosed=lstat(package.appendingPathComponent("Library").path,&metadata)==0 && metadata.st_mode&S_IFMT==S_IFREG
+            let diagnostic:[String:Any] = ["ownedImageRecords":matched.count,"aliasClosed":aliasClosed,"entities":entities]
+            print("Owned cancellation absence diagnostic: "+String(decoding:try JSONSerialization.data(withJSONObject:diagnostic,options:[.sortedKeys]),as:UTF8.self))
+        }
+        return matched.count
     }
     private func observeOwnedHelper(_ action:String,target:String) async throws ->Bool {
         let deadline=ContinuousClock.now.advanced(by:.seconds(5))
