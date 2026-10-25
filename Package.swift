@@ -6,15 +6,17 @@ let package = Package(
     dependencies: [
         .package(url:"https://github.com/unum-cloud/USearch",exact:"2.26.5"),
         .package(url:"https://github.com/huggingface/swift-transformers.git",exact:"1.3.5"),
+        .package(url:"https://github.com/huggingface/swift-jinja.git",exact:"2.5.2"),
         .package(url:"https://github.com/FluidInference/FluidAudio.git",exact:"0.17.7",traits:[])
     ],
     targets: [
         .systemLibrary(name: "CSQLite"),
         .executableTarget(name:"OSwindPreparationGuardian"),
-        .target(name: "OSwindCore", dependencies: ["CSQLite",.product(name:"USearch",package:"USearch"),.product(name:"FluidAudio",package:"FluidAudio"),.product(name:"Tokenizers",package:"swift-transformers"),.product(name:"Hub",package:"swift-transformers")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
+        .target(name:"OSwindTokenizers",dependencies:[.product(name:"Hub",package:"swift-transformers"),.product(name:"Jinja",package:"swift-jinja")],path:"Vendor/OSwindTokenizers/Sources"),
+        .target(name: "OSwindCore", dependencies: ["CSQLite","OSwindTokenizers",.product(name:"USearch",package:"USearch"),.product(name:"FluidAudio",package:"FluidAudio"),.product(name:"Hub",package:"swift-transformers")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
         .executableTarget(name: "OSwind", dependencies: ["OSwindCore"]),
         .executableTarget(name: "OSwindCLI", dependencies: ["OSwindCore"]),
-        .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore",.product(name:"FluidAudio",package:"FluidAudio")]),
+        .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore","OSwindTokenizers",.product(name:"FluidAudio",package:"FluidAudio")]),
         .testTarget(name: "OSwindAppTests", dependencies: ["OSwind", "OSwindCore"])
     ], swiftLanguageModes: [.v5]
 )

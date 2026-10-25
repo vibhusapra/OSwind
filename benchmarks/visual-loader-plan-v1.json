@@ -1,0 +1,90 @@
+{
+  "format": "OSwind visual-loader comparison plan v1",
+  "frozenUTC": "2026-10-25T11:22:32Z",
+  "state": "Frozen before any paired timing trial; correctness regressions developed and passing",
+  "baselineProductCommit": "5aa58b9ff2a32282b25b48c554b3beafb459a6d1",
+  "scope": "Actual immutable signed CLI benchmark-visual, synthetic three-color images, CPU+GPU, fresh process and library each trial. No claim of cache-cold startup, natural retrieval quality, capture, sustained power or competitor ranking.",
+  "order": [
+    "old",
+    "new",
+    "new",
+    "old",
+    "old",
+    "new"
+  ],
+  "pairs": [
+    [
+      0,
+      1
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      4,
+      5
+    ]
+  ],
+  "compute": "cpuAndGPU",
+  "fixtureImages": [
+    {
+      "file": "red.png",
+      "sha256": "bca744cb09ea50114128c16c1bf819092637a5ad238373c0aab8ff7af1ffb199",
+      "bytes": 483
+    },
+    {
+      "file": "green.png",
+      "sha256": "7ef5ce8ea4c6a205be44789bb492bd96e7072bc25ba4577370482b72ec053b24",
+      "bytes": 483
+    },
+    {
+      "file": "blue.png",
+      "sha256": "27b0f37f95b14fe4a28397c15cdb812fb6f5c48c171692a594f577f5ebc0257f",
+      "bytes": 483
+    }
+  ],
+  "queries": [
+    "a solid red square",
+    "a solid green square",
+    "a solid blue square"
+  ],
+  "targets": [
+    0,
+    1,
+    2
+  ],
+  "tokenizerSHA256": "cb9140fae3ac5122c972d37adf83e1248471a38147ad76f8215c8872c6fd8322",
+  "primaryMetrics": [
+    "process awake elapsed seconds",
+    "child user/system CPU seconds",
+    "child maximum resident bytes",
+    "benchmark indexing seconds"
+  ],
+  "secondaryMetrics": [
+    "query median and p95 milliseconds"
+  ],
+  "correctness": [
+    "Complete source vocabulary count256000 and framed UTF8 SHA256 f57390f3a17769b135b2f59728f6c310d0835308f65843053208463f36955eda",
+    "Complete ordered merge count580604 and framed UTF8 SHA256 4bdea648ea809879e4da3be6d25b28bffd60e5bbbeac784638e106b0c1145f67",
+    "Byte-distinct canonical-equivalent keys retained in small regression; all pinned metadata behavior preserved",
+    "Independent73 query token IDs, truncation, EOS and padding",
+    "Same frozen model/fixture corpus hashes and benchmark recalls/scopes/reopened counts"
+  ],
+  "controls": [
+    "All main test/compiler/model jobs stopped first.",
+    "One child trial at a time; caches and OS background activity uncontrolled.",
+    "Record exact CLI/model/harness/fixture hashes and failed trials; no replacement trials unless separately reported.",
+    "Do not tune to held-out quality data. This is parser correctness and loading cost."
+  ],
+  "baselineSignedCLISHA256": "bbf95f80a3d1ef195d72c6190351d0420a5cd32abf095c1949b9e33d02ff9047",
+  "precedingUnusedProtocolSHA256": "61d80c54d52fc13b8a10a4924eee8a2107ae3ae0e56dc3c80295521c83177c80",
+  "amendment": "Before candidate implementation or timing: keyed Foundation decoding collapses canonical Unicode vocab keys; source has61 additional entries. Candidate must match exact pinned-source digests, rather than reproduce baseline key loss. Source padding disabled in independent raw tokenizer before applying OSwind EOS/right-padding. Original54 golden inputs match. Prior protocols unused.",
+  "preimplementationProtocolSHA256": "b43fe23cb9a9b4add1c2a9535db12a17f3faf3e14d7a4fb5c40b351ff43739d5",
+  "additionalCorrectnessReferences": {
+    "queries": 439,
+    "canonicalProbes": 366,
+    "sha256": "bfe39a039eb3b372433f8db1218d2bbf25d20db21659e70c644291e10e86e964",
+    "scope": "Expanded diagnostic correctness checks; no held-out quality or timing selection."
+  }
+}

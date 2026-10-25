@@ -1,16 +1,16 @@
 import Foundation
-import Tokenizers
+import OSwindTokenizers
 import Hub
 
 struct VisualTokens:Sendable {var ids:[Int];var truncated:Bool}
-/// The pinned Gemma Unigram tokenizer preserves case, accents and whitespace.
+/// The pinned Gemma BPE tokenizer preserves case, accents and whitespace.
 /// Truncate before EOS, then right-pad: SigLIP pools the final position.
 struct VisualTokenizer:Sendable {
     private let tokenizer:Tokenizer
     init(directory:URL) async throws {
         let tree=try BackupFileTree(root:directory)
         let configuration=try JSONDecoder().decode(Config.self,from:tree.read("tokenizer_config.json",limit:65536))
-        let vocabulary=try JSONDecoder().decode(Config.self,from:tree.read("tokenizer.json",limit:36*1024*1024))
+        let vocabulary=try VisualTokenizerData.decode(tree.read("tokenizer.json",limit:36*1024*1024))
         try Task.checkCancellation()
         // Explicit in-memory config: no Hub client, token lookup, fallback
         // resource accessor, URLSession or model-name resolution is constructed.

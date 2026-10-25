@@ -1,0 +1,53 @@
+--- upstream/BPETokenizer.swift
++++ Sources/BPETokenizer.swift
+@@ -6,6 +6,8 @@
+ //  Copyright © 2019 Hugging Face. All rights reserved.
+ //
+ 
++// OSwind modification, 2026-10-25: exact UTF8 merge-key equality and hashing.
++// Original Apache2 source provenance and minimal patch are retained one folder above.
+ import Foundation
+ import Hub
+ 
+@@ -24,12 +26,16 @@
+     }
+ 
+     static func == (lhs: BytePair, rhs: BytePair) -> Bool {
+-        lhs.a == rhs.a && lhs.b == rhs.b
++        lhs.a.utf8.elementsEqual(rhs.a.utf8) && lhs.b.utf8.elementsEqual(rhs.b.utf8)
+     }
+ 
+     func hash(into hasher: inout Hasher) {
+-        hasher.combine(a)
+-        hasher.combine(b)
++        // BPE merge identity is exact bytes, including canonical-equivalent
++        // Unicode spellings. Lengths keep the two components unambiguous.
++        hasher.combine(a.utf8.count)
++        for byte in a.utf8 { hasher.combine(byte) }
++        hasher.combine(b.utf8.count)
++        for byte in b.utf8 { hasher.combine(byte) }
+     }
+ }
+ 
+--- upstream/Normalizer.swift
++++ Sources/Normalizer.swift
+@@ -5,6 +5,8 @@
+ //  Created by Pedro Cuenca on 17/7/23.
+ //
+ 
++// OSwind modification, 2026-10-25: literal String replacement before combining marks.
++// Original Apache2 source provenance and minimal patch are retained one folder above.
+ import Foundation
+ import Hub
+ 
+@@ -354,7 +356,9 @@
+             )
+             return replaced
+         case let .string(toReplace, replacement):
+-            return text.replacingOccurrences(of: toReplace, with: replacement)
++            // Literal tokenizer patterns match scalars/bytes, even when a
++            // following combining mark shares the pattern's grapheme cluster.
++            return text.replacingOccurrences(of: toReplace, with: replacement, options: .literal)
+         }
+     }
+ }

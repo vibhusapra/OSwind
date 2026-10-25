@@ -277,8 +277,11 @@
   "ci": {
     "runID": 40187982568,
     "codeCommit": "5aa58b9ff2a32282b25b48c554b3beafb459a6d1",
-    "state": "in_progress at report generation",
-    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40187982568"
+    "state": "completed",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40187982568",
+    "nativePass": true,
+    "benchmarkHarnessesPass": true,
+    "conclusion": "success"
   },
   "limits": [
     "A busy lock is a failure with its owned image retained; close readers and retry. No force detach or conversion to success.",

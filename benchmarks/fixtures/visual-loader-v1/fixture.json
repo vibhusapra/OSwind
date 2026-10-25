@@ -1,0 +1,17 @@
+{
+  "images": [
+    "red.png",
+    "green.png",
+    "blue.png"
+  ],
+  "queries": [
+    "a solid red square",
+    "a solid green square",
+    "a solid blue square"
+  ],
+  "targets": [
+    0,
+    1,
+    2
+  ]
+}
