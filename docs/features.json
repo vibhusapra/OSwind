@@ -491,8 +491,8 @@
     "id": "F062",
     "axis": "Developer",
     "feature": "Plugin / collector SDK",
-    "status": "todo",
-    "evidence": "No extension API yet",
+    "status": "partial",
+    "evidence": "Bounded versioned text admission via stdin; Python collector + six-tool read SDK, stable retries, privacy/curation preservation, atomic rollback and encrypted process checks. In-app plugin installation, scheduling, sandbox and connector catalog remain open. See docs/COLLECTORS.md.",
     "references": "Pensieve, Screenpipe, Retrace (jhammant)"
   },
   {

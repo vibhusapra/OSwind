@@ -83,7 +83,7 @@ rows=[
 ('Data','Personal device sync','todo','No sync backend','Screenpipe Business'),
 ('Developer','Authenticated localhost API','tested','Live socket health/stats/search/get plus 401 auth and 403 Origin/Host checks pass','Screenpipe, Pensieve'),
 ('Developer','MCP stdio integration','tested','Real stdio subprocess initialize/list/search passes; protocol and unknown-tool unit tests pass','Pieces, TimeScroll, Screenpipe'),
-('Developer','Plugin / collector SDK','todo','No extension API yet','Pensieve, Screenpipe, Retrace (jhammant)'),
+('Developer','Plugin / collector SDK','partial','Bounded versioned text admission via stdin; Python collector + six-tool read SDK, stable retries, privacy/curation preservation, atomic rollback and encrypted process checks. In-app plugin installation, scheduling, sandbox and connector catalog remain open. See docs/COLLECTORS.md.','Pensieve, Screenpipe, Retrace (jhammant)'),
 ('UX', 'Native macOS UI + menu bar', 'partial', 'Signed synthetic setup/search/replay/routines/export/entity flows exercised. Current schema22 native rejection/rename/rescan/manual override and scoped 2 → global 6 Cmd-K pass with capture off; owned GUI exits and earlier sample unchanged. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open', 'TimeScroll, rem, ScreenMemory'),
 ('UX','Onboarding and permission health','implemented','Setup controls + CLI doctor; bundled permission-flow review pending','All polished apps'),
 ('UX','Global shortcut + login item','partial','Carbon hotkey and SMAppService; real keyboard/relaunch verification pending','Most native tools'),
