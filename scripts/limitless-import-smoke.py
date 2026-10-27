@@ -28,7 +28,6 @@ report=dict(format='OSwind Limitless API migration process checks',version=1,sta
 environment=os.environ.copy();environment['OSWIND_DATA_DIR']=str(library)
 secret=secrets.token_urlsafe(32).encode()
 package=root/'Migration.oswindvault'
-vault_created=False
 
 def save():
     temporary=root/'report.tmp'
@@ -136,7 +135,7 @@ try:
     check('1000 authored entries admitted by one bounded page; timing includes fresh CLI startup, Apple embeddings and SQLite')
 
     if args.native_vault:
-        assert vault('vault-create','create',package,'--name','Owned migration','--capacity-gb','1','--passphrase-stdin',password=True)['state']=='locked';vault_created=True
+        assert vault('vault-create','create',package,'--name','Owned migration','--capacity-gb','1','--passphrase-stdin',password=True)['state']=='locked'
         vault('vault-unlock','unlock',package,'--passphrase-stdin',password=True)
         alias=package/'Library'
         assert run('encrypted-import','import-limitless',updated,'--json',data=alias)['imported']==1
@@ -152,10 +151,15 @@ try:
 except BaseException:
     report['state']='failed';raise
 finally:
-    if vault_created:
+    # An unconfirmed create response does not prove native attachment absence.
+    # Inspect the exact owned path even when create raised before acknowledgement.
+    if args.native_vault:
         try:
             if attached():vault('vault-cleanup-lock','lock',package)
             report['nativeCleanupDetached']=not attached()
+        except BaseException as error:
+            report['state']='failed';report['nativeCleanupDetached']=False
+            report['cleanupErrorType']=type(error).__name__;raise
         finally:save()
     save()
 print(json.dumps(report,indent=2))

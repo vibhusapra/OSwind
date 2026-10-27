@@ -30,7 +30,10 @@ and tags. The last explicitly imported file wins; this is not a remote sync or
 an automatic conflict resolver. Changed evidence invalidates derived links.
 
 Privacy exclusions and secret redaction apply before publication, including the
-rendered source metadata and speaker labels. Excluded updates leave previously
+rendered source metadata and speaker labels. App/title exclusions can only use
+the known import identity and title: the API does not supply the original
+recording application or website, so their capture-time rules cannot be
+reconstructed. Excluded updates leave previously
 admitted history intact. Notes have no fabricated media, source URL, timed
 transcript or playback. Search can retrieve speaker text, but recording-local
 speaker filters do not apply to these notes.
