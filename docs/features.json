@@ -451,9 +451,9 @@
     "id": "F057",
     "axis": "Data",
     "feature": "Rewind / Limitless migration",
-    "status": "todo",
-    "evidence": "Schema adapters missing",
-    "references": "Retrace (haseab)"
+    "status": "partial",
+    "evidence": "Offline Limitless API JSON text adapter: stable exact-UTF8 IDs, source times, Markdown/recursive speaker text, initial stars, curation-preserving retries, privacy and atomic cancellation. CLI and Settings entry; 17 new core/app-worker cases, 912 full functional passes/one physical skip and183 focused TSan passes. Signed app/ZIP, encrypted note reopen, privacy and actual process checks pass. First frozen 1000-note import25.82s/86.9MB peakRSS including startup/Apple embeddings/SQLite; not desktop/power/competitor evidence. Original runner invocation and owned cleanup-fault failures retained; cleanup follow-up passes. Account-export ZIP, Rewind databases/video, chats/audio, remote pagination and native panels remain missing",
+    "references": "Limitless API, Retrace (haseab)"
   },
   {
     "id": "F058",

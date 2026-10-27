@@ -603,21 +603,29 @@ import UniformTypeIdentifiers
     }
     func cancelAudioImport() { audioImportTask?.cancel() }
     func exportData() { pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
-    func importData() {
+    func importData(limitlessAPI:Bool=false) {
         guard !importingJSON else {return};let panel=NSOpenPanel();panel.allowedContentTypes=[.json]
-        if panel.runModal() == .OK,let url=panel.url {importJSONFile(url)}
+        if limitlessAPI {panel.title="Import Limitless API JSON";panel.message="Choose a saved API response containing data.lifelogs or data.lifelog. Account-export ZIP files, audio and Rewind databases are not supported."}
+        if panel.runModal() == .OK,let url=panel.url {importJSONFile(url,limitlessAPI:limitlessAPI)}
     }
     func cancelJSONImport() {jsonImportTask?.cancel()}
-    func importJSONFile(_ url:URL) {
-        guard !libraryWipe.busy,!importingJSON else {return};importingJSON=true;importStatus="Importing sources and checking recap links…"
+    func importJSONFile(_ url:URL,limitlessAPI:Bool=false) {
+        guard !libraryWipe.busy,!importingJSON else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
         let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
-        let worker=Task.detached(priority:.utility) {try store.importJSONDetailed(from:url,embedder:embedder,policy:policy)}
+        let worker=Task.detached(priority:.utility) {()throws->String in
+            if limitlessAPI {
+                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy)
+                return "Imported \(result.imported) Limitless text notes · \(result.excluded) excluded."+(result.hasMorePages ? " This response has another page; import each saved page to complete the export.":" Only the supplied response was imported.")
+            }
+            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy)
+            return "Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
+        }
         jsonImportTask=Task {
             defer {importingJSON=false;jsonImportTask=nil}
             do {
-                let result=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
+                let status=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
                 guard libraryOperationGeneration==generation else {return}
-                importStatus="Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
+                importStatus=status
                 selected=nil;invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
             } catch is CancellationError {guard libraryOperationGeneration==generation else {return};importStatus="Import cancelled before publication."}
             catch {guard libraryOperationGeneration==generation else {return};importStatus="Import did not complete: "+error.localizedDescription;errorMessage=error.localizedDescription}

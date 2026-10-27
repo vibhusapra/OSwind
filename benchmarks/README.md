@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+[Limitless API text migration](limitless-import-v1.json): source 0e949f3, 912 functional passes/one physical skip, 183 focused TSan passes, signed app/ZIP and actual encrypted/process checks. A 1,000-note first frozen import takes 25.82 s / 86.9 MB peak RSS with startup/Apple embeddings/SQLite included. Original invocation and owned cleanup-fault receipts remain retained; harness follow-up corrects unconfirmed-create cleanup. Partial migration and release acceptance remain explicit.
+
 ## Bounded visual source validation
 
 [Sourcec440650 partial qualification](visual-source-digest-v1.json) passes69 related normal and69 TSan cases. Three exact-bundle pairs on the existing100-photo/501-query fixture observe query median13.36→12.00ms, p9516.67→14.91ms, with identical459/498 top1/top5 counts, scope and reopen. The [frozen protocol](visual-source-digest-plan-v1.json) pins executables, model, corpus, input hashes and fixed order. Six legacy three-image compatibility trials also pass. Peak RSS stays about1.58GB; no broad memory/energy/competitor claim.
