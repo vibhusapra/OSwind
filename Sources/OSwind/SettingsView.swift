@@ -225,7 +225,11 @@ struct SettingsView: View {
             Section("Encrypted library") {VaultStorageControls(root:m.store.root).disabled(m.libraryTransfer.busy || m.libraryWipe.busy)}
             Section("Your storage") {
                 Text(m.store.root.path).font(.caption).textSelection(.enabled)
-                Toggle("Automatic retention and storage cleanup",isOn:$m.settings.automaticMaintenance)
+                Toggle("Automatic retention and storage cleanup",isOn:Binding(get:{m.settings.automaticMaintenance},set:{m.configureAutomaticMaintenance($0)}))
+                if m.settings.automaticMaintenance && !m.housekeepingActive {
+                    Text("Automatic cleanup is paused for this library. Resume checks these retention and storage limits every five minutes.").font(.caption).foregroundStyle(.secondary)
+                    Button("Resume automatic cleanup") {m.configureAutomaticMaintenance(true)}.disabled(m.libraryWipe.busy || m.libraryWipe.pendingCleanup)
+                }
                 Stepper("Retain \(m.settings.privacy.retentionDays) days",value:$m.settings.privacy.retentionDays,in:1...3650)
                 Text("The history budget excludes temporary import and export workspaces. They use additional disk space until the operation finishes.").font(.caption).foregroundStyle(.secondary)
                 Stepper("Storage budget: \(m.settings.privacy.maxStorageGB) GB",value:$m.settings.privacy.maxStorageGB,in:1...1000)
@@ -244,7 +248,7 @@ struct SettingsView: View {
             Section("Text interchange") {
                 HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() }.disabled(m.importingJSON || m.libraryTransfer.busy || m.libraryWipe.busy) }
                 Button("Import Limitless API JSON…") {m.importData(limitlessAPI:true)}.disabled(m.importingJSON || m.libraryTransfer.busy || m.libraryWipe.busy)
-                Text("Import saved Limitless API responses as searchable notes with source times, speaker labels and initial stars. Audio, account-export ZIP files and Rewind databases need other adapters.").font(.caption).foregroundStyle(.secondary)
+                Text("Import saved Limitless API responses as searchable notes with source times, speaker labels and initial stars. Your retention policy applies to imported dates. Audio, account-export ZIP files and Rewind databases need other adapters.").font(.caption).foregroundStyle(.secondary)
                 if m.importingJSON {HStack {ProgressView().controlSize(.small);Button("Cancel import") {m.cancelJSONImport()}}}
                 if !m.importStatus.isEmpty {Text(m.importStatus).font(.caption).textSelection(.enabled)}
                 Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)
