@@ -1,0 +1,608 @@
+{
+  "format": "OSwind Limitless API text migration qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T18:41:04.979830+00:00",
+  "codeCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
+  "harnessFollowupCommit": "6005f4bd6a862311ccdcc4bc6c3a6ed82f7bc666",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/65",
+  "scope": "Offline saved Limitless API response text adapter; authored sources only, no vendor account or normal history",
+  "newCases": {
+    "core": 14,
+    "appWorker": 3
+  },
+  "fullSuite": {
+    "defined": 913,
+    "passed": 912,
+    "skipped": 1,
+    "failures": 0,
+    "physicalAudioCaseSkipped": "NativeSystemAudioTests.testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder",
+    "driverAwakeSeconds": 428.93155904090963,
+    "driverSystemSeconds": 428.93423986434937,
+    "optIns": [
+      "native vault",
+      "real local speech/speaker and visual models",
+      "Metal expressions",
+      "real idle expiry",
+      "managed runtime",
+      "independent entity and visual tokenizer references"
+    ]
+  },
+  "focusedThreadSanitizer": {
+    "passed": 183,
+    "skipped": 0,
+    "failures": 0,
+    "raceWarnings": 0,
+    "selection": "OSwindAppTests|LimitlessImportTests|TextCollectorTests|Recap|LibraryBackupTests|BackupWorkspaceTests|BackupFileTreeTests",
+    "driverAwakeSeconds": 99.38234079210088
+  },
+  "originalOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 428.93155904090963,
+      "systemSeconds": 428.93423986434937
+    },
+    {
+      "name": "related-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 99.38234079210088,
+      "systemSeconds": 99.3776478767395
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 50.16644895891659,
+      "systemSeconds": 50.166600942611694
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.6323508750647306,
+      "systemSeconds": 1.6323587894439697
+    },
+    {
+      "name": "migration-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 33.605407333001494,
+      "systemSeconds": 33.605560064315796
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 6.907597708050162,
+      "systemSeconds": 6.90762996673584
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.3851608328986913,
+      "systemSeconds": 0.3851628303527832
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.0582635421305895,
+      "systemSeconds": 1.05826997756958
+    },
+    {
+      "name": "domain-privacy-v1",
+      "exitCode": 2,
+      "awakeSeconds": 0.05053245881572366,
+      "systemSeconds": 0.05053281784057617
+    }
+  ],
+  "continuation": {
+    "scope": "Corrected the retained domain test invocation and ran previously unrun stages plus the changed harness against the same immutable signed product",
+    "operations": [
+      {
+        "name": "migration-process-followup-v1",
+        "exitCode": 0,
+        "awakeSeconds": 33.15184266702272,
+        "systemSeconds": 33.15199518203735
+      },
+      {
+        "name": "domain-privacy-corrected-v1",
+        "exitCode": 0,
+        "awakeSeconds": 0.30106908385641873,
+        "systemSeconds": 0.3010721206665039
+      },
+      {
+        "name": "recap-process-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.4635260838549584,
+        "systemSeconds": 1.4635331630706787
+      },
+      {
+        "name": "backup-process-v1",
+        "exitCode": 0,
+        "awakeSeconds": 0.7045628328341991,
+        "systemSeconds": 0.7045667171478271
+      },
+      {
+        "name": "vault-process-v1",
+        "exitCode": 0,
+        "awakeSeconds": 14.328055583871901,
+        "systemSeconds": 14.32812213897705
+      },
+      {
+        "name": "doctor-v1",
+        "exitCode": 0,
+        "awakeSeconds": 0.10850750003010035,
+        "systemSeconds": 0.10850787162780762
+      }
+    ]
+  },
+  "processChecks": [
+    "exact identity, DST-crossing instants, nested speaker text, page notice, retry and keyword search across processes",
+    "update preserves user curation; malformed final entry publishes no earlier changes",
+    "default privacy redaction and exclusion; final symlink/FIFO refusal without blocking",
+    "normal OSwind JSON round trip retains imported note text",
+    "1000 authored entries admitted by one bounded page; timing includes fresh CLI startup, Apple embeddings and SQLite",
+    "encrypted APFS import, exact note reopen and locked refusal without plaintext fallback"
+  ],
+  "normalProcessOperations": [
+    {
+      "name": "first",
+      "exitCode": 0,
+      "awakeSeconds": 0.510876249987632,
+      "systemSeconds": 0.5108799934387207,
+      "userCPUSeconds": 0.056354999999999995,
+      "systemCPUSeconds": 0.0288,
+      "peakRSSBytes": 56967168,
+      "stdoutSHA256": "84685bef9f4fdefc5f3dc6da2b5d8a932527c635cd3f27338346366a77118a02",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retry",
+      "exitCode": 0,
+      "awakeSeconds": 0.0864824999589473,
+      "systemSeconds": 0.08648395538330078,
+      "userCPUSeconds": 0.048456,
+      "systemCPUSeconds": 0.019695999999999998,
+      "peakRSSBytes": 56541184,
+      "stdoutSHA256": "84685bef9f4fdefc5f3dc6da2b5d8a932527c635cd3f27338346366a77118a02",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "get",
+      "exitCode": 0,
+      "awakeSeconds": 0.054161875043064356,
+      "systemSeconds": 0.05416440963745117,
+      "userCPUSeconds": 0.008076,
+      "systemCPUSeconds": 0.004955,
+      "peakRSSBytes": 18497536,
+      "stdoutSHA256": "2e0131ba173e16fc9aed026b7cbe610197c9a66b3a04b54ea1a38bf00db42129",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "search",
+      "exitCode": 0,
+      "awakeSeconds": 0.06578754191286862,
+      "systemSeconds": 0.06578922271728516,
+      "userCPUSeconds": 0.010053,
+      "systemCPUSeconds": 0.005398,
+      "peakRSSBytes": 21299200,
+      "stdoutSHA256": "6972a03d3be06136021fbc5cfe98333b1c53841a083f1d278f5832b0ad5e7cf4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "curate",
+      "exitCode": 0,
+      "awakeSeconds": 0.0876822080463171,
+      "systemSeconds": 0.08768296241760254,
+      "userCPUSeconds": 0.047233,
+      "systemCPUSeconds": 0.019795,
+      "peakRSSBytes": 55984128,
+      "stdoutSHA256": "2b95fc5dc5be4f60aaced4edd12cb4154b786d1a33a9e86f568d637c37b09cf1",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "update",
+      "exitCode": 0,
+      "awakeSeconds": 0.0839507079217583,
+      "systemSeconds": 0.0839529037475586,
+      "userCPUSeconds": 0.046662999999999996,
+      "systemCPUSeconds": 0.020440999999999997,
+      "peakRSSBytes": 56524800,
+      "stdoutSHA256": "8216ed2b8a8745206548046ec496d61f5441e1b883243970bf7918cc522abbcf",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "get-updated",
+      "exitCode": 0,
+      "awakeSeconds": 0.05974325002171099,
+      "systemSeconds": 0.05974388122558594,
+      "userCPUSeconds": 0.00784,
+      "systemCPUSeconds": 0.004689,
+      "peakRSSBytes": 18448384,
+      "stdoutSHA256": "26403421c4f86bc3b45f8e690b189ccb36899cff35746a11639dbb9f2e618c8b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "count",
+      "exitCode": 0,
+      "awakeSeconds": 0.060058125061914325,
+      "systemSeconds": 0.06005978584289551,
+      "userCPUSeconds": 0.00788,
+      "systemCPUSeconds": 0.004556999999999999,
+      "peakRSSBytes": 18759680,
+      "stdoutSHA256": "4243c1422a974e02f48883e0048c8cefb53bf32e5f97c4d5af9eebe17007e36f",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "invalid-final",
+      "exitCode": 1,
+      "awakeSeconds": 0.052697750041261315,
+      "systemSeconds": 0.05269980430603027,
+      "userCPUSeconds": 0.007837,
+      "systemCPUSeconds": 0.004843,
+      "peakRSSBytes": 19431424,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "aea9438d557349c343cfca0add7ba6022009d2e74a0fbbfb2b52df369349fe1d"
+    },
+    {
+      "name": "after-invalid",
+      "exitCode": 0,
+      "awakeSeconds": 0.05984454206191003,
+      "systemSeconds": 0.059845924377441406,
+      "userCPUSeconds": 0.007476999999999999,
+      "systemCPUSeconds": 0.004356,
+      "peakRSSBytes": 18432000,
+      "stdoutSHA256": "26403421c4f86bc3b45f8e690b189ccb36899cff35746a11639dbb9f2e618c8b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "privacy",
+      "exitCode": 0,
+      "awakeSeconds": 0.0859789161477238,
+      "systemSeconds": 0.08598089218139648,
+      "userCPUSeconds": 0.045784,
+      "systemCPUSeconds": 0.02089,
+      "peakRSSBytes": 56246272,
+      "stdoutSHA256": "8322882873db20926a7218749f42de4331cc6217080f12a62f60917da72a00f5",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "redacted",
+      "exitCode": 0,
+      "awakeSeconds": 0.05395954195410013,
+      "systemSeconds": 0.05396103858947754,
+      "userCPUSeconds": 0.0076879999999999995,
+      "systemCPUSeconds": 0.004515,
+      "peakRSSBytes": 18382848,
+      "stdoutSHA256": "ab4e3ab169787ecf00c523097dd47afa7044394067436e3580ec8cf307f7bf07",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "symlink-refusal",
+      "exitCode": 1,
+      "awakeSeconds": 0.05166708305478096,
+      "systemSeconds": 0.05166792869567871,
+      "userCPUSeconds": 0.00745,
+      "systemCPUSeconds": 0.004725,
+      "peakRSSBytes": 18432000,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "1a48afb18e480d5dc151facb85dc3b9068ba378a16fcb12bed73c364b2e47828"
+    },
+    {
+      "name": "fifo-refusal",
+      "exitCode": 1,
+      "awakeSeconds": 0.06103112502023578,
+      "systemSeconds": 0.061032772064208984,
+      "userCPUSeconds": 0.0073549999999999996,
+      "systemCPUSeconds": 0.004424,
+      "peakRSSBytes": 18497536,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "81dd559b5326e0c39ceb3cc61078de77d500d278c49ad77fcd5af6f34fc21a9d"
+    },
+    {
+      "name": "export",
+      "exitCode": 0,
+      "awakeSeconds": 0.056349582970142365,
+      "systemSeconds": 0.0563509464263916,
+      "userCPUSeconds": 0.007253,
+      "systemCPUSeconds": 0.004325,
+      "peakRSSBytes": 18186240,
+      "stdoutSHA256": "5536d1057905f067dc47149596065640e5a55942178f97b83e08246fa190eb87",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "import-portable",
+      "exitCode": 0,
+      "awakeSeconds": 0.11924729100428522,
+      "systemSeconds": 0.11924886703491211,
+      "userCPUSeconds": 0.084702,
+      "systemCPUSeconds": 0.035847,
+      "peakRSSBytes": 61063168,
+      "stdoutSHA256": "7a93f366fad47d7ca7802ab77bbb2ec0dadf3cfbb2772494fc6a38f39bcf47b6",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "portable-get",
+      "exitCode": 0,
+      "awakeSeconds": 0.055355832912027836,
+      "systemSeconds": 0.05535697937011719,
+      "userCPUSeconds": 0.007442,
+      "systemCPUSeconds": 0.004249,
+      "peakRSSBytes": 18432000,
+      "stdoutSHA256": "26403421c4f86bc3b45f8e690b189ccb36899cff35746a11639dbb9f2e618c8b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 25.8196428748779,
+      "systemSeconds": 25.81976079940796,
+      "userCPUSeconds": 37.034506,
+      "systemCPUSeconds": 10.480834,
+      "peakRSSBytes": 86933504,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "thousand-stats",
+      "exitCode": 0,
+      "awakeSeconds": 0.05668012495152652,
+      "systemSeconds": 0.05668187141418457,
+      "userCPUSeconds": 0.008218999999999999,
+      "systemCPUSeconds": 0.005325,
+      "peakRSSBytes": 18759680,
+      "stdoutSHA256": "e3a02139fcda62786be89ece430df5777d2f12a2b13f5e88870fdd7e6c882eb4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vault-create",
+      "exitCode": 0,
+      "awakeSeconds": 2.37467308412306,
+      "systemSeconds": 2.3746860027313232,
+      "userCPUSeconds": 0.104534,
+      "systemCPUSeconds": 0.176832,
+      "peakRSSBytes": 18481152,
+      "stdoutSHA256": "8a1ada17c0b6e09b4edd5dca2792628d31a4a0440397a904af5bee161fce8ce4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vault-unlock",
+      "exitCode": 0,
+      "awakeSeconds": 0.6753857501316816,
+      "systemSeconds": 0.6753897666931152,
+      "userCPUSeconds": 0.039695999999999995,
+      "systemCPUSeconds": 0.060072999999999994,
+      "peakRSSBytes": 18006016,
+      "stdoutSHA256": "cab2e5b5d6874dfeea898bb008ebb5764082736eb9979872b128757970b3fa8a",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encrypted-import",
+      "exitCode": 0,
+      "awakeSeconds": 0.11234308290295303,
+      "systemSeconds": 0.11234498023986816,
+      "userCPUSeconds": 0.047353,
+      "systemCPUSeconds": 0.020284999999999997,
+      "peakRSSBytes": 56410112,
+      "stdoutSHA256": "8216ed2b8a8745206548046ec496d61f5441e1b883243970bf7918cc522abbcf",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encrypted-get",
+      "exitCode": 0,
+      "awakeSeconds": 0.06952250003814697,
+      "systemSeconds": 0.06952500343322754,
+      "userCPUSeconds": 0.00857,
+      "systemCPUSeconds": 0.005124,
+      "peakRSSBytes": 19103744,
+      "stdoutSHA256": "607a364d5a862ad5dfd1f1524ac78459b2e3e6f5541e49510f95cb152ddd8a8b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vault-lock",
+      "exitCode": 0,
+      "awakeSeconds": 0.7065264580305666,
+      "systemSeconds": 0.7065331935882568,
+      "userCPUSeconds": 0.066652,
+      "systemCPUSeconds": 0.118865,
+      "peakRSSBytes": 16039936,
+      "stdoutSHA256": "8a1ada17c0b6e09b4edd5dca2792628d31a4a0440397a904af5bee161fce8ce4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "locked-refusal",
+      "exitCode": 1,
+      "awakeSeconds": 0.013352167094126344,
+      "systemSeconds": 0.013354063034057617,
+      "userCPUSeconds": 0.004484999999999999,
+      "systemCPUSeconds": 0.0029059999999999997,
+      "peakRSSBytes": 12632064,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "ef23074e482104d9ae172699c3871e84ca9f8f2d89dba447e0c46d04ef535a71"
+    },
+    {
+      "name": "vault-reopen",
+      "exitCode": 0,
+      "awakeSeconds": 0.6456127921119332,
+      "systemSeconds": 0.6456167697906494,
+      "userCPUSeconds": 0.034825999999999996,
+      "systemCPUSeconds": 0.053297,
+      "peakRSSBytes": 18022400,
+      "stdoutSHA256": "cab2e5b5d6874dfeea898bb008ebb5764082736eb9979872b128757970b3fa8a",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encrypted-get-reopened",
+      "exitCode": 0,
+      "awakeSeconds": 0.07187912496738136,
+      "systemSeconds": 0.07188081741333008,
+      "userCPUSeconds": 0.008502,
+      "systemCPUSeconds": 0.005170999999999999,
+      "peakRSSBytes": 19103744,
+      "stdoutSHA256": "607a364d5a862ad5dfd1f1524ac78459b2e3e6f5541e49510f95cb152ddd8a8b",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vault-final-lock",
+      "exitCode": 0,
+      "awakeSeconds": 0.7601612920407206,
+      "systemSeconds": 0.7601661682128906,
+      "userCPUSeconds": 0.061036999999999994,
+      "systemCPUSeconds": 0.111916,
+      "peakRSSBytes": 16220160,
+      "stdoutSHA256": "8a1ada17c0b6e09b4edd5dca2792628d31a4a0440397a904af5bee161fce8ce4",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "harnessFollowupProcessChecks": [
+    "exact identity, DST-crossing instants, nested speaker text, page notice, retry and keyword search across processes",
+    "update preserves user curation; malformed final entry publishes no earlier changes",
+    "default privacy redaction and exclusion; final symlink/FIFO refusal without blocking",
+    "normal OSwind JSON round trip retains imported note text",
+    "1000 authored entries admitted by one bounded page; timing includes fresh CLI startup, Apple embeddings and SQLite",
+    "encrypted APFS import, exact note reopen and locked refusal without plaintext fallback"
+  ],
+  "bulk": {
+    "entries": 1000,
+    "inputBytes": 488863,
+    "inputSHA256": "70e32c219367fedea497a9a31028a5905e816af2cba345e1c3717f6a3fb267fa",
+    "firstFrozenObservation": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 25.8196428748779,
+      "systemSeconds": 25.81976079940796,
+      "userCPUSeconds": 37.034506,
+      "systemCPUSeconds": 10.480834,
+      "peakRSSBytes": 86933504,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "followupObservation": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 26.013047292130068,
+      "systemSeconds": 26.013168811798096,
+      "userCPUSeconds": 37.240108,
+      "systemCPUSeconds": 11.134501,
+      "peakRSSBytes": 85278720,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scope": "One first frozen CLI observation plus a separate unchanged-product harness-followup observation. Fresh library/process; includes startup, Apple embeddings, privacy, SQLite and publication. Executable preflight hashes warm caches. Host/cache state uncontrolled; no competitor, desktop capture, steady overhead or power claim. Not an optimized/baseline pair."
+  },
+  "package": {
+    "scope": "Separately staged schema22 offline Limitless API text migration; no installation, measured power or competitive ranking claim",
+    "codeCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "029cc0038a8c4130e8d4a1e40489270a858c62de5efcc493881a3d3962429bfa",
+        "signedSHA256": "4ff4c50238e2479ecf034af8e00f1c26a99c5bb53c5d13985302819be15b4114",
+        "normalizedPayloadSHA256": "4a24559607242f8fe4be7dc66aaafb689a0846ada0d5d5207d79ee8e65c457b3"
+      },
+      "oswindctl": {
+        "rawSHA256": "048f2fbcc98db1a8156ba214dbddd7dd66d1d2b29255bd404cc7d857ed84e76b",
+        "signedSHA256": "c67c9b0477603a6a03f3f6a03e86131502fbb04083425d1dd83fa155a9bbac69",
+        "normalizedPayloadSHA256": "4f93bfebe2524f17088d3ecf1170f1899876bb451bc0e00c4756158fb1647df1"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "e4c817d458c46757b30ed816182a57bbdc38999dd1b4e15f7b374d94ce132352",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "3da29b78d041acbd355fe9a6d1263321cf07e642da7cdb6673253407aae17215",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "doctor": {
+    "accessibility": true,
+    "screenLocked": true,
+    "screenRecording": true,
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max",
+    "version": "0.1.0"
+  },
+  "nativeCleanup": {
+    "normalProcessDetached": true,
+    "followupProcessDetached": true,
+    "finalIndependentOwnedAttachmentCount": 0
+  },
+  "retainedDevelopmentCounterexamples": [
+    {
+      "stage": "focused-v1",
+      "result": "Compile failed because a new test called a nonexistent keywordSearch helper; corrected to existing keyword search. Original log retained."
+    },
+    {
+      "stage": "domain-privacy-v1",
+      "exitCode": 2,
+      "result": "Runner omitted required --root; no product assertions ran. Original invocation retained; separate corrected invocation passes."
+    },
+    {
+      "stage": "harness-fault-before-v1",
+      "result": "Private fault proxy had a Path/string type error before native setup; no injection occurred. Original log retained."
+    }
+  ],
+  "harnessCleanupFault": {
+    "plan": "benchmarks/limitless-import-cleanup-plan-v1.json",
+    "injection": "Proxy delegates actual staged CLI create and unlock for one owned image, then deliberately returns41 before a create success response",
+    "before": {
+      "faultTrial": "before-v2",
+      "attachedAfterUnconfirmedCreate": true,
+      "cleanupReceiptAbsent": true,
+      "normalRecoveryExit": 0,
+      "independentAfterRecoveryDetached": true
+    },
+    "after": {
+      "injectedFailureRetained": true,
+      "harnessCleanupDetached": true,
+      "independentAfterRecoveryDetached": true
+    },
+    "expectedFaultTrialsExit": 1,
+    "result": "Original injected failure retained. Before fix final cleanup was skipped; independent normal Lock detached. After fix the same injected failure runs normal Lock and independently confirms absence. This tests harness cleanup, not a spontaneous product create failure."
+  },
+  "ci": {
+    "sourceCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
+    "runID": 40559873195,
+    "status": "Benchmark harness job success; native job in progress at last live check. Follow-up commit has separate CI.",
+    "followupCommit": "6005f4bd6a862311ccdcc4bc6c3a6ed82f7bc666",
+    "followupRunID": 40561965184
+  },
+  "logSHA256": {
+    "continue-v1.log": "ca0825efb21c5a076f0edaf25f9742d97060ecd61644c3e1fe6f21e19ad1bb9c",
+    "qualify.log": "41a4e58a5b44b7ddb3c9438ccced8f28d747b6d88eb3391f29fdd998e64abe2c",
+    "related-tsan-v1.log": "c13f98d0b58d4afce774f21d5068e52f3c502e7f1fb9788a808df7677e79fcae",
+    "doctor-v1.log": "4ea864ab00064c7f2cd88dade559587aebe3196ba36b054dfe792bc23cd22953",
+    "domain-privacy-v1.log": "7a0184477b16df791f9557e9bcf495ed899212f5b5b593b31b068c3d4353b43c",
+    "recap-process-v1.log": "2afd71efaa9f464db926f32daebd63d194acc36719c238617bc451bf6e9b44dd",
+    "integration-indexed-v1.log": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "focused-v1.log": "120ad04bf1076ba15a5a1816e7cbcafb3ae1125d9b0a3bfebf1b49b5be0ec804",
+    "focused-v3.log": "582206c55eecb359f332a2e035ab094fc2f59b91e8f34bcf561e390e9cf6fad4",
+    "release-build-v1.log": "d6121cd0a7dc82e0d8efe2bac664eaf5713cb51d34ed5aecea1e1b51d16054ea",
+    "migration-process-followup-v1.log": "864472c699882aef4eb0559de41c3e94f7a0eae1717b9545ad1f4582987b5425",
+    "focused-v2.log": "83ced096fafad4a8f691b6b9f977ba0890091d3aae0c4e766204b199857e2531",
+    "harness-fault-before-v2.log": "049226680b8aeacf506032ea4707fb0be475ea025293fc42337aab1f41ff34d9",
+    "harness-fault-before-v1.log": "b646c410ee0abb0b2bb7dbde1bff11e99291582a9ed507602f7d40d828ebf099",
+    "migration-process-v1.log": "61927de53226007a7705ca193b7c981230007de71e2c14396c63bad060b93db9",
+    "integration-v1.log": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "vault-process-v1.log": "e146ed4f9fc4ad9d6cdf08578c146fac756c01cf19f2d5e3329a1d6aaaf60432",
+    "harness-fault-after-v1.log": "3018c6da3e7ac64a207d49bb1ec835e990ee28596e0feec656e16dc3f7aeb2a1",
+    "backup-process-v1.log": "5ce37061e9bc9c91b0ac6c4e9684e24290c861a1085b6b8bd0375975e3ebbe68",
+    "collector-process-v1.log": "1544b94df0db02a04b1bf703a77f61de6d1927100c83d66063be013fbd1502e5",
+    "full-most-optins-v1.log": "ecbdb61601f178b5b2beb79dcdad53f3983c970f3ac31b73077b31b500a0711c",
+    "package-proof-v1.log": "471a56090386ec6d7ed238bad50d50e2f31d241efc6f350e9a2e058813c2c8bf",
+    "domain-privacy-corrected-v1.log": "a1ab6e0b7ec3e3fcb7b62b564eae8b28abf18927559fb0a964081b17a008c16b"
+  },
+  "scopedAutomatedContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "openGates": [
+    "Inherited PR64 local busy-terminal attachment-inspection failure remains open; no claim this adapter fixes it",
+    "Native file-panel, keyboard and VoiceOver acceptance not performed",
+    "Limitless account-export ZIP, Rewind database/video, audio/chats and remote pagination/download adapters absent",
+    "Sustained capture/energy, full physical audio/sleep/wake, notarized distribution, sync and matched whole-product competitor ranking remain open"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "format": "OSwind migration harness cleanup fault plan",
+  "frozenUTC": "2026-10-27T18:35:04.874442+00:00",
+  "state": "Before any fault trial",
+  "productCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
+  "harnessIssue": "Cleanup currently depends on a confirmed create response; an unconfirmed create may still own an attached image. Workspace is preserved, but final inventory is skipped.",
+  "injection": "An owned CLI proxy delegates all normal commands to the staged binary. After its owned vault create succeeds, it unlocks that exact new vault using the in-memory pipe secret, then deliberately returns nonzero without a success response.",
+  "beforeExpected": [
+    "Harness fails",
+    "Exact owned image remains attached because confirmed-create flag is false",
+    "Independent normal product Lock detaches it; never delete attached or uncertain fixtures"
+  ],
+  "fix": "Run final independent owned-image inventory whenever native-vault mode was requested, including an unconfirmed create.",
+  "afterExpected": [
+    "Same injected failure remains a failure",
+    "Final normal Lock detaches exact owned image",
+    "Report explicitly confirms final independent absence"
+  ],
+  "controls": [
+    "No normal library, credentials, TCC or application interaction",
+    "Fresh workspace per trial, original failure retained",
+    "Do not run while frozen qualification or any model/build workload is active",
+    "Only aggregate/hash receipts public; no secrets or raw image inventory",
+    "No product behavior or performance claim from this harness fault injection"
+  ]
+}

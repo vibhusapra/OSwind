@@ -55,7 +55,8 @@ is safe. Existing encrypted-library admission and closed-library refusal apply.
 Inputs are bounded to 16 MiB, 1,000 entries, 100,000 JSON values, 10,000 content
 nodes and 12 nested content levels. JSON arrays have a 10,000-item bound and
 the full JSON has a 32-level depth bound. An encoded JSON string is limited to
-1 MiB; rendered text is limited to 2 MiB per note. Local input must be a regular
+1 MiB; rendered text is limited to 2 MiB per note and the shared store also enforces
+a one-million-character record bound. Local input must be a regular
 file; final symlinks and special files are refused. Reads check the opened
 descriptor's initial/final size and modification stamp. A UTF-8 file BOM is
 accepted separately from BOM characters within text. No filesystem timestamp
@@ -74,3 +75,5 @@ and [API documentation](https://www.limitless.ai/developers/docs/api). The
 [account export article](https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info)
 describes an export request but does not specify its archive member schema.
 No vendor code, user account history or private archive was used.
+
+[Qualification receipts](../benchmarks/limitless-import-v1.json) retain original failures, the separate corrected continuation, native cleanup fault injection and source/package identities. Automated app-worker checks do not establish native file-panel acceptance.
