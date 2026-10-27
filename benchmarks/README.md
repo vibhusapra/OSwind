@@ -1,5 +1,12 @@
 # Benchmark protocol and results
 
+## Bounded visual source validation
+
+[Sourcec440650 partial qualification](visual-source-digest-v1.json) passes69 related normal and69 TSan cases. Three exact-bundle pairs on the existing100-photo/501-query fixture observe query median13.36→12.00ms, p9516.67→14.91ms, with identical459/498 top1/top5 counts, scope and reopen. The [frozen protocol](visual-source-digest-plan-v1.json) pins executables, model, corpus, input hashes and fixed order. Six legacy three-image compatibility trials also pass. Peak RSS stays about1.58GB; no broad memory/energy/competitor claim.
+
+A later held-reader terminal check retains a different native inspection error: exit1 remains visible, but the expected busy message is not reached. Normal recovery detaches and preserves history; no successful retry replaces the failure. The sequence is partial, with full evidence and limitations in the report.
+
+
 ## Matched-bundle text-encoder diagnostic
 
 [Six fixed-order probes](visual-query-components-v1.json) compare source5aa58b9 and152c846 against the exact same c538c66 bundle: all501 token arrays and text vectors match exactly. Medians excluding each process's first text remain about1.7–1.8ms. Preparation/first text is4.65→2.04s, consistent with the separate loader measurements. Total process CPU/resources include a second tokenization and JSON output, so they do not isolate inference. Three pairs with uncontrolled caches do not establish a small latency win. A separate low-coverage owned-process stack sample shows source validation/traversal/hashing; it does not establish their CPU percentage or explain the historical end-to-end timing difference. No vendor hashing change was made on speculation.

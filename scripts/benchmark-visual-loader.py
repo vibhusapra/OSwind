@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sequential signed-CLI visual-loading pairs on a frozen synthetic fixture.
+"""Sequential signed-CLI visual pairs on a frozen explicit image fixture.
 
 macOS only. Per-child wait4 CPU/RSS; uncontrolled OS/CoreML caches. No capture,
 normal history, provider calls, power settings or energy/competitor assertion.
@@ -29,13 +29,26 @@ baseline,candidate=args.baseline.resolve(strict=True),args.candidate.resolve(str
 model=args.model_dir.resolve(strict=True);inputFile=args.fixture.resolve(strict=True)
 assert sha(baseline)==protocol['baselineSignedCLISHA256'],'Frozen baseline differs'
 assert sha(candidate)!=sha(baseline),'Candidate equals baseline'
-assert fixture['queries']==protocol['queries'] and fixture['targets']==protocol['targets']
-assert len(fixture['images'])==len(protocol['fixtureImages'])==3
+if 'candidateSignedCLISHA256' in protocol:assert sha(candidate)==protocol['candidateSignedCLISHA256']
+def value_sha(value):
+    return hashlib.sha256(json.dumps(value,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+
+
+if 'queries' in protocol:
+    assert fixture['queries']==protocol['queries'] and fixture['targets']==protocol['targets']
+else:
+    assert value_sha(fixture['queries'])==protocol['queriesSHA256']
+    assert value_sha(fixture['targets'])==protocol['targetsSHA256']
+imageCount=len(protocol['fixtureImages']);queryCount=len(fixture['queries'])
+assert 1<=imageCount<=256 and 1<=queryCount<=1024
+assert len(fixture['images'])==imageCount and len(fixture['targets'])==queryCount
 images=[]
 for path,expected in zip(fixture['images'],protocol['fixtureImages']):
     path=Path(path);path=path if path.is_absolute() else inputFile.parent/path
     path=path.resolve(strict=True);assert sha(path)==expected['sha256'];images.append(str(path))
 assert sha(model/'tokenizer.json')==protocol['tokenizerSHA256']
+if 'modelManifestSHA256' in protocol:
+    assert sha(model/'OSWIND-VISION.json')==protocol['modelManifestSHA256']
 order=['baseline','candidate','candidate','baseline','baseline','candidate']
 assert protocol['order']==['old','new','new','old','old','new']
 
@@ -50,10 +63,10 @@ assert not competing_jobs(),'Wait for local Swift/test/CLI jobs to finish before
 root=args.root.resolve();root.mkdir(mode=0o700,exist_ok=False)
 sourceInputFile=inputFile;inputFile=root/'input-fixture.json'
 inputFile.write_text(json.dumps(fixture|{'images':images},indent=2)+'\n')
-report=dict(format='OSwind paired visual-loader workload v1',state='running',
+report=dict(format='OSwind paired visual-loader workload v1' if imageCount==3 and queryCount==3 else 'OSwind paired visual workload v2',state='running',
             protocolSHA256=sha(args.protocol),fixtureSHA256=sha(sourceInputFile),normalizedFixtureSHA256=sha(inputFile),
             baselineSHA256=sha(baseline),candidateSHA256=sha(candidate),
-            order=order,trials=[],scope='Three solid-color authored PNGs and three fixed queries through actual signed CLI visual index/query/reopen. Fresh process/library each trial; uncontrolled OS/CoreML caches and background activity. No natural visual-quality, capture, cold-cache, physical-power or competitor ranking claim.',
+            order=order,trials=[],scope=protocol.get('workloadScope',protocol.get('scope','Explicit frozen image/query fixture through signed CLI index/query/reopen. Uncontrolled caches/background activity; no capture, energy or competitor claim.')),
             limits=['Child CPU excludes shared daemons; wait4 maximum RSS is macOS bytes, not total system memory.','No baseline/candidate build or model/test job may overlap; other background activity is uncontrolled.','Clock divergence over1 second stops the run and retains the trial. No replacement trials are silently added.'])
 
 
@@ -79,16 +92,26 @@ def stop_owned_child(child):
         signal.signal(signal.SIGINT,previous)
 
 
+def verify_inputs():
+    assert sha(baseline)==protocol['baselineSignedCLISHA256'] and sha(candidate)==report['candidateSHA256']
+    assert sha(sourceInputFile)==report['fixtureSHA256'] and sha(args.protocol)==report['protocolSHA256']
+    assert sha(inputFile)==report['normalizedFixtureSHA256']
+    for path,expected in zip(images,protocol['fixtureImages']):assert sha(Path(path))==expected['sha256']
+    assert sha(model/'tokenizer.json')==protocol['tokenizerSHA256']
+    if 'modelManifestSHA256' in protocol:assert sha(model/'OSWIND-VISION.json')==protocol['modelManifestSHA256']
+
+
 save()
 try:
     for index,label in enumerate(order):
         assert not competing_jobs(),'Competing local build/test/CLI job appeared'
+        verify_inputs()
         folder=root/f'{index}-{label}';folder.mkdir(mode=0o700)
         cli=baseline if label=='baseline' else candidate
         command=[str(cli),'benchmark-visual','--fixture',str(inputFile),'--model-dir',str(model),'--root',str(folder/'library'),'--compute','cpuAndGPU','--output',str(folder/'benchmark.json')]
         begin=time.monotonic();systemBegin=time.time();deadline=begin+300;timedOut=False;stage=0
         with (folder/'stdout.log').open('wb') as stdout,(folder/'stderr.log').open('wb') as stderr:
-            child=subprocess.Popen(command,stdout=stdout,stderr=stderr)
+            child=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr)
             # No Popen.poll/wait: wait4 must reap this exact child to retain its
             # resource receipt, rather than cumulative unrelated-child metrics.
             try:
@@ -118,8 +141,13 @@ try:
         assert child.returncode==0 and not timedOut,'Owned trial failed; retained without replacement'
         assert abs(trial['awakeElapsedSeconds']-trial['systemElapsedSeconds'])<=1,'Clock divergence; retain trial'
         assert not trial['competingJobsAfter'],'Competing local workload; retain trial'
+        verify_inputs()
         native=trial['benchmark']
-        assert native['images']==3 and native['queries']==3 and native['reopenedIndexSources']==3 and native['scopedResultsVerified']
+        assert native['images']==imageCount and native['queries']==queryCount and native['reopenedIndexSources']==imageCount and native['scopedResultsVerified']
+        if 'expectedModelID' in protocol:assert native['modelID']==protocol['expectedModelID']
+        if 'expectedCorpusSHA256' in protocol:assert native['corpusSHA256']==protocol['expectedCorpusSHA256']
+        if 'expectedCorrectCounts' in protocol:
+            assert {f'at{k}':round(native[f'recallAt{k}']*queryCount) for k in [1,5,10]}==protocol['expectedCorrectCounts']
         if index:
             original=report['trials'][0]['benchmark']
             for key in ['modelID','corpusSHA256','recallAt1','recallAt5','recallAt10','indexedFrames']:

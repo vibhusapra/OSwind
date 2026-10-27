@@ -1,0 +1,40 @@
+{
+  "format": "OSwind owned native draft observation",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T18:17:34.249106+00:00",
+  "codeCommit": "c440650c955917ff7bd51b2ec819c80a6318cbae",
+  "syntheticWorkspace": true,
+  "observed": [
+    "Demo workspace paused with six authored sources and no model",
+    "Ask answer and source-linked draft sheet",
+    "Reviewed text edited to 30 UTF-8 bytes with citations retained",
+    "Copy draft acknowledged by native UI",
+    "Done returned to source Ask"
+  ],
+  "notVerified": [
+    "Global shortcut destination capture",
+    "Direct AX insertion",
+    "Actual clipboard paste delivery",
+    "Undo, protected-field delivery, GUI capture and physical sleep/wake"
+  ],
+  "limits": [
+    "Shortcut attempts did not populate a destination; delivery to Carbon hotkey was not measured",
+    "Owned fixture lacked a Paste menu; unchanged text after Cmd-V is not evidence of product clipboard failure",
+    "No insertion attempted while destination was absent",
+    "No screenshot or native UI recording retained"
+  ],
+  "cleanupIncident": {
+    "event": "Reading app AX state after Quit unexpectedly reopened the staged app without demo flags and showed onboarding",
+    "normalHistoryRowsInspected": false,
+    "normalStoreOpenCannotBeExcluded": true,
+    "servicesToggled": false,
+    "processesAbsentAtExitCheck": true,
+    "defaultSelectedLibraryPreferenceAbsent": true,
+    "defaultSettingsFileAbsent": true,
+    "defaultCaptureAudioAPIRoutinesOff": true,
+    "launchServicesRestoredTo": "/Applications/OSwind.app",
+    "normalLibraryRowsQueried": false
+  },
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false
+}

@@ -1,0 +1,492 @@
+{
+  "format": "OSwind bounded visual digest partial qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T17:45:04.005986+00:00",
+  "codeCommit": "c440650c955917ff7bd51b2ec819c80a6318cbae",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/64",
+  "scope": "Size and SHA256 validation through one bounded descriptor; ranking, root, privacy, frame and current-byte checks retained. Explicit public/synthetic fixtures; no normal history or UI input.",
+  "normalSelection": {
+    "defined": 69,
+    "passed": 69,
+    "skipped": 0,
+    "failed": 0
+  },
+  "threadSanitizer": {
+    "defined": 69,
+    "passed": 69,
+    "skipped": 0,
+    "failed": 0
+  },
+  "selection": "BackupFileTreeTests|VisualIndexStoreTests|VisualRetrievalTests|VisualImageSnapshotTests|VisualSourcePlanTests|NativeVaultVisualIndexTests|LibraryBackupTests|BackupWorkspaceTests|VisualPreviewTests",
+  "newCases": 4,
+  "parentFullSuite": {
+    "codeCommit": "d48fcbd564b4fef59a9d9be0abb99c80db2889be",
+    "passed": 891,
+    "skipped": 1,
+    "failed": 0,
+    "scope": "Not rerun in full for this focused digest change; current69-case normal/TSan selection and process contracts are recorded separately"
+  },
+  "operations": [
+    {
+      "name": "related-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 43.23374729207717,
+      "systemSeconds": 43.23401212692261
+    },
+    {
+      "name": "related-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 58.07993574999273,
+      "systemSeconds": 58.08029317855835
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 48.24827462481335,
+      "systemSeconds": 48.248570919036865
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.7516442919149995,
+      "systemSeconds": 1.751655101776123
+    },
+    {
+      "name": "freeze-plan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.10603591706603765,
+      "systemSeconds": 0.10603690147399902
+    },
+    {
+      "name": "natural-pairs-v1",
+      "exitCode": 0,
+      "awakeSeconds": 70.42581574991345,
+      "systemSeconds": 70.43618512153625
+    },
+    {
+      "name": "legacy-three-image-pairs-v1",
+      "exitCode": 0,
+      "awakeSeconds": 22.893462290987372,
+      "systemSeconds": 22.8960919380188
+    },
+    {
+      "name": "collector-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 6.705321250017732,
+      "systemSeconds": 6.705637693405151
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.3709868330042809,
+      "systemSeconds": 0.3710012435913086
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.0384422910865396,
+      "systemSeconds": 1.0384838581085205
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 14.734900125069544,
+      "systemSeconds": 14.735303163528442
+    },
+    {
+      "name": "terminal-v1",
+      "exitCode": 0,
+      "awakeSeconds": 9.370767541928217,
+      "systemSeconds": 9.370933055877686
+    },
+    {
+      "name": "busy-terminal-v1",
+      "exitCode": 1,
+      "awakeSeconds": 5.206697250017896,
+      "systemSeconds": 5.206774950027466
+    }
+  ],
+  "continuation": [
+    {
+      "scope": "Only previously unrun doctor stage after the terminal check stopped the original pipeline; failed busy trial is not replaced",
+      "name": "doctor-continuation-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.12057725014165044,
+      "systemSeconds": 0.12057805061340332,
+      "failedTrialImageIndependentlyAbsentAfterNormalRecovery": true
+    }
+  ],
+  "naturalPairs": {
+    "format": "OSwind paired visual workload v2",
+    "state": "completed",
+    "protocolSHA256": "fad407388d54a36dd831893fed1c56b5522247597b64d06217820c235b346bec",
+    "fixtureSHA256": "073d535c9fc222f9c8b37a63602f5f961727557587875a0bf834a6f2f0c3fc34",
+    "normalizedFixtureSHA256": "073d535c9fc222f9c8b37a63602f5f961727557587875a0bf834a6f2f0c3fc34",
+    "baselineSHA256": "ffbbc2db26eb5a626a6207f15f6c9a69d7d2f0dea92afc270fbe396f855d7b10",
+    "candidateSHA256": "7e5d04f0a7892142c5837376b630242f812149e161322b6e887871804dbf4fdb",
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline",
+      "baseline",
+      "candidate"
+    ],
+    "trials": [
+      {
+        "index": 0,
+        "label": "baseline",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 12.230809291824698,
+        "systemElapsedSeconds": 12.230883836746216,
+        "childUserCPUSeconds": 8.283796,
+        "childSystemCPUSeconds": 1.8769529999999999,
+        "childMaximumResidentBytes": 1581088768,
+        "stdoutSHA256": "e0480b53cab8cf4087f9db75d4e6d3839d99128107d8baa0ca34fd6fafb30a2b",
+        "stderrSHA256": "1727255e18b2293c0c96a7925739af94db7770d8908408994f70c3d7a7b3a747",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 4.141147971153259,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 13.36205005645752,
+          "queryP95Milliseconds": 17.266035079956055,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      },
+      {
+        "index": 1,
+        "label": "candidate",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 11.56719245808199,
+        "systemElapsedSeconds": 11.567264080047607,
+        "childUserCPUSeconds": 8.164077,
+        "childSystemCPUSeconds": 1.280568,
+        "childMaximumResidentBytes": 1579794432,
+        "stdoutSHA256": "9009aa4e0224bca119dbaf998a06f25f63d597d3b620873ce2b1ce31a9a00ab0",
+        "stderrSHA256": "180460f00137288f9315cc390b2d27de23a1546d5b33ee1826d3ddc208652b39",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 3.829756021499634,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 11.958956718444824,
+          "queryP95Milliseconds": 14.657020568847656,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      },
+      {
+        "index": 2,
+        "label": "candidate",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 10.985747624887154,
+        "systemElapsedSeconds": 10.985815048217773,
+        "childUserCPUSeconds": 8.011608,
+        "childSystemCPUSeconds": 1.258899,
+        "childMaximumResidentBytes": 1581498368,
+        "stdoutSHA256": "27c6866a585525b216069d7028297bed048f1834d5977638ffa8184aa3b3a766",
+        "stderrSHA256": "f3f73eb20f5f83d7c243384dc35f48c3af7b34c7a4fa6f3502b8cc9b10d02834",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 3.693107008934021,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 12.050032615661621,
+          "queryP95Milliseconds": 14.91403579711914,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      },
+      {
+        "index": 3,
+        "label": "baseline",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 12.417520040879026,
+        "systemElapsedSeconds": 12.41759705543518,
+        "childUserCPUSeconds": 8.32461,
+        "childSystemCPUSeconds": 1.713679,
+        "childMaximumResidentBytes": 1582170112,
+        "stdoutSHA256": "1b853b92109b7a88ff75db3d6fadd4fe03c61363d1d960f3da9b6d17a4ae7cfa",
+        "stderrSHA256": "4d4620d310467fdb595dc022cbc627819181f4013c850e655187fa3dddcd56b9",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 3.948698043823242,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 14.706969261169434,
+          "queryP95Milliseconds": 16.670942306518555,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      },
+      {
+        "index": 4,
+        "label": "baseline",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 11.138277749996632,
+        "systemElapsedSeconds": 11.144918203353882,
+        "childUserCPUSeconds": 7.880196,
+        "childSystemCPUSeconds": 1.597696,
+        "childMaximumResidentBytes": 1581350912,
+        "stdoutSHA256": "f9b52c07b1fb46f4ae1f6a2e01c90d2b88efa9fbd9a326b4615963a4b6210065",
+        "stderrSHA256": "97d5cbc468f96cd46c9c80d401b9a0a40450575d9f419684496a7cc1fae25ee9",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 3.675478935241699,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 12.488007545471191,
+          "queryP95Milliseconds": 15.063047409057617,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      },
+      {
+        "index": 5,
+        "label": "candidate",
+        "exitCode": 0,
+        "timedOut": false,
+        "awakeElapsedSeconds": 11.002340291859582,
+        "systemElapsedSeconds": 11.005691289901733,
+        "childUserCPUSeconds": 8.015982,
+        "childSystemCPUSeconds": 1.271134,
+        "childMaximumResidentBytes": 1581694976,
+        "stdoutSHA256": "eb2cba783e3a0514f76fa7265a6542f0cf33671970fa518100ccfd82223a4df4",
+        "stderrSHA256": "291f44ae33c8170bd6b9102e702638b615fdb15ba9af68c0e3eee510fb58f01c",
+        "benchmark": {
+          "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+          "gpu": "Apple M5 Max",
+          "images": 100,
+          "indexedFrames": 100,
+          "indexingSeconds": 3.685684084892273,
+          "limits": [
+            "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+            "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+            "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+            "No image, caption, source path or raw vector is included in this aggregate report."
+          ],
+          "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+          "os": "Version 26.6.2 (Build 25G83)",
+          "queries": 501,
+          "queryMedianMilliseconds": 12.004971504211426,
+          "queryP95Milliseconds": 15.24496078491211,
+          "recallAt1": 0.9161676646706587,
+          "recallAt5": 0.9940119760479041,
+          "recallAt10": 0.9940119760479041,
+          "reopenedIndexSources": 100,
+          "schema": 22,
+          "scope": "Fixed public/synthetic image fixture through native visual index, query, source validation and reopen; not desktop capture, battery, cold-start or a competitor benchmark",
+          "scopedResultsVerified": true
+        },
+        "competingJobsAfter": []
+      }
+    ],
+    "scope": "Actual signed CLI index/query/source-validation/reopen on the already developer-opened100-photo/501-caption COCO2017 subset, seed1729. Fresh process/library every trial, exact same prepared model identity. Not fresh quality/training holdout, physical capture, calibrated power, cache-cold or competitor ranking.",
+    "limits": [
+      "Child CPU excludes shared daemons; wait4 maximum RSS is macOS bytes, not total system memory.",
+      "No baseline/candidate build or model/test job may overlap; other background activity is uncontrolled.",
+      "Clock divergence over1 second stops the run and retains the trial. No replacement trials are silently added."
+    ]
+  },
+  "naturalMedians": {
+    "baseline": {
+      "queryMedianMilliseconds": 13.36205005645752,
+      "queryP95Milliseconds": 16.670942306518555,
+      "indexingSeconds": 3.948698043823242,
+      "awakeElapsedSeconds": 12.230809291824698,
+      "childUserCPUSeconds": 8.283796,
+      "childSystemCPUSeconds": 1.713679,
+      "childMaximumResidentBytes": 1581350912
+    },
+    "candidate": {
+      "queryMedianMilliseconds": 12.004971504211426,
+      "queryP95Milliseconds": 14.91403579711914,
+      "indexingSeconds": 3.693107008934021,
+      "awakeElapsedSeconds": 11.002340291859582,
+      "childUserCPUSeconds": 8.015982,
+      "childSystemCPUSeconds": 1.271134,
+      "childMaximumResidentBytes": 1581498368
+    }
+  },
+  "legacyHarnessCompatibility": {
+    "protocol": "benchmarks/visual-loader-plan-v1.json",
+    "completedTrials": 6,
+    "allContractsPass": true,
+    "reportSHA256": "f6e784fb4dcf02fe388b9444e49ef1cb83503f04e13963305c01df7686263454"
+  },
+  "package": {
+    "scope": "Separately staged schema22 bounded single-descriptor visual media digest; no installation, measured power or competitive ranking claim",
+    "codeCommit": "c440650c955917ff7bd51b2ec819c80a6318cbae",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "f103c58434b3e3af83fc12642419f47198ede8383359605bfb61d5359d250e9c",
+        "signedSHA256": "7c842f6df22fb727b0c42c68791a22a0c442fa1a598e4c6a5a2a0e54002109a0",
+        "normalizedPayloadSHA256": "787bbde365560342957318626ff12864507593d4d9bbcaddc71a541c178b42e4"
+      },
+      "oswindctl": {
+        "rawSHA256": "001c9c0b75d6280815c436cd93600f309a04e77089de64414c22539e95e6033f",
+        "signedSHA256": "7e5d04f0a7892142c5837376b630242f812149e161322b6e887871804dbf4fdb",
+        "normalizedPayloadSHA256": "1b334b048d43a7cd9f62a4c93cd49d1d058d5bda9ff804acf8ee78180e26a2f2"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "a29981780a3e0bba93b9b95c54658a531d11ec69c78a4c378bcdfe9128389830",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "9d7049b00edf932469a1bb78ca9a28e2024fcf22ce7dc7c09da8c4aad9e82355",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "retainedTerminalCounterexample": {
+    "actualExitCode": 1,
+    "expectedExitCode": 1,
+    "actualMessage": "Cannot inspect encrypted disk attachments",
+    "expectedMessageFragment": "files are in use",
+    "ownedImageAttachedAfterExit": true,
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "independentAttachmentAbsenceAfterRecovery": true,
+    "outputSHA256": "20129e55305d1674e6d02ff9ec04a48cc14c9c09618817b95df4e5d694b93910",
+    "interpretation": "The process preserved a native operation failure rather than converting it to cancellation. The controlled held-reader busy-message expectation was not reached. Actual hdiutil result details were not captured; root cause is unproven. Failure remains retained; it was not replaced by a successful retry. Vault process/close sources are unchanged from the parent."
+  },
+  "doctor": {
+    "screenLocked": false,
+    "screenRecording": true,
+    "accessibility": true,
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max"
+  },
+  "logSHA256": {
+    "related-optins-v1": "1986ea2a69f5fe7d88302209e34c8363130975ec4f124af91fb9c3938d86b845",
+    "related-tsan-v1": "61ab9608ef5470c08dff4bfe7dd3299badc5867e8ffa5b7909c2c3a2ea94e674",
+    "release-build-v1": "30e5bcf39303aafd5cb07156992e4cb0943f44ee092680104c326437bf805887",
+    "package-proof-v1": "4e779715e14cd67b701f74bc74c9e520925cf4d01b0f658001b6fac7ce86cf3b",
+    "freeze-plan-v1": "c87d4924afd94be0e4f98afb911a4b6a61d9ff88ddf7414128ea72644efd9433",
+    "natural-pairs-v1": "b1c3e32a679e97bcfde4374d2777edd5f4503681f033404f9cdd6e96614c166e",
+    "legacy-three-image-pairs-v1": "3e4736ac7cab8cf616cc0b30f406f7a42a2ab3ff433e1bac49e21530a165b0c2",
+    "collector-process-v1": "aa76235807cab4277c1904d286571e737163760b314c9b3db17927a646dcfc1b",
+    "integration-v1": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "integration-indexed-v1": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "vault-process-v1": "ee90ef8523ff0623f901abc83b12a91a5e92bb02e858826c28f85b28fffe9bf1",
+    "terminal-v1": "4a06cff780d3c54c6689c8d4f591b1e19a2a9f360d0cc6a0afad750972c50a09",
+    "busy-terminal-v1": "907cd28597a0daace379ce26a950c1291e8709802d8722db7815b9989a0ad890",
+    "doctor-continuation-v1": "75b93daa3aff6afc6b0b138699093e7baaaca771bb1d064f3c11257fd293d87a"
+  },
+  "scopedDigestContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "ci": {
+    "codeCommit": "c440650c955917ff7bd51b2ec819c80a6318cbae",
+    "runID": 40550737446,
+    "jobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
+    "verifiedAtUTC": "2026-10-27T18:17:34.248507+00:00"
+  },
+  "limits": [
+    "Three pairs on a previously opened100-photo/501-caption COCO2017 subset, not fresh held-out desktop or model-training acceptance",
+    "Preflight hashes warm input caches; OS/CoreML caches and background services uncontrolled",
+    "CPU/GPU requested; no per-operation hardware placement or calibrated energy claim",
+    "Each process includes fresh library/index preparation; no process-wide memory saving claim",
+    "The original13-operation pipeline has12 successes and one terminal expectation failure; separate continuation executes only the previously unrun doctor stage",
+    "Signed CLI permissions/unlocked session do not establish current signed-GUI TCC or editor acceptance",
+    "Broader physical capture, native authentication/accessibility, sustained power and matched competitor ranking remain open"
+  ]
+}
