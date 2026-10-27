@@ -1,5 +1,6 @@
 import XCTest
 import CSQLite
+import Darwin
 @testable import OSwindCore
 
 final class VisualIndexStoreTests:XCTestCase {
@@ -43,6 +44,18 @@ final class VisualIndexStoreTests:XCTestCase {
     func testChangedBytesArePrunedAndOldHitCannotHydrate() throws {
         try image();let hits=try store.searchVisual(SearchFilter(),vector:[1,0],modelID:model).hits
         try Data("replacement pixels".utf8).write(to:root.appendingPathComponent("images/one.dat"))
+        let result=try store.searchVisual(SearchFilter(),vector:[1,0],modelID:model)
+        XCTAssertTrue(result.hits.isEmpty);XCTAssertEqual(result.invalidMedia,1);XCTAssertThrowsError(try store.hydrate(hits))
+    }
+    func testSameSizeInPlaceChangeWithRestoredModificationTimeStillRehashes() throws {
+        try image();let hits=try store.searchVisual(SearchFilter(),vector:[1,0],modelID:model).hits
+        let path=root.appendingPathComponent("images/one.dat");var before=stat();XCTAssertEqual(lstat(path.path,&before),0)
+        let file=try FileHandle(forWritingTo:path);try file.seek(toOffset:0);try file.write(contentsOf:Data([0x00]));try file.close()
+        let times=[before.st_atimespec,before.st_mtimespec]
+        XCTAssertEqual(times.withUnsafeBufferPointer {utimensat(AT_FDCWD,path.path,$0.baseAddress,0)},0)
+        var after=stat();XCTAssertEqual(lstat(path.path,&after),0)
+        XCTAssertEqual(after.st_ino,before.st_ino);XCTAssertEqual(after.st_size,before.st_size)
+        XCTAssertEqual(after.st_mtimespec.tv_sec,before.st_mtimespec.tv_sec);XCTAssertEqual(after.st_mtimespec.tv_nsec,before.st_mtimespec.tv_nsec)
         let result=try store.searchVisual(SearchFilter(),vector:[1,0],modelID:model)
         XCTAssertTrue(result.hits.isEmpty);XCTAssertEqual(result.invalidMedia,1);XCTAssertThrowsError(try store.hydrate(hits))
     }

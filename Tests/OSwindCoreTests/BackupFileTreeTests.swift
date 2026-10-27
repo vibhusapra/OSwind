@@ -28,6 +28,38 @@ final class BackupFileTreeTests: XCTestCase {
         let mode = try FileManager.default.attributesOfItem(atPath:targetURL.appendingPathComponent("media/blob").path)[.posixPermissions] as! NSNumber
         XCTAssertEqual(mode.intValue & 0o777,0o600)
     }
+    func testBoundedDigestKnownHashesExactAndEmptyBoundsAndNoProgressOnOversize() throws {
+        try fixture("abc",data:Data("abc".utf8));try fixture("empty",data:Data())
+        XCTAssertEqual(try source.digest("abc",limit:3),BackupFileDigest(bytes:3,sha256:"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"))
+        XCTAssertEqual(try source.digest("empty",limit:0),BackupFileDigest(bytes:0,sha256:"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
+        var reads=0
+        XCTAssertThrowsError(try source.digest("abc",limit:2) {_ in reads+=1})
+        XCTAssertThrowsError(try source.digest("abc",limit:0) {_ in reads+=1})
+        XCTAssertThrowsError(try source.digest("abc",limit:-1) {_ in reads+=1})
+        XCTAssertEqual(reads,0)
+        XCTAssertEqual(try source.digest("abc",limit:Int64.max).sha256,"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+    }
+    func testBoundedDigestRetainsCancellationAndMutationChecks() throws {
+        let data=Data(repeating:0x77,count:3*1024*1024),url=try fixture("large",data:data)
+        var callbacks=0
+        do { _ = try source.digest("large",limit:Int64(data.count)) {_ in callbacks+=1;throw CancellationError()};XCTFail("Cancellation swallowed") }
+        catch is CancellationError {} catch {XCTFail("Wrong cancellation error: \(error)")}
+        XCTAssertEqual(callbacks,1)
+        var changed=false
+        XCTAssertThrowsError(try source.digest("large",limit:Int64(data.count)) {_ in
+            if !changed {changed=true;let file=try FileHandle(forWritingTo:url);try file.truncate(atOffset:1);try file.close()}
+        })
+        XCTAssertTrue(changed)
+        XCTAssertEqual(try source.digest("large",limit:1),BackupFileDigest(bytes:1,sha256:sha(Data([0x77]))))
+    }
+    func testBoundedDigestRejectsLinksAndSpecialFilesWithoutFollowingOrBlocking() throws {
+        let outside=root.appendingPathComponent("owned-outside"),data=Data("Owned outside sentinel".utf8)
+        try data.write(to:outside)
+        try FileManager.default.createSymbolicLink(at:sourceURL.appendingPathComponent("link"),withDestinationURL:outside)
+        let fifo=sourceURL.appendingPathComponent("fifo");XCTAssertEqual(mkfifo(fifo.path,0o600),0)
+        for name in ["link","fifo","../owned-outside"] {XCTAssertThrowsError(try source.digest(name,limit:100))}
+        XCTAssertEqual(try Data(contentsOf:outside),data)
+    }
     func testTraversalNULAndOversizedComponentsCannotReadOrWrite() throws {
         try fixture()
         let invalid = ["","/etc/passwd","../outside","images/../a.jpg","images//a.jpg","images/./a.jpg","images/a.jpg/","images/a\0.jpg",String(repeating:"x/",count:65)+"f","images/"+String(repeating:"x",count:256)]

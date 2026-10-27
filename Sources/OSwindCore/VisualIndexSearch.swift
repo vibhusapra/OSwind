@@ -15,8 +15,7 @@ extension MemoryStore {
         else {throw OSwindError.unavailable("This visual source or frame changed. Refresh the results.")}
         try tree.requireRootIdentity(at:root)
         let maximum=plan.kind == .image ? Int64(64*1024*1024):VisualVideoSnapshot.maximumBytes
-        try tree.withFile(plan.path) {_,stamp in guard stamp.bytes<=maximum else {throw OSwindError.invalid("Retained visual media exceeds the indexing limit")}}
-        let digest=try tree.digest(plan.path) {guard $0<=maximum else {throw OSwindError.invalid("Retained visual media exceeds the indexing limit")}}
+        let digest=try tree.digest(plan.path,limit:maximum)
         guard digest.sha256==match.mediaSHA256 else {throw OSwindError.unavailable("The retained image or replay changed. Rebuild visual indexing.")}
         try tree.requireRootIdentity(at:root)
     }

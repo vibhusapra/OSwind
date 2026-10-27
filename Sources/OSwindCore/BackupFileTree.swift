@@ -206,6 +206,16 @@ final class BackupFileTree {
     func digest(_ relative: String, progress: (Int64) throws -> Void = { _ in }) throws -> BackupFileDigest {
         try withFile(relative) { file, metadata in try Self.stream(file,before:metadata,progress:progress) }
     }
+    /// Check the bound on the exact descriptor that will be streamed, before
+    /// buffer allocation or any content read. stream() also rejects growth and
+    /// final identity/size/mtime changes; no size-only second open is needed.
+    func digest(_ relative:String,limit:Int64,progress:(Int64) throws ->Void={_ in}) throws ->BackupFileDigest {
+        guard limit>=0 else {throw BackupFileError.invalid("Invalid backup digest bound")}
+        return try withFile(relative) {file,metadata in
+            guard metadata.bytes<=limit else {throw BackupFileError.invalid("Backup member exceeds the byte limit")}
+            return try Self.stream(file,before:metadata,progress:progress)
+        }
+    }
     @discardableResult func copy(_ relative: String, to target: BackupFileTree, as member: String,
                                 progress: (Int64) throws -> Void = { _ in }) throws -> BackupFileDigest {
         try withFile(relative) { file, metadata in
