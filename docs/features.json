@@ -284,7 +284,7 @@
     "axis": "AI",
     "feature": "Draft insertion into other apps",
     "status": "partial",
-    "evidence": "Editable answer-to-draft review, explicit shortcut-bound native AX selected-text insertion and Copy. Evidence revision/privacy checks, protected-field/role/selection/process/expiry guards, bounded text, cancellation and single-attempt acknowledgement handling. Browser/terminal/IDE insertion, signed live delivery, undo and accessibility acceptance remain open. See docs/CONTEXTUAL-DRAFTS.md",
+    "evidence": "Editable evidence-backed drafts, guarded shortcut-bound native AX insertion and Copy. Native fdea203 observes exact 30-byte Copy to actual NSTextView paste and native paste Undo on authored data. GUI AX access unavailable; shortcut attempt captures no destination, so direct insertion and its Undo remain unverified. Evidence/privacy, protected-field, selection/process/expiry, cancellation and single-attempt guards tested. Browser/terminal/IDE insertion refused; broader editor/VoiceOver acceptance open. See docs/CONTEXTUAL-DRAFTS.md",
     "references": "Minne, Littlebird Hover"
   },
   {
@@ -452,7 +452,7 @@
     "axis": "Data",
     "feature": "Rewind / Limitless migration",
     "status": "partial",
-    "evidence": "Offline Limitless API JSON text adapter: stable exact-UTF8 IDs, source times, Markdown/recursive speaker text, initial stars, curation-preserving retries, privacy and atomic cancellation. CLI and Settings entry; 17 new core/app-worker cases, 912 full functional passes/one physical skip and183 focused TSan passes. Signed app/ZIP, encrypted note reopen, privacy and actual process checks pass. First frozen 1000-note import25.82s/86.9MB peakRSS including startup/Apple embeddings/SQLite; not desktop/power/competitor evidence. Original runner invocation and owned cleanup-fault failures retained; cleanup follow-up passes. Account-export ZIP, Rewind databases/video, chats/audio, remote pagination and native panels remain missing",
+    "evidence": "Offline Limitless API JSON text adapter: stable exact-UTF8 IDs, source times, Markdown/recursive speaker text, initial stars, curation-preserving retries, privacy and atomic cancellation. CLI and Settings entry; 17 new core/app-worker cases, 912 full functional passes/one physical skip and 183 focused TSan passes. Signed app/ZIP, encrypted note reopen, privacy and actual process checks pass. First frozen 1,000-note import 25.82 s / 86.9 MB peakRSS including startup/Apple embeddings/SQLite; not desktop/power/competitor evidence. Original runner invocation and owned cleanup-fault failures retained; cleanup follow-up passes. Account-export ZIP, Rewind databases/video, chats/audio, remote pagination and native panels remain missing",
     "references": "Limitless API, Retrace (haseab)"
   },
   {
@@ -516,7 +516,7 @@
     "axis": "UX",
     "feature": "Global shortcut + login item",
     "status": "partial",
-    "evidence": "Carbon hotkey and SMAppService; real keyboard/relaunch verification pending",
+    "evidence": "Handler/key status, workspace notice, Capture-settings retry, successful-handle ownership and stale-ticket guards. Frozen fdea203: 118 related normal and 118 TSan passes, nine operations and both CI jobs. Native macOS registration observed; one targeted key attempt captures no destination. GUI AX/Screen Recording access unavailable. SMAppService exists; global delivery, login/relaunch, VoiceOver and other-tool conflicts remain open",
     "references": "Most native tools"
   },
   {

@@ -4,7 +4,6 @@ import Carbon
 import OSwindCore
 
 @MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
-    var hotKey: EventHotKeyRef?
     private var terminationReady=false
     private var terminationInProgress=false
     var finishTermination:(NSApplication)->Void={application in application.terminate(nil)}
@@ -52,17 +51,15 @@ import OSwindCore
         }
         #endif
         NSApp.setActivationPolicy(.regular)
-        let id = EventHotKeyID(signature:0x4f53574e,id:1)
-        RegisterEventHotKey(UInt32(kVK_Space), UInt32(cmdKey | shiftKey),id,GetApplicationEventTarget(),0,&hotKey)
-        var spec = EventTypeSpec(eventClass:OSType(kEventClassKeyboard),eventKind:UInt32(kEventHotKeyPressed))
-        InstallEventHandler(GetApplicationEventTarget(), { _,_,_ in DispatchQueue.main.async {
+        GlobalShortcutModel.shared.configure {
             // Capture explicit external focus before OSwind activates. Opening
             // the app normally never inspects a different application's field.
             if let session=AppSession.current,!session.busy,let model=session.model,!model.store.isClosed,!model.libraryWipe.busy,!model.libraryWipe.pendingCleanup {model.drafting.chooseDestination(privacy:model.settings.privacy)}
             NotificationCenter.default.post(name:.oswindOpenMain,object:nil)
             if AppSession.current?.model?.drafting.showing != true {NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)}
-        }; return noErr },1,&spec,nil,nil)
+        }
     }
+    func applicationWillTerminate(_ notification:Notification) {GlobalShortcutModel.shared.stop()}
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
         if terminationReady {return .terminateNow}

@@ -567,9 +567,23 @@
   "ci": {
     "sourceCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
     "runID": 40559873195,
-    "status": "Benchmark harness job success; native job in progress at last live check. Follow-up commit has separate CI.",
+    "jobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
     "followupCommit": "6005f4bd6a862311ccdcc4bc6c3a6ed82f7bc666",
-    "followupRunID": 40561965184
+    "followupRunID": 40561965184,
+    "followupJobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
+    "documentationCommit": "e197a15546a5e45327850076131b89d7ef6803ee",
+    "documentationRunID": 40562408322,
+    "documentationJobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
+    "verifiedAtUTC": "2026-10-27T19:50:07.315122+00:00"
   },
   "logSHA256": {
     "continue-v1.log": "ca0825efb21c5a076f0edaf25f9742d97060ecd61644c3e1fe6f21e19ad1bb9c",

@@ -86,3 +86,7 @@ The [light](../assets/contextual-draft-light.png) and
 renders, not live editor delivery evidence.
 
 The [owned native observation](../benchmarks/contextual-drafts-native-v1.json) records paused demo Ask, editing and Copy acknowledgement. Shortcut destination capture, actual paste delivery and direct insertion remain unverified. It also records a cleanup relaunch incident and its limits; native fixture coverage must not be described as full editor acceptance.
+
+The native receipt includes a cleanup correction: a truncated process check missed the staged app after an unscoped relaunch. Its normal default database descriptor was subsequently observed, the exact owned process stopped, and read-only quick-check passed on the preserved database. No source rows were selected; prior automatic store activity is not audited. Further native acceptance was deferred at the locked-session preflight.
+
+The later [fdea203 native observation](../benchmarks/shortcut-native-v1.json) confirms actual Copy/paste and native paste Undo in an owned field. It also observes registration accepted and GUI permissions unavailable. A targeted key attempt still captures no destination; direct insertion remains unverified.
