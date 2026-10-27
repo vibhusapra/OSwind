@@ -472,7 +472,13 @@
   "allKnownContractsPass": false,
   "releaseAcceptanceComplete": false,
   "ci": {
-    "status": "pending live verification"
+    "codeCommit": "c440650c955917ff7bd51b2ec819c80a6318cbae",
+    "runID": 40550737446,
+    "jobs": {
+      "native": "success",
+      "benchmark-harnesses": "success"
+    },
+    "verifiedAtUTC": "2026-10-27T18:17:34.248507+00:00"
   },
   "limits": [
     "Three pairs on a previously opened100-photo/501-caption COCO2017 subset, not fresh held-out desktop or model-training acceptance",

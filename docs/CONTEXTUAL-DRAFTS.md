@@ -84,3 +84,5 @@ passes, one physical-audio skip,105 focused TSan passes and14 ordered operations
 The [light](../assets/contextual-draft-light.png) and
 [dark](../assets/contextual-draft-dark.png) images are authored sample component
 renders, not live editor delivery evidence.
+
+The [owned native observation](../benchmarks/contextual-drafts-native-v1.json) records paused demo Ask, editing and Copy acknowledgement. Shortcut destination capture, actual paste delivery and direct insertion remain unverified. It also records a cleanup relaunch incident and its limits; native fixture coverage must not be described as full editor acceptance.
