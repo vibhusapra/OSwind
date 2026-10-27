@@ -15,7 +15,9 @@ import OSwindCore
             }
             let preview: AppModel
             do {
-                if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="NativeModelDownloadBusy" {
+                if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="SettingsDataQuiet" {
+                    preview=try AppModel(startServices:false)
+                } else if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="NativeModelDownloadBusy" {
                     let setup=NativeModelSetupModel(installer:{kind,_,_,progress in
                         let catalog=try kind.catalog()
                         progress(NativeModelProgress(phase:"Downloading",completedBytes:176_000_000,totalBytes:catalog.bytes,completedFiles:7,totalFiles:catalog.files.count,file:"Encoder.mlmodelc/weights/weight.bin"))
