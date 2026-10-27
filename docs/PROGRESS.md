@@ -1,5 +1,12 @@
 # OSwind delivery ledger
 
+## Automatic maintenance lifecycle — source 693d797 / schema 22
+
+- [PR #67](https://github.com/vibhusapra/OSwind/pull/67) prevents automatic retention during quiet preparation, visible onboarding and a queued callback after library-switch preparation. Before the fix, all three authored old-note cases delete their source (four failed assertions); active configured and explicit manual cleanup already pass. Eight cases now cover lifecycle, resume, disabled policy and API/capture isolation. [Behavior](MAINTENANCE-STARTUP.md).
+- [Qualification](../benchmarks/maintenance-startup-v1.json): **931 defined cases: 930 pass / one physical-audio skip / zero failures**, **126 focused TSan passes**, all **16 ordered operations** and both source CI jobs pass. Four active/quiet light/dark 760×720 layouts are checked. Signed app/ZIP payloads match; installed bundle bytes and launch registration are preserved, and complete process inventory has no owned GUI instance.
+- The repeated authored 1,000-note import is slower: **25.82 → 97.34 s**, despite byte-identical CLI, identical input and all 1,000 vectors byte-identical (maximum difference 0). Child user/system CPU rises 37.03/10.48 → 120.12/39.65 s. This is an unpaired observation under uncontrolled host/framework/cache state; root cause is unproven. No performance improvement, code-regression, energy or competitor claim.
+- Timer callbacks are invoked against real authored SQLite stores; this is not an actual five-minute runtime or physical sleep/wake test. Prior default-library activity from the corrected native cleanup incident is not audited/recovered. The inherited busy-terminal failure and broader quiet visual/wake, permissions, privacy-model, sync, distribution and competitive gates remain open. Release acceptance stays false.
+
 ## Desktop shortcut registration — source fdea203 / schema 22, partial native acceptance
 
 - [PR #66](https://github.com/vibhusapra/OSwind/pull/66) reports native handler/key registration results, provides a workspace notice and Capture-settings retry, adopts only successful native handles, retains failed cleanup resources, and drops stale event tickets. Default registration mode/key and normal app-opening behavior stay the same. [Behavior](SHORTCUTS.md).

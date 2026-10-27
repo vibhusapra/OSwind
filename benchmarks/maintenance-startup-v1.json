@@ -1,0 +1,317 @@
+{
+  "format": "OSwind automatic-maintenance startup qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T20:41:40.400898+00:00",
+  "codeCommit": "693d797313bed844d148156be2c54f52c7fdaa78",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/67",
+  "scope": "Lifecycle of automatic retention during quiet preparation, visible onboarding, configured startup and library switching; authored fixtures only",
+  "newCases": 8,
+  "beforeFix": {
+    "productCommit": "1fa802da73457517c9c42737d627ab54d0e9b6dc",
+    "cases": 5,
+    "failedCases": 3,
+    "failedAssertions": 4,
+    "passedCases": 2,
+    "result": "Automatic entry deletes the authored historical note during quiet preparation, onboarding and after switch preparation. Active configured and explicit manual cleanup already pass. Original receipt retained."
+  },
+  "fullSuite": {
+    "defined": 931,
+    "passed": 930,
+    "skipped": 1,
+    "failures": 0,
+    "physicalAudioSkipped": "NativeSystemAudioTests.testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder",
+    "driverAwakeSeconds": 572.7960882091429,
+    "driverSystemSeconds": 572.7986559867859,
+    "suiteSeconds": 562.908,
+    "optIns": [
+      "owned native vaults",
+      "actual speech/speaker and visual models",
+      "Metal expression checks",
+      "real native-model idle expiry",
+      "managed runtime",
+      "independent entity/visual tokenizer references"
+    ]
+  },
+  "threadSanitizer": {
+    "passed": 126,
+    "skipped": 0,
+    "failures": 0,
+    "raceWarnings": 0,
+    "selection": "OSwindAppTests|BrowserPrivacyContextTests|FocusedWindowBindingTests",
+    "driverAwakeSeconds": 148.50178633304313
+  },
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 572.7960882091429,
+      "systemSeconds": 572.7986559867859
+    },
+    {
+      "name": "debug-package-v1",
+      "exitCode": 0,
+      "awakeSeconds": 12.022279042052105,
+      "systemSeconds": 12.022333860397339
+    },
+    {
+      "name": "render-active-light-v1",
+      "exitCode": 0,
+      "awakeSeconds": 3.3186350830364972,
+      "systemSeconds": 3.3186511993408203
+    },
+    {
+      "name": "render-active-dark-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.254862707806751,
+      "systemSeconds": 2.2548739910125732
+    },
+    {
+      "name": "render-quiet-light-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.1347062499262393,
+      "systemSeconds": 2.134716272354126
+    },
+    {
+      "name": "render-quiet-dark-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.3485604161396623,
+      "systemSeconds": 2.3485710620880127
+    },
+    {
+      "name": "app-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 148.50178633304313,
+      "systemSeconds": 148.50245213508606
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 80.66453287494369,
+      "systemSeconds": 80.66489505767822
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 4.452787874964997,
+      "systemSeconds": 4.452808856964111
+    },
+    {
+      "name": "migration-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 112.20316924992949,
+      "systemSeconds": 112.20367193222046
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.9073615409433842,
+      "systemSeconds": 0.9073667526245117
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.1980786668136716,
+      "systemSeconds": 2.1980888843536377
+    },
+    {
+      "name": "recap-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 4.349710708949715,
+      "systemSeconds": 4.349732160568237
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.0112824589014053,
+      "systemSeconds": 2.011291980743408
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 31.00982900010422,
+      "systemSeconds": 31.009968996047974
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.3129033329896629,
+      "systemSeconds": 0.31290411949157715
+    }
+  ],
+  "componentRenders": [
+    {
+      "file": "assets/maintenance-active-light.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "2241afaa64973dcac94a20331b0c5b55a111cd357bed34140097e99a1cf783b1",
+      "review": "Visually inspected: active/paused policy, Resume control and retention/storage limits readable in native light/dark Form. Owned temporary sample path only; below-fold content scrolls."
+    },
+    {
+      "file": "assets/maintenance-active-dark.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "d6168a86b1ecc3219025f62176eeb20dbb90d631cc76d55867e2e3dd4890a96a",
+      "review": "Visually inspected: active/paused policy, Resume control and retention/storage limits readable in native light/dark Form. Owned temporary sample path only; below-fold content scrolls."
+    },
+    {
+      "file": "assets/maintenance-quiet-light.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "515185cafc2406c38a802c55f7bbf6338343bb4c7214f0edb1e57cf77aa8617f",
+      "review": "Visually inspected: active/paused policy, Resume control and retention/storage limits readable in native light/dark Form. Owned temporary sample path only; below-fold content scrolls."
+    },
+    {
+      "file": "assets/maintenance-quiet-dark.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "1894bb07f9db63c60372a85e24e80eea68e8689da036ec40c76a70ba0d759a24",
+      "review": "Visually inspected: active/paused policy, Resume control and retention/storage limits readable in native light/dark Form. Owned temporary sample path only; below-fold content scrolls."
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 quiet/onboarding automatic-maintenance lifecycle; no installation, measured power or competitive ranking claim",
+    "codeCommit": "693d797313bed844d148156be2c54f52c7fdaa78",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "0c754a44d3d6ea9e9f42606c20ebcacb9afda23eb51cffad407b658c670c44d3",
+        "signedSHA256": "d759c9d4f12da679a6dfca540e24f6f4407f53d4366cceb8f25394caeddc4a65",
+        "normalizedPayloadSHA256": "930c78568e8f337962dfa8e75448d7de200416e2140f533a3196f2edd1113f80"
+      },
+      "oswindctl": {
+        "rawSHA256": "048f2fbcc98db1a8156ba214dbddd7dd66d1d2b29255bd404cc7d857ed84e76b",
+        "signedSHA256": "c67c9b0477603a6a03f3f6a03e86131502fbb04083425d1dd83fa155a9bbac69",
+        "normalizedPayloadSHA256": "4f93bfebe2524f17088d3ecf1170f1899876bb451bc0e00c4756158fb1647df1"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "ccdf57b637f57bd52d0ae73ca721728e97ba961ade92bba7c2781b9db83b796b",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "46fc6c2fa67a444590fa2b40f6a52ca7b753ee84b98a363b20c1d33bcfce7ec4",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "installedUnchangedScope": "Installed bundle tree only; normal default-library cleanup incident is recorded separately and is not an assertion of unchanged user data",
+  "launchRegistrationRestored": "/Applications/OSwind.app",
+  "completeProcessInventoryOwnedGUIInstances": 0,
+  "retainedTimingVariation": {
+    "baseline": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 25.8196428748779,
+      "systemSeconds": 25.81976079940796,
+      "userCPUSeconds": 37.034506,
+      "systemCPUSeconds": 10.480834,
+      "peakRSSBytes": 86933504,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "current": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 97.34247537516057,
+      "systemSeconds": 97.3429172039032,
+      "userCPUSeconds": 120.121017,
+      "systemCPUSeconds": 39.651242,
+      "peakRSSBytes": 92045312,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "signedCLISHA256": "c67c9b0477603a6a03f3f6a03e86131502fbb04083425d1dd83fa155a9bbac69",
+    "signedCLIBytesIdentical": true,
+    "bulkInputSHA256": "70e32c219367fedea497a9a31028a5905e816af2cba345e1c3717f6a3fb267fa",
+    "bulkInputIdentical": true,
+    "vectorCheck": {
+      "scope": "Only authored1000-note benchmark libraries, read-only numerical vectors; no normal library or source text selected",
+      "baseline": {
+        "records": 1000,
+        "orderedIDVectorModelSHA256": "70f3fbab40c0554da71c01360a249f520f72df25bcde33d44dbe12d5487f5b4a",
+        "models": [
+          "apple-nl-sentence-en-v1"
+        ]
+      },
+      "current": {
+        "records": 1000,
+        "orderedIDVectorModelSHA256": "70f3fbab40c0554da71c01360a249f520f72df25bcde33d44dbe12d5487f5b4a",
+        "models": [
+          "apple-nl-sentence-en-v1"
+        ]
+      },
+      "allVectorBytesMatch": true,
+      "maximumAbsoluteVectorDifference": 0.0
+    },
+    "windowReuseProbe": {
+      "scope": "Authored bulk fixture only; ASCII verified so Python and Swift Character windows match",
+      "records": 1000,
+      "inputLengthMin": 505,
+      "inputLengthMax": 509,
+      "totalWindows": 1000,
+      "uniqueWindows": 1000,
+      "potentialDuplicateWindowLookups": 0
+    },
+    "scope": "Separate unpaired observations. Same executable, authored input and all 1000 output vectors; elapsed 25.82 to 97.34 s and increased child CPU cost. Host/framework/cache state uncontrolled; root cause unproven. No speed improvement, code-regression, energy or competitor claim. All receipts retained."
+  },
+  "nativeScope": {
+    "liveFiveMinuteTimerWaitPerformed": false,
+    "automaticCallbackInvokedAgainstRealSQLite": true,
+    "liveUserDataUsed": false,
+    "guiPermissionGrantsChanged": false,
+    "note": "Regression invokes the timer entry point with real authored stores. Layout renders are component QA; native long-duration/sleep/wake and physical power acceptance are separate."
+  },
+  "ci": {
+    "codeCommit": "693d797313bed844d148156be2c54f52c7fdaa78",
+    "runID": 40575819267,
+    "jobs": {
+      "native": {
+        "id": 122441833133,
+        "conclusion": "success"
+      },
+      "benchmark-harnesses": {
+        "id": 122441833335,
+        "conclusion": "success"
+      }
+    }
+  },
+  "logSHA256": {
+    "after-fix-v1.log": "862cdc7a157554507f69e455ce67053c9e698d8c00c93e293138d9178850d75c",
+    "app-tsan-v1.log": "dfe2b015843904d404e1e170c8b2645d27aca6e5d7b13be0a7072c8e99865562",
+    "backup-process-v1.log": "5ce37061e9bc9c91b0ac6c4e9684e24290c861a1085b6b8bd0375975e3ebbe68",
+    "before-fix-v1.log": "e3b6df99f4e84e3234a976cf803bed9572c165f6b69fc89b3d8964dabf155a19",
+    "debug-package-v1.log": "68388aaf2d484ef59b271c4030d68fdebeebb95edc2f211fce3d62a20bffa7c4",
+    "doctor-v1.log": "6084bd864b746c34b239c6dbb8d40e81a0c076c1640ee7804bcec31bbd97ebd3",
+    "full-most-optins-v1.log": "774ebc9cf7ef8027c507acdf920e527ef01fcae6ec9ac61981b3bc9f972f2ef4",
+    "integration-indexed-v1.log": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+    "integration-v1.log": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "migration-process-v1.log": "aaaed1c67924e7b24b2b10d859cc6e95a99c669596bf6119d1bc8c04cd76e4dc",
+    "package-proof-v1.log": "622930cb4ba78aa788a9d0ea281506a1091326df4413a23db2ed1a30db1d0b7a",
+    "qualify.log": "896b2be5fa98c648a353c36b51e6ed0d21231ab1dc28abc04f2b76f0cd48f326",
+    "recap-process-v1.log": "9b8ce74fff727b0a8ccff1b5e70b9b0517b5004b70bf8c6a3d97f81b14851974",
+    "related-v1.log": "e69cf6bce75bf2334db177e917813088e2b2f724747d1efef475822bb7ce0106",
+    "related-v2.log": "c5ec1a9c12dbe49e84cd4450b5e14ae914e53b8ed28c82516de64ab0aa679204",
+    "release-build-v1.log": "2fa48c310df4e5091b7fb9418a2d1e6f91707988092c79cce2bf72c54052710b",
+    "render-active-dark-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "render-active-light-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "render-quiet-dark-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "render-quiet-light-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vault-process-v1.log": "e146ed4f9fc4ad9d6cdf08578c146fac756c01cf19f2d5e3329a1d6aaaf60432"
+  },
+  "scopedAutomatedContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "openGates": [
+    "Earlier unscoped native QA process opened the default library; preserved database passes read-only quick-check but earlier automatic activity is not audited or recovered by this change",
+    "Inherited busy-terminal native attachment-inspection failure remains unresolved",
+    "Broader quiet visual-index/wake behavior, actual long-duration scheduling and physical energy unverified",
+    "Direct native draft insertion, GUI permissions and full physical acceptance remain open",
+    "Import timing variation on identical bytes remains unexplained; whole-product competitive ranking and broad parity are unproved"
+  ]
+}

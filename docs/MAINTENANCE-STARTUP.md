@@ -39,3 +39,5 @@ from the [native QA cleanup incident](../benchmarks/contextual-drafts-native-v1.
 That preserved database passed a read-only integrity check; no source rows were
 selected. Broader quiet-start visual-index/wake behavior and physical power
 remain separate qualification work.
+
+[Qualification](../benchmarks/maintenance-startup-v1.json) passes 930 full functional cases with one physical-audio skip, 126 focused TSan cases, 16 ordered operations and both source CI jobs. Four active/quiet light/dark layouts are visually checked. It retains the original failure and a slower unpaired import observation on identical CLI/input/vector bytes.
