@@ -1,5 +1,12 @@
 # OSwind delivery ledger
 
+## Bounded visual digest — sourcec440650 / schema22, partial qualification
+
+- [PR #64](https://github.com/vibhusapra/OSwind/pull/64) checks the media size on the exact descriptor it hashes. The duplicate size-only open is removed; SHA256, root, privacy, frame and ranking checks stay intact. Four new cases cover bounds, cancellation/mutation, links/special files and same-size in-place mutation with restored mtime.
+- [Qualification](../benchmarks/visual-source-digest-v1.json): **69 related normal and69 TSan passes**, no skips/failures; six natural and six legacy harness trials complete. On three exact-bundle100-photo/501-query pairs, median query **13.36→12.00ms**, p95 **16.67→14.91ms**. All expected459/501 top1 and498/501 top5 counts, scope and reopen checks match. Peak RSS is effectively unchanged around1.58GB. Caches/host activity uncontrolled; not desktop, energy or competitor evidence.
+- The original13-stage sequence has12 successes and a retained busy-terminal expectation failure. It returns exit1 with `Cannot inspect encrypted disk attachments` rather than the expected `files are in use`; the image remains attached at that point. Normal cleanup detaches and preserves the exact authored note, and independent later inspection confirms absence. Actual native result details were not captured; root cause is unproven. No failed-trial replacement occurred. A separate continuation runs only the previously unrun doctor stage.
+- Fresh27October signed-CLI doctor reports an unlocked session with CLI Screen Recording/AX access. Signed-GUI TCC and live editor acceptance remain separate. App/ZIP payload proofs pass; installed bundle bytes match the pre-run snapshot. Full parent892-case/105-TSan receipts retain their source attribution; current focused counts are not a new full-suite pass. CI pending live verification; release acceptance remains open.
+
 ## Visual query diagnostic — exact model, no speculative tokenizer change
 
 - [Current natural recheck](../benchmarks/visual-tokenizer-natural-v1.json) preserves459/501 top1 and498/501 top5, with one retained failed same-model-ID comparison check. Current28.49/35.66ms query timing and old unpaired14.27ms remain visible; four compiled metadata member hashes differ despite matching graphs/weights/tokenizer.

@@ -53,3 +53,14 @@ not prove execution equivalence or retroactively pass that check. The old14.27ms
 query result is a different source/bundle and an unpaired observation. The
 larger current timing is retained; no tokenizer cause or speedup is inferred.
 No retry or model/threshold adjustment followed this recheck.
+
+### Matched bounded-digest comparison
+
+[Sourcec440650](../benchmarks/visual-source-digest-v1.json) removes one redundant
+size-check open per candidate while retaining byte hashing and root/privacy/frame
+checks. Three exact-c538c66-bundle pairs on the same100-photo/501-query fixture
+observe median13.36→12.00ms, p9516.67→14.91ms and unchanged459/498 top1/top5
+counts. This matched comparison does not erase the prior same-ID mismatch or
+explain the older unpaired28.49ms observation. Caches/host activity remain
+uncontrolled. The broader qualification retains a separate native terminal
+inspection-error expectation failure with verified normal recovery.
