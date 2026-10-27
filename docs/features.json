@@ -451,9 +451,9 @@
     "id": "F057",
     "axis": "Data",
     "feature": "Rewind / Limitless migration",
-    "status": "todo",
-    "evidence": "Schema adapters missing",
-    "references": "Retrace (haseab)"
+    "status": "partial",
+    "evidence": "Offline Limitless API JSON text adapter: stable exact-UTF8 IDs, source times, Markdown/recursive speaker text, initial stars, curation-preserving retries, privacy and atomic cancellation. CLI and Settings entry; 17 new core/app worker cases pass. Encrypted packaged-process and broader qualification pending. Account-export ZIP, Rewind databases/video, chats/audio, remote pagination and native panels remain missing",
+    "references": "Limitless API, Retrace (haseab)"
   },
   {
     "id": "F058",

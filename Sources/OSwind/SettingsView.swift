@@ -233,6 +233,8 @@ struct SettingsView: View {
             }
             Section("Text interchange") {
                 HStack { Button("Export text & metadata JSON") { m.exportData() }; Button("Import OSwind JSON") { m.importData() }.disabled(m.importingJSON || m.libraryTransfer.busy || m.libraryWipe.busy) }
+                Button("Import Limitless API JSON…") {m.importData(limitlessAPI:true)}.disabled(m.importingJSON || m.libraryTransfer.busy || m.libraryWipe.busy)
+                Text("Import saved Limitless API responses as searchable notes with source times, speaker labels and initial stars. Audio, account-export ZIP files and Rewind databases need other adapters.").font(.caption).foregroundStyle(.secondary)
                 if m.importingJSON {HStack {ProgressView().controlSize(.small);Button("Cancel import") {m.cancelJSONImport()}}}
                 if !m.importStatus.isEmpty {Text(m.importStatus).font(.caption).textSelection(.enabled)}
                 Text("JSON exchanges text, tags and metadata. Use a full backup for media and conversations. Imported JSON media paths are stripped and embeddings rebuilt; privacy exclusions and redaction apply.").font(.caption).foregroundStyle(.secondary)

@@ -92,6 +92,7 @@ do {
           export-markdown NEW_DIR [--include-media]  Export portable Markdown sources and conversations
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
+          import-limitless PATH [--json]  Import saved Limitless API text response
           diarize PATH --speaker-model DIR [--repetitions N] [--output NEW_JSON]  Anonymous raw timeline, no library write
           import-audio PATH [--retain-audio] Transcribe and save an audio file locally
             [--engine parakeet --native-model DIR] [--speaker-model DIR]
@@ -466,6 +467,11 @@ do {
                 try store.importCollectorBatch(await collectorStandardInput(),embedder:embedder,policy:policy)
             }
             try encoded(report)
+        case "import-limitless":
+            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import-limitless PATH [--json]")}
+            let path=URL(fileURLWithPath:args[0]),policy=AppSettings.load(root:root).privacy
+            let report=try await runAsyncCLI(cancellationMessage:"Stopping Limitless text import; identical source IDs are safe to retry if its result is unconfirmed.") {try store.importLimitlessAPI(from:path,embedder:embedder,policy:policy)}
+            if json {try encoded(report)} else {print("Imported \(report.imported) Limitless text notes · \(report.excluded) excluded");if report.hasMorePages {FileHandle.standardError.write(Data("This response has another page. Import each saved page; this is not a complete-account export.\n".utf8))}}
         case "import":
             let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import PATH [--json]")}
             let report=try store.importJSONDetailed(from:URL(fileURLWithPath:args[0]),embedder:embedder,policy:AppSettings.load(root:root).privacy)
