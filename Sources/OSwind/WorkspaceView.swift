@@ -5,6 +5,7 @@ import AppKit
 private let accent = OSwindTheme.accent
 struct WorkspaceView: View {
     @EnvironmentObject var m: AppModel
+    @ObservedObject private var shortcut=GlobalShortcutModel.shared
     @FocusState private var searchFocused: Bool
     @State private var note = ""
     @State private var showNote = false
@@ -33,6 +34,13 @@ struct WorkspaceView: View {
             }.frame(width:230).frame(maxHeight:.infinity).background(Color(nsColor:.controlBackgroundColor))
             Divider()
             VStack(spacing:0) {
+                if shortcut.state == .unavailable {
+                    HStack {
+                        Label(shortcut.keyConflict ? "⇧⌘Space is already in use.":"The desktop shortcut is unavailable.",systemImage:"keyboard")
+                        Spacer()
+                        Button("Review shortcut") {m.settingsTab="Capture";m.showSettings=true}
+                    }.font(.callout).padding(.horizontal,24).padding(.vertical,10).background(.orange.opacity(0.12))
+                }
                 if let status=m.recapSaveStatus {
                     HStack {if m.savingRecap {ProgressView().controlSize(.small)};Text(status).font(.caption);Spacer();if !m.savingRecap {Button {m.recapSaveStatus=nil} label: {Image(systemName:"xmark")}.accessibilityLabel("Dismiss recap status")}}.padding(10).background(accent.opacity(0.06))
                 }

@@ -7,6 +7,7 @@ import OSwindCore
 
 struct SettingsView: View {
     @EnvironmentObject var m: AppModel
+    @ObservedObject private var shortcut=GlobalShortcutModel.shared
     @Environment(\.dismiss) var dismiss
     @State private var tab = "Capture"
     @State private var key = ""
@@ -37,6 +38,15 @@ struct SettingsView: View {
     private var replayCaptureActive:Bool {m.settings.visualCaptureMode == .replay && !m.settings.allDisplays && m.settings.snapshotRegions.focusedWindowCrop==nil && m.settings.snapshotRegions.valid}
     private var capture: some View {
         Group {
+            Section("Desktop shortcut") {
+                Label(shortcut.message,systemImage:shortcut.state == .registered ? "checkmark.circle":"keyboard")
+                if shortcut.state == .unavailable {
+                    Text(shortcut.keyConflict ? "Release the shortcut in the app using it, then retry here.":"Retry shortcut setup. If it remains unavailable, reopen OSwind.").font(.caption).foregroundStyle(.secondary)
+                    Button("Retry shortcut") {shortcut.retry()}
+                }
+                if !shortcut.diagnostic.isEmpty {Text(shortcut.diagnostic).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)}
+                Text("Registration confirms macOS accepted the shortcut. Use it from an editable field to check destination capture; normal app opening does not select a destination.").font(.caption).foregroundStyle(.secondary)
+            }
             Section("Capture profile") {
                 Picker("Visual memory",selection:$m.settings.visualCaptureMode) { Text("Snapshots").tag(VisualCaptureMode.snapshots); Text("Replay · HEVC clips").tag(VisualCaptureMode.replay) }
                 Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(replayCaptureActive ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }

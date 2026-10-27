@@ -516,7 +516,7 @@
     "axis": "UX",
     "feature": "Global shortcut + login item",
     "status": "partial",
-    "evidence": "Carbon hotkey and SMAppService; real keyboard/relaunch verification pending",
+    "evidence": "Carbon handler/key results are visible in Capture settings, with a workspace failure notice, retry, owned cleanup and fresh event tickets. Ten injected native-call cases pass; registration does not prove keyboard delivery or native draft insertion. SMAppService exists; signed native shortcut/login/relaunch, VoiceOver and conflict acceptance remain open",
     "references": "Most native tools"
   },
   {
