@@ -106,7 +106,7 @@ import OSwindCore
             }.padding(28))
         } else if model.section == "SettingsCapture" || model.section == "SettingsPrivacy" {
             size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:model.section == "SettingsCapture" ? "Capture":"Privacy").environmentObject(model))
-        } else if model.section == "SettingsData" {
+        } else if model.section == "SettingsData" || model.section == "SettingsDataQuiet" {
             size = NSSize(width:760,height:720); content = AnyView(SettingsView(initialTab:"Data").environmentObject(model))
         } else if model.section == "LibraryOpening" {
             size=NSSize(width:1000,height:680);content=AnyView(LibraryRecoveryView(session:AppSession.previewOpening(in:model.store.root),locationLabel:"Sample library · stored on this Mac"))

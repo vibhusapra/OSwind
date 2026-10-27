@@ -420,7 +420,7 @@
     "axis": "Data",
     "feature": "Retention + storage budget",
     "status": "tested",
-    "evidence": "Age/budget outcomes, oldest-first batches, shared-media cleanup and unmet targets; schema17 excludes temporary staging from history deletion budget while physical disk reporting includes it. Old schema16 writer refusal verified",
+    "evidence": "Age/budget outcomes, oldest-first batches, shared-media cleanup and unmet targets. Quiet preparation/onboarding/switch callbacks now skip automatic pruning; explicit resume, active policy and manual cleanup covered by eight new cases. Frozen 693d797: 930 full functional passes/one physical skip, 126 TSan, 16 operations and both CI jobs. Five-minute and physical power acceptance remain open. Temporary staging excluded from deletion budget; older writers refused",
     "references": "Recall, ScreenMemory"
   },
   {

@@ -38,6 +38,11 @@ admitted history intact. Notes have no fabricated media, source URL, timed
 transcript or playback. Search can retrieve speaker text, but recording-local
 speaker filters do not apply to these notes.
 
+Imported notes keep their original dates. Active retention applies to those
+dates; review the library policy before importing an old archive. Quiet library
+preparation and incomplete onboarding do not run automatic retention; see
+[maintenance startup](MAINTENANCE-STARTUP.md).
+
 ## Completion and errors
 
 The result reports requested, imported and excluded counts, stable IDs and

@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+[Automatic maintenance lifecycle](maintenance-startup-v1.json): 930 functional passes/one physical-audio skip, 126 focused TSan passes, 16 successful operations and both source CI jobs. Three retained before-fix old-note failures are fixed. Identical CLI/input/vector bytes still show unpaired 1,000-note timing variation 25.82→97.34 s; no code-regression or speed claim. Active/quiet light/dark layouts checked; long-duration scheduling and physical power remain open.
+
 [Desktop shortcut registration](shortcut-registration-v1.json): 118 related normal / 118 TSan passes, nine operations and both source CI jobs. [Native observation](shortcut-native-v1.json) confirms registration, actual 30-byte Copy/paste and native paste Undo; key delivery/direct insertion remain unverified, with GUI permissions unavailable. The earlier native cleanup/process-absence correction is explicit in the retained draft receipt.
 
 [Limitless API text migration](limitless-import-v1.json): source 0e949f3, 912 functional passes/one physical skip, 183 focused TSan passes, signed app/ZIP and actual encrypted/process checks. A 1,000-note first frozen import takes 25.82 s / 86.9 MB peak RSS with startup/Apple embeddings/SQLite included. Original invocation and owned cleanup-fault receipts remain retained; harness follow-up corrects unconfirmed-create cleanup. Partial migration and release acceptance remain explicit.

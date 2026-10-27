@@ -65,7 +65,10 @@ import UniformTypeIdentifiers
     private var answerTask: Task<Void,Never>?
     @Published var errorMessage: String?
     @Published var showSettings = false
-    @Published var showOnboarding = false
+    @Published var showOnboarding = false {didSet {
+        if showOnboarding {stopHousekeeping()}
+        else if oldValue && housekeepingRequested {startHousekeeping()}
+    }}
     @Published var pauseUntil: Date?
     private var pauseTimer: Timer?
     @Published var apiStatus = "API off"
@@ -116,6 +119,8 @@ import UniformTypeIdentifiers
     @Published var audioImportStatus=""
     private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
+    private var housekeepingRequested=false
+    @Published private(set) var housekeepingActive=false
     init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
@@ -156,22 +161,32 @@ import UniformTypeIdentifiers
             NotificationCenter.default.publisher(for:name).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.sessionDidBecomeActiveNotification).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
-        startHousekeeping()
     }
-    private func startHousekeeping() {housekeeping?.invalidate();housekeeping = Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }}
-    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };if settings.entityAutomaticIndex && !demo {entityMemory.build()};resumeAutomaticVisualIndex() }
+    private func stopHousekeeping() {housekeeping?.invalidate();housekeeping=nil;housekeepingActive=false}
+    private func startHousekeeping() {
+        stopHousekeeping()
+        guard housekeepingRequested,!showOnboarding,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        housekeeping=Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }
+        housekeepingActive=true
+    }
+    func configureAutomaticMaintenance(_ enabled:Bool) {
+        settings.automaticMaintenance=enabled
+        if enabled {housekeepingRequested=true;startHousekeeping()}
+    }
+    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};housekeepingRequested=true;startHousekeeping();if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };if settings.entityAutomaticIndex && !demo {entityMemory.build()};resumeAutomaticVisualIndex() }
     func selectPreparedVisualModel(_ installed:VisualModelInstallation) {
         guard !store.isClosed else {return}
         settings.search.visual.modelDirectory=installed.directory.path
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); housekeeping?.invalidate(); housekeeping = nil; api?.stop(); api = nil;apiStatus="API off"
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); api?.stop(); api = nil;apiStatus="API off"
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -483,6 +498,7 @@ import UniformTypeIdentifiers
     func maintain(automatic:Bool=false) {
         guard !automatic || !libraryWipe.pendingCleanup else {return}
         guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil else {return}
+        if automatic {guard housekeepingActive,!showOnboarding else {return}}
         let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance
         maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
         Task {
