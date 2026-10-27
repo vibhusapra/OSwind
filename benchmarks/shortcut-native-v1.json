@@ -1,0 +1,55 @@
+{
+  "format": "OSwind owned shortcut and clipboard native observation",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T19:50:07.310485+00:00",
+  "codeCommit": "fdea2030ac7fc402365b0fa87af4d3fb463320df",
+  "launch": {
+    "ownedPID": 40844,
+    "exactStageVerified": true,
+    "demoArgumentVerified": true,
+    "ownedLibraryDescriptorVerified": true,
+    "normalDefaultDescriptorObserved": false
+  },
+  "preflight": {
+    "screenLocked": false,
+    "accessibility": true,
+    "screenRecording": true
+  },
+  "observed": [
+    "Paused Balanced sample workspace, six authored records",
+    "Settings says macOS registered the shortcut",
+    "GUI Screen Recording and Accessibility indicators are unavailable",
+    "Evidence-only Ask retrieves six authored sources without a language-model request",
+    "Reviewed draft edited to exactly OSwind owned native draft [1]. (30 UTF-8 bytes), six source references retained",
+    "Copy draft acknowledgement",
+    "Actual native Cmd-A/Cmd-V replaces the owned field with that exact 30-byte string",
+    "Native Undo restores Before | after (14 bytes)"
+  ],
+  "shortcutAttempt": {
+    "target": "Owned editable NSTextView",
+    "method": "CUA target pressKey super+shift+space, duration 120 ms",
+    "destinationCaptured": false,
+    "directInsertionAttempted": false,
+    "permissionRefusalMessageObserved": false,
+    "rootCauseEstablished": false,
+    "scope": "Registration accepted, but this targeted synthetic key attempt did not produce a destination. GUI AX access is unavailable; no claim this explains the missing routed result. Carbon event delivery, permission refusal and direct AX insertion remain separate unverified gates."
+  },
+  "clipboardScope": "Actual explicit Copy plus native clipboard paste and native paste Undo; not AX selected-text insertion or its Undo",
+  "securitySettingsChanged": false,
+  "captureAudioAPIRoutinesEnabledByTest": false,
+  "normalHistoryUsedAsFixture": false,
+  "screenshotsRetained": false,
+  "cleanup": {
+    "recordedAtUTC": "2026-10-27T19:46:52.039941+00:00",
+    "fixtureNormalKeyboardQuitExitVerified": true,
+    "menuQuitAttempt": "stale UI element; no termination occurred",
+    "stagedAppNormalKeyboardQuitExitVerified": true,
+    "closedHandlesRead": false,
+    "completeUntruncatedProcessInventoryGUIInstances": 0,
+    "normalLibraryRowsQueriedDuringThisFixtureRun": false
+  },
+  "launchRegistrationRestored": "/Applications/OSwind.app",
+  "installedBundleTreeUnchanged": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false
+}

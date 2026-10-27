@@ -28,12 +28,25 @@
     "normalHistoryRowsInspected": false,
     "normalStoreOpenCannotBeExcluded": true,
     "servicesToggled": false,
-    "processesAbsentAtExitCheck": true,
+    "processesAbsentAtExitCheck": false,
     "defaultSelectedLibraryPreferenceAbsent": true,
     "defaultSettingsFileAbsent": true,
     "defaultCaptureAudioAPIRoutinesOff": true,
     "launchServicesRestoredTo": "/Applications/OSwind.app",
-    "normalLibraryRowsQueried": false
+    "normalLibraryRowsQueried": false,
+    "priorProcessAbsenceClaimWithdrawn": true,
+    "normalDefaultStoreOpenConfirmed": true,
+    "normalStoreActivityNotAudited": true,
+    "correction": {
+      "recordedAtUTC": "2026-10-27T19:07:42.772280+00:00",
+      "reason": "Filtering an exec output after truncation missed the process; previous absence claim withdrawn",
+      "normalHistoryRowsSelected": false,
+      "normalDatabasePreserved": true,
+      "readOnlyQuickCheckOK": true,
+      "integrityCheckScope": "Read-only SQLite quick_check only; no source rows selected or contents emitted. Does not establish absence of earlier automatic store activity.",
+      "oldOwnedProcessStoppedWith": "SIGTERM after exact PID/path and default-database descriptor checks; no vault path descriptor observed",
+      "completeInventoryOwnedGUIInstancesRemaining": 0
+    }
   },
   "allKnownContractsPass": false,
   "releaseAcceptanceComplete": false

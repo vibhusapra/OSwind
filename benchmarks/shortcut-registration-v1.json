@@ -1,0 +1,202 @@
+{
+  "format": "OSwind desktop shortcut registration qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-27T19:50:07.311156+00:00",
+  "codeCommit": "fdea2030ac7fc402365b0fa87af4d3fb463320df",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/66",
+  "scope": "Desktop shortcut registration feedback, successful-handle ownership, retry/cleanup and stale ticket guards; no assertion of global keyboard delivery or native direct insertion",
+  "newInjectedCases": 10,
+  "normalSelection": {
+    "passed": 118,
+    "skipped": 0,
+    "failures": 0,
+    "selection": "OSwindAppTests|BrowserPrivacyContextTests|FocusedWindowBindingTests",
+    "driverAwakeSeconds": 59.58200441580266
+  },
+  "threadSanitizer": {
+    "passed": 118,
+    "skipped": 0,
+    "failures": 0,
+    "raceWarnings": 0,
+    "driverAwakeSeconds": 77.34472570894286
+  },
+  "parentFullSuite": {
+    "codeCommit": "0e949f3ffbe96923ce4a27a15c38995d0bab4f84",
+    "defined": 913,
+    "passed": 912,
+    "physicalAudioSkipped": 1,
+    "failures": 0,
+    "coreCLIAndDependencyInputsUnchanged": true,
+    "scope": "Parent attribution retained. These 118 focused checks are not a new full 923-case local run."
+  },
+  "operations": [
+    {
+      "name": "app-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 59.58200441580266,
+      "systemSeconds": 59.58227896690369
+    },
+    {
+      "name": "debug-package-v1",
+      "exitCode": 0,
+      "awakeSeconds": 4.723940458148718,
+      "systemSeconds": 4.723963260650635
+    },
+    {
+      "name": "render-light-v1",
+      "exitCode": 0,
+      "awakeSeconds": 2.472547084093094,
+      "systemSeconds": 2.4725589752197266
+    },
+    {
+      "name": "render-dark-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.9459565000142902,
+      "systemSeconds": 1.9459660053253174
+    },
+    {
+      "name": "app-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 77.34472570894286,
+      "systemSeconds": 77.34508109092712
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 18.432648499961942,
+      "systemSeconds": 18.424980878829956
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.6070193338673562,
+      "systemSeconds": 1.6044600009918213
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.8346692500635982,
+      "systemSeconds": 0.8334400653839111
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.3825028748251498,
+      "systemSeconds": 0.38195300102233887
+    }
+  ],
+  "componentRenders": [
+    {
+      "file": "assets/shortcut-settings-light.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "e7624448c08fe8dc83e22338f9f091d2a22576a346f13cdbe95f1b823a51d0c0",
+      "review": "Visually inspected: shortcut status first, readable Capture controls, light/dark native Form. Below-fold content is intentionally scrollable. Component preview never registers a hotkey; idle text is not a live failure."
+    },
+    {
+      "file": "assets/shortcut-settings-dark.png",
+      "widthPixels": 760,
+      "heightPixels": 720,
+      "sha256": "be5ae73451c28bd14a17108ee3ab3ed1fb3b2c8a47dbd78726c9339d819b22cc",
+      "review": "Visually inspected: shortcut status first, readable Capture controls, light/dark native Form. Below-fold content is intentionally scrollable. Component preview never registers a hotkey; idle text is not a live failure."
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 desktop shortcut registration status and ownership; no installation, measured power or competitive ranking claim",
+    "codeCommit": "fdea2030ac7fc402365b0fa87af4d3fb463320df",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "6416024bd3d86d2353f9bab829c93bda7fe04c527f7ba5d7b1ae31b3c78e9005",
+        "signedSHA256": "4809eda01b23f2a03687e0d63ca08d1bda0060f5eb922bd580469c0d84f3a4a5",
+        "normalizedPayloadSHA256": "a5bb0bf1a6bf4d76f06651e24ad1482479fe693f977a2fe72d047a6260b86cea"
+      },
+      "oswindctl": {
+        "rawSHA256": "048f2fbcc98db1a8156ba214dbddd7dd66d1d2b29255bd404cc7d857ed84e76b",
+        "signedSHA256": "c67c9b0477603a6a03f3f6a03e86131502fbb04083425d1dd83fa155a9bbac69",
+        "normalizedPayloadSHA256": "4f93bfebe2524f17088d3ecf1170f1899876bb451bc0e00c4756158fb1647df1"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "fd15787d370b8bbdcae0a38f3750b41119c92cb1a6421578732584fb8c62675f",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "7de20a645253eb40f41a64f83bd6e47f00627ad15d7e7af1571b986dc1569234",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "frozenDoctorCLI": {
+    "screenLocked": true,
+    "accessibility": true,
+    "screenRecording": true,
+    "os": "Version 26.6.2 (Build 25G83)",
+    "gpu": "Apple M5 Max"
+  },
+  "nativeObservation": "benchmarks/shortcut-native-v1.json",
+  "retainedDevelopmentCounterexamples": [
+    {
+      "file": "focused-v1.log",
+      "result": "Compile failed because SDK ByteCount is imported into Swift as Int; corrected without changing the native buffer size."
+    },
+    {
+      "file": "ownership-before-fix-v1.log",
+      "result": "Three mocked cases run:two failed assertions show error out-parameters were treated as owned handles. Fixed to adopt only successful native outputs. This is a mock ownership regression, not an observed invalid pointer from macOS."
+    },
+    {
+      "file": "app-selection-v1.log",
+      "result": "Preliminary118-case selection has106 passes/12 opt-in skips, retained. Subsequent frozen normal andTSan selections include all opt-ins and pass118 each."
+    }
+  ],
+  "cleanupCorrection": "benchmarks/contextual-drafts-native-v1.json",
+  "ci": {
+    "codeCommit": "fdea2030ac7fc402365b0fa87af4d3fb463320df",
+    "runID": 40565534769,
+    "jobs": {
+      "native": {
+        "id": 122405661491,
+        "conclusion": "success"
+      },
+      "benchmark-harnesses": {
+        "id": 122405662266,
+        "conclusion": "success"
+      }
+    }
+  },
+  "logSHA256": {
+    "app-optins-v1.log": "8eb563d001583971b176ebbddb55c577083150a7cdee2f27271f03c43bef89f7",
+    "app-selection-v1.log": "e303b9b3203b1b1fd381c4792cbc33482da3f21c34550eb6249bcba90ad49896",
+    "app-tsan-v1.log": "783f80c621dc42b4b97115dfb3894a6171c59bc1da2a61d23b4014a55b6366e8",
+    "debug-package-v1.log": "16ae0ce519fd00b2d7980c334d952fa6f1407e851edf8ecd592c6d028d527a57",
+    "doctor-v1.log": "8908b305ab253a86f8e9c41a6a19e244c18976b665c2ed42f9f220cfd9b98c43",
+    "focused-v1.log": "3cfee7c4e259b940752c3d5b930ca23003564578fce43bfde3b0e9362832ea28",
+    "focused-v2.log": "04aeca93dcf74d61892c3a2d563a18782b2b66f6f7442982c11a346448b34e1e",
+    "focused-v3.log": "410e441166defa8ed78c3012cded2f44683d507ccb1ab9b39fd2905d0585ba7e",
+    "integration-v1.log": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+    "ownership-after-fix-v1.log": "8742f1cf8751e6bcf8532284c220f74f80653504d185e22837fb81ead11fea20",
+    "ownership-before-fix-v1.log": "3d99793a5f27e0256746c711fc0196baf351b3a10739b353ccfdd50ed1a14e44",
+    "package-proof-v1.log": "e9e41eae46ee79da6f46c61aa81d1cdb3fb723333f64357a424793350d64776b",
+    "qualify.log": "f39ee2bc78a8af7cda4896cec2bb0af010a43d3fb0b48b55b01a031f69eb0b29",
+    "release-build-v1.log": "6a909e2c6abb5f3464b3775b80b7f90437d4ba2221937159edbd255b0db50640",
+    "render-dark-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "render-light-v1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "scopedAutomatedContractsPass": true,
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "openGates": [
+    "Global key delivery, native permission refusal/direct insertion and conflict-with-other-tools acceptance unverified",
+    "Signed staged GUI AX/Screen Recording access unavailable; no grants changed",
+    "VoiceOver and login/relaunch acceptance pending",
+    "Inherited PR64 local busy-terminal attachment-inspection failure remains open",
+    "Earlier unscoped native cleanup incident opened the default library; exact old process stopped, preserved library passes read-only quick-check, but automatic activity is not audited",
+    "Whole-product parity, uninterrupted desktop power and competitor ranking remain open"
+  ]
+}

@@ -30,3 +30,5 @@ native calls and do not register a real hotkey, emit keyboard events, change
 focus or read another application. Native keyboard delivery, conflicts with
 other installed tools and end-to-end editor insertion require separate live
 acceptance; earlier draft observations remain partial.
+
+[Qualification](../benchmarks/shortcut-registration-v1.json) records 118 passing related normal/TSan cases each, nine successful operations and green source CI. [Native observation](../benchmarks/shortcut-native-v1.json) confirms registration and actual Copy/paste/Undo on an owned field; a targeted shortcut attempt still captures no destination. GUI permissions are unavailable. This does not establish direct insertion.

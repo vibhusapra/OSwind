@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+[Desktop shortcut registration](shortcut-registration-v1.json): 118 related normal / 118 TSan passes, nine operations and both source CI jobs. [Native observation](shortcut-native-v1.json) confirms registration, actual 30-byte Copy/paste and native paste Undo; key delivery/direct insertion remain unverified, with GUI permissions unavailable. The earlier native cleanup/process-absence correction is explicit in the retained draft receipt.
+
 [Limitless API text migration](limitless-import-v1.json): source 0e949f3, 912 functional passes/one physical skip, 183 focused TSan passes, signed app/ZIP and actual encrypted/process checks. A 1,000-note first frozen import takes 25.82 s / 86.9 MB peak RSS with startup/Apple embeddings/SQLite included. Original invocation and owned cleanup-fault receipts remain retained; harness follow-up corrects unconfirmed-create cleanup. Partial migration and release acceptance remain explicit.
 
 ## Bounded visual source validation
