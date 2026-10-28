@@ -211,6 +211,7 @@ struct SettingsView: View {
             Section("Local API") {
                 Toggle("Enable authenticated loopback API",isOn:Binding(get:{m.settings.apiEnabled},set:{if $0 { m.startAPI() } else { m.stopAPI() }}))
                 Text(m.apiStatus).font(.caption)
+                if m.settings.apiEnabled && m.apiStatus == "API off" {Button("Start local API") {m.startAPI()}.disabled(m.showOnboarding || m.libraryWipe.busy || m.libraryWipe.pendingCleanup)}
                 Text("Read only: GET /v1/search, /v1/memories/{id}, /v1/stats. Bound to 127.0.0.1:47831. Requests require Authorization: Bearer TOKEN. Browser origins are rejected.").font(.caption).foregroundStyle(.secondary)
                 Button("Reveal token file") { NSWorkspace.shared.activateFileViewerSelecting([m.store.root.appendingPathComponent("api-token")]) }
             }
@@ -271,7 +272,7 @@ struct OnboardingView: View {
     var body: some View { VStack(alignment:.leading,spacing:22) {
         Image(systemName:"wind").font(.system(size:54)).foregroundStyle(.mint)
         Text("A memory for your Mac.\nEntirely yours.").font(.system(size:34,weight:.medium,design:.rounded))
-        Text("OSwind saves the windows you choose, reads their text on device, and helps you find your way back. Capture starts when you resume it.").foregroundStyle(.secondary)
+        Text("OSwind saves the windows you choose, reads their text on device, and helps you find your way back. Your saved startup preferences apply after this introduction.").foregroundStyle(.secondary)
         VStack(alignment:.leading,spacing:14) { Label("Local storage, no account, no telemetry",systemImage:"internaldrive"); Label("Pause anytime; exclude apps and websites",systemImage:"pause.circle"); Label("Local models or your own API keys",systemImage:"sparkles"); Label("Export and delete your memory",systemImage:"arrow.up.doc") }.font(.callout)
         Text("Screen Recording is required. Accessibility enables browser URL rules. Microphone and system audio are optional and controlled separately.").font(.caption).foregroundStyle(.secondary)
         HStack { Button("Explore first") { complete() }; Spacer(); Button("Set up OSwind") { complete(); m.showSettings = true }.buttonStyle(.borderedProminent) }

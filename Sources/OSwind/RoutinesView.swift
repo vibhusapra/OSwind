@@ -20,7 +20,11 @@ struct RoutinesView:View {
                     Spacer();Button("New routine",systemImage:"plus") {var d=RoutineDefinition();d.ai=app.settings.ai;editing=RoutineEditorSelection(value:d,revision:nil)}.buttonStyle(.borderedProminent)
                 }
                 VStack(alignment:.leading,spacing:10) {
-                    Toggle("Run schedules while OSwind is open",isOn:$app.settings.routinesEnabled).accessibilityIdentifier("routines-enabled")
+                    Toggle("Run schedules while OSwind is open",isOn:Binding(get:{app.settings.routinesEnabled},set:{app.configureRoutineScheduling($0)})).accessibilityIdentifier("routines-enabled")
+                    if app.settings.routinesEnabled && !model.schedulingActive {
+                        Text("Schedules are paused for this library. Resume schedules to check due routines without starting capture or the API.").font(.caption).foregroundStyle(.secondary)
+                        Button("Resume schedules") {app.configureRoutineScheduling(true)}.disabled(app.showOnboarding || app.libraryWipe.busy || app.libraryWipe.pendingCleanup || app.demo)
+                    }
                     Text("Runs one routine at a time. After sleep or restart, only the latest missed occurrence can run, within 24 hours. OSwind does not wake your Mac. Failed or interrupted occurrences wait for a manual retry.").font(.caption).foregroundStyle(.secondary)
                     if model.busy {HStack {ProgressView().controlSize(.small);Text("Preparing a source-linked result…").font(.caption);Spacer();Button("Cancel run"){model.cancel()}}}
                 }.padding(18).background(.quaternary.opacity(0.35),in:RoundedRectangle(cornerRadius:12))

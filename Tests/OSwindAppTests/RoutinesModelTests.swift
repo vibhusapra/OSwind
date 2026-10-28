@@ -31,6 +31,13 @@ import XCTest
         let model=RoutinesModel(store:store,settings:config,due:{_,_ in await gate.wait();try Task.checkCancellation();return nil},manual:{_,_,_ in nil})
         model.tick();await fulfillment(of:[gate.entered],timeout:5);model.apply(AppSettings());await gate.open();try await eventually {!model.busy};XCTAssertNil(model.error)
     }
+    func testStoppedSchedulerRejectsLateAutomaticTickButManualRunStillWorks()async throws {
+        let count=Count();var settings=AppSettings();settings.routinesEnabled=true
+        let model=RoutinesModel(store:store,settings:settings,due:{_,_ in await count.tick();return nil},manual:{_,_,_ in await count.run();return nil})
+        model.start();try await eventually {await count.due==1};try await eventually {!model.busy};model.stop()
+        model.tickIfStarted();try await Task.sleep(for:.milliseconds(20));let due=await count.due;XCTAssertEqual(due,1)
+        model.runNow("owned-manual");try await eventually {await count.manual==1};try await eventually {!model.busy}
+    }
     func testAutomaticRunDefinitionChangeCancelsAndNoResultPublishes() async throws {
         let saved=try store.saveRoutine(RoutineDefinition()),gate=Gate(),source=Memory(text:"Synthetic source")
         try store.insert(source);var settings=AppSettings();settings.routinesEnabled=true

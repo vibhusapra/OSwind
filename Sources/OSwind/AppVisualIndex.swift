@@ -6,14 +6,14 @@ extension AppModel {
         (settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled) && ![.serious,.critical].contains(ProcessInfo.processInfo.thermalState)
     }
     func resumeAutomaticVisualIndex() {
-        guard visualAutoResumeAllowed,!demo,!store.isClosed,!SessionState.locked,!libraryWipe.busy,!libraryTransfer.busy,settings.search.visual.enabled,settings.search.visual.automaticIndex,visualPowerAllowed,!visualIndexing else {return}
+        guard visualAutoResumeAllowed,!showOnboarding,!demo,!store.isClosed,!SessionState.locked,!libraryWipe.busy,!libraryWipe.pendingCleanup,!libraryTransfer.busy,settings.search.visual.enabled,settings.search.visual.automaticIndex,visualPowerAllowed,!visualIndexing else {return}
         rebuildVisualIndex(pendingOnly:true)
     }
     func cancelVisualIndexing() {
         visualGeneration=UUID();visualIndexTask?.cancel();visualAutomaticTask?.cancel();visualIndexTask=nil;visualAutomaticTask=nil;pendingVisualIDs.removeAll();visualIndexing=false;visualAutomaticIndexing=false;visualIndexStatus="Visual indexing cancelled; completed sources remain."
     }
     func queueVisualIndex(_ memory:Memory) {
-        guard settings.search.visual.enabled,settings.search.visual.automaticIndex,memory.kind == .screen,memory.imagePath != nil || memory.videoPath != nil else {return}
+        guard !showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup,settings.search.visual.enabled,settings.search.visual.automaticIndex,memory.kind == .screen,memory.imagePath != nil || memory.videoPath != nil else {return}
         visualAutoResumeAllowed=true
         guard !settings.search.visual.modelDirectory.isEmpty else {visualIndexStatus="Choose a prepared local visual model in Models settings.";return}
         guard visualPowerAllowed else {visualIndexStatus="Visual indexing paused by power or thermal policy. Build / resume later to catch up.";return}
@@ -21,7 +21,7 @@ extension AppModel {
         pendingVisualIDs.removeAll {$0==memory.id};pendingVisualIDs.append(memory.id);startAutomaticVisualIndex()
     }
     func startAutomaticVisualIndex() {
-        guard visualAutomaticTask==nil,!visualIndexing,settings.search.visual.enabled,settings.search.visual.automaticIndex,visualPowerAllowed,!pendingVisualIDs.isEmpty else {return}
+        guard visualAutoResumeAllowed,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup,visualAutomaticTask==nil,!visualIndexing,settings.search.visual.enabled,settings.search.visual.automaticIndex,visualPowerAllowed,!pendingVisualIDs.isEmpty else {return}
         let generation=visualGeneration;visualAutomaticIndexing=true;visualIndexStatus="Indexing latest retained visuals…"
         visualAutomaticTask=Task { [weak self] in
             guard let self else {return}

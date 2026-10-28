@@ -66,6 +66,14 @@ import OSwindCore
         } else if model.section == "RoutineEditor" {
             var sample=RoutineDefinition();sample.ai=model.settings.ai
             size=NSSize(width:760,height:850);content=AnyView(RoutineEditor(value:sample,revision:nil,model:model.routines).environmentObject(model))
+        } else if model.section == "RoutinesQuiet" {
+            model.settings.routinesEnabled=true
+            size=NSSize(width:900,height:700);content=AnyView(RoutinesView(model:model.routines).environmentObject(model))
+        } else if model.section == "OnboardingPreview" {
+            size=NSSize(width:590,height:720);content=AnyView(OnboardingView().environmentObject(model))
+        } else if model.section == "SettingsConnectQuiet" {
+            model.settings.apiEnabled=true
+            size=NSSize(width:760,height:720);content=AnyView(SettingsView(initialTab:"Connect").environmentObject(model))
         } else if model.section == "Routines" {
             if model.routines.items.isEmpty {
                 var sample=RoutineDefinition();sample.title="Evening reflection · sample";sample.window = .last24Hours
