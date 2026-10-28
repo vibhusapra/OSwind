@@ -212,11 +212,11 @@ struct SettingsView: View {
                 Toggle("Enable authenticated loopback API",isOn:Binding(get:{m.settings.apiEnabled},set:{if $0 { m.startAPI() } else { m.stopAPI() }}))
                 Text(m.apiStatus).font(.caption)
                 if m.settings.apiEnabled && m.apiStatus == "API off" {Button("Start local API") {m.startAPI()}.disabled(m.showOnboarding || m.libraryWipe.busy || m.libraryWipe.pendingCleanup)}
-                Text("Read only: GET /v1/search, /v1/memories/{id}, /v1/stats. Bound to 127.0.0.1:47831. Requests require Authorization: Bearer TOKEN. Browser origins are rejected.").font(.caption).foregroundStyle(.secondary)
+                Text("Read-only source search and reads, stats, activity, and entity scopes. Bound to 127.0.0.1:47831. Requests require Authorization: Bearer TOKEN. Browser origins are rejected.").font(.caption).foregroundStyle(.secondary)
                 Button("Reveal token file") { NSWorkspace.shared.activateFileViewerSelecting([m.store.root.appendingPathComponent("api-token")]) }
             }
             Section("MCP for Claude, Cursor, Codex and other clients") {
-                Text("Point your MCP client to oswindctl mcp. It provides search_memory, get_memory and memory_stats over stdio. The client runs locally with access to this user's OSwind store; configure only clients you trust.").font(.caption)
+                Text("Use oswindctl mcp for six read-only tools: source search and reads, stats, activity, entities and entity sources. The client runs locally with access to this user's OSwind store; configure only clients you trust.").font(.caption)
                 Text(mcpConfiguration).font(.system(size:11,design:.monospaced)).textSelection(.enabled)
             }
         }
@@ -260,7 +260,7 @@ struct SettingsView: View {
     }
     private var mcpConfiguration: String {
         let object = ["mcpServers":["oswind":["command":"/Applications/OSwind.app/Contents/MacOS/oswindctl","args":["--data",m.store.root.path,"mcp"]]]] as [String:Any]
-        return (try? JSONSerialization.data(withJSONObject:object,options:[.sortedKeys,.prettyPrinted])).flatMap { String(data:$0,encoding:.utf8) } ?? ""
+        return (try? JSONSerialization.data(withJSONObject:object,options:[.sortedKeys,.prettyPrinted,.withoutEscapingSlashes])).flatMap { String(data:$0,encoding:.utf8) } ?? ""
     }
     private func entries(_ text: String) -> [String] { text.components(separatedBy:.newlines).map {$0.trimmingCharacters(in:.whitespaces)}.filter {!$0.isEmpty} }
     private func multiline(_ title: String,value: Binding<String>) -> some View { VStack(alignment:.leading,spacing:6) { Text(title).font(.caption); TextEditor(text:value).font(.system(size:11,design:.monospaced)).frame(height:68).padding(5).background(.background,in:RoundedRectangle(cornerRadius:6)) } }

@@ -30,7 +30,7 @@ struct RoutinesView:View {
                 }.padding(18).background(.quaternary.opacity(0.35),in:RoundedRectangle(cornerRadius:12))
                 if let error=model.error {Label(error,systemImage:"info.circle").font(.callout).foregroundStyle(.secondary)}
                 if model.items.isEmpty {
-                    ContentUnavailableView("A little perspective, on schedule",systemImage:"calendar.badge.clock",description:Text("Choose a prompt, a source window and a time. Results stay in your conversation history with their original evidence."))
+                    ContentUnavailableView("A little perspective, on schedule",systemImage:"calendar.badge.clock",description:Text("Choose a prompt, a source window and a time. Results stay in your conversation history with their original evidence.")).frame(maxWidth:.infinity)
                 }
                 ForEach(model.items) {routine in
                     VStack(alignment:.leading,spacing:12) {
