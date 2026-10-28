@@ -1,0 +1,232 @@
+{
+  "format": "OSwind nonblocking library lifecycle status qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-28T22:39:33.587649+00:00",
+  "codeCommit": "b2c520ce97d482933b3b4a5ef61f8178a8c6fd2d",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/68",
+  "scope": "Single authoritative connection pointer with a short independent lock; lifecycle status does not wait for SQL work. SQL/media leases unchanged. Owned fixtures only.",
+  "newCases": 7,
+  "beforeFix": {
+    "productCommit": "6a5d9fe",
+    "cases": 6,
+    "passedCases": 4,
+    "failedCases": 2,
+    "failedAssertions": 2,
+    "result": "Both held-writer status probes fail the one-second early-completion assertion; ordinary close, failed-close retry and restore paths pass.",
+    "initialFixtureCompileFailureRetained": true
+  },
+  "afterFix": {
+    "cases": 7,
+    "failures": 0,
+    "contract": "Status completes before held writer release while actual SQL reader and close remain serialized; failed native close remains open, retry and restore paths publish closed; four concurrent readers exercise pointer synchronization.",
+    "notMeasured": "No physical UI input latency, import throughput percentage, energy or competitor result"
+  },
+  "fullSuite": {
+    "defined": 938,
+    "passed": 937,
+    "skipped": 1,
+    "failures": 0,
+    "suiteSeconds": 435.935,
+    "driverAwakeSeconds": 440.65775141702034,
+    "physicalAudioSkipped": "NativeSystemAudioTests.testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder",
+    "optIns": [
+      "Actual owned encrypted APFS",
+      "Local cached speech/speaker/visual models",
+      "Real 120-second idle/model reload",
+      "Managed runtime",
+      "Metal expression paths",
+      "Pinned native tokenizer references"
+    ]
+  },
+  "threadSanitizer": {
+    "passed": 177,
+    "skipped": 0,
+    "failures": 0,
+    "raceReports": 0,
+    "suiteSeconds": 100.791,
+    "driverAwakeSeconds": 133.48947345791385,
+    "selection": "OSwindAppTests|StoreLifecycleTests|StoreTests|LibraryBackupTests|BackupWorkspaceTests|NativeVaultCancellationTests|VaultAttachCompletionTests"
+  },
+  "orderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 440.65775141702034,
+      "systemSeconds": 440.658399105072
+    },
+    {
+      "name": "lifecycle-app-vault-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 133.48947345791385,
+      "systemSeconds": 133.4896697998047
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 51.486875124974176,
+      "systemSeconds": 51.48695206642151
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.7398642499465495,
+      "systemSeconds": 1.7398672103881836
+    },
+    {
+      "name": "migration-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 33.63558791694231,
+      "systemSeconds": 33.63563680648804
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.37487412500195205,
+      "systemSeconds": 0.3748750686645508
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.0481376249808818,
+      "systemSeconds": 1.048140048980713
+    },
+    {
+      "name": "recap-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.4388780840672553,
+      "systemSeconds": 1.4388809204101562
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.7021483338903636,
+      "systemSeconds": 0.7021498680114746
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 14.596741124987602,
+      "systemSeconds": 14.596762895584106
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.11363241705112159,
+      "systemSeconds": 0.1136331558227539
+    }
+  ],
+  "packageProof": {
+    "scope": "Separately staged schema22 nonblocking connection lifecycle status; no installation, measured power or competitive ranking claim",
+    "codeCommit": "b2c520ce97d482933b3b4a5ef61f8178a8c6fd2d",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "b48e288e5bcfd404214f1d332edc9a46781bbe04e53fe3d66287993da90295ac",
+        "signedSHA256": "23e8a28fded3ab22bbd1e7948b153eb009a093fedf734211c0720bc449769a09",
+        "normalizedPayloadSHA256": "cb5f7ce1ad5da117dc8ee79367f77162f1da439ec1344e8509b99057a666637a"
+      },
+      "oswindctl": {
+        "rawSHA256": "fffa7e40aa58cac21e35544c366fad43f725b3520a2985275a3048c8e6c5280d",
+        "signedSHA256": "4b1a152c246356feee97a8a368666aeea3dc2e9dc59709360c9804f2c8d7ff06",
+        "normalizedPayloadSHA256": "44e9d58a998a9a68ae526e595f4372788650ef408f6ffc9a86aa0eccc6e3434d"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "56d56dcf74b9d42d59f64b84b24307916bc87c20ce795e8db00d3548f128610d",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "3e236788da1cb30f37aa92d7e326c2f451963ed4f54d6c8ea81412297b139e6c",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "afterProcessChecks": {
+    "recordedAtUTC": "2026-10-28T22:37:39.593902+00:00",
+    "completeProcessInventoryChecked": true,
+    "matchingOwnedProcesses": [],
+    "ownedArtifactImageCount": 0,
+    "imageInventorySucceeded": true,
+    "installedTreeUnchanged": true,
+    "stagedTreeUnchanged": true,
+    "zipUnchanged": true
+  },
+  "migration": {
+    "state": "completed",
+    "checks": [
+      "exact identity, DST-crossing instants, nested speaker text, page notice, retry and keyword search across processes",
+      "update preserves user curation; malformed final entry publishes no earlier changes",
+      "default privacy redaction and exclusion; final symlink/FIFO refusal without blocking",
+      "normal OSwind JSON round trip retains imported note text",
+      "1000 authored entries admitted by one bounded page; timing includes fresh CLI startup, Apple embeddings and SQLite",
+      "encrypted APFS import, exact note reopen and locked refusal without plaintext fallback"
+    ],
+    "nativeCleanupDetached": true,
+    "bulkInputBytes": 488863,
+    "bulkInputSHA256": "70e32c219367fedea497a9a31028a5905e816af2cba345e1c3717f6a3fb267fa",
+    "thousandImport": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 26.356524791102856,
+      "systemSeconds": 26.35656428337097,
+      "userCPUSeconds": 37.36657,
+      "systemCPUSeconds": 11.735111999999999,
+      "peakRSSBytes": 90505216,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "priorUnpairedAwakeSeconds": [
+      25.819643,
+      97.342475
+    ],
+    "sameInputAndVectors": {
+      "scope": "Only authored 1000-note benchmark libraries, read-only IDs/models/vector bytes; no normal source values selected",
+      "records": 1000,
+      "baselineSource": "693d797313bed844d148156be2c54f52c7fdaa78",
+      "currentSource": "b2c520ce97d482933b3b4a5ef61f8178a8c6fd2d",
+      "models": [
+        "apple-nl-sentence-en-v1"
+      ],
+      "digestEncoding": "Binary-ID-ordered rows; each UTF8 ID, UTF8 model and embedding blob prefixed with little-endian UInt64 byte length",
+      "baselineVectorSHA256": "104aa9de8a7fc9808fc04b25b41b5bad13e2109d04c4ef8f14fce8b17b7cf508",
+      "currentVectorSHA256": "104aa9de8a7fc9808fc04b25b41b5bad13e2109d04c4ef8f14fce8b17b7cf508",
+      "allVectorBytesMatch": true,
+      "maximumAbsoluteVectorDifference": 0.0,
+      "timingInterpretation": "Unpaired uncontrolled host/framework/cache state. No causal performance improvement or regression claim."
+    },
+    "limits": [
+      "Includes process startup, Apple embeddings and SQLite",
+      "Different current CLI bytes, identical authored input and all 1000 stored vectors",
+      "Uncontrolled host/framework/cache state and no paired timing protocol; no causal speed or regression claim"
+    ]
+  },
+  "ci": {
+    "runID": 40779889309,
+    "sourceCommit": "b2c520ce97d482933b3b4a5ef61f8178a8c6fd2d",
+    "status": "in_progress",
+    "benchmarkHarnesses": "success",
+    "native": "in_progress"
+  },
+  "auditCorrection": {
+    "initialFinalAuditAssertionFailed": true,
+    "initialDiagnosticValuesRetained": false,
+    "rootCause": "Unproven. A suspected shell self-match was not reproduced.",
+    "correctedCurrentAudit": "Command identity plus exact owned path, complete process inventory before output, final-proof-v2; empty current owned GUI/test/driver and current artifact-image inventories. Installed/stage/ZIP hashes unchanged.",
+    "failedProductTrialReplaced": false
+  },
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "remainingGates": [
+    "Inherited busy-terminal attachment-inspection failure: actual native result details/root cause unproven",
+    "Physical signed-GUI shortcut/input responsiveness during long import",
+    "Quiet/onboarding wake/power/session indexing lifecycle",
+    "Learned PII detection, sync, notarized distribution and whole-product competitor/energy acceptance",
+    "Earlier default-library automatic activity from native cleanup incident remains unaudited"
+  ]
+}
