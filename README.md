@@ -10,7 +10,7 @@ Recent work adds [reviewed contextual drafts](docs/CONTEXTUAL-DRAFTS.md), [expli
 
 [Automatic maintenance](docs/MAINTENANCE-STARTUP.md) respects quiet preparation and onboarding, with an explicit resume control. [Maintenance qualification](benchmarks/maintenance-startup-v1.json) has 930 functional passes, one physical-audio skip, 126 focused TSan passes and 16 successful operations; broader release acceptance remains open.
 
-[Lifecycle status checks](docs/STORE-LIFECYCLE.md) now stay independent of long SQL writers. [Latest local qualification](benchmarks/nonblocking-library-state-v1.json) has 937 functional passes, one physical-audio skip, 177 focused TSan passes and 11 successful build/package/process operations. Source CI is running; physical UI latency and broader release gates remain open.
+[Lifecycle status checks](docs/STORE-LIFECYCLE.md) now stay independent of long SQL writers. [Latest local qualification](benchmarks/nonblocking-library-state-v1.json) has 937 functional passes, one physical-audio skip, 177 focused TSan passes and 11 successful build/package/process operations. Both frozen-source CI jobs pass; physical UI latency and broader release gates remain open.
 
 Builds are staged and ad-hoc signed. Full test, model, process and package receipts—including retained failures—are in the [delivery ledger](docs/PROGRESS.md) and [benchmark index](benchmarks/README.md). An encrypted-library terminal attachment-inspection failure remains open. Passing component checks do not establish unattended desktop or release readiness.
 

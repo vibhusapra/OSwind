@@ -207,11 +207,25 @@
     ]
   },
   "ci": {
-    "runID": 40779889309,
     "sourceCommit": "b2c520ce97d482933b3b4a5ef61f8178a8c6fd2d",
-    "status": "in_progress",
-    "benchmarkHarnesses": "success",
-    "native": "in_progress"
+    "runID": 40779889309,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 123138573131,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 123138573517,
+        "name": "native",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Frozen product source CI; later documentation commit has a separate run"
   },
   "auditCorrection": {
     "initialFinalAuditAssertionFailed": true,
