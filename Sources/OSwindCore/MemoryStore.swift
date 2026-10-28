@@ -9,7 +9,16 @@ public final class MemoryStore: @unchecked Sendable {
     public let root: URL
     private var closeDirectory:BackupFileTree?
     let mediaRootIdentity:BackupFileStamp
-    private var db: OpaquePointer?
+    // Connection identity has its own short lock: UI lifecycle guards must not
+    // wait behind SQL, imports or model inference. SQL operations still hold
+    // `lock` for their complete lifetime. Never hold this lock while acquiring
+    // the SQL mutex; publish nil only after the native close succeeds.
+    private let connectionLock = NSLock()
+    private var connection: OpaquePointer?
+    private var db: OpaquePointer? {
+        get { connectionLock.lock();defer {connectionLock.unlock()};return connection }
+        set { connectionLock.lock();connection=newValue;connectionLock.unlock() }
+    }
     private let lock = NSRecursiveLock()
     private var metalScopeCache: MetalScopeCache?
     private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
@@ -143,7 +152,7 @@ public final class MemoryStore: @unchecked Sendable {
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
         _ = finishRecapInvalidation()
     }
-    public var isClosed:Bool {lock.lock();defer {lock.unlock()};return db==nil}
+    public var isClosed:Bool {db==nil}
     /// Revalidate a prepared connection before attaching it to a visible model.
     /// This checks the current directory, not just its saved pathname.
     public func validateDirectoryIdentity() throws {try requireMediaRootIdentity()}

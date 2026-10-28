@@ -1,5 +1,12 @@
 # OSwind delivery ledger
 
+## Nonblocking lifecycle status — source b2c520c / schema 22
+
+- [PR #68](https://github.com/vibhusapra/OSwind/pull/68) keeps `isClosed` off the mutex held by imports/model inference. A separate short lock protects the single connection pointer; SQL/media serialization and native close ownership remain intact. Two held-writer probes fail before the fix; seven lifecycle cases pass afterward. [Behavior](STORE-LIFECYCLE.md).
+- [Qualification](../benchmarks/nonblocking-library-state-v1.json): **938 defined: 937 pass / one physical-audio skip / zero failures**, **177 focused TSan passes**, and all **11 ordered operations** pass. The separately staged signed app/ZIP payloads match; installed/staged bytes remain unchanged and final owned process/current fixture-image inventories are empty. Both frozen-source CI jobs pass (run 40779889309); later documentation CI is separate.
+- An initial final-audit assertion retained no diagnostic values; a suspected shell self-match is not reproduced. A corrected command-identity audit passes current checks; the first cause remains unproven. This is retained as an audit issue, not attributed to a product failure.
+- Current authored 1,000-note import **26.36 s**, alongside prior **25.82/97.34 s**, is unpaired. Input and all 1,000 stored vectors match; current CLI bytes differ and host/framework/cache state is uncontrolled. No causal speed, physical UI-latency, energy or competitor claim. Busy-terminal, quiet wake/indexing, native and broader parity/release gates remain open.
+
 ## Automatic maintenance lifecycle — source 693d797 / schema 22
 
 - [PR #67](https://github.com/vibhusapra/OSwind/pull/67) prevents automatic retention during quiet preparation, visible onboarding and a queued callback after library-switch preparation. Before the fix, all three authored old-note cases delete their source (four failed assertions); active configured and explicit manual cleanup already pass. Eight cases now cover lifecycle, resume, disabled policy and API/capture isolation. [Behavior](MAINTENANCE-STARTUP.md).
