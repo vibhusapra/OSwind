@@ -163,3 +163,5 @@ a new private root and authored records, creates only its own encrypted image
 when requested, independently checks detachment and retains artifacts. It does
 not exercise ordinary history, a live external service, sustained plugin jobs,
 device capture, source authenticity or end-to-end desktop retrieval quality.
+
+The read SDK also exposes `client.privacy_check(memory_id)` through the read-only `memory_privacy_check` tool. It reports a historical experimental import check, not absence of PII or permission to send content. See [PII scan records](PII-SCAN-RECORDS.md).

@@ -1,0 +1,761 @@
+{
+  "format": "OSwind content-bound experimental import-check records",
+  "version": 1,
+  "date": "2026-10-29",
+  "productCommit": "08398188671f6be36098b929990aac4c3d71ec6d",
+  "fixtureCommit": "d2ee1b146ae0a655868059ba3e477fc628841078",
+  "baseCommit": "6bc274d0adc428af4a716761c9832abc13e1f2b3",
+  "schema": 23,
+  "scope": "Historical metadata for optional learned text imports, surfaced without reloading a model. No privacy operating point, complete capture/media/egress protection, physical power, full parity, distribution or competitive ranking acceptance.",
+  "host": {
+    "chip": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2"
+  },
+  "qualification": {
+    "state": "corrected-full-suite-passed-with-retained-initial-failures",
+    "initial": {
+      "source": "08398188671f6be36098b929990aac4c3d71ec6d",
+      "frozenInputs": 579,
+      "report": {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/report.json",
+        "sha256": "46911c6cb721b4685049914a3ea1b9bc56c361fe3250602adb91bd5e3cb89fbe"
+      },
+      "suite": {
+        "defined": 1216,
+        "passed": 1211,
+        "skipped": 2,
+        "failures": 3,
+        "seconds": 543.149,
+        "logSHA256": "ad55b9b6a0a41e839396eb18504fdbd9c6d65961a73017bd804d32167df6a1ca"
+      },
+      "otherStagesPassed": 16
+    },
+    "fixtureCorrection": {
+      "source": "d2ee1b146ae0a655868059ba3e477fc628841078",
+      "frozenInputs": 581,
+      "report": {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/report.json",
+        "sha256": "2f96473fb174dac696808492dd1a89a4bc907f7800a093cc6a5ea6f99a724114"
+      },
+      "suite": {
+        "defined": 1216,
+        "passed": 1214,
+        "skipped": 2,
+        "failures": 0,
+        "seconds": 520.276,
+        "logSHA256": "304e7e1f6c9f487502e6cfe1a057c13b8902188ef7f592ff671b28a1a7a3f913"
+      },
+      "onlyChanges": [
+        {
+          "path": "Tests/OSwindCoreTests/ProjectCorrectionTests.swift",
+          "oldSHA256": "a9c6898168edd8a0a97b0e262c0e33140db3fcb65a8bba0975060d1b027693fa",
+          "newSHA256": "3f44f8659b948e745673594efd671567eaea57f8a341c9ae24afe8abe4d705bd",
+          "change": "Advance the explicit latest-schema expectation from 22 to 23; all preservation/migration assertions remain."
+        },
+        {
+          "path": "Tests/OSwindCoreTests/SnapshotRegionTests.swift",
+          "oldSHA256": "a13d0eb39869602fe359f449cc2879c987be72d137a94ae30a24dbdf66753225",
+          "newSHA256": "cfb6c349de9e89cc35c91146571cf481d6625312208477910e45c13a88b38f5e",
+          "change": "Advance the explicit latest-schema expectation from 22 to 23; all preservation/migration assertions remain."
+        },
+        {
+          "path": "Tests/OSwindCoreTests/VisualIndexStoreTests.swift",
+          "oldSHA256": "c59a77d03a01c59b9efd424232c0c31a08ac5e81ebd2383a658c1cadcc779231",
+          "newSHA256": "fe96ef15618a342f2109ccf08694884fb9a6a7b9af3f3285e683b7868914eab9",
+          "change": "Advance the explicit latest-schema expectation from 22 to 23; all preservation/migration assertions remain."
+        }
+      ],
+      "unchangedProductToolsAndAssets": true,
+      "reusedPassingStages": 16,
+      "reuseReason": "Only three static latest-schema test expectations changed; product, scripts, SDK, models, assets, sanitizer/optimized tests and signed package remain unchanged. Original failed run and all log hashes are retained."
+    },
+    "selectedTSan": {
+      "defined": 202,
+      "passed": 202,
+      "skipped": 0,
+      "failures": 0,
+      "seconds": 154.58,
+      "logSHA256": "b898db8c1c7f21f259b2b7fba98d6e6878b4de9a923ba1ca79be341dcb58cf1e"
+    },
+    "selectedOptimized": {
+      "defined": 202,
+      "passed": 202,
+      "skipped": 0,
+      "failures": 0,
+      "seconds": 117.27,
+      "logSHA256": "bf709b08561d7dda50ba85f5fb05e55c73670e201414b75535a48ac527480075"
+    },
+    "skipReasons": [
+      "Explicit owned system-audio fixtures; no microphone access",
+      "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+    ],
+    "sdkOffline": {
+      "tests": 16,
+      "passed": true,
+      "log": {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/sdk-offline.log",
+        "sha256": "1270659258e5794ce8a1e87cd3784331d154c8092539ce7c5cd7d6e2375c9484"
+      }
+    },
+    "operations": [
+      {
+        "name": "full-most-optins",
+        "state": "failed",
+        "returncode": 1,
+        "seconds": 547.3557509589009,
+        "logSHA256": "ad55b9b6a0a41e839396eb18504fdbd9c6d65961a73017bd804d32167df6a1ca"
+      },
+      {
+        "name": "selected-tsan",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 185.4501094999723,
+        "logSHA256": "b898db8c1c7f21f259b2b7fba98d6e6878b4de9a923ba1ca79be341dcb58cf1e"
+      },
+      {
+        "name": "selected-release",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 235.73687045904808,
+        "logSHA256": "bf709b08561d7dda50ba85f5fb05e55c73670e201414b75535a48ac527480075"
+      },
+      {
+        "name": "package",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 103.5542204589583,
+        "logSHA256": "7c12f16ce14e7193c9d55ce76e26327929985579f9e78c3434e1bf51652895d4"
+      },
+      {
+        "name": "configured-import-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.703912666067481,
+        "logSHA256": "4a81acb6e8be3c6371d2ce5e977db474df270167185c675716b78eefe276f244"
+      },
+      {
+        "name": "input-lifetime-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.0752102080732584,
+        "logSHA256": "024c2684b5ae9afbb5fa70e67ac7bd9b8692ce0f1cd7fae723f96a9b4f00e8da"
+      },
+      {
+        "name": "learned-import-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 15.819195708958432,
+        "logSHA256": "b5bbf409c1bca3777d2e580c4117588b14779d16e42d5249183bb97bb20f1672"
+      },
+      {
+        "name": "scan-record-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 4.890220041852444,
+        "logSHA256": "009fb97ecbaeda432fe51c4f72a2841f06b5d395e9c10eb7a5dde98f9916b3e8"
+      },
+      {
+        "name": "api-mcp-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.3712340828496963,
+        "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+      },
+      {
+        "name": "sdk-offline",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 4.798033667029813,
+        "logSHA256": "1270659258e5794ce8a1e87cd3784331d154c8092539ce7c5cd7d6e2375c9484"
+      },
+      {
+        "name": "pattern-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.7722452080342919,
+        "logSHA256": "ac879a1e8af596d3be156728f7776f904e41f39a09ec79ec0537477007d5133a"
+      },
+      {
+        "name": "limitless-vault-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 32.30819758307189,
+        "logSHA256": "9988a351e121c90b78a76b2f3cc7785dd715e443d28a597fbbf245f1752a1b3d"
+      },
+      {
+        "name": "collector-vault-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 6.746005000080913,
+        "logSHA256": "f663b89cbaffea4847aaeb27049d9e33e678ec258f217f2871a5f6c855f0d6bc"
+      },
+      {
+        "name": "recap-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.3269224578980356,
+        "logSHA256": "2d9de0f4b7da181e71a96d172a01d009300173b19992650f0a4760c95e2a35f5"
+      },
+      {
+        "name": "markdown-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.7108411251101643,
+        "logSHA256": "9dfdb8c0243b0493cfb416c394a2a1efda8bd60bf00a3993374083d253777102"
+      },
+      {
+        "name": "domain-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.28486429201439023,
+        "logSHA256": "9cd4f59d7611b72ec60bb9161b5921d84e35e9d436effb9906f27235a7b0b3d4"
+      },
+      {
+        "name": "package-proof",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.592289041960612,
+        "logSHA256": "e14f6d0ae2a8c2acdf13e90236e16b59006f6a95b96e7ad3a25630ecd9a1cf8e"
+      }
+    ],
+    "signedProcessGroups": 11
+  },
+  "learnedImportProcesses": {
+    "report": {
+      "path": ".artifacts/pii-scan-records-v1/qualification-v1/pii-import-processes/report.json",
+      "sha256": "8d1c2bb1e9815b21619d4fa04149b082de0ba64cff2d2c894d9a5cf85868ea95"
+    },
+    "operations": 30,
+    "nativeCases": [
+      {
+        "compute": "cpu",
+        "kind": "import",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "collect",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 6,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "import-limitless",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 5,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "import",
+        "case": "authored-email-known-miss",
+        "masked": false,
+        "summary": {
+          "compute": "cpu",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 0,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "collect",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 6,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import-limitless",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 5,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 2
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import",
+        "case": "authored-email-known-miss",
+        "masked": false,
+        "summary": {
+          "compute": "coreML",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 0,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      }
+    ],
+    "cancelBeforeEOF": true
+  },
+  "scanRecordProcesses": {
+    "report": {
+      "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-processes/report.json",
+      "sha256": "9e02bb2733d5fb10bcefd23903264273b3e9e35aa57bc4a601062970820ea981"
+    },
+    "operations": 23,
+    "nativeCases": [
+      {
+        "compute": "cpu",
+        "recorded": true,
+        "SDK": true,
+        "backupPreservesRecord": true,
+        "contentWriteInvalidates": true,
+        "JSONCannotMint": true,
+        "eraseCascades": true
+      },
+      {
+        "compute": "coreML",
+        "recorded": true,
+        "SDK": true,
+        "backupPreservesRecord": true,
+        "contentWriteInvalidates": true,
+        "JSONCannotMint": true,
+        "eraseCascades": true
+      }
+    ],
+    "offlineForgedReportCannotMint": true,
+    "privacyAcceptance": false
+  },
+  "package": {
+    "scope": "Separately staged schema23 library-owned content-bound experimental import-check records; no accepted privacy operating point, complete desktop/media/egress protection, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "08398188671f6be36098b929990aac4c3d71ec6d",
+    "schema": 23,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "4a2585434ba5ab199980f01586cdca954ceee220aa8d56acbdb95f3c401ed746",
+        "signedSHA256": "da5a43a737cd3805195e13f6b7d1ed155d19bf55a929f4c7b8551bf3b9304de1",
+        "normalizedPayloadSHA256": "3bde8c3c39921be346403182584c0cc453476702cbada483ca6198bd70a4bbed"
+      },
+      "oswindctl": {
+        "rawSHA256": "27c357e361905c404d074076e49f1c8a38c9e9521cebc36c3ec2c962867c1755",
+        "signedSHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "normalizedPayloadSHA256": "36c23c9d2778a465d797ece10c8ff058d45dca670336e2070e4fd670db00e6e5"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "2241b7a4ee02589428a5e6f019c1cb18e09c36eaaa704393083514494ed6a5ed",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "17cead35bad19c4eca1abba6f5f991b94ab8d1f7fa18d3d84f55cceb684f4f31",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installedUnchanged": true
+  },
+  "publicationIntegrity": {
+    "state": "passed",
+    "frozenInputs": 581,
+    "productUnchanged": true,
+    "onlyThreeTestExpectationsChanged": true,
+    "originalFailedLogUnchanged": true,
+    "correctedLogSHA256": "304e7e1f6c9f487502e6cfe1a057c13b8902188ef7f592ff671b28a1a7a3f913",
+    "installedFiles": 15,
+    "installedUnchanged": true,
+    "bundleFiles": 34,
+    "bundleAndExtractedZipUnchanged": true,
+    "strictSignaturesPass": true,
+    "ownedMountedImages": [],
+    "noOwnCompilerOrEvaluationDriver": true
+  },
+  "renders": {
+    "scope": "Offscreen SwiftUI component rasterization and AppKit Settings Forms; no foreground/capture/VoiceOver acceptance",
+    "cards": [
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/changed-dark.png",
+        "sha256": "75f78a7f0ad6a1a5c1b715c08c59a091237a1a4b1e10a95bbe5d94f69e304e11"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/changed-light.png",
+        "sha256": "49858e69fc9e08ed5f645c0e4e40bed85094cf3794bbfb2dc0b1b35efbb9fc95"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/failure-dark.png",
+        "sha256": "40b6f02baaafd79c067b019368aff3d2e073e29546ab795eb44dd5eef373b882"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/failure-light.png",
+        "sha256": "ce142bdcfadddee4daf202c57c3c74d9d6b136d9fcd7e325e5cac1488df37d84"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/loading-dark.png",
+        "sha256": "d4252f0b33a2e2dcc076f4f462132ea21936261f17f4ae919bc1bcdbac6d64bc"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/loading-light.png",
+        "sha256": "7cb10540475fcc571d6ad8c414f4555afe45606fe9cfa90f08a563c43089b1b2"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/masked-dark.png",
+        "sha256": "ff2dd93912bdc8528aae4cb42daaee71680b2adf2cf9cac8fa5e28e73e96f640"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/masked-light.png",
+        "sha256": "2b6f1f69dd9de3677a5b332b61e04af090cfbd1e58a43958cc3fd07da36bdd9d"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/no-masks-dark.png",
+        "sha256": "24557d68c1d55e6140a989986216713e9be22f75bd0a21284e6b9b485a7263a1"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/no-masks-light.png",
+        "sha256": "6440fc86648771d904b763c3cdba14ff8b6ef9f30a5907b92631c05e513f697d"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/none-dark.png",
+        "sha256": "005a4a532ea072cace375e0c1c39e34c30f203fce55006f016ce6aec6c4ca502"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/none-light.png",
+        "sha256": "57ec6fd4c7045c6ec61083b0af0df1fe339e3ddf87ada3c6f5fc2d396e5fd706"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/unavailable-dark.png",
+        "sha256": "40b6f02baaafd79c067b019368aff3d2e073e29546ab795eb44dd5eef373b882"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/scan-record-renders/unavailable-light.png",
+        "sha256": "ce142bdcfadddee4daf202c57c3c74d9d6b136d9fcd7e325e5cac1488df37d84"
+      }
+    ],
+    "settings": [
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/busy-dark.png",
+        "sha256": "217aa2e73c9b9e1bc09d0a64d34783e62bbb19fdbecf91d62bf86125ac4e5f62"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/busy-light.png",
+        "sha256": "84550c46501c7bb38f5f9a90efd0ca08e4568ef10b3a5075b9eca545009e9fed"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/failure-dark.png",
+        "sha256": "24f001ec30f5de11264e70f0356865174a9ecb737721fa872f147f6246ada303"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/failure-light.png",
+        "sha256": "115a5bc8211b464a5734e83823c1de695883a3d43aa50e6af6eb3cdcb1df61a3"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/idle-dark.png",
+        "sha256": "e4f9e03c0b2c9d2f680d26ead0d1a88f9593d91f1c9f83f285b102fb1be698d4"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/idle-light.png",
+        "sha256": "58e8a40716918046f5fd1c4f2e2d7e885fc266fce98aad111a8cd74d09a3aa5a"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/imports-dark.png",
+        "sha256": "025a07c3ba198afee8c6a58155e2581c3dda366f0ab889540e89c0d903feeeb5"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/imports-light.png",
+        "sha256": "224a78dce39cc4d7c48718b659ef81749c2e133399d6eff4b84e97e3f7de6650"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/ready-dark.png",
+        "sha256": "28fd330453a59ec64f7b51439a6c72123aed85f9ed4d9330762be08be25c549f"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/ready-light.png",
+        "sha256": "86aff0892cfd2ab01e21b858fb541ee476ee50815baabaf1a0444e07cd666ce2"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/stopping-dark.png",
+        "sha256": "b654d66d6fc812447e2b740c833f600e68f3bfe403b9e9e0b808f6ef1396bacd"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/corrected-full-v1/renders-normal/stopping-light.png",
+        "sha256": "83b158a46dee630b36fe94751da95e7e468e7d740a356dc8708e076c475196b3"
+      }
+    ],
+    "reviewed": [
+      "corrected-full-v1/scan-record-renders/no-masks-dark.png",
+      "qualification-v1/scan-record-renders/masked-light.png"
+    ],
+    "retainedInitialFullRunCards": [
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/changed-dark.png",
+        "sha256": "75f78a7f0ad6a1a5c1b715c08c59a091237a1a4b1e10a95bbe5d94f69e304e11"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/changed-light.png",
+        "sha256": "49858e69fc9e08ed5f645c0e4e40bed85094cf3794bbfb2dc0b1b35efbb9fc95"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/failure-dark.png",
+        "sha256": "40b6f02baaafd79c067b019368aff3d2e073e29546ab795eb44dd5eef373b882"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/failure-light.png",
+        "sha256": "ce142bdcfadddee4daf202c57c3c74d9d6b136d9fcd7e325e5cac1488df37d84"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/loading-dark.png",
+        "sha256": "d4252f0b33a2e2dcc076f4f462132ea21936261f17f4ae919bc1bcdbac6d64bc"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/loading-light.png",
+        "sha256": "7cb10540475fcc571d6ad8c414f4555afe45606fe9cfa90f08a563c43089b1b2"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/masked-dark.png",
+        "sha256": "ff2dd93912bdc8528aae4cb42daaee71680b2adf2cf9cac8fa5e28e73e96f640"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/masked-light.png",
+        "sha256": "2b6f1f69dd9de3677a5b332b61e04af090cfbd1e58a43958cc3fd07da36bdd9d"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/no-masks-dark.png",
+        "sha256": "24557d68c1d55e6140a989986216713e9be22f75bd0a21284e6b9b485a7263a1"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/no-masks-light.png",
+        "sha256": "6440fc86648771d904b763c3cdba14ff8b6ef9f30a5907b92631c05e513f697d"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/none-dark.png",
+        "sha256": "005a4a532ea072cace375e0c1c39e34c30f203fce55006f016ce6aec6c4ca502"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/none-light.png",
+        "sha256": "57ec6fd4c7045c6ec61083b0af0df1fe339e3ddf87ada3c6f5fc2d396e5fd706"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/unavailable-dark.png",
+        "sha256": "40b6f02baaafd79c067b019368aff3d2e073e29546ab795eb44dd5eef373b882"
+      },
+      {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/scan-record-renders/unavailable-light.png",
+        "sha256": "ce142bdcfadddee4daf202c57c3c74d9d6b136d9fcd7e325e5cac1488df37d84"
+      }
+    ]
+  },
+  "quality": {
+    "privacyAcceptance": false,
+    "knownEmailMissRecords": [
+      {
+        "compute": "cpu",
+        "state": "recorded",
+        "masksReturned": false,
+        "privacyAcceptance": false,
+        "record": {
+          "checkedAt": "2026-10-29T16:16:18.982606Z",
+          "compute": "cpu",
+          "contentSHA256": "5e7fba904b6ff0c36e433b4151f4adb512bafd43855e10e318213d641895b844",
+          "coverage": "oswind-import-text-fields-v1",
+          "fields": 4,
+          "framedTokens": 73,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redacted": false,
+          "threshold": 0.5,
+          "version": 1,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "state": "recorded",
+        "masksReturned": false,
+        "privacyAcceptance": false,
+        "record": {
+          "checkedAt": "2026-10-29T16:16:28.915545Z",
+          "compute": "coreML",
+          "contentSHA256": "b47eddb26bb7b9d3ac8ce479ef766461ab70ce98863b9361ba98a44e3e759e29",
+          "coverage": "oswind-import-text-fields-v1",
+          "fields": 4,
+          "framedTokens": 128,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redacted": false,
+          "threshold": 0.5,
+          "version": 1,
+          "windows": 1
+        }
+      }
+    ],
+    "knownMissReceipt": {
+      "path": ".artifacts/pii-scan-records-v1/signed-known-miss-records-v1.json",
+      "sha256": "0121f3baadf9f36ce450423d0ecaf7d693127f2dc936c4efc7c3ce405a05154d"
+    },
+    "modelChange": false,
+    "thresholdChange": false,
+    "reservedPredictionsOpened": false,
+    "meaning": "A matching record proves a library processing record, not absence of personal information. Both native policies retain the known miss with redacted=false. Earlier authored/domain/model comparison quality results keep their own source and scope."
+  },
+  "retainedFailures": [
+    {
+      "receipt": {
+        "path": ".artifacts/pii-scan-records-v1/focused-v2.log",
+        "sha256": "bc2fdc2706f31d9eed4822462433de0dcf13ac31004c59f3d4dbdc08c7a5bbcf"
+      },
+      "meaning": "Test-only async XCTest autoclosure compilation error; awaited value moved before assertion."
+    },
+    {
+      "receipt": {
+        "path": ".artifacts/pii-scan-records-v1/focused-v3.log",
+        "sha256": "57152e4767bf5b16a16d10e9eb5543241f83d419a80a6943f3f07beb52b7147b"
+      },
+      "meaning": "Two backup-record preservation failures fixed by explicit bounded restore/revalidation, and fourteen blank AppKit SwiftUI-text renderer assertions fixed using SwiftUI rasterization."
+    },
+    {
+      "receipt": {
+        "path": ".artifacts/pii-scan-records-v1/qualification-v1/full-most-optins.log",
+        "sha256": "ad55b9b6a0a41e839396eb18504fdbd9c6d65961a73017bd804d32167df6a1ca"
+      },
+      "meaning": "Three explicit schema22 expectations; corrected to23 without altering any preservation/migration assertions. Entire rerun passed separately."
+    }
+  ],
+  "ci": {
+    "parentPR84": {
+      "source": "c54ac84aa4bfebf0298e4aceabd0701e5521aa51",
+      "run": 40895428548,
+      "native": "success",
+      "benchmarkHarnesses": "success",
+      "publication": "6bc274d0adc428af4a716761c9832abc13e1f2b3",
+      "publicationRun": 40898605890,
+      "publicationNative": "success",
+      "publicationBenchmarkHarnesses": "success"
+    },
+    "initialProduct": {
+      "source": "08398188671f6be36098b929990aac4c3d71ec6d",
+      "run": 40907113048,
+      "native": "failure",
+      "benchmarkHarnesses": "success",
+      "failure": "Three same schema22 expectation failures verified in native job123564800192;1216 defined,58 opt-in skips,3 failures. Distinct from local native/model-enabled suite."
+    },
+    "fixtureFollowup": {
+      "source": "d2ee1b146ae0a655868059ba3e477fc628841078",
+      "run": 40910656484,
+      "native": "in_progress",
+      "benchmarkHarnesses": "success",
+      "acceptancePending": true
+    },
+    "priorUnresolvedNativeDetach": [
+      {
+        "run": 40889784746,
+        "source": "28a95f8",
+        "diagnostic": "Normal hdiutil exit16 in NativeVaultQueryRecoveryTests; cause unproven."
+      },
+      {
+        "source": "c7fed19",
+        "diagnostic": "Normal hdiutil exit16 in NativeVaultVisualIndexTests final lock; cause unproven."
+      }
+    ],
+    "caveat": "Passing current local and parent CI does not establish the cause or repair of earlier independent detach failures; publication CI remains separate."
+  },
+  "featureChange": {
+    "canonicalVendors": 16,
+    "requirements": 76,
+    "evidenceRowsChanged": [
+      "F047",
+      "F061",
+      "F062",
+      "F063",
+      "F072"
+    ],
+    "statusesUnchanged": true,
+    "counts": {
+      "live verified": 4,
+      "partial": 37,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 4,
+      "out of v0 desktop scope": 2
+    },
+    "canonicalVendorBytesUnchanged": true,
+    "allRenderedCellsMatchCanonical": true,
+    "deterministicRender": true,
+    "htmlSHA256": "34abc331fa21cc7789e3051483486cd4f731c6d1ad8d1bd0cf45bf7146fdaca6",
+    "newVisualAcceptance": false
+  },
+  "marketRefresh": {
+    "receipt": {
+      "path": "docs/landscape-source-checks-2026-10-29.json",
+      "sha256": "5ccb5c03f796277998a8dd9cf8e1ca81a1a0d705622f192b4a96fbbc9ca07a39"
+    },
+    "existingProfiles": 16,
+    "additionalComparators": [
+      "OpenRecall",
+      "OpenHistory",
+      "silverfish",
+      "Goldfish"
+    ],
+    "canonicalIntegrationPending": true,
+    "runtimeComparisonAccepted": false
+  },
+  "remaining": [
+    "Representative held-out desktop OCR/speech/metadata privacy acceptance; current model has retained misses.",
+    "Learned capture admission, actual image/audio/video treatment, export/remote egress policy and recheck controls.",
+    "Permissioned foreground/TCC/VoiceOver, older Mac/OS coverage and independent native detach failure analysis.",
+    "Physical energy and long-run production capture measurements; real competitor runtime benchmarks.",
+    "Private-device sync, signed/notarized installer/updates and broad v0 feature parity.",
+    "Integrate four queued comparator profiles and audit all market source/pricing uncertainty."
+  ]
+}
