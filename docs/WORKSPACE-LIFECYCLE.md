@@ -42,4 +42,4 @@ The first full/model/native run passes 953 of 956 cases with three retained skip
 
 ![Onboarding, light](../assets/wake-onboarding-light.png)
 
-The separately staged ad-hoc-signed app/ZIP has matching payloads across all 33 files. Installed and staged bytes remain unchanged after processes. Complete full-command-path inventory finds no owned GUI/test/driver or current artifact/opening image, and read-only launch lookup resolves to `/Applications/OSwind.app`. Both product-source CI jobs pass (run 40789738849); fixture-only follow-up CI is still running.
+The separately staged ad-hoc-signed app/ZIP has matching payloads across all 33 files. Installed and staged bytes remain unchanged after processes. Complete full-command-path inventory finds no owned GUI/test/driver or current artifact/opening image, and read-only launch lookup resolves to `/Applications/OSwind.app`. Both product-source CI jobs pass (run 40789738849); both fixture-only follow-up CI jobs also pass (run 40798125648). Later documentation revisions have separate CI runs.

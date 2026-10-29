@@ -1,7 +1,7 @@
 {
   "format": "OSwind quiet-workspace wake and onboarding lifecycle qualification",
   "version": 1,
-  "recordedAtUTC": "2026-10-29T01:19:00.877407+00:00",
+  "recordedAtUTC": "2026-10-29T01:30:18.353150+00:00",
   "productCommit": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
   "qualificationCommit": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
   "schema": 22,
@@ -483,13 +483,13 @@
   "fixtureFollowupCI": {
     "sourceCommit": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
     "runID": 40798125648,
-    "status": "in_progress",
+    "status": "completed",
     "jobs": [
       {
         "id": 123199440166,
         "name": "native",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 123199440945,
@@ -498,7 +498,8 @@
         "conclusion": "success"
       }
     ],
-    "scope": "Test-only follow-up CI; product source remains9d6f33e"
+    "scope": "Test-only follow-up CI; product source remains9d6f33e",
+    "conclusion": "success"
   },
   "allKnownContractsPass": false,
   "releaseAcceptanceComplete": false,
