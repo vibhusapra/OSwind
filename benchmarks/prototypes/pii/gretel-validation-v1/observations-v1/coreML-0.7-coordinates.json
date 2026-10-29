@@ -1,0 +1,5007 @@
+[
+  {
+    "id": "gretel-validation-7a894503f2ef4786aa7e3f5b06f58650",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3e5788566018c6fc79b578b57a4f686db8f4a40916032bbaf13ed348bd75c2e9",
+    "renderedTextSHA256": "ba7bb29e87cbf248790657dc5bf5ebc326f5c9a3445edcda220cd78bf4123ba3",
+    "sourceSHA256": "0120b215e30b2d83a20f29f2a66e110f8406472bc7fa9ffe49e44a5665b31065",
+    "model": [
+      {
+        "start": 93,
+        "end": 103,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 93,
+        "end": 103,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 93,
+        "end": 103,
+        "label": "phone",
+        "score": 0.9212897
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-a36b6bae194341bf99ea90522874d0bc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "2b8d2d952f33a554573c0b354a2c6ec7366ad9a863f7eb6a35f497caa4db720e",
+    "renderedTextSHA256": "43fb8163198eca7fffe8ff46bfee7be38683ccc04443bbbddda4e94b39a7c38d",
+    "sourceSHA256": "701bd431d7972f645fd4b2e1182c369c1cc126359450cb81c87e82d15b028932",
+    "model": [
+      {
+        "start": 78,
+        "end": 87,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 78,
+        "end": 87,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 78,
+        "end": 87,
+        "label": "financial_id",
+        "score": 0.7393434
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-3bce470c22674a778991926a1fcbec75",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "11488a65de227d92df17b6fb5de821742df6eceb9e6088beb6316cff0f481e6a",
+    "renderedTextSHA256": "7129449f586e88e9daa9837a086ed46ba56658679dea2ecd0abcc33b4d464d8a",
+    "sourceSHA256": "da7f7a81563abae0f0db99ad6c1e5374aef7d9a036e20543dfd89682497227fa",
+    "model": [
+      {
+        "start": 100,
+        "end": 111,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 100,
+        "end": 111,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 100,
+        "end": 111,
+        "label": "government_id",
+        "score": 0.8735943
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-2994c5025a2745dba2f30db171da2c1b",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "15219888af8425b46c91ce20dd4423f5ec8ffc89064c72f7f158bfe10caf47d1",
+    "renderedTextSHA256": "8275ea4b4245b027e16816512d8c736f40c853d18696e215ddb75103d56f54d2",
+    "sourceSHA256": "8d3b20faa70ebeadb368075278a5fa1f905b86e44a5b631712892196e5eac619",
+    "model": [
+      {
+        "start": 68,
+        "end": 79,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 68,
+        "end": 79,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 68,
+        "end": 79,
+        "label": "government_id",
+        "score": 0.9174181
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c0482ddf43804456a6b17630605c5959",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ae76e3a5d5b9c02b88ef2f6fdf96c66394946f72960df508daa5a1d3e0f7f8e0",
+    "renderedTextSHA256": "8cde0bb9982e37fb8c4769d6c5397329939a9e5044b1bbe7a693f7228a9a823b",
+    "sourceSHA256": "7a72aa045f860ce35826289618576d5521bc258d7b91859b59f9c7562ae214a9",
+    "model": [
+      {
+        "start": 39,
+        "end": 50,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 39,
+        "end": 50,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 39,
+        "end": 50,
+        "label": "government_id",
+        "score": 0.966805
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-fb60ccca4fc54b35b503d57021286010",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3a0723b5eeb6ae2a96d8c7daaef279eeadbe2fe68eb36396a3fc6456b962b0b9",
+    "renderedTextSHA256": "5994339d6a8d7c95d66efcc4f3e5618f5d2ef837e800af26eaa0e65ae0e13421",
+    "sourceSHA256": "960d1ffcc016a912abbdf74d39cbc630e6cdcc5cae7e631f062d32da7144cee9",
+    "model": [
+      {
+        "start": 56,
+        "end": 64,
+        "label": "modelMasks"
+      },
+      {
+        "start": 120,
+        "end": 133,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 56,
+        "end": 64,
+        "label": "masks"
+      },
+      {
+        "start": 120,
+        "end": 133,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 56,
+        "end": 64,
+        "label": "secret",
+        "score": 0.723274
+      },
+      {
+        "start": 120,
+        "end": 133,
+        "label": "phone",
+        "score": 0.96056265
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-1f389d2fb23f47f1bf0c5e29c51a4ad4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f649ae015225efc54880d6b05f248deed044ec32636f5b8724353d576e7aca4a",
+    "renderedTextSHA256": "baee7d6d34b44d2a1a885eafae5fc8c99aa3fe776548fb03a9b394e64ada020f",
+    "sourceSHA256": "f04831a0a4a3d62704dc27028fba72e0e69d9a003f8ecea00a3b8a7b24684ba7",
+    "model": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "government_id",
+        "score": 0.8938423
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-d8c01b0dcbca49f68282e3851620afa1",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ba9458f62f0b1d0783867b8b0fc6056f0f941b856ec724a8b3ff52d0179ee1c1",
+    "renderedTextSHA256": "81dad5b6545f1c5acb00a352db4b4addd6ebed9c0e2b51a1fd8b18a00594efd4",
+    "sourceSHA256": "81dad5b6545f1c5acb00a352db4b4addd6ebed9c0e2b51a1fd8b18a00594efd4",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-8e33c2dca28c4417b6953c781fb776ae",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b764aa9fa3bb47e4cfe53393ab2083d032df4c835e19606519eaddad1cc748f3",
+    "renderedTextSHA256": "4f81f21133dfaad2eb0a1d5ccc833634e8bf99b022b6d1865ca4dae92c04681f",
+    "sourceSHA256": "b99516bdf9d2a1a466904ff0fe54672b4b114adfc098f863cb48a5a17f19c275",
+    "model": [
+      {
+        "start": 121,
+        "end": 133,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 121,
+        "end": 133,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 121,
+        "end": 133,
+        "label": "phone",
+        "score": 0.82169294
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-8790adca1ead40a1a2b72eaf96da9761",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "62f25869446232587dca46ebdd401f2d58cebd1edc54f4612370d486cbd8ecef",
+    "renderedTextSHA256": "c1fd484b2e4d93e1556cb22d17d29d66bf2a589e05c53c9586d736bcb2da006f",
+    "sourceSHA256": "8b6bc271e3e7f12402bcb6c008ab9787613c62baf38e502e4e1a15a4a1c76598",
+    "model": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "phone",
+        "score": 0.9508817
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-782e1e615e0b40a9b70c3cc020fa9f60",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "66fb1a188db42d9682a10c746b7dc19a3ed88f3d5f54725876195a27b21f3444",
+    "renderedTextSHA256": "879db6c8ad8fc3bf06037321393dc4bba3fe0ce07259886f6e3144e34d311dfb",
+    "sourceSHA256": "9ace99206dae6a1883c2a67729b75cc2f287a2c8654545def8f8b3d0ed8f27c6",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 167,
+        "end": 180,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-718edaae034043cc8a73183244f0e6bc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "7f3b4d74e6e8906dd46de1d90b5af9b7a529f2200cce54c1aeedcf6711bd82a5",
+    "renderedTextSHA256": "c971cdfe2e62ae1ef062cc6c206858a4fe826cdb223b8c11e7ca24ba7ba34632",
+    "sourceSHA256": "c971cdfe2e62ae1ef062cc6c206858a4fe826cdb223b8c11e7ca24ba7ba34632",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-3f7ff22f0e594fc0be80d98da58b870b",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "c63b7054646434758b0594b0e2e8a150e06d60ac69f184adcfc0057c8bbf1bcf",
+    "renderedTextSHA256": "bf196226e13df7121657fc5b4431057603d5279b3dbc4bb3bc712a16fa255c1d",
+    "sourceSHA256": "ae052f6f12d906d2d0f3c5b7c426f54f05fdd3a55eb5919a965db6bd46407499",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 26,
+        "end": 41,
+        "label": "masks"
+      },
+      {
+        "start": 43,
+        "end": 58,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-62e79b4252874c90ae6e102d872020b7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e08c95e3af7ec7dc124fb3c9c5c4748984c3d11c588afe47029ec80b4583aa3e",
+    "renderedTextSHA256": "406bd9289153279d4851411b80e806941dd8e43d9a20d20a97c1e8ca7e61f6eb",
+    "sourceSHA256": "2041520026b0b7425598a23932321f4002129847f97435ac86357c8a4079a480",
+    "model": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "ip_address",
+        "score": 0.8713275
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-30c15c96410c4682b211d68537246910",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "fc1b7a72e3b7b265f9efb6400dda3d6a7aa41dcafeda3f88eceb058550d45acf",
+    "renderedTextSHA256": "5e005e25011ef4da39e2241e6fe5ce534843abc51bdd9b0d2dbe5827eec52870",
+    "sourceSHA256": "f3cdc630923aff09a213fe3bdaa594a9222cab695108bb2b741a2f7360e4184d",
+    "model": [
+      {
+        "start": 164,
+        "end": 175,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 164,
+        "end": 175,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 164,
+        "end": 175,
+        "label": "government_id",
+        "score": 0.9548558
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-8b85092b02d04918b74e74db7173b540",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "c2208b105ce7d33f9ec785198b4e62196eccddb8347e9214c7513aa8588cc982",
+    "renderedTextSHA256": "59464d80388ea85d62c1ef4bd3a709c07f30719679a5da9342540b7a4eedeef5",
+    "sourceSHA256": "380475e8554b537c37ca32cfac58fc7058914bb5ebb273de1c97fc88bd9b1cab",
+    "model": [
+      {
+        "start": 107,
+        "end": 121,
+        "label": "modelMasks"
+      },
+      {
+        "start": 126,
+        "end": 141,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 107,
+        "end": 121,
+        "label": "masks"
+      },
+      {
+        "start": 126,
+        "end": 141,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 107,
+        "end": 121,
+        "label": "ip_address",
+        "score": 0.91882914
+      },
+      {
+        "start": 126,
+        "end": 141,
+        "label": "ip_address",
+        "score": 0.7655204
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-fc35f4199244434094bbc115b616a8b3",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "67c28b37419ef59e9b602d955694a5ddeace530efd6c096456a6ec7bb8fd0720",
+    "renderedTextSHA256": "3b577839b9c3e9354f0e9a0abba51983c802572a94d2f448e5df7925bf0ddf2d",
+    "sourceSHA256": "8be08bd809278ca56c93c2a5971b7f35ef386f0042e5fa3c7e4615765a74fe6e",
+    "model": [
+      {
+        "start": 151,
+        "end": 162,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 151,
+        "end": 162,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 151,
+        "end": 162,
+        "label": "government_id",
+        "score": 0.78169864
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f94533a7fbc94281a134f82255c21652",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a2c35651bbc5da89875285a0fe9238452bade497614fb5bab11e4d1e123b86fc",
+    "renderedTextSHA256": "41b88ca2ba916f866052b762f76013eaf8a33fdf7026075e82ef77d51b5a4979",
+    "sourceSHA256": "281e124ca5ed69719823f1542600a78032e3a0ea1b3f5eef802891d77974c4d1",
+    "model": [
+      {
+        "start": 129,
+        "end": 137,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 129,
+        "end": 137,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 129,
+        "end": 137,
+        "label": "phone",
+        "score": 0.906713
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-27b034ae35e243d8a86dde8338205c57",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e72e697575719b7109c08c94fbd38376dfcd3d7e6e7076266329cc645134f5a0",
+    "renderedTextSHA256": "301f7c172560ca386319ce0ca688dd6685845cd5cb6f804ebd409a555f4b49bc",
+    "sourceSHA256": "301f7c172560ca386319ce0ca688dd6685845cd5cb6f804ebd409a555f4b49bc",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-5fb8d57bbff647c4a8257d812e776029",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b5b5bc51d8ecc1870102d483d569bbeb2b2fee52fd27c04ea3a8ae1911f61fe9",
+    "renderedTextSHA256": "3ad44abbedfe67b311dfe78891978e2b22dc60ee775912f6a7418c58eb410bfc",
+    "sourceSHA256": "3ad44abbedfe67b311dfe78891978e2b22dc60ee775912f6a7418c58eb410bfc",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-6dd86af5d9b94c628037e4eec785be1c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "acef6d5859989643db3aedc1453ded6476f15bdb852f0dfc985ac0baf67b53ca",
+    "renderedTextSHA256": "1004ff36454f30075fe7174124dd862d118c08aa2b8af8c55794422135db7b77",
+    "sourceSHA256": "6a56125eb2c4821cb46256dae9425e67769fd9b80704f803e8b9bd949725ed32",
+    "model": [
+      {
+        "start": 69,
+        "end": 80,
+        "label": "modelMasks"
+      },
+      {
+        "start": 107,
+        "end": 129,
+        "label": "modelMasks"
+      },
+      {
+        "start": 164,
+        "end": 175,
+        "label": "modelMasks"
+      },
+      {
+        "start": 216,
+        "end": 226,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 69,
+        "end": 80,
+        "label": "masks"
+      },
+      {
+        "start": 107,
+        "end": 129,
+        "label": "masks"
+      },
+      {
+        "start": 164,
+        "end": 175,
+        "label": "masks"
+      },
+      {
+        "start": 216,
+        "end": 226,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 69,
+        "end": 80,
+        "label": "secret",
+        "score": 0.85527724
+      },
+      {
+        "start": 107,
+        "end": 129,
+        "label": "email",
+        "score": 0.8721459
+      },
+      {
+        "start": 164,
+        "end": 175,
+        "label": "phone",
+        "score": 0.9302258
+      },
+      {
+        "start": 216,
+        "end": 226,
+        "label": "date_of_birth",
+        "score": 0.7863365
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-5326351587c84d889b1e74d2d13c0035",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "8fac8eff9c1a6fbdcb31756c9171d6d559720c6f161ea74a2e236c0097a04192",
+    "renderedTextSHA256": "e3066d53a93f06aee948b629477d7e600a3f59b032d94df555a1386a7d015e03",
+    "sourceSHA256": "3138404a740e2999ffb8c573e498262bfc109c0831bf729e056c5083668cf064",
+    "model": [
+      {
+        "start": 218,
+        "end": 229,
+        "label": "modelMasks"
+      },
+      {
+        "start": 298,
+        "end": 307,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 218,
+        "end": 229,
+        "label": "masks"
+      },
+      {
+        "start": 298,
+        "end": 307,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 218,
+        "end": 229,
+        "label": "government_id",
+        "score": 0.81575596
+      },
+      {
+        "start": 298,
+        "end": 307,
+        "label": "phone",
+        "score": 0.71044475
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c2144ee4ac5f4c6e84eeaec290f82ade",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "bd732a8840a98568f4bef60bc5c47b17770f1a4ca64933cb26188a5569ea5841",
+    "renderedTextSHA256": "4af359bf23d12733544374e87c3b8b5a13943f7be4b65e55a71280522806bad6",
+    "sourceSHA256": "4af359bf23d12733544374e87c3b8b5a13943f7be4b65e55a71280522806bad6",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-f82862e5c4a448069bfe407d359054fc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ffdea21d9dac884d1caf80bbbbd45e62c3c59640ec3ef7f7e066ea7ac6011593",
+    "renderedTextSHA256": "241a7a4c85a5134db3abb4e2e32779c24d5ecb54b0c823ee7311551b99c1b647",
+    "sourceSHA256": "241a7a4c85a5134db3abb4e2e32779c24d5ecb54b0c823ee7311551b99c1b647",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-e86db55459474fbf85bdb89621839f75",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "72b76f7348b2ee91b13f478eb6204cace1ee12a3401742a75e454ce09873d9d3",
+    "renderedTextSHA256": "8591f2b37fe5c06e0d169033d7aedd6926106f534735853527a094e8232e9f59",
+    "sourceSHA256": "65f2c5cd526041ae59c40eceb8db2dba4e9b05db07f700dd08637e1555520ad8",
+    "model": [
+      {
+        "start": 56,
+        "end": 67,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 56,
+        "end": 67,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 56,
+        "end": 67,
+        "label": "government_id",
+        "score": 0.9258241
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-1e6231e847f04a6997ccb9d34421517e",
+    "windowCount": 3,
+    "framedTokens": 384,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "32ce5011f9ac4bc9f5157759cfa6c454916898276ee52f41a017c0514577e57f",
+    "renderedTextSHA256": "b6cba2633e7f302969efcac5d87a0ed0eae36a3056d7eaa0b4a71651d306e7bd",
+    "sourceSHA256": "cb59dd6242842fe4c71b66fd5da74c1e771d91ed13f80bb6197288558fb87389",
+    "model": [
+      {
+        "start": 90,
+        "end": 101,
+        "label": "modelMasks"
+      },
+      {
+        "start": 135,
+        "end": 146,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 90,
+        "end": 101,
+        "label": "masks"
+      },
+      {
+        "start": 135,
+        "end": 146,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 90,
+        "end": 101,
+        "label": "government_id",
+        "score": 0.9408264
+      },
+      {
+        "start": 135,
+        "end": 146,
+        "label": "government_id",
+        "score": 0.94018567
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f8846fac49f144e2ae396627393621fa",
+    "windowCount": 3,
+    "framedTokens": 384,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a0871145adfddadbb3a6c567d9182030bc1621e0f76af3f7ad629a378b606eed",
+    "renderedTextSHA256": "06b7f216eb1225f5015870b3e322e4bb251187e212f762aa3d9c65945e3498cb",
+    "sourceSHA256": "d7efa7c7759f95b94b86180bbfefe8f8ce85743066fc3a12300e39e89f0f98f8",
+    "model": [
+      {
+        "start": 146,
+        "end": 164,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 146,
+        "end": 164,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 146,
+        "end": 164,
+        "label": "phone",
+        "score": 0.9564344
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f5f8340d7ebe4e42b0153a80354bbed7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3cf127c0e0206257f292c06d55801799a8b8e969b9245f1abb7f9a60dce609c8",
+    "renderedTextSHA256": "c763b32a0c542920a93cdb81df95fac0fee460ae28aa6bb8bf833d736d51518d",
+    "sourceSHA256": "0c2c534bb1cf3ae714ff8a2fe0cdd522ecbc2cf8a0bbdd3a2ad2c5b6e92ed033",
+    "model": [
+      {
+        "start": 47,
+        "end": 57,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 47,
+        "end": 57,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 47,
+        "end": 57,
+        "label": "date_of_birth",
+        "score": 0.71826816
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-6cb5ab4bcc2749f39d91d347d866173d",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e7701215b41ee78c1b0b3ba0656dd74e5b70f5d2a51abd8d734687292ca24a2e",
+    "renderedTextSHA256": "3e48b2cf21448702a321b5b38186fbee2c9f3cf3c5033a812fc8f189c3a7c6b4",
+    "sourceSHA256": "759d06dc3b0ec785a993fd64035644a614654d3145377c05f2910c10091b401f",
+    "model": [
+      {
+        "start": 224,
+        "end": 238,
+        "label": "modelMasks"
+      },
+      {
+        "start": 382,
+        "end": 392,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 224,
+        "end": 238,
+        "label": "masks"
+      },
+      {
+        "start": 382,
+        "end": 392,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 224,
+        "end": 238,
+        "label": "credit_card",
+        "score": 0.892907
+      },
+      {
+        "start": 382,
+        "end": 392,
+        "label": "date_of_birth",
+        "score": 0.77608806
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-94f0b98d20f740198f665b1087209444",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "c4362dfef071369bba8509938038e0d86c36e2ee2492113f69a69a3396f8fc2f",
+    "renderedTextSHA256": "f205fa6a1cc059b20809b9389541782a394b25afa7da2668d9ce4c3e30eca602",
+    "sourceSHA256": "170e8697d95c9a197e9ccd290d914bdbf560434a182e5ddfdcb92cf4f703f906",
+    "model": [
+      {
+        "start": 96,
+        "end": 108,
+        "label": "modelMasks"
+      },
+      {
+        "start": 218,
+        "end": 234,
+        "label": "modelMasks"
+      },
+      {
+        "start": 427,
+        "end": 441,
+        "label": "modelMasks"
+      },
+      {
+        "start": 602,
+        "end": 612,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 96,
+        "end": 108,
+        "label": "masks"
+      },
+      {
+        "start": 218,
+        "end": 234,
+        "label": "masks"
+      },
+      {
+        "start": 427,
+        "end": 441,
+        "label": "masks"
+      },
+      {
+        "start": 602,
+        "end": 612,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 96,
+        "end": 108,
+        "label": "secret",
+        "score": 0.710225
+      },
+      {
+        "start": 218,
+        "end": 234,
+        "label": "credit_card",
+        "score": 0.7935242
+      },
+      {
+        "start": 427,
+        "end": 434,
+        "label": "ip_address",
+        "score": 0.9261638
+      },
+      {
+        "start": 427,
+        "end": 441,
+        "label": "ip_address",
+        "score": 0.88286126
+      },
+      {
+        "start": 602,
+        "end": 612,
+        "label": "date_of_birth",
+        "score": 0.7193516
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-64bfc7a281a64ce29d387e9ddf64df6c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f3ecfc8c47c9d8af6603c836e80735af6833a139e74f4eccd98175549289a8bc",
+    "renderedTextSHA256": "af3549a000f77939346338267622c5b6cf58648d15392bc839f5b7595b847599",
+    "sourceSHA256": "5e5b47cf9ab60fcfdff84baaddc0585aa4e6bb6fdf47fed2986a47bbbd353c3b",
+    "model": [
+      {
+        "start": 134,
+        "end": 147,
+        "label": "modelMasks"
+      },
+      {
+        "start": 149,
+        "end": 160,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 134,
+        "end": 147,
+        "label": "masks"
+      },
+      {
+        "start": 149,
+        "end": 160,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 134,
+        "end": 147,
+        "label": "government_id",
+        "score": 0.9052182
+      },
+      {
+        "start": 149,
+        "end": 160,
+        "label": "government_id",
+        "score": 0.83779013
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f9f0e78e78a540938dca9450def58cfa",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "5c103ea685d2ba132d7be7c0ce6ab4ed1c1b2481937dbd0cf00aafae31ff8a51",
+    "renderedTextSHA256": "3053ba72a71511b698dd6925e026dd767d2cb600e6588e5e4b7b539fc3a4ba87",
+    "sourceSHA256": "6999030d3ca7ae5ac91086ade79bb838cedeb3adf11f4a35aa9ebf6679a20392",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 80,
+        "end": 98,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-d580b1f13336457f896858df4d2a2931",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "fbc7ca5438c9b73cd44190e11b4b0ae276dd1ef8e327c60b7655a8848e8ce1cf",
+    "renderedTextSHA256": "fea269b7d7bad5e29ce028942dec3791ba613d73e74c47cf1257393e389aa9de",
+    "sourceSHA256": "80263ce5f83f2295234c3e36cc0038a22a9c322dc3886da30644e5ba96b127ed",
+    "model": [
+      {
+        "start": 60,
+        "end": 77,
+        "label": "modelMasks"
+      },
+      {
+        "start": 91,
+        "end": 101,
+        "label": "modelMasks"
+      },
+      {
+        "start": 112,
+        "end": 125,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 50,
+        "end": 77,
+        "label": "masks"
+      },
+      {
+        "start": 91,
+        "end": 101,
+        "label": "masks"
+      },
+      {
+        "start": 112,
+        "end": 125,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 60,
+        "end": 77,
+        "label": "secret",
+        "score": 0.7977694
+      },
+      {
+        "start": 91,
+        "end": 101,
+        "label": "ip_address",
+        "score": 0.92701685
+      },
+      {
+        "start": 112,
+        "end": 125,
+        "label": "ip_address",
+        "score": 0.79764324
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-2e5abee95a2a416a9ce7112c12ff351a",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "2d7497d6220440de811dcb1814311b125a4ac3e7f205cad6e7d0de27674a6568",
+    "renderedTextSHA256": "b6f08299be12d37a7b4323056f787b83f3ead5b0340dc8d6ba23301c89598540",
+    "sourceSHA256": "b6f08299be12d37a7b4323056f787b83f3ead5b0340dc8d6ba23301c89598540",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-02ae67e5faa74751bb83be9febd857fc",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "75a412a75a2da058c2a67a587160e29b095c5128f732af2c652954b49cfcaa23",
+    "renderedTextSHA256": "a1194227b4ee9710a72c4eeab245ef1def6230ec28ebb2999a542c814abcfd87",
+    "sourceSHA256": "a1194227b4ee9710a72c4eeab245ef1def6230ec28ebb2999a542c814abcfd87",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-ed1acd0fc4c7425d9faad0a088ee91f6",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "9a38a6cdb32449505bd29e2b89e95d91402c12b3d6d70abfb01bc4159adfb43b",
+    "renderedTextSHA256": "7402161e6a4fb202f77b3b308430de3d03850b8547f4e5fe07488d2c1cdc2aa3",
+    "sourceSHA256": "d6778f9c85e6b6d36be0473ff9c5e16d1d39837aec8644fa348381b09ac243fd",
+    "model": [
+      {
+        "start": 76,
+        "end": 88,
+        "label": "modelMasks"
+      },
+      {
+        "start": 107,
+        "end": 120,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 76,
+        "end": 88,
+        "label": "masks"
+      },
+      {
+        "start": 107,
+        "end": 120,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 76,
+        "end": 88,
+        "label": "ip_address",
+        "score": 0.71485794
+      },
+      {
+        "start": 107,
+        "end": 120,
+        "label": "phone",
+        "score": 0.9345029
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c37eb0b42f354b4c92a846636b47e341",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d13d988300d3e19ac497b79ae8ce30e7df0bebaf84ffe81e6de44f036a1fabbe",
+    "renderedTextSHA256": "1d0ec04cde03e58bc4d0f93bfefbf4bd046a8e0a82dce95b363ccf96a25c0c40",
+    "sourceSHA256": "5a7b11623b341ce45a9c60762557631533e6779883d3cfb1d03f8916352fa854",
+    "model": [
+      {
+        "start": 109,
+        "end": 123,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 109,
+        "end": 123,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 109,
+        "end": 123,
+        "label": "secret",
+        "score": 0.7013438
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-9e79af61a1704991b9dace7228e9dbdc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ed8897105123e85cb3e34844f7c78181775124bfc4144a3b49d2ae7608eb7cc6",
+    "renderedTextSHA256": "99d2787690168f37ef7527fb39999527f47502ea6966252037271d9effc035c4",
+    "sourceSHA256": "08af94c0beade64bfbbb122006d5367fd8df3e68f2b15f3189802ea0678b6fad",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 158,
+        "end": 174,
+        "label": "masks"
+      },
+      {
+        "start": 176,
+        "end": 190,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-bcd8c1140e924484aaab6ebeb48bf6f4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "22fed2f7798e77ee9cf28634367eb1387c78a801e8ae85afef5c5b6a3df816c6",
+    "renderedTextSHA256": "2cdb3df42426084c875e43964c32bbaf677c3e811ce5de8db2f86c00ad843dd5",
+    "sourceSHA256": "2cdb3df42426084c875e43964c32bbaf677c3e811ce5de8db2f86c00ad843dd5",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-19f76ba2d949425897781f274d6471d9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d6eba443a7ccbd3b6ec317225a31107e308fc96f1dec55bbf36499973dbd360f",
+    "renderedTextSHA256": "d81ac395fd74f55a497e02f1d6cee36508c8a4455f40b23c56fe702b52398407",
+    "sourceSHA256": "d81ac395fd74f55a497e02f1d6cee36508c8a4455f40b23c56fe702b52398407",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-de32715547ae4853ad2c8c9e7756b8fb",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "dd64b819bfd9799df8020ee30105aae1e94fee35b764e7b7a335d586f2ffebb4",
+    "renderedTextSHA256": "93735dc50b1aab41d029a4a49e053549aa6346490eb1e1193184f6c66e340102",
+    "sourceSHA256": "93735dc50b1aab41d029a4a49e053549aa6346490eb1e1193184f6c66e340102",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-e9b877469e54468f9cbb6ee050b7adda",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f2ccb1695eee0e4fde5f86bea516095e332374c3fbccca2aedce6b59ca3af335",
+    "renderedTextSHA256": "2bfa59775998d8e44f0b2fc163d4c7b20c7274d9ab4b500abc520457f9eba864",
+    "sourceSHA256": "2bfa59775998d8e44f0b2fc163d4c7b20c7274d9ab4b500abc520457f9eba864",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-7dd48624919f4b05bf192d4bfa55ee65",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d5bbf7b78137a9c658ee63ab08ac8ee2f7b845004f2c2f1b10c736525637e63c",
+    "renderedTextSHA256": "7b0b4944c056ed7feff3de73d9ea27b6d535351b50f399ebc615215efb1bcd70",
+    "sourceSHA256": "1b6e5c9b07140bea6f6dcc53ec7be0edd6ddb5836adb46f91164a736a88da9b4",
+    "model": [
+      {
+        "start": 2,
+        "end": 17,
+        "label": "modelMasks"
+      },
+      {
+        "start": 19,
+        "end": 31,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 2,
+        "end": 17,
+        "label": "masks"
+      },
+      {
+        "start": 19,
+        "end": 31,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 2,
+        "end": 17,
+        "label": "financial_id",
+        "score": 0.75933534
+      },
+      {
+        "start": 19,
+        "end": 31,
+        "label": "financial_id",
+        "score": 0.769528
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-2fe82199d3eb4b5692a4b954ec06ccc4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f7d69244937c7a0220fba5e57a45ba70cbdf29c7088c9f098f84086084a342e5",
+    "renderedTextSHA256": "49be9ef2b917c0fa86bbe2f3edcd0a723a2c4d6f52c3d20d9bdcd8109eaf41a2",
+    "sourceSHA256": "e51f9dbb6b8f74aa0e37fe6272cfd18a25023433eb9c311f49aa8c9feba83980",
+    "model": [
+      {
+        "start": 37,
+        "end": 48,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 37,
+        "end": 48,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 37,
+        "end": 48,
+        "label": "government_id",
+        "score": 0.9054612
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-dda81fd497c34a69a650dfc77804a3e2",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a585b96081be02d1b2628d4b02b29c3e3049ceeec6b0b43d94843ccd58a39b4e",
+    "renderedTextSHA256": "1c09b5bacb123bea9d8d62799f04584c5dd5e6c5780a69f9f4a44c2d20bc65b2",
+    "sourceSHA256": "610d5d8b4ffa3de49e4f763dde6a944883a02570c08571e5fe6c11ac6180a308",
+    "model": [
+      {
+        "start": 251,
+        "end": 265,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 251,
+        "end": 265,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 251,
+        "end": 265,
+        "label": "phone",
+        "score": 0.89495105
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-56ba049efc4e4e379d128f72497d64b3",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a0124a799c4609a2d4c435ae3b19c161ef37b724ac2fe5b52613cf045ffdb3fc",
+    "renderedTextSHA256": "e6ec4bfcac31cef8319e9d3020a02ab5f5221d9ede8d748dd52b822631bebd2f",
+    "sourceSHA256": "e9977b9675db354f2bcb4811b7cbb6aedf42bdc355759428fd502f6c81289ca5",
+    "model": [
+      {
+        "start": 342,
+        "end": 352,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 342,
+        "end": 352,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 342,
+        "end": 352,
+        "label": "date_of_birth",
+        "score": 0.73643184
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-837ac222657a47d8a117280bcb641120",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "dd06472d9e9137f76e070affc934458df69865461c8ebf130304876fbf9aad99",
+    "renderedTextSHA256": "89d7827743f52582269c8e4a5d1b9d2b264b3604de3d05233acbab0d7f7cf682",
+    "sourceSHA256": "9fb5032b95d603a099d868b809d89bd307fbe8a30cb0cb0aac1dd9b28bcf7a6a",
+    "model": [
+      {
+        "start": 52,
+        "end": 66,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 52,
+        "end": 66,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 52,
+        "end": 66,
+        "label": "ip_address",
+        "score": 0.8760353
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-33e1f7bc53ee4967955bff640f00dd83",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "02290d70f9c3ff5600723cdcd33d3ec38918ee289cddfcfb2611c26740e8b43d",
+    "renderedTextSHA256": "73e71ed9954235d75f4ae42b59e57807b0b703aaeda9fe887da9676fbaf61ed2",
+    "sourceSHA256": "d044a67b4a29ef88a764b451cd7537a0141291db7b528552b3c7186d48a84866",
+    "model": [
+      {
+        "start": 58,
+        "end": 68,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 58,
+        "end": 68,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 58,
+        "end": 68,
+        "label": "date_of_birth",
+        "score": 0.78299665
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-4035fbb17b9141658e5d2e1d53d3e18c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3644418412af41d21373c7a7e89dd5b24186e786632196cb3671d96f0e5a618f",
+    "renderedTextSHA256": "78f67f70af548127d4e2c609eb2f31764d7acc7a6e082d40680c6eae3af24454",
+    "sourceSHA256": "b2a072a925ba9a569ee9d6876f56670f1649d489aa6f65cbaa542e78648aa8ea",
+    "model": [
+      {
+        "start": 42,
+        "end": 56,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 42,
+        "end": 56,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 42,
+        "end": 56,
+        "label": "phone",
+        "score": 0.9495753
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-216c7730e51849b8a7203a5d6f71ff74",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "debfc9d92ef65b8477b21a6b4fc013081625fd58f750105dbcc50949aade1d00",
+    "renderedTextSHA256": "83743e52318fb490592bc84255a9365034dceffd37f99e76be83aa7da1ee8c9d",
+    "sourceSHA256": "83743e52318fb490592bc84255a9365034dceffd37f99e76be83aa7da1ee8c9d",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-49f595c7fb524b558ee86bbd5a6b23e7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "6293bbbb94a98b116c2063077d203a89f283f885fa2af8e30fee65d8bc8869a4",
+    "renderedTextSHA256": "5fccd6396ac65da8176e8e652016acf51913a896764062e2310e0da5eae5927f",
+    "sourceSHA256": "dfe2fea79d0996af2234a658425e7eb20b80f717a9a93040181b3872ca16adc4",
+    "model": [
+      {
+        "start": 127,
+        "end": 141,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 127,
+        "end": 141,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 127,
+        "end": 141,
+        "label": "ip_address",
+        "score": 0.7724051
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f6ebad13f21b48479c42477b36c0eaad",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "370050f71faeed7dc0bbafe5a57593a6d1e9622722e6ebf71ce2531192564f3f",
+    "renderedTextSHA256": "2b60c34336abdb3b0a7bc94f0fab50de160c4f4fe5d0f745bd5d2efcfdae8990",
+    "sourceSHA256": "423a33623a1eee1fb2f3d5b70cd588edc2a704ea81faa992fc8de20f19fde085",
+    "model": [
+      {
+        "start": 70,
+        "end": 85,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 70,
+        "end": 85,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 70,
+        "end": 85,
+        "label": "phone",
+        "score": 0.9415869
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-2e7d5d220161479295cc37b7d7613f69",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3a72c0c36f9799aaaa292f6575b1d0bae1518d87b4f6c5f9a1a3ed2746cb660e",
+    "renderedTextSHA256": "97f665edb174cedfde3bb502414ba22a86effc0c0fb80bbf486aa7c498a35105",
+    "sourceSHA256": "97f665edb174cedfde3bb502414ba22a86effc0c0fb80bbf486aa7c498a35105",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-d2b9d9bae1a44ebc89ea56b0f33777c9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "be427ec8a39dd959df84e923aac340ae2507d93e098e7cab74b532844da8636d",
+    "renderedTextSHA256": "8f39dcfab3e5209505d034e01f76e8c8290e0f2bb5fd2e22c7e138947dbc7be7",
+    "sourceSHA256": "a275a0f3fe05f92ff4a7bd8bb22e2aef5167bcac929d68d383de6850d2564387",
+    "model": [
+      {
+        "start": 40,
+        "end": 50,
+        "label": "modelMasks"
+      },
+      {
+        "start": 183,
+        "end": 194,
+        "label": "modelMasks"
+      },
+      {
+        "start": 199,
+        "end": 210,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 40,
+        "end": 50,
+        "label": "masks"
+      },
+      {
+        "start": 183,
+        "end": 194,
+        "label": "masks"
+      },
+      {
+        "start": 199,
+        "end": 210,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 40,
+        "end": 50,
+        "label": "date_of_birth",
+        "score": 0.8298619
+      },
+      {
+        "start": 183,
+        "end": 194,
+        "label": "government_id",
+        "score": 0.9335999
+      },
+      {
+        "start": 199,
+        "end": 210,
+        "label": "government_id",
+        "score": 0.9179754
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-f116bc365b264590b1922e4728ec4c02",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f6e0dbca5e1fef1113b07b0380003a17593b01e47f7c29457f0820d075df8e5e",
+    "renderedTextSHA256": "ed66a0419cc74c198ce6c6656225b2fba994f48b6cd4b36eece6d34cde3d8105",
+    "sourceSHA256": "937542760c67560daeb95dba2c4615c4b2f6678824954c6fab34d80b917fb71c",
+    "model": [
+      {
+        "start": 95,
+        "end": 108,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 95,
+        "end": 108,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 95,
+        "end": 108,
+        "label": "phone",
+        "score": 0.9554962
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-a733c17c770f43ebb3a9bf5971ce6b36",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "97f89d41ec40ebfc9128ad4b36b24feb983f00e50223fc397f72119da8d4f344",
+    "renderedTextSHA256": "c979bbc2a0f1e9d017d8676f81a774da1da8f9d65dcc3b597db2c8ab989b073f",
+    "sourceSHA256": "7a35ceb32d775127ae24cbd67daea3f07afb1264d8914e28894884d441190276",
+    "model": [
+      {
+        "start": 149,
+        "end": 165,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 149,
+        "end": 165,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 149,
+        "end": 165,
+        "label": "credit_card",
+        "score": 0.8690413
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c2e8aee077f447ac92e9fc11f56ea7fa",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "910cfe5b2d7c891c2a877332a6668ee8f4250c87310b95d14c82d502d026daf5",
+    "renderedTextSHA256": "1ed68b18c2325d116bd3bf179c65d20ceb4934022e71c00593b57308227496f5",
+    "sourceSHA256": "3987dfdf3cabfb32e256ef050a5a275c5f891a600a6afdf854c12b6f5e4580e5",
+    "model": [
+      {
+        "start": 57,
+        "end": 68,
+        "label": "modelMasks"
+      },
+      {
+        "start": 147,
+        "end": 160,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 57,
+        "end": 68,
+        "label": "masks"
+      },
+      {
+        "start": 147,
+        "end": 160,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 57,
+        "end": 68,
+        "label": "ip_address",
+        "score": 0.7960862
+      },
+      {
+        "start": 147,
+        "end": 160,
+        "label": "ip_address",
+        "score": 0.8652569
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-bac7cb9d443d4c509a822e959d8509c3",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "8d52d8f74c25c57d8cb9f1330a478e2811085ec13212b9bc98744ed3cdd32968",
+    "renderedTextSHA256": "f0f747904d1204d857c53753878a0ad7edd3c27023ddd61ee0b768ff6579fc7e",
+    "sourceSHA256": "afd7efe5f334e2808109191a4394d68f1a581f85e476757a5ca0f1844b61b9a1",
+    "model": [
+      {
+        "start": 44,
+        "end": 54,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 44,
+        "end": 54,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 44,
+        "end": 54,
+        "label": "date_of_birth",
+        "score": 0.77963966
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-bc7b3e086eed4a3eabba81198f0497c4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "571654005690f1df9dac5bba93f8d6215416bc788ba948ea4396fa384740613d",
+    "renderedTextSHA256": "d6a04702753811b9bf3538170a78797f06ed7b4ea74602b15d1d61fcf0e9e7b2",
+    "sourceSHA256": "d6a04702753811b9bf3538170a78797f06ed7b4ea74602b15d1d61fcf0e9e7b2",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-d860e0723f524cb0b7e372af4c570313",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "25e05706c762bbc6cea1a95b5e791a366677b72ca97d2ec9d851ce0edeb4db79",
+    "renderedTextSHA256": "9173bad55ffe33c6623f9c73d865b982431bc16f9c6178fa23bad5df12d69cb4",
+    "sourceSHA256": "9173bad55ffe33c6623f9c73d865b982431bc16f9c6178fa23bad5df12d69cb4",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-b1b9fbf6995f4ba7bef501d4d3ad30f9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "7f40c407ed696451bd24746964177aad8b9813684bbfad4027461fccf6357aac",
+    "renderedTextSHA256": "46ecf8846f2e66d9fea4eee7bc412cb8ed3b86f90fc0061fdda4ae62578eab1b",
+    "sourceSHA256": "39feaaa267e65151b20766c3faf91117405c29f274de69e1ce3ae2e9beb57163",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 117,
+        "end": 135,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-557c95df9e994fc3bcab6577f772721b",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "efe0bdacfd9d7eb2727770bb567658bf7a2f474e3da75342cf6f4b404732638f",
+    "renderedTextSHA256": "4de94d638e61753c3d25a09a5aace503f7e342fe4acde7906663e8e50dcee26d",
+    "sourceSHA256": "f18659cdf5759d272b34b8dd0a64a8b0915f18327c58bec1ea24c06c4458fc28",
+    "model": [
+      {
+        "start": 208,
+        "end": 223,
+        "label": "modelMasks"
+      },
+      {
+        "start": 225,
+        "end": 237,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 208,
+        "end": 223,
+        "label": "masks"
+      },
+      {
+        "start": 225,
+        "end": 237,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 208,
+        "end": 223,
+        "label": "financial_id",
+        "score": 0.8632669
+      },
+      {
+        "start": 225,
+        "end": 237,
+        "label": "financial_id",
+        "score": 0.78143466
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-bb48c079006b4fe5a0b3929dccf34d2f",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "55885f5db145b14fc03aa70ba227cddf69715a766e6c496c6daecb7a631ab132",
+    "renderedTextSHA256": "dbc7f0135b0ccbbd2fe65cb4848cc4d1dd6318a7c463994e6e2d19625817e214",
+    "sourceSHA256": "dbc7f0135b0ccbbd2fe65cb4848cc4d1dd6318a7c463994e6e2d19625817e214",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-1c1abdaef469422690fbc545be6b7b13",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "1179702be9d37fb349b6a4edddbaab0d92fb83f01686fb689fd4a4de37dd3372",
+    "renderedTextSHA256": "ba8ddba1054dd185cb9f7b1e21557acb86b8036fe06555fe72974d5b56746fd0",
+    "sourceSHA256": "92207d830971cf4905afe473bedc220c688cd4ede9d7f272076027cea8f9dfbe",
+    "model": [
+      {
+        "start": 41,
+        "end": 54,
+        "label": "modelMasks"
+      },
+      {
+        "start": 114,
+        "end": 125,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 41,
+        "end": 54,
+        "label": "masks"
+      },
+      {
+        "start": 114,
+        "end": 125,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 41,
+        "end": 54,
+        "label": "phone",
+        "score": 0.9254703
+      },
+      {
+        "start": 114,
+        "end": 125,
+        "label": "government_id",
+        "score": 0.9260466
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-6594f48b653243f8b929683b3b0700c3",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "4bc42c8359184b6c8dd9af2c09a231db097b00f082d847a80275a067c38254d7",
+    "renderedTextSHA256": "f7de9469c2eb6767ec1f2db2dd9c5f0c78cac30ec3c273b55c3ec6a0ba29b8b8",
+    "sourceSHA256": "e35af03ef06b08d1798ab67230703765d7524951df037dba022b427481890c71",
+    "model": [
+      {
+        "start": 103,
+        "end": 120,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 103,
+        "end": 120,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 103,
+        "end": 120,
+        "label": "secret",
+        "score": 0.73245424
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-0a705b8cfb3240fab155a91bdfa9b3e7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d86953d89e9f0ff526beb02ddb7b3915b04e1abed984683272dba79527eb7e57",
+    "renderedTextSHA256": "607914e237f43c8ab4c37e213dd0f5f3e123b9675b9f4a0cff0fd1d9911a8d39",
+    "sourceSHA256": "607914e237f43c8ab4c37e213dd0f5f3e123b9675b9f4a0cff0fd1d9911a8d39",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-e54111b6abd64503a6f7bd3be3c9cb0e",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "4a4f933a215bbccf484ee8a7bd5550020445b197311748e47c41321c2fad22c6",
+    "renderedTextSHA256": "b0308ca2df6e2cc58a9aa5e20bdb6bb3d80f52b91a79ca10d81bc74213328964",
+    "sourceSHA256": "2e57e2d2cc3a1f7e5e2cbd860912da238d4a95085a6d1672509207af0e160ef7",
+    "model": [
+      {
+        "start": 398,
+        "end": 414,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 131,
+        "end": 147,
+        "label": "masks"
+      },
+      {
+        "start": 398,
+        "end": 414,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 398,
+        "end": 414,
+        "label": "credit_card",
+        "score": 0.8141047
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-e150361d20bc410bbd80a3be34cbd20e",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "907757f9a21d4b372229f8170312606029476bc9357d1fce9f3ef357dd96c808",
+    "renderedTextSHA256": "9ab419729a96f86c00f8342d4929d7b1fd1c8febbbf46112dfc6c451d3928f6e",
+    "sourceSHA256": "e4d972404f33677cd33e6603bd9d4b06a5f90be87cab47a4cd9d243dfa4adf1d",
+    "model": [
+      {
+        "start": 31,
+        "end": 42,
+        "label": "modelMasks"
+      },
+      {
+        "start": 44,
+        "end": 55,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 31,
+        "end": 42,
+        "label": "masks"
+      },
+      {
+        "start": 44,
+        "end": 55,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 31,
+        "end": 42,
+        "label": "government_id",
+        "score": 0.9335455
+      },
+      {
+        "start": 44,
+        "end": 55,
+        "label": "government_id",
+        "score": 0.8659956
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c4e354c1a0f04605b31d1ff720db861a",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "61124689bd242d9c5bedfae576aa920c198a60f95d58f9e8b5f768175df89dfa",
+    "renderedTextSHA256": "40b1f3d306f74207f652dda7c15a3eca384a0e454c85a04298db8a2333c2a599",
+    "sourceSHA256": "5421b49bee79d33f4f1627995db22f0e73375d0f5d622ede7610a8fbc72ad6f4",
+    "model": [
+      {
+        "start": 114,
+        "end": 139,
+        "label": "modelMasks"
+      },
+      {
+        "start": 157,
+        "end": 167,
+        "label": "modelMasks"
+      },
+      {
+        "start": 179,
+        "end": 190,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 114,
+        "end": 139,
+        "label": "masks"
+      },
+      {
+        "start": 157,
+        "end": 167,
+        "label": "masks"
+      },
+      {
+        "start": 179,
+        "end": 190,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 114,
+        "end": 139,
+        "label": "email",
+        "score": 0.74997246
+      },
+      {
+        "start": 157,
+        "end": 167,
+        "label": "date_of_birth",
+        "score": 0.82375866
+      },
+      {
+        "start": 179,
+        "end": 190,
+        "label": "government_id",
+        "score": 0.9337355
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-4a4adbb3455146d6a854f5d3923bda9c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "0f26017b6c418701d63a636cd692ebef5514d14f05443412bb1d8e91c63fc637",
+    "renderedTextSHA256": "97cd3fc17eeab8b1b8a819b00726ee883d9d1ce3b6ce8d45090b0171aba29072",
+    "sourceSHA256": "97cd3fc17eeab8b1b8a819b00726ee883d9d1ce3b6ce8d45090b0171aba29072",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-53018a3f75d341c192c39af95f8f53f6",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ae8c88c1536e76919c6a1924a965a63d4d4b0fdfa2eb70e720bc5ddef302a200",
+    "renderedTextSHA256": "6a1bbbb519b034c1a732603602806e97fd14ad5c32dec5738462f0a2482e0cad",
+    "sourceSHA256": "75d3f5e1fbfe09afccda7f60b95f44c0aff681d7663650eba9ce2756e31ce921",
+    "model": [
+      {
+        "start": 111,
+        "end": 123,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 111,
+        "end": 123,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 111,
+        "end": 123,
+        "label": "ip_address",
+        "score": 0.86414945
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-ac55ac836423482b90ee665ea483c0e7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e9329970cc9796b110ece617fe37d2ef9698008694f2b9ddbfdbf5f08ef08453",
+    "renderedTextSHA256": "e6f6ea881f59afe7139d5ffb9d0b8a483a1fff1c91d617eec2c4c4431132580b",
+    "sourceSHA256": "e6f6ea881f59afe7139d5ffb9d0b8a483a1fff1c91d617eec2c4c4431132580b",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-8c9752480a9349f3a1ceb31cb66c4383",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "08a5a6a1dea3fd6281024bc8da730860911d87c95f3605fad18d34ecb02774f6",
+    "renderedTextSHA256": "32227e57ced9daf7b7d51febf81273c9cfa0563ea6d8a5d2d93d82e3b4323670",
+    "sourceSHA256": "2a1e1d9e7e1dae862054b4d6c218afe56fa52bcac96ddd085714fbeea375ac2b",
+    "model": [
+      {
+        "start": 12,
+        "end": 25,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 12,
+        "end": 25,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 12,
+        "end": 25,
+        "label": "government_id",
+        "score": 0.88112235
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-912c508d607f430ca91d9bc6ff8fcf0a",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f7ae4e30706f88569f4991d2413c0b80dd6e937dc73dab36d4a96108d0bec8e0",
+    "renderedTextSHA256": "8de21f5eeb8811b7c37256a3378964860d11594764a3f1518470f2f0d2bd1d33",
+    "sourceSHA256": "22f39e1fb7de634bcbd5c2c5d87342724a01bf600cef1d329e7da923c15ec68e",
+    "model": [
+      {
+        "start": 105,
+        "end": 116,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 105,
+        "end": 116,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 105,
+        "end": 116,
+        "label": "government_id",
+        "score": 0.78703463
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-4546700f8a3f4c98803f868f90d3d2a9",
+    "windowCount": 3,
+    "framedTokens": 384,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3deda9a6b9d4944eb0476f9adb54f742183465a349c2c097123f1d6542f78577",
+    "renderedTextSHA256": "4a2facc933cf960f2f58589e35f6018fb6d7f04bef18a26318c5f7d451e8909a",
+    "sourceSHA256": "fb4f2de4d55b2c360d555b508c495e38f54ca87a84fbb4aef3978457a59f29ec",
+    "model": [
+      {
+        "start": 744,
+        "end": 754,
+        "label": "modelMasks"
+      },
+      {
+        "start": 777,
+        "end": 788,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 744,
+        "end": 754,
+        "label": "masks"
+      },
+      {
+        "start": 777,
+        "end": 788,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 744,
+        "end": 754,
+        "label": "phone",
+        "score": 0.82553786
+      },
+      {
+        "start": 777,
+        "end": 788,
+        "label": "government_id",
+        "score": 0.8193352
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-07dd257824dd477998eea644d70f1a55",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a859f1c3c0d105a70fa9c192b39dea1d47dfe8757a95483ecdc9fc3603b793a6",
+    "renderedTextSHA256": "7a1d443d3a625f1bc1ad0d3e90f5745d9415b5e03c960a4ec09c2aafbb1a8775",
+    "sourceSHA256": "7a1d443d3a625f1bc1ad0d3e90f5745d9415b5e03c960a4ec09c2aafbb1a8775",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-b33074ef19184eb7ac775fa068100690",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "0e81cdd94e0d184362c045b10dac88703f3f200c256d81ae5ea918e6184e546c",
+    "renderedTextSHA256": "01dee3c975fab38b2d9b0346c3c4d44879e2205ffa06f9dd34a2493f27f714f3",
+    "sourceSHA256": "e2710c6171fa5805cd071eefc331ac9fce51dbbfe08d6eba35e6b26dee24fb4f",
+    "model": [
+      {
+        "start": 145,
+        "end": 156,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 145,
+        "end": 156,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 145,
+        "end": 156,
+        "label": "government_id",
+        "score": 0.9266126
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-835bfcb374f04d9284ae1fa69f9c88e9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "2aec6da45d9a0523d5067d8ffe6ecb023d0c340ed24be35895e2e02bd998748f",
+    "renderedTextSHA256": "7b2e8b812da25ab5b60e25be6f35a9a0e876cf8716e6c7cd2d48e94b9570fa6b",
+    "sourceSHA256": "d445220ef2bf554c37228e8408c8138f1b45eb41611633dea8522376aa317da8",
+    "model": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 74,
+        "end": 85,
+        "label": "government_id",
+        "score": 0.85005707
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c657d9e1a19a4e5e98fbc9ca2ff3a04a",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ba5ba6d0592b572f71810106be5b71823d713b7c8885abd0cfb347889bf7672f",
+    "renderedTextSHA256": "bf13fcbfc4f3b7bd3e1057432033cbb9cd8183ae3ab8a34e57874433ed15a100",
+    "sourceSHA256": "1556b043d34fc25705f8e709e744c7ea43aee09185a5d44f0c76259668047607",
+    "model": [
+      {
+        "start": 83,
+        "end": 94,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 83,
+        "end": 94,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 83,
+        "end": 94,
+        "label": "government_id",
+        "score": 0.90431535
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-e3d84c9666054249842b306c0e6d2eca",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "65c3e78cec21ca37f5e5effa204f453d1739ae6f887e432057b4233c6a50cb7e",
+    "renderedTextSHA256": "da570194d017e54f89723f1952dfa27afc996cc005524152e1111826cbc897f6",
+    "sourceSHA256": "e8a74fc8cb4a1fabbaa16d91f66265c7a33d24c12297ed7a0eb9cc1d2aba9dd1",
+    "model": [
+      {
+        "start": 107,
+        "end": 118,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 107,
+        "end": 118,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 107,
+        "end": 118,
+        "label": "government_id",
+        "score": 0.8710206
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-d4e1a60c379a4d2cbd3a94efefcebde4",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a9944e419f46f6b05aa9bcdc98a6b6bb509811add87406493bbd10acfb7458fa",
+    "renderedTextSHA256": "de3e51dfd92b0f3ed13186ae862582a1615408ed90593dad03c6731cf6a9d992",
+    "sourceSHA256": "c409f15d2dbd37e8b5f450614d56a2053799b4bfe116bdcfe701c3750b016809",
+    "model": [
+      {
+        "start": 148,
+        "end": 160,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 148,
+        "end": 160,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 148,
+        "end": 160,
+        "label": "ip_address",
+        "score": 0.9053143
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-5d3408f9ac5144ad93765557d1523a16",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "250add71f093e39bb3354a43e66a45969b825eb22e2e43b5178d88a6cde28052",
+    "renderedTextSHA256": "3f1eaedcfa96864506a305aa2790981c01524126c4043bd13ad019701996acec",
+    "sourceSHA256": "fe9c0be24779c90b6ce1c71e032d6723d3bf0ad453c8f22ac3d848f3a09dbe89",
+    "model": [
+      {
+        "start": 108,
+        "end": 126,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 108,
+        "end": 126,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 108,
+        "end": 126,
+        "label": "credit_card",
+        "score": 0.8804624
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-61c8330f5fc441e896e3943a984ae81c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b74a6e34d04caaa329d06b2008dc5d1ab6899ef30c90e2db1beba4bc0ea4976a",
+    "renderedTextSHA256": "572e9c39e28d1eaf911ded1cb2afc5636aa28958320d14ba7665ba1798890f30",
+    "sourceSHA256": "572e9c39e28d1eaf911ded1cb2afc5636aa28958320d14ba7665ba1798890f30",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-c0eefc7b881847b9af23115d2dd42ac4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "7c971d63a2aa507e7ce26d494151d6f845fa5d66c990371cfb47ae76a6235505",
+    "renderedTextSHA256": "53edf31900df5fba767f085a045150b9e23576c4e99b32df29dba688a445a05f",
+    "sourceSHA256": "3f5caae9a74d401acfe1d04e98596cabf4f3da62021d061c8e498864b0ad2d8f",
+    "model": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "date_of_birth",
+        "score": 0.79201305
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-5295d9924a814cd98ea48ebd5887ee32",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "25d5f7a38e6d81f33019ecab2244d7f20242f76e56cd614191e080f12a47bc2d",
+    "renderedTextSHA256": "3b26c830d3ff55dbbcaf91cec1f7ae07eadcb25512861b0c24834b656f97f67d",
+    "sourceSHA256": "3b26c830d3ff55dbbcaf91cec1f7ae07eadcb25512861b0c24834b656f97f67d",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-4dad476b163c45adba6022714e562ac7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "ea8610be2b245f1c6cb7c54ecbf363a398785cee0464e39731d43b6eb59307b1",
+    "renderedTextSHA256": "0333e5e2d1ec49328447b034ce48c425a08efc2550bc43c2ef6c1135653a8cfe",
+    "sourceSHA256": "f327fae8903321f709698bbf6e6fb9f3dca664ca0dc89d2cdc2bac77419a3284",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 208,
+        "end": 223,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-838e28adcf7b4beb9297ed1c4279d67c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f29eb7d3edcfdb72ccd9e5cecb881eb9247c3159cad82a2ec73bd4d00cb925a0",
+    "renderedTextSHA256": "fd86bc01087ef38971e8e58fcf397a94706864dcb85a273a66a4d59c9e4f3036",
+    "sourceSHA256": "201267f6f7833619b3c4c986e63b19a1bdee4b567d6036419fdf9d77f5a2c7ae",
+    "model": [
+      {
+        "start": 198,
+        "end": 214,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 198,
+        "end": 214,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 198,
+        "end": 214,
+        "label": "credit_card",
+        "score": 0.761129
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-a19b14c895c44f8ea2a67af4726222bc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "5dc9c4e9a40b8d7e186b3b5fe8e9b431a37f7e66710eb23d64e94d2d64ac75c2",
+    "renderedTextSHA256": "1ede8c63632ab04fd919a9df55827cc191330d09e2f75af26070dfe84df8766e",
+    "sourceSHA256": "1ede8c63632ab04fd919a9df55827cc191330d09e2f75af26070dfe84df8766e",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-002fd786c4584c4c91767b12797a8867",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "bc92c7389e54d622b49f63bdddffc7d37bcbc2f9ea1f3cd7856b625e87adbe17",
+    "renderedTextSHA256": "b29e88b3cdc4df28c918f43fe54ccab457641051bef5909c5968378b921cb290",
+    "sourceSHA256": "14cd90902f39f44406e971b0c9fa11e7521f581006ff56f241bf0795573d97b6",
+    "model": [
+      {
+        "start": 54,
+        "end": 65,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 54,
+        "end": 65,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 54,
+        "end": 65,
+        "label": "government_id",
+        "score": 0.94674975
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-d5de2aafa66a49f1ab2121ed9129def3",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "97fccb928ee92b220a8dc47b2a925beb42e3eb950b4e25c833a52cda62309073",
+    "renderedTextSHA256": "0a033d1862d6f7d23cf01928ada1d5d9d5f28b319e94097b22afe03f7ab8009f",
+    "sourceSHA256": "4a35c42933e631b18f914c5c6223f9149d68429bf0467420a410968b3dc9ad92",
+    "model": [
+      {
+        "start": 189,
+        "end": 203,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 189,
+        "end": 203,
+        "label": "masks"
+      },
+      {
+        "start": 216,
+        "end": 235,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 189,
+        "end": 203,
+        "label": "ip_address",
+        "score": 0.7635205
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-8ac958393a3e403f86d1918e20aa71ee",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "99ae6202a1afa512b6d3b0878a39d6fae1ff97e6b7087a15e76120e7339fe17f",
+    "renderedTextSHA256": "40b0f82037c34792a962d9f8971458c764640e62ede8213c2f26bf7619f2e808",
+    "sourceSHA256": "c126e55159ebf4a5458ec5b90c67bce2229ce4edd173bbc14a90c789325ff5e5",
+    "model": [
+      {
+        "start": 33,
+        "end": 44,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 33,
+        "end": 44,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 33,
+        "end": 44,
+        "label": "government_id",
+        "score": 0.93871105
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-0c36c7985596435db79941e8c37c8513",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "8a92500aea2d3b84b7e6824c462d3540c7f72eb0353bedb6ac70bb9c617e8644",
+    "renderedTextSHA256": "b150485be1dab49608cc6d5479b3df28e5d940005eafbe512a1b9122e028558e",
+    "sourceSHA256": "b150485be1dab49608cc6d5479b3df28e5d940005eafbe512a1b9122e028558e",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-a6c9ef093d154756bddacc68dd46bc05",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "fff5247aea6c05e7e31a87ebec1e46bd544b73434bddc65f59cc42a390947b9f",
+    "renderedTextSHA256": "df3bd65ef6ef570514ac7f7736e8754bb43cf58fefd038ce85a20c3ccada5acf",
+    "sourceSHA256": "3e6e36a431a9c8e256f69134510ab05886f4ab1a87b6804a5b2e8a270cd6167f",
+    "model": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 151,
+        "end": 169,
+        "label": "credit_card",
+        "score": 0.7146751
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-4b8ecd21a7d04af6b800cdadc9d85af4",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "5cf8c64aaa2a64cdb530a36b15a17d5fd040e0eea6c87c261f30969c08d3c4a0",
+    "renderedTextSHA256": "37bba90a3ba0fc18701d6dbaa0fca549ef0bda8ea9c795969941a8cc5de126f8",
+    "sourceSHA256": "37bba90a3ba0fc18701d6dbaa0fca549ef0bda8ea9c795969941a8cc5de126f8",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-bec800f733814648855bfedbad341cb0",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "43d946ae33b20c378d62c8e8dd7211de0027f993861d5ea6e01b0d120156b008",
+    "renderedTextSHA256": "5e029db900c5076312809726756154771f541731da41c27bc8dd19960724a28d",
+    "sourceSHA256": "5e029db900c5076312809726756154771f541731da41c27bc8dd19960724a28d",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-728a2c4bdf714a0787780c569834b443",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "9a3c0390bb41e40285db379f642575d8fa78e041501853fbd55c5826868a56ca",
+    "renderedTextSHA256": "44bd6c27739cfe03201fdbc60cbab93335c26cc2bfef43c41e00ce97723c72a7",
+    "sourceSHA256": "44bd6c27739cfe03201fdbc60cbab93335c26cc2bfef43c41e00ce97723c72a7",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-74f546e79988413b9b18f71953b2d1be",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "548871d9fe42c072ba2c0e1bab78bf19906944efa0bffb95374ebc9f9f697729",
+    "renderedTextSHA256": "c156d12c1251a2e9131c572f181025d99a79019084b29a263bca7facc9f6e08d",
+    "sourceSHA256": "7ea097d8d52179caa5e0993657c3cdf0b49d2743edd9ca5d1dde53de0b028cbb",
+    "model": [
+      {
+        "start": 116,
+        "end": 171,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 106,
+        "end": 172,
+        "label": "masks"
+      },
+      {
+        "start": 424,
+        "end": 442,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 116,
+        "end": 171,
+        "label": "secret",
+        "score": 0.7556112
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-acf2d914549543ad904dbac0b0b1682b",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e3e2186a17a29064e0f42770da8010c2d25b85e775021ab2694a4f9435281a58",
+    "renderedTextSHA256": "eed63b9afd6135dd189b173ac848335dfbe2cea5f2c4d5d2a507864f9023a4f3",
+    "sourceSHA256": "eed63b9afd6135dd189b173ac848335dfbe2cea5f2c4d5d2a507864f9023a4f3",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-07a114a1c807433eb62c8be926030597",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "689602c2da023394b153f4fd78e504e8129687e0bb4aceda1eaffeb95e05917e",
+    "renderedTextSHA256": "26c26da4f4e6913106c4dc7d7b0ba0c27d8f25ea1c4a630214fdad7ed24474cb",
+    "sourceSHA256": "26c26da4f4e6913106c4dc7d7b0ba0c27d8f25ea1c4a630214fdad7ed24474cb",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-3e33bd8c103e4b5799f587edd8655fbc",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d6b3e908d39ab13bda3473af0422f7b6074f8ce404ef6cb852b090dc93a1ac78",
+    "renderedTextSHA256": "1bf4b9b19bc6b51660bd020ec54e4aabaaa77fa0a948edf288a41d2de91e482d",
+    "sourceSHA256": "016dc0754f207ef1c5972fff479c35a26a607a2b941fc722fdcbacea2990d6a9",
+    "model": [
+      {
+        "start": 93,
+        "end": 108,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 93,
+        "end": 108,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 93,
+        "end": 108,
+        "label": "ip_address",
+        "score": 0.7039197
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-227a4755752f462287e7e6c67ea1aff4",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "c9018f9fb649b8440a99058af849ba2e7a5a712ee4ff81abd24db978a7168e56",
+    "renderedTextSHA256": "c5381c1a8b56e5962fa62843ef09e8ee63403776be22e7aee581d52b42f6eff3",
+    "sourceSHA256": "e880389065fd0d043524c7660b7cce0b082ad2b72b63afb9f2a113f720a333f7",
+    "model": [
+      {
+        "start": 258,
+        "end": 269,
+        "label": "modelMasks"
+      },
+      {
+        "start": 323,
+        "end": 341,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 258,
+        "end": 269,
+        "label": "masks"
+      },
+      {
+        "start": 323,
+        "end": 341,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 258,
+        "end": 269,
+        "label": "government_id",
+        "score": 0.9459429
+      },
+      {
+        "start": 323,
+        "end": 341,
+        "label": "credit_card",
+        "score": 0.72652733
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-b2dc096ba9944f3680149e62ab2cbe3e",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "f6820328b7fc4bdf2782a1440a4bcfe33e2f603d1611dcdfeb354642e07b1c56",
+    "renderedTextSHA256": "f88d00ff2df43512cfc882a27ead07e6d5c36eede9e3357da2532797b3003c67",
+    "sourceSHA256": "f88d00ff2df43512cfc882a27ead07e6d5c36eede9e3357da2532797b3003c67",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-8974b7d23fb04fe4bdf9a9d932a391b1",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "5fbc38edd1050d80d4ff64adec878bf1027c1e494b723fb3baf81c385bf6f009",
+    "renderedTextSHA256": "b74c7ea7d4989eb74a2761c7af8a95dc84fb040dfe528e4c638231bc7873d422",
+    "sourceSHA256": "b74c7ea7d4989eb74a2761c7af8a95dc84fb040dfe528e4c638231bc7873d422",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-11a3bfda5657425eb4341e7e5f2c9386",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e47d7ddcec30e2d158e2fd2ccf926a0c76ae49b8cd52e8f459d2a9195dea21de",
+    "renderedTextSHA256": "a4621f925370234e1bb6e3359891895e376683221dfe28d2eb505523022d4645",
+    "sourceSHA256": "232d4f9dba6b96af8beae5b7d34c78919376ae15f95ecec0904a2fd0c092d8ae",
+    "model": [
+      {
+        "start": 49,
+        "end": 67,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 49,
+        "end": 67,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 49,
+        "end": 67,
+        "label": "credit_card",
+        "score": 0.7526431
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-82fae98b88f148c398176ccfeca29a6b",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "0b9577e085e12b8058d4a8ff2ec3d452615a49a405e88e283dab9a5d85555591",
+    "renderedTextSHA256": "cd4b2120b2344ef1a4b38b939209266c52f885ca78f3569beebb89c95b396a21",
+    "sourceSHA256": "cd4b2120b2344ef1a4b38b939209266c52f885ca78f3569beebb89c95b396a21",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-655eb3c4263b4e29a087ca579168d3dd",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "005097bf3e72f110484e4794dff5e4dd4e92db213f901ea6d0f449bd8d4b32cf",
+    "renderedTextSHA256": "13c505c6f2c0aed36957010d99a9f31d8e9ac1d42e0b898f26c2a7ae28cc0d52",
+    "sourceSHA256": "1e688f31825c47c2edcb20cae8a9bb0afb77e81cd43908a56d96cea5d5452b24",
+    "model": [
+      {
+        "start": 112,
+        "end": 122,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 112,
+        "end": 122,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 112,
+        "end": 122,
+        "label": "date_of_birth",
+        "score": 0.72856927
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-443414536c8a4e88b57e34f45809eca0",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a8818f736e148bda9053f3a4cadfd9b3e3a19b08f22cbe4044d725d31c8464c5",
+    "renderedTextSHA256": "cb8fc3d51c8900cc6df9a8888123323b65feba47344a7124533be7a1cc9e5c4a",
+    "sourceSHA256": "9c8746e844f72afd2979b279576bbc6ff26adcd3af0dcf4c956ca96f902561fb",
+    "model": [
+      {
+        "start": 170,
+        "end": 180,
+        "label": "modelMasks"
+      },
+      {
+        "start": 210,
+        "end": 221,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 170,
+        "end": 180,
+        "label": "masks"
+      },
+      {
+        "start": 210,
+        "end": 221,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 170,
+        "end": 180,
+        "label": "date_of_birth",
+        "score": 0.7824385
+      },
+      {
+        "start": 210,
+        "end": 221,
+        "label": "government_id",
+        "score": 0.90169203
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-218d4b0306d6421eb4dda1419c7eb929",
+    "windowCount": 4,
+    "framedTokens": 512,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d0620d3e02e39910dcd7f492e62616c2fa571fd71aa6c5215669e7c37eb8294a",
+    "renderedTextSHA256": "d92224e5a411aa57f9b4e092e5a4eb5a5780fecd903010b02c2b5f413ba317e6",
+    "sourceSHA256": "d92224e5a411aa57f9b4e092e5a4eb5a5780fecd903010b02c2b5f413ba317e6",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-069a933c3ccb4523a448eb9b91cfca13",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "890367f3f0f0af4b004f73f959addd95c090eb2eef6228ea6a7545ab0e9a1b0b",
+    "renderedTextSHA256": "28d3bb16020e237732f827efd08356d88dd62ba80d029e79c31cdd2ddd8d06d0",
+    "sourceSHA256": "28d3bb16020e237732f827efd08356d88dd62ba80d029e79c31cdd2ddd8d06d0",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-f2572e5dc7ed4e23b7d98596135f7630",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b655fa453c489f54e2a95325b185e62b3db4e5860bb7955c46613d2548fae168",
+    "renderedTextSHA256": "fd1bbab7da6ab3e1d48623aec7f04ad287f8896d3d5e4ede348df9fbca0ca22e",
+    "sourceSHA256": "fd1bbab7da6ab3e1d48623aec7f04ad287f8896d3d5e4ede348df9fbca0ca22e",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-ff15c380455945ad928c006aa8c898df",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "db928308a66bd9c3d51ee201fe397e7214f31725612f75917c16566ed6adb092",
+    "renderedTextSHA256": "bfb3a2c117b171274d9683d48168c299cd7277dcf0e8eeccf923f4167531d62d",
+    "sourceSHA256": "f2a9ef31b91f5325b6d81a85301634c488e5b0d7a2295998e25eec7f05515e28",
+    "model": [],
+    "hybrid": [
+      {
+        "start": 307,
+        "end": 322,
+        "label": "masks"
+      }
+    ],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c1642948287c4eaaa64aaff3bc812457",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "a3eb3a4e614333f4ceaeeba27b440d64cca0bb112649148262e9195e7ed2c7ef",
+    "renderedTextSHA256": "b0c1992a333217314575496cfe1e5f84ae2264200d9d4a3636a5b0d710bee57f",
+    "sourceSHA256": "d43695ab2cd67efe03887c4afe399a8f4378243112f2a9b0f4bfe26015b01a1f",
+    "model": [
+      {
+        "start": 102,
+        "end": 117,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 102,
+        "end": 117,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 102,
+        "end": 117,
+        "label": "phone",
+        "score": 0.8764174
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-6de056fc51ff4cdaa1accf1862ee6eef",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "6ff3ec0471ee492f5152086d675c4bf76063c86860623298f5906f63f647942c",
+    "renderedTextSHA256": "e87ad33d59c164c3cf5533ea9130a54efeb610cefcee268b9b66698ea9c3a066",
+    "sourceSHA256": "e87ad33d59c164c3cf5533ea9130a54efeb610cefcee268b9b66698ea9c3a066",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-7c727a7c89dd4f2b9b31f6e4f5949739",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e65d1cc3db56581c9cec538b6531c0234216a57f99e2a3e9675158eaf5469231",
+    "renderedTextSHA256": "b2897a7c216706ef503b569f97c5ebc6bc7f7c312cd8406a6136969652542e04",
+    "sourceSHA256": "e35a06103256b18416783d13f656882aebfbef809152f46dffadbfd7196b2283",
+    "model": [
+      {
+        "start": 177,
+        "end": 193,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 177,
+        "end": 193,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 177,
+        "end": 193,
+        "label": "financial_id",
+        "score": 0.7713452
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-7b324e5508854e20a4761de0387bcb6c",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "99c5422dd0f315c8534f8e1d45a1fad812a4be184bba11072a7d03688b799dbb",
+    "renderedTextSHA256": "5cf9efd4781b759773c740d51660e849d91d0a25b47b6cdd8eec642dc21cbec4",
+    "sourceSHA256": "5cf9efd4781b759773c740d51660e849d91d0a25b47b6cdd8eec642dc21cbec4",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-b04e9aa877ef43f6a02f76177ecb5b16",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "168ef2d4abfd2de2a70b5de1a8338657533cf391492d8471c3a1a9eb732a5b03",
+    "renderedTextSHA256": "9c687b33ba1cb7d2e70d6aba235d69ee223a5c7d0fc98f09ca5136cfec87c805",
+    "sourceSHA256": "cf4bd1f361eb63e9477d0257e422ad7b41c9ddd437298cc27055a4475d79d451",
+    "model": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 67,
+        "end": 78,
+        "label": "phone",
+        "score": 0.9513085
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-dc468d922c2e424d8b6500d9eda973f6",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "75a4b79c1a20beb91eca4c94cbe83cb5e8aafe628f74e48f554c9e95a0c20c0e",
+    "renderedTextSHA256": "ed79386cc965aa97a04ecd89a9c1c368a5925d0fe0e2d95e664b501aace36d5c",
+    "sourceSHA256": "0109ace8973813f316525b18fae2ca654540f2049772b274f2de5876484333ec",
+    "model": [
+      {
+        "start": 72,
+        "end": 83,
+        "label": "modelMasks"
+      },
+      {
+        "start": 88,
+        "end": 99,
+        "label": "modelMasks"
+      },
+      {
+        "start": 268,
+        "end": 282,
+        "label": "modelMasks"
+      },
+      {
+        "start": 287,
+        "end": 303,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 72,
+        "end": 83,
+        "label": "masks"
+      },
+      {
+        "start": 88,
+        "end": 99,
+        "label": "masks"
+      },
+      {
+        "start": 268,
+        "end": 282,
+        "label": "masks"
+      },
+      {
+        "start": 287,
+        "end": 303,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 72,
+        "end": 83,
+        "label": "government_id",
+        "score": 0.87414694
+      },
+      {
+        "start": 88,
+        "end": 99,
+        "label": "government_id",
+        "score": 0.82863235
+      },
+      {
+        "start": 268,
+        "end": 282,
+        "label": "credit_card",
+        "score": 0.7493429
+      },
+      {
+        "start": 287,
+        "end": 303,
+        "label": "credit_card",
+        "score": 0.84681606
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-63a9fd061a2443b5b0912aec41cbaf39",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "1d7be19b16e5563632b52f7085236e57fa2947c8b770b227fedd5146b0aef08c",
+    "renderedTextSHA256": "81ca59ea8aa073c9a1191b2e56a8f8be9f15166dfe5be1f00cd5d6f97216f16a",
+    "sourceSHA256": "9a946ffe5cffed959ce48e6f3410cd6fccaec419cd09c222e5d3f0aa86964169",
+    "model": [
+      {
+        "start": 134,
+        "end": 146,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 134,
+        "end": 146,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 134,
+        "end": 146,
+        "label": "financial_id",
+        "score": 0.87392706
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-7c4b8a42d8e04e47ba55cbfcbee0267d",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "00c54c70e156d6ff0851880841eced29fe1ff4d3332f08bdccaa71d9c3b77674",
+    "renderedTextSHA256": "40f0f202cc6de1a4f36b866337103dfcc7fa734ce4c5f619f73359da6fbfe2b7",
+    "sourceSHA256": "7eae23df95b4c341e01a17e4f00dfebbe4ad8ccda7140361a37a572e51433aca",
+    "model": [
+      {
+        "start": 21,
+        "end": 32,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 21,
+        "end": 32,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 21,
+        "end": 32,
+        "label": "government_id",
+        "score": 0.8502827
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-50c35b9da1bd473b89af0d4508a14d9e",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e15b9f68028661b4607ad61119d361bf57b2bacf150b66cded36489a2c479ca0",
+    "renderedTextSHA256": "5a10f89bd2b07084ed1d33caa09dc983a3a9363d56c693a2f469680fb9d624e6",
+    "sourceSHA256": "5a10f89bd2b07084ed1d33caa09dc983a3a9363d56c693a2f469680fb9d624e6",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-c849d8615ee1474ba69f18ef5f6268ce",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "bb312933cac13fd173ad283563ac9cf0ceaa019f59dd9b8bead27dac584a49ef",
+    "renderedTextSHA256": "f266452b9d2865c5e9528ae2aea0a0b5219d3eff97ee806a905b0ab840542299",
+    "sourceSHA256": "f266452b9d2865c5e9528ae2aea0a0b5219d3eff97ee806a905b0ab840542299",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-bd3ddb40b6774f2a9f36ea37c70d5f34",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3ba9acb95638da1a9c8ff61caf07a59a2cacc850097ed07aeab90f922e4bff7b",
+    "renderedTextSHA256": "bcebdf161f8830435f879c4f0a447de1cef072f9f4aeca796de51b506d3117e9",
+    "sourceSHA256": "0bafba941fa2bfae4b5f04158e3e019248dfdd1187135d5624d848b1c5532923",
+    "model": [
+      {
+        "start": 110,
+        "end": 124,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 110,
+        "end": 124,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 110,
+        "end": 124,
+        "label": "phone",
+        "score": 0.7643333
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-755251d7e6a44dceaf8f85ab11e5d58c",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "c87dec32d1260b0f0945c9b3cb3460ef39892e9f4bf403191ec4f039c4cabbd1",
+    "renderedTextSHA256": "53eebd898596f5fd760b12383ac2debf6ee235881eaf1162680938a9e9112ce6",
+    "sourceSHA256": "53eebd898596f5fd760b12383ac2debf6ee235881eaf1162680938a9e9112ce6",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-0030e86207f0421687c5d88f68e38de1",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "8dd2e089c83bbed0f1ce01fa53fb49b2170675aacda60269df8cfa566349ae2f",
+    "renderedTextSHA256": "4af5b6b4153b731bed269a5c999a64bbff522ce5cdd5f6cf644fcde978e45399",
+    "sourceSHA256": "c97f31ccfb0bc0cd4d09629a4aa00f202114fdb17ad8b5efc7f2c5f1fdfd9dff",
+    "model": [
+      {
+        "start": 84,
+        "end": 99,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 84,
+        "end": 99,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 84,
+        "end": 99,
+        "label": "financial_id",
+        "score": 0.8842373
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-edcb9becdaa7400497cfbd8fa4e1a593",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d3d061f996161460cd5ff31a3ad7501822802ae5a5672849cb769e1a4241d295",
+    "renderedTextSHA256": "1d13236dfec88295898bc16529f7626eb1c2e7195bff026112162e01943f67ab",
+    "sourceSHA256": "ea8a384d416db76cb17ce568a20abc2fdf5c5f116f38e2dc040e5ac5be03a7de",
+    "model": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 74,
+        "end": 84,
+        "label": "government_id",
+        "score": 0.7808409
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-14ca4b9e266249d0a7457886e3dd1a04",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "be3b2084c1c76a962648416c132d9892806a812685fbbb4dd945aba833d444f7",
+    "renderedTextSHA256": "d6fc2bb307c44d0b9ca0100063dfa1d822d26d12284f8ffbae9591f6d3a472d4",
+    "sourceSHA256": "d6fc2bb307c44d0b9ca0100063dfa1d822d26d12284f8ffbae9591f6d3a472d4",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-4eccd1b701154304aafc3f8f6834db54",
+    "windowCount": 4,
+    "framedTokens": 512,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "45ab386c2f721f701ab894a01280c3ac58ff1732e1f3645487e974a777952ce8",
+    "renderedTextSHA256": "8cd856e58c7d7d35f0e73ea45e045cf0f428e304f800697318a23d978d79bca8",
+    "sourceSHA256": "6709f096060c667a5ab95ce40c189aa48ae6a1abf688882e16bf474e381d7410",
+    "model": [
+      {
+        "start": 289,
+        "end": 301,
+        "label": "modelMasks"
+      },
+      {
+        "start": 415,
+        "end": 426,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 289,
+        "end": 301,
+        "label": "masks"
+      },
+      {
+        "start": 415,
+        "end": 426,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 289,
+        "end": 301,
+        "label": "phone",
+        "score": 0.9298851
+      },
+      {
+        "start": 415,
+        "end": 426,
+        "label": "government_id",
+        "score": 0.8982678
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-8a1b933d94314b45bc926de431551b14",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "838ef0e329c8512c3292d3ce10c03ece16d25bd413f4d9b1900a4f59250682e2",
+    "renderedTextSHA256": "3f51fdbbfd19fd9bd45157fe816cadd159e5fcdd240f321034507b27e1d8ab8f",
+    "sourceSHA256": "3f51fdbbfd19fd9bd45157fe816cadd159e5fcdd240f321034507b27e1d8ab8f",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-a80c5060c9f74768b81a7a968e8bd7ca",
+    "windowCount": 3,
+    "framedTokens": 384,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "aea0daa7c9a3b238ef49013d2d56659258461794d099d138f86c1a3e344b762e",
+    "renderedTextSHA256": "a54317f3dc58ee078d1421b02d81fa9e46240958f3d54fbd784748092c301846",
+    "sourceSHA256": "a7038af707c1b18a598944f6d9914b6ba12ff2d0cc3919f0e68464602dfa940d",
+    "model": [
+      {
+        "start": 129,
+        "end": 144,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 129,
+        "end": 144,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 129,
+        "end": 144,
+        "label": "financial_id",
+        "score": 0.9158286
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-e6a28194cc2f4a678df5b57dc3f5e725",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3bd18b7837c129c642070f9381d3e85431fc2b7fcc1541ae0e8fa99cdf07c7db",
+    "renderedTextSHA256": "4d9b0ce85f6559dee46770dc4d6577e9d719ff08d525ffe4446ebf719cd3a0b0",
+    "sourceSHA256": "961bf2398904807e2ced3a13f50e4f2436028b421d9ca6f09787a113663b7b8f",
+    "model": [
+      {
+        "start": 48,
+        "end": 77,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 48,
+        "end": 77,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 48,
+        "end": 77,
+        "label": "secret",
+        "score": 0.88736
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-52c58124cf74495c8fc69daabc22468c",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d61f5ef3c7e7ee3f82d64d4603379860c3cf4c57e1e3995b9350efb46c3fe929",
+    "renderedTextSHA256": "d0b313ab3cb958e7d9ae27606df0604b4593d181bcdc4ced2fa03557ce73cb28",
+    "sourceSHA256": "5df99b425f3c4d19620007825af10c026649379a29bd4f94ac90ed7e6039c997",
+    "model": [
+      {
+        "start": 25,
+        "end": 37,
+        "label": "modelMasks"
+      },
+      {
+        "start": 81,
+        "end": 92,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 25,
+        "end": 37,
+        "label": "masks"
+      },
+      {
+        "start": 81,
+        "end": 92,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 25,
+        "end": 37,
+        "label": "financial_id",
+        "score": 0.741509
+      },
+      {
+        "start": 81,
+        "end": 92,
+        "label": "financial_id",
+        "score": 0.7234553
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-6a4503dda37f42e68a312904d455a244",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d0bc9c31c12efa64cbcc7fd942ca9abcc4ec627d26c4041ee979641a34f7af21",
+    "renderedTextSHA256": "63064e5cf3b158129f95f5be03eb327d186bcc6a5417ff658e1703ad2f8e9d0d",
+    "sourceSHA256": "63064e5cf3b158129f95f5be03eb327d186bcc6a5417ff658e1703ad2f8e9d0d",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-9935d3f4ccd3437aa51aef79a3d3de5a",
+    "windowCount": 4,
+    "framedTokens": 512,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "bef1f245ca55fc88fe4660647b93dfc5c3ce43c8d11bc26f29cf122a3e7425bb",
+    "renderedTextSHA256": "421a0da1a37baf072c5568d9e9714bdb8155883d5623acc19c34b6c4b5faa3a3",
+    "sourceSHA256": "f0ce32ed56cabe4e0de8e6c64a668e2a92fbfbf9d816c3701f9dac49e338eb06",
+    "model": [
+      {
+        "start": 110,
+        "end": 120,
+        "label": "modelMasks"
+      },
+      {
+        "start": 170,
+        "end": 225,
+        "label": "modelMasks"
+      },
+      {
+        "start": 232,
+        "end": 287,
+        "label": "modelMasks"
+      },
+      {
+        "start": 381,
+        "end": 422,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 110,
+        "end": 120,
+        "label": "masks"
+      },
+      {
+        "start": 170,
+        "end": 225,
+        "label": "masks"
+      },
+      {
+        "start": 232,
+        "end": 287,
+        "label": "masks"
+      },
+      {
+        "start": 381,
+        "end": 422,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 110,
+        "end": 120,
+        "label": "date_of_birth",
+        "score": 0.7753633
+      },
+      {
+        "start": 170,
+        "end": 225,
+        "label": "secret",
+        "score": 0.8361041
+      },
+      {
+        "start": 170,
+        "end": 225,
+        "label": "secret",
+        "score": 0.81013286
+      },
+      {
+        "start": 232,
+        "end": 287,
+        "label": "secret",
+        "score": 0.77068835
+      },
+      {
+        "start": 381,
+        "end": 422,
+        "label": "address",
+        "score": 0.7374772
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-8008919b1319473b92a7c5a660ce619b",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "bef22dbe1d392477c344269fd3290eb167b32c2f2785b9d8c88aac4c06c41b82",
+    "renderedTextSHA256": "3491182693b97dddfd380f3b48084941a835fb5c4d2f02f6f2d3c523028df040",
+    "sourceSHA256": "3491182693b97dddfd380f3b48084941a835fb5c4d2f02f6f2d3c523028df040",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-311acddd159b4d2b9f4a013c62013900",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b7ce1cbca6fd8fa368eb849fdcca9a267810e380b248731dda10d1ae3dc1bb91",
+    "renderedTextSHA256": "4d55e3fcea032436ca81c54a0bdb71049c07a19bcb084a76aeed9ed374b6b2bb",
+    "sourceSHA256": "4d55e3fcea032436ca81c54a0bdb71049c07a19bcb084a76aeed9ed374b6b2bb",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-f590c1cabb7a405b9cbea2d894626328",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "e489ba96d4c13cf5acab18537509f8f4e9f00abcaf52ba8d460da0dba6429668",
+    "renderedTextSHA256": "7e182d86fe24e7cef4d40a96620d39c44a9c6e1212a256b48bc707447d9fd266",
+    "sourceSHA256": "7e182d86fe24e7cef4d40a96620d39c44a9c6e1212a256b48bc707447d9fd266",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-9a6b241cd8c4425887384e610d32d4de",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "d77257489cd968231fceb2b6f8688158cf58e1f767fb39e9bad0a4a73df52da3",
+    "renderedTextSHA256": "decae7c68123d6949f7212a974929ba2477d4b8882e695b5010549df9ff6b12c",
+    "sourceSHA256": "c3438a22f67c7632a849a18b20cf56eec13fa989f631179f1418fb52699d912e",
+    "model": [
+      {
+        "start": 58,
+        "end": 99,
+        "label": "modelMasks"
+      },
+      {
+        "start": 121,
+        "end": 136,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 58,
+        "end": 99,
+        "label": "masks"
+      },
+      {
+        "start": 121,
+        "end": 136,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 58,
+        "end": 99,
+        "label": "secret",
+        "score": 0.83766395
+      },
+      {
+        "start": 121,
+        "end": 136,
+        "label": "financial_id",
+        "score": 0.71722853
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": true,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-c14d8250f06447279e33843d659f4f4f",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "6dd828926d4c5023de5d4fb4562b4c37b852ff45025faf1ff72dade1d3dc508d",
+    "renderedTextSHA256": "d0e7b04ec251acb1b561c6f1e4c413e1acf6a8d61541c707a82f00c1cd6b4284",
+    "sourceSHA256": "d0e7b04ec251acb1b561c6f1e4c413e1acf6a8d61541c707a82f00c1cd6b4284",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-7240c9778c6546e18745e9f6b40c82bb",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3aec3ff46b6666ab3ab8969d6542a0ceb73d4a4c529412e08c00987040303549",
+    "renderedTextSHA256": "ae572c87e718bab651f6ba3a0a5fa646441164ef4f454c56aa9d471e08e39839",
+    "sourceSHA256": "d7dc93a3eb8a957d50650abfedf4af6363d90a4f9013b83c6991f44d460de37f",
+    "model": [
+      {
+        "start": 137,
+        "end": 150,
+        "label": "modelMasks"
+      }
+    ],
+    "hybrid": [
+      {
+        "start": 137,
+        "end": 150,
+        "label": "masks"
+      }
+    ],
+    "typed": [
+      {
+        "start": 137,
+        "end": 150,
+        "label": "ip_address",
+        "score": 0.7314667
+      }
+    ],
+    "modelRedacted": true,
+    "patternRedacted": false,
+    "redacted": true,
+    "suppressMedia": true
+  },
+  {
+    "id": "gretel-validation-942c2ae7ce674db2917838b9a857908d",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "af041fd72e3f3ea9b2c7ea68ce6df6d297fe7ef026a7440a48fe0508702d3b79",
+    "renderedTextSHA256": "78ae2511059478f5b777e9b683549868110a3a58ca904afb98b7d4fb25549aee",
+    "sourceSHA256": "78ae2511059478f5b777e9b683549868110a3a58ca904afb98b7d4fb25549aee",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-4bb585efe7354bf5bc8bd14e933d7780",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "475d03087797f903dd2aaa12ea8c4ab229e6bdbc0835db08e14e14a2b09aaf0b",
+    "renderedTextSHA256": "d0fec12d6e281073ef8173b294236e726be54dcdefbaddb2da784c599296793f",
+    "sourceSHA256": "d0fec12d6e281073ef8173b294236e726be54dcdefbaddb2da784c599296793f",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-77fcae968afa4cb9be4cbdf5ad93f60d",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "53926303a40c586868a20ad5976363718ef504bf084c657bde444c87f4cc62df",
+    "renderedTextSHA256": "5208882ca0c134958321d26408a2f73bf0309b6ccbecdf907ab1a3a83eb9b7ba",
+    "sourceSHA256": "5208882ca0c134958321d26408a2f73bf0309b6ccbecdf907ab1a3a83eb9b7ba",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-773f9a897c5c44319edcbf5d3c3a37a9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "5547140b3903491c728b40c2c0cb8d5e5b320f9b029089ed6a411c8e0c657dbc",
+    "renderedTextSHA256": "56a3d759a83a18f0d87b8c8c45ba7e1c1331acb61e23b7b4acb759c8430740f3",
+    "sourceSHA256": "56a3d759a83a18f0d87b8c8c45ba7e1c1331acb61e23b7b4acb759c8430740f3",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-268fd2cffe8947bb853cbdc59afcee84",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "8ed655a77518fcf22d06ded365ea3baef017fc26bf11e80c4ad126c20654f387",
+    "renderedTextSHA256": "fbd51c93370d233f8b12e69fcd22aa2b6621bcc0d2d0f30593de5c75a8548dcc",
+    "sourceSHA256": "fbd51c93370d233f8b12e69fcd22aa2b6621bcc0d2d0f30593de5c75a8548dcc",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-28f1edcfefb74189abb49056b9efefc9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "2ac711c6b54d27beb385a01a34be4616200cec9ffac000de67a21cfd1678bf71",
+    "renderedTextSHA256": "d5065f23826d756cf3d8b5af48513b4dc4b9447274eacf6523f627cb53622c23",
+    "sourceSHA256": "d5065f23826d756cf3d8b5af48513b4dc4b9447274eacf6523f627cb53622c23",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-7cc2f6ac04d24da888b14d6fa58181ac",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "05389d4b5badf8a3b8ecde6faed1e80329fa9fd486d37930ae81bfe3843c9c7a",
+    "renderedTextSHA256": "8e074dfa102e8aefcdad215f1f23d121c52b68642f90edcdc8f391634310afa6",
+    "sourceSHA256": "8e074dfa102e8aefcdad215f1f23d121c52b68642f90edcdc8f391634310afa6",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-6d4c57c3a95b4ca5acdd3f412fae3df7",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "78b173cb7191219abe4fc879c13a80f89c26a77af6a4657598b16adc744fd49b",
+    "renderedTextSHA256": "2d3582e5c9a2b63f1a8b3aef450140b38cc92eb23eb510721e89e44163d1e08b",
+    "sourceSHA256": "2d3582e5c9a2b63f1a8b3aef450140b38cc92eb23eb510721e89e44163d1e08b",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-34ad3c4616834230a485fb416d41a5db",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "454145fd9f6d23b8eeb74139a0b0742d353f92598a219e0f09eee6aa5acc63f6",
+    "renderedTextSHA256": "75363d2877453e5ffe0d64aecc92727c40561321ac3efc513c5124fbaadae971",
+    "sourceSHA256": "75363d2877453e5ffe0d64aecc92727c40561321ac3efc513c5124fbaadae971",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-427e69bff09542c58c6494b711a7c81e",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "3ca3a3a5da57868a8319e8075169f3178c3505f46378cbef6928f54bdba8c05e",
+    "renderedTextSHA256": "7b4b74e81de3743b1b9e31bde7240808b1a1f39e1134858e85679979b00fc0b7",
+    "sourceSHA256": "7b4b74e81de3743b1b9e31bde7240808b1a1f39e1134858e85679979b00fc0b7",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-27e19fc5e21647319ec2efd09342a5f8",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "67995ae8a7e4e9ac3bfd3c428f1a6a5f3136f98f51bfaf79bd0ef7b7c6f52d26",
+    "renderedTextSHA256": "7d92b64351a8b44c6c4cc2e4d2c042219a3febce972272a67c4f204e9ca6dafa",
+    "sourceSHA256": "7d92b64351a8b44c6c4cc2e4d2c042219a3febce972272a67c4f204e9ca6dafa",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-977bd97fad8a4ad5badb424a210df932",
+    "windowCount": 2,
+    "framedTokens": 256,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "67c0a132c114f91b5056fa8173f26a7963b46ee96ae49a95dd2f674b8b2973a5",
+    "renderedTextSHA256": "918e6af5fee346a67f996a35649addeb662a127e32cc4c6ef58c9fbb71949d7a",
+    "sourceSHA256": "918e6af5fee346a67f996a35649addeb662a127e32cc4c6ef58c9fbb71949d7a",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-068a25d08dea4b72ac8607c917473f0f",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "7ec050df2cbdf97577fb4df7b9ab2ab214d46849f68644203e25fef5cd3e7d0f",
+    "renderedTextSHA256": "5a8a35f29bf7336199a3e4e2095d073d03b4818df0e9ab49a8c5c6ad8cb91a2a",
+    "sourceSHA256": "5a8a35f29bf7336199a3e4e2095d073d03b4818df0e9ab49a8c5c6ad8cb91a2a",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  },
+  {
+    "id": "gretel-validation-3db6d0b88a7249128b7dbef4c73905f9",
+    "windowCount": 1,
+    "framedTokens": 128,
+    "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+    "compute": "coreML",
+    "threshold": 0.7,
+    "originalStdoutSHA256": "b122c6f6db136bfca73c095ca9dafda2e4dc225615d9af7aef7b1b221a69a5bd",
+    "renderedTextSHA256": "48d8aa20998092475dbc43c864879b49a91c4518baf76d4fcf8e013d09b4a48f",
+    "sourceSHA256": "48d8aa20998092475dbc43c864879b49a91c4518baf76d4fcf8e013d09b4a48f",
+    "model": [],
+    "hybrid": [],
+    "typed": [],
+    "modelRedacted": false,
+    "patternRedacted": false,
+    "redacted": false,
+    "suppressMedia": false
+  }
+]

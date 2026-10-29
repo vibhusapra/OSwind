@@ -1,9 +1,9 @@
 # Public domain privacy validation
 
 This follow-up broadens the [72-source authored fixture](NATIVE-PII-QUALITY.md)
-with externally authored synthetic English documents. **Data admission is
-complete; native model quality results are pending.** No threshold, privacy
-policy or production learned-redaction mode is accepted by preparing data.
+with externally authored synthetic English documents. **All 918 native inspections completed; quality remains insufficient for an
+accepted production policy.** Data admission and execution contracts pass,
+while missed values and over-redaction remain substantial.
 
 The source is [Gretel's public validation split](https://huggingface.co/datasets/gretelai/gretel-pii-masking-en-v1/tree/e06eb1499ca8d54470f085021cd8e54f9efac7fd),
 revision `e06eb1499ca8d54470f085021cd8e54f9efac7fd`. Its pinned
@@ -124,15 +124,74 @@ changes publication, not source text, annotations, selection or model input.
 Future native output text also stays local; public observations must omit raw
 text and entity values.
 
-## Planned native evaluation
+## Native evaluation and results
 
 `prepare-pii-domain-eval.py` freezes the exact signed CLI, selected corpus,
 admission receipt, code and local model/runtime bytes before any native call.
 `evaluate-pii-domain-quality.py` first measures actual rule admission through a
-fresh explicit synthetic library, then makes **918 planned inspections**:
+fresh explicit synthetic library, then completed **918 inspections**:
 153 sources × CPU/Core ML × thresholds 0.3/0.5/0.7. Model and combined masks are
-scored separately; every final mask must equal the union of actual learned and
-actual shipping-rule masks. Failed calls/refusals retain their original receipt.
+scored separately; all final masks equal the union of actual learned and actual
+shipping-rule masks. All native calls exit normally. The signed product is
+`7e21e0f`, frozen evaluation tooling is `4994f97`, and the binary SHA256 is
+`45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418`.
+No product source, native app build or installation changes.
+
+| Backend / threshold | Learned values fully masked | Combined values fully masked | Policy-negatives flagged | Combined character precision / recall |
+| --- | ---: | ---: | ---: | ---: |
+| Production rules | — | 45/250 | 0/45 | 81.59% / 14.17% |
+| CPU 0.3 | 229/250 | 229/250 | 42/45 | 60.62% / 93.49% |
+| CPU 0.5 | 189/250 | 189/250 | 25/45 | 74.48% / 72.23% |
+| CPU 0.7 | 111/250 | 118/250 | 4/45 | 86.53% / 37.25% |
+| Core ML 0.3 | 227/250 | 227/250 | 42/45 | 58.97% / 92.63% |
+| Core ML 0.5 | 186/250 | 186/250 | 26/45 | 73.84% / 72.66% |
+| Core ML 0.7 | 109/250 | 115/250 | 3/45 | 87.15% / 37.21% |
+
+At CPU 0.7 only 2/26 email values and 1/36 address values are fully covered.
+A partially masked identifier does not count as protected. These are 250
+values across 153 documents, not 918 independent quality examples. Rule
+protection has a narrower intended scope than the selected policy; its low
+recall alone does not justify replacing it. Policy-negatives contain other
+annotated PII, so these flags measure disagreement with the stated policy,
+not a universal definition of harmless text.
+
+Exact combined masks agree on 135/153 sources at 0.3, 142/153 at 0.5, and
+146/153 at 0.7. Model masks alone agree on 145/153 at 0.7. CPU512/CoreML128
+window contexts differ on longer documents; this run does not isolate context
+effects from provider numerical effects. Differences remain in the receipt;
+no backend substitutes for another. The earlier short 72-source exact mask
+parity remains separately scoped.
+
+The [complete receipt](../benchmarks/pii-domain-validation-v1.json) binds ten
+public files and every native operation. Published observations contain only
+source/output hashes, model metadata, labels and original-source codepoint
+ranges. Raw source, rendered text and original JSON remain local. All 918
+public metric/union/flag checks replay without source text or model packages:
+
+```sh
+python3 scripts/test-pii-coordinate-quality.py
+python3 scripts/replay-pii-domain-quality.py
+```
+
+Eight new coordinate-scorer tests pass, including agreement with the literal
+scorer on owned Unicode examples. Combined with the 14 source-admission,
+14 existing literal-scorer and ten native-output tests, 46 offline tests pass.
+Full local replay independently rechecks every original stdout/stderr hash,
+UTF-16 conversion, rendered text, model/compute/threshold identity, flags and
+actual rule/learned union, and matches every metric with both scorers:
+
+```sh
+python3 scripts/replay-pii-domain-quality.py \
+  --corpus /absolute/new/admitted/corpus.json \
+  --native-output /absolute/original/native-evaluation
+```
+
+Returned suppression flags do not qualify actual screenshot/audio admission.
+Operation times include startup/loading and uncontrolled host activity; public
+alternative-model asset preparation overlapped some Core ML calls. No latency,
+energy or physical GPU-placement advantage follows. Stronger Small/Base
+candidates are prepared for separate local reference comparison; no candidate
+is selected for production.
 
 ```sh
 python3 scripts/prepare-pii-domain-eval.py \
@@ -155,5 +214,5 @@ the ordered evaluation. Longer sources can have different CPU512/CoreML128
 window contexts, so backend mask agreement is measured and reported, not
 assumed or required. No favorable backend substitution or automatic retry.
 Raw operation times do not establish latency/energy or physical GPU placement.
-No quality, production admission, release or competitor acceptance follows from
-this data/preparation work. F047 remains TODO.
+No quality operating point, production admission, release or competitor
+acceptance is established. F047 remains TODO.

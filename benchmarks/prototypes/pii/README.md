@@ -118,3 +118,19 @@ python3 scripts/replay-pii-native-quality.py
 ```
 
 Replay performs no inference/download or history access. For fresh native experiments, follow the explicit prepare/evaluate recipe in the linked quality document and use new output directories. No Swift/C++ source or app binary changes in this follow-up.
+
+## External domain validation
+
+[Domain validation](../../../docs/PII-DOMAIN-VALIDATION.md) completes918 native inspections on153 frozen external synthetic English documents (250 values/45 policy-negatives), with both backend results retained. At0.7, combined CPU coverage is118/250 with4/45 flagged; Core ML115/250 with3/45. No privacy operating point is accepted.
+
+`gretel-validation-v1/manifest.json` and `observations-v1/` publish hashes, labels and original-source codepoint ranges only. Source/entity/rendered text remains local after push protection flags credential-shaped synthetic source values; no bypass or credential test. The [receipt](../../pii-domain-validation-v1.json) binds ten public files and every operation.
+
+```sh
+python3 scripts/test-pii-coordinate-quality.py
+python3 scripts/replay-pii-domain-quality.py
+# Full literal/UTF16/rendering checks, without inference, require local inputs:
+python3 scripts/replay-pii-domain-quality.py \
+  --corpus /absolute/prepared/corpus.json --native-output /absolute/original/evaluation
+```
+
+Public replay proves coordinate metrics, identity, union and flag consistency; it does not reproduce literal source alignment/rendering without the explicit local files. Both modes pass on all918 stored observations. Stronger Small/Base candidates are downloaded and verified for a separate reference comparison, not installed into OSwind.
