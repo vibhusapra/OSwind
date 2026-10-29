@@ -175,19 +175,46 @@ private final class OwnedVaultNativeTrace:@unchecked Sendable {
     func markFailure() {lock.withLock {failureStage=stage;stage="failure-cleanup"}}
     func append(_ event:VaultNativeDiagnostic) {lock.withLock {total+=1;if event.summary.status != 0 {nonzero+=1};if items.count==512 {items.removeFirst();dropped+=1};items.append(.init(stage:stage,event:event))}}
     func snapshot()->Report {lock.withLock {.init(stage:stage,failureStage:failureStage,total:total,nonzero:nonzero,dropped:dropped,events:items,beforeMutations:boundaries)}}
+    static func redactedJSON(_ encoded:Data,roots:[URL],secret:Data)throws->Data {
+        guard encoded.range(of:secret)==nil else {throw OSwindError.invalid("Fixture credential appeared in native diagnostic capture")}
+        let encoder=JSONEncoder()
+        var text=String(decoding:encoded,as:UTF8.self)
+        // Match JSON's escaped representation, including /private aliases and
+        // quoted/non-ASCII path components. Longer roots must be replaced first.
+        for path in Set(roots.map(\.path)).sorted(by:{$0.count==$1.count ? $0<$1:$0.count>$1.count}) {
+            let quoted=String(decoding:try encoder.encode(path),as:UTF8.self)
+            text=text.replacingOccurrences(of:String(quoted.dropFirst().dropLast()),with:"<owned-fixture>")
+        }
+        return Data(text.utf8)
+    }
     func save(root:URL,secret:Data,failed:Bool)throws {
         let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys]
         let encoded=try encoder.encode(snapshot())
         // Fixture-only observation can contain owned system-tool text. Refuse
         // to print/write any trace containing the generated credential.
-        guard encoded.range(of:secret)==nil else {throw OSwindError.invalid("Fixture credential appeared in native diagnostic capture")}
-        let text=String(decoding:encoded,as:UTF8.self).replacingOccurrences(of:root.path,with:"<owned-fixture>")
+        let exported=try Self.redactedJSON(encoded,roots:[root,self.root],secret:secret)
+        let text=String(decoding:exported,as:UTF8.self)
         if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_VAULT_TRACE_DIR"] {
             let directory=URL(fileURLWithPath:destination,isDirectory:true);try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
             try Data(text.utf8).write(to:directory.appendingPathComponent(root.lastPathComponent+(failed ? "-exception":"-completed")+".json"),options:.withoutOverwriting)
         }
         if failed || snapshot().nonzero>0 {print("Owned vault native result trace: "+text)}
         else {let s=snapshot();print("Owned vault native trace: calls=\(s.total) nonzero=\(s.nonzero) dropped=\(s.dropped)")}
+    }
+}
+final class OwnedVaultNativeTraceTests:XCTestCase {
+    func testEscapedAndCanonicalFixturePathsAreRedactedBeforeExport() throws {
+        let roots=["/var/tmp/owned-\"café\"","/private/var/tmp/owned-\"café\""].map {URL(fileURLWithPath:$0)}
+        let original=["alias":roots[0].path+"/Library/memory.sqlite","canonical":roots[1].path+"/Library/memory.sqlite","native":"Failure at "+roots[1].path+"/image"]
+        let encoded=try JSONEncoder().encode(original)
+        let exported=try OwnedVaultNativeTrace.redactedJSON(encoded,roots:roots,secret:Data("fixture-credential".utf8))
+        let result=try JSONDecoder().decode([String:String].self,from:exported)
+        XCTAssertEqual(result,["alias":"<owned-fixture>/Library/memory.sqlite","canonical":"<owned-fixture>/Library/memory.sqlite","native":"Failure at <owned-fixture>/image"])
+        XCTAssertTrue(result.values.allSatisfy {!$0.contains("/var/tmp/")})
+    }
+    func testCredentialBearingTraceIsRefusedBeforeExport() throws {
+        let secret=Data("owned-fixture-secret".utf8),encoded=try JSONEncoder().encode(["diagnostic":"owned-fixture-secret"])
+        XCTAssertThrowsError(try OwnedVaultNativeTrace.redactedJSON(encoded,roots:[],secret:secret))
     }
 }
 final class NativeVaultDetachSettlementTests:XCTestCase {
