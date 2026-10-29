@@ -69,6 +69,8 @@ jobs:
         run: python3 scripts/import-preparation-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-import-preparation"
       - name: Verify bounded import files and pending collector wipe ordering
         run: python3 scripts/import-input-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-import-input"
+      - name: Verify experimental import PII refuses missing assets and invalid settings offline
+        run: python3 scripts/pii-import-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pii-import"
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
@@ -82,6 +84,9 @@ jobs:
         with:
           name: owned-pattern-terminal-receipts
           path: |
+            ${{ runner.temp }}/oswind-pii-import/report.json
+            ${{ runner.temp }}/oswind-pii-import/*.stdout
+            ${{ runner.temp }}/oswind-pii-import/*.stderr
             ${{ runner.temp }}/oswind-pattern-privacy/report.json
             ${{ runner.temp }}/oswind-vault-terminal/report.json
             ${{ runner.temp }}/oswind-vault-terminal/*.pty-output

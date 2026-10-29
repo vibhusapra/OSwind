@@ -22,6 +22,7 @@ public enum LimitlessImport {
 }
 
 public struct LimitlessImportResult:Codable,Sendable {
+    public var learnedPrivacy:PIIImportSummary?=nil
     public var format="OSwind Limitless API text import",version=1
     public var requested:Int,imported:Int,excluded:Int,hasMorePages:Bool,sourceIDs:[String]
 }
@@ -174,4 +175,17 @@ public extension MemoryStore {
             return .init(requested:page.memories.count,imported:result.imported,excluded:result.excluded,hasMorePages:page.hasMorePages,sourceIDs:page.ids)
         }
     }
+    func importLimitlessAPI(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> LimitlessImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        return try await importLimitlessAPI(data:LibraryImportFile.read(url,maximumBytes:LimitlessImport.maximumBytes),embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot,admission:reservation.lease,scanner:scanner)
+    }
+    func importLimitlessAPI(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> LimitlessImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        try Task.checkCancellation();let page=try LimitlessPage(data)
+        let result=try await importDecodedMemoriesWithPII(page.memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot,admission:reservation.lease,scanner:scanner)
+        return .init(learnedPrivacy:result.learnedPrivacy,requested:page.memories.count,imported:result.imported,excluded:result.excluded,hasMorePages:page.hasMorePages,sourceIDs:page.ids)
+    }
+
 }

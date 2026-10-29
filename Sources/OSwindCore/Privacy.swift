@@ -84,6 +84,7 @@ public enum CaptureProfile: String, Codable, CaseIterable, Sendable {
 public struct AppSettings: Codable, Equatable, Sendable {
     public var profile: CaptureProfile = .balanced
     public var privacy = PrivacyPolicy()
+    public var piiImports = PIIImportConfiguration()
     public var visualCaptureMode:VisualCaptureMode = .snapshots
     public var allDisplays = false
     public var snapshotRegions=SnapshotRegionSettings()
@@ -104,11 +105,12 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,piiImports,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
         privacy = try c.decodeIfPresent(PrivacyPolicy.self,forKey:.privacy) ?? privacy
+        piiImports = try c.decodeIfPresent(PIIImportConfiguration.self,forKey:.piiImports) ?? piiImports
         visualCaptureMode = try c.decodeIfPresent(VisualCaptureMode.self,forKey:.visualCaptureMode) ?? visualCaptureMode
         allDisplays = try c.decodeIfPresent(Bool.self,forKey:.allDisplays) ?? allDisplays
         // A malformed new selector must not fall back to capturing all displays.
