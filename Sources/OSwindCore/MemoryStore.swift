@@ -664,30 +664,32 @@ public final class MemoryStore: @unchecked Sendable {
                 try preparationProgress?(prepared.count)
             }
             try Task.checkCancellation();try requireMediaRootIdentity()
-            lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
-            do {
-                // Full stored payloads include favorite/tags and typed evidence,
-                // unlike evidenceHash. Missing targets are fenced as well, so a
-                // concurrent insert cannot be silently overwritten by this batch.
-                for id in ids {
-                    try Task.checkCancellation()
-                    guard try importStoredSource(id,decodeMemory:false).digest==snapshot[id]?.digest else {throw OSwindError.unavailable("An import target or linked source changed during preparation. Retry the import using the current library.")}
-                }
-                for m in prepared {
-                    try Task.checkCancellation();try insert(m)
-                    if let embedder {
-                        let current=try passagesCurrent(m,modelID:embedder.modelID)
-                        if reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
-                        if !current,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+            // Match audio/visual admission: activity state mutex precedes SQL.
+            // Another writer may borrow this same reservation while preparing.
+            return try activity.withActive(for:mediaRootIdentity) {
+                lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
+                do {
+                    // Full stored payloads include favorite/tags and typed evidence,
+                    // unlike evidenceHash. Missing targets are fenced as well, so a
+                    // concurrent insert cannot be silently overwritten by this batch.
+                    for id in ids {
+                        try Task.checkCancellation()
+                        guard try importStoredSource(id,decodeMemory:false).digest==snapshot[id]?.digest else {throw OSwindError.unavailable("An import target or linked source changed during preparation. Retry the import using the current library.")}
                     }
-                }
-                try Task.checkCancellation();try requireMediaRootIdentity()
-                try activity.withActive(for:mediaRootIdentity) {
+                    for m in prepared {
+                        try Task.checkCancellation();try insert(m)
+                        if let embedder {
+                            let current=try passagesCurrent(m,modelID:embedder.modelID)
+                            if reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
+                            if !current,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+                        }
+                    }
+                    try Task.checkCancellation();try requireMediaRootIdentity()
                     if let settingsSnapshot {try settingsSnapshot.withCurrent(root:root,policy:policy) {try exec("COMMIT")}}
                     else {try exec("COMMIT")}
-                }
-                _ = finishRecapInvalidation();return report
-            } catch {try? exec("ROLLBACK");throw error}
+                    _ = finishRecapInvalidation();return report
+                } catch {try? exec("ROLLBACK");throw error}
+            }
         }
     }
 

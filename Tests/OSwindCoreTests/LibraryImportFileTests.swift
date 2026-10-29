@@ -3,6 +3,26 @@ import Darwin
 import CSQLite
 @testable import OSwindCore
 
+private final class ImportLeaseOrderProbe:@unchecked Sendable {
+    let prepared=XCTestExpectation(description:"Import finished preparation")
+    let entered=XCTestExpectation(description:"Other writer holds borrowed activity")
+    let forbiddenBegin=XCTestExpectation(description:"Import must not reserve SQLite while waiting for shared activity")
+    private let condition=NSCondition()
+    private var held=false,released=false
+    init() {forbiddenBegin.isInverted=true}
+    var holding:Bool {condition.lock();defer {condition.unlock()};return held}
+    func waitForHolder() throws {
+        condition.lock();defer {condition.unlock()};prepared.fulfill();let deadline=Date().addingTimeInterval(20)
+        while !held {guard condition.wait(until:deadline) else {throw OSwindError.unavailable("Lease holder test timed out")}}
+    }
+    func hold() throws {
+        condition.lock();defer {held=false;condition.unlock()};held=true;condition.broadcast();entered.fulfill()
+        let deadline=Date().addingTimeInterval(20)
+        while !released {guard condition.wait(until:deadline) else {throw OSwindError.unavailable("Lease release test timed out")}}
+    }
+    func release() {condition.lock();released=true;condition.broadcast();condition.unlock()}
+}
+
 final class LibraryImportFileTests:XCTestCase {
     var root:URL!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-import-file-"+UUID().uuidString);try Paths.ensure(root)}
@@ -112,5 +132,28 @@ final class LibraryImportFileTests:XCTestCase {
             {try store.importCollectorBatch(bad,policy:snapshot.settings.privacy,settingsSnapshot:snapshot).imported},
             {try store.importLimitlessAPI(data:bad,policy:snapshot.settings.privacy,settingsSnapshot:snapshot).imported}
         ] {XCTAssertThrowsError(try operation()) {XCTAssertTrue($0.localizedDescription.contains("Saved settings changed"))}}
+    }
+    func testWaitingForSharedActivityDoesNotHoldSQLiteAheadOfOtherWriters() async throws {
+        let store=try MemoryStore(root:root.appendingPathComponent("library")),activity=try store.mediaWriteLease(),probe=ImportLeaseOrderProbe()
+        defer {probe.release();activity.release();try? store.close()}
+        try store.withRoutineDatabase {db in
+            sqlite3_trace_v2(db.handle,UInt32(SQLITE_TRACE_STMT),{_,context,_,sql in
+                if let context,let sql,String(cString:sql.assumingMemoryBound(to:CChar.self))=="BEGIN IMMEDIATE" {
+                    let probe=Unmanaged<ImportLeaseOrderProbe>.fromOpaque(context).takeUnretainedValue()
+                    if probe.holding {probe.forbiddenBegin.fulfill()}
+                };return 0
+            },Unmanaged.passUnretained(probe).toOpaque())
+        }
+        defer {try? store.withRoutineDatabase {sqlite3_trace_v2($0.handle,0,nil,nil)}}
+        let importer=Task.detached {try store.importDecodedMemoriesDetailed([Memory(id:"owned",kind:.note,text:"Owned input")],embedder:nil,policy:.init(),admission:activity,preparationProgress:{_ in try probe.waitForHolder()})}
+        await fulfillment(of:[probe.prepared],timeout:10)
+        let holder=Task.detached {try activity.withActive(for:store.mediaRootIdentity) {try probe.hold()}}
+        await fulfillment(of:[probe.entered],timeout:10)
+        await fulfillment(of:[probe.forbiddenBegin],timeout:1)
+        let progressed=XCTestExpectation(description:"SQLite remains available while activity is borrowed")
+        let reader=Task.detached {let count=try store.stats().count;progressed.fulfill();return count}
+        await fulfillment(of:[progressed],timeout:2)
+        probe.release();try await holder.value;let count=try await reader.value;XCTAssertEqual(count,0)
+        let result=try await importer.value;XCTAssertEqual(result.imported,1)
     }
 }
