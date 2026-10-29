@@ -35,20 +35,33 @@ public struct PrivacyPolicy: Codable, Equatable, Sendable {
         return nil
     }
     public func sanitize(_ text: String) -> (text: String, redacted: Bool) {
-        guard redactSecrets else { return (text, false) }
-        var result = text
-        for pattern in Self.secretPatterns { if let re = try? NSRegularExpression(pattern: pattern) { result = re.stringByReplacingMatches(in: result, range: NSRange(result.startIndex..., in: result), withTemplate: "[REDACTED]") } }
-        return (result, result != text)
+        let ranges=sensitiveRanges(in:text)
+        guard !ranges.isEmpty else {return (text,false)}
+        let original=text as NSString
+        // Every detector sees the original text. An earlier key match must
+        // never erase the trigger needed to recognize a later secret value.
+        let masks=ranges.map {original.rangeOfComposedCharacterSequences(for:$0)}.sorted {$0.location<$1.location}
+        var merged=[NSRange]();merged.reserveCapacity(masks.count)
+        for range in masks {
+            if let previous=merged.last,range.location<=NSMaxRange(previous) {
+                merged[merged.count-1]=NSRange(location:previous.location,length:max(NSMaxRange(previous),NSMaxRange(range))-previous.location)
+            } else {merged.append(range)}
+        }
+        let output=NSMutableString(string:text)
+        for range in merged.reversed() {output.replaceCharacters(in:range,with:"[REDACTED]")}
+        return (output as String,true)
     }
-    /// Original-source ranges for combining experimental detectors without
-    /// allowing an earlier mask to hide a later detector's trigger.
+    /// Production and explicit learned inspection use the same original-source
+    /// pattern matches; neither evaluates patterns against already-masked text.
     func sensitiveRanges(in text:String)->[NSRange] {
         guard redactSecrets else {return []}
         let range=NSRange(text.startIndex...,in:text)
-        return Self.secretPatterns.flatMap {pattern in
-            (try? NSRegularExpression(pattern:pattern))?.matches(in:text,range:range).map(\.range) ?? []
-        }
+        return Self.secretDetectors.flatMap {$0.matches(in:text,range:range).map(\.range)}
     }
+    // These fixed program literals must compile. Do not silently drop a
+    // detector on a developer error. Instances are immutable and shared;
+    // matching sources and replacement buffers remain local to each call.
+    private static let secretDetectors=secretPatterns.map {try! NSRegularExpression(pattern:$0)}
     private static let secretPatterns = [
             #"\b(?:sk|ghp|github_pat|sk-ant)-?[A-Za-z0-9_\-]{20,}\b"#,
             #"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"#,

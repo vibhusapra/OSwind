@@ -54,12 +54,26 @@ jobs:
         run: python3 scripts/pii-inspection-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --model-dir "$RUNNER_TEMP/absent-pii-model" --runtime-library "$RUNNER_TEMP/absent-pii-runtime.dylib" --root "$RUNNER_TEMP/pii-cli-offline"
       - name: Verify history-free PII setup CLI without downloads
         run: python3 scripts/pii-setup-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/pii-setup-offline"
+      - name: Verify original-source pattern privacy across imports exports and media
+        run: python3 scripts/privacy-mask-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pattern-privacy"
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
           python3 scripts/vault-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-interruptions"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal-busy" --held-reader
+      - name: Retain owned pattern and terminal process receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-pattern-terminal-receipts
+          path: |
+            ${{ runner.temp }}/oswind-pattern-privacy/report.json
+            ${{ runner.temp }}/oswind-vault-terminal/report.json
+            ${{ runner.temp }}/oswind-vault-terminal/*.pty-output
+            ${{ runner.temp }}/oswind-vault-terminal-busy/report.json
+            ${{ runner.temp }}/oswind-vault-terminal-busy/*.pty-output
+          if-no-files-found: ignore
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise explicit text collectors and Python SDK on encrypted APFS
