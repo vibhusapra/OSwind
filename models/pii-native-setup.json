@@ -1,0 +1,132 @@
+{
+  "format": 1,
+  "id": "gliner-pii-edge-native-v1",
+  "revision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "runtimeVersion": "1.24.2",
+  "files": [
+    {
+      "path": "model/onnx/model.onnx",
+      "bytes": 181078966,
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+      "url": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/resolve/9b7f39b0a2da971a5beea78d35f1539d4009c891/onnx/model.onnx?download=true"
+    },
+    {
+      "path": "model/tokenizer.json",
+      "bytes": 3583593,
+      "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205",
+      "url": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/resolve/9b7f39b0a2da971a5beea78d35f1539d4009c891/tokenizer.json?download=true"
+    },
+    {
+      "path": "model/tokenizer_config.json",
+      "bytes": 21214,
+      "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27",
+      "url": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/resolve/9b7f39b0a2da971a5beea78d35f1539d4009c891/tokenizer_config.json?download=true"
+    },
+    {
+      "path": "model/MODEL-CARD.md",
+      "bytes": 15896,
+      "sha256": "88f7fb463e7ab0b256caeb5da30af9262ba1b223598576dc12e599d257e91c23",
+      "url": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/resolve/9b7f39b0a2da971a5beea78d35f1539d4009c891/README.md?download=true"
+    },
+    {
+      "path": "model/gliner_config.json",
+      "bytes": 4316,
+      "sha256": "77e6b57335c4bfd461e9041682196dd6c373a0b09bbd9269ef9e95b807915340",
+      "url": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/resolve/9b7f39b0a2da971a5beea78d35f1539d4009c891/gliner_config.json?download=true"
+    },
+    {
+      "path": "licenses/Ettin-MODEL-CARD.md",
+      "bytes": 40309,
+      "sha256": "af0966cf06fc770f289fd6a81abbdb9d8ab2d010c8b38ae9aa46807547c5a8cd",
+      "url": "https://huggingface.co/jhu-clsp/ettin-encoder-32m/resolve/1b8ba06455dd44f80fc9c1ca9e22806157a57379/README.md?download=true"
+    },
+    {
+      "path": "licenses/Ettin-MIT.txt",
+      "bytes": 1123,
+      "sha256": "7e096e455b9dac457008fa960d25e64066416f417a71c7ad61fbdd65158ba9b9",
+      "url": "https://raw.githubusercontent.com/jhu-clsp/ettin-encoder-vs-decoder/6cbf954a2ecaa7c753be6468a1bccdef401d5f93/LICENSE"
+    },
+    {
+      "path": "runtime.whl",
+      "bytes": 17217857,
+      "sha256": "d8a50b422d45c0144864c0977d04ad4fa50a8a48e5153056ab1f7d06ea9fc3e2",
+      "url": "https://files.pythonhosted.org/packages/23/1c/38af1cfe82c75d2b205eb5019834b0f2b0b6647ec8a20a3086168e413570/onnxruntime-1.24.2-cp312-cp312-macosx_14_0_arm64.whl"
+    }
+  ],
+  "runtimeMember": "onnxruntime/capi/libonnxruntime.1.24.2.dylib",
+  "runtimeBytes": 27651368,
+  "runtimeSHA256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa",
+  "runtimeLicenseMember": "onnxruntime/LICENSE",
+  "runtimeLicenseSHA256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+  "bucketBytes": 181078847,
+  "bucketSHA256": "a6a66d8a988b9507b6d8d714a727ca47fcacef6b5090825f79b86be917e3e136",
+  "patches": [
+    {
+      "offset": 19,
+      "before": "9b97ac56",
+      "after": "a496ac56",
+      "meaning": "GraphProto message length"
+    },
+    {
+      "offset": 181078669,
+      "before": "5a340a09696e7075745f69647312270a25080712210a0c120a62617463685f73697a650a11120f73657175656e63655f6c656e677468",
+      "after": "5a1c0a09696e7075745f696473120f0a0d080712090a0208010a03088001",
+      "meaning": "Graph input"
+    },
+    {
+      "offset": 181078723,
+      "before": "5a390a0e617474656e74696f6e5f6d61736b12270a25080712210a0c120a62617463685f73697a650a11120f73657175656e63655f6c656e677468",
+      "after": "5a210a0e617474656e74696f6e5f6d61736b120f0a0d080712090a0208010a03088001",
+      "meaning": "Graph input"
+    },
+    {
+      "offset": 181078782,
+      "before": "5a350a0a776f7264735f6d61736b12270a25080712210a0c120a62617463685f73697a650a11120f73657175656e63655f6c656e677468",
+      "after": "5a1d0a0a776f7264735f6d61736b120f0a0d080712090a0208010a03088001",
+      "meaning": "Graph input"
+    },
+    {
+      "offset": 181078837,
+      "before": "5a2d0a0c746578745f6c656e67746873121d0a1b080712170a0c120a62617463685f73697a650a07120576616c7565",
+      "after": "5a1e0a0c746578745f6c656e67746873120e0a0c080712080a0208010a020801",
+      "meaning": "Graph input"
+    },
+    {
+      "offset": 181078884,
+      "before": "624c0a066c6f6769747312420a400801123c0a0a1208706f736974696f6e0a0c120a62617463685f73697a650a11120f73657175656e63655f6c656e6774680a0d120b6e756d5f636c6173736573",
+      "after": "622c0a066c6f6769747312220a200801121c0a0208010a0e120c736f757263655f776f7264730a02080c0a020803",
+      "meaning": "Graph output"
+    }
+  ],
+  "samples": [
+    {
+      "id": "validation-9433c40dbdab",
+      "text": "Owned support note: my private phone number is +1 (202) 555-0100. Keep this private.",
+      "sourceSHA256": "29db039252418dac662b961ab13f40d7c83a5e5e63d172ba619ae280d592466f",
+      "ranges": [
+        {
+          "location": 47,
+          "length": 17
+        }
+      ],
+      "labels": [
+        1
+      ]
+    },
+    {
+      "id": "validation-d434d76c94e6",
+      "text": "Owned support note: my password is OwnedOnly-0-Raven!42. Keep this private.",
+      "sourceSHA256": "1a7d65cfe095dc0b88c13320b9152d4f9be7f24807662ceb90aef5fd70abbbb5",
+      "ranges": [
+        {
+          "location": 35,
+          "length": 20
+        }
+      ],
+      "labels": [
+        10
+      ]
+    }
+  ],
+  "attribution": "GLiNER PII edge v1.0: knowledgator, declared Apache-2.0. https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/tree/9b7f39b0a2da971a5beea78d35f1539d4009c891\nEttin encoder32m: Johns Hopkins University Center for Language and Speech Processing, declared MIT. Model revision1b8ba06455dd44f80fc9c1ca9e22806157a57379. The pinned upstream code MIT notice is retained alongside the pinned model card.\nONNX Runtime1.24.2: Microsoft Corporation, MIT. Native dylib and license extracted from the checksum-pinned official PyPI macOS arm64 wheel. No Python installation or imported wheel code.\nCore ML derivative: six exact metadata/message-length patches of the original pinned graph. All other bytes are preserved; no fine-tuning or privacy operating point is implied.\n"
+}

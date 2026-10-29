@@ -1,0 +1,602 @@
+{
+  "format": "OSwind native PII setup qualification v1",
+  "recordedAtUTC": "2026-10-29T06:29:24.334382+00:00",
+  "source": "fef24c7eaa42c3ae81642ce96a058ff7c503efe1",
+  "base": "c8aa5cc48d08d236e8ec8d7143d514d5bac11dd3",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/74",
+  "F047Implemented": false,
+  "productionLearnedRedactorSelected": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "platform": {
+    "os": "Version 26.6.2 (Build 25G83)",
+    "availableGPU": "Apple M5 Max",
+    "scope": "Identity and requested Core ML CPUAndGPU policy are not per-operation placement or physical energy evidence"
+  },
+  "setup": {
+    "recipe": "models/pii-native-setup.json",
+    "recipeBuildID": "a3a2575a7ec8cf79e85f21ec2e913ff0f68633919fe6ad14cc88c8f1a034b09f",
+    "downloadFiles": 8,
+    "downloadBytes": 201963274,
+    "installedPayloadBytes": 393488824,
+    "installedFilesIncludingReceipt": 13,
+    "metadataPatches": 6,
+    "CPUModelSHA256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+    "CoreMLModelSHA256": "a6a66d8a988b9507b6d8d714a727ca47fcacef6b5090825f79b86be917e3e136",
+    "runtimeSHA256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa",
+    "preparedOS": "Version 26.6.2 (Build 25G83)",
+    "compatibilitySamples": 4,
+    "computePolicies": [
+      "cpu",
+      "coreML"
+    ],
+    "PythonInstalledOrImported": false,
+    "archiveMembersRetained": [
+      "onnxruntime/capi/libonnxruntime.1.24.2.dylib",
+      "onnxruntime/LICENSE"
+    ],
+    "publication": "Verified private payload published atomically; existing corrupt installations refused and preserved",
+    "verification": "Known file hashes/preparation receipt only; no inference/download/creation",
+    "modelCacheOutsideHistory": true,
+    "modelAndRuntimeBundled": false,
+    "sourceCredentialReuse": false,
+    "scope": "Sample compatibility and asset integrity only; no accepted privacy operating point"
+  },
+  "payload": {
+    "ATTRIBUTION.txt": {
+      "bytes": 762,
+      "sha256": "e7a8fc089369fa0196aa7d447f5a481c1b5787f355143fbef64f7c07bc6f17f8"
+    },
+    "OSWIND-PII.json": {
+      "bytes": 327,
+      "sha256": "30548c9743f8bedd5668154c2226e9f6b069e02b6361e835dc53596c24a7058a"
+    },
+    "licenses/Ettin-MIT.txt": {
+      "bytes": 1123,
+      "sha256": "7e096e455b9dac457008fa960d25e64066416f417a71c7ad61fbdd65158ba9b9"
+    },
+    "licenses/Ettin-MODEL-CARD.md": {
+      "bytes": 40309,
+      "sha256": "af0966cf06fc770f289fd6a81abbdb9d8ab2d010c8b38ae9aa46807547c5a8cd"
+    },
+    "licenses/GLiNER-Apache-2.0.txt": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "licenses/ONNXRuntime-MIT.txt": {
+      "bytes": 1073,
+      "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+    },
+    "model/MODEL-CARD.md": {
+      "bytes": 15896,
+      "sha256": "88f7fb463e7ab0b256caeb5da30af9262ba1b223598576dc12e599d257e91c23"
+    },
+    "model/gliner_config.json": {
+      "bytes": 4316,
+      "sha256": "77e6b57335c4bfd461e9041682196dd6c373a0b09bbd9269ef9e95b807915340"
+    },
+    "model/onnx/model-bucket128.onnx": {
+      "bytes": 181078847,
+      "sha256": "a6a66d8a988b9507b6d8d714a727ca47fcacef6b5090825f79b86be917e3e136"
+    },
+    "model/onnx/model.onnx": {
+      "bytes": 181078966,
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836"
+    },
+    "model/tokenizer.json": {
+      "bytes": 3583593,
+      "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205"
+    },
+    "model/tokenizer_config.json": {
+      "bytes": 21214,
+      "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27"
+    },
+    "runtime/libonnxruntime.1.24.2.dylib": {
+      "bytes": 27651368,
+      "sha256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa"
+    }
+  },
+  "full": {
+    "defined": 1020,
+    "passed": 1018,
+    "skipped": 2,
+    "failures": 0,
+    "suiteAwakeSeconds": 431.207,
+    "suiteWallSeconds": 431.288,
+    "logSHA256": "d7844d111366a104d1e52bc1405d3fa9a870d65a415b23657e958f5f6df092a7"
+  },
+  "threadSanitizer": {
+    "defined": 168,
+    "passed": 168,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 175.848,
+    "suiteWallSeconds": 175.879,
+    "logSHA256": "39a8d8f593f9683573e82c42c17fb67435e9f2844250b75afc85343b8b9f62fa"
+  },
+  "optimizedPII": {
+    "defined": 64,
+    "passed": 64,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 14.792,
+    "suiteWallSeconds": 14.797,
+    "logSHA256": "c4ba6328044d9e6da107c7eb745b67efe9c288fbbcb8eb88f639c021cb6b206d"
+  },
+  "nativeReferenceChecks": {
+    "full-most-optins-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "pii-visual-tsan-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "pii-release-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ]
+  },
+  "orderedOperations": [
+    {
+      "name": "catalog-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.024198458064347506,
+      "systemSeconds": 0.02419877052307129
+    },
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 439.5300095831044,
+      "systemSeconds": 439.533490896225
+    },
+    {
+      "name": "pii-visual-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 208.62406266690232,
+      "systemSeconds": 208.62571597099304
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 49.58459987514652,
+      "systemSeconds": 49.58499312400818
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.7969435839913785,
+      "systemSeconds": 1.7969589233398438
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 10.984800542006269,
+      "systemSeconds": 10.984888076782227
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.07880629086866975,
+      "systemSeconds": 0.07880711555480957
+    },
+    {
+      "name": "pii-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 6.530986374942586,
+      "systemSeconds": 6.5310378074646
+    },
+    {
+      "name": "pii-setup-v1",
+      "exitCode": 0,
+      "awakeSeconds": 48.76714845816605,
+      "systemSeconds": 48.7675359249115
+    },
+    {
+      "name": "pii-setup-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.1339169170241803,
+      "systemSeconds": 0.13391804695129395
+    },
+    {
+      "name": "pii-release-v1",
+      "exitCode": 0,
+      "awakeSeconds": 131.66375287505798,
+      "systemSeconds": 131.65154790878296
+    },
+    {
+      "name": "vendor-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.02517604106105864,
+      "systemSeconds": 0.025176048278808594
+    }
+  ],
+  "finalPackage": {
+    "scope": "Separately staged schema22 native PII preparation/inspection and Settings; assets outside the app, no learned capture policy, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "fef24c7eaa42c3ae81642ce96a058ff7c503efe1",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "69e877a9706a1fdc73b141ec965d597e30ceb3ba47c6e1118d63e6569d330b28",
+        "signedSHA256": "ddbae94ea4b9f657d0f94cc233e3fc636c5c800694240f240e55d72fd44d6b12",
+        "normalizedPayloadSHA256": "ec93a0488770595c76d30870661aebad266258fd6f84adc278c5480c375a8a49"
+      },
+      "oswindctl": {
+        "rawSHA256": "b44451aae6a3691eb9af6a0975e8eb6a78c57519b968cd522c2b7b2e482327c0",
+        "signedSHA256": "43289a2f15ccc3e3b15ae0422a823439a771c51ed61ba5b7b71cd38d23c5fbf8",
+        "normalizedPayloadSHA256": "798322f104a05b34a6bf59d0947adece6878acb8f47967fcbb5886ef4229939f"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "fcd7bb93bee56273b5a4bbc432d151ce2c8aef0977e30469caed3561fc31d669",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "da3a7438e058cc087b2e01af435c49a169c57db24ef3ff79662b88f6635fbd5c",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "CLI": {
+    "setupChecks": 19,
+    "offlineSetupChecks": 11,
+    "backwardCompatibleExplicitInspectionChecks": 25,
+    "freshPublicDownload": true,
+    "selectiveNativeExtractor": true,
+    "interruptedNativeDownload": {
+      "name": "interrupted-native-download",
+      "exitCode": 130,
+      "expectedCancellation": true,
+      "unpublishedWorkspacesRemaining": 0
+    },
+    "setupReportSHA256": "5b320fc86efdc03f7d7c1c7fac9565cc37477ee31c16933ee26f6accf87c80b0",
+    "offlineReportSHA256": "c004f95b2232d53b837fcdf281b86a1e9fc5653b5a25b73038995914639f3ab2",
+    "historyDirectoriesAbsent": true,
+    "scope": "Actual signed CLI, synthetic text and owned caches; timings are functional receipts, not performance measurements"
+  },
+  "renders": {
+    "configurations": [
+      {
+        "configuration": "renders-normal-v1",
+        "images": [
+          {
+            "file": "busy-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "3c1a0776d1acb7505284c0b8325741813476ac08336e18d323dfb235889d2221"
+          },
+          {
+            "file": "busy-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "e409d859b28dd846a8d3fc06e2b616cbb07f5045b2a1b15a38d5af15c7724db5"
+          },
+          {
+            "file": "failure-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "a5ba746c835ff5d73ee282f4eafd99ce4b1b8e52c35b4fe848967fe327980ab6"
+          },
+          {
+            "file": "failure-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "4f156e5308ab74afd42c12cc932e21ea92d3f5abad5c551bc12dd8cbe40d9f55"
+          },
+          {
+            "file": "idle-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "acacb202c209d73ffe0d14fc34128d9e7583f459fbe999e0e58425d82ad7bcb5"
+          },
+          {
+            "file": "idle-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "ff618d86e9dedf4f0aab1e58ce352b291e09d74273f9c0f08ebfc5d8b0111570"
+          },
+          {
+            "file": "ready-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "240f1bdc2e623f4eab86c6489de164c320b0be8c4a726a9956d073e541ff6a68"
+          },
+          {
+            "file": "ready-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "23db813260d334fc08f6841de129b91d1e9ad57b306ca14e09d1c6b6252277b4"
+          },
+          {
+            "file": "stopping-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "d9f1bf51cf47329ecc85aa2299fb83514ac7c61752bd9ce3091b9bf18ddcec74"
+          },
+          {
+            "file": "stopping-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "dcc613adfa51110bdcf07b681ffa330198ff4ad846f455887c6f5aeba64523b3"
+          }
+        ]
+      },
+      {
+        "configuration": "renders-tsan-v1",
+        "images": [
+          {
+            "file": "busy-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "3c1a0776d1acb7505284c0b8325741813476ac08336e18d323dfb235889d2221"
+          },
+          {
+            "file": "busy-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "e409d859b28dd846a8d3fc06e2b616cbb07f5045b2a1b15a38d5af15c7724db5"
+          },
+          {
+            "file": "failure-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "a5ba746c835ff5d73ee282f4eafd99ce4b1b8e52c35b4fe848967fe327980ab6"
+          },
+          {
+            "file": "failure-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "4f156e5308ab74afd42c12cc932e21ea92d3f5abad5c551bc12dd8cbe40d9f55"
+          },
+          {
+            "file": "idle-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "acacb202c209d73ffe0d14fc34128d9e7583f459fbe999e0e58425d82ad7bcb5"
+          },
+          {
+            "file": "idle-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "ff618d86e9dedf4f0aab1e58ce352b291e09d74273f9c0f08ebfc5d8b0111570"
+          },
+          {
+            "file": "ready-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "240f1bdc2e623f4eab86c6489de164c320b0be8c4a726a9956d073e541ff6a68"
+          },
+          {
+            "file": "ready-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "23db813260d334fc08f6841de129b91d1e9ad57b306ca14e09d1c6b6252277b4"
+          },
+          {
+            "file": "stopping-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "d9f1bf51cf47329ecc85aa2299fb83514ac7c61752bd9ce3091b9bf18ddcec74"
+          },
+          {
+            "file": "stopping-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "dcc613adfa51110bdcf07b681ffa330198ff4ad846f455887c6f5aeba64523b3"
+          }
+        ]
+      },
+      {
+        "configuration": "renders-optimized-v1",
+        "images": [
+          {
+            "file": "busy-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "3c1a0776d1acb7505284c0b8325741813476ac08336e18d323dfb235889d2221"
+          },
+          {
+            "file": "busy-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "e409d859b28dd846a8d3fc06e2b616cbb07f5045b2a1b15a38d5af15c7724db5"
+          },
+          {
+            "file": "failure-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "a5ba746c835ff5d73ee282f4eafd99ce4b1b8e52c35b4fe848967fe327980ab6"
+          },
+          {
+            "file": "failure-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "4f156e5308ab74afd42c12cc932e21ea92d3f5abad5c551bc12dd8cbe40d9f55"
+          },
+          {
+            "file": "idle-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "acacb202c209d73ffe0d14fc34128d9e7583f459fbe999e0e58425d82ad7bcb5"
+          },
+          {
+            "file": "idle-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "ff618d86e9dedf4f0aab1e58ce352b291e09d74273f9c0f08ebfc5d8b0111570"
+          },
+          {
+            "file": "ready-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "240f1bdc2e623f4eab86c6489de164c320b0be8c4a726a9956d073e541ff6a68"
+          },
+          {
+            "file": "ready-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "23db813260d334fc08f6841de129b91d1e9ad57b306ca14e09d1c6b6252277b4"
+          },
+          {
+            "file": "stopping-dark.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "d9f1bf51cf47329ecc85aa2299fb83514ac7c61752bd9ce3091b9bf18ddcec74"
+          },
+          {
+            "file": "stopping-light.png",
+            "width": 1420,
+            "height": 800,
+            "sha256": "dcc613adfa51110bdcf07b681ffa330198ff4ad846f455887c6f5aeba64523b3"
+          }
+        ]
+      }
+    ],
+    "normalImagesVisuallyReviewed": 10,
+    "states": [
+      "idle",
+      "ready",
+      "failure",
+      "busy",
+      "stopping"
+    ],
+    "appearances": [
+      "light",
+      "dark"
+    ],
+    "nonblankGuard": true,
+    "publishedSampleSHA256": "23db813260d334fc08f6841de129b91d1e9ad57b306ca14e09d1c6b6252277b4",
+    "scope": "Owned offscreen native AppKit/SwiftUI hosting views and injected actions; no native button-click or production GUI acceptance"
+  },
+  "visual": {
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "images": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "scope": "Current signed CLI functional recheck on an already-opened corpus, no paired speed/energy/new-holdout claim"
+  },
+  "cleanup": {
+    "recordedAtUTC": "2026-10-29T06:27:06.340470+00:00",
+    "source": "fef24c7eaa42c3ae81642ce96a058ff7c503efe1",
+    "packagingSource": "fef24c7eaa42c3ae81642ce96a058ff7c503efe1",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "retainedDevelopmentFindings": [
+    {
+      "kind": "initial compiler error",
+      "evidenceSHA256": "bb270aac974f212e7574a422fb898a97ec8cebc62891b3599c2a15b339527d8d",
+      "status": "Throwing && expression corrected; later builds/tests pass"
+    },
+    {
+      "kind": "insufficient render check",
+      "evidenceSHA256": "e612aae4ad233f339148fcf9fe1c38a84b2db845bc270d59a4d83f9a412cd4e8",
+      "status": "First ImageRenderer test returned blank backgrounds despite passing; native hosting views and nonblank assertion replace it"
+    },
+    {
+      "kind": "initial extraction path",
+      "evidenceSHA256": "1260937493da145eb9477036f508a02fe7de5d209bb02b933a5b45303f2dd9b8",
+      "status": "Development run extracted entire pinned wheel into scratch; final frozen signed run selects two members only"
+    }
+  ],
+  "inheritedCIFailure": {
+    "implementationSource": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+    "implementationRun": 40822289384,
+    "implementationJobs": "both success",
+    "laterHead": "c8aa5cc48d08d236e8ec8d7143d514d5bac11dd3",
+    "laterRun": 40824503723,
+    "job": 123284316910,
+    "benchmarkJob": 123284316716,
+    "benchmarkConclusion": "success",
+    "nativeConclusion": "failure",
+    "test": "NativeVaultDetachSettlementTests.testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment",
+    "selectedCases": 30,
+    "selectedPasses": 29,
+    "error": "The vault is still attached because files are in use. Close other readers and retry locking.",
+    "cause": "unproven; current native eject driver maps nonzero hdiutil failure to this message without exposing exit/stderr",
+    "nextAction": "Capture bounded native detach result/identity evidence on owned failures before selecting a repair; do not force detach or discard a failing observation"
+  },
+  "CI": {
+    "source": "fef24c7eaa42c3ae81642ce96a058ff7c503efe1",
+    "runID": 40827752090,
+    "benchmarkJob": {
+      "id": 123294596829,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "nativeJob": {
+      "id": 123294597134,
+      "status": "completed",
+      "conclusion": "success",
+      "ownedNativeVaultStep": "success"
+    },
+    "scope": "Both source jobs passed. This does not repair inherited PR73 failure; later documentation heads are separate.",
+    "checkedAtUTC": "2026-10-29T06:37:21.904714+00:00"
+  },
+  "limits": [
+    "Two normal skips: physical owned system-audio opt-in and locked/thermal visual admission",
+    "No selected learned capture/import/retrieval/export policy, representative hybrid privacy acceptance, long-source windows or image/audio admission",
+    "Existing model-only threshold0.5 validation:42/48 values covered and8/24 negatives flagged; no new quality score inferred from setup",
+    "Native GUI button clicks, permissions, signed release/TCC and complete desktop/power qualification remain open",
+    "Thread Sanitizer excludes precompiled ONNX Runtime/Core ML internals; framework diagnostics are retained",
+    "Ordinary live-download cancellation qualified; abrupt parent-death setup case not exercised here",
+    "Prior cross-rebuild executable identity failure remains retained; this single source build has raw/signed payload proof, no cross-build equivalence claim",
+    "Inherited PR73 native rapid-lock CI failure and busy-terminal attachment-inspection diagnostic remain unresolved; newer local/source passes do not explain or repair them",
+    "Prior default-library activity from earlier cleanup incident remains unaudited/unrecovered",
+    "No automatic repair of corrupt model caches, resumable partial downloads, notarized updates, sync or competitor ranking claim"
+  ]
+}

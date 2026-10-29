@@ -29,7 +29,7 @@ The Core ML graph SHA256 is
 operators and initializers are unchanged. The explicit runtime is the previously
 evaluated macOS arm64 ONNX Runtime 1.24.2 dylib (27651368 bytes, SHA256
 `94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa`).
-There is no application model installer for this experimental backend yet.
+[Native setup](NATIVE-PII-SETUP.md) now prepares these assets from Models settings or `pii prepare`; `pii verify` and managed-cache inspection never auto-download.
 
 Only pinned byte hashes are accepted. Descriptor-bound, bounded reads reject
 symlinked assets and source changes. The model is parsed from the exact verified
@@ -129,5 +129,5 @@ python3 scripts/pii-inspection-smoke.py /absolute/oswindctl \
 These are compatibility and ownership checks on authored validation data.
 They are not representative privacy acceptance, a reserved-test result,
 capture/GUI/media acceptance, a latency/energy benchmark or competitor ranking.
-Long-source windows, installer/setup, application integration, policy/record
+Long-source windows, production application integration, policy/record
 revision fences, image treatment and representative hybrid quality remain TODO.

@@ -22,6 +22,7 @@ import UniformTypeIdentifiers
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     let visualModelSetup:VisualModelSetupModel
+    let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
@@ -124,10 +125,11 @@ import UniformTypeIdentifiers
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
+        piiModelSetup=piiSetup ?? PIIModelSetupModel()
         demo = CommandLine.arguments.contains("--demo")
         let resolved = LibraryLocationPreferences.selection(demo:demo)
         let root = selectedRoot ?? resolved.url
@@ -218,7 +220,7 @@ import UniformTypeIdentifiers
         drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
-        visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
+        visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
     }
