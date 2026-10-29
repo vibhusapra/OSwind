@@ -380,7 +380,7 @@
     "axis": "Privacy",
     "feature": "Encrypted vault / biometric unlock",
     "status": "partial",
-    "evidence": "Managed AES-256 APFS images, closed handles, migration and optional user-presence Keychain. Product 1de936a retains exit/signal/unknown provenance and requires normal zero exit; no retry, force detach or relaxed identity proof. Full suite: 1,093 passes/two skips; 107 TSan and 107 optimized passes; all 11 ordered package/process checks pass. Signed CLI: 13 ordinary checks, SIGINT and terminal cancellation, held-reader normal exit 16 and history-preserving recovery pass. Installed bytes unchanged; final owned processes/images absent. A separate 30-case read-only probe observes two hdiutil SIGINT/status-2 terminations despite later separate groups. Historical PR77 status 2 remains unclassified; query-interruption recovery is next. Authentication, physical GUI/sleep/power, OS matrix and release acceptance remain open. See VAULT-TERMINATION.md.",
+    "evidence": "Managed AES-256 APFS images, closed handles, migration and optional user-presence Keychain. Product 7e21e0f recovers one verified SIGINT on a read-only query with a shared deadline and package/manifest/image/cancellation fences. Normal errors, other signals and repeated interruption refuse. No mutation retry or force detach. Full suite: 1,118 passes/two skips; 132 TSan; 132 optimized; all 12 ordered checks pass. Signed kernel-confirmed faults: four old failures versus four recoveries, plus three double-SIGINT and three SIGTERM refusals. History and independent detach preserved. Separate status median 64.12 to 66.49 ms; paired median +1.72 ms on one M5 Max, excluding desktop/power claims. Historical status-2 class, authentication, native GUI/sleep, OS matrix and release acceptance remain open. See VAULT-QUERY-RECOVERY.md.",
     "references": "TimeScroll beta, Recall"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "Signed fbe6fac schema22 exercises all 818 defined cases: 817 full/native/model/Metal passes and one physical case; 407 distinct TSan passes, thirteen qualification operations, five repeated CLI interruptions, terminal Ctrl-C and limited native Stop/recovery pass. Initial CI Python-startup timeout fixture corrected; verification301cbad CI passes both jobs. Preceding project qualification has 18 paired scaling trials; original cancellation failures remain retained. Corpus and pinned rem component results remain separate; no overall competitor rank",
+    "evidence": "Frozen product 7e21e0f: 1,120 defined, 1,118 full available model/native passes, two physical-session skips; 132 selected vault TSan and 132 optimized passes; all 12 package/process operations pass. Signed CLI native-query fault comparison preserves every planned recovery/refusal and the encrypted note. New cases cover cancellation, shared deadlines, native reaping and identity changes. Existing retrieval/OCR/ASR corpus metrics retain their original source and scope. No new quality, physical power or whole-competitor ranking follows. See VAULT-QUERY-RECOVERY.md and separately attributed benchmark receipts.",
     "references": "OSwind quality bar"
   },
   {

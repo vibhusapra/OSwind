@@ -92,12 +92,19 @@ struct VaultVolumeProof:Sendable {
 struct NativeVaultDriver:Sendable {
     private let observer:(@Sendable (VaultNativeDiagnostic)->Void)?
     private let willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?
-    init(observer:(@Sendable (VaultNativeDiagnostic)->Void)?=nil,willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?=nil) {self.observer=observer;self.willMutate=willMutate}
+    // Internal transport seam for owned query-interruption fixtures only.
+    // Public LibraryVault construction supplies no override or trace observer.
+    typealias QueryProcess = @Sendable (VaultNativeOperation,String,[String],Double) async throws -> VaultProcessResult
+    private let queryProcess:QueryProcess?
+    init(observer:(@Sendable (VaultNativeDiagnostic)->Void)?=nil,willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?=nil,queryProcess:QueryProcess?=nil) {self.observer=observer;self.willMutate=willMutate;self.queryProcess=queryProcess}
     private func observed(_ operation:VaultNativeOperation,_ executable:String,_ arguments:[String],timeout:Double=60,cancellation:VaultProcess.CancellationPolicy = .terminateChild,mountedDevice:Int32?=nil) async throws -> VaultProcessResult {
         // This wrapper accepts no secret. Create/attach retain their separate
         // unobserved stdin-only credential path.
         if operation.mutates {willMutate?(operation,mountedDevice)}
-        let start=ContinuousClock.now,result=try await VaultProcess.run(executable,arguments,timeout:timeout,cancellation:cancellation)
+        let start=ContinuousClock.now
+        let result:VaultProcessResult
+        if !operation.mutates,let queryProcess {result=try await queryProcess(operation,executable,arguments,timeout)}
+        else {result=try await VaultProcess.run(executable,arguments,timeout:timeout,cancellation:cancellation)}
         if let observer {let elapsed=start.duration(to:.now).components;observer(.init(operation:operation,result:result,durationSeconds:Double(elapsed.seconds)+Double(elapsed.attoseconds)/1e18))};return result
     }
     static func attachmentList(_ result:VaultProcessResult)throws->[[String:Any]] {
@@ -112,15 +119,21 @@ struct NativeVaultDriver:Sendable {
               let encrypted=object["encrypted"] as? Bool else {throw VaultNativeFailure(operation:.encryptionProbe,result:result,invalidOutput:true)}
         return encrypted
     }
-    private func images() async throws -> [[String:Any]] {
-        try Self.attachmentList(await observed(.attachmentInventory,"/usr/bin/hdiutil",["info","-plist"]))
+    private func query(_ operation:VaultNativeOperation,_ executable:String,_ arguments:[String],identity:VaultQueryIdentity) async throws ->VaultProcessResult {
+        try await VaultReadOnlyQuery.run(operation:operation,validate:{try identity.validate()}) {timeout in
+            try await self.observed(operation,executable,arguments,timeout:timeout)
+        }
+    }
+    private func images(identity:VaultQueryIdentity) async throws -> [[String:Any]] {
+        try Self.attachmentList(await query(.attachmentInventory,"/usr/bin/hdiutil",["info","-plist"],identity:identity))
     }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
         let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
         guard result.succeeded else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
-        try Self.encryptionFlag(await observed(.encryptionProbe,"/usr/bin/hdiutil",["isencrypted","-plist",paths.image.path]))
+        let identity=try VaultQueryIdentity(paths:paths)
+        return try Self.encryptionFlag(await query(.encryptionProbe,"/usr/bin/hdiutil",["isencrypted","-plist",paths.image.path],identity:identity))
     }
     func attach(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         guard try await encrypted(paths:paths) else {throw OSwindError.invalid("The selected disk image is not encrypted")}
@@ -144,10 +157,10 @@ struct NativeVaultDriver:Sendable {
         }
     }
     func attachment(paths:VaultPaths) async throws -> VaultVolumeProof? {
-        _=try paths.tree()
-        let info=try paths.info(),saved=try? paths.session(info:info),prefix=paths.mounts.standardizedFileURL.path+"/"
+        let identity=try VaultQueryIdentity(paths:paths)
+        let info=identity.info,saved=try? paths.session(info:info),prefix=paths.mounts.standardizedFileURL.path+"/"
         let expectedImage=paths.image.standardizedFileURL.resolvingSymlinksInPath()
-        let listed=try await images()
+        let listed=try await images(identity:identity)
         let found=listed.filter { item in
             let byPath=(item["image-path"] as? String).map {URL(fileURLWithPath:$0).standardizedFileURL.resolvingSymlinksInPath()==expectedImage} ?? false
             let entities=item["system-entities"] as? [[String:Any]] ?? []
@@ -159,6 +172,7 @@ struct NativeVaultDriver:Sendable {
             // A stale path alone is never proof of detach. Even with no matching
             // attachment, a saved image identity must still match its package.
             if let saved {let stamp=try BackupFileTree(root:paths.image).identity();guard stamp.device==saved.imageDevice,stamp.inode==saved.imageInode else {throw OSwindError.unavailable("The vault image moved or was replaced. Its detached state could not be verified.")}}
+            try identity.validate()
             return nil
         }
         guard found.count==1,found[0]["image-encrypted"] as? Bool==true,let entities=found[0]["system-entities"] as? [[String:Any]],let reported=found[0]["image-path"] as? String else {throw OSwindError.invalid("Encrypted disk attachment identity is ambiguous")}
@@ -178,7 +192,7 @@ struct NativeVaultDriver:Sendable {
             volume=volumes[0];url=saved.map {paths.mount($0)} ?? paths.mounts;root=nil
         }
         guard let device=volume["dev-entry"] as? String,device.hasPrefix("/dev/disk") else {throw OSwindError.invalid("Cannot identify the encrypted volume device")}
-        let disk=try await observed(.volumeInfo,"/usr/sbin/diskutil",["info","-plist",device])
+        let disk=try await query(.volumeInfo,"/usr/sbin/diskutil",["info","-plist",device],identity:identity)
         guard disk.succeeded else {throw VaultNativeFailure(operation:.volumeInfo,result:disk)}
         guard let metadata=try? PropertyListSerialization.propertyList(from:disk.stdout,format:nil) as? [String:Any],let uuid=metadata["VolumeUUID"] as? String,UUID(uuidString:uuid) != nil,metadata["FilesystemType"] as? String=="apfs",metadata["DeviceIdentifier"] as? String==String(device.dropFirst(5)) else {throw VaultNativeFailure(operation:.volumeInfo,result:disk,invalidOutput:true)}
         let stamp=try BackupFileTree(root:paths.image).identity(),matchesPath=URL(fileURLWithPath:reported).standardizedFileURL.resolvingSymlinksInPath()==expectedImage
@@ -196,6 +210,7 @@ struct NativeVaultDriver:Sendable {
             let on=withUnsafePointer(to:&target) {$0.withMemoryRebound(to:CChar.self,capacity:targetCapacity) {String(cString:$0)}}
             guard from==device,URL(fileURLWithPath:on).standardizedFileURL==url.standardizedFileURL else {throw OSwindError.invalid("The kernel mount does not match the encrypted volume")}
         }
+        try identity.validate()
         return .init(mount:url,device:device,volumeUUID:uuid,root:root,image:stamp,attachmentDevice:attachmentDevice,reportedImagePath:reported)
     }
     private func same(_ a:VaultVolumeProof,_ b:VaultVolumeProof,allowUnmounted:Bool=false) -> Bool {

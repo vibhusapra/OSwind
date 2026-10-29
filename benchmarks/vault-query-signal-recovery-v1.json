@@ -1,0 +1,3062 @@
+{
+  "format": "OSwind identity-bound read-only native query interruption recovery v1",
+  "recordedAtUTC": "2026-10-29T10:36:42.272954+00:00",
+  "source": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+  "base": "575b63d2dd62e0820a7957bc55c32b8019187737",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/79",
+  "releaseAcceptance": false,
+  "historicalStatus2CauseEstablished": false,
+  "competitiveRanking": false,
+  "normalHistoryAudited": false,
+  "reservedTestPredictionsOpened": false,
+  "contract": {
+    "onlyVerifiedSIGINT": true,
+    "maximumReadOnlyAttempts": 2,
+    "queryOperations": [
+      "attachmentInventory",
+      "encryptionProbe",
+      "volumeInfo"
+    ],
+    "sharedAdmissionDeadlineSeconds": 60,
+    "prePostCancellationChecks": true,
+    "packageManifestAndImageIdentityFences": true,
+    "missingImageMustRemainAbsent": true,
+    "imageContentsAndMtimeMayChange": true,
+    "partialInterruptedOutputDiscarded": true,
+    "normalExit2NotRetried": true,
+    "otherSignalsNotRetried": true,
+    "malformedSuccessfulOutputNotRetried": true,
+    "thrownErrorsNotRetried": true,
+    "repeatedInterruptRefused": true,
+    "mutationRetryAdded": false,
+    "credentialPathChanged": false,
+    "forceDetachAdded": false,
+    "existingDetachProofRelaxed": false,
+    "limits": "Shared deadline covers both attempts, validation and result admission. Existing Foundation launch/reaping behavior can add scheduling/cleanup time; not a hard real-time wall-clock bound."
+  },
+  "precedingDriverRegression": {
+    "defined": 2,
+    "passed": 1,
+    "skipped": 0,
+    "failedCases": 1,
+    "reportedFailures": 1,
+    "reportedTestSeconds": 0.372,
+    "reportedSuiteSeconds": 0.373,
+    "logSHA256": "4b5b7a60ae383140646a74df3b10229b9d5cdf2b285e01bbd2ca4636e97db706",
+    "scope": "Original read-only policy plus internal query transport seam, before recovery implementation. Real Python SIGINT fails; real Python normal exit2 is refused. Immutable signed baseline is compared independently."
+  },
+  "focusedDevelopment": {
+    "defined": 41,
+    "passed": 41,
+    "skipped": 0,
+    "failedCases": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 15.969,
+    "reportedSuiteSeconds": 15.972,
+    "logSHA256": "77894624cea7d42fa799dbf0e258433a2aac35c53213352702f9e5336a23623a"
+  },
+  "full": {
+    "defined": 1120,
+    "passed": 1118,
+    "skipped": 2,
+    "failedCases": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 449.523,
+    "reportedSuiteSeconds": 449.612,
+    "logSHA256": "01fed151c5e8f2cb8246de762039e45d264894febb9990c1d18e8b5e3138880b"
+  },
+  "threadSanitizer": {
+    "defined": 132,
+    "passed": 132,
+    "skipped": 0,
+    "failedCases": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 141.606,
+    "reportedSuiteSeconds": 141.636,
+    "logSHA256": "2f46e32845a3ce0caf280dd13edb4438e1acccdf99694f7dc7e8706d37b29cd6"
+  },
+  "optimizedVault": {
+    "defined": 132,
+    "passed": 132,
+    "skipped": 0,
+    "failedCases": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 137.507,
+    "reportedSuiteSeconds": 137.519,
+    "logSHA256": "b509f22717b2d467b6d72d92372c711e1b1efeac876fbf1e3e5c91424706e379"
+  },
+  "orderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 457.57215066603385,
+      "wallSeconds": 457.5779240131378
+    },
+    {
+      "name": "vault-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 174.83532891701907,
+      "wallSeconds": 174.83753490447998
+    },
+    {
+      "name": "optimized-vault-v1",
+      "exitCode": 0,
+      "awakeSeconds": 256.2600693749264,
+      "wallSeconds": 256.25136518478394
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 102.58351058303379,
+      "wallSeconds": 102.57679796218872
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.5643032500520349,
+      "wallSeconds": 1.564310073852539
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.5334120420739055,
+      "wallSeconds": 0.5334138870239258
+    },
+    {
+      "name": "vault-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 15.005659917136654,
+      "wallSeconds": 15.005724906921387
+    },
+    {
+      "name": "vault-interruptions-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.588447292102501,
+      "wallSeconds": 5.588473081588745
+    },
+    {
+      "name": "vault-terminal-v1",
+      "exitCode": 0,
+      "awakeSeconds": 9.571849124971777,
+      "wallSeconds": 9.57189416885376
+    },
+    {
+      "name": "vault-terminal-busy-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.939928166102618,
+      "wallSeconds": 5.939955234527588
+    },
+    {
+      "name": "query-native-paired-v1",
+      "exitCode": 0,
+      "awakeSeconds": 6.655129874823615,
+      "wallSeconds": 6.655161142349243
+    },
+    {
+      "name": "final-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.14465533290058374,
+      "wallSeconds": 0.14465594291687012
+    }
+  ],
+  "qualificationPlanSHA256": "1ef0e6e24fbb2133debf7d38f7829ef5739fc8bb1e1a232c95a5233b5c2bf0f1",
+  "qualificationDriverSHA256": "359be91f8a8e5786d4ebbbd2b617af3e408621d4aff606ccad65ba9ac8417203",
+  "ordinaryNativeTraces": {
+    "normal": [
+      {
+        "file": "oswind-native-detach-held-reader-99E5D9DE-B1FD-4ABB-85F3-8CAE3C378403-completed.json",
+        "sha256": "092a1a7cbb5c9cfb137530f6b1d14e0d56dff1e04dc9cabe20a3fe833893fa1f",
+        "calls": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-F4371BB7-C7C0-4609-9665-1DDCA396EF8B-completed.json",
+        "sha256": "3013c932d31b17a93295f0b60d68db35a523ed7bafd013c15f25332609858dd1",
+        "calls": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ],
+    "tsan": [
+      {
+        "file": "oswind-native-detach-held-reader-4B2D0E64-978E-433A-B5A6-E9F8BC3EB46A-completed.json",
+        "sha256": "77de14a0bb38c8c4a6ba69eca286e2e77b7522ad6128266a65495b962237d63c",
+        "calls": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-761C52A6-D4F1-41EA-A6FC-2905D850D83E-completed.json",
+        "sha256": "c320dd1d17d2a221d3f9c03ff7d906d10534285ed85c891f5e2249aed6a779ba",
+        "calls": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ],
+    "optimized": [
+      {
+        "file": "oswind-native-detach-held-reader-272FB91C-6D18-4DEE-85CA-76280AEFD19A-completed.json",
+        "sha256": "9c14bdd914d6b4ed9a611f43b9b398d3e477dd36329256eb45c0ac7f3eb1fc59",
+        "calls": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-821A56E2-3FD1-45AF-9FD2-E19FCB97787C-completed.json",
+        "sha256": "c3f92e15da98b337a49d2c915414409cbc71401394c6ec479ae2205737cb7027",
+        "calls": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ]
+  },
+  "injectedNativeFixtures": {
+    "scope": "Actual encrypted APFS mutations and ordinary recovery; classified interruption outcomes supplied by real Python SIGINT controls through an internal transport override, not a claim of interrupted hdiutil in these unit fixtures",
+    "configurations": {
+      "normal": [
+        {
+          "file": "query-recovery-completed-40D79FD5-1094-44C2-917C-CF375E1057D0.json",
+          "sha256": "401dab740075ed4a8770c86344f07e7f6ee740d7c43af8acf876f55afacd7ccf",
+          "calls": 29,
+          "injectedPythonSIGINT": 3,
+          "mutations": 2,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "exit",
+              "status": 0,
+              "calls": 14
+            },
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "imageDetach",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "exit",
+              "status": 0,
+              "calls": 8
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            }
+          ]
+        },
+        {
+          "file": "query-refusal-completed-3B640FE5-47D8-431C-ACC8-1166342837C9.json",
+          "sha256": "ebe04409495357a4daedc7b64435732d5685ecdaaf418068aabf275865304081",
+          "calls": 2,
+          "injectedPythonSIGINT": 2,
+          "mutations": 0,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 2
+            }
+          ]
+        }
+      ],
+      "tsan": [
+        {
+          "file": "query-recovery-completed-D58CC36C-A244-4B1E-A747-A977CF8B958B.json",
+          "sha256": "3095c49ed7abf570de2fafb8c8c980133f28237c6aec71426bbbb1df4c657eb5",
+          "calls": 29,
+          "injectedPythonSIGINT": 3,
+          "mutations": 2,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "exit",
+              "status": 0,
+              "calls": 14
+            },
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "imageDetach",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "exit",
+              "status": 0,
+              "calls": 8
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            }
+          ]
+        },
+        {
+          "file": "query-refusal-completed-219E30CE-45DE-4C51-AA81-8469AE0E812D.json",
+          "sha256": "ca06a74dee5c6212b8a37a7e7058248fb6679c0ae75e701976b25f2be8d199bb",
+          "calls": 2,
+          "injectedPythonSIGINT": 2,
+          "mutations": 0,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 2
+            }
+          ]
+        }
+      ],
+      "optimized": [
+        {
+          "file": "query-recovery-completed-86CC8BC1-20DD-404A-9204-70A9F775ADCE.json",
+          "sha256": "e433cd9dc3f2525b9deccf55cf2a091c23d611a41b9462df56cc4c60d45256a1",
+          "calls": 29,
+          "injectedPythonSIGINT": 3,
+          "mutations": 2,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "exit",
+              "status": 0,
+              "calls": 14
+            },
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "encryptionProbe",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            },
+            {
+              "operation": "imageDetach",
+              "termination": "exit",
+              "status": 0,
+              "calls": 2
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "exit",
+              "status": 0,
+              "calls": 8
+            },
+            {
+              "operation": "volumeInfo",
+              "termination": "signal",
+              "status": 2,
+              "calls": 1
+            }
+          ]
+        },
+        {
+          "file": "query-refusal-completed-36352DF0-C423-4FE7-B8B7-5ACCF6933634.json",
+          "sha256": "78e4975b219067eb1a379126d800c95d06d314eea30ce8e5a000409008c0b7ee",
+          "calls": 2,
+          "injectedPythonSIGINT": 2,
+          "mutations": 0,
+          "outcomes": [
+            {
+              "operation": "attachmentInventory",
+              "termination": "signal",
+              "status": 2,
+              "calls": 2
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "actualNativeChildFaults": {
+    "development": {
+      "report": {
+        "format": "OSwind owned native inventory child interruption v1",
+        "state": "completed",
+        "binarySHA256": {
+          "candidate": "93cb515cbd7987e5b86c247d64ecc37ace845a90afdac5cd3e8a080460cf8008",
+          "baseline": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca"
+        },
+        "scriptSHA256": "4287e5ce348b4710e3f6466377454bdb52ffa03ee66488eb389e8f49cd7f9943",
+        "plan": [
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 2
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 2
+          }
+        ],
+        "trials": [
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 77427,
+                "parent": 77426,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "271f845a16d8de8a198d142b4bbadc18339324debd6f6c22abe546835da94247",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.10710541601292789
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 77433,
+                "parent": 77432,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "271f845a16d8de8a198d142b4bbadc18339324debd6f6c22abe546835da94247",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.09926504199393094
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 77439,
+                "parent": 77438,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "271f845a16d8de8a198d142b4bbadc18339324debd6f6c22abe546835da94247",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.09729487495496869
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 3
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 77445,
+                "parent": 77444,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "271f845a16d8de8a198d142b4bbadc18339324debd6f6c22abe546835da94247",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.10458358307369053
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77451,
+                "parent": 77450,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.04016520897857845
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77455,
+                "parent": 77454,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.04526358307339251
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77459,
+                "parent": 77458,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.03599949995987117
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 3
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77463,
+                "parent": 77462,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.03573275008238852
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77467,
+                "parent": 77466,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 77469,
+                "parent": 77466,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.07002170803025365
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77473,
+                "parent": 77472,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 77475,
+                "parent": 77472,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.07348958286456764
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77479,
+                "parent": 77478,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 77481,
+                "parent": 77478,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.07114416686818004
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77485,
+                "parent": 77484,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.041701666079461575
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77489,
+                "parent": 77488,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.048378749983385205
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 77493,
+                "parent": 77492,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.04940816713497043
+          }
+        ],
+        "scope": "Only direct owned CLI hdiutil info -plist children; private synthetic encrypted APFS. No user terminal, library, credentials, Keychain, permissions, forced detach or power changes. Direct child signals are not parent Ctrl-C.",
+        "passphrasePersisted": false,
+        "calibration": [
+          {
+            "mode": "exit2",
+            "kernel": {
+              "termination": "exit",
+              "status": 2,
+              "waitStatus": 512
+            },
+            "childReturncode": 2
+          },
+          {
+            "mode": "SIGINT",
+            "kernel": {
+              "termination": "signal",
+              "status": 2,
+              "waitStatus": 2
+            },
+            "childReturncode": -2
+          }
+        ],
+        "observer": "Bounded proc_listchildpids/proc_pidinfo/proc_pidpath; calibrated 136-byte BSD info, own UID, direct parent and exact executable before STOP; complete ps -ww command and stopped state before test signal; no process environment reads",
+        "confirmedCoverage": {
+          "('candidate', 'SIGINT', 1)": 4,
+          "('candidate', 'SIGINT', 2)": 3,
+          "('candidate', 'SIGTERM', 1)": 3,
+          "('baseline', 'SIGINT', 1)": 4
+        },
+        "historyPreserved": true,
+        "independentlyDetached": true
+      },
+      "reportSHA256": "80fcdeb46d422a8aa88b56fda90c224a8ef902936a5816c0b93911907dc3bd45",
+      "scope": "Fixed 14-trial actual CLI/native child fault experiment: four preceding failures, four candidate single-SIGINT recoveries, three repeated-SIGINT and three SIGTERM refusals. Same note/package per run; no failure-rate or latency improvement estimate. SIGSTOP/child signal is not parent terminal Ctrl-C."
+    },
+    "signed": {
+      "report": {
+        "format": "OSwind owned native inventory child interruption v1",
+        "state": "completed",
+        "binarySHA256": {
+          "candidate": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+          "baseline": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca"
+        },
+        "scriptSHA256": "4287e5ce348b4710e3f6466377454bdb52ffa03ee66488eb389e8f49cd7f9943",
+        "plan": [
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 2
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 0
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 1
+          },
+          {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 2
+          }
+        ],
+        "trials": [
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 91017,
+                "parent": 91016,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "64c97ec4c671e2a6ae9a40d6596e50735cafa7c062f41049db244ce46871e4c0",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.1144128330051899
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 91024,
+                "parent": 91023,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "64c97ec4c671e2a6ae9a40d6596e50735cafa7c062f41049db244ce46871e4c0",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.10021041706204414
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 91030,
+                "parent": 91029,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "64c97ec4c671e2a6ae9a40d6596e50735cafa7c062f41049db244ce46871e4c0",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.08893491607159376
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 3
+            },
+            "cliExit": 0,
+            "targets": [
+              {
+                "pid": 91036,
+                "parent": 91035,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 0,
+            "stdoutSHA256": "64c97ec4c671e2a6ae9a40d6596e50735cafa7c062f41049db244ce46871e4c0",
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "seconds": 0.10176095901988447
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91042,
+                "parent": 91041,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.04166954196989536
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91046,
+                "parent": 91045,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.039810749934986234
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91050,
+                "parent": 91049,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.04285545786842704
+          },
+          {
+            "plan": {
+              "binary": "baseline",
+              "signal": "SIGINT",
+              "targets": 1,
+              "repetition": 3
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91054,
+                "parent": 91053,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.03542345901951194
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91058,
+                "parent": 91057,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 91060,
+                "parent": 91057,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.06039370805956423
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91064,
+                "parent": 91063,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 91066,
+                "parent": 91063,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.07165004196576774
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGINT",
+              "targets": 2,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91070,
+                "parent": 91069,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              },
+              {
+                "pid": 91072,
+                "parent": 91069,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 2,
+                  "waitStatus": 2
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 2,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "4fa5106a96f1f3c370de400c4d357d21cbe172f1af8374a5b16ae0c4dadb4b45",
+            "seconds": 0.06670795800164342
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 0
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91078,
+                "parent": 91077,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.037585292011499405
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 1
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91082,
+                "parent": 91081,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.046123707899823785
+          },
+          {
+            "plan": {
+              "binary": "candidate",
+              "signal": "SIGTERM",
+              "targets": 1,
+              "repetition": 2
+            },
+            "cliExit": 1,
+            "targets": [
+              {
+                "pid": 91086,
+                "parent": 91085,
+                "command": "hdiutil info -plist",
+                "signalSent": true,
+                "stoppedIdentityConfirmed": true,
+                "kernel": {
+                  "termination": "signal",
+                  "status": 15,
+                  "waitStatus": 15
+                }
+              }
+            ],
+            "kernelConfirmedTargets": 1,
+            "expectedExit": 1,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSHA256": "3d1aec5c775878122b313ab8092a28759a13a2de43f78a5a9fdcba31e7289eba",
+            "seconds": 0.0458081669639796
+          }
+        ],
+        "scope": "Only direct owned CLI hdiutil info -plist children; private synthetic encrypted APFS. No user terminal, library, credentials, Keychain, permissions, forced detach or power changes. Direct child signals are not parent Ctrl-C.",
+        "passphrasePersisted": false,
+        "calibration": [
+          {
+            "mode": "exit2",
+            "kernel": {
+              "termination": "exit",
+              "status": 2,
+              "waitStatus": 512
+            },
+            "childReturncode": 2
+          },
+          {
+            "mode": "SIGINT",
+            "kernel": {
+              "termination": "signal",
+              "status": 2,
+              "waitStatus": 2
+            },
+            "childReturncode": -2
+          }
+        ],
+        "observer": "Bounded proc_listchildpids/proc_pidinfo/proc_pidpath; calibrated 136-byte BSD info, own UID, direct parent and exact executable before STOP; complete ps -ww command and stopped state before test signal; no process environment reads",
+        "confirmedCoverage": {
+          "('candidate', 'SIGINT', 1)": 4,
+          "('candidate', 'SIGINT', 2)": 3,
+          "('candidate', 'SIGTERM', 1)": 3,
+          "('baseline', 'SIGINT', 1)": 4
+        },
+        "historyPreserved": true,
+        "independentlyDetached": true
+      },
+      "reportSHA256": "2eee1caad739d0c83b9d8c9056e14c5dec81fdf746794f6e3397a3232ba1b899",
+      "scope": "Fixed 14-trial actual CLI/native child fault experiment: four preceding failures, four candidate single-SIGINT recoveries, three repeated-SIGINT and three SIGTERM refusals. Same note/package per run; no failure-rate or latency improvement estimate. SIGSTOP/child signal is not parent terminal Ctrl-C."
+    }
+  },
+  "retainedSlowObserver": {
+    "report": {
+      "format": "OSwind owned native inventory child interruption v1",
+      "state": "failed",
+      "binarySHA256": {
+        "candidate": "93cb515cbd7987e5b86c247d64ecc37ace845a90afdac5cd3e8a080460cf8008",
+        "baseline": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca"
+      },
+      "scriptSHA256": "c23439028815c90a922d3e80c63582084388d95d105440cd7dfc214f68eddb45",
+      "plan": [
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 0
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 1
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 2
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 3
+        },
+        {
+          "binary": "baseline",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 0
+        },
+        {
+          "binary": "baseline",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 1
+        },
+        {
+          "binary": "baseline",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 2
+        },
+        {
+          "binary": "baseline",
+          "signal": "SIGINT",
+          "targets": 1,
+          "repetition": 3
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 2,
+          "repetition": 0
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 2,
+          "repetition": 1
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGINT",
+          "targets": 2,
+          "repetition": 2
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGTERM",
+          "targets": 1,
+          "repetition": 0
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGTERM",
+          "targets": 1,
+          "repetition": 1
+        },
+        {
+          "binary": "candidate",
+          "signal": "SIGTERM",
+          "targets": 1,
+          "repetition": 2
+        }
+      ],
+      "trials": [
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.07712591695599258
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.09004720905795693
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08973908401094377
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.07411212497390807
+        },
+        {
+          "plan": {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 0
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.09019445814192295
+        },
+        {
+          "plan": {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 1
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.07584399986080825
+        },
+        {
+          "plan": {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 2
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.07531154179014266
+        },
+        {
+          "plan": {
+            "binary": "baseline",
+            "signal": "SIGINT",
+            "targets": 1,
+            "repetition": 3
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08944095787592232
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 0
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08936670795083046
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 1
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08960591698996723
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGINT",
+            "targets": 2,
+            "repetition": 2
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.07710537500679493
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 0
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.093802958028391
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 1
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08706354186870158
+        },
+        {
+          "plan": {
+            "binary": "candidate",
+            "signal": "SIGTERM",
+            "targets": 1,
+            "repetition": 2
+          },
+          "cliExit": 0,
+          "targets": [],
+          "kernelConfirmedTargets": 0,
+          "expectedExit": null,
+          "stdoutSHA256": "baacc7de1ab6932d2a5f1ba47f970a9475e7396052b6e4c1d09f95a71a3ade6d",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "seconds": 0.08679629187099636
+        }
+      ],
+      "scope": "Only direct owned CLI hdiutil info -plist children; private synthetic encrypted APFS. No user terminal, library, credentials, Keychain, permissions, forced detach or power changes. Direct child signals are not parent Ctrl-C.",
+      "passphrasePersisted": false,
+      "calibration": [
+        {
+          "mode": "exit2",
+          "kernel": {
+            "termination": "exit",
+            "status": 2,
+            "waitStatus": 512
+          },
+          "childReturncode": 2
+        },
+        {
+          "mode": "SIGINT",
+          "kernel": {
+            "termination": "signal",
+            "status": 2,
+            "waitStatus": 2
+          },
+          "childReturncode": -2
+        }
+      ],
+      "confirmedCoverage": {
+        "('candidate', 'SIGINT', 1)": 0,
+        "('candidate', 'SIGINT', 2)": 0,
+        "('candidate', 'SIGTERM', 1)": 0,
+        "('baseline', 'SIGINT', 1)": 0
+      },
+      "errorType": "AssertionError",
+      "normalRecoveryDetached": true
+    },
+    "reportSHA256": "24f7d3c5ae4402387bb1cdc9a179b3b28cdd76eb41446632acf5b7800f4b0d17",
+    "sourceSHA256": "c23439028815c90a922d3e80c63582084388d95d105440cd7dfc214f68eddb45",
+    "scope": "All 14 status commands completed without a confirmed helper target. Coverage correctly failed; no interruption/recovery claim. Ordinary cleanup detached. Faster observer added; original run retained."
+  },
+  "package": {
+    "scope": "Separately staged schema22 identity-bound read-only query interruption recovery; no complete privacy detection acceptance, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "44d718a0e023e3a5bdfeebfa8dbe5e2679db83d933ae2bc0ee2b7a22c18fbdcf",
+        "signedSHA256": "769d4a3b179e2d8492c34a5e0ef4c7a98ac1ec0352356d1724b1ac7a5fdddbeb",
+        "normalizedPayloadSHA256": "9ece6da4b1769e703cc55e2ef388b66ca4dddacb350d14e0229908d11430be7b"
+      },
+      "oswindctl": {
+        "rawSHA256": "a080e4d40c26c09de39f1e33e8a96676bfb25e275b6c2b43d382583973587886",
+        "signedSHA256": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+        "normalizedPayloadSHA256": "9302fbb6501837694d085937d1f86c8fcd6db90273abd019aa60d615f784505a"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "adeb2b02d472a25a56a8b7bc7dc89b162f733122807472ec6c706b9a0a07e371",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "e05dc0599df0e9334da56dec07f30df942eb5660c505259c96ac973336ef2c23",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "ordinaryCLI": {
+    "state": "completed",
+    "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+    "checks": [
+      "create initializes and detaches, public handle closed",
+      "closed handle refuses plaintext fallback",
+      "wrong passphrase refused without attachment",
+      "managed handle writes and retrieves on verified volume",
+      "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+      "explicit plaintext backup/Markdown export, private source staging cleaned",
+      "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+      "retry detaches after reader closes",
+      "verified native migration remounts with history and retains original",
+      "missing source refuses before destination creation",
+      "renamed attached package remains visibly attached despite stale OS image path",
+      "moved package closes public handle and normally unmounts/ejects verified backing device",
+      "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+    ],
+    "binary_sha256": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+    "schema_version": 22,
+    "old_writer_check": "not requested; pass --old-cli with a pinned older binary",
+    "verified_detached": true,
+    "passphrase_persisted": false,
+    "normal_library_opened": false,
+    "cleanup_detached": true
+  },
+  "observedHelperInterruptions": {
+    "state": "completed",
+    "binary_sha256": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+    "scope": "Actual SIGINT during observed owned hdiutil create/attach helpers; random in-memory passphrase, no Keychain or normal library",
+    "checks": [
+      {
+        "action": "create",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "create",
+        "still_attached": false,
+        "stdout_empty": true
+      },
+      {
+        "action": "unlock",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "attach",
+        "still_attached": false,
+        "stdout_empty": true
+      }
+    ],
+    "recovery_unlock_and_lock_passed": true,
+    "passphrase_persisted": false
+  },
+  "terminal": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0347059171181172,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 90604,
+          "helperGroup": 90604,
+          "foregroundGroup": 90602,
+          "CLIGroup": 90602
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 0.9364147088490427,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 90726,
+          "helperGroup": 90726,
+          "foregroundGroup": 90719,
+          "CLIGroup": 90719
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.5908707499038428,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 90767,
+          "CLIGroup": 90767
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "state": "completed",
+    "immediateRecoveryPassed": true,
+    "sourceHistoryPreserved": true,
+    "noOwnedImagesAfterFinalLock": true,
+    "passphrasePersisted": false
+  },
+  "heldReaderTerminal": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+    "trials": [
+      {
+        "action": "lock",
+        "exitCode": 1,
+        "wallSeconds": 0.59326700004749,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 90877,
+          "CLIGroup": 90877
+        },
+        "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+        "ownedImageAttachedAfterExit": true
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "state": "completed",
+    "busyFailurePreserved": true
+  },
+  "finalProof": {
+    "recordedAtUTC": "2026-10-29T10:36:01.754867+00:00",
+    "source": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "packagingSource": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "limitations": [
+    "Two normal skips: physical system-audio opt-in and unavailable visual session admission",
+    "Precompiled runtime/framework internals are outside TSan coverage",
+    "Normal full run retains 432 existing short PII reference comparisons, not representative privacy acceptance",
+    "Historical reported status2 discarded termination reason and cannot be retrospectively classified",
+    "No physical GUI/capture/authentication/sleep/power, matched competitor, sync, notarization, previous default-library audit or overall release acceptance"
+  ],
+  "ordinaryStatusObservation": {
+    "report": {
+      "format": "OSwind paired ordinary CLI status observations v1",
+      "state": "completed",
+      "binarySHA256": {
+        "candidate": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+        "baseline": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca"
+      },
+      "scriptSHA256": "f5152dd38a8692f5d76a4c7ec56f459d8d4feea5fcc534c5c9e3bed0e248dce8",
+      "plan": [
+        {
+          "pair": 0,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": true
+        },
+        {
+          "pair": 1,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": true
+        },
+        {
+          "pair": 2,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 3,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 4,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 5,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 6,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 7,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 8,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 9,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 10,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 11,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 12,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 13,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 14,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 15,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 16,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 17,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 18,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 19,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 20,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "warmup": false
+        },
+        {
+          "pair": 21,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "warmup": false
+        }
+      ],
+      "samples": [
+        {
+          "pair": 0,
+          "binary": "baseline",
+          "warmup": true,
+          "elapsedSeconds": 0.0710638330783695,
+          "wallSeconds": 0.07106280326843262,
+          "waitedChildUserSeconds": 0.012376999999999971,
+          "waitedChildSystemSeconds": 0.009402999999999995,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 0,
+          "binary": "candidate",
+          "warmup": true,
+          "elapsedSeconds": 0.07205337495543063,
+          "wallSeconds": 0.07205414772033691,
+          "waitedChildUserSeconds": 0.01183500000000004,
+          "waitedChildSystemSeconds": 0.009448999999999985,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 1,
+          "binary": "candidate",
+          "warmup": true,
+          "elapsedSeconds": 0.07057158299721777,
+          "wallSeconds": 0.0705718994140625,
+          "waitedChildUserSeconds": 0.011658999999999975,
+          "waitedChildSystemSeconds": 0.009335000000000038,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 1,
+          "binary": "baseline",
+          "warmup": true,
+          "elapsedSeconds": 0.05829741689376533,
+          "wallSeconds": 0.058297157287597656,
+          "waitedChildUserSeconds": 0.011465000000000003,
+          "waitedChildSystemSeconds": 0.008735999999999966,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 2,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06419991701841354,
+          "wallSeconds": 0.06419992446899414,
+          "waitedChildUserSeconds": 0.010873999999999995,
+          "waitedChildSystemSeconds": 0.008213999999999999,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 2,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.0637071249075234,
+          "wallSeconds": 0.06370711326599121,
+          "waitedChildUserSeconds": 0.011116999999999988,
+          "waitedChildSystemSeconds": 0.008570999999999995,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 3,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06403720797970891,
+          "wallSeconds": 0.06403708457946777,
+          "waitedChildUserSeconds": 0.010946999999999985,
+          "waitedChildSystemSeconds": 0.008678000000000019,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 3,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06358425016514957,
+          "wallSeconds": 0.06358504295349121,
+          "waitedChildUserSeconds": 0.010820000000000052,
+          "waitedChildSystemSeconds": 0.00827,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 4,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06874479120597243,
+          "wallSeconds": 0.06874489784240723,
+          "waitedChildUserSeconds": 0.010662999999999978,
+          "waitedChildSystemSeconds": 0.00837300000000002,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 4,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06702758301980793,
+          "wallSeconds": 0.06702828407287598,
+          "waitedChildUserSeconds": 0.011232999999999993,
+          "waitedChildSystemSeconds": 0.008965999999999974,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 5,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.0687500829808414,
+          "wallSeconds": 0.06875109672546387,
+          "waitedChildUserSeconds": 0.011083999999999983,
+          "waitedChildSystemSeconds": 0.008990999999999971,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 5,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.0670707079116255,
+          "wallSeconds": 0.06707096099853516,
+          "waitedChildUserSeconds": 0.01108300000000001,
+          "waitedChildSystemSeconds": 0.008726000000000012,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 6,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06404512492008507,
+          "wallSeconds": 0.06404495239257812,
+          "waitedChildUserSeconds": 0.010745000000000005,
+          "waitedChildSystemSeconds": 0.008155000000000023,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 6,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06814041687175632,
+          "wallSeconds": 0.06814098358154297,
+          "waitedChildUserSeconds": 0.011504000000000014,
+          "waitedChildSystemSeconds": 0.00895900000000005,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 7,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06734779197722673,
+          "wallSeconds": 0.06734800338745117,
+          "waitedChildUserSeconds": 0.010958999999999997,
+          "waitedChildSystemSeconds": 0.008604999999999974,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 7,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06373475003056228,
+          "wallSeconds": 0.06373476982116699,
+          "waitedChildUserSeconds": 0.01094299999999998,
+          "waitedChildSystemSeconds": 0.008568999999999938,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 8,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06627970817498863,
+          "wallSeconds": 0.06627988815307617,
+          "waitedChildUserSeconds": 0.011024000000000034,
+          "waitedChildSystemSeconds": 0.00819700000000001,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 8,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.05762100010178983,
+          "wallSeconds": 0.057621002197265625,
+          "waitedChildUserSeconds": 0.011315999999999993,
+          "waitedChildSystemSeconds": 0.008931000000000022,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 9,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06783495796844363,
+          "wallSeconds": 0.06783580780029297,
+          "waitedChildUserSeconds": 0.011152999999999968,
+          "waitedChildSystemSeconds": 0.008808999999999956,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 9,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06028354191221297,
+          "wallSeconds": 0.06028389930725098,
+          "waitedChildUserSeconds": 0.010985999999999996,
+          "waitedChildSystemSeconds": 0.008533000000000013,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 10,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06546333408914506,
+          "wallSeconds": 0.06546282768249512,
+          "waitedChildUserSeconds": 0.010865000000000014,
+          "waitedChildSystemSeconds": 0.008365000000000067,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 10,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06511437497101724,
+          "wallSeconds": 0.06511402130126953,
+          "waitedChildUserSeconds": 0.01095700000000005,
+          "waitedChildSystemSeconds": 0.008465999999999974,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 11,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06869045807980001,
+          "wallSeconds": 0.06869006156921387,
+          "waitedChildUserSeconds": 0.011117999999999961,
+          "waitedChildSystemSeconds": 0.008596000000000048,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 11,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06391929206438363,
+          "wallSeconds": 0.06392025947570801,
+          "waitedChildUserSeconds": 0.011050000000000004,
+          "waitedChildSystemSeconds": 0.008529999999999927,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 12,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06397354090586305,
+          "wallSeconds": 0.06397366523742676,
+          "waitedChildUserSeconds": 0.010871999999999993,
+          "waitedChildSystemSeconds": 0.00819000000000003,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 12,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06393395806662738,
+          "wallSeconds": 0.0639350414276123,
+          "waitedChildUserSeconds": 0.011009000000000047,
+          "waitedChildSystemSeconds": 0.00856100000000004,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 13,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06493070907890797,
+          "wallSeconds": 0.06493115425109863,
+          "waitedChildUserSeconds": 0.011165999999999898,
+          "waitedChildSystemSeconds": 0.009180999999999995,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 13,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06857291702181101,
+          "wallSeconds": 0.068572998046875,
+          "waitedChildUserSeconds": 0.011201000000000016,
+          "waitedChildSystemSeconds": 0.008650999999999964,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 14,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.0721647918689996,
+          "wallSeconds": 0.07216477394104004,
+          "waitedChildUserSeconds": 0.011210000000000053,
+          "waitedChildSystemSeconds": 0.008526000000000034,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 14,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.05745770805515349,
+          "wallSeconds": 0.05745887756347656,
+          "waitedChildUserSeconds": 0.011236000000000024,
+          "waitedChildSystemSeconds": 0.008722999999999925,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 15,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06604520883411169,
+          "wallSeconds": 0.06604623794555664,
+          "waitedChildUserSeconds": 0.01091399999999998,
+          "waitedChildSystemSeconds": 0.008499000000000034,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 15,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.061291208025068045,
+          "wallSeconds": 0.06129169464111328,
+          "waitedChildUserSeconds": 0.010704999999999965,
+          "waitedChildSystemSeconds": 0.008136000000000032,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 16,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.07013933290727437,
+          "wallSeconds": 0.07014012336730957,
+          "waitedChildUserSeconds": 0.010824000000000056,
+          "waitedChildSystemSeconds": 0.008424999999999905,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 16,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.07282866700552404,
+          "wallSeconds": 0.07282900810241699,
+          "waitedChildUserSeconds": 0.011321999999999943,
+          "waitedChildSystemSeconds": 0.008852000000000082,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 17,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.07132708397693932,
+          "wallSeconds": 0.07132697105407715,
+          "waitedChildUserSeconds": 0.011542000000000052,
+          "waitedChildSystemSeconds": 0.00941599999999998,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 17,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06957275001332164,
+          "wallSeconds": 0.06957316398620605,
+          "waitedChildUserSeconds": 0.01120499999999991,
+          "waitedChildSystemSeconds": 0.008623999999999965,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 18,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06342141702771187,
+          "wallSeconds": 0.06342196464538574,
+          "waitedChildUserSeconds": 0.011090000000000044,
+          "waitedChildSystemSeconds": 0.008446000000000065,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 18,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06814149999991059,
+          "wallSeconds": 0.06814193725585938,
+          "waitedChildUserSeconds": 0.011167000000000038,
+          "waitedChildSystemSeconds": 0.00890599999999997,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 19,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06589083303697407,
+          "wallSeconds": 0.06589102745056152,
+          "waitedChildUserSeconds": 0.011182999999999943,
+          "waitedChildSystemSeconds": 0.008746000000000032,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 19,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06728570815175772,
+          "wallSeconds": 0.06728529930114746,
+          "waitedChildUserSeconds": 0.010870000000000046,
+          "waitedChildSystemSeconds": 0.00810999999999995,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 20,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.05787224997766316,
+          "wallSeconds": 0.05787301063537598,
+          "waitedChildUserSeconds": 0.01103199999999993,
+          "waitedChildSystemSeconds": 0.008296999999999999,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 20,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06394079211167991,
+          "wallSeconds": 0.06394100189208984,
+          "waitedChildUserSeconds": 0.011249000000000065,
+          "waitedChildSystemSeconds": 0.009029999999999982,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 21,
+          "binary": "candidate",
+          "warmup": false,
+          "elapsedSeconds": 0.06693562492728233,
+          "wallSeconds": 0.06693506240844727,
+          "waitedChildUserSeconds": 0.011460000000000026,
+          "waitedChildSystemSeconds": 0.009172000000000069,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        },
+        {
+          "pair": 21,
+          "binary": "baseline",
+          "warmup": false,
+          "elapsedSeconds": 0.06369774998165667,
+          "wallSeconds": 0.06369829177856445,
+          "waitedChildUserSeconds": 0.010885999999999951,
+          "waitedChildSystemSeconds": 0.008278999999999925,
+          "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+          "exitCode": 0
+        }
+      ],
+      "scope": "One synthetic detached encrypted APFS package, same status output, alternating AB/BA. Includes process startup/native IPC/identity checks. Host and caches uncontrolled; no isolated guard latency, energy, desktop, competitor or causal speed claim.",
+      "passphrasePersisted": false,
+      "metrics": {
+        "candidate": {
+          "elapsedSeconds": {
+            "samples": 20,
+            "median": 0.06649041688069701,
+            "p95": 0.07140216312836856,
+            "minimum": 0.05745770805515349,
+            "maximum": 0.07282866700552404
+          },
+          "waitedChildCPUSeconds": {
+            "samples": 20,
+            "median": 0.020017499999999966,
+            "p95": 0.020648300000000095,
+            "minimum": 0.019413000000000014,
+            "maximum": 0.020958000000000032
+          }
+        },
+        "baseline": {
+          "elapsedSeconds": {
+            "samples": 20,
+            "median": 0.06412252096924931,
+            "p95": 0.07024060585536063,
+            "minimum": 0.05787224997766316,
+            "maximum": 0.0721647918689996
+          },
+          "waitedChildCPUSeconds": {
+            "samples": 20,
+            "median": 0.01923950000000002,
+            "p95": 0.01983014999999988,
+            "minimum": 0.018840999999999997,
+            "maximum": 0.01985199999999998
+          }
+        }
+      },
+      "pairedCandidateMinusBaselineSeconds": {
+        "samples": 20,
+        "median": 0.001716854516416788,
+        "p95": 0.006142685830127448,
+        "minimum": -0.014707083813846111,
+        "maximum": 0.007551416056230664
+      },
+      "all44StatusOutputsEqual": true,
+      "manifestAndImageIdentityUnchangedDuringStatus": true,
+      "historyPreserved": true,
+      "independentlyDetached": true
+    },
+    "reportSHA256": "2f9339c5728cb25ba897e906327b197a4665f8752ae05e440b3bf8357ecacd31",
+    "host": {
+      "chip": "Apple M5 Max",
+      "macOS": "26.6.2"
+    },
+    "scope": "Separate post-qualification 44-call experiment, not a thirteenth ordered qualification operation or whole-desktop benchmark"
+  },
+  "postBenchmarkProof": {
+    "recordedAtUTC": "2026-10-29T10:39:32.653250+00:00",
+    "source": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "packagingSource": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "sourceCIObservation": {
+    "recordedAtUTC": "2026-10-29T10:49:06.807220+00:00",
+    "source": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "run": 40856700219,
+    "benchmark": {
+      "id": 123389358327,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "native": {
+      "id": 123389358649,
+      "status": "completed",
+      "conclusion": "success",
+      "nativeFaultStepSucceeded": true
+    },
+    "laterDocumentationHeadCISeparate": true
+  },
+  "trackerFollowup": {
+    "requirements": 76,
+    "offerings": 16,
+    "allStatusesUnchanged": true,
+    "other74FeatureRowsUnchanged": true,
+    "vendorRowsUnchanged": true,
+    "canonicalJSONUnchangedOnRender": true,
+    "deterministicHTML": true,
+    "inputSHA256": {
+      "docs/features.json": "624297da249269d0953dd8b22d00ca54fe85966f338c4b0d1edd953117841bfa",
+      "docs/landscape.json": "67f6b21f433603da2515de21b894eb01d9fbc0fbcca0f2372d6cc2318294bb68"
+    },
+    "HTMLSHA256": "7f798e65c6393dfc33cdba4ae490cf60b66e9f3a354b507bf00ca02bc676747c",
+    "desktopVisualReview": true,
+    "desktopCSSWidth": 1600,
+    "narrowDOMChecks": {
+      "viewport": 487,
+      "pageWidth": 487,
+      "tableOverflow": "auto"
+    },
+    "filters": [
+      "F048 Encrypted vault",
+      "7e21e0f returns F048 and F072",
+      "TODO returns F013 F047 F059 F067 F071"
+    ],
+    "narrowVisualReview": false,
+    "limits": [
+      "Requested390 CSS override yielded487; resized narrow screenshot was blank; no renewed narrow visual acceptance",
+      "Ordinary desktop rendering and narrow DOM/filter/overflow checks pass"
+    ],
+    "temporaryOverridesReset": true,
+    "previewTabsClosed": true,
+    "statusCounts": {
+      "live verified": 4,
+      "partial": 36,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 5,
+      "out of v0 desktop scope": 2
+    }
+  },
+  "deliveryProof": {
+    "recordedAtUTC": "2026-10-29T10:47:27.615067+00:00",
+    "source": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "packagingSource": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    },
+    "productAndQualifiedHarnessInputsUnchanged": true
+  }
+}
