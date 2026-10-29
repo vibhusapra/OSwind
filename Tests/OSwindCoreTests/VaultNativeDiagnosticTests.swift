@@ -64,4 +64,25 @@ final class VaultNativeDiagnosticTests:XCTestCase {
             }
         }
     }
+    func testSafeSummaryRetainsTerminationClassWithoutRawOutput() throws {
+        for termination:VaultProcessTermination in [.exit,.signal,.unknown] {
+            let result=VaultProcessResult(status:2,stdout:privateOutput,stderr:privateOutput,termination:termination)
+            let summary=VaultNativeSummary(operation:.attachmentInventory,result:result)
+            XCTAssertEqual(summary.termination,termination)
+            let decoded=try JSONDecoder().decode(VaultNativeSummary.self,from:JSONEncoder().encode(summary))
+            XCTAssertEqual(decoded,summary)
+            let error=VaultNativeFailure(operation:.attachmentInventory,result:result)
+            XCTAssertTrue(error.localizedDescription.contains(termination.label+" 2"))
+            XCTAssertFalse(String(reflecting:error).contains("PRIVATE-CREDENTIAL"))
+        }
+    }
+    func testZeroStatusSignalOrUnknownTerminationCannotAdmitSuccessfulBody() throws {
+        let inventory=try PropertyListSerialization.data(fromPropertyList:["images":[]],format:.xml,options:0)
+        let encryption=try PropertyListSerialization.data(fromPropertyList:["encrypted":true],format:.xml,options:0)
+        for termination:VaultProcessTermination in [.signal,.unknown] {
+            XCTAssertThrowsError(try NativeVaultDriver.attachmentList(.init(status:0,stdout:inventory,stderr:Data(),termination:termination)))
+            XCTAssertThrowsError(try NativeVaultDriver.encryptionFlag(.init(status:0,stdout:encryption,stderr:Data(),termination:termination)))
+        }
+        XCTAssertTrue(VaultProcessResult(status:0,stdout:Data(),stderr:Data()).succeeded)
+    }
 }

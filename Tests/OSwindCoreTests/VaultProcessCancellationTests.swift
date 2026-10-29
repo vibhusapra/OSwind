@@ -70,4 +70,17 @@ final class VaultProcessCancellationTests:XCTestCase {
         let result=try await VaultProcess.run("/usr/bin/python3",["-c","import sys;print('owned output');sys.stderr.write('owned error');sys.exit(7)"],cancellation:.finishNativeAction)
         XCTAssertEqual(result.status,7);XCTAssertEqual(String(data:result.stdout,encoding:.utf8),"owned output\n");XCTAssertEqual(String(data:result.stderr,encoding:.utf8),"owned error")
     }
+    func testEqualNumberNormalExitAndUncaughtSignalAreNotBothCalledExit() async throws {
+        for number in [SIGINT,SIGTERM] {
+            let normal=try await VaultProcess.run("/usr/bin/python3",["-c","raise SystemExit(\(number))"])
+            let signalled=try await VaultProcess.run("/usr/bin/python3",["-c","import os,signal;signal.signal(\(number),signal.SIG_DFL);os.kill(os.getpid(),\(number));raise SystemExit(99)"])
+            XCTAssertEqual(normal.status,number);XCTAssertEqual(signalled.status,number)
+            XCTAssertEqual(normal.termination,.exit);XCTAssertEqual(signalled.termination,.signal)
+            XCTAssertFalse(normal.succeeded);XCTAssertFalse(signalled.succeeded)
+            let normalError=VaultNativeFailure(operation:.attachmentInventory,result:normal),signalError=VaultNativeFailure(operation:.attachmentInventory,result:signalled)
+            XCTAssertTrue(normalError.localizedDescription.contains("exit \(number)"))
+            XCTAssertTrue(signalError.localizedDescription.contains("signal \(number)"),"signal \(number)")
+            XCTAssertFalse(signalError.localizedDescription.contains("exit \(number)"),"signal \(number)")
+        }
+    }
 }
