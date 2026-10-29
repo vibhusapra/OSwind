@@ -1,0 +1,234 @@
+{
+  "format": "OSwind local alternative PII reference validation v1",
+  "frozenAtUTC": "2026-10-29T11:53:03.973656+00:00",
+  "productSourceUnchanged": "7e21e0f6fc8d1cbec4c6a49cf284813a6d12b912",
+  "harnessBase": "4994f9729d94746382f9f8afb2f3b0d393209999",
+  "corpusSHA256": "1f535deee05a2c5785bd3201e6b50e3bd349996e33802855314a39dff127491e",
+  "patternPredictionsSHA256": "ec5c5eefc2b595f6e39fdb65c913230d8f756a6e8b5691e7df85f28e3d9409d3",
+  "models": {
+    "edge": {
+      "repository": "knowledgator/gliner-pii-edge-v1.0",
+      "revision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+      "files": [
+        {
+          "path": "gliner_config.json",
+          "bytes": 4316,
+          "sha256": "77e6b57335c4bfd461e9041682196dd6c373a0b09bbd9269ef9e95b807915340"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 3583593,
+          "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 21214,
+          "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 694,
+          "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049"
+        },
+        {
+          "path": "pytorch_model.bin",
+          "bytes": 180735778,
+          "sha256": "0160706fa5d034410175cc53808419d975658e12f1cac1a916fbde8155155add"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "bytes": 181078966,
+          "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836"
+        }
+      ]
+    },
+    "small": {
+      "repository": "knowledgator/gliner-pii-small-v1.0",
+      "revision": "d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e",
+      "files": [
+        {
+          "path": "gliner_config.json",
+          "bytes": 4316,
+          "sha256": "c10803bade021f40072b194bc78bc2edd2bf3e60637a6f34cc9b00705bf3c168"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 3583593,
+          "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 21214,
+          "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 694,
+          "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049"
+        },
+        {
+          "path": "pytorch_model.bin",
+          "bytes": 326195231,
+          "sha256": "4e305dd95b70c5822443d06d8e6a84b47532d1f9d674d1cd577b0f9aac7d6b02"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "bytes": 326820148,
+          "sha256": "c60fd671a30798c1bfad5828f8bbf6214eb44cbc5e2f0fb968563ae935a17454"
+        }
+      ]
+    },
+    "base": {
+      "repository": "knowledgator/gliner-pii-base-v1.0",
+      "revision": "61726e0ad791dcab3e29339bbec3ad42ded65641",
+      "files": [
+        {
+          "path": "gliner_config.json",
+          "bytes": 3902,
+          "sha256": "e33d3da38e0d369fa7574668d3798ca6c7d2b23cba7d628507112eeb426aaccb"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 8649232,
+          "sha256": "ee028763434d18611c1c36356ea1d050e90a9fa94ede57fac48b39f85f818ad1"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 1691,
+          "sha256": "3ec8a90d8758fbc56d50831990c3a3a65660f020c5b06534adf43b04091ffa9e"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 970,
+          "sha256": "b2f1b2f15f29a6b6d9d6ea4eca1675d2c231a71477f151d48f79cc83a625ba21"
+        },
+        {
+          "path": "pytorch_model.bin",
+          "bytes": 664140735,
+          "sha256": "da21d12e61e3da22cb93d2663b8593e752c440479a68a647b061447bcd8f9e42"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "bytes": 664764803,
+          "sha256": "c6ccec44625d46bfe3191152e41d6564b69bc9d4313b7f3e419e8372679e9fed"
+        },
+        {
+          "path": "spm.model",
+          "bytes": 2464616,
+          "sha256": "c679fbf93643d19aab7ee10c0b99e460bdbc02fedf34b92b05af343b4af586fd"
+        },
+        {
+          "path": "added_tokens.json",
+          "bytes": 65,
+          "sha256": "c358eb74586ab438484d8acf4534f67283b33041bc5ffee6b20a4a075cdc3cd6"
+        }
+      ]
+    }
+  },
+  "labels": {
+    "email address": "email",
+    "phone number": "phone",
+    "location address": "address",
+    "ssn": "government_id",
+    "passport number": "government_id",
+    "driver license": "government_id",
+    "account number": "financial_id",
+    "credit card": "credit_card",
+    "dob": "date_of_birth",
+    "ip address": "ip_address",
+    "password": "secret",
+    "api key": "secret"
+  },
+  "thresholdGrid": [
+    0.3,
+    0.5,
+    0.7
+  ],
+  "initialThreshold": 0.5,
+  "runtimePins": {
+    "numpy": "2.2.6",
+    "torch": "2.7.0",
+    "onnxruntime": "1.24.2",
+    "gliner": "0.2.29",
+    "transformers": "4.57.1",
+    "tokenizers": "0.22.2",
+    "regex": "2026.9.29",
+    "safetensors": "0.8.0"
+  },
+  "codeSHA256": {
+    "scripts/prepare-pii-eval.py": "5a99ec59f30662d951260f529dbda2f441530854f36540b4e5c0ccd840c0a369",
+    "scripts/pii_quality.py": "2ed02a103cf6ab80a7e58a06f9cd2a4e13f4797a30c634f337430a32df0900fe",
+    "scripts/test-pii-quality.py": "4a79b96214c67ab1911be53e86f7eb25d2dcf7b6c743454fd7f3ca535b2cc60d",
+    "scripts/evaluate-pii-model.py": "15446b614c0ef4baf5cd4168f91bf64790965e5a793075ab14de2bf0643439d2",
+    "scripts/evaluate-pii-baseline.py": "dc30f6ed2b8f753f0e5bf31f1a4143675003aa70433def2f91ae76a883537f15",
+    ".artifacts/pii-backend-alternatives-v1/evaluate-quality-v1.py": "9b0bf920359541a64280b569b2da264a8612b50835150169510d90c2032033b2",
+    ".artifacts/pii-backend-alternatives-v1/run-comparison-v1.py": "637c390b0a6be0fe617ac5a6a0ce2508c209e87dea8edca47da5852e8d7522c6",
+    "benchmarks/prototypes/pii/requirements.lock": "cd475dfcaed48d9b86b533229d176c93dee149339b14de8adc999798500f9393",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/config.py": "8a5a521da4fe5299868b846c51cc67a904b6327a72efa1648c22df938c96587e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/infer_packing.py": "08bfab9934fc5d9f6f535382f6c2d4b6feba747980f58e43a96fa3cfac563631",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/__init__.py": "d621cdd7ff8572db552f04e5ced20fb4b11d7d8fccb3336c6bb243e840503858",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/model.py": "cc1c03ed1540de4c6b836f544921e0a2de33cfae6ad4d8aeb35dc08845d867fe",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/utils.py": "e304365fdf2f7e71772206d190facb64861cb3cec59cf329257efbef6064725a",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/streaming.py": "fd1ee34bd485421d8483b3f784a39f29c0e8d4cc66d0657625c652fef3051267",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/training/__init__.py": "368f50088704eebaa84b674e948fd79a5018412322b3884d0d69c0657f6e05e3",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/training/trainer.py": "191f8cc424f123f6fe8532aa138ea0d4b3b0295db06460b24a547c3c1a4c78da",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/runtime/onnx.py": "e8c678a47c961a8bfdf8b102d8ff49e169a9c1b6b841fdeccc314557b6b58546",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/runtime/openvino.py": "1aaeac33b8da4b242b61eeca84ae59d2a152bb82fabe52f0faf2f6b5fd09001f",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/runtime/__init__.py": "4482d87541e4f48092736186b497c285d2931aecd4d151a5752385ddabb0738d",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/runtime/base.py": "c0c25cb7a468ce2ebd7421c620e79e20074522d4645b3519e9573e4f6c44777e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/data_processing/collator.py": "b6fcce993130b7b4f3c3539ee828a98b886e185b688eeb224b99e16a7bab3362",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/data_processing/__init__.py": "46af4e03db3828fd93993d4eddb689053d2b9a379c05031453f034ee60805c89",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/data_processing/processor.py": "46bef57b653d5991776f151882d82f49e6121610b40ba51edc6d4172742e6d01",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/data_processing/tokenizer.py": "2dd8c7762ae6cd8fcd8dbf062e16f5441d44814373611d7b6be3a87ed08c5d9a",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/data_processing/utils.py": "5e2c9025cb2c14df05736b80fd7cc677e0edd4373f630eb69bb61ab40db00ba8",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/decoding/decoder.py": "bc744959db5937ca3c218102189e8416bdc6a5cb5dcf40de843b9394d3dca5e8",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/decoding/__init__.py": "469e1706634818bd26a35006e503dafb5077650c418249fd7c329831a6301e3a",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/decoding/utils.py": "447759eaa67000291bfda5f80875a2d0941e91b56c03169bbb783528c195838f",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/context_encoders.py": "73c7d8e4efd78ec9de291eeb7d4715922f8cfa6e736082e3d7640de9ad6c4e20",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/decoder.py": "288c84daee403dc072774a5494dc79b825c708d193f4016e2e510eba5bd42d3e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/scorers.py": "bc7ec66a566a102e5913421cd3fd7f315307990ddf1319665d4ee5111714e96e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/loss_functions.py": "5e9f49fc1d808a903cff90a440b8f0c75da3bd1fcfd24ea17e661f2c18673ce5",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/span_rep.py": "dba08bc90d09164ea72a66331dd802149520d68661b71abfdd20d25602981e81",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/cache.py": "ae35007b6abfb9547903b3c51ea53f5096b1edb4b4964fc00d4783af33ccf4f9",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/__init__.py": "9f5aea153eb9300a9fda6e83b523d9cb7bcee9cfd1a7c4890466290522ce1696",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/encoder.py": "473204b1378ab462a7dbe24ea7f66f1291266b63d3d6afac9ab888b692108b7f",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/utils.py": "ad99baafbca0c401b48e48a6983f793d377d8249469db8b9be689613f4e1e652",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/layers.py": "614b5960fc21db7fa04d520564e721d5bc35bed723daf366dc798edad89ccabc",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/base.py": "121ce030f6ed9137315bc8486031c7901f433ef52f5881343773cdb46e8e9e3f",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/outputs.py": "f3929b57602af56c58318b4b5b86113ec7f33cc95c030d5aba04c0a049d5d810",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/evaluation/evaluate_ner.py": "97288f8868b16145696739efb37cf472a0ee75f75e68957c85f114786346e4dd",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/evaluation/__init__.py": "e2692693dba27ba5803ea9eaa1a95e3c158314193211b11b7409163722bae87c",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/evaluation/utils.py": "33b54d2ffd17e81a42fb44ce99a7bda6dd80d57fa4894875da36bc9c53afcf13",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/evaluation/evaluator.py": "52f66c1df1ad8c5ecbd90b17293bb412bcb9ddd0ffce6add1b0b361cbc4ab83e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/question_answering.py": "45209525d64441496338a6f9b94a60e390ab170c97933de55ee5c65ada13647e",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/classification.py": "b574276346120b7cd9b3f0fe6282ebc37af37a770b416f67690e68125f735922",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/open_extraction.py": "211e6dfc3c8357c5b8b3499145185cfeb6fe134c60f2496f3d00c4d23fddf485",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/__init__.py": "facd166ea2daa1a386a5589dda4b9686f012f2495dc41836b45e4df1422ca0e1",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/relation_extraction.py": "83573cc4a361cc3d7b567e0a6885da251c4cd00300d8613a221673bed2cfdf37",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/summarization.py": "30f9fa3a764799cfaf05ae2917fa7c874e23b307d963d4703d252d2baa822738",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/multitask/base.py": "9ffb3b9461878cc405ecb789411e5da779e5e046925c43f644411dc19cf52c37",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/server.py": "394cd2872595e7fa6a20b575d68a0eaa9aad5689271a9f5b6db2590a23e8124d",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/config.py": "0492e912b5434c710fce04ac44836f36e7911c25c38dfdc33500fa88aecc5a40",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/memory.py": "3775952a3768e6d3a3ceae265ddf6bc030263ebc3206704631ab582cc67006fb",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/client.py": "842cd4a91d857889094317f41bd7e0e48d2cbe578e7b98bf16689efd2a502fe3",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/__init__.py": "14a8c246b318c29638dd9a31e29b74535505f8eb66748e266c36eb0e1c413350",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/serve/__main__.py": "826cdb8e10796c076de7693bc5d25062ef39b18d9a01e839a2dc6e80395bd6fd",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/decoding/trie/__init__.py": "eb6ba1fe656f3b0ad0f7ba293be75c9716f5db253687dbc41340efb804ce70ce",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/decoding/trie/python_labels_trie.py": "8507f5c29d7056f6f030cb2d37e6084d95e8ff964c0418abd23320de0ffb04e4",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/multitask/relations_layers.py": "0eed8c33d2e2092cbfb8239628c014dff92c3605bb97a119c1ccbf5cce83c0cc",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/multitask/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".local/pii-python-v1/lib/python3.12/site-packages/gliner/modeling/multitask/triples_layers.py": "06a4cff68ce5d21c920d163b1c7f83e2834df496211ee84a9d9a94f8eaa9f02f"
+  },
+  "scope": "Same153 already selected public synthetic English validation documents,250 values/45 policy-negatives. External author annotations, unknown training overlap. No public test or authored reserved predictions. Fixed three thresholds and twelve prompts across three models/two runtimes.",
+  "limits": [
+    "Python full-text reference processing is not a native installed product backend",
+    "All text must fit512 framed tokens; truncation/over-budget input refuses the whole run",
+    "Pinned regex grapheme expansion is reference behavior, not assumed native ICU equivalence",
+    "MPS parameters and every output logits tensor must be on MPS with CPU fallback disabled; tokenization/decoding stay on CPU",
+    "Actual signed shipping-rule masks are reused without detector replication",
+    "Times include finite-output validation, no randomized paired isolation, physical power or competitor speed claim",
+    "Raw source/entity text is not persisted by this reference evaluator or published",
+    "No quality policy or production privacy acceptance"
+  ],
+  "originalPathBearingPlanSHA256": "dfcb7c51631526fc576e9b5c807e2ea02bdd0e95e467761c1e479b2f7257721c"
+}

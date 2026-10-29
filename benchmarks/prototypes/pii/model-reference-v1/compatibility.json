@@ -1,0 +1,85 @@
+{
+  "state": "verified",
+  "models": 3,
+  "neuralOutputsValidated": 2754,
+  "coordinateMetricGroupsRecomputed": 54,
+  "distinctSources": 153,
+  "backendAgreement": {
+    "edge": {
+      "0.3": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 8.225440979003906e-06
+      },
+      "0.5": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 8.225440979003906e-06
+      },
+      "0.7": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 3.0994415283203125e-06
+      }
+    },
+    "small": {
+      "0.3": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 3.814697265625e-06
+      },
+      "0.5": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 3.814697265625e-06
+      },
+      "0.7": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 1.5497207641601562e-06
+      }
+    },
+    "base": {
+      "0.3": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 4.231929779052734e-06
+      },
+      "0.5": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 4.231929779052734e-06
+      },
+      "0.7": {
+        "exactModelMasks": 153,
+        "exactCombinedMasks": 153,
+        "sameTypedCategoriesAndCoordinates": 153,
+        "maxConfidenceDifferenceOnMatchingSpans": 1.6093254089355469e-06
+      }
+    }
+  },
+  "qualityAcceptance": false,
+  "productionBackendSelected": false,
+  "nativeCPUAndReferenceEdgeMaskAgreement": {
+    "0.3": {
+      "model": 153,
+      "hybrid": 153
+    },
+    "0.5": {
+      "model": 153,
+      "hybrid": 153
+    },
+    "0.7": {
+      "model": 153,
+      "hybrid": 153
+    }
+  }
+}

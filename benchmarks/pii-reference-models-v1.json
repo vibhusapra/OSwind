@@ -1,0 +1,370 @@
+{
+  "format": "OSwind local PII model reference comparison v1",
+  "state": "completed",
+  "recordedAtUTC": "2026-10-29T12:18:44.729679+00:00",
+  "originalPlanSHA256": "dfcb7c51631526fc576e9b5c807e2ea02bdd0e95e467761c1e479b2f7257721c",
+  "corpusSHA256": "1f535deee05a2c5785bd3201e6b50e3bd349996e33802855314a39dff127491e",
+  "distinctSources": 153,
+  "goldValues": 250,
+  "policyNegativeSources": 45,
+  "models": 3,
+  "runtimes": [
+    "onnx-cpu",
+    "torch-mps"
+  ],
+  "thresholdGrid": [
+    0.3,
+    0.5,
+    0.7
+  ],
+  "neuralOutputsValidated": 2754,
+  "coordinateMetricGroupsRecomputed": 54,
+  "matrix": {
+    "state": "completed",
+    "operations": [
+      {
+        "model": "edge",
+        "runtime": "onnx-cpu",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 8.602357709081843
+      },
+      {
+        "model": "edge",
+        "runtime": "torch-mps",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 27.534734457964078
+      },
+      {
+        "model": "small",
+        "runtime": "onnx-cpu",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 11.661857082974166
+      },
+      {
+        "model": "small",
+        "runtime": "torch-mps",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 29.937317290809005
+      },
+      {
+        "model": "base",
+        "runtime": "onnx-cpu",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 12.021442125085741
+      },
+      {
+        "model": "base",
+        "runtime": "torch-mps",
+        "exitCode": 0,
+        "timeout": false,
+        "elapsedSeconds": 36.869197624968365
+      }
+    ],
+    "scope": "Six sequential experimental reference processes, no automatic retry or installed product change. All failures remain retained."
+  },
+  "compatibility": {
+    "state": "verified",
+    "models": 3,
+    "neuralOutputsValidated": 2754,
+    "coordinateMetricGroupsRecomputed": 54,
+    "distinctSources": 153,
+    "backendAgreement": {
+      "edge": {
+        "0.3": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 8.225440979003906e-06
+        },
+        "0.5": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 8.225440979003906e-06
+        },
+        "0.7": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 3.0994415283203125e-06
+        }
+      },
+      "small": {
+        "0.3": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 3.814697265625e-06
+        },
+        "0.5": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 3.814697265625e-06
+        },
+        "0.7": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 1.5497207641601562e-06
+        }
+      },
+      "base": {
+        "0.3": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 4.231929779052734e-06
+        },
+        "0.5": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 4.231929779052734e-06
+        },
+        "0.7": {
+          "exactModelMasks": 153,
+          "exactCombinedMasks": 153,
+          "sameTypedCategoriesAndCoordinates": 153,
+          "maxConfidenceDifferenceOnMatchingSpans": 1.6093254089355469e-06
+        }
+      }
+    },
+    "qualityAcceptance": false,
+    "productionBackendSelected": false,
+    "nativeCPUAndReferenceEdgeMaskAgreement": {
+      "0.3": {
+        "model": 153,
+        "hybrid": 153
+      },
+      "0.5": {
+        "model": 153,
+        "hybrid": 153
+      },
+      "0.7": {
+        "model": 153,
+        "hybrid": 153
+      }
+    }
+  },
+  "artifacts": [
+    {
+      "path": "prototypes/pii/model-reference-v1/plan.json",
+      "bytes": 15569,
+      "sha256": "7e6c8dcaa5b6bb60bc1fecf6d57ae8c130d8a1dd4854e10918df696df1807e66"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/asset-plan-v2.json",
+      "bytes": 5413,
+      "sha256": "b2cd86898892b7e4bc5b00c8b023fc6e76d157fbd23bff8ae072719cd24fbf26"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/compatibility.json",
+      "bytes": 2444,
+      "sha256": "152065c9a4d2f0dca6c25da532084139df3a3600be77d789e117bb4ae3e76968"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/source-metadata.json",
+      "bytes": 3695,
+      "sha256": "608c6184fba521f48e94b0aaeeedc057e4e4adfd7faa3a1b9d733f25773918be"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/evaluate-quality-v1.py",
+      "bytes": 8779,
+      "sha256": "9b0bf920359541a64280b569b2da264a8612b50835150169510d90c2032033b2"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/prepare-assets-v1.py",
+      "bytes": 2676,
+      "sha256": "4acb44c30e8fd0490bbec889cf49c841a64fb2eae5e42d029540f1730c0702b2"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/run-comparison-v1.py",
+      "bytes": 1498,
+      "sha256": "637c390b0a6be0fe617ac5a6a0ce2508c209e87dea8edca47da5852e8d7522c6"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-onnx-cpu/report.json",
+      "bytes": 90907,
+      "sha256": "b8ca53c8465cc27fc0a9d8f84089c83adbd66acf292c96f2f7e1a11cb5f0a695"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-onnx-cpu/predictions-0.3.json",
+      "bytes": 250668,
+      "sha256": "e72f892cc4ae23d45a91a223f9c02d7c8e657492df3363d090d160760f1ff950"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-onnx-cpu/predictions-0.5.json",
+      "bytes": 180683,
+      "sha256": "2baca1e2e6fc51b32fb035df692c29a3b883a1c19603b987c019f692e1c6d9e1"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-onnx-cpu/predictions-0.7.json",
+      "bytes": 129165,
+      "sha256": "ef8543e1eb8c3532bb6317ce721dcc53237b57668f45e8cd4184231b3131b01f"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-torch-mps/report.json",
+      "bytes": 90770,
+      "sha256": "c8298c5d620f7cbd7081fe90dd35a8f15c21d30a80c54ef3bf7db5d1315997bd"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-torch-mps/predictions-0.3.json",
+      "bytes": 250678,
+      "sha256": "e8d4e2114b50694d830731b7cd9f44b55cb9a29430851c610c7bc09a4f844bf6"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-torch-mps/predictions-0.5.json",
+      "bytes": 180695,
+      "sha256": "ef4dacd307629c2cb0e8dc75d872381efaa3160d4af02a9ceb3bf7102a4852b2"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/edge-torch-mps/predictions-0.7.json",
+      "bytes": 129157,
+      "sha256": "5083ae25d61756b53e5060d5a2401e3f8278067ce73c11ad3b5618b4120f9c31"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-onnx-cpu/report.json",
+      "bytes": 90819,
+      "sha256": "2b325f6f4ca56e136dcd61dab99c70a88cb3048bb4dfc1a2fd9ef94a5503862b"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-onnx-cpu/predictions-0.3.json",
+      "bytes": 236908,
+      "sha256": "ca80a82d9f50c324f5e8426f858c0e25a6a24b1f50572f581664281e0eb5caf8"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-onnx-cpu/predictions-0.5.json",
+      "bytes": 190981,
+      "sha256": "533b8ba27d32b160530ef30f0f9578a1c0b8be2c231e9e3d56e1700d7ed6817e"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-onnx-cpu/predictions-0.7.json",
+      "bytes": 145884,
+      "sha256": "912f1ab76453a7f7516cbaad0fbea9827e9cb4a749acd590b30e175184e71db9"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-torch-mps/report.json",
+      "bytes": 90673,
+      "sha256": "86d60ca8fbecd2e6e1b2a09893ec6e02180ade39095f99f3f4d4ee44c3fdb575"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-torch-mps/predictions-0.3.json",
+      "bytes": 236901,
+      "sha256": "527f3d21f14643d5952b9be435ba66af71eab3791d966c5ded9f3c648cd7e689"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-torch-mps/predictions-0.5.json",
+      "bytes": 190982,
+      "sha256": "c272cbf27f845a285499e57f5adce11eae05852269546ea6417b9829b08a83af"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/small-torch-mps/predictions-0.7.json",
+      "bytes": 145892,
+      "sha256": "0ce43934db1dd2e8968e19a120342246fd7ba380967f379bed51f8b1639fcaf4"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-onnx-cpu/report.json",
+      "bytes": 90705,
+      "sha256": "2113e47a845f564817e7f4f2510e48d7270212b844aa602c494c83f756b3349e"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-onnx-cpu/predictions-0.3.json",
+      "bytes": 211596,
+      "sha256": "33fb9e61c18d25074da2d08006491e00a360893f0df3aa8b96403c9936cd2936"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-onnx-cpu/predictions-0.5.json",
+      "bytes": 185473,
+      "sha256": "48b343f2e3f88c1a9406f2a6b12c8ceea893925afb4030a89f23eb68db64d7af"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-onnx-cpu/predictions-0.7.json",
+      "bytes": 158017,
+      "sha256": "863cf7b545b0abc397f47cdfe0dca21811031c3c2c303b7c67383ba99f6f9a2c"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-torch-mps/report.json",
+      "bytes": 90635,
+      "sha256": "533fb4abfd8dc4db0878b84330890feed28c5638162775fbea13a1fdbce7ff8c"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-torch-mps/predictions-0.3.json",
+      "bytes": 211603,
+      "sha256": "ed23e22a672f3934a2167920cc8b30deb6087eae1ec89fdeb8b2a497374da51c"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-torch-mps/predictions-0.5.json",
+      "bytes": 185480,
+      "sha256": "09a9cef5507823858411e422612f72bf156dff1333bfa0238073d9b13d19533d"
+    },
+    {
+      "path": "prototypes/pii/model-reference-v1/base-torch-mps/predictions-0.7.json",
+      "bytes": 158020,
+      "sha256": "1ad9936aaa01c2f1bf7c3f8b08419e090068b469cc39e4c7dbd19127b3581cd7"
+    },
+    {
+      "path": "prototypes/pii/gretel-validation-v1/manifest.json",
+      "bytes": 269329,
+      "sha256": "5b4b6ce6e952ca35fcaf65cc38cca92da4a9889d858f98b44b61b854a92efcce"
+    },
+    {
+      "path": "prototypes/pii/gretel-validation-v1/observations-v1/pattern-predictions.json",
+      "bytes": 32313,
+      "sha256": "ec5c5eefc2b595f6e39fdb65c913230d8f756a6e8b5691e7df85f28e3d9409d3"
+    },
+    {
+      "path": "pii-domain-validation-v1.json",
+      "bytes": 460875,
+      "sha256": "d72bdc27539e39dd26f483778556bb7ddb1f1b73a65886966f13ab6c11442d17"
+    },
+    {
+      "path": "prototypes/pii/gretel-validation-v1/observations-v1/cpu-0.3-coordinates.json",
+      "bytes": 252343,
+      "sha256": "52f60244d7a7c732ab489a91f008f083e38d9561bb0d2c98f0904a01919f162c"
+    },
+    {
+      "path": "prototypes/pii/gretel-validation-v1/observations-v1/cpu-0.5-coordinates.json",
+      "bytes": 191201,
+      "sha256": "d796cc7e213282d55024dc31eb612761f82074af784dd90f9f2cf5ce9383d598"
+    },
+    {
+      "path": "prototypes/pii/gretel-validation-v1/observations-v1/cpu-0.7-coordinates.json",
+      "bytes": 146320,
+      "sha256": "0591ac97c82abe42f5e43e87c6d5e95c8fd0bac3ef6191e4acacb0b9efb4a8a2"
+    }
+  ],
+  "scope": "Same153 already selected public synthetic English validation documents,250 values/45 policy-negatives. External author annotations, unknown training overlap. No public test or authored reserved predictions. Fixed three thresholds and twelve prompts across three models/two runtimes.",
+  "limits": [
+    "Python full-text reference processing is not a native installed product backend",
+    "All text must fit512 framed tokens; truncation/over-budget input refuses the whole run",
+    "Pinned regex grapheme expansion is reference behavior, not assumed native ICU equivalence",
+    "MPS parameters and every output logits tensor must be on MPS with CPU fallback disabled; tokenization/decoding stay on CPU",
+    "Actual signed shipping-rule masks are reused without detector replication",
+    "Times include finite-output validation, no randomized paired isolation, physical power or competitor speed claim",
+    "Raw source/entity text is not persisted by this reference evaluator or published",
+    "No quality policy or production privacy acceptance"
+  ],
+  "rawSourceOrEntityTextPublished": false,
+  "productionBackendSelected": false,
+  "qualityAcceptance": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "prototypeSource": "Exact separately frozen artifact scripts and62 source hashes; base4994f97. No source/package/test input or product binary changed.",
+  "additionalAssets": {
+    "files": 14,
+    "bytes": 1996651210,
+    "installedIntoProduct": false
+  },
+  "reproduction": "From repository root stage the exact scripts/assets plan into a new direct child of .artifacts. Explicitly prepare pinned Edge weights with the existing recipe, Small/Base assets with the provided downloader and the same pinned153-source corpus. Rehydrate local absolute paths in a new plan; preserve original receipts. New path-bearing plan/report hashes and uncontrolled timing/memory can differ. Compare source-bound coordinates/metrics under the stated scope.",
+  "hostObservedAfterRun": {
+    "cpu": "Apple M5 Max",
+    "macOS": "26.6.2",
+    "scope": "Read after the completed sequential local processes; no hardware/power setting changed."
+  }
+}

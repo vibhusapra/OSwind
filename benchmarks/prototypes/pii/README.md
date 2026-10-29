@@ -134,3 +134,15 @@ python3 scripts/replay-pii-domain-quality.py \
 ```
 
 Public replay proves coordinate metrics, identity, union and flag consistency; it does not reproduce literal source alignment/rendering without the explicit local files. Both modes pass on all918 stored observations. Stronger Small/Base candidates are downloaded and verified for a separate reference comparison, not installed into OSwind.
+
+## Local reference model comparison
+
+[Edge/Small/Base comparison](../../../docs/PII-MODEL-COMPARISON.md) completes six CPU ONNX/PyTorch MPS processes and2,754 finite-output-validated forwards on the same153-source subset. CPU/MPS masks and typed category/coordinates match for every model/threshold; no privacy operating point or installed backend is accepted. Base0.5 combined coverage207/250 with26/45 flagged illustrates the remaining trade-off.
+
+`model-reference-v1/` preserves exact scripts, sanitized plan/source pins, all coordinate predictions, timings and process/memory observations; no raw source/entity text or weights. [Receipt](../../pii-reference-models-v1.json) binds37 files.
+
+```sh
+python3 scripts/replay-pii-reference-models.py
+```
+
+The linked document includes the explicit asset preparation and plan rehydration recipe. Use a new owned artifact root; no inference script downloads weights. No native app, retention/cancellation, power or competitor acceptance follows from reference MPS execution.

@@ -189,9 +189,10 @@ python3 scripts/replay-pii-domain-quality.py \
 Returned suppression flags do not qualify actual screenshot/audio admission.
 Operation times include startup/loading and uncontrolled host activity; public
 alternative-model asset preparation overlapped some Core ML calls. No latency,
-energy or physical GPU-placement advantage follows. Stronger Small/Base
-candidates are prepared for separate local reference comparison; no candidate
-is selected for production.
+energy or physical GPU-placement advantage follows. The [separate Edge/Small/Base reference comparison](PII-MODEL-COMPARISON.md)
+now completes 2,754 finite-output-validated CPU/MPS forwards. It preserves
+substantial recall/over-redaction trade-offs; no candidate is selected for
+production.
 
 ```sh
 python3 scripts/prepare-pii-domain-eval.py \

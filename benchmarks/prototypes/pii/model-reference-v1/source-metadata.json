@@ -1,0 +1,133 @@
+[
+  {
+    "repository": "knowledgator/gliner-pii-small-v1.0",
+    "revision": "d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e",
+    "declaredLicense": "apache-2.0",
+    "files": [
+      {
+        "name": "gliner_config.json",
+        "bytes": 4316,
+        "sha256": "c10803bade021f40072b194bc78bc2edd2bf3e60637a6f34cc9b00705bf3c168"
+      },
+      {
+        "name": "README.md",
+        "bytes": 15896,
+        "sha256": "f715f1ad8ff24c0f6f1b2745684a587dfe7390f8a1f0621deec57243b34a8b5a"
+      }
+    ],
+    "modelFiles": [
+      "onnx/model.onnx",
+      "onnx/model_fp16.onnx",
+      "onnx/model_quint8.onnx"
+    ],
+    "configuration": {
+      "gliner_config.json": {
+        "model_name": "jhu-clsp/ettin-encoder-68m",
+        "model_type": "gliner",
+        "hidden_size": 768,
+        "span_mode": "token_level",
+        "has_rnn": true,
+        "words_splitter_type": "whitespace",
+        "max_len": 2048,
+        "architectures": null
+      }
+    }
+  },
+  {
+    "repository": "knowledgator/gliner-pii-base-v1.0",
+    "revision": "61726e0ad791dcab3e29339bbec3ad42ded65641",
+    "declaredLicense": "apache-2.0",
+    "files": [
+      {
+        "name": "gliner_config.json",
+        "bytes": 3902,
+        "sha256": "e33d3da38e0d369fa7574668d3798ca6c7d2b23cba7d628507112eeb426aaccb"
+      },
+      {
+        "name": "README.md",
+        "bytes": 15896,
+        "sha256": "f715f1ad8ff24c0f6f1b2745684a587dfe7390f8a1f0621deec57243b34a8b5a"
+      }
+    ],
+    "modelFiles": [
+      "onnx/model.onnx",
+      "onnx/model_fp16.onnx",
+      "onnx/model_quint8.onnx"
+    ],
+    "configuration": {
+      "gliner_config.json": {
+        "model_name": "microsoft/deberta-v3-small",
+        "model_type": "gliner",
+        "hidden_size": 768,
+        "span_mode": "markerV0",
+        "has_rnn": true,
+        "words_splitter_type": "whitespace",
+        "max_len": 2048,
+        "architectures": null
+      }
+    }
+  },
+  {
+    "repository": "knowledgator/gliner-pii-large-v1.0",
+    "revision": "f847f54fbc97ad6e78bfa20ed9c5e5d5c43327b9",
+    "declaredLicense": "apache-2.0",
+    "files": [
+      {
+        "name": "gliner_config.json",
+        "bytes": 3870,
+        "sha256": "0f85c68effd06bad4c3bd532d2094c1b83d3a765bfbaf1e702d8ee6c44083a97"
+      },
+      {
+        "name": "README.md",
+        "bytes": 15897,
+        "sha256": "967369b6285cb20c4538443eefb5dcbc585c77e309b7e7803b83b80cb45f820b"
+      }
+    ],
+    "modelFiles": [
+      "onnx/model.onnx",
+      "onnx/model_quint8.onnx"
+    ],
+    "configuration": {
+      "gliner_config.json": {
+        "model_name": "microsoft/deberta-v3-large",
+        "model_type": "gliner",
+        "hidden_size": 512,
+        "span_mode": "token_level",
+        "has_rnn": true,
+        "words_splitter_type": "whitespace",
+        "max_len": 768,
+        "architectures": null
+      }
+    }
+  },
+  {
+    "repository": "knowledgator/gliner-stream-pii-v1.0",
+    "revision": "e871777dc4b3b688747a0433fff8d94a36fcc7b0",
+    "declaredLicense": "apache-2.0",
+    "files": [
+      {
+        "name": "gliner_config.json",
+        "bytes": 3730,
+        "sha256": "230c4e80da5df0f0fd884b10b9a010a095747cbf58bcd1c22d7333d27437043f"
+      },
+      {
+        "name": "README.md",
+        "bytes": 5076,
+        "sha256": "7f7adc5595d6311a40d81e1ccd6dd76ce6fa948978e7b29215113ed4cfcab95e"
+      }
+    ],
+    "modelFiles": [],
+    "configuration": {
+      "gliner_config.json": {
+        "model_name": "Qwen/Qwen3-0.6B",
+        "model_type": "gliner_streaming_span",
+        "hidden_size": 1024,
+        "span_mode": "markerV2",
+        "has_rnn": null,
+        "words_splitter_type": "whitespace",
+        "max_len": 8192,
+        "architectures": null
+      }
+    }
+  }
+]

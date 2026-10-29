@@ -1,0 +1,3227 @@
+{
+  "state": "completed",
+  "model": "edge",
+  "modelRepository": "knowledgator/gliner-pii-edge-v1.0",
+  "modelRevision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "runtime": "onnx-cpu",
+  "planSHA256": "dfcb7c51631526fc576e9b5c807e2ea02bdd0e95e467761c1e479b2f7257721c",
+  "corpusSHA256": "1f535deee05a2c5785bd3201e6b50e3bd349996e33802855314a39dff127491e",
+  "sources": 153,
+  "goldValues": 250,
+  "policyNegativeSources": 45,
+  "scope": "Same153 already selected public synthetic English validation documents,250 values/45 policy-negatives. External author annotations, unknown training overlap. No public test or authored reserved predictions. Fixed three thresholds and twelve prompts across three models/two runtimes.",
+  "limits": [
+    "Python full-text reference processing is not a native installed product backend",
+    "All text must fit512 framed tokens; truncation/over-budget input refuses the whole run",
+    "Pinned regex grapheme expansion is reference behavior, not assumed native ICU equivalence",
+    "MPS parameters and every output logits tensor must be on MPS with CPU fallback disabled; tokenization/decoding stay on CPU",
+    "Actual signed shipping-rule masks are reused without detector replication",
+    "Times include finite-output validation, no randomized paired isolation, physical power or competitor speed claim",
+    "Raw source/entity text is not persisted by this reference evaluator or published",
+    "No quality policy or production privacy acceptance"
+  ],
+  "timings": [
+    {
+      "id": "gretel-validation-7a894503f2ef4786aa7e3f5b06f58650",
+      "threshold": 0.5,
+      "tokens": 82,
+      "elapsedSeconds": 0.012706208042800426
+    },
+    {
+      "id": "gretel-validation-7a894503f2ef4786aa7e3f5b06f58650",
+      "threshold": 0.3,
+      "tokens": 82,
+      "elapsedSeconds": 0.008113125106319785
+    },
+    {
+      "id": "gretel-validation-7a894503f2ef4786aa7e3f5b06f58650",
+      "threshold": 0.7,
+      "tokens": 82,
+      "elapsedSeconds": 0.008042250061407685
+    },
+    {
+      "id": "gretel-validation-a36b6bae194341bf99ea90522874d0bc",
+      "threshold": 0.5,
+      "tokens": 72,
+      "elapsedSeconds": 0.007927666883915663
+    },
+    {
+      "id": "gretel-validation-a36b6bae194341bf99ea90522874d0bc",
+      "threshold": 0.3,
+      "tokens": 72,
+      "elapsedSeconds": 0.007659458788111806
+    },
+    {
+      "id": "gretel-validation-a36b6bae194341bf99ea90522874d0bc",
+      "threshold": 0.7,
+      "tokens": 72,
+      "elapsedSeconds": 0.007297208067029715
+    },
+    {
+      "id": "gretel-validation-3bce470c22674a778991926a1fcbec75",
+      "threshold": 0.5,
+      "tokens": 82,
+      "elapsedSeconds": 0.007949292194098234
+    },
+    {
+      "id": "gretel-validation-3bce470c22674a778991926a1fcbec75",
+      "threshold": 0.3,
+      "tokens": 82,
+      "elapsedSeconds": 0.0077792920637875795
+    },
+    {
+      "id": "gretel-validation-3bce470c22674a778991926a1fcbec75",
+      "threshold": 0.7,
+      "tokens": 82,
+      "elapsedSeconds": 0.0077622090466320515
+    },
+    {
+      "id": "gretel-validation-2994c5025a2745dba2f30db171da2c1b",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.008850458078086376
+    },
+    {
+      "id": "gretel-validation-2994c5025a2745dba2f30db171da2c1b",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.008690333925187588
+    },
+    {
+      "id": "gretel-validation-2994c5025a2745dba2f30db171da2c1b",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.00859645800665021
+    },
+    {
+      "id": "gretel-validation-c0482ddf43804456a6b17630605c5959",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.008802082855254412
+    },
+    {
+      "id": "gretel-validation-c0482ddf43804456a6b17630605c5959",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.008497999981045723
+    },
+    {
+      "id": "gretel-validation-c0482ddf43804456a6b17630605c5959",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.008412917144596577
+    },
+    {
+      "id": "gretel-validation-fb60ccca4fc54b35b503d57021286010",
+      "threshold": 0.5,
+      "tokens": 89,
+      "elapsedSeconds": 0.009250500006601214
+    },
+    {
+      "id": "gretel-validation-fb60ccca4fc54b35b503d57021286010",
+      "threshold": 0.3,
+      "tokens": 89,
+      "elapsedSeconds": 0.009169625118374825
+    },
+    {
+      "id": "gretel-validation-fb60ccca4fc54b35b503d57021286010",
+      "threshold": 0.7,
+      "tokens": 89,
+      "elapsedSeconds": 0.009180209133774042
+    },
+    {
+      "id": "gretel-validation-1f389d2fb23f47f1bf0c5e29c51a4ad4",
+      "threshold": 0.5,
+      "tokens": 99,
+      "elapsedSeconds": 0.010129125090315938
+    },
+    {
+      "id": "gretel-validation-1f389d2fb23f47f1bf0c5e29c51a4ad4",
+      "threshold": 0.3,
+      "tokens": 99,
+      "elapsedSeconds": 0.009729125071316957
+    },
+    {
+      "id": "gretel-validation-1f389d2fb23f47f1bf0c5e29c51a4ad4",
+      "threshold": 0.7,
+      "tokens": 99,
+      "elapsedSeconds": 0.009674999862909317
+    },
+    {
+      "id": "gretel-validation-d8c01b0dcbca49f68282e3851620afa1",
+      "threshold": 0.5,
+      "tokens": 94,
+      "elapsedSeconds": 0.010720916092395782
+    },
+    {
+      "id": "gretel-validation-d8c01b0dcbca49f68282e3851620afa1",
+      "threshold": 0.3,
+      "tokens": 94,
+      "elapsedSeconds": 0.01000170805491507
+    },
+    {
+      "id": "gretel-validation-d8c01b0dcbca49f68282e3851620afa1",
+      "threshold": 0.7,
+      "tokens": 94,
+      "elapsedSeconds": 0.009832957992330194
+    },
+    {
+      "id": "gretel-validation-8e33c2dca28c4417b6953c781fb776ae",
+      "threshold": 0.5,
+      "tokens": 91,
+      "elapsedSeconds": 0.010597208980470896
+    },
+    {
+      "id": "gretel-validation-8e33c2dca28c4417b6953c781fb776ae",
+      "threshold": 0.3,
+      "tokens": 91,
+      "elapsedSeconds": 0.010127791902050376
+    },
+    {
+      "id": "gretel-validation-8e33c2dca28c4417b6953c781fb776ae",
+      "threshold": 0.7,
+      "tokens": 91,
+      "elapsedSeconds": 0.010235500056296587
+    },
+    {
+      "id": "gretel-validation-8790adca1ead40a1a2b72eaf96da9761",
+      "threshold": 0.5,
+      "tokens": 94,
+      "elapsedSeconds": 0.009630749933421612
+    },
+    {
+      "id": "gretel-validation-8790adca1ead40a1a2b72eaf96da9761",
+      "threshold": 0.3,
+      "tokens": 94,
+      "elapsedSeconds": 0.009697000030428171
+    },
+    {
+      "id": "gretel-validation-8790adca1ead40a1a2b72eaf96da9761",
+      "threshold": 0.7,
+      "tokens": 94,
+      "elapsedSeconds": 0.00966366590000689
+    },
+    {
+      "id": "gretel-validation-782e1e615e0b40a9b70c3cc020fa9f60",
+      "threshold": 0.5,
+      "tokens": 101,
+      "elapsedSeconds": 0.011285000015050173
+    },
+    {
+      "id": "gretel-validation-782e1e615e0b40a9b70c3cc020fa9f60",
+      "threshold": 0.3,
+      "tokens": 101,
+      "elapsedSeconds": 0.011118500027805567
+    },
+    {
+      "id": "gretel-validation-782e1e615e0b40a9b70c3cc020fa9f60",
+      "threshold": 0.7,
+      "tokens": 101,
+      "elapsedSeconds": 0.011133624939247966
+    },
+    {
+      "id": "gretel-validation-718edaae034043cc8a73183244f0e6bc",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.009626124985516071
+    },
+    {
+      "id": "gretel-validation-718edaae034043cc8a73183244f0e6bc",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.00964199984446168
+    },
+    {
+      "id": "gretel-validation-718edaae034043cc8a73183244f0e6bc",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.00961862481199205
+    },
+    {
+      "id": "gretel-validation-3f7ff22f0e594fc0be80d98da58b870b",
+      "threshold": 0.5,
+      "tokens": 118,
+      "elapsedSeconds": 0.01239349995739758
+    },
+    {
+      "id": "gretel-validation-3f7ff22f0e594fc0be80d98da58b870b",
+      "threshold": 0.3,
+      "tokens": 118,
+      "elapsedSeconds": 0.011853125179186463
+    },
+    {
+      "id": "gretel-validation-3f7ff22f0e594fc0be80d98da58b870b",
+      "threshold": 0.7,
+      "tokens": 118,
+      "elapsedSeconds": 0.011878582881763577
+    },
+    {
+      "id": "gretel-validation-62e79b4252874c90ae6e102d872020b7",
+      "threshold": 0.5,
+      "tokens": 80,
+      "elapsedSeconds": 0.008225125027820468
+    },
+    {
+      "id": "gretel-validation-62e79b4252874c90ae6e102d872020b7",
+      "threshold": 0.3,
+      "tokens": 80,
+      "elapsedSeconds": 0.008219750132411718
+    },
+    {
+      "id": "gretel-validation-62e79b4252874c90ae6e102d872020b7",
+      "threshold": 0.7,
+      "tokens": 80,
+      "elapsedSeconds": 0.008297417080029845
+    },
+    {
+      "id": "gretel-validation-30c15c96410c4682b211d68537246910",
+      "threshold": 0.5,
+      "tokens": 105,
+      "elapsedSeconds": 0.013172667007893324
+    },
+    {
+      "id": "gretel-validation-30c15c96410c4682b211d68537246910",
+      "threshold": 0.3,
+      "tokens": 105,
+      "elapsedSeconds": 0.01322191720828414
+    },
+    {
+      "id": "gretel-validation-30c15c96410c4682b211d68537246910",
+      "threshold": 0.7,
+      "tokens": 105,
+      "elapsedSeconds": 0.012462459038943052
+    },
+    {
+      "id": "gretel-validation-8b85092b02d04918b74e74db7173b540",
+      "threshold": 0.5,
+      "tokens": 98,
+      "elapsedSeconds": 0.011641750112175941
+    },
+    {
+      "id": "gretel-validation-8b85092b02d04918b74e74db7173b540",
+      "threshold": 0.3,
+      "tokens": 98,
+      "elapsedSeconds": 0.011391582898795605
+    },
+    {
+      "id": "gretel-validation-8b85092b02d04918b74e74db7173b540",
+      "threshold": 0.7,
+      "tokens": 98,
+      "elapsedSeconds": 0.011331374989822507
+    },
+    {
+      "id": "gretel-validation-fc35f4199244434094bbc115b616a8b3",
+      "threshold": 0.5,
+      "tokens": 87,
+      "elapsedSeconds": 0.008472290821373463
+    },
+    {
+      "id": "gretel-validation-fc35f4199244434094bbc115b616a8b3",
+      "threshold": 0.3,
+      "tokens": 87,
+      "elapsedSeconds": 0.008440500125288963
+    },
+    {
+      "id": "gretel-validation-fc35f4199244434094bbc115b616a8b3",
+      "threshold": 0.7,
+      "tokens": 87,
+      "elapsedSeconds": 0.008497083093971014
+    },
+    {
+      "id": "gretel-validation-f94533a7fbc94281a134f82255c21652",
+      "threshold": 0.5,
+      "tokens": 92,
+      "elapsedSeconds": 0.0097610829398036
+    },
+    {
+      "id": "gretel-validation-f94533a7fbc94281a134f82255c21652",
+      "threshold": 0.3,
+      "tokens": 92,
+      "elapsedSeconds": 0.009454042185097933
+    },
+    {
+      "id": "gretel-validation-f94533a7fbc94281a134f82255c21652",
+      "threshold": 0.7,
+      "tokens": 92,
+      "elapsedSeconds": 0.009448209078982472
+    },
+    {
+      "id": "gretel-validation-27b034ae35e243d8a86dde8338205c57",
+      "threshold": 0.5,
+      "tokens": 68,
+      "elapsedSeconds": 0.007236042059957981
+    },
+    {
+      "id": "gretel-validation-27b034ae35e243d8a86dde8338205c57",
+      "threshold": 0.3,
+      "tokens": 68,
+      "elapsedSeconds": 0.006941291969269514
+    },
+    {
+      "id": "gretel-validation-27b034ae35e243d8a86dde8338205c57",
+      "threshold": 0.7,
+      "tokens": 68,
+      "elapsedSeconds": 0.007024040911346674
+    },
+    {
+      "id": "gretel-validation-5fb8d57bbff647c4a8257d812e776029",
+      "threshold": 0.5,
+      "tokens": 112,
+      "elapsedSeconds": 0.011849584057927132
+    },
+    {
+      "id": "gretel-validation-5fb8d57bbff647c4a8257d812e776029",
+      "threshold": 0.3,
+      "tokens": 112,
+      "elapsedSeconds": 0.011367208091542125
+    },
+    {
+      "id": "gretel-validation-5fb8d57bbff647c4a8257d812e776029",
+      "threshold": 0.7,
+      "tokens": 112,
+      "elapsedSeconds": 0.01138304197229445
+    },
+    {
+      "id": "gretel-validation-6dd86af5d9b94c628037e4eec785be1c",
+      "threshold": 0.5,
+      "tokens": 101,
+      "elapsedSeconds": 0.010889792116358876
+    },
+    {
+      "id": "gretel-validation-6dd86af5d9b94c628037e4eec785be1c",
+      "threshold": 0.3,
+      "tokens": 101,
+      "elapsedSeconds": 0.010913084028288722
+    },
+    {
+      "id": "gretel-validation-6dd86af5d9b94c628037e4eec785be1c",
+      "threshold": 0.7,
+      "tokens": 101,
+      "elapsedSeconds": 0.011035041185095906
+    },
+    {
+      "id": "gretel-validation-5326351587c84d889b1e74d2d13c0035",
+      "threshold": 0.5,
+      "tokens": 163,
+      "elapsedSeconds": 0.02179587516002357
+    },
+    {
+      "id": "gretel-validation-5326351587c84d889b1e74d2d13c0035",
+      "threshold": 0.3,
+      "tokens": 163,
+      "elapsedSeconds": 0.021764667006209493
+    },
+    {
+      "id": "gretel-validation-5326351587c84d889b1e74d2d13c0035",
+      "threshold": 0.7,
+      "tokens": 163,
+      "elapsedSeconds": 0.02074537519365549
+    },
+    {
+      "id": "gretel-validation-c2144ee4ac5f4c6e84eeaec290f82ade",
+      "threshold": 0.5,
+      "tokens": 111,
+      "elapsedSeconds": 0.013484542025253177
+    },
+    {
+      "id": "gretel-validation-c2144ee4ac5f4c6e84eeaec290f82ade",
+      "threshold": 0.3,
+      "tokens": 111,
+      "elapsedSeconds": 0.013127167010679841
+    },
+    {
+      "id": "gretel-validation-c2144ee4ac5f4c6e84eeaec290f82ade",
+      "threshold": 0.7,
+      "tokens": 111,
+      "elapsedSeconds": 0.0130518339574337
+    },
+    {
+      "id": "gretel-validation-f82862e5c4a448069bfe407d359054fc",
+      "threshold": 0.5,
+      "tokens": 82,
+      "elapsedSeconds": 0.0080268329475075
+    },
+    {
+      "id": "gretel-validation-f82862e5c4a448069bfe407d359054fc",
+      "threshold": 0.3,
+      "tokens": 82,
+      "elapsedSeconds": 0.007903625024482608
+    },
+    {
+      "id": "gretel-validation-f82862e5c4a448069bfe407d359054fc",
+      "threshold": 0.7,
+      "tokens": 82,
+      "elapsedSeconds": 0.007940541952848434
+    },
+    {
+      "id": "gretel-validation-e86db55459474fbf85bdb89621839f75",
+      "threshold": 0.5,
+      "tokens": 148,
+      "elapsedSeconds": 0.015613500028848648
+    },
+    {
+      "id": "gretel-validation-e86db55459474fbf85bdb89621839f75",
+      "threshold": 0.3,
+      "tokens": 148,
+      "elapsedSeconds": 0.015665249899029732
+    },
+    {
+      "id": "gretel-validation-e86db55459474fbf85bdb89621839f75",
+      "threshold": 0.7,
+      "tokens": 148,
+      "elapsedSeconds": 0.015562957851216197
+    },
+    {
+      "id": "gretel-validation-1e6231e847f04a6997ccb9d34421517e",
+      "threshold": 0.5,
+      "tokens": 203,
+      "elapsedSeconds": 0.02486004214733839
+    },
+    {
+      "id": "gretel-validation-1e6231e847f04a6997ccb9d34421517e",
+      "threshold": 0.3,
+      "tokens": 203,
+      "elapsedSeconds": 0.024598499992862344
+    },
+    {
+      "id": "gretel-validation-1e6231e847f04a6997ccb9d34421517e",
+      "threshold": 0.7,
+      "tokens": 203,
+      "elapsedSeconds": 0.024737332947552204
+    },
+    {
+      "id": "gretel-validation-f8846fac49f144e2ae396627393621fa",
+      "threshold": 0.5,
+      "tokens": 267,
+      "elapsedSeconds": 0.03321754117496312
+    },
+    {
+      "id": "gretel-validation-f8846fac49f144e2ae396627393621fa",
+      "threshold": 0.3,
+      "tokens": 267,
+      "elapsedSeconds": 0.03199362498708069
+    },
+    {
+      "id": "gretel-validation-f8846fac49f144e2ae396627393621fa",
+      "threshold": 0.7,
+      "tokens": 267,
+      "elapsedSeconds": 0.03183804196305573
+    },
+    {
+      "id": "gretel-validation-f5f8340d7ebe4e42b0153a80354bbed7",
+      "threshold": 0.5,
+      "tokens": 66,
+      "elapsedSeconds": 0.006692375056445599
+    },
+    {
+      "id": "gretel-validation-f5f8340d7ebe4e42b0153a80354bbed7",
+      "threshold": 0.3,
+      "tokens": 66,
+      "elapsedSeconds": 0.0063329171389341354
+    },
+    {
+      "id": "gretel-validation-f5f8340d7ebe4e42b0153a80354bbed7",
+      "threshold": 0.7,
+      "tokens": 66,
+      "elapsedSeconds": 0.006315124919638038
+    },
+    {
+      "id": "gretel-validation-6cb5ab4bcc2749f39d91d347d866173d",
+      "threshold": 0.5,
+      "tokens": 164,
+      "elapsedSeconds": 0.01790708303451538
+    },
+    {
+      "id": "gretel-validation-6cb5ab4bcc2749f39d91d347d866173d",
+      "threshold": 0.3,
+      "tokens": 164,
+      "elapsedSeconds": 0.018193082883954048
+    },
+    {
+      "id": "gretel-validation-6cb5ab4bcc2749f39d91d347d866173d",
+      "threshold": 0.7,
+      "tokens": 164,
+      "elapsedSeconds": 0.018259249860420823
+    },
+    {
+      "id": "gretel-validation-94f0b98d20f740198f665b1087209444",
+      "threshold": 0.5,
+      "tokens": 177,
+      "elapsedSeconds": 0.020723165944218636
+    },
+    {
+      "id": "gretel-validation-94f0b98d20f740198f665b1087209444",
+      "threshold": 0.3,
+      "tokens": 177,
+      "elapsedSeconds": 0.020954290870577097
+    },
+    {
+      "id": "gretel-validation-94f0b98d20f740198f665b1087209444",
+      "threshold": 0.7,
+      "tokens": 177,
+      "elapsedSeconds": 0.02087791613303125
+    },
+    {
+      "id": "gretel-validation-64bfc7a281a64ce29d387e9ddf64df6c",
+      "threshold": 0.5,
+      "tokens": 109,
+      "elapsedSeconds": 0.011605917010456324
+    },
+    {
+      "id": "gretel-validation-64bfc7a281a64ce29d387e9ddf64df6c",
+      "threshold": 0.3,
+      "tokens": 109,
+      "elapsedSeconds": 0.01152000017464161
+    },
+    {
+      "id": "gretel-validation-64bfc7a281a64ce29d387e9ddf64df6c",
+      "threshold": 0.7,
+      "tokens": 109,
+      "elapsedSeconds": 0.011091332882642746
+    },
+    {
+      "id": "gretel-validation-f9f0e78e78a540938dca9450def58cfa",
+      "threshold": 0.5,
+      "tokens": 72,
+      "elapsedSeconds": 0.006080792052671313
+    },
+    {
+      "id": "gretel-validation-f9f0e78e78a540938dca9450def58cfa",
+      "threshold": 0.3,
+      "tokens": 72,
+      "elapsedSeconds": 0.006186500191688538
+    },
+    {
+      "id": "gretel-validation-f9f0e78e78a540938dca9450def58cfa",
+      "threshold": 0.7,
+      "tokens": 72,
+      "elapsedSeconds": 0.006173999980092049
+    },
+    {
+      "id": "gretel-validation-d580b1f13336457f896858df4d2a2931",
+      "threshold": 0.5,
+      "tokens": 91,
+      "elapsedSeconds": 0.009310834109783173
+    },
+    {
+      "id": "gretel-validation-d580b1f13336457f896858df4d2a2931",
+      "threshold": 0.3,
+      "tokens": 91,
+      "elapsedSeconds": 0.009507917100563645
+    },
+    {
+      "id": "gretel-validation-d580b1f13336457f896858df4d2a2931",
+      "threshold": 0.7,
+      "tokens": 91,
+      "elapsedSeconds": 0.009435625048354268
+    },
+    {
+      "id": "gretel-validation-2e5abee95a2a416a9ce7112c12ff351a",
+      "threshold": 0.5,
+      "tokens": 52,
+      "elapsedSeconds": 0.004879083018749952
+    },
+    {
+      "id": "gretel-validation-2e5abee95a2a416a9ce7112c12ff351a",
+      "threshold": 0.3,
+      "tokens": 52,
+      "elapsedSeconds": 0.004622500156983733
+    },
+    {
+      "id": "gretel-validation-2e5abee95a2a416a9ce7112c12ff351a",
+      "threshold": 0.7,
+      "tokens": 52,
+      "elapsedSeconds": 0.004690917208790779
+    },
+    {
+      "id": "gretel-validation-02ae67e5faa74751bb83be9febd857fc",
+      "threshold": 0.5,
+      "tokens": 155,
+      "elapsedSeconds": 0.018005582969635725
+    },
+    {
+      "id": "gretel-validation-02ae67e5faa74751bb83be9febd857fc",
+      "threshold": 0.3,
+      "tokens": 155,
+      "elapsedSeconds": 0.017429291969165206
+    },
+    {
+      "id": "gretel-validation-02ae67e5faa74751bb83be9febd857fc",
+      "threshold": 0.7,
+      "tokens": 155,
+      "elapsedSeconds": 0.017709875013679266
+    },
+    {
+      "id": "gretel-validation-ed1acd0fc4c7425d9faad0a088ee91f6",
+      "threshold": 0.5,
+      "tokens": 95,
+      "elapsedSeconds": 0.00999862514436245
+    },
+    {
+      "id": "gretel-validation-ed1acd0fc4c7425d9faad0a088ee91f6",
+      "threshold": 0.3,
+      "tokens": 95,
+      "elapsedSeconds": 0.00968945911154151
+    },
+    {
+      "id": "gretel-validation-ed1acd0fc4c7425d9faad0a088ee91f6",
+      "threshold": 0.7,
+      "tokens": 95,
+      "elapsedSeconds": 0.00967112509533763
+    },
+    {
+      "id": "gretel-validation-c37eb0b42f354b4c92a846636b47e341",
+      "threshold": 0.5,
+      "tokens": 100,
+      "elapsedSeconds": 0.010379333049058914
+    },
+    {
+      "id": "gretel-validation-c37eb0b42f354b4c92a846636b47e341",
+      "threshold": 0.3,
+      "tokens": 100,
+      "elapsedSeconds": 0.010229957988485694
+    },
+    {
+      "id": "gretel-validation-c37eb0b42f354b4c92a846636b47e341",
+      "threshold": 0.7,
+      "tokens": 100,
+      "elapsedSeconds": 0.010187041945755482
+    },
+    {
+      "id": "gretel-validation-9e79af61a1704991b9dace7228e9dbdc",
+      "threshold": 0.5,
+      "tokens": 111,
+      "elapsedSeconds": 0.011529208160936832
+    },
+    {
+      "id": "gretel-validation-9e79af61a1704991b9dace7228e9dbdc",
+      "threshold": 0.3,
+      "tokens": 111,
+      "elapsedSeconds": 0.011241582920774817
+    },
+    {
+      "id": "gretel-validation-9e79af61a1704991b9dace7228e9dbdc",
+      "threshold": 0.7,
+      "tokens": 111,
+      "elapsedSeconds": 0.011179790832102299
+    },
+    {
+      "id": "gretel-validation-bcd8c1140e924484aaab6ebeb48bf6f4",
+      "threshold": 0.5,
+      "tokens": 86,
+      "elapsedSeconds": 0.00904883281327784
+    },
+    {
+      "id": "gretel-validation-bcd8c1140e924484aaab6ebeb48bf6f4",
+      "threshold": 0.3,
+      "tokens": 86,
+      "elapsedSeconds": 0.008921875152736902
+    },
+    {
+      "id": "gretel-validation-bcd8c1140e924484aaab6ebeb48bf6f4",
+      "threshold": 0.7,
+      "tokens": 86,
+      "elapsedSeconds": 0.008898249827325344
+    },
+    {
+      "id": "gretel-validation-19f76ba2d949425897781f274d6471d9",
+      "threshold": 0.5,
+      "tokens": 65,
+      "elapsedSeconds": 0.006499875104054809
+    },
+    {
+      "id": "gretel-validation-19f76ba2d949425897781f274d6471d9",
+      "threshold": 0.3,
+      "tokens": 65,
+      "elapsedSeconds": 0.0063719169702380896
+    },
+    {
+      "id": "gretel-validation-19f76ba2d949425897781f274d6471d9",
+      "threshold": 0.7,
+      "tokens": 65,
+      "elapsedSeconds": 0.006259083049371839
+    },
+    {
+      "id": "gretel-validation-de32715547ae4853ad2c8c9e7756b8fb",
+      "threshold": 0.5,
+      "tokens": 76,
+      "elapsedSeconds": 0.00704495795071125
+    },
+    {
+      "id": "gretel-validation-de32715547ae4853ad2c8c9e7756b8fb",
+      "threshold": 0.3,
+      "tokens": 76,
+      "elapsedSeconds": 0.006791374878957868
+    },
+    {
+      "id": "gretel-validation-de32715547ae4853ad2c8c9e7756b8fb",
+      "threshold": 0.7,
+      "tokens": 76,
+      "elapsedSeconds": 0.0066910418681800365
+    },
+    {
+      "id": "gretel-validation-e9b877469e54468f9cbb6ee050b7adda",
+      "threshold": 0.5,
+      "tokens": 122,
+      "elapsedSeconds": 0.014430457958951592
+    },
+    {
+      "id": "gretel-validation-e9b877469e54468f9cbb6ee050b7adda",
+      "threshold": 0.3,
+      "tokens": 122,
+      "elapsedSeconds": 0.014538499992340803
+    },
+    {
+      "id": "gretel-validation-e9b877469e54468f9cbb6ee050b7adda",
+      "threshold": 0.7,
+      "tokens": 122,
+      "elapsedSeconds": 0.014598832931369543
+    },
+    {
+      "id": "gretel-validation-7dd48624919f4b05bf192d4bfa55ee65",
+      "threshold": 0.5,
+      "tokens": 69,
+      "elapsedSeconds": 0.006517707835882902
+    },
+    {
+      "id": "gretel-validation-7dd48624919f4b05bf192d4bfa55ee65",
+      "threshold": 0.3,
+      "tokens": 69,
+      "elapsedSeconds": 0.006137415999546647
+    },
+    {
+      "id": "gretel-validation-7dd48624919f4b05bf192d4bfa55ee65",
+      "threshold": 0.7,
+      "tokens": 69,
+      "elapsedSeconds": 0.006145500112324953
+    },
+    {
+      "id": "gretel-validation-2fe82199d3eb4b5692a4b954ec06ccc4",
+      "threshold": 0.5,
+      "tokens": 75,
+      "elapsedSeconds": 0.006921791937202215
+    },
+    {
+      "id": "gretel-validation-2fe82199d3eb4b5692a4b954ec06ccc4",
+      "threshold": 0.3,
+      "tokens": 75,
+      "elapsedSeconds": 0.006827458972111344
+    },
+    {
+      "id": "gretel-validation-2fe82199d3eb4b5692a4b954ec06ccc4",
+      "threshold": 0.7,
+      "tokens": 75,
+      "elapsedSeconds": 0.0067990419920533895
+    },
+    {
+      "id": "gretel-validation-dda81fd497c34a69a650dfc77804a3e2",
+      "threshold": 0.5,
+      "tokens": 157,
+      "elapsedSeconds": 0.016838832991197705
+    },
+    {
+      "id": "gretel-validation-dda81fd497c34a69a650dfc77804a3e2",
+      "threshold": 0.3,
+      "tokens": 157,
+      "elapsedSeconds": 0.01678291684947908
+    },
+    {
+      "id": "gretel-validation-dda81fd497c34a69a650dfc77804a3e2",
+      "threshold": 0.7,
+      "tokens": 157,
+      "elapsedSeconds": 0.01678499998524785
+    },
+    {
+      "id": "gretel-validation-56ba049efc4e4e379d128f72497d64b3",
+      "threshold": 0.5,
+      "tokens": 149,
+      "elapsedSeconds": 0.019068624824285507
+    },
+    {
+      "id": "gretel-validation-56ba049efc4e4e379d128f72497d64b3",
+      "threshold": 0.3,
+      "tokens": 149,
+      "elapsedSeconds": 0.01913220901042223
+    },
+    {
+      "id": "gretel-validation-56ba049efc4e4e379d128f72497d64b3",
+      "threshold": 0.7,
+      "tokens": 149,
+      "elapsedSeconds": 0.019166250014677644
+    },
+    {
+      "id": "gretel-validation-837ac222657a47d8a117280bcb641120",
+      "threshold": 0.5,
+      "tokens": 155,
+      "elapsedSeconds": 0.0198424169793725
+    },
+    {
+      "id": "gretel-validation-837ac222657a47d8a117280bcb641120",
+      "threshold": 0.3,
+      "tokens": 155,
+      "elapsedSeconds": 0.0196733339689672
+    },
+    {
+      "id": "gretel-validation-837ac222657a47d8a117280bcb641120",
+      "threshold": 0.7,
+      "tokens": 155,
+      "elapsedSeconds": 0.02011537505313754
+    },
+    {
+      "id": "gretel-validation-33e1f7bc53ee4967955bff640f00dd83",
+      "threshold": 0.5,
+      "tokens": 97,
+      "elapsedSeconds": 0.011272582923993468
+    },
+    {
+      "id": "gretel-validation-33e1f7bc53ee4967955bff640f00dd83",
+      "threshold": 0.3,
+      "tokens": 97,
+      "elapsedSeconds": 0.010975792072713375
+    },
+    {
+      "id": "gretel-validation-33e1f7bc53ee4967955bff640f00dd83",
+      "threshold": 0.7,
+      "tokens": 97,
+      "elapsedSeconds": 0.010932957986369729
+    },
+    {
+      "id": "gretel-validation-4035fbb17b9141658e5d2e1d53d3e18c",
+      "threshold": 0.5,
+      "tokens": 72,
+      "elapsedSeconds": 0.007503290893509984
+    },
+    {
+      "id": "gretel-validation-4035fbb17b9141658e5d2e1d53d3e18c",
+      "threshold": 0.3,
+      "tokens": 72,
+      "elapsedSeconds": 0.007581999991089106
+    },
+    {
+      "id": "gretel-validation-4035fbb17b9141658e5d2e1d53d3e18c",
+      "threshold": 0.7,
+      "tokens": 72,
+      "elapsedSeconds": 0.007555041927844286
+    },
+    {
+      "id": "gretel-validation-216c7730e51849b8a7203a5d6f71ff74",
+      "threshold": 0.5,
+      "tokens": 78,
+      "elapsedSeconds": 0.006840500049293041
+    },
+    {
+      "id": "gretel-validation-216c7730e51849b8a7203a5d6f71ff74",
+      "threshold": 0.3,
+      "tokens": 78,
+      "elapsedSeconds": 0.006664499873295426
+    },
+    {
+      "id": "gretel-validation-216c7730e51849b8a7203a5d6f71ff74",
+      "threshold": 0.7,
+      "tokens": 78,
+      "elapsedSeconds": 0.006654999917373061
+    },
+    {
+      "id": "gretel-validation-49f595c7fb524b558ee86bbd5a6b23e7",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.008171874796971679
+    },
+    {
+      "id": "gretel-validation-49f595c7fb524b558ee86bbd5a6b23e7",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.008047458017244935
+    },
+    {
+      "id": "gretel-validation-49f595c7fb524b558ee86bbd5a6b23e7",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.00789695791900158
+    },
+    {
+      "id": "gretel-validation-f6ebad13f21b48479c42477b36c0eaad",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.007372959051281214
+    },
+    {
+      "id": "gretel-validation-f6ebad13f21b48479c42477b36c0eaad",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.007379583083093166
+    },
+    {
+      "id": "gretel-validation-f6ebad13f21b48479c42477b36c0eaad",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.007492583943530917
+    },
+    {
+      "id": "gretel-validation-2e7d5d220161479295cc37b7d7613f69",
+      "threshold": 0.5,
+      "tokens": 158,
+      "elapsedSeconds": 0.01735412492416799
+    },
+    {
+      "id": "gretel-validation-2e7d5d220161479295cc37b7d7613f69",
+      "threshold": 0.3,
+      "tokens": 158,
+      "elapsedSeconds": 0.01736924983561039
+    },
+    {
+      "id": "gretel-validation-2e7d5d220161479295cc37b7d7613f69",
+      "threshold": 0.7,
+      "tokens": 158,
+      "elapsedSeconds": 0.01732920901849866
+    },
+    {
+      "id": "gretel-validation-d2b9d9bae1a44ebc89ea56b0f33777c9",
+      "threshold": 0.5,
+      "tokens": 101,
+      "elapsedSeconds": 0.009747541975229979
+    },
+    {
+      "id": "gretel-validation-d2b9d9bae1a44ebc89ea56b0f33777c9",
+      "threshold": 0.3,
+      "tokens": 101,
+      "elapsedSeconds": 0.009683040902018547
+    },
+    {
+      "id": "gretel-validation-d2b9d9bae1a44ebc89ea56b0f33777c9",
+      "threshold": 0.7,
+      "tokens": 101,
+      "elapsedSeconds": 0.009648708160966635
+    },
+    {
+      "id": "gretel-validation-f116bc365b264590b1922e4728ec4c02",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.007243582978844643
+    },
+    {
+      "id": "gretel-validation-f116bc365b264590b1922e4728ec4c02",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.0073035829700529575
+    },
+    {
+      "id": "gretel-validation-f116bc365b264590b1922e4728ec4c02",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.007255250122398138
+    },
+    {
+      "id": "gretel-validation-a733c17c770f43ebb3a9bf5971ce6b36",
+      "threshold": 0.5,
+      "tokens": 107,
+      "elapsedSeconds": 0.011874083895236254
+    },
+    {
+      "id": "gretel-validation-a733c17c770f43ebb3a9bf5971ce6b36",
+      "threshold": 0.3,
+      "tokens": 107,
+      "elapsedSeconds": 0.011949457926675677
+    },
+    {
+      "id": "gretel-validation-a733c17c770f43ebb3a9bf5971ce6b36",
+      "threshold": 0.7,
+      "tokens": 107,
+      "elapsedSeconds": 0.011737167136743665
+    },
+    {
+      "id": "gretel-validation-c2e8aee077f447ac92e9fc11f56ea7fa",
+      "threshold": 0.5,
+      "tokens": 118,
+      "elapsedSeconds": 0.013836625032126904
+    },
+    {
+      "id": "gretel-validation-c2e8aee077f447ac92e9fc11f56ea7fa",
+      "threshold": 0.3,
+      "tokens": 118,
+      "elapsedSeconds": 0.013787708943709731
+    },
+    {
+      "id": "gretel-validation-c2e8aee077f447ac92e9fc11f56ea7fa",
+      "threshold": 0.7,
+      "tokens": 118,
+      "elapsedSeconds": 0.013754624873399734
+    },
+    {
+      "id": "gretel-validation-bac7cb9d443d4c509a822e959d8509c3",
+      "threshold": 0.5,
+      "tokens": 64,
+      "elapsedSeconds": 0.006088250083848834
+    },
+    {
+      "id": "gretel-validation-bac7cb9d443d4c509a822e959d8509c3",
+      "threshold": 0.3,
+      "tokens": 64,
+      "elapsedSeconds": 0.0059299590066075325
+    },
+    {
+      "id": "gretel-validation-bac7cb9d443d4c509a822e959d8509c3",
+      "threshold": 0.7,
+      "tokens": 64,
+      "elapsedSeconds": 0.005864458158612251
+    },
+    {
+      "id": "gretel-validation-bc7b3e086eed4a3eabba81198f0497c4",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.008050791919231415
+    },
+    {
+      "id": "gretel-validation-bc7b3e086eed4a3eabba81198f0497c4",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.00810462492518127
+    },
+    {
+      "id": "gretel-validation-bc7b3e086eed4a3eabba81198f0497c4",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.008185958955436945
+    },
+    {
+      "id": "gretel-validation-d860e0723f524cb0b7e372af4c570313",
+      "threshold": 0.5,
+      "tokens": 105,
+      "elapsedSeconds": 0.011377749964594841
+    },
+    {
+      "id": "gretel-validation-d860e0723f524cb0b7e372af4c570313",
+      "threshold": 0.3,
+      "tokens": 105,
+      "elapsedSeconds": 0.011480334214866161
+    },
+    {
+      "id": "gretel-validation-d860e0723f524cb0b7e372af4c570313",
+      "threshold": 0.7,
+      "tokens": 105,
+      "elapsedSeconds": 0.011503332993015647
+    },
+    {
+      "id": "gretel-validation-b1b9fbf6995f4ba7bef501d4d3ad30f9",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.008087125141173601
+    },
+    {
+      "id": "gretel-validation-b1b9fbf6995f4ba7bef501d4d3ad30f9",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.008141166996210814
+    },
+    {
+      "id": "gretel-validation-b1b9fbf6995f4ba7bef501d4d3ad30f9",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.00812654197216034
+    },
+    {
+      "id": "gretel-validation-557c95df9e994fc3bcab6577f772721b",
+      "threshold": 0.5,
+      "tokens": 148,
+      "elapsedSeconds": 0.017691790824756026
+    },
+    {
+      "id": "gretel-validation-557c95df9e994fc3bcab6577f772721b",
+      "threshold": 0.3,
+      "tokens": 148,
+      "elapsedSeconds": 0.017823667032644153
+    },
+    {
+      "id": "gretel-validation-557c95df9e994fc3bcab6577f772721b",
+      "threshold": 0.7,
+      "tokens": 148,
+      "elapsedSeconds": 0.017871208023279905
+    },
+    {
+      "id": "gretel-validation-bb48c079006b4fe5a0b3929dccf34d2f",
+      "threshold": 0.5,
+      "tokens": 72,
+      "elapsedSeconds": 0.007847833912819624
+    },
+    {
+      "id": "gretel-validation-bb48c079006b4fe5a0b3929dccf34d2f",
+      "threshold": 0.3,
+      "tokens": 72,
+      "elapsedSeconds": 0.0077959580812603235
+    },
+    {
+      "id": "gretel-validation-bb48c079006b4fe5a0b3929dccf34d2f",
+      "threshold": 0.7,
+      "tokens": 72,
+      "elapsedSeconds": 0.007742875022813678
+    },
+    {
+      "id": "gretel-validation-1c1abdaef469422690fbc545be6b7b13",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.008099166909232736
+    },
+    {
+      "id": "gretel-validation-1c1abdaef469422690fbc545be6b7b13",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.0081687499769032
+    },
+    {
+      "id": "gretel-validation-1c1abdaef469422690fbc545be6b7b13",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.008157917065545917
+    },
+    {
+      "id": "gretel-validation-6594f48b653243f8b929683b3b0700c3",
+      "threshold": 0.5,
+      "tokens": 86,
+      "elapsedSeconds": 0.0071694578509777784
+    },
+    {
+      "id": "gretel-validation-6594f48b653243f8b929683b3b0700c3",
+      "threshold": 0.3,
+      "tokens": 86,
+      "elapsedSeconds": 0.007185458904132247
+    },
+    {
+      "id": "gretel-validation-6594f48b653243f8b929683b3b0700c3",
+      "threshold": 0.7,
+      "tokens": 86,
+      "elapsedSeconds": 0.007147915894165635
+    },
+    {
+      "id": "gretel-validation-0a705b8cfb3240fab155a91bdfa9b3e7",
+      "threshold": 0.5,
+      "tokens": 83,
+      "elapsedSeconds": 0.0092417080886662
+    },
+    {
+      "id": "gretel-validation-0a705b8cfb3240fab155a91bdfa9b3e7",
+      "threshold": 0.3,
+      "tokens": 83,
+      "elapsedSeconds": 0.00913179200142622
+    },
+    {
+      "id": "gretel-validation-0a705b8cfb3240fab155a91bdfa9b3e7",
+      "threshold": 0.7,
+      "tokens": 83,
+      "elapsedSeconds": 0.009029291104525328
+    },
+    {
+      "id": "gretel-validation-e54111b6abd64503a6f7bd3be3c9cb0e",
+      "threshold": 0.5,
+      "tokens": 175,
+      "elapsedSeconds": 0.021801457973197103
+    },
+    {
+      "id": "gretel-validation-e54111b6abd64503a6f7bd3be3c9cb0e",
+      "threshold": 0.3,
+      "tokens": 175,
+      "elapsedSeconds": 0.021833834005519748
+    },
+    {
+      "id": "gretel-validation-e54111b6abd64503a6f7bd3be3c9cb0e",
+      "threshold": 0.7,
+      "tokens": 175,
+      "elapsedSeconds": 0.021904250141233206
+    },
+    {
+      "id": "gretel-validation-e150361d20bc410bbd80a3be34cbd20e",
+      "threshold": 0.5,
+      "tokens": 85,
+      "elapsedSeconds": 0.007326625054702163
+    },
+    {
+      "id": "gretel-validation-e150361d20bc410bbd80a3be34cbd20e",
+      "threshold": 0.3,
+      "tokens": 85,
+      "elapsedSeconds": 0.007255624979734421
+    },
+    {
+      "id": "gretel-validation-e150361d20bc410bbd80a3be34cbd20e",
+      "threshold": 0.7,
+      "tokens": 85,
+      "elapsedSeconds": 0.007165875053033233
+    },
+    {
+      "id": "gretel-validation-c4e354c1a0f04605b31d1ff720db861a",
+      "threshold": 0.5,
+      "tokens": 103,
+      "elapsedSeconds": 0.011614874936640263
+    },
+    {
+      "id": "gretel-validation-c4e354c1a0f04605b31d1ff720db861a",
+      "threshold": 0.3,
+      "tokens": 103,
+      "elapsedSeconds": 0.011466250056400895
+    },
+    {
+      "id": "gretel-validation-c4e354c1a0f04605b31d1ff720db861a",
+      "threshold": 0.7,
+      "tokens": 103,
+      "elapsedSeconds": 0.01130062504671514
+    },
+    {
+      "id": "gretel-validation-4a4adbb3455146d6a854f5d3923bda9c",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.00689654191955924
+    },
+    {
+      "id": "gretel-validation-4a4adbb3455146d6a854f5d3923bda9c",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.006924874847754836
+    },
+    {
+      "id": "gretel-validation-4a4adbb3455146d6a854f5d3923bda9c",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.006973708979785442
+    },
+    {
+      "id": "gretel-validation-53018a3f75d341c192c39af95f8f53f6",
+      "threshold": 0.5,
+      "tokens": 167,
+      "elapsedSeconds": 0.020603165961802006
+    },
+    {
+      "id": "gretel-validation-53018a3f75d341c192c39af95f8f53f6",
+      "threshold": 0.3,
+      "tokens": 167,
+      "elapsedSeconds": 0.021066749934107065
+    },
+    {
+      "id": "gretel-validation-53018a3f75d341c192c39af95f8f53f6",
+      "threshold": 0.7,
+      "tokens": 167,
+      "elapsedSeconds": 0.020621875068172812
+    },
+    {
+      "id": "gretel-validation-ac55ac836423482b90ee665ea483c0e7",
+      "threshold": 0.5,
+      "tokens": 63,
+      "elapsedSeconds": 0.0062140419613569975
+    },
+    {
+      "id": "gretel-validation-ac55ac836423482b90ee665ea483c0e7",
+      "threshold": 0.3,
+      "tokens": 63,
+      "elapsedSeconds": 0.005980874877423048
+    },
+    {
+      "id": "gretel-validation-ac55ac836423482b90ee665ea483c0e7",
+      "threshold": 0.7,
+      "tokens": 63,
+      "elapsedSeconds": 0.00589429191313684
+    },
+    {
+      "id": "gretel-validation-8c9752480a9349f3a1ceb31cb66c4383",
+      "threshold": 0.5,
+      "tokens": 101,
+      "elapsedSeconds": 0.011233875062316656
+    },
+    {
+      "id": "gretel-validation-8c9752480a9349f3a1ceb31cb66c4383",
+      "threshold": 0.3,
+      "tokens": 101,
+      "elapsedSeconds": 0.01131620816886425
+    },
+    {
+      "id": "gretel-validation-8c9752480a9349f3a1ceb31cb66c4383",
+      "threshold": 0.7,
+      "tokens": 101,
+      "elapsedSeconds": 0.011376542039215565
+    },
+    {
+      "id": "gretel-validation-912c508d607f430ca91d9bc6ff8fcf0a",
+      "threshold": 0.5,
+      "tokens": 112,
+      "elapsedSeconds": 0.013149125035852194
+    },
+    {
+      "id": "gretel-validation-912c508d607f430ca91d9bc6ff8fcf0a",
+      "threshold": 0.3,
+      "tokens": 112,
+      "elapsedSeconds": 0.013151541817933321
+    },
+    {
+      "id": "gretel-validation-912c508d607f430ca91d9bc6ff8fcf0a",
+      "threshold": 0.7,
+      "tokens": 112,
+      "elapsedSeconds": 0.013258666964247823
+    },
+    {
+      "id": "gretel-validation-4546700f8a3f4c98803f868f90d3d2a9",
+      "threshold": 0.5,
+      "tokens": 235,
+      "elapsedSeconds": 0.028838291997089982
+    },
+    {
+      "id": "gretel-validation-4546700f8a3f4c98803f868f90d3d2a9",
+      "threshold": 0.3,
+      "tokens": 235,
+      "elapsedSeconds": 0.029037415981292725
+    },
+    {
+      "id": "gretel-validation-4546700f8a3f4c98803f868f90d3d2a9",
+      "threshold": 0.7,
+      "tokens": 235,
+      "elapsedSeconds": 0.029116207966580987
+    },
+    {
+      "id": "gretel-validation-07dd257824dd477998eea644d70f1a55",
+      "threshold": 0.5,
+      "tokens": 91,
+      "elapsedSeconds": 0.0097053749486804
+    },
+    {
+      "id": "gretel-validation-07dd257824dd477998eea644d70f1a55",
+      "threshold": 0.3,
+      "tokens": 91,
+      "elapsedSeconds": 0.009665249846875668
+    },
+    {
+      "id": "gretel-validation-07dd257824dd477998eea644d70f1a55",
+      "threshold": 0.7,
+      "tokens": 91,
+      "elapsedSeconds": 0.009662708966061473
+    },
+    {
+      "id": "gretel-validation-b33074ef19184eb7ac775fa068100690",
+      "threshold": 0.5,
+      "tokens": 125,
+      "elapsedSeconds": 0.014729665825143456
+    },
+    {
+      "id": "gretel-validation-b33074ef19184eb7ac775fa068100690",
+      "threshold": 0.3,
+      "tokens": 125,
+      "elapsedSeconds": 0.014575917040929198
+    },
+    {
+      "id": "gretel-validation-b33074ef19184eb7ac775fa068100690",
+      "threshold": 0.7,
+      "tokens": 125,
+      "elapsedSeconds": 0.014596624998375773
+    },
+    {
+      "id": "gretel-validation-835bfcb374f04d9284ae1fa69f9c88e9",
+      "threshold": 0.5,
+      "tokens": 83,
+      "elapsedSeconds": 0.008427917025983334
+    },
+    {
+      "id": "gretel-validation-835bfcb374f04d9284ae1fa69f9c88e9",
+      "threshold": 0.3,
+      "tokens": 83,
+      "elapsedSeconds": 0.008421791950240731
+    },
+    {
+      "id": "gretel-validation-835bfcb374f04d9284ae1fa69f9c88e9",
+      "threshold": 0.7,
+      "tokens": 83,
+      "elapsedSeconds": 0.008402582956478
+    },
+    {
+      "id": "gretel-validation-c657d9e1a19a4e5e98fbc9ca2ff3a04a",
+      "threshold": 0.5,
+      "tokens": 76,
+      "elapsedSeconds": 0.00726774986833334
+    },
+    {
+      "id": "gretel-validation-c657d9e1a19a4e5e98fbc9ca2ff3a04a",
+      "threshold": 0.3,
+      "tokens": 76,
+      "elapsedSeconds": 0.007236749865114689
+    },
+    {
+      "id": "gretel-validation-c657d9e1a19a4e5e98fbc9ca2ff3a04a",
+      "threshold": 0.7,
+      "tokens": 76,
+      "elapsedSeconds": 0.007284999825060368
+    },
+    {
+      "id": "gretel-validation-e3d84c9666054249842b306c0e6d2eca",
+      "threshold": 0.5,
+      "tokens": 77,
+      "elapsedSeconds": 0.0075247499626129866
+    },
+    {
+      "id": "gretel-validation-e3d84c9666054249842b306c0e6d2eca",
+      "threshold": 0.3,
+      "tokens": 77,
+      "elapsedSeconds": 0.007202290929853916
+    },
+    {
+      "id": "gretel-validation-e3d84c9666054249842b306c0e6d2eca",
+      "threshold": 0.7,
+      "tokens": 77,
+      "elapsedSeconds": 0.007203750079497695
+    },
+    {
+      "id": "gretel-validation-d4e1a60c379a4d2cbd3a94efefcebde4",
+      "threshold": 0.5,
+      "tokens": 133,
+      "elapsedSeconds": 0.01593483379110694
+    },
+    {
+      "id": "gretel-validation-d4e1a60c379a4d2cbd3a94efefcebde4",
+      "threshold": 0.3,
+      "tokens": 133,
+      "elapsedSeconds": 0.015910167014226317
+    },
+    {
+      "id": "gretel-validation-d4e1a60c379a4d2cbd3a94efefcebde4",
+      "threshold": 0.7,
+      "tokens": 133,
+      "elapsedSeconds": 0.016026125056669116
+    },
+    {
+      "id": "gretel-validation-5d3408f9ac5144ad93765557d1523a16",
+      "threshold": 0.5,
+      "tokens": 84,
+      "elapsedSeconds": 0.008760415948927402
+    },
+    {
+      "id": "gretel-validation-5d3408f9ac5144ad93765557d1523a16",
+      "threshold": 0.3,
+      "tokens": 84,
+      "elapsedSeconds": 0.008411457994952798
+    },
+    {
+      "id": "gretel-validation-5d3408f9ac5144ad93765557d1523a16",
+      "threshold": 0.7,
+      "tokens": 84,
+      "elapsedSeconds": 0.00844049989245832
+    },
+    {
+      "id": "gretel-validation-61c8330f5fc441e896e3943a984ae81c",
+      "threshold": 0.5,
+      "tokens": 64,
+      "elapsedSeconds": 0.006242542061954737
+    },
+    {
+      "id": "gretel-validation-61c8330f5fc441e896e3943a984ae81c",
+      "threshold": 0.3,
+      "tokens": 64,
+      "elapsedSeconds": 0.006255999905988574
+    },
+    {
+      "id": "gretel-validation-61c8330f5fc441e896e3943a984ae81c",
+      "threshold": 0.7,
+      "tokens": 64,
+      "elapsedSeconds": 0.0062468331307172775
+    },
+    {
+      "id": "gretel-validation-c0eefc7b881847b9af23115d2dd42ac4",
+      "threshold": 0.5,
+      "tokens": 80,
+      "elapsedSeconds": 0.00790012488141656
+    },
+    {
+      "id": "gretel-validation-c0eefc7b881847b9af23115d2dd42ac4",
+      "threshold": 0.3,
+      "tokens": 80,
+      "elapsedSeconds": 0.00801174994558096
+    },
+    {
+      "id": "gretel-validation-c0eefc7b881847b9af23115d2dd42ac4",
+      "threshold": 0.7,
+      "tokens": 80,
+      "elapsedSeconds": 0.008076833095401525
+    },
+    {
+      "id": "gretel-validation-5295d9924a814cd98ea48ebd5887ee32",
+      "threshold": 0.5,
+      "tokens": 76,
+      "elapsedSeconds": 0.007952917134389281
+    },
+    {
+      "id": "gretel-validation-5295d9924a814cd98ea48ebd5887ee32",
+      "threshold": 0.3,
+      "tokens": 76,
+      "elapsedSeconds": 0.00804191711358726
+    },
+    {
+      "id": "gretel-validation-5295d9924a814cd98ea48ebd5887ee32",
+      "threshold": 0.7,
+      "tokens": 76,
+      "elapsedSeconds": 0.007979375077411532
+    },
+    {
+      "id": "gretel-validation-4dad476b163c45adba6022714e562ac7",
+      "threshold": 0.5,
+      "tokens": 124,
+      "elapsedSeconds": 0.013786624884232879
+    },
+    {
+      "id": "gretel-validation-4dad476b163c45adba6022714e562ac7",
+      "threshold": 0.3,
+      "tokens": 124,
+      "elapsedSeconds": 0.013549875002354383
+    },
+    {
+      "id": "gretel-validation-4dad476b163c45adba6022714e562ac7",
+      "threshold": 0.7,
+      "tokens": 124,
+      "elapsedSeconds": 0.01355666690506041
+    },
+    {
+      "id": "gretel-validation-838e28adcf7b4beb9297ed1c4279d67c",
+      "threshold": 0.5,
+      "tokens": 94,
+      "elapsedSeconds": 0.009903999976813793
+    },
+    {
+      "id": "gretel-validation-838e28adcf7b4beb9297ed1c4279d67c",
+      "threshold": 0.3,
+      "tokens": 94,
+      "elapsedSeconds": 0.009821084095165133
+    },
+    {
+      "id": "gretel-validation-838e28adcf7b4beb9297ed1c4279d67c",
+      "threshold": 0.7,
+      "tokens": 94,
+      "elapsedSeconds": 0.009771624812856317
+    },
+    {
+      "id": "gretel-validation-a19b14c895c44f8ea2a67af4726222bc",
+      "threshold": 0.5,
+      "tokens": 92,
+      "elapsedSeconds": 0.009624083060771227
+    },
+    {
+      "id": "gretel-validation-a19b14c895c44f8ea2a67af4726222bc",
+      "threshold": 0.3,
+      "tokens": 92,
+      "elapsedSeconds": 0.00961249996908009
+    },
+    {
+      "id": "gretel-validation-a19b14c895c44f8ea2a67af4726222bc",
+      "threshold": 0.7,
+      "tokens": 92,
+      "elapsedSeconds": 0.009548208909109235
+    },
+    {
+      "id": "gretel-validation-002fd786c4584c4c91767b12797a8867",
+      "threshold": 0.5,
+      "tokens": 97,
+      "elapsedSeconds": 0.010859250091016293
+    },
+    {
+      "id": "gretel-validation-002fd786c4584c4c91767b12797a8867",
+      "threshold": 0.3,
+      "tokens": 97,
+      "elapsedSeconds": 0.010898292064666748
+    },
+    {
+      "id": "gretel-validation-002fd786c4584c4c91767b12797a8867",
+      "threshold": 0.7,
+      "tokens": 97,
+      "elapsedSeconds": 0.010989250149577856
+    },
+    {
+      "id": "gretel-validation-d5de2aafa66a49f1ab2121ed9129def3",
+      "threshold": 0.5,
+      "tokens": 117,
+      "elapsedSeconds": 0.013024375075474381
+    },
+    {
+      "id": "gretel-validation-d5de2aafa66a49f1ab2121ed9129def3",
+      "threshold": 0.3,
+      "tokens": 117,
+      "elapsedSeconds": 0.012798374984413385
+    },
+    {
+      "id": "gretel-validation-d5de2aafa66a49f1ab2121ed9129def3",
+      "threshold": 0.7,
+      "tokens": 117,
+      "elapsedSeconds": 0.012762625003233552
+    },
+    {
+      "id": "gretel-validation-8ac958393a3e403f86d1918e20aa71ee",
+      "threshold": 0.5,
+      "tokens": 64,
+      "elapsedSeconds": 0.005542165832594037
+    },
+    {
+      "id": "gretel-validation-8ac958393a3e403f86d1918e20aa71ee",
+      "threshold": 0.3,
+      "tokens": 64,
+      "elapsedSeconds": 0.005522292107343674
+    },
+    {
+      "id": "gretel-validation-8ac958393a3e403f86d1918e20aa71ee",
+      "threshold": 0.7,
+      "tokens": 64,
+      "elapsedSeconds": 0.005498209036886692
+    },
+    {
+      "id": "gretel-validation-0c36c7985596435db79941e8c37c8513",
+      "threshold": 0.5,
+      "tokens": 62,
+      "elapsedSeconds": 0.0053492081351578236
+    },
+    {
+      "id": "gretel-validation-0c36c7985596435db79941e8c37c8513",
+      "threshold": 0.3,
+      "tokens": 62,
+      "elapsedSeconds": 0.0051919580437242985
+    },
+    {
+      "id": "gretel-validation-0c36c7985596435db79941e8c37c8513",
+      "threshold": 0.7,
+      "tokens": 62,
+      "elapsedSeconds": 0.005188124952837825
+    },
+    {
+      "id": "gretel-validation-a6c9ef093d154756bddacc68dd46bc05",
+      "threshold": 0.5,
+      "tokens": 153,
+      "elapsedSeconds": 0.01889216690324247
+    },
+    {
+      "id": "gretel-validation-a6c9ef093d154756bddacc68dd46bc05",
+      "threshold": 0.3,
+      "tokens": 153,
+      "elapsedSeconds": 0.018986291019245982
+    },
+    {
+      "id": "gretel-validation-a6c9ef093d154756bddacc68dd46bc05",
+      "threshold": 0.7,
+      "tokens": 153,
+      "elapsedSeconds": 0.019070541951805353
+    },
+    {
+      "id": "gretel-validation-4b8ecd21a7d04af6b800cdadc9d85af4",
+      "threshold": 0.5,
+      "tokens": 117,
+      "elapsedSeconds": 0.012789375148713589
+    },
+    {
+      "id": "gretel-validation-4b8ecd21a7d04af6b800cdadc9d85af4",
+      "threshold": 0.3,
+      "tokens": 117,
+      "elapsedSeconds": 0.013011707924306393
+    },
+    {
+      "id": "gretel-validation-4b8ecd21a7d04af6b800cdadc9d85af4",
+      "threshold": 0.7,
+      "tokens": 117,
+      "elapsedSeconds": 0.013151250081136823
+    },
+    {
+      "id": "gretel-validation-bec800f733814648855bfedbad341cb0",
+      "threshold": 0.5,
+      "tokens": 134,
+      "elapsedSeconds": 0.01747612515464425
+    },
+    {
+      "id": "gretel-validation-bec800f733814648855bfedbad341cb0",
+      "threshold": 0.3,
+      "tokens": 134,
+      "elapsedSeconds": 0.01767925010062754
+    },
+    {
+      "id": "gretel-validation-bec800f733814648855bfedbad341cb0",
+      "threshold": 0.7,
+      "tokens": 134,
+      "elapsedSeconds": 0.01746383309364319
+    },
+    {
+      "id": "gretel-validation-728a2c4bdf714a0787780c569834b443",
+      "threshold": 0.5,
+      "tokens": 95,
+      "elapsedSeconds": 0.00947970780543983
+    },
+    {
+      "id": "gretel-validation-728a2c4bdf714a0787780c569834b443",
+      "threshold": 0.3,
+      "tokens": 95,
+      "elapsedSeconds": 0.00946833286434412
+    },
+    {
+      "id": "gretel-validation-728a2c4bdf714a0787780c569834b443",
+      "threshold": 0.7,
+      "tokens": 95,
+      "elapsedSeconds": 0.009437625063583255
+    },
+    {
+      "id": "gretel-validation-74f546e79988413b9b18f71953b2d1be",
+      "threshold": 0.5,
+      "tokens": 175,
+      "elapsedSeconds": 0.01793391606770456
+    },
+    {
+      "id": "gretel-validation-74f546e79988413b9b18f71953b2d1be",
+      "threshold": 0.3,
+      "tokens": 175,
+      "elapsedSeconds": 0.017976833041757345
+    },
+    {
+      "id": "gretel-validation-74f546e79988413b9b18f71953b2d1be",
+      "threshold": 0.7,
+      "tokens": 175,
+      "elapsedSeconds": 0.01797066698782146
+    },
+    {
+      "id": "gretel-validation-acf2d914549543ad904dbac0b0b1682b",
+      "threshold": 0.5,
+      "tokens": 68,
+      "elapsedSeconds": 0.0058802091516554356
+    },
+    {
+      "id": "gretel-validation-acf2d914549543ad904dbac0b0b1682b",
+      "threshold": 0.3,
+      "tokens": 68,
+      "elapsedSeconds": 0.005907542072236538
+    },
+    {
+      "id": "gretel-validation-acf2d914549543ad904dbac0b0b1682b",
+      "threshold": 0.7,
+      "tokens": 68,
+      "elapsedSeconds": 0.005894791102036834
+    },
+    {
+      "id": "gretel-validation-07a114a1c807433eb62c8be926030597",
+      "threshold": 0.5,
+      "tokens": 65,
+      "elapsedSeconds": 0.006697959033772349
+    },
+    {
+      "id": "gretel-validation-07a114a1c807433eb62c8be926030597",
+      "threshold": 0.3,
+      "tokens": 65,
+      "elapsedSeconds": 0.006698959041386843
+    },
+    {
+      "id": "gretel-validation-07a114a1c807433eb62c8be926030597",
+      "threshold": 0.7,
+      "tokens": 65,
+      "elapsedSeconds": 0.006681791972368956
+    },
+    {
+      "id": "gretel-validation-3e33bd8c103e4b5799f587edd8655fbc",
+      "threshold": 0.5,
+      "tokens": 93,
+      "elapsedSeconds": 0.00981833296827972
+    },
+    {
+      "id": "gretel-validation-3e33bd8c103e4b5799f587edd8655fbc",
+      "threshold": 0.3,
+      "tokens": 93,
+      "elapsedSeconds": 0.009669207967817783
+    },
+    {
+      "id": "gretel-validation-3e33bd8c103e4b5799f587edd8655fbc",
+      "threshold": 0.7,
+      "tokens": 93,
+      "elapsedSeconds": 0.009727917145937681
+    },
+    {
+      "id": "gretel-validation-227a4755752f462287e7e6c67ea1aff4",
+      "threshold": 0.5,
+      "tokens": 161,
+      "elapsedSeconds": 0.017676041927188635
+    },
+    {
+      "id": "gretel-validation-227a4755752f462287e7e6c67ea1aff4",
+      "threshold": 0.3,
+      "tokens": 161,
+      "elapsedSeconds": 0.017762125004082918
+    },
+    {
+      "id": "gretel-validation-227a4755752f462287e7e6c67ea1aff4",
+      "threshold": 0.7,
+      "tokens": 161,
+      "elapsedSeconds": 0.017750666942447424
+    },
+    {
+      "id": "gretel-validation-b2dc096ba9944f3680149e62ab2cbe3e",
+      "threshold": 0.5,
+      "tokens": 89,
+      "elapsedSeconds": 0.00942570879124105
+    },
+    {
+      "id": "gretel-validation-b2dc096ba9944f3680149e62ab2cbe3e",
+      "threshold": 0.3,
+      "tokens": 89,
+      "elapsedSeconds": 0.009135250002145767
+    },
+    {
+      "id": "gretel-validation-b2dc096ba9944f3680149e62ab2cbe3e",
+      "threshold": 0.7,
+      "tokens": 89,
+      "elapsedSeconds": 0.00895904190838337
+    },
+    {
+      "id": "gretel-validation-8974b7d23fb04fe4bdf9a9d932a391b1",
+      "threshold": 0.5,
+      "tokens": 163,
+      "elapsedSeconds": 0.020124166971072555
+    },
+    {
+      "id": "gretel-validation-8974b7d23fb04fe4bdf9a9d932a391b1",
+      "threshold": 0.3,
+      "tokens": 163,
+      "elapsedSeconds": 0.019880875013768673
+    },
+    {
+      "id": "gretel-validation-8974b7d23fb04fe4bdf9a9d932a391b1",
+      "threshold": 0.7,
+      "tokens": 163,
+      "elapsedSeconds": 0.020022958051413298
+    },
+    {
+      "id": "gretel-validation-11a3bfda5657425eb4341e7e5f2c9386",
+      "threshold": 0.5,
+      "tokens": 69,
+      "elapsedSeconds": 0.007378250127658248
+    },
+    {
+      "id": "gretel-validation-11a3bfda5657425eb4341e7e5f2c9386",
+      "threshold": 0.3,
+      "tokens": 69,
+      "elapsedSeconds": 0.007288584019988775
+    },
+    {
+      "id": "gretel-validation-11a3bfda5657425eb4341e7e5f2c9386",
+      "threshold": 0.7,
+      "tokens": 69,
+      "elapsedSeconds": 0.007307040970772505
+    },
+    {
+      "id": "gretel-validation-82fae98b88f148c398176ccfeca29a6b",
+      "threshold": 0.5,
+      "tokens": 76,
+      "elapsedSeconds": 0.008119249949231744
+    },
+    {
+      "id": "gretel-validation-82fae98b88f148c398176ccfeca29a6b",
+      "threshold": 0.3,
+      "tokens": 76,
+      "elapsedSeconds": 0.008239333052188158
+    },
+    {
+      "id": "gretel-validation-82fae98b88f148c398176ccfeca29a6b",
+      "threshold": 0.7,
+      "tokens": 76,
+      "elapsedSeconds": 0.007964625023305416
+    },
+    {
+      "id": "gretel-validation-655eb3c4263b4e29a087ca579168d3dd",
+      "threshold": 0.5,
+      "tokens": 106,
+      "elapsedSeconds": 0.010016916785389185
+    },
+    {
+      "id": "gretel-validation-655eb3c4263b4e29a087ca579168d3dd",
+      "threshold": 0.3,
+      "tokens": 106,
+      "elapsedSeconds": 0.009859666926786304
+    },
+    {
+      "id": "gretel-validation-655eb3c4263b4e29a087ca579168d3dd",
+      "threshold": 0.7,
+      "tokens": 106,
+      "elapsedSeconds": 0.009948292048648
+    },
+    {
+      "id": "gretel-validation-443414536c8a4e88b57e34f45809eca0",
+      "threshold": 0.5,
+      "tokens": 106,
+      "elapsedSeconds": 0.011357208015397191
+    },
+    {
+      "id": "gretel-validation-443414536c8a4e88b57e34f45809eca0",
+      "threshold": 0.3,
+      "tokens": 106,
+      "elapsedSeconds": 0.011109333951026201
+    },
+    {
+      "id": "gretel-validation-443414536c8a4e88b57e34f45809eca0",
+      "threshold": 0.7,
+      "tokens": 106,
+      "elapsedSeconds": 0.01128958398476243
+    },
+    {
+      "id": "gretel-validation-218d4b0306d6421eb4dda1419c7eb929",
+      "threshold": 0.5,
+      "tokens": 262,
+      "elapsedSeconds": 0.023137958021834493
+    },
+    {
+      "id": "gretel-validation-218d4b0306d6421eb4dda1419c7eb929",
+      "threshold": 0.3,
+      "tokens": 262,
+      "elapsedSeconds": 0.023403750034049153
+    },
+    {
+      "id": "gretel-validation-218d4b0306d6421eb4dda1419c7eb929",
+      "threshold": 0.7,
+      "tokens": 262,
+      "elapsedSeconds": 0.023111124988645315
+    },
+    {
+      "id": "gretel-validation-069a933c3ccb4523a448eb9b91cfca13",
+      "threshold": 0.5,
+      "tokens": 78,
+      "elapsedSeconds": 0.00804916606284678
+    },
+    {
+      "id": "gretel-validation-069a933c3ccb4523a448eb9b91cfca13",
+      "threshold": 0.3,
+      "tokens": 78,
+      "elapsedSeconds": 0.008022750029340386
+    },
+    {
+      "id": "gretel-validation-069a933c3ccb4523a448eb9b91cfca13",
+      "threshold": 0.7,
+      "tokens": 78,
+      "elapsedSeconds": 0.007965250173583627
+    },
+    {
+      "id": "gretel-validation-f2572e5dc7ed4e23b7d98596135f7630",
+      "threshold": 0.5,
+      "tokens": 83,
+      "elapsedSeconds": 0.008270541904494166
+    },
+    {
+      "id": "gretel-validation-f2572e5dc7ed4e23b7d98596135f7630",
+      "threshold": 0.3,
+      "tokens": 83,
+      "elapsedSeconds": 0.008247917052358389
+    },
+    {
+      "id": "gretel-validation-f2572e5dc7ed4e23b7d98596135f7630",
+      "threshold": 0.7,
+      "tokens": 83,
+      "elapsedSeconds": 0.008134375093504786
+    },
+    {
+      "id": "gretel-validation-ff15c380455945ad928c006aa8c898df",
+      "threshold": 0.5,
+      "tokens": 192,
+      "elapsedSeconds": 0.023930707946419716
+    },
+    {
+      "id": "gretel-validation-ff15c380455945ad928c006aa8c898df",
+      "threshold": 0.3,
+      "tokens": 192,
+      "elapsedSeconds": 0.02421833318658173
+    },
+    {
+      "id": "gretel-validation-ff15c380455945ad928c006aa8c898df",
+      "threshold": 0.7,
+      "tokens": 192,
+      "elapsedSeconds": 0.023952333023771644
+    },
+    {
+      "id": "gretel-validation-c1642948287c4eaaa64aaff3bc812457",
+      "threshold": 0.5,
+      "tokens": 84,
+      "elapsedSeconds": 0.009407124947756529
+    },
+    {
+      "id": "gretel-validation-c1642948287c4eaaa64aaff3bc812457",
+      "threshold": 0.3,
+      "tokens": 84,
+      "elapsedSeconds": 0.009424332994967699
+    },
+    {
+      "id": "gretel-validation-c1642948287c4eaaa64aaff3bc812457",
+      "threshold": 0.7,
+      "tokens": 84,
+      "elapsedSeconds": 0.009312125155702233
+    },
+    {
+      "id": "gretel-validation-6de056fc51ff4cdaa1accf1862ee6eef",
+      "threshold": 0.5,
+      "tokens": 87,
+      "elapsedSeconds": 0.009062667144462466
+    },
+    {
+      "id": "gretel-validation-6de056fc51ff4cdaa1accf1862ee6eef",
+      "threshold": 0.3,
+      "tokens": 87,
+      "elapsedSeconds": 0.008929000003263354
+    },
+    {
+      "id": "gretel-validation-6de056fc51ff4cdaa1accf1862ee6eef",
+      "threshold": 0.7,
+      "tokens": 87,
+      "elapsedSeconds": 0.008942750049754977
+    },
+    {
+      "id": "gretel-validation-7c727a7c89dd4f2b9b31f6e4f5949739",
+      "threshold": 0.5,
+      "tokens": 168,
+      "elapsedSeconds": 0.017631959170103073
+    },
+    {
+      "id": "gretel-validation-7c727a7c89dd4f2b9b31f6e4f5949739",
+      "threshold": 0.3,
+      "tokens": 168,
+      "elapsedSeconds": 0.017955291084945202
+    },
+    {
+      "id": "gretel-validation-7c727a7c89dd4f2b9b31f6e4f5949739",
+      "threshold": 0.7,
+      "tokens": 168,
+      "elapsedSeconds": 0.017838165862485766
+    },
+    {
+      "id": "gretel-validation-7b324e5508854e20a4761de0387bcb6c",
+      "threshold": 0.5,
+      "tokens": 83,
+      "elapsedSeconds": 0.00802470906637609
+    },
+    {
+      "id": "gretel-validation-7b324e5508854e20a4761de0387bcb6c",
+      "threshold": 0.3,
+      "tokens": 83,
+      "elapsedSeconds": 0.007911999942734838
+    },
+    {
+      "id": "gretel-validation-7b324e5508854e20a4761de0387bcb6c",
+      "threshold": 0.7,
+      "tokens": 83,
+      "elapsedSeconds": 0.007927334168925881
+    },
+    {
+      "id": "gretel-validation-b04e9aa877ef43f6a02f76177ecb5b16",
+      "threshold": 0.5,
+      "tokens": 80,
+      "elapsedSeconds": 0.007565999869257212
+    },
+    {
+      "id": "gretel-validation-b04e9aa877ef43f6a02f76177ecb5b16",
+      "threshold": 0.3,
+      "tokens": 80,
+      "elapsedSeconds": 0.007575874915346503
+    },
+    {
+      "id": "gretel-validation-b04e9aa877ef43f6a02f76177ecb5b16",
+      "threshold": 0.7,
+      "tokens": 80,
+      "elapsedSeconds": 0.007549750152975321
+    },
+    {
+      "id": "gretel-validation-dc468d922c2e424d8b6500d9eda973f6",
+      "threshold": 0.5,
+      "tokens": 154,
+      "elapsedSeconds": 0.015770124970003963
+    },
+    {
+      "id": "gretel-validation-dc468d922c2e424d8b6500d9eda973f6",
+      "threshold": 0.3,
+      "tokens": 154,
+      "elapsedSeconds": 0.015964915975928307
+    },
+    {
+      "id": "gretel-validation-dc468d922c2e424d8b6500d9eda973f6",
+      "threshold": 0.7,
+      "tokens": 154,
+      "elapsedSeconds": 0.015873000025749207
+    },
+    {
+      "id": "gretel-validation-63a9fd061a2443b5b0912aec41cbaf39",
+      "threshold": 0.5,
+      "tokens": 86,
+      "elapsedSeconds": 0.009137541987001896
+    },
+    {
+      "id": "gretel-validation-63a9fd061a2443b5b0912aec41cbaf39",
+      "threshold": 0.3,
+      "tokens": 86,
+      "elapsedSeconds": 0.009044667007401586
+    },
+    {
+      "id": "gretel-validation-63a9fd061a2443b5b0912aec41cbaf39",
+      "threshold": 0.7,
+      "tokens": 86,
+      "elapsedSeconds": 0.008896125014871359
+    },
+    {
+      "id": "gretel-validation-7c4b8a42d8e04e47ba55cbfcbee0267d",
+      "threshold": 0.5,
+      "tokens": 89,
+      "elapsedSeconds": 0.00795254111289978
+    },
+    {
+      "id": "gretel-validation-7c4b8a42d8e04e47ba55cbfcbee0267d",
+      "threshold": 0.3,
+      "tokens": 89,
+      "elapsedSeconds": 0.007940750103443861
+    },
+    {
+      "id": "gretel-validation-7c4b8a42d8e04e47ba55cbfcbee0267d",
+      "threshold": 0.7,
+      "tokens": 89,
+      "elapsedSeconds": 0.008066667011007667
+    },
+    {
+      "id": "gretel-validation-50c35b9da1bd473b89af0d4508a14d9e",
+      "threshold": 0.5,
+      "tokens": 164,
+      "elapsedSeconds": 0.020109750097617507
+    },
+    {
+      "id": "gretel-validation-50c35b9da1bd473b89af0d4508a14d9e",
+      "threshold": 0.3,
+      "tokens": 164,
+      "elapsedSeconds": 0.020068917190656066
+    },
+    {
+      "id": "gretel-validation-50c35b9da1bd473b89af0d4508a14d9e",
+      "threshold": 0.7,
+      "tokens": 164,
+      "elapsedSeconds": 0.0204349581617862
+    },
+    {
+      "id": "gretel-validation-c849d8615ee1474ba69f18ef5f6268ce",
+      "threshold": 0.5,
+      "tokens": 86,
+      "elapsedSeconds": 0.008720124838873744
+    },
+    {
+      "id": "gretel-validation-c849d8615ee1474ba69f18ef5f6268ce",
+      "threshold": 0.3,
+      "tokens": 86,
+      "elapsedSeconds": 0.008882707916200161
+    },
+    {
+      "id": "gretel-validation-c849d8615ee1474ba69f18ef5f6268ce",
+      "threshold": 0.7,
+      "tokens": 86,
+      "elapsedSeconds": 0.008725417079403996
+    },
+    {
+      "id": "gretel-validation-bd3ddb40b6774f2a9f36ea37c70d5f34",
+      "threshold": 0.5,
+      "tokens": 82,
+      "elapsedSeconds": 0.008235415909439325
+    },
+    {
+      "id": "gretel-validation-bd3ddb40b6774f2a9f36ea37c70d5f34",
+      "threshold": 0.3,
+      "tokens": 82,
+      "elapsedSeconds": 0.008268832927569747
+    },
+    {
+      "id": "gretel-validation-bd3ddb40b6774f2a9f36ea37c70d5f34",
+      "threshold": 0.7,
+      "tokens": 82,
+      "elapsedSeconds": 0.00823670788668096
+    },
+    {
+      "id": "gretel-validation-755251d7e6a44dceaf8f85ab11e5d58c",
+      "threshold": 0.5,
+      "tokens": 200,
+      "elapsedSeconds": 0.024808458983898163
+    },
+    {
+      "id": "gretel-validation-755251d7e6a44dceaf8f85ab11e5d58c",
+      "threshold": 0.3,
+      "tokens": 200,
+      "elapsedSeconds": 0.02486537490040064
+    },
+    {
+      "id": "gretel-validation-755251d7e6a44dceaf8f85ab11e5d58c",
+      "threshold": 0.7,
+      "tokens": 200,
+      "elapsedSeconds": 0.025141125079244375
+    },
+    {
+      "id": "gretel-validation-0030e86207f0421687c5d88f68e38de1",
+      "threshold": 0.5,
+      "tokens": 86,
+      "elapsedSeconds": 0.009450290817767382
+    },
+    {
+      "id": "gretel-validation-0030e86207f0421687c5d88f68e38de1",
+      "threshold": 0.3,
+      "tokens": 86,
+      "elapsedSeconds": 0.009293624898418784
+    },
+    {
+      "id": "gretel-validation-0030e86207f0421687c5d88f68e38de1",
+      "threshold": 0.7,
+      "tokens": 86,
+      "elapsedSeconds": 0.009305624989792705
+    },
+    {
+      "id": "gretel-validation-edcb9becdaa7400497cfbd8fa4e1a593",
+      "threshold": 0.5,
+      "tokens": 121,
+      "elapsedSeconds": 0.013467333046719432
+    },
+    {
+      "id": "gretel-validation-edcb9becdaa7400497cfbd8fa4e1a593",
+      "threshold": 0.3,
+      "tokens": 121,
+      "elapsedSeconds": 0.013459041947498918
+    },
+    {
+      "id": "gretel-validation-edcb9becdaa7400497cfbd8fa4e1a593",
+      "threshold": 0.7,
+      "tokens": 121,
+      "elapsedSeconds": 0.013520834036171436
+    },
+    {
+      "id": "gretel-validation-14ca4b9e266249d0a7457886e3dd1a04",
+      "threshold": 0.5,
+      "tokens": 51,
+      "elapsedSeconds": 0.005182124907150865
+    },
+    {
+      "id": "gretel-validation-14ca4b9e266249d0a7457886e3dd1a04",
+      "threshold": 0.3,
+      "tokens": 51,
+      "elapsedSeconds": 0.004956291988492012
+    },
+    {
+      "id": "gretel-validation-14ca4b9e266249d0a7457886e3dd1a04",
+      "threshold": 0.7,
+      "tokens": 51,
+      "elapsedSeconds": 0.004910083021968603
+    },
+    {
+      "id": "gretel-validation-4eccd1b701154304aafc3f8f6834db54",
+      "threshold": 0.5,
+      "tokens": 293,
+      "elapsedSeconds": 0.039211458060890436
+    },
+    {
+      "id": "gretel-validation-4eccd1b701154304aafc3f8f6834db54",
+      "threshold": 0.3,
+      "tokens": 293,
+      "elapsedSeconds": 0.03851537499576807
+    },
+    {
+      "id": "gretel-validation-4eccd1b701154304aafc3f8f6834db54",
+      "threshold": 0.7,
+      "tokens": 293,
+      "elapsedSeconds": 0.03853695816360414
+    },
+    {
+      "id": "gretel-validation-8a1b933d94314b45bc926de431551b14",
+      "threshold": 0.5,
+      "tokens": 80,
+      "elapsedSeconds": 0.007417833898216486
+    },
+    {
+      "id": "gretel-validation-8a1b933d94314b45bc926de431551b14",
+      "threshold": 0.3,
+      "tokens": 80,
+      "elapsedSeconds": 0.007250416092574596
+    },
+    {
+      "id": "gretel-validation-8a1b933d94314b45bc926de431551b14",
+      "threshold": 0.7,
+      "tokens": 80,
+      "elapsedSeconds": 0.0073009999468922615
+    },
+    {
+      "id": "gretel-validation-a80c5060c9f74768b81a7a968e8bd7ca",
+      "threshold": 0.5,
+      "tokens": 204,
+      "elapsedSeconds": 0.024896791204810143
+    },
+    {
+      "id": "gretel-validation-a80c5060c9f74768b81a7a968e8bd7ca",
+      "threshold": 0.3,
+      "tokens": 204,
+      "elapsedSeconds": 0.02487087482586503
+    },
+    {
+      "id": "gretel-validation-a80c5060c9f74768b81a7a968e8bd7ca",
+      "threshold": 0.7,
+      "tokens": 204,
+      "elapsedSeconds": 0.024624915793538094
+    },
+    {
+      "id": "gretel-validation-e6a28194cc2f4a678df5b57dc3f5e725",
+      "threshold": 0.5,
+      "tokens": 135,
+      "elapsedSeconds": 0.013366250088438392
+    },
+    {
+      "id": "gretel-validation-e6a28194cc2f4a678df5b57dc3f5e725",
+      "threshold": 0.3,
+      "tokens": 135,
+      "elapsedSeconds": 0.013250125106424093
+    },
+    {
+      "id": "gretel-validation-e6a28194cc2f4a678df5b57dc3f5e725",
+      "threshold": 0.7,
+      "tokens": 135,
+      "elapsedSeconds": 0.013304500142112374
+    },
+    {
+      "id": "gretel-validation-52c58124cf74495c8fc69daabc22468c",
+      "threshold": 0.5,
+      "tokens": 139,
+      "elapsedSeconds": 0.015769375022500753
+    },
+    {
+      "id": "gretel-validation-52c58124cf74495c8fc69daabc22468c",
+      "threshold": 0.3,
+      "tokens": 139,
+      "elapsedSeconds": 0.015868250047788024
+    },
+    {
+      "id": "gretel-validation-52c58124cf74495c8fc69daabc22468c",
+      "threshold": 0.7,
+      "tokens": 139,
+      "elapsedSeconds": 0.015837999992072582
+    },
+    {
+      "id": "gretel-validation-6a4503dda37f42e68a312904d455a244",
+      "threshold": 0.5,
+      "tokens": 62,
+      "elapsedSeconds": 0.004564333939924836
+    },
+    {
+      "id": "gretel-validation-6a4503dda37f42e68a312904d455a244",
+      "threshold": 0.3,
+      "tokens": 62,
+      "elapsedSeconds": 0.004564165836200118
+    },
+    {
+      "id": "gretel-validation-6a4503dda37f42e68a312904d455a244",
+      "threshold": 0.7,
+      "tokens": 62,
+      "elapsedSeconds": 0.004522291012108326
+    },
+    {
+      "id": "gretel-validation-9935d3f4ccd3437aa51aef79a3d3de5a",
+      "threshold": 0.5,
+      "tokens": 217,
+      "elapsedSeconds": 0.01962470798753202
+    },
+    {
+      "id": "gretel-validation-9935d3f4ccd3437aa51aef79a3d3de5a",
+      "threshold": 0.3,
+      "tokens": 217,
+      "elapsedSeconds": 0.02004345809109509
+    },
+    {
+      "id": "gretel-validation-9935d3f4ccd3437aa51aef79a3d3de5a",
+      "threshold": 0.7,
+      "tokens": 217,
+      "elapsedSeconds": 0.01997437491081655
+    },
+    {
+      "id": "gretel-validation-8008919b1319473b92a7c5a660ce619b",
+      "threshold": 0.5,
+      "tokens": 41,
+      "elapsedSeconds": 0.0038816670421510935
+    },
+    {
+      "id": "gretel-validation-8008919b1319473b92a7c5a660ce619b",
+      "threshold": 0.3,
+      "tokens": 41,
+      "elapsedSeconds": 0.0036773330066353083
+    },
+    {
+      "id": "gretel-validation-8008919b1319473b92a7c5a660ce619b",
+      "threshold": 0.7,
+      "tokens": 41,
+      "elapsedSeconds": 0.003639125032350421
+    },
+    {
+      "id": "gretel-validation-311acddd159b4d2b9f4a013c62013900",
+      "threshold": 0.5,
+      "tokens": 95,
+      "elapsedSeconds": 0.01003441703505814
+    },
+    {
+      "id": "gretel-validation-311acddd159b4d2b9f4a013c62013900",
+      "threshold": 0.3,
+      "tokens": 95,
+      "elapsedSeconds": 0.010168249951675534
+    },
+    {
+      "id": "gretel-validation-311acddd159b4d2b9f4a013c62013900",
+      "threshold": 0.7,
+      "tokens": 95,
+      "elapsedSeconds": 0.0101777499075979
+    },
+    {
+      "id": "gretel-validation-f590c1cabb7a405b9cbea2d894626328",
+      "threshold": 0.5,
+      "tokens": 113,
+      "elapsedSeconds": 0.011600167024880648
+    },
+    {
+      "id": "gretel-validation-f590c1cabb7a405b9cbea2d894626328",
+      "threshold": 0.3,
+      "tokens": 113,
+      "elapsedSeconds": 0.0114183749537915
+    },
+    {
+      "id": "gretel-validation-f590c1cabb7a405b9cbea2d894626328",
+      "threshold": 0.7,
+      "tokens": 113,
+      "elapsedSeconds": 0.011424415977671742
+    },
+    {
+      "id": "gretel-validation-9a6b241cd8c4425887384e610d32d4de",
+      "threshold": 0.5,
+      "tokens": 115,
+      "elapsedSeconds": 0.009327916894108057
+    },
+    {
+      "id": "gretel-validation-9a6b241cd8c4425887384e610d32d4de",
+      "threshold": 0.3,
+      "tokens": 115,
+      "elapsedSeconds": 0.00900408299639821
+    },
+    {
+      "id": "gretel-validation-9a6b241cd8c4425887384e610d32d4de",
+      "threshold": 0.7,
+      "tokens": 115,
+      "elapsedSeconds": 0.009043124970048666
+    },
+    {
+      "id": "gretel-validation-c14d8250f06447279e33843d659f4f4f",
+      "threshold": 0.5,
+      "tokens": 107,
+      "elapsedSeconds": 0.011528000002726912
+    },
+    {
+      "id": "gretel-validation-c14d8250f06447279e33843d659f4f4f",
+      "threshold": 0.3,
+      "tokens": 107,
+      "elapsedSeconds": 0.011556708021089435
+    },
+    {
+      "id": "gretel-validation-c14d8250f06447279e33843d659f4f4f",
+      "threshold": 0.7,
+      "tokens": 107,
+      "elapsedSeconds": 0.01154208299703896
+    },
+    {
+      "id": "gretel-validation-7240c9778c6546e18745e9f6b40c82bb",
+      "threshold": 0.5,
+      "tokens": 126,
+      "elapsedSeconds": 0.009857083903625607
+    },
+    {
+      "id": "gretel-validation-7240c9778c6546e18745e9f6b40c82bb",
+      "threshold": 0.3,
+      "tokens": 126,
+      "elapsedSeconds": 0.009668499929830432
+    },
+    {
+      "id": "gretel-validation-7240c9778c6546e18745e9f6b40c82bb",
+      "threshold": 0.7,
+      "tokens": 126,
+      "elapsedSeconds": 0.009647333063185215
+    },
+    {
+      "id": "gretel-validation-942c2ae7ce674db2917838b9a857908d",
+      "threshold": 0.5,
+      "tokens": 147,
+      "elapsedSeconds": 0.017984916921705008
+    },
+    {
+      "id": "gretel-validation-942c2ae7ce674db2917838b9a857908d",
+      "threshold": 0.3,
+      "tokens": 147,
+      "elapsedSeconds": 0.017929666908457875
+    },
+    {
+      "id": "gretel-validation-942c2ae7ce674db2917838b9a857908d",
+      "threshold": 0.7,
+      "tokens": 147,
+      "elapsedSeconds": 0.017871957970783114
+    },
+    {
+      "id": "gretel-validation-4bb585efe7354bf5bc8bd14e933d7780",
+      "threshold": 0.5,
+      "tokens": 115,
+      "elapsedSeconds": 0.012658708961680532
+    },
+    {
+      "id": "gretel-validation-4bb585efe7354bf5bc8bd14e933d7780",
+      "threshold": 0.3,
+      "tokens": 115,
+      "elapsedSeconds": 0.012493875110521913
+    },
+    {
+      "id": "gretel-validation-4bb585efe7354bf5bc8bd14e933d7780",
+      "threshold": 0.7,
+      "tokens": 115,
+      "elapsedSeconds": 0.012486208928748965
+    },
+    {
+      "id": "gretel-validation-77fcae968afa4cb9be4cbdf5ad93f60d",
+      "threshold": 0.5,
+      "tokens": 125,
+      "elapsedSeconds": 0.014654458034783602
+    },
+    {
+      "id": "gretel-validation-77fcae968afa4cb9be4cbdf5ad93f60d",
+      "threshold": 0.3,
+      "tokens": 125,
+      "elapsedSeconds": 0.014254292007535696
+    },
+    {
+      "id": "gretel-validation-77fcae968afa4cb9be4cbdf5ad93f60d",
+      "threshold": 0.7,
+      "tokens": 125,
+      "elapsedSeconds": 0.014206625055521727
+    },
+    {
+      "id": "gretel-validation-773f9a897c5c44319edcbf5d3c3a37a9",
+      "threshold": 0.5,
+      "tokens": 79,
+      "elapsedSeconds": 0.008869291981682181
+    },
+    {
+      "id": "gretel-validation-773f9a897c5c44319edcbf5d3c3a37a9",
+      "threshold": 0.3,
+      "tokens": 79,
+      "elapsedSeconds": 0.008403291925787926
+    },
+    {
+      "id": "gretel-validation-773f9a897c5c44319edcbf5d3c3a37a9",
+      "threshold": 0.7,
+      "tokens": 79,
+      "elapsedSeconds": 0.008579374989494681
+    },
+    {
+      "id": "gretel-validation-268fd2cffe8947bb853cbdc59afcee84",
+      "threshold": 0.5,
+      "tokens": 78,
+      "elapsedSeconds": 0.006460750009864569
+    },
+    {
+      "id": "gretel-validation-268fd2cffe8947bb853cbdc59afcee84",
+      "threshold": 0.3,
+      "tokens": 78,
+      "elapsedSeconds": 0.006515124812722206
+    },
+    {
+      "id": "gretel-validation-268fd2cffe8947bb853cbdc59afcee84",
+      "threshold": 0.7,
+      "tokens": 78,
+      "elapsedSeconds": 0.0064746669959276915
+    },
+    {
+      "id": "gretel-validation-28f1edcfefb74189abb49056b9efefc9",
+      "threshold": 0.5,
+      "tokens": 93,
+      "elapsedSeconds": 0.009964082855731249
+    },
+    {
+      "id": "gretel-validation-28f1edcfefb74189abb49056b9efefc9",
+      "threshold": 0.3,
+      "tokens": 93,
+      "elapsedSeconds": 0.010017958004027605
+    },
+    {
+      "id": "gretel-validation-28f1edcfefb74189abb49056b9efefc9",
+      "threshold": 0.7,
+      "tokens": 93,
+      "elapsedSeconds": 0.009905458195134997
+    },
+    {
+      "id": "gretel-validation-7cc2f6ac04d24da888b14d6fa58181ac",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.006638166960328817
+    },
+    {
+      "id": "gretel-validation-7cc2f6ac04d24da888b14d6fa58181ac",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.006680459016934037
+    },
+    {
+      "id": "gretel-validation-7cc2f6ac04d24da888b14d6fa58181ac",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.006696625147014856
+    },
+    {
+      "id": "gretel-validation-6d4c57c3a95b4ca5acdd3f412fae3df7",
+      "threshold": 0.5,
+      "tokens": 111,
+      "elapsedSeconds": 0.010252541862428188
+    },
+    {
+      "id": "gretel-validation-6d4c57c3a95b4ca5acdd3f412fae3df7",
+      "threshold": 0.3,
+      "tokens": 111,
+      "elapsedSeconds": 0.010214957874268293
+    },
+    {
+      "id": "gretel-validation-6d4c57c3a95b4ca5acdd3f412fae3df7",
+      "threshold": 0.7,
+      "tokens": 111,
+      "elapsedSeconds": 0.009988500038161874
+    },
+    {
+      "id": "gretel-validation-34ad3c4616834230a485fb416d41a5db",
+      "threshold": 0.5,
+      "tokens": 74,
+      "elapsedSeconds": 0.006170250009745359
+    },
+    {
+      "id": "gretel-validation-34ad3c4616834230a485fb416d41a5db",
+      "threshold": 0.3,
+      "tokens": 74,
+      "elapsedSeconds": 0.006155291106551886
+    },
+    {
+      "id": "gretel-validation-34ad3c4616834230a485fb416d41a5db",
+      "threshold": 0.7,
+      "tokens": 74,
+      "elapsedSeconds": 0.006160250166431069
+    },
+    {
+      "id": "gretel-validation-427e69bff09542c58c6494b711a7c81e",
+      "threshold": 0.5,
+      "tokens": 101,
+      "elapsedSeconds": 0.011840500170364976
+    },
+    {
+      "id": "gretel-validation-427e69bff09542c58c6494b711a7c81e",
+      "threshold": 0.3,
+      "tokens": 101,
+      "elapsedSeconds": 0.011811750009655952
+    },
+    {
+      "id": "gretel-validation-427e69bff09542c58c6494b711a7c81e",
+      "threshold": 0.7,
+      "tokens": 101,
+      "elapsedSeconds": 0.0127407091204077
+    },
+    {
+      "id": "gretel-validation-27e19fc5e21647319ec2efd09342a5f8",
+      "threshold": 0.5,
+      "tokens": 157,
+      "elapsedSeconds": 0.016137124970555305
+    },
+    {
+      "id": "gretel-validation-27e19fc5e21647319ec2efd09342a5f8",
+      "threshold": 0.3,
+      "tokens": 157,
+      "elapsedSeconds": 0.016131708165630698
+    },
+    {
+      "id": "gretel-validation-27e19fc5e21647319ec2efd09342a5f8",
+      "threshold": 0.7,
+      "tokens": 157,
+      "elapsedSeconds": 0.0162062079180032
+    },
+    {
+      "id": "gretel-validation-977bd97fad8a4ad5badb424a210df932",
+      "threshold": 0.5,
+      "tokens": 166,
+      "elapsedSeconds": 0.020559458062052727
+    },
+    {
+      "id": "gretel-validation-977bd97fad8a4ad5badb424a210df932",
+      "threshold": 0.3,
+      "tokens": 166,
+      "elapsedSeconds": 0.02063670800998807
+    },
+    {
+      "id": "gretel-validation-977bd97fad8a4ad5badb424a210df932",
+      "threshold": 0.7,
+      "tokens": 166,
+      "elapsedSeconds": 0.020727416034787893
+    },
+    {
+      "id": "gretel-validation-068a25d08dea4b72ac8607c917473f0f",
+      "threshold": 0.5,
+      "tokens": 75,
+      "elapsedSeconds": 0.00750066596083343
+    },
+    {
+      "id": "gretel-validation-068a25d08dea4b72ac8607c917473f0f",
+      "threshold": 0.3,
+      "tokens": 75,
+      "elapsedSeconds": 0.0074179579969495535
+    },
+    {
+      "id": "gretel-validation-068a25d08dea4b72ac8607c917473f0f",
+      "threshold": 0.7,
+      "tokens": 75,
+      "elapsedSeconds": 0.007398582994937897
+    },
+    {
+      "id": "gretel-validation-3db6d0b88a7249128b7dbef4c73905f9",
+      "threshold": 0.5,
+      "tokens": 116,
+      "elapsedSeconds": 0.014334458159282804
+    },
+    {
+      "id": "gretel-validation-3db6d0b88a7249128b7dbef4c73905f9",
+      "threshold": 0.3,
+      "tokens": 116,
+      "elapsedSeconds": 0.014302500057965517
+    },
+    {
+      "id": "gretel-validation-3db6d0b88a7249128b7dbef4c73905f9",
+      "threshold": 0.7,
+      "tokens": 116,
+      "elapsedSeconds": 0.01457362505607307
+    }
+  ],
+  "results": {
+    "0.3": {
+      "model": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 4209,
+          "fp": 2706,
+          "fn": 293,
+          "precision": 0.6086767895878525,
+          "recall": 0.9349178143047534,
+          "f1": 0.7373215380572832
+        },
+        "fullyCoveredValues": 229,
+        "goldValues": 250,
+        "fullValueRecall": 0.916,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 42,
+        "negativeFalsePositiveRate": 0.9333333333333333
+      },
+      "hybrid": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 4209,
+          "fp": 2734,
+          "fn": 293,
+          "precision": 0.6062220941955927,
+          "recall": 0.9349178143047534,
+          "f1": 0.7355176933158585
+        },
+        "fullyCoveredValues": 229,
+        "goldValues": 250,
+        "fullValueRecall": 0.916,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 42,
+        "negativeFalsePositiveRate": 0.9333333333333333
+      },
+      "typed": {
+        "examples": 153,
+        "exactTypedSpans": {
+          "tp": 194,
+          "fp": 300,
+          "fn": 56,
+          "precision": 0.39271255060728744,
+          "recall": 0.776,
+          "f1": 0.521505376344086
+        },
+        "characterCoverageUntyped": {
+          "tp": 4209,
+          "fp": 2706,
+          "fn": 293,
+          "precision": 0.6086767895878525,
+          "recall": 0.9349178143047534,
+          "f1": 0.7373215380572832
+        },
+        "fullyCoveredValues": 229,
+        "goldValues": 250,
+        "fullValueRecall": 0.916,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 42,
+        "negativeFalsePositiveRate": 0.9333333333333333,
+        "perLabel": {
+          "credit_card": {
+            "tp": 17,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.85,
+            "recall": 0.9444444444444444,
+            "f1": 0.8947368421052632
+          },
+          "email": {
+            "tp": 15,
+            "fp": 0,
+            "fn": 11,
+            "precision": 1.0,
+            "recall": 0.5769230769230769,
+            "f1": 0.7317073170731707
+          },
+          "phone": {
+            "tp": 18,
+            "fp": 6,
+            "fn": 1,
+            "precision": 0.75,
+            "recall": 0.9473684210526315,
+            "f1": 0.8372093023255814
+          },
+          "date_of_birth": {
+            "tp": 51,
+            "fp": 19,
+            "fn": 3,
+            "precision": 0.7285714285714285,
+            "recall": 0.9444444444444444,
+            "f1": 0.8225806451612904
+          },
+          "ip_address": {
+            "tp": 29,
+            "fp": 26,
+            "fn": 11,
+            "precision": 0.5272727272727272,
+            "recall": 0.725,
+            "f1": 0.6105263157894736
+          },
+          "typed": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "address": {
+            "tp": 13,
+            "fp": 8,
+            "fn": 23,
+            "precision": 0.6190476190476191,
+            "recall": 0.3611111111111111,
+            "f1": 0.45614035087719296
+          },
+          "government_id": {
+            "tp": 32,
+            "fp": 112,
+            "fn": 1,
+            "precision": 0.2222222222222222,
+            "recall": 0.9696969696969697,
+            "f1": 0.36158192090395475
+          },
+          "secret": {
+            "tp": 10,
+            "fp": 91,
+            "fn": 5,
+            "precision": 0.09900990099009901,
+            "recall": 0.6666666666666666,
+            "f1": 0.17241379310344826
+          },
+          "financial_id": {
+            "tp": 9,
+            "fp": 35,
+            "fn": 0,
+            "precision": 0.20454545454545456,
+            "recall": 1.0,
+            "f1": 0.339622641509434
+          }
+        }
+      }
+    },
+    "0.5": {
+      "model": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 3252,
+          "fp": 1056,
+          "fn": 1250,
+          "precision": 0.754874651810585,
+          "recall": 0.7223456241670368,
+          "f1": 0.7382519863791146
+        },
+        "fullyCoveredValues": 189,
+        "goldValues": 250,
+        "fullValueRecall": 0.756,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 25,
+        "negativeFalsePositiveRate": 0.5555555555555556
+      },
+      "hybrid": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 3252,
+          "fp": 1114,
+          "fn": 1250,
+          "precision": 0.7448465414567109,
+          "recall": 0.7223456241670368,
+          "f1": 0.733423545331529
+        },
+        "fullyCoveredValues": 189,
+        "goldValues": 250,
+        "fullValueRecall": 0.756,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 25,
+        "negativeFalsePositiveRate": 0.5555555555555556
+      },
+      "typed": {
+        "examples": 153,
+        "exactTypedSpans": {
+          "tp": 169,
+          "fp": 112,
+          "fn": 81,
+          "precision": 0.6014234875444839,
+          "recall": 0.676,
+          "f1": 0.6365348399246704
+        },
+        "characterCoverageUntyped": {
+          "tp": 3252,
+          "fp": 1056,
+          "fn": 1250,
+          "precision": 0.754874651810585,
+          "recall": 0.7223456241670368,
+          "f1": 0.7382519863791146
+        },
+        "fullyCoveredValues": 189,
+        "goldValues": 250,
+        "fullValueRecall": 0.756,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 25,
+        "negativeFalsePositiveRate": 0.5555555555555556,
+        "perLabel": {
+          "credit_card": {
+            "tp": 17,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.85,
+            "recall": 0.9444444444444444,
+            "f1": 0.8947368421052632
+          },
+          "email": {
+            "tp": 9,
+            "fp": 0,
+            "fn": 17,
+            "precision": 1.0,
+            "recall": 0.34615384615384615,
+            "f1": 0.5142857142857142
+          },
+          "phone": {
+            "tp": 18,
+            "fp": 4,
+            "fn": 1,
+            "precision": 0.8181818181818182,
+            "recall": 0.9473684210526315,
+            "f1": 0.8780487804878049
+          },
+          "date_of_birth": {
+            "tp": 39,
+            "fp": 5,
+            "fn": 15,
+            "precision": 0.8863636363636364,
+            "recall": 0.7222222222222222,
+            "f1": 0.7959183673469388
+          },
+          "ip_address": {
+            "tp": 25,
+            "fp": 11,
+            "fn": 15,
+            "precision": 0.6944444444444444,
+            "recall": 0.625,
+            "f1": 0.6578947368421053
+          },
+          "typed": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "address": {
+            "tp": 10,
+            "fp": 3,
+            "fn": 26,
+            "precision": 0.7692307692307693,
+            "recall": 0.2777777777777778,
+            "f1": 0.40816326530612246
+          },
+          "government_id": {
+            "tp": 32,
+            "fp": 30,
+            "fn": 1,
+            "precision": 0.5161290322580645,
+            "recall": 0.9696969696969697,
+            "f1": 0.6736842105263158
+          },
+          "secret": {
+            "tp": 10,
+            "fp": 32,
+            "fn": 5,
+            "precision": 0.23809523809523808,
+            "recall": 0.6666666666666666,
+            "f1": 0.3508771929824562
+          },
+          "financial_id": {
+            "tp": 9,
+            "fp": 24,
+            "fn": 0,
+            "precision": 0.2727272727272727,
+            "recall": 1.0,
+            "f1": 0.42857142857142855
+          }
+        }
+      }
+    },
+    "0.7": {
+      "model": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 1566,
+          "fp": 143,
+          "fn": 2936,
+          "precision": 0.9163253364540667,
+          "recall": 0.3478454020435362,
+          "f1": 0.5042666237320882
+        },
+        "fullyCoveredValues": 111,
+        "goldValues": 250,
+        "fullValueRecall": 0.444,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 4,
+        "negativeFalsePositiveRate": 0.08888888888888889
+      },
+      "hybrid": {
+        "examples": 153,
+        "characterCoverageUntyped": {
+          "tp": 1677,
+          "fp": 261,
+          "fn": 2825,
+          "precision": 0.8653250773993808,
+          "recall": 0.37250111061750335,
+          "f1": 0.5208074534161491
+        },
+        "fullyCoveredValues": 118,
+        "goldValues": 250,
+        "fullValueRecall": 0.472,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 4,
+        "negativeFalsePositiveRate": 0.08888888888888889
+      },
+      "typed": {
+        "examples": 153,
+        "exactTypedSpans": {
+          "tp": 110,
+          "fp": 13,
+          "fn": 140,
+          "precision": 0.8943089430894309,
+          "recall": 0.44,
+          "f1": 0.5898123324396783
+        },
+        "characterCoverageUntyped": {
+          "tp": 1566,
+          "fp": 143,
+          "fn": 2936,
+          "precision": 0.9163253364540667,
+          "recall": 0.3478454020435362,
+          "f1": 0.5042666237320882
+        },
+        "fullyCoveredValues": 111,
+        "goldValues": 250,
+        "fullValueRecall": 0.444,
+        "negativeExamples": 45,
+        "negativeExamplesWithPrediction": 4,
+        "negativeFalsePositiveRate": 0.08888888888888889,
+        "perLabel": {
+          "credit_card": {
+            "tp": 11,
+            "fp": 0,
+            "fn": 7,
+            "precision": 1.0,
+            "recall": 0.6111111111111112,
+            "f1": 0.7586206896551725
+          },
+          "email": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 24,
+            "precision": 1.0,
+            "recall": 0.07692307692307693,
+            "f1": 0.14285714285714288
+          },
+          "phone": {
+            "tp": 18,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.9473684210526315,
+            "f1": 0.972972972972973
+          },
+          "date_of_birth": {
+            "tp": 15,
+            "fp": 1,
+            "fn": 39,
+            "precision": 0.9375,
+            "recall": 0.2777777777777778,
+            "f1": 0.42857142857142866
+          },
+          "ip_address": {
+            "tp": 16,
+            "fp": 1,
+            "fn": 24,
+            "precision": 0.9411764705882353,
+            "recall": 0.4,
+            "f1": 0.5614035087719298
+          },
+          "typed": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": 0,
+            "recall": 0,
+            "f1": 0
+          },
+          "address": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 36,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "government_id": {
+            "tp": 32,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.9142857142857143,
+            "recall": 0.9696969696969697,
+            "f1": 0.9411764705882354
+          },
+          "secret": {
+            "tp": 7,
+            "fp": 4,
+            "fn": 8,
+            "precision": 0.6363636363636364,
+            "recall": 0.4666666666666667,
+            "f1": 0.5384615384615385
+          },
+          "financial_id": {
+            "tp": 9,
+            "fp": 4,
+            "fn": 0,
+            "precision": 0.6923076923076923,
+            "recall": 1.0,
+            "f1": 0.8181818181818181
+          }
+        }
+      }
+    }
+  },
+  "modelOutputsValidated": 459,
+  "sourceTextPublished": false,
+  "rawEntityTextPersisted": false,
+  "qualityAcceptance": false,
+  "productionBackendSelected": false,
+  "providers": [
+    "CPUExecutionProvider"
+  ],
+  "loadSeconds": 0.15306666609831154,
+  "firstOutputShape": [
+    1,
+    26,
+    12,
+    3
+  ],
+  "completedSources": 153,
+  "peakRSSBytes": 979222528
+}
