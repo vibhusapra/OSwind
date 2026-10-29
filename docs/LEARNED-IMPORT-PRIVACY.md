@@ -43,6 +43,14 @@ The first native all-path acceptance attempt at threshold 0.5 missed the authore
 
 A separate Unicode test initially refused a valid model span ending inside a composed character. The import validator now accepts original scalar boundaries and the existing mask layer expands to whole characters. Its earlier failure remains in `focused-v3.log`. Initial test compilation failures remain in `compile-focused-v1.log` and `focused-v2.log`.
 
+## Qualified source and staged build
+
+[PR #84](https://github.com/vibhusapra/OSwind/pull/84), product source `c54ac84aa4bfebf0298e4aceabd0701e5521aa51`, passes the [frozen source/product qualification](../benchmarks/learned-import-privacy-v1.json): 1,193 defined tests (1,191 passes/two explicit skips), 152 selected TSan passes, 152 optimized passes, and all 14 ordered operations. All 573 frozen inputs match. Nine signed process groups include 30 PII-import operations, six authored native phone positives and two retained email misses. The counts establish the stated contracts; privacy acceptance remains failed/open.
+
+The ad-hoc signed app and ZIP are staged locally at `.artifacts/learned-import-privacy-v1/qualification-v1/release-v1/`. Strict signatures, normalized same-build executable payloads, the complete 34-file extracted archive tree and absence of TSan runtime dependencies pass. Installed bytes match the pre-run manifest; no installation or normal-history capture occurred. This is a development build, without Developer ID/notarization or general desktop acceptance. The signed CLI SHA256 is `b1668c566122410603837f6278c62ac0f71dec43df344d107183d06f79f998bc`.
+
+Twelve owned native Settings renders cover idle, prepared, failure, busy, stopping and enabled-import states in light/dark themes. Representative enabled/failure layouts were reviewed. These are offscreen renders and worker tests, separate from permissioned foreground interaction. The report's 76 rows match canonical data, only F047 changes, vendors remain byte-identical, and rendering is deterministic; no new competitive-report visual review is claimed.
+
 ## Remaining work
 
 - [ ] Accept a sensitivity/model policy against representative desktop OCR, speech and metadata, with held-out negatives, value recall and over-redaction costs.
@@ -50,6 +58,7 @@ A separate Unicode test initially refused a valid model span ending inside a com
 - [ ] Integrate learned protection into live screen/audio admission, with saved-policy and source-revision fences.
 - [ ] Treat actual image/audio/video content and verify no sensitive media retention.
 - [ ] Protect remote-model egress and exports consistently without implying imports cover those paths.
+- [ ] Profile actual Core ML operator placement and fallback costs before making a GPU/ANE execution claim.
 - [ ] Add model/settings provenance per persisted record, migration/reindex/rescan controls, throughput and physical power measurements.
 - [ ] Finish the broader all-writer admission audit, including CLI note preparation.
 - [ ] Resolve the independent encrypted-image detach failure: PR83 source94f60b0 CI passed, but publication28a95f8 run40889784746 failed `NativeVaultQueryRecoveryTests` line94 on normal `hdiutil` exit16. The cause remains unproven; no forced detach or altered cleanup policy was added.
