@@ -1,0 +1,264 @@
+{
+  "format": "OSwind native PII decoding qualification v1",
+  "recordedAtUTC": "2026-10-29T04:34:50.352945+00:00",
+  "source": "f2d0a74155f8707b854e3acbc679c4b43f8563ee",
+  "base": "f2592329d925db1176e4bbe32e83b049b6ff5f79",
+  "schema": 22,
+  "F047Implemented": false,
+  "productionLearnedRedactorSelected": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "platform": {
+    "os": "Version 26.6.2 (Build 25G83)",
+    "availableGPU": "Apple M5 Max",
+    "scope": "Available GPU identity is not per-operation placement evidence."
+  },
+  "decoder": {
+    "newCases": 18,
+    "focusedCases": 28,
+    "focusedPassed": 28,
+    "CPUReferenceCases": 92,
+    "CPUModelValidationSources": 72,
+    "constructedLogitCases": 20,
+    "CPUThresholdComparisons": 276,
+    "CoreMLThresholdComparisons": 216,
+    "CPUConfidenceMaxDifference": 0,
+    "CoreMLConfidenceMaxDifference": 2.086162567138672e-06,
+    "CPUConfidenceTolerance": 1e-06,
+    "CoreMLConfidenceTolerance": 0.001,
+    "allSpanBoundariesLabelsAndWholeGraphemeMasksMatch": true,
+    "maximumWords": 512,
+    "maximumCandidates": 16384,
+    "sourceBindingScope": "Exact supplied source bytes only. Model/library/policy generation and producer-to-source ownership require the future backend owner. No production privacy admission claim."
+  },
+  "nativeCPUExports": {
+    "runs": 2,
+    "distinctSourcesPerRun": 72,
+    "forwardCallsPerRun": 144,
+    "maxAbsoluteLogitDifferenceBothRuns": 0,
+    "secondRunInputsUnchanged": true,
+    "scope": "Two sequential completed validation exports retained; harness adds nonfinite-reference refusal/docstring repair before second. All92 tensor/expected-span/mask rows are identical. Not a single-process Swift app inference pipeline."
+  },
+  "coreMLBucket": {
+    "tokenBucket": 128,
+    "dynamicOutputWordCount": true,
+    "originalTokenRange": [
+      49,
+      78
+    ],
+    "observedWordRange": [
+      6,
+      24
+    ],
+    "distinctValidationSources": 72,
+    "forwardCalls": 144,
+    "separatePaddedCPUSmokeCalls": 6,
+    "maxAbsoluteLogitDifference": 0.00019073486328125,
+    "predeclaredAbsoluteLogitTolerance": 0.001,
+    "operatorAndInitializerBytesUnchanged": true,
+    "perSessionDistinctCoreMLPartitionNames": 20,
+    "perSessionDistinctCPUNodeNames": 82,
+    "totalNodeInvocations": {
+      "CPUExecutionProvider": 11808,
+      "CoreMLExecutionProvider": 2880
+    },
+    "frameworkWarningSessions": 24,
+    "peakOwnedProcessRSSBytes": 830849024,
+    "policy": "MLProgram CPUAndGPU+CPU",
+    "physicalGPUPlacementProven": false,
+    "scope": "Fixed padded token input with dynamic word output; same72 validation inputs, three operating thresholds. All framework warnings retained. Larger buckets, long-source support, actual device placement, residency/energy and production owner unqualified. Peak process RSS excludes shared framework daemons. No paired latency/speed claim."
+  },
+  "normal": {
+    "defined": 984,
+    "passes": 982,
+    "skipped": 2,
+    "failures": 0,
+    "suiteSeconds": 415.682
+  },
+  "TSan": {
+    "defined": 132,
+    "passes": 132,
+    "skipped": 0,
+    "failures": 0,
+    "suiteSeconds": 152.719
+  },
+  "optimizedPII": {
+    "defined": 28,
+    "passes": 28,
+    "skipped": 0,
+    "failures": 0,
+    "suiteSeconds": 0.353
+  },
+  "optimizedReceipt": {
+    "source": "f2d0a74155f8707b854e3acbc679c4b43f8563ee",
+    "exitCode": 0,
+    "awakeSeconds": 124.84729725006036,
+    "systemSeconds": 124.84716582298279,
+    "scope": "Separate optimized primitive check after six-operation full qualification; no source changes/commits between. Not full release app or hardware acceptance."
+  },
+  "TSanSelection": "PII.*Tests|Visual.*Tests|EntityWordPieceTests|EntityNERDecodingTests",
+  "TSanRaceReportObserved": false,
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 420.4498092920985,
+      "systemSeconds": 420.4480011463165
+    },
+    {
+      "name": "pii-visual-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 182.82125679193996,
+      "systemSeconds": 182.8204700946808
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 48.67317000008188,
+      "systemSeconds": 48.67296099662781
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.5903939590789378,
+      "systemSeconds": 1.5903880596160889
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.249615458073094,
+      "systemSeconds": 11.249567985534668
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.0776810001116246,
+      "systemSeconds": 0.07768082618713379
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 native PII decoding/grapheme masks; CoreML remains a separately validated prototype; no learned redactor installation, physical energy or competitive ranking claim",
+    "codeCommit": "f2d0a74155f8707b854e3acbc679c4b43f8563ee",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "befee7e04784438bfbe1100b9ac129ffb05e7c53bcdbd3acaac485840fa8277c",
+        "signedSHA256": "e0650a733fb8f5836f7d816cfb8142c0d9e7db7ec1f5c536f4dbc4c74e9c6344",
+        "normalizedPayloadSHA256": "7678f37307e0dee2776418fdb744e62af4296ad88bab919f13d8a8c55a4d425d"
+      },
+      "oswindctl": {
+        "rawSHA256": "fcadcb779aa96ee152d3e7728d0a46f25510bac0034cea84667106b4c82db7de",
+        "signedSHA256": "429583f209669a7c987549dc16de60c8dcec0334ee0099984a233b953d03dcb8",
+        "normalizedPayloadSHA256": "b4454f58e91c90ce4d35a502443a226b5fb97328eee48ff426d3cae65908293f"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "d2d818f558cda0ac74ee97e0f0cda367e9970e9b2d94cbc8ad3b58c9cf4269e7",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "9b0a12aa2b93ca97d03eb041fdc19818f14c65ce7a5c81f47e1fbf9805f31d3c",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "finalProof": {
+    "source": "f2d0a74155f8707b854e3acbc679c4b43f8563ee",
+    "frozenSourceAndReferencesUnchanged": true,
+    "fullCommandPathOwnedProcesses": [],
+    "processScope": "Current project compiler/test commands, staged app/CLI/helper/native-probe executables and current qualification/release-check drivers. System framework daemons/residency not covered.",
+    "artifactRootImagePaths": [],
+    "imageScope": "Current artifact root only; test-temp vault cleanup is checked by its own test cases.",
+    "installedAppUnchanged": true,
+    "stagedAndUnpackedTreesMatchManifest": true,
+    "bundleFiles": 33,
+    "zipSHA256": "d2d818f558cda0ac74ee97e0f0cda367e9970e9b2d94cbc8ad3b58c9cf4269e7"
+  },
+  "visual": {
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "photos": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "observedTimings": {
+      "indexingSeconds": 3.7376019954681396,
+      "queryMedianMilliseconds": 11.453986167907715,
+      "queryP95Milliseconds": 14.002084732055664
+    },
+    "limits": [
+      "Single process/trial, uncontrolled Core ML/OS caches and host background activity.",
+      "Index time includes local model preparation. Query time includes text embedding, exact vector scan, source byte checks and result loading.",
+      "Fixture admission copies explicit supplied images with empty OCR; it does not measure capture permission, OCR, secret detection or background capture latency.",
+      "No image, caption, source path or raw vector is included in this aggregate report."
+    ],
+    "scope": "Same opened corpus/bundle functional compatibility; no new holdout, paired speed, physical desktop/power or competitor acceptance."
+  },
+  "offlineParserChecks": {
+    "cases": 4,
+    "passes": 4,
+    "precedingFailedCases": 1,
+    "reason": "Nonfinite expected reference was accepted; now refused. Original measured finite outputs remain valid and identical."
+  },
+  "references": [
+    {
+      "path": "prototypes/pii/native-decoder-reference-v1.json",
+      "sha256": "9a6b1ef283b902ae16b6b5060339f9c3bea782ca9f45a423fc26e61f39edc30e"
+    },
+    {
+      "path": "prototypes/pii/coreml-decoder-reference-v1.json",
+      "sha256": "d83122da7561d6c62d96c0b7c2b1239a1970e0b37759d16ce1a92984aa8d851f"
+    }
+  ],
+  "observations": [
+    {
+      "path": "prototypes/pii/observations/native-decoder-export-v2.json",
+      "sha256": "b686864ff1fcb50f07b574d97c29f9c04c1647b39116d99873616c9ec958a5d7"
+    },
+    {
+      "path": "prototypes/pii/observations/native-decoder-export-plan-v2.json",
+      "sha256": "c21bfab0b6989a2ac39416942ed4ff2e4d5f7a8c57a9d614695a35ada3a09ba3"
+    },
+    {
+      "path": "prototypes/pii/observations/native-coreml-bucket-v1.json",
+      "sha256": "03f0193fbb1bcd2292a9826c8b3e23d59db3c0d141630f676f6f663278467ec0"
+    },
+    {
+      "path": "prototypes/pii/observations/native-coreml-bucket-plan-v1.json",
+      "sha256": "4fc254adabdda0ef3c5e886c049c689a3ef8d784bc9b38e09ae26d1b6c7c10e4"
+    }
+  ],
+  "skips": [
+    "Owned physical system-audio fixtures not opted in; no microphone used.",
+    "WorkspaceWakeLifecycleTests visual admission unavailable while locked/thermal; settings unchanged."
+  ],
+  "remaining": [
+    "Pinned production runtime/model loading, serial ownership, cancellation/drain and idle release",
+    "Producer/source/model/library/policy identity fences and long-source windows",
+    "Capture/import/query/export/screenshot/audio admission, setup and failure UI",
+    "Independent representative quality and matched competitor/physical power workloads"
+  ],
+  "CI": {
+    "source": "f2d0a74155f8707b854e3acbc679c4b43f8563ee",
+    "runID": 40816013794,
+    "workflowConclusion": "success",
+    "scope": "Exact frozen primary source; later documentation CI is separate.",
+    "nativeJobID": 123257120544,
+    "nativeConclusion": "success",
+    "benchmarkJobID": 123257120848,
+    "benchmarkConclusion": "success"
+  }
+}

@@ -1,0 +1,831 @@
+{
+  "state": "completed",
+  "operations": [
+    {
+      "group": 0,
+      "policy": "cpu",
+      "exitCode": 0,
+      "awakeSeconds": 0.20386904198676348,
+      "systemSeconds": 0.20386886596679688,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "cpu",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 0.0765075,
+        "firstForwardSeconds": 0.0100024,
+        "warmForwardMedianSeconds": 0.00903346,
+        "warmForwardP95Seconds": 0.00906183,
+        "maxAbsoluteLogitDifference": 1.85966e-05,
+        "peakRSSBytes": 434864128,
+        "forwardSecondsInRunOrder": [
+          0.0100024,
+          0.00910612,
+          0.00904033,
+          0.00906183,
+          0.00903346,
+          0.00889158
+        ]
+      },
+      "frameworkStdoutPrelude": "",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 3162
+      }
+    },
+    {
+      "group": 0,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9366506251972169,
+      "systemSeconds": 1.936643123626709,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.44891,
+        "firstForwardSeconds": 0.180823,
+        "warmForwardMedianSeconds": 0.062485,
+        "warmForwardP95Seconds": 0.0635411,
+        "maxAbsoluteLogitDifference": 3.62396e-05,
+        "peakRSSBytes": 825851904,
+        "forwardSecondsInRunOrder": [
+          0.180823,
+          0.065371,
+          0.0167164,
+          0.0635411,
+          0.062485,
+          0.0163887
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_NonZero_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 1,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9612631669733673,
+      "systemSeconds": 1.9612541198730469,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.45346,
+        "firstForwardSeconds": 0.111612,
+        "warmForwardMedianSeconds": 0.0639332,
+        "warmForwardP95Seconds": 0.0651149,
+        "maxAbsoluteLogitDifference": 2.90871e-05,
+        "peakRSSBytes": 829243392,
+        "forwardSecondsInRunOrder": [
+          0.111612,
+          0.0663346,
+          0.0645627,
+          0.0651149,
+          0.0639332,
+          0.063457
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 2,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8173474168870598,
+      "systemSeconds": 1.8173401355743408,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.39741,
+        "firstForwardSeconds": 0.108488,
+        "warmForwardMedianSeconds": 0.0624528,
+        "warmForwardP95Seconds": 0.062988,
+        "maxAbsoluteLogitDifference": 3.24249e-05,
+        "peakRSSBytes": 825737216,
+        "forwardSecondsInRunOrder": [
+          0.108488,
+          0.0646953,
+          0.0188396,
+          0.0624528,
+          0.062988,
+          0.0166585
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 3,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8400692089926451,
+      "systemSeconds": 1.8400609493255615,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.39731,
+        "firstForwardSeconds": 0.110414,
+        "warmForwardMedianSeconds": 0.065169,
+        "warmForwardP95Seconds": 0.0655227,
+        "maxAbsoluteLogitDifference": 3.24249e-05,
+        "peakRSSBytes": 830849024,
+        "forwardSecondsInRunOrder": [
+          0.110414,
+          0.0172685,
+          0.0688424,
+          0.065169,
+          0.0169079,
+          0.0655227
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 4,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8819524580612779,
+      "systemSeconds": 1.8819451332092285,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.45561,
+        "firstForwardSeconds": 0.107978,
+        "warmForwardMedianSeconds": 0.0602298,
+        "warmForwardP95Seconds": 0.0616289,
+        "maxAbsoluteLogitDifference": 2.57492e-05,
+        "peakRSSBytes": 824246272,
+        "forwardSecondsInRunOrder": [
+          0.107978,
+          0.0628092,
+          0.015767,
+          0.0616289,
+          0.0602298,
+          0.0155239
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_rnn_Cast_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 5,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9143547920975834,
+      "systemSeconds": 1.9143469333648682,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.41632,
+        "firstForwardSeconds": 0.109072,
+        "warmForwardMedianSeconds": 0.062231,
+        "warmForwardP95Seconds": 0.0684602,
+        "maxAbsoluteLogitDifference": 3.14713e-05,
+        "peakRSSBytes": 820133888,
+        "forwardSecondsInRunOrder": [
+          0.109072,
+          0.0634408,
+          0.0606051,
+          0.0617188,
+          0.0684602,
+          0.062231
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 6,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9955894998274744,
+      "systemSeconds": 1.995582103729248,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.45837,
+        "firstForwardSeconds": 0.110871,
+        "warmForwardMedianSeconds": 0.0642478,
+        "warmForwardP95Seconds": 0.0648179,
+        "maxAbsoluteLogitDifference": 3.05176e-05,
+        "peakRSSBytes": 824721408,
+        "forwardSecondsInRunOrder": [
+          0.110871,
+          0.0669898,
+          0.0657851,
+          0.0634485,
+          0.0648179,
+          0.0642478
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 7,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8310599999967963,
+      "systemSeconds": 1.8310515880584717,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43181,
+        "firstForwardSeconds": 0.108386,
+        "warmForwardMedianSeconds": 0.0620911,
+        "warmForwardP95Seconds": 0.0634345,
+        "maxAbsoluteLogitDifference": 3.05176e-05,
+        "peakRSSBytes": 817528832,
+        "forwardSecondsInRunOrder": [
+          0.108386,
+          0.015898,
+          0.0642425,
+          0.0620911,
+          0.0152306,
+          0.0634345
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 8,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8610218330286443,
+      "systemSeconds": 1.8610138893127441,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43237,
+        "firstForwardSeconds": 0.109099,
+        "warmForwardMedianSeconds": 0.0636659,
+        "warmForwardP95Seconds": 0.0641789,
+        "maxAbsoluteLogitDifference": 3.00407e-05,
+        "peakRSSBytes": 824393728,
+        "forwardSecondsInRunOrder": [
+          0.109099,
+          0.0639804,
+          0.0154725,
+          0.0641789,
+          0.0636659,
+          0.0151215
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 9,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9875593341421336,
+      "systemSeconds": 1.987550973892212,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.4906,
+        "firstForwardSeconds": 0.110552,
+        "warmForwardMedianSeconds": 0.0625155,
+        "warmForwardP95Seconds": 0.0625739,
+        "maxAbsoluteLogitDifference": 3.33786e-05,
+        "peakRSSBytes": 825491456,
+        "forwardSecondsInRunOrder": [
+          0.110552,
+          0.0651308,
+          0.0747216,
+          0.0625739,
+          0.0625155,
+          0.0619973
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_Squeeze_2_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 10,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.939924499951303,
+      "systemSeconds": 1.9399149417877197,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.41996,
+        "firstForwardSeconds": 0.110029,
+        "warmForwardMedianSeconds": 0.0621224,
+        "warmForwardP95Seconds": 0.062135,
+        "maxAbsoluteLogitDifference": 3.05176e-05,
+        "peakRSSBytes": 827801600,
+        "forwardSecondsInRunOrder": [
+          0.110029,
+          0.0650759,
+          0.0638199,
+          0.0619115,
+          0.0621224,
+          0.062135
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 11,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.908197792014107,
+      "systemSeconds": 1.9081900119781494,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.49364,
+        "firstForwardSeconds": 0.114309,
+        "warmForwardMedianSeconds": 0.0648806,
+        "warmForwardP95Seconds": 0.0659053,
+        "maxAbsoluteLogitDifference": 3.14713e-05,
+        "peakRSSBytes": 818774016,
+        "forwardSecondsInRunOrder": [
+          0.114309,
+          0.0165346,
+          0.067567,
+          0.0648806,
+          0.0157985,
+          0.0659053
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_rnn_Cast_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 12,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8679673748556525,
+      "systemSeconds": 1.8679602146148682,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.44668,
+        "firstForwardSeconds": 0.112442,
+        "warmForwardMedianSeconds": 0.0620902,
+        "warmForwardP95Seconds": 0.0638095,
+        "maxAbsoluteLogitDifference": 2.86102e-05,
+        "peakRSSBytes": 825753600,
+        "forwardSecondsInRunOrder": [
+          0.112442,
+          0.065094,
+          0.017188,
+          0.0638095,
+          0.0620902,
+          0.0169195
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 13,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.973621750017628,
+      "systemSeconds": 1.9736130237579346,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43647,
+        "firstForwardSeconds": 0.112332,
+        "warmForwardMedianSeconds": 0.0637491,
+        "warmForwardP95Seconds": 0.0653448,
+        "maxAbsoluteLogitDifference": 2.47955e-05,
+        "peakRSSBytes": 827817984,
+        "forwardSecondsInRunOrder": [
+          0.112332,
+          0.0659862,
+          0.0638957,
+          0.0653448,
+          0.0637491,
+          0.063103
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 14,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.984165625181049,
+      "systemSeconds": 1.984156847000122,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.48253,
+        "firstForwardSeconds": 0.109445,
+        "warmForwardMedianSeconds": 0.0616508,
+        "warmForwardP95Seconds": 0.0628908,
+        "maxAbsoluteLogitDifference": 2.67029e-05,
+        "peakRSSBytes": 820641792,
+        "forwardSecondsInRunOrder": [
+          0.109445,
+          0.0652974,
+          0.0675048,
+          0.0611425,
+          0.0628908,
+          0.0616508
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 15,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.854888750007376,
+      "systemSeconds": 1.8548810482025146,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.42475,
+        "firstForwardSeconds": 0.109749,
+        "warmForwardMedianSeconds": 0.0636633,
+        "warmForwardP95Seconds": 0.0677174,
+        "maxAbsoluteLogitDifference": 2.76566e-05,
+        "peakRSSBytes": 825507840,
+        "forwardSecondsInRunOrder": [
+          0.109749,
+          0.0163455,
+          0.0671348,
+          0.0636633,
+          0.0152505,
+          0.0677174
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 16,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9928359999321401,
+      "systemSeconds": 1.9928267002105713,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.48471,
+        "firstForwardSeconds": 0.111046,
+        "warmForwardMedianSeconds": 0.0634935,
+        "warmForwardP95Seconds": 0.065096,
+        "maxAbsoluteLogitDifference": 2.28882e-05,
+        "peakRSSBytes": 825507840,
+        "forwardSecondsInRunOrder": [
+          0.111046,
+          0.067939,
+          0.0670477,
+          0.06303,
+          0.065096,
+          0.0634935
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 17,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8702992910984904,
+      "systemSeconds": 1.8702950477600098,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43897,
+        "firstForwardSeconds": 0.107149,
+        "warmForwardMedianSeconds": 0.0613345,
+        "warmForwardP95Seconds": 0.061861,
+        "maxAbsoluteLogitDifference": 2.38419e-05,
+        "peakRSSBytes": 820461568,
+        "forwardSecondsInRunOrder": [
+          0.107149,
+          0.0172086,
+          0.0629158,
+          0.061861,
+          0.0163707,
+          0.0613345
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 18,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9574806250166148,
+      "systemSeconds": 1.9574720859527588,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43316,
+        "firstForwardSeconds": 0.104808,
+        "warmForwardMedianSeconds": 0.0638501,
+        "warmForwardP95Seconds": 0.0665195,
+        "maxAbsoluteLogitDifference": 2.0504e-05,
+        "peakRSSBytes": 818200576,
+        "forwardSecondsInRunOrder": [
+          0.104808,
+          0.064965,
+          0.063215,
+          0.0638501,
+          0.0626452,
+          0.0665195
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_Squeeze_2_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 19,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.90907470905222,
+      "systemSeconds": 1.909066915512085,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.4848,
+        "firstForwardSeconds": 0.108715,
+        "warmForwardMedianSeconds": 0.0609273,
+        "warmForwardP95Seconds": 0.0816045,
+        "maxAbsoluteLogitDifference": 2.81334e-05,
+        "peakRSSBytes": 818085888,
+        "forwardSecondsInRunOrder": [
+          0.108715,
+          0.0163083,
+          0.0626048,
+          0.0816045,
+          0.0151713,
+          0.0609273
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 20,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.9185549579560757,
+      "systemSeconds": 1.9185469150543213,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.42034,
+        "firstForwardSeconds": 0.10624,
+        "warmForwardMedianSeconds": 0.0617297,
+        "warmForwardP95Seconds": 0.0706219,
+        "maxAbsoluteLogitDifference": 0.000190735,
+        "peakRSSBytes": 818003968,
+        "forwardSecondsInRunOrder": [
+          0.10624,
+          0.063218,
+          0.0627147,
+          0.0706219,
+          0.060942,
+          0.0617297
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 21,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.886262167012319,
+      "systemSeconds": 1.886254072189331,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.47521,
+        "firstForwardSeconds": 0.106916,
+        "warmForwardMedianSeconds": 0.0633685,
+        "warmForwardP95Seconds": 0.0641125,
+        "maxAbsoluteLogitDifference": 2.28882e-05,
+        "peakRSSBytes": 824279040,
+        "forwardSecondsInRunOrder": [
+          0.106916,
+          0.0656855,
+          0.0164893,
+          0.0633685,
+          0.0641125,
+          0.015668
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 22,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8905972500797361,
+      "systemSeconds": 1.8905889987945557,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.41026,
+        "firstForwardSeconds": 0.105896,
+        "warmForwardMedianSeconds": 0.0617615,
+        "warmForwardP95Seconds": 0.0630068,
+        "maxAbsoluteLogitDifference": 4.76837e-05,
+        "peakRSSBytes": 817971200,
+        "forwardSecondsInRunOrder": [
+          0.105896,
+          0.0635832,
+          0.063362,
+          0.0616683,
+          0.0630068,
+          0.0617615
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    },
+    {
+      "group": 23,
+      "policy": "coreml",
+      "exitCode": 0,
+      "awakeSeconds": 1.8598710410296917,
+      "systemSeconds": 1.859863042831421,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 6,
+        "loadSeconds": 1.43,
+        "firstForwardSeconds": 0.106499,
+        "warmForwardMedianSeconds": 0.0622528,
+        "warmForwardP95Seconds": 0.063893,
+        "maxAbsoluteLogitDifference": 1.95503e-05,
+        "peakRSSBytes": 817725440,
+        "forwardSecondsInRunOrder": [
+          0.106499,
+          0.0162718,
+          0.0658351,
+          0.0622528,
+          0.0151667,
+          0.063893
+        ]
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 492,
+        "CoreMLExecutionProvider": 120
+      }
+    }
+  ],
+  "distinctCoreMLSources": 72,
+  "CoreMLForwardCalls": 144
+}

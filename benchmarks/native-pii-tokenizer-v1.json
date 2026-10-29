@@ -174,15 +174,24 @@
   "CI": {
     "source": "2d8d65d31480e7b76eda803a6504f4a92c34fff1",
     "runID": 40809566323,
-    "status": "in_progress",
+    "status": "completed",
     "benchmarkJobID": 123236420425,
     "benchmarkConclusion": "success",
     "nativeJobID": 123236419935,
-    "nativeStatus": "in_progress"
+    "nativeStatus": "completed",
+    "nativeConclusion": "success"
   },
   "platform": {
     "os": "Version 26.6.2 (Build 25G83)",
     "availableGPU": "Apple M5 Max",
     "limit": "Available device identity is not per-operation placement evidence; older supported Macs not qualified here."
+  },
+  "documentationFollowupCI": {
+    "source": "f2592329d925db1176e4bbe32e83b049b6ff5f79",
+    "runID": 40811352542,
+    "nativeJobID": 123242156616,
+    "nativeConclusion": "success",
+    "benchmarkJobID": 123242156258,
+    "benchmarkConclusion": "success"
   }
 }
