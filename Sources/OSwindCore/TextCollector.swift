@@ -68,16 +68,19 @@ private struct CollectorBatch:Decodable {
 public extension MemoryStore {
     /// Validate the whole bounded batch before reserving a writer. Stable IDs
     /// permit retry after an unknown transport result; exclusions are prospective.
-    func importCollectorBatch(_ data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil)throws->CollectorImportResult {
-        try Task.checkCancellation();guard data.count<=TextCollector.maximumBatchBytes else {throw OSwindError.invalid("Collector batch exceeds 16 MiB")}
-        let batch=try JSONDecoder().decode(CollectorBatch.self,from:data),tag=try TextCollector.tag(collectorID:batch.collectorID)
-        var memories=[Memory](),ids=[String](),seen=Set<String>()
-        for record in batch.records {
-            try Task.checkCancellation();let id=try TextCollector.sourceID(collectorID:batch.collectorID,key:record.key)
-            guard seen.insert(id).inserted else {throw OSwindError.invalid("Collector source keys must be unique within a batch")}
-            var memory=Memory(id:id,timestamp:record.timestamp,kind:.note,app:record.app,bundleID:record.bundleID,title:record.title,url:record.url,text:record.text);memory.tags=["collector",tag];memories.append(memory);ids.append(id)
+    func importCollectorBatch(_ data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil)throws->CollectorImportResult {
+        return try withImportActivity(admission) {activity in
+            try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+            try Task.checkCancellation();guard data.count<=TextCollector.maximumBatchBytes else {throw OSwindError.invalid("Collector batch exceeds 16 MiB")}
+            let batch=try JSONDecoder().decode(CollectorBatch.self,from:data),tag=try TextCollector.tag(collectorID:batch.collectorID)
+            var memories=[Memory](),ids=[String](),seen=Set<String>()
+            for record in batch.records {
+                try Task.checkCancellation();let id=try TextCollector.sourceID(collectorID:batch.collectorID,key:record.key)
+                guard seen.insert(id).inserted else {throw OSwindError.invalid("Collector source keys must be unique within a batch")}
+                var memory=Memory(id:id,timestamp:record.timestamp,kind:.note,app:record.app,bundleID:record.bundleID,title:record.title,url:record.url,text:record.text);memory.tags=["collector",tag];memories.append(memory);ids.append(id)
+            }
+            let result=try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot,admission:activity)
+            return .init(collectorID:batch.collectorID,requested:memories.count,imported:result.imported,excluded:result.excluded,sourceIDs:ids)
         }
-        let result=try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot)
-        return .init(collectorID:batch.collectorID,requested:memories.count,imported:result.imported,excluded:result.excluded,sourceIDs:ids)
     }
 }

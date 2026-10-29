@@ -65,7 +65,7 @@ import OSwindCore
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
         if terminationReady {return .terminateNow}
-        guard let session=AppSession.current,session.vaultPackage != nil || session.busy else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
+        guard let session=AppSession.current,session.vaultPackage != nil || session.busy || session.model?.hasPendingJSONImport == true else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
         guard !terminationInProgress else {return .terminateCancel}
         terminationInProgress=true
         // terminateLater enters AppKit's nested modal run loop. If terminate()

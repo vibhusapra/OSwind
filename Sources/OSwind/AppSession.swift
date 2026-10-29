@@ -55,7 +55,7 @@ import OSwindCore
         guard maySwitch else {return}
         run {
             let package=try LibraryVault.package(containing:url)
-            if package==self.vaultPackage,self.model != nil {return}
+            if let package,package==self.vaultPackage,self.model != nil {return}
             if package==nil {try LibraryLocationSelection(url:url,requiresExisting:true,origin:"selected").validate()}
             try await self.departCurrent()
             self.selection = .init(url:package?.appendingPathComponent("Library") ?? url,requiresExisting:true,origin:"selected")
@@ -96,7 +96,7 @@ import OSwindCore
             if terminationRequested || locked() {try await performLock();return}
             if model==nil {model=try await preparedModel(root:vault.libraryURL,startServices:startServices)}
         } else if let previous=model {
-            previous.clearForVaultLock();closingStore=previous.store;model=nil
+            await stageForClosing(previous)
             // A competing CLI may have already replaced the public handle. The
             // store retains its verified canonical root solely for safe close.
             let store=previous.store;try await Task.detached(priority:.utility) {try store.close()}.value;closingStore=nil
@@ -139,7 +139,7 @@ import OSwindCore
     }
     private func performLock() async throws {
         guard let package=vaultPackage else {return}
-        if let previous=model {previous.clearForVaultLock();closingStore=previous.store;model=nil}
+        if let previous=model {await stageForClosing(previous)}
         let vault=try LibraryVault(package:package)
         vaultStatus=try await vault.lock(store:closingStore);closingStore=nil
         guard vaultStatus?.state == .locked else {throw OSwindError.unavailable("The encrypted volume is still attached. Retry locking when other readers finish.")}
@@ -148,9 +148,16 @@ import OSwindCore
     private func departCurrent() async throws {
         if vaultPackage != nil {try await performLock()}
         else if let previous=model {
-            previous.clearForVaultLock();closingStore=previous.store;model=nil
+            await stageForClosing(previous)
             let store=previous.store;try await Task.detached(priority:.utility) {try store.close()}.value;closingStore=nil
         } else if let store=closingStore {try await Task.detached(priority:.utility) {try store.close()}.value;closingStore=nil}
+    }
+    /// Remove visible access first, then join imports before a SQLite close or
+    /// image mutation. Even a worker not yet holding a reservation must finish.
+    private func stageForClosing(_ previous:AppModel) async {
+        previous.clearForVaultLock();closingStore=previous.store
+        if model === previous {model=nil}
+        await previous.cancelJSONImportAndWait()
     }
     func createVault(at package:URL,name:String,capacityGiB:Int,passphrase:String,copyHistory:Bool,remember:Bool,observeMigration:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) {
         guard maySwitch else {return}
@@ -159,6 +166,7 @@ import OSwindCore
         message="";snapshotNeedsReview=false
         original?.prepareForLibrarySwitch()
         run {
+            await original?.cancelJSONImportAndWait()
             let relay=LibraryProgressRelay(),observer=Task {while !Task.isCancelled {do {try await Task.sleep(for:.milliseconds(100))} catch {break};self.progress=relay.get() ?? self.progress}}
             defer {observer.cancel();self.progress=nil}
             var secret=Data(passphrase.utf8);defer {secret.resetBytes(in:0..<secret.count)}
@@ -193,6 +201,7 @@ import OSwindCore
         }
     }
     private func restorePreparedOriginal(_ original:AppModel) async throws {
+        await original.cancelJSONImportAndWait()
         let store=original.store;try await Task.detached(priority:.utility) {try store.close()}.value
         // Restoring the original is cancellation cleanup: a stopped migration
         // still needs a quiet original workspace, with no resumed services.
@@ -224,7 +233,9 @@ import OSwindCore
     func lockForTermination() async -> Bool {
         terminationRequested=true
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
-        guard vaultPackage != nil else {model?.prepareForLibrarySwitch();return true}
+        guard vaultPackage != nil else {
+            model?.prepareForLibrarySwitch();await model?.cancelJSONImportAndWait();return true
+        }
         if vaultStatus?.state != .locked {requestLock();while busy {if let operation {await operation.value} else {break}}}
         let detached=vaultStatus?.imageAttached == false
         if !detached {terminationRequested=false}
@@ -238,7 +249,7 @@ import OSwindCore
             catch {self.failure=error.localizedDescription}
             do {
                 if try self.reconcileMovedPackage() {
-                    if let previous=self.model {previous.clearForVaultLock();self.closingStore=previous.store;self.model=nil}
+                    if let previous=self.model {await self.stageForClosing(previous)}
                     self.pendingLock=true
                 }
             } catch {self.failure=error.localizedDescription}
@@ -304,7 +315,7 @@ import OSwindCore
                     else {try await self.loadVault(startServices:false)}
                 } catch {
                     if let previous=self.model {
-                        previous.clearForVaultLock();self.closingStore=previous.store;self.model=nil
+                        await self.stageForClosing(previous)
                         let store=previous.store;try? await Task.detached(priority:.utility) {try store.close()}.value
                     }
                     self.vaultStatus?.state = .unavailable

@@ -26,7 +26,7 @@ import UniformTypeIdentifiers
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
-        if oldValue.privacy != settings.privacy {drafting.clear()}
+        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -83,6 +83,9 @@ import UniformTypeIdentifiers
     @Published private(set) var importingJSON=false
     @Published private(set) var importStatus=""
     private var jsonImportTask:Task<Void,Never>?
+    private var jsonImportWorker:Task<String,Error>?
+    private var jsonImportDrainers=0
+    var hasPendingJSONImport:Bool {jsonImportWorker != nil || jsonImportTask != nil}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
@@ -221,7 +224,7 @@ import UniformTypeIdentifiers
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
-        libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
+        libraryOperationGeneration=UUID();cancelJSONImport();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
@@ -660,27 +663,38 @@ import UniformTypeIdentifiers
         if limitlessAPI {panel.title="Import Limitless API JSON";panel.message="Choose a saved API response containing data.lifelogs or data.lifelog. Account-export ZIP files, audio and Rewind databases are not supported."}
         if panel.runModal() == .OK,let url=panel.url {importJSONFile(url,limitlessAPI:limitlessAPI)}
     }
-    func cancelJSONImport() {jsonImportTask?.cancel()}
-    func importJSONFile(_ url:URL,limitlessAPI:Bool=false) {
-        guard !libraryWipe.busy,!importingJSON else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
-        let snapshot:LibrarySettingsSnapshot
-        do {
-            snapshot=try LibrarySettingsSnapshot.capture(root:store.root)
-            guard snapshot.settings.privacy==settings.privacy else {snapshot.release();throw OSwindError.unavailable("Current privacy settings have not been saved. Resolve the settings error before importing.")}
-        }
-        catch {importingJSON=false;importStatus="Import did not complete: "+error.localizedDescription;errorMessage=error.localizedDescription;return}
-        let store=self.store,embedder=self.embedder,policy=snapshot.settings.privacy,generation=libraryOperationGeneration
+    func cancelJSONImport() {jsonImportWorker?.cancel();jsonImportTask?.cancel()}
+    /// Join both the actual worker and its UI completion, even if the drain
+    /// caller is cancelled. No acknowledgement precedes descriptor release.
+    func cancelJSONImportAndWait() async {
+        jsonImportDrainers+=1;defer {jsonImportDrainers-=1}
+        let worker=jsonImportWorker,completion=jsonImportTask
+        worker?.cancel();completion?.cancel()
+        if let worker {_ = try? await worker.value}
+        if let completion {await completion.value}
+    }
+    enum JSONImportPhase:Sendable {case started,settingsCaptured}
+    // The observer is an internal test seam; production callers leave it nil.
+    func importJSONFile(_ url:URL,limitlessAPI:Bool=false,observeWorker:(@Sendable (JSONImportPhase)throws->Void)?=nil) {
+        guard !store.isClosed,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {()throws->String in
+            try Task.checkCancellation();try observeWorker?(.started);try Task.checkCancellation()
+            let activity=try store.mediaWriteLease();defer {activity.release()}
+            let snapshot=try LibrarySettingsSnapshot.capture(root:store.root)
             defer {snapshot.release()}
+            guard snapshot.settings.privacy==policy else {throw OSwindError.unavailable("The import's privacy settings no longer match saved settings. Retry with the current privacy settings.")}
+            try observeWorker?(.settingsCaptured);try Task.checkCancellation()
             if limitlessAPI {
-                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot)
+                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
                 return "Imported \(result.imported) Limitless text notes · \(result.excluded) excluded."+(result.hasMorePages ? " This response has another page; import each saved page to complete the export.":" Only the supplied response was imported.")
             }
-            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot)
+            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
             return "Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
         }
+        jsonImportWorker=worker
         jsonImportTask=Task {
-            defer {importingJSON=false;jsonImportTask=nil}
+            defer {importingJSON=false;jsonImportTask=nil;jsonImportWorker=nil}
             do {
                 let status=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
                 guard libraryOperationGeneration==generation else {return}

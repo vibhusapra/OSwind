@@ -24,15 +24,17 @@ import OSwindCore
         let file=root.appendingPathComponent("unsupported.json");try Data(#"{"data":{"archive":"unsupported"}}"#.utf8).write(to:file)
         app.importJSONFile(file,limitlessAPI:true);try await waitForImport();XCTAssertNotNil(app.errorMessage);XCTAssertTrue(app.importStatus.hasPrefix("Import did not complete:"));XCTAssertEqual(try app.store.stats().count,0)
     }
-    func testMalformedSavedPolicyRefusesBeforeStartingWorker() throws {
+    func testMalformedSavedPolicyRefusesWithoutPublication() async throws {
         let file=try fixture(),settings=root.appendingPathComponent("settings.json")
         try Data("{malformed".utf8).write(to:settings);try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:settings.path)
         app.importJSONFile(file,limitlessAPI:true)
+        try await waitForImport()
         XCTAssertFalse(app.importingJSON);XCTAssertTrue(app.importStatus.contains("malformed"));XCTAssertNotNil(app.errorMessage);XCTAssertEqual(try app.store.stats().count,0)
     }
-    func testUnsavedInMemoryPolicyDoesNotSilentlyUseDifferentDiskPolicy() throws {
+    func testUnsavedInMemoryPolicyDoesNotSilentlyUseDifferentDiskPolicy() async throws {
         let file=try fixture();var disk=app.settings;disk.privacy.redactSecrets.toggle();try disk.save(root:root)
         app.importJSONFile(file,limitlessAPI:true)
-        XCTAssertFalse(app.importingJSON);XCTAssertTrue(app.importStatus.contains("have not been saved"));XCTAssertEqual(try app.store.stats().count,0)
+        try await waitForImport()
+        XCTAssertFalse(app.importingJSON);XCTAssertTrue(app.importStatus.contains("no longer match"));XCTAssertEqual(try app.store.stats().count,0)
     }
 }
