@@ -1,0 +1,861 @@
+{
+  "labels": {
+    "email address": "email",
+    "phone number": "phone",
+    "location address": "address",
+    "ssn": "government_id",
+    "passport number": "government_id",
+    "driver license": "government_id",
+    "account number": "financial_id",
+    "credit card": "credit_card",
+    "dob": "date_of_birth",
+    "ip address": "ip_address",
+    "password": "secret",
+    "api key": "secret"
+  },
+  "policy": "Detect explicitly contextual contact, government, financial, birth-date, network and authentication identifiers. Names, public URLs, ages, generic dates, amounts and placeholders alone are not in this policy. Synthetic values remain positives based on displayed type/context.",
+  "rows": [
+    {
+      "id": "validation-a20d85708e83",
+      "split": "validation",
+      "text": "Owned support note: my personal email is owned.person0@example.test. Keep this private.",
+      "gold": [
+        {
+          "start": 41,
+          "end": 67,
+          "label": "email",
+          "value": "owned.person0@example.test"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c7bfdc3084bd",
+      "split": "validation",
+      "text": "Contact record | personal email: owned.person1@example.test | verified by owner.",
+      "gold": [
+        {
+          "start": 33,
+          "end": 59,
+          "label": "email",
+          "value": "owned.person1@example.test"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-94e710a6598c",
+      "split": "validation",
+      "text": "Please update the personal email to owned.person2@example.test in this private profile.",
+      "gold": [
+        {
+          "start": 36,
+          "end": 62,
+          "label": "email",
+          "value": "owned.person2@example.test"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-1ad214d23dc0",
+      "split": "validation",
+      "text": "🔒 Private personal email = owned.person3@example.test; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 27,
+          "end": 53,
+          "label": "email",
+          "value": "owned.person3@example.test"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-9433c40dbdab",
+      "split": "validation",
+      "text": "Owned support note: my private phone number is +1 (202) 555-0100. Keep this private.",
+      "gold": [
+        {
+          "start": 47,
+          "end": 64,
+          "label": "phone",
+          "value": "+1 (202) 555-0100"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-0cd4287829ca",
+      "split": "validation",
+      "text": "Contact record | private phone number: +1 (202) 555-0101 | verified by owner.",
+      "gold": [
+        {
+          "start": 39,
+          "end": 56,
+          "label": "phone",
+          "value": "+1 (202) 555-0101"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-6f4ec61172b7",
+      "split": "validation",
+      "text": "Please update the private phone number to +1 (202) 555-0102 in this private profile.",
+      "gold": [
+        {
+          "start": 42,
+          "end": 59,
+          "label": "phone",
+          "value": "+1 (202) 555-0102"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-bdd8d06db471",
+      "split": "validation",
+      "text": "🔒 Private private phone number = +1 (202) 555-0103; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 33,
+          "end": 50,
+          "label": "phone",
+          "value": "+1 (202) 555-0103"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c18165bd8721",
+      "split": "validation",
+      "text": "Owned support note: my home street address is 410 Willow Lane, Springfield, MA 01103. Keep this private.",
+      "gold": [
+        {
+          "start": 46,
+          "end": 84,
+          "label": "address",
+          "value": "410 Willow Lane, Springfield, MA 01103"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-81e0cfd8599b",
+      "split": "validation",
+      "text": "Contact record | home street address: 411 Willow Lane, Springfield, MA 01103 | verified by owner.",
+      "gold": [
+        {
+          "start": 38,
+          "end": 76,
+          "label": "address",
+          "value": "411 Willow Lane, Springfield, MA 01103"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-f477fc51bec1",
+      "split": "validation",
+      "text": "Please update the home street address to 412 Willow Lane, Springfield, MA 01103 in this private profile.",
+      "gold": [
+        {
+          "start": 41,
+          "end": 79,
+          "label": "address",
+          "value": "412 Willow Lane, Springfield, MA 01103"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c2c417b1672e",
+      "split": "validation",
+      "text": "🔒 Private home street address = 413 Willow Lane, Springfield, MA 01103; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 32,
+          "end": 70,
+          "label": "address",
+          "value": "413 Willow Lane, Springfield, MA 01103"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-6393453f0431",
+      "split": "validation",
+      "text": "Owned support note: my Social Security number is 000-12-1000. Keep this private.",
+      "gold": [
+        {
+          "start": 49,
+          "end": 60,
+          "label": "government_id",
+          "value": "000-12-1000"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-a94d217a3190",
+      "split": "validation",
+      "text": "Contact record | Social Security number: 000-12-1001 | verified by owner.",
+      "gold": [
+        {
+          "start": 41,
+          "end": 52,
+          "label": "government_id",
+          "value": "000-12-1001"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-98c59d163c9d",
+      "split": "validation",
+      "text": "Please update the Social Security number to 000-12-1002 in this private profile.",
+      "gold": [
+        {
+          "start": 44,
+          "end": 55,
+          "label": "government_id",
+          "value": "000-12-1002"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-bd214ed8ce4e",
+      "split": "validation",
+      "text": "🔒 Private Social Security number = 000-12-1003; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 35,
+          "end": 46,
+          "label": "government_id",
+          "value": "000-12-1003"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-ff74f67d709f",
+      "split": "validation",
+      "text": "Owned support note: my passport number is X1000000. Keep this private.",
+      "gold": [
+        {
+          "start": 42,
+          "end": 50,
+          "label": "government_id",
+          "value": "X1000000"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-b1a7891a399b",
+      "split": "validation",
+      "text": "Contact record | passport number: X1000001 | verified by owner.",
+      "gold": [
+        {
+          "start": 34,
+          "end": 42,
+          "label": "government_id",
+          "value": "X1000001"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-81b22c521f57",
+      "split": "validation",
+      "text": "Please update the passport number to X1000002 in this private profile.",
+      "gold": [
+        {
+          "start": 37,
+          "end": 45,
+          "label": "government_id",
+          "value": "X1000002"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d5df0bbe011d",
+      "split": "validation",
+      "text": "🔒 Private passport number = X1000003; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 28,
+          "end": 36,
+          "label": "government_id",
+          "value": "X1000003"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-7f9494b081bc",
+      "split": "validation",
+      "text": "Owned support note: my driver license number is D1000000. Keep this private.",
+      "gold": [
+        {
+          "start": 48,
+          "end": 56,
+          "label": "government_id",
+          "value": "D1000000"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-f3a7647f467c",
+      "split": "validation",
+      "text": "Contact record | driver license number: D1000001 | verified by owner.",
+      "gold": [
+        {
+          "start": 40,
+          "end": 48,
+          "label": "government_id",
+          "value": "D1000001"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-e1766aa32196",
+      "split": "validation",
+      "text": "Please update the driver license number to D1000002 in this private profile.",
+      "gold": [
+        {
+          "start": 43,
+          "end": 51,
+          "label": "government_id",
+          "value": "D1000002"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-71cb58b0240a",
+      "split": "validation",
+      "text": "🔒 Private driver license number = D1000003; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 34,
+          "end": 42,
+          "label": "government_id",
+          "value": "D1000003"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-4bf33f0012d3",
+      "split": "validation",
+      "text": "Owned support note: my bank account number is 9042-1200-7781. Keep this private.",
+      "gold": [
+        {
+          "start": 46,
+          "end": 60,
+          "label": "financial_id",
+          "value": "9042-1200-7781"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-53e04c32cd15",
+      "split": "validation",
+      "text": "Contact record | bank account number: 9042-1201-7781 | verified by owner.",
+      "gold": [
+        {
+          "start": 38,
+          "end": 52,
+          "label": "financial_id",
+          "value": "9042-1201-7781"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d1eef2535014",
+      "split": "validation",
+      "text": "Please update the bank account number to 9042-1202-7781 in this private profile.",
+      "gold": [
+        {
+          "start": 41,
+          "end": 55,
+          "label": "financial_id",
+          "value": "9042-1202-7781"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-f2e30c692496",
+      "split": "validation",
+      "text": "🔒 Private bank account number = 9042-1203-7781; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 32,
+          "end": 46,
+          "label": "financial_id",
+          "value": "9042-1203-7781"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-540c6d5f0635",
+      "split": "validation",
+      "text": "Owned support note: my credit card number is 4111 1111 1111 1111. Keep this private.",
+      "gold": [
+        {
+          "start": 45,
+          "end": 64,
+          "label": "credit_card",
+          "value": "4111 1111 1111 1111"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c1882e1ed5fb",
+      "split": "validation",
+      "text": "Contact record | credit card number: 4111 1111 1111 1111 | verified by owner.",
+      "gold": [
+        {
+          "start": 37,
+          "end": 56,
+          "label": "credit_card",
+          "value": "4111 1111 1111 1111"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-a1b53b13d646",
+      "split": "validation",
+      "text": "Please update the credit card number to 4111 1111 1111 1111 in this private profile.",
+      "gold": [
+        {
+          "start": 40,
+          "end": 59,
+          "label": "credit_card",
+          "value": "4111 1111 1111 1111"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-1ba0afd2a6d1",
+      "split": "validation",
+      "text": "🔒 Private credit card number = 4111 1111 1111 1111; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 31,
+          "end": 50,
+          "label": "credit_card",
+          "value": "4111 1111 1111 1111"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d421bf8c5c93",
+      "split": "validation",
+      "text": "Owned support note: my date of birth is 1988-06-01. Keep this private.",
+      "gold": [
+        {
+          "start": 40,
+          "end": 50,
+          "label": "date_of_birth",
+          "value": "1988-06-01"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-38637fc34c4c",
+      "split": "validation",
+      "text": "Contact record | date of birth: 1988-06-02 | verified by owner.",
+      "gold": [
+        {
+          "start": 32,
+          "end": 42,
+          "label": "date_of_birth",
+          "value": "1988-06-02"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-490e35b0f368",
+      "split": "validation",
+      "text": "Please update the date of birth to 1988-06-03 in this private profile.",
+      "gold": [
+        {
+          "start": 35,
+          "end": 45,
+          "label": "date_of_birth",
+          "value": "1988-06-03"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-7094ed68f8ef",
+      "split": "validation",
+      "text": "🔒 Private date of birth = 1988-06-04; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 26,
+          "end": 36,
+          "label": "date_of_birth",
+          "value": "1988-06-04"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-4ba9ce7e42e6",
+      "split": "validation",
+      "text": "Owned support note: my client IP address is 192.0.2.1. Keep this private.",
+      "gold": [
+        {
+          "start": 44,
+          "end": 53,
+          "label": "ip_address",
+          "value": "192.0.2.1"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-12ccec3bfd62",
+      "split": "validation",
+      "text": "Contact record | client IP address: 192.0.2.2 | verified by owner.",
+      "gold": [
+        {
+          "start": 36,
+          "end": 45,
+          "label": "ip_address",
+          "value": "192.0.2.2"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d98c085a94ce",
+      "split": "validation",
+      "text": "Please update the client IP address to 192.0.2.3 in this private profile.",
+      "gold": [
+        {
+          "start": 39,
+          "end": 48,
+          "label": "ip_address",
+          "value": "192.0.2.3"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-8aefe49f9fdf",
+      "split": "validation",
+      "text": "🔒 Private client IP address = 192.0.2.4; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 30,
+          "end": 39,
+          "label": "ip_address",
+          "value": "192.0.2.4"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d434d76c94e6",
+      "split": "validation",
+      "text": "Owned support note: my password is OwnedOnly-0-Raven!42. Keep this private.",
+      "gold": [
+        {
+          "start": 35,
+          "end": 55,
+          "label": "secret",
+          "value": "OwnedOnly-0-Raven!42"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-8f4311e095ef",
+      "split": "validation",
+      "text": "Contact record | password: OwnedOnly-1-Raven!42 | verified by owner.",
+      "gold": [
+        {
+          "start": 27,
+          "end": 47,
+          "label": "secret",
+          "value": "OwnedOnly-1-Raven!42"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-83c151520a66",
+      "split": "validation",
+      "text": "Please update the password to OwnedOnly-2-Raven!42 in this private profile.",
+      "gold": [
+        {
+          "start": 30,
+          "end": 50,
+          "label": "secret",
+          "value": "OwnedOnly-2-Raven!42"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-2377350ee74d",
+      "split": "validation",
+      "text": "🔒 Private password = OwnedOnly-3-Raven!42; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 21,
+          "end": 41,
+          "label": "secret",
+          "value": "OwnedOnly-3-Raven!42"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c75009542f78",
+      "split": "validation",
+      "text": "Owned support note: my API key is sk-owned-5feceb66ffc86f38d952786c6d696c79. Keep this private.",
+      "gold": [
+        {
+          "start": 34,
+          "end": 75,
+          "label": "secret",
+          "value": "sk-owned-5feceb66ffc86f38d952786c6d696c79"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-05cb1fb13859",
+      "split": "validation",
+      "text": "Contact record | API key: sk-owned-6b86b273ff34fce19d6b804eff5a3f57 | verified by owner.",
+      "gold": [
+        {
+          "start": 26,
+          "end": 67,
+          "label": "secret",
+          "value": "sk-owned-6b86b273ff34fce19d6b804eff5a3f57"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-74f550307ce1",
+      "split": "validation",
+      "text": "Please update the API key to sk-owned-d4735e3a265e16eee03f59718b9b5d03 in this private profile.",
+      "gold": [
+        {
+          "start": 29,
+          "end": 70,
+          "label": "secret",
+          "value": "sk-owned-d4735e3a265e16eee03f59718b9b5d03"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-00ca49659894",
+      "split": "validation",
+      "text": "🔒 Private API key = sk-owned-4e07408562bedb8b60ce05c1decfe3ad; do not include it in a public recap.",
+      "gold": [
+        {
+          "start": 20,
+          "end": 61,
+          "label": "secret",
+          "value": "sk-owned-4e07408562bedb8b60ce05c1decfe3ad"
+        }
+      ],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-095059eae19d",
+      "split": "validation",
+      "text": "The Atlas retrieval benchmark is owned by Mira Chen at Northwind Research.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-ff9eb70781c0",
+      "split": "validation",
+      "text": "Documentation is at https://developer.apple.com/documentation and is public.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d821bef7f563",
+      "split": "validation",
+      "text": "Release date: 2026-11-15. This is a software release, not a birth date.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-bc499a177bf1",
+      "split": "validation",
+      "text": "The package version is 1.24.2 and the model has 32 million parameters.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-87f38f50c9be",
+      "split": "validation",
+      "text": "Our meeting starts at 10:30; the budget is 42 dollars for the demo.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-adfede5cb478",
+      "split": "validation",
+      "text": "Use the placeholder <YOUR_API_KEY> in this public setup tutorial.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-7a8d0026e369",
+      "split": "validation",
+      "text": "The password policy requires a long value. No password is shown here.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-014e40bb7c84",
+      "split": "validation",
+      "text": "Email address validation rejects missing at-signs; this describes a rule.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-ffdba08800f8",
+      "split": "validation",
+      "text": "Phone number formatting and international prefixes need unit tests.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-ee50e28e50c0",
+      "split": "validation",
+      "text": "The account is named Atlas Team. No account number is displayed.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-7dd6bfaa6d2a",
+      "split": "validation",
+      "text": "Room 42 is upstairs; pick up the USB-C adapter at reception.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-c45515b5e2f9",
+      "split": "validation",
+      "text": "The progress report has 954 passes and two physical acceptance skips.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-4b32a8e696ce",
+      "split": "validation",
+      "text": "A sample response says [REDACTED]. That is literal placeholder text.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d9d3ece3b64e",
+      "split": "validation",
+      "text": "This page explains how Social Security numbers are structured without an identifier.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-8d35b5224a63",
+      "split": "validation",
+      "text": "A passport number is required on the form, but this blank form has no value.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-d40f8ec5ae9b",
+      "split": "validation",
+      "text": "Use driver license as a search label; no license credential is present.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-5bebc41c705b",
+      "split": "validation",
+      "text": "A credit card number must pass a checksum. The input is currently blank.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-a59a3859d1c3",
+      "split": "validation",
+      "text": "The person turned 28 last month. A date of birth is not present.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-957d0bb5ccf8",
+      "split": "validation",
+      "text": "IP address is the name of a networking concept in this public glossary.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-06ebe773b561",
+      "split": "validation",
+      "text": "The SHA256 digest is abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-5b3b0581eab3",
+      "split": "validation",
+      "text": "The API returned status 200 with 1024 results and a 512-dimensional vector.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-a0b34ef50ef9",
+      "split": "validation",
+      "text": "Swift code: let passwordPolicyEnabled = true; let accountCount = 17.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-ddd9da770294",
+      "split": "validation",
+      "text": "Identifiers in this document are synthetic and no secret fields are populated.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    },
+    {
+      "id": "validation-148427cdf353",
+      "split": "validation",
+      "text": "Open-source model licenses include Apache-2.0 and MIT; review the notices.",
+      "gold": [],
+      "source": "authored-synthetic-v1"
+    }
+  ],
+  "originalFullCorpusSHA256": "a848affbd8b56492fcf77efdaf792d6d8306bef63e57beb7b605505c9d98687b",
+  "reservedTestPredictionsOpened": false
+}
