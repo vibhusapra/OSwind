@@ -1,4 +1,5 @@
 import XCTest
+import Darwin
 @testable import OSwindCore
 
 private actor DetachObservations {
@@ -143,19 +144,104 @@ private actor DetachPause {
     }
 }
 
+private final class OwnedVaultNativeTrace:@unchecked Sendable {
+    struct Item:Codable {let stage:String,event:VaultNativeDiagnostic}
+    struct Handle:Codable {let descriptor:Int,path:String?,mounted:Bool}
+    struct Boundary:Codable {let stage:String,operation:VaultNativeOperation,mountedDevice:Int32?,ownedHandles:[Handle]}
+    struct Report:Codable {let stage:String,failureStage:String?,total:Int,nonzero:Int,dropped:Int,events:[Item],beforeMutations:[Boundary]}
+    private let lock=NSLock()
+    private let root:URL
+    private let rootPrefix:String
+    private var stage="create",failureStage:String?,items=[Item](),total=0,nonzero=0,dropped=0
+    private var boundaries=[Boundary]()
+    init(root:URL) {let canonical=root.resolvingSymlinksInPath();self.root=canonical;rootPrefix=canonical.path.hasSuffix("/") ? canonical.path:canonical.path+"/"}
+    func beforeMutation(_ operation:VaultNativeOperation,_ mountedDevice:Int32?) {
+        // Inspect this test process's descriptor names only, without reading
+        // file contents or retaining unrelated paths. /dev/fd snapshots can
+        // race a concurrent close; failed lookups are simply omitted.
+        var owned=[Handle]()
+        for name in (try? FileManager.default.contentsOfDirectory(atPath:"/dev/fd")) ?? [] {
+            guard let descriptor=Int32(name) else {continue}
+            var metadata=stat();guard fstat(descriptor,&metadata)==0 else {continue}
+            let mounted=mountedDevice.map {$0==metadata.st_dev} ?? false
+            var bytes=[CChar](repeating:0,count:Int(MAXPATHLEN))
+            let found=bytes.withUnsafeMutableBytes {fcntl(descriptor,F_GETPATH,$0.baseAddress!)}
+            let path=found==0 ? String(cString:bytes):nil
+            if mounted || path?.hasPrefix(rootPrefix)==true {owned.append(.init(descriptor:Int(descriptor),path:path,mounted:mounted))}
+        }
+        lock.withLock {if boundaries.count<128 {boundaries.append(.init(stage:stage,operation:operation,mountedDevice:mountedDevice,ownedHandles:owned.sorted {$0.descriptor<$1.descriptor}))}}
+    }
+    func setStage(_ value:String) {lock.withLock {stage=value}}
+    func markFailure() {lock.withLock {failureStage=stage;stage="failure-cleanup"}}
+    func append(_ event:VaultNativeDiagnostic) {lock.withLock {total+=1;if event.summary.status != 0 {nonzero+=1};if items.count==512 {items.removeFirst();dropped+=1};items.append(.init(stage:stage,event:event))}}
+    func snapshot()->Report {lock.withLock {.init(stage:stage,failureStage:failureStage,total:total,nonzero:nonzero,dropped:dropped,events:items,beforeMutations:boundaries)}}
+    func save(root:URL,secret:Data,failed:Bool)throws {
+        let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys]
+        let encoded=try encoder.encode(snapshot())
+        // Fixture-only observation can contain owned system-tool text. Refuse
+        // to print/write any trace containing the generated credential.
+        guard encoded.range(of:secret)==nil else {throw OSwindError.invalid("Fixture credential appeared in native diagnostic capture")}
+        let text=String(decoding:encoded,as:UTF8.self).replacingOccurrences(of:root.path,with:"<owned-fixture>")
+        if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_VAULT_TRACE_DIR"] {
+            let directory=URL(fileURLWithPath:destination,isDirectory:true);try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+            try Data(text.utf8).write(to:directory.appendingPathComponent(root.lastPathComponent+(failed ? "-exception":"-completed")+".json"),options:.withoutOverwriting)
+        }
+        if failed || snapshot().nonzero>0 {print("Owned vault native result trace: "+text)}
+        else {let s=snapshot();print("Owned vault native trace: calls=\(s.total) nonzero=\(s.nonzero) dropped=\(s.dropped)")}
+    }
+}
 final class NativeVaultDetachSettlementTests:XCTestCase {
+    func testKnownHeldReaderCapturesBusyExitAndPreservesHistoryUntilNormalRecovery() async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned held-reader encrypted-volume fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-detach-held-reader-"+UUID().uuidString);try Paths.ensure(root)
+        let trace=OwnedVaultNativeTrace(root:root),driver=NativeVaultDriver(observer:{trace.append($0)},willMutate:{trace.beforeMutation($0,$1)})
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package,nativeDriver:driver)
+        var activeStore:MemoryStore?,reader:FileHandle?
+        do {
+            _ = try await LibraryVault.create(at:package,name:"Owned native busy control",capacityGiB:1,passphrase:secret,nativeDriver:driver)
+            trace.setStage("held-reader-unlock");_ = try await vault.unlock(passphrase:secret)
+            let store=try MemoryStore(root:vault.libraryURL);activeStore=store
+            try store.insert(Memory(id:"owned-busy",text:"Owned busy control must survive normal recovery"))
+            // A raw owned file handle represents an external reader, outside
+            // OSwind's read-lease registry. No user process or file is used.
+            reader=try FileHandle(forReadingFrom:vault.libraryURL.appendingPathComponent("memory.sqlite"))
+            trace.setStage("expected-held-reader-lock")
+            do {_ = try await vault.lock(store:store);XCTFail("A held filesystem reader was force-detached")}
+            catch let error as VaultNativeFailure {XCTAssertEqual(error.summary.operation,.imageDetach);XCTAssertEqual(error.summary.status,EBUSY)}
+            XCTAssertTrue(store.isClosed);activeStore=nil
+            let attached=try await driver.attachment(paths:VaultPaths(package));XCTAssertNotNil(attached);XCTAssertTrue(attached?.mounted == true)
+            let paths=try VaultPaths(package);XCTAssertEqual(try paths.session(info:paths.info())?.phase,.closing)
+            try reader?.close();reader=nil
+            trace.setStage("normal-recovery-lock");let recovered=try await vault.lock();XCTAssertFalse(recovered.imageAttached)
+            trace.setStage("verify-preserved-history");_ = try await vault.unlock(passphrase:secret)
+            let final=try MemoryStore(root:vault.libraryURL);activeStore=final
+            XCTAssertEqual(try final.get("owned-busy")?.text,"Owned busy control must survive normal recovery")
+            _ = try await vault.lock(store:final);activeStore=nil
+            let busy=trace.snapshot().events.filter {$0.event.summary.operation == .imageDetach && $0.event.summary.status != 0}
+            XCTAssertEqual(busy.count,1);XCTAssertTrue(busy.first?.event.stderrSuffix.lowercased().contains("busy") == true)
+            let blocked=trace.snapshot().beforeMutations.filter {$0.stage=="expected-held-reader-lock"}
+            XCTAssertEqual(blocked.count,1);XCTAssertTrue(blocked[0].ownedHandles.contains {$0.mounted && $0.path?.hasSuffix("/memory.sqlite")==true})
+            try trace.save(root:root,secret:secret,failed:false);try FileManager.default.removeItem(at:root)
+        } catch {
+            let original=error;trace.markFailure();try? reader?.close();try? activeStore?.close();_ = try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)} catch {print("Owned native trace could not be saved; original failure is preserved")};throw original
+        }
+    }
     func testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned rapid encrypted-volume detach fixture")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-detach-settling-"+UUID().uuidString);try Paths.ensure(root)
-        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
+        let trace=OwnedVaultNativeTrace(root:root),driver=NativeVaultDriver(observer:{trace.append($0)},willMutate:{trace.beforeMutation($0,$1)})
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package,nativeDriver:driver)
         var activeStore:MemoryStore?
         do {
-            _ = try await LibraryVault.create(at:package,name:"Owned detach settling",capacityGiB:1,passphrase:secret)
+            _ = try await LibraryVault.create(at:package,name:"Owned detach settling",capacityGiB:1,passphrase:secret,nativeDriver:driver)
             for iteration in 0..<6 {
+                trace.setStage("cycle-\(iteration)-unlock")
                 _ = try await vault.unlock(passphrase:secret)
                 let store=try MemoryStore(root:vault.libraryURL);activeStore=store
                 XCTAssertEqual(try store.stats(includeDiskUsage:false).count,iteration)
                 try store.insert(Memory(id:"owned-\(iteration)",text:"Preserved owned detach cycle \(iteration)"))
+                trace.setStage("cycle-\(iteration)-lock")
                 let locked=try await vault.lock(store:store);XCTAssertTrue(store.isClosed);activeStore=nil
                 XCTAssertEqual(locked.state,.locked);XCTAssertFalse(locked.imageAttached);XCTAssertFalse(locked.volumeMounted)
                 let inventory=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"]);XCTAssertEqual(inventory.status,0)
@@ -163,14 +249,17 @@ final class NativeVaultDetachSettlementTests:XCTestCase {
                 let images=try XCTUnwrap(info["images"] as? [[String:Any]])
                 XCTAssertFalse(images.contains {($0["image-path"] as? String)?.hasPrefix(package.path+"/") == true})
             }
-            _ = try await vault.unlock(passphrase:secret)
+            trace.setStage("final-read-unlock");_ = try await vault.unlock(passphrase:secret)
             let final=try MemoryStore(root:vault.libraryURL);activeStore=final
             XCTAssertEqual(try final.stats(includeDiskUsage:false).count,6)
             for iteration in 0..<6 {XCTAssertEqual(try final.get("owned-\(iteration)")?.text,"Preserved owned detach cycle \(iteration)")}
-            _ = try await vault.lock(store:final);activeStore=nil
+            trace.setStage("final-lock");_ = try await vault.lock(store:final);activeStore=nil
+            XCTAssertTrue(trace.snapshot().beforeMutations.allSatisfy {$0.ownedHandles.allSatisfy {!$0.mounted}},"OSwind retained an owned mounted-file handle before a normal detach")
+            try trace.save(root:root,secret:secret,failed:false)
             try FileManager.default.removeItem(at:root)
         } catch {
-            try? activeStore?.close();_ = try? await vault.lock();throw error
+            let original=error;trace.markFailure();try? activeStore?.close();_ = try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)} catch {print("Owned native trace could not be saved; original failure is preserved")};throw original
         }
     }
 }

@@ -264,7 +264,7 @@ import OSwindCore
         while session.busy {try await Task.sleep(for:.milliseconds(10))}
         session.vaultStatus = .init(info:info,state:state,libraryPath:package.appendingPathComponent("Library").path,message:state == .closing ? "The encrypted volume is still mounted. Finish the current operation or retry locking.":"Encrypted image is detached",volumeMounted:state == .closing,imageAttached:state == .closing)
         session.failure=nil
-        if state == .closing {session.failure="The vault is still mounted because files are in use. Close other readers and retry locking."}
+        if state == .closing {session.failure="Locking is incomplete. macOS has not confirmed that the encrypted image is detached. Close any other readers and retry locking."}
         return session
     }
     #endif

@@ -13,6 +13,18 @@ enum VaultAttachmentObservationError:LocalizedError {
 /// remains 50 ms; later pauses back off to 1 second, totaling at most 11.55 s
 /// across 16 observations. Native inspections retain their separate deadlines.
 enum VaultDetachSettlement {
+    /// A failed command does not establish that the image remains attached.
+    /// This performs one fresh observation only; nil is not a locked verdict.
+    /// It never retries a mutation or admits another image/device identity.
+    static func inspectAfterFailure(expected:VaultVolumeProof,
+                                    validate:@Sendable () throws ->Void,
+                                    inspect:@Sendable () async throws ->VaultVolumeProof?) async throws ->VaultVolumeProof? {
+        try Task.checkCancellation();try validate()
+        let current=try await inspect()
+        try validate();try Task.checkCancellation()
+        if let current {guard expected.sameIdentity(as:current,allowUnmounted:true) else {throw OSwindError.invalid("The attachment changed after the failed native detach; no further volume was detached")}}
+        return current
+    }
     static func delayMilliseconds(_ attempt:Int)->Int {min(1000,50 << min(5,max(0,attempt)))}
     static func confirm(attempts:Int=16,
                         pause:@Sendable (Int) async throws ->Void={attempt in try await Task.sleep(for:.milliseconds(delayMilliseconds(attempt)))},

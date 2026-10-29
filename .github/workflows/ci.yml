@@ -21,7 +21,14 @@ jobs:
       - name: Verify tokenizer patch against resolved upstream
         run: python3 scripts/check-tokenizer-vendor.py --upstream .build/checkouts/swift-transformers
       - name: Verify owned encrypted APFS images and app sessions
-        run: OSWIND_TEST_NATIVE_VAULT=1 swift test --filter 'NativeVault|VaultSessionTests'
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-vault-native-traces" swift test --filter 'NativeVault|VaultSessionTests'
+      - name: Retain owned native vault diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vault-native-diagnostics
+          path: ${{ runner.temp }}/oswind-vault-native-traces/*.json
+          if-no-files-found: ignore
       - name: Verify pinned native-model installer without network
         run: python3 scripts/test-native-model-setup.py
       - name: Verify evaluation asset integrity contracts offline
