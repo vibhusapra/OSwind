@@ -141,7 +141,7 @@ struct SettingsView: View {
                 Text(m.indexStatus).font(.caption).foregroundStyle(.secondary)
             }
             VisualModelSettingsView()
-            PIIModelSettingsView(setup:m.piiModelSetup)
+            PIIModelSettingsView(setup:m.piiModelSetup,configuration:$m.settings.piiImports)
             Section("Local model library") {
                 HStack { Button(m.startingModelServer ? "Starting…" : "Start local server") { m.startModelServer() }.disabled(m.startingModelServer); Button("Check local server") { m.inspectLocalModels() }; Text(m.modelStatus).font(.caption).foregroundStyle(.secondary) }
                 ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }

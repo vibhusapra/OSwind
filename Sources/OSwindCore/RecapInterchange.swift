@@ -1,6 +1,7 @@
 import Foundation
 
 public struct JSONImportResult:Codable,Sendable {
+    public var learnedPrivacy:PIIImportSummary?=nil
     public var imported=0
     public var excluded=0
     public var skippedLinkedRecaps=0

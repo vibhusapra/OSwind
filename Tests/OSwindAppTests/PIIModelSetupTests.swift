@@ -44,7 +44,7 @@ private actor PIISetupGate {
         let directory=URL(fileURLWithPath:path);try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         let ready=installation()
         for dark in [false,true] {
-            for state in ["idle","ready","failure","busy","stopping"] {
+            for state in ["idle","ready","failure","busy","stopping","imports"] {
                 let gate=PIISetupGate()
                 let model=PIIModelSetupModel(installer:{_ in
                     if state=="busy" || state=="stopping" {await gate.wait()}
@@ -55,8 +55,10 @@ private actor PIISetupGate {
                 // Form uses native AppKit content; ImageRenderer can return a
                 // blank background. Rasterize an owned offscreen hosting view.
                 _ = NSApplication.shared
-                let view=Form {PIIModelSettingsView(setup:model)}.formStyle(.grouped).frame(width:710,height:400).preferredColorScheme(dark ? .dark:.light)
-                let host=NSHostingView(rootView:view),window=NSWindow(contentRect:NSRect(x:0,y:0,width:710,height:400),styleMask:[.titled],backing:.buffered,defer:false)
+                var config=PIIImportConfiguration();config.enabled=state=="imports"
+                let height:CGFloat=state=="imports" ? 710:400
+                let view=Form {PIIModelSettingsView(setup:model,configuration:.constant(config))}.formStyle(.grouped).frame(width:710,height:height).preferredColorScheme(dark ? .dark:.light)
+                let host=NSHostingView(rootView:view),window=NSWindow(contentRect:NSRect(x:0,y:0,width:710,height:height),styleMask:[.titled],backing:.buffered,defer:false)
                 window.isReleasedWhenClosed=false;window.appearance=NSAppearance(named:dark ? .darkAqua:.aqua);window.contentView=host
                 host.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(150));host.layoutSubtreeIfNeeded();window.displayIfNeeded()
                 guard let bitmap=host.bitmapImageRepForCachingDisplay(in:host.bounds) else {throw OSwindError.unavailable("Owned PII settings bitmap unavailable")}

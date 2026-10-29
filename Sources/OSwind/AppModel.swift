@@ -27,6 +27,7 @@ import UniformTypeIdentifiers
     @Published var settings: AppSettings { didSet {
         capture.settings = settings; audio.settings = settings;routines.apply(settings)
         if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport()}
+        if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -412,7 +413,7 @@ import UniformTypeIdentifiers
     func saveAnswer(_ value:Answer?=nil) {
         guard !libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
         savingRecap=true;recapSaveStatus="Saving a source-linked recap…"
-        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)}
         recapSaveTask=Task {
             defer {savingRecap=false;recapSaveTask=nil}
@@ -675,22 +676,38 @@ import UniformTypeIdentifiers
     }
     enum JSONImportPhase:Sendable {case started,settingsCaptured}
     // The observer is an internal test seam; production callers leave it nil.
-    func importJSONFile(_ url:URL,limitlessAPI:Bool=false,observeWorker:(@Sendable (JSONImportPhase)throws->Void)?=nil) {
+    func importJSONFile(_ url:URL,limitlessAPI:Bool=false,observeWorker:(@Sendable (JSONImportPhase)throws->Void)?=nil,scannerFactory:@escaping @Sendable (PIIImportConfiguration) async throws->PIIImportScanner = {try await $0.scanner()}) {
         guard !store.isClosed,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
-        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {()throws->String in
             try Task.checkCancellation();try observeWorker?(.started);try Task.checkCancellation()
             let activity=try store.mediaWriteLease();defer {activity.release()}
             let snapshot=try LibrarySettingsSnapshot.capture(root:store.root)
             defer {snapshot.release()}
-            guard snapshot.settings.privacy==policy else {throw OSwindError.unavailable("The import's privacy settings no longer match saved settings. Retry with the current privacy settings.")}
+            guard snapshot.settings.privacy==policy,snapshot.settings.piiImports==pii else {throw OSwindError.unavailable("The import's privacy settings no longer match saved settings. Retry with the current privacy settings.")}
             try observeWorker?(.settingsCaptured);try Task.checkCancellation()
-            if limitlessAPI {
-                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
-                return "Imported \(result.imported) Limitless text notes · \(result.excluded) excluded."+(result.hasMorePages ? " This response has another page; import each saved page to complete the export.":" Only the supplied response was imported.")
+            func perform(_ scanner:PIIImportScanner?) async throws -> String {
+                func suffix(_ result:PIIImportSummary?)->String {
+                    guard let result else {return ""}
+                    return " Additional experimental PII masking: \(result.redactedSources) of \(result.sources) sources changed (\(result.compute.rawValue), threshold \(result.threshold)); detection is incomplete."
+                }
+                if limitlessAPI {
+                    let result:LimitlessImportResult
+                    if let scanner {result=try await store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity,scanner:scanner)}
+                    else {result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)}
+                    return "Imported \(result.imported) Limitless text notes · \(result.excluded) excluded."+(result.hasMorePages ? " This response has another page; import each saved page to complete the export.":" Only the supplied response was imported.")+suffix(result.learnedPrivacy)
+                }
+                let result:JSONImportResult
+                if let scanner {result=try await store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity,scanner:scanner)}
+                else {result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)}
+                return "Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."+suffix(result.learnedPrivacy)
             }
-            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
-            return "Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
+            if pii.enabled {
+                let scanner=try await scannerFactory(pii)
+                do {let result=try await perform(scanner);await scanner.shutdown();return result}
+                catch {await scanner.shutdown();throw error}
+            }
+            return try await perform(nil)
         }
         jsonImportWorker=worker
         jsonImportTask=Task {

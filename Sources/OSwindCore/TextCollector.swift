@@ -24,6 +24,7 @@ public enum TextCollector {
     public static func tag(collectorID:String)throws->String {try identity(collectorID);return "collector:"+digest(collectorID).prefix(32)}
 }
 public struct CollectorImportResult:Codable,Sendable {
+    public var learnedPrivacy:PIIImportSummary?=nil
     public var format="OSwind collector result",version=1
     public var collectorID:String,requested:Int,imported:Int,excluded:Int,sourceIDs:[String]
 }
@@ -65,22 +66,34 @@ private struct CollectorBatch:Decodable {
         guard !decoded.isEmpty else {throw OSwindError.invalid("Use at least one collector record")};records=decoded
     }
 }
+private func decodedCollectorImport(_ data:Data)throws->(CollectorBatch,[Memory],[String]) {
+        try Task.checkCancellation();guard data.count<=TextCollector.maximumBatchBytes else {throw OSwindError.invalid("Collector batch exceeds 16 MiB")}
+        let batch=try JSONDecoder().decode(CollectorBatch.self,from:data),tag=try TextCollector.tag(collectorID:batch.collectorID)
+        var memories=[Memory](),ids=[String](),seen=Set<String>()
+        for record in batch.records {
+            try Task.checkCancellation();let id=try TextCollector.sourceID(collectorID:batch.collectorID,key:record.key)
+            guard seen.insert(id).inserted else {throw OSwindError.invalid("Collector source keys must be unique within a batch")}
+            var memory=Memory(id:id,timestamp:record.timestamp,kind:.note,app:record.app,bundleID:record.bundleID,title:record.title,url:record.url,text:record.text);memory.tags=["collector",tag];memories.append(memory);ids.append(id)
+        }
+        return (batch,memories,ids)
+}
 public extension MemoryStore {
     /// Validate the whole bounded batch before reserving a writer. Stable IDs
     /// permit retry after an unknown transport result; exclusions are prospective.
     func importCollectorBatch(_ data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil)throws->CollectorImportResult {
         return try withImportActivity(admission) {activity in
             try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
-            try Task.checkCancellation();guard data.count<=TextCollector.maximumBatchBytes else {throw OSwindError.invalid("Collector batch exceeds 16 MiB")}
-            let batch=try JSONDecoder().decode(CollectorBatch.self,from:data),tag=try TextCollector.tag(collectorID:batch.collectorID)
-            var memories=[Memory](),ids=[String](),seen=Set<String>()
-            for record in batch.records {
-                try Task.checkCancellation();let id=try TextCollector.sourceID(collectorID:batch.collectorID,key:record.key)
-                guard seen.insert(id).inserted else {throw OSwindError.invalid("Collector source keys must be unique within a batch")}
-                var memory=Memory(id:id,timestamp:record.timestamp,kind:.note,app:record.app,bundleID:record.bundleID,title:record.title,url:record.url,text:record.text);memory.tags=["collector",tag];memories.append(memory);ids.append(id)
-            }
+            let (batch,memories,ids)=try decodedCollectorImport(data)
             let result=try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot,admission:activity)
             return .init(collectorID:batch.collectorID,requested:memories.count,imported:result.imported,excluded:result.excluded,sourceIDs:ids)
         }
     }
+    func importCollectorBatch(_ data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> CollectorImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        let (batch,memories,ids)=try decodedCollectorImport(data)
+        let result=try await importDecodedMemoriesWithPII(memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot,admission:reservation.lease,scanner:scanner)
+        return .init(learnedPrivacy:result.learnedPrivacy,collectorID:batch.collectorID,requested:memories.count,imported:result.imported,excluded:result.excluded,sourceIDs:ids)
+    }
+
 }

@@ -1,0 +1,421 @@
+{
+  "format": "OSwind experimental learned text-import qualification",
+  "version": 1,
+  "date": "2026-10-29",
+  "codeCommit": "c54ac84aa4bfebf0298e4aceabd0701e5521aa51",
+  "baseCommit": "28a95f87ee65b7829b6733cf9000490a4591a78e",
+  "schema": 22,
+  "scope": "Optional off-by-default native CPU/Core ML text masking for prospective OSwind JSON, collector and saved Limitless API imports; no capture, retained-media, egress, accepted privacy policy, physical power, distribution or competitive-rank acceptance.",
+  "frozen": {
+    "inputCount": 573,
+    "manifestSHA256": "a5897c40f4fbbc54440d21f7d41ea6480c2b6676a1926721bd51d651daa327c5",
+    "allInputsUnchanged": true,
+    "driverSHA256": "5127632b436a1debfbe5b0b866779073b8181fd5446e2ca64ba9db7f31e938ad",
+    "packageProofToolSHA256": "1dded71be0d88a45b88df461790b8e345c0b53d52fe48e62b7f51b214121fbc3"
+  },
+  "tests": {
+    "full-most-optins": {
+      "defined": 1193,
+      "passed": 1191,
+      "skipped": 2,
+      "failures": 0
+    },
+    "selected-tsan": {
+      "defined": 152,
+      "passed": 152,
+      "skipped": 0,
+      "failures": 0
+    },
+    "selected-release": {
+      "defined": 152,
+      "passed": 152,
+      "skipped": 0,
+      "failures": 0
+    }
+  },
+  "skipReasons": [
+    "Owned system-audio fixture opt-in absent; no microphone access.",
+    "Visual admission requires an unlocked session and allowed thermal state; no device setting changed."
+  ],
+  "operations": [
+    {
+      "name": "full-most-optins",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 530.8850006249268,
+      "logSHA256": "02996707c01c8fe35fe411a7614c8d423e913a8a847ab0f732350d64c97d7d25"
+    },
+    {
+      "name": "selected-tsan",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 161.49738062522374,
+      "logSHA256": "1def05de80634d01f4d2294ee22ff9875113d355732d7edc4889d8cabbec834a"
+    },
+    {
+      "name": "selected-release",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 217.42915187496692,
+      "logSHA256": "2ed3b263fb0946bd02688fd0de3642c7aeb2fb1b5dc2e97dd1dad3bde743831c"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 103.19242391595617,
+      "logSHA256": "d8297118b3e0b886e887d3ad933d673da942f5068edbb1cab8a0410b18d6e1cc"
+    },
+    {
+      "name": "configured-import-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.694183083018288,
+      "logSHA256": "b330adbce0033e73728804e6b9fd65699b4cc6317e06d645c98afbff6854b2ae"
+    },
+    {
+      "name": "input-lifetime-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.078869333025068,
+      "logSHA256": "25d41001ce475607fd1a5246ef1df8027f1b690c136d3e25474acaa00f320b1b"
+    },
+    {
+      "name": "learned-import-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 15.886972583131865,
+      "logSHA256": "e457817211ebbb9bfbdfbd41fa8bb7177bc72e5b964384d961b1f1719309fc34"
+    },
+    {
+      "name": "pattern-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 0.6839327088091522,
+      "logSHA256": "ac879a1e8af596d3be156728f7776f904e41f39a09ec79ec0537477007d5133a"
+    },
+    {
+      "name": "limitless-vault-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 32.54117079102434,
+      "logSHA256": "8d86827b292f13b10b539898eb7b5f93c18aa3ec0f980a47e8d5c15a4d056379"
+    },
+    {
+      "name": "collector-vault-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 6.9742123750038445,
+      "logSHA256": "5078e39a802e1ad27876842702a48077c0ea4f8584580ff7ba8a865b2c9c7c25"
+    },
+    {
+      "name": "recap-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.3970309169963002,
+      "logSHA256": "baee005410d335c0cb03edd77e3ef647ccf91b6f7d1f8cfac047af874e1aae76"
+    },
+    {
+      "name": "markdown-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.6596241251099855,
+      "logSHA256": "9dfdb8c0243b0493cfb416c394a2a1efda8bd60bf00a3993374083d253777102"
+    },
+    {
+      "name": "domain-processes",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 0.2977414580527693,
+      "logSHA256": "cb10a32ddc7690a650638f8dda16c05225bdda0d873458ea60bdf9c295c3b014"
+    },
+    {
+      "name": "package-proof",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.740315917180851,
+      "logSHA256": "9b3f64340077cfda61bc096c3ca20facdb34936ce7a50602b504a78e2db17498"
+    }
+  ],
+  "importProcesses": {
+    "operations": 30,
+    "nativeCases": [
+      {
+        "compute": "cpu",
+        "kind": "import",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "collect",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 6,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "import-limitless",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "cpu",
+          "fields": 5,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "cpu",
+        "kind": "import",
+        "case": "authored-email-known-miss",
+        "masked": false,
+        "summary": {
+          "compute": "cpu",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:cpu",
+          "redactedSources": 0,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "collect",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 6,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import-limitless",
+        "case": "authored-phone-positive",
+        "masked": true,
+        "summary": {
+          "compute": "coreML",
+          "fields": 5,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 1,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 2
+        }
+      },
+      {
+        "compute": "coreML",
+        "kind": "import",
+        "case": "authored-email-known-miss",
+        "masked": false,
+        "summary": {
+          "compute": "coreML",
+          "fields": 4,
+          "modelID": "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:coreML",
+          "redactedSources": 0,
+          "sources": 1,
+          "threshold": 0.5,
+          "windows": 1
+        }
+      }
+    ],
+    "cancelBeforeEOF": true,
+    "privacyAcceptance": false,
+    "reportSHA256": "160e74c8649ccb305ca1084b4f5ff0e032f12cbedf8734addb302f3227ce1881"
+  },
+  "package": {
+    "scope": "Separately staged schema22 optional experimental learned text-import masking; no accepted privacy operating point, complete desktop/media/egress protection, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "c54ac84aa4bfebf0298e4aceabd0701e5521aa51",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "76c26c4ee074a684c0c1e6c8c274297f8322dc8ae64fa2a75106e99cac90d2b1",
+        "signedSHA256": "5aaff52f8d04b3e39973ff874d19602547e517d010301d0cbcfaba7a83483034",
+        "normalizedPayloadSHA256": "90d274e4ec99718cc7ac73adf6e082349aaaf96ee8c6ab951821251ae2c1a222"
+      },
+      "oswindctl": {
+        "rawSHA256": "a84fb9c29ab4f538d40c0cdaabd4aac9c256d0c19eb4720a99802dac87d87c84",
+        "signedSHA256": "b1668c566122410603837f6278c62ac0f71dec43df344d107183d06f79f998bc",
+        "normalizedPayloadSHA256": "4a6baba918acfa7e11886fcbb2e42758bd36aeb6514c322e00a2b0bf5bf05fc9"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "f1f7161dc4387f8ae49cacb1b599f683931d5fcc7f5df48e766d656a9d3ec450",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "b3f3b44817cf29d2cc2706ed7dd868d14f68e3d6fa383ddacdeff29eb0d90705",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installedUnchanged": true
+  },
+  "settingsRenders": {
+    "files": {
+      "ready-dark.png": "28fd330453a59ec64f7b51439a6c72123aed85f9ed4d9330762be08be25c549f",
+      "imports-light.png": "224a78dce39cc4d7c48718b659ef81749c2e133399d6eff4b84e97e3f7de6650",
+      "stopping-light.png": "83b158a46dee630b36fe94751da95e7e468e7d740a356dc8708e076c475196b3",
+      "ready-light.png": "86aff0892cfd2ab01e21b858fb541ee476ee50815baabaf1a0444e07cd666ce2",
+      "stopping-dark.png": "b654d66d6fc812447e2b740c833f600e68f3bfe403b9e9e0b808f6ef1396bacd",
+      "idle-light.png": "58e8a40716918046f5fd1c4f2e2d7e885fc266fce98aad111a8cd74d09a3aa5a",
+      "busy-dark.png": "217aa2e73c9b9e1bc09d0a64d34783e62bbb19fdbecf91d62bf86125ac4e5f62",
+      "busy-light.png": "84550c46501c7bb38f5f9a90efd0ca08e4568ef10b3a5075b9eca545009e9fed",
+      "imports-dark.png": "025a07c3ba198afee8c6a58155e2581c3dda366f0ab889540e89c0d903feeeb5",
+      "idle-dark.png": "e4f9e03c0b2c9d2f680d26ead0d1a88f9593d91f1c9f83f285b102fb1be698d4",
+      "failure-light.png": "115a5bc8211b464a5734e83823c1de695883a3d43aa50e6af6eb3cdcb1df61a3",
+      "failure-dark.png": "24f001ec30f5de11264e70f0356865174a9ecb737721fa872f147f6246ada303"
+    },
+    "states": [
+      "idle",
+      "ready",
+      "failure",
+      "busy",
+      "stopping",
+      "imports"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "scope": "Owned offscreen Settings renders; automated nonblank checks in normal/TSan/optimized selections. Representative enabled light/dark and failure layouts reviewed. No installed-GUI/capture/TCC acceptance."
+  },
+  "quality": {
+    "accepted": false,
+    "operatingPointAccepted": false,
+    "initialEmailAcceptanceFailedAssertions": 10,
+    "pinnedNativeKnownMisses": 2,
+    "packagedAuthoredLearnedPhonePositives": 6,
+    "directCPUEmailInspectionSHA256": "2c6656551694d5b69a2dcfd0e2cdd3ad84b825e4596a4bd4acbaa44662092651",
+    "modelSelectionUnchanged": true,
+    "reservedPredictionsUnopened": true,
+    "framingQualityAndThroughputUnqualified": true,
+    "operatorPlacementAndPhysicalPowerUnmeasured": true
+  },
+  "retainedFailures": [
+    {
+      "log": "compile-focused-v1.log",
+      "sha256": "784e98295af0c66798e07a69ae6d17cdf9f30d560c01bd62877e4113d47a760f",
+      "reason": "Existing Settings render caller omitted the new configuration binding; no test execution."
+    },
+    {
+      "log": "focused-v2.log",
+      "sha256": "3e5286aecf6f1103775ec8c16ff8c62fa7e3f6e8fdc5701fdd7f925521d88957",
+      "reason": "The render caller still needed its configuration binding; no test execution."
+    },
+    {
+      "log": "focused-v3.log",
+      "sha256": "9ebdc8575c639b9baae556a07cc977f5141125bd48e516fec76945c5d191d272",
+      "reason": "One valid decomposed-character model span was refused by an overly strict whole-grapheme raw-span validator. Scalar validation plus existing mask expansion fixes it."
+    },
+    {
+      "log": "focused-v4.log",
+      "sha256": "0bb076cbb281c0b11648aea08a294261c3dc4acf9ecee95b5127a5c732ae1195",
+      "reason": "Ten authored email assertions fail across native GUI/core import paths at threshold 0.5. Quality gate remains failed; this is not erased by later contract passes."
+    }
+  ],
+  "previousCI": {
+    "observedAt": "2026-10-29",
+    "source94f60b0": {
+      "run": 40886632763,
+      "jobs": [
+        {
+          "id": 123491993390,
+          "name": "benchmark-harnesses",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 123491993886,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "publication28a95f8": {
+      "run": 40889784746,
+      "jobs": [
+        {
+          "id": 123503120966,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 123503121676,
+          "name": "benchmark-harnesses",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "failure": {
+        "file": "Tests/OSwindCoreTests/NativeVaultQueryRecoveryTests.swift",
+        "line": 94,
+        "test": "testRepeatedInterruptsRefuseStatusAfterTwoCallsAndPermitOrdinaryRecovery",
+        "reason": "Normal encrypted-image detach hdiutil exit 16; independent root cause unproven."
+      }
+    }
+  },
+  "featureChange": {
+    "id": "F047",
+    "previous": "todo",
+    "current": "partial",
+    "allOtherFeatureRowsUnchanged": true,
+    "vendorDataUnchanged": true
+  },
+  "staticReport": {
+    "rows": 76,
+    "onlyChangedFeature": [
+      "F047"
+    ],
+    "vendorBytesUnchanged": true,
+    "rendererDeterministic": true,
+    "htmlSHA256": "618586b32377a3a0d1adaa98a5bf8b96cfae2b200b7d2773f7fecd97870ee77d",
+    "newVisualAcceptance": false
+  }
+}

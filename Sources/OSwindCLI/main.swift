@@ -33,6 +33,28 @@ func piiOutput<T:Encodable>(_ body:() async throws -> T) async throws {
     var data=try encoder.encode(value);data.append(10)
     try FileHandle(fileDescriptor:descriptor,closeOnDealloc:false).write(contentsOf:data)
 }
+func importPIIConfiguration(_ saved:PIIImportConfiguration) throws -> PIIImportConfiguration {
+    let enabled=args.filter {$0=="--pii"}.count
+    guard enabled<=1 else {throw OSwindError.invalid("Use --pii only once")}
+    args.removeAll {$0=="--pii"}
+    let compute=try validatedOption("--pii-compute"),threshold=try validatedOption("--pii-threshold"),cache=try validatedOption("--pii-cache-root")
+    guard enabled==1 || (compute==nil && threshold==nil && cache==nil) else {throw OSwindError.invalid("PII options require --pii")}
+    if enabled==0 {return saved}
+    guard let compute,let policy=PIIComputePolicy(rawValue:compute),let threshold,let value=Double(threshold),value.isFinite,value>0,value<1 else {throw OSwindError.invalid("Use --pii --pii-compute cpu|coreML --pii-threshold 0..1 [--pii-cache-root DIR]; this detector is experimental")}
+    var configuration=saved;configuration.enabled=true;configuration.compute=policy;configuration.threshold=value
+    if let cache {configuration.cacheRoot=cache}
+    return configuration
+}
+func withImportPII<T>(_ configuration:PIIImportConfiguration,_ body:(PIIImportScanner?) async throws->T) async throws->T {
+    guard configuration.enabled else {return try await body(nil)}
+    // Core ML may print native diagnostics. Restore stdout after joined model
+    // teardown so all ordinary and --json result streams stay machine-readable.
+    fflush(nil);let descriptor=dup(STDOUT_FILENO)
+    guard descriptor>=0 else {throw OSwindError.unavailable("Cannot reserve import output")}
+    defer {fflush(nil);_ = dup2(descriptor,STDOUT_FILENO);Darwin.close(descriptor)}
+    guard dup2(STDERR_FILENO,STDOUT_FILENO)>=0 else {throw OSwindError.unavailable("Cannot isolate native model diagnostics")}
+    return try await configuration.withScanner {try await body($0)}
+}
 func searchFilter() throws -> SearchFilter {
     var values = [String:Any]()
     let fields = [("--app","app"),("--kind","kind"),("--from","start"),("--to","end"),("--tag","tag"),("--speaker","speaker"),("--entity","entity"),("--limit","limit")]
@@ -109,6 +131,8 @@ do {
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           import-limitless PATH [--json]  Import saved Limitless API text response
+          Import/collect PII options: --pii --pii-compute cpu|coreML --pii-threshold 0..1 [--pii-cache-root DIR]
+          Saved import PII settings also apply. Experimental; new text imports only; no scan fallback.
           diarize PATH --speaker-model DIR [--repetitions N] [--output NEW_JSON]  Anonymous raw timeline, no library write
           import-audio PATH [--retain-audio] Transcribe and save an audio file locally
             [--engine parakeet --native-model DIR] [--speaker-model DIR]
@@ -512,24 +536,43 @@ do {
             print(memory.id)
         case "export": guard let path = args.first else { throw OSwindError.invalid("Enter an output path") }; try store.exportJSON(to:URL(fileURLWithPath:path)); print("Exported text and metadata")
         case "collect":
-            guard args==["--stdin"] else {throw OSwindError.invalid("Use collect --stdin with a version 1 text batch")}
             let activity=try store.mediaWriteLease();defer {activity.release()}
             let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
+            let pii=try importPIIConfiguration(snapshot.settings.piiImports)
+            guard args==["--stdin"] else {throw OSwindError.invalid("Use collect --stdin with a version 1 text batch")}
             let report=try await runAsyncCLI(cancellationMessage:"Stopping collector admission; retry identical source keys if its result is unconfirmed.") {
-                try store.importCollectorBatch(await collectorStandardInput(),embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
+                let data=try await collectorStandardInput()
+                return try await withImportPII(pii) {scanner in
+                    if let scanner {return try await store.importCollectorBatch(data,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity,scanner:scanner)}
+                    return try store.importCollectorBatch(data,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
+                }
             }
             try encoded(report)
         case "import-limitless":
-            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import-limitless PATH [--json]")}
             let activity=try store.mediaWriteLease();defer {activity.release()}
-            let path=URL(fileURLWithPath:args[0]),snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
-            let report=try await runAsyncCLI(cancellationMessage:"Stopping Limitless text import; identical source IDs are safe to retry if its result is unconfirmed.") {try store.importLimitlessAPI(from:path,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)}
+            let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
+            let pii=try importPIIConfiguration(snapshot.settings.piiImports)
+            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import-limitless PATH [--json]")}
+            let path=URL(fileURLWithPath:args[0])
+            let report=try await runAsyncCLI(cancellationMessage:"Stopping Limitless text import; identical source IDs are safe to retry if its result is unconfirmed.") {
+                try await withImportPII(pii) {scanner in
+                    if let scanner {return try await store.importLimitlessAPI(from:path,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity,scanner:scanner)}
+                    return try store.importLimitlessAPI(from:path,embedder:embedder,policy:policy,settingsSnapshot:snapshot,admission:activity)
+                }
+            }
             if json {try encoded(report)} else {print("Imported \(report.imported) Limitless text notes · \(report.excluded) excluded");if report.hasMorePages {FileHandle.standardError.write(Data("This response has another page. Import each saved page; this is not a complete-account export.\n".utf8))}}
         case "import":
-            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import PATH [--json]")}
             let activity=try store.mediaWriteLease();defer {activity.release()}
             let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()}
-            let report=try store.importJSONDetailed(from:URL(fileURLWithPath:args[0]),embedder:embedder,policy:snapshot.settings.privacy,settingsSnapshot:snapshot,admission:activity)
+            let pii=try importPIIConfiguration(snapshot.settings.piiImports)
+            let json=args.contains("--json");args.removeAll {$0=="--json"};guard args.count==1 else {throw OSwindError.invalid("Use import PATH [--json]")}
+            let path=URL(fileURLWithPath:args[0])
+            let report=try await runAsyncCLI(cancellationMessage:"Stopping JSON import; model and import work are joined before library cleanup.") {
+                try await withImportPII(pii) {scanner in
+                    if let scanner {return try await store.importJSONDetailed(from:path,embedder:embedder,policy:snapshot.settings.privacy,settingsSnapshot:snapshot,admission:activity,scanner:scanner)}
+                    return try store.importJSONDetailed(from:path,embedder:embedder,policy:snapshot.settings.privacy,settingsSnapshot:snapshot,admission:activity)
+                }
+            }
             if json {try encoded(report)} else {print(report.imported);if report.excluded>0 || report.skippedLinkedRecaps>0 {FileHandle.standardError.write(Data("Import omitted \(report.excluded) excluded records and \(report.skippedLinkedRecaps) linked recaps with excluded, redacted or stale originals.\n".utf8))}}
         case "capture-replay":
             let bundle=try validatedOption("--app-bundle"),duration=try validatedOption("--seconds")

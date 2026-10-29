@@ -602,94 +602,149 @@ public final class MemoryStore: @unchecked Sendable {
             return try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot,admission:activity)
         }
     }
+    /// Optional learned protection is explicit and prospective. The reservation
+    /// spans input and every model await; no SQLite lock spans inference.
+    public func importJSONDetailed(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> JSONImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        let data=try LibraryImportFile.read(url,maximumBytes:LibraryImportFile.jsonMaximumBytes)
+        return try await importJSONDetailed(data:data,embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot,admission:reservation.lease,scanner:scanner)
+    }
+    public func importJSONDetailed(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> JSONImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        try Task.checkCancellation();guard data.count<=LibraryImportFile.jsonMaximumBytes else {throw OSwindError.invalid("Import exceeds 100 MB")}
+        let decoder=JSONDecoder();decoder.dateDecodingStrategy = .custom {try ISOTime.decode(from:$0)}
+        let memories:[Memory]
+        do {memories=try decoder.decode([Memory].self,from:data)} catch {memories=try JSONDecoder().decode([Memory].self,from:data)}
+        return try await importDecodedMemoriesWithPII(memories,embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot,admission:reservation.lease,scanner:scanner)
+    }
     /// Borrow one reservation through input, decoding and publication. Never
     /// reacquire a shared flock inside an operation: a queued exclusive writer
     /// must not create a nested-lock wait cycle. Caller owns a borrowed lease;
     /// its active state is checked again under its mutex through final commit.
-    func withImportActivity<T>(_ admission:MediaAdmissionLease?,_ body:(MediaAdmissionLease)throws->T) throws -> T {
+    func reserveImportActivity(_ admission:MediaAdmissionLease?) throws -> (lease:MediaAdmissionLease,owned:Bool) {
         try Task.checkCancellation()
         if let admission {
             try admission.withActive(for:mediaRootIdentity) {};try requireMediaRootIdentity()
-            try withRoutineDatabase {_ in ()};return try body(admission)
+            try withRoutineDatabase {_ in ()};return (admission,false)
         }
-        let activity=try mediaWriteLease();defer {activity.release()};return try body(activity)
+        return (try mediaWriteLease(),true)
+    }
+    func withImportActivity<T>(_ admission:MediaAdmissionLease?,_ body:(MediaAdmissionLease)throws->T) throws -> T {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        return try body(reservation.lease)
     }
     func validateImportSettings(policy:PrivacyPolicy,snapshot:LibrarySettingsSnapshot?) throws {
         if let snapshot {try snapshot.withCurrent(root:root,policy:policy) {}}
     }
-    // The observer is an internal concurrency-test seam. It runs with neither
-    // the store mutex nor a SQLite transaction held, never during publication.
+    private struct ImportPreparation {
+        var ordered:[Memory],inputIDs:Set<String>,ids:Set<String>,snapshot:[String:ImportStoredSource]
+        let policy:PrivacyPolicy,collectorAdmission:Bool
+        var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),incoming=[String:Memory]()
+        var passages=[String:[PassageVector]](),reusedPassages=Set<String>()
+    }
+    private func beginImportPreparation(_ memories:[Memory],policy:PrivacyPolicy,collectorAdmission:Bool,settingsSnapshot:LibrarySettingsSnapshot?) throws -> ImportPreparation {
+        try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+        let ordered=try RecapImport.ordered(memories),inputIDs=Set(memories.map(\.id))
+        let ids=inputIDs.union(ordered.flatMap {$0.recap?.sources.map(\.id) ?? []})
+        return .init(ordered:ordered,inputIDs:inputIDs,ids:ids,snapshot:try importSourceSnapshot(ids),policy:policy,collectorAdmission:collectorAdmission)
+    }
+    // No store/activity state mutex spans preparation, including learned awaits.
     func importDecodedMemoriesDetailed(_ memories:[Memory],embedder:LocalEmbedder?,policy:PrivacyPolicy,collectorAdmission:Bool=false,settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,preparationProgress:((Int)throws->Void)?=nil) throws -> JSONImportResult {
         try withImportActivity(admission) {activity in
-            try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
-            let ordered=try RecapImport.ordered(memories),inputIDs=Set(memories.map(\.id))
-            let ids=inputIDs.union(ordered.flatMap {$0.recap?.sources.map(\.id) ?? []})
-            let snapshot=try importSourceSnapshot(ids)
-            var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),passages=[String:[PassageVector]](),reusedPassages=Set<String>(),incoming=[String:Memory]()
-            for var m in ordered {
-                try Task.checkCancellation()
-                let browser=collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
-                if policy.exclusion(app:m.bundleID,title:m.title,url:m.url,isBrowser:browser) != nil {blocked.insert(m.id);report.excluded+=1;continue}
-                if collectorAdmission,let previous=snapshot[m.id]?.memory {
-                    guard previous.kind == .note,previous.recap==nil else {throw OSwindError.invalid("Collector source ID belongs to incompatible content")}
-                    m.favorite=previous.favorite;m.tags=Array(Set(previous.tags+m.tags)).sorted()
-                }
-                if let recap=m.recap {
-                    var omit=false
-                    for reference in recap.sources {
-                        if blocked.contains(reference.id) {omit=true;break}
-                        guard let current=incoming[reference.id] ?? snapshot[reference.id]?.memory else {throw OSwindError.invalid("Linked recap import is missing a source. Import the complete JSON library or restore a full backup.")}
-                        if !inputIDs.contains(reference.id),policy.exclusion(app:current.bundleID,title:current.title,url:current.url) != nil {omit=true;break}
-                        if current.evidenceHash != reference.revision {omit=true;break}
-                    }
-                    if omit {blocked.insert(m.id);report.skippedLinkedRecaps+=1;continue}
-                }
-                if let visual=m.visualRecording {
-                    guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}
-                    let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text
-                } else if let transcript=m.transcript {
-                    guard m.text==transcript.text else {throw OSwindError.invalid("Transcript and source text differ")}
-                    let clean=try transcript.sanitized(policy:policy).transcript;m.transcript=clean;m.text=clean.text
-                } else {m.text=policy.sanitize(m.text).text}
-                if var recap=m.recap {recap.provider=policy.sanitize(recap.provider).text;m.recap=recap}
-                m.title=policy.sanitize(m.title).text;m.url=m.url.map {policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
-                m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
-                if let embedder,m.embeddingModel==embedder.modelID,SemanticPassagePlan.needed(m) {
-                    // A short metadata read preserves the existing retry fast path.
-                    // Never hold this query's mutex over passage/model preparation.
-                    if try passagesCurrent(m,modelID:embedder.modelID) {reusedPassages.insert(m.id)}
-                    else if let records=try Self.prepareApplePassages(m,embedder:embedder) {passages[m.id]=records}
-                }
-                prepared.append(m);incoming[m.id]=m;report.imported+=1
-                try preparationProgress?(prepared.count)
+            var context=try beginImportPreparation(memories,policy:policy,collectorAdmission:collectorAdmission,settingsSnapshot:settingsSnapshot)
+            for original in context.ordered {
+                guard let candidate=try prepareImportCandidate(original,context:&context) else {continue}
+                try finishImportCandidate(candidate,context:&context,embedder:embedder)
+                try preparationProgress?(context.prepared.count)
             }
-            try Task.checkCancellation();try requireMediaRootIdentity()
-            // Match audio/visual admission: activity state mutex precedes SQL.
-            // Another writer may borrow this same reservation while preparing.
-            return try activity.withActive(for:mediaRootIdentity) {
-                lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
-                do {
-                    // Full stored payloads include favorite/tags and typed evidence,
-                    // unlike evidenceHash. Missing targets are fenced as well, so a
-                    // concurrent insert cannot be silently overwritten by this batch.
-                    for id in ids {
-                        try Task.checkCancellation()
-                        guard try importStoredSource(id,decodeMemory:false).digest==snapshot[id]?.digest else {throw OSwindError.unavailable("An import target or linked source changed during preparation. Retry the import using the current library.")}
-                    }
-                    for m in prepared {
-                        try Task.checkCancellation();try insert(m)
-                        if let embedder {
-                            let current=try passagesCurrent(m,modelID:embedder.modelID)
-                            if reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
-                            if !current,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
-                        }
-                    }
-                    try Task.checkCancellation();try requireMediaRootIdentity()
-                    if let settingsSnapshot {try settingsSnapshot.withCurrent(root:root,policy:policy) {try exec("COMMIT")}}
-                    else {try exec("COMMIT")}
-                    _ = finishRecapInvalidation();return report
-                } catch {try? exec("ROLLBACK");throw error}
+            return try commitImport(context,embedder:embedder,settingsSnapshot:settingsSnapshot,activity:activity)
+        }
+    }
+    func importDecodedMemoriesWithPII(_ memories:[Memory],embedder:LocalEmbedder?,policy:PrivacyPolicy,collectorAdmission:Bool=false,settingsSnapshot:LibrarySettingsSnapshot?=nil,admission:MediaAdmissionLease?=nil,scanner:PIIImportScanner) async throws -> JSONImportResult {
+        let reservation=try reserveImportActivity(admission);defer {if reservation.owned {reservation.lease.release()}}
+        var context=try beginImportPreparation(memories,policy:policy,collectorAdmission:collectorAdmission,settingsSnapshot:settingsSnapshot)
+        context.report.learnedPrivacy = .init(modelID:scanner.modelID,compute:scanner.compute,threshold:scanner.threshold)
+        for original in context.ordered {
+            guard let candidate=try prepareImportCandidate(original,context:&context) else {continue}
+            let result=try await scanner.sanitize(candidate,policy:policy)
+            try Task.checkCancellation();try requireMediaRootIdentity();try validateImportSettings(policy:policy,snapshot:settingsSnapshot)
+            context.report.learnedPrivacy?.sources+=1
+            context.report.learnedPrivacy?.redactedSources += result.redacted ? 1:0
+            context.report.learnedPrivacy?.fields+=result.fields;context.report.learnedPrivacy?.windows+=result.windows
+            try finishImportCandidate(result.memory,context:&context,embedder:embedder)
+        }
+        return try commitImport(context,embedder:embedder,settingsSnapshot:settingsSnapshot,activity:reservation.lease)
+    }
+    private func prepareImportCandidate(_ original:Memory,context:inout ImportPreparation) throws -> Memory? {
+        var m=original
+        try Task.checkCancellation()
+        let browser=context.collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
+        if context.policy.exclusion(app:m.bundleID,title:m.title,url:m.url,isBrowser:browser) != nil {context.blocked.insert(m.id);context.report.excluded+=1;return nil}
+        if context.collectorAdmission,let previous=context.snapshot[m.id]?.memory {
+            guard previous.kind == .note,previous.recap==nil else {throw OSwindError.invalid("Collector source ID belongs to incompatible content")}
+            m.favorite=previous.favorite;m.tags=Array(Set(previous.tags+m.tags)).sorted()
+        }
+        if let recap=m.recap {
+            var omit=false
+            for reference in recap.sources {
+                if context.blocked.contains(reference.id) {omit=true;break}
+                guard let current=context.incoming[reference.id] ?? context.snapshot[reference.id]?.memory else {throw OSwindError.invalid("Linked recap import is missing a source. Import the complete JSON library or restore a full backup.")}
+                if !context.inputIDs.contains(reference.id),context.policy.exclusion(app:current.bundleID,title:current.title,url:current.url) != nil {omit=true;break}
+                if current.evidenceHash != reference.revision {omit=true;break}
             }
+            if omit {context.blocked.insert(m.id);context.report.skippedLinkedRecaps+=1;return nil}
+        }
+        return m
+    }
+    private func finishImportCandidate(_ original:Memory,context:inout ImportPreparation,embedder:LocalEmbedder?) throws {
+        var m=original
+        if let visual=m.visualRecording {
+            guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}
+            let clean=try visual.sanitized(policy:context.policy);m.visualRecording=clean;m.text=clean.text
+        } else if let transcript=m.transcript {
+            guard m.text==transcript.text else {throw OSwindError.invalid("Transcript and source text differ")}
+            let clean=try transcript.sanitized(policy:context.policy).transcript;m.transcript=clean;m.text=clean.text
+        } else {m.text=context.policy.sanitize(m.text).text}
+        if var recap=m.recap {recap.provider=context.policy.sanitize(recap.provider).text;m.recap=recap}
+        m.title=context.policy.sanitize(m.title).text;m.url=m.url.map {context.policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
+        m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
+        if let embedder,m.embeddingModel==embedder.modelID,SemanticPassagePlan.needed(m) {
+            // A short metadata read preserves the existing retry fast path.
+            // Never hold this query's mutex over passage/model preparation.
+            if try passagesCurrent(m,modelID:embedder.modelID) {context.reusedPassages.insert(m.id)}
+            else if let records=try Self.prepareApplePassages(m,embedder:embedder) {context.passages[m.id]=records}
+        }
+        context.prepared.append(m);context.incoming[m.id]=m;context.report.imported+=1
+    }
+    private func commitImport(_ context:ImportPreparation,embedder:LocalEmbedder?,settingsSnapshot:LibrarySettingsSnapshot?,activity:MediaAdmissionLease) throws -> JSONImportResult {
+        try Task.checkCancellation();try requireMediaRootIdentity()
+        // Match audio/visual admission: activity state mutex precedes SQL.
+        // Another writer may borrow this same reservation while preparing.
+        return try activity.withActive(for:mediaRootIdentity) {
+            lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
+            do {
+                // Full stored payloads include favorite/tags and typed evidence,
+                // unlike evidenceHash. Missing targets are fenced as well, so a
+                // concurrent insert cannot be silently overwritten by this batch.
+                for id in context.ids {
+                    try Task.checkCancellation()
+                    guard try importStoredSource(id,decodeMemory:false).digest==context.snapshot[id]?.digest else {throw OSwindError.unavailable("An import target or linked source changed during preparation. Retry the import using the current library.")}
+                }
+                for m in context.prepared {
+                    try Task.checkCancellation();try insert(m)
+                    if let embedder {
+                        let current=try passagesCurrent(m,modelID:embedder.modelID)
+                        if context.reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
+                        if !current,let records=context.passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+                    }
+                }
+                try Task.checkCancellation();try requireMediaRootIdentity()
+                if let settingsSnapshot {try settingsSnapshot.withCurrent(root:root,policy:context.policy) {try exec("COMMIT")}}
+                else {try exec("COMMIT")}
+                _ = finishRecapInvalidation();return context.report
+            } catch {try? exec("ROLLBACK");throw error}
         }
     }
 
