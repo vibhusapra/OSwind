@@ -32,7 +32,7 @@ import OSwindCore
                         try await Task.sleep(for:.seconds(120));throw CancellationError()
                     })
                     preview=try AppModel(startServices:false,visualSetup:setup)
-                } else {preview=try AppModel()}
+                } else {preview=try AppModel(startServices:false)}
             } catch { FileHandle.standardError.write(Data((error.localizedDescription+"\n").utf8)); NSApp.terminate(nil); return }
             let path = CommandLine.arguments[index+1]
             if let queryIndex = CommandLine.arguments.firstIndex(of:"--preview-query"), queryIndex+1 < CommandLine.arguments.count { preview.query = CommandLine.arguments[queryIndex+1] }

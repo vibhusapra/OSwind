@@ -2,13 +2,15 @@
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
-**v0 is in active development.** The [feature ledger](docs/features.json) tracks 76 requirements across [16 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
+**v0 is in active development.** The [feature ledger](docs/features.json) tracks 77 requirements across [20 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
 
-The latest work reduces [full Accessibility polling during replay](docs/REPLAY-CONTEXT-DUTY.md). Frame processing retains fresh complete privacy checks; controlled scheduler/tree work counts are separate from physical energy. Its [frozen qualification](benchmarks/replay-context-duty-v1.json) passes 1,228 full tests with two explicit skips, 131 sanitizer and 131 optimized checks with one session-admission skip each, plus all 17 ordered stages. The [delivery ledger](docs/PROGRESS.md) tracks remaining acceptance.
+The latest work adds [standalone Accessibility text capture](docs/ACCESSIBILITY-TEXT-CAPTURE.md): an explicit desktop mode that reads permitted focused-window text without screen pixels or OCR. Setup explains the required Accessibility access, and saved crop/display scopes remain blocked until explicitly resolved. Native app coverage and physical power remain open. [Replay context duty](docs/REPLAY-CONTEXT-DUTY.md) separately reduces full-tree polling while retaining per-frame privacy checks.
+
+[Current qualification](benchmarks/accessibility-text-capture-v1.json): 1,252 full passes / two explicit skips, 163 selected sanitizer and 163 optimized passes/one skip each, all 17 ordered stages. The staged signed app and portability checks pass; positive native text capture, application coverage and sustained power remain separate acceptance work.
 
 [Experimental local PII import masking](docs/LEARNED-IMPORT-PRIVACY.md) and [per-memory check records](docs/PII-SCAN-RECORDS.md) are available for explicit text imports. The model stays off by default and has known misses. A recorded check does not establish that personal information is absent; learned capture/media/egress protection remains open.
 
-Builds are staged and ad-hoc signed. [Benchmark receipts](benchmarks/README.md) retain successes, failures and their scope. Physical desktop, native vault detach and release acceptance remain open. [October 29 research notes](docs/landscape-source-checks-2026-10-29.json) queue four more comparators and retain pricing/access caveats.
+Builds are staged and ad-hoc signed. [Benchmark receipts](benchmarks/README.md) retain successes, failures and their scope. Physical desktop, native vault detach and release acceptance remain open. [October 29 research notes](docs/landscape-source-checks-2026-10-29.json) record the four newly integrated profiles and retain pricing/access caveats.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 
@@ -37,6 +39,7 @@ To install locally, copy `dist/OSwind.app` to `/Applications`. The build is ad-h
 
 - [People & projects](docs/ENTITY-MEMORY.md): on-device suggestions and explicit project aliases, source-linked curation/merges, scoped search/Ask and read-only integrations. Full backup preserves this layer; source JSON/Markdown currently do not.
 
+- [Text-only Accessibility mode](docs/ACCESSIBILITY-TEXT-CAPTURE.md) reads permitted focused-window text without Screen Recording, pixels or OCR; explicit saved scope, privacy checks and repeated-text suppression apply. Some applications expose incomplete or no accessible text.
 - ScreenCaptureKit focused-window snapshots or opt-in hardware HEVC replay with timed OCR/Accessibility text; native frame seeking and OCR boxes. Multi-display capture uses masked snapshots; see [replay scope and checks](docs/REPLAY.md).
 - [Display selection and crop regions](docs/CAPTURE-REGIONS.md) preserve chosen display identities, crop window/display snapshots before OCR, and refuse wider replay fallbacks. Native crop alignment and hardware acceptance remain open.
 - [Bounded accessibility reads](docs/ACCESSIBILITY-CAPTURE.md) keep snapshot/replay/audio tree traversal off the UI thread; cancellation and fail-closed work budgets preserve capture boundaries. Shared-read cancellation and audio epoch/session guards are tested; physical availability/energy measurements remain open.

@@ -36,6 +36,7 @@ struct SettingsView: View {
 
     }
     private var replayCaptureActive:Bool {m.settings.visualCaptureMode == .replay && !m.settings.allDisplays && m.settings.snapshotRegions.focusedWindowCrop==nil && m.settings.snapshotRegions.valid}
+    private var textCaptureActive:Bool {m.settings.visualCaptureMode == .accessibility}
     private var capture: some View {
         Group {
             Section("Desktop shortcut") {
@@ -48,21 +49,34 @@ struct SettingsView: View {
                 Text("Registration confirms macOS accepted the shortcut. Use it from an editable field to check destination capture; normal app opening does not select a destination.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Capture profile") {
-                Picker("Visual memory",selection:$m.settings.visualCaptureMode) { Text("Snapshots").tag(VisualCaptureMode.snapshots); Text("Replay · HEVC clips").tag(VisualCaptureMode.replay) }
+                Picker("Desktop memory",selection:$m.settings.visualCaptureMode) {ForEach(VisualCaptureMode.allCases,id:\.self) {Text($0.label).tag($0)}}
                 Picker("Profile",selection:$m.settings.profile) { ForEach(CaptureProfile.allCases,id:\.self) { Text("\($0.rawValue.capitalized) · \(replayCaptureActive ? $0.replayInterval(lowPower:false,thermalLimited:false).formatted():$0.interval.formatted()) s").tag($0) } }
-                Text(replayCaptureActive ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
-                Toggle("Capture displays instead of the focused window",isOn:$m.settings.allDisplays)
-                Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "Display recording uses snapshots. Turn off display capture and clear the window crop for replay." : "Default: focused window only. Full-display mode masks recognized browser apps, excluded apps and any app with an excluded window title. Safe windows of the same app are also masked; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
+                if textCaptureActive {
+                    Text("Requires Accessibility, without Screen Recording. Reads text exposed by the focused application, with app, title and website context. No screenshots, replay video or OCR. Light checks every 20 s; Balanced every 5 s; Detailed every 2 s. App switches also trigger checks; unchanged text is skipped. Low Power Mode and thermal pressure slow checks, and two minutes of inactivity pauses them. Apps may expose incomplete text or none at all.").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    Text(replayCaptureActive ? "Focused-window replay: Light 1280 px / 5 s; Balanced 1920 px / 1 s; Detailed 2560 px / 0.5 s. Hardware HEVC clips include timed OCR and accessibility text. Clips become searchable after finalization, usually within five seconds. Unchanged stream frames are omitted. Low Power Mode and thermal pressure reduce the rate; inactivity pauses capture." : "Light: 1280 px / 20 s. Balanced: 1920 px / 5 s. Detailed: 2560 px / 2 s. Changes trigger captures; duplicate frames are skipped. Low Power Mode and thermal pressure slow capture, and two minutes of inactivity pauses it.").font(.caption).foregroundStyle(.secondary)
+                    Toggle("Capture displays instead of the focused window",isOn:$m.settings.allDisplays)
+                    Text(m.settings.visualCaptureMode == .replay && m.settings.allDisplays ? "Display recording uses snapshots. Turn off display capture and clear the window crop for replay." : "Default: focused window only. Full-display mode masks recognized browser apps, excluded apps and any app with an excluded window title. Safe windows of the same app are also masked; background URLs cannot be verified.").font(.caption).foregroundStyle(.secondary)
+                }
                 Toggle("Resume capture when OSwind opens",isOn:$m.settings.captureOnLaunch)
                 Toggle("Open at login",isOn:Binding(get:{SMAppService.mainApp.status == .enabled},set:{m.login($0)}))
             }
             Section("Capture area") {
-                SnapshotRegionsView(configuration:$m.settings.snapshotRegions,displayMode:m.settings.allDisplays,replay:m.settings.visualCaptureMode == .replay)
+                if textCaptureActive {
+                    Text("Text-only capture reads the focused window's accessible text. It cannot apply a screen crop or collect background displays.").font(.caption).foregroundStyle(.secondary)
+                    if m.settings.allDisplays || m.settings.snapshotRegions.focusedWindowCrop != nil || !m.settings.snapshotRegions.valid {
+                        Label("Capture paused until its scope is resolved",systemImage:"pause.circle")
+                        Button("Use full focused-window text") {m.settings.allDisplays=false;m.settings.snapshotRegions=SnapshotRegionSettings()}
+                    }
+                } else {SnapshotRegionsView(configuration:$m.settings.snapshotRegions,displayMode:m.settings.allDisplays,replay:m.settings.visualCaptureMode == .replay)}
             }
             Section("macOS access") {
-                permissionRow("Screen Recording",ready:CGPreflightScreenCaptureAccess(),detail:"Required to capture screen pixels and system audio.",url:"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")
-                permissionRow("Accessibility",ready:AXIsProcessTrusted(),detail:"Optional for native apps; required by default for browser URL privacy rules.",url:"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
-                Button("Request Screen Recording") { _ = CGRequestScreenCaptureAccess() }
+                if textCaptureActive {Label("Screen Recording is not required for text-only desktop capture",systemImage:"text.viewfinder")}
+                else {
+                    permissionRow("Screen Recording",ready:CGPreflightScreenCaptureAccess(),detail:"Required to capture screen pixels and system audio.",url:"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")
+                    Button("Request Screen Recording") { _ = CGRequestScreenCaptureAccess() }
+                }
+                permissionRow("Accessibility",ready:AXIsProcessTrusted(),detail:textCaptureActive ? "Required for text-only capture. System audio and microphone access are separate." : "Optional for native apps; required by default for browser URL privacy rules.",url:"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
                 Button("Request Accessibility") { let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String:true] as CFDictionary; _ = AXIsProcessTrustedWithOptions(options) }
                 Text("Global search: ⇧⌘Space. Pause/resume in app: ⇧⌘P. OSwind shows capture status in the menu bar.").font(.caption).foregroundStyle(.secondary)
             }
@@ -85,6 +99,8 @@ struct SettingsView: View {
                 Toggle("Redact common secrets and sensitive numbers",isOn:$m.settings.privacy.redactSecrets)
                 Text("Matches common API tokens, password assignments, card-like numbers, SSNs and private key blocks. Redacted captures keep text only; the original image is discarded. Pattern filtering is best effort and does not detect every kind of personal information.").font(.caption).foregroundStyle(.secondary)
                 Toggle("Keep screenshots and replay clips alongside text",isOn:$m.settings.privacy.retainImages)
+                    .disabled(textCaptureActive)
+                if textCaptureActive {Text("Text-only mode creates no screenshots or replay clips. Audio capture is controlled separately in Audio settings.").font(.caption).foregroundStyle(.secondary)}
                 Text("Screen, audio, and model access are separate. Audio segments are discarded when a foreground privacy rule is active at segment completion. Use Pause and Stop audio for sensitive activity.").font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -275,7 +291,8 @@ struct OnboardingView: View {
         Text("A memory for your Mac.\nEntirely yours.").font(.system(size:34,weight:.medium,design:.rounded))
         Text("OSwind saves the windows you choose, reads their text on device, and helps you find your way back. Your saved startup preferences apply after this introduction.").foregroundStyle(.secondary)
         VStack(alignment:.leading,spacing:14) { Label("Local storage, no account, no telemetry",systemImage:"internaldrive"); Label("Pause anytime; exclude apps and websites",systemImage:"pause.circle"); Label("Local models or your own API keys",systemImage:"sparkles"); Label("Export and delete your memory",systemImage:"arrow.up.doc") }.font(.callout)
-        Text("Screen Recording is required. Accessibility enables browser URL rules. Microphone and system audio are optional and controlled separately.").font(.caption).foregroundStyle(.secondary)
+        Picker("Desktop memory",selection:$m.settings.visualCaptureMode) {ForEach(VisualCaptureMode.allCases,id:\.self) {Text($0.label).tag($0)}}
+        Text(m.settings.visualCaptureMode == .accessibility ? "Text-only capture requires Accessibility, without Screen Recording. It reads permitted focused-window text; some apps expose incomplete text. Microphone and system audio are separate." : "Snapshots and replay require Screen Recording. Accessibility enables browser URL rules. Microphone and system audio are optional and controlled separately.").font(.caption).foregroundStyle(.secondary)
         HStack { Button("Explore first") { complete() }; Spacer(); Button("Set up OSwind") { complete(); m.showSettings = true }.buttonStyle(.borderedProminent) }
     }.padding(36).frame(width:590) }
     private func complete() { UserDefaults.standard.set(true,forKey:"onboarded"); dismiss() }

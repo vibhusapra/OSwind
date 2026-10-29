@@ -1,0 +1,521 @@
+{
+  "format": "OSwind standalone Accessibility text capture",
+  "version": 1,
+  "date": "2026-10-29",
+  "codeCommit": "eadabc13371dd13e87865f2ca8d53a206da8bbe2",
+  "parentCommit": "5c2ca645e0e0db1cc3571bc4ccba012652b1ded0",
+  "schema": 23,
+  "scope": "Explicit sampled focused-window text mode with no screen pixels, OCR or retained media. Controlled core/controller observations plus signed CLI protocol/refusal/portability checks. Positive native signed-GUI/TCC capture, application coverage, active-time coalescing, physical power and competitor rank remain unaccepted.",
+  "qualification": {
+    "state": "completed",
+    "frozenInputs": 588,
+    "frozenReport": {
+      "path": ".artifacts/accessibility-text-capture-v1/qualification-v1/report.json",
+      "sha256": "c98c660374c9053643b981ec8419454939e51276f5356a3319c50545d51eb7f8"
+    },
+    "full": {
+      "defined": 1254,
+      "passed": 1252,
+      "skipped": 2,
+      "failures": 0,
+      "seconds": 541.249,
+      "skipReasons": [
+        "Explicit owned system-audio fixtures; no microphone access",
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "e10009de4e9e533481457354154f04449e5fbf0d9c9e7b1fd3638deaca9d0837"
+    },
+    "selectedTSan": {
+      "defined": 164,
+      "passed": 163,
+      "skipped": 1,
+      "failures": 0,
+      "seconds": 18.185,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "dd43e42c6a15a85aaecaf566e4d954177a0829bb5df07e42b999b2ab71bb5093"
+    },
+    "selectedOptimized": {
+      "defined": 164,
+      "passed": 163,
+      "skipped": 1,
+      "failures": 0,
+      "seconds": 14.096,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "fd49f20b225229467793ec86f83f496b87d68a78c0a0f529baef03b1389ffb64"
+    },
+    "orderedStages": [
+      {
+        "name": "full-most-optins",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 546.5794448330998,
+        "logSHA256": "e10009de4e9e533481457354154f04449e5fbf0d9c9e7b1fd3638deaca9d0837"
+      },
+      {
+        "name": "selected-tsan",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 49.197678124997765,
+        "logSHA256": "dd43e42c6a15a85aaecaf566e4d954177a0829bb5df07e42b999b2ab71bb5093"
+      },
+      {
+        "name": "selected-release",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 134.970079125138,
+        "logSHA256": "fd49f20b225229467793ec86f83f496b87d68a78c0a0f529baef03b1389ffb64"
+      },
+      {
+        "name": "package",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 106.2749055000022,
+        "logSHA256": "81ee990159f75890f3c31a8f0a57418b6ca0da55546056845e7fe938846bba96"
+      },
+      {
+        "name": "capture-region-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.8346093341242522,
+        "logSHA256": "ff1a821a103b000bc57854216be294fcacd66fc8b261123d36957c2be75f5df9"
+      },
+      {
+        "name": "entity-memory-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 7.838902792194858,
+        "logSHA256": "535928dca9b680ffa0db9a96f829c7328e99309ba44f677f358b031cba345b77"
+      },
+      {
+        "name": "entity-vault-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 7.3745433748699725,
+        "logSHA256": "207c068d5f2bb91ef8df39d4d06bfcd06d5097ef27624d1e2103ec62f689a8ad"
+      },
+      {
+        "name": "project-corrections-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.8832112078089267,
+        "logSHA256": "977b1ec42ddce1fc97979e6e2c39f7391aca3f98c80d5355cbf2bac5ebbd3e0e"
+      },
+      {
+        "name": "tag-index-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.8943277918733656,
+        "logSHA256": "778ccb35304f7fa0cb4bd99512a3aae890a87e8a0fabb5549d726021b6cda862"
+      },
+      {
+        "name": "tag-index-interruption-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 30.329538458026946,
+        "logSHA256": "a31e2ac7bcc5d840c50290aed6a7f9e9a781b36c4713561c4b563a91d8bc376f"
+      },
+      {
+        "name": "hardware-replay-probe",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 2.0685867918655276,
+        "logSHA256": "81852b70e115773c6024704cab9cb5d5a856d3930089360bf6fbbdb8145cd9ed"
+      },
+      {
+        "name": "replay-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.500460958108306,
+        "logSHA256": "58c97006e8ae55baed6a280e8c50444b07bc5705e9b8f942b7723a353a72a857"
+      },
+      {
+        "name": "api-mcp-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.3714509999845177,
+        "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+      },
+      {
+        "name": "sdk-offline",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 5.057147416984662,
+        "logSHA256": "ce9dab671f5417715e5cb6c2cdcd317b00602d05c56fbbb82e94d9a57cc03efd"
+      },
+      {
+        "name": "pattern-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.6890676249749959,
+        "logSHA256": "ac879a1e8af596d3be156728f7776f904e41f39a09ec79ec0537477007d5133a"
+      },
+      {
+        "name": "accessibility-text-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.5018002500291914,
+        "logSHA256": "659a13a8a6cfe36a3359e263f9b9736606cefeb906cd920d55e79c5fbeaaa12e"
+      },
+      {
+        "name": "package-proof",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.716571083990857,
+        "logSHA256": "f7604cc1e9d026c82f7189c581b53d8a5bbc1a7b70bba77875bfe443853a9118"
+      }
+    ]
+  },
+  "controlledWorkCounts": {
+    "scope": "Explicit sequential production-controller calls with owned contexts and injectable source-embedding requests; passage indexing is separate. Not elapsed timer cadence, native AX IPC, CPU or energy.",
+    "cases": {
+      "repeated": {
+        "attempts": 100,
+        "sources": 1,
+        "fullReads": 101,
+        "sourceEmbeddingRequests": 1,
+        "mediaFiles": 0
+      },
+      "changed": {
+        "attempts": 10,
+        "sources": 10,
+        "fullReads": 20,
+        "sourceEmbeddingRequests": 10,
+        "mediaFiles": 0
+      }
+    },
+    "identicalAcrossFullTSanAndOptimized": true
+  },
+  "signedProcessContracts": {
+    "receipt": {
+      "path": ".artifacts/accessibility-text-capture-v1/qualification-v1/text-processes/report.json",
+      "sha256": "659a13a8a6cfe36a3359e263f9b9736606cefeb906cd920d55e79c5fbeaaa12e"
+    },
+    "groups": [
+      "mode-specific permission report and zero-source native refusal at the observed boundary",
+      "explicit replay cannot widen a saved text-only mode to pixels",
+      "saved display and crop constraints refuse before context/device admission",
+      "wrong or unknown modes cannot fall through to text or pixel capture",
+      "separate authored interchange source retains text-only shape and cannot imply a learned PII check",
+      "quiet full backup preserves text mode and source; no startup services or media introduced",
+      "preceding signed23 client reads source but refuses unknown-mode capture and backup-settings decode; settings bytes unchanged",
+      "plain JSON portability and independent source deletion preserve media-free source semantics"
+    ],
+    "operations": 29,
+    "nativeRefusalBoundary": "Locked-session gate before target lookup",
+    "doctor": {
+      "desktopCaptureMode": "accessibility",
+      "screenRecordingRequiredForDesktop": false,
+      "desktopPermissionReady": true,
+      "accessibility": true,
+      "screenRecording": true,
+      "screenLocked": true
+    },
+    "mediaFiles": 0,
+    "emptyDirectoryScaffoldingAllowed": true,
+    "actualNativeTextCaptureClaimed": false,
+    "authoredInterchangeIsNativeCapture": false,
+    "precedingSignedCLI_SHA256": "d86fc87683e933fe096ddc8cf8845531cece2576f83b0aeb660093dd38d4a4ce"
+  },
+  "componentRenders": {
+    "receipt": {
+      "path": ".artifacts/accessibility-text-capture-v1/ui-renders-v1/report.json",
+      "sha256": "3a148902d3651f43590ac5ed6194bd060cb778160e80452347b1f00b140028f1"
+    },
+    "cases": [
+      {
+        "name": "text-ready-light",
+        "pid": 13653,
+        "state": "passed",
+        "seconds": 2.3953477079048753,
+        "pngSHA256": "03dc9107a68174c5a8921d2df20acf52d04cdd5cba7ff4858eb7d095acc1d5b6",
+        "bytes": 196180
+      },
+      {
+        "name": "text-ready-dark",
+        "pid": 13659,
+        "state": "passed",
+        "seconds": 1.8105685419868678,
+        "pngSHA256": "ef8073be3e595d2b34a9035545544665aad107539aed4469327f754338c7b7d6",
+        "bytes": 200530
+      },
+      {
+        "name": "text-crop-blocked-light",
+        "pid": 13663,
+        "state": "passed",
+        "seconds": 1.8087982907891273,
+        "pngSHA256": "46760a7cc84589cca17a23f5864c380d1eff9aad7230b5952252ff0ea98b08f9",
+        "bytes": 195679
+      },
+      {
+        "name": "text-crop-blocked-dark",
+        "pid": 13667,
+        "state": "passed",
+        "seconds": 1.7687290420290083,
+        "pngSHA256": "6e79c3ef670b113d28fa8c5cc13754be5e4e051140d6cf408afaa1ca151cb5f2",
+        "bytes": 199844
+      },
+      {
+        "name": "text-privacy-light",
+        "pid": 13674,
+        "state": "passed",
+        "seconds": 1.8081293748691678,
+        "pngSHA256": "401e73ac3e25608a225f2c7b56a9df36f28f3236bdfae9b3ef7e1f169b1d7cb2",
+        "bytes": 173267
+      },
+      {
+        "name": "text-privacy-dark",
+        "pid": 13680,
+        "state": "passed",
+        "seconds": 1.7931048751343042,
+        "pngSHA256": "4d1d79d9fc13bcb3edfec0fe65ee93f2d9d4e145c7ddf1f3c9732ea92009cc04",
+        "bytes": 174490
+      },
+      {
+        "name": "text-onboarding-light",
+        "pid": 13684,
+        "state": "passed",
+        "seconds": 1.6788757909089327,
+        "pngSHA256": "653c8e7ad5a976c4f1631126acf00b90a1d41daed132edefdf21fdf53af1c026",
+        "bytes": 142226
+      },
+      {
+        "name": "text-onboarding-dark",
+        "pid": 13687,
+        "state": "passed",
+        "seconds": 1.7493192919064313,
+        "pngSHA256": "711fce35b90a1376cb6769fe32600ca2884cc7587634feb817f1af8c7d0b0dc7",
+        "bytes": 145418
+      },
+      {
+        "name": "snapshots-light",
+        "pid": 13691,
+        "state": "passed",
+        "seconds": 1.8445141250267625,
+        "pngSHA256": "209fcbcb2db518bb3d7f4ae4b0e362ba82f212422dd574c1c79ccaa35217b644",
+        "bytes": 204344
+      },
+      {
+        "name": "snapshots-dark",
+        "pid": 13695,
+        "state": "passed",
+        "seconds": 1.753762625157833,
+        "pngSHA256": "f363b1cae7cdc730b35fcec8e03169de1f8c1e9e94fc9f9fdf380805f9973025",
+        "bytes": 208743
+      },
+      {
+        "name": "replay-light",
+        "pid": 13701,
+        "state": "passed",
+        "seconds": 1.8407937919255346,
+        "pngSHA256": "b7d01525afb9e7d88e0fad4ffda0afee47f43e42f577d73a606a9e5d30777bed",
+        "bytes": 207594
+      },
+      {
+        "name": "replay-dark",
+        "pid": 13705,
+        "state": "passed",
+        "seconds": 1.8188567911274731,
+        "pngSHA256": "08711e8e18a51f8fe4528ef6af4715e4530aa6fe9234a0d913c3c0e88fa87250",
+        "bytes": 212035
+      }
+    ],
+    "rendererSHA256": "876f2d38bcbbf411a57d10eb4f71c7f633702c14f57b3dfad4fee4e54ea9331a",
+    "sourceBytesMatchQualifiedBuild": true,
+    "scope": "Only owned demo AppKit components; no normal history, desktop pixel capture, foreground target, permission changes, listeners or live signed-GUI/TCC acceptance."
+  },
+  "hardwareReplayProbe": {
+    "receipt": {
+      "path": ".artifacts/accessibility-text-capture-v1/qualification-v1/hardware-replay/report.json",
+      "sha256": "db32d586f72a763da3b28d0834cab43fa4bcafca252ff6f8fda8f04e2b79d717"
+    },
+    "authoredFrames": 12,
+    "decodedIdentityChecks": 12,
+    "scope": "Generated static desktop-like pixels with changing labels; actual Vision OCR, required-hardware HEVC (or explicit software H264), source storage, every-frame decode and decoded ownership/authored frame-token OCR checks. JPEG uses the same pixels at quality 0.75. Excludes desktop capture, natural workloads, power, database/metadata bytes and competitors."
+  },
+  "package": {
+    "scope": "Separately staged Accessibility-only desktop capture with media-free admission and explicit setup; controlled observations only. No live capture, calibrated physical energy, broad parity, hardened-distribution or competitive ranking acceptance.",
+    "codeCommit": "eadabc13371dd13e87865f2ca8d53a206da8bbe2",
+    "schema": 23,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "97e5e3cdc83c6fc21be9e8dc0711c4e84e25461f763b2a9c9e630f46b4628edc",
+        "signedSHA256": "58d68c8822d0d231d686078dc94c9b0158e73b7e0bc3c02b1f5fcf11c21df5e8",
+        "normalizedPayloadSHA256": "0dd66ccb597696b8c413d72a2ae7fbb49a096995d919547f74fc974944c4e8a6"
+      },
+      "oswindctl": {
+        "rawSHA256": "1d782d2eb037847ab66d5c6216f4dfe74138bbb578cca4199eab192ae1affd28",
+        "signedSHA256": "12604c5e29a9df493380e76fe20eb5f2b01c03c8a603e92109b5e6e3808e61b3",
+        "normalizedPayloadSHA256": "8f01671c3ac87ce99f551e823d44092f036d80ce9414df023182be2cd1d3371e"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "0fd28c471a920471bed7d4390f418cf59369933df076a055a1252e11848005cb",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "aa83fd166a4254335ea577f34fbb296315934aeae49f405c9afea89f0c70cf64",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installedUnchanged": true
+  },
+  "statisticsCIReplay": {
+    "format": "OSwind CI statistics schema23 replay",
+    "state": "completed",
+    "source": "eadabc13371dd13e87865f2ca8d53a206da8bbe2",
+    "cliSHA256": "12604c5e29a9df493380e76fe20eb5f2b01c03c8a603e92109b5e6e3808e61b3",
+    "ciBeforeSHA256": "80975c981b341cd0202c59a09ec33de31f34feea82eeeb00256ce046179c5e09",
+    "ciAfterSHA256": "a510d959bbe671557326380b15aec28a79d29d8373fcfb1ec6bf6279c442f924",
+    "harnessSHA256": "054f6678f065e0e18fd2a4db17c681bebd6b0129d466593011b16c9a75d3a44e",
+    "executedAssertionSHA256": "3324a8a31fa09cbd6658d0e3b1c17c74e8153d753c8f8c24ca3965b37453dcd4",
+    "operations": [
+      {
+        "name": "vectors",
+        "returncode": 0,
+        "stdoutSHA256": "25649c5d4cd13351cae3893a293f083e5d9d75aa40a9c4e3e900a29db7fa2268",
+        "stderrSHA256": "fbdce808854ca6014a95c1323fa5af3a8bea1c0dfdc4bbdc1256b6889183e232"
+      },
+      {
+        "name": "statistics",
+        "returncode": 0,
+        "stdoutSHA256": "38fa79efd7ce4f82e57d434195d90df2405210d41ae7c5890ce682f4580361ff",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "count": 1000,
+    "schemaVersion": 23,
+    "modes": [
+      "legacy_sql_scan",
+      "maintained_sql",
+      "maintained_with_disk"
+    ],
+    "oldSchema22PredicatePasses": false,
+    "correctedExactCIAssertionsPass": true,
+    "vectorIdentityAndNonselfRecallAssertionsPass": true,
+    "scope": "Strict signed current CLI on a new marked1000-source/128-dimension synthetic archive. Actual CI inline assertions replayed, with only the local output path adapted. No user history, performance/energy inference or whole-product benchmark."
+  },
+  "publicationIntegrity": {
+    "allFrozenInputsMatchedAtTerminalAudit": true,
+    "frozenInputChangesAfterQualification": [
+      ".github/workflows/ci.yml"
+    ],
+    "onlyChangeMeaning": "CI fixture expected schema22 updated to23; signed command/assertion replayed separately. No product/test/tool/model/SDK/asset byte changes.",
+    "sourceTestsToolsSDKAndAssetsUnchanged": true,
+    "installedFiles": 15,
+    "installedTreeUnchanged": true,
+    "packageAndExtractedTreeStillEqual": true,
+    "noOwnCompilerOrEvaluationDriver": true,
+    "qualificationPrefixMountedImages": []
+  },
+  "staticReport": {
+    "canonicalVendors": 20,
+    "newVendors": [
+      "OpenRecall",
+      "OpenHistory",
+      "silverfish",
+      "Goldfish (goldfish.sh)"
+    ],
+    "requirements": 77,
+    "prior76StatusesUnchanged": true,
+    "newFeature": "F077 partial",
+    "counts": {
+      "live verified": 4,
+      "partial": 38,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 4,
+      "out of v0 desktop scope": 2
+    },
+    "evidenceRowsChanged": [
+      "F004",
+      "F013",
+      "F063",
+      "F072"
+    ],
+    "renderedCellsMatch": true,
+    "deterministicRender": true,
+    "htmlSHA256": "994ce21fdf0085c2abf3fdc213c55ccc620f273d621d4a1a2f40b6d835608e4c",
+    "browserQA": {
+      "path": ".artifacts/accessibility-text-capture-v1/landscape-qa-v4/report.json",
+      "sha256": "a289a9d7cfbf4203cf939580ae828d04882e6bfc9a043aa9f08231f7a12416ea"
+    },
+    "nativeGUIAcceptance": false
+  },
+  "retainedFailures": [
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/focused-v2.log",
+      "sha256": "01155c5a62c913f642cf58ab9e3dcc92b408e908c3a032429a0a130dfd6203aa",
+      "meaning": "Test-only backup API names failed compilation; corrected before subsequent runs."
+    },
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/stopped-focused-v3.json",
+      "sha256": "d4f8162e6ee39357050f10877dc72b9ac653b1ad7e952f905ac0eeb6f1b0655f",
+      "meaning": "Deliberately stopped fake reader suspended every observation instead of first only; corrected."
+    },
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/stopped-focused-v3-cleanup.json",
+      "sha256": "2fa46e0d82e9576c770664a0af5069edf80e8b388fd18fc01e2fe928de6e2f6e",
+      "meaning": "Two verified empty owned interrupted roots cleaned; no user data."
+    },
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/debug-process-v1/report.json",
+      "sha256": "b117437b3c28ff9ed15bdcf35fcbf1f15a8cdef99665fae19ab08a067c524e1f",
+      "meaning": "Harness rejected an empty staging directory; corrected check still rejects every file/symlink."
+    },
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/landscape-qa-v1/launch-failure.json",
+      "sha256": "9f081bd3b76796713d85543f7c333bed708b2882c87ecf0f3d571977b4babb5e",
+      "meaning": "Expected Playwright shell absent; explicit installed runtime subsequently passed."
+    },
+    {
+      "path": ".artifacts/accessibility-text-capture-v1/inherited-statistics-schema-failure-v1.json",
+      "sha256": "5df14011b6c7253cbe2ae60d86be518b5b640330896b7425b0eff3458e7503b7",
+      "meaning": "Parent CI schema22 expectation rejected actual23 statistics; strict corrected assertion replayed on this signed binary."
+    }
+  ],
+  "priorIndependentGates": [
+    "Native hdiutil normal exit16 on PR83 publication28a95f8, run40889784746, query-recovery detach; cause unproven.",
+    "Native hdiutil normal exit16 on source c7fed19 visual-index final lock; cause unproven."
+  ],
+  "remaining": [
+    "Signed native text-mode setup, window/browser/secure-field transitions and representative application AX completeness.",
+    "Active-time/session coalescing, natural multilingual/editing workloads and sustained cadence/missed-change coverage.",
+    "Paired text/snapshot/replay energy, CPU, storage with idle controls; matched whole-product competitor workloads.",
+    "Personal-device sync, complete migration coverage, notarized installer/updates and older Macs/OS matrix; broad parity/top-three remains open."
+  ],
+  "cacheLimits": "Prepared native/model assets are reused; framework and OS caches/background processes are uncontrolled. No throughput/energy inference.",
+  "hostedCISnapshotBeforePublication": {
+    "format": "OSwind source CI snapshot before qualification publication",
+    "source": "eadabc13371dd13e87865f2ca8d53a206da8bbe2",
+    "run": 40925508014,
+    "jobs": [
+      {
+        "id": 123629810814,
+        "name": "native",
+        "status": "in_progress",
+        "conclusion": null,
+        "active": [
+          {
+            "name": "Package app",
+            "conclusion": null
+          }
+        ]
+      },
+      {
+        "id": 123629811435,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success",
+        "active": []
+      }
+    ],
+    "scope": "Source CI predates the separately replayed statistics schema assertion fix. Parent source/publication runs40915071098/40918119566 failed that stale assertion after native tests and owned vault checks passed. Final publication requires its own run."
+  }
+}
