@@ -1,0 +1,96 @@
+{
+  "modelRepository": "knowledgator/gliner-pii-edge-v1.0",
+  "modelRevision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "modelFiles": [
+    {
+      "path": "README.md",
+      "bytes": 15896,
+      "sha256": "88f7fb463e7ab0b256caeb5da30af9262ba1b223598576dc12e599d257e91c23",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "gliner_config.json",
+      "bytes": 4316,
+      "sha256": "77e6b57335c4bfd461e9041682196dd6c373a0b09bbd9269ef9e95b807915340",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "onnx/model.onnx",
+      "bytes": 181078966,
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "onnx/model_fp16.onnx",
+      "bytes": 90845497,
+      "sha256": "af499f06532909628765ce1cebd65311fa2d9a16f74a34e7b6e1b9369230a3a7",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "onnx/model_quint8.onnx",
+      "bytes": 45820894,
+      "sha256": "988acb03456b26e2d9f2521016d820310c2ed64deb4a846297d3289f0c2eb7e4",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "pytorch_model.bin",
+      "bytes": 180735778,
+      "sha256": "0160706fa5d034410175cc53808419d975658e12f1cac1a916fbde8155155add",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 694,
+      "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 3583593,
+      "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 21214,
+      "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27",
+      "lfsChecksumVerified": false
+    }
+  ],
+  "runtimePins": {
+    "gliner": "0.2.29",
+    "transformers": "4.57.1",
+    "torch": "2.7.0",
+    "onnxruntime": "1.24.2",
+    "numpy": "2.2.6"
+  },
+  "format": "OSwind experimental PII source v1",
+  "declaredLicense": "Apache-2.0",
+  "encoder": {
+    "repository": "jhu-clsp/ettin-encoder-32m",
+    "revision": "1b8ba06455dd44f80fc9c1ca9e22806157a57379",
+    "declaredLicense": "MIT"
+  },
+  "modelCard": "https://huggingface.co/knowledgator/gliner-pii-edge-v1.0/tree/9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "installedInApplication": false,
+  "nativeRuntime": {
+    "version": "1.24.2",
+    "repository": "microsoft/onnxruntime",
+    "ref": "v1.24.2",
+    "declaredLicense": "MIT",
+    "headers": [
+      {
+        "path": "onnxruntime_c_api.h",
+        "bytes": 373909,
+        "sha256": "09e5750c82f7b291cfad3e4a135d4ef78a4c54d7b3f86a5a178692279cf88334",
+        "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/include/onnxruntime/core/session/onnxruntime_c_api.h"
+      },
+      {
+        "path": "onnxruntime_ep_c_api.h",
+        "bytes": 102495,
+        "sha256": "9f05feec0c200e418577425c7fbc56668d845bedfaf1b0447f95a7d6aad5180c",
+        "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/include/onnxruntime/core/session/onnxruntime_ep_c_api.h"
+      }
+    ]
+  }
+}

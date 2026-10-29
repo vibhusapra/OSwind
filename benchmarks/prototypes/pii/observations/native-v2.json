@@ -1,0 +1,76 @@
+{
+  "operations": [
+    {
+      "policy": "cpu",
+      "exitCode": 0,
+      "awakeSeconds": 0.7074977080337703,
+      "systemSeconds": 0.7074987888336182,
+      "profile": {
+        "nodeInvocationCounts": {
+          "CPUExecutionProvider": 24630
+        },
+        "uniqueProfiledNodeNames": {
+          "CPUExecutionProvider": 821
+        }
+      },
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "cpu",
+        "fixedInputs": 3,
+        "runs": 30,
+        "loadSeconds": 0.117919,
+        "firstForwardSeconds": 0.00908238,
+        "warmForwardMedianSeconds": 0.00860408,
+        "warmForwardP95Seconds": 0.00910292,
+        "maxAbsoluteLogitDifference": 0,
+        "peakRSSBytes": 468008960,
+        "forwardSecondsInRunOrder": [
+          0.00908238,
+          0.00878583,
+          0.00912654,
+          0.00882654,
+          0.00860408,
+          0.00883204,
+          0.00833737,
+          0.00895063,
+          0.00906488,
+          0.00879404,
+          0.00833262,
+          0.00873321,
+          0.00837067,
+          0.00880167,
+          0.00865371,
+          0.00822363,
+          0.00838587,
+          0.008829,
+          0.00837258,
+          0.00911842,
+          0.00910292,
+          0.00883217,
+          0.00856004,
+          0.00897667,
+          0.00859087,
+          0.008589,
+          0.00843654,
+          0.00781788,
+          0.00789912,
+          0.00827825
+        ]
+      }
+    },
+    {
+      "policy": "coreml",
+      "exitCode": 1,
+      "awakeSeconds": 0.4725097920745611,
+      "systemSeconds": 0.47250986099243164,
+      "profile": {
+        "nodeInvocationCounts": {},
+        "uniqueProfiledNodeNames": {}
+      },
+      "error": "2026-10-28 19:30:07.478 native-probe[owned PID/thread] 2026-10-28 19:30:07.477748 [W:onnxruntime:, coreml_execution_provider.cc:113 GetCapability] CoreMLExecutionProvider::GetCapability, number of partitions supported by CoreML: 70 number of nodes in the graph: 831 number of nodes supported by CoreML: 604\nFailed to create MLModel, error: Failed to build the model execution plan using a model architecture file '<CoreML temporary model.mil>' with error code: -7.\n"
+    }
+  ],
+  "inputsUnchanged": true,
+  "scope": "Three previously opened authored validation tensors. Native C API forward only, no native tokenizer/decoder or app/PII acceptance. CoreML partition provider assignment is not physical GPU/ANE placement. Host/cache state uncontrolled."
+}

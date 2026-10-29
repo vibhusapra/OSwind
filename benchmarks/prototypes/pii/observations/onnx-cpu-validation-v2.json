@@ -1,0 +1,343 @@
+{
+  "state": "completed",
+  "runtime": "onnx-cpu",
+  "format": "fp32",
+  "corpusSHA256": "a848affbd8b56492fcf77efdaf792d6d8306bef63e57beb7b605505c9d98687b",
+  "planSHA256": "09996368eae9ace1ac61be49e17b94bf49701b7c4cbb71d79d30413c3be10855",
+  "harnessSHA256": "15446b614c0ef4baf5cd4168f91bf64790965e5a793075ab14de2bf0643439d2",
+  "split": "validation",
+  "reservedTestOpened": false,
+  "examples": 72,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "limits": [
+    "Authored template contract set, not natural desktop or training-independent quality acceptance",
+    "Python reference pipeline includes imports/tokenization/decoding; not native app latency or memory",
+    "Provider requests do not prove GPU/ANE placement; no energy claim",
+    "MPS CPU fallback is disabled; ordinary CPU tokenization/decoding remains",
+    "Uncontrolled host/framework/cache state; all timings retained"
+  ],
+  "metrics": {
+    "0.5": {
+      "examples": 72,
+      "exactTypedSpans": {
+        "tp": 38,
+        "fp": 13,
+        "fn": 10,
+        "precision": 0.7450980392156863,
+        "recall": 0.7916666666666666,
+        "f1": 0.7676767676767677
+      },
+      "characterCoverageUntyped": {
+        "tp": 704,
+        "fp": 139,
+        "fn": 180,
+        "precision": 0.8351126927639383,
+        "recall": 0.7963800904977375,
+        "f1": 0.8152866242038216
+      },
+      "fullyCoveredValues": 42,
+      "goldValues": 48,
+      "fullValueRecall": 0.875,
+      "negativeExamples": 24,
+      "negativeExamplesWithPrediction": 8,
+      "negativeFalsePositiveRate": 0.3333333333333333,
+      "perLabel": {
+        "address": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "credit_card": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "date_of_birth": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "email": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "financial_id": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "government_id": {
+          "tp": 12,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.9230769230769231,
+          "recall": 1.0,
+          "f1": 0.9600000000000001
+        },
+        "ip_address": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "phone": {
+          "tp": 4,
+          "fp": 4,
+          "fn": 0,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666
+        },
+        "secret": {
+          "tp": 8,
+          "fp": 8,
+          "fn": 0,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666
+        }
+      }
+    },
+    "0.3": {
+      "examples": 72,
+      "exactTypedSpans": {
+        "tp": 40,
+        "fp": 40,
+        "fn": 8,
+        "precision": 0.5,
+        "recall": 0.8333333333333334,
+        "f1": 0.625
+      },
+      "characterCoverageUntyped": {
+        "tp": 866,
+        "fp": 313,
+        "fn": 18,
+        "precision": 0.734520780322307,
+        "recall": 0.9796380090497737,
+        "f1": 0.8395540475036355
+      },
+      "fullyCoveredValues": 45,
+      "goldValues": 48,
+      "fullValueRecall": 0.9375,
+      "negativeExamples": 24,
+      "negativeExamplesWithPrediction": 20,
+      "negativeFalsePositiveRate": 0.8333333333333334,
+      "perLabel": {
+        "address": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.888888888888889
+        },
+        "credit_card": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "date_of_birth": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8
+        },
+        "email": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "financial_id": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 4,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "government_id": {
+          "tp": 12,
+          "fp": 6,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8
+        },
+        "ip_address": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.888888888888889
+        },
+        "phone": {
+          "tp": 4,
+          "fp": 4,
+          "fn": 0,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666
+        },
+        "secret": {
+          "tp": 8,
+          "fp": 25,
+          "fn": 0,
+          "precision": 0.24242424242424243,
+          "recall": 1.0,
+          "f1": 0.3902439024390244
+        }
+      }
+    },
+    "0.7": {
+      "examples": 72,
+      "exactTypedSpans": {
+        "tp": 27,
+        "fp": 2,
+        "fn": 21,
+        "precision": 0.9310344827586207,
+        "recall": 0.5625,
+        "f1": 0.7012987012987013
+      },
+      "characterCoverageUntyped": {
+        "tp": 453,
+        "fp": 0,
+        "fn": 431,
+        "precision": 1.0,
+        "recall": 0.5124434389140271,
+        "f1": 0.6776364996260283
+      },
+      "fullyCoveredValues": 29,
+      "goldValues": 48,
+      "fullValueRecall": 0.6041666666666666,
+      "negativeExamples": 24,
+      "negativeExamplesWithPrediction": 0,
+      "negativeFalsePositiveRate": 0.0,
+      "perLabel": {
+        "address": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "credit_card": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571428571428571
+        },
+        "date_of_birth": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666
+        },
+        "email": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "financial_id": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0
+        },
+        "government_id": {
+          "tp": 12,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "ip_address": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.25,
+          "f1": 0.4
+        },
+        "phone": {
+          "tp": 4,
+          "fp": 2,
+          "fn": 0,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8
+        },
+        "secret": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.625,
+          "f1": 0.7692307692307693
+        }
+      }
+    }
+  },
+  "runtimeVersions": {
+    "gliner": "0.2.29",
+    "transformers": "4.57.1",
+    "torch": "2.7.0",
+    "onnxruntime": "1.24.2",
+    "numpy": "2.2.6"
+  },
+  "providers": [
+    "CPUExecutionProvider"
+  ],
+  "providerOptions": {
+    "CPUExecutionProvider": {}
+  },
+  "loadSeconds": 0.14195895800366998,
+  "completedExamples": 72,
+  "timing": {
+    "firstPredictionSeconds": 0.007607040926814079,
+    "warmMedianSeconds": 0.005436375038698316,
+    "warmP95Seconds": 0.006542042130604386,
+    "totalAwakeSeconds": 2.8014536250848323,
+    "totalSystemSeconds": 2.801459789276123,
+    "samples": 72,
+    "scope": "Threshold0.5 first per case; all72 examples including negatives; initial case excluded from warm summaries, no timed samples removed"
+  },
+  "peakRSSBytes": 828342272
+}

@@ -1,0 +1,136 @@
+{
+  "format": "OSwind learned PII evaluation plan v1",
+  "frozenAtUTC": "2026-10-29T02:27:53.155832+00:00",
+  "productSource": "8f54c10",
+  "corpusSHA256": "a848affbd8b56492fcf77efdaf792d6d8306bef63e57beb7b605505c9d98687b",
+  "corpusScope": "Authored template contract examples, not representative natural desktop or verified unseen training data. Test shares concepts with validation; reserved predictions remain unopened.",
+  "validationCases": 72,
+  "reservedTestCases": 144,
+  "labels": {
+    "email address": "email",
+    "phone number": "phone",
+    "location address": "address",
+    "ssn": "government_id",
+    "passport number": "government_id",
+    "driver license": "government_id",
+    "account number": "financial_id",
+    "credit card": "credit_card",
+    "dob": "date_of_birth",
+    "ip address": "ip_address",
+    "password": "secret",
+    "api key": "secret"
+  },
+  "thresholdGrid": [
+    0.3,
+    0.5,
+    0.7
+  ],
+  "initialThreshold": 0.5,
+  "maximumTokens": 512,
+  "maximumTextCharacters": 4096,
+  "modelRepository": "knowledgator/gliner-pii-edge-v1.0",
+  "modelRevision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "modelFiles": [
+    {
+      "path": "README.md",
+      "bytes": 15896,
+      "sha256": "88f7fb463e7ab0b256caeb5da30af9262ba1b223598576dc12e599d257e91c23",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "gliner_config.json",
+      "bytes": 4316,
+      "sha256": "77e6b57335c4bfd461e9041682196dd6c373a0b09bbd9269ef9e95b807915340",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "onnx/model.onnx",
+      "bytes": 181078966,
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "onnx/model_fp16.onnx",
+      "bytes": 90845497,
+      "sha256": "af499f06532909628765ce1cebd65311fa2d9a16f74a34e7b6e1b9369230a3a7",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "onnx/model_quint8.onnx",
+      "bytes": 45820894,
+      "sha256": "988acb03456b26e2d9f2521016d820310c2ed64deb4a846297d3289f0c2eb7e4",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "pytorch_model.bin",
+      "bytes": 180735778,
+      "sha256": "0160706fa5d034410175cc53808419d975658e12f1cac1a916fbde8155155add",
+      "lfsChecksumVerified": true
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 694,
+      "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 3583593,
+      "sha256": "84b3a9b18f04a0ccd03b72d9f871b7e0bec40fd7021ef50bc30a7c3693c11205",
+      "lfsChecksumVerified": false
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 21214,
+      "sha256": "3398f6d1ad4b4c4f9874d390d060a75c58cad5e5ce9b22841b3e40643b4ada27",
+      "lfsChecksumVerified": false
+    }
+  ],
+  "runtimePins": {
+    "gliner": "0.2.29",
+    "transformers": "4.57.1",
+    "torch": "2.7.0",
+    "onnxruntime": "1.24.2",
+    "numpy": "2.2.6"
+  },
+  "providersAllowed": [
+    "CPUExecutionProvider",
+    "CoreMLExecutionProvider"
+  ],
+  "providerPolicy": "Explicit CPU or CoreML+CPU only. CoreML GPU/ANE requests are not proof of placement; record profile partition assignment. No network during inference.",
+  "compatibilityAbsoluteTolerance": 0.001,
+  "compatibilityInputs": "First validation input for email, phone, address (indices0,4,8); no threshold/model selection on reserved test.",
+  "exportLayout": "Record runtime shape before adaptation. Accept only exact current position-last dimensions or an explicit position-first transpose to those exact dimensions, with unchanged numerical tolerance.",
+  "metrics": [
+    "Exact typed span micro F1",
+    "Untyped character coverage precision/recall",
+    "Fully covered secret values; partial masks are not full coverage",
+    "Negative-example false-positive rate",
+    "Cold load, per-input wall, CPU/RSS, actual provider assignments"
+  ],
+  "acceptance": "No automatic production or top-tier acceptance from these contract fixtures. Preserve regex behavior; qualify independent corpus/provenance, native tokenizer/decoder, whole graphemes, truncation/cancellation and all ingestion/egress paths before F047 implementation claim.",
+  "codeSHA256": {
+    "scripts/prepare-pii-eval.py": "5a99ec59f30662d951260f529dbda2f441530854f36540b4e5c0ccd840c0a369",
+    "scripts/pii_quality.py": "2ed02a103cf6ab80a7e58a06f9cd2a4e13f4797a30c634f337430a32df0900fe",
+    "scripts/test-pii-quality.py": "4a79b96214c67ab1911be53e86f7eb25d2dcf7b6c743454fd7f3ca535b2cc60d",
+    "scripts/evaluate-pii-model.py": "15446b614c0ef4baf5cd4168f91bf64790965e5a793075ab14de2bf0643439d2",
+    "scripts/evaluate-pii-baseline.py": "dc30f6ed2b8f753f0e5bf31f1a4143675003aa70433def2f91ae76a883537f15"
+  },
+  "revision": 6,
+  "priorPlanSHA256": "52382bfa76adc189c0c41462cb58d5d06dea0ea902403b7803fc1508a67ebe61",
+  "retainedFailure": "Compatibility-v1 failed an output-layout assertion before scores. Actual exported tensor shape had not been recorded. No corpus, label, threshold or tolerance change.",
+  "requirementsLockSHA256": "cd475dfcaed48d9b86b533229d176c93dee149339b14de8adc999798500f9393",
+  "retainedFailures": [
+    "Compatibility-v1 failed the assumed position-first output shape before quality scoring.",
+    "Compatibility-v2 retained that assertion because an indentation-sensitive script substitution did not apply; no new model conclusion.",
+    "Baseline-v1 refused malformed authored Memory interchange input missing required regions. No admissions or quality scores; fixture schema fixed with regions:[]; source text/gold unchanged."
+  ],
+  "verifiedRuntimeLayout": "Position-last (batch,words,classes,3); pinned graph dimension names are stale. CPU PyTorch/FP32 ONNX max absolute difference4.1008e-5 on three fixed validation inputs.",
+  "qualityRuntime": "Initial onnx-cpu FP32. Other variants require separate recorded runtime checks; no reserved test inference.",
+  "baselineCLI": {
+    "productSource": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+    "sha256": "4b1a152c246356feee97a8a368666aeea3dc2e9dc59709360c9804f2c8d7ff06",
+    "metrics": "Actual CLI import/export, unique monotonic marker alignment only; no typed-span comparison and no model-only timing comparison."
+  },
+  "harnessRevision": "Enforce all code/corpus hashes before loading/invoking; bound scorer text/gold; add offline generator/plan refusal contracts. Corpus/labels/thresholds/model/tolerance unchanged."
+}

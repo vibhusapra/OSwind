@@ -1,0 +1,488 @@
+{
+  "format": "OSwind learned PII validation v1",
+  "recordedAtUTC": "2026-10-29T02:32:18.184267+00:00",
+  "productBase": "8f54c10",
+  "shippingBaselineProduct": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+  "productSwiftCOrPackageChanged": false,
+  "F047Implemented": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "scope": "216 authored template contract examples; 72 validation scored, 144 reserved test predictions not run/opened. Not natural desktop, verified training-independent data or whole-product acceptance. Reserved negatives share concepts with validation.",
+  "corpusSHA256": "a848affbd8b56492fcf77efdaf792d6d8306bef63e57beb7b605505c9d98687b",
+  "modelRepository": "knowledgator/gliner-pii-edge-v1.0",
+  "modelRevision": "9b7f39b0a2da971a5beea78d35f1539d4009c891",
+  "planSHA256": "09996368eae9ace1ac61be49e17b94bf49701b7c4cbb71d79d30413c3be10855",
+  "plan": "prototypes/pii/plan-v6.json",
+  "observations": [
+    {
+      "path": "prototypes/pii/observations/onnx-cpu-validation-v2.json",
+      "sha256": "2f0136c226b3160da97ed5d07d5249fa142b7b230a163a675103ed6df96f1d5a"
+    },
+    {
+      "path": "prototypes/pii/observations/mps-validation-v2.json",
+      "sha256": "94a360a3702abf5f12d6c4de72c6ac5cbcef1aa5396d67878b4acbeda0979b0f"
+    },
+    {
+      "path": "prototypes/pii/observations/shipping-regex-validation-v3.json",
+      "sha256": "655a184631586a947c451b5c05d7933904aefc6e1134262d3de2e8af4a181fb0"
+    },
+    {
+      "path": "prototypes/pii/observations/compatibility-v3.json",
+      "sha256": "7850135ff0c8707214e81eaa9445683d01a9ac9132ed983e0e8d0133fc30cec2"
+    },
+    {
+      "path": "prototypes/pii/observations/mps-probe-v1.json",
+      "sha256": "439f296f0af7901b62adf2f9446199212b0f743c332bdd959d7fa8aa37ca4d38"
+    }
+  ],
+  "quality": {
+    "shippingRegex": {
+      "examples": 72,
+      "characterCoverageUntyped": {
+        "tp": 324,
+        "fp": 40,
+        "fn": 560,
+        "precision": 0.8901098901098901,
+        "recall": 0.3665158371040724,
+        "f1": 0.5192307692307692
+      },
+      "fullyCoveredValues": 14,
+      "goldValues": 48,
+      "fullValueRecall": 0.2916666666666667,
+      "negativeExamples": 24,
+      "negativeExamplesWithPrediction": 0,
+      "negativeFalsePositiveRate": 0.0
+    },
+    "learnedCPUAndMPSIdentical": true,
+    "learnedByThreshold": {
+      "0.5": {
+        "examples": 72,
+        "exactTypedSpans": {
+          "tp": 38,
+          "fp": 13,
+          "fn": 10,
+          "precision": 0.7450980392156863,
+          "recall": 0.7916666666666666,
+          "f1": 0.7676767676767677
+        },
+        "characterCoverageUntyped": {
+          "tp": 704,
+          "fp": 139,
+          "fn": 180,
+          "precision": 0.8351126927639383,
+          "recall": 0.7963800904977375,
+          "f1": 0.8152866242038216
+        },
+        "fullyCoveredValues": 42,
+        "goldValues": 48,
+        "fullValueRecall": 0.875,
+        "negativeExamples": 24,
+        "negativeExamplesWithPrediction": 8,
+        "negativeFalsePositiveRate": 0.3333333333333333,
+        "perLabel": {
+          "address": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 2,
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666
+          },
+          "credit_card": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "date_of_birth": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "email": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "financial_id": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "government_id": {
+            "tp": 12,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.9230769230769231,
+            "recall": 1.0,
+            "f1": 0.9600000000000001
+          },
+          "ip_address": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "phone": {
+            "tp": 4,
+            "fp": 4,
+            "fn": 0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666
+          },
+          "secret": {
+            "tp": 8,
+            "fp": 8,
+            "fn": 0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666
+          }
+        }
+      },
+      "0.3": {
+        "examples": 72,
+        "exactTypedSpans": {
+          "tp": 40,
+          "fp": 40,
+          "fn": 8,
+          "precision": 0.5,
+          "recall": 0.8333333333333334,
+          "f1": 0.625
+        },
+        "characterCoverageUntyped": {
+          "tp": 866,
+          "fp": 313,
+          "fn": 18,
+          "precision": 0.734520780322307,
+          "recall": 0.9796380090497737,
+          "f1": 0.8395540475036355
+        },
+        "fullyCoveredValues": 45,
+        "goldValues": 48,
+        "fullValueRecall": 0.9375,
+        "negativeExamples": 24,
+        "negativeExamplesWithPrediction": 20,
+        "negativeFalsePositiveRate": 0.8333333333333334,
+        "perLabel": {
+          "address": {
+            "tp": 4,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.888888888888889
+          },
+          "credit_card": {
+            "tp": 4,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "date_of_birth": {
+            "tp": 4,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8
+          },
+          "email": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "financial_id": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 4,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "government_id": {
+            "tp": 12,
+            "fp": 6,
+            "fn": 0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8
+          },
+          "ip_address": {
+            "tp": 4,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.888888888888889
+          },
+          "phone": {
+            "tp": 4,
+            "fp": 4,
+            "fn": 0,
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666
+          },
+          "secret": {
+            "tp": 8,
+            "fp": 25,
+            "fn": 0,
+            "precision": 0.24242424242424243,
+            "recall": 1.0,
+            "f1": 0.3902439024390244
+          }
+        }
+      },
+      "0.7": {
+        "examples": 72,
+        "exactTypedSpans": {
+          "tp": 27,
+          "fp": 2,
+          "fn": 21,
+          "precision": 0.9310344827586207,
+          "recall": 0.5625,
+          "f1": 0.7012987012987013
+        },
+        "characterCoverageUntyped": {
+          "tp": 453,
+          "fp": 0,
+          "fn": 431,
+          "precision": 1.0,
+          "recall": 0.5124434389140271,
+          "f1": 0.6776364996260283
+        },
+        "fullyCoveredValues": 29,
+        "goldValues": 48,
+        "fullValueRecall": 0.6041666666666666,
+        "negativeExamples": 24,
+        "negativeExamplesWithPrediction": 0,
+        "negativeFalsePositiveRate": 0.0,
+        "perLabel": {
+          "address": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "credit_card": {
+            "tp": 3,
+            "fp": 0,
+            "fn": 1,
+            "precision": 1.0,
+            "recall": 0.75,
+            "f1": 0.8571428571428571
+          },
+          "date_of_birth": {
+            "tp": 2,
+            "fp": 0,
+            "fn": 2,
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666
+          },
+          "email": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "financial_id": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 4,
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0
+          },
+          "government_id": {
+            "tp": 12,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "ip_address": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 3,
+            "precision": 1.0,
+            "recall": 0.25,
+            "f1": 0.4
+          },
+          "phone": {
+            "tp": 4,
+            "fp": 2,
+            "fn": 0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8
+          },
+          "secret": {
+            "tp": 5,
+            "fp": 0,
+            "fn": 3,
+            "precision": 1.0,
+            "recall": 0.625,
+            "f1": 0.7692307692307693
+          }
+        }
+      }
+    }
+  },
+  "timing": {
+    "pythonONNXCPU": {
+      "firstPredictionSeconds": 0.007607040926814079,
+      "warmMedianSeconds": 0.005436375038698316,
+      "warmP95Seconds": 0.006542042130604386,
+      "totalAwakeSeconds": 2.8014536250848323,
+      "totalSystemSeconds": 2.801459789276123,
+      "samples": 72,
+      "scope": "Threshold0.5 first per case; all72 examples including negatives; initial case excluded from warm summaries, no timed samples removed"
+    },
+    "pythonTorchMPS": {
+      "firstPredictionSeconds": 0.17181800003163517,
+      "warmMedianSeconds": 0.028187749907374382,
+      "warmP95Seconds": 0.08767716586589813,
+      "totalAwakeSeconds": 8.354983792174608,
+      "totalSystemSeconds": 8.355005979537964,
+      "samples": 72,
+      "scope": "Threshold0.5 first per case; all72 examples including negatives; initial case excluded from warm summaries, no timed samples removed"
+    },
+    "limits": "Reference tokenize/decode/inference; sequential uncontrolled host/caches, small batch-one inputs; cannot isolate backend causal speed. Native CPU probe profiles every node, excludes tokenize/decode and is not comparable. Baseline CLI time includes embeddings/storage/startup."
+  },
+  "memory": {
+    "pythonCPUPeakRSSBytes": 828342272,
+    "pythonMPSPeakRSSBytes": 1441546240,
+    "MPS": {
+      "currentAllocatedBytes": 180711680,
+      "driverAllocatedBytes": 1121452032
+    },
+    "limits": "Whole Python process including imports; MPS allocator/driver separate; not production app or power acceptance."
+  },
+  "native": {
+    "operations": [
+      {
+        "policy": "cpu",
+        "exitCode": 0,
+        "awakeSeconds": 0.7074977080337703,
+        "systemSeconds": 0.7074987888336182,
+        "profile": {
+          "nodeInvocationCounts": {
+            "CPUExecutionProvider": 24630
+          },
+          "uniqueProfiledNodeNames": {
+            "CPUExecutionProvider": 821
+          }
+        },
+        "report": {
+          "state": "completed",
+          "runtime": "onnxruntime-1.24.2-native",
+          "policy": "cpu",
+          "fixedInputs": 3,
+          "runs": 30,
+          "loadSeconds": 0.117919,
+          "firstForwardSeconds": 0.00908238,
+          "warmForwardMedianSeconds": 0.00860408,
+          "warmForwardP95Seconds": 0.00910292,
+          "maxAbsoluteLogitDifference": 0,
+          "peakRSSBytes": 468008960,
+          "forwardSecondsInRunOrder": [
+            0.00908238,
+            0.00878583,
+            0.00912654,
+            0.00882654,
+            0.00860408,
+            0.00883204,
+            0.00833737,
+            0.00895063,
+            0.00906488,
+            0.00879404,
+            0.00833262,
+            0.00873321,
+            0.00837067,
+            0.00880167,
+            0.00865371,
+            0.00822363,
+            0.00838587,
+            0.008829,
+            0.00837258,
+            0.00911842,
+            0.00910292,
+            0.00883217,
+            0.00856004,
+            0.00897667,
+            0.00859087,
+            0.008589,
+            0.00843654,
+            0.00781788,
+            0.00789912,
+            0.00827825
+          ]
+        }
+      },
+      {
+        "policy": "coreml",
+        "exitCode": 1,
+        "awakeSeconds": 0.4725097920745611,
+        "systemSeconds": 0.47250986099243164,
+        "profile": {
+          "nodeInvocationCounts": {},
+          "uniqueProfiledNodeNames": {}
+        },
+        "error": "2026-10-28 19:30:07.478 native-probe[owned PID/thread] 2026-10-28 19:30:07.477748 [W:onnxruntime:, coreml_execution_provider.cc:113 GetCapability] CoreMLExecutionProvider::GetCapability, number of partitions supported by CoreML: 70 number of nodes in the graph: 831 number of nodes supported by CoreML: 604\nFailed to create MLModel, error: Failed to build the model execution plan using a model architecture file '<CoreML temporary model.mil>' with error code: -7.\n"
+      }
+    ],
+    "inputsUnchanged": true,
+    "scope": "Three previously opened authored validation tensors. Native C API forward only, no native tokenizer/decoder or app/PII acceptance. CoreML partition provider assignment is not physical GPU/ANE placement. Host/cache state uncontrolled."
+  },
+  "offlineTests": {
+    "scorerGeneratorPlan": 14,
+    "assetAdmission": 6,
+    "failures": 0,
+    "realDownloadInTests": false,
+    "CIResult": "pending"
+  },
+  "retainedFailures": [
+    "Compatibility-v1 trusted stale output dimension names and failed its layout assertion before quality scoring.",
+    "Compatibility-v2 indentation-sensitive edit did not apply; same failed assertion, no new model conclusion.",
+    "Shipping baseline-v1 malformed Memory interchange omitted regions; refused before scoring. regions:[] corrects authored schema, corpus/gold unchanged.",
+    "Native-v1 CoreML recognized 604/831 optimized nodes in 70 partitions but model execution-plan construction failed with code -7. Native-v2 retains same failure; no GPU execution evidence.",
+    "Native-v1 omitted two first-sweep timing samples; v2 retains all30 samples. v1 observations retained privately; no timing winner selected."
+  ],
+  "decision": "Keep shipping pattern protection. No automatic learned redactor integration from these fixtures. Native CPU forward viable; MPS Python parity passes; CoreML dynamic exported graph currently fails. No operating point accepted.",
+  "remaining": [
+    "Native byte-level tokenizer, word offsets and token-level decoder with complete grapheme admission",
+    "Native accelerator conversion/runtime compatibility and bounded serial ownership, cancellation and release",
+    "Independent representative OCR/ASR/desktop/multilingual quality before privacy acceptance; tune on validation only",
+    "Full ingestion/egress, screenshots and audio suppression, long-source coverage and fail-safe behavior",
+    "Setup download/license/residency controls, UX, current native regression/TSan and sustained physical power workload",
+    "Whole-product matched competitor benchmarks and distribution/release gates"
+  ],
+  "nativePlan": "prototypes/pii/observations/native-plan-v2.json",
+  "nativePlanSHA256": "81f2e806fe86e698acf372223ab8a71cb66bd535814a1cdad55e8e90e32a0215"
+}

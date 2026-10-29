@@ -1,0 +1,51 @@
+{
+  "state": "completed",
+  "rows": [
+    {
+      "id": "validation-a20d85708e83",
+      "outputDevice": "mps:0",
+      "shape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "maximumAbsoluteLogitDifference": 5.14984130859375e-05,
+      "awakeSeconds": 1.2490169999655336,
+      "systemSeconds": 1.249023199081421
+    },
+    {
+      "id": "validation-9433c40dbdab",
+      "outputDevice": "mps:0",
+      "shape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "maximumAbsoluteLogitDifference": 2.6702880859375e-05,
+      "awakeSeconds": 0.09239108394831419,
+      "systemSeconds": 0.09239315986633301
+    },
+    {
+      "id": "validation-c18165bd8721",
+      "outputDevice": "mps:0",
+      "shape": [
+        1,
+        22,
+        12,
+        3
+      ],
+      "maximumAbsoluteLogitDifference": 2.6702880859375e-05,
+      "awakeSeconds": 0.13518158299848437,
+      "systemSeconds": 0.13518500328063965
+    }
+  ],
+  "CPUFallbackEnabled": false,
+  "modelTensorDevices": [
+    "mps:0"
+  ],
+  "currentMPSAllocatedBytes": 180717824,
+  "MPSDriverAllocatedBytes": 1118846976,
+  "scope": "Three frozen validation inputs; neural tensors/output on MPS with automatic CPU fallback disabled. CPU tokenization/decoding remain. No native application or power acceptance."
+}
