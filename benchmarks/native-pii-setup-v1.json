@@ -575,15 +575,17 @@
     "runID": 40827752090,
     "benchmarkJob": {
       "id": 123294596829,
+      "status": "completed",
       "conclusion": "success"
     },
     "nativeJob": {
       "id": 123294597134,
-      "lastObservedStatus": "in_progress",
-      "lastObservedStep": "Package app",
+      "status": "completed",
+      "conclusion": "success",
       "ownedNativeVaultStep": "success"
     },
-    "scope": "Snapshot; later source/head conclusions remain separate"
+    "scope": "Both source jobs passed. This does not repair inherited PR73 failure; later documentation heads are separate.",
+    "checkedAtUTC": "2026-10-29T06:37:21.904714+00:00"
   },
   "limits": [
     "Two normal skips: physical owned system-audio opt-in and locked/thermal visual admission",

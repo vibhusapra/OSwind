@@ -135,8 +135,8 @@ native encrypted-vault lock/unlock test with the generic files-in-use refusal
 the new local full suite and the new source's native-vault CI step also pass,
 but neither explains or repairs that failure. Underlying native exit/stderr are
 not surfaced by the current eject driver; diagnostic work is the next priority.
-New source CI run 40827752090 has a passing benchmark job and a native job last
-observed at packaging. Later documentation-head CI is separate. Broad privacy,
+Both new source CI jobs pass in run 40827752090 (native123294597134 /
+benchmark123294596829). Later documentation-head CI is separate. Broad privacy,
 physical power, competitor and release acceptance remain open.
 
 ![Native PII model setup, authored ready-state sample](../assets/pii-model-setup.png)
