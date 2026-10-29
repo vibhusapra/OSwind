@@ -38,7 +38,7 @@
     {
       "path": "PreTokenizer.swift",
       "upstreamSHA256": "060a079b78583114485677927cf18e8d0fbe499c3c135e10dcb124a21ceb473f",
-      "vendoredSHA256": "060a079b78583114485677927cf18e8d0fbe499c3c135e10dcb124a21ceb473f"
+      "vendoredSHA256": "46e6b016d05c3ff082e983e28099a140e56b7cb5d8f79f60c823a2d124e8e23b"
     },
     {
       "path": "String+PreTokenization.swift",

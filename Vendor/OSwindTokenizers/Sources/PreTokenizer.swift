@@ -314,16 +314,18 @@ class ByteLevelPreTokenizer: PreTokenizer {
     }
 
     func preTokenize(text: String, options: PreTokenizerOptions = [.firstSection]) -> [String] {
+        guard !text.isEmpty else { return [] }
         guard useRegex else {
-            let token = (addPrefixSpace && !text.hasPrefix(" ")) ? " " + text : text
+            let token = (addPrefixSpace && text.utf8.first != 32) ? " " + text : text
             return [byteEncodeToken(token)]
         }
 
         var result: [String] = []
-        enumerateRegexTokens(in: text, with: byteLevelPreTokenizeRegex) { token in
-            let prefixed =
-                (self.addPrefixSpace && !token.hasPrefix(" ")) ? " " + token : token
-            result.append(self.byteEncodeToken(prefixed))
+        // ByteLevel adds one virtual prefix to the input before regex splitting,
+        // not a new space to punctuation/subsequent fragments (e.g. "a-b").
+        let prefixed = (addPrefixSpace && text.utf8.first != 32) ? " " + text : text
+        enumerateRegexTokens(in: prefixed, with: byteLevelPreTokenizeRegex) { token in
+            result.append(self.byteEncodeToken(token))
         }
         return result
     }

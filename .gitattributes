@@ -1,0 +1,2 @@
+# Unified diff context prefixes empty source lines with one space.
+Vendor/OSwindTokenizers/unicode-correctness.patch -whitespace
