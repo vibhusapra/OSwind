@@ -95,6 +95,7 @@ public enum NativeModelInstaller {
         var directory=cache.standardizedFileURL.resolvingSymlinksInPath()
         guard directory.pathComponents.count<=128 else {throw OSwindError.invalid("Choose a shallower model cache location")}
         for _ in 0..<128 {
+            if (try? exists(directory.appendingPathComponent("OSWIND-PII.json")))==true {throw OSwindError.invalid("Choose a model cache outside prepared PII packages")}
             if (try? exists(directory.appendingPathComponent("OSWIND-VISION.json")))==true || directory.pathExtension.lowercased()=="mlmodelc" || (try? exists(directory.appendingPathComponent("OSWIND-MODEL.json")))==true || (try? exists(directory.appendingPathComponent("Preprocessor.mlmodelc")))==true || (try? exists(directory.appendingPathComponent("Segmentation.mlmodelc")))==true {throw OSwindError.invalid("Choose a model cache outside installed model packages")}
             if try exists(directory.appendingPathComponent("memory.sqlite")) {throw OSwindError.invalid("Choose a model cache outside OSwind memory libraries")}
             if directory.pathExtension.lowercased()=="oswindbackup" {throw OSwindError.invalid("Choose a model cache outside backup packages")}
