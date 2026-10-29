@@ -49,6 +49,7 @@ func vaultPassphrase() throws -> Data {
     return data
 }
 do {
+    guard command != "pii" || (selectedVault==nil && explicitData==nil) else {throw OSwindError.invalid("PII inspection does not use --vault or --data")}
     guard selectedVault==nil || explicitData==nil else {throw OSwindError.invalid("Choose --vault or --data, not both")}
     if let selectedVault,command != "vault" {
         let vault=try LibraryVault(package:URL(fileURLWithPath:selectedVault,isDirectory:true)),status=try await vault.status()
@@ -59,6 +60,8 @@ do {
         OSwind 0.1.0 · local desktop memory
         Usage: oswindctl [--data DIRECTORY] COMMAND
           doctor                         Inspect local permissions, GPU and models
+          pii inspect --model-dir DIR --runtime-library DYLIB --compute cpu|coreML --threshold VALUE --stdin
+                                         Experimental local PII inspection; no history access
           collect --stdin                Admit a bounded version 1 text-collector batch
           search [--preview] [--mode hybrid|keyword|semantic|visual] [--app APP] [--kind KIND]
                  [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
@@ -176,6 +179,32 @@ do {
         }
         if let output {try writeNewPrivateJSON(Integration.json(report),to:output)}
         try encoded(report)
+    } else if command == "pii" {
+        guard args.first=="inspect" else {throw OSwindError.invalid("Use pii inspect with explicit local model, runtime, compute, threshold and --stdin")}
+        args.removeFirst()
+        guard let directory=try validatedOption("--model-dir"),let library=try validatedOption("--runtime-library"),
+              let rawCompute=try validatedOption("--compute"),let compute=PIIComputePolicy(rawValue:rawCompute),
+              let rawThreshold=try validatedOption("--threshold"),let threshold=Double(rawThreshold),threshold.isFinite,threshold>0,threshold<1,
+              args==["--stdin"],isatty(STDIN_FILENO)==0 else {throw OSwindError.invalid("PII inspect requires explicit model/runtime paths, cpu|coreML, threshold between zero and one, and piped --stdin only")}
+        var input=Data()
+        while let chunk=try FileHandle.standardInput.read(upToCount:16385-input.count),!chunk.isEmpty {
+            input.append(chunk);guard input.count<=16384 else {throw OSwindError.invalid("PII input exceeds16384 bytes; no scan returned")}
+        }
+        guard let text=String(data:input,encoding:.utf8) else {throw OSwindError.invalid("PII input must be valid UTF-8")}
+        // Core ML can write framework diagnostics to stdout. This dedicated
+        // process keeps FD1 on stderr through teardown; JSON uses the saved FD.
+        fflush(nil);let resultFD=dup(STDOUT_FILENO)
+        guard resultFD>=0 else {throw OSwindError.unavailable("Cannot reserve PII result output")}
+        defer {Darwin.close(resultFD)}
+        guard dup2(STDERR_FILENO,STDOUT_FILENO)>=0 else {throw OSwindError.unavailable("Cannot isolate native model diagnostics")}
+        let inspector=PIIInspector(modelDirectory:URL(fileURLWithPath:directory,isDirectory:true),runtimeLibrary:URL(fileURLWithPath:library),compute:compute)
+        do {
+            let result=try await inspector.inspect(text,threshold:threshold)
+            await inspector.shutdown()
+            let encoder=JSONEncoder();encoder.outputFormatting=[.prettyPrinted,.sortedKeys]
+            var data=try encoder.encode(result);data.append(10)
+            try FileHandle(fileDescriptor:resultFD,closeOnDealloc:false).write(contentsOf:data)
+        } catch {await inspector.shutdown();throw error}
     } else if command == "vision" {
         try await runVisualModelCLI()
     } else if command == "wipe" {

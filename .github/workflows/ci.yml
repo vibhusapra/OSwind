@@ -12,6 +12,8 @@ jobs:
         run: python3 scripts/generate-model-catalog.py --check
       - name: Verify pinned tokenizer source and license
         run: python3 scripts/check-tokenizer-vendor.py
+      - name: Verify pinned native PII runtime headers and license
+        run: python3 scripts/check-pii-runtime-vendor.py
       - name: Build and test
         run: swift test
       - name: Verify tokenizer patch against resolved upstream
@@ -39,6 +41,8 @@ jobs:
         run: |
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Verify history-free PII CLI refusals without model downloads
+        run: python3 scripts/pii-inspection-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --model-dir "$RUNNER_TEMP/absent-pii-model" --runtime-library "$RUNNER_TEMP/absent-pii-runtime.dylib" --root "$RUNNER_TEMP/pii-cli-offline"
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"

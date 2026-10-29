@@ -37,7 +37,19 @@ public struct PrivacyPolicy: Codable, Equatable, Sendable {
     public func sanitize(_ text: String) -> (text: String, redacted: Bool) {
         guard redactSecrets else { return (text, false) }
         var result = text
-        let patterns = [
+        for pattern in Self.secretPatterns { if let re = try? NSRegularExpression(pattern: pattern) { result = re.stringByReplacingMatches(in: result, range: NSRange(result.startIndex..., in: result), withTemplate: "[REDACTED]") } }
+        return (result, result != text)
+    }
+    /// Original-source ranges for combining experimental detectors without
+    /// allowing an earlier mask to hide a later detector's trigger.
+    func sensitiveRanges(in text:String)->[NSRange] {
+        guard redactSecrets else {return []}
+        let range=NSRange(text.startIndex...,in:text)
+        return Self.secretPatterns.flatMap {pattern in
+            (try? NSRegularExpression(pattern:pattern))?.matches(in:text,range:range).map(\.range) ?? []
+        }
+    }
+    private static let secretPatterns = [
             #"\b(?:sk|ghp|github_pat|sk-ant)-?[A-Za-z0-9_\-]{20,}\b"#,
             #"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"#,
             #"(?i)\b(password|passwd|api[_ -]?key|secret|access[_ -]?token)\s*[:=]\s*[^\s,;]{4,}"#,
@@ -45,9 +57,6 @@ public struct PrivacyPolicy: Codable, Equatable, Sendable {
             #"\b\d{3}-\d{2}-\d{4}\b"#,
             #"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----[\s\S]*?(?:-----END [^\n]*PRIVATE KEY-----|$)"#
         ]
-        for pattern in patterns { if let re = try? NSRegularExpression(pattern: pattern) { result = re.stringByReplacingMatches(in: result, range: NSRange(result.startIndex..., in: result), withTemplate: "[REDACTED]") } }
-        return (result, result != text)
-    }
 }
 public enum CaptureProfile: String, Codable, CaseIterable, Sendable {
     case light, balanced, detailed

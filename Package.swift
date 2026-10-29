@@ -12,11 +12,12 @@ let package = Package(
     targets: [
         .systemLibrary(name: "CSQLite"),
         .executableTarget(name:"OSwindPreparationGuardian"),
+        .target(name:"CPIIRuntime",path:"Vendor/ONNXRuntime",exclude:["LICENSE","README.md","provenance.json"],sources:["PIIRuntime.cpp"],publicHeadersPath:"include",cxxSettings:[.headerSearchPath("vendor")]),
         .target(name:"OSwindTokenizers",dependencies:[.product(name:"Hub",package:"swift-transformers"),.product(name:"Jinja",package:"swift-jinja")],path:"Vendor/OSwindTokenizers/Sources"),
-        .target(name: "OSwindCore", dependencies: ["CSQLite","OSwindTokenizers",.product(name:"USearch",package:"USearch"),.product(name:"FluidAudio",package:"FluidAudio"),.product(name:"Hub",package:"swift-transformers")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
+        .target(name: "OSwindCore", dependencies: ["CSQLite","OSwindTokenizers","CPIIRuntime",.product(name:"USearch",package:"USearch"),.product(name:"FluidAudio",package:"FluidAudio"),.product(name:"Hub",package:"swift-transformers")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
         .executableTarget(name: "OSwind", dependencies: ["OSwindCore"]),
         .executableTarget(name: "OSwindCLI", dependencies: ["OSwindCore"]),
         .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore","OSwindTokenizers",.product(name:"FluidAudio",package:"FluidAudio")]),
         .testTarget(name: "OSwindAppTests", dependencies: ["OSwind", "OSwindCore"])
-    ], swiftLanguageModes: [.v5]
+    ], swiftLanguageModes: [.v5],cxxLanguageStandard:.cxx17
 )

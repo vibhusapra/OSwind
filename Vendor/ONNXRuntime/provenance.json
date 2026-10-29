@@ -1,0 +1,23 @@
+{
+  "repository": "https://github.com/microsoft/onnxruntime",
+  "ref": "v1.24.2",
+  "license": "MIT",
+  "licenseSHA256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+  "headers": [
+    {
+      "path": "onnxruntime_c_api.h",
+      "bytes": 373909,
+      "sha256": "09e5750c82f7b291cfad3e4a135d4ef78a4c54d7b3f86a5a178692279cf88334",
+      "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/include/onnxruntime/core/session/onnxruntime_c_api.h",
+      "localPath": "vendor/onnxruntime_c_api.h"
+    },
+    {
+      "path": "onnxruntime_ep_c_api.h",
+      "bytes": 102495,
+      "sha256": "9f05feec0c200e418577425c7fbc56668d845bedfaf1b0447f95a7d6aad5180c",
+      "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/include/onnxruntime/core/session/onnxruntime_ep_c_api.h",
+      "localPath": "vendor/onnxruntime_ep_c_api.h"
+    }
+  ],
+  "scope": "Unmodified C API headers only; runtime dylib remains explicit/pinned and is not bundled."
+}
