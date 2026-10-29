@@ -10,7 +10,7 @@ The selected app's complete accessible focused-window text is observed. Text-onl
 
 Light samples every 20 seconds, Balanced every five, and Detailed every two. App switches also trigger checks with the existing coalescing guard. Low Power Mode and serious/critical thermal pressure multiply the interval, and two minutes without input pauses automatic capture. Sleep, lock, permission loss, pause and library changes prevent further admission.
 
-These are sampled text observations, not keystroke logging or continuous active-time sessions. Unchanged text is not repeatedly stored and does not extend the original source's timestamp. Native application coverage, missed changes, interval-aware session coalescing and physical energy still need their own qualification.
+Current automatic text capture joins identical observations into [bounded sampled spans](TEXT-OBSERVATION-SPANS.md), preserving first/last timestamps, sample count and gaps. Manual captures remain separate points. These are not keystroke logs, attention or continuous active-time sessions. Native application coverage, missed changes and physical energy still need their own qualification.
 
 ## Admission and data handling
 
@@ -30,9 +30,11 @@ Sources use the existing screen-source format with `display: accessibility-windo
 
 `doctor` adds `desktopCaptureMode`, `screenRecordingRequiredForDesktop` and `desktopPermissionReady` while retaining its existing fields. Permission readiness does not establish an unlocked session or useful accessible text.
 
-Schema 23 and the Memory interchange shape are unchanged. Quiet backup/restore preserves text-only mode but leaves automatic services off. A signed preceding schema-23 binary reads the text records, but its unknown-mode decoder blocks snapshot/replay capture before device access. Strict older backup-settings decoding refuses the new mode; use the newer app to restore these settings. Unknown future modes still disable capture rather than widening its scope.
+The current sampled-span implementation uses schema 24 and optional `textObservation` metadata. Older clients refuse this format. The preceding source eadabc1 used schema 23 with no spans; its compatibility checks below remain historical evidence. Quiet backup/restore preserves text-only mode but leaves automatic services off. For that pre-span build, a signed preceding schema-23 binary reads the text records, but its unknown-mode decoder blocks snapshot/replay capture before device access. Strict older backup-settings decoding refuses the new mode; use the newer app to restore these settings. Unknown future modes still disable capture rather than widening its scope.
 
 ## Verification
+
+The following frozen counts qualify the preceding source eadabc1. The sampled-span implementation has 111 focused passes and nine debug process groups / 26 operations; its final qualification is pending. See the [span contract](TEXT-OBSERVATION-SPANS.md).
 
 Focused core/controller checks pass, including no-pixel/OCR seams, required Accessibility access, exclusions, changed context, cancellation during reads/model preparation, identical-byte policy replacement, root substitution, actual wipe ordering, dedupe, source deletion/manual capture and quiet backup. Separate app-model checks cover explicit saved mode changes and save failures. [Frozen source eadabc1 qualification](../benchmarks/accessibility-text-capture-v1.json) passes 1,252 full cases with two explicit skips, 163 selected TSan and 163 optimized cases with one session-admission skip each, and all 17 ordered stages over 588 unchanged declared inputs. The full skips are the opt-in owned system-audio fixture and an unlocked-session/thermal visual-admission check. Product, test, tool, model, SDK and asset bytes remain unchanged after qualification.
 

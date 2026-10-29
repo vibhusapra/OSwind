@@ -47,6 +47,20 @@ import OSwindCore
             if pending {let target=model.store.root.appendingPathComponent("owned-keep");try Data([1]).write(to:target);try FileManager.default.createSymbolicLink(at:model.store.root.appendingPathComponent("images/owned-pending"),withDestinationURL:target)}
             model.wipeLocalLibrary();while model.libraryWipe.busy {try await Task.sleep(nanoseconds:10_000_000)}
             size=NSSize(width:760,height:520);content=AnyView(VStack(alignment:.leading,spacing:18) {Text("Your local library.").font(.title2);LibraryWipeStatusView(model:model.libraryWipe,retry:{});Text("Capture, audio, API access and scheduling stay off. Resume when you are ready.").foregroundStyle(.secondary);Spacer()}.padding(28))
+        } else if model.section == "TextObservationHealth" {
+            var metrics=CaptureMetrics();metrics.saved=12;metrics.coalesced=180;metrics.unchanged=184;metrics.excluded=7
+            size=NSSize(width:600,height:360);content=AnyView(VStack(alignment:.leading,spacing:18) {Text("Capture health · sample").font(.title2);CaptureHealthSummary(metrics:metrics);Text("Joined samples extend an existing text source. Duplicate frames are skipped.").font(.caption).foregroundStyle(.secondary);Spacer()}.padding(28))
+        } else if model.section == "TextObservationDetail" || model.section == "TextObservationCards" {
+            let first=Date(timeIntervalSince1970:1730611800)
+            var source=Memory(id:"owned-observation-preview",timestamp:first,endTimestamp:first.addingTimeInterval(45),app:"Notes · sample",bundleID:"org.oswind.owned-preview",title:"Release review · sample",text:"Maya owns the release checklist. The deadline is Friday. This is authored sample text for layout review.",display:"accessibility-window")
+            source.textObservation=TextObservationSpan(sessionID:"A4C884AF-88F7-4EA8-8D4A-5C8A34858C2A",samples:10,largestGapSeconds:5);try model.store.insert(source)
+            if model.section=="TextObservationDetail" {
+                model.selected=source;let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+                while model.selectedPIIScan==nil,model.selectedPIIScanError==nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+                guard model.selectedPIIScan?.state == .notRecorded else {throw OSwindError.unavailable("Owned observation preview did not load its source check status")}
+                size=NSSize(width:850,height:760);content=AnyView(MemoryDetail(memory:source,query:"").environmentObject(model))
+            }
+            else {size=NSSize(width:760,height:580);content=AnyView(VStack(alignment:.leading,spacing:20) {Text("Sampled desktop text").font(.title2);MemoryCard(hit:SearchHit(memory:source,score:1,match:"owned sample")).frame(width:310);Spacer()}.padding(28).environmentObject(model))}
         } else if model.section == "LinkedRecapDetail" {
             let source=Memory(id:"recap-preview-source",app:"Notes",title:"Release decision · sample",text:"Maya owns the release. The deadline is Friday.")
             try model.store.insert(source)

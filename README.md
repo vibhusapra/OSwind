@@ -2,9 +2,11 @@
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
-**v0 is in active development.** The [feature ledger](docs/features.json) tracks 77 requirements across [20 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
+**v0 is in active development.** The [feature ledger](docs/features.json) tracks 78 requirements across [20 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
 
-The latest work adds [standalone Accessibility text capture](docs/ACCESSIBILITY-TEXT-CAPTURE.md): an explicit desktop mode that reads permitted focused-window text without screen pixels or OCR. Setup explains the required Accessibility access, and saved crop/display scopes remain blocked until explicitly resolved. Native app coverage and physical power remain open. [Replay context duty](docs/REPLAY-CONTEXT-DUTY.md) separately reduces full-tree polling while retaining per-frame privacy checks.
+The current work adds [sampled text observation spans](docs/TEXT-OBSERVATION-SPANS.md): repeated automatic text stays findable in a later time scope, with first/last samples and gaps explicitly shown. Focused tests and process contracts pass; final source qualification is in progress.
+
+The preceding milestone adds [standalone Accessibility text capture](docs/ACCESSIBILITY-TEXT-CAPTURE.md): an explicit desktop mode that reads permitted focused-window text without screen pixels or OCR. Setup explains the required Accessibility access, and saved crop/display scopes remain blocked until explicitly resolved. Native app coverage and physical power remain open. [Replay context duty](docs/REPLAY-CONTEXT-DUTY.md) separately reduces full-tree polling while retaining per-frame privacy checks.
 
 [Current qualification](benchmarks/accessibility-text-capture-v1.json): 1,252 full passes / two explicit skips, 163 selected sanitizer and 163 optimized passes/one skip each, all 17 ordered stages. The staged signed app and portability checks pass; positive native text capture, application coverage and sustained power remain separate acceptance work.
 

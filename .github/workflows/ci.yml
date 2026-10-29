@@ -78,6 +78,10 @@ jobs:
           python3 scripts/accessibility-text-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-ax-text"
           mkdir -p .artifacts
           cp "$RUNNER_TEMP/oswind-ax-text/report.json" .artifacts/accessibility-text-ci.json
+      - name: Verify sampled text scopes and quiet portability without native capture
+        run: |
+          python3 scripts/text-observation-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-text-observations"
+          cp "$RUNNER_TEMP/oswind-text-observations/report.json" .artifacts/text-observation-ci.json
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
@@ -198,7 +202,7 @@ jobs:
           python3 - <<'PYCODE'
           import json
           report = json.load(open('.artifacts/statistics-ci.json'))
-          assert report['count'] == 1000 and report['schema_version'] == 23
+          assert report['count'] == 1000 and report['schema_version'] == 24
           assert set(report['modes']) == {'maintained_sql', 'legacy_sql_scan', 'maintained_with_disk'}
           PYCODE
       - name: Verify long-source semantic passage processes
@@ -233,6 +237,7 @@ jobs:
             .artifacts/backup-process-ci.json
             .artifacts/audio-process-ci.json
             .artifacts/accessibility-text-ci.json
+            .artifacts/text-observation-ci.json
 
   benchmark-harnesses:
     runs-on: macos-26

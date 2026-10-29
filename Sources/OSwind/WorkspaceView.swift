@@ -127,11 +127,11 @@ struct MemoryCard: View {
                     if hit.visual != nil {VisualHitImage(hit:hit)}
                     else if let path = memory.imagePath, let url = m.store.assetURL(path), let image = NSImage(contentsOf:url) { Image(nsImage:image).resizable().aspectRatio(contentMode:.fit).frame(height:150).frame(maxWidth:.infinity).background(.black.opacity(0.08)) }
                     else { VStack(alignment:.leading,spacing:12) { Image(systemName:memory.kind == .audio ? "waveform" : memory.kind == .summary ? "sun.max" : "text.alignleft").foregroundStyle(accent).font(.title3); EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.system(size:12,design:.monospaced)).foregroundStyle(.secondary).lineLimit(5).frame(maxWidth:.infinity,alignment:.leading) }.padding(20).frame(height:150).background(accent.opacity(0.055)) }
-                    Text(memory.recap != nil ? "LINKED RECAP":memory.visualRecording == nil ? memory.kind.rawValue.uppercased():"REPLAY").font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
+                    Text(memory.textObservation.map {"TEXT · \($0.samples) OBS."} ?? (memory.recap != nil ? "LINKED RECAP":memory.visualRecording == nil ? memory.kind.rawValue.uppercased():"REPLAY")).font(.system(size:8,weight:.semibold,design:.monospaced)).padding(5).background(.regularMaterial,in:RoundedRectangle(cornerRadius:4)).padding(8).frame(maxWidth:.infinity,alignment:.trailing)
                 }
             }.buttonStyle(.plain)
             VStack(alignment:.leading,spacing:9) {
-                HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent); Spacer(); Text(memory.timestamp,style:.time).font(.caption2).foregroundStyle(.secondary) }
+                HStack { Text(memory.app.isEmpty ? "Memory" : memory.app).font(.caption.weight(.medium)).foregroundStyle(accent).lineLimit(1); Spacer(); Group {if memory.textObservation != nil,let end=memory.endTimestamp {Text(memory.timestamp.formatted(date:.omitted,time:.standard)+" – "+end.formatted(date:.omitted,time:.standard))}else {Text(memory.timestamp,style:.time)}}.font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal:true,vertical:false) }
                 Button { m.openMemory(memory,query:m.activeSearchQuery,passage:hit.passage,visual:hit.visual) } label: { Text(memory.title.isEmpty ? "Untitled memory" : memory.title).font(.system(size:14,weight:.medium)).lineLimit(2).frame(maxWidth:.infinity,alignment:.leading) }.buttonStyle(.plain)
                 if memory.imagePath != nil && !memory.text.isEmpty && !m.query.isEmpty { EvidenceSnippetView(text:memory.text,query:m.activeSearchQuery,budget:m.activeSearchQuery.isEmpty ? 400 : 100,passage:hit.passage).font(.caption).foregroundStyle(.secondary).lineLimit(3) }
                 HStack { Text(memory.timestamp,style:.date).font(.caption2).foregroundStyle(.tertiary); Spacer(); if !m.query.isEmpty { Text(hit.match).font(.caption2).foregroundStyle(.secondary) }; Button { m.favorite(memory) } label: { Image(systemName:memory.favorite ? "bookmark.fill" : "bookmark").foregroundStyle(memory.favorite ? accent : .secondary) }.buttonStyle(.plain).accessibilityLabel(memory.favorite ? "Unsave memory" : "Save memory") }
@@ -161,6 +161,7 @@ struct MemoryDetail: View {
             if let match=m.selectedVisual {Label(match.decodedTime.map {"Visual match at \($0.formatted(.number.precision(.fractionLength(1)))) s"} ?? "Matched image appearance",systemImage:"photo").font(.caption).foregroundStyle(.secondary)}
             ScrollView {
                 PIIScanRecordView(status:m.selectedPIIScan,error:m.selectedPIIScanError)
+                if let observation=memory.textObservation {TextObservationSummary(memory:memory,observation:observation)}
                 if memory.kind == .summary {RecapEvidenceView(memory:memory)}
                 if !query.isEmpty && memory.visualRecording == nil {
                     VStack(alignment:.leading,spacing:8) {
@@ -278,7 +279,7 @@ struct InsightsView: View {
         Text("CAPTURED APPLICATIONS").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(.secondary)
         ForEach(m.stats.apps.sorted {$0.value > $1.value},id:\.key) { app,count in HStack { Text(app).frame(width:140,alignment:.leading); GeometryReader { geo in RoundedRectangle(cornerRadius:4).fill(accent.opacity(0.6)).frame(width:max(2,geo.size.width*Double(count)/Double(max(1,m.stats.count)))) }.frame(height:18); Text("\(count)").monospacedDigit().frame(width:55,alignment:.trailing) }.padding(.vertical,4) }
         Divider()
-        Text("Capture health").font(.title3.weight(.medium)); HStack(spacing:25) { Text("\(m.capture.metrics.saved) saved"); Text("\(m.capture.metrics.unchanged) duplicates skipped"); Text("\(m.capture.metrics.excluded) excluded"); Text("\(m.capture.metrics.errors) errors") }.font(.caption).foregroundStyle(.secondary)
+        Text("Capture health").font(.title3.weight(.medium)); CaptureHealthSummary(metrics:m.capture.metrics)
         Text("\(Int(m.capture.metrics.lastLatencyMS)) ms last capture · \(m.settings.profile.interval.formatted()) s base interval").font(.caption).foregroundStyle(.secondary)
         Button("Run retention cleanup") { m.maintain() }
     }.padding(32) } }

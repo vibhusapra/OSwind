@@ -6,7 +6,7 @@ import CoreFoundation
 public enum Integration {
     public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
     public static func filter(_ args: [String: Any]) throws -> SearchFilter {
-        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","entity","detail","limit","mode"])
+        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","entity","detail","limit","mode","sourceStartsOnly"])
         guard Set(args.keys).isSubset(of:allowed) else { throw OSwindError.invalid("Unknown search parameter") }
         for name in ["query","app","kind","start","end","tag","speaker","entity","detail","mode"] {
             if let value = args[name] {
@@ -14,7 +14,7 @@ public enum Integration {
                 if name != "query", text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { throw OSwindError.invalid("Remove the \(name) filter instead of leaving it blank") }
             }
         }
-        for name in ["favorites","literal"] {
+        for name in ["favorites","literal","sourceStartsOnly"] {
             if let value = args[name] {
                 guard let number = value as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else { throw OSwindError.invalid("\(name) must be a boolean") }
             }
@@ -32,7 +32,7 @@ public enum Integration {
         func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; return try QueryScopeResolver.instant(value) }
         if let speaker=args["speaker"] as? String { guard speaker.count<=128,!speaker.utf8.contains(0) else { throw OSwindError.invalid("Keep speaker labels within 128 characters") } }
         if let entity=args["entity"] as? String {try validateEntityID(entity)}
-        return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,speaker:args["speaker"] as? String,entityID:args["entity"] as? String,limit:limit)
+        return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,speaker:args["speaker"] as? String,entityID:args["entity"] as? String,limit:limit,sourceStartsOnly:args["sourceStartsOnly"] as? Bool)
     }
     public static func activityRequest(_ args:[String:Any]) throws -> ActivityCalendarRequest {
         let metadata=Set(["app","kind","start","end","favorites","tag","speaker","entity"])
@@ -48,7 +48,8 @@ public enum Integration {
     }
     public static func activityJSON(_ value:ActivityCalendarSnapshot) throws -> [String:Any] {
         guard var object=try json(value) as? [String:Any] else {throw OSwindError.invalid("Cannot encode calendar activity")}
-        object["totalSources"]=value.totalSources;object["recordedDays"]=value.recordedDays;return object
+        object["totalSources"]=value.totalSources;object["recordedDays"]=value.recordedDays;object["timeBasis"]="source-start"
+        if var scope=object["scope"] as? [String:Any] {scope["sourceStartsOnly"]=true;object["scope"]=scope};return object
     }
     public static func activity(_ request:ActivityCalendarRequest,store:MemoryStore) async throws -> ActivityCalendarSnapshot {
         let worker=Task.detached(priority:.utility) {try store.activityCalendar(request)}
@@ -68,8 +69,9 @@ public enum Integration {
         }
     }
     public static var tools: [[String: Any]] {
-        let common: [String: Any] = ["query": ["type":"string","description":"Double-quoted phrases are required; uppercase AND/OR/NOT and parentheses combine content conditions (each OR branch needs a positive term). Otherwise words are soft ranking cues. Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "entity": ["type":"string","description":"Local entity ID from memory_entities; matches source membership, not verified identity"], "detail": ["type":"string","enum":["full","preview"],"description":"Defaults to full. Preview omits timed segments but retains original text and explicit summary/revision metadata; get_memory returns the complete source."], "mode": ["type":"string","enum":["hybrid","keyword","semantic","visual"]], "literal":["type":"boolean","description":"Use ordinary token ranking; disable date/scope, required-phrase and Boolean interpretation"]]
+        var common: [String: Any] = ["query": ["type":"string","description":"Double-quoted phrases are required; uppercase AND/OR/NOT and parentheses combine content conditions (each OR branch needs a positive term). Otherwise words are soft ranking cues. Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "entity": ["type":"string","description":"Local entity ID from memory_entities; matches source membership, not verified identity"], "detail": ["type":"string","enum":["full","preview"],"description":"Defaults to full. Preview omits timed segments but retains original text and explicit summary/revision metadata; get_memory returns the complete source."], "mode": ["type":"string","enum":["hybrid","keyword","semantic","visual"]], "literal":["type":"boolean","description":"Use ordinary token ranking; disable date/scope, required-phrase and Boolean interpretation"]]
         let annotation: [String: Any] = ["readOnlyHint":true,"destructiveHint":false,"openWorldHint":false]
+        common["sourceStartsOnly"]=["type":"boolean","description":"When true, time filters match source starts only. Default also includes bounded sampled text observation spans; gaps are unobserved, not continuous activity."]
         var activityProperties=common.filter {["app","kind","start","end","favorites","tag","speaker","entity"].contains($0.key)}
         activityProperties["month"]=["type":"string","description":"Gregorian YYYY-MM"]
         activityProperties["timeZone"]=["type":"string","description":"Time zone identifier, default this Mac's current zone"]
@@ -148,7 +150,7 @@ public final class LocalAPIServer: @unchecked Sendable {
         }
         if let value = args["limit"] as? String {
             guard let limit = Int(value) else { return (400,["error":"limit must be an integer from 1 to 100"]) }; args["limit"] = limit
-        }; for name in ["favorites","literal"] { if let value = args[name] as? String {
+        }; for name in ["favorites","literal","sourceStartsOnly"] { if let value = args[name] as? String {
             guard ["true","false"].contains(value) else { return (400,["error":"\(name) must be true or false"]) }; args[name] = value == "true"
         } }
         if let value=args["firstWeekday"] as? String {guard let integer=Int(value) else {return (400,["error":"firstWeekday must be an integer from 1 to 7"])};args["firstWeekday"]=integer}

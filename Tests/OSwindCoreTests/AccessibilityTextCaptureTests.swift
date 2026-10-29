@@ -210,8 +210,8 @@ private final class TextEmbeddingCounter:@unchecked Sendable {
         c.onCapture={_ in if !signaled {signaled=true;saved.fulfill()}}
         c.start();defer {c.pause()};await fulfillment(of:[saved],timeout:10)
         for _ in 1..<100 {await c.captureOnce()}
-        XCTAssertEqual(try store.stats().count,1);XCTAssertEqual(c.metrics.unchanged,99);XCTAssertEqual(world.reads,101);XCTAssertEqual(counter.count,1)
-        print("AX_TEXT_DUTY repeated attempts=100 sources=1 fullReads=101 sourceEmbeddingRequests=1 mediaFiles=0")
+        XCTAssertEqual(try store.stats().count,1);XCTAssertEqual(c.metrics.unchanged,99);XCTAssertEqual(c.metrics.coalesced,99);XCTAssertEqual(world.reads,200);XCTAssertEqual(counter.count,1)
+        print("AX_TEXT_DUTY repeated attempts=100 sources=1 fullReads=200 sourceEmbeddingRequests=1 mediaFiles=0 spanExtensions=99")
         let firstReads=world.reads,firstRequests=counter.count
         for i in 0..<10 {world.context?.accessibilityText="Owned changing duty source \(i)";await c.captureOnce()}
         XCTAssertEqual(try store.stats().count,11);XCTAssertEqual(world.reads-firstReads,20);XCTAssertEqual(counter.count-firstRequests,10);try assertNoMedia()

@@ -160,6 +160,7 @@ import UniformTypeIdentifiers
         entityMemory.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         libraryWipe.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.onCapture = { [weak self] memory in self?.captured(memory) }; audio.onCapture = { [weak self] memory in self?.captured(memory) }
+        capture.onObservation = {[weak self] memory in self?.observed(memory)}
         self.drafting.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
@@ -249,7 +250,7 @@ import UniformTypeIdentifiers
         case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
         default: break
         }
-        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",entityID:entityScope?.id,limit:200)
+        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",entityID:entityScope?.id,limit:200,sourceStartsOnly:range=="Calendar slice" ? true:nil)
     }
     func browseEntity(_ entity:MemoryEntity,ask:Bool) {
         cancelOpeningMemory();selected=nil;hits=[];resolvedSearch=nil;entityScope=entity;query="";appFilter="All apps";range="All time";section=ask ? "Ask":"Memories";refresh()
@@ -462,6 +463,16 @@ import UniformTypeIdentifiers
             do {let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()};guard libraryOperationGeneration==generation else {return};captured(memory)}
             catch {guard libraryOperationGeneration==generation,!Task.isCancelled else {return};errorMessage=error.localizedDescription}
         }
+    }
+    private var lastObservationRefresh = -Double.infinity
+    private func observed(_ memory:Memory) {
+        if selected?.id==memory.id {selected=memory}
+        // No source/entity/embedding queue work for unchanged text. Calendar
+        // has its own revision monitor; coalesce ordinary visible list refresh.
+        let now=ProcessInfo.processInfo.systemUptime
+        guard now-lastObservationRefresh>=3 else {return}
+        lastObservationRefresh=now
+        if refreshing {pendingRefresh=true}else {refresh()}
     }
     private func captured(_ memory: Memory) {
         if settings.entityAutomaticIndex {entityMemory.enqueue(memory)}

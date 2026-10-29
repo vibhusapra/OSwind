@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version22 fences writers that cannot preserve/enforce project-ID corrections.
-    public static let schemaVersion = 23
+    // Version24 fences writers that cannot preserve sampled text spans.
+    public static let schemaVersion = 24
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -147,6 +147,7 @@ public final class MemoryStore: @unchecked Sendable {
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try exec(EntitySchema.sql)
         try exec(PIIScanSchema.sql)
+        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
@@ -195,6 +196,7 @@ public final class MemoryStore: @unchecked Sendable {
     private func insertValidated(_ memory:Memory,deferRecapLinks:Bool) throws {
         lock.lock(); defer { lock.unlock() }
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
+        try memory.textObservation?.validated(for:memory)
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
         if let visual=memory.visualRecording {_ = try visual.validated();guard memory.kind == .screen,memory.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}}
@@ -214,6 +216,7 @@ public final class MemoryStore: @unchecked Sendable {
         var payload = memory; payload.embedding = nil
         let data = try JSONEncoder().encode(payload)
         guard data.count <= Self.maximumRecordBytes else { throw OSwindError.invalid("Memory payload exceeds 128 MiB") }
+        guard memory.textObservation==nil || data.count<=262144 else {throw OSwindError.invalid("Sampled text payload exceeds 256 KiB")}
         bind(stmt, 1, memory.id); sqlite3_bind_double(stmt, 2, memory.timestamp.timeIntervalSince1970); bind(stmt, 3, memory.kind.rawValue); bind(stmt, 4, memory.app); bind(stmt, 5, memory.title); bind(stmt, 6, memory.url); bind(stmt, 7, memory.text); sqlite3_bind_int(stmt, 8, memory.favorite ? 1 : 0)
         _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 9, $0.baseAddress, Int32(data.count), transient) }
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
@@ -296,11 +299,25 @@ public final class MemoryStore: @unchecked Sendable {
     public func get(_ id: String) throws -> Memory? {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
-    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil) -> (String, [String]) {
+    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true) -> (String, [String]) {
+        // An inverted interval can otherwise match a span crossing both bounds.
+        // Public query resolution reports the error; raw store APIs fail closed.
+        if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
+        if let start=filter.start,let end=filter.end,start>=end {return ("0=1",[])}
         var parts = ["1=1"]; var values = [String]()
         if let app = filter.app, !app.isEmpty { parts.append("\(prefix)app=?"); values.append(app) }
         if let kind = filter.kind { parts.append("\(prefix)kind=?"); values.append(kind.rawValue) }
-        if let start = filter.start { parts.append("\(prefix)timestamp>=?"); values.append(String(start.timeIntervalSince1970)) }
+        if let start = filter.start {
+            let value=String(start.timeIntervalSince1970)
+            if includeTextObservations && filter.sourceStartsOnly != true {
+                // Valid spans never exceed 15 minutes. Bound the timestamp
+                // index first, then inspect only older candidate IDs. CASE
+                // avoids SQLite's million-row MULTI-INDEX OR + sort plan.
+                let lower=String(start.addingTimeInterval(-TextObservationSpan.maximumDuration-1).timeIntervalSince1970)
+                parts.append("(\(prefix)timestamp>=? AND CASE WHEN \(prefix)timestamp>=? THEN 1 ELSE EXISTS(SELECT 1 FROM text_observation_ranges _observed WHERE _observed.memory_id=\(prefix)id AND _observed.last_observed>=?) END)");values += [lower,value,value]
+            }
+            else {parts.append("\(prefix)timestamp>=?");values.append(value)}
+        }
         if let end = filter.end { parts.append("\(prefix)timestamp<?"); values.append(String(end.timeIntervalSince1970)) }
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM memory_tags t WHERE t.memory_id=\(prefix)id AND t.tag=?)"); values.append(tag) }

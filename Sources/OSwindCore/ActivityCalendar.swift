@@ -30,7 +30,7 @@ public struct ActivitySourceScope:Codable,Equatable,Sendable {
     public var start:Date?
     public var end:Date?
     public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;start=filter.start;end=filter.end}
-    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID)}
+    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID,sourceStartsOnly:true)}
 }
 public struct ActivityCalendarRequest:Equatable,Sendable {
     public var month:String
@@ -128,7 +128,7 @@ extension MemoryStore {
             source="memories m INDEXED BY memories_activity_time"
         }else {source="memories m"}
         let tag=filter.tag;filter.tag=nil
-        var predicate=conditions(filter)
+        var predicate=conditions(filter,includeTextObservations:false)
         if let tag {predicate.0 += " AND m.tag=?";predicate.1.append(tag)}
         return try withRoutineDatabase {database in
             try Task.checkCancellation()

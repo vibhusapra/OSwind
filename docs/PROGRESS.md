@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Sampled text observation spans — work in progress
+
+- [Bounded sampled spans](TEXT-OBSERVATION-SPANS.md) are being implemented so repeated automatic text remains findable in a later time scope. The range records first/last samples and gaps, not attention or continuous activity. Manual captures stay separate; pause/lock/privacy/context/clock/gap/cap boundaries break continuity.
+- New metadata-only compare-and-swap admission preserves source vectors/FTS/curation, while sampled extent changes invalidate evidence and scope caches. A sparse derived time projection avoids search-time source JSON scans. Schema24 fences older writers. Implementation and focused qualification are in progress; the preceding PR87 receipt does not qualify these changes.
+- Current111 focused checks, nine debug process groups/26 operations and ten owned light/dark component renders pass. The first million-source probe retained a20-second migration and1.6–1.7-second broad-query regression; corrected debug reads are about3ms and open-plus-verification about1.1s, with exact ID oracles. Different build modes and uncontrolled caches prevent a speed ranking; signed optimized qualification follows. Parent87 publicationa17ebb4 now passes both CI jobs in run40928433204; this source gets separate CI.
+
 ## Standalone Accessibility text capture — PR #87 / source eadabc1
 
 - [Text-only desktop mode](ACCESSIBILITY-TEXT-CAPTURE.md) is available in setup/Settings, with required AX access and no pixel-source enumeration, capture, OCR or retained media. Stored display/crop scopes refuse until explicitly resolved. Full context/privacy observations, bounded text, pattern masks, utility preparation, exact saved-policy/root fences, activity ordering and an invalidatable final transaction are implemented. One bounded sanitized-source digest suppresses repeated automatic text; deletion and manual capture still work.

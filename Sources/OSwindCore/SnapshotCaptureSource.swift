@@ -18,6 +18,8 @@ struct SnapshotCaptureDeferral:Error {var reason:String}
     var permitted:()->Bool = {CGPreflightScreenCaptureAccess()}
     var accessibilityPermitted:()->Bool = {AXIsProcessTrusted()}
     var idleSeconds:()->Double = {CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)}
+    var now:()->Date = {Date()}
+    var uptime:()->Double = {ProcessInfo.processInfo.systemUptime}
     var textCommitPermitted:@Sendable ()->Bool = {!SessionState.locked && AXIsProcessTrusted()}
     var textEmbedding:@Sendable (String,LocalEmbedder) throws -> [Float]? = {text,embedder in
         try Task.checkCancellation();let vector=embedder.embed(text)

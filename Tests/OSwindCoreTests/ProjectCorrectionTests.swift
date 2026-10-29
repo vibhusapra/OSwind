@@ -70,7 +70,7 @@ final class ProjectCorrectionTests:XCTestCase {
     }
     func testSchema21MigrationRepairsExistingAutomaticLinkWithoutBackfill() throws {
         try rename();try index();try makeLegacy21();try store.close();store=try MemoryStore(root:root)
-        XCTAssertEqual(MemoryStore.schemaVersion,23);XCTAssertTrue(try store.entitySources(project.id).isEmpty);XCTAssertEqual(try ignoredCount(),1)
+        XCTAssertEqual(MemoryStore.schemaVersion,24);XCTAssertTrue(try store.entitySources(project.id).isEmpty);XCTAssertEqual(try ignoredCount(),1)
         XCTAssertEqual(try store.entityIndexProgress(processor:EntityExtractor.processor(store.entityIndexPlan())).indexed,1)
         try store.withRoutineDatabase {db in
             XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM entity_ignored WHERE kind='project' AND key='unmapped legacy'"),1)

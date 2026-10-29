@@ -48,15 +48,42 @@ enum AccessibilityCaptureRecord {
 }
 
 extension MemoryStore {
-    /// Indexed lookup; avoid decoding a potentially large replacement payload
-    /// on the capture hot path. Oversized rows simply do not suppress a capture.
-    func accessibilityCaptureStillExists(id:String,matching memory:Memory) throws -> Bool {
+    private func boundedTextObservation(_ id:String,db:RoutineDatabase)throws->Memory? {
+        let row=try db.statement("SELECT CASE WHEN length(payload)<=262144 THEN payload END FROM memories WHERE id=?")
+        defer {sqlite3_finalize(row)};db.bind(row,1,id)
+        let result=sqlite3_step(row);if result==SQLITE_DONE {return nil};guard result==SQLITE_ROW else {throw db.error()}
+        let count=Int(sqlite3_column_bytes(row,0));guard count>0,count<=262144,let bytes=sqlite3_column_blob(row,0) else {return nil}
+        return try JSONDecoder().decode(Memory.self,from:Data(bytes:bytes,count:count))
+    }
+    func accessibilityObservationCanContinue(_ cursor:TextObservationCursor)throws->Bool {
         try withRoutineDatabase {db in
-            let row=try db.statement("SELECT CASE WHEN length(payload)<=262144 THEN kind='screen' AND app=? AND title=? AND COALESCE(url,'')=? AND text=? AND json_extract(CAST(payload AS TEXT),'$.bundleID')=? ELSE 0 END FROM memories WHERE id=?")
-            defer {sqlite3_finalize(row)}
-            for (index,value) in [memory.app,memory.title,memory.url ?? "",memory.text,memory.bundleID,id].enumerated() {db.bind(row,Int32(index+1),value)}
-            let result=sqlite3_step(row);if result==SQLITE_DONE {return false};guard result==SQLITE_ROW else {throw db.error()}
-            return sqlite3_column_int(row,0)==1
+            do {guard let current=try boundedTextObservation(cursor.id,db:db) else {return false};return try cursor.matches(current)}
+            catch is CancellationError {throw CancellationError()}
+            catch {return false}
+        }
+    }
+    /// Update only sampled metadata, preserving current curation and every
+    /// embedding/vector/FTS identity. A raced revision discards this observation.
+    func extendAccessibilityObservation(_ cursor:TextObservationCursor,at date:Date,reservation:AccessibilityCaptureReservation)throws->Memory {
+        try Task.checkCancellation();try requireMediaRootIdentity()
+        return try reservation.activity.withActive(for:mediaRootIdentity) {
+            try withRoutineDatabase {db in
+                try db.execute("BEGIN IMMEDIATE")
+                do {
+                    guard var memory=try boundedTextObservation(cursor.id,db:db),try cursor.matches(memory) else {throw SnapshotCaptureDeferral(reason:"Text source changed · next observation starts a new span")}
+                    let gap=date.timeIntervalSince(cursor.last)
+                    memory.endTimestamp=date
+                    memory.textObservation=TextObservationSpan(sessionID:cursor.span.sessionID,samples:cursor.span.samples+1,largestGapSeconds:max(cursor.span.largestGapSeconds,gap))
+                    try memory.textObservation?.validated(for:memory)
+                    let data=try JSONEncoder().encode(memory);guard data.count<=262144 else {throw OSwindError.invalid("Sampled text payload exceeds 256 KiB")}
+                    let row=try db.statement("UPDATE memories SET payload=? WHERE id=?");defer {sqlite3_finalize(row)}
+                    _ = data.withUnsafeBytes {sqlite3_bind_blob(row,1,$0.baseAddress,Int32(data.count),unsafeBitCast(-1,to:sqlite3_destructor_type.self))}
+                    db.bind(row,2,memory.id);try db.done(row)
+                    try Task.checkCancellation();try requireMediaRootIdentity()
+                    try reservation.snapshot.withCurrent(root:root,policy:reservation.snapshot.settings.privacy) {try db.execute("COMMIT")}
+                    return memory
+                } catch {try? db.execute("ROLLBACK");throw error}
+            }
         }
     }
     /// Only the final small source transaction is inside the publication gate.
