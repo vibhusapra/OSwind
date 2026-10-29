@@ -85,7 +85,7 @@ final class SnapshotRegionTests:XCTestCase {
         var database:OpaquePointer?;XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&database),SQLITE_OK)
         XCTAssertEqual(sqlite3_exec(database,"PRAGMA user_version=19",nil,nil,nil),SQLITE_OK);sqlite3_close(database)
         let reopened=try MemoryStore(root:root);defer {try? reopened.close()}
-        XCTAssertEqual(MemoryStore.schemaVersion,22);XCTAssertEqual(try reopened.get("owned-scope-fence")?.text,"Owned source remains");XCTAssertEqual(AppSettings.load(root:root),settings)
+        XCTAssertEqual(MemoryStore.schemaVersion,23);XCTAssertEqual(try reopened.get("owned-scope-fence")?.text,"Owned source remains");XCTAssertEqual(AppSettings.load(root:root),settings)
         try reopened.withRoutineDatabase {db in
             let statement=try db.statement("PRAGMA user_version");defer {sqlite3_finalize(statement)}
             XCTAssertEqual(sqlite3_step(statement),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(statement,0),Int32(MemoryStore.schemaVersion))
