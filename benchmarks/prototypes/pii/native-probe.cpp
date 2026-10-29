@@ -8,11 +8,13 @@
 #include <cstring>
 #include <dlfcn.h>
 #include <fstream>
+#include <fcntl.h>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <sys/resource.h>
+#include <unistd.h>
 #include <vector>
 
 using Clock = std::chrono::steady_clock;
@@ -52,9 +54,37 @@ static Tensor tensor(std::istream& stream, bool floating) {
     require(bool(stream), "Truncated tensor data"); return result;
 }
 struct Case { std::vector<Tensor> inputs; Tensor expected; };
+static void writeOutputs(const char* path, const std::vector<Case>& cases,
+                         const std::vector<std::vector<float>>& actual) {
+    // Exclusive output only after all calls pass. A partial write is never a
+    // valid fixture: consumers require the exact header, shapes, sizes and EOF.
+    int fd = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    require(fd >= 0, "Cannot create exclusive native output fixture");
+    auto closeFile = [](int* value) { if (*value >= 0) close(*value); delete value; };
+    std::unique_ptr<int, decltype(closeFile)> owner(new int(fd), closeFile);
+    auto bytes = [&](const void* data, size_t size) {
+        auto cursor = static_cast<const char*>(data);
+        while (size) {
+            const auto written = write(fd, cursor, size);
+            require(written > 0, "Native output fixture write failed");
+            cursor += written; size -= static_cast<size_t>(written);
+        }
+    };
+    const uint32_t count = static_cast<uint32_t>(cases.size());
+    require(actual.size() == cases.size(), "Incomplete native output fixture");
+    bytes("OSWPOUT1", 8); bytes(&count, sizeof(count));
+    for (size_t i = 0; i < cases.size(); ++i) {
+        uint32_t rank = static_cast<uint32_t>(cases[i].expected.shape.size()); bytes(&rank, sizeof(rank));
+        for (int64_t value : cases[i].expected.shape) {
+            uint64_t dimension = static_cast<uint64_t>(value); bytes(&dimension, sizeof(dimension));
+        }
+        uint64_t elements = actual[i].size(); bytes(&elements, sizeof(elements));
+        bytes(actual[i].data(), actual[i].size() * sizeof(float));
+    }
+}
 int main(int argc, char** argv) {
     try {
-        require(argc == 7, "usage: native-probe DYLIB MODEL FIXTURES cpu|coreml PROFILE_PREFIX REPETITIONS");
+        require(argc == 7 || argc == 8, "usage: native-probe DYLIB MODEL FIXTURES cpu|coreml PROFILE_PREFIX REPETITIONS [EXCLUSIVE_OUTPUT]");
         const std::string policy = argv[4];
         require(policy == "cpu" || policy == "coreml", "Invalid compute policy");
         const std::string repetitionsText = argv[6];
@@ -123,6 +153,7 @@ int main(int argc, char** argv) {
         double maximumDifference = 0, first = 0;
         std::vector<double> warm;
         std::vector<double> allTimes;
+        std::vector<std::vector<float>> firstOutputs;
         for (unsigned repeat = 0; repeat < repetitions; ++repeat) {
             for (auto& item : cases) {
                 std::vector<std::unique_ptr<OrtValue, decltype(releaseValue)>> owned;
@@ -156,6 +187,8 @@ int main(int argc, char** argv) {
                     maximumDifference = std::max(maximumDifference, std::abs(double(values[i]) - item.expected.floats[i]));
                 }
                 require(maximumDifference <= 0.001, "Native logits exceed frozen tolerance");
+                if (argc == 8 && repeat == 0)
+                    firstOutputs.emplace_back(values, values + item.expected.floats.size());
             }
         }
         OrtAllocator* allocator = nullptr; check(api->GetAllocatorWithDefaultOptions(&allocator));
@@ -163,6 +196,7 @@ int main(int argc, char** argv) {
         // The caller supplies a simple profile prefix. Keep paths out of JSON;
         // detailed assignment evidence is retained by the external wrapper.
         check(api->AllocatorFree(allocator, profileRaw));
+        if (argc == 8) writeOutputs(argv[7], cases, firstOutputs);
         std::sort(warm.begin(), warm.end());
         rusage usage{}; require(getrusage(RUSAGE_SELF, &usage) == 0, "Cannot read resource usage");
         std::cout << "{\"state\":\"completed\",\"runtime\":\"onnxruntime-1.24.2-native\",\"policy\":\"" << policy
