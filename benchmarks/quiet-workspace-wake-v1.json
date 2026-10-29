@@ -1,0 +1,513 @@
+{
+  "format": "OSwind quiet-workspace wake and onboarding lifecycle qualification",
+  "version": 1,
+  "recordedAtUTC": "2026-10-29T01:30:18.353150+00:00",
+  "productCommit": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+  "qualificationCommit": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/69",
+  "scope": "Configured startup/onboarding, quiet wake/power/session callbacks, independent manual service controls, disabled routine timer and API status ownership. Authored fixtures and actual notification publishers; no normal history, provider keys or physical wake acceptance.",
+  "newCases": 18,
+  "beforeFix": {
+    "productCommit": "7bd10de",
+    "cases": 8,
+    "passed": 3,
+    "failedCases": 5,
+    "failedAssertions": 16,
+    "result": "Quiet wake, dismissed onboarding, startup during onboarding, quiet power/session and wake after switch preparation request work. Active wake, manual entity build and queued power-after-switch controls already pass."
+  },
+  "initialFocusedSelection": {
+    "defined": 34,
+    "passed": 33,
+    "skipped": 1,
+    "failures": 0,
+    "skip": "Visual admission requires unlocked session/allowed thermal state"
+  },
+  "initialQualification": {
+    "source": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+    "orderedOperations": [
+      {
+        "name": "full-most-optins-v1",
+        "exitCode": 0,
+        "awakeSeconds": 521.4307222079951,
+        "systemSeconds": 1246.8778069019318
+      },
+      {
+        "name": "app-lifecycle-tsan-v1",
+        "exitCode": 1,
+        "awakeSeconds": 151.11146170902066,
+        "systemSeconds": 2887.8469610214233
+      }
+    ],
+    "diagnostic": {
+      "recordedAtUTC": "2026-10-29T01:02:47.663690+00:00",
+      "productSource": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+      "fullNormal": {
+        "defined": 956,
+        "passed": 953,
+        "skipped": 3,
+        "failures": 0,
+        "driverAwakeSeconds": 521.4307222079951,
+        "driverSystemSeconds": 1246.8778069019318,
+        "skipReasons": [
+          "Muted audio output could not start",
+          "Physical system-audio opt-in absent",
+          "Visual admission requires unlocked/allowed thermal state"
+        ]
+      },
+      "initialThreadSanitizer": {
+        "defined": 151,
+        "passed": 149,
+        "skipped": 1,
+        "failedCases": 1,
+        "failedAssertions": 2,
+        "raceReports": 0,
+        "failedCase": "LibraryOpeningTests.testNativeVaultLockDuringPreparationClosesLateStoreAndDetaches",
+        "caseSeconds": 355.717,
+        "assertions": [
+          "Session still busy after continuous-clock fixture deadline",
+          "Cached status unlocked rather than locked while operation still draining"
+        ],
+        "driverAwakeSeconds": 151.11146170902066,
+        "driverSystemSeconds": 2887.8469610214233
+      },
+      "powerEvidence": {
+        "source": "Read-only pmset event log",
+        "sleepStartLocal": "2026-10-28 17:51:22 -0700",
+        "wakeLocal": "2026-10-28 17:57:04 -0700",
+        "reportedSleepSeconds": 342,
+        "reason": "Maintenance Sleep",
+        "interpretation": "This sleep overlaps the failed case and counts against its old 20-second continuous-clock fixture budget. It is not proof of full product/device sleep acceptance."
+      },
+      "unchangedRetry": {
+        "exitCode": 0,
+        "awakeSeconds": 15.3522926250007,
+        "systemSeconds": 15.352221965789795,
+        "source": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+        "scope": "One separately observed unchanged native case; retains the earlier failed 151-case run"
+      },
+      "independentAfterFailureImages": {
+        "recordedAtUTC": "2026-10-29T00:58:22.211553+00:00",
+        "ownedImages": [],
+        "completeInventorySucceeded": true
+      },
+      "fixtureFollowup": "Test-only: ten/twenty-second SuspendingClock awake budgets, bounded condition polling, and normal termination join after an awake deadline failure before owned-root removal. Product inputs unchanged. Focused eight-case TSan check in progress.",
+      "noTrialReplacement": true
+    },
+    "plannedReleaseAndProcessStagesNotRunAfterTSanFailure": true,
+    "noFailedTrialReplacement": true
+  },
+  "fixtureFollowup": {
+    "source": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
+    "productInputsUnchanged": true,
+    "change": "Retain ten/twenty awake-second opening fixture budgets with SuspendingClock and await normal termination after an awake deadline failure before removing its owned root. No device-setting or keep-awake changes.",
+    "separateOpeningTSan": {
+      "passed": 8,
+      "failures": 0,
+      "suiteSeconds": 3.161
+    },
+    "limits": "Not a controlled physical-sleep or complete device acceptance trial"
+  },
+  "currentFullSuite": {
+    "defined": 956,
+    "passed": 954,
+    "skipped": 2,
+    "failures": 0,
+    "suiteSeconds": 415.802,
+    "driverAwakeSeconds": 439.78955574985594,
+    "driverSystemSeconds": 439.7875027656555,
+    "skips": [
+      "NativeSystemAudioTests.testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder: physical opt-in absent",
+      "WorkspaceWakeLifecycleTests.testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup: session locked/thermal admission"
+    ],
+    "optIns": [
+      "Owned encrypted APFS",
+      "Local cached speech/speaker/visual models",
+      "Real idle/model-reload timers",
+      "Managed runtime",
+      "Metal expression paths",
+      "Pinned tokenizer references"
+    ]
+  },
+  "currentThreadSanitizer": {
+    "defined": 151,
+    "passed": 150,
+    "skipped": 1,
+    "failures": 0,
+    "raceReports": 0,
+    "suiteSeconds": 47.897,
+    "driverAwakeSeconds": 77.47426770883612,
+    "driverSystemSeconds": 77.47390699386597,
+    "selection": "OSwindAppTests|StoreLifecycleTests|BrowserPrivacyContextTests|FocusedWindowBindingTests",
+    "skip": "WorkspaceWakeLifecycleTests visual admission requires unlocked session/allowed thermal state"
+  },
+  "currentOrderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 439.78955574985594,
+      "systemSeconds": 439.7875027656555
+    },
+    {
+      "name": "app-lifecycle-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 77.47426770883612,
+      "systemSeconds": 77.47390699386597
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 18.164767083944753,
+      "systemSeconds": 18.1646831035614
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.6079826247878373,
+      "systemSeconds": 1.607975959777832
+    },
+    {
+      "name": "migration-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 32.865202125161886,
+      "systemSeconds": 32.86504888534546
+    },
+    {
+      "name": "integration-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.39174879086203873,
+      "systemSeconds": 0.39174675941467285
+    },
+    {
+      "name": "integration-indexed-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.070384084014222,
+      "systemSeconds": 1.0703802108764648
+    },
+    {
+      "name": "recap-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.4544686668086797,
+      "systemSeconds": 1.4544620513916016
+    },
+    {
+      "name": "backup-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.7624228328932077,
+      "systemSeconds": 0.7624189853668213
+    },
+    {
+      "name": "vault-process-v1",
+      "exitCode": 0,
+      "awakeSeconds": 14.452244125073776,
+      "systemSeconds": 14.452176809310913
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.10875587491318583,
+      "systemSeconds": 0.10875582695007324
+    }
+  ],
+  "renders": {
+    "initialSource": "21368dd99fb79edb9c0c66a6fbe67ef20ce4832f",
+    "initialOperations": [
+      {
+        "name": "debug-package-v1",
+        "exitCode": 0,
+        "awakeSeconds": 15.498409625142813,
+        "systemSeconds": 171.5765402317047
+      },
+      {
+        "name": "render-schedules-light-v1",
+        "exitCode": 0,
+        "awakeSeconds": 3.1599575409200042,
+        "systemSeconds": 3.1599512100219727
+      },
+      {
+        "name": "render-schedules-dark-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.7435527918860316,
+        "systemSeconds": 1.743549108505249
+      },
+      {
+        "name": "render-connect-light-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.783454166026786,
+        "systemSeconds": 1.7834510803222656
+      },
+      {
+        "name": "render-connect-dark-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.8570994997862726,
+        "systemSeconds": 1.8570959568023682
+      },
+      {
+        "name": "render-onboarding-light-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.8412632918916643,
+        "systemSeconds": 1.8412611484527588
+      },
+      {
+        "name": "render-onboarding-dark-v1",
+        "exitCode": 0,
+        "awakeSeconds": 1.9754917500540614,
+        "systemSeconds": 1.9754879474639893
+      }
+    ],
+    "finalSource": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+    "finalOperations": [
+      {
+        "name": "debug-package-v2",
+        "exitCode": 0,
+        "awakeSeconds": 12.051620125072077,
+        "systemSeconds": 12.58253526687622
+      },
+      {
+        "name": "render-schedules-light-v2",
+        "exitCode": 0,
+        "awakeSeconds": 2.1555705422069877,
+        "systemSeconds": 2.155566692352295
+      },
+      {
+        "name": "render-schedules-dark-v2",
+        "exitCode": 0,
+        "awakeSeconds": 1.801565415924415,
+        "systemSeconds": 1.8015618324279785
+      },
+      {
+        "name": "render-connect-light-v2",
+        "exitCode": 0,
+        "awakeSeconds": 1.8765636251773685,
+        "systemSeconds": 1.876561164855957
+      },
+      {
+        "name": "render-connect-dark-v2",
+        "exitCode": 0,
+        "awakeSeconds": 2.0956674171611667,
+        "systemSeconds": 2.0956647396087646
+      },
+      {
+        "name": "render-onboarding-light-v2",
+        "exitCode": 0,
+        "awakeSeconds": 2.426653292030096,
+        "systemSeconds": 2.426650047302246
+      },
+      {
+        "name": "render-onboarding-dark-v2",
+        "exitCode": 0,
+        "awakeSeconds": 2.4362665829248726,
+        "systemSeconds": 2.4362621307373047
+      }
+    ],
+    "layoutProof": {
+      "codeCommit": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+      "images": [
+        {
+          "path": "assets/wake-schedules-light.png",
+          "pixels": [
+            1800,
+            1400
+          ],
+          "sha256": "fd2f405a3595d6821f3ffba25e3701824c060ba7bf34bb00188f781e1d1eb109",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        },
+        {
+          "path": "assets/wake-schedules-dark.png",
+          "pixels": [
+            1800,
+            1400
+          ],
+          "sha256": "ca0ebff253625e32262690898d82b376273ca2f9544cf8a3431f3bbbc731000f",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        },
+        {
+          "path": "assets/wake-connect-light.png",
+          "pixels": [
+            1520,
+            1440
+          ],
+          "sha256": "bf02c91bd1f561900396d7d9e7ae77aa876f7f8ecb034f87e88c0dce68b38f95",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        },
+        {
+          "path": "assets/wake-connect-dark.png",
+          "pixels": [
+            1520,
+            1440
+          ],
+          "sha256": "4e9b5279b5ac6ce2ab1ab7c716f6141b96b5356af2245702cbbffc80d9ef02e0",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        },
+        {
+          "path": "assets/wake-onboarding-light.png",
+          "pixels": [
+            1180,
+            1440
+          ],
+          "sha256": "c3c69e515224c8cc7a1af0706838cec82cae6d5f3d52955e7e82d01613cab196",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        },
+        {
+          "path": "assets/wake-onboarding-dark.png",
+          "pixels": [
+            1180,
+            1440
+          ],
+          "sha256": "3889b2dcf404bdbe87ef7e4f9d49142731c7d79a360193e763ec25963f1cbb02",
+          "visuallyReviewed": true,
+          "scope": "Isolated component render; no native interaction or device transition acceptance"
+        }
+      ],
+      "onboardingFollowupByteIdenticalToReviewedInitial": true,
+      "initialDebugPackageClockDifferenceSeconds": 156.0781306065619,
+      "clockDifferenceInterpretation": "Recorded awake/system-clock spread; cause not assigned, no build performance or physical-wake claim"
+    },
+    "scope": "Component layout only; paused schedules button is disabled in demo by design"
+  },
+  "packageProof": {
+    "scope": "Separately staged schema22 quiet/onboarding configured-services and wake lifecycle; no installation, measured power or competitive ranking claim",
+    "codeCommit": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "48aabeeb452647111f39357326dc1bc390f2b03fd75d7890bd32457576f58b92",
+        "signedSHA256": "2d17dd9e2934235516a6dd474a5b37db6e93fdf47e49ed542cd2dfbf8287ee44",
+        "normalizedPayloadSHA256": "3118363e5eb2709bc00c15fab963fac38a3a6711c38e2b62e0c22bae976f3df4"
+      },
+      "oswindctl": {
+        "rawSHA256": "fffa7e40aa58cac21e35544c366fad43f725b3520a2985275a3048c8e6c5280d",
+        "signedSHA256": "4b1a152c246356feee97a8a368666aeea3dc2e9dc59709360c9804f2c8d7ff06",
+        "normalizedPayloadSHA256": "44e9d58a998a9a68ae526e595f4372788650ef408f6ffc9a86aa0eccc6e3434d"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "81c0848b914e441b8530d401e90ebe1cff8a1d57ed244e77b409eccd4fcb17a2",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "633c3d66f643788c4988bd9bab17e4018d7c22db8b4fc9e92edc44ad7e4c0ee1",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "finalIndependentAudit": {
+    "recordedAtUTC": "2026-10-29T01:15:53.454021+00:00",
+    "method": "Complete ps -ww command column, exact executable prefix and owned path, filtered before output; no comm basename filter",
+    "ownedGUIProcesses": [],
+    "ownedTestProcesses": [],
+    "ownedDriverProcesses": [],
+    "currentArtifactAndOpeningImageCount": 0,
+    "imageInventorySucceeded": true,
+    "installedTreeUnchanged": true,
+    "stagedTreeUnchanged": true,
+    "zipUnchanged": true,
+    "productInputsUnchangedAfterTestOnlyFollowup": true
+  },
+  "launchRegistration": {
+    "readOnlyLookup": "/Applications/OSwind.app",
+    "expected": "/Applications/OSwind.app",
+    "registrationChanged": false
+  },
+  "migrationProcess": {
+    "state": "completed",
+    "checks": [
+      "exact identity, DST-crossing instants, nested speaker text, page notice, retry and keyword search across processes",
+      "update preserves user curation; malformed final entry publishes no earlier changes",
+      "default privacy redaction and exclusion; final symlink/FIFO refusal without blocking",
+      "normal OSwind JSON round trip retains imported note text",
+      "1000 authored entries admitted by one bounded page; timing includes fresh CLI startup, Apple embeddings and SQLite",
+      "encrypted APFS import, exact note reopen and locked refusal without plaintext fallback"
+    ],
+    "nativeCleanupDetached": true,
+    "bulkInputBytes": 488863,
+    "bulkInputSHA256": "70e32c219367fedea497a9a31028a5905e816af2cba345e1c3717f6a3fb267fa",
+    "thousandImport": {
+      "name": "thousand-import",
+      "exitCode": 0,
+      "awakeSeconds": 25.544303916860372,
+      "systemSeconds": 25.544185876846313,
+      "userCPUSeconds": 36.072236,
+      "systemCPUSeconds": 9.562229,
+      "peakRSSBytes": 83279872,
+      "stdoutSHA256": "f146e580ef965f0eb448e5e5d62f8ac558f9bb4ecb3dc25f2bf37750a74d5812",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "CLIBytesMatchSourceB2c": true,
+    "vectorProof": {
+      "scope": "Only authored benchmark IDs/model/vector bytes selected read-only; no normal-library values",
+      "records": 1000,
+      "allVectorBytesMatchPriorB2c": true,
+      "maximumAbsoluteDifference": 0,
+      "digestEncoding": "ID/model/blob, each UInt64 little-endian byte-length-prefixed, ordered by binary ID",
+      "orderedVectorSHA256": "104aa9de8a7fc9808fc04b25b41b5bad13e2109d04c4ef8f14fce8b17b7cf508"
+    },
+    "priorUnpairedSeconds": [
+      25.819643,
+      97.342475,
+      26.356524791102856
+    ],
+    "limits": "Includes startup, Apple embeddings and SQLite. Same current CLI/input/vector bytes; timings are unpaired under uncontrolled host/framework/cache state. No speed, energy or competitor claim."
+  },
+  "productSourceCI": {
+    "sourceCommit": "9d6f33ef281f214850fa39ebe8804c600fbf90a9",
+    "runID": 40789738849,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "id": 123171682728,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 123171682899,
+        "name": "native",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Frozen final product source CI; later documentation revisions have separate runs"
+  },
+  "fixtureFollowupCI": {
+    "sourceCommit": "4a137279c5ee14f69abad7df3e8e3d71bc0406a8",
+    "runID": 40798125648,
+    "status": "completed",
+    "jobs": [
+      {
+        "id": 123199440166,
+        "name": "native",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 123199440945,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Test-only follow-up CI; product source remains9d6f33e",
+    "conclusion": "success"
+  },
+  "allKnownContractsPass": false,
+  "releaseAcceptanceComplete": false,
+  "remainingGates": [
+    "Original TSan failure retained; fixture follow-up does not establish physical sleep/wake acceptance",
+    "Locked-session visual-admission skip and physical audio/GUI/VoiceOver boundaries",
+    "Inherited busy-terminal attachment-inspection failure with unproven native cause",
+    "Learned PII, complete sync/migrations, notarized distribution and matched whole-product competitor/energy evaluation",
+    "Earlier normal-default-library automatic activity remains unaudited; prior PR68 comm-based process absence claim is withdrawn and corrected separately"
+  ]
+}

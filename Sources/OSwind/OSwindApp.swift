@@ -15,7 +15,7 @@ import OSwindCore
             }
             let preview: AppModel
             do {
-                if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="SettingsDataQuiet" {
+                if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,["SettingsDataQuiet","RoutinesQuiet","SettingsConnectQuiet","OnboardingPreview"].contains(CommandLine.arguments[index+1]) {
                     preview=try AppModel(startServices:false)
                 } else if let index=CommandLine.arguments.firstIndex(of:"--preview-section"),index+1<CommandLine.arguments.count,CommandLine.arguments[index+1]=="NativeModelDownloadBusy" {
                     let setup=NativeModelSetupModel(installer:{kind,_,_,progress in

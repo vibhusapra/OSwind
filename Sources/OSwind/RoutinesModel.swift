@@ -15,6 +15,7 @@ import OSwindCore
     private let now:() -> Date
     private let interval:Double
     private var timer:Timer?
+    var schedulingActive:Bool {timer != nil}
     private var task:Task<Void,Never>?
     var onChange:(() -> Void)?
     init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings) {
@@ -29,16 +30,17 @@ import OSwindCore
     func apply(_ value:AppSettings) {
         if settings.routinesEnabled && !value.routinesEnabled || settings.privacy != value.privacy || settings.ai.allowRemote && !value.ai.allowRemote {task?.cancel()}
         let enabled = !settings.routinesEnabled && value.routinesEnabled;settings=value
-        if enabled,timer != nil {tick()}
+        if enabled {tickIfStarted()}
     }
     func start() {
         guard timer==nil else {return}
-        timer=Timer.scheduledTimer(withTimeInterval:interval,repeats:true) {[weak self] _ in Task {@MainActor in self?.tick()}}
-        timer?.tolerance=min(15,interval/2);tick()
+        timer=Timer.scheduledTimer(withTimeInterval:interval,repeats:true) {[weak self] _ in Task {@MainActor in self?.tickIfStarted()}}
+        timer?.tolerance=min(15,interval/2);tickIfStarted()
     }
     func stop() {timer?.invalidate();timer=nil;task?.cancel()}
     func clearForLock() {stop();items.removeAll();history.removeAll();onChange=nil}
     func tick() {guard settings.routinesEnabled else {return};execute(id:nil)}
+    func tickIfStarted() {guard timer != nil else {return};tick()}
     func runNow(_ id:String) {execute(id:id)}
     func cancel() {task?.cancel()}
     private func execute(id:String?) {

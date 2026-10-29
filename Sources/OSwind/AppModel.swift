@@ -38,7 +38,7 @@ import UniformTypeIdentifiers
     @Published var mode: SearchMode = .hybrid
     @Published var visualIndexing=false
     @Published var visualAutomaticIndexing=false
-    var visualAutoResumeAllowed=true
+    var visualAutoResumeAllowed=false
     @Published var visualIndexProgress=0.0
     @Published var visualIndexStatus="Enable a local visual model to index retained screenshots and replay frames."
     var visualGeneration=UUID()
@@ -66,8 +66,8 @@ import UniformTypeIdentifiers
     @Published var errorMessage: String?
     @Published var showSettings = false
     @Published var showOnboarding = false {didSet {
-        if showOnboarding {stopHousekeeping()}
-        else if oldValue && housekeepingRequested {startHousekeeping()}
+        if showOnboarding {suspendConfiguredServices()}
+        else if oldValue {activateConfiguredServices();if housekeepingRequested && !housekeepingActive {startHousekeeping()}}
     }}
     @Published var pauseUntil: Date?
     private var pauseTimer: Timer?
@@ -108,6 +108,9 @@ import UniformTypeIdentifiers
     private var pendingRefresh = false
     let demo: Bool
     private var api: LocalAPIServer?
+    private var apiGeneration=UUID()
+    private var configuredServicesRequested=false
+    private(set) var configuredServicesActive=false
     private var cancellables = Set<AnyCancellable>()
     private var refreshTask: Task<Void,Never>?
     private var statisticsTask: Task<Void,Never>?
@@ -153,7 +156,7 @@ import UniformTypeIdentifiers
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
             NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.drafting.clear() }.store(in:&cancellables)
         }
-        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.routines.tick();if self?.settings.entityAutomaticIndex==true {self?.entityMemory.build()}; self?.resumeAutomaticVisualIndex() }.store(in:&cancellables)
+        NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.resumeConfiguredWorkAfterWake() }.store(in:&cancellables)
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
@@ -173,20 +176,51 @@ import UniformTypeIdentifiers
         settings.automaticMaintenance=enabled
         if enabled {housekeepingRequested=true;startHousekeeping()}
     }
-    func startConfiguredServices() {visualAutoResumeAllowed=true;guard !libraryWipe.busy,!libraryWipe.pendingCleanup else {return};housekeepingRequested=true;startHousekeeping();if !demo {routines.start()}; if settings.apiEnabled { startAPI() }; if settings.captureOnLaunch && !demo { capture.start() };if settings.entityAutomaticIndex && !demo {entityMemory.build()};resumeAutomaticVisualIndex() }
+    func startConfiguredServices() {
+        configuredServicesRequested=true;housekeepingRequested=true
+        activateConfiguredServices()
+    }
+    private func activateConfiguredServices() {
+        guard configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping()
+        if !demo && settings.routinesEnabled {routines.start()}
+        if settings.apiEnabled {startAPI()}
+        if settings.captureOnLaunch && !demo {capture.start()}
+        if settings.entityAutomaticIndex && !demo {entityMemory.build()}
+        resumeAutomaticVisualIndex()
+    }
+    private func suspendConfiguredServices() {
+        configuredServicesActive=false;stopHousekeeping();drafting.clear()
+        visualAutoResumeAllowed=false;cancelVisualIndexing();entityMemory.cancel();routines.stop()
+        pauseAll(discardReplay:true);stopAPI(preservePreference:true)
+    }
+    private func resumeConfiguredWorkAfterWake() {
+        guard !showOnboarding,!demo,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        routines.tickIfStarted()
+        if configuredServicesActive && settings.entityAutomaticIndex {entityMemory.build()}
+        resumeAutomaticVisualIndex()
+    }
+    func configureRoutineScheduling(_ enabled:Bool) {
+        settings.routinesEnabled=enabled
+        guard enabled,!showOnboarding,!demo,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {routines.stop();return}
+        // Explicit schedule controls authorize this service only, including a
+        // quietly prepared library. They do not start capture or the API.
+        routines.start()
+    }
     func selectPreparedVisualModel(_ installed:VisualModelInstallation) {
         guard !store.isClosed else {return}
         settings.search.visual.modelDirectory=installed.directory.path
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel()
         libraryOperationGeneration=UUID();jsonImportTask?.cancel();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); api?.stop(); api = nil;apiStatus="API off"
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -648,8 +682,22 @@ import UniformTypeIdentifiers
         }
     }
 
-    func startAPI() {guard !libraryWipe.busy else {return};do { if api == nil { api = try LocalAPIServer(store:store,embedder:embedder) }; api?.onState = { [weak self] text in Task { @MainActor in self?.apiStatus = text } }; try api?.start(); settings.apiEnabled = true } catch { apiStatus = error.localizedDescription } }
-    func stopAPI() { api?.stop(); api = nil; apiStatus = "API off"; settings.apiEnabled = false }
+    func startAPI() {
+        guard !showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        if api != nil {settings.apiEnabled=true;return}
+        do {
+            api=try LocalAPIServer(store:store,embedder:embedder)
+            apiGeneration=UUID();let generation=apiGeneration
+            api?.onState = { [weak self] text in Task { @MainActor in guard let self,self.apiGeneration==generation,self.api != nil else {return};self.apiStatus=text } }
+            try api?.start();settings.apiEnabled=true
+        } catch {stopAPI(preservePreference:true);apiStatus=error.localizedDescription}
+    }
+    func stopAPI(preservePreference:Bool=false) {
+        // Already queued callbacks keep their old ticket and cannot relabel a
+        // stopped or replacement listener. Do not mutate its callback on stop.
+        apiGeneration=UUID();api?.stop();api=nil;apiStatus="API off"
+        if !preservePreference {settings.apiEnabled=false}
+    }
     func login(_ enabled: Bool) { do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { errorMessage = error.localizedDescription } }
     func seedDemo() throws {
         guard try store.stats().count == 0 else { return }

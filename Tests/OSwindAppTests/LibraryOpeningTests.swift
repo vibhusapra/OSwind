@@ -11,8 +11,11 @@ private final class LibraryOpeningGate:@unchecked Sendable {
     func open(_ root:URL) throws -> MemoryStore {
         let value=try MemoryStore(root:root)
         condition.lock();defer {condition.unlock()};store=value;usedMainThread=Thread.isMainThread;entered.fulfill()
-        let deadline=Date().addingTimeInterval(10)
-        while !released {if !condition.wait(until:deadline) {timedOut=true;break}}
+        let deadline=SuspendingClock.now.advanced(by:.seconds(10))
+        while !released {
+            if SuspendingClock.now>=deadline {timedOut=true;break}
+            _=condition.wait(until:Date().addingTimeInterval(0.1))
+        }
         return value // Deliberately ignores cancellation to exercise late success cleanup.
     }
     func release(){condition.lock();released=true;condition.broadcast();condition.unlock()}
@@ -30,8 +33,15 @@ private final class OpeningAttempt:@unchecked Sendable {
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-opening-"+UUID().uuidString);try Paths.ensure(root);suite="org.oswind.owned-opening."+UUID().uuidString;defaults=UserDefaults(suiteName:suite)!}
     override func tearDownWithError() throws {defaults.removePersistentDomain(forName:suite);try? FileManager.default.removeItem(at:root)}
     func finish(_ session:AppSession) async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(20))
-        while session.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+        // Keep the same awake-work budget across laptop maintenance sleep.
+        // A timed-out fixture must still join normal cleanup before tearDown
+        // removes its owned root; never leave a busy task writing into it.
+        let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+        while session.busy,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+        if session.busy {
+            XCTFail("Owned opening did not settle within 20 awake seconds")
+            let safe=await session.lockForTermination();XCTAssertTrue(safe,"Owned opening cleanup could not confirm safe termination")
+        }
         XCTAssertFalse(session.busy)
     }
     func cleanup(_ session:AppSession) throws {session.model?.prepareForLibrarySwitch();try session.model?.store.close();session.model=nil}
