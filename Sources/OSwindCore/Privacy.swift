@@ -139,5 +139,5 @@ public struct AppSettings: Codable, Equatable, Sendable {
             var safe=Self();safe.snapshotRegions = .disabled;safe.automaticMaintenance=false;return safe
         }
     }
-    public func save(root: URL = Paths.data) throws { try Paths.ensure(root); let data = try JSONEncoder().encode(self); try data.write(to: root.appendingPathComponent("settings.json"), options: .atomic); try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: root.appendingPathComponent("settings.json").path) }
+    public func save(root: URL = Paths.data) throws {try SettingsFileAccess.save(JSONEncoder().encode(self),root:root)}
 }

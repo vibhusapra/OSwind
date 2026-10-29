@@ -160,15 +160,14 @@ private struct LimitlessPage {
 }
 
 public extension MemoryStore {
-    func importLimitlessAPI(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy())throws->LimitlessImportResult {
+    func importLimitlessAPI(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil)throws->LimitlessImportResult {
         try Task.checkCancellation();guard url.isFileURL,!url.path.utf8.contains(0) else {throw LimitlessImport.invalid("select a local JSON file")}
         let tree=try BackupFileTree(root:url.deletingLastPathComponent())
-        return try importLimitlessAPI(data:tree.read(url.lastPathComponent,limit:LimitlessImport.maximumBytes),embedder:embedder,policy:policy)
+        return try importLimitlessAPI(data:tree.read(url.lastPathComponent,limit:LimitlessImport.maximumBytes),embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot)
     }
-    func importLimitlessAPI(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy())throws->LimitlessImportResult {
+    func importLimitlessAPI(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil)throws->LimitlessImportResult {
         try Task.checkCancellation();let page=try LimitlessPage(data)
-        let admission=try mediaWriteLease();defer {admission.release()}
-        let result=try importDecodedMemoriesDetailed(page.memories,embedder:embedder,policy:policy,collectorAdmission:true)
+        let result=try importDecodedMemoriesDetailed(page.memories,embedder:embedder,policy:policy,collectorAdmission:true,settingsSnapshot:settingsSnapshot)
         return .init(requested:page.memories.count,imported:result.imported,excluded:result.excluded,hasMorePages:page.hasMorePages,sourceIDs:page.ids)
     }
 }

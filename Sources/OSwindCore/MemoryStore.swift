@@ -1,6 +1,7 @@
 import Foundation
 import CSQLite
 import Darwin
+import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
     // Version22 fences writers that cannot preserve/enforce project-ID corrections.
@@ -579,54 +580,110 @@ public final class MemoryStore: @unchecked Sendable {
     public func exportJSON(to url: URL) throws {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories ORDER BY timestamp"); defer { sqlite3_finalize(stmt) }; var memories = [Memory](); while sqlite3_step(stmt) == SQLITE_ROW { memories.append(try decode(stmt)) }; let encoder = JSONEncoder(); encoder.outputFormatting = [.prettyPrinted,.sortedKeys]; encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; try encoder.encode(memories).write(to: url, options: .atomic)
     }
-    @discardableResult public func importJSON(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Int {try importJSONDetailed(from:url,embedder:embedder,policy:policy).imported}
-    public func importJSONDetailed(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> JSONImportResult {
+    @discardableResult public func importJSON(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil) throws -> Int {try importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot).imported}
+    public func importJSONDetailed(from url:URL,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil) throws -> JSONImportResult {
         try Task.checkCancellation()
-        return try importJSONDetailed(data:Data(contentsOf:url),embedder:embedder,policy:policy)
+        return try importJSONDetailed(data:Data(contentsOf:url),embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot)
     }
-    public func importJSONDetailed(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy()) throws -> JSONImportResult {
+    public func importJSONDetailed(data:Data,embedder:LocalEmbedder?=nil,policy:PrivacyPolicy=PrivacyPolicy(),settingsSnapshot:LibrarySettingsSnapshot?=nil) throws -> JSONImportResult {
         try Task.checkCancellation();guard data.count<=100_000_000 else {throw OSwindError.invalid("Import exceeds 100 MB")}
         let decoder=JSONDecoder();decoder.dateDecodingStrategy = .custom {try ISOTime.decode(from:$0)}
         let memories:[Memory]
         do {memories=try decoder.decode([Memory].self,from:data)} catch {memories=try JSONDecoder().decode([Memory].self,from:data)}
-        return try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy)
+        return try importDecodedMemoriesDetailed(memories,embedder:embedder,policy:policy,settingsSnapshot:settingsSnapshot)
     }
-    func importDecodedMemoriesDetailed(_ memories:[Memory],embedder:LocalEmbedder?,policy:PrivacyPolicy,collectorAdmission:Bool=false) throws -> JSONImportResult {
+    // The observer is an internal concurrency-test seam. It runs with neither
+    // the store mutex nor a SQLite transaction held, never during publication.
+    func importDecodedMemoriesDetailed(_ memories:[Memory],embedder:LocalEmbedder?,policy:PrivacyPolicy,collectorAdmission:Bool=false,settingsSnapshot:LibrarySettingsSnapshot?=nil,preparationProgress:((Int)throws->Void)?=nil) throws -> JSONImportResult {
         let ordered=try RecapImport.ordered(memories),inputIDs=Set(memories.map(\.id))
+        let activity=try mediaWriteLease();defer {activity.release()}
+        let ids=inputIDs.union(ordered.flatMap {$0.recap?.sources.map(\.id) ?? []})
+        let snapshot=try importSourceSnapshot(ids)
+        var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),passages=[String:[PassageVector]](),reusedPassages=Set<String>(),incoming=[String:Memory]()
+        for var m in ordered {
+            try Task.checkCancellation()
+            let browser=collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
+            if policy.exclusion(app:m.bundleID,title:m.title,url:m.url,isBrowser:browser) != nil {blocked.insert(m.id);report.excluded+=1;continue}
+            if collectorAdmission,let previous=snapshot[m.id]?.memory {
+                guard previous.kind == .note,previous.recap==nil else {throw OSwindError.invalid("Collector source ID belongs to incompatible content")}
+                m.favorite=previous.favorite;m.tags=Array(Set(previous.tags+m.tags)).sorted()
+            }
+            if let recap=m.recap {
+                var omit=false
+                for reference in recap.sources {
+                    if blocked.contains(reference.id) {omit=true;break}
+                    guard let current=incoming[reference.id] ?? snapshot[reference.id]?.memory else {throw OSwindError.invalid("Linked recap import is missing a source. Import the complete JSON library or restore a full backup.")}
+                    if !inputIDs.contains(reference.id),policy.exclusion(app:current.bundleID,title:current.title,url:current.url) != nil {omit=true;break}
+                    if current.evidenceHash != reference.revision {omit=true;break}
+                }
+                if omit {blocked.insert(m.id);report.skippedLinkedRecaps+=1;continue}
+            }
+            if let visual=m.visualRecording {
+                guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}
+                let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text
+            } else if let transcript=m.transcript {
+                guard m.text==transcript.text else {throw OSwindError.invalid("Transcript and source text differ")}
+                let clean=try transcript.sanitized(policy:policy).transcript;m.transcript=clean;m.text=clean.text
+            } else {m.text=policy.sanitize(m.text).text}
+            if var recap=m.recap {recap.provider=policy.sanitize(recap.provider).text;m.recap=recap}
+            m.title=policy.sanitize(m.title).text;m.url=m.url.map {policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
+            m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
+            if let embedder,m.embeddingModel==embedder.modelID,SemanticPassagePlan.needed(m) {
+                // A short metadata read preserves the existing retry fast path.
+                // Never hold this query's mutex over passage/model preparation.
+                if try passagesCurrent(m,modelID:embedder.modelID) {reusedPassages.insert(m.id)}
+                else if let records=try Self.prepareApplePassages(m,embedder:embedder) {passages[m.id]=records}
+            }
+            prepared.append(m);incoming[m.id]=m;report.imported+=1
+            try preparationProgress?(prepared.count)
+        }
+        try Task.checkCancellation();try requireMediaRootIdentity()
         lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
         do {
-            var report=JSONImportResult(),blocked=Set<String>()
-            for var m in ordered {
+            // Full stored payloads include favorite/tags and typed evidence,
+            // unlike evidenceHash. Missing targets are fenced as well, so a
+            // concurrent insert cannot be silently overwritten by this batch.
+            for id in ids {
                 try Task.checkCancellation()
-                let browser=collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
-                if policy.exclusion(app:m.bundleID,title:m.title,url:m.url,isBrowser:browser) != nil {blocked.insert(m.id);report.excluded+=1;continue}
-                if collectorAdmission,let previous=try get(m.id) {
-                    guard previous.kind == .note,previous.recap==nil else {throw OSwindError.invalid("Collector source ID belongs to incompatible content")}
-                    m.favorite=previous.favorite;m.tags=Array(Set(previous.tags+m.tags)).sorted()
-                }
-                if let recap=m.recap {
-                    var omit=false
-                    for reference in recap.sources {
-                        if blocked.contains(reference.id) {omit=true;break}
-                        guard let current=try get(reference.id) else {throw OSwindError.invalid("Linked recap import is missing a source. Import the complete JSON library or restore a full backup.")}
-                        if !inputIDs.contains(reference.id),policy.exclusion(app:current.bundleID,title:current.title,url:current.url) != nil {omit=true;break}
-                        if current.evidenceHash != reference.revision {omit=true;break}
-                    }
-                    if omit {blocked.insert(m.id);report.skippedLinkedRecaps+=1;continue}
-                }
-                if let visual=m.visualRecording {
-                    guard m.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}
-                    let clean=try visual.sanitized(policy:policy);m.visualRecording=clean;m.text=clean.text
-                } else if let transcript=m.transcript {
-                    guard m.text==transcript.text else {throw OSwindError.invalid("Transcript and source text differ")}
-                    let clean=try transcript.sanitized(policy:policy).transcript;m.transcript=clean;m.text=clean.text
-                } else {m.text=policy.sanitize(m.text).text}
-                if var recap=m.recap {recap.provider=policy.sanitize(recap.provider).text;m.recap=recap}
-                m.title=policy.sanitize(m.title).text;m.url=m.url.map {policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
-                m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
-                try insert(m);if let embedder {try indexApplePassages(m,embedder:embedder)};report.imported+=1
+                guard try importStoredSource(id,decodeMemory:false).digest==snapshot[id]?.digest else {throw OSwindError.unavailable("An import target or linked source changed during preparation. Retry the import using the current library.")}
             }
-            try Task.checkCancellation();try exec("COMMIT");_ = finishRecapInvalidation();return report
+            for m in prepared {
+                try Task.checkCancellation();try insert(m)
+                if let embedder {
+                    let current=try passagesCurrent(m,modelID:embedder.modelID)
+                    if reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
+                    if !current,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+                }
+            }
+            try Task.checkCancellation();try requireMediaRootIdentity()
+            if let settingsSnapshot {try settingsSnapshot.withCurrent(root:root,policy:policy) {try exec("COMMIT")}}
+            else {try exec("COMMIT")}
+            _ = finishRecapInvalidation();return report
+        } catch {try? exec("ROLLBACK");throw error}
+    }
+
+    private struct ImportStoredSource {
+        var digest:Data?
+        var memory:Memory?
+    }
+    /// Called only while holding the store mutex and a read/write transaction.
+    private func importStoredSource(_ id:String,decodeMemory:Bool=true) throws -> ImportStoredSource {
+        let stmt=try prepare("SELECT payload FROM memories WHERE id=?");defer {sqlite3_finalize(stmt)};bind(stmt,1,id)
+        switch sqlite3_step(stmt) {
+        case SQLITE_DONE:return .init()
+        case SQLITE_ROW:
+            guard let bytes=sqlite3_column_blob(stmt,0) else {throw OSwindError.database("Missing import target payload")}
+            let data=Data(bytes:bytes,count:Int(sqlite3_column_bytes(stmt,0)))
+            return .init(digest:Data(SHA256.hash(data:data)),memory:decodeMemory ? try JSONDecoder().decode(Memory.self,from:data):nil)
+        default:throw failure()
+        }
+    }
+    private func importSourceSnapshot(_ ids:Set<String>) throws -> [String:ImportStoredSource] {
+        lock.lock();defer {lock.unlock()};try Task.checkCancellation();try exec("BEGIN")
+        do {
+            var result=[String:ImportStoredSource]()
+            for id in ids {try Task.checkCancellation();result[id]=try importStoredSource(id)}
+            try exec("COMMIT");return result
         } catch {try? exec("ROLLBACK");throw error}
     }
 
@@ -883,13 +940,18 @@ extension MemoryStore {
 extension MemoryStore {
     func indexApplePassages(_ memory: Memory, embedder: LocalEmbedder) throws {
         guard memory.embeddingModel == embedder.modelID, SemanticPassagePlan.needed(memory), try !passagesCurrent(memory,modelID:embedder.modelID) else { return }
+        guard let records=try Self.prepareApplePassages(memory,embedder:embedder) else {return}
+        _ = try savePassages(memory:memory,modelID:embedder.modelID,records:records)
+    }
+    private static func prepareApplePassages(_ memory:Memory,embedder:LocalEmbedder) throws -> [PassageVector]? {
+        guard memory.embeddingModel==embedder.modelID,SemanticPassagePlan.needed(memory) else {return nil}
         var records = [PassageVector]()
         for passage in SemanticPassagePlan.make(memory) {
             try Task.checkCancellation()
             guard let vector = embedder.embed(passage.input) else { throw OSwindError.unavailable("Apple passage embeddings unavailable") }
             records.append(PassageVector(range:passage.range,vector:vector))
         }
-        _ = try savePassages(memory:memory,modelID:embedder.modelID,records:records)
+        return records
     }
 }
 

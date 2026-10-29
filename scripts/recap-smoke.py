@@ -31,12 +31,12 @@ with tempfile.TemporaryDirectory(prefix='oswind-recap-contract-') as temporary:
     cli('chat','save-recap',chat['id'],'--turn','missing',ok=False)
     preview=cli('erase','preview','--app','Notes');assert preview['matchedSources']==1 and preview['sources']==3
     exported=root/'all.json';cli('export',exported);clone=root/'json-clone';imported=cli('import',exported,'--json',data=clone);assert imported==dict(imported=4,excluded=0,skippedLinkedRecaps=0)
-    filtered=root/'filtered';settings=cli('config',data=filtered);settings['privacy']['excludedApps']=['com.oswind.private'];(filtered/'settings.json').write_text(json.dumps(settings))
+    filtered=root/'filtered';settings=cli('config',data=filtered);settings['privacy']['excludedApps']=['com.oswind.private'];(filtered/'settings.json').write_text(json.dumps(settings));(filtered/'settings.json').chmod(0o600)
     omitted=cli('import',exported,'--json',data=filtered);assert omitted==dict(imported=1,excluded=1,skippedLinkedRecaps=2)
     markdown=root/'markdown';info=cli('export-markdown',markdown);assert info['memories']==4
     for file in markdown.rglob('*.md'):
         for target in re.findall(r'\]\(([^)]+)\)',file.read_text()):assert (file.parent/target).resolve().exists(),(file,target)
-    settings=cli('config');settings['privacy']['excludedApps']=['com.oswind.private'];(library/'settings.json').write_text(json.dumps(settings))
+    settings=cli('config');settings['privacy']['excludedApps']=['com.oswind.private'];(library/'settings.json').write_text(json.dumps(settings));(library/'settings.json').chmod(0o600)
     hidden=root/'hidden-markdown';info=cli('export-markdown',hidden);assert info['memories']==1 and info['excludedMemories']==3 and info['excludedTurns']==2
     archive=root/'library.oswindbackup';cli('backup','create',archive);restored=root/'restored';cli('backup','restore',archive,'--to',restored)
     assert cli('get',second['id'],data=restored)['recap']['sources'][0]['id']==first['id']

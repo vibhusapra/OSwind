@@ -663,13 +663,20 @@ import UniformTypeIdentifiers
     func cancelJSONImport() {jsonImportTask?.cancel()}
     func importJSONFile(_ url:URL,limitlessAPI:Bool=false) {
         guard !libraryWipe.busy,!importingJSON else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
-        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        let snapshot:LibrarySettingsSnapshot
+        do {
+            snapshot=try LibrarySettingsSnapshot.capture(root:store.root)
+            guard snapshot.settings.privacy==settings.privacy else {snapshot.release();throw OSwindError.unavailable("Current privacy settings have not been saved. Resolve the settings error before importing.")}
+        }
+        catch {importingJSON=false;importStatus="Import did not complete: "+error.localizedDescription;errorMessage=error.localizedDescription;return}
+        let store=self.store,embedder=self.embedder,policy=snapshot.settings.privacy,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {()throws->String in
+            defer {snapshot.release()}
             if limitlessAPI {
-                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy)
+                let result=try store.importLimitlessAPI(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot)
                 return "Imported \(result.imported) Limitless text notes · \(result.excluded) excluded."+(result.hasMorePages ? " This response has another page; import each saved page to complete the export.":" Only the supplied response was imported.")
             }
-            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy)
+            let result=try store.importJSONDetailed(from:url,embedder:embedder,policy:policy,settingsSnapshot:snapshot)
             return "Imported \(result.imported) records · \(result.excluded) excluded · \(result.skippedLinkedRecaps) linked recaps omitted because an original was excluded, redacted or stale."
         }
         jsonImportTask=Task {
