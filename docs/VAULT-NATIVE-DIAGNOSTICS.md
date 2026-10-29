@@ -9,9 +9,9 @@ cause remains unproven. A passing retry does not repair that receipt.
 ## Product behavior
 
 Native attachment inventory, encryption and APFS-volume queries now distinguish
-nonzero tool exits from malformed successful output. A missing encryption flag
+normal exits, signal/unknown termination and malformed successful output. See the newer [termination provenance qualification](VAULT-TERMINATION.md). A missing encryption flag
 is unknown, rather than evidence that an image is unencrypted. Failure messages
-include operation/tool/exit status without raw native text, paths, UUIDs or
+include operation/tool/termination class/status without raw native text, paths, UUIDs or
 credentials. Error reflection and the retained summary contain only fixed
 operation names, counts and SHA256 output digests.
 

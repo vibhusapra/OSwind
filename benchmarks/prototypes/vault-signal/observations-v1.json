@@ -1,0 +1,2015 @@
+{
+  "format": "OSwind read-only Foundation launch signal observations v1",
+  "runs": [
+    {
+      "name": "info-signal-probe-v2",
+      "plan": {
+        "plans": [
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          }
+        ],
+        "binarySHA256": "554752db0ef20d2ada8a6fb4f091568f40c7df6ff99943c2e3ec84da835ee4ef",
+        "scope": "Read-only hdiutil info and synthetic Python control. One private controlling PTY per probe; no vault mutations, user terminal, keys or settings. Native inventory stdout only count/hash, never retained."
+      },
+      "results": [
+        {
+          "index": 0,
+          "parentPID": 56822,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07727616582997143,
+          "result": {
+            "childGroup": 56823,
+            "childPID": 56823,
+            "childSession": 56822,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 1,
+          "parentPID": 56824,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07224029209464788,
+          "result": {
+            "childGroup": 56825,
+            "childPID": 56825,
+            "childSession": 56824,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 2,
+          "parentPID": 56826,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07527029188349843,
+          "result": {
+            "childGroup": 56827,
+            "childPID": 56827,
+            "childSession": 56826,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 3,
+          "parentPID": 56828,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07851754198782146,
+          "result": {
+            "childGroup": 56829,
+            "childPID": 56829,
+            "childSession": 56828,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 4,
+          "parentPID": 56830,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.0760320839472115,
+          "result": {
+            "childGroup": 56831,
+            "childPID": 56831,
+            "childSession": 56830,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 5,
+          "parentPID": 56832,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07418745895847678,
+          "result": {
+            "childGroup": 56833,
+            "childPID": 56833,
+            "childSession": 56832,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 6,
+          "parentPID": 56834,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07627837499603629,
+          "result": {
+            "childGroup": 56835,
+            "childPID": 56835,
+            "childSession": 56834,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 7,
+          "parentPID": 56836,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07307341694831848,
+          "result": {
+            "childGroup": 56837,
+            "childPID": 56837,
+            "childSession": 56836,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 8,
+          "parentPID": 56838,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07086670794524252,
+          "result": {
+            "childGroup": 56839,
+            "childPID": 56839,
+            "childSession": 56838,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 9,
+          "parentPID": 56841,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.0755267080385238,
+          "result": {
+            "childGroup": 56843,
+            "childPID": 56843,
+            "childSession": 56841,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 10,
+          "parentPID": 56845,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07358237495645881,
+          "result": {
+            "childGroup": 56846,
+            "childPID": 56846,
+            "childSession": 56845,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 11,
+          "parentPID": 56847,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07376112509518862,
+          "result": {
+            "childGroup": 56848,
+            "childPID": 56848,
+            "childSession": 56847,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 12,
+          "parentPID": 56849,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07763933390378952,
+          "result": {
+            "childGroup": 56850,
+            "childPID": 56850,
+            "childSession": 56849,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 13,
+          "parentPID": 56851,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07846670807339251,
+          "result": {
+            "childGroup": 56852,
+            "childPID": 56852,
+            "childSession": 56851,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 14,
+          "parentPID": 56853,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07651566690765321,
+          "result": {
+            "childGroup": 56854,
+            "childPID": 56854,
+            "childSession": 56853,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 15,
+          "parentPID": 56855,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.1384529999922961,
+          "result": {
+            "childGroup": 56856,
+            "childPID": 56856,
+            "childSession": 56855,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 16,
+          "parentPID": 56857,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.14112183288671076,
+          "result": {
+            "childGroup": 56858,
+            "childPID": 56858,
+            "childSession": 56857,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 17,
+          "parentPID": 56859,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07222125004045665,
+          "result": {
+            "childGroup": 56860,
+            "childPID": 56860,
+            "childSession": 56859,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 18,
+          "parentPID": 56861,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07167008309625089,
+          "result": {
+            "childGroup": 56862,
+            "childPID": 56862,
+            "childSession": 56861,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 19,
+          "parentPID": 56863,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07282029115594923,
+          "result": {
+            "childGroup": 56864,
+            "childPID": 56864,
+            "childSession": 56863,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 2,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "signal"
+          }
+        },
+        {
+          "index": 20,
+          "parentPID": 56865,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07797670783475041,
+          "result": {
+            "childGroup": 56866,
+            "childPID": 56866,
+            "childSession": 56865,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 2,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "signal"
+          }
+        },
+        {
+          "index": 21,
+          "parentPID": 56867,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07446620799601078,
+          "result": {
+            "childGroup": 56868,
+            "childPID": 56868,
+            "childSession": 56867,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 22,
+          "parentPID": 56869,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07125262496992946,
+          "result": {
+            "childGroup": 56870,
+            "childPID": 56870,
+            "childSession": 56869,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 23,
+          "parentPID": 56871,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.14306866703554988,
+          "result": {
+            "childGroup": 56872,
+            "childPID": 56872,
+            "childSession": 56871,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 24,
+          "parentPID": 56873,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.13897462491877377,
+          "result": {
+            "childGroup": 56874,
+            "childPID": 56874,
+            "childSession": 56873,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 25,
+          "parentPID": 56875,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07478229212574661,
+          "result": {
+            "childGroup": 56876,
+            "childPID": 56876,
+            "childSession": 56875,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 26,
+          "parentPID": 56877,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.0721309999935329,
+          "result": {
+            "childGroup": 56878,
+            "childPID": 56878,
+            "childSession": 56877,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 27,
+          "parentPID": 56879,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07408795901574194,
+          "result": {
+            "childGroup": 56880,
+            "childPID": 56880,
+            "childSession": 56879,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 28,
+          "parentPID": 56881,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.14363620802760124,
+          "result": {
+            "childGroup": 56882,
+            "childPID": 56882,
+            "childSession": 56881,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 29,
+          "parentPID": 56883,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.13677329197525978,
+          "result": {
+            "childGroup": 56884,
+            "childPID": 56884,
+            "childSession": 56883,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "mode": "info",
+          "trials": 15,
+          "outcomes": [
+            {
+              "termination": "exit",
+              "status": 0,
+              "trials": 15
+            }
+          ]
+        },
+        {
+          "mode": "control",
+          "trials": 15,
+          "outcomes": [
+            {
+              "termination": "exit",
+              "status": 0,
+              "trials": 13
+            },
+            {
+              "termination": "signal",
+              "status": 2,
+              "trials": 2
+            }
+          ]
+        }
+      ],
+      "allObservedChildGroupsOwnPID": true,
+      "resultsSHA256": "f0a4e3032d43359d9cf230bbc92191b3bdd099c111800882ffc8c22e5ea11eba"
+    },
+    {
+      "name": "public-signal-probe-v1",
+      "plan": {
+        "plans": [
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          }
+        ],
+        "binarySHA256": "a05994e4970ea6108c643c42c5456fd2dc6624f420063a8147c69ffd32c16c26",
+        "scope": "Read-only hdiutil info and synthetic Python control. One private controlling PTY per probe; no vault mutations, user terminal, keys or settings. Native inventory stdout only count/hash, never retained."
+      },
+      "results": [
+        {
+          "index": 0,
+          "parentPID": 70393,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.30031641689129174,
+          "result": {
+            "childGroup": 70394,
+            "childPID": 70394,
+            "childSession": 70393,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 1,
+          "parentPID": 70395,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07720483304001391,
+          "result": {
+            "childGroup": 70396,
+            "childPID": 70396,
+            "childSession": 70395,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 2,
+          "parentPID": 70397,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07125783315859735,
+          "result": {
+            "childGroup": 70398,
+            "childPID": 70398,
+            "childSession": 70397,
+            "mode": "info",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 3,
+          "parentPID": 70400,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07533670892007649,
+          "result": {
+            "childGroup": -1,
+            "childPID": 70401,
+            "childSession": -1,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 2,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "signal"
+          }
+        },
+        {
+          "index": 4,
+          "parentPID": 70404,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.0786186249461025,
+          "result": {
+            "childGroup": 70405,
+            "childPID": 70405,
+            "childSession": 70404,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 5,
+          "parentPID": 70406,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07711320812813938,
+          "result": {
+            "childGroup": 70407,
+            "childPID": 70407,
+            "childSession": 70406,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 2,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "signal"
+          }
+        },
+        {
+          "index": 6,
+          "parentPID": 70409,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07698079198598862,
+          "result": {
+            "childGroup": 70410,
+            "childPID": 70410,
+            "childSession": 70409,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 7,
+          "parentPID": 70411,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07608104101382196,
+          "result": {
+            "childGroup": 70412,
+            "childPID": 70412,
+            "childSession": 70411,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 8,
+          "parentPID": 70413,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.0732449172064662,
+          "result": {
+            "childGroup": 70414,
+            "childPID": 70414,
+            "childSession": 70413,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 9,
+          "parentPID": 70415,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07207900006324053,
+          "result": {
+            "childGroup": 70416,
+            "childPID": 70416,
+            "childSession": 70415,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 10,
+          "parentPID": 70417,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07459079101681709,
+          "result": {
+            "childGroup": 70418,
+            "childPID": 70418,
+            "childSession": 70417,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 11,
+          "parentPID": 70419,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07886537490412593,
+          "result": {
+            "childGroup": 70420,
+            "childPID": 70420,
+            "childSession": 70419,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 12,
+          "parentPID": 70421,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.06971779209561646,
+          "result": {
+            "childGroup": 70422,
+            "childPID": 70422,
+            "childSession": 70421,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 13,
+          "parentPID": 70423,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07701004203408957,
+          "result": {
+            "childGroup": 70424,
+            "childPID": 70424,
+            "childSession": 70423,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 14,
+          "parentPID": 70425,
+          "plan": {
+            "mode": "info",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07817999995313585,
+          "result": {
+            "childGroup": 70426,
+            "childPID": 70426,
+            "childSession": 70425,
+            "mode": "info",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 3333,
+            "stdoutSHA256": "0bf26d41399173774e07e414e515e16f0d473ca956415b8e0398f11afd5b3d74",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 15,
+          "parentPID": 70427,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 0
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.14283566712401807,
+          "result": {
+            "childGroup": 70428,
+            "childPID": 70428,
+            "childSession": 70427,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 16,
+          "parentPID": 70430,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 1
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.07557754102163017,
+          "result": {
+            "childGroup": 70431,
+            "childPID": 70431,
+            "childSession": 70430,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 17,
+          "parentPID": 70432,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": null,
+            "repeat": 2
+          },
+          "terminalCtrlC": false,
+          "probeExit": 0,
+          "seconds": 0.14204879105091095,
+          "result": {
+            "childGroup": 70433,
+            "childPID": 70433,
+            "childSession": 70432,
+            "mode": "control",
+            "parentSignalsObserved": 0,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 18,
+          "parentPID": 70434,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07477370812557638,
+          "result": {
+            "childGroup": 70435,
+            "childPID": 70435,
+            "childSession": 70434,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 2,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "signal"
+          }
+        },
+        {
+          "index": 19,
+          "parentPID": 70436,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.1353827090933919,
+          "result": {
+            "childGroup": 70437,
+            "childPID": 70437,
+            "childSession": 70436,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 20,
+          "parentPID": 70438,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.14535062480717897,
+          "result": {
+            "childGroup": 70439,
+            "childPID": 70439,
+            "childSession": 70438,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 21,
+          "parentPID": 70440,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.13817829196341336,
+          "result": {
+            "childGroup": 70441,
+            "childPID": 70441,
+            "childSession": 70440,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 22,
+          "parentPID": 70442,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07423783303238451,
+          "result": {
+            "childGroup": 70443,
+            "childPID": 70443,
+            "childSession": 70442,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 23,
+          "parentPID": 70444,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.0005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.13949662493541837,
+          "result": {
+            "childGroup": 70445,
+            "childPID": 70445,
+            "childSession": 70444,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 24,
+          "parentPID": 70447,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07475887495093048,
+          "result": {
+            "childGroup": 70448,
+            "childPID": 70448,
+            "childSession": 70447,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 25,
+          "parentPID": 70451,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.1408534161746502,
+          "result": {
+            "childGroup": 70452,
+            "childPID": 70452,
+            "childSession": 70451,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 26,
+          "parentPID": 70453,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.002,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.07843216601759195,
+          "result": {
+            "childGroup": 70454,
+            "childPID": 70454,
+            "childSession": 70453,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 27,
+          "parentPID": 70455,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 0
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.14334758394397795,
+          "result": {
+            "childGroup": 70456,
+            "childPID": 70456,
+            "childSession": 70455,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 28,
+          "parentPID": 70457,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 1
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.13970429101027548,
+          "result": {
+            "childGroup": 70458,
+            "childPID": 70458,
+            "childSession": 70457,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        },
+        {
+          "index": 29,
+          "parentPID": 70459,
+          "plan": {
+            "mode": "control",
+            "delaySeconds": 0.005,
+            "repeat": 2
+          },
+          "terminalCtrlC": true,
+          "probeExit": 0,
+          "seconds": 0.144282832974568,
+          "result": {
+            "childGroup": 70460,
+            "childPID": 70460,
+            "childSession": 70459,
+            "mode": "control",
+            "parentSignalsObserved": 1,
+            "phase": "completed",
+            "rawInventoryRetained": false,
+            "status": 0,
+            "stderrBytes": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stdoutBytes": 0,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "termination": "exit"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "mode": "info",
+          "trials": 15,
+          "outcomes": [
+            {
+              "termination": "exit",
+              "status": 0,
+              "trials": 13
+            },
+            {
+              "termination": "signal",
+              "status": 2,
+              "trials": 2
+            }
+          ]
+        },
+        {
+          "mode": "control",
+          "trials": 15,
+          "outcomes": [
+            {
+              "termination": "exit",
+              "status": 0,
+              "trials": 14
+            },
+            {
+              "termination": "signal",
+              "status": 2,
+              "trials": 1
+            }
+          ]
+        }
+      ],
+      "allObservedChildGroupsOwnPID": false,
+      "resultsSHA256": "1ab5cb3bd93d633a451e2626c1064fd9ab6dc5a6dfc114df489e8ab9afa9c981"
+    }
+  ],
+  "scope": "Two separately frozen 30-trial component runs. Counts are observations, not failure probability, native-vault historical diagnosis or a cancellation repair. Native inventory stdout is never retained. Private PTYs, no disk-image mutation, user terminal, library, key, permission or power-setting change."
+}
