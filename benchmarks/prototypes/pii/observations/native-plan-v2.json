@@ -1,0 +1,47 @@
+{
+  "frozenAtUTC": "2026-10-29T02:30:06.275206+00:00",
+  "parentPlanSHA256": "52382bfa76adc189c0c41462cb58d5d06dea0ea902403b7803fc1508a67ebe61",
+  "inputs": [
+    {
+      "path": "benchmarks/prototypes/pii/native-probe.cpp",
+      "sha256": "82aa504e482515e95fd152018c28395c65ec724fddbf3256004613f2cd8ad790"
+    },
+    {
+      "path": "benchmarks/prototypes/pii/export-native-fixtures.py",
+      "sha256": "8911a4b1a7fbf85fbfbc724c1ff9a6866eaa82d56762e1f3238bd1aaea972ed8"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/native/run-v2/native-probe",
+      "sha256": "e3b3750ab16ece8c4ed0d47e9ef133288a7a13a0ea023428070cec00d8aa22ba"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/native/run-v1/fixtures.bin",
+      "sha256": "8781d43c66ca94650e52f551d9ee932ab07edb877f7bc11b60ae92d9a94d6838"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/native/include/onnxruntime_c_api.h",
+      "sha256": "09e5750c82f7b291cfad3e4a135d4ef78a4c54d7b3f86a5a178692279cf88334"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/native/include/onnxruntime_ep_c_api.h",
+      "sha256": "9f05feec0c200e418577425c7fbc56668d845bedfaf1b0447f95a7d6aad5180c"
+    },
+    {
+      "path": ".local/pii-python-v1/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.24.2.dylib",
+      "sha256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/model/onnx/model.onnx",
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836"
+    }
+  ],
+  "policiesInOrder": [
+    "cpu",
+    "coreml"
+  ],
+  "repetitions": 10,
+  "absoluteTolerance": 0.001,
+  "scope": "Three previously opened authored validation tensors. Native C API forward only, no native tokenizer/decoder or app/PII acceptance. CoreML partition provider assignment is not physical GPU/ANE placement. Host/cache state uncontrolled.",
+  "priorPlanSHA256": "ae6c26bb9d9ba8adcd715a3e43b4de094d2279a4ee06c98bc332228363f513f3",
+  "change": "Retain every forward timing; same tensor/model/provider/threshold policy. First attempt CPU pass/CoreML constructor failure retained."
+}

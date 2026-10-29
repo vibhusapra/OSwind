@@ -1,0 +1,76 @@
+{
+  "state": "completed",
+  "loadSeconds": 0.34398566698655486,
+  "rows": [
+    {
+      "id": "validation-a20d85708e83",
+      "referenceShape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "exportedShape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "inputShape": [
+        1,
+        60
+      ],
+      "runtimeLayout": "position-last",
+      "maximumAbsoluteLogitDifference": 4.100799560546875e-05,
+      "meanAbsoluteLogitDifference": 7.08065908838762e-06
+    },
+    {
+      "id": "validation-9433c40dbdab",
+      "referenceShape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "exportedShape": [
+        1,
+        20,
+        12,
+        3
+      ],
+      "inputShape": [
+        1,
+        61
+      ],
+      "runtimeLayout": "position-last",
+      "maximumAbsoluteLogitDifference": 3.5762786865234375e-05,
+      "meanAbsoluteLogitDifference": 5.670388418366201e-06
+    },
+    {
+      "id": "validation-c18165bd8721",
+      "referenceShape": [
+        1,
+        22,
+        12,
+        3
+      ],
+      "exportedShape": [
+        1,
+        22,
+        12,
+        3
+      ],
+      "inputShape": [
+        1,
+        63
+      ],
+      "runtimeLayout": "position-last",
+      "maximumAbsoluteLogitDifference": 2.574920654296875e-05,
+      "meanAbsoluteLogitDifference": 6.123730599938426e-06
+    }
+  ],
+  "providers": [
+    "CPUExecutionProvider"
+  ],
+  "scope": "Strict local-only PyTorch weight load versus exact pinned FP32 ONNX on three fixed validation inputs; runtime axes recorded and numerical agreement required. Not privacy or native application acceptance."
+}

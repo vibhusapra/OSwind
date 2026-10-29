@@ -1,0 +1,41 @@
+{
+  "frozenAtUTC": "2026-10-29T02:38:46.037084+00:00",
+  "hypothesis": "One bounded diagnostic of static input/output metadata versus dynamic graph. A success would not establish dynamic/native tokenizer/decoder or actual GPU node placement. No operator/initializer transforms, one already-opened validation input repeated30 times.",
+  "sourceModelSHA256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+  "fixtureSHA256": "7b1bad37b214252016d696a76f68af6427be2e3e0442f6e5c7a228a8cecd804a",
+  "binarySHA256": "e3b3750ab16ece8c4ed0d47e9ef133288a7a13a0ea023428070cec00d8aa22ba",
+  "absoluteTolerance": 0.001,
+  "policiesInOrder": [
+    "cpu",
+    "coreml"
+  ],
+  "repetitions": 10,
+  "staticModelSHA256": "cb3d3184629be1d00434534fb15701b5c7ee5c2dd3d38fd7c560792cbb3831a2",
+  "unchangedNodeInitializerSHA256": "a62df836363360b6f2a3420ffa260176584e655aedb8a9ca339aa5361bbb2130",
+  "fixedInputShapes": {
+    "input_ids": [
+      1,
+      60
+    ],
+    "attention_mask": [
+      1,
+      60
+    ],
+    "words_mask": [
+      1,
+      60
+    ],
+    "text_lengths": [
+      1,
+      1
+    ],
+    "logits": [
+      1,
+      20,
+      12,
+      3
+    ]
+  },
+  "nativeFixtureSHA256": "4e1255c245e423902570a71cf00a58527c1a920199ccc9101bf269853a3ff321",
+  "preparationScriptSHA256": "b019eb735c3c6c537c2c14ff16ddadcc12f67c6858ccc67e6df5ffed31a5576e"
+}

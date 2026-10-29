@@ -372,7 +372,7 @@
     "axis": "Privacy",
     "feature": "PII model / image redaction",
     "status": "todo",
-    "evidence": "No learned local PII or visual-sensitive-content model",
+    "evidence": "Validation-only pinned GLiNER prototype:72 authored cases, CPU/MPS metrics agree; threshold0.5 fully covers42/48 values but flags8/24 negatives. Native CPU logits match on30 fixed-input calls; dynamic CoreML construction fails. Separate static metadata diagnostic completes30 CoreML-EP calls on one repeated input with CPU partitions/warnings retained.20 offline scorer/asset tests pass. No production tokenizer/decoder/privacy-path integration, image redaction or independent desktop acceptance; see PII-EVALUATION.md",
     "references": "Screenpipe, Recall, Retrace (jhammant)"
   },
   {

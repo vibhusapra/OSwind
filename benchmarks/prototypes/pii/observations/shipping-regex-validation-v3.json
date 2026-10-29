@@ -1,0 +1,41 @@
+{
+  "state": "completed",
+  "binarySHA256": "4b1a152c246356feee97a8a368666aeea3dc2e9dc59709360c9804f2c8d7ff06",
+  "corpusSHA256": "a848affbd8b56492fcf77efdaf792d6d8306bef63e57beb7b605505c9d98687b",
+  "planSHA256": "09996368eae9ace1ac61be49e17b94bf49701b7c4cbb71d79d30413c3be10855",
+  "harnessSHA256": "dc30f6ed2b8f753f0e5bf31f1a4143675003aa70433def2f91ae76a883537f15",
+  "split": "validation",
+  "reservedTestOpened": false,
+  "operations": [
+    {
+      "name": "import",
+      "exitCode": 0,
+      "awakeSeconds": 0.5520625410135835,
+      "systemSeconds": 0.5520639419555664
+    },
+    {
+      "name": "export",
+      "exitCode": 0,
+      "awakeSeconds": 0.04785104119218886,
+      "systemSeconds": 0.0478520393371582
+    }
+  ],
+  "metrics": {
+    "examples": 72,
+    "characterCoverageUntyped": {
+      "tp": 324,
+      "fp": 40,
+      "fn": 560,
+      "precision": 0.8901098901098901,
+      "recall": 0.3665158371040724,
+      "f1": 0.5192307692307692
+    },
+    "fullyCoveredValues": 14,
+    "goldValues": 48,
+    "fullValueRecall": 0.2916666666666667,
+    "negativeExamples": 24,
+    "negativeExamplesWithPrediction": 0,
+    "negativeFalsePositiveRate": 0.0
+  },
+  "scope": "Actual immutable shipping CLI admission; only unique source/output mask reconstruction accepted. Baseline has no typed spans. Untyped character precision counts removed non-secret context as over-redaction. Operation timing includes embeddings/SQLite/startup, not comparable to model-only latency."
+}
