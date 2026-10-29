@@ -131,5 +131,8 @@ python3 scripts/pii-inspection-smoke.py /absolute/oswindctl \
 These are compatibility and ownership checks on authored validation data.
 They are not representative privacy acceptance, a reserved-test result,
 capture/GUI/media acceptance, a latency/energy benchmark or competitor ranking.
-Long-source windows, production application integration, policy/record
-revision fences, image treatment and representative hybrid quality remain TODO.
+Bounded long-source windows and native setup are now implemented in their
+separate receipts. [Actual combined-mask quality](NATIVE-PII-QUALITY.md) is scored
+on the same 72 authored sources without accepting an operating point.
+Production application integration, policy/record revision fences, image/audio
+treatment and representative hybrid quality remain TODO.

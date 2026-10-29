@@ -105,3 +105,16 @@ cp benchmarks/prototypes/pii/diagnose-coreml-bucket-v1.py \
 The historical bucket diagnostic is a one-shot preparation with fixed ignored paths: use a fresh directory/checkout, preserve existing receipts, and never run it during another build/test pipeline. It tests three-source CPU/Core ML smoke first and proceeds to all72 only on success. No operator or initializer is rewritten. All framework warning text and actual binary outputs remain separate from the terminal report object.
 
 Native binary hashes and workspace paths vary across fresh builds, so provenance bytes/aggregate file hashes can differ. Preserve the committed golden fixtures; compare new tensor/decoder results under the declared tolerances and keep new receipts separate. Do not overwrite original observations to make hashes match. The public export plan has workspace-relative paths; its recorded original-plan digest identifies the original path-bearing receipt. Peak owned-process memory excludes system services. Source/model/library/policy generation ownership, device placement, long sources and application integration remain unqualified.
+
+## Actual native combined-mask quality
+
+[Native hybrid quality](../../../docs/NATIVE-PII-QUALITY.md) reuses signed product7e21e0f and freezes separate tooling/source/asset identities before432 real calls. The combined inspector is measured independently against actual production import/export rule masks, with no detector replication or gold-derived output. Both backends have identical masks at0.3/0.5/0.7; at0.7 the union improves whole-value coverage29/48→33/48 on the same72 authored validation sources. No operating point or production admission is accepted, and144 reserved test predictions remain unopened.
+
+`native-hybrid-v1/` preserves all432 actual native stdout byte strings, actual exported rule text, predictions and a sanitized plan. The [receipt](../../native-hybrid-pii-quality-v1.json) binds all16 files and contains every operation/metric. Stderr byte counts/hashes are public; original repetitive framework diagnostics and machine-specific plan paths remain local.
+
+```sh
+python3 scripts/test-pii-native-quality.py
+python3 scripts/replay-pii-native-quality.py
+```
+
+Replay performs no inference/download or history access. For fresh native experiments, follow the explicit prepare/evaluate recipe in the linked quality document and use new output directories. No Swift/C++ source or app binary changes in this follow-up.

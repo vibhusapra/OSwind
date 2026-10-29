@@ -1,6 +1,6 @@
 # Learned PII evaluation
 
-OSwind still uses pattern-based secret protection. The optional learned candidate is **not connected to capture, imports, answers, exports, screenshots or audio**. F047 remains TODO. [Measured results](../benchmarks/pii-model-evaluation-v1.json) identify a useful recall opportunity and unacceptable false positives at the example0.5 threshold. The original dynamic-shape Core ML failure is retained; [explicit native inspection](NATIVE-PII-RUNTIME.md) now qualifies a fixed128-token Core ML path and CPU runtime. Representative hybrid quality, production admission and an accepted operating point remain open.
+OSwind still uses pattern-based secret protection. The optional learned candidate is **not connected to capture, imports, answers, exports, screenshots or audio**. F047 remains TODO. [Measured model-only results](../benchmarks/pii-model-evaluation-v1.json) identify a useful recall opportunity and unacceptable false positives at the example 0.5 threshold. [Actual native hybrid quality](NATIVE-PII-QUALITY.md) now scores the combined learned/production-pattern masks: 432 calls preserve CPU/Core ML mask parity; at 0.7, whole-value coverage improves from 29/48 to 33/48 with 0/24 negatives flagged. This remains the same small authored validation set, with no accepted operating point. The original dynamic-shape Core ML failure is retained; [explicit native inspection](NATIVE-PII-RUNTIME.md) qualifies a fixed128-token Core ML path and CPU runtime. Representative hybrid quality and production admission remain open.
 
 ## Validation results
 
@@ -44,7 +44,7 @@ Retained earlier failures include two output-layout assertions before scoring an
 ## Remaining gates
 
 - [Native tokenization/input masks](NATIVE-PII.md) match181 independent references. [Native output decoding and whole-grapheme masks](NATIVE-PII-DECODING.md) now match276 CPU and216 fixed-token CoreML comparisons. Connect these contracts to a production backend and every admission path. Refuse truncation, stale sources and invalid output without exposing raw sensitive data through a fallback.
-- Establish a working native accelerator path, serialized ownership, cancellation, bounded long-source processing and idle/manual model release.
+- Explicit native inspection now has CPU/fixed128 Core ML execution, serialized ownership, joined cancellation, bounded complete-document windows and idle/manual release. Physical device placement, native app residency/power and production integration remain unqualified; see [runtime](NATIVE-PII-RUNTIME.md) and [document](NATIVE-PII-DOCUMENTS.md) receipts.
 - Tune only on validation; freeze representative independent OCR/ASR/desktop and multilingual acceptance data before opening it. Measure whole-value recall and false-positive cost together.
 - Qualify every ingestion and egress path, screenshot/audio suppression, lock/wipe/backup lifecycle and setup/download/license controls. Text span quality is not visual redaction acceptance.
 - Re-run relevant native tests/TSan after production integration, then physical desktop/power and matched competitor workloads. Existing product qualification and overall parity/release gates remain separate.
