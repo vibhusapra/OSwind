@@ -65,6 +65,8 @@ jobs:
         run: python3 scripts/pii-setup-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/pii-setup-offline"
       - name: Verify original-source pattern privacy across imports exports and media
         run: python3 scripts/privacy-mask-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pattern-privacy"
+      - name: Verify configured imports reject changed saved policies
+        run: python3 scripts/import-preparation-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-import-preparation"
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
