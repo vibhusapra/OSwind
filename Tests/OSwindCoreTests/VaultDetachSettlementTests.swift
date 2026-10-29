@@ -181,7 +181,14 @@ private final class OwnedVaultNativeTrace:@unchecked Sendable {
         var text=String(decoding:encoded,as:UTF8.self)
         // Match JSON's escaped representation, including /private aliases and
         // quoted/non-ASCII path components. Longer roots must be replaced first.
-        let paths:Set<String>=Set(roots.map { $0.path })
+        var paths:Set<String>=Set(roots.map { $0.path })
+        // Foundation may present /var even after resolving a /private/var
+        // symlink. F_GETPATH uses the kernel spelling; pin that spelling too.
+        for root in roots {
+            if let native=realpath(root.path,nil) {
+                paths.insert(String(cString:native));free(native)
+            }
+        }
         let ordered=paths.sorted { (left:String,right:String)->Bool in
             if left.count != right.count {return left.count>right.count}
             return left<right
@@ -220,6 +227,14 @@ final class OwnedVaultNativeTraceTests:XCTestCase {
     func testCredentialBearingTraceIsRefusedBeforeExport() throws {
         let secret=Data("owned-fixture-secret".utf8),encoded=try JSONEncoder().encode(["diagnostic":"owned-fixture-secret"])
         XCTAssertThrowsError(try OwnedVaultNativeTrace.redactedJSON(encoded,roots:[],secret:secret))
+    }
+    func testKernelSpellingOfActualFixtureRootIsRedacted() throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-trace-path-"+UUID().uuidString)
+        try Paths.ensure(root);defer {try? FileManager.default.removeItem(at:root)}
+        let native=try XCTUnwrap(realpath(root.path,nil));defer {free(native)}
+        let encoded=try JSONEncoder().encode(["path":String(cString:native)+"/Library/memory.sqlite"])
+        let exported=try OwnedVaultNativeTrace.redactedJSON(encoded,roots:[root.resolvingSymlinksInPath()],secret:Data("fixture-credential".utf8))
+        XCTAssertEqual(try JSONDecoder().decode([String:String].self,from:exported),["path":"<owned-fixture>/Library/memory.sqlite"])
     }
 }
 final class NativeVaultDetachSettlementTests:XCTestCase {
