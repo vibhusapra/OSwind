@@ -35,7 +35,7 @@ try:
     assert entity('sources',project['id'])==[] and entity('sources',person['id'])[0]['id']==source
     report['checks'].append('labels, notes, correction and deliberate source link survive normal lock/remount')
     archive=root/'entity.oswindbackup';restored=root/'restored'
-    info=json.loads(command('--vault',package,'backup','create',archive));assert info['sourceSchema']==22
+    info=json.loads(command('--vault',package,'backup','create',archive));assert info['sourceSchema']==23
     command('backup','restore',archive,'--to',restored)
     restored_groups=json.loads(command('--data',restored,'entity','list'));assert {g['id'] for g in restored_groups}=={g['id'] for g in groups}
     assert json.loads(command('--data',restored,'entity','index'))['indexed']==1

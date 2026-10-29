@@ -23,8 +23,8 @@ try:
  settings={'allDisplays':True,'snapshotRegions':region,'captureOnLaunch':True,'apiEnabled':True,'automaticMaintenance':False}
  settingsFile=library/'settings.json';settingsFile.write_text(json.dumps(settings));settingsSHA=hashlib.sha256(settingsFile.read_bytes()).hexdigest();before=snapshot()
  assert json.loads(run(binary,'--data',library,'stats','--json').stdout)['count']==1
- after=snapshot();assert after['schema']==22 and before['ids']==after['ids'] and hashlib.sha256(settingsFile.read_bytes()).hexdigest()==settingsSHA
- report['checks'].append('schema19 upgrades to22 with exact source identity/text and unchanged settings bytes')
+ after=snapshot();assert after['schema']==23 and before['ids']==after['ids'] and hashlib.sha256(settingsFile.read_bytes()).hexdigest()==settingsSHA
+ report['checks'].append('schema19 upgrades to23 with exact source identity/text and unchanged settings bytes')
  if a.old_cli:
   for command in [('stats','--json'),('note','Older capture client must refuse')]:
    refusal=run(creator,'--data',library,*command,ok=False);assert 'newer OSwind' in refusal.stderr
@@ -37,5 +37,5 @@ try:
  quiet=json.loads((restored/'settings.json').read_text());assert quiet['allDisplays'] and not quiet['captureOnLaunch'] and not quiet['apiEnabled']
  for key,value in region.items():assert quiet['snapshotRegions'][key]==value
  report['checks'].append('quiet backup restore preserves exact selected identities and both crop scopes without starting capture or API')
- report.update(state='completed',sourceSchema=19,targetSchema=22,physicalCaptureClaimed=False);save();print(json.dumps(report,indent=2))
+ report.update(state='completed',sourceSchema=19,targetSchema=23,physicalCaptureClaimed=False);save();print(json.dumps(report,indent=2))
 except BaseException as error:report.update(state='failed',failure=str(error));save();raise
