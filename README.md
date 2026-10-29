@@ -10,6 +10,8 @@ Recent work adds [reviewed contextual drafts](docs/CONTEXTUAL-DRAFTS.md), [text 
 
 [Automatic maintenance](docs/MAINTENANCE-STARTUP.md), [nonblocking lifecycle status](docs/STORE-LIFECYCLE.md), and [quiet workspace startup/wake](docs/WORKSPACE-LIFECYCLE.md) keep preparation and setup under control. Quiet libraries have explicit schedule/API resume controls, and disabled schedules avoid a polling timer. [Latest local qualification](benchmarks/quiet-workspace-wake-v1.json) has 954 functional passes/two skips and 150 selected TSan passes/one skip, with signed-package/process checks. An earlier sleep-overlapping TSan failure remains retained; the fixture follow-up and broad physical/release gates are documented. Both product-source and fixture-only CI jobs pass; later documentation CI is separate.
 
+[Native vault closing](docs/VAULT-NATIVE-DIAGNOSTICS.md) now verifies fresh attachment state after failed native actions and preserves safe error diagnostics. The [current qualification](benchmarks/vault-native-diagnostics-v1.json) has 1,050 functional passes/two skips, 128 selected TSan passes and 48 optimized passes, plus signed CLI cancellation and held-reader checks. Historical native failure causes and broader release acceptance remain open.
+
 Builds are staged and ad-hoc signed. Full test, model, process and package receipts—including retained failures—are in the [delivery ledger](docs/PROGRESS.md) and [benchmark index](benchmarks/README.md). An encrypted-library terminal attachment-inspection failure remains open. Passing component checks do not establish unattended desktop or release readiness.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)

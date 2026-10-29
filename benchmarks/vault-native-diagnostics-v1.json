@@ -1,0 +1,1415 @@
+{
+  "format": "OSwind native vault result-aware closing and diagnostics v1",
+  "recordedAtUTC": "2026-10-29T08:02:14.173093+00:00",
+  "productSource": "4594e943718d4264a1bd00be38c8573b7372d0c3",
+  "fixtureFollowupSource": "193287c61c5792a0f86a1980d1c48ae7859dd265",
+  "base": "ae7b1f75bf2a0c2545927b1bfda7f828b226c169",
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/75",
+  "schema": 22,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "allKnownVaultContractsAccepted": false,
+  "behavior": {
+    "nonzeroExitIsAttachmentProof": false,
+    "independentConsecutiveAbsencesRequired": 2,
+    "identityValidatedAroundIPC": true,
+    "forceDetach": false,
+    "genericBusyMutationRetry": false,
+    "missingEncryptionFlagAcceptedAsFalse": false,
+    "publicErrorRawNativeText": false,
+    "publicConstructionInstallsTraceObserver": false,
+    "credentialCreateAttachObserved": false
+  },
+  "full": {
+    "defined": 1052,
+    "passed": 1050,
+    "skipped": 2,
+    "failures": 0,
+    "suiteAwakeSeconds": 437.34,
+    "suiteWallSeconds": 437.422,
+    "logSHA256": "f95c7dd12c802411f63b76bc36f220c7f7515376e1af2e847a802551ed37e51f"
+  },
+  "threadSanitizer": {
+    "defined": 128,
+    "passed": 128,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 138.301,
+    "suiteWallSeconds": 138.329,
+    "logSHA256": "ce60be0059d54f6443b2ccd782bbe195ad1e05f6dd1166cc09741e5f6c520865"
+  },
+  "optimizedVault": {
+    "defined": 48,
+    "passed": 48,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 15.906,
+    "suiteWallSeconds": 15.911,
+    "logSHA256": "ebb932df5c1513514411b4fcf377cea32515f6f2f9ae1b01f3ff89ccac319605"
+  },
+  "orderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 445.5959674590267,
+      "wallSeconds": 445.5961768627167
+    },
+    {
+      "name": "vault-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 171.00682512507774,
+      "wallSeconds": 171.00690579414368
+    },
+    {
+      "name": "optimized-vault-v1",
+      "exitCode": 0,
+      "awakeSeconds": 77.70866983383894,
+      "wallSeconds": 77.70870614051819
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 102.70528862508945,
+      "wallSeconds": 102.7053370475769
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.6325469589792192,
+      "wallSeconds": 1.6325480937957764
+    },
+    {
+      "name": "vault-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 15.165630167117342,
+      "wallSeconds": 15.165637254714966
+    },
+    {
+      "name": "vault-interruptions-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.628617124864832,
+      "wallSeconds": 5.628620147705078
+    },
+    {
+      "name": "vault-terminal-v1",
+      "exitCode": 0,
+      "awakeSeconds": 9.802471583010629,
+      "wallSeconds": 9.802478075027466
+    },
+    {
+      "name": "vault-terminal-busy-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.940230874810368,
+      "wallSeconds": 5.940233945846558
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 10.887048917124048,
+      "wallSeconds": 10.887053728103638
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.07706691697239876,
+      "wallSeconds": 0.07706809043884277
+    },
+    {
+      "name": "optimized-rapid-00-v1",
+      "exitCode": 0,
+      "awakeSeconds": 14.425188540946692,
+      "wallSeconds": 14.425195932388306
+    },
+    {
+      "name": "optimized-rapid-01-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.394373540999368,
+      "wallSeconds": 11.394378900527954
+    },
+    {
+      "name": "optimized-rapid-02-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.533511291956529,
+      "wallSeconds": 11.533517122268677
+    },
+    {
+      "name": "optimized-rapid-03-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.339516957988963,
+      "wallSeconds": 11.339523077011108
+    }
+  ],
+  "fixtureFollowup": {
+    "scope": "Only test trace export and three new tests change; Sources/Vendor/package/scripts/models/workflow inputs identical to productSource. Original owned trace files exposed synthetic temporary roots due escaped/canonical replacement mismatch; retained locally. New trace export redacts both representations.",
+    "operations": [
+      {
+        "name": "trace-normal-v3",
+        "exitCode": 0,
+        "awakeSeconds": 22.784395291935652,
+        "wallSeconds": 22.784405946731567
+      },
+      {
+        "name": "trace-tsan-v3",
+        "exitCode": 0,
+        "awakeSeconds": 47.6526774589438,
+        "wallSeconds": 47.6526997089386
+      },
+      {
+        "name": "trace-optimized-v3",
+        "exitCode": 0,
+        "awakeSeconds": 132.59698208305053,
+        "wallSeconds": 132.59704542160034
+      }
+    ],
+    "suites": {
+      "trace-normal-v3": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "suiteAwakeSeconds": 16.24,
+        "suiteWallSeconds": 16.241,
+        "logSHA256": "1cebdd1cda203b70733a84a21f462f55adfd5498cacbe56a61e225cdc036938f"
+      },
+      "trace-tsan-v3": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "suiteAwakeSeconds": 16.408,
+        "suiteWallSeconds": 16.422,
+        "logSHA256": "481f8e57e1efecba9c913f9acad88e80a8f48b0783589f4b78106a98d5a65c4f"
+      },
+      "trace-optimized-v3": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "suiteAwakeSeconds": 15.849,
+        "suiteWallSeconds": 15.85,
+        "logSHA256": "2a947f102f0e0954e4a67bf31e893f36ec1103e58eb54245c4b9e360136a6872"
+      }
+    }
+  },
+  "nativeTraceChecks": {
+    "vault-normal-traces": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-1B0CCDE4-C25A-4527-BC7D-91261B0F7F99-completed.json",
+          "sha256": "6239c88e055431489520547f4f7ea01a81da7e8814468f72a660985e3efe3efc",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.07666875,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-5986DEE4-4A28-4173-BB6A-663E2219D368-completed.json",
+          "sha256": "7b9d4d59757b5f309e11698073f73726bd8a130500d5052251b624638180c739",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "vault-tsan-traces": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-804EAE9F-BEED-4530-80A8-0F0DA64450DC-completed.json",
+          "sha256": "0294285736717cffe5a35cd77c5275f2061b92343b37e492a8890503e8711e8d",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.084243708,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-D793B6CE-E44F-4FAF-8051-309A83700215-completed.json",
+          "sha256": "4847716f65c19da2041d44f9df66c3dc7d1f648f8da79d7c3b16e97f9803a213",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "vault-optimized-traces": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-26C44B75-FA44-4E4B-942E-3090D3C10758-completed.json",
+          "sha256": "538facb1464e66519ffc0ca0d0840e1dd488ab8a6380b0c1367fd8a1c7c0ff5c",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.06054325,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-428DF090-9846-4FBB-A174-E992286B169C-completed.json",
+          "sha256": "ce21286e5fa5042d6cd5f45f282ae3de9c371637fd6bdcff6c0a52d011f5b4f5",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "vault-rapid-release-traces": {
+      "files": [
+        {
+          "file": "oswind-native-detach-settling-3F0E5A2A-638A-4C88-B21F-C79D4A9E8AEE-completed.json",
+          "sha256": "c8248667b7755ea656605221d82637ae72880cb46d61192f9ea191cda17bf0b6",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        },
+        {
+          "file": "oswind-native-detach-settling-5F615D87-90E5-4E9D-9CD4-41193F104D27-completed.json",
+          "sha256": "f2382f96b2789e22e9cd72a7453393add50b08ce41133d2b5c95e59502f6b545",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        },
+        {
+          "file": "oswind-native-detach-settling-DD00CAD0-68C8-422F-9145-90E1DA49F18D-completed.json",
+          "sha256": "301eee086c671b0c6750ad8dcd14b571d9b77fd8dbc39e7dfcf0a3c85e0e16d6",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        },
+        {
+          "file": "oswind-native-detach-settling-E680E2B5-3729-4857-89D1-48B46398DFDA-completed.json",
+          "sha256": "bdb2a714096347867881a5f685b923c67e559ab86c15fbae6a5057812c849b81",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 416,
+      "nonzero": 0,
+      "normalDetachCalls": 32,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "trace-normal-v3": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-F4BE64C5-53D0-4AA3-9C44-00A8D88FC3BE-completed.json",
+          "sha256": "0e822a3c7b332dde6c610048b8ee3e2c5aa6ca52470cef9a8b9c3550faa08b63",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.052769416,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-A1D1A8E5-735D-4B07-B89A-D7F4F67F104B-completed.json",
+          "sha256": "976da0533f4667c9b9f83870737d68b89a7f447895d059c65bd763a543fde8f1",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "trace-tsan-v3": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-54BC6D43-4DC9-4C9D-BD16-6B8E9AC2B7A9-completed.json",
+          "sha256": "f8673480a359449bd9d1ae00878e551195df8c8a772b70dd6229c861d592d3ff",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.057285916,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-9F79318D-8724-445B-86DB-D405871D08E2-completed.json",
+          "sha256": "82c41f41ef2c36fc8de55d5b40d99f46eb92cbe8325858e75e75ab5de54813d0",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    },
+    "trace-optimized-v3": {
+      "files": [
+        {
+          "file": "oswind-native-detach-held-reader-D6BFB209-A59E-4CA4-A449-54A50FB45EB1-completed.json",
+          "sha256": "ac5f4bbe349f2cb93c40e419c86cac704b1c10294d2d1b26cd47766ea06431fa",
+          "calls": 50,
+          "nonzero": 1,
+          "dropped": 0,
+          "normalDetachCalls": 4,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "expected-held-reader-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 1,
+              "mountedOwnedHandles": 1
+            },
+            {
+              "stage": "normal-recovery-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "verify-preserved-history",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": [
+            {
+              "stage": "expected-held-reader-lock",
+              "summary": {
+                "operation": "imageDetach",
+                "status": 16,
+                "stderrBytes": 50,
+                "stderrSHA256": "c0fb319faeb76dfe8440152d2d26f2493d85b70e87f5bc0d418202e4b095ce99",
+                "stdoutBytes": 0,
+                "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              },
+              "durationSeconds": 0.052033667,
+              "stderrSuffix": "hdiutil: couldn't unmount \"disk9\" - Resource busy\n"
+            }
+          ]
+        },
+        {
+          "file": "oswind-native-detach-settling-1598F059-E3BE-40AA-BD08-ADD2ECEAEC14-completed.json",
+          "sha256": "54b2afac83009fbb8faa2b0f08e44544beca0d4d937b8dbf4e5f23f9887d22e1",
+          "calls": 104,
+          "nonzero": 0,
+          "dropped": 0,
+          "normalDetachCalls": 8,
+          "beforeMutations": [
+            {
+              "stage": "create",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-0-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-1-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-2-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-3-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-4-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "cycle-5-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            },
+            {
+              "stage": "final-lock",
+              "operation": "imageDetach",
+              "ownedHandles": 0,
+              "mountedOwnedHandles": 0
+            }
+          ],
+          "nonzeroResults": []
+        }
+      ],
+      "calls": 154,
+      "nonzero": 1,
+      "normalDetachCalls": 12,
+      "scope": "Owned synthetic fixtures only; completed suffix is body completion, not XCTest assertion success. Native/FD observations are not atomic or exhaustive system-reader discovery."
+    }
+  },
+  "finalPackage": {
+    "scope": "Separately staged schema22 native vault result-aware closing/diagnostics; no root-cause repair, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "4594e943718d4264a1bd00be38c8573b7372d0c3",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "663fa27a1d16ce582a68992bb7ace53feb0e0aa1c27b55804493e272095d92d5",
+        "signedSHA256": "a6a2c2888ce2bb23e40247ba6e1acb1568a9fc8168a83fb64004d1b71d622481",
+        "normalizedPayloadSHA256": "8e61ddf195b8ee68feb66736e0e1e92ea2299134136b5e8dfb7f693d7cdd361f"
+      },
+      "oswindctl": {
+        "rawSHA256": "a3731f2138bcd2f2bb90eed91942b28cd7235e47f52868ab2e83f5336a0b3d00",
+        "signedSHA256": "a5f8d6692422576ea7dd625843d6b8861b39a72b0370b21859c801d0e3e0a133",
+        "normalizedPayloadSHA256": "cfe1b1df6302897c3d9fb2da6d7c0629e9e8db087360a605764d5b013bc5f18d"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "6415eb5615ee3f923439af4dcd5640b0912a11b8438aa17e3525020d7ffbe64e",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "b4b9c3f8bc5b87694dbfce5f98e361c5739caeda6aa077bae9ea6c484b541de8",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "visual": {
+    "images": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "scope": "Previously opened corpus; compatibility only, no paired speed/energy/new-holdout inference"
+  },
+  "cleanup": {
+    "recordedAtUTC": "2026-10-29T08:02:14.039327+00:00",
+    "source": "4594e943718d4264a1bd00be38c8573b7372d0c3",
+    "packagingSource": "4594e943718d4264a1bd00be38c8573b7372d0c3",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "retainedDevelopmentFindings": [
+    {
+      "kind": "Trace export audit failure",
+      "logSHA256": "fb1f0e182a9d91f0a39dea6f4717eaafdf53d5f39020d2783797bfd5b0821eb8",
+      "status": "Foundation resolved /var while F_GETPATH used /private/var; add POSIX realpath and actual-filesystem test"
+    },
+    {
+      "kind": "Trace-helper compiler budget failure",
+      "logSHA256": "74ac118ff8b95222847aca0bfbec08c4844787f54c618ced286ed789d99928e9",
+      "status": "Complex path-sort expression split into explicit typed steps"
+    },
+    {
+      "kind": "Development compile failure",
+      "logSHA256": "90c4e1d1ea3c016fc7d59b9608dd334c3580027c7d2af66a30e9862d72ef07b0",
+      "status": "Missing session(info:) fixture argument corrected"
+    },
+    {
+      "kind": "Development descriptor assertion failure",
+      "logSHA256": "7882b4b84ab2378775fba19fed490760d1daf8b57469b01e385e361769918898",
+      "status": "Path-only collector missed known reader; verified mounted-device filtering captures it"
+    },
+    {
+      "kind": "Test trace export defect",
+      "logSHA256": "f95c7dd12c802411f63b76bc36f220c7f7515376e1af2e847a802551ed37e51f",
+      "status": "Synthetic owned temporary paths were not replaced in escaped JSON; test-only follow-up corrects export and verifies both roots"
+    }
+  ],
+  "CLI": {
+    "vault-cli-v1": {
+      "reportSHA256": "fb35cab3231576edc4910925177cb56d505b399a7b5c6660660f6a073b8d19de",
+      "result": {
+        "state": "completed",
+        "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+        "checks": [
+          "create initializes and detaches, public handle closed",
+          "closed handle refuses plaintext fallback",
+          "wrong passphrase refused without attachment",
+          "managed handle writes and retrieves on verified volume",
+          "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+          "explicit plaintext backup/Markdown export, private source staging cleaned",
+          "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+          "retry detaches after reader closes",
+          "verified native migration remounts with history and retains original",
+          "missing source refuses before destination creation",
+          "renamed attached package remains visibly attached despite stale OS image path",
+          "moved package closes public handle and normally unmounts/ejects verified backing device",
+          "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+        ],
+        "binary_sha256": "a5f8d6692422576ea7dd625843d6b8861b39a72b0370b21859c801d0e3e0a133",
+        "schema_version": 22,
+        "old_writer_check": "not requested; pass --old-cli with a pinned older binary",
+        "verified_detached": true,
+        "passphrase_persisted": false,
+        "normal_library_opened": false,
+        "cleanup_detached": true
+      }
+    },
+    "vault-interruptions-v1": {
+      "reportSHA256": "546de6ea590b2a3b26a355d117c827368653ec7476a8ca437a9dbf2563822c71",
+      "result": {
+        "state": "completed",
+        "binary_sha256": "a5f8d6692422576ea7dd625843d6b8861b39a72b0370b21859c801d0e3e0a133",
+        "scope": "Actual SIGINT during observed owned hdiutil create/attach helpers; random in-memory passphrase, no Keychain or normal library",
+        "checks": [
+          {
+            "action": "create",
+            "exit_code": 130,
+            "owned_helper_observed_before_interrupt": true,
+            "helper_action": "create",
+            "still_attached": false,
+            "stdout_empty": true
+          },
+          {
+            "action": "unlock",
+            "exit_code": 130,
+            "owned_helper_observed_before_interrupt": true,
+            "helper_action": "attach",
+            "still_attached": false,
+            "stdout_empty": true
+          }
+        ],
+        "recovery_unlock_and_lock_passed": true,
+        "passphrase_persisted": false
+      }
+    },
+    "vault-terminal-v1": {
+      "reportSHA256": "1a1e73e6bbc97abedbcf78691609710468dc1660cbe598830ad67a5e8673abab",
+      "result": {
+        "format": "OSwind private controlling-PTY cooperative cancellation v1",
+        "binarySHA256": "a5f8d6692422576ea7dd625843d6b8861b39a72b0370b21859c801d0e3e0a133",
+        "trials": [
+          {
+            "action": "create",
+            "exitCode": 130,
+            "wallSeconds": 1.0278851250186563,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "owned native helper"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          },
+          {
+            "action": "unlock",
+            "exitCode": 130,
+            "wallSeconds": 0.9672912079840899,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "owned native helper"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          },
+          {
+            "action": "lock",
+            "exitCode": 130,
+            "wallSeconds": 0.6461705421097577,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "persisted closing phase"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          }
+        ],
+        "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+        "state": "completed",
+        "immediateRecoveryPassed": true,
+        "sourceHistoryPreserved": true,
+        "noOwnedImagesAfterFinalLock": true,
+        "passphrasePersisted": false
+      }
+    },
+    "vault-terminal-busy-v1": {
+      "reportSHA256": "efb903668cb58731826e6b2473ded25b6a9205d82a69c7e50f66488a6d034690",
+      "result": {
+        "format": "OSwind private controlling-PTY cooperative cancellation v1",
+        "binarySHA256": "a5f8d6692422576ea7dd625843d6b8861b39a72b0370b21859c801d0e3e0a133",
+        "trials": [
+          {
+            "action": "lock",
+            "exitCode": 1,
+            "wallSeconds": 0.5847109579481184,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "persisted closing phase"
+            },
+            "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+            "ownedImageAttachedAfterExit": true
+          }
+        ],
+        "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+        "normalRecoveryDetached": true,
+        "recoveredHistoryPreserved": true,
+        "state": "completed",
+        "busyFailurePreserved": true
+      }
+    }
+  },
+  "precedingRapidDevelopmentRuns": {
+    "trials": 8,
+    "normalDetaches": 64,
+    "observedCalls": 832,
+    "nonzero": 0,
+    "scope": "Preceding diagnostic-only source, before result-aware closing policy; not pooled with final optimized repetitions"
+  },
+  "inheritedCIFailure": {
+    "implementationSource": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+    "implementationRun": 40822289384,
+    "implementationJobs": "both success",
+    "laterHead": "c8aa5cc48d08d236e8ec8d7143d514d5bac11dd3",
+    "laterRun": 40824503723,
+    "job": 123284316910,
+    "benchmarkJob": 123284316716,
+    "benchmarkConclusion": "success",
+    "nativeConclusion": "failure",
+    "test": "NativeVaultDetachSettlementTests.testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment",
+    "selectedCases": 30,
+    "selectedPasses": 29,
+    "error": "The vault is still attached because files are in use. Close other readers and retry locking.",
+    "cause": "Unproven: previous driver discarded native status/output; controlled EBUSY does not identify historical CI cause",
+    "nextAction": "Retain bounded owned native diagnostics on recurrence; logical result-aware closing repair and passing trials do not erase historical counterexample"
+  },
+  "limits": [
+    "Two full-suite skips: physical system-audio opt-in and unavailable locked/thermal visual admission",
+    "TSan excludes precompiled native/framework internals; passing selected tests is not exhaustive race freedom",
+    "No force detach, OS-lock/TCC/power changes, real passphrase/Keychain or normal-history corpus used",
+    "FD inventory is own-process fixture metadata only; concurrent closes/external readers can be missed",
+    "Old held-reader terminal inventory failure and later-head PR73 rapid CI root causes remain unproven",
+    "Prior default-library activity from earlier cleanup incident remains unaudited/unrecovered",
+    "No production learned PII admission/representative privacy operating point, long-source windows, image/audio redaction or whole-product acceptance",
+    "Physical GUI/authentication/capture/wake, sustained power, sync, notarized updates, matched competitor measurements and broad parity remain open",
+    "No cross-rebuild executable equivalence claimed; same-build signed/raw normalization and extracted-package proofs are scoped to staged package"
+  ],
+  "CI": {
+    "source": "4594e943718d4264a1bd00be38c8573b7372d0c3",
+    "runID": 40837043800,
+    "checkedAtUTC": "2026-10-29T08:00:23.431Z",
+    "jobs": [
+      {
+        "id": 123324143810,
+        "name": "native",
+        "status": "in_progress",
+        "conclusion": null,
+        "ownedNativeVaultStep": "success",
+        "activeStep": "Exercise encrypted-library CLI and interruptions"
+      },
+      {
+        "id": 123324144228,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Original product source CI only; later fixture/documentation heads are separate. Passing checks do not explain historical PR73 counterexample."
+  }
+}
