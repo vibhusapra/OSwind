@@ -38,6 +38,7 @@ jobs:
       - name: Verify authored PII scorer and frozen input contracts offline
         run: |
           python3 scripts/test-pii-quality.py
+          python3 scripts/test-pii-native-quality.py
           python3 scripts/test-pii-assets.py
           python3 scripts/test-pii-native-export.py
       - name: Verify visual model tools without downloads
