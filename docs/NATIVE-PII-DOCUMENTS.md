@@ -63,7 +63,7 @@ CPU/Core ML preserve all 432 short-input validation comparisons across the
 existing 72 sources/three thresholds. The existing 181 tokenizer references
 also check window framing against the original encoder. A repeated authored
 860-word document yields three CPU windows/1,223 framed tokens and 15 Core ML
-windows/1,920 framed tokens; both cover all three authored phone values. These
+windows/1,920 framed tokens; both cover one known authored phone value at all three positions. These
 are compatibility/functional observations, not representative privacy quality,
 causal speed, physical GPU placement, energy or competitor evidence.
 
@@ -76,8 +76,42 @@ empty result streams and removal of their observed runtime snapshots. The
 original failed observation remains retained. The observer proves native runtime
 preparation, not a particular inference instruction being in flight.
 
-Frozen full/race/optimized, signed CLI/package and compatibility qualification
-is recorded separately before publication. No old failure is replaced by a
-later favorable observation. The 144 reserved PII test predictions remain
-unopened; production privacy policy, media handling and revision fences remain
-separate implementation/acceptance work.
+## Frozen qualification and outstanding production failure
+
+[PR #76](https://github.com/vibhusapra/OSwind/pull/76) and the
+[machine-readable receipt](../benchmarks/pii-document-windows-v1.json) bind the
+implementation to source `3890d6d`. **1,079 defined cases: 1,077 passes/two skips,
+95 selected TSan passes and 88 optimized PII passes** complete with no failures.
+All **15 ordered operations** pass. The skips are physical system-audio opt-in
+and unavailable visual admission; precompiled native/framework internals are
+outside TSan coverage. Both actual backends preserve all 432 short-reference
+comparisons in normal, TSan and optimized configurations.
+
+The signed CLI passes **30 real-model checks, 19 offline inspection refusals,
+11 offline setup refusals and two managed-cache long-document checks**. CPU and
+Core ML native-preparation SIGINT each return 130 with no result and remove their
+observed runtime-code snapshot. The final ordinary/migration, SIGINT and normal/
+held-reader terminal vault checks pass. The 34-file app/ZIP passes strict
+signatures, same-build normalized payload and complete extracted-tree checks.
+Visual compatibility preserves 459/501 top1 and 498/501 top5/top10 with exact
+current model/corpus, scope/index/reopen. Installed/staged bytes remain unchanged;
+final complete-command owned-process/current-artifact-image inventories are empty.
+No installation or unscoped GUI launch occurs.
+
+CPU and Core ML use different long-document window boundaries and can produce
+different detections. Matching short references and the repeated authored phone
+example do not establish equivalent or representative long-document quality.
+No old failure is replaced by a later favorable observation. The 144 reserved
+PII test predictions remain unopened.
+
+A subsequent controlled production-admission probe finds a separate pattern
+masking failure on the same immutable signed CLI. For the fake input
+`sk-aaaaaaaaaaaaaaaaaaaa-password=OwnedOverlapSecret`, production import/export
+retains `[REDACTED]=OwnedOverlapSecret`: an earlier regex replacement removes the
+later secret trigger. Explicit inspection masks the whole example from original
+source ranges. This receipt retains both outputs and their source/binary hashes.
+The production original-source pattern-union repair is the next priority.
+The passing suite does not cover this newly reproduced contract; no normal
+history audit, automatic repair of older records or privacy-release acceptance
+is claimed. Representative hybrid quality, learned production admission, media
+treatment and privacy/record revision fences remain separate work.

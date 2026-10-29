@@ -1,0 +1,1098 @@
+{
+  "format": "OSwind complete bounded PII document inspection qualification v1",
+  "recordedAtUTC": "2026-10-29T08:36:43.391204+00:00",
+  "source": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+  "base": "55e0a4c56dd9683384e05e25956596c00dfc9bce",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/76",
+  "F047Implemented": false,
+  "productionLearnedRedactorSelected": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "reservedTestPredictionsOpened": false,
+  "documentContract": {
+    "maximumUTF8Bytes": 131072,
+    "maximumScalars": 32768,
+    "maximumOriginalWords": 8192,
+    "maximumWordBytes": 1024,
+    "maximumWindows": 256,
+    "maximumFramedTokens": 65536,
+    "maximumDecodedSpans": 16384,
+    "maximumWordOverlap": 16,
+    "CPUWindowFramedTokens": 512,
+    "CoreMLWindowFramedTokens": 128,
+    "tokenizeEachOriginalWordOnce": true,
+    "composedCharacterSeams": true,
+    "completePlanBeforeInference": true,
+    "windowDigestAndDocumentPositionBinding": true,
+    "overlappingDetectionUnion": true,
+    "duplicateRangeLabelConfidence": "maximum",
+    "patternInput": "complete original document",
+    "partialResultOnFailure": false,
+    "wholeDocumentFIFOLease": true,
+    "joinedPlanningInferenceCancellation": true
+  },
+  "modelAssets": {
+    "setupRecipe": "models/pii-native-setup.json",
+    "recipeBuildID": "a3a2575a7ec8cf79e85f21ec2e913ff0f68633919fe6ad14cc88c8f1a034b09f",
+    "CPUModelSHA256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+    "CoreMLModelSHA256": "a6a66d8a988b9507b6d8d714a727ca47fcacef6b5090825f79b86be917e3e136",
+    "runtimeSHA256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa",
+    "assetsUnchanged": true,
+    "repeatedPublicDownloads": false,
+    "physicalDevicePlacementMeasured": false
+  },
+  "full": {
+    "defined": 1079,
+    "passed": 1077,
+    "skipped": 2,
+    "failures": 0,
+    "reportedTestSeconds": 435.944,
+    "reportedSuiteSeconds": 436.029,
+    "logSHA256": "ad26a46bd03a0eb6de7cbcfa285083e8f19aa43b91a80d99b8529ea31112db21"
+  },
+  "threadSanitizer": {
+    "defined": 95,
+    "passed": 95,
+    "skipped": 0,
+    "failures": 0,
+    "reportedTestSeconds": 178.446,
+    "reportedSuiteSeconds": 178.469,
+    "logSHA256": "32dbff7d22b03968938ec72140c4ee53872347a25c0265f3cc56ea9dc320ea91"
+  },
+  "optimizedPII": {
+    "defined": 88,
+    "passed": 88,
+    "skipped": 0,
+    "failures": 0,
+    "reportedTestSeconds": 20.534,
+    "reportedSuiteSeconds": 20.54,
+    "logSHA256": "af7382f40289529d02720c48345a80babebbce989685965d2b95391b0c897589"
+  },
+  "orderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 441.88795925001614,
+      "wallSeconds": 441.8883640766144
+    },
+    {
+      "name": "pii-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 211.42321041598916,
+      "wallSeconds": 211.4234037399292
+    },
+    {
+      "name": "optimized-pii-v1",
+      "exitCode": 0,
+      "awakeSeconds": 83.43690412514843,
+      "wallSeconds": 83.4369809627533
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 101.91991645889357,
+      "wallSeconds": 101.92001008987427
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.6710588750429451,
+      "wallSeconds": 1.6710598468780518
+    },
+    {
+      "name": "pii-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 13.610970166046172,
+      "wallSeconds": 13.610982894897461
+    },
+    {
+      "name": "pii-cli-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.20425187493674457,
+      "wallSeconds": 0.20425176620483398
+    },
+    {
+      "name": "pii-setup-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.12379095796495676,
+      "wallSeconds": 0.12379074096679688
+    },
+    {
+      "name": "managed-pii-v1",
+      "exitCode": 0,
+      "awakeSeconds": 4.298764749895781,
+      "wallSeconds": 4.298768758773804
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 10.89286124985665,
+      "wallSeconds": 10.892871856689453
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.0810375411529094,
+      "wallSeconds": 0.08103775978088379
+    },
+    {
+      "name": "vault-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 25.65179541707039,
+      "wallSeconds": 25.651818990707397
+    },
+    {
+      "name": "vault-interruptions-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.516976916929707,
+      "wallSeconds": 5.516982078552246
+    },
+    {
+      "name": "vault-terminal-v1",
+      "exitCode": 0,
+      "awakeSeconds": 9.842578457901254,
+      "wallSeconds": 9.842587232589722
+    },
+    {
+      "name": "vault-terminal-busy-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.937218791106716,
+      "wallSeconds": 5.9372241497039795
+    }
+  ],
+  "referenceChecks": {
+    "full-most-optins-v1": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "pii-tsan-v1": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "optimized-pii-v1": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ]
+  },
+  "authoredDocumentObservations": {
+    "full-most-optins-v1": [
+      {
+        "compute": "coreML",
+        "windows": 15,
+        "framedTokens": 1920,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      },
+      {
+        "compute": "cpu",
+        "windows": 3,
+        "framedTokens": 1223,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      }
+    ],
+    "pii-tsan-v1": [
+      {
+        "compute": "coreML",
+        "windows": 15,
+        "framedTokens": 1920,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      },
+      {
+        "compute": "cpu",
+        "windows": 3,
+        "framedTokens": 1223,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      }
+    ],
+    "optimized-pii-v1": [
+      {
+        "compute": "coreML",
+        "windows": 15,
+        "framedTokens": 1920,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      },
+      {
+        "compute": "cpu",
+        "windows": 3,
+        "framedTokens": 1223,
+        "sourceWords": 860,
+        "targetPositions": 3,
+        "learnedFullTargetPositions": 3,
+        "uniqueValueStrings": 1,
+        "distinctDocuments": 1
+      }
+    ]
+  },
+  "CLI": {
+    "pii-cli-v1": {
+      "reportSHA256": "741d356e19827400d2bda6516c2e33bd6874e0bf73a774b7c51c2cb212c53060",
+      "checks": 30,
+      "result": {
+        "format": "OSwind PII CLI functional smoke v1",
+        "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "realModel": true,
+        "checks": [
+          {
+            "name": "unknown-command",
+            "exitCode": 1,
+            "wallSeconds": 0.5002949999179691,
+            "stdoutBytes": 0,
+            "stderrBytes": 44,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "missing-options",
+            "exitCode": 1,
+            "wallSeconds": 0.011460499837994576,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "unknown-option",
+            "exitCode": 1,
+            "wallSeconds": 0.010784334037452936,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "duplicate-stdin",
+            "exitCode": 1,
+            "wallSeconds": 0.008749666158109903,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "duplicate-threshold",
+            "exitCode": 1,
+            "wallSeconds": 0.008350166957825422,
+            "stdoutBytes": 0,
+            "stderrBytes": 34,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "explicit-data-refused",
+            "exitCode": 1,
+            "wallSeconds": 0.007607500068843365,
+            "stdoutBytes": 0,
+            "stderrBytes": 54,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "vault-refused-before-inspection",
+            "exitCode": 1,
+            "wallSeconds": 0.007510750088840723,
+            "stdoutBytes": 0,
+            "stderrBytes": 54,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-utf8",
+            "exitCode": 1,
+            "wallSeconds": 0.0075037500355392694,
+            "stdoutBytes": 0,
+            "stderrBytes": 38,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-bytes",
+            "exitCode": 1,
+            "wallSeconds": 0.00750099983997643,
+            "stdoutBytes": 0,
+            "stderrBytes": 56,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "empty",
+            "exitCode": 1,
+            "wallSeconds": 0.0075832088477909565,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "whitespace",
+            "exitCode": 1,
+            "wallSeconds": 0.006876041879877448,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-scalars",
+            "exitCode": 1,
+            "wallSeconds": 0.007136916043236852,
+            "stdoutBytes": 0,
+            "stderrBytes": 46,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-word",
+            "exitCode": 1,
+            "wallSeconds": 0.006794541142880917,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-0",
+            "exitCode": 1,
+            "wallSeconds": 0.006360874976962805,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-1",
+            "exitCode": 1,
+            "wallSeconds": 0.0064347919542342424,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-nan",
+            "exitCode": 1,
+            "wallSeconds": 0.006368416827172041,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-inf",
+            "exitCode": 1,
+            "wallSeconds": 0.0064524998888373375,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold--1",
+            "exitCode": 1,
+            "wallSeconds": 0.006171915913000703,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "implicit-compute-refused",
+            "exitCode": 1,
+            "wallSeconds": 0.006279707886278629,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "cpu",
+            "exitCode": 0,
+            "wallSeconds": 0.7666371250525117,
+            "stdoutBytes": 1059,
+            "stderrBytes": 0,
+            "stdoutSHA256": "1be303885b91e844c05956d2dccc2cd06798fcfddb657acb33f553020b2d7542"
+          },
+          {
+            "name": "coreml",
+            "exitCode": 0,
+            "wallSeconds": 2.2192677499260753,
+            "stdoutBytes": 1068,
+            "stderrBytes": 1735,
+            "stdoutSHA256": "643adf735cad22d95baa2d56989268ad6308811ca6fc8c49e475cf690950ceda"
+          },
+          {
+            "name": "coreml-windowed",
+            "exitCode": 0,
+            "wallSeconds": 2.291741916909814,
+            "stdoutBytes": 1118,
+            "stderrBytes": 1735,
+            "stdoutSHA256": "2988f407eea29a44f3dff103247fc63be2b271865efa3d3eec15226b2bd92493"
+          },
+          {
+            "name": "cpu-windowed",
+            "exitCode": 0,
+            "wallSeconds": 0.7581163328140974,
+            "stdoutBytes": 2972,
+            "stderrBytes": 0,
+            "stdoutSHA256": "6542336102f7c7cbca02473d1b56bc9c15c6d07995057eef387bb78c82fb0482"
+          },
+          {
+            "name": "cpu-long-document",
+            "exitCode": 0,
+            "wallSeconds": 0.8257650828454643,
+            "stdoutBytes": 7093,
+            "stderrBytes": 0,
+            "stdoutSHA256": "bb599e32902bf807dc161fa7b174eba5d91e2203b12d378baeaa0fba2670cf41"
+          },
+          {
+            "name": "cpu-native-preparation-SIGINT",
+            "exitCode": 130,
+            "wallSeconds": 0.6260784999467432,
+            "observedOwnedRuntimePreparation": true,
+            "stdoutBytes": 0,
+            "stderrBytes": 137,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "newRuntimeSnapshotsRemaining": 0
+          },
+          {
+            "name": "coreML-long-document",
+            "exitCode": 0,
+            "wallSeconds": 2.74215633305721,
+            "stdoutBytes": 7099,
+            "stderrBytes": 1725,
+            "stdoutSHA256": "860121ff029da64dc4859c11ed09033a8f176e34ac4ecd09c5f0fd9f6e9baa29"
+          },
+          {
+            "name": "coreML-native-preparation-SIGINT",
+            "exitCode": 130,
+            "wallSeconds": 2.0316237499937415,
+            "observedOwnedRuntimePreparation": true,
+            "stdoutBytes": 0,
+            "stderrBytes": 1872,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "newRuntimeSnapshotsRemaining": 0
+          },
+          {
+            "name": "runtime-hash",
+            "exitCode": 1,
+            "wallSeconds": 0.23845558310858905,
+            "stdoutBytes": 0,
+            "stderrBytes": 71,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "runtime-symlink",
+            "exitCode": 1,
+            "wallSeconds": 0.2391255828551948,
+            "stdoutBytes": 0,
+            "stderrBytes": 69,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "graph-hash",
+            "exitCode": 1,
+            "wallSeconds": 0.16219737520441413,
+            "stdoutBytes": 0,
+            "stderrBytes": 48,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "historyDirectoryAbsent": true,
+        "newRuntimeSnapshotsRemaining": [],
+        "limitations": [
+          "Synthetic functional inputs; not a quality, latency or energy benchmark",
+          "No capture, import, export, GUI or normal history qualification",
+          "Abrupt process termination cleanup is not exercised"
+        ]
+      }
+    },
+    "pii-cli-offline-v1": {
+      "reportSHA256": "4aedb5d6c3427010a2243811a4d1579a547ced5510682d4efbaf0e32f255820b",
+      "checks": 19,
+      "result": {
+        "format": "OSwind PII CLI functional smoke v1",
+        "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "realModel": false,
+        "checks": [
+          {
+            "name": "unknown-command",
+            "exitCode": 1,
+            "wallSeconds": 0.008436083793640137,
+            "stdoutBytes": 0,
+            "stderrBytes": 44,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "missing-options",
+            "exitCode": 1,
+            "wallSeconds": 0.007504165871068835,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "unknown-option",
+            "exitCode": 1,
+            "wallSeconds": 0.007477958919480443,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "duplicate-stdin",
+            "exitCode": 1,
+            "wallSeconds": 0.007038208888843656,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "duplicate-threshold",
+            "exitCode": 1,
+            "wallSeconds": 0.00705933291465044,
+            "stdoutBytes": 0,
+            "stderrBytes": 34,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "explicit-data-refused",
+            "exitCode": 1,
+            "wallSeconds": 0.00701695797033608,
+            "stdoutBytes": 0,
+            "stderrBytes": 54,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "vault-refused-before-inspection",
+            "exitCode": 1,
+            "wallSeconds": 0.0067764578852802515,
+            "stdoutBytes": 0,
+            "stderrBytes": 54,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-utf8",
+            "exitCode": 1,
+            "wallSeconds": 0.006958500016480684,
+            "stdoutBytes": 0,
+            "stderrBytes": 38,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-bytes",
+            "exitCode": 1,
+            "wallSeconds": 0.007480249973013997,
+            "stdoutBytes": 0,
+            "stderrBytes": 56,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "empty",
+            "exitCode": 1,
+            "wallSeconds": 0.007153166923671961,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "whitespace",
+            "exitCode": 1,
+            "wallSeconds": 0.007097083842381835,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-scalars",
+            "exitCode": 1,
+            "wallSeconds": 0.007321958197280765,
+            "stdoutBytes": 0,
+            "stderrBytes": 46,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "oversized-word",
+            "exitCode": 1,
+            "wallSeconds": 0.007032416993752122,
+            "stdoutBytes": 0,
+            "stderrBytes": 79,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-0",
+            "exitCode": 1,
+            "wallSeconds": 0.006447291001677513,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-1",
+            "exitCode": 1,
+            "wallSeconds": 0.006705209147185087,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-nan",
+            "exitCode": 1,
+            "wallSeconds": 0.006495834095403552,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold-inf",
+            "exitCode": 1,
+            "wallSeconds": 0.0068012080155313015,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "invalid-threshold--1",
+            "exitCode": 1,
+            "wallSeconds": 0.006783458171412349,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "implicit-compute-refused",
+            "exitCode": 1,
+            "wallSeconds": 0.006911250064149499,
+            "stdoutBytes": 0,
+            "stderrBytes": 143,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "historyDirectoryAbsent": true,
+        "newRuntimeSnapshotsRemaining": [],
+        "limitations": [
+          "Synthetic functional inputs; not a quality, latency or energy benchmark",
+          "No capture, import, export, GUI or normal history qualification",
+          "Abrupt process termination cleanup is not exercised"
+        ]
+      }
+    },
+    "pii-setup-offline-v1": {
+      "reportSHA256": "96c28dddb97d01f001bece509fb937742b110d2c3e3f597f87d2e8703fa30f96",
+      "checks": 11,
+      "result": {
+        "format": "OSwind PII setup process smoke v1",
+        "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "checks": [
+          {
+            "name": "verify-unknown",
+            "exitCode": 1,
+            "wallSeconds": 0.008008125005289912,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 48
+          },
+          {
+            "name": "verify-duplicate-cache",
+            "exitCode": 1,
+            "wallSeconds": 0.00689491699449718,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 35
+          },
+          {
+            "name": "verify--data",
+            "exitCode": 1,
+            "wallSeconds": 0.006795375142246485,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 54
+          },
+          {
+            "name": "verify--vault",
+            "exitCode": 1,
+            "wallSeconds": 0.0067324580159038305,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 54
+          },
+          {
+            "name": "prepare-unknown",
+            "exitCode": 1,
+            "wallSeconds": 0.006748167099431157,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 48
+          },
+          {
+            "name": "prepare-duplicate-cache",
+            "exitCode": 1,
+            "wallSeconds": 0.00697495904751122,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 35
+          },
+          {
+            "name": "prepare--data",
+            "exitCode": 1,
+            "wallSeconds": 0.007091375067830086,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 54
+          },
+          {
+            "name": "prepare--vault",
+            "exitCode": 1,
+            "wallSeconds": 0.006714500021189451,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 54
+          },
+          {
+            "name": "verify-missing",
+            "exitCode": 1,
+            "wallSeconds": 0.010017292108386755,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 66
+          },
+          {
+            "name": "inspect-missing",
+            "exitCode": 1,
+            "wallSeconds": 0.009605583967640996,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 66
+          },
+          {
+            "name": "mixed-cache-paths",
+            "exitCode": 1,
+            "wallSeconds": 0.006407374981790781,
+            "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrBytes": 143
+          }
+        ],
+        "historyDirectoryAbsent": true,
+        "freshPublicDownload": false,
+        "interruptedPublicDownload": false,
+        "limits": [
+          "Synthetic source text and owned caches only",
+          "No native GUI clicks, production learned privacy, representative quality or physical GPU placement acceptance",
+          "Prepared verification checks files and preparation receipt; does not rerun inference"
+        ]
+      }
+    },
+    "vault-cli-v1": {
+      "reportSHA256": "e09d407a2c4aed1c675f079bf659208a0bfd195b9f689bfb366fac30ae60a987",
+      "checks": 13,
+      "result": {
+        "state": "completed",
+        "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+        "checks": [
+          "create initializes and detaches, public handle closed",
+          "closed handle refuses plaintext fallback",
+          "wrong passphrase refused without attachment",
+          "managed handle writes and retrieves on verified volume",
+          "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+          "explicit plaintext backup/Markdown export, private source staging cleaned",
+          "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+          "retry detaches after reader closes",
+          "verified native migration remounts with history and retains original",
+          "missing source refuses before destination creation",
+          "renamed attached package remains visibly attached despite stale OS image path",
+          "moved package closes public handle and normally unmounts/ejects verified backing device",
+          "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+        ],
+        "binary_sha256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "schema_version": 22,
+        "old_writer_check": "not requested; pass --old-cli with a pinned older binary",
+        "verified_detached": true,
+        "passphrase_persisted": false,
+        "normal_library_opened": false,
+        "cleanup_detached": true
+      }
+    },
+    "vault-interruptions-v1": {
+      "reportSHA256": "d11c9190ceddad41b21372a652d917f9c5cc0cd5e1ee32e3833e0941e29b1b60",
+      "checks": 2,
+      "result": {
+        "state": "completed",
+        "binary_sha256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "scope": "Actual SIGINT during observed owned hdiutil create/attach helpers; random in-memory passphrase, no Keychain or normal library",
+        "checks": [
+          {
+            "action": "create",
+            "exit_code": 130,
+            "owned_helper_observed_before_interrupt": true,
+            "helper_action": "create",
+            "still_attached": false,
+            "stdout_empty": true
+          },
+          {
+            "action": "unlock",
+            "exit_code": 130,
+            "owned_helper_observed_before_interrupt": true,
+            "helper_action": "attach",
+            "still_attached": false,
+            "stdout_empty": true
+          }
+        ],
+        "recovery_unlock_and_lock_passed": true,
+        "passphrase_persisted": false
+      }
+    },
+    "vault-terminal-v1": {
+      "reportSHA256": "8ef0be39236422400ec0900a8b65ae08a1d265c6499497d08a1a10fbea3a8a2d",
+      "checks": 3,
+      "result": {
+        "format": "OSwind private controlling-PTY cooperative cancellation v1",
+        "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "trials": [
+          {
+            "action": "create",
+            "exitCode": 130,
+            "wallSeconds": 1.0509710831101984,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "owned native helper"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          },
+          {
+            "action": "unlock",
+            "exitCode": 130,
+            "wallSeconds": 0.9606302499305457,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "owned native helper"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          },
+          {
+            "action": "lock",
+            "exitCode": 130,
+            "wallSeconds": 0.651650250190869,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "persisted closing phase"
+            },
+            "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+            "ownedImageAttachedAfterExit": false
+          }
+        ],
+        "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+        "state": "completed",
+        "immediateRecoveryPassed": true,
+        "sourceHistoryPreserved": true,
+        "noOwnedImagesAfterFinalLock": true,
+        "passphrasePersisted": false
+      }
+    },
+    "vault-terminal-busy-v1": {
+      "reportSHA256": "b8154d2039c74c6f7922cf3bd714312e7510e68222d1e5f003494efce4a0c80a",
+      "checks": 1,
+      "result": {
+        "format": "OSwind private controlling-PTY cooperative cancellation v1",
+        "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "trials": [
+          {
+            "action": "lock",
+            "exitCode": 1,
+            "wallSeconds": 0.5642143751028925,
+            "terminalCtrlC": true,
+            "observed": {
+              "boundary": "persisted closing phase"
+            },
+            "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+            "ownedImageAttachedAfterExit": true
+          }
+        ],
+        "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+        "normalRecoveryDetached": true,
+        "recoveredHistoryPreserved": true,
+        "state": "completed",
+        "busyFailurePreserved": true
+      }
+    }
+  },
+  "finalPackage": {
+    "scope": "Separately staged schema22 complete bounded native PII document inspection; no production privacy acceptance, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "1408a36bfa0d5e2daff8efecca06c78b01d1c75f3baf08a749a6fd872accea85",
+        "signedSHA256": "900ab885a10c15ed058a97e8aeb8cbc7d531b0d53e02c125e532ebad57a06fb0",
+        "normalizedPayloadSHA256": "b203d091a5c1301ebb4e70f01781e69d6a0c718da6a85e5fa3f3d5c888517b51"
+      },
+      "oswindctl": {
+        "rawSHA256": "7358491bfbed29d242f5f27087df0e639377ceba79fd268e72e956cc63fb7886",
+        "signedSHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+        "normalizedPayloadSHA256": "d704328c98531e9152f94056bf4e4cb86ef2de7322ae00a723fe15119f55a762"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "28f0b6c3a74d146144f10c1924dc8584e52f35a4cd4524e21842c3b2ef2570f5",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "200944e64d7bc75a6c644856477efafe7db9ec751dc9ee9ebc55973955cec964",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "cleanup": {
+    "recordedAtUTC": "2026-10-29T08:36:43.260965+00:00",
+    "source": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+    "packagingSource": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "authoredDocumentScope": "One known authored phone value repeated at three positions in one 860-model-word document; no representative, independent-value, speed, energy or comparative quality claim. Three CPU/15 Core ML windows in observed configurations; requested Core ML policy is not physical GPU evidence.",
+  "managedCacheInspection": {
+    "checks": [
+      {
+        "compute": "cpu",
+        "windowCount": 4,
+        "framedTokens": 1748,
+        "stdoutSHA256": "cba1055dc73eaffacab7718093c48173fc4c083aa521fa9791b5a15f5f0bcb06",
+        "completeSourceSHA256": "1f9e57b1848a4860b67e8cd2774c32525b0b1cf63a6d93cc652e2fe33d1e763b"
+      },
+      {
+        "compute": "coreML",
+        "windowCount": 22,
+        "framedTokens": 2816,
+        "stdoutSHA256": "8ab7fa10ba01e070d570cb662ee50c8b550df4137bb0207fc05d0c7f8f9d0b7a",
+        "completeSourceSHA256": "1f9e57b1848a4860b67e8cd2774c32525b0b1cf63a6d93cc652e2fe33d1e763b"
+      }
+    ],
+    "historyDirectoryAbsent": true,
+    "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+    "scope": "Existing pinned cache, synthetic long document; no downloads or history"
+  },
+  "visual": {
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "images": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "scope": "Previously opened corpus/current signed CLI compatibility, no paired performance or new-holdout claim"
+  },
+  "retainedDevelopmentFinding": {
+    "kind": "First CLI cancellation observer misses runtime snapshot",
+    "failedLogSHA256": "bfb34de97f202a24a38474923d0f324a0a3907c3e3036380a90ef9dcb6735d45",
+    "probeSHA256": "7363fdb7ac80ce0ec84c9c6b3ceef66e832566cad6b7858ff3118bd7b0c295df",
+    "normalProbeLogSHA256": "10f24fd10a00d09f5accdac76482fb224cb333e5e367cae4a99259ab1b9da95a",
+    "cause": "Exact child descriptor probe observes runtime under user temporary directory despite TMPDIR override; Foundation location assumption invalid",
+    "repair": "Observe exact owned child PID mapped/retained UUID runtime snapshot via bounded lsof before SIGINT; verify its removal after joined cancellation",
+    "debugSuccessfulChecks": 30,
+    "debugReportSHA256": "da5b50b7722b041f4e7d1006a065724453df2a63d88eaa3729da938a6df7a42e",
+    "scope": "Observed preparation, not proof of a particular native inference instruction in flight"
+  },
+  "limits": [
+    "Two normal skips: physical system-audio opt-in and unavailable visual admission",
+    "Precompiled ONNX Runtime/Core ML internals outside TSan instrumentation",
+    "Overlap cannot guarantee detection of arbitrarily long/context-dependent secrets; native model/window success is not complete privacy protection",
+    "Known model-only threshold0.5 validation remains42/48 full-value coverage and8/24 negatives flagged; no accepted hybrid operating point",
+    "No selected production learned recording/ingestion/answer/export policy, policy/record-revision fences or image/audio privacy acceptance",
+    "144 reserved PII test predictions remain unopened; authored repeated-value document is not independent/representative or verified training-unseen quality",
+    "Historical PR73 rapid-vault CI and older terminal inspection failure causes remain unproven; passing current trials do not erase them",
+    "Prior default-library activity from earlier cleanup incident remains unaudited/unrecovered",
+    "Physical GUI/authentication/permissions/wake/capture, sustained power, sync, notarized updates, matched competitor measurements and broad parity remain open",
+    "No installation/unscoped GUI launch, system settings changes, real provider keys or normal-history corpus; staged build is ad-hoc signed",
+    "No cross-rebuild executable equivalence claim; package proof binds same-build raw/signed/extracted payloads only",
+    "Second Ctrl-C retains existing immediate-exit behavior and can leave runtime-code snapshots; no abrupt-termination cleanup acceptance",
+    "Confirmed synthetic production sequential-pattern admission leak retained; feature/full suite success does not cover that newly reproduced privacy contract",
+    "CPU/Core ML have different long-document window boundaries and may produce different detections; short-reference compatibility does not prove equal long-source quality"
+  ],
+  "knownProductionPatternFailure": {
+    "source": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+    "binarySHA256": "b928988febb6387a72cc2a873bd0670e641977f55814c96030a05b2b92747f8a",
+    "inputSHA256": "cdd23267e72504801425f3931ad78be7a3b296091fd84a98d4f2173e37e5386b",
+    "operations": [
+      {
+        "name": "import",
+        "exitCode": 0
+      },
+      {
+        "name": "export",
+        "exitCode": 0
+      }
+    ],
+    "productionText": "[REDACTED]=OwnedOverlapSecret",
+    "productionLeakedOwnedValue": true,
+    "explicitInspectionLeakedOwnedValue": false,
+    "explicitInspectionText": "[REDACTED]",
+    "normalHistoryOpened": false,
+    "settingsFilePresent": false,
+    "scope": "One disposable synthetic note, default shipping pattern policy, immutable signed CLI; no real credential or normal history",
+    "reportSHA256": "c9ac06ef11d6a8bcd19b6363e0942ba8ed3f529de77e1b493eecf8c4348e1051",
+    "status": "Confirmed admission leak under preceding sequential production regex; explicit inspector original-source union masks full value. Next implementation priority, no normal history audit or automatic repair claimed."
+  },
+  "allKnownPrivacyContractsAccepted": false,
+  "CI": {
+    "source": "3890d6dd4d4c5f017aa6a1451538ab59bbe4defd",
+    "runID": 40841323123,
+    "checkedAtUTC": "2026-10-29T08:36:43.181Z",
+    "jobs": [
+      {
+        "id": 123338135391,
+        "name": "native",
+        "status": "in_progress",
+        "conclusion": null,
+        "ownedNativeVaultStep": "success",
+        "activeStep": "Package app"
+      },
+      {
+        "id": 123338135788,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Original implementation source only; later documentation heads are separate."
+  }
+}

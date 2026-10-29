@@ -1393,15 +1393,12 @@
   "CI": {
     "source": "4594e943718d4264a1bd00be38c8573b7372d0c3",
     "runID": 40837043800,
-    "checkedAtUTC": "2026-10-29T08:00:23.431Z",
     "jobs": [
       {
         "id": 123324143810,
         "name": "native",
-        "status": "in_progress",
-        "conclusion": null,
-        "ownedNativeVaultStep": "success",
-        "activeStep": "Exercise encrypted-library CLI and interruptions"
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 123324144228,
@@ -1410,6 +1407,24 @@
         "conclusion": "success"
       }
     ],
-    "scope": "Original product source CI only; later fixture/documentation heads are separate. Passing checks do not explain historical PR73 counterexample."
+    "fixtureDocumentationHead": {
+      "source": "55e0a4c56dd9683384e05e25956596c00dfc9bce",
+      "runID": 40839482711,
+      "jobs": [
+        {
+          "id": 123332112525,
+          "name": "native",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 123332112930,
+          "name": "benchmark-harnesses",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "scope": "Both original product and later fixture/documentation jobs pass independently; historical counterexample causes remain unproven. Verified during subsequent PII document work."
   }
 }
