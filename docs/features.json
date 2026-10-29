@@ -428,7 +428,7 @@
     "axis": "Data",
     "feature": "Library-scoped transient work and close",
     "status": "tested",
-    "evidence": "Schema17 audio/replay/import/source export scratch, shared lifetime reservations, fullwipe/close waits, explicit SQLite BUSY retry, root identity and deterministic subprocess cleanup.487tests/81TSan plus14signed process groups pass; schema18 encrypted volume and per-connection MEMORY temp policy added; headless signed qualification passes; actual authentication/native acceptance remain open",
+    "evidence": "Schema17 audio/replay/import/source export scratch, shared lifetime reservations, fullwipe/close waits, explicit SQLite BUSY retry, root identity and deterministic subprocess cleanup.487tests/81TSan plus14signed process groups pass; schema18 encrypted volume and per-connection MEMORY temp policy added; headless signed qualification passes; actual authentication/native acceptance remain open Source94f60b0 extends JSON/Limitless imports through bounded file/stdin/decode, borrows one activity reservation, orders activity before SQL and joins actual GUI workers before switch/lock/quit. Shared-lease pre-fix regression fails three assertions; corrected full1162/2skip,119TSan/119optimized and all12 ordered operations pass. Other writer/lifecycle paths remain separately scoped; see IMPORT-INPUT-LIFETIME.md.",
     "references": "Library privacy and lifecycle"
   },
   {
@@ -436,7 +436,7 @@
     "axis": "Data",
     "feature": "JSON export/import",
     "status": "tested",
-    "evidence": "Redaction/exclusions, atomic rollback and media-path stripping. JSON, collector and saved Limitless API imports prepare sanitization/source+passage embeddings outside the SQLite writer; current passage indexes are reused. Full target/linked-parent payload and configured saved-policy snapshots fence concurrent edits, curation, insertion/deletion and settings resave/ABA. Explicit per-request core policies remain supported. Source d3f0181 qualification: 1,143 passes/two skips, 88 TSan, 88 optimized, all 11 ordered operations and signed package/ZIP checks pass. Eight configured-policy process checks pass. Physical/input-read/GUI-drain and all-path learned-admission limits remain; see IMPORT-PREPARATION.md. Text+metadata only.",
+    "evidence": "Normal JSON and saved Limitless input uses retained regular descriptors, size-before-allocation/chunk limits, mutation/root checks and cooperative cancellation; JSON remains capped at100MB. Source94f60b0: 1162 passes/two skips,119TSan,119optimized, all12 operations, signed34-file app/ZIP proofs. Same sparse100000001-byte oversized input: three signed samples/build, median process peakRSS118.16 to18.32MB including startup; no general throughput/power claim. Existing sanitization, source/settings fences, collector curation, path stripping, atomic recap rollback and passage reuse retained. Pending-input/wipe baseline leaves one verified late collector note; current reservation orders admission before wipe, leaving zero. Text+metadata only; other writer and learned/privacy/device gates remain open. See IMPORT-INPUT-LIFETIME.md.",
     "references": "Most memory tools"
   },
   {
@@ -500,7 +500,7 @@
     "axis": "UX",
     "feature": "Native macOS UI + menu bar",
     "status": "partial",
-    "evidence": "Signed synthetic setup/search/replay/routines/export/entity flows exercised. Current schema22 native rejection/rename/rescan/manual override and scoped 2 \u2192 global 6 Cmd-K pass with capture off; owned GUI exits and earlier sample unchanged. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open",
+    "evidence": "Signed synthetic setup/search/replay/routines/export/entity flows exercised. Current schema22 native rejection/rename/rescan/manual override and scoped 2 \u2192 global 6 Cmd-K pass with capture off; owned GUI exits and earlier sample unchanged. Full VoiceOver/global keyboard/permissions and older Mac matrix remain open Source94f60b0 controller/owned-session checks now cover ordinary-library switching, invalid destinations and JSON import drain at quit/lock, including a worker before reservation acquisition. The former nil-vault-package comparison silently skipped all plain-to-plain switches; regression and fix retained. These are controller/session tests, not new native panel or VoiceOver acceptance.",
     "references": "TimeScroll, rem, ScreenMemory"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "Frozen product 7e21e0f: 1,120 defined, 1,118 full available model/native passes, two physical-session skips; 132 selected vault TSan and 132 optimized passes; all 12 package/process operations pass. Signed CLI native-query fault comparison preserves every planned recovery/refusal and the encrypted note. New cases cover cancellation, shared deadlines, native reaping and identity changes. Existing retrieval/OCR/ASR corpus metrics retain their original source and scope. No new quality, physical power or whole-competitor ranking follows. See VAULT-QUERY-RECOVERY.md and separately attributed benchmark receipts.",
+    "evidence": "Frozen product94f60b0: 1164 defined,1162 available model/native passes,two physical/admission skips;119 selected TSan and119 optimized passes;all12 package/process operations pass. New cases cover bounded input, borrowed activity ordering and GUI import transition drains. Signed input comparison records sparse-file RSS and one old late post-wipe collector note versus zero current survivors. Stopped pre-fix qualification, six plain-switch assertions and three shared-lease assertions remain retained. Existing retrieval/OCR/ASR/privacy quality corpus metrics retain their original source and scope. No new natural desktop quality, physical power or whole-competitor ranking follows. See IMPORT-INPUT-LIFETIME.md and separately attributed receipts.",
     "references": "OSwind quality bar"
   },
   {
