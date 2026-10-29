@@ -4,6 +4,8 @@ OSwind can retain focused-window visual history as short HEVC clips, with frame 
 
 Light samples at 1280 px / 5 seconds; Balanced at 1920 px / 1 second; Detailed at 2560 px / 0.5 second. Low Power Mode and serious/critical thermal pressure each multiply the interval by three. Sleep, lock, excluded contexts and two minutes of inactivity suspend automatic capture. ScreenCaptureKit emits changed complete frames; unchanged frames and dropped frames are omitted. OCR uses one consumer and a newest-one-frame buffer, so processing cannot create an unbounded pixel queue. This is sampled history, not a recording of every transition or 60 fps video.
 
+[Context observation duty](REPLAY-CONTEXT-DUTY.md) separates the supervisor's focused-window metadata checks from mandatory complete AX observations around every frame's OCR. Quiet bound streams avoid full tree walks on each supervisor tick. Same-app focus changes still require metadata checks and rebinding; the optimization does not establish battery savings or replace native transition acceptance.
+
 The stream binds an unambiguous focused window using its owner and focused accessibility window bounds/title. An explicit focus mismatch is rejected even if only one other window is shareable; the same rule applies to snapshots. It rechecks privacy/context before and after OCR. Allowed pixels enter an AVFoundation encoder with the VideoToolbox hardware requirement enabled. Encoding readiness has a two-second limit; finalization has a ten-second timeout. Failures surface in capture status and back off before retrying. No silent software encoder fallback runs during normal capture.
 
 Force quit or a crash can lose an uncommitted clip; sustained fault recovery remains an acceptance gate.

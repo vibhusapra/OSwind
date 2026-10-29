@@ -1,0 +1,365 @@
+{
+  "format": "OSwind replay context observation duty",
+  "version": 1,
+  "date": "2026-10-29",
+  "codeCommit": "fbb7350c4e650a398f8b75e61c8596dd6fcb4f2f",
+  "parentCommit": "0fed038693b8cdd0ee0fb11f1c50ac58fa08e7d8",
+  "schema": 23,
+  "scope": "Focused-window metadata supervision while a replay stream is bound; full current privacy/context observations remain mandatory before and after each frame OCR. No live window-transition, calibrated energy, sustained capture, distribution, broad parity or competitive ranking acceptance.",
+  "qualification": {
+    "state": "completed",
+    "frozenInputs": 584,
+    "frozenReport": {
+      "path": ".artifacts/capture-budget-v1/qualification-v1/report.json",
+      "sha256": "21764bb31667835ac9434435905d808b196243b76afcc6512fd00b4c88eb1ba6"
+    },
+    "full": {
+      "defined": 1230,
+      "passed": 1228,
+      "skipped": 2,
+      "failures": 0,
+      "seconds": 517.428,
+      "skipReasons": [
+        "Explicit owned system-audio fixtures; no microphone access",
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "441427be4be6dce8af0f6a5aba9cb891500e560ac35cbfd008734e7d0e0122f8"
+    },
+    "selectedTSan": {
+      "defined": 132,
+      "passed": 131,
+      "skipped": 1,
+      "failures": 0,
+      "seconds": 15.658,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "9d37eb3cbbe9545ab19b5ba6050508b06110f9250c0359f7d9227b958e6a4c01"
+    },
+    "selectedOptimized": {
+      "defined": 132,
+      "passed": 131,
+      "skipped": 1,
+      "failures": 0,
+      "seconds": 12.111,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "66ede7c497b360b57cf7f7673594e11da3b13134bedb7725b64d29dc0b587e06"
+    },
+    "orderedStages": [
+      {
+        "name": "full-most-optins",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 524.5512800829019,
+        "logSHA256": "441427be4be6dce8af0f6a5aba9cb891500e560ac35cbfd008734e7d0e0122f8"
+      },
+      {
+        "name": "selected-tsan",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 46.25030237506144,
+        "logSHA256": "9d37eb3cbbe9545ab19b5ba6050508b06110f9250c0359f7d9227b958e6a4c01"
+      },
+      {
+        "name": "selected-release",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 131.49728179094382,
+        "logSHA256": "66ede7c497b360b57cf7f7673594e11da3b13134bedb7725b64d29dc0b587e06"
+      },
+      {
+        "name": "package",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 106.26245829206891,
+        "logSHA256": "267b1c844c40c0b2fd562a3f8989905386cfe82a8f311724bfad792c14ebd41e"
+      },
+      {
+        "name": "capture-region-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.7573091250378639,
+        "logSHA256": "ae13b78d4ef525caa396b44cf63aa129f97a226e522abf4e3171a1c2f65fa404"
+      },
+      {
+        "name": "entity-memory-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 7.893642083974555,
+        "logSHA256": "dbe100d29100edbc481a3b1c67434148229a64f887a6fab280658539b9b7ebc2"
+      },
+      {
+        "name": "entity-vault-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 7.784406582824886,
+        "logSHA256": "5a35d9b8dc1aea8b558bb77e879a14134f4c0822f76e7fee4c8c58f1ca526263"
+      },
+      {
+        "name": "project-corrections-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.8249703329056501,
+        "logSHA256": "81355431f56db0bb9a533ca81e3fb0db53c001b72dc443dc14463e3b38c543a1"
+      },
+      {
+        "name": "tag-index-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.8490250420290977,
+        "logSHA256": "1074b0345ee7bbfed34aceb99da2ddad135188b5691bb777ae3b8cf923e62234"
+      },
+      {
+        "name": "tag-index-interruption-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 30.253507875138894,
+        "logSHA256": "7527d8b4f10e0503ace679a4efaa6caadf2887566cb7afcb5b105a204d3105f1"
+      },
+      {
+        "name": "hardware-replay-probe",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 2.0432939999736845,
+        "logSHA256": "b1a00594a3c842e9e3a636315b4b1402289ce807701d363c6b13980013d1983b"
+      },
+      {
+        "name": "replay-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.5683174580335617,
+        "logSHA256": "58c97006e8ae55baed6a280e8c50444b07bc5705e9b8f942b7723a353a72a857"
+      },
+      {
+        "name": "api-mcp-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.34683266608044505,
+        "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+      },
+      {
+        "name": "sdk-offline",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 4.879361875122413,
+        "logSHA256": "d3821bfceb932e626c275110563147c085266dccc8c80c57160777ad4a3341c2"
+      },
+      {
+        "name": "pattern-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.6963730840943754,
+        "logSHA256": "ac879a1e8af596d3be156728f7776f904e41f39a09ec79ec0537477007d5133a"
+      },
+      {
+        "name": "absent-target-admission",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.20500595797784626,
+        "logSHA256": "fbf4d241668be4886dddae3442f180393f1981e374d827ded3eed39fb5b56267"
+      },
+      {
+        "name": "package-proof",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.6455494170077145,
+        "logSHA256": "f2d3e2c0acedf183cf0366e4ba4efb890f71466678e94936b6fc0efdc4de009e"
+      }
+    ]
+  },
+  "controlledWorkCounts": {
+    "scope": "Production monitor and traversal over an authored301-node tree,120 simulated half-second ticks. Native stream enumeration/rebinding is outside these counts. Not elapsed seconds, cross-process AX IPC, CPU, energy or an older/competitor app comparison.",
+    "fullAttributeRequestsPerRead": 1510,
+    "bindingAttributeRequestsPerRead": 4,
+    "cases": {
+      "quiet": {
+        "polls": 120,
+        "frames": 0,
+        "fullReads": 1,
+        "bindingReads": 120,
+        "attributes": 1990
+      },
+      "light": {
+        "polls": 120,
+        "frames": 12,
+        "fullReads": 25,
+        "bindingReads": 120,
+        "attributes": 38230
+      },
+      "balanced": {
+        "polls": 120,
+        "frames": 60,
+        "fullReads": 121,
+        "bindingReads": 120,
+        "attributes": 183190
+      },
+      "detailed": {
+        "polls": 120,
+        "frames": 120,
+        "fullReads": 241,
+        "bindingReads": 120,
+        "attributes": 364390
+      }
+    },
+    "identicalAcrossFullTSanAndOptimized": true
+  },
+  "hardwareReplayProbe": {
+    "append_including_chunk_finalization_ms": [
+      76.4399766921997,
+      0.0890493392944336,
+      0.08499622344970703,
+      0.0890493392944336,
+      0.09107589721679688,
+      18.619060516357422,
+      0.0820159912109375,
+      0.08499622344970703,
+      0.08594989776611328,
+      0.08606910705566406,
+      16.784071922302246,
+      0.08106231689453125
+    ],
+    "clips": 3,
+    "codec": "hevc",
+    "decoded_frame_identity_checks_passed": 12,
+    "decoded_frames": 12,
+    "decoded_ocr_checks_passed": 12,
+    "format": "OSwind synthetic visual replay probe v1",
+    "hardware_required": true,
+    "height": 720,
+    "input_frames": 12,
+    "interval_seconds": 1,
+    "jpeg_reference_bytes": 572784,
+    "ocr_checks_passed": 12,
+    "ocr_ms": [
+      247.36690521240234,
+      63.102006912231445,
+      63.18795680999756,
+      61.17093563079834,
+      62.00003623962402,
+      61.16795539855957,
+      62.533020973205566,
+      61.720967292785645,
+      61.40303611755371,
+      61.16807460784912,
+      61.61701679229736,
+      61.76102161407471
+    ],
+    "schema_version": 23,
+    "scope": "Generated static desktop-like pixels with changing labels; actual Vision OCR, required-hardware HEVC (or explicit software H264), source storage, every-frame decode and decoded ownership/authored frame-token OCR checks. JPEG uses the same pixels at quality 0.75. Excludes desktop capture, natural workloads, power, database/metadata bytes and competitors.",
+    "source_frame_identity_checks_passed": 12,
+    "stored_frames": 12,
+    "thumbnail_bytes": 31236,
+    "video_bytes": 59969,
+    "video_plus_thumbnail_to_jpeg_ratio": 0.15923105394005418,
+    "wall_seconds": 2.0140269994735718,
+    "width": 1280
+  },
+  "strictAbsentTargetAdmission": {
+    "format": "OSwind strict absent-target replay admission",
+    "cliSHA256": "d86fc87683e933fe096ddc8cf8845531cece2576f83b0aeb660093dd38d4a4ce",
+    "doctor": {
+      "screenLocked": true,
+      "screenRecording": true,
+      "accessibility": true,
+      "gpu": "Apple M5 Max",
+      "os": "Version 26.6.2 (Build 25G83)"
+    },
+    "absentTarget": "org.oswind.absent-a525dfbe22e1497596005c742b6d1e26",
+    "returncode": 1,
+    "stderr": "OSwind: Replay needs an unlocked session and existing Screen Recording access\n",
+    "savedSources": 0,
+    "scope": "Locked-session replay refusal with an explicitly absent target argument; zero sources. Native target lookup/fallback, unlocked capture and physical power were not exercised.",
+    "rawReceiptSHA256": "fbf4d241668be4886dddae3442f180393f1981e374d827ded3eed39fb5b56267",
+    "targetResolutionExercised": false,
+    "observedBoundary": "Locked-session guard before target lookup"
+  },
+  "package": {
+    "scope": "Separately staged replay focused-window metadata supervision; fresh complete per-frame checks unchanged. No live capture, calibrated physical energy, broad parity, hardened-distribution or competitive ranking acceptance.",
+    "codeCommit": "fbb7350c4e650a398f8b75e61c8596dd6fcb4f2f",
+    "schema": 23,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "6323a57db76a514f3bee2927312554fb8e1a498ca5ccba83894bd1f4260749e0",
+        "signedSHA256": "bdaac080f5d76b685dd04d5ff1e819753fa1677d9783673a0b12a51fae37b012",
+        "normalizedPayloadSHA256": "39c4375fd635ee0f9db96db5a9f59e70bfdfec76440f2dfabe272245c5d38eda"
+      },
+      "oswindctl": {
+        "rawSHA256": "416d3e8f5bc3d1c824c4881e2c9171eb267414dd3f81329b728957175867aa96",
+        "signedSHA256": "d86fc87683e933fe096ddc8cf8845531cece2576f83b0aeb660093dd38d4a4ce",
+        "normalizedPayloadSHA256": "64760cf9448289efbf7f81a58b16307a2ed528f0797f37cd5e8906e2ba8ddbcc"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "3cbe3784b8cb19c927dbab0ba4b91094dd213e609353a946071d6cf19e49151b",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "8cd3e44e3a9bef0963325c421de844662cd6dd137fd398665dfdeb96b0a7dbee",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installedUnchanged": true
+  },
+  "publicationIntegrity": {
+    "frozenInputsStillMatch": true,
+    "sourceTestsToolsSDKAndAssetsUnchanged": true,
+    "installedFiles": 15,
+    "installedTreeUnchanged": true,
+    "packageAndExtractedTreeStillEqual": true,
+    "qualificationPrefixMountedImages": [],
+    "noOwnCompilerOrEvaluationDriver": true
+  },
+  "retainedFailures": [
+    {
+      "path": ".artifacts/capture-budget-v1/retained-publication-failure-v1.json",
+      "sha256": "3609921538d9791b1b7dfc32a8aef5e69d864ad5ac720d7c140fd20d2396ee66",
+      "meaning": "Publication-only parser rejected singular test-skipped summaries; parser corrected, raw qualification logs unchanged. New-report self-link checked after creation."
+    },
+    {
+      "path": ".artifacts/capture-budget-v1/focused-v1.log",
+      "sha256": "2f800cc145c3ab0e809a3326210c63a9460c398f54b8cdc3204855c603b1e6c0",
+      "meaning": "Actor-isolated environment construction used in a nonisolated default argument; initialization moved inside its actor before the next focused run."
+    }
+  ],
+  "priorIndependentGates": [
+    "Native hdiutil normal exit16 on PR83 publication28a95f8, run40889784746, query-recovery detach; cause unproven.",
+    "Native hdiutil normal exit16 on source c7fed19 visual-index final lock; cause unproven."
+  ],
+  "staticReport": {
+    "canonicalVendors": 16,
+    "requirements": 76,
+    "evidenceRowsChanged": [
+      "F003",
+      "F007",
+      "F013",
+      "F072"
+    ],
+    "statusesUnchanged": true,
+    "counts": {
+      "live verified": 4,
+      "partial": 37,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 4,
+      "out of v0 desktop scope": 2
+    },
+    "canonicalVendorBytesUnchanged": true,
+    "renderedCellsMatch": true,
+    "deterministicRender": true,
+    "htmlSHA256": "5929169b497f37081961b433c3ecd56f0f18a713cbe65b5e2dc143ec487d3a6d",
+    "READMEFileLinksExist": true,
+    "newVisualAcceptance": false
+  },
+  "remaining": [
+    "Signed native same-app window/browser/secure transitions, permission/session changes and physical power-cadence acceptance.",
+    "Actual sustained Light/Balanced/Detailed captures with system telemetry, process/idle controls, storage and calibrated energy.",
+    "Standalone AX-only text collection: current Accessibility text augments screen/audio capture and capture startup still requires Screen Recording.",
+    "Personal device sync, notarized installer/updates, older Macs/OS, broad parity and whole-product competitor measurements."
+  ],
+  "cacheLimits": "Native model fixtures reuse current local prepared assets; framework compilation and OS caches/background activity are uncontrolled. No model throughput/power result is inferred."
+}

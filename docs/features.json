@@ -20,7 +20,7 @@
     "axis": "Capture",
     "feature": "Continuous visual replay / HEVC",
     "status": "partial",
-    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Strict-selector device retest: 12 captured frames / 4 clips, all decoded with exact frame identity; native search match, seek and play observed. Follow-up native retest passes player-first layout, matched frame, aligned boxes, seek/play/pause/end/restart. All-display replay, natural workload/power and broad lock/resume remain open",
+    "evidence": "Focused-window ScreenCaptureKit stream, hardware-required HEVC, timed OCR/AX, frame seek/boxes and erasable chunks. Strict-selector device retest: 12 captured frames / 4 clips, all decoded with exact frame identity; native search match, seek and play observed. Follow-up native retest passes player-first layout, matched frame, aligned boxes, seek/play/pause/end/restart. All-display replay, natural workload/power and broad lock/resume remain open Source fbb7350 changes bound-stream supervision to focused-window metadata, with fresh complete AX reads around every frame OCR. Same-app title/bounds, app/session/permission/cadence and scope-sharing guards have controlled tests. The full/model, sanitizer, optimized and signed decoder qualification is tracked separately in REPLAY-CONTEXT-DUTY.md; this adds no physical capture/power or broad replay acceptance.",
     "references": "Rewind Desktop, Retrace (haseab), rem"
   },
   {
@@ -52,7 +52,7 @@
     "axis": "Capture",
     "feature": "Event-driven capture",
     "status": "partial",
-    "evidence": "Replay uses ScreenCaptureKit frame events; snapshots use app-switch plus interval. Broad automatic window/context transition acceptance remains open",
+    "evidence": "Replay uses ScreenCaptureKit frame events; snapshots use app-switch plus interval. Broad automatic window/context transition acceptance remains open Bound replay supervision now polls only focused-window metadata; frame events retain fresh full privacy observations before/after OCR. The coordinator never serves binding-only metadata to a full reader. Simulated scheduler/tree work counts are separate from actual native window changes, CPU or energy. See REPLAY-CONTEXT-DUTY.md.",
     "references": "Screenpipe"
   },
   {
@@ -100,7 +100,7 @@
     "axis": "Energy",
     "feature": "Long-run battery and CPU budget",
     "status": "todo",
-    "evidence": "Paired signed CPU/wall indexing/restore observations published; no watts or battery drain. Earlier noninteractive powermetrics probe refused because sudo needs a password. A pinned optional non-root macmon observer now passes8 offline contracts and20 finite hardware samples; a40-sample owned-CPU responsiveness probe is system-only with visible background GPU drift. No app energy or sustained battery result; settings unchanged. Older schema11 component soak completed with four gaps; current uninterrupted desktop capture and physical power remain missing",
+    "evidence": "Paired signed CPU/wall indexing/restore observations published; no watts or battery drain. Earlier noninteractive powermetrics probe refused because sudo needs a password. A pinned optional non-root macmon observer now passes8 offline contracts and20 finite hardware samples; a40-sample owned-CPU responsiveness probe is system-only with visible background GPU drift. No app energy or sustained battery result; settings unchanged. Older schema11 component soak completed with four gaps; current uninterrupted desktop capture and physical power remain missing Replay context duty now has an authored 301-node/120-tick work-count fixture: one full read plus120 four-attribute binding reads for a quiet bound stream, with two fresh full checks per sampled frame for all profiles. This is neither cross-process AX timing nor physical power. Long-run battery/CPU budget stays TODO; native/device/energy acceptance remains open. See REPLAY-CONTEXT-DUTY.md.",
     "references": "Screenpipe, all always-on tools"
   },
   {
@@ -572,7 +572,7 @@
     "axis": "Quality",
     "feature": "Retrieval / OCR / ASR fixture suite",
     "status": "partial",
-    "evidence": "Product0839818 / fixture-only d2ee1b1: full1216 defined,1214 available-model/native passes,two physical/admission skips,zero failures under581 frozen inputs. Original579-input run retains three schema22 expectation failures; only those version constants changed, with data/migration assertions and all product/tool/model bytes unchanged. Its202 selected TSan,202 optimized,16 offline SDK checks and eleven signed process groups pass. Learned-import30 operations/eight native cases and scan-record23 operations/two native CPU/Core ML cases cover metadata, invalidation, backup, JSON refusal and read-only surfaces. Strict signed package/same-build payload/extracted-tree proof covers34 files; installed15-file tree unchanged. Fourteen card/twelve Settings component renders are distinct from foreground/TCC acceptance. Known native email misses, earlier developmental regressions and prior independent native detach exit16 remain explicit; no privacy operating point is accepted. Existing retrieval/OCR/ASR/privacy corpus metrics retain their original source and scope. No new natural desktop quality, physical power, complete parity or whole-competitor ranking follows. See PII-SCAN-RECORDS.md and benchmarks/pii-scan-records-v1.json.",
+    "evidence": "Frozen productfbb7350:1230 defined,1228 available-model/native passes,two explicit skips,zero failures;132 selected TSan and132 optimized defined (131 passes/one session-admission skip each);all17 ordered stages pass over584 unchanged declared inputs. Replay supervisor metadata/full scope, same-app changes, secure/browser refusal, late cancellation and coordinator sharing contracts are covered. Authored301-node/120-tick work counts match across normal, TSan and optimized runs; no native IPC/CPU/power benchmark follows. Signed generated hardwareHEVC stores/decodes all12 frames with exact authored identities. Six schema23 process groups include actual encrypted APFS and one-million-source SIGKILL/retry with full source/tag oracles; replay/HTTP/MCP/SDK16/privacy and locked-session zero-source checks (native target resolution unexercised) pass. Strict signed package/same-build payload/extracted-tree proof covers34 files; installed15-file tree unchanged. Initial actor-isolation compile failure, earlier schema22 fixture failures and independent native detach exit16 gates remain retained. Existing retrieval/OCR/ASR/privacy corpus quality metrics retain their original source/scope. No new natural desktop quality, physical power, complete parity or whole-competitor ranking follows. See REPLAY-CONTEXT-DUTY.md and benchmarks/replay-context-duty-v1.json.",
     "references": "OSwind quality bar"
   },
   {
