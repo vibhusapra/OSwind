@@ -71,18 +71,45 @@ struct VaultVolumeProof:Sendable {
     var attachmentDevice:String
     var reportedImagePath:String
     var mounted:Bool {root != nil}
+    func sameIdentity(as other:Self,allowUnmounted:Bool=false)->Bool {
+        let roots:Bool
+        if let first=root,let second=other.root {roots=first.device==second.device && first.inode==second.inode && mount==other.mount}
+        else {roots=(root==nil && other.root==nil) || (allowUnmounted && other.root==nil)}
+        return roots && device==other.device && attachmentDevice==other.attachmentDevice && volumeUUID==other.volumeUUID && image.device==other.image.device && image.inode==other.image.inode
+    }
 }
 struct NativeVaultDriver:Sendable {
+    private let observer:(@Sendable (VaultNativeDiagnostic)->Void)?
+    private let willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?
+    init(observer:(@Sendable (VaultNativeDiagnostic)->Void)?=nil,willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?=nil) {self.observer=observer;self.willMutate=willMutate}
+    private func observed(_ operation:VaultNativeOperation,_ executable:String,_ arguments:[String],timeout:Double=60,cancellation:VaultProcess.CancellationPolicy = .terminateChild,mountedDevice:Int32?=nil) async throws -> VaultProcessResult {
+        // This wrapper accepts no secret. Create/attach retain their separate
+        // unobserved stdin-only credential path.
+        if operation.mutates {willMutate?(operation,mountedDevice)}
+        let start=ContinuousClock.now,result=try await VaultProcess.run(executable,arguments,timeout:timeout,cancellation:cancellation)
+        if let observer {let elapsed=start.duration(to:.now).components;observer(.init(operation:operation,result:result,durationSeconds:Double(elapsed.seconds)+Double(elapsed.attoseconds)/1e18))};return result
+    }
+    static func attachmentList(_ result:VaultProcessResult)throws->[[String:Any]] {
+        guard result.status==0 else {throw VaultNativeFailure(operation:.attachmentInventory,result:result)}
+        guard let data=try? PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any],
+              let images=data["images"] as? [[String:Any]] else {throw VaultNativeFailure(operation:.attachmentInventory,result:result,invalidOutput:true)}
+        return images
+    }
+    static func encryptionFlag(_ result:VaultProcessResult)throws->Bool {
+        guard result.status==0 else {throw VaultNativeFailure(operation:.encryptionProbe,result:result)}
+        guard let object=try? PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any],
+              let encrypted=object["encrypted"] as? Bool else {throw VaultNativeFailure(operation:.encryptionProbe,result:result,invalidOutput:true)}
+        return encrypted
+    }
     private func images() async throws -> [[String:Any]] {
-        let r=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"])
-        guard r.status==0,let data=try PropertyListSerialization.propertyList(from:r.stdout,format:nil) as? [String:Any],let images=data["images"] as? [[String:Any]] else {throw OSwindError.unavailable("Cannot inspect encrypted disk attachments")};return images
+        try Self.attachmentList(await observed(.attachmentInventory,"/usr/bin/hdiutil",["info","-plist"]))
     }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
         let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
         guard result.status==0 else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
-        let r=try await VaultProcess.run("/usr/bin/hdiutil",["isencrypted","-plist",paths.image.path]);guard r.status==0,let p=try PropertyListSerialization.propertyList(from:r.stdout,format:nil) as? [String:Any] else {throw OSwindError.invalid("Cannot verify encrypted disk image")};return p["encrypted"] as? Bool==true
+        try Self.encryptionFlag(await observed(.encryptionProbe,"/usr/bin/hdiutil",["isencrypted","-plist",paths.image.path]))
     }
     func attach(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         guard try await encrypted(paths:paths) else {throw OSwindError.invalid("The selected disk image is not encrypted")}
@@ -140,8 +167,9 @@ struct NativeVaultDriver:Sendable {
             volume=volumes[0];url=saved.map {paths.mount($0)} ?? paths.mounts;root=nil
         }
         guard let device=volume["dev-entry"] as? String,device.hasPrefix("/dev/disk") else {throw OSwindError.invalid("Cannot identify the encrypted volume device")}
-        let disk=try await VaultProcess.run("/usr/sbin/diskutil",["info","-plist",device])
-        guard disk.status==0,let metadata=try PropertyListSerialization.propertyList(from:disk.stdout,format:nil) as? [String:Any],let uuid=metadata["VolumeUUID"] as? String,UUID(uuidString:uuid) != nil,metadata["FilesystemType"] as? String=="apfs",metadata["DeviceIdentifier"] as? String==String(device.dropFirst(5)) else {throw OSwindError.invalid("Cannot verify the attached APFS volume")}
+        let disk=try await observed(.volumeInfo,"/usr/sbin/diskutil",["info","-plist",device])
+        guard disk.status==0 else {throw VaultNativeFailure(operation:.volumeInfo,result:disk)}
+        guard let metadata=try? PropertyListSerialization.propertyList(from:disk.stdout,format:nil) as? [String:Any],let uuid=metadata["VolumeUUID"] as? String,UUID(uuidString:uuid) != nil,metadata["FilesystemType"] as? String=="apfs",metadata["DeviceIdentifier"] as? String==String(device.dropFirst(5)) else {throw VaultNativeFailure(operation:.volumeInfo,result:disk,invalidOutput:true)}
         let stamp=try BackupFileTree(root:paths.image).identity(),matchesPath=URL(fileURLWithPath:reported).standardizedFileURL.resolvingSymlinksInPath()==expectedImage
         if !matchesPath {
             guard let saved,device==saved.device,uuid.caseInsensitiveCompare(info.volumeUUID) == .orderedSame,stamp.device==saved.imageDevice,stamp.inode==saved.imageInode else {throw OSwindError.invalid("A moved image could not be bound to this vault session")}
@@ -160,10 +188,7 @@ struct NativeVaultDriver:Sendable {
         return .init(mount:url,device:device,volumeUUID:uuid,root:root,image:stamp,attachmentDevice:attachmentDevice,reportedImagePath:reported)
     }
     private func same(_ a:VaultVolumeProof,_ b:VaultVolumeProof,allowUnmounted:Bool=false) -> Bool {
-        let roots:Bool
-        if let first=a.root,let second=b.root {roots=first.device==second.device && first.inode==second.inode && a.mount==b.mount}
-        else {roots=(a.root==nil && b.root==nil) || (allowUnmounted && b.root==nil)}
-        return roots && a.device==b.device && a.attachmentDevice==b.attachmentDevice && a.volumeUUID==b.volumeUUID && a.image.device==b.image.device && a.image.inode==b.image.inode
+        a.sameIdentity(as:b,allowUnmounted:allowUnmounted)
     }
     func detach(paths:VaultPaths,expected:VaultSession) async throws {
         guard let current=try await attachment(paths:paths) else {return}
@@ -175,26 +200,10 @@ struct NativeVaultDriver:Sendable {
         guard let verified=try await attachment(paths:paths) else {return}
         guard same(proof,verified) else {throw OSwindError.invalid("The image changed before detach; no volume was detached")}
         let identity=try VaultDetachIdentity(paths:paths,image:verified.image)
-        let first=try await VaultProcess.run("/usr/bin/hdiutil",["detach",verified.attachmentDevice],timeout:30,cancellation:.finishNativeAction)
-        if first.status != 0 {
-            // A renamed mounted package can have a stale Disk Arbitration path.
-            // A normal kernel unmount uses the freshly verified current mount.
-            // EBUSY remains EBUSY; force flags are never used.
-            guard verified.mounted,URL(fileURLWithPath:verified.reportedImagePath).standardizedFileURL.resolvingSymlinksInPath() != paths.image.standardizedFileURL.resolvingSymlinksInPath(),let current=try await attachment(paths:paths),same(verified,current) else {throw OSwindError.unavailable("The vault is still attached because files are in use. Close other readers and retry locking.")}
-            let unmount=try await VaultProcess.run("/sbin/umount",[current.mount.path],timeout:30,cancellation:.finishNativeAction)
-            guard unmount.status==0 else {throw OSwindError.unavailable("The moved vault is still mounted because files are in use. Close other readers and retry locking.")}
-            guard let unmounted=try await attachment(paths:paths),!unmounted.mounted,same(verified,unmounted,allowUnmounted:true) else {throw OSwindError.invalid("The unmounted attachment changed. Its remaining device was preserved.")}
-            let final=try await VaultProcess.run("/usr/bin/hdiutil",["detach",unmounted.attachmentDevice],timeout:30,cancellation:.finishNativeAction)
-            guard final.status==0 else {throw OSwindError.unavailable("The filesystem is unmounted but its encrypted image is still attached. Retry locking.")}
-        }
-        try await VaultDetachSettlement.confirm {
-            try identity.validate()
-            let observed=try await attachment(paths:paths)
-            // Revalidate after native IPC even when the OS now reports absent.
-            try identity.validate()
-            guard let observed else {return true}
-            guard same(verified,observed,allowUnmounted:true) else {throw OSwindError.invalid("The attachment changed during detach verification")}
-            return false
-        }
+        try await VaultEjectTransition.run(verified:verified,
+            expectedImage:{paths.image},validate:{try identity.validate()},
+            observe:{try await self.attachment(paths:paths)},
+            detach:{device,mountedDevice in try await self.observed(.imageDetach,"/usr/bin/hdiutil",["detach",device],timeout:30,cancellation:.finishNativeAction,mountedDevice:mountedDevice)},
+            unmount:{mount,mountedDevice in try await self.observed(.filesystemUnmount,"/sbin/umount",[mount.path],timeout:30,cancellation:.finishNativeAction,mountedDevice:mountedDevice)})
     }
 }

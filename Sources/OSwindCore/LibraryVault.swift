@@ -7,17 +7,23 @@ import CryptoKit
 /// a closed regular file while detached, preventing accidental plaintext fallback.
 public actor LibraryVault {
     let paths:VaultPaths
-    private let driver=NativeVaultDriver()
+    private let driver:NativeVaultDriver
     var acceptedPassphraseDigest:Data?
     private var migrationDetails:VaultMigrationDetails?
     public nonisolated let libraryURL:URL
     public nonisolated let packageURL:URL
-    public init(package:URL) throws {let paths=try VaultPaths(package);self.paths=paths;packageURL=paths.package;libraryURL=paths.library}
+    public init(package:URL) throws {let paths=try VaultPaths(package);self.paths=paths;packageURL=paths.package;libraryURL=paths.library;driver=NativeVaultDriver()}
+    init(package:URL,nativeDriver:NativeVaultDriver) throws {let paths=try VaultPaths(package);self.paths=paths;packageURL=paths.package;libraryURL=paths.library;driver=nativeDriver}
     public static func metadata(at package:URL) throws -> LibraryVaultInfo {try VaultPaths(package).info()}
     public static func package(containing url:URL) throws -> URL? {try VaultAccess.package(containing:url)?.package}
     public static func create(at package:URL,name:String,capacityGiB:Int=128,passphrase:Data,keepUnlocked:Bool=false) async throws -> LibraryVaultStatus {
         let result=try await build(at:package,name:name,capacityGiB:capacityGiB,passphrase:passphrase,keepUnlocked:keepUnlocked,source:nil,progress:{_ in})
         return result.1
+    }
+    /// Owned native fixtures can observe nonsecret calls throughout creation
+    /// and closing. Public construction never enables native output tracing.
+    static func create(at package:URL,name:String,capacityGiB:Int,passphrase:Data,nativeDriver:NativeVaultDriver) async throws -> LibraryVaultStatus {
+        try await build(at:package,name:name,capacityGiB:capacityGiB,passphrase:passphrase,keepUnlocked:false,source:nil,progress:{_ in},nativeDriver:nativeDriver).1
     }
     public static func migrate(from source:MemoryStore,to package:URL,name:String,capacityGiB:Int=128,passphrase:Data,keepUnlocked:Bool=false,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) async throws -> LibraryVaultMigrationResult {
         guard try !source.hasPendingLibraryWipeCleanup() else {throw OSwindError.unavailable("Finish library cleanup before copying history into a vault")}
@@ -27,7 +33,7 @@ public actor LibraryVault {
         guard let details=await result.0.migrationDetails else {throw OSwindError.unavailable("The encrypted copy did not produce a verified snapshot")}
         return .init(status:result.1,snapshot:details.snapshot,sourceStable:details.sourceStable)
     }
-    private static func build(at package:URL,name:String,capacityGiB:Int,passphrase:Data,keepUnlocked:Bool,source:MemoryStore?,progress:@escaping @Sendable (LibraryBackupProgress)->Void) async throws -> (LibraryVault,LibraryVaultStatus) {
+    private static func build(at package:URL,name:String,capacityGiB:Int,passphrase:Data,keepUnlocked:Bool,source:MemoryStore?,progress:@escaping @Sendable (LibraryBackupProgress)->Void,nativeDriver:NativeVaultDriver=NativeVaultDriver()) async throws -> (LibraryVault,LibraryVaultStatus) {
         try Task.checkCancellation();try validateSecret(passphrase)
         var paths=try VaultPaths(package)
         var info=LibraryVaultInfo(name:name,capacityGiB:capacityGiB,volumeUUID:"00000000-0000-0000-0000-000000000000");try info.validate()
@@ -36,8 +42,8 @@ public actor LibraryVault {
         paths=try VaultPaths(paths.package)
         let lease=try VaultOperationLease(paths:paths);defer {withExtendedLifetime(lease){}}
         try paths.write(info,as:VaultPaths.manifestName);try paths.closeAlias()
-        let driver=NativeVaultDriver();try await driver.create(paths:paths,capacityGiB:capacityGiB,secret:passphrase)
-        let vault=try LibraryVault(package:paths.package)
+        try await nativeDriver.create(paths:paths,capacityGiB:capacityGiB,secret:passphrase)
+        let vault=try LibraryVault(package:paths.package,nativeDriver:nativeDriver)
         // create owns the operation lease; unlock uses the same implementation
         // without trying to acquire a second exclusive reservation.
         let status=try await vault.openUnderLease(passphrase:passphrase,allowSetup:true,source:source,progress:progress)
