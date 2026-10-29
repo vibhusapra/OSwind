@@ -1,6 +1,6 @@
 # Learned PII evaluation
 
-OSwind still uses pattern-based secret protection. The optional learned candidate is **not connected to capture, imports, answers, exports, screenshots or audio**. F047 remains TODO. [Measured results](../benchmarks/pii-model-evaluation-v1.json) identify a useful recall opportunity and two blockers: false positives at the default threshold and a failed dynamic-shape native Core ML runtime. A separate static-shape diagnostic provides a bounded path forward.
+OSwind still uses pattern-based secret protection. The optional learned candidate is **not connected to capture, imports, answers, exports, screenshots or audio**. F047 remains TODO. [Measured results](../benchmarks/pii-model-evaluation-v1.json) identify a useful recall opportunity and unacceptable false positives at the example0.5 threshold. The original dynamic-shape Core ML failure is retained; [explicit native inspection](NATIVE-PII-RUNTIME.md) now qualifies a fixed128-token Core ML path and CPU runtime. Representative hybrid quality, production admission and an accepted operating point remain open.
 
 ## Validation results
 

@@ -372,7 +372,7 @@
     "axis": "Privacy",
     "feature": "PII model / image redaction",
     "status": "todo",
-    "evidence": "Pinned GLiNER threshold0.5 covers42/48 authored values but flags8/24 negatives; no operating point accepted. Native inputs match181 references; decoder/whole-grapheme masks match276 CPU and216 CoreML threshold comparisons. Fixed128-token/dynamic-word prototype completes144 CoreML-EP calls on72 sources, with CPU partitions/warnings retained; physical GPU placement unmeasured.984 defined cases:982pass/2skip;132TSan and28optimized PII pass;6ordered operations and both source CI jobs pass. No production model-owner, capture/import/query/export/setup or image/audio admission integration; independent desktop quality still open. See NATIVE-PII-DECODING.md",
+    "evidence": "Explicit pinned local PIIInspector/CLI now provides CPU/fixed128-token Core ML, FIFO32, joined cancellation/shutdown, retention and original-source pattern/model mask union. Both backends match72 validation sources at3 thresholds in normal/TSan/optimized runs;25 real signed CLI checks and18 offline refusals pass.1004 defined:1002pass/2skip;152TSan and48optimized PII pass. Final34-file signed app/ZIP includes MIT notice; final visual compatibility passes. Cross-rebuild executable identity assertion fails and is retained; current raw/signed payload proof passes. Inherited model-only threshold0.5 covers42/48 values with8/24 negative false positives; no operating point accepted. No learned capture/import/query/export/setup, long-source or image/audio admission; representative desktop quality and physical GPU placement remain open. See NATIVE-PII-RUNTIME.md",
     "references": "Screenpipe, Recall, Retrace (jhammant)"
   },
   {

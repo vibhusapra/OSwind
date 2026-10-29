@@ -2,6 +2,8 @@
 
 [PR #72](https://github.com/vibhusapra/OSwind/pull/72) adds native output decoding and source-bound whole-grapheme masks. A separate native prototype now runs the pinned model with fixed 128-token inputs and varying output word counts through Core ML. **Capture, import, query, export and setup do not select this model/decoder yet.** F047 remains TODO; classifier quality is still the [earlier validation result](PII-EVALUATION.md).
 
+[PR #73](https://github.com/vibhusapra/OSwind/pull/73) subsequently adds [explicit native inspection and model ownership](NATIVE-PII-RUNTIME.md). It qualifies the runtime and decoder together through a history-free CLI; the production paths above remain unselected.
+
 ## Output contract
 
 `PIIDecoding` accepts a batch-one tensor shaped **1 × exact source word count × 12 labels × 3 start/end/inside logits**. Source preparation reuses the [native word splitter](NATIVE-PII.md). Every tensor cell must be finite; wrong layout, labels, batch, word count or element count refuses the entire result.
