@@ -1,0 +1,125 @@
+{
+  "operations": [
+    {
+      "policy": "cpu",
+      "exitCode": 0,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "cpu",
+        "fixedInputs": 3,
+        "runs": 30,
+        "loadSeconds": 0.0792539,
+        "firstForwardSeconds": 0.00791375,
+        "warmForwardMedianSeconds": 0.00769808,
+        "warmForwardP95Seconds": 0.00992804,
+        "maxAbsoluteLogitDifference": 4.76837e-06,
+        "peakRSSBytes": 452395008,
+        "forwardSecondsInRunOrder": [
+          0.00791375,
+          0.00745354,
+          0.00756625,
+          0.00805496,
+          0.00741262,
+          0.00914258,
+          0.0100482,
+          0.00976029,
+          0.00939062,
+          0.00980442,
+          0.0097235,
+          0.00992804,
+          0.00950117,
+          0.00980238,
+          0.00785317,
+          0.00971867,
+          0.00801421,
+          0.00769808,
+          0.00750608,
+          0.00698583,
+          0.00723229,
+          0.0074935,
+          0.00746117,
+          0.00694213,
+          0.00692654,
+          0.00687092,
+          0.00697533,
+          0.00708408,
+          0.00696346,
+          0.00692433
+        ]
+      },
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 15810
+      },
+      "uniqueProfiledNodeNames": {
+        "CPUExecutionProvider": 527
+      },
+      "frameworkStdoutPrelude": "",
+      "stdoutSHA256": "a74dc67d0b46daa39399706f5f14bfa66beaa59423aec1c51cd373e43f13f7f9"
+    },
+    {
+      "policy": "coreml",
+      "exitCode": 0,
+      "report": {
+        "state": "completed",
+        "runtime": "onnxruntime-1.24.2-native",
+        "policy": "coreml",
+        "fixedInputs": 3,
+        "runs": 30,
+        "loadSeconds": 1.51496,
+        "firstForwardSeconds": 0.403832,
+        "warmForwardMedianSeconds": 0.0113455,
+        "warmForwardP95Seconds": 0.0116436,
+        "maxAbsoluteLogitDifference": 2.0504e-05,
+        "peakRSSBytes": 803373056,
+        "forwardSecondsInRunOrder": [
+          0.403832,
+          0.0123499,
+          0.0118512,
+          0.0115392,
+          0.0116168,
+          0.011305,
+          0.0114045,
+          0.0112678,
+          0.0112875,
+          0.0113109,
+          0.0115218,
+          0.0114441,
+          0.0112648,
+          0.0113455,
+          0.0114042,
+          0.0112937,
+          0.0112466,
+          0.0112232,
+          0.0113655,
+          0.0113778,
+          0.0112882,
+          0.0116647,
+          0.0116436,
+          0.0115483,
+          0.0114904,
+          0.0113053,
+          0.011313,
+          0.0113626,
+          0.0112174,
+          0.0113408
+        ]
+      },
+      "profiledNodeInvocations": {
+        "CPUExecutionProvider": 2460,
+        "CoreMLExecutionProvider": 600
+      },
+      "uniqueProfiledNodeNames": {
+        "CPUExecutionProvider": 82,
+        "CoreMLExecutionProvider": 20
+      },
+      "frameworkStdoutPrelude": "E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: Invalid tensor rank 0 inferred from: ios16.reduce_max, expecting 1..E5RT encountered an STL exception. msg = Input: _core_ConstantOfShape_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_Add_3_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_LSTM_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_rnn_lstm_Reshape_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Input: _core_scorer_Expand_1_output_0 has unbounded dimension which is not supported. Please consult MIL Framework or milPython on adding a bound for this dimension..E5RT encountered an STL exception. msg = Failed to PropagateInputTensorShapes: std::invalid_argument during type inference for ios18.matmul: shapes of x and y are not broadcastable.",
+      "stdoutSHA256": "446a7d65e7c615ab9e4dac7fdafed35c7ffb1d27331014fe22e751fd74dbb642"
+    }
+  ],
+  "scope": "One bounded diagnostic of static input/output metadata versus dynamic graph. A success would not establish dynamic/native tokenizer/decoder or actual GPU node placement. No operator/initializer transforms, one already-opened validation input repeated30 times.",
+  "recovery": "Initial wrapper json.loads failed on CoreML framework stdout warnings before the final JSON object, after the executable exited0. Original reports/profiles retained. Parse exactly one known completed object with no trailing non-whitespace; preserve the prelude. No model/binary/inference retry.",
+  "distinctInputs": 1,
+  "fixtureSlots": 3,
+  "reportFixedInputsFieldMeansSlots": true
+}

@@ -66,3 +66,9 @@ clang++ -std=c++17 -O2 -Wall -Wextra -Werror \
 ```
 
 Public `observations/` includes complete reference reports, synthetic CPU predictions at every threshold, actual regex masks and native results. The standard-library scorer can recompute quality from these and the generated corpus. Native input fixtures/parity report refer to previously opened validation inputs, never the reserved test. Initial assertion failures, failed Core ML attempts and earlier timings are retained separately; no favorable repeat replaces them.
+
+## Separate static-shape diagnostic
+
+`prepare-static-diagnostic.py` is the exact preparation behind `observations/static-plan-v1.json`. In a fresh reproduction only, make `.artifacts/pii-model-evaluation-v1/native/static-diagnostic-v1`, copy this script there as `prepare.py`, then run that copy with the locked Python. It reads only `compatibility-0-v3.npz`, fixes input/output shape metadata and preserves every operator/initializer byte. It writes a separate `static.onnx`, binary fixture and frozen plan. It is a one-shot historical preparation; do not run over existing receipts or during another probe.
+
+Use the same compiled native executable with that graph/fixture and fresh profile prefixes under both policies. The binary header still has three slots, but **all three repeat the same single validation input**. The original native `fixedInputs:3` field counts those slots. Both policies complete thirty calls within tolerance. The Core ML profile records600 CoreML-EP partition and2,460 CPU node invocations; these are not physical GPU/ANE device assignments. Framework stdout warnings are retained in `observations/static-diagnostic-v1.json`. The original wrapper's JSON parse failed after successful execution because of that warning prelude; recovery parses exactly the terminal completed object without changing inputs or repeating inference. No dynamic-shape or three-distinct-input success is claimed by this diagnostic.

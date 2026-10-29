@@ -472,9 +472,10 @@
     "Compatibility-v2 indentation-sensitive edit did not apply; same failed assertion, no new model conclusion.",
     "Shipping baseline-v1 malformed Memory interchange omitted regions; refused before scoring. regions:[] corrects authored schema, corpus/gold unchanged.",
     "Native-v1 CoreML recognized 604/831 optimized nodes in 70 partitions but model execution-plan construction failed with code -7. Native-v2 retains same failure; no GPU execution evidence.",
-    "Native-v1 omitted two first-sweep timing samples; v2 retains all30 samples. v1 observations retained privately; no timing winner selected."
+    "Native-v1 omitted two first-sweep timing samples; v2 retains all30 samples. v1 observations retained privately; no timing winner selected.",
+    "Static diagnostic wrapper JSON parse failed on CoreML framework warning prelude after executable exit0. Recovered exactly one final JSON object from retained output, preserving all warnings; no inference/model retry."
   ],
-  "decision": "Keep shipping pattern protection. No automatic learned redactor integration from these fixtures. Native CPU forward viable; MPS Python parity passes; CoreML dynamic exported graph currently fails. No operating point accepted.",
+  "decision": "Keep shipping pattern protection. No automatic learned redactor integration from these fixtures. Native CPU forward viable; MPS Python parity passes; dynamic CoreML graph fails. Static shape-only single-input diagnostic completes via20 CoreML partitions plus82 CPU nodes, with framework warnings. No operating point accepted.",
   "remaining": [
     "Native byte-level tokenizer, word offsets and token-level decoder with complete grapheme admission",
     "Native accelerator conversion/runtime compatibility and bounded serial ownership, cancellation and release",
@@ -484,5 +485,27 @@
     "Whole-product matched competitor benchmarks and distribution/release gates"
   ],
   "nativePlan": "prototypes/pii/observations/native-plan-v2.json",
-  "nativePlanSHA256": "81f2e806fe86e698acf372223ab8a71cb66bd535814a1cdad55e8e90e32a0215"
+  "nativePlanSHA256": "81f2e806fe86e698acf372223ab8a71cb66bd535814a1cdad55e8e90e32a0215",
+  "staticDiagnostic": {
+    "distinctInputs": 1,
+    "repetitions": 30,
+    "plan": "prototypes/pii/observations/static-plan-v1.json",
+    "planSHA256": "330c17deb580db39b89366b4c460c74d7b5dcab9785eba60b8ee2bce125dcdc3",
+    "receipt": "prototypes/pii/observations/static-diagnostic-v1.json",
+    "receiptSHA256": "8f477e368fcca7580a6f3ad76f9421fb60f1e51d9d407a45f6c0537c5af573ea",
+    "operatorAndInitializerBytesChanged": false,
+    "maximumCoreMLAbsoluteLogitDifference": 2.0504e-05,
+    "profiledCoreMLInvocations": 600,
+    "profiledCPUInvocations": 2460,
+    "scope": "Static metadata only on one previously opened validation input repeated30 times. CoreML EP completes with CPU fallback partitions and framework warnings; physical GPU/ANE placement, dynamic input shapes and full quality/latency remain unqualified. Native report fixedInputs=3 counts duplicate fixture slots, not distinct sources."
+  },
+  "CI": {
+    "source": "cb2907803fcab6bf5d039a6be298abd8e6249331",
+    "runID": 40807375186,
+    "benchmarkJobID": 123229434208,
+    "benchmarkConclusion": "success",
+    "nativeJobID": 123229434757,
+    "nativeStatus": "in_progress",
+    "scope": "Source commit before the static diagnostic publication follow-up; no claim about later documentation/probe snapshot CI."
+  }
 }
