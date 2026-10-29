@@ -21,13 +21,15 @@ jobs:
       - name: Verify tokenizer patch against resolved upstream
         run: python3 scripts/check-tokenizer-vendor.py --upstream .build/checkouts/swift-transformers
       - name: Verify owned encrypted APFS images and app sessions
-        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-vault-native-traces" swift test --filter 'NativeVault|VaultSessionTests'
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-vault-native-traces" OSWIND_TEST_VAULT_QUERY_TRACE_DIR="$RUNNER_TEMP/oswind-vault-query-traces" swift test --filter 'NativeVault|VaultSessionTests'
       - name: Retain owned native vault diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vault-native-diagnostics
-          path: ${{ runner.temp }}/oswind-vault-native-traces/*.json
+          path: |
+            ${{ runner.temp }}/oswind-vault-native-traces/*.json
+            ${{ runner.temp }}/oswind-vault-query-traces/*.json
           if-no-files-found: ignore
       - name: Verify pinned native-model installer without network
         run: python3 scripts/test-native-model-setup.py
@@ -62,6 +64,7 @@ jobs:
           python3 scripts/vault-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-interruptions"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal-busy" --held-reader
+          python3 scripts/vault-query-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-query-interruptions"
       - name: Retain owned pattern and terminal process receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,6 +76,9 @@ jobs:
             ${{ runner.temp }}/oswind-vault-terminal/*.pty-output
             ${{ runner.temp }}/oswind-vault-terminal-busy/report.json
             ${{ runner.temp }}/oswind-vault-terminal-busy/*.pty-output
+            ${{ runner.temp }}/oswind-vault-query-interruptions/report.json
+            ${{ runner.temp }}/oswind-vault-query-interruptions/*.stdout
+            ${{ runner.temp }}/oswind-vault-query-interruptions/*.stderr
           if-no-files-found: ignore
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
