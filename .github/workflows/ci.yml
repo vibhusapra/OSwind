@@ -67,6 +67,8 @@ jobs:
         run: python3 scripts/privacy-mask-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pattern-privacy"
       - name: Verify configured imports reject changed saved policies
         run: python3 scripts/import-preparation-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-import-preparation"
+      - name: Verify bounded import files and pending collector wipe ordering
+        run: python3 scripts/import-input-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-import-input"
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"

@@ -77,6 +77,26 @@ import AppKit
         session.requestLock();try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.closing);XCTAssertNotNil(session.failure)
         try other.close();session.requestLock();try await finish(session);XCTAssertNil(session.failure);XCTAssertEqual(session.vaultStatus?.state,.locked)
     }
+    func testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture() async throws {
+        try native();let package=root.appendingPathComponent("Import.oswindvault"),secret=UUID().uuidString
+        _ = try await LibraryVault.create(at:package,name:"Import drain",capacityGiB:1,passphrase:Data(secret.utf8))
+        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+        let file=root.appendingPathComponent("input.json");try JSONEncoder().encode([Memory(id:"must-not-publish",kind:.note,text:"Owned cancelled import")]).write(to:file)
+        for phase in [AppModel.JSONImportPhase.started,.settingsCaptured] {
+            session.unlock(passphrase:secret,remember:false);try await finish(session);let model=try XCTUnwrap(session.model)
+            try model.settings.save(root:model.store.root);try model.store.insert(Memory(id:"keep",kind:.note,text:"Preserve encrypted history"))
+            let gate=ImportWorkerGate();defer {gate.release()}
+            model.importJSONFile(file,observeWorker:{if $0==phase {try gate.pause()}})
+            await fulfillment(of:[gate.entered],timeout:10);session.requestLock()
+            await fulfillment(of:[gate.cancelled],timeout:10)
+            XCTAssertTrue(session.busy);XCTAssertNil(session.model);XCTAssertFalse(model.store.isClosed)
+            gate.release();try await finish(session)
+            XCTAssertNil(session.failure);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertTrue(model.store.isClosed);XCTAssertFalse(model.hasPendingJSONImport)
+        }
+        session.unlock(passphrase:secret,remember:false);try await finish(session)
+        XCTAssertNotNil(try session.model?.store.get("keep"));XCTAssertNil(try session.model?.store.get("must-not-publish"))
+        session.requestLock();try await finish(session);XCTAssertNil(session.failure)
+    }
     func testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal() async throws {
         try native();let original=root.appendingPathComponent("Original"),package=root.appendingPathComponent("Snapshot.oswindvault")
         let session=AppSession(selection:.init(url:original,requiresExisting:false,origin:"environment"),defaults:defaults,locked:{false});try await finish(session);let source=try XCTUnwrap(session.model?.store)
