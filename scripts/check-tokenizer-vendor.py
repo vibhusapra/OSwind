@@ -25,7 +25,7 @@ for row in manifest['files']:
     assert Path(row['path']).name==row['path'] and row['path'].endswith('.swift')
     assert sha(base/'Sources'/row['path'])==row['vendoredSHA256'],row['path']
     if row['vendoredSHA256']!=row['upstreamSHA256']:changed.append(row['path'])
-assert set(changed)=={'BPETokenizer.swift','Normalizer.swift'}
+assert set(changed)=={'BPETokenizer.swift','Normalizer.swift','PreTokenizer.swift'}
 if args.upstream:
     upstream=args.upstream.resolve(strict=True)
     assert subprocess.check_output(['git','-C',str(upstream),'rev-parse','HEAD'],text=True).strip()==manifest['revision']
@@ -33,7 +33,7 @@ if args.upstream:
     for row in manifest['files']:
         source=upstream/'Sources/Tokenizers'/row['path']
         assert sha(source)==row['upstreamSHA256'],row['path']
-    for name in ['BPETokenizer.swift','Normalizer.swift']:
+    for name in ['BPETokenizer.swift','Normalizer.swift','PreTokenizer.swift']:
         old=(upstream/'Sources/Tokenizers'/name).read_text().splitlines(keepends=True)
         new=(base/'Sources'/name).read_text().splitlines(keepends=True)
         patch+=''.join(difflib.unified_diff(old,new,fromfile='upstream/'+name,tofile='Sources/'+name))
