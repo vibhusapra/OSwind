@@ -155,7 +155,9 @@
     "imageInventorySucceeded": true,
     "installedTreeUnchanged": true,
     "stagedTreeUnchanged": true,
-    "zipUnchanged": true
+    "zipUnchanged": true,
+    "processAbsenceProofAccepted": false,
+    "priorProcessAbsenceClaimWithdrawn": true
   },
   "migration": {
     "state": "completed",
@@ -232,7 +234,32 @@
     "initialDiagnosticValuesRetained": false,
     "rootCause": "Unproven. A suspected shell self-match was not reproduced.",
     "correctedCurrentAudit": "Command identity plus exact owned path, complete process inventory before output, final-proof-v2; empty current owned GUI/test/driver and current artifact-image inventories. Installed/stage/ZIP hashes unchanged.",
-    "failedProductTrialReplaced": false
+    "failedProductTrialReplaced": false,
+    "laterProcessFilterFinding": {
+      "recordedAtUTC": "2026-10-29T01:10:43.510344+00:00",
+      "earlierProcessAbsenceClaimWithdrawn": true,
+      "reason": "macOS ps comm output is truncated by default. A live owned xctest was shown as /Applications/Xc; basename filtering could silently exclude it. The earlier comm-based empty result is not accepted as process-absence proof.",
+      "liveObservation": {
+        "pid": 92066,
+        "commColumn": "/Applications/Xc",
+        "ucommColumn": "xctest"
+      },
+      "correctedMethod": "Full ps -ww command column; exact executable prefix plus owned path, filtered before output. No comm basename filter.",
+      "currentOwnedGUI": [],
+      "currentExpectedWork": [
+        {
+          "pid": 91063,
+          "kind": "current follow-up driver",
+          "elapsed": "06:34"
+        },
+        {
+          "pid": 92066,
+          "kind": "owned test",
+          "elapsed": "06:11"
+        }
+      ],
+      "limits": "Current inventory does not prove the earlier point-in-time absence. Installed/staged/ZIP hash and image-inventory checks are independent of this filter."
+    }
   },
   "allKnownContractsPass": false,
   "releaseAcceptanceComplete": false,

@@ -1,5 +1,8 @@
 # Benchmark protocol and results
 
+[Quiet workspace lifecycle](quiet-workspace-wake-v1.json), product 9d6f33e / test-only qualification 4a13727 / schema 22: current 956 defined cases (954 passes/two skips), 151 selected TSan cases (150 passes/one skip), all 11 follow-up operations and seven final render operations pass. Both product-source CI jobs pass; fixture follow-up CI is running. Original 149-pass/one-skip/one-failed TSan run remains:342s maintenance sleep overlaps the 355.7 s opening case; an unchanged awake retry passes, followed by the awake-budget/cleanup fixture follow-up. Complete current command-path/image inventories, 33-file app/ZIP and installed-byte proofs pass. No physical wake, desktop energy, causal speed or competitor claim follows. PR #68's earlier truncated-comm process-absence observation is withdrawn; current proofs use full command paths.
+
+
 [Nonblocking lifecycle status](nonblocking-library-state-v1.json), source b2c520c/schema22: 938 defined cases (937 pass, one physical-audio skip), 177 selected TSan passes and all 11 ordered operations pass. Two causal held-writer status probes fail before the fix; SQL reads/close remain serialized afterward. Signed app/ZIP and installed/staged-byte proofs pass. Both frozen-source CI jobs pass (run 40779889309); later documentation CI is separate. Initial audit assertion values were not retained; corrected current identity/inventory checks pass, with original cause unproven. The unpaired 26.36-second authored import and prior 25.82/97.34-second observations are not causal speed or competitor evidence; exact input/vector matches are recorded. Physical desktop, power, inherited busy-terminal and broader release gates remain open.
 
 
