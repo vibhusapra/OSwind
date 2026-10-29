@@ -121,4 +121,32 @@ final class ImportPreparationTests:XCTestCase {
         XCTAssertEqual(try store.importJSONDetailed(data:JSONEncoder().encode([source]),policy:policy).imported,1)
         XCTAssertEqual(try store.get(source.id)?.text,source.text)
     }
+    func testUnchangedImportPreservesCurrentPassageKeysAndRevisions() throws {
+        let embedder=LocalEmbedder();guard embedder.available else {throw XCTSkip("Apple English embedding asset is unavailable")}
+        let source=note("long",text:String(repeating:"Owned desktop fixture remembers the Aurora launch. ",count:85))
+        _ = try store.importDecodedMemoriesDetailed([source],embedder:embedder,policy:.init())
+        func identities() throws -> [String] {
+            try store.withRoutineDatabase {db in
+                let row=try db.statement("SELECT CAST(key AS TEXT)||':'||CAST(revision AS TEXT) FROM vector_keys WHERE memory_id='long' AND ordinal>0 ORDER BY ordinal")
+                defer {sqlite3_finalize(row)};var result=[String](),status=sqlite3_step(row)
+                while status==SQLITE_ROW {result.append(db.text(row,0));status=sqlite3_step(row)}
+                guard status==SQLITE_DONE else {throw db.error()};return result
+            }
+        }
+        let before=try identities();XCTAssertFalse(before.isEmpty)
+        _ = try store.importDecodedMemoriesDetailed([source],embedder:embedder,policy:.init())
+        XCTAssertEqual(try identities(),before,"Retry must reuse current passage embeddings and preserve their journal identities")
+    }
+    func testReusablePassageIndexRemovedDuringPreparationRefusesThenRetries() throws {
+        let embedder=LocalEmbedder();guard embedder.available else {throw XCTSkip("Apple English embedding asset is unavailable")}
+        let source=note("long",text:String(repeating:"Owned desktop fixture remembers the Aurora launch. ",count:85))
+        _ = try store.importDecodedMemoriesDetailed([source],embedder:embedder,policy:.init())
+        let input=[source,note("fresh")]
+        XCTAssertThrowsError(try store.importDecodedMemoriesDetailed(input,embedder:embedder,policy:.init(),preparationProgress:{if $0==1 {
+            try self.store.withRoutineDatabase {try $0.execute("DELETE FROM semantic_passages WHERE memory_id='long'; DELETE FROM passage_manifests WHERE memory_id='long'")}
+        }})) {XCTAssertTrue($0.localizedDescription.contains("passage index changed"))}
+        XCTAssertNil(try store.get("fresh"))
+        XCTAssertEqual(try store.importDecodedMemoriesDetailed(input,embedder:embedder,policy:.init()).imported,2)
+        XCTAssertTrue(try store.passagesCurrent(XCTUnwrap(store.get(source.id)),modelID:embedder.modelID))
+    }
 }

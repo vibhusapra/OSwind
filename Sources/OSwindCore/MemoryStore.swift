@@ -599,7 +599,7 @@ public final class MemoryStore: @unchecked Sendable {
         let activity=try mediaWriteLease();defer {activity.release()}
         let ids=inputIDs.union(ordered.flatMap {$0.recap?.sources.map(\.id) ?? []})
         let snapshot=try importSourceSnapshot(ids)
-        var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),passages=[String:[PassageVector]](),incoming=[String:Memory]()
+        var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),passages=[String:[PassageVector]](),reusedPassages=Set<String>(),incoming=[String:Memory]()
         for var m in ordered {
             try Task.checkCancellation()
             let browser=collectorAdmission && WindowContext(app:m.app,bundle:m.bundleID,pid:0,title:m.title,url:m.url,accessibilityText:"",secure:false).browser
@@ -628,7 +628,12 @@ public final class MemoryStore: @unchecked Sendable {
             if var recap=m.recap {recap.provider=policy.sanitize(recap.provider).text;m.recap=recap}
             m.title=policy.sanitize(m.title).text;m.url=m.url.map {policy.sanitize($0).text};m.imagePath=nil;m.audioPath=nil;m.videoPath=nil;m.regions=[]
             m.embedding=embedder?.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder?.modelID
-            if let embedder,let records=try Self.prepareApplePassages(m,embedder:embedder) {passages[m.id]=records}
+            if let embedder,m.embeddingModel==embedder.modelID,SemanticPassagePlan.needed(m) {
+                // A short metadata read preserves the existing retry fast path.
+                // Never hold this query's mutex over passage/model preparation.
+                if try passagesCurrent(m,modelID:embedder.modelID) {reusedPassages.insert(m.id)}
+                else if let records=try Self.prepareApplePassages(m,embedder:embedder) {passages[m.id]=records}
+            }
             prepared.append(m);incoming[m.id]=m;report.imported+=1
             try preparationProgress?(prepared.count)
         }
@@ -644,7 +649,11 @@ public final class MemoryStore: @unchecked Sendable {
             }
             for m in prepared {
                 try Task.checkCancellation();try insert(m)
-                if let embedder,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+                if let embedder {
+                    let current=try passagesCurrent(m,modelID:embedder.modelID)
+                    if reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
+                    if !current,let records=passages[m.id] {_ = try savePassages(memory:m,modelID:embedder.modelID,records:records)}
+                }
             }
             try Task.checkCancellation();try requireMediaRootIdentity()
             if let settingsSnapshot {try settingsSnapshot.withCurrent(root:root,policy:policy) {try exec("COMMIT")}}
