@@ -1,0 +1,10 @@
+Gretel synthetic domain-specific PII documents (English)
+Dataset author: Gretel AI (publisher attribution).
+Source: gretelai/gretel-pii-masking-en-v1 on Hugging Face
+Revision: e06eb1499ca8d54470f085021cd8e54f9efac7fd
+Publisher-declared license: Apache License, Version 2.0
+https://www.apache.org/licenses/LICENSE-2.0
+
+OSwind uses a deterministic, explicitly mapped subset of the public validation split for local evaluation. Gold offsets are reconstructed only for unique exact literal occurrences; no normalization or fuzzy alignment is applied. Source data is synthetic; publisher annotations are not independently relabeled. No test split is used.
+
+Raw dataset text and entity values are not distributed in Git. The public manifest contains hashes, labels and coordinate metadata only; full reproduction explicitly prepares the pinned public validation data locally.

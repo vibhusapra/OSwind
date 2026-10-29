@@ -117,3 +117,5 @@ fences, conservative media treatment, then live desktop and power qualification.
 Existing [window](NATIVE-PII-DOCUMENTS.md), [ownership](NATIVE-PII-RUNTIME.md) and
 [setup](NATIVE-PII-SETUP.md) contracts remain separate. This result does not
 establish competitor parity, ranking or release acceptance.
+
+The [public domain validation follow-up](PII-DOMAIN-VALIDATION.md) completes 918 inspections on 153 frozen external synthetic documents. At 0.7, combined coverage is 118/250 values with 4/45 policy-negatives flagged on CPU, and 115/250 with 3/45 on Core ML. No policy is accepted. That broader result does not alter this historical 72-source result.

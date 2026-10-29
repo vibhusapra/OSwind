@@ -1,0 +1,31 @@
+{
+  "dataset": "gretelai/gretel-pii-masking-en-v1",
+  "revision": "e06eb1499ca8d54470f085021cd8e54f9efac7fd",
+  "validation": {
+    "type": "file",
+    "oid": "4de978ed307a56c08994759a10f1b2fe10f4cf66",
+    "size": 2031349,
+    "lfs": {
+      "oid": "3de64be0dddd0dc8a6a1a1368533cc1efe8a9ec290f87feaa064e4e78a5d22b8",
+      "size": 2031349,
+      "pointerSize": 132
+    },
+    "xetHash": "475e092670b1080491c973a87ac1aefb39809908daf367e74d5af797ba0cbc7a",
+    "path": "data/validation-00000-of-00001.parquet"
+  },
+  "reader": {
+    "version": "21.0.0",
+    "filename": "pyarrow-21.0.0-cp312-cp312-macosx_12_0_arm64.whl",
+    "url": "https://files.pythonhosted.org/packages/ca/d4/d4f817b21aacc30195cf6a46ba041dd1be827efa4a623cc8bf39a1c2a0c0/pyarrow-21.0.0-cp312-cp312-macosx_12_0_arm64.whl",
+    "bytes": 31160305,
+    "sha256": "3a302f0e0963db37e0a24a70c56cf91a4faa0bca51c23812279ca2e23481fccd"
+  },
+  "scope": "Public synthetic English validation documents only; no test split download or predictions. Model training overlap unknown; not representative desktop or accepted privacy policy.",
+  "publisherCard": {
+    "url": "https://huggingface.co/datasets/gretelai/gretel-pii-masking-en-v1/blob/e06eb1499ca8d54470f085021cd8e54f9efac7fd/README.md",
+    "bytes": 8266,
+    "sha256": "3dbe0511851d81bf8e73a3c72502a8b7ff9295d51d6b38e3b5690ab989a3d8bc",
+    "declaredLicense": "Apache-2.0"
+  },
+  "testSplitDownloaded": false
+}

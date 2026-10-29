@@ -40,6 +40,11 @@ jobs:
           python3 scripts/test-pii-quality.py
           python3 scripts/test-pii-native-quality.py
           python3 scripts/replay-pii-native-quality.py
+          python3 scripts/test-pii-domain-quality.py
+          python3 scripts/replay-pii-domain-admission.py
+          python3 scripts/test-pii-coordinate-quality.py
+          python3 scripts/replay-pii-domain-quality.py
+          python3 scripts/replay-pii-reference-models.py
           python3 scripts/test-pii-assets.py
           python3 scripts/test-pii-native-export.py
       - name: Verify visual model tools without downloads

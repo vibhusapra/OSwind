@@ -1,0 +1,119 @@
+{
+  "format": "OSwind alternative local PII asset preparation v1",
+  "models": [
+    {
+      "repository": "knowledgator/gliner-pii-small-v1.0",
+      "revision": "d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e",
+      "declaredLicense": "apache-2.0",
+      "files": [
+        {
+          "path": "gliner_config.json",
+          "bytes": 4316,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/gliner_config.json",
+          "gitBlobSHA1": "0a64fc99ae077e8bbb9b082bce538c07f5420319"
+        },
+        {
+          "path": "pytorch_model.bin",
+          "bytes": 326195231,
+          "sha256": "4e305dd95b70c5822443d06d8e6a84b47532d1f9d674d1cd577b0f9aac7d6b02",
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/pytorch_model.bin",
+          "gitBlobSHA1": "62397fd98a7a58da6433a3e76d9d51256d393b7c"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 694,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/special_tokens_map.json",
+          "gitBlobSHA1": "6bf65ea14185a88eef7e24b41c86a953a58dcbad"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 3583593,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/tokenizer.json",
+          "gitBlobSHA1": "b625701e5c22e413f28b394f2aa8388273b735c8"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 21214,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/tokenizer_config.json",
+          "gitBlobSHA1": "943fdbd40c3411b09907c7dc770049154b261553"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "bytes": 326820148,
+          "sha256": "c60fd671a30798c1bfad5828f8bbf6214eb44cbc5e2f0fb968563ae935a17454",
+          "url": "https://huggingface.co/knowledgator/gliner-pii-small-v1.0/resolve/d21aad5b4a7ec82b3d0970fd1ac74a12c087d85e/onnx/model.onnx",
+          "gitBlobSHA1": "1266b1c968dd526e2561b706cdb0984729244a31"
+        }
+      ]
+    },
+    {
+      "repository": "knowledgator/gliner-pii-base-v1.0",
+      "revision": "61726e0ad791dcab3e29339bbec3ad42ded65641",
+      "declaredLicense": "apache-2.0",
+      "files": [
+        {
+          "path": "added_tokens.json",
+          "bytes": 65,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/added_tokens.json",
+          "gitBlobSHA1": "7546b399c0c104e8eb33438f622def928f3707b5"
+        },
+        {
+          "path": "gliner_config.json",
+          "bytes": 3902,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/gliner_config.json",
+          "gitBlobSHA1": "47ce168020b0e9d9cd4e060c4b9a245975f72558"
+        },
+        {
+          "path": "pytorch_model.bin",
+          "bytes": 664140735,
+          "sha256": "da21d12e61e3da22cb93d2663b8593e752c440479a68a647b061447bcd8f9e42",
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/pytorch_model.bin",
+          "gitBlobSHA1": "a2c53feb362b778e1c67981e16dbb33815022943"
+        },
+        {
+          "path": "special_tokens_map.json",
+          "bytes": 970,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/special_tokens_map.json",
+          "gitBlobSHA1": "83fb22de184abab1b193b1f6001e3015e865e50b"
+        },
+        {
+          "path": "spm.model",
+          "bytes": 2464616,
+          "sha256": "c679fbf93643d19aab7ee10c0b99e460bdbc02fedf34b92b05af343b4af586fd",
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/spm.model",
+          "gitBlobSHA1": "b1b95e5b0fef33623979511f423eaeee465c46f0"
+        },
+        {
+          "path": "tokenizer.json",
+          "bytes": 8649232,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/tokenizer.json",
+          "gitBlobSHA1": "4811a898785c678e05053f8d709c8333f38f4ec8"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "bytes": 1691,
+          "sha256": null,
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/tokenizer_config.json",
+          "gitBlobSHA1": "884832de0f31b98b02e6213332059b6cfd687ad7"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "bytes": 664764803,
+          "sha256": "c6ccec44625d46bfe3191152e41d6564b69bc9d4313b7f3e419e8372679e9fed",
+          "url": "https://huggingface.co/knowledgator/gliner-pii-base-v1.0/resolve/61726e0ad791dcab3e29339bbec3ad42ded65641/onnx/model.onnx",
+          "gitBlobSHA1": "00c93656d0389ae91e35beb3c6e9de84b80ed05a"
+        }
+      ]
+    }
+  ],
+  "predictionsGenerated": false,
+  "installIntoProduct": false
+}

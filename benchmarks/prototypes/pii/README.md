@@ -118,3 +118,31 @@ python3 scripts/replay-pii-native-quality.py
 ```
 
 Replay performs no inference/download or history access. For fresh native experiments, follow the explicit prepare/evaluate recipe in the linked quality document and use new output directories. No Swift/C++ source or app binary changes in this follow-up.
+
+## External domain validation
+
+[Domain validation](../../../docs/PII-DOMAIN-VALIDATION.md) completes918 native inspections on153 frozen external synthetic English documents (250 values/45 policy-negatives), with both backend results retained. At0.7, combined CPU coverage is118/250 with4/45 flagged; Core ML115/250 with3/45. No privacy operating point is accepted.
+
+`gretel-validation-v1/manifest.json` and `observations-v1/` publish hashes, labels and original-source codepoint ranges only. Source/entity/rendered text remains local after push protection flags credential-shaped synthetic source values; no bypass or credential test. The [receipt](../../pii-domain-validation-v1.json) binds ten public files and every operation.
+
+```sh
+python3 scripts/test-pii-coordinate-quality.py
+python3 scripts/replay-pii-domain-quality.py
+# Full literal/UTF16/rendering checks, without inference, require local inputs:
+python3 scripts/replay-pii-domain-quality.py \
+  --corpus /absolute/prepared/corpus.json --native-output /absolute/original/evaluation
+```
+
+Public replay proves coordinate metrics, identity, union and flag consistency; it does not reproduce literal source alignment/rendering without the explicit local files. Both modes pass on all918 stored observations. Stronger Small/Base candidates are downloaded and verified for a separate reference comparison, not installed into OSwind.
+
+## Local reference model comparison
+
+[Edge/Small/Base comparison](../../../docs/PII-MODEL-COMPARISON.md) completes six CPU ONNX/PyTorch MPS processes and2,754 finite-output-validated forwards on the same153-source subset. CPU/MPS masks and typed category/coordinates match for every model/threshold; no privacy operating point or installed backend is accepted. Base0.5 combined coverage207/250 with26/45 flagged illustrates the remaining trade-off.
+
+`model-reference-v1/` preserves exact scripts, sanitized plan/source pins, all coordinate predictions, timings and process/memory observations; no raw source/entity text or weights. [Receipt](../../pii-reference-models-v1.json) binds37 files.
+
+```sh
+python3 scripts/replay-pii-reference-models.py
+```
+
+The linked document includes the explicit asset preparation and plan rehydration recipe. Use a new owned artifact root; no inference script downloads weights. No native app, retention/cancellation, power or competitor acceptance follows from reference MPS execution.
