@@ -43,7 +43,7 @@ Retained earlier failures include two output-layout assertions before scoring an
 
 ## Remaining gates
 
-- Implement and independently verify native byte-level tokenization, word offsets, token-level decoding and complete grapheme boundaries. Refuse truncation, stale sources and invalid output without exposing raw sensitive data through a fallback.
+- [Native tokenization and word/input masks](NATIVE-PII.md) now match181 independent reference inputs, with a corrected shared ByteLevel prefix. Connect them to a qualified backend and implement token-level decoding and complete grapheme admission. Refuse truncation, stale sources and invalid output without exposing raw sensitive data through a fallback.
 - Establish a working native accelerator path, serialized ownership, cancellation, bounded long-source processing and idle/manual model release.
 - Tune only on validation; freeze representative independent OCR/ASR/desktop and multilingual acceptance data before opening it. Measure whole-value recall and false-positive cost together.
 - Qualify every ingestion and egress path, screenshot/audio suppression, lock/wipe/backup lifecycle and setup/download/license controls. Text span quality is not visual redaction acceptance.

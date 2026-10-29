@@ -372,7 +372,7 @@
     "axis": "Privacy",
     "feature": "PII model / image redaction",
     "status": "todo",
-    "evidence": "Validation-only pinned GLiNER prototype:72 authored cases, CPU/MPS metrics agree; threshold0.5 fully covers42/48 values but flags8/24 negatives. Native CPU logits match on30 fixed-input calls; dynamic CoreML construction fails. Separate static metadata diagnostic completes30 CoreML-EP calls on one repeated input with CPU partitions/warnings retained.20 offline scorer/asset tests pass. No production tokenizer/decoder/privacy-path integration, image redaction or independent desktop acceptance; see PII-EVALUATION.md",
+    "evidence": "Validation-only pinned GLiNER prototype:72 authored cases, CPU/MPS metrics agree; threshold0.5 fully covers42/48 values but flags8/24 negatives. Native CPU logits match; dynamic CoreML construction fails, separate one-input static diagnostic completes with CPU partitions/warnings. Native input tensors/UTF16 words now match181 independent GLiNER/Rust references, with frozen Unicode15.0 splitting and shared ByteLevel prefix fix.966 defined native cases:964pass/2skip;114focused TSan pass;6ordered operations pass. No production backend/decoder/privacy-path integration, image redaction or independent desktop acceptance; see PII-EVALUATION.md and NATIVE-PII.md",
     "references": "Screenpipe, Recall, Retrace (jhammant)"
   },
   {

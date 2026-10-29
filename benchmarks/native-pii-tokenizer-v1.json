@@ -1,0 +1,188 @@
+{
+  "format": "OSwind native PII tokenizer qualification v1",
+  "recordedAtUTC": "2026-10-29T03:12:03.342449+00:00",
+  "source": "2d8d65d31480e7b76eda803a6504f4a92c34fff1",
+  "base": "35f1563d43c21c1253bae29b38dabf1a38fbc4d5",
+  "schema": 22,
+  "feature": "Native experimental PII input contract and shared ByteLevel prefix correction",
+  "F047Implemented": false,
+  "productionRedactorSelected": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "reference": {
+    "path": "prototypes/pii/native-tokenizer-reference-v2.json",
+    "sha256": "38303b8a7caf42592966e850cad0d6f3d054b177a1c914bb25d8580da535b412",
+    "rows": 181,
+    "authoredValidation": 72,
+    "authoredBoundaries": 109,
+    "wordClassRanges": 748,
+    "unicodeVersion": "15.0.0",
+    "modelInference": false,
+    "reservedTestPredictionsOpened": false,
+    "scope": "Corpus JSON contains all authored split texts; only validation and additional boundaries are tokenized. Not a detection-quality or independent natural-data holdout."
+  },
+  "compatibility": {
+    "nativeTensorReferenceCases": 181,
+    "allInputIDsAttentionMasksWordMasksWordCountsAndUTF16OffsetsMatch": true,
+    "existingVisualTokenizerReferenceCases": 439,
+    "concurrentPIIEncodingCalls": 32,
+    "focusedDefined": 21,
+    "focusedPassed": 21,
+    "focusedSkipped": 0,
+    "sourceBounds": {
+      "maxScalars": 4096,
+      "maxUTF8Bytes": 16384,
+      "maxWordUTF8Bytes": 1024,
+      "maxFramedTokens": 512,
+      "silentTruncation": false
+    }
+  },
+  "normal": {
+    "defined": 966,
+    "skipped": 2,
+    "failures": 0,
+    "passes": 964,
+    "suiteSeconds": 407.948
+  },
+  "TSan": {
+    "defined": 114,
+    "skipped": 0,
+    "failures": 0,
+    "passes": 114,
+    "suiteSeconds": 154.664
+  },
+  "TSanSelection": "PIITokenizerTests|Visual.*Tests|EntityWordPieceTests|EntityNERDecodingTests",
+  "TSanRaceReportObserved": false,
+  "operations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 412.56223820894957,
+      "systemSeconds": 412.5615141391754
+    },
+    {
+      "name": "tokenizer-visual-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 184.18238170887344,
+      "systemSeconds": 184.18206000328064
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 51.02782791596837,
+      "systemSeconds": 51.027737855911255
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.5657769578974694,
+      "systemSeconds": 1.56577467918396
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.400491500040516,
+      "systemSeconds": 11.400472164154053
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.08021924993954599,
+      "systemSeconds": 0.08021998405456543
+    }
+  ],
+  "package": {
+    "scope": "Separately staged schema22 native PII tokenizer scaffolding and shared ByteLevel correction; no learned redactor installation, physical energy or competitive ranking claim",
+    "codeCommit": "2d8d65d31480e7b76eda803a6504f4a92c34fff1",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "533c477c18a48a61eb47ed03db4a6473bbb7838b6e4acd0ed53e85e0edd0dc55",
+        "signedSHA256": "bd994a00237885cdd457641192d32121041504f537e25161385899f5886850eb",
+        "normalizedPayloadSHA256": "8afc9e3ee19a987fec5560e2502970ec336a24935eb957262b256ffe7b175c61"
+      },
+      "oswindctl": {
+        "rawSHA256": "4b4fde153dfc4e3edd716d8b3b8bf60eedd4eed5bef510bb7a72f548cd5926c9",
+        "signedSHA256": "cd32ce098de7a20503b5f6f3d9a42016006145b06aadea6343fa6ad53bd9a1d1",
+        "normalizedPayloadSHA256": "d8709491d5e60c12e713e6956e98fd782f309f461f7bb3c8d15b314a70b83781"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "5a6c0be081bc4445635d556ffd1674f8b16dbbd3bad082d5b08656eee254be16",
+    "bundleFiles": 33,
+    "bundleTreeSHA256": "e144429d0ddb48bcd1dafddbb2e292abd6cec1b6122ee01b5dbae9b605064769",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "finalProof": {
+    "source": "2d8d65d31480e7b76eda803a6504f4a92c34fff1",
+    "frozenSourceUnchanged": true,
+    "fullCommandPathProcessInventory": [],
+    "artifactRootImagePaths": [],
+    "imageScope": "Only current qualification artifact root; native test-owned cleanup is checked by its test cases, not inferred globally from this root filter.",
+    "installedAppUnchanged": true,
+    "stagedAppMatchesManifest": true,
+    "bundleFiles": 33,
+    "zipSHA256": "5a6c0be081bc4445635d556ffd1674f8b16dbbd3bad082d5b08656eee254be16"
+  },
+  "visual": {
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "photos": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "scope": "Same opened historical corpus and current bundle; functional compatibility, not new holdout/paired speed/power/competitor acceptance.",
+    "observedTimings": {
+      "indexingSeconds": 4.062448024749756,
+      "queryMedianMilliseconds": 11.392951011657715,
+      "queryP95Milliseconds": 13.483047485351562
+    },
+    "timingLimits": "One sequential current observation after full/TSan model tests; host/framework/cache state uncontrolled. No causal latency or speedup claim."
+  },
+  "skips": [
+    "NativeSystemAudioTests owned physical system-audio fixtures not opted in; no microphone used.",
+    "WorkspaceWakeLifecycleTests visual admission unavailable while locked/thermal; no device setting changes."
+  ],
+  "retainedFailures": [
+    "Before shared prefix correction:1 test with2 failed assertions.",
+    "First expanded focused build: test-only async-autoclosure compilation error; corrected before qualification.",
+    "First corrected focused run:19passes/1visual-reference opt-in skip; complete opt-in follow-up21passes/0skips."
+  ],
+  "remaining": [
+    "Native token-level PII decoder and backend resource owner/inference integration",
+    "Whole-grapheme privacy admission, source revision fencing and long-source windows",
+    "Every ingestion/egress privacy path plus setup/download/stop/release UI",
+    "Representative multilingual OCR/ASR/desktop quality and physical power/competitor workloads"
+  ],
+  "CI": {
+    "source": "2d8d65d31480e7b76eda803a6504f4a92c34fff1",
+    "runID": 40809566323,
+    "status": "in_progress",
+    "benchmarkJobID": 123236420425,
+    "benchmarkConclusion": "success",
+    "nativeJobID": 123236419935,
+    "nativeStatus": "in_progress"
+  },
+  "platform": {
+    "os": "Version 26.6.2 (Build 25G83)",
+    "availableGPU": "Apple M5 Max",
+    "limit": "Available device identity is not per-operation placement evidence; older supported Macs not qualified here."
+  }
+}

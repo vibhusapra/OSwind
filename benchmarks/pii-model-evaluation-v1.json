@@ -465,7 +465,7 @@
     "assetAdmission": 6,
     "failures": 0,
     "realDownloadInTests": false,
-    "CIResult": "pending"
+    "CIResult": "Both jobs pass at35f1563, run40807914674"
   },
   "retainedFailures": [
     "Compatibility-v1 trusted stale output dimension names and failed its layout assertion before quality scoring.",
@@ -500,12 +500,12 @@
     "scope": "Static metadata only on one previously opened validation input repeated30 times. CoreML EP completes with CPU fallback partitions and framework warnings; physical GPU/ANE placement, dynamic input shapes and full quality/latency remain unqualified. Native report fixedInputs=3 counts duplicate fixture slots, not distinct sources."
   },
   "CI": {
-    "source": "cb2907803fcab6bf5d039a6be298abd8e6249331",
-    "runID": 40807375186,
-    "benchmarkJobID": 123229434208,
+    "source": "35f1563d43c21c1253bae29b38dabf1a38fbc4d5",
+    "runID": 40807914674,
+    "benchmarkJobID": 123231152221,
     "benchmarkConclusion": "success",
-    "nativeJobID": 123229434757,
-    "nativeStatus": "in_progress",
-    "scope": "Source commit before the static diagnostic publication follow-up; no claim about later documentation/probe snapshot CI."
+    "nativeJobID": 123231151650,
+    "nativeConclusion": "success",
+    "scope": "Exact static-diagnostic publication follow-up source; newer native tokenizer work has separate qualification."
   }
 }
