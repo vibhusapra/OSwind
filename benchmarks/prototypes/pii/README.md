@@ -72,3 +72,36 @@ Public `observations/` includes complete reference reports, synthetic CPU predic
 `prepare-static-diagnostic.py` is the exact preparation behind `observations/static-plan-v1.json`. In a fresh reproduction only, make `.artifacts/pii-model-evaluation-v1/native/static-diagnostic-v1`, copy this script there as `prepare.py`, then run that copy with the locked Python. It reads only `compatibility-0-v3.npz`, fixes input/output shape metadata and preserves every operator/initializer byte. It writes a separate `static.onnx`, binary fixture and frozen plan. It is a one-shot historical preparation; do not run over existing receipts or during another probe.
 
 Use the same compiled native executable with that graph/fixture and fresh profile prefixes under both policies. The binary header still has three slots, but **all three repeat the same single validation input**. The original native `fixedInputs:3` field counts those slots. Both policies complete thirty calls within tolerance. The Core ML profile records600 CoreML-EP partition and2,460 CPU node invocations; these are not physical GPU/ANE device assignments. Framework stdout warnings are retained in `observations/static-diagnostic-v1.json`. The original wrapper's JSON parse failed after successful execution because of that warning prelude; recovery parses exactly the terminal completed object without changing inputs or repeating inference. No dynamic-shape or three-distinct-input success is claimed by this diagnostic.
+
+## Native decoder and fixed128 Core ML follow-up
+
+[Native decoding report](../../../docs/NATIVE-PII-DECODING.md) distinguishes the new72-source fixed-token/dynamic-word experiment from that earlier one-input diagnostic. The original dynamic graph's failed construction remains retained. No production backend/installer selects these prototypes.
+
+The committed `native-decoder-reference-v1.json` and `coreml-decoder-reference-v1.json` contain synthetic tensors and independent expected spans/masks. `swift test --filter PIIDecodingTests` replays all492 threshold comparisons without weights or Python. To rebuild inference observations in a fresh checkout after preparing the pinned model/runtime/header environment above:
+
+```bash
+.local/pii-python-v1/bin/python scripts/prepare-pii-decoder-eval.py \
+  --model .artifacts/pii-model-evaluation-v1/model \
+  --corpus .artifacts/pii-model-evaluation-v1/authored-v1.json \
+  --output .artifacts/native-pii-decoding-v1/reference-v2
+mkdir -p .artifacts/native-pii-decoding-v1/native
+clang++ -std=c++17 -O2 -Wall -Wextra -Werror \
+  -I .artifacts/pii-model-evaluation-v1/native/include \
+  benchmarks/prototypes/pii/native-probe.cpp \
+  -o .artifacts/native-pii-decoding-v1/native/native-probe
+python3 scripts/export-pii-native-eval.py \
+  --reference .artifacts/native-pii-decoding-v1/reference-v2 \
+  --binary .artifacts/native-pii-decoding-v1/native/native-probe \
+  --library .local/pii-python-v1/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.24.2.dylib \
+  --model .artifacts/pii-model-evaluation-v1/model/onnx/model.onnx \
+  --output .artifacts/native-pii-decoding-v1/native-export-v2
+mkdir -p .artifacts/native-pii-decoding-v1/coreml-bucket-v1
+cp benchmarks/prototypes/pii/diagnose-coreml-bucket-v1.py \
+  .artifacts/native-pii-decoding-v1/coreml-bucket-v1/diagnose.py
+.local/pii-python-v1/bin/python \
+  .artifacts/native-pii-decoding-v1/coreml-bucket-v1/diagnose.py
+```
+
+The historical bucket diagnostic is a one-shot preparation with fixed ignored paths: use a fresh directory/checkout, preserve existing receipts, and never run it during another build/test pipeline. It tests three-source CPU/Core ML smoke first and proceeds to all72 only on success. No operator or initializer is rewritten. All framework warning text and actual binary outputs remain separate from the terminal report object.
+
+Native binary hashes and workspace paths vary across fresh builds, so provenance bytes/aggregate file hashes can differ. Preserve the committed golden fixtures; compare new tensor/decoder results under the declared tolerances and keep new receipts separate. Do not overwrite original observations to make hashes match. The public export plan has workspace-relative paths; its recorded original-plan digest identifies the original path-bearing receipt. Peak owned-process memory excludes system services. Source/model/library/policy generation ownership, device placement, long sources and application integration remain unqualified.

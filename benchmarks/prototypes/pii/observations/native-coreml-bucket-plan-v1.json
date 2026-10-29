@@ -1,0 +1,122 @@
+{
+  "frozenAtUTC": "2026-10-29T03:50:35.244712+00:00",
+  "hypothesis": "Fixed128 token inputs, dynamic output word count; metadata-only model change, exact operator/initializer bytes preserved. Masked pad IDs50283, attention/word masks0, actual text_lengths unchanged. Three-source CPU then CoreML smoke; continue72-source CoreML only if both first triplets meet unchanged1e-3 logit tolerance.",
+  "sourceModelSHA256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836",
+  "unchangedNodeInitializerSHA256": "a62df836363360b6f2a3420ffa260176584e655aedb8a9ca339aa5361bbb2130",
+  "files": [
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/bucket-128.onnx",
+      "sha256": "a6a66d8a988b9507b6d8d714a727ca47fcacef6b5090825f79b86be917e3e136"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/native/native-probe",
+      "sha256": "eecd153b8cf7f62b89afa839e029cf9ac0e8d2d4cec0aaa8e426c907e4381791"
+    },
+    {
+      "path": ".local/pii-python-v1/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.24.2.dylib",
+      "sha256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/diagnose.py",
+      "sha256": "70689d1e64a35a34b92814e17a700f4f15642611ae88fc2655b02ae75fe635b0"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-00.bin",
+      "sha256": "d00e7c653a77ce8c19773c0d0e128e592bb6925b085eeb122598d45a0aa69ef0"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-01.bin",
+      "sha256": "0bb009e2b32644189d3a215166328a413233d13e8b5849d3cfeea093fc3b1c4e"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-02.bin",
+      "sha256": "e3ec6423f95033dc7f62e5ca00776b22eef95562ebfc107af413c7fe68dd7ff5"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-03.bin",
+      "sha256": "52e07499cc3ab39d78122433e4a60286d939df1e16556d9197b391b047388d1c"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-04.bin",
+      "sha256": "a414b32b2b6f3faa50341a8303f366eed9f3c753e86cc8c775a5d9532bac0e7f"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-05.bin",
+      "sha256": "897370bfbcd447f8496013a346d71af7e5203a2be937839296dc048de7cbad2c"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-06.bin",
+      "sha256": "6b62240c31a7262572a1ca20ec46899d0b3b49f9eef7fdd97b4e177930fc59a7"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-07.bin",
+      "sha256": "a437a1b8942e332613f81a280cebb3bc636a9f30cf50a100bd5ba7df3adf5142"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-08.bin",
+      "sha256": "e0974e3678f0d163e0916b28d044dc53a63a1e6e2aeb11808545f12a8182351c"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-09.bin",
+      "sha256": "222cdb9cc7984217e24bb724abb725bb45501340aeaf84eef2aed01d08db64cb"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-10.bin",
+      "sha256": "6a4b8c93cf5bf96b174312bde41a89dc729c7b3eb4f4b75ac45c1e904c2c9ff3"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-11.bin",
+      "sha256": "5877c10f1cecbe2ee41ad6db4541a7185179bc1f5631db155a097e35a4804135"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-12.bin",
+      "sha256": "f24cc4798422e9b6796e16bd8b8a709efbf18621afea8f38876cd03cd692243b"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-13.bin",
+      "sha256": "e7673697417b27185aa95aea3a5ddaf3370a0bb651b38f8eb73bae8ae165dce7"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-14.bin",
+      "sha256": "6b81c81ba1442e14a1a1b9b9a738027aa696f9bc8db6e7e39df26795d30f3056"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-15.bin",
+      "sha256": "ab9be9414879bf5029607f886bd30d74a4ea071785bb0fa53315af11d237ffad"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-16.bin",
+      "sha256": "854296e487faebb80149f0ce53a7e4c19ce46b9151643a3ac62f632ef500f38d"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-17.bin",
+      "sha256": "19e7baf4ebc347fecacb0752c4dc5d37a9530321d3089037e183007ccd16b248"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-18.bin",
+      "sha256": "9a88fec195b447fe80e51d882f4a15bf9198351dcc0735d60bcc6abce3c8bc2e"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-19.bin",
+      "sha256": "cc973662b747eb81680cef9dac6a1edbe1e92fc7ca525ae4ec383475f7b58f3f"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-20.bin",
+      "sha256": "6f83bc3b9b5641872351646d145ee0653ef368b7f0737aa028be17ca1fa08164"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-21.bin",
+      "sha256": "f22e51c52f9e124383f55c029732cf0489dca3536bda056b087b6ba821558e0d"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-22.bin",
+      "sha256": "9195ca83f80d3f29e7bf8ce4537679033303526bddcfe59eada510d9fcd623c5"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/coreml-bucket-v1/inputs-23.bin",
+      "sha256": "08a5bbede2f44627c9f4582944324794812c84747459e7453e76845c6af3907d"
+    }
+  ],
+  "policy": "MLProgram CPUAndGPU+CPU; provider partition assignment is not physical per-operation GPU placement. No performance winner/new quality acceptance.",
+  "confidenceToleranceForLaterComparison": 0.001
+}

@@ -1,0 +1,134 @@
+{
+  "format": "OSwind72-source native PII tensor export v1",
+  "inputs": [
+    {
+      "path": ".artifacts/native-pii-decoding-v1/native/native-probe",
+      "sha256": "eecd153b8cf7f62b89afa839e029cf9ac0e8d2d4cec0aaa8e426c907e4381791"
+    },
+    {
+      "path": ".local/pii-python-v1/lib/python3.12/site-packages/onnxruntime/capi/libonnxruntime.1.24.2.dylib",
+      "sha256": "94e1e79a7eae49dd6dec88c2ada0bf30ed2f04f02dd03abc12d7d8ebed92cdfa"
+    },
+    {
+      "path": ".artifacts/pii-model-evaluation-v1/model/onnx/model.onnx",
+      "sha256": "4ca588722e6d79447ad4c9c230eeba3d9d472c672a9598184a34e9f77fc35836"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/reference-python-v1.json",
+      "sha256": "b78d4ceef67b07524b9ddc8b929541587c9d031746e90cd543e1310f1472885c"
+    },
+    {
+      "path": "benchmarks/prototypes/pii/native-probe.cpp",
+      "sha256": "c38c568b8fe1e5845806640aa21e0f1bc63cc64a016e65578e7442d7c1aaaef9"
+    },
+    {
+      "path": "scripts/export-pii-native-eval.py",
+      "sha256": "2dad190bc99e25d3baf03d0434fbf82e0c2c2e4ffb402fad57ce0d6d31bc73dd"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-00.bin",
+      "sha256": "01eb77064b1c812cf0a553105be57744212c0594c5b2a33f3eb445234cea218f"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-01.bin",
+      "sha256": "9714c3829981c404cff4c9a29163f68205874f499ac0a2a7e4a9fbfa5a4a7709"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-02.bin",
+      "sha256": "f0853598090f3f87809eed0a100336f43faeb038fbd3fe9df4d0d07026afa230"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-03.bin",
+      "sha256": "3e68f77481d6d58bf96a9066eaf544d68afb09780bd0426dab73a964dba94d92"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-04.bin",
+      "sha256": "49df9a77a9e0e2d44fb2c4da0565910b23acc982f3b97064296bdba65eff341b"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-05.bin",
+      "sha256": "1a1371863eddd4f32b2a6ed5589e7249297c493a2381621c3e7ffe3bd16fd541"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-06.bin",
+      "sha256": "c61b82aaaadd39bc2550ff694d66ee99f89303c6c343758282f98a0957584c30"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-07.bin",
+      "sha256": "ba5ded0139d3e6f6cd64bf04c65cd776bd8b9cc93ad1beb2261a49a1147c2674"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-08.bin",
+      "sha256": "97742874d1f5f0b49062573a14520f44fdb70158ad1d00a473953f4392530dc3"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-09.bin",
+      "sha256": "65b9cfe3dec84191341b556e6263fc4c71336e24013058d8f386e1620f3dd67d"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-10.bin",
+      "sha256": "0422568a351bbc561467b730ca731259d4f7e73439ab867141af491b31389922"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-11.bin",
+      "sha256": "9eb5b339e22c82630faa88271556094999697fa2408cc57c243712eefce8c8eb"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-12.bin",
+      "sha256": "411e2a0f4b46e9d1de12ca3bfb4033a4e8bf26e0c56828aef99f38679a3eb27f"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-13.bin",
+      "sha256": "23417abeb9dc29da02a46476f5a1bab2031a87ccee12e816ecf856ed99c52bd5"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-14.bin",
+      "sha256": "e1b93a846747b4f507f213686cde1bb72d66cf96c834a2a3776315ee5836574c"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-15.bin",
+      "sha256": "ffba6d9fe12dd908bb21ba0eb523a126e2cd23dd6379073aa36d4c7b4aa53c9c"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-16.bin",
+      "sha256": "945a0616d72d0db692ddeb50c8c8373cb84ad810453c0e0534dd9d5ae8698d2e"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-17.bin",
+      "sha256": "3472ad920aa99994954ebc30ea8b322bce9a8e0c063bbe8295be9c69122bea92"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-18.bin",
+      "sha256": "b7e1c12166d94685e4fa7e3b2e351f14353e80e55e19f82a1020e900ebe31b3d"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-19.bin",
+      "sha256": "ef4f61c71c680c8b81c85b16006debf08197ca3af25bc8dd734e30e874ac0a1a"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-20.bin",
+      "sha256": "ae4ecc05519892a42162e69a005249b6dbee148dacc42399b21afe1c430ed049"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-21.bin",
+      "sha256": "c14f42b05db6e889d492f6deb58ac15c485596532c0ddb749818cd74a37c2441"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-22.bin",
+      "sha256": "59900f3ca3b3ed46810373dbdc1acd892c75afce0b9824fe4f5d3f51365efed9"
+    },
+    {
+      "path": ".artifacts/native-pii-decoding-v1/reference-v2/native-inputs-23.bin",
+      "sha256": "f6fea6a056cb0faf6a1163ce60e49a26d30115448c39d1e332cb13aa7833a1c9"
+    }
+  ],
+  "repetitionsPerInput": 2,
+  "distinctSources": 72,
+  "forwardCalls": 144,
+  "absoluteLogitTolerance": 0.001,
+  "scope": "Native CPU fixed tensors, independently matched native Swift input arrays; not a single-process app inference pipeline, power or competitor acceptance.",
+  "publication": {
+    "originalPlanSHA256": "5265c5647bf5bf4edd69546bfe9155c3cbedcdcc219e3dfc557272ff46db2ac6",
+    "change": "Workspace-absolute file paths made relative; all digests unchanged."
+  }
+}

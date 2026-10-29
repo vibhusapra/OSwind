@@ -1,0 +1,178 @@
+{
+  "state": "completed",
+  "operations": [
+    {
+      "group": 0,
+      "exitCode": 0,
+      "awakeSeconds": 0.1759680830873549,
+      "systemSeconds": 0.17596721649169922,
+      "outputSHA256": "13cfeb326e0e096f451eeff905c592b88613286d9d02153ff5d4fde981cce196"
+    },
+    {
+      "group": 1,
+      "exitCode": 0,
+      "awakeSeconds": 0.18451687484048307,
+      "systemSeconds": 0.18451714515686035,
+      "outputSHA256": "a90fef21dbf6dcf1fed48adae4c2d3b85e212b3c05594c244645745f324a1b28"
+    },
+    {
+      "group": 2,
+      "exitCode": 0,
+      "awakeSeconds": 0.1858745829667896,
+      "systemSeconds": 0.18587374687194824,
+      "outputSHA256": "6221c315e2616e6db9a5e4fc5c851ab79900d303c25eab17e6257dbf750d7ef3"
+    },
+    {
+      "group": 3,
+      "exitCode": 0,
+      "awakeSeconds": 0.1851174170151353,
+      "systemSeconds": 0.18511700630187988,
+      "outputSHA256": "fcdb611d672771d69bcd11e93665552307cb2d59097b079d245db6044a26e357"
+    },
+    {
+      "group": 4,
+      "exitCode": 0,
+      "awakeSeconds": 0.1749392079655081,
+      "systemSeconds": 0.17493796348571777,
+      "outputSHA256": "0cafb9f7da35fd30fbcf0dff1be2880826a710601b30cebe824b1dfa53883518"
+    },
+    {
+      "group": 5,
+      "exitCode": 0,
+      "awakeSeconds": 0.17951395804993808,
+      "systemSeconds": 0.17951393127441406,
+      "outputSHA256": "d01963e97ebee9dd7b44ec45b76d422d0013f69bce4f6a85e28cf7bb97be0d01"
+    },
+    {
+      "group": 6,
+      "exitCode": 0,
+      "awakeSeconds": 0.17102679214440286,
+      "systemSeconds": 0.17102599143981934,
+      "outputSHA256": "3b5827aa3c621d58c61b9a729340de517a2c98891d3492ffcf4fa38202b80135"
+    },
+    {
+      "group": 7,
+      "exitCode": 0,
+      "awakeSeconds": 0.17025075014680624,
+      "systemSeconds": 0.17024993896484375,
+      "outputSHA256": "a9bdf5164467770416427078db542b514ec5aa2c35a34dec010835ffc6e2d172"
+    },
+    {
+      "group": 8,
+      "exitCode": 0,
+      "awakeSeconds": 0.17284491704776883,
+      "systemSeconds": 0.17284512519836426,
+      "outputSHA256": "7aeece5fe58a2b9fb07045eb7ec6ab03bf166d879dc60364f73eb2f05d641a9d"
+    },
+    {
+      "group": 9,
+      "exitCode": 0,
+      "awakeSeconds": 0.17617645906284451,
+      "systemSeconds": 0.17617583274841309,
+      "outputSHA256": "a94f01f162176411d1113aba1f7e10f534ec57d9d25d1f76b1e5a1d4ffdf3dda"
+    },
+    {
+      "group": 10,
+      "exitCode": 0,
+      "awakeSeconds": 0.175235333153978,
+      "systemSeconds": 0.17523503303527832,
+      "outputSHA256": "9fc53a20175235f59b6c487c291c642c7472add77d5554b78915c16a80bd7f1b"
+    },
+    {
+      "group": 11,
+      "exitCode": 0,
+      "awakeSeconds": 0.17286362498998642,
+      "systemSeconds": 0.17286300659179688,
+      "outputSHA256": "bc4376f98b07b6bf118e569b0870dc1393c2624ab289be04653509feab7ac9ce"
+    },
+    {
+      "group": 12,
+      "exitCode": 0,
+      "awakeSeconds": 0.1786990410182625,
+      "systemSeconds": 0.17869901657104492,
+      "outputSHA256": "c47ce135f9ffb8b5d8cda47d5345057867597463184acfb007d4d4aa86d01f96"
+    },
+    {
+      "group": 13,
+      "exitCode": 0,
+      "awakeSeconds": 0.17619708413258195,
+      "systemSeconds": 0.17619681358337402,
+      "outputSHA256": "d57f0f2aa93161ad0298893628177e67c926cb056a7b7b84b1f57d82eda7aa69"
+    },
+    {
+      "group": 14,
+      "exitCode": 0,
+      "awakeSeconds": 0.17835612501949072,
+      "systemSeconds": 0.17835640907287598,
+      "outputSHA256": "c6e2d10782f6a6fe353fd404ac8c476337424f0dc0ec74cee46ec28030432e45"
+    },
+    {
+      "group": 15,
+      "exitCode": 0,
+      "awakeSeconds": 0.1773822910618037,
+      "systemSeconds": 0.1773829460144043,
+      "outputSHA256": "dd0adf256649138841e4f81cd5fec98842b32e8c86d0a9f8fbe02a68ad378b70"
+    },
+    {
+      "group": 16,
+      "exitCode": 0,
+      "awakeSeconds": 0.18039970798417926,
+      "systemSeconds": 0.18039917945861816,
+      "outputSHA256": "1cff4fdc11f16867d873cce67a2c7bf63c353122d2f647660b3ae7a66a13f7e1"
+    },
+    {
+      "group": 17,
+      "exitCode": 0,
+      "awakeSeconds": 0.18293254100717604,
+      "systemSeconds": 0.18293213844299316,
+      "outputSHA256": "ca8e4118eb11d19ebb5c9d41bbe38c37992b3758ec496b1756f35da8e6282f7d"
+    },
+    {
+      "group": 18,
+      "exitCode": 0,
+      "awakeSeconds": 0.1786192909348756,
+      "systemSeconds": 0.1786189079284668,
+      "outputSHA256": "113e84a275fc064447c6225cc243411acfcb93e8b521a8f7aad88375c8f39bc6"
+    },
+    {
+      "group": 19,
+      "exitCode": 0,
+      "awakeSeconds": 0.17932541714981198,
+      "systemSeconds": 0.17932486534118652,
+      "outputSHA256": "e43ac7cb0d0da0e7b9ab4c90e9c772b14de8bc44348397034362b07ffb08293e"
+    },
+    {
+      "group": 20,
+      "exitCode": 0,
+      "awakeSeconds": 0.17842574999667704,
+      "systemSeconds": 0.17842507362365723,
+      "outputSHA256": "18121622875992b852a767f5b2319fdb0fefb883541c1532ed7f13143ceb1106"
+    },
+    {
+      "group": 21,
+      "exitCode": 0,
+      "awakeSeconds": 0.19128716690465808,
+      "systemSeconds": 0.19128704071044922,
+      "outputSHA256": "54012c21bbf60ec112f264715aac5fde994f5c2130b89bdb3b4755f6f85b6c59"
+    },
+    {
+      "group": 22,
+      "exitCode": 0,
+      "awakeSeconds": 0.17334708315320313,
+      "systemSeconds": 0.17334723472595215,
+      "outputSHA256": "a4ecb8820e0551b003b165bceea3404a21cee751b23c423c1a49d2b0d09aadd4"
+    },
+    {
+      "group": 23,
+      "exitCode": 0,
+      "awakeSeconds": 0.17671312484890223,
+      "systemSeconds": 0.1767129898071289,
+      "outputSHA256": "8077a9b24be5b12b0ef0bcae67491dc46538a96be1891d6ab2ddf93a6dd5d47f"
+    }
+  ],
+  "distinctSources": 72,
+  "forwardCalls": 144,
+  "maximumAbsoluteLogitDifference": 0,
+  "inputsUnchanged": true,
+  "referenceSHA256": "9a6b1ef283b902ae16b6b5060339f9c3bea782ca9f45a423fc26e61f39edc30e"
+}
