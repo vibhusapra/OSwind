@@ -75,10 +75,11 @@ in every case. This establishes native query interruption in that analogue;
 it does not establish historical vault causality or repair OSwind's lifecycle.
 No raw inventory stdout is retained.
 
-Next: qualify bounded recovery specifically for a verified SIGINT-interrupted
-read-only query, with a shared deadline, cancellation and identity fences. Normal
-exit2, other signals, malformed output, repeated interruption and failed mutations
-must remain distinct refusal cases. No mutation retry is justified by this probe.
-Learned production privacy, physical desktop/power, sync, notarized distribution,
-matched competitor workloads, prior default-library activity audit, broad parity
-and release acceptance remain open.
+[Subsequent source7e21e0f](VAULT-QUERY-RECOVERY.md) now qualifies one bounded
+recovery specifically for a verified SIGINT-interrupted read-only query, with a
+shared budget and cancellation/identity fences. Repeated interruption, normal
+exit2, other signals, malformed output and failed mutations remain refusals.
+This earlier source1de936a receipt remains unchanged. Learned production privacy,
+physical desktop/power, sync, notarized distribution, matched competitor
+workloads, prior default-library audit, broad parity and release acceptance remain
+open.

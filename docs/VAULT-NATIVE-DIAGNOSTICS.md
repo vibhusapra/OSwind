@@ -125,3 +125,8 @@ The new result-aware state policy repairs a logical error class; it does not
 prove the old CI counterexample's cause or establish encrypted-library release
 acceptance. Native GUI/authentication/TCC, physical power, broader parity and
 the prior default-library activity audit remain open.
+
+[Later read-only recovery](VAULT-QUERY-RECOVERY.md) permits one fresh query only
+after verified SIGINT, with a shared budget and identity/cancellation fences.
+Mutation and final detach proof remain unchanged; current qualification is
+separately attributed to source7e21e0f.

@@ -1,0 +1,720 @@
+{
+  "format": "OSwind paired ordinary CLI status observations v1",
+  "state": "completed",
+  "binarySHA256": {
+    "candidate": "45ef3df1e3bd2ea4fad804feeded7130193ce1a4e240644f8b806e12db18c418",
+    "baseline": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca"
+  },
+  "scriptSHA256": "f5152dd38a8692f5d76a4c7ec56f459d8d4feea5fcc534c5c9e3bed0e248dce8",
+  "plan": [
+    {
+      "pair": 0,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": true
+    },
+    {
+      "pair": 1,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": true
+    },
+    {
+      "pair": 2,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 3,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 4,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 5,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 6,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 7,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 8,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 9,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 10,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 11,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 12,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 13,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 14,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 15,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 16,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 17,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 18,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 19,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 20,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "warmup": false
+    },
+    {
+      "pair": 21,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "warmup": false
+    }
+  ],
+  "samples": [
+    {
+      "pair": 0,
+      "binary": "baseline",
+      "warmup": true,
+      "elapsedSeconds": 0.0710638330783695,
+      "wallSeconds": 0.07106280326843262,
+      "waitedChildUserSeconds": 0.012376999999999971,
+      "waitedChildSystemSeconds": 0.009402999999999995,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 0,
+      "binary": "candidate",
+      "warmup": true,
+      "elapsedSeconds": 0.07205337495543063,
+      "wallSeconds": 0.07205414772033691,
+      "waitedChildUserSeconds": 0.01183500000000004,
+      "waitedChildSystemSeconds": 0.009448999999999985,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 1,
+      "binary": "candidate",
+      "warmup": true,
+      "elapsedSeconds": 0.07057158299721777,
+      "wallSeconds": 0.0705718994140625,
+      "waitedChildUserSeconds": 0.011658999999999975,
+      "waitedChildSystemSeconds": 0.009335000000000038,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 1,
+      "binary": "baseline",
+      "warmup": true,
+      "elapsedSeconds": 0.05829741689376533,
+      "wallSeconds": 0.058297157287597656,
+      "waitedChildUserSeconds": 0.011465000000000003,
+      "waitedChildSystemSeconds": 0.008735999999999966,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 2,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06419991701841354,
+      "wallSeconds": 0.06419992446899414,
+      "waitedChildUserSeconds": 0.010873999999999995,
+      "waitedChildSystemSeconds": 0.008213999999999999,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 2,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.0637071249075234,
+      "wallSeconds": 0.06370711326599121,
+      "waitedChildUserSeconds": 0.011116999999999988,
+      "waitedChildSystemSeconds": 0.008570999999999995,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 3,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06403720797970891,
+      "wallSeconds": 0.06403708457946777,
+      "waitedChildUserSeconds": 0.010946999999999985,
+      "waitedChildSystemSeconds": 0.008678000000000019,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 3,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06358425016514957,
+      "wallSeconds": 0.06358504295349121,
+      "waitedChildUserSeconds": 0.010820000000000052,
+      "waitedChildSystemSeconds": 0.00827,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 4,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06874479120597243,
+      "wallSeconds": 0.06874489784240723,
+      "waitedChildUserSeconds": 0.010662999999999978,
+      "waitedChildSystemSeconds": 0.00837300000000002,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 4,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06702758301980793,
+      "wallSeconds": 0.06702828407287598,
+      "waitedChildUserSeconds": 0.011232999999999993,
+      "waitedChildSystemSeconds": 0.008965999999999974,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 5,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.0687500829808414,
+      "wallSeconds": 0.06875109672546387,
+      "waitedChildUserSeconds": 0.011083999999999983,
+      "waitedChildSystemSeconds": 0.008990999999999971,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 5,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.0670707079116255,
+      "wallSeconds": 0.06707096099853516,
+      "waitedChildUserSeconds": 0.01108300000000001,
+      "waitedChildSystemSeconds": 0.008726000000000012,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 6,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06404512492008507,
+      "wallSeconds": 0.06404495239257812,
+      "waitedChildUserSeconds": 0.010745000000000005,
+      "waitedChildSystemSeconds": 0.008155000000000023,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 6,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06814041687175632,
+      "wallSeconds": 0.06814098358154297,
+      "waitedChildUserSeconds": 0.011504000000000014,
+      "waitedChildSystemSeconds": 0.00895900000000005,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 7,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06734779197722673,
+      "wallSeconds": 0.06734800338745117,
+      "waitedChildUserSeconds": 0.010958999999999997,
+      "waitedChildSystemSeconds": 0.008604999999999974,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 7,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06373475003056228,
+      "wallSeconds": 0.06373476982116699,
+      "waitedChildUserSeconds": 0.01094299999999998,
+      "waitedChildSystemSeconds": 0.008568999999999938,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 8,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06627970817498863,
+      "wallSeconds": 0.06627988815307617,
+      "waitedChildUserSeconds": 0.011024000000000034,
+      "waitedChildSystemSeconds": 0.00819700000000001,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 8,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.05762100010178983,
+      "wallSeconds": 0.057621002197265625,
+      "waitedChildUserSeconds": 0.011315999999999993,
+      "waitedChildSystemSeconds": 0.008931000000000022,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 9,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06783495796844363,
+      "wallSeconds": 0.06783580780029297,
+      "waitedChildUserSeconds": 0.011152999999999968,
+      "waitedChildSystemSeconds": 0.008808999999999956,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 9,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06028354191221297,
+      "wallSeconds": 0.06028389930725098,
+      "waitedChildUserSeconds": 0.010985999999999996,
+      "waitedChildSystemSeconds": 0.008533000000000013,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 10,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06546333408914506,
+      "wallSeconds": 0.06546282768249512,
+      "waitedChildUserSeconds": 0.010865000000000014,
+      "waitedChildSystemSeconds": 0.008365000000000067,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 10,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06511437497101724,
+      "wallSeconds": 0.06511402130126953,
+      "waitedChildUserSeconds": 0.01095700000000005,
+      "waitedChildSystemSeconds": 0.008465999999999974,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 11,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06869045807980001,
+      "wallSeconds": 0.06869006156921387,
+      "waitedChildUserSeconds": 0.011117999999999961,
+      "waitedChildSystemSeconds": 0.008596000000000048,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 11,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06391929206438363,
+      "wallSeconds": 0.06392025947570801,
+      "waitedChildUserSeconds": 0.011050000000000004,
+      "waitedChildSystemSeconds": 0.008529999999999927,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 12,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06397354090586305,
+      "wallSeconds": 0.06397366523742676,
+      "waitedChildUserSeconds": 0.010871999999999993,
+      "waitedChildSystemSeconds": 0.00819000000000003,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 12,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06393395806662738,
+      "wallSeconds": 0.0639350414276123,
+      "waitedChildUserSeconds": 0.011009000000000047,
+      "waitedChildSystemSeconds": 0.00856100000000004,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 13,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06493070907890797,
+      "wallSeconds": 0.06493115425109863,
+      "waitedChildUserSeconds": 0.011165999999999898,
+      "waitedChildSystemSeconds": 0.009180999999999995,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 13,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06857291702181101,
+      "wallSeconds": 0.068572998046875,
+      "waitedChildUserSeconds": 0.011201000000000016,
+      "waitedChildSystemSeconds": 0.008650999999999964,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 14,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.0721647918689996,
+      "wallSeconds": 0.07216477394104004,
+      "waitedChildUserSeconds": 0.011210000000000053,
+      "waitedChildSystemSeconds": 0.008526000000000034,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 14,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.05745770805515349,
+      "wallSeconds": 0.05745887756347656,
+      "waitedChildUserSeconds": 0.011236000000000024,
+      "waitedChildSystemSeconds": 0.008722999999999925,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 15,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06604520883411169,
+      "wallSeconds": 0.06604623794555664,
+      "waitedChildUserSeconds": 0.01091399999999998,
+      "waitedChildSystemSeconds": 0.008499000000000034,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 15,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.061291208025068045,
+      "wallSeconds": 0.06129169464111328,
+      "waitedChildUserSeconds": 0.010704999999999965,
+      "waitedChildSystemSeconds": 0.008136000000000032,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 16,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.07013933290727437,
+      "wallSeconds": 0.07014012336730957,
+      "waitedChildUserSeconds": 0.010824000000000056,
+      "waitedChildSystemSeconds": 0.008424999999999905,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 16,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.07282866700552404,
+      "wallSeconds": 0.07282900810241699,
+      "waitedChildUserSeconds": 0.011321999999999943,
+      "waitedChildSystemSeconds": 0.008852000000000082,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 17,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.07132708397693932,
+      "wallSeconds": 0.07132697105407715,
+      "waitedChildUserSeconds": 0.011542000000000052,
+      "waitedChildSystemSeconds": 0.00941599999999998,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 17,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06957275001332164,
+      "wallSeconds": 0.06957316398620605,
+      "waitedChildUserSeconds": 0.01120499999999991,
+      "waitedChildSystemSeconds": 0.008623999999999965,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 18,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06342141702771187,
+      "wallSeconds": 0.06342196464538574,
+      "waitedChildUserSeconds": 0.011090000000000044,
+      "waitedChildSystemSeconds": 0.008446000000000065,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 18,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06814149999991059,
+      "wallSeconds": 0.06814193725585938,
+      "waitedChildUserSeconds": 0.011167000000000038,
+      "waitedChildSystemSeconds": 0.00890599999999997,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 19,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06589083303697407,
+      "wallSeconds": 0.06589102745056152,
+      "waitedChildUserSeconds": 0.011182999999999943,
+      "waitedChildSystemSeconds": 0.008746000000000032,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 19,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06728570815175772,
+      "wallSeconds": 0.06728529930114746,
+      "waitedChildUserSeconds": 0.010870000000000046,
+      "waitedChildSystemSeconds": 0.00810999999999995,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 20,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.05787224997766316,
+      "wallSeconds": 0.05787301063537598,
+      "waitedChildUserSeconds": 0.01103199999999993,
+      "waitedChildSystemSeconds": 0.008296999999999999,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 20,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06394079211167991,
+      "wallSeconds": 0.06394100189208984,
+      "waitedChildUserSeconds": 0.011249000000000065,
+      "waitedChildSystemSeconds": 0.009029999999999982,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 21,
+      "binary": "candidate",
+      "warmup": false,
+      "elapsedSeconds": 0.06693562492728233,
+      "wallSeconds": 0.06693506240844727,
+      "waitedChildUserSeconds": 0.011460000000000026,
+      "waitedChildSystemSeconds": 0.009172000000000069,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    },
+    {
+      "pair": 21,
+      "binary": "baseline",
+      "warmup": false,
+      "elapsedSeconds": 0.06369774998165667,
+      "wallSeconds": 0.06369829177856445,
+      "waitedChildUserSeconds": 0.010885999999999951,
+      "waitedChildSystemSeconds": 0.008278999999999925,
+      "outputSHA256": "b965d5c2b07bcbaada82b76cc5994fb60bd5018ccd1ee2840dd6c62de0f544e7",
+      "exitCode": 0
+    }
+  ],
+  "scope": "One synthetic detached encrypted APFS package, same status output, alternating AB/BA. Includes process startup/native IPC/identity checks. Host and caches uncontrolled; no isolated guard latency, energy, desktop, competitor or causal speed claim.",
+  "passphrasePersisted": false,
+  "metrics": {
+    "candidate": {
+      "elapsedSeconds": {
+        "samples": 20,
+        "median": 0.06649041688069701,
+        "p95": 0.07140216312836856,
+        "minimum": 0.05745770805515349,
+        "maximum": 0.07282866700552404
+      },
+      "waitedChildCPUSeconds": {
+        "samples": 20,
+        "median": 0.020017499999999966,
+        "p95": 0.020648300000000095,
+        "minimum": 0.019413000000000014,
+        "maximum": 0.020958000000000032
+      }
+    },
+    "baseline": {
+      "elapsedSeconds": {
+        "samples": 20,
+        "median": 0.06412252096924931,
+        "p95": 0.07024060585536063,
+        "minimum": 0.05787224997766316,
+        "maximum": 0.0721647918689996
+      },
+      "waitedChildCPUSeconds": {
+        "samples": 20,
+        "median": 0.01923950000000002,
+        "p95": 0.01983014999999988,
+        "minimum": 0.018840999999999997,
+        "maximum": 0.01985199999999998
+      }
+    }
+  },
+  "pairedCandidateMinusBaselineSeconds": {
+    "samples": 20,
+    "median": 0.001716854516416788,
+    "p95": 0.006142685830127448,
+    "minimum": -0.014707083813846111,
+    "maximum": 0.007551416056230664
+  },
+  "all44StatusOutputsEqual": true,
+  "manifestAndImageIdentityUnchangedDuringStatus": true,
+  "historyPreserved": true,
+  "independentlyDetached": true
+}
