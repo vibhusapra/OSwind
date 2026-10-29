@@ -90,6 +90,20 @@ final class PIITokenizerTests:XCTestCase {
                 XCTAssertEqual(Array(word.text.utf8),Array(reference.text.utf8),row.id)
                 XCTAssertEqual(word.range,NSRange(location:reference.location,length:reference.length),row.id)
             }
+            let document=try PIIDocument(row.text)
+            for compute:PIIComputePolicy in [.cpu,.coreML] {
+                let plan=try tokenizer.windows(document,compute:compute);try plan.validate(document:document)
+                for window in plan.windows {
+                    let independent=try tokenizer.encode(window.text)
+                    XCTAssertEqual(window.input.inputIDs,independent.inputIDs,row.id)
+                    XCTAssertEqual(window.input.wordsMask,independent.wordsMask,row.id)
+                    XCTAssertLessThanOrEqual(window.input.inputIDs.count,compute == .cpu ? 512:128,row.id)
+                }
+                if actual.inputIDs.count <= (compute == .cpu ? 512:128) {
+                    XCTAssertEqual(plan.windows.count,1,row.id)
+                    XCTAssertEqual(plan.windows.first?.input.inputIDs,actual.inputIDs,row.id)
+                }
+            }
         }
         XCTAssertThrowsError(try tokenizer.encode(" \t\n"))
         XCTAssertThrowsError(try tokenizer.encode(String(repeating:"a",count:1025)))

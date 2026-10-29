@@ -11,15 +11,17 @@ public struct PIIInspection:Codable,Sendable {
     }
     public struct Mask:Codable,Sendable {public let startUTF16:Int,lengthUTF16:Int}
     public let sourceSHA256:String,modelID:String,compute:PIIComputePolicy,threshold:Double
+    public let windowCount:Int,framedTokens:Int
     public let text:String,spans:[Span],modelMasks:[Mask],masks:[Mask]
     public let modelRedacted:Bool,patternRedacted:Bool,redacted:Bool,suppressMedia:Bool
 }
 
 struct PIINativeOutput:Sendable {
-    let sourceSHA256:String,modelID:String,shape:[Int],logits:[Float]
+    let sourceSHA256:String,windowID:String,modelID:String,shape:[Int],logits:[Float]
 }
 protocol PIINativeBackend:Sendable {
-    func predict(_ text:String) async throws -> PIINativeOutput
+    func prepare(_ document:PIIDocument) async throws -> PIIWindowPlan
+    func predict(_ window:PIIWindowPlan.Window) async throws -> PIINativeOutput
     func close()
 }
 
@@ -98,8 +100,7 @@ public actor PIIInspector {
     }
     public func inspect(_ text:String,threshold:Double) async throws -> PIIInspection {
         guard threshold.isFinite,threshold>0,threshold<1 else {throw OSwindError.invalid("PII threshold must be strictly between zero and one")}
-        let source=try PIIDecoding.Source(text)
-        guard !source.words.isEmpty else {throw OSwindError.invalid("PII input has no non-whitespace words")}
+        let source=try PIIDocument(text)
         try await acquire(UUID());defer {release()}
         try Task.checkCancellation()
         guard !closed else {throw CancellationError()};let token=generation
@@ -110,18 +111,38 @@ public actor PIIInspector {
         }
         guard let backend else {throw OSwindError.unavailable("PII model is unavailable")}
         do {
-            let output=try await backend.predict(text)
-            try Task.checkCancellation()
-            guard !closed,generation==token else {throw CancellationError()}
-            guard output.sourceSHA256==source.sha256,output.modelID==modelID else {throw OSwindError.invalid("PII output belongs to another source or model")}
-            let detection=try PIIDecoding.decode(source:source,shape:output.shape,logits:output.logits,threshold:threshold)
-            let masked=try PIIDecoding.redact(text,detection:detection)
+            let plan=try await backend.prepare(source)
+            try Task.checkCancellation();guard !closed,generation==token else {throw CancellationError()}
+            try plan.validate(document:source)
+            struct Key:Hashable {let start:Int,length:Int,label:String}
+            var spans=[Key:PIIInspection.Span]()
+            for window in plan.windows {
+                try Task.checkCancellation()
+                let output=try await backend.predict(window)
+                try Task.checkCancellation();guard !closed,generation==token else {throw CancellationError()}
+                guard output.sourceSHA256==window.sourceSHA256,output.windowID==window.id,output.modelID==modelID else {throw OSwindError.invalid("PII output belongs to another window, source or model")}
+                let detection=try PIIDecoding.decode(source:PIIDecoding.Source(window:window),shape:output.shape,logits:output.logits,threshold:threshold)
+                // Keep the union across contexts. Global flat-span competition
+                // must not discard a sensitive span found by another window.
+                for span in detection.spans {
+                    let key=Key(start:span.range.location,length:span.range.length,label:span.promptLabel)
+                    if let previous=spans[key],previous.confidence>=span.confidence {continue}
+                    guard spans[key] != nil || spans.count<PIIDocument.maximumSpans else {throw OSwindError.invalid("PII document span budget exceeded; no partial scan returned")}
+                    spans[key] = .init(startUTF16:span.range.location,lengthUTF16:span.range.length,label:span.promptLabel,category:span.category,confidence:span.confidence)
+                }
+            }
+            let ordered=spans.values.sorted {left,right in
+                if left.startUTF16 != right.startUTF16 {return left.startUTF16<right.startUTF16}
+                if left.lengthUTF16 != right.lengthUTF16 {return left.lengthUTF16<right.lengthUTF16}
+                return left.label<right.label
+            }
+            let masked=try PIIDecoding.mask(text,ranges:ordered.map {NSRange(location:$0.startUTF16,length:$0.lengthUTF16)})
             let patterns=PrivacyPolicy().sensitiveRanges(in:text)
             let final=try PIIDecoding.mask(text,ranges:masked.ranges+patterns)
             try Task.checkCancellation()
             let redacted=final.redacted
             return PIIInspection(sourceSHA256:source.sha256,modelID:modelID,compute:compute,threshold:threshold,
-                text:final.text,spans:detection.spans.map {.init(startUTF16:$0.range.location,lengthUTF16:$0.range.length,label:$0.promptLabel,category:$0.category,confidence:$0.confidence)},
+                windowCount:plan.windows.count,framedTokens:plan.framedTokens,text:final.text,spans:ordered,
                 modelMasks:masked.ranges.map {.init(startUTF16:$0.location,lengthUTF16:$0.length)},
                 masks:final.ranges.map {.init(startUTF16:$0.location,lengthUTF16:$0.length)},
                 modelRedacted:masked.redacted,patternRedacted:!patterns.isEmpty,redacted:redacted,suppressMedia:redacted)
@@ -136,7 +157,7 @@ private final class PIILocalBackend:PIINativeBackend,@unchecked Sendable {
     private let lock=NSLock()
     private var session:OpaquePointer?
     static func identifier(_ compute:PIIComputePolicy)->String {
-        "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:\(compute.rawValue)"
+        "gliner-pii-edge:9b7f39b0a2da971a5beea78d35f1539d4009c891:token-v1:grapheme-v1:windows-v1:\(compute.rawValue)"
     }
     private static func digest(_ data:Data)->String {SHA256.hash(data:data).map {String(format:"%02x",$0)}.joined()}
     static func load(directory:URL,library:URL,compute:PIIComputePolicy) async throws -> any PIINativeBackend {
@@ -184,16 +205,27 @@ private final class PIILocalBackend:PIINativeBackend,@unchecked Sendable {
         try? FileManager.default.removeItem(at:snapshot)
     }
     deinit {close()}
-    func predict(_ text:String) async throws -> PIINativeOutput {
-        let job=Task.detached(priority:.utility) {try self.run(text)}
+    func prepare(_ document:PIIDocument) async throws -> PIIWindowPlan {
+        let job=Task.detached(priority:.utility) {try self.plan(document)}
+        return try await withTaskCancellationHandler {
+            let result=try await job.value;try Task.checkCancellation();return result
+        } onCancel: {job.cancel()}
+    }
+    private func plan(_ document:PIIDocument)throws->PIIWindowPlan {
+        lock.lock();defer {lock.unlock()};try Task.checkCancellation()
+        guard session != nil else {throw OSwindError.unavailable("PII native session is closed")}
+        return try tokenizer.windows(document,compute:compute)
+    }
+    func predict(_ window:PIIWindowPlan.Window) async throws -> PIINativeOutput {
+        let job=Task.detached(priority:.utility) {try self.run(window)}
         return try await withTaskCancellationHandler {
             let output=try await job.value;try Task.checkCancellation();return output
         } onCancel: {job.cancel()}
     }
-    private func run(_ text:String)throws->PIINativeOutput {
+    private func run(_ window:PIIWindowPlan.Window)throws->PIINativeOutput {
         lock.lock();defer {lock.unlock()};try Task.checkCancellation()
         guard let session else {throw OSwindError.unavailable("PII native session is closed")}
-        let input=try tokenizer.encode(text)
+        let input=window.input
         var ids=input.inputIDs,attention=input.attentionMask,mask=input.wordsMask
         if compute == .coreML {
             guard ids.count<=128 else {throw OSwindError.invalid("PII input exceeds the fixed128 Core ML bucket; no truncated scan returned")}
@@ -207,6 +239,6 @@ private final class PIILocalBackend:PIINativeBackend,@unchecked Sendable {
         }}}
         try Task.checkCancellation()
         guard status==0 else {throw OSwindError.unavailable("Native PII inference failed; no scan returned")}
-        return PIINativeOutput(sourceSHA256:Self.digest(Data(text.utf8)),modelID:Self.identifier(compute),shape:[1,input.words.count,12,3],logits:logits)
+        return PIINativeOutput(sourceSHA256:window.sourceSHA256,windowID:window.id,modelID:Self.identifier(compute),shape:[1,input.words.count,12,3],logits:logits)
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 /// Experimental batch-one, flat/single-label GLiNER token-output contract.
-/// Not selected by capture/import/export or the model installer.
+/// Used by explicit inspection/setup checks, not capture/import/export policies.
 enum PIIDecoding {
     static let maximumWords=512,maximumCandidates=16384
     private static let categories=["email","phone","address","government_id","government_id","government_id","financial_id","credit_card","date_of_birth","ip_address","secret","secret"]
@@ -15,6 +15,11 @@ enum PIIDecoding {
             words=try PIITokenizer.split(text)
             guard words.count<=maximumWords else {throw OSwindError.invalid("PII source exceeds decoder word bound")}
             sha256=PIIDecoding.digest(text)
+        }
+        init(window:PIIWindowPlan.Window) throws {
+            try Task.checkCancellation()
+            guard !window.input.words.isEmpty,window.input.words.count<=maximumWords else {throw OSwindError.invalid("PII window exceeds decoder word bound")}
+            words=window.input.words;sha256=window.sourceSHA256
         }
     }
     struct Span:Equatable,Sendable {
@@ -102,7 +107,7 @@ enum PIIDecoding {
     }
     static func mask(_ text:String,ranges:[NSRange])throws->Redaction {
         try Task.checkCancellation()
-        guard text.utf8.count<=4*PIITokenizer.maximumScalars else {throw OSwindError.invalid("PII source exceeds input byte bound")}
+        guard text.utf8.count<=PIIDocument.maximumBytes,ranges.count<=2*PIIDocument.maximumSpans else {throw OSwindError.invalid("PII source or masks exceed document bound")}
         let original=text as NSString
         var masks=[NSRange]()
         for range in ranges {
