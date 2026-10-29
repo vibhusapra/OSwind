@@ -35,6 +35,24 @@ final class AccessibilityReaderTests:XCTestCase {
         var source=OwnedAccessibilityTree();source.values[0]=[:]
         XCTAssertNil(try AccessibilityTraversal.read(source,identity:identity,budget:AccessibilityReadBudget()))
     }
+    func testBindingScopeReadsOnlyFocusedWindowMetadataAndNeverReturnsTextURLOrSecurity() throws {
+        var source=OwnedAccessibilityTree(),attributes=[AccessibilityAttribute](),input=identity
+        input.accessibilityText="Old full text";input.url="https://example.org/old";input.secure=true
+        source.values[1]?[.position] = .point(.init(x:12,y:34));source.values[1]?[.size] = .size(.init(width:480,height:300))
+        source.beforeRead={_,attribute in
+            attributes.append(attribute)
+            if [.focusedElement,.role,.subrole,.url,.value,.children].contains(attribute) {XCTFail("Binding check read sensitive/tree attributes")}
+        }
+        let result=try XCTUnwrap(AccessibilityTraversal.read(source,identity:input,budget:AccessibilityReadBudget(maximumMessages:4),scope:.binding))
+        XCTAssertEqual(attributes,[.focusedWindow,.title,.position,.size]);XCTAssertEqual(result.title,"Owned page")
+        XCTAssertEqual(result.bounds,CGRect(x:12,y:34,width:480,height:300));XCTAssertEqual(result.accessibilityText,"");XCTAssertNil(result.url);XCTAssertFalse(result.secure)
+    }
+    func testBindingScopeStillRefusesIncompleteBudgetAndLateCancellation() throws {
+        var source=OwnedAccessibilityTree(),cancelled=false
+        XCTAssertThrowsError(try AccessibilityTraversal.read(source,identity:identity,budget:AccessibilityReadBudget(maximumMessages:2),scope:.binding))
+        source.beforeRead={_,attribute in if attribute == .position {cancelled=true}}
+        XCTAssertThrowsError(try AccessibilityTraversal.read(source,identity:identity,budget:AccessibilityReadBudget(cancelled:{cancelled}),scope:.binding)) {XCTAssertTrue($0 is CancellationError)}
+    }
     func testFocusedSecureElementStopsBeforeTraversingValues() throws {
         var source=OwnedAccessibilityTree();source.values[0]?[.focusedElement] = .node(3);source.values[3]=[.subrole:.string(kAXSecureTextFieldSubrole)]
         source.beforeRead={_,attribute in if attribute == .value {XCTFail("Protected context reached text extraction")}}

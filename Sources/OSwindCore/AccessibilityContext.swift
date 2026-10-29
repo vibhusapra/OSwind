@@ -22,19 +22,21 @@ final class AccessibilityWorker:@unchecked Sendable {
 
 }
 enum AccessibilityReadFailure:Error {case exhausted,unavailable}
+enum AccessibilityReadScope:Sendable {case binding,full}
 /// Share only currently running observations of the same application. A stopped
 /// consumer releases its own lease; it cannot cancel another consumer's read.
 @MainActor final class AccessibilityContextCoordinator {
     private struct Read {
-        var id:UUID,identity:WindowContext,task:Task<WindowContext?,Never>,observers:Set<UUID>
+        var id:UUID,identity:WindowContext,scope:AccessibilityReadScope,task:Task<WindowContext?,Never>,observers:Set<UUID>
     }
     private var active:Read?
     var observerCount:Int {active?.observers.count ?? 0}
-    private let operation:(WindowContext) async ->WindowContext?
-    init(operation:@escaping (WindowContext) async ->WindowContext?) {self.operation=operation}
-    func read(_ identity:WindowContext) async ->WindowContext? {
+    private let operation:(WindowContext,AccessibilityReadScope) async ->WindowContext?
+    init(operation:@escaping (WindowContext) async ->WindowContext?) {self.operation={identity,_ in await operation(identity)}}
+    init(scopedOperation:@escaping (WindowContext,AccessibilityReadScope) async ->WindowContext?) {operation=scopedOperation}
+    func read(_ identity:WindowContext,scope:AccessibilityReadScope = .full) async ->WindowContext? {
         guard !Task.isCancelled else {return nil}
-        if let previous=active,previous.task.isCancelled || previous.identity.pid != identity.pid || previous.identity.bundle != identity.bundle {
+        if let previous=active,previous.task.isCancelled || previous.identity.pid != identity.pid || previous.identity.bundle != identity.bundle || (previous.scope == .binding && scope == .full) {
             // Do not queue more IPC while a different/cancelled observation is
             // releasing its slot. Recheck admission after its actual completion.
             _=await previous.task.value
@@ -43,16 +45,19 @@ enum AccessibilityReadFailure:Error {case exhausted,unavailable}
         let observer=UUID(),id:UUID,task:Task<WindowContext?,Never>
         if let current=active {
             guard current.identity.pid==identity.pid,current.identity.bundle==identity.bundle,!current.task.isCancelled else {return nil}
+            // A new metadata request can start while an older one finishes.
+            // A full reader must never join that narrower replacement.
+            guard current.scope == .full || scope == .binding else {return nil}
             guard current.observers.count<8 else {return nil}
             id=current.id;task=current.task;active?.observers.insert(observer)
         }else {
             id=UUID();let operation=self.operation
             task=Task { [weak self] in
-                let value=await operation(identity)
+                let value=await operation(identity,scope)
                 if self?.active?.id==id {self?.active=nil}
                 return Task.isCancelled ? nil:value
             }
-            active=Read(id:id,identity:identity,task:task,observers:[observer])
+            active=Read(id:id,identity:identity,scope:scope,task:task,observers:[observer])
         }
         defer {release(observer,id:id)}
         let value=await withTaskCancellationHandler {await task.value} onCancel:{Task {@MainActor [weak self] in self?.release(observer,id:id)}}
@@ -83,13 +88,19 @@ protocol AccessibilityTreeSource {
     func value(_ node:Node,_ attribute:AccessibilityAttribute,budget:AccessibilityReadBudget) throws -> AccessibilityTreeValue<Node>?
 }
 enum AccessibilityTraversal {
-    static func read<Source:AccessibilityTreeSource>(_ source:Source,identity:WindowContext,budget:AccessibilityReadBudget) throws -> WindowContext? {
+    static func read<Source:AccessibilityTreeSource>(_ source:Source,identity:WindowContext,budget:AccessibilityReadBudget,scope:AccessibilityReadScope = .full) throws -> WindowContext? {
         func value(_ node:Source.Node,_ attribute:AccessibilityAttribute) throws -> AccessibilityTreeValue<Source.Node>? {try budget.checkpoint();return try source.value(node,attribute,budget:budget)}
         func string(_ node:Source.Node,_ attribute:AccessibilityAttribute) throws -> String? {if case .string(let text)=try value(node,attribute) {return text};return nil}
         guard case .node(let window)=try value(source.root,.focusedWindow) else {return nil}
         var context=identity
         context.title=try string(window,.title) ?? ""
         if case .point(let position)=try value(window,.position),case .size(let size)=try value(window,.size) {context.bounds=CGRect(origin:position,size:size)}
+        if scope == .binding {
+            // This result can decide whether to replace a stream, never whether
+            // a frame is private or safe. No focused values, URL or tree text.
+            context.accessibilityText="";context.url=nil;context.secure=false
+            try budget.checkpoint();return context
+        }
         if case .node(let focused)=try value(source.root,.focusedElement),try string(focused,.subrole)==kAXSecureTextFieldSubrole {context.secure=true;return context}
         var queue=[window],known:Set<Source.Node>=[window],offset=0,textSize=0,texts=[String]()
         while offset<queue.count {
@@ -167,9 +178,9 @@ private struct NativeAccessibilityTree:AccessibilityTreeSource {
     }
 }
 public enum AccessibilityContext {
-    @MainActor private static let coordinator=AccessibilityContextCoordinator {identity in
-        await AccessibilityWorker.shared.run {try? AccessibilityTraversal.read(NativeAccessibilityTree(pid:identity.pid),identity:identity,budget:AccessibilityReadBudget())}
-    }
+    @MainActor private static let coordinator=AccessibilityContextCoordinator(scopedOperation:{identity,scope in
+        await AccessibilityWorker.shared.run {try? AccessibilityTraversal.read(NativeAccessibilityTree(pid:identity.pid),identity:identity,budget:AccessibilityReadBudget(),scope:scope)}
+    })
     @MainActor private static func identity(targetBundleID:String?)->WindowContext? {
         let application=targetBundleID.flatMap {bundle in NSWorkspace.shared.runningApplications.first {$0.bundleIdentifier==bundle}} ?? (targetBundleID==nil ? NSWorkspace.shared.frontmostApplication:nil)
         guard let app=application,!app.isTerminated else {return nil}
@@ -180,12 +191,18 @@ public enum AccessibilityContext {
         return context.pid==now.pid && context.bundle==now.bundle
     }
     @MainActor public static func read(targetBundleID:String?=nil) async -> WindowContext? {
+        await observe(targetBundleID:targetBundleID,scope:.full)
+    }
+    @MainActor static func readBinding(targetBundleID:String?=nil) async -> WindowContext? {
+        await observe(targetBundleID:targetBundleID,scope:.binding)
+    }
+    @MainActor private static func observe(targetBundleID:String?,scope:AccessibilityReadScope) async -> WindowContext? {
         guard !Task.isCancelled,let selected=identity(targetBundleID:targetBundleID) else {return nil}
         // Preserve the explicit optional-AX path for native apps. Browser URL
         // policy and unambiguous ScreenCaptureKit binding still apply; without
         // AX permission, secure-field detection and accessible text are absent.
         if !AXIsProcessTrusted() {return selected}
-        let context=await coordinator.read(selected)
+        let context=await coordinator.read(selected,scope:scope)
         guard !Task.isCancelled,let context,identityCurrent(context,targetBundleID:targetBundleID) else {return nil}
         return context
     }

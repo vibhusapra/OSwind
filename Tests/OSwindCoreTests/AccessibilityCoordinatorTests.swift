@@ -62,4 +62,29 @@ import XCTest
         for task in tasks {if await task.value != nil {accepted+=1}}
         XCTAssertEqual(accepted,8);XCTAssertEqual(source.loads,1)
     }
+    func testFullRequestWaitsForNarrowBindingReadAndStartsItsOwnCompleteObservation() async throws {
+        let entered=XCTestExpectation(description:"binding IPC in flight")
+        var resolve:CheckedContinuation<WindowContext?,Never>?,scopes=[AccessibilityReadScope](),requested=false
+        let identity=self.identity,coordinator=AccessibilityContextCoordinator(scopedOperation:{context,scope in
+            scopes.append(scope)
+            if scope == .binding {return await withCheckedContinuation {resolve=$0;entered.fulfill()}}
+            var result=context;result.accessibilityText="Complete current tree";result.secure=true;return result
+        })
+        let metadata=Task {await coordinator.read(identity,scope:.binding)};await fulfillment(of:[entered],timeout:5)
+        let full=Task {requested=true;return await coordinator.read(identity,scope:.full)}
+        try await wait {requested};await Task.yield();XCTAssertEqual(scopes,[.binding])
+        resolve?.resume(returning:identity)
+        let narrow=await metadata.value,complete=await full.value
+        XCTAssertEqual(narrow?.accessibilityText,"");XCTAssertEqual(complete?.accessibilityText,"Complete current tree");XCTAssertTrue(complete?.secure==true)
+        XCTAssertEqual(scopes,[.binding,.full])
+    }
+    func testBindingRequestCanJoinAlreadyRunningCompleteObservationWithoutAnotherIPCJob() async throws {
+        let entered=XCTestExpectation(description:"full IPC in flight")
+        var resolve:CheckedContinuation<WindowContext?,Never>?,scopes=[AccessibilityReadScope]()
+        let identity=self.identity,coordinator=AccessibilityContextCoordinator(scopedOperation:{_,scope in scopes.append(scope);return await withCheckedContinuation {resolve=$0;entered.fulfill()}})
+        let full=Task {await coordinator.read(identity,scope:.full)};await fulfillment(of:[entered],timeout:5)
+        let metadata=Task {await coordinator.read(identity,scope:.binding)};try await wait {coordinator.observerCount==2}
+        var complete=identity;complete.accessibilityText="Owned complete tree";resolve?.resume(returning:complete)
+        let a=await full.value,b=await metadata.value;XCTAssertEqual(a?.accessibilityText,b?.accessibilityText);XCTAssertEqual(scopes,[.full])
+    }
 }
