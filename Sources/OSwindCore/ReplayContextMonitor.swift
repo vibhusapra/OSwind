@@ -7,7 +7,7 @@ import ApplicationServices
 @MainActor struct ReplayContextEnvironment {
     var available: (Bool) -> Bool = { targeted in
         !SessionState.locked && CGPreflightScreenCaptureAccess() &&
-            (targeted || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120)
+            (targeted || NativeInputActivity.secondsSinceLastInput()<=120)
     }
     var identityCurrent: (WindowContext,String?) -> Bool = {
         AccessibilityContext.identityCurrent($0,targetBundleID:$1)
