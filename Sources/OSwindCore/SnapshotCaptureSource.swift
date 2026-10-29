@@ -17,7 +17,7 @@ struct SnapshotCaptureDeferral:Error {var reason:String}
     var locked:()->Bool = {SessionState.locked}
     var permitted:()->Bool = {CGPreflightScreenCaptureAccess()}
     var accessibilityPermitted:()->Bool = {AXIsProcessTrusted()}
-    var idleSeconds:()->Double = {CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)}
+    var idleSeconds:()->Double = {NativeInputActivity.secondsSinceLastInput()}
     var now:()->Date = {Date()}
     var uptime:()->Double = {ProcessInfo.processInfo.systemUptime}
     var textCommitPermitted:@Sendable ()->Bool = {!SessionState.locked && AXIsProcessTrusted()}
