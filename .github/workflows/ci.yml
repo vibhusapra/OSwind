@@ -62,6 +62,18 @@ jobs:
           python3 scripts/vault-interruption-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-interruptions"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal"
           python3 scripts/vault-terminal-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-terminal-busy" --held-reader
+      - name: Retain owned pattern and terminal process receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-pattern-terminal-receipts
+          path: |
+            ${{ runner.temp }}/oswind-pattern-privacy/report.json
+            ${{ runner.temp }}/oswind-vault-terminal/report.json
+            ${{ runner.temp }}/oswind-vault-terminal/*.pty-output
+            ${{ runner.temp }}/oswind-vault-terminal-busy/report.json
+            ${{ runner.temp }}/oswind-vault-terminal-busy/*.pty-output
+          if-no-files-found: ignore
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise explicit text collectors and Python SDK on encrypted APFS

@@ -73,7 +73,49 @@ For a causal before/after check, add `--baseline /absolute/old/oswindctl` and it
 check; expected old failures remain in the receipt rather than being counted as
 passing current contracts. CI runs the current-build path without model downloads.
 
-Frozen full/race/optimized, signed package/process and unchanged authored
-validation-baseline checks are recorded separately before publication. This
-fix does not establish complete PII detection, a learned privacy operating point,
-production learned admission, desktop power or competitive/release acceptance.
+## Frozen qualification: privacy checks pass; terminal failure retained
+
+[PR #77](https://github.com/vibhusapra/OSwind/pull/77) and the
+[qualification receipt](../benchmarks/privacy-original-mask-union-v1.json) bind
+product source `7621eb8`. **1,092 defined tests: 1,090 passes/two skips**, **154
+selected TSan passes** and **113 optimized passes** complete with no failures.
+Both real native PII backends preserve all 432 short-reference comparisons in
+normal/TSan/optimized configurations. Precompiled framework/runtime internals
+are outside TSan coverage; the skips remain physical system-audio opt-in and
+unavailable visual admission.
+
+The signed before/after process harness retains the old eight text mismatches
+and three route failures, while all 13 current contracts pass. The standalone
+CI route repeats those same 13 contracts; these are not 26 independent cases.
+The actual signed CLI re-scores the same 72 authored validation examples with
+exactly unchanged aggregate metrics: 14/48 fully covered values, 0/24 negatives
+flagged. That corpus lacks the overlapping-trigger cases; unchanged aggregate
+scores do not establish this repaired invariant or representative PII quality.
+Thirty native-model CLI success/refusal/cancellation checks also pass.
+
+The 34-file app/ZIP passes strict signatures, same-build normalized payload and
+complete extracted-tree equality. Visual compatibility preserves 459/501 top1
+and 498/501 top5/top10 with current model/corpus/scopes/index/reopen. Installed
+and staged bytes remain unchanged. Final complete-command owned-executable and
+current-artifact image inventories are empty. No installation/unscoped GUI occurs.
+
+The ordered process qualification is **partial: 14/15 operations pass**. The
+last held-reader terminal Ctrl-C trial returns CLI failure 1 with an attached
+image and the public message `Cannot inspect encrypted disk attachments (hdiutil
+exit 2)`. It fails before reaching the required busy-file refusal. The original
+assertion remains strict. Normal recovery after closing the owned reader detaches
+and preserves its note; that recovery does not convert the failed trial to a pass.
+
+The native wrapper retains `terminationStatus` but discards `terminationReason`.
+The reported 2 is not established as a normal exit versus an uncaught signal.
+Earlier observed create/attach helpers already have process groups distinct from
+the CLI; inherited foreground-group membership must not be assumed as the cause.
+Retaining termination provenance and an owned reproduction are the next priority.
+No force detach or favorable retry substitutes for that evidence.
+
+A subsequent workflow-only change uploads owned pattern/terminal receipts even
+when a later CI step fails. Product/test/script/model inputs remain unchanged
+from the qualified product source; that workflow change has a separate CI head.
+This fix does not establish complete PII detection, a learned operating point,
+production learned admission, historical-data repair, desktop power or broader
+competitive/release acceptance.
