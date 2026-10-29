@@ -181,7 +181,12 @@ private final class OwnedVaultNativeTrace:@unchecked Sendable {
         var text=String(decoding:encoded,as:UTF8.self)
         // Match JSON's escaped representation, including /private aliases and
         // quoted/non-ASCII path components. Longer roots must be replaced first.
-        for path in Set(roots.map(\.path)).sorted(by:{$0.count==$1.count ? $0<$1:$0.count>$1.count}) {
+        let paths:Set<String>=Set(roots.map { $0.path })
+        let ordered=paths.sorted { (left:String,right:String)->Bool in
+            if left.count != right.count {return left.count>right.count}
+            return left<right
+        }
+        for path in ordered {
             let quoted=String(decoding:try encoder.encode(path),as:UTF8.self)
             text=text.replacingOccurrences(of:String(quoted.dropFirst().dropLast()),with:"<owned-fixture>")
         }
