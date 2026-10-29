@@ -1,0 +1,814 @@
+{
+  "format": "OSwind native vault termination provenance qualification v1",
+  "recordedAtUTC": "2026-10-29T09:53:26.462831+00:00",
+  "source": "1de936afe68efd75450292e1566dfa89222f4878",
+  "base": "c5dd1d3754ef10248596f7d3fede881389ff3ec4",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/78",
+  "releaseAcceptance": false,
+  "historicalStatus2CauseEstablished": false,
+  "cancellationLifecycleRepair": false,
+  "competitiveRanking": false,
+  "normalHistoryAudited": false,
+  "reservedTestPredictionsOpened": false,
+  "mechanism": {
+    "actualFoundationTerminationReason": true,
+    "normalZeroExitRequired": true,
+    "safeSummaryClasses": [
+      "exit",
+      "signal",
+      "unknown"
+    ],
+    "rawNativeOutputInPublicErrors": false,
+    "mutationRetryAdded": false,
+    "queryRetryAdded": false,
+    "forceDetachAdded": false,
+    "identityProofRelaxed": false,
+    "deadlinesAndCancellationChanged": false,
+    "reference": "https://developer.apple.com/documentation/foundation/process/terminationreason-swift.enum"
+  },
+  "precedingRegression": {
+    "defined": 1,
+    "passed": 0,
+    "skipped": 0,
+    "reportedFailures": 2,
+    "reportedTestSeconds": 0.379,
+    "reportedSuiteSeconds": 0.38,
+    "logSHA256": "e8618336d543ea8cd76fd895b1b9c09e4fd3963c3d9248bf99537da89add56e3",
+    "failedCases": 1,
+    "scope": "Label-only real Python exit versus self-signal probe against preceding implementation. Final test additionally asserts the new termination class. Reported assertions are not independent cases."
+  },
+  "focusedAfter": {
+    "defined": 56,
+    "passed": 54,
+    "skipped": 2,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 3.392,
+    "reportedSuiteSeconds": 3.395,
+    "logSHA256": "a6ca04b298ccba7d7e9a3f36507de6c3f81e788b7b151e884382341a03575f3c"
+  },
+  "full": {
+    "defined": 1095,
+    "passed": 1093,
+    "skipped": 2,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 434.874,
+    "reportedSuiteSeconds": 434.96,
+    "logSHA256": "17dc1eb7ae8e4c37309c825b6ea745d0bd402821260fbb39b0eca79d964a3c99"
+  },
+  "threadSanitizer": {
+    "defined": 107,
+    "passed": 107,
+    "skipped": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 128.24,
+    "reportedSuiteSeconds": 128.268,
+    "logSHA256": "d40eb74f5f1d386e59b3fa1047087857c5d71419537920a005cdafef65fbfce6"
+  },
+  "optimizedVault": {
+    "defined": 107,
+    "passed": 107,
+    "skipped": 0,
+    "reportedFailures": 0,
+    "reportedTestSeconds": 125.44,
+    "reportedSuiteSeconds": 125.45,
+    "logSHA256": "76fa8b5fd9ee16b057d099016fd796da34c88a86d58f0402169b46f68c5fd764"
+  },
+  "orderedOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 440.2171729579568,
+      "wallSeconds": 440.21574330329895
+    },
+    {
+      "name": "vault-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 161.0794909580145,
+      "wallSeconds": 161.0789692401886
+    },
+    {
+      "name": "optimized-vault-v1",
+      "exitCode": 0,
+      "awakeSeconds": 243.7815377919469,
+      "wallSeconds": 243.7807469367981
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 102.50182304088958,
+      "wallSeconds": 102.50149083137512
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.558955040993169,
+      "wallSeconds": 1.5589501857757568
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.5298794999253005,
+      "wallSeconds": 0.5298776626586914
+    },
+    {
+      "name": "vault-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 15.041932207997888,
+      "wallSeconds": 15.041882753372192
+    },
+    {
+      "name": "vault-interruptions-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.450197583064437,
+      "wallSeconds": 5.450180768966675
+    },
+    {
+      "name": "vault-terminal-v1",
+      "exitCode": 0,
+      "awakeSeconds": 9.666742166969925,
+      "wallSeconds": 9.66671109199524
+    },
+    {
+      "name": "vault-terminal-busy-v1",
+      "exitCode": 0,
+      "awakeSeconds": 5.841072708135471,
+      "wallSeconds": 5.8410539627075195
+    },
+    {
+      "name": "final-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.14040429098531604,
+      "wallSeconds": 0.14040398597717285
+    }
+  ],
+  "qualificationPlanSHA256": "151097ea0deae4464b95cd509c2454ed53eaa986dfc5980701dce0832f3c22e4",
+  "qualificationDriverSHA256": "9817105208b3d61968cef5f079abccb5c6dbe7a0b9fd23b1b3cd7c142bc1bf66",
+  "nativeTraceAssociation": "One shared export directory; exactly two unchanged file exports per configuration within logged NativeVaultDetachSettlementTests suite time bounds, complete JSON and expected 104/50 call and 0/1 nonzero contracts verified. Combined stdout/stderr log can interleave XCTest text inside printed JSON; on-disk exports are authoritative",
+  "nativeTraces": {
+    "normal": [
+      {
+        "file": "oswind-native-detach-held-reader-3AD52199-5526-4256-B461-06ED764F515A-completed.json",
+        "sha256": "902ae68d1306bbdf485f066dc56fec544f1f07fcf627712b93bb3c14efba15ab",
+        "fileModifiedAtUTC": "2026-10-29T09:36:39.204401+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:36:34.133",
+          "2026-10-29 02:36:49.568"
+        ],
+        "total": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-4E99B91B-3C5E-405B-AF34-F2850D443316-completed.json",
+        "sha256": "eb542779197c63ed93a72b482317d1ff84fb6c98fcf718bd227735931f9e4ea1",
+        "fileModifiedAtUTC": "2026-10-29T09:36:49.566302+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:36:34.133",
+          "2026-10-29 02:36:49.568"
+        ],
+        "total": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ],
+    "tsan": [
+      {
+        "file": "oswind-native-detach-held-reader-F42D3DB2-F538-4DBF-9015-F8E5F7D68D52-completed.json",
+        "sha256": "5b54f3ecbec3b5001c00fb3e458e6f33428f8132c658d9b536df288da7ce9acd",
+        "fileModifiedAtUTC": "2026-10-29T09:41:17.593653+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:41:12.278",
+          "2026-10-29 02:41:28.062"
+        ],
+        "total": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-96341053-81E4-4F46-B96F-1A4603FC5566-completed.json",
+        "sha256": "78118057b2677058447a9920b65edb0bac13f9994481145eabc69ef7d587ac2b",
+        "fileModifiedAtUTC": "2026-10-29T09:41:28.058228+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:41:12.278",
+          "2026-10-29 02:41:28.062"
+        ],
+        "total": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ],
+    "optimized": [
+      {
+        "file": "oswind-native-detach-held-reader-3F469142-7051-43AC-897E-3170EA939291-completed.json",
+        "sha256": "25a20015d0f28beb2150577243868d4dca4a8adb57a051980fba22402ffaf1f4",
+        "fileModifiedAtUTC": "2026-10-29T09:45:28.374888+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:45:23.217",
+          "2026-10-29 02:45:38.674"
+        ],
+        "total": 50,
+        "dropped": 0,
+        "nonzero": 1,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 26
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 3
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 16,
+            "calls": 1
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 17
+          }
+        ]
+      },
+      {
+        "file": "oswind-native-detach-settling-F8B2E8CA-A999-4E3B-A1A2-11BB11970C10-completed.json",
+        "sha256": "a836a728e1085a9cd9a9a71321b76a04c7310baccb8a8bfd2d1e02d9a39f9d44",
+        "fileModifiedAtUTC": "2026-10-29T09:45:38.671819+00:00",
+        "loggedSuiteBoundsLocal": [
+          "2026-10-29 02:45:23.217",
+          "2026-10-29 02:45:38.674"
+        ],
+        "total": 104,
+        "dropped": 0,
+        "nonzero": 0,
+        "outcomes": [
+          {
+            "operation": "attachmentInventory",
+            "termination": "exit",
+            "status": 0,
+            "calls": 56
+          },
+          {
+            "operation": "encryptionProbe",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "imageDetach",
+            "termination": "exit",
+            "status": 0,
+            "calls": 8
+          },
+          {
+            "operation": "volumeInfo",
+            "termination": "exit",
+            "status": 0,
+            "calls": 32
+          }
+        ]
+      }
+    ]
+  },
+  "package": {
+    "scope": "Separately staged schema22 native vault termination provenance; no complete privacy detection acceptance, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "1de936afe68efd75450292e1566dfa89222f4878",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "d49feb2eb47caca51d68507013e13efa5bc5874ad09b4b25f1f1b7b21c89ddf7",
+        "signedSHA256": "b20c4717bd048e82c1cb783659e7faa9cefd7b3cb99292916ff36165a1b43768",
+        "normalizedPayloadSHA256": "7db15e2d49ed6f2e6aebe2f9aa18743b232ac4c0b7d9c63ce7a0aef0f0bf8243"
+      },
+      "oswindctl": {
+        "rawSHA256": "8cdda267295de3f4add31140f7fbbf0b36d617771544ddb70c4238ccda0dcf39",
+        "signedSHA256": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca",
+        "normalizedPayloadSHA256": "e30d8fc50f7fbd2157d982a37155c3f050d67efc0049edbda7c1e6c38a513926"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "629b7fbce566a6636787141aea031bb46f3d15009489914dff212d85326e7904",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "0d34faeb406a002a427f7a2ddb42f339a1ff90282fb7455df306732384fb3339",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "terminal": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca",
+    "trials": [
+      {
+        "action": "create",
+        "exitCode": 130,
+        "wallSeconds": 1.0315091249067336,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 69849,
+          "helperGroup": 69849,
+          "foregroundGroup": 69847,
+          "CLIGroup": 69847
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "unlock",
+        "exitCode": 130,
+        "wallSeconds": 0.9387108748778701,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "owned native helper",
+          "helperPID": 69965,
+          "helperGroup": 69965,
+          "foregroundGroup": 69959,
+          "CLIGroup": 69959
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      },
+      {
+        "action": "lock",
+        "exitCode": 130,
+        "wallSeconds": 0.6539806250948459,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 70007,
+          "CLIGroup": 70007
+        },
+        "outputSHA256": "fd69b8a71c52c538eb9f9b86d6969bcdc5e89429bfe6cf9aaba8f6a76da9d8e3",
+        "ownedImageAttachedAfterExit": false
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "state": "completed",
+    "immediateRecoveryPassed": true,
+    "sourceHistoryPreserved": true,
+    "noOwnedImagesAfterFinalLock": true,
+    "passphrasePersisted": false
+  },
+  "heldReaderTerminal": {
+    "format": "OSwind private controlling-PTY cooperative cancellation v1",
+    "binarySHA256": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca",
+    "trials": [
+      {
+        "action": "lock",
+        "exitCode": 1,
+        "wallSeconds": 0.6130604578647763,
+        "terminalCtrlC": true,
+        "observed": {
+          "boundary": "persisted closing phase",
+          "foregroundGroup": 70116,
+          "CLIGroup": 70116
+        },
+        "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+        "ownedImageAttachedAfterExit": true
+      }
+    ],
+    "scope": "Actual VINTR Ctrl-C from a new private controlling PTY. Secret uses a separate closed pipe because CLI refuses interactive password stdin. Owned synthetic encrypted packages only; no user terminal, credentials, Keychain, TCC, forced detach or power changes.",
+    "normalRecoveryDetached": true,
+    "recoveredHistoryPreserved": true,
+    "state": "completed",
+    "busyFailurePreserved": true
+  },
+  "ordinaryCLI": {
+    "state": "completed",
+    "scope": "Owned native encrypted-library CLI flow. No Keychain, normal library or native user-auth/TCC changes.",
+    "checks": [
+      "create initializes and detaches, public handle closed",
+      "closed handle refuses plaintext fallback",
+      "wrong passphrase refused without attachment",
+      "managed handle writes and retrieves on verified volume",
+      "import and standalone Whisper workspaces remain in managed volume and clean on exit",
+      "explicit plaintext backup/Markdown export, private source staging cleaned",
+      "held reader keeps mounted closing state; no forced detach or plaintext reopening",
+      "retry detaches after reader closes",
+      "verified native migration remounts with history and retains original",
+      "missing source refuses before destination creation",
+      "renamed attached package remains visibly attached despite stale OS image path",
+      "moved package closes public handle and normally unmounts/ejects verified backing device",
+      "unmounted filesystem remains pending until remaining encrypted image detaches; original history survived remount"
+    ],
+    "binary_sha256": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca",
+    "schema_version": 22,
+    "old_writer_check": "not requested; pass --old-cli with a pinned older binary",
+    "verified_detached": true,
+    "passphrase_persisted": false,
+    "normal_library_opened": false,
+    "cleanup_detached": true
+  },
+  "observedHelperInterruptions": {
+    "state": "completed",
+    "binary_sha256": "1f87285571fbef96d4f1a8a89f3a8475a21518fcbac769cff3322dac5842b2ca",
+    "scope": "Actual SIGINT during observed owned hdiutil create/attach helpers; random in-memory passphrase, no Keychain or normal library",
+    "checks": [
+      {
+        "action": "create",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "create",
+        "still_attached": false,
+        "stdout_empty": true
+      },
+      {
+        "action": "unlock",
+        "exit_code": 130,
+        "owned_helper_observed_before_interrupt": true,
+        "helper_action": "attach",
+        "still_attached": false,
+        "stdout_empty": true
+      }
+    ],
+    "recovery_unlock_and_lock_passed": true,
+    "passphrase_persisted": false
+  },
+  "unchangedDevelopmentHeldReaderRepetitions": [
+    {
+      "reportSHA256": "50171b84e81bdc676d1dc0fe4c58e25f898c8851c5dbcff70bcc9481f0e3a514",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.6040212910156697,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 55610,
+            "CLIGroup": 55610
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    },
+    {
+      "reportSHA256": "c8b0929753c1dce1e1a7b10f93821589bc4e9dc652f9d87308b13ea52915db38",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.6033627910073847,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 55731,
+            "CLIGroup": 55731
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    },
+    {
+      "reportSHA256": "2fca6102183fcefe0f50fb13b5989722ad0c59aa71b138156909400657fe971e",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.6211369161028415,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 55851,
+            "CLIGroup": 55851
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    },
+    {
+      "reportSHA256": "ae4c45daa753bde6f5b46ccef2a869e9052cf6ed14d734e7e14cb2464f0860fa",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.6095839589834213,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 55969,
+            "CLIGroup": 55969
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    },
+    {
+      "reportSHA256": "1a194e58c61ad6be5df1319208486a16433bf5b8ccea1d7f72a042763381dbaf",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.5866924170404673,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 56086,
+            "CLIGroup": 56086
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    },
+    {
+      "reportSHA256": "3bdab1887ad996d86728d9e3bf3a2a19361a9c88dd10c8c0f712ebb3248f5405",
+      "trials": [
+        {
+          "action": "lock",
+          "exitCode": 1,
+          "wallSeconds": 0.5841842498630285,
+          "terminalCtrlC": true,
+          "observed": {
+            "boundary": "persisted closing phase",
+            "foregroundGroup": 56205,
+            "CLIGroup": 56205
+          },
+          "outputSHA256": "fd76da0fab814d3ef5b131ac731b022f95fdb8d3ca496614fe3286d19fab95e1",
+          "ownedImageAttachedAfterExit": true
+        }
+      ],
+      "normalRecoveryDetached": true,
+      "recoveredHistoryPreserved": true
+    }
+  ],
+  "componentSignalObservationSHA256": "02b8ec28aaa8d4c5ff040584a2cedb2fb28b1ece707a77418b5dd1b3e8ae190f",
+  "componentProbeSources": {
+    "benchmarks/prototypes/vault-signal/FoundationInfoProbe.swift": "32cc9922802c49d55fa1da5ebd35d75a51aa65e6d44a20fd2ca5e103f3b2b60b",
+    "benchmarks/prototypes/vault-signal/probe.py": "83c6ebad514733b62dd81801fd84f6a62c00b46efc60259feaccf2fab39fa118"
+  },
+  "finalProof": {
+    "recordedAtUTC": "2026-10-29T09:49:12.709361+00:00",
+    "source": "1de936afe68efd75450292e1566dfa89222f4878",
+    "packagingSource": "1de936afe68efd75450292e1566dfa89222f4878",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "postDiagnosticProof": {
+    "recordedAtUTC": "2026-10-29T09:51:44.091482+00:00",
+    "source": "1de936afe68efd75450292e1566dfa89222f4878",
+    "packagingSource": "1de936afe68efd75450292e1566dfa89222f4878",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "retainedFailures": [
+    {
+      "scope": "Preceding label-only helper regression",
+      "defined": 1,
+      "reportedAssertions": 2,
+      "logSHA256": "e8618336d543ea8cd76fd895b1b9c09e4fd3963c3d9248bf99537da89add56e3"
+    },
+    {
+      "scope": "First diagnostic parser expected line-separated JSON; terminal flush dropped a separator between complete objects; no helper failure inferred",
+      "logSHA256": "f63166f7680db788b8a0aeb0167fbcb9dfcef19aa0acaeecf9f10b1d7beba520"
+    },
+    {
+      "scope": "PR77 signed held-reader terminal status2 remains ambiguous because old product discarded reason",
+      "source": "7621eb8838ce56cb85a46e7cfba83e15346210f0",
+      "reportSHA256": "2ab005effb55d561b7797e90febf78fcf393c8b2aebd6343a612ce691ccb25f3"
+    }
+  ],
+  "limitations": [
+    "Two normal skips: physical owned system-audio and unavailable visual session admission",
+    "Precompiled native/framework internals are outside TSan coverage; Core ML warnings remain in raw full log",
+    "Normal full suite preserves 432 existing short PII backend comparisons, not new privacy quality acceptance",
+    "Probe hdiutil signal2 is established only for that component run; historical encrypted-vault status2 cannot be retrospectively classified",
+    "Passing terminal repetitions and current qualification do not estimate failure probability or repair older failures",
+    "No new UI/physical capture, authentication, sleep, power, competitor workload, sync, notarization, release acceptance or prior default-library audit"
+  ],
+  "trackerFollowup": {
+    "scope": "Documentation renderer/probe follow-up; product qualification remains source1de936a",
+    "canonicalJSONUnchangedOnRender": true,
+    "allOther75FeatureRowsUnchanged": true,
+    "allStatusesUnchanged": true,
+    "vendorsUnchanged": true,
+    "requirements": 76,
+    "offerings": 16,
+    "statusCounts": {
+      "live verified": 4,
+      "partial": 36,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 5,
+      "out of v0 desktop scope": 2
+    },
+    "inputSHA256": {
+      "docs/features.json": "2c2b6a39aefa6d2a069666bc77bd2a9f0102db1a003c8fce836f04f4af225d7d",
+      "docs/landscape.json": "67f6b21f433603da2515de21b894eb01d9fbc0fbcca0f2372d6cc2318294bb68"
+    },
+    "HTMLSHA256": "fb8818c51512cfd00dd17b4d72cfd7929b083d02a3ac57b75c9ac199a0f7b5ae",
+    "desktopAndNarrowBrowserReview": true,
+    "observedNarrowCSSViewport": 487,
+    "narrowPageWidth": 487,
+    "filterChecks": [
+      "Encrypted vault selects F048 only",
+      "TODO selects F013 F047 F059 F067 F071"
+    ],
+    "temporaryViewportReset": true,
+    "previewTabsClosed": true,
+    "limits": [
+      "Requested390 viewport is observed as487 CSS pixels in IAB; no exact390 CSS-width claim",
+      "Initial resize screenshot blank; fresh narrow tab produces visible inspected layout",
+      "Copy control not invoked"
+    ]
+  },
+  "deliveryAudit": {
+    "recordedAtUTC": "2026-10-29T09:58:24.897614+00:00",
+    "source": "1de936afe68efd75450292e1566dfa89222f4878",
+    "packagingSource": "1de936afe68efd75450292e1566dfa89222f4878",
+    "installedAppBytesUnchanged": true,
+    "stagedBundleTreeUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    },
+    "trackedProductInputsUnchangedFromQualifiedSource": true
+  },
+  "sourceCIObservation": {
+    "recordedAtUTC": "2026-10-29T09:59:18.811569+00:00",
+    "commit": "1de936afe68efd75450292e1566dfa89222f4878",
+    "run": 40851077518,
+    "benchmarkJob": {
+      "id": 123370401510,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "nativeJob": {
+      "id": 123370401920,
+      "status": "in_progress",
+      "conclusion": null,
+      "lastObservedStep": "Package app"
+    },
+    "laterDocumentationHeadCISeparate": true
+  }
+}

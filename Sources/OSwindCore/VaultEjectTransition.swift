@@ -27,14 +27,14 @@ enum VaultEjectTransition {
             try await VaultDetachSettlement.inspectAfterFailure(expected:verified,validate:validate,inspect:observe)
         }
         let first=try await detach(verified.attachmentDevice,verified.root?.device)
-        if first.status != 0,let current=try await afterFailure() {
+        if !first.succeeded,let current=try await afterFailure() {
             let actual=try expectedImage().standardizedFileURL.resolvingSymlinksInPath()
             guard verified.mounted,current.mounted,
                   URL(fileURLWithPath:verified.reportedImagePath).standardizedFileURL.resolvingSymlinksInPath() != actual,
                   verified.sameIdentity(as:current) else {throw VaultNativeFailure(operation:.imageDetach,result:first)}
             try validate()
             let result=try await unmount(current.mount,current.root?.device)
-            if result.status != 0 {
+            if !result.succeeded {
                 if try await afterFailure()==nil {try await confirmDetached();return}
                 throw VaultNativeFailure(operation:.filesystemUnmount,result:result)
             }
@@ -42,7 +42,7 @@ enum VaultEjectTransition {
             guard let unmounted else {try await confirmDetached();return}
             guard !unmounted.mounted,verified.sameIdentity(as:unmounted,allowUnmounted:true) else {throw OSwindError.invalid("The unmounted attachment changed. Its remaining device was preserved.")}
             let final=try await detach(unmounted.attachmentDevice,verified.root?.device)
-            if final.status != 0 {
+            if !final.succeeded {
                 if try await afterFailure() != nil {throw VaultNativeFailure(operation:.imageDetach,result:final)}
             }
         }

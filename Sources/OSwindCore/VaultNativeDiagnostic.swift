@@ -10,8 +10,10 @@ enum VaultNativeOperation:String,Codable,Sendable {
 /// output text or timestamps. A nonzero native status is not proof of EBUSY.
 struct VaultNativeSummary:Codable,Equatable,Sendable {
     let operation:VaultNativeOperation,status:Int32,stdoutBytes:Int,stderrBytes:Int,stdoutSHA256:String,stderrSHA256:String
+    let termination:VaultProcessTermination
     init(operation:VaultNativeOperation,result:VaultProcessResult) {
         self.operation=operation;status=result.status;stdoutBytes=result.stdout.count;stderrBytes=result.stderr.count
+        termination=result.termination
         stdoutSHA256=BackupSHA256.hex(result.stdout);stderrSHA256=BackupSHA256.hex(result.stderr)
     }
 }
@@ -35,7 +37,7 @@ struct VaultNativeFailure:Error,LocalizedError,CustomStringConvertible,CustomDeb
         summary=VaultNativeSummary(operation:operation,result:result);self.invalidOutput=invalidOutput
     }
     var errorDescription:String? {
-        let code="\(summary.operation.tool) exit \(summary.status)"
+        let code="\(summary.operation.tool) \(summary.termination.label) \(summary.status)"
         switch summary.operation {
         case .attachmentInventory:return "Cannot inspect encrypted disk attachments (\(code)\(invalidOutput ? ", invalid inventory":"")). Check vault status before retrying."
         case .volumeInfo:return "Cannot verify the attached APFS volume (\(code)\(invalidOutput ? ", invalid volume information":"")). Its protected state is unconfirmed."

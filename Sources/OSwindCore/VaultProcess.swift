@@ -1,7 +1,18 @@
 import Foundation
 import Darwin
 
-struct VaultProcessResult:Sendable {var status:Int32;var stdout:Data;var stderr:Data}
+enum VaultProcessTermination:String,Codable,Sendable {
+    case exit,signal,unknown
+    init(_ reason:Process.TerminationReason) {
+        switch reason {case .exit:self = .exit;case .uncaughtSignal:self = .signal;@unknown default:self = .unknown}
+    }
+    var label:String {switch self {case .exit:return "exit";case .signal:return "signal";case .unknown:return "termination status"}}
+}
+struct VaultProcessResult:Sendable {
+    var status:Int32;var stdout:Data;var stderr:Data
+    var termination:VaultProcessTermination = .exit
+    var succeeded:Bool {termination == .exit && status==0}
+}
 /// Native helper output may include paths, but never emit the passphrase or
 /// command output into public logs. No shell, environment password or key argv.
 enum VaultProcess {
@@ -47,7 +58,7 @@ enum VaultProcess {
             while process.isRunning {drain(output.fileHandleForReading,stdout);drain(error.fileHandleForReading,stderr);guard !stdout.oversized,!stderr.oversized else {throw OSwindError.unavailable("Encrypted-library system output exceeded its limit")};try Task.checkCancellation();guard ContinuousClock.now<deadline else {throw OSwindError.unavailable("Encrypted-library system operation timed out. Check its status before retrying.")};Thread.sleep(forTimeInterval:0.02)}
             for _ in 0..<32 {drain(output.fileHandleForReading,stdout);drain(error.fileHandleForReading,stderr)}
             guard !stdout.oversized,!stderr.oversized else {throw OSwindError.unavailable("Encrypted-library system output exceeded its limit")}
-            try Task.checkCancellation();return .init(status:process.terminationStatus,stdout:stdout.data,stderr:stderr.data)
+            try Task.checkCancellation();return .init(status:process.terminationStatus,stdout:stdout.data,stderr:stderr.data,termination:VaultProcessTermination(process.terminationReason))
         }
         return try await withTaskCancellationHandler {
             let result=try await job.value
@@ -90,13 +101,13 @@ struct NativeVaultDriver:Sendable {
         if let observer {let elapsed=start.duration(to:.now).components;observer(.init(operation:operation,result:result,durationSeconds:Double(elapsed.seconds)+Double(elapsed.attoseconds)/1e18))};return result
     }
     static func attachmentList(_ result:VaultProcessResult)throws->[[String:Any]] {
-        guard result.status==0 else {throw VaultNativeFailure(operation:.attachmentInventory,result:result)}
+        guard result.succeeded else {throw VaultNativeFailure(operation:.attachmentInventory,result:result)}
         guard let data=try? PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any],
               let images=data["images"] as? [[String:Any]] else {throw VaultNativeFailure(operation:.attachmentInventory,result:result,invalidOutput:true)}
         return images
     }
     static func encryptionFlag(_ result:VaultProcessResult)throws->Bool {
-        guard result.status==0 else {throw VaultNativeFailure(operation:.encryptionProbe,result:result)}
+        guard result.succeeded else {throw VaultNativeFailure(operation:.encryptionProbe,result:result)}
         guard let object=try? PropertyListSerialization.propertyList(from:result.stdout,format:nil) as? [String:Any],
               let encrypted=object["encrypted"] as? Bool else {throw VaultNativeFailure(operation:.encryptionProbe,result:result,invalidOutput:true)}
         return encrypted
@@ -106,7 +117,7 @@ struct NativeVaultDriver:Sendable {
     }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
         let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
-        guard result.status==0 else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
+        guard result.succeeded else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
         try Self.encryptionFlag(await observed(.encryptionProbe,"/usr/bin/hdiutil",["isencrypted","-plist",paths.image.path]))
@@ -122,7 +133,7 @@ struct NativeVaultDriver:Sendable {
     private func attachAndProve(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         do {
             let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
-            guard r.status==0 else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}
+            guard r.succeeded else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}
             guard let proof=try await attachment(paths:paths),proof.mounted,proof.mount.standardizedFileURL==mount.standardizedFileURL else {throw OSwindError.invalid("The attached vault did not match its requested location")};return proof
         } catch {
             let driver=self
@@ -168,7 +179,7 @@ struct NativeVaultDriver:Sendable {
         }
         guard let device=volume["dev-entry"] as? String,device.hasPrefix("/dev/disk") else {throw OSwindError.invalid("Cannot identify the encrypted volume device")}
         let disk=try await observed(.volumeInfo,"/usr/sbin/diskutil",["info","-plist",device])
-        guard disk.status==0 else {throw VaultNativeFailure(operation:.volumeInfo,result:disk)}
+        guard disk.succeeded else {throw VaultNativeFailure(operation:.volumeInfo,result:disk)}
         guard let metadata=try? PropertyListSerialization.propertyList(from:disk.stdout,format:nil) as? [String:Any],let uuid=metadata["VolumeUUID"] as? String,UUID(uuidString:uuid) != nil,metadata["FilesystemType"] as? String=="apfs",metadata["DeviceIdentifier"] as? String==String(device.dropFirst(5)) else {throw VaultNativeFailure(operation:.volumeInfo,result:disk,invalidOutput:true)}
         let stamp=try BackupFileTree(root:paths.image).identity(),matchesPath=URL(fileURLWithPath:reported).standardizedFileURL.resolvingSymlinksInPath()==expectedImage
         if !matchesPath {
