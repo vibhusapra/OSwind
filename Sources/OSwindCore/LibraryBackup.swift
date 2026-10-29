@@ -54,6 +54,7 @@ final class BackupDataReader {
         if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
         if schema>=15 {try db.requireTable("recap_sources")}
         if schema>=22 {try db.requireTable("entity_project_ignored")}
+        if schema>=23 {try db.requireTable("pii_scan_records")}
         if schema>=21 {for name in ["memory_entities","entity_aliases","entity_mentions","entity_index_state","entity_ignored"] {try db.requireTable(name)}}
         if schema>=19 {for name in ["visual_sources","visual_manifests","visual_vectors"] {try db.requireTable(name)}}
         guard try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED WHERE length(payload)>\(MemoryStore.maximumRecordBytes)")==0 else { throw BackupFileError.invalid("A source payload exceeds the backup format's 128 MiB record bound") }

@@ -54,7 +54,7 @@ private final class RestoreRows {
         guard result.allSatisfy(\.isFinite) else { throw BackupFileError.invalid("Invalid restored vector values") }; return result
     }
     func rows(_ table: String, columns: String, _ body: (OpaquePointer) throws -> Void) throws -> Int64 {
-        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests","memory_entities","entity_aliases","entity_mentions","entity_ignored","entity_project_ignored"]
+        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests","memory_entities","entity_aliases","entity_mentions","entity_ignored","entity_project_ignored","pii_scan_records"]
         guard allowed.contains(table) else { throw BackupFileError.invalid("Unsupported restore table") }
         let statement = try source.db.prepare("SELECT \(columns) FROM \(table) NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(statement) }
         var count: Int64 = 0, status = sqlite3_step(statement)
@@ -183,11 +183,29 @@ private final class RestoreRows {
             guard code==SQLITE_DONE else {throw db.error()}
         }
     }
+    func restorePIIScanRecords(into handle:OpaquePointer) throws {
+        guard source.schema>=23 else {return}
+        _ = try copy("pii_scan_records",columns:["memory_id","content_sha256","is_current","receipt"],into:handle,validate:{row in
+            let id=try self.source.db.text(row,0),digest=try self.source.db.text(row,1),flag=try self.integer(row,2)
+            guard !id.isEmpty,id.count<200,digest.utf8.count==64,digest.utf8.allSatisfy({(48...57).contains($0)||(97...102).contains($0)}),[0,1].contains(flag),sqlite3_column_bytes(row,3)>0,sqlite3_column_bytes(row,3)<=8192 else {throw BackupFileError.invalid("Invalid PII import-check record bounds")}
+            _ = try self.cachedMemory(id)
+        },afterBind:{row,insert in
+            // A backup carries a historical library record, not a fresh scan.
+            // Only a supported record matching the restored text stays current.
+            let bytes=try self.payload(row,3),id=try self.source.db.text(row,0),digest=try self.source.db.text(row,1)
+            let memory=try self.cachedMemory(id)
+            var current=false
+            if try self.integer(row,2)==1,let record=try? JSONDecoder().decode(PIIScanRecord.self,from:bytes),record.valid,record.contentSHA256==digest,
+               let actual=try? PIIScanContent.digest(memory),actual==digest {current=true}
+            guard sqlite3_bind_int(insert,3,current ? 1:0)==SQLITE_OK else {throw OSwindError.database("Cannot restore PII check validity")}
+        })
+    }
     func restore(into handle: OpaquePointer, progress: (LibraryBackupProgress) throws -> Void) throws {
         _ = try memories { try progress(LibraryBackupProgress(phase:"Restoring sources",completedItems:$0,unit:"records")) }
         try destination.rebuildRecapLinks()
         try restoreVisualIndexes(into:handle)
         try restoreEntities(into:handle)
+        try restorePIIScanRecords(into:handle)
         _ = try copy("semantic_vectors",columns:["memory_id","model","dimension","vector","content_hash"],into:handle,validate:{ row in
             let id = try self.source.db.text(row,0), hash = try self.source.db.text(row,4), dimension = try self.integer(row,2)
             guard (1...8192).contains(dimension), hash == (try self.hashes.hash(id)) else { throw BackupFileError.invalid("Restored vector source hash differs") }

@@ -59,6 +59,7 @@ Twelve owned native Settings renders cover idle, prepared, failure, busy, stoppi
 - [ ] Treat actual image/audio/video content and verify no sensitive media retention.
 - [ ] Protect remote-model egress and exports consistently without implying imports cover those paths.
 - [ ] Profile actual Core ML operator placement and fallback costs before making a GPU/ANE execution claim.
-- [ ] Add model/settings provenance per persisted record, migration/reindex/rescan controls, throughput and physical power measurements.
+- [x] Model/compute/threshold/time and content-bound per-memory import-check records: [PII-SCAN-RECORDS.md](PII-SCAN-RECORDS.md). These are descriptive, not a privacy-acceptance result.
+- [ ] Saved admission-policy provenance and reindex/rescan controls for broader capture/egress workflows; representative throughput and physical power measurements.
 - [ ] Finish the broader all-writer admission audit, including CLI note preparation.
 - [ ] Resolve the independent encrypted-image detach failure: PR83 source94f60b0 CI passed, but publication28a95f8 run40889784746 failed `NativeVaultQueryRecoveryTests` line94 on normal `hdiutil` exit16. The cause remains unproven; no forced detach or altered cleanup policy was added.

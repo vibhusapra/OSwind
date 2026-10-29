@@ -489,6 +489,9 @@ do {
             if args.contains("--use-model") { settings.search = configuration; try settings.save(root:root) }
             try emit(store.semanticIndexes())
         case "config": try encoded(AppSettings.load(root:root))
+        case "privacy-status":
+            guard args.count==1 else {throw OSwindError.invalid("Use privacy-status MEMORY_ID")}
+            try encoded(store.piiScanStatus(args[0]))
         case "get":
             guard args.count==1 else {throw OSwindError.invalid("Use get MEMORY_ID")}
             guard let memory=try store.get(args[0]) else {throw OSwindError.invalid("Memory not found")}

@@ -53,7 +53,11 @@ import UniformTypeIdentifiers
     @Published var hits = [SearchHit]()
     @Published var stats = StoreStats()
     @Published var storageUpdatedAt: Date?
-    @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil}}}
+    @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil};refreshSelectedPIIScan()}}
+    @Published var selectedPIIScan:PIIScanStatus?
+    @Published var selectedPIIScanError:String?
+    private var piiScanStatusTask:Task<Void,Never>?
+    private var piiScanStatusGeneration=UUID()
     @Published private(set) var openingMemoryID:String?
     private var detailTask:Task<Void,Never>?
     private var detailGeneration=UUID()
@@ -275,6 +279,28 @@ import UniformTypeIdentifiers
     }
     @Published var selectedPassage: PassageRange?
     @Published var selectedVisual:VisualMatch?
+    @discardableResult func refreshSelectedPIIScan(read:(@Sendable (Memory)throws->PIIScanStatus)?=nil) -> Task<Void,Never>? {
+        piiScanStatusTask?.cancel();piiScanStatusTask=nil;piiScanStatusGeneration=UUID()
+        selectedPIIScan=nil;selectedPIIScanError=nil
+        guard let memory=selected else {return nil}
+        let store=self.store,generation=piiScanStatusGeneration
+        let worker=Task.detached(priority:.utility) {
+            try Task.checkCancellation()
+            if let read {return try read(memory)}
+            return try store.piiScanStatus(memory.id,matching:memory)
+        }
+        piiScanStatusTask=Task {[weak self] in
+            do {
+                let value=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
+                guard let self,!Task.isCancelled,self.piiScanStatusGeneration==generation,self.selected?.id==memory.id else {return}
+                self.selectedPIIScan=value;self.piiScanStatusTask=nil
+            } catch {
+                guard let self,!Task.isCancelled,self.piiScanStatusGeneration==generation,self.selected?.id==memory.id else {return}
+                self.selectedPIIScanError="The local import-check record is unavailable.";self.piiScanStatusTask=nil
+            }
+        }
+        return piiScanStatusTask
+    }
     func cancelOpeningMemory() {
         detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
     }

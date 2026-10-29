@@ -1,0 +1,188 @@
+{
+  "format": "OSwind primary-source competitor check and expansion queue",
+  "version": 1,
+  "checked": "2026-10-29",
+  "scope": "Documentation rechecks and four additional comparators; no application installs, purchases, agreements, code reuse or runtime measurements.",
+  "canonicalMatrix": "landscape.json",
+  "canonicalVendorCount": 16,
+  "canonicalVendorsUnchanged": true,
+  "existingChecks": [
+    {
+      "name": "Screenpipe",
+      "sources": [
+        "https://screenpipe.com/onboarding",
+        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md"
+      ],
+      "observation": "Annual pricing still displays Basic $250 and Business $500/seat. Free history is limited. The source license distinguishes official builds from commercial source builds and restricts competing-product use without a commercial license. No code copied or runtime tested."
+    },
+    {
+      "name": "Original Rewind / Limitless",
+      "sources": [
+        "https://www.limitless.ai/",
+        "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info"
+      ],
+      "observation": "Homepage timed out twice. The September 9, 2026 help article describes account exports containing transcripts, chats and optional audio, with smaller date-range exports suggested for large histories. Current homepage/service/pricing was not reverified."
+    },
+    {
+      "name": "Rewind Desktop (rewind.app)",
+      "sources": [
+        "https://rewind.app/",
+        "https://rewind.app/blog/rewind-vs-rewind-desktop"
+      ],
+      "observation": "Homepage still describes local screen history and optional encrypted user-owned S3 archive with on-demand older video. The comparison URL returned a cache miss; the prior $30/month comparison claim was not freshly confirmed."
+    },
+    {
+      "name": "Pieces",
+      "sources": [
+        "https://pieces.app/pricing"
+      ],
+      "observation": "Monthly Pro $18.99/user and Enterprise $22.99/user, 7-day card-required trial, no free plan stated. On-device memory, recaps and MCP are advertised; Enterprise adds organization policy and provider/API-key controls."
+    },
+    {
+      "name": "Littlebird",
+      "sources": [
+        "https://littlebird.ai/pricing",
+        "https://littlebird.ai/privacy"
+      ],
+      "observation": "Basic is free; displayed annual Plus is $204 ($17/month equivalent), Power $510 ($42.50/month equivalent); Pro starts at $100/month. Team starts at $17/seat/month annual, Enterprise custom. Privacy page says data is stored on US-East AWS and selected context goes to AI providers; active-app-only and exclusion claims are vendor statements."
+    },
+    {
+      "name": "Microsoft Recall",
+      "sources": [
+        "https://support.microsoft.com/en-us/windows/ai/ai-features/retrace-your-steps-with-recall"
+      ],
+      "observation": "Publisher documentation describes opt-in local encrypted snapshots, semantic/visual recall, Windows Hello and Copilot+ hardware requirements. This is a Windows comparator, not a Mac runtime tested here."
+    },
+    {
+      "name": "ScreenMemory",
+      "sources": [
+        "https://screenmemory.app/"
+      ],
+      "observation": "Standard $29 includes one year of updates, optional $5/year renewals; Lifetime $39. Free copy simultaneously lists 24-hour and unlimited history, so the inconsistency remains unresolved. Local OCR, timeline/calendar and application exclusions are advertised."
+    },
+    {
+      "name": "TimeScroll",
+      "sources": [
+        "https://timescroll.muzhen.org/"
+      ],
+      "observation": "Site describes free native Swift/macOS14+, on-device MobileCLIP2 or local Ollama semantic search, AX/direct mode, thermal/duplicate backoff, local Whisper audio, MCP and an encrypted-vault beta. No power or privacy result independently measured."
+    },
+    {
+      "name": "Retrace (haseab)",
+      "sources": [
+        "https://github.com/haseab/retrace"
+      ],
+      "observation": "README identifies an early-development MIT project with periodic screenshots, Vision OCR, filtered search/timeline, analytics and resumable original-Rewind import. Repository claims, not executed acceptance."
+    },
+    {
+      "name": "Retrace (jhammant)",
+      "sources": [
+        "https://github.com/jhammant/retrace"
+      ],
+      "observation": "README identifies Apache-2.0, macOS/Windows local capture and OS-native processing. It describes discarding raw frames after processing while retaining text, thumbnails and metadata. Cached documentation can lag current HEAD; no runtime or test claims independently reproduced."
+    },
+    {
+      "name": "rem",
+      "sources": [
+        "https://github.com/jasonjmcghee/rem"
+      ],
+      "observation": "README still describes an early local screen-memory project and asks for contributors. Repository labels MIT; no current packaged-app benchmark performed."
+    },
+    {
+      "name": "Unlost",
+      "sources": [
+        "https://github.com/Vincent-liuwingsang/unlost"
+      ],
+      "observation": "README labels Apache-2.0 and describes semantic/natural-language app/date search, screenshot text cropping and meeting transcripts. It marks local/provider LLM/agent and remote-storage integrations as future work; do not treat the roadmap as shipped."
+    },
+    {
+      "name": "Pensieve (formerly Memos)",
+      "sources": [
+        "https://github.com/arkohut/pensieve"
+      ],
+      "observation": "README describes local full-text/vector retrieval, chronological entity context, browser metadata, Ollama/OpenAI-compatible processing and plugins. It now advertises a v0.33 agent skill. Installing or benchmarking the current release was not part of this check."
+    },
+    {
+      "name": "Minne",
+      "sources": [
+        "https://minne.sh/"
+      ],
+      "observation": "Site describes AX-based personal context, contextual drafting, a user-owned wiki, local MCP, optional local Ollama and external inference choices. It labels MIT and free. No local execution or inference-egress audit performed."
+    },
+    {
+      "name": "Omi",
+      "sources": [
+        "https://get.omi.me/"
+      ],
+      "observation": "Wearable homepage advertises a free plan and unlimited on-phone transcription. This does not verify current desktop-plan allowances; do not substitute wearable marketing for desktop pricing or behavior."
+    },
+    {
+      "name": "Granola",
+      "sources": [
+        "https://www.granola.ai/pricing"
+      ],
+      "observation": "Page displays Basic $0 with limited history, Business $14 and Enterprise $35/user/month. Business adds unlimited history, integrations, MCP/API; Enterprise adds policy/SSO/admin controls. No billing or runtime acceptance performed."
+    }
+  ],
+  "additionalComparators": [
+    {
+      "name": "OpenRecall",
+      "sources": [
+        "https://github.com/openrecall/openrecall",
+        "https://github.com/openrecall/openrecall/wiki/FAQ"
+      ],
+      "licenseClaim": "AGPL-3.0 (repository label)",
+      "plan": "Open-source project; no subscription price established by these sources",
+      "platform": "macOS, Windows, Linux; Python 3.11",
+      "features": "Periodic screenshots, local OCR, semantic history search and browser-based recall UI.",
+      "difference": "A direct screenshot-memory comparator missing from the 16-offering matrix.",
+      "limits": "No installation, code reuse or runtime benchmark. Review pinned version, license and model setup before a comparison."
+    },
+    {
+      "name": "OpenHistory",
+      "sources": [
+        "https://openhistory.sh/",
+        "https://github.com/ztratar/openhistory"
+      ],
+      "licenseClaim": "MIT (repository label)",
+      "plan": "Source/download available; paid plan not established by reviewed sources",
+      "platform": "macOS14+; Apple on-device summaries require compatible Apple Intelligence/macOS26+",
+      "features": "Permitted foreground AX context, no screenshots/audio/key logging; timeline, hourly/day summaries, optional inference providers and authenticated read-only local MCP.",
+      "difference": "A text-only, low-capture-surface comparator relevant to light mode and explicit cloud consent.",
+      "limits": "README contains both source-install and download language. Distribution, energy, privacy and runtime claims remain untested."
+    },
+    {
+      "name": "silverfish",
+      "sources": [
+        "https://github.com/KonstantinKo/silverfish"
+      ],
+      "licenseClaim": "Apache-2.0 (repository label)",
+      "plan": "Source project; no subscription established",
+      "platform": "macOS Apple Silicon",
+      "features": "AX text/metadata to SQLite FTS5; local Ollama, hardware/model-slot onboarding, hierarchical summaries, graph/wiki/profile, chat/drafting and MCP.",
+      "difference": "Useful reference for model-role setup and text-only local operation; no traction/rank inference from repository existence.",
+      "limits": "Cached README inspected, not code/runtime. Existing-database import and loopback-only inference are project claims, not verified interoperability/security results."
+    },
+    {
+      "name": "Goldfish (goldfish.sh)",
+      "sources": [
+        "https://goldfish.sh/",
+        "https://goldfish.sh/privacy"
+      ],
+      "licenseClaim": "No open-source license established from reviewed primary pages",
+      "plan": "Free during beta; post-beta price not published on reviewed homepage",
+      "platform": "macOS and Windows",
+      "features": "AX text capture, on-device SQLite memory, contextual replies/chat and AI-tool integrations. Policy describes Cloudflare/Azure AI processing for user requests and background organization, plus dictation.",
+      "difference": "Local storage is distinct from local inference. Pattern masking explicitly preserves names, emails, phones, addresses and dates of birth for context.",
+      "limits": "Vendor policy claims, not independently audited. Not the unrelated coding-memory plugins or forensic tools named Goldfish."
+    }
+  ],
+  "canonicalIntegrationPending": true,
+  "rankingAccepted": false,
+  "remaining": [
+    "Integrate the four additional profiles into the human-facing matrix with an independently verified renderer revision.",
+    "Reverify unavailable pricing/service pages; distinguish cached source evidence from live HEAD.",
+    "Pin permissible versions and agree a reproducible owned workload before actual competitor benchmarks.",
+    "Do not infer privacy, energy, latency or accuracy from vendor documentation."
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "format": "OSwind schema23 process-fixture correction qualification",
+  "version": 1,
+  "date": "2026-10-29",
+  "productCommit": "08398188671f6be36098b929990aac4c3d71ec6d",
+  "fixtureCommit": "e243f84c4263576a51df9206c1f30a5d787825d3",
+  "previousPublication": "effbfb2754fe363bfe75c5d79779ab0e4fba1a45",
+  "cliSHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+  "state": "completed",
+  "scope": "Six strict process harnesses now expect schema23. Only version expectations and descriptions change; older input versions, source/SQL/settings/backup/refusal assertions and product code remain unchanged. Newly owned fixture libraries; no competitive, power or desktop-capture acceptance.",
+  "changes": [
+    {
+      "path": "scripts/capture-region-smoke.py",
+      "oldSHA256": "4c66dafd99c3fcd89e3fdfc69f7324b0bd08a8273db37c964683bfcaa1c59600",
+      "newSHA256": "89b293acdcaef39a8e2b8f70939f25ddfca09bb92a3ad9a90bf33859b5e3c4f0"
+    },
+    {
+      "path": "scripts/entity-memory-smoke.py",
+      "oldSHA256": "2eff466eef98c022704c612f2d20ef69402e6084c13044d0477f88ff152185d8",
+      "newSHA256": "3f1e3cb3e212a81218a38fbf4749367a2c45a925824cdd361f56292f039efe5a"
+    },
+    {
+      "path": "scripts/entity-vault-smoke.py",
+      "oldSHA256": "2b7a3c184fd77ae256b4f0571b06456b1441118516a8328efbf95b249912ac33",
+      "newSHA256": "c7cc62d2320309a7129884778ae1eb23c81b505e30ae1f010e5676190b16475c"
+    },
+    {
+      "path": "scripts/project-corrections-smoke.py",
+      "oldSHA256": "70ce507e78a34f97db5718c93d74c2d2f70ea24165e3a1e81ad810a217416c2f",
+      "newSHA256": "afe7f4b1abb82db6f950db6dd19c159b29d469fbdabb360bdc499a53d40b8800"
+    },
+    {
+      "path": "scripts/tag-index-smoke.py",
+      "oldSHA256": "1731663b205284d310164b2d85c37e97842fd9c4eddb044250409d86837f1bc8",
+      "newSHA256": "bd974ab04aac12c827946350130c9a133498424707fa1493ca7aeed6019e9654"
+    },
+    {
+      "path": "scripts/tag-index-interruption-smoke.py",
+      "oldSHA256": "c2e4ad276e8d35e8d0bf26ca7a8af1926268e1a27309b9d4c2aa19297175df78",
+      "newSHA256": "8b9ab0a629a91f59fd013c395468c96235fb6a181722e48c220318aa32045ee9"
+    }
+  ],
+  "retainedFailure": {
+    "path": ".artifacts/capture-budget-v1/stale-schema-region-v1.log",
+    "sha256": "3e0bb8f4f850709481b264d94d32004d028ff4142fc6749a4771da2ca0d4ecdf",
+    "meaning": "Original capture-region harness aborts at the schema22 expectation against signed product0839818; new harness passes exact source/settings/region and quiet restore contracts."
+  },
+  "frozenReport": {
+    "path": ".artifacts/schema23-process-fixtures-v1/report.json",
+    "sha256": "0b9e379b54cefeeed6df43524f089636f16b1a5d72d1dda2bb2faa8fa1e2c613",
+    "inputs": 10
+  },
+  "checks": [
+    {
+      "name": "capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 0.2914874169509858,
+      "logSHA256": "f9089b8dd9bb15441b6e1cbfd0db4145751afb27b67984f157a0881ebdf27f12",
+      "contracts": {
+        "format": "OSwind capture-region compatibility v1",
+        "scope": "Owned synthetic source/settings, library compatibility refusal and quiet backup/restore. No pixels, normal library, credentials or native input.",
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "checks": [
+          "schema19 upgrades to23 with exact source identity/text and unchanged settings bytes",
+          "quiet backup restore preserves exact selected identities and both crop scopes without starting capture or API"
+        ],
+        "actualOlderSchema19Creator": false,
+        "olderClientRefusal": "Not exercised; supply pinned --old-cli for actual refusal evidence",
+        "state": "completed",
+        "sourceSchema": 19,
+        "targetSchema": 23,
+        "physicalCaptureClaimed": false
+      }
+    },
+    {
+      "name": "entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 7.8580702499020845,
+      "logSHA256": "4551d896a053447ef1daa7b0e8912230aaf49d9f68fc4232ad330ed5cafa31da",
+      "contracts": {
+        "format": "OSwind source-linked entity memory qualification v1",
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "olderSchema20BinarySHA256": null,
+        "olderClientRefusalChecked": false,
+        "harnessSHA256": "3f1e3cb3e212a81218a38fbf4749367a2c45a925824cdd361f56292f039efe5a",
+        "schema": 23,
+        "passed": true,
+        "sources": 1000,
+        "projectOracleSources": 667,
+        "projectPrecision": 1.0,
+        "projectRecall": 1.0,
+        "automaticSpansVerified": 1335,
+        "firstIndexWallSeconds": 0.48521683388389647,
+        "resumeWallSeconds": 0.04617995792068541,
+        "observedNLPAndProjectGroups": [
+          {
+            "kind": "organization",
+            "name": "Apollo",
+            "sources": 334
+          },
+          {
+            "kind": "person",
+            "name": "Chen",
+            "sources": 334
+          },
+          {
+            "kind": "project",
+            "name": "Apollo Launch",
+            "sources": 667
+          }
+        ],
+        "checks": [
+          "exact project alias oracle",
+          "UTF16 source anchors",
+          "scoped keyword retrieval",
+          "metadata-only edit preserves completion and source links",
+          "correction survives actual alias-rule rescan",
+          "read-only MCP membership and validation",
+          "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+          "quiet backup restore retains definitions, aliases and links",
+          "restored completion reset",
+          "source erasure",
+          "full wipe erases curated definitions"
+        ],
+        "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+      }
+    },
+    {
+      "name": "entity-vault",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 7.771437207935378,
+      "logSHA256": "04b2ba16c304bc7f9651c39c8cb8b2a9de4b5c004ab97c0ac80ebeb526ef02e5",
+      "contracts": {
+        "format": "OSwind native entity vault v1",
+        "state": "completed",
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "checks": [
+          "native local NLP/project indexing and explicit person link on verified encrypted library",
+          "rejected project mention survives native encrypted rule-rescan",
+          "labels, notes, correction and deliberate source link survive normal lock/remount",
+          "full backup and quiet restore retain entity metadata/correction with native rescan"
+        ],
+        "scope": "Synthetic source and entity metadata on one newly-created encrypted APFS volume. No normal library, real credentials, Keychain, authentication or TCC changes. No Apple-framework temporary-memory zeroization or power claim.",
+        "schema": 23,
+        "sourceCount": 1,
+        "entityCount": 4,
+        "verifiedDetached": true,
+        "passphrasePersisted": false,
+        "cleanupDetached": true
+      }
+    },
+    {
+      "name": "project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 1.8042605000082403,
+      "logSHA256": "8be440f853b701d7f59a6292b030947f31d4aa32fa404617a13185abb5a67ed0",
+      "contracts": {
+        "format": "OSwind stable project correction process qualification v1",
+        "passed": true,
+        "schema": 23,
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "harnessSHA256": "afe7f4b1abb82db6f950db6dd19c159b29d469fbdabb360bdc499a53d40b8800",
+        "legacy21": null,
+        "checks": [
+          "rename and merge retain rejected project source",
+          "favorite/tags preserve exclusion",
+          "manual override restores automatic matching",
+          "deleting project erases its stable exclusions before name reuse",
+          "MCP/HTTP and scoped keyword retrieval omit rejected source",
+          "quiet23 backup resets completion and preserves correction after rescan",
+          "source deletion and full wipe erase stable exclusions"
+        ],
+        "scope": "Three authored notes and actual CLI/HTTP/MCP/storage processes; optional exact older21 binary covers native format migration/refusal and legacy archive repair. No normal history, representative NLP accuracy, native UI, device, power or competitor claim."
+      }
+    },
+    {
+      "name": "tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 0.8354857501108199,
+      "logSHA256": "70c0192526bb8ac12e03d837bce2c873daafbf964239e5d86a291bcfb0a9ab2c",
+      "contracts": {
+        "format": "OSwind transactionally indexed tags v2",
+        "scope": "Owned synthetic source/tag mutations, schema20 upgrade and refusal, exact search and quiet portability. No capture, normal history or credentials.",
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "olderBinarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "actualOlderSchema20Client": false,
+        "harnessSHA256": "bd974ab04aac12c827946350130c9a133498424707fa1493ca7aeed6019e9654",
+        "schema": 23,
+        "passed": true,
+        "checks": [
+          "missing derived tag projection repairs without changing source payloads",
+          "duplicate tags count once; case stays exact",
+          "current writes maintain projection; older client not supplied",
+          "current indexed searches agree with explicit source/tag membership",
+          "source metadata and tag rows match independent SQL JSON oracle",
+          "quiet backup restore rebuilds counts",
+          "JSON round trip rebuilds counts"
+        ]
+      }
+    },
+    {
+      "name": "tag-index-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "seconds": 29.22720183315687,
+      "logSHA256": "171dc20f0028678d9de39af17d790b42d92c0353723fd37d60fbfcdd0b9552ef",
+      "contracts": {
+        "format": "OSwind tag installation kill retry v1",
+        "binarySHA256": "3625971b5bbe0cf9fc4d6594eada68a426a81caf3dfc5d69344512b7a00baf39",
+        "harnessSHA256": "8b9ab0a629a91f59fd013c395468c96235fb6a181722e48c220318aa32045ee9",
+        "scope": "Marked owned APFS archive clone; actual SIGKILL after uncommitted WAL growth, SQLite recovery and successful first-open retry. Pre/post payload hashes warm caches; no UI, capture, power or competitor claim.",
+        "fixture": {
+          "distribution": "year",
+          "format": "OSwind owned activity benchmark fixture v1",
+          "normalHistory": false,
+          "seed": 1729,
+          "sources": 1000000,
+          "textBytes": 1024
+        },
+        "observedMigrationWALBytes": 2191872,
+        "processExitCode": -9,
+        "uncommittedProjectionAbsentAfterRecovery": true,
+        "sourcePayloadsPreserved": true,
+        "logicalSourceSHA256": "8fa1d82b7000bf356a801c396bbf5875cf7413a58463148ba9f26ca088766a74",
+        "fullProjectionSQLJSONOraclePass": true,
+        "retryWallSeconds": 5.094664459116757,
+        "passed": true
+      }
+    }
+  ],
+  "ownedEncryptedImagesRemainMounted": false,
+  "originalQualificationReportsUnchanged": true,
+  "limitations": [
+    "Legacy19 capture and missing-tag repair paths use the harness-declared synthetic fixtures; optional signed older clients were not supplied.",
+    "Independent one-million-source pre-tag schema20 clone covers actual SIGKILL, rollback, source-payload hash preservation and full tag SQL/JSON oracle. Cache state is uncontrolled; timing is diagnostic.",
+    "Parent CI and later publication CI are separate; earlier native detach failures retain their original release gates."
+  ]
+}

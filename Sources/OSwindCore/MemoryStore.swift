@@ -5,7 +5,7 @@ import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
     // Version22 fences writers that cannot preserve/enforce project-ID corrections.
-    public static let schemaVersion = 22
+    public static let schemaVersion = 23
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -146,6 +146,7 @@ public final class MemoryStore: @unchecked Sendable {
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try exec(EntitySchema.sql)
+        try exec(PIIScanSchema.sql)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
@@ -525,12 +526,12 @@ public final class MemoryStore: @unchecked Sendable {
         if memories.count <= count { return memories }
         return (0..<count).map { memories[Int(Double($0)*Double(memories.count-1)/Double(count-1))] }
     }
-    private func changeMetadata(_ id:String,change:(inout Memory)->Void) throws {
+    private func changeMetadata(_ id:String,preservingPIIScan:Bool=false,change:(inout Memory)->Void) throws {
         lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
-        do {if var memory=try get(id) {change(&memory);try updateMetadata(memory)};try exec("COMMIT")}
+        do {if var memory=try get(id) {change(&memory);try updateMetadata(memory,preservingPIIScan:preservingPIIScan)};try exec("COMMIT")}
         catch {try? exec("ROLLBACK");throw error}
     }
-    public func setFavorite(_ id: String, value: Bool) throws {try changeMetadata(id) {$0.favorite=value}}
+    public func setFavorite(_ id: String, value: Bool) throws {try changeMetadata(id,preservingPIIScan:true) {$0.favorite=value}}
     public func setTags(_ id: String, tags: [String]) throws {try changeMetadata(id) {$0.tags=Array(Set(tags.filter {!$0.isEmpty})).sorted()}}
     public func renameAudioSpeaker(_ id:String,from speaker:String,to name:String,policy:PrivacyPolicy=PrivacyPolicy()) throws -> Memory {
         lock.lock(); defer { lock.unlock() }; try Task.checkCancellation()
@@ -545,8 +546,9 @@ public final class MemoryStore: @unchecked Sendable {
             memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT");_ = finishRecapInvalidation(); return memory
         } catch { try? exec("ROLLBACK"); throw error }
     }
-    private func updateMetadata(_ m: Memory) throws {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m)
+    private func updateMetadata(_ m: Memory,preservingPIIScan:Bool=false) throws {
+        lock.lock(); defer { lock.unlock() };let scanToken=preservingPIIScan ? try piiScanFavoriteToken(m.id):nil
+        let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m);if let scanToken {try preservePIIScanAfterFavorite(m.id,token:scanToken)}
     }
     @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
     public func diskBytes(includeStaging:Bool=true) -> Int64 {
@@ -642,6 +644,7 @@ public final class MemoryStore: @unchecked Sendable {
         var ordered:[Memory],inputIDs:Set<String>,ids:Set<String>,snapshot:[String:ImportStoredSource]
         let policy:PrivacyPolicy,collectorAdmission:Bool
         var report=JSONImportResult(),blocked=Set<String>(),prepared=[Memory](),incoming=[String:Memory]()
+        var scanRecords=[String:PIIScanRecord]()
         var passages=[String:[PassageVector]](),reusedPassages=Set<String>()
     }
     private func beginImportPreparation(_ memories:[Memory],policy:PrivacyPolicy,collectorAdmission:Bool,settingsSnapshot:LibrarySettingsSnapshot?) throws -> ImportPreparation {
@@ -674,6 +677,7 @@ public final class MemoryStore: @unchecked Sendable {
             context.report.learnedPrivacy?.redactedSources += result.redacted ? 1:0
             context.report.learnedPrivacy?.fields+=result.fields;context.report.learnedPrivacy?.windows+=result.windows
             try finishImportCandidate(result.memory,context:&context,embedder:embedder)
+            if let prepared=context.prepared.last {context.scanRecords[prepared.id]=try PIIScanRecord(memory:prepared,result:result,scanner:scanner)}
         }
         return try commitImport(context,embedder:embedder,settingsSnapshot:settingsSnapshot,activity:reservation.lease)
     }
@@ -734,6 +738,7 @@ public final class MemoryStore: @unchecked Sendable {
                 }
                 for m in context.prepared {
                     try Task.checkCancellation();try insert(m)
+                    if let record=context.scanRecords[m.id] {try savePIIScanRecord(record,for:m.id)}
                     if let embedder {
                         let current=try passagesCurrent(m,modelID:embedder.modelID)
                         if context.reusedPassages.contains(m.id),!current {throw OSwindError.unavailable("An import passage index changed during preparation. Retry the import using the current library.")}
