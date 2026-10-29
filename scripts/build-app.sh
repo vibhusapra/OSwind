@@ -59,6 +59,7 @@ install -m 644 ThirdParty/Apache-2.0.txt "$app/Contents/Resources/ThirdParty/Apa
 mkdir -p "$app/Contents/Resources/ThirdParty/FluidAudio"
 ditto ThirdParty/FluidAudio "$app/Contents/Resources/ThirdParty/FluidAudio"
 ditto ThirdParty/VisualRuntime "$app/Contents/Resources/ThirdParty/VisualRuntime"
+ditto ThirdParty/ONNXRuntime "$app/Contents/Resources/ThirdParty/ONNXRuntime"
 # Public preparation tools are copied into an isolated model-cache workspace
 # only after their embedded hashes pass. Weights and Python are separate downloads.
 mkdir -p "$app/Contents/Resources/scripts" "$app/Contents/Resources/models"

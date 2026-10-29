@@ -1,0 +1,382 @@
+{
+  "format": "OSwind native PII runtime qualification v1",
+  "recordedAtUTC": "2026-10-29T05:34:53.044032+00:00",
+  "source": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+  "packagingSource": "e13db2c88a4908902b9f85b6749a107249e60e86",
+  "base": "3a78e156650e8c17a957fd09ca39e31a874b7335",
+  "schema": 22,
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/73",
+  "F047Implemented": false,
+  "productionLearnedRedactorSelected": false,
+  "releaseAcceptance": false,
+  "competitiveRanking": false,
+  "platform": {
+    "os": "Version 26.6.2 (Build 25G83)",
+    "availableGPU": "Apple M5 Max",
+    "scope": "GPU identity/requested Core ML CPUAndGPU policy is not per-operator device placement or energy evidence"
+  },
+  "implementation": {
+    "ownerCases": 16,
+    "nativeBoundaryAndOptInCases": 4,
+    "newCases": 20,
+    "queueBound": 32,
+    "CPUFramedTokenBound": 512,
+    "CoreMLFramedTokenBound": 128,
+    "byteBound": 16384,
+    "scalarBound": 4096,
+    "thresholdRequired": true,
+    "defaultThreshold": null,
+    "sourceAndModelBound": true,
+    "patternsAndLearnedMasksCombinedOnOriginalSource": true,
+    "strictUTF8Stdin": true,
+    "sourceTextPersistedByCommand": false,
+    "modelOrRuntimeBundled": false,
+    "modelResidentScope": "Backend/session ownership only; not physical memory measurement"
+  },
+  "full": {
+    "defined": 1004,
+    "passed": 1002,
+    "skipped": 2,
+    "failures": 0,
+    "suiteAwakeSeconds": 430.39,
+    "suiteWallSeconds": 430.466,
+    "logSHA256": "6eed50340baf6bd3067eccc5950e2ba8f7463973d246856a2e6218dd7bbac415"
+  },
+  "threadSanitizer": {
+    "defined": 152,
+    "passed": 152,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 169.514,
+    "suiteWallSeconds": 169.544,
+    "logSHA256": "13dbe927738aa9d938b0aac782d1a1e0ffc6543f4fe0fa6de9155d54aa0039d3"
+  },
+  "optimizedPII": {
+    "defined": 48,
+    "passed": 48,
+    "skipped": 0,
+    "failures": 0,
+    "suiteAwakeSeconds": 10.87,
+    "suiteWallSeconds": 10.874,
+    "logSHA256": "13c6d194094c5ae9a5f31d3eefb77aa45546899de1a8c46e165fa7b3f465d5a6"
+  },
+  "nativeReferenceChecks": {
+    "full-most-optins-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "pii-visual-tsan-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ],
+    "pii-release-v1.log": [
+      {
+        "compute": "coreML",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 2.0861626e-06
+      },
+      {
+        "compute": "cpu",
+        "sources": 72,
+        "comparisons": 216,
+        "maximumConfidenceDifference": 0.0
+      }
+    ]
+  },
+  "orderedSourceOperations": [
+    {
+      "name": "full-most-optins-v1",
+      "exitCode": 0,
+      "awakeSeconds": 438.7126199170016,
+      "systemSeconds": 438.7335948944092
+    },
+    {
+      "name": "pii-visual-tsan-v1",
+      "exitCode": 0,
+      "awakeSeconds": 198.88082445901819,
+      "systemSeconds": 198.88245677947998
+    },
+    {
+      "name": "release-build-v1",
+      "exitCode": 0,
+      "awakeSeconds": 102.92084095790051,
+      "systemSeconds": 102.92168593406677
+    },
+    {
+      "name": "package-proof-v1",
+      "exitCode": 0,
+      "awakeSeconds": 1.682451041880995,
+      "systemSeconds": 1.682464838027954
+    },
+    {
+      "name": "visual-compatibility-v1",
+      "exitCode": 0,
+      "awakeSeconds": 11.326578916050494,
+      "systemSeconds": 11.326672315597534
+    },
+    {
+      "name": "doctor-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.08370854193344712,
+      "systemSeconds": 0.0837099552154541
+    },
+    {
+      "name": "pii-cli-v1",
+      "exitCode": 0,
+      "awakeSeconds": 6.92743679205887,
+      "systemSeconds": 6.927494049072266
+    },
+    {
+      "name": "pii-release-v1",
+      "exitCode": 0,
+      "awakeSeconds": 124.87833133386448,
+      "systemSeconds": 124.8793568611145
+    },
+    {
+      "name": "vendor-offline-v1",
+      "exitCode": 0,
+      "awakeSeconds": 0.021197250112891197,
+      "systemSeconds": 0.021198034286499023
+    }
+  ],
+  "packagingOperationsBeforeCrossRebuildAssertion": [
+    {
+      "name": "vendor-offline-v2",
+      "exitCode": 0,
+      "awakeSeconds": 0.020931457867845893
+    },
+    {
+      "name": "release-build-v2",
+      "exitCode": 0,
+      "awakeSeconds": 101.39804941602051
+    },
+    {
+      "name": "package-proof-v2",
+      "exitCode": 0,
+      "awakeSeconds": 1.5461841251235455
+    }
+  ],
+  "finalSignedCompatibilityOperations": [
+    {
+      "name": "pii-cli-v2",
+      "exitCode": 0,
+      "awakeSeconds": 6.923396833939478
+    },
+    {
+      "name": "pii-cli-offline-v2",
+      "exitCode": 0,
+      "awakeSeconds": 0.18161775008775294
+    },
+    {
+      "name": "visual-compatibility-v2",
+      "exitCode": 0,
+      "awakeSeconds": 10.32744179200381
+    }
+  ],
+  "finalPackage": {
+    "scope": "Separately staged schema22 explicit native PII inspection/ownership; no default learned capture policy, physical energy, hardened-distribution or competitive ranking claim",
+    "codeCommit": "e13db2c88a4908902b9f85b6749a107249e60e86",
+    "schema": 22,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "55d42c6eff1c99a12a09c6647eb93b62106c363546e608b52465e71027c2619e",
+        "signedSHA256": "6d03067c4397e78f9cce84026318fbf73b658c4a77ea08c65095430fe94a933e",
+        "normalizedPayloadSHA256": "7df22a0381f4362a273875e2fce4b655a918fa1a408d05da57e09ef7110184b6"
+      },
+      "oswindctl": {
+        "rawSHA256": "9fb46d248ab137ff82dd735828f0fdfb91f1dce68daa73885cdcab4c3cd94c3c",
+        "signedSHA256": "c2a07896785c7885d1647c84bcf2224151079582a7a320f00cd6b24ce409bfba",
+        "normalizedPayloadSHA256": "eda919492d5e8656f9af47412b57f717d6811d4c9fe4321becb058010abc301d"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "219abd1e556c3527179667052d2c7bfda08898147c4460736cb93fcdb9fa4143",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "88cf3d85521dbbad283c60e58f01cdb8bf4a446ca69d1e1ee4c7bc8041f9b7c9",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installed17Unchanged": true,
+    "installedUnchanged": true
+  },
+  "license": {
+    "packagingSource": "e13db2c88a4908902b9f85b6749a107249e60e86",
+    "implementationSource": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+    "allExecutablePayloadsUnchanged": false,
+    "crossRebuildIdentity": "Failed; retained qualify-v2.log and rebuild-difference-v1.json. OSwind/CLI sections including text differ, cause unproven; guardian identical. No binary equivalence claim.",
+    "licenseSHA256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "licenseAndNoticeBundled": true,
+    "compiledSourcesUnchanged": true
+  },
+  "crossRebuildIdentity": {
+    "passed": false,
+    "priorDriverExitCode": 1,
+    "retainedFailureLogSHA256": "017997763897bd073607f96faaf4e7c458c3ecb45379af4616b8fa012ae77a5a",
+    "differences": {
+      "OSwind": {
+        "firstUUID": "662675d2fb31328e90d745359a468424",
+        "secondUUID": "41c8722c4cff3e93905f41fed0c9cf32",
+        "changedSections": [
+          "__DATA,__bss",
+          "__DATA,__common",
+          "__DATA,__data",
+          "__DATA,__objc_const",
+          "__DATA,__objc_data",
+          "__DATA,__objc_selrefs",
+          "__DATA,__s_async_hook",
+          "__DATA_CONST,__const",
+          "__DATA_CONST,__got",
+          "__TEXT,__const",
+          "__TEXT,__constg_swiftt",
+          "__TEXT,__eh_frame",
+          "__TEXT,__gcc_except_tab",
+          "__TEXT,__objc_methlist",
+          "__TEXT,__objc_stubs",
+          "__TEXT,__stubs",
+          "__TEXT,__swift5_entry",
+          "__TEXT,__swift5_typeref",
+          "__TEXT,__swift_as_entry",
+          "__TEXT,__swift_as_ret",
+          "__TEXT,__text",
+          "__TEXT,__unwind_info"
+        ],
+        "sectionsIdentical": false
+      },
+      "oswindctl": {
+        "firstUUID": "666f212ce23b31839cf7176e31b813cc",
+        "secondUUID": "43111ee55dff3fa1a3f9be520e62f935",
+        "changedSections": [
+          "__DATA,__bss",
+          "__DATA,__common",
+          "__DATA,__data",
+          "__DATA,__objc_const",
+          "__DATA,__objc_data",
+          "__DATA,__objc_selrefs",
+          "__DATA,__s_async_hook",
+          "__DATA_CONST,__const",
+          "__DATA_CONST,__got",
+          "__TEXT,__const",
+          "__TEXT,__constg_swiftt",
+          "__TEXT,__eh_frame",
+          "__TEXT,__gcc_except_tab",
+          "__TEXT,__objc_methlist",
+          "__TEXT,__objc_stubs",
+          "__TEXT,__stubs",
+          "__TEXT,__swift5_entry",
+          "__TEXT,__swift5_typeref",
+          "__TEXT,__swift_as_entry",
+          "__TEXT,__swift_as_ret",
+          "__TEXT,__text",
+          "__TEXT,__unwind_info"
+        ],
+        "sectionsIdentical": false
+      },
+      "oswind-preparation-guardian": {
+        "firstUUID": "7ad0d1c410af3c27a17387b4fc4d264c",
+        "secondUUID": "7ad0d1c410af3c27a17387b4fc4d264c",
+        "changedSections": [],
+        "sectionsIdentical": true
+      }
+    },
+    "scope": "Initial post-notice driver stopped after same-rebuild signing/ZIP proof, at a cross-rebuild byte-identity assertion. Compiled source inputs are unchanged, but OSwind and CLI sections including __text differ; cause unproven. No byte/semantic equivalence claim is derived from matching source alone. Final package subsequently receives its own CLI/visual compatibility checks."
+  },
+  "CLI": {
+    "realModelChecks": 25,
+    "offlineRefusalChecks": 18,
+    "realModelReportSHA256": "0265bfe74de4382b4d80f0680be053fa91c61502fd6dfaad55b898818b67de9e",
+    "offlineReportSHA256": "1494fa9536b2c119cccf1df0bb95994d3c1cfecd1b802ab8f471ef5938aad600",
+    "historyDirectoriesAbsent": true,
+    "newRuntimeSnapshotsRemaining": [],
+    "scope": "Synthetic success/refusal checks; no normal history, GUI or abrupt-termination cleanup acceptance"
+  },
+  "visual": {
+    "modelID": "siglip2:c538c66046557dcf8e414ed73485b7f2496f926271c3dc73564609cc7b2b4a3e",
+    "corpusSHA256": "6cccb6158465374aee61ca3eaee5f775c0f07c834dfd6eae0cd72bf83f5dd572",
+    "images": 100,
+    "queries": 501,
+    "top1": 459,
+    "top5": 498,
+    "top10": 498,
+    "checks": {
+      "sameModel": true,
+      "sameCorpus": true,
+      "sameCounts": true,
+      "indexReopen": true,
+      "scoped": true
+    },
+    "scope": "Final signed CLI repeat on an already-opened corpus; functional compatibility only, no speed/energy/holdout claim"
+  },
+  "cleanup": {
+    "recordedAtUTC": "2026-10-29T05:34:17.712798+00:00",
+    "source": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+    "packagingSource": "e13db2c88a4908902b9f85b6749a107249e60e86",
+    "installedAppBytesUnchanged": true,
+    "bothStagedBundleTreesUnchanged": true,
+    "ownedExecutableInventory": {
+      "method": "Complete ps -ww command columns, parsed exact executable/argument scope; excludes shells/rg/Python and unrelated apps",
+      "matches": []
+    },
+    "currentArtifactImageInventory": {
+      "scope": "Only image paths under this run artifact root; not unrelated system or temporary test images",
+      "matches": []
+    }
+  },
+  "priorQuality": {
+    "reference": "pii-model-evaluation-v1.json",
+    "threshold": 0.5,
+    "modelFullValueCoverage": "42/48 authored positive validation values",
+    "modelNegativeFalsePositives": "8/24",
+    "hybridOperatingPointAccepted": false,
+    "reservedTestPredictionsOpened": false,
+    "scope": "Inherited model-only validation findings; not a quality score for the new hybrid union"
+  },
+  "CI": {
+    "source": "2e95c495943d2b181c12446ed119978ddeb9ac85",
+    "runID": 40822289384,
+    "benchmarkJob": {
+      "id": 123277274922,
+      "conclusion": "success"
+    },
+    "nativeJob": {
+      "id": 123277275092,
+      "lastObservedStatus": "in_progress"
+    },
+    "scope": "Snapshot only; source CI completion and later packaging/documentation head are separate"
+  },
+  "limits": [
+    "Physical owned system-audio opt-in and locked/thermal visual admission remain two normal skips",
+    "Core ML framework shape/partition diagnostics remain in unedited logs despite successful validated outputs",
+    "Precompiled ONNX Runtime/Core ML internals are not Thread Sanitizer instrumented",
+    "Anonymous unlinked dylib rejected by macOS policy; named private verified snapshot used, no policy changed",
+    "Abrupt termination may retain a runtime-code-only temporary snapshot; not exercised by smoke",
+    "No selected learned capture/import/retrieval/export policy, installer/setup, long-source windows, policy/record revision admission or image/audio treatment",
+    "No representative desktop PII acceptance, training-unseen proof, reserved-test score, physical energy, competitor ranking, native GUI/TCC or hardened/notarized distribution claim",
+    "Inherited busy-terminal Ctrl-C diagnostic and prior default-library activity audit remain unresolved; passing new tests do not repair those historical incidents"
+  ]
+}

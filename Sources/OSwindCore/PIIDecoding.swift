@@ -98,13 +98,18 @@ enum PIIDecoding {
     static func redact(_ text:String,detection:Detection)throws->Redaction {
         try Task.checkCancellation()
         guard text.utf8.count<=4*PIITokenizer.maximumScalars,digest(text)==detection.sourceSHA256 else {throw OSwindError.invalid("PII result belongs to different source bytes")}
+        return try mask(text,ranges:detection.spans.map(\.range))
+    }
+    static func mask(_ text:String,ranges:[NSRange])throws->Redaction {
+        try Task.checkCancellation()
+        guard text.utf8.count<=4*PIITokenizer.maximumScalars else {throw OSwindError.invalid("PII source exceeds input byte bound")}
         let original=text as NSString
         var masks=[NSRange]()
-        for span in detection.spans {
+        for range in ranges {
             try Task.checkCancellation()
-            guard span.range.location>=0,span.range.length>0,span.range.location<=original.length,
-                  span.range.length<=original.length-span.range.location else {throw OSwindError.invalid("PII span is outside its source")}
-            let whole=original.rangeOfComposedCharacterSequences(for:span.range)
+            guard range.location>=0,range.length>0,range.location<=original.length,
+                  range.length<=original.length-range.location else {throw OSwindError.invalid("PII span is outside its source")}
+            let whole=original.rangeOfComposedCharacterSequences(for:range)
             guard whole.location>=0,whole.length>0,whole.location<=original.length,whole.length<=original.length-whole.location,
                   PassageRange(start:whole.location,length:whole.length).text(in:text) != nil else {throw OSwindError.invalid("PII mask does not cover whole source characters")}
             masks.append(whole)

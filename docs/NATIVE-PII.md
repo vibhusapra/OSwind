@@ -1,6 +1,6 @@
 # Native PII input contract
 
-[PR #71](https://github.com/vibhusapra/OSwind/pull/71) adds native tokenization for the [experimental GLiNER candidate](PII-EVALUATION.md) and corrects the shared ByteLevel pre-tokenizer. The recognizer is not connected to capture, import, answers, exports or setup. Model inference, decoding, complete-grapheme privacy admission and a production lifecycle remain open. F047 stays TODO.
+[PR #71](https://github.com/vibhusapra/OSwind/pull/71) adds native tokenization for the [experimental GLiNER candidate](PII-EVALUATION.md) and corrects the shared ByteLevel pre-tokenizer. The recognizer is not connected to capture, import, answers, exports or setup. [Explicit native inspection](NATIVE-PII-RUNTIME.md) now combines inference, decoding and whole-grapheme masks with a drainable model owner. Production capture/egress admission and setup remain open. F047 stays TODO.
 
 ## Compatibility
 

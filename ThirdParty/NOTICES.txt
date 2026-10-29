@@ -75,3 +75,10 @@ Local changes: exact UTF8 BPE merge-key equality/hash and literal String
 normalizer replacement before combining marks. Original file headers, full
 source/vendored hashes and a minimal patch are retained in Vendor/OSwindTokenizers.
 Hub and swift-jinja remain unchanged pinned dependencies; no model weights ship.
+
+ONNX Runtime C API headers v1.24.2 — Microsoft Corporation (MIT).
+https://github.com/microsoft/onnxruntime/tree/v1.24.2
+Unmodified headers are compiled with OSwind's own bounded C API wrapper.
+See ONNXRuntime/LICENSE for the complete notice, also retained in
+Vendor/ONNXRuntime/LICENSE in the source tree. The explicit local runtime dylib
+and experimental GLiNER model weights are not bundled with the application.
