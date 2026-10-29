@@ -7,10 +7,12 @@ import argparse
 import hashlib
 import json
 import os
+import signal
 from pathlib import Path
 import subprocess
 import tempfile
 import time
+import uuid
 
 
 def main():
@@ -55,10 +57,11 @@ def main():
     run("explicit-data-refused",["--data",str(history),*base])
     run("vault-refused-before-inspection",["--vault",str(root/"missing-vault"),*base])
     run("invalid-utf8",base,b"\xff")
-    run("oversized-bytes",base,b"a"*16385)
+    run("oversized-bytes",base,b"a"*131073)
     run("empty",base,b"")
     run("whitespace",base,b" \n\t")
-    run("oversized-scalars",base,b"a"*4097)
+    run("oversized-scalars",base,b"a"*32769)
+    run("oversized-word",base,b"a"*1025)
     for value in ["0","1","nan","inf","-1"]:
         arguments=base.copy();arguments[arguments.index("--threshold")+1]=value
         run("invalid-threshold-"+value,arguments)
@@ -69,8 +72,47 @@ def main():
         cpu=run("cpu",base,secret,True);assert cpu["patternRedacted"] and cpu["redacted"]
         arguments=base.copy();arguments[arguments.index("--compute")+1]="coreML"
         coreml=run("coreml",arguments,secret,True);assert coreml["patternRedacted"] and coreml["redacted"]
-        run("coreml-overflow",arguments,b"word "*128)
-        run("cpu-token-overflow",base,b"word "*500)
+        assert run("coreml-windowed",arguments,b"word "*128,True)["windowCount"]>1
+        assert run("cpu-windowed",base,b"word "*500,True)["windowCount"]>1
+        document=secret+b" "+b"Routine work continues. "*100+b" "+secret+b" "+b"Routine work continues. "*100+b" "+secret
+        for compute in ["cpu","coreML"]:
+            arguments=base.copy();arguments[arguments.index("--compute")+1]=compute
+            value=run(compute+"-long-document",arguments,document,True)
+            assert value["windowCount"]>1 and 0<value["framedTokens"]<=65536
+            assert value["patternRedacted"] and value["text"].count("[REDACTED]")>=3
+            # Observe only this exact child's mapped/retained native snapshot.
+            # Foundation's user temporary directory can ignore TMPDIR on macOS.
+            # This proves owned runtime preparation, not an inference instruction
+            # in flight or physical GPU placement. Never inspect another PID.
+            start=time.monotonic();process=subprocess.Popen([str(binary),*arguments],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env)
+            observed=set();stdout=stderr=b""
+            try:
+                process.stdin.write(b"Routine work continues. "*1000);process.stdin.close();process.stdin=None
+                deadline=time.monotonic()+30
+                while time.monotonic()<deadline and process.poll() is None:
+                    listing=subprocess.run(["/usr/sbin/lsof","-a","-p",str(process.pid),"-Fn"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=2)
+                    for line in listing.stdout.splitlines():
+                        if not line.startswith("n/"):continue
+                        path=Path(line[1:])
+                        if path.name!="runtime.dylib" or not path.parent.name.startswith("oswind-pii-runtime-"):continue
+                        try:uuid.UUID(path.parent.name.removeprefix("oswind-pii-runtime-"))
+                        except ValueError:continue
+                        if path.is_file():observed.add(path)
+                    if observed:break
+                    time.sleep(.01)
+                assert observed,"Owned native runtime preparation was not observed before cancellation"
+                process.send_signal(signal.SIGINT)
+                stdout,stderr=process.communicate(timeout=180)
+                (root/(compute+"-cancel.stdout")).write_bytes(stdout);(root/(compute+"-cancel.stderr")).write_bytes(stderr)
+                assert process.returncode==130 and stdout==b"",(compute,process.returncode,stderr[-1000:])
+                assert b"Stopping PII inspection" in stderr and b"Operation cancelled." in stderr
+                assert all(not path.parent.exists() for path in observed),"Cancelled inspection left its observed native runtime snapshot"
+                assert not history.exists()
+                records.append(dict(name=compute+"-native-preparation-SIGINT",exitCode=process.returncode,wallSeconds=time.monotonic()-start,observedOwnedRuntimePreparation=True,stdoutBytes=0,stderrBytes=len(stderr),stdoutSHA256=hashlib.sha256(stdout).hexdigest(),newRuntimeSnapshotsRemaining=0))
+            finally:
+                if process.poll() is None:process.kill();stdout,stderr=process.communicate()
+                elif not stdout and not stderr:stdout,stderr=process.communicate()
+                (root/(compute+"-cancel.stdout")).write_bytes(stdout);(root/(compute+"-cancel.stderr")).write_bytes(stderr)
         bad=root/"wrong-runtime.dylib";bad.write_bytes(b"not a runtime")
         arguments=base.copy();arguments[arguments.index("--runtime-library")+1]=str(bad)
         run("runtime-hash",arguments)

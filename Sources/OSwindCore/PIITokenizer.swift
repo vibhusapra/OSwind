@@ -4,7 +4,7 @@ import Hub
 import OSwindTokenizers
 
 /// Native input contract for the pinned experimental GLiNER token-level model.
-/// No backend, model installation or production redactor is selected here.
+/// No network, backend loading or production privacy policy is selected here.
 struct PIITokenizer:Sendable {
     struct Word:Equatable,Sendable {let text:String;let range:NSRange}
     struct Input:Sendable {
@@ -62,15 +62,26 @@ struct PIITokenizer:Sendable {
         ids.append(50282);mask.append(0);try Task.checkCancellation()
         return Input(inputIDs:ids,attentionMask:Array(repeating:1,count:ids.count),wordsMask:mask,words:words)
     }
+    func windows(_ document:PIIDocument,compute:PIIComputePolicy)throws->PIIWindowPlan {
+        try PIIWindowPlan.make(document:document,prompt:prompt,tokenLimit:compute == .cpu ? 512:128,padded:compute == .coreML) {
+            tokenizer.encode(text:$0,addSpecialTokens:false).map(Int64.init)
+        }
+    }
 
     /// Python3.12 re `\w+(?:[-_]\w+)*|\S`, with original scalar/UTF-16
-    /// coordinates. Intermediate words can split a grapheme; future redaction
-    /// admission must independently require/expand whole composed characters.
+    /// coordinates. Intermediate words can split a grapheme; window seams and
+    /// redaction independently preserve/expand complete composed characters.
     static func split(_ text:String)throws->[Word] {
-        guard text.utf8.count<=4*maximumScalars else {throw OSwindError.invalid("PII source exceeds input byte bound")}
+        try split(text,scalarLimit:maximumScalars)
+    }
+    static func splitDocument(_ text:String)throws->[Word] {
+        try split(text,scalarLimit:PIIDocument.maximumScalars)
+    }
+    private static func split(_ text:String,scalarLimit:Int)throws->[Word] {
+        guard text.utf8.count<=4*scalarLimit else {throw OSwindError.invalid("PII source exceeds input byte bound")}
         try Task.checkCancellation()
         let scalars=Array(text.unicodeScalars)
-        guard scalars.count<=maximumScalars else {throw OSwindError.invalid("PII source exceeds input scalar bound")}
+        guard scalars.count<=scalarLimit else {throw OSwindError.invalid("PII source exceeds input scalar bound")}
         var offsets=[Int]();offsets.reserveCapacity(scalars.count+1);offsets.append(0)
         for scalar in scalars {offsets.append(offsets.last!+(scalar.value>0xffff ? 2:1))}
         let original=text as NSString

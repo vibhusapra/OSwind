@@ -13,12 +13,14 @@ printf '%s' 'Owned synthetic note: password=fixtureSecret' | oswindctl pii inspe
   --compute cpu --threshold 0.5 --stdin
 ```
 
-Use `coreML` explicitly for the fixed bucket. CPU accepts up to 512 framed
-tokens; Core ML accepts up to 128, including the fixed 12-label prompt. Both
-refuse overflow. Neither truncates, downloads assets or contacts a provider.
-Input is strict UTF-8 through a pipe, at most 16 KiB / 4096 Unicode scalars and
-512 original words. A threshold strictly between zero and one is required;
-0.5 is an example, **not an accepted privacy operating point**.
+Use `coreML` explicitly for the fixed bucket. [Complete document inspection](NATIVE-PII-DOCUMENTS.md)
+now plans overlapping windows of up to 512 CPU or 128 Core ML framed tokens,
+including the fixed 12-label prompt. It refuses incomplete/over-budget work;
+neither backend truncates, downloads assets or contacts a provider. Strict UTF-8
+input must fit 128 KiB / 32,768 Unicode scalars / 8,192 words and the complete
+window work budget described in that contract. A threshold strictly between
+zero and one is required; 0.5 is an example, **not an accepted privacy operating
+point**. Earlier qualification below applies to the preceding single-window code.
 
 The model directory contains `tokenizer.json`, `tokenizer_config.json` and
 `onnx/model.onnx` for CPU or `onnx/model-bucket128.onnx` for Core ML. Original
@@ -64,7 +66,7 @@ Results bind model logits to immutable source bytes and the fixed model ID.
 Learned and existing secret-pattern masks are computed on the original source,
 expanded to whole graphemes, merged, then applied together. A learned mask
 cannot hide `password=` from the pattern detector. JSON returns the final text,
-source digest, model/compute/threshold, typed original UTF-16 spans without raw
+source digest, model/compute/threshold, window/token counts, typed original UTF-16 spans without raw
 span text, learned masks, combined masks and redaction/media-suppression flags.
 Any failure refuses the entire result; it does not return a regex-only fallback.
 Unrecognized PII can remain in a successful result: the experimental detector

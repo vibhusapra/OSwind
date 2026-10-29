@@ -18,16 +18,21 @@ final class PIIInspectorTests:XCTestCase {
         init(gate:Gate?=nil,mode:Mode = .valid) {self.gate=gate;self.mode=mode}
         var snapshot:State {lock.withLock {state}}
         func close() {lock.withLock {state.closes+=1;state.closedWhileActive = state.closedWhileActive || state.active>0}}
-        func predict(_ text:String) async throws -> PIINativeOutput {
+        func prepare(_ document:PIIDocument) async throws -> PIIWindowPlan {
+            try PIIWindowPlan.make(document:document,prompt:[50281,50369],tokenLimit:512) {_ in [1]}
+        }
+        func predict(_ window:PIIWindowPlan.Window) async throws -> PIINativeOutput {
+            let text=window.text
             lock.withLock {state.calls.append(text);state.active+=1;state.maximum=max(state.maximum,state.active)}
             defer {lock.withLock {state.active-=1}}
             if let gate {await gate.wait()}
             if mode == .fail {throw OSwindError.unavailable("synthetic model failure")}
-            let source=try PIIDecoding.Source(text)
+            let source=try PIIDecoding.Source(window:window)
             var logits=Array(repeating:Float(-20),count:source.words.count*36)
             if mode == .entity {for channel in 0..<3 {logits[2*3+channel]=8}}
             if mode == .nan {logits[0] = .nan}
             return PIINativeOutput(sourceSHA256:mode == .sourceMismatch ? "other":source.sha256,
+                windowID:window.id,
                 modelID:mode == .modelMismatch ? "other":PIIInspector.expectedModelID(.cpu),
                 shape:mode == .shape ? [1,1,1,1]:[1,source.words.count,12,3],logits:logits)
         }
@@ -136,7 +141,7 @@ final class PIIInspectorTests:XCTestCase {
     func testThresholdEmptyAndOversizedInputRefuseBeforeLoading() async throws {
         let backend=Backend(),inspector=PIIInspector(loader:{backend})
         for threshold:Double in [0,1,-1,.nan,.infinity] {await refused {try await inspector.inspect("text",threshold:threshold)}}
-        for text in [""," \n\t",String(repeating:"a",count:4097),Array(repeating:"a",count:513).joined(separator:" ")] {
+        for text in [""," \n\t",String(repeating:"a",count:32769),Array(repeating:"a",count:8193).joined(separator:" ")] {
             await refused {try await inspector.inspect(text,threshold:0.5)}
         }
         XCTAssertTrue(backend.snapshot.calls.isEmpty);let resident=await inspector.modelResident;XCTAssertFalse(resident)

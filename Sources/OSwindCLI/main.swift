@@ -212,17 +212,19 @@ do {
                   let rawThreshold=try validatedOption("--threshold"),let threshold=Double(rawThreshold),threshold.isFinite,threshold>0,threshold<1,
                   args==["--stdin"],isatty(STDIN_FILENO)==0 else {throw OSwindError.invalid("PII inspect requires cpu|coreML, threshold between zero and one, piped --stdin, and either prepared cache or both explicit asset paths")}
             var input=Data()
-            while let chunk=try FileHandle.standardInput.read(upToCount:16385-input.count),!chunk.isEmpty {
-                input.append(chunk);guard input.count<=16384 else {throw OSwindError.invalid("PII input exceeds16384 bytes; no scan returned")}
+            while let chunk=try FileHandle.standardInput.read(upToCount:131073-input.count),!chunk.isEmpty {
+                input.append(chunk);guard input.count<=131072 else {throw OSwindError.invalid("PII input exceeds131072 bytes; no scan returned")}
             }
             guard let text=String(data:input,encoding:.utf8) else {throw OSwindError.invalid("PII input must be valid UTF-8")}
             try await piiOutput {
-                let modelURL:URL,runtimeURL:URL
-                if let directory,let library {modelURL=URL(fileURLWithPath:directory,isDirectory:true);runtimeURL=URL(fileURLWithPath:library)}
-                else {let installed=try await PIIModelPreparation.verify(cache:cache);modelURL=installed.modelDirectory;runtimeURL=installed.runtimeLibrary}
-                let inspector=PIIInspector(modelDirectory:modelURL,runtimeLibrary:runtimeURL,compute:compute)
-                do {let result=try await inspector.inspect(text,threshold:threshold);await inspector.shutdown();return result}
-                catch {await inspector.shutdown();throw error}
+                return try await runAsyncCLI(cancellationMessage:"Stopping PII inspection; active native work is joined before model cleanup.") {
+                    let modelURL:URL,runtimeURL:URL
+                    if let directory,let library {modelURL=URL(fileURLWithPath:directory,isDirectory:true);runtimeURL=URL(fileURLWithPath:library)}
+                    else {let installed=try await PIIModelPreparation.verify(cache:cache);modelURL=installed.modelDirectory;runtimeURL=installed.runtimeLibrary}
+                    let inspector=PIIInspector(modelDirectory:modelURL,runtimeLibrary:runtimeURL,compute:compute)
+                    do {let result=try await inspector.inspect(text,threshold:threshold);await inspector.shutdown();return result}
+                    catch {await inspector.shutdown();throw error}
+                }
             }
         }
     } else if command == "vision" {
