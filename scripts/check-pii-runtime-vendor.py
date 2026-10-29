@@ -23,6 +23,7 @@ def check():
         assert row["url"]==f'https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/include/onnxruntime/core/session/{Path(relative).name}'
     digest=hashlib.sha256((ROOT/"LICENSE").read_bytes()).hexdigest()
     assert digest==provenance["licenseSHA256"]=="2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+    assert (ROOT.parent.parent/"ThirdParty/ONNXRuntime/LICENSE").read_bytes()==(ROOT/"LICENSE").read_bytes()
     print("Pinned ONNX Runtime headers and MIT license verified offline")
 
 if __name__=="__main__":check()
