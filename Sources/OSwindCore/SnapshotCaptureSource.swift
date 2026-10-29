@@ -1,6 +1,7 @@
 import AppKit
 import ScreenCaptureKit
 import Vision
+import ApplicationServices
 
 struct SnapshotCaptureDeferral:Error {var reason:String}
 /// Internal seams let owned image fixtures exercise the actual admission path
@@ -15,6 +16,13 @@ struct SnapshotCaptureDeferral:Error {var reason:String}
 @MainActor struct SnapshotCaptureEnvironment {
     var locked:()->Bool = {SessionState.locked}
     var permitted:()->Bool = {CGPreflightScreenCaptureAccess()}
+    var accessibilityPermitted:()->Bool = {AXIsProcessTrusted()}
+    var idleSeconds:()->Double = {CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)}
+    var textCommitPermitted:@Sendable ()->Bool = {!SessionState.locked && AXIsProcessTrusted()}
+    var textEmbedding:@Sendable (String,LocalEmbedder) throws -> [Float]? = {text,embedder in
+        try Task.checkCancellation();let vector=embedder.embed(text)
+        try Task.checkCancellation();return vector
+    }
     var context:(String?) async -> WindowContext? = {await AccessibilityContext.read(targetBundleID:$0)}
     var identityCurrent:(WindowContext,String?)->Bool = {AccessibilityContext.identityCurrent($0,targetBundleID:$1)}
     var frames:(AppSettings,WindowContext) async throws -> [SnapshotCaptureFrame] = {try await NativeSnapshotSource.frames(settings:$0,context:$1)}
@@ -72,6 +80,7 @@ enum SnapshotDisplayPrivacy {
         return .init(identifier:id,displayID:display.displayID,frame:display.frame,size:CGSize(width:display.width,height:display.height))
     }
     static func frames(settings:AppSettings,context:WindowContext) async throws -> [SnapshotCaptureFrame] {
+        guard settings.visualCaptureMode != .accessibility else {throw SnapshotCaptureDeferral(reason:"Text-only mode never captures screen pixels")}
         guard settings.snapshotRegions.valid else {throw SnapshotCaptureDeferral(reason:"Display or crop configuration is invalid") }
         let content=try await SCShareableContent.excludingDesktopWindows(true,onScreenWindowsOnly:true)
         var plans=[Plan]()

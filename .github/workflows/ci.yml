@@ -73,6 +73,11 @@ jobs:
         run: python3 scripts/pii-import-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pii-import"
       - name: Verify PII check records cannot be forged by JSON without model assets
         run: python3 scripts/pii-scan-record-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-pii-records"
+      - name: Verify text-only mode boundaries and quiet portability without desktop capture
+        run: |
+          python3 scripts/accessibility-text-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-ax-text"
+          mkdir -p .artifacts
+          cp "$RUNNER_TEMP/oswind-ax-text/report.json" .artifacts/accessibility-text-ci.json
       - name: Exercise encrypted-library CLI and interruptions
         run: |
           python3 scripts/vault-smoke.py .build/release/oswindctl --root "$RUNNER_TEMP/oswind-vault-process"
@@ -227,6 +232,7 @@ jobs:
             .artifacts/passages-apple-ci.json
             .artifacts/backup-process-ci.json
             .artifacts/audio-process-ci.json
+            .artifacts/accessibility-text-ci.json
 
   benchmark-harnesses:
     runs-on: macos-26

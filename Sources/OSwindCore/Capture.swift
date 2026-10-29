@@ -51,7 +51,12 @@ public struct CaptureMetrics: Sendable {
     private var snapshotContextWorker:Task<WindowContext?,Never>?
     private var snapshotWorker:Task<(Memory,Data?,MediaAdmissionLease?),Error>?
     private var snapshotPassages:Task<Void,Error>?
-    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel()}
+    private var textReservationWorker:Task<AccessibilityCaptureReservation,Error>?
+    private var textPreparationWorker:Task<(Memory,Data,Bool),Error>?
+    private var textCommitWorker:Task<Void,Error>?
+    private var textGate=ReplayCommitGate()
+    private var lastTextCapture:(digest:Data,id:String)?
+    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel();textReservationWorker?.cancel();textPreparationWorker?.cancel();textCommitWorker?.cancel();textGate.invalidate();textGate=ReplayCommitGate()}
     private var timer: Timer?
     private var observers = [AnyCancellable]()
     private var busy = false
@@ -67,9 +72,19 @@ public struct CaptureMetrics: Sendable {
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] { observers.append(center.publisher(for:name).sink { [weak self] _ in Task { @MainActor in self?.suspended = true; self?.epoch = UUID(); self?.cancelSnapshotWork();self?.status = "Sleeping / locked"; self?.replay?.stop(); self?.replay=nil } }) }
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.publisher(for:name).sink { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
-    public func start() { guard !running else { return }; guard CGPreflightScreenCaptureAccess() else { status = "Screen Recording permission required"; return }; running = true; epoch = UUID(); status = "Listening for changes"; configureMode() }
+    public func start() {
+        guard !running else {return}
+        if settings.visualCaptureMode == .accessibility {
+            guard snapshots.accessibilityPermitted() else {status="Accessibility permission required for text-only capture";return}
+        } else {guard snapshots.permitted() else {status="Screen Recording permission required";return}}
+        running=true;epoch=UUID();status="Listening for changes";configureMode()
+    }
     private var noDisplaysSelected:Bool {settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true}
     private func configureMode() {
+        if settings.visualCaptureMode == .accessibility {
+            do {try AccessibilityCaptureRecord.validateScope(settings)}catch {status=error.localizedDescription;return}
+            replay?.stop();replay=nil;schedule();Task {await captureOnce()};return
+        }
         guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
         guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
         if settings.visualCaptureMode == .replay && !settings.allDisplays && settings.snapshotRegions.focusedWindowCrop==nil {
@@ -82,6 +97,7 @@ public struct CaptureMetrics: Sendable {
     /// Explicit bounded replay, including a chosen app. Existing permissions
     /// only; never prompts or falls through to a different app when absent.
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
+        guard settings.visualCaptureMode != .accessibility else {throw OSwindError.invalid("Text-only mode cannot capture replay · select a pixel mode explicitly in Settings")}
         guard settings.snapshotRegions.valid else {throw OSwindError.invalid("Invalid capture area; choose a new area in Settings")}
         guard !settings.allDisplays else {throw OSwindError.invalid("Replay requires focused-window mode; turn off display capture first")}
         guard settings.snapshotRegions.focusedWindowCrop==nil else {throw OSwindError.invalid("Focused-window replay cannot use a crop; choose snapshots or clear the crop")}
@@ -97,7 +113,7 @@ public struct CaptureMetrics: Sendable {
         guard metrics.saved>previousSaved else {throw OSwindError.unavailable("Replay saved no evidence: "+status)}
     }
     private func schedule() {
-        timer?.invalidate(); let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .null)
+        timer?.invalidate(); let idle = snapshots.idleSeconds()
         let interval = settings.profile.effectiveInterval(lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled, thermalLimited: ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical, idleSeconds: idle) ?? 20
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in Task { @MainActor in guard let self, self.running else { return }; await self.captureOnce(); self.schedule() } }
     }
@@ -122,6 +138,7 @@ public struct CaptureMetrics: Sendable {
     }
     public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
         guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
+        if settings.visualCaptureMode == .accessibility {await captureTextOnce(manual:manual,targetBundleID:targetBundleID);return}
         guard manual || settings.visualCaptureMode != .replay || settings.allDisplays || settings.snapshotRegions.focusedWindowCrop != nil else {return}
         guard targetBundleID==nil || !settings.allDisplays else {status="Targeted app capture requires focused-window mode";return}
         guard manual || targetBundleID == nil else { status = "Targeted app capture requires a manual request"; return }
@@ -129,7 +146,7 @@ public struct CaptureMetrics: Sendable {
         guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
         guard !snapshots.locked() else {status="Locked · capture suspended";return}
         guard snapshots.permitted() else {status="Screen Recording permission required";return}
-        if !manual,CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)>120 {metrics.idle+=1;status="Idle · saving energy";return}
+        if !manual,snapshots.idleSeconds()>120 {metrics.idle+=1;status="Idle · saving energy";return}
         // Reserve the operation before the first suspension: pause, a settings
         // change and a second manual request must invalidate or defer this read.
         busy=true;defer {busy=false};let token=epoch,begin=Date();lastCapture=begin
@@ -209,6 +226,75 @@ public struct CaptureMetrics: Sendable {
             }
         } catch is CancellationError {if epoch==token {status="Snapshot cancelled"}}
         catch let deferral as SnapshotCaptureDeferral {if epoch==token {metrics.excluded+=1;status=deferral.reason}}
+        catch {if epoch==token {metrics.errors+=1;status=error.localizedDescription}}
+    }
+    private func textCurrent(token:UUID,manual:Bool)->Bool {
+        !Task.isCancelled && epoch==token && settings.visualCaptureMode == .accessibility && (running || manual) && !suspended && !snapshots.locked() && snapshots.accessibilityPermitted()
+    }
+    private func captureTextOnce(manual:Bool,targetBundleID:String?) async {
+        do {try AccessibilityCaptureRecord.validateScope(settings)}catch {status=error.localizedDescription;return}
+        guard manual || targetBundleID==nil else {status="Targeted app capture requires a manual request";return}
+        guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
+        guard !snapshots.locked() else {status="Locked · text capture suspended";return}
+        guard snapshots.accessibilityPermitted() else {status="Accessibility permission required for text-only capture";return}
+        if !manual,snapshots.idleSeconds()>120 {metrics.idle+=1;status="Idle · saving energy";return}
+        busy=true;defer {busy=false};let token=epoch,start=Date(),configuration=settings,sourceStore=store,localEmbedder=embedder,gate=textGate
+        lastCapture=start
+        do {
+            let reserve=Task.detached(priority:.utility) {try AccessibilityCaptureReservation(store:sourceStore,configuration:configuration)}
+            textReservationWorker=reserve;defer {textReservationWorker=nil}
+            let reservation=try await withTaskCancellationHandler {try await reserve.value} onCancel:{reserve.cancel()}
+            defer {reservation.release()}
+            guard textCurrent(token:token,manual:manual) else {return}
+            let capturedAt=Date(),initial=await readSnapshotContext(targetBundleID)
+            guard textCurrent(token:token,manual:manual) else {return}
+            guard let context=initial,snapshots.identityCurrent(context,targetBundleID) else {status="Application context unavailable or busy";return}
+            guard context.bundle != "com.oswind.desktop",context.bundle != Bundle.main.bundleIdentifier else {status="OSwind window · skipped";return}
+            guard !context.secure else {metrics.excluded+=1;status="Protected text field · skipped";return}
+            if let reason=configuration.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {metrics.excluded+=1;status=reason;return}
+            let previous=lastTextCapture,embedding=snapshots.textEmbedding
+            let prepare=Task.detached(priority:.utility) {() throws -> (Memory,Data,Bool) in
+                var memory=try AccessibilityCaptureRecord.make(context,at:capturedAt,policy:configuration.privacy)
+                let digest=try AccessibilityCaptureRecord.digest(memory)
+                var duplicate=false
+                if !manual,let previous,previous.digest==digest {duplicate=try sourceStore.accessibilityCaptureStillExists(id:previous.id,matching:memory)}
+                if !duplicate {memory.embedding=try embedding(memory.searchableText,localEmbedder);memory.embeddingModel=memory.embedding==nil ? nil:localEmbedder.modelID}
+                try Task.checkCancellation();return (memory,digest,duplicate)
+            }
+            textPreparationWorker=prepare;defer {textPreparationWorker=nil}
+            let prepared=try await withTaskCancellationHandler {try await prepare.value} onCancel:{prepare.cancel()}
+            guard textCurrent(token:token,manual:manual) else {return}
+            if prepared.2 {metrics.unchanged+=1;status="Unchanged accessible text · skipped";return}
+            let latest=await readSnapshotContext(targetBundleID)
+            guard textCurrent(token:token,manual:manual) else {return}
+            guard let latest,SnapshotContextBinding.matches(context,latest),snapshots.identityCurrent(latest,targetBundleID),
+                  configuration.privacy.exclusion(app:latest.bundle,title:latest.title,url:latest.url,isBrowser:latest.browser)==nil else {metrics.excluded+=1;status="Context changed · text discarded";return}
+            let memory=prepared.0,commitPermitted=snapshots.textCommitPermitted
+            let commit=Task.detached(priority:.utility) {
+                try gate.commit {
+                    try Task.checkCancellation()
+                    guard commitPermitted() else {throw CancellationError()}
+                    try sourceStore.insertAccessibilityCapture(memory,reservation:reservation)
+                }
+            }
+            textCommitWorker=commit;defer {textCommitWorker=nil}
+            try await withTaskCancellationHandler {try await commit.value} onCancel:{commit.cancel()}
+            metrics.saved+=1
+            guard textCurrent(token:token,manual:manual) else {return}
+            lastTextCapture=(prepared.1,memory.id)
+            var pending:String?
+            if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled {
+                let indexing=Task.detached(priority:.utility) {try sourceStore.indexApplePassages(memory,embedder:localEmbedder)}
+                snapshotPassages=indexing;defer {snapshotPassages=nil}
+                do {try await withTaskCancellationHandler {try await indexing.value} onCancel:{indexing.cancel()}}catch {pending=error.localizedDescription}
+            }
+            guard textCurrent(token:token,manual:manual) else {return}
+            metrics.lastLatencyMS=Date().timeIntervalSince(start)*1000
+            if let pending {metrics.errors+=1;status="Saved accessible text · search indexing pending: "+pending}
+            else {status="Saved accessible text · "+memory.app}
+            onCapture?(memory)
+        } catch is CancellationError {if epoch==token {status="Text capture cancelled"}}
+        catch let refusal as SnapshotCaptureDeferral {if epoch==token {status=refusal.reason}}
         catch {if epoch==token {metrics.errors+=1;status=error.localizedDescription}}
     }
     nonisolated public static func fingerprint(_ image: CGImage) -> [UInt8] {

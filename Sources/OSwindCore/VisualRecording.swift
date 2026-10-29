@@ -63,7 +63,12 @@ public struct VisualRecording:Codable,Equatable,Sendable {
         return ranked.max {a,b in a.phrases != b.phrases ? a.phrases<b.phrases:a.terms != b.terms ? a.terms<b.terms:a.time>b.time}?.time ?? 0
     }
 }
-public enum VisualCaptureMode:String,Codable,CaseIterable,Sendable {case snapshots,replay}
+public enum VisualCaptureMode:String,Codable,CaseIterable,Sendable {
+    case snapshots,replay,accessibility
+    public var label:String {
+        switch self {case .snapshots:return "Snapshots";case .replay:return "Replay · HEVC clips";case .accessibility:return "Text only · Accessibility"}
+    }
+}
 public extension CaptureProfile {
     func replayInterval(lowPower:Bool,thermalLimited:Bool) -> Double {
         let base:Double = self == .light ? 5:self == .balanced ? 1:0.5

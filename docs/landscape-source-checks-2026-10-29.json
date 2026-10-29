@@ -1,11 +1,11 @@
 {
   "format": "OSwind primary-source competitor check and expansion queue",
-  "version": 1,
+  "version": 2,
   "checked": "2026-10-29",
-  "scope": "Documentation rechecks and four additional comparators; no application installs, purchases, agreements, code reuse or runtime measurements.",
+  "scope": "Documentation rechecks plus four additional profiles now integrated into the canonical20-offering comparison. No competitor app installation, purchase, agreement, code reuse or runtime/power measurement is established by these notes.",
   "canonicalMatrix": "landscape.json",
-  "canonicalVendorCount": 16,
-  "canonicalVendorsUnchanged": true,
+  "canonicalVendorCount": 20,
+  "canonicalVendorsUnchanged": false,
   "existingChecks": [
     {
       "name": "Screenpipe",
@@ -177,12 +177,13 @@
       "limits": "Vendor policy claims, not independently audited. Not the unrelated coding-memory plugins or forensic tools named Goldfish."
     }
   ],
-  "canonicalIntegrationPending": true,
+  "canonicalIntegrationPending": false,
   "rankingAccepted": false,
   "remaining": [
-    "Integrate the four additional profiles into the human-facing matrix with an independently verified renderer revision.",
     "Reverify unavailable pricing/service pages; distinguish cached source evidence from live HEAD.",
     "Pin permissible versions and agree a reproducible owned workload before actual competitor benchmarks.",
     "Do not infer privacy, energy, latency or accuracy from vendor documentation."
-  ]
+  ],
+  "canonicalVendorCountAtCollection": 16,
+  "integration": "Four additional profiles integrated; source-check labels, unavailable pricing and standalone text-capture requirement remain explicit. The historical initial queue/evidence is preserved in earlier commits."
 }

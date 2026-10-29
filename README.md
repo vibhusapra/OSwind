@@ -2,13 +2,13 @@
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
-**v0 is in active development.** The [feature ledger](docs/features.json) tracks 76 requirements across [16 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
+**v0 is in active development.** The [feature ledger](docs/features.json) tracks 77 requirements across [20 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.
 
-The latest work reduces [full Accessibility polling during replay](docs/REPLAY-CONTEXT-DUTY.md). Frame processing retains fresh complete privacy checks; controlled scheduler/tree work counts are separate from physical energy. Its [frozen qualification](benchmarks/replay-context-duty-v1.json) passes 1,228 full tests with two explicit skips, 131 sanitizer and 131 optimized checks with one session-admission skip each, plus all 17 ordered stages. The [delivery ledger](docs/PROGRESS.md) tracks remaining acceptance.
+The latest work adds [standalone Accessibility text capture](docs/ACCESSIBILITY-TEXT-CAPTURE.md): an explicit desktop mode that reads permitted focused-window text without screen pixels or OCR. Setup explains the required Accessibility access, and saved crop/display scopes remain blocked until explicitly resolved. Native app coverage and physical power remain open. [Replay context duty](docs/REPLAY-CONTEXT-DUTY.md) separately reduces full-tree polling while retaining per-frame privacy checks.
 
 [Experimental local PII import masking](docs/LEARNED-IMPORT-PRIVACY.md) and [per-memory check records](docs/PII-SCAN-RECORDS.md) are available for explicit text imports. The model stays off by default and has known misses. A recorded check does not establish that personal information is absent; learned capture/media/egress protection remains open.
 
-Builds are staged and ad-hoc signed. [Benchmark receipts](benchmarks/README.md) retain successes, failures and their scope. Physical desktop, native vault detach and release acceptance remain open. [October 29 research notes](docs/landscape-source-checks-2026-10-29.json) queue four more comparators and retain pricing/access caveats.
+Builds are staged and ad-hoc signed. [Benchmark receipts](benchmarks/README.md) retain successes, failures and their scope. Physical desktop, native vault detach and release acceptance remain open. [October 29 research notes](docs/landscape-source-checks-2026-10-29.json) record the four newly integrated profiles and retain pricing/access caveats.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 

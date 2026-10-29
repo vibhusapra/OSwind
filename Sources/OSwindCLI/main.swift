@@ -159,6 +159,7 @@ do {
           --vault PACKAGE <command>               Use an already-unlocked managed library
           prune [--days N] [--max-gb N] [--json]   Retention with explicit file/budget outcome
           capture-replay --seconds N [--app-bundle ID]  Bounded hardware replay with existing permissions
+          capture-text [--app-bundle ID]  One configured text-only capture; no pixel APIs
           capture [--app-bundle ID]      Capture a chosen/current window once
           transcribe FILE --model PATH   Local whisper.cpp transcription
           serve                          Read-only token-auth API at 127.0.0.1:47831
@@ -358,6 +359,9 @@ do {
     } else if command == "doctor" {
         let settings = AppSettings.load(root:root); let embedder = LocalEmbedder()
         var result: [String:Any] = ["version":"0.1.0","os":ProcessInfo.processInfo.operatingSystemVersionString,"gpu":MTLCreateSystemDefaultDevice()?.name ?? "unavailable","screenRecording":CGPreflightScreenCaptureAccess(),"screenLocked":SessionState.locked,"accessibility":AXIsProcessTrusted(),"sentenceEmbeddings":embedder.available,"dataDirectory":root.path,"whisperExecutable":FileManager.default.isExecutableFile(atPath:settings.whisperBinary),"whisperModel":FileManager.default.fileExists(atPath:settings.whisperModel),"provider":settings.ai.provider.rawValue]
+        result["desktopCaptureMode"]=settings.visualCaptureMode.rawValue
+        result["screenRecordingRequiredForDesktop"]=settings.visualCaptureMode != .accessibility
+        result["desktopPermissionReady"]=settings.visualCaptureMode == .accessibility ? AXIsProcessTrusted():CGPreflightScreenCaptureAccess()
         #if canImport(FoundationModels)
         if #available(macOS 26, *) { result["appleIntelligence"] = SystemLanguageModel.default.isAvailable }
         #endif
@@ -583,6 +587,15 @@ do {
             let controller=CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root))
             try await controller.captureReplay(seconds:seconds,targetBundleID:bundle)
             try emit(["status":controller.status,"saved":controller.metrics.saved,"errors":controller.metrics.errors])
+        case "capture-text":
+            let bundle=try validatedOption("--app-bundle")
+            guard args.isEmpty else {throw OSwindError.invalid("Use capture-text [--app-bundle ID]")}
+            let settings=AppSettings.load(root:root)
+            guard settings.visualCaptureMode == .accessibility else {throw OSwindError.invalid("Select and save Text only in Capture settings before capture-text")}
+            let controller=CaptureController(store:store,embedder:embedder,settings:settings)
+            await controller.captureOnce(manual:true,targetBundleID:bundle)
+            guard controller.metrics.saved==1,controller.metrics.errors==0 else {throw OSwindError.unavailable("Text-only capture saved no complete indexed source: "+controller.status)}
+            try emit(["status":controller.status,"saved":controller.metrics.saved,"errors":controller.metrics.errors,"mode":"accessibility"])
         case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
         case "import-audio":
             var settings=AppSettings.load(root:root)
