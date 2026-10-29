@@ -1,6 +1,8 @@
 # Sampled text observation spans
 
-Implementation is in progress on top of source eadabc1 / PR #87. This source is not yet qualified. The first focused build exposed a private UI color reference; it was corrected before the next run. The current expanded focused run passes 132 checks, including evidence pinning; nine debug process groups / 26 operations cover CLI/HTTP/MCP/SDK, quiet portability, exact-boundary erase and an actual preceding schema 23 writer. Full native/model, sanitizer, optimized and signed package acceptance remains pending.
+Source 2d58589 implements sampled spans on top of PR #87. The full suite passes 1,286 cases with three explicit skips; selected TSan passes 261 with one skip, and optimized passes all 262. All 35 new span/pinning cases pass in each build. The original frozen 19-stage run retains 16 passes and three harness failures. Fixture-only 44e0bb1 corrects two schema harnesses and a closed-socket preflight; a four-stage signed follow-up passes the affected contracts and consecutive API server use. Product, tests, SDK, CI, models and assets retain their qualified bytes. [Detailed receipt](../benchmarks/text-observation-spans-v1.json).
+
+A separate current signed manual AX probe captures only owned AppKit fixtures, verifies text, pattern masking, exclusion and deletion, and retains zero media. After the host became unlocked, one native system-audio isolation test passes both generated-tone observations and one muted playback lifecycle test passes. These supplement the earlier skips without rewriting the full run. Native automatic spans, representative app coverage, sustained cadence and physical power remain unaccepted.
 
 ## What the range means
 
@@ -18,22 +20,31 @@ Observation metadata participates in evidence revisions. Opening a result or con
 
 The logical library version is 24 so older writers refuse it. A quiet backup preserves sampled metadata with automatic services off. Plain JSON can carry authored sampled metadata; its presence is not proof of native capture or an absence of personal information. Metadata validation rejects impossible counts, dates, gaps and retained-media combinations. Pattern masking remains fallible.
 
-## Work remaining
+## Verification and remaining work
 
-- [x] 132 focused store/controller/query/race/UI-model checks, including pin-before-inference and capture-after-pinning. Original compile and pre-fix regression failures remain retained.
-- [x] Nine debug CLI/HTTP/MCP/SDK/portability groups and 26 operations. The actual preceding schema 23 writer drops unknown span fields; upgrading those sources preserves exact payload bytes and installs an empty projection.
-- [x] Ten final light/dark owned component renders with sampled extents, capture health, source cards and mode guidance; native input/TCC acceptance remains separate.
-- [ ] Owned archive migration/query/write work measurements and independent source oracle.
-- [ ] Frozen full native/model, sanitizer/optimized, signed process/package checks.
-- [ ] Updated comparison, feature ledger, qualified receipts and draft PR.
-- [ ] Actual permissioned native text spans, representative application coverage and sustained power/cadence acceptance.
+- [x] 132 expanded focused checks; all 35 new span/pinning cases also pass in full, TSan and optimized builds.
+- [x] Nine current signed CLI/HTTP/MCP/SDK/portability groups and 26 operations. An actual preceding schema 23 writer drops unknown span fields; upgrading its output preserves exact payload bytes and installs an empty range projection.
+- [x] Ten final light/dark owned component renders with sampled extents, capture health, source cards and mode guidance.
+- [x] Paired signed million-source range reads: 90 persistent MCP/SDK operations, six scopes, exact independent IDs and unchanged typed fields for every original source. The positive sparse-overlap and empty-after-last controls pass.
+- [x] Full/native-model, TSan/optimized, generated hardware replay, encrypted APFS, million-source migration SIGKILL/retry and signed package/ZIP checks. The original three harness failures and corrected follow-up remain separate.
+- [x] Current manual native AX text, generated-tone process isolation and muted audio playback lifecycle follow-ups, all on owned fixtures with no settings changes.
+- [x] Comparison/feature ledger, receipts and [draft PR #88](https://github.com/vibhusapra/OSwind/pull/88).
+- [ ] Actual native automatic text spans, representative applications/browser/secure-field transitions and natural multilingual/editing workloads.
+- [ ] Sustained cadence/missed-change and physical energy/storage acceptance with idle controls.
+- [ ] Personal-device sync, complete migrations, notarized distribution/updates, older Mac/macOS matrix and matched whole-product competitor workloads.
 
 ## Development performance probe
 
 The first million-source probe retained a roughly 20-second migration and 1.6–1.7-second broad query regression. Supported pre-24 writers cannot encode observation metadata, so their upgrade now installs the empty projection without a payload scan; schema 24 cache repair still rebuilds from bounded sources. Time queries use the validated 15-minute maximum span to bound the timestamp index, then a CASE-gated sparse lookup, avoiding the large OR sort.
 
-The corrected debug probe reports about 3 ms persistent MCP/SDK reads versus about 2.4–2.7ms for the preceding optimized build, with exact independent IDs. Open plus fixture verification is about 1.1 s versus the first 20-second result. These are warm development observations with different build modes and uncontrolled caches/background work. A paired signed optimized rerun is pending; no SQL-only, cold-start, energy or competitor ranking claim follows.
+The corrected debug probe reports about 3 ms persistent MCP/SDK reads versus about 2.4–2.7ms for the preceding optimized build, with exact independent IDs. Open plus fixture verification is about 1.1 s versus the first 20-second result. These are warm development observations with different build modes and uncontrolled caches/background work. The subsequent paired signed optimized probe observes roughly 2.8–3.2 ms medians for the three 100-result scopes across the current point/span modes, versus about 2.9 ms for the preceding build. Empty/sparse controls are about 0.15–0.25 ms. Open plus fixture verification is 0.53 s current / 0.82 s preceding. All independent IDs and original million typed rows match. Five samples per scope, warmed caches and uncontrolled host activity do not establish a speed ranking, isolated SQL cost, cold start, energy or competitor rank.
 
-The initial frozen qualification was intentionally stopped after review found that metadata edits bypassed the sampled-payload size bound. An actual pre-fix regression case has three failed assertions: the oversized tag edit succeeded and removed time lookup coverage. Metadata writes now enforce the same span/record bounds before SQL; the rejected edit preserves its source and sparse projection. The interrupted manifest/logs, verified stopped handles and failed regression receipt remain retained. A fresh full qualification will use the corrected source.
+The initial frozen qualification was intentionally stopped after review found that metadata edits bypassed the sampled-payload size bound. An actual pre-fix regression case has three failed assertions: the oversized tag edit succeeded and removed time lookup coverage. Metadata writes now enforce the same span/record bounds before SQL; the rejected edit preserves its source and sparse projection. The interrupted manifest/logs, verified stopped handles and failed regression receipt remain retained. The subsequent full qualification uses the corrected source.
 
 A second frozen run passed all 1,281 defined full cases (three explicit skips) and 254 selected sanitizer cases (one skip), then was intentionally stopped during optimized compilation. Review found that an extending source could invalidate a visible result or answer in flight. Two pre-fix regression tests retain five failed assertions. The corrected consumer transaction pins the extent before reasoning/inspection, and capture continues in a new source. A newly added integration assertion initially counted only two captures while also storing a recap; it now checks two screen sources and three total records. These interrupted runs do not qualify the subsequent pinning changes.
+
+The third frozen run completes with three retained harness failures: entity/tag scripts still expected schema 23, and the HTTP bind preflight refused a just-used fixed address. No listening process was observed at inspection; the exact earlier socket state was not captured. A separate owned TCP pair reproduces the closed-address refusal and verifies that SO_REUSEADDR permits rebind while still refusing a live listener. Only the strict latest-version constants and socket preflight change; historical schema 20 and all source/SQL/JSON oracles remain unchanged. The corrected four-stage follow-up uses the exact same signed CLI and starts its HTTP check immediately after the preceding API server closes.
+
+## Native idle counterexample found after qualification
+
+The owned automatic-controller pilot twice produces no source with `Idle · saving energy`, including after a native fixture click. This exposed an inherited capture/replay idle-query bug: the implementation asks for `.null`, while [Apple specifies any input](https://developer.apple.com/documentation/coregraphics/cgeventsource/secondssincelasteventtype%28_%3Aeventtype%3A%29?language=objc). A same-process native API comparison reports null-event age 1,416,474.46 seconds versus any-input age 0.31 seconds. The two event types have raw values 0 and 4,294,967,295. This is a current automatic-capture/replay acceptance blocker, despite the passing controlled suites. Manual native captures bypass idle admission and remain positive. The first private harness bootstrap also misread quoted linker object paths; that setup failure is retained separately. Shared native input activity accounting and new regression/native verification are the next fix. No idle or device policy was changed to obtain these results.
