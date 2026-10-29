@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version22 fences writers that cannot preserve/enforce project-ID corrections.
-    public static let schemaVersion = 23
+    // Version24 fences writers that cannot preserve sampled text spans.
+    public static let schemaVersion = 24
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -147,6 +147,7 @@ public final class MemoryStore: @unchecked Sendable {
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try exec(EntitySchema.sql)
         try exec(PIIScanSchema.sql)
+        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
@@ -195,6 +196,7 @@ public final class MemoryStore: @unchecked Sendable {
     private func insertValidated(_ memory:Memory,deferRecapLinks:Bool) throws {
         lock.lock(); defer { lock.unlock() }
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
+        try memory.textObservation?.validated(for:memory)
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
         if let visual=memory.visualRecording {_ = try visual.validated();guard memory.kind == .screen,memory.text==visual.text else {throw OSwindError.invalid("Visual recording and source text differ")}}
@@ -208,12 +210,17 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
+        if let before=try get(memory.id),before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash {
+            let unpin=try prepare("DELETE FROM text_observation_pins WHERE memory_id=?");defer {sqlite3_finalize(unpin)};bind(unpin,1,memory.id)
+            guard sqlite3_step(unpin)==SQLITE_DONE else {throw failure()}
+        }
         if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
         let data = try JSONEncoder().encode(payload)
         guard data.count <= Self.maximumRecordBytes else { throw OSwindError.invalid("Memory payload exceeds 128 MiB") }
+        guard memory.textObservation==nil || data.count<=262144 else {throw OSwindError.invalid("Sampled text payload exceeds 256 KiB")}
         bind(stmt, 1, memory.id); sqlite3_bind_double(stmt, 2, memory.timestamp.timeIntervalSince1970); bind(stmt, 3, memory.kind.rawValue); bind(stmt, 4, memory.app); bind(stmt, 5, memory.title); bind(stmt, 6, memory.url); bind(stmt, 7, memory.text); sqlite3_bind_int(stmt, 8, memory.favorite ? 1 : 0)
         _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 9, $0.baseAddress, Int32(data.count), transient) }
         if let vector = memory.embedding, !vector.isEmpty, vector.allSatisfy({$0.isFinite}) { _ = vector.withUnsafeBytes { sqlite3_bind_blob(stmt, 10, $0.baseAddress, Int32($0.count), transient) } }
@@ -246,19 +253,26 @@ public final class MemoryStore: @unchecked Sendable {
     }
     /// Revalidate and load complete evidence in one read snapshot. Deleted or
     /// revised sources fail explicitly, rather than silently retargeting offsets.
-    public func hydrate(_ hits:[SearchHit]) throws -> [SearchHit] {
-        let activity=try hits.contains(where:{$0.visual != nil}) ? mediaWriteLease():nil
+    public func hydrate(_ hits:[SearchHit],pinTextObservations:Bool=false) throws -> [SearchHit] {
+        let pins=pinTextObservations && hits.contains {$0.memory.textObservation != nil}
+        let activity=try (pins || hits.contains(where:{$0.visual != nil})) ? mediaWriteLease():nil
         defer {activity?.release()}
         lock.lock();defer {lock.unlock()};try Task.checkCancellation()
-        try exec("SAVEPOINT hydrate_sources");defer {try? exec("RELEASE hydrate_sources")}
-        return try hits.map { hit in
+        let owns=pins && db.map {sqlite3_get_autocommit($0) != 0} == true
+        try exec(owns ? "BEGIN IMMEDIATE":"SAVEPOINT hydrate_sources")
+        do {let result=try hits.map { hit in
             try Task.checkCancellation()
             let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
-            guard let current=try get(hit.id),current.searchPreview==nil,current.evidenceHash==expected else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            guard let current=try get(hit.id),current.searchPreview==nil else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            let exact=current.evidenceHash==expected
+            let appended = pinTextObservations && !exact ? try current.extendsTextObservation(hit.memory):false
+            guard exact || appended else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
             guard hit.passage.map({$0.text(in:current.text) != nil}) ?? true else {throw OSwindError.invalid("The source passage is no longer valid")}
             if let visual=hit.visual {try validateVisualMatch(visual,memory:current)}
+            if pins {try withRoutineDatabase {try $0.pinTextObservation(current)}}
             return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage,visual:hit.visual)
-        }
+        };try Task.checkCancellation();try exec(owns ? "COMMIT":"RELEASE hydrate_sources");return result
+        } catch {try? exec(owns ? "ROLLBACK":"ROLLBACK TO hydrate_sources; RELEASE hydrate_sources");throw error}
     }
     public func hydrate(_ memory:Memory) throws -> Memory {try hydrate([SearchHit(memory:memory,score:0,match:"")])[0].memory}
     private func replaceSpeakerProjection(_ memory:Memory) throws {
@@ -296,11 +310,25 @@ public final class MemoryStore: @unchecked Sendable {
     public func get(_ id: String) throws -> Memory? {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
-    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil) -> (String, [String]) {
+    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true) -> (String, [String]) {
+        // An inverted interval can otherwise match a span crossing both bounds.
+        // Public query resolution reports the error; raw store APIs fail closed.
+        if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
+        if let start=filter.start,let end=filter.end,start>=end {return ("0=1",[])}
         var parts = ["1=1"]; var values = [String]()
         if let app = filter.app, !app.isEmpty { parts.append("\(prefix)app=?"); values.append(app) }
         if let kind = filter.kind { parts.append("\(prefix)kind=?"); values.append(kind.rawValue) }
-        if let start = filter.start { parts.append("\(prefix)timestamp>=?"); values.append(String(start.timeIntervalSince1970)) }
+        if let start = filter.start {
+            let value=String(start.timeIntervalSince1970)
+            if includeTextObservations && filter.sourceStartsOnly != true {
+                // Valid spans never exceed 15 minutes. Bound the timestamp
+                // index first, then inspect only older candidate IDs. CASE
+                // avoids SQLite's million-row MULTI-INDEX OR + sort plan.
+                let lower=String(start.addingTimeInterval(-TextObservationSpan.maximumDuration-1).timeIntervalSince1970)
+                parts.append("(\(prefix)timestamp>=? AND CASE WHEN \(prefix)timestamp>=? THEN 1 ELSE EXISTS(SELECT 1 FROM text_observation_ranges _observed WHERE _observed.memory_id=\(prefix)id AND _observed.last_observed>=?) END)");values += [lower,value,value]
+            }
+            else {parts.append("\(prefix)timestamp>=?");values.append(value)}
+        }
         if let end = filter.end { parts.append("\(prefix)timestamp<?"); values.append(String(end.timeIntervalSince1970)) }
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM memory_tags t WHERE t.memory_id=\(prefix)id AND t.tag=?)"); values.append(tag) }
@@ -548,7 +576,12 @@ public final class MemoryStore: @unchecked Sendable {
     }
     private func updateMetadata(_ m: Memory,preservingPIIScan:Bool=false) throws {
         lock.lock(); defer { lock.unlock() };let scanToken=preservingPIIScan ? try piiScanFavoriteToken(m.id):nil
-        let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m);if let scanToken {try preservePIIScanAfterFavorite(m.id,token:scanToken)}
+        try m.textObservation?.validated(for:m)
+        let data=try JSONEncoder().encode(m)
+        guard data.count<=Self.maximumRecordBytes else {throw OSwindError.invalid("Memory payload exceeds 128 MiB")}
+        guard m.textObservation==nil || data.count<=262144 else {throw OSwindError.invalid("Sampled text payload exceeds 256 KiB")}
+        let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }
+        _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m);if let scanToken {try preservePIIScanAfterFavorite(m.id,token:scanToken)}
     }
     @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
     public func diskBytes(includeStaging:Bool=true) -> Int64 {

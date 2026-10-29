@@ -18,7 +18,7 @@ The server binds to `127.0.0.1:47831` only. Every request, including health, req
 - `GET /v1/search?query=release&mode=hybrid&limit=20`
 - `GET /v1/memories/{id}`
 
-Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `speaker` (recording-local name), `detail` (`full` or `preview`), `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Returned dates are ISO 8601. Assets are relative paths, not served over HTTP. HTTP and MCP search return an envelope: `{ "hits": [...], "warnings": [...], "modelID": "..." | null, "duration": 0.1, "strategy": "exact" | "ann-exact-rerank" | null }`. `duration` is seconds. Clients should show warnings for partial index coverage and Hybrid keyword fallback. Semantic-only returns an error if the selected model is unavailable. These paths read the store's `settings.json` search configuration; vectors must be built for the selected model first.
+Search fields: `app`, `kind` (`screen`, `audio`, `note`, `summary`), `start` and `end` (ISO 8601, inclusive start/exclusive end), `favorites=true`, `tag`, `speaker` (recording-local name), `detail` (`full` or `preview`), `limit` (1–100), `mode` (`hybrid`, `keyword`, `semantic`). Time filters also include bounded sampled text spans. Set `sourceStartsOnly=true` (HTTP) or `sourceStartsOnly: true` (MCP) to match starts only; values must be Booleans and HTTP accepts only `true`/`false`. Returned dates are ISO 8601. Assets are relative paths, not served over HTTP. HTTP and MCP search return an envelope: `{ "hits": [...], "warnings": [...], "modelID": "..." | null, "duration": 0.1, "strategy": "exact" | "ann-exact-rerank" | null }`. `duration` is seconds. Clients should show warnings for partial index coverage and Hybrid keyword fallback. Semantic-only returns an error if the selected model is unavailable. These paths read the store's `settings.json` search configuration; vectors must be built for the selected model first.
 
 CLI search prints the hit array by default, with warnings on stderr. Add `--details` for the same envelope. The HTTP header deadline is separate from model inference timeouts.
 
@@ -80,3 +80,5 @@ oswindctl --data /path/to/library get MEMORY_ID
 ```
 
 Schema 11 builds the cache one audio source at a time during migration, within the migration transaction. Source, name-index and preview writes are atomic. Metadata changes reserve the SQLite writer before reading a source so concurrent attribution edits cannot be overwritten by stale favorite/tag updates.
+
+Sampled text sources can include `textObservation` (version, sessionID, samples, largestGapSeconds) and `endTimestamp` for their last sample. Gaps are unobserved; this is not continuous activity or a native-capture/privacy attestation. Calendar responses expose `timeBasis: "source-start"` and `scope.sourceStartsOnly: true`. See [sampled spans](TEXT-OBSERVATION-SPANS.md).

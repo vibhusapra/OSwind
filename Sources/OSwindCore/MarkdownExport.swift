@@ -88,6 +88,7 @@ public enum MarkdownExport {
                         var metadata: [String:Any] = ["oswind_id":policy.sanitize(id).text,"kind":memory.kind.rawValue,"created":try ISOTime.string(memory.timestamp),"title":memory.title,"app":memory.app,"bundle_id":memory.bundleID,"favorite":memory.favorite,"tags":memory.tags,"aliases":[memory.title]]
                         if let recap=memory.recap {metadata["recap_provider"]=policy.sanitize(recap.provider).text;metadata["linked_source_ids"]=recap.sources.map(\.id)}
                         if let end = memory.endTimestamp { metadata["ended"] = try ISOTime.string(end) }
+                        if let observation=memory.textObservation {metadata["text_observation_samples"]=observation.samples;metadata["largest_observation_gap_seconds"]=observation.largestGapSeconds;metadata["observation_semantics"]="Sampled first/last context; gaps unobserved, not continuous activity or attention"}
                         if let session = memory.audioSessionID { metadata["audio_session_id"] = session }
                         try page.write("---\n")
                         for name in metadata.keys.sorted() { try page.write(name+": "+yaml(metadata[name]!)+"\n") }

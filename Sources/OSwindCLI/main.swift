@@ -67,8 +67,10 @@ func searchFilter() throws -> SearchFilter {
         }
     }
     if values["limit"] == nil { values["limit"] = 20 }
+    guard args.filter({$0=="--source-starts-only"}).count<=1 else {throw OSwindError.invalid("Use --source-starts-only only once")}
+    if args.contains("--source-starts-only") {values["sourceStartsOnly"]=true}
     values["favorites"] = args.contains("--favorites")
-    args.removeAll {$0 == "--favorites" || $0 == "--json" || $0 == "--literal"}
+    args.removeAll {$0 == "--favorites" || $0 == "--json" || $0 == "--literal" || $0 == "--source-starts-only"}
     values["query"] = args.joined(separator:" ")
     return try Integration.filter(values)
 }
@@ -99,7 +101,7 @@ do {
                                          Inspect using prepared assets; never auto-downloads
           collect --stdin                Admit a bounded version 1 text-collector batch
           search [--preview] [--mode hybrid|keyword|semantic|visual] [--app APP] [--kind KIND]
-                 [--from ISO8601] [--to ISO8601] [--limit N] [--literal] WORDS
+                 [--from ISO8601] [--to ISO8601] [--limit N] [--literal] [--source-starts-only] WORDS
                  Query scopes: yesterday, last week, on:YYYY-MM-DD, app:"Safari", kind:audio, speaker:"Maya", tag:work, is:favorite
                  Content: "archive launch"; alpha AND (beta OR gamma); alpha NOT beta
                  --literal disables both scope and content syntax; ordinary words rank softly

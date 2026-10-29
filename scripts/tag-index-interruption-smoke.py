@@ -32,7 +32,7 @@ with (root/'interrupted.stdout').open('wb') as stdout,(root/'interrupted.stderr'
 interrupted=state();assert interrupted=={k:v for k,v in before.items() if k!='logicalSourceSHA256'}
 started=time.monotonic();retry=subprocess.run(prefix+['stats','--json'],capture_output=True,check=True,timeout=180);retry_seconds=time.monotonic()-started
 assert json.loads(retry.stdout)['count']==marker['sources'];after=state(with_hash=True)
-assert after['schema']==23 and after['tagTable'] and after['tagMarker'] and after['logicalSourceSHA256']==before['logicalSourceSHA256']
+assert after['schema']==24 and after['tagTable'] and after['tagMarker'] and after['logicalSourceSHA256']==before['logicalSourceSHA256']
 with contextlib.closing(sqlite3.connect(database)) as db:
     oracle="SELECT DISTINCT m.id,t.value,m.timestamp,m.app,m.kind,m.favorite FROM memories m,json_each(CAST(m.payload AS TEXT),'$.tags') t WHERE t.type='text'";columns='memory_id,tag,timestamp,app,kind,favorite'
     assert db.execute(f'SELECT COUNT(*) FROM ({oracle} EXCEPT SELECT {columns} FROM memory_tags)').fetchone()[0]==0

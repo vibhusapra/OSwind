@@ -72,14 +72,14 @@ extension RoutineDatabase {
     func prepareErasure(_ scope:HistoryErasureScope) throws -> Int {
         try execute("CREATE TEMP TABLE IF NOT EXISTS erasure_ids(id TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.erasure_ids;")
         var predicates=["1=1"],values=[String]()
-        if scope.start != nil {predicates.append("(timestamp>=? OR json_extract(CAST(payload AS TEXT),'$.endTimestamp')+978307200>?)")}
+        if scope.start != nil {predicates.append("(timestamp>=? OR json_extract(CAST(payload AS TEXT),'$.endTimestamp')+978307200>? OR id IN (SELECT memory_id FROM text_observation_ranges WHERE last_observed>=?))")}
         if scope.end != nil {predicates.append("timestamp<?")}
         if let app=scope.app {predicates.append("app=?");values.append(app)}
         if let bundle=scope.bundleID {predicates.append("json_extract(CAST(payload AS TEXT),'$.bundleID')=?");values.append(bundle)}
         if let kind=scope.kind {predicates.append("kind=?");values.append(kind.rawValue)}
         let row=try statement("SELECT id,url FROM memories WHERE "+predicates.joined(separator:" AND "));defer {sqlite3_finalize(row)}
         var index:Int32=1
-        if let start=scope.start {sqlite3_bind_double(row,index,start.timeIntervalSince1970);sqlite3_bind_double(row,index+1,start.timeIntervalSince1970);index+=2}
+        if let start=scope.start {for offset:Int32 in 0..<3 {sqlite3_bind_double(row,index+offset,start.timeIntervalSince1970)};index+=3}
         if let end=scope.end {sqlite3_bind_double(row,index,end.timeIntervalSince1970);index+=1}
         for value in values {bind(row,index,value);index+=1}
         let insert=try statement("INSERT INTO temp.erasure_ids VALUES(?)");defer {sqlite3_finalize(insert)}

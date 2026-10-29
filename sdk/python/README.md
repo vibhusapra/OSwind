@@ -22,3 +22,5 @@ server must support `memory_privacy_check`; unsupported requests fail rather tha
 inventing a check. See [PII scan records](../../docs/PII-SCAN-RECORDS.md).
 
 MIT licensed with the OSwind repository; see [LICENSE](../../LICENSE).
+
+For a source-start-only date scope, pass `client.search("release", start="2024-11-03T06:00:00Z", sourceStartsOnly=True)`. The default also includes bounded sampled text spans overlapping the scope. Returned source dictionaries preserve `textObservation` and `endTimestamp`; these describe first/last samples and gaps, not continuous activity or attention. No client/model download change is required. See [sampled text spans](../../docs/TEXT-OBSERVATION-SPANS.md).

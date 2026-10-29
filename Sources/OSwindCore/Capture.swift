@@ -25,7 +25,7 @@ public enum SessionState {
     }
 }
 public struct CaptureMetrics: Sendable {
-    public var saved = 0, unchanged = 0, excluded = 0, idle = 0, errors = 0
+    public var saved = 0, unchanged = 0, coalesced = 0, excluded = 0, idle = 0, errors = 0
     public var lastLatencyMS = 0.0
     public init() {}
 }
@@ -45,6 +45,7 @@ public struct CaptureMetrics: Sendable {
     private var replay:ReplayCaptureSession?
     private var replayGate=ReplayCommitGate()
     public var onCapture: ((Memory) -> Void)?
+    public var onObservation:((Memory)->Void)?
     private let store: MemoryStore
     private let embedder: LocalEmbedder
     private let snapshots:SnapshotCaptureEnvironment
@@ -52,11 +53,11 @@ public struct CaptureMetrics: Sendable {
     private var snapshotWorker:Task<(Memory,Data?,MediaAdmissionLease?),Error>?
     private var snapshotPassages:Task<Void,Error>?
     private var textReservationWorker:Task<AccessibilityCaptureReservation,Error>?
-    private var textPreparationWorker:Task<(Memory,Data,Bool),Error>?
-    private var textCommitWorker:Task<Void,Error>?
+    private var textPreparationWorker:Task<PreparedTextObservation,Error>?
+    private var textCommitWorker:Task<Memory,Error>?
     private var textGate=ReplayCommitGate()
-    private var lastTextCapture:(digest:Data,id:String)?
-    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel();textReservationWorker?.cancel();textPreparationWorker?.cancel();textCommitWorker?.cancel();textGate.invalidate();textGate=ReplayCommitGate()}
+    private var lastTextCapture:TextObservationCursor?
+    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel();textReservationWorker?.cancel();textPreparationWorker?.cancel();textCommitWorker?.cancel();textGate.invalidate();textGate=ReplayCommitGate();lastTextCapture=nil}
     private var timer: Timer?
     private var observers = [AnyCancellable]()
     private var busy = false
@@ -232,6 +233,9 @@ public struct CaptureMetrics: Sendable {
         !Task.isCancelled && epoch==token && settings.visualCaptureMode == .accessibility && (running || manual) && !suspended && !snapshots.locked() && snapshots.accessibilityPermitted()
     }
     private func captureTextOnce(manual:Bool,targetBundleID:String?) async {
+        guard !busy else {return}
+        var keptContinuity=false
+        defer {if !keptContinuity {lastTextCapture=nil}}
         do {try AccessibilityCaptureRecord.validateScope(settings)}catch {status=error.localizedDescription;return}
         guard manual || targetBundleID==nil else {status="Targeted app capture requires a manual request";return}
         guard !Task.isCancelled,!busy,!suspended,running || manual else {return}
@@ -246,42 +250,53 @@ public struct CaptureMetrics: Sendable {
             let reservation=try await withTaskCancellationHandler {try await reserve.value} onCancel:{reserve.cancel()}
             defer {reservation.release()}
             guard textCurrent(token:token,manual:manual) else {return}
-            let capturedAt=Date(),initial=await readSnapshotContext(targetBundleID)
+            let capturedAt=snapshots.now(),observedUptime=snapshots.uptime(),initial=await readSnapshotContext(targetBundleID)
             guard textCurrent(token:token,manual:manual) else {return}
             guard let context=initial,snapshots.identityCurrent(context,targetBundleID) else {status="Application context unavailable or busy";return}
             guard context.bundle != "com.oswind.desktop",context.bundle != Bundle.main.bundleIdentifier else {status="OSwind window · skipped";return}
             guard !context.secure else {metrics.excluded+=1;status="Protected text field · skipped";return}
             if let reason=configuration.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser) {metrics.excluded+=1;status=reason;return}
             let previous=lastTextCapture,embedding=snapshots.textEmbedding
-            let prepare=Task.detached(priority:.utility) {() throws -> (Memory,Data,Bool) in
+            let cadence=configuration.profile.effectiveInterval(lowPower:ProcessInfo.processInfo.isLowPowerModeEnabled,thermalLimited:ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical,idleSeconds:0) ?? 20
+            let gapLimit=min(TextObservationSpan.maximumGap,max(10,cadence*2.5))
+            let prepare=Task.detached(priority:.utility) {() throws -> PreparedTextObservation in
                 var memory=try AccessibilityCaptureRecord.make(context,at:capturedAt,policy:configuration.privacy)
-                let digest=try AccessibilityCaptureRecord.digest(memory)
-                var duplicate=false
-                if !manual,let previous,previous.digest==digest {duplicate=try sourceStore.accessibilityCaptureStillExists(id:previous.id,matching:memory)}
-                if !duplicate {memory.embedding=try embedding(memory.searchableText,localEmbedder);memory.embeddingModel=memory.embedding==nil ? nil:localEmbedder.modelID}
-                try Task.checkCancellation();return (memory,digest,duplicate)
+                let digest=try AccessibilityCaptureRecord.digest(memory),binding=try TextObservationCursor.binding(context)
+                var continuation:TextObservationCursor?
+                if !manual,let previous,previous.canContinue(digest:digest,binding:binding,at:capturedAt,uptime:observedUptime,gapLimit:gapLimit),try sourceStore.accessibilityObservationCanContinue(previous) {continuation=previous}
+                if continuation==nil {
+                    if !manual {memory.textObservation=TextObservationSpan()}
+                    try memory.textObservation?.validated(for:memory)
+                    memory.embedding=try embedding(memory.searchableText,localEmbedder);memory.embeddingModel=memory.embedding==nil ? nil:localEmbedder.modelID
+                }
+                try Task.checkCancellation();return PreparedTextObservation(memory:memory,digest:digest,binding:binding,continuation:continuation)
             }
             textPreparationWorker=prepare;defer {textPreparationWorker=nil}
             let prepared=try await withTaskCancellationHandler {try await prepare.value} onCancel:{prepare.cancel()}
             guard textCurrent(token:token,manual:manual) else {return}
-            if prepared.2 {metrics.unchanged+=1;status="Unchanged accessible text · skipped";return}
             let latest=await readSnapshotContext(targetBundleID)
             guard textCurrent(token:token,manual:manual) else {return}
             guard let latest,SnapshotContextBinding.matches(context,latest),snapshots.identityCurrent(latest,targetBundleID),
                   configuration.privacy.exclusion(app:latest.bundle,title:latest.title,url:latest.url,isBrowser:latest.browser)==nil else {metrics.excluded+=1;status="Context changed · text discarded";return}
-            let memory=prepared.0,commitPermitted=snapshots.textCommitPermitted
+            let proposed=prepared.memory,commitPermitted=snapshots.textCommitPermitted
             let commit=Task.detached(priority:.utility) {
-                try gate.commit {
+                let admitted:Memory=try gate.commit {
                     try Task.checkCancellation()
                     guard commitPermitted() else {throw CancellationError()}
-                    try sourceStore.insertAccessibilityCapture(memory,reservation:reservation)
+                    if let cursor=prepared.continuation {return try sourceStore.extendAccessibilityObservation(cursor,at:capturedAt,reservation:reservation)}
+                    try sourceStore.insertAccessibilityCapture(proposed,reservation:reservation);return proposed
                 }
+                _ = sourceStore.finishRecapInvalidation()
+                return admitted
             }
             textCommitWorker=commit;defer {textCommitWorker=nil}
-            try await withTaskCancellationHandler {try await commit.value} onCancel:{commit.cancel()}
-            metrics.saved+=1
+            let memory=try await withTaskCancellationHandler {try await commit.value} onCancel:{commit.cancel()}
+            if prepared.continuation==nil {metrics.saved+=1}else {metrics.unchanged+=1;metrics.coalesced+=1}
             guard textCurrent(token:token,manual:manual) else {return}
-            lastTextCapture=(prepared.1,memory.id)
+            if !manual,let span=memory.textObservation {
+                lastTextCapture=TextObservationCursor(id:memory.id,digest:prepared.digest,binding:prepared.binding,first:memory.timestamp,last:capturedAt,uptime:observedUptime,span:span);keptContinuity=true
+            }
+            if prepared.continuation != nil {metrics.lastLatencyMS=Date().timeIntervalSince(start)*1000;status="Observed unchanged text · \(memory.textObservation?.samples ?? 1) samples";onObservation?(memory);return}
             var pending:String?
             if settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled {
                 let indexing=Task.detached(priority:.utility) {try sourceStore.indexApplePassages(memory,embedder:localEmbedder)}

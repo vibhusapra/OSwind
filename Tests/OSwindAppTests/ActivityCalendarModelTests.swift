@@ -77,6 +77,7 @@ private actor CalendarModelFixture {
         app.browseActivity(start:repeated.start,end:repeated.end,snapshot:snapshot)
         XCTAssertEqual(app.section,"Memories");XCTAssertEqual(app.mode,.keyword);XCTAssertEqual(app.range,"Calendar slice");XCTAssertEqual(app.calendarSliceZone,zone.identifier)
         let filter=try QueryScopeResolver.resolve(app.filter,interpret:true).filter
+        XCTAssertEqual(filter.sourceStartsOnly,true)
         XCTAssertEqual(filter.start,repeated.start);XCTAssertEqual(filter.end,repeated.end);XCTAssertEqual(filter.app,"Notes");XCTAssertEqual(filter.kind,.audio);XCTAssertTrue(filter.favoritesOnly);XCTAssertEqual(filter.tag,"release notes");XCTAssertEqual(filter.speaker,"Maya Chen")
         let deadline=ContinuousClock.now.advanced(by:.seconds(10));while app.refreshing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
         XCTAssertFalse(app.refreshing);XCTAssertNil(app.searchInputError);XCTAssertEqual(app.hits.map(\.id),["owned-hour-1"])

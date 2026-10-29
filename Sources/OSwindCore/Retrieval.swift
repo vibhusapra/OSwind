@@ -9,7 +9,8 @@ public extension Memory {
         let encoder=JSONEncoder(); encoder.outputFormatting = .sortedKeys
         let audio=transcript.flatMap { try? encoder.encode($0) }.map { SHA256.hash(data:$0).map { String(format:"%02x",$0) }.joined() } ?? ""
         let linked=recap.flatMap {try? encoder.encode($0)}.map {":"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()} ?? ""
-        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio + linked
+        let observation=textObservation.flatMap {try? encoder.encode($0)}.map {":sampled-text:"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()+":"+String((endTimestamp ?? timestamp).timeIntervalSinceReferenceDate.bitPattern)} ?? ""
+        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio + linked + observation
         guard let visualRecording else {return base}
         return base+":"+SHA256.hash(data:(try? encoder.encode(visualRecording)) ?? Data()).map {String(format:"%02x",$0)}.joined()
     }
