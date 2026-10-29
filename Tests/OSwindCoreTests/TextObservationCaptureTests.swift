@@ -90,4 +90,21 @@ import AppKit
         XCTAssertEqual(result.erasure.sources,1);XCTAssertEqual(try store.stats().count,0)
         let rangeCount=try store.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM text_observation_ranges")};XCTAssertEqual(rangeCount,0)
     }
+    func testPinnedEvidenceKeepsItsExtentWhileAutomaticCaptureContinuesInNewSource()async throws {
+        let w=ObservationWorld(),c=try controller(w);let first=try await start(c);defer {c.pause()}
+        w.advance(5);await c.captureOnce();let source=try XCTUnwrap(store.get(first.id))
+        var configuration=AIConfiguration();configuration.provider = .evidence
+        let answer=try await AnswerEngine(store:store,embedder:LocalEmbedder()).answer("Friday",configuration:configuration),chat=try store.createChat()
+        _=try store.appendChatTurn(sessionID:chat.id,question:"Who owns release?",answer:answer);let recap=try store.saveRecap(answer)
+        w.advance(5);await c.captureOnce();XCTAssertEqual(c.metrics.saved,2);XCTAssertEqual(try store.get(first.id)?.textObservation?.samples,2);XCTAssertEqual(try store.get(first.id)?.endTimestamp,source.endTimestamp)
+        w.advance(5);await c.captureOnce();XCTAssertEqual(c.metrics.saved,2);XCTAssertEqual(c.metrics.coalesced,2);XCTAssertEqual(try store.stats().count,3)
+        XCTAssertEqual(try store.search(SearchFilter(kind:.screen),mode:.keyword).count,2)
+        XCTAssertNotNil(try store.get(recap.id));XCTAssertEqual(try store.chatTurns(chat.id).count,1)
+    }
+    func testPinAfterPreparationRefusesLateExtensionAndNextTickStartsNewSource()async throws {
+        let w=ObservationWorld(),c=try controller(w);let first=try await start(c);defer {c.pause()}
+        w.advance(5);w.readHook={if w.reads==4 {_=try? self.store.hydrate([SearchHit(memory:first,score:1,match:"owned")],pinTextObservations:true)};return w.context}
+        await c.captureOnce();XCTAssertNil(try store.get(first.id)?.endTimestamp);XCTAssertEqual(c.metrics.coalesced,0)
+        w.readHook=nil;w.advance(5);await c.captureOnce();XCTAssertEqual(c.metrics.saved,2)
+    }
 }

@@ -115,7 +115,7 @@ public final class AnswerEngine {
         else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone,detail:.preview,expressionPlan:contentPlan); candidates = result.hits; retrievalWarnings = result.warnings }
         var fingerprints = Set<String>()
         let selected = Array(candidates.filter { fingerprints.insert($0.memory.kind == .audio || $0.memory.textObservation != nil ? ($0.memory.searchPreview?.sourceRevision ?? $0.memory.evidenceHash):$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
-        let hits=try store.hydrate(selected)
+        let hits=try store.hydrate(selected,pinTextObservations:true)
         guard !hits.isEmpty else { return Answer(text: "I couldn’t find recorded evidence for that question. Try a different phrase or date range.", sources: [], provider: "evidence", duration: Date().timeIntervalSince(start),warnings:retrievalWarnings,resolution:resolution) }
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800

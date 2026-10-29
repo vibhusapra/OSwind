@@ -210,6 +210,10 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
+        if let before=try get(memory.id),before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash {
+            let unpin=try prepare("DELETE FROM text_observation_pins WHERE memory_id=?");defer {sqlite3_finalize(unpin)};bind(unpin,1,memory.id)
+            guard sqlite3_step(unpin)==SQLITE_DONE else {throw failure()}
+        }
         if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
@@ -249,19 +253,26 @@ public final class MemoryStore: @unchecked Sendable {
     }
     /// Revalidate and load complete evidence in one read snapshot. Deleted or
     /// revised sources fail explicitly, rather than silently retargeting offsets.
-    public func hydrate(_ hits:[SearchHit]) throws -> [SearchHit] {
-        let activity=try hits.contains(where:{$0.visual != nil}) ? mediaWriteLease():nil
+    public func hydrate(_ hits:[SearchHit],pinTextObservations:Bool=false) throws -> [SearchHit] {
+        let pins=pinTextObservations && hits.contains {$0.memory.textObservation != nil}
+        let activity=try (pins || hits.contains(where:{$0.visual != nil})) ? mediaWriteLease():nil
         defer {activity?.release()}
         lock.lock();defer {lock.unlock()};try Task.checkCancellation()
-        try exec("SAVEPOINT hydrate_sources");defer {try? exec("RELEASE hydrate_sources")}
-        return try hits.map { hit in
+        let owns=pins && db.map {sqlite3_get_autocommit($0) != 0} == true
+        try exec(owns ? "BEGIN IMMEDIATE":"SAVEPOINT hydrate_sources")
+        do {let result=try hits.map { hit in
             try Task.checkCancellation()
             let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
-            guard let current=try get(hit.id),current.searchPreview==nil,current.evidenceHash==expected else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            guard let current=try get(hit.id),current.searchPreview==nil else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            let exact=current.evidenceHash==expected
+            let appended = pinTextObservations && !exact ? try current.extendsTextObservation(hit.memory):false
+            guard exact || appended else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
             guard hit.passage.map({$0.text(in:current.text) != nil}) ?? true else {throw OSwindError.invalid("The source passage is no longer valid")}
             if let visual=hit.visual {try validateVisualMatch(visual,memory:current)}
+            if pins {try withRoutineDatabase {try $0.pinTextObservation(current)}}
             return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage,visual:hit.visual)
-        }
+        };try Task.checkCancellation();try exec(owns ? "COMMIT":"RELEASE hydrate_sources");return result
+        } catch {try? exec(owns ? "ROLLBACK":"ROLLBACK TO hydrate_sources; RELEASE hydrate_sources");throw error}
     }
     public func hydrate(_ memory:Memory) throws -> Memory {try hydrate([SearchHit(memory:memory,score:0,match:"")])[0].memory}
     private func replaceSpeakerProjection(_ memory:Memory) throws {

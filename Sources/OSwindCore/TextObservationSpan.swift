@@ -57,6 +57,29 @@ struct PreparedTextObservation:Sendable {
     let continuation:TextObservationCursor?
 }
 
+extension Memory {
+    /// Only a verified append of the same literal source can advance a stale
+    /// visible result at the point it is consumed. Edits never retarget it.
+    func extendsTextObservation(_ previous:Memory)throws->Bool {
+        guard let now=textObservation,let old=previous.textObservation,id==previous.id,timestamp==previous.timestamp,
+              now.sessionID==old.sessionID,now.samples>old.samples,
+              try AccessibilityCaptureRecord.digest(self)==AccessibilityCaptureRecord.digest(previous) else {return false}
+        try now.validated(for:self);try old.validated(for:previous)
+        let elapsed=(endTimestamp ?? timestamp).timeIntervalSince(previous.endTimestamp ?? previous.timestamp)
+        return elapsed>0 && now.largestGapSeconds>=old.largestGapSeconds && elapsed<=Double(now.samples-old.samples)*now.largestGapSeconds+0.000001
+    }
+}
+extension RoutineDatabase {
+    func textObservationPinned(_ id:String)throws->Bool {
+        let row=try statement("SELECT 1 FROM text_observation_pins WHERE memory_id=?");defer {sqlite3_finalize(row)};bind(row,1,id)
+        let code=sqlite3_step(row);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw error()};return code==SQLITE_ROW
+    }
+    func pinTextObservation(_ memory:Memory)throws {
+        guard memory.textObservation != nil else {return}
+        let row=try statement("INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(?)");defer {sqlite3_finalize(row)};bind(row,1,memory.id);try done(row)
+    }
+}
+
 /// Sparse, rebuildable time-range projection. Ordinary point sources retain
 /// their existing indexed timestamp path; search never scans source JSON.
 enum TextObservationSchema {
@@ -92,6 +115,27 @@ enum TextObservationSchema {
     ]
     static func install(_ db:RoutineDatabase,sourceVersion:Int32)throws {
         try Task.checkCancellation()
+        // Pins have no source body. Existing citations rebuild the cold state;
+        // an in-flight consumer pins before leaving its writer transaction.
+        try db.execute("""
+        CREATE TABLE IF NOT EXISTS text_observation_pins(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE) WITHOUT ROWID;
+        CREATE TRIGGER IF NOT EXISTS text_observation_pin_chat AFTER INSERT ON chat_sources BEGIN
+            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(new.memory_id);
+        END;
+        CREATE TRIGGER IF NOT EXISTS text_observation_pin_recap AFTER INSERT ON recap_sources BEGIN
+            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(new.source_id);
+        END;
+        CREATE TRIGGER IF NOT EXISTS text_observation_pin_guard BEFORE UPDATE OF payload ON memories
+        WHEN EXISTS(SELECT 1 FROM text_observation_pins WHERE memory_id=old.id)
+        AND json_type(CAST(old.payload AS TEXT),'$.textObservation')='object' AND (
+            json_extract(CAST(old.payload AS TEXT),'$.endTimestamp') IS NOT json_extract(CAST(new.payload AS TEXT),'$.endTimestamp') OR
+            json_extract(CAST(old.payload AS TEXT),'$.textObservation.version') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.version') OR
+            json_extract(CAST(old.payload AS TEXT),'$.textObservation.sessionID') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.sessionID') OR
+            json_extract(CAST(old.payload AS TEXT),'$.textObservation.samples') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.samples') OR
+            json_extract(CAST(old.payload AS TEXT),'$.textObservation.largestGapSeconds') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.largestGapSeconds'))
+        BEGIN SELECT RAISE(ABORT,'Text observation is pinned; start a new source'); END;
+        INSERT OR IGNORE INTO text_observation_pins(memory_id) SELECT memory_id FROM chat_sources UNION SELECT source_id FROM recap_sources;
+        """)
         let table=try db.statement("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_ranges'")
         let existed=sqlite3_step(table)==SQLITE_ROW;sqlite3_finalize(table)
         try db.execute("CREATE TABLE IF NOT EXISTS text_observation_ranges(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE,last_observed REAL NOT NULL) WITHOUT ROWID; CREATE INDEX IF NOT EXISTS text_observation_end ON text_observation_ranges(last_observed,memory_id)")

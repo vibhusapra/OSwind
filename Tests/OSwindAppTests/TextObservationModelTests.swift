@@ -3,6 +3,17 @@ import XCTest
 @testable import OSwindCore
 
 @MainActor final class TextObservationModelTests:XCTestCase {
+    func testOpeningAnActivelyExtendedSpanUsesCurrentAdmittedExtent()async throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-observation-open-"+UUID().uuidString);defer {try? FileManager.default.removeItem(at:root)}
+        let app=try AppModel(root:root,startServices:false);defer {app.prepareForLibrarySwitch();try? app.store.close()};app.settings.visualCaptureMode = .accessibility
+        let first=Date(timeIntervalSince1970:1730611800);var memory=Memory(id:"owned-growing-inspector",timestamp:first,app:"Owned",text:"Owned words",display:"accessibility-window");memory.textObservation=TextObservationSpan();try app.store.insert(memory)
+        let reservation=try AccessibilityCaptureReservation(store:app.store,configuration:app.settings)
+        let cursor=TextObservationCursor(id:memory.id,digest:try AccessibilityCaptureRecord.digest(memory),binding:Data(),first:first,last:first,uptime:1,span:try XCTUnwrap(memory.textObservation))
+        _=try app.store.extendAccessibilityObservation(cursor,at:first.addingTimeInterval(5),reservation:reservation);reservation.release()
+        app.openMemory(memory,query:"");let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while app.openingMemoryID != nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+        XCTAssertNil(app.errorMessage);XCTAssertEqual(app.selected?.textObservation?.samples,2)
+    }
     func testAdmittedObservationUpdatesOnlyMatchingInspectorWithoutStartingCapture()async throws {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-owned-observation-model-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:root)}

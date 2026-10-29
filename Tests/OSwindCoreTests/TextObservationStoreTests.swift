@@ -47,10 +47,11 @@ final class TextObservationStoreTests:XCTestCase {
         let scope=HistoryErasureScope(start:date.addingTimeInterval(30),end:date.addingTimeInterval(31)),preview=try store.previewErasure(scope)
         XCTAssertEqual(preview.sources,1);_=try store.eraseHistory(scope,expectedToken:preview.token);XCTAssertEqual(try sql("SELECT COUNT(*) FROM text_observation_ranges"),"0")
     }
-    func testExtensionInvalidatesRecapsTurnsAndLateSourceRevisions()throws {
+    func testSavedEvidencePinsExtentAndExplicitEditsStillInvalidateReferences()throws {
         let m=memory();try store.insert(m);let answer=Answer(text:"Maya [1]",sources:[.init(memory:m,score:1,match:"owned")],provider:"owned",duration:0),chat=try store.createChat()
         _=try store.appendChatTurn(sessionID:chat.id,question:"What was observed?",answer:answer);let recap=try store.saveRecap(answer)
-        let updated=try extend(m);XCTAssertNotEqual(updated.evidenceHash,m.evidenceHash);XCTAssertEqual(updated.contentHash,m.contentHash)
+        XCTAssertThrowsError(try extend(m));XCTAssertNotNil(try store.get(recap.id));XCTAssertEqual(try store.chatTurns(chat.id).count,1)
+        var edited=m;edited.text="Changed release facts";try store.insert(edited)
         XCTAssertNil(try store.get(recap.id));XCTAssertTrue(try store.chatTurns(chat.id).isEmpty)
         XCTAssertThrowsError(try store.saveRecap(answer));XCTAssertThrowsError(try store.appendChatTurn(sessionID:chat.id,question:"Late?",answer:answer))
     }
@@ -136,5 +137,40 @@ final class TextObservationStoreTests:XCTestCase {
         XCTAssertThrowsError(try store.setTags(m.id,tags:[String(repeating:"x",count:300000)]))
         XCTAssertTrue(try store.get(m.id)?.tags.isEmpty == true)
         XCTAssertEqual(try store.matchingCount(SearchFilter(start:date.addingTimeInterval(3))),1)
+    }
+    func testEvidenceConsumptionPinsSpanBeforeModelResponse()async throws {
+        let m=memory();try store.insert(m);var configuration=AIConfiguration();configuration.provider = .evidence
+        let answer=try await AnswerEngine(store:store,embedder:LocalEmbedder()).answer("Friday",configuration:configuration)
+        XCTAssertThrowsError(try extend(m))
+        XCTAssertEqual(try store.get(m.id)?.textObservation?.samples,1)
+        XCTAssertNoThrow(try store.saveRecap(answer))
+    }
+    func testPinnedStaleResultCanAdvanceOnlyThroughUneditedAppend()throws {
+        let m=memory();try store.insert(m);let newer=try extend(m)
+        let hit=SearchHit(memory:m,score:1,match:"owned")
+        XCTAssertThrowsError(try store.hydrate([hit]))
+        let pinned=try store.hydrate([hit],pinTextObservations:true);XCTAssertEqual(pinned[0].memory.textObservation,newer.textObservation)
+        XCTAssertThrowsError(try extend(newer))
+        var edited=newer;edited.text="Changed source";try store.insert(edited)
+        XCTAssertThrowsError(try store.hydrate([hit],pinTextObservations:true))
+    }
+    func testPinGuardProtectsSQLWritersAndSourceEraseCascadesPins()throws {
+        let m=memory();try store.insert(m);let recap=try store.saveRecap(Answer(text:"Maya [1]",sources:[.init(memory:m,score:1,match:"owned")],provider:"owned",duration:0))
+        XCTAssertEqual(try sql("SELECT COUNT(*) FROM text_observation_pins"),"1")
+        XCTAssertThrowsError(try store.withRoutineDatabase {try $0.execute("UPDATE memories SET payload=CAST(json_set(CAST(payload AS TEXT),'$.endTimestamp',timestamp-978307200+5,'$.textObservation.samples',2,'$.textObservation.largestGapSeconds',5) AS BLOB) WHERE id='observed'")})
+        XCTAssertNil(try store.get(m.id)?.endTimestamp);XCTAssertNotNil(try store.get(recap.id));try store.delete(m.id);XCTAssertEqual(try sql("SELECT COUNT(*) FROM text_observation_pins"),"0")
+    }
+    func testColdPinRepairPreservesReferencedExtent()throws {
+        let m=memory();try store.insert(m);_=try store.saveRecap(Answer(text:"Maya [1]",sources:[.init(memory:m,score:1,match:"owned")],provider:"owned",duration:0))
+        try store.withRoutineDatabase {try $0.execute("DROP TABLE text_observation_pins")};try store.close();store=try MemoryStore(root:root)
+        XCTAssertEqual(try sql("SELECT COUNT(*) FROM text_observation_pins"),"1");XCTAssertThrowsError(try extend(m))
+    }
+    func testQuietBackupRestoresPinsForSavedEvidence()throws {
+        let m=memory();try store.insert(m);let recap=try store.saveRecap(Answer(text:"Maya [1]",sources:[.init(memory:m,score:1,match:"owned")],provider:"owned",duration:0))
+        let archive=root.deletingLastPathComponent().appendingPathComponent("owned-pinned-"+UUID().uuidString+".oswindbackup"),restored=root.deletingLastPathComponent().appendingPathComponent("owned-pinned-restored-"+UUID().uuidString)
+        defer {try? FileManager.default.removeItem(at:archive);try? FileManager.default.removeItem(at:restored)}
+        _=try LibraryBackup.create(store:store,destination:archive);_=try LibraryBackup.restore(archive,to:restored)
+        let copy=try MemoryStore(root:restored);defer {try? copy.close()};XCTAssertNotNil(try copy.get(recap.id))
+        let count=try copy.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM text_observation_pins")};XCTAssertEqual(count,1)
     }
 }

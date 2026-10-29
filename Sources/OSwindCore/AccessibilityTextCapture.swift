@@ -57,7 +57,7 @@ extension MemoryStore {
     }
     func accessibilityObservationCanContinue(_ cursor:TextObservationCursor)throws->Bool {
         try withRoutineDatabase {db in
-            do {guard let current=try boundedTextObservation(cursor.id,db:db) else {return false};return try cursor.matches(current)}
+            do {guard try !db.textObservationPinned(cursor.id),let current=try boundedTextObservation(cursor.id,db:db) else {return false};return try cursor.matches(current)}
             catch is CancellationError {throw CancellationError()}
             catch {return false}
         }
@@ -70,6 +70,7 @@ extension MemoryStore {
             try withRoutineDatabase {db in
                 try db.execute("BEGIN IMMEDIATE")
                 do {
+                    guard try !db.textObservationPinned(cursor.id) else {throw SnapshotCaptureDeferral(reason:"Source pinned for evidence · next observation starts a new span")}
                     guard var memory=try boundedTextObservation(cursor.id,db:db),try cursor.matches(memory) else {throw SnapshotCaptureDeferral(reason:"Text source changed · next observation starts a new span")}
                     let gap=date.timeIntervalSince(cursor.last)
                     memory.endTimestamp=date

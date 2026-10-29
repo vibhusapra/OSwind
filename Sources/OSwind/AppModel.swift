@@ -307,7 +307,7 @@ import UniformTypeIdentifiers
     }
     func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil,visual:VisualMatch?=nil) {
         let store=self.store
-        openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)])[0].memory}
+        openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)],pinTextObservations:true)[0].memory}
     }
     func openEntitySource(_ source:EntitySource) {
         let store=self.store
