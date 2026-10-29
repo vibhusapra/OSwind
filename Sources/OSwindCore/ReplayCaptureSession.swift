@@ -9,7 +9,6 @@ import Vision
 @MainActor final class ReplayCaptureSession {
     private let store:MemoryStore,embedder:LocalEmbedder
     private let gate:ReplayCommitGate
-    private let targetBundleID:String?
     private var retiring=[UUID:Task<Void,Never>]()
     private var lastFlush=Date(),retryAfter=Date.distantPast
     private let onMemory:@MainActor (Memory)->Void
@@ -19,14 +18,16 @@ import Vision
     private var recorder:VisualChunkRecorder?
     private var consumer:Task<Void,Never>?
     private var supervisor:Task<Void,Never>?
-    private let contextReads=AccessibilityReadSession()
+    private let contextMonitor:ReplayContextMonitor
     private var generation=UUID()
     private var binding=""
+    private var boundContext:WindowContext?
     private var currentInterval=0.0
     private var stopped=false
     var settings:AppSettings
     init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings,gate:ReplayCommitGate,targetBundleID:String?=nil,onMemory:@escaping @MainActor (Memory)->Void,onStatus:@escaping @MainActor (String)->Void,onFailure:@escaping @MainActor (String)->Void={_ in}) {
-        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.targetBundleID=targetBundleID;self.onMemory=onMemory;self.onStatus=onStatus;self.onFailure=onFailure
+        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.onMemory=onMemory;self.onStatus=onStatus;self.onFailure=onFailure
+        contextMonitor=ReplayContextMonitor(target:targetBundleID)
     }
     func start() {
         supervisor=Task { [weak self] in
@@ -40,12 +41,12 @@ import Vision
     /// Synchronous invalidation prevents a late OCR result publishing after a
     /// settings/library boundary. Discard is used for library switches/erasure.
     func stop(discard:Bool=false) {
-        contextReads.cancel()
+        contextMonitor.cancel()
         stopped=true;generation=UUID();if discard {supervisor?.cancel()};supervisor=nil
         retire(discard:discard)
     }
     private func retire(discard:Bool=false) {
-        generation=UUID();binding="";if discard {consumer?.cancel()};consumer=nil
+        generation=UUID();binding="";boundContext=nil;if discard {consumer?.cancel()};consumer=nil
         let previousSource=source,previousRecorder=recorder;source=nil;recorder=nil
         let id=UUID(),notifyFailure=onFailure,notifyStatus=onStatus
         retiring[id]=Task { [weak self] in
@@ -55,13 +56,11 @@ import Vision
         }
     }
     func waitUntilStopped() async {for task in Array(retiring.values) {await task.value}}
-    private static func key(_ context:WindowContext)->String {[String(context.pid),context.bundle,context.title,context.url ?? "",context.bounds.map {NSStringFromRect($0)} ?? ""].joined(separator:"\u{0}")}
+    private static func key(_ context:WindowContext)->String {ReplayContextMonitor.key(context)}
     private func eligible() async ->WindowContext? {
-        guard settings.snapshotRegions.valid,settings.snapshotRegions.focusedWindowCrop==nil,!stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),(targetBundleID != nil || CGEventSource.secondsSinceLastEventType(.combinedSessionState,eventType:.null)<=120) else {return nil}
-        let result=await contextReads.read(targetBundleID)
-        guard !stopped,!Task.isCancelled,!SessionState.locked,CGPreflightScreenCaptureAccess(),let context=result,
-              AccessibilityContext.identityCurrent(context,targetBundleID:targetBundleID),!context.secure,context.bundle != Bundle.main.bundleIdentifier,context.bundle != "com.oswind.desktop",
-              settings.privacy.exclusion(app:context.bundle,title:context.title,url:context.url,isBrowser:context.browser)==nil else {return nil}
+        guard settings.snapshotRegions.valid,settings.snapshotRegions.focusedWindowCrop==nil,!stopped,!Task.isCancelled else {return nil}
+        let result=await contextMonitor.fresh(policy:settings.privacy)
+        guard !stopped,!Task.isCancelled,let context=result else {return nil}
         return context
     }
     private func updateBinding() async {
@@ -71,8 +70,14 @@ import Vision
             do {try await recorder?.flush()} catch {guard !stopped else {return};retire(discard:true);retryAfter=Date().addingTimeInterval(10);onFailure(error.localizedDescription);onStatus("Replay finalization: "+error.localizedDescription);return}
         }
         guard !stopped else {return}
-        guard let context=await eligible() else {guard !stopped else {return};if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
+        guard settings.snapshotRegions.valid,settings.snapshotRegions.focusedWindowCrop==nil else {if source != nil {retire(discard:true)};onStatus("Replay paused · invalid capture area");return}
         let interval=settings.profile.replayInterval(lowPower:ProcessInfo.processInfo.isLowPowerModeEnabled,thermalLimited:ProcessInfo.processInfo.thermalState == .serious || ProcessInfo.processInfo.thermalState == .critical)
+        guard contextMonitor.available else {if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
+        // Frame events own the expensive complete AX observations. The
+        // supervisor only checks session/focused-window identity and cadence while
+        // this stream is bound. Its next frame is never admitted from a cache.
+        if source != nil,await contextMonitor.canKeepBinding(boundContext,intervalUnchanged:currentInterval==interval) {return}
+        guard let context=await eligible() else {guard !stopped else {return};if source != nil {retire()};onStatus("Replay paused · locked, idle or excluded");return}
         let key=Self.key(context)
         guard source==nil || binding != key || currentInterval != interval else {return}
         retire();let token=generation;binding=key;currentInterval=interval
@@ -91,6 +96,8 @@ import Vision
             let policy=settings.privacy,display="window-\(window.windowID)"
             try await source.start()
             guard !stopped,generation==token else {await source.stop();try? await writer.close(commit:false);return}
+            // Retain window metadata, not the tree body, for supervision.
+            var observed=context;observed.accessibilityText="";observed.url=nil;observed.secure=false;boundContext=observed
             onStatus("Replay · \(interval.formatted()) s · hardware HEVC")
             consumer=Task { [weak self] in
                 do {
