@@ -41,7 +41,7 @@ public actor PIIImportScanner {
         self.inspector=inspector;self.compute=compute;self.threshold=threshold;modelID=PIIInspector.expectedModelID(compute)
     }
     public func shutdown() async {closed=true;await inspector.shutdown()}
-    struct Result:Sendable {let memory:Memory,redacted:Bool,fields:Int,windows:Int}
+    struct Result:Sendable {let memory:Memory,redacted:Bool,fields:Int,windows:Int,framedTokens:Int,checkedAt:Date}
     func sanitize(_ original:Memory,policy:PrivacyPolicy) async throws -> Result {
         guard !closed else {throw OSwindError.unavailable("PII import scanner is shut down")}
         var document=try ImportPIIDocument(original)
@@ -49,7 +49,7 @@ public actor PIIImportScanner {
         try Task.checkCancellation();guard !closed else {throw CancellationError()}
         let masks=try Self.validatedMasks(result,source:document.source,compute:compute,threshold:threshold)
         let memory=try document.apply(masks,learned:result.modelMasks.map {NSRange(location:$0.startUTF16,length:$0.lengthUTF16)})
-        return .init(memory:memory,redacted:document.redacted,fields:document.fields.count,windows:result.windowCount)
+        return .init(memory:memory,redacted:document.redacted,fields:document.fields.count,windows:result.windowCount,framedTokens:result.framedTokens,checkedAt:Date())
     }
     /// Independently bind the service response to the exact original bytes and
     /// reconstruct its masks. Never trust rendered output or offsets blindly.

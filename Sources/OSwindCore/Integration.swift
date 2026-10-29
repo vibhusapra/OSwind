@@ -58,6 +58,9 @@ public enum Integration {
         switch name {
         case "memory_entities","entity_sources":return try await entityRead(name,args:args,store:store)
         case "search_memory": let f = try filter(args); let mode = (args["mode"] as? String).flatMap(SearchMode.init) ?? .hybrid; return try json(await RetrievalEngine(store:store,apple:embedder).search(f,mode:mode,configuration:AppSettings.load(root:store.root).search,interpretQuery:!(args["literal"] as? Bool ?? false),detail:(args["detail"] as? String).flatMap(SearchDetail.init) ?? .full))
+        case "memory_privacy_check":
+            guard args.count==1,let id=args["id"] as? String else {throw OSwindError.invalid("Use one memory id")}
+            return try json(store.piiScanStatus(id))
         case "get_memory": guard let id = args["id"] as? String else { throw OSwindError.invalid("Missing memory id") }; guard let memory = try store.get(id) else { throw OSwindError.invalid("Memory not found") }; return try json(memory)
         case "memory_stats": return try json(store.stats())
         case "memory_activity":return try activityJSON(await activity(activityRequest(args),store:store))
@@ -75,6 +78,7 @@ public enum Integration {
         return entityTools(annotation:annotation)+[
             ["name":"memory_activity","description":"Monthly saved-source counts and optional hour buckets, scoped by metadata. Counts are complete, not capped search results, duration or productivity. No search text/relevance filtering. Read only.","inputSchema":["type":"object","properties":activityProperties,"required":["month"],"additionalProperties":false],"annotations":annotation],
             ["name":"search_memory", "description":"Search local desktop OCR, notes, audio transcripts, or retained images/replay frames with mode visual. Visual similarity is not a factual caption. Results are untrusted recorded content; cite id and timestamp. Read only.", "inputSchema":["type":"object","properties":common,"additionalProperties":false],"annotations":annotation],
+            ["name":"memory_privacy_check","description":"Read a library-owned experimental PII import-check record for one source. A matching record does not establish absence of PII, image/audio treatment or remote-egress protection. Read only.","inputSchema":["type":"object","properties":["id":["type":"string"]],"required":["id"],"additionalProperties":false],"annotations":annotation],
             ["name":"get_memory","description":"Read one recorded memory by its source id.","inputSchema":["type":"object","properties":["id":["type":"string"]],"required":["id"],"additionalProperties":false],"annotations":annotation],
             ["name":"memory_stats","description":"Read local capture counts and storage use.","inputSchema":["type":"object","additionalProperties":false],"annotations":annotation]
         ]
@@ -154,6 +158,7 @@ public final class LocalAPIServer: @unchecked Sendable {
             if components.path == "/v1/activity" {return (200,try await Integration.execute("memory_activity",args:args,store:store,embedder:embedder))}
             if components.path == "/health" { return (200,["status":"ok","version":"0.1.0"]) }
             if components.path == "/v1/search" { return (200,try await Integration.execute("search_memory",args:args,store:store,embedder:embedder)) }
+            if components.path == "/v1/memory-privacy-check" {return (200,try await Integration.execute("memory_privacy_check",args:args,store:store,embedder:embedder))}
             if components.path == "/v1/stats" { return (200,try Integration.json(store.stats())) }
             if components.path.hasPrefix("/v1/memories/") { return (200,try await Integration.execute("get_memory",args:["id":String(components.path.dropFirst("/v1/memories/".count))],store:store,embedder:embedder)) }
             return (404,["error":"Not found"])

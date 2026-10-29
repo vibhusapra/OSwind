@@ -160,6 +160,7 @@ struct MemoryDetail: View {
             HStack { VStack(alignment:.leading,spacing:4) { Text(memory.title).font(.title2.weight(.semibold)); Text("\(memory.app) · \(memory.timestamp.formatted())").font(.caption).foregroundStyle(.secondary) }; Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.cancelAction) }
             if let match=m.selectedVisual {Label(match.decodedTime.map {"Visual match at \($0.formatted(.number.precision(.fractionLength(1)))) s"} ?? "Matched image appearance",systemImage:"photo").font(.caption).foregroundStyle(.secondary)}
             ScrollView {
+                PIIScanRecordView(status:m.selectedPIIScan,error:m.selectedPIIScanError)
                 if memory.kind == .summary {RecapEvidenceView(memory:memory)}
                 if !query.isEmpty && memory.visualRecording == nil {
                     VStack(alignment:.leading,spacing:8) {
@@ -175,7 +176,7 @@ struct MemoryDetail: View {
                 if memory.visualRecording==nil && ((memory.transcript?.segments.isEmpty ?? true) || memory.transcript?.segments.allSatisfy({$0.text == "[REDACTED]"}) == true) { Text(memory.text).textSelection(.enabled).font(.system(size:14)).frame(maxWidth:.infinity,alignment:.leading).padding(.top,12) }
             }
             if let url = memory.url, let parsed = URL(string:url), ["https","http"].contains(parsed.scheme) { Link(url,destination:parsed).font(.caption).lineLimit(1) }
-            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Link to entity") {showEntityLink=true}; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() }.disabled(m.deletingID != nil || m.maintenanceBusy) }
+            HStack { TextField("Tags, comma separated",text:$tags).onSubmit { do { try m.store.setTags(memory.id,tags:tags.split(separator:",").map { $0.trimmingCharacters(in:.whitespaces) }); m.refreshSelectedPIIScan();m.refresh() } catch { m.errorMessage = error.localizedDescription } }; if memory.imagePath != nil || memory.visualRecording != nil { Toggle("OCR boxes",isOn:$boxes).toggleStyle(.checkbox) }; Button("Link to entity") {showEntityLink=true}; Button("Copy text") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(memory.text,forType:.string) }; Button("Save") { m.favorite(memory) }; Button("Delete",role:.destructive) { m.delete(memory); dismiss() }.disabled(m.deletingID != nil || m.maintenanceBusy) }
             Text("Source \(memory.id)").font(.system(size:10,design:.monospaced)).foregroundStyle(.tertiary).textSelection(.enabled)
         }.padding(24).frame(width:850,height:760).onAppear { tags = memory.tags.joined(separator:", ") }.sheet(isPresented:$showEntityLink) {EntityLinkSheet(sourceID:memory.id).environmentObject(m)}
     }

@@ -37,7 +37,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-smoke-') as directory:
     process=subprocess.run(prefix+['mcp'],input='\n'.join(json.dumps(r) for r in requests)+'\n',text=True,capture_output=True,timeout=30,check=True)
     responses=[json.loads(line) for line in process.stdout.splitlines()]
     assert len(responses)==3
-    assert {tool['name'] for tool in responses[1]['result']['tools']}=={'search_memory','get_memory','memory_stats','memory_activity','memory_entities','entity_sources'}
+    assert {tool['name'] for tool in responses[1]['result']['tools']}=={'search_memory','get_memory','memory_stats','memory_activity','memory_entities','entity_sources','memory_privacy_check'}
     visual_tool=next(tool for tool in responses[1]['result']['tools'] if tool['name']=='search_memory')
     assert 'visual' in visual_tool['inputSchema']['properties']['mode']['enum']
     assert identifier in responses[2]['result']['content'][0]['text']
@@ -64,6 +64,9 @@ with tempfile.TemporaryDirectory(prefix='oswind-smoke-') as directory:
         status,hits=get('/v1/search?query=socket&mode='+mode); assert status==200 and hits['hits'][0]['memory']['id']==identifier
         if runtime: assert hits['strategy']=='ann-exact-rerank' and not hits['warnings']
         assert get('/v1/memories/'+identifier)[1]['text']=='OSwind socket smoke marker'
+        status,privacy=get('/v1/memory-privacy-check?id='+identifier);assert status==200 and privacy['state']=='notRecorded' and privacy['privacyAcceptance'] is False
+        assert get('/v1/memory-privacy-check?id='+identifier,authorized=False)[0]==401
+        assert get('/v1/memory-privacy-check?id='+identifier+'&extra=x')[0]==400
         assert get('/health',authorized=False)[0]==401
         assert get('/health',extra={'Origin':'https://example.com'})[0]==403
         assert get('/health',extra={'Host':'evil.example'})[0]==403

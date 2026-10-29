@@ -43,7 +43,7 @@ class Client:
     locking a vault. HTTP tokens and provider keys are neither read nor needed.
     """
     READ_TOOLS = frozenset({"search_memory", "get_memory", "memory_stats",
-                           "memory_activity", "memory_entities", "entity_sources"})
+                           "memory_activity", "memory_entities", "entity_sources", "memory_privacy_check"})
 
     def __init__(self, executable, data, *, timeout=30.0,
                  max_response_bytes=32 * 1024 * 1024):
@@ -191,6 +191,10 @@ class Client:
 
     def get(self, identifier):
         return self.call("get_memory", id=identifier)
+
+    def privacy_check(self, identifier):
+        """Read the historical experimental import check; not proof PII is absent."""
+        return self.call("memory_privacy_check", id=identifier)
 
     def stats(self):
         return self.call("memory_stats")

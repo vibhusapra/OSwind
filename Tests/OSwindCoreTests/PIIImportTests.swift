@@ -218,15 +218,18 @@ extension PIIImportTests {
         try await configuration.withScanner {scanner in
             let json=try await self.store.importJSONDetailed(data:JSONEncoder().encode([self.note(text:text)]),scanner:scanner)
             XCTAssertEqual(json.learnedPrivacy?.compute,compute);XCTAssertEqual(json.learnedPrivacy?.sources,1)
+            XCTAssertEqual(try self.store.piiScanStatus("owned").state,.recorded);XCTAssertEqual(try self.store.piiScanStatus("owned").record?.compute,compute)
             XCTAssertFalse(try XCTUnwrap(self.store.get("owned")).text.contains(email))
             let collector=try JSONSerialization.data(withJSONObject:["format":"OSwind collector batch","version":1,"collectorID":"org.example.fixture","records":[["key":"native","timestamp":"2026-10-29T12:00:00Z","app":"Fixture","bundleID":"org.example.fixture","title":"Fixture","text":text]]])
             let collected=try await self.store.importCollectorBatch(collector,scanner:scanner)
             XCTAssertEqual(collected.learnedPrivacy?.redactedSources,1)
+            XCTAssertEqual(try self.store.piiScanStatus(collected.sourceIDs[0]).state,.recorded)
             XCTAssertFalse(try XCTUnwrap(self.store.get(collected.sourceIDs[0])).text.contains(email))
             let record:[String:Any]=["id":"native-limitless","title":"Fixture","markdown":text,"startTime":"2026-10-29T12:00:00Z","endTime":"2026-10-29T12:01:00Z","isStarred":false,"contents":[]]
             let page=try JSONSerialization.data(withJSONObject:["data":["lifelogs":[record]],"meta":["lifelogs":["count":1,"nextCursor":NSNull()]]])
             let imported=try await self.store.importLimitlessAPI(data:page,scanner:scanner)
             XCTAssertEqual(imported.learnedPrivacy?.redactedSources,1)
+            XCTAssertEqual(try self.store.piiScanStatus(imported.sourceIDs[0]).state,.recorded)
             XCTAssertFalse(try XCTUnwrap(self.store.get(imported.sourceIDs[0])).text.contains(email))
         }
         XCTAssertEqual(try store.stats().count,3)

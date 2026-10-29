@@ -14,4 +14,11 @@ examples. A current OSwind executable and an explicit existing library are requi
 Run offline transport checks with `python3 scripts/test-python-sdk.py` from the
 repository root. Run actual process checks using `scripts/collector-sdk-smoke.py`.
 
+The current client also exposes `client.privacy_check(memory_id)`. It returns the
+last library-owned experimental import-check record and whether it still matches
+that source. `privacyAcceptance` remains false: a record does not establish that
+PII is absent or that images, audio, video or remote requests are protected. The
+server must support `memory_privacy_check`; unsupported requests fail rather than
+inventing a check. See [PII scan records](../../docs/PII-SCAN-RECORDS.md).
+
 MIT licensed with the OSwind repository; see [LICENSE](../../LICENSE).
