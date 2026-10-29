@@ -117,3 +117,5 @@ fences, conservative media treatment, then live desktop and power qualification.
 Existing [window](NATIVE-PII-DOCUMENTS.md), [ownership](NATIVE-PII-RUNTIME.md) and
 [setup](NATIVE-PII-SETUP.md) contracts remain separate. This result does not
 establish competitor parity, ranking or release acceptance.
+
+The next [public domain validation pass](PII-DOMAIN-VALIDATION.md) freezes153 externally authored synthetic documents before inference. Its data-admission checks are complete; native quality results are pending and do not alter this historical72-source result.
