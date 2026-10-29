@@ -1,6 +1,6 @@
 # Sampled text observation spans
 
-Implementation is in progress on top of source eadabc1 / PR #87. This source is not yet qualified. The first focused build exposed a private UI color reference; it was corrected before the next run. The current focused run passes 111 checks; nine debug process groups / 26 operations cover CLI/HTTP/MCP/SDK, quiet portability, exact-boundary erase and an actual preceding schema 23 writer. Full native/model, sanitizer, optimized and signed package acceptance remains pending.
+Implementation is in progress on top of source eadabc1 / PR #87. This source is not yet qualified. The first focused build exposed a private UI color reference; it was corrected before the next run. The current focused run passes 112 checks; nine debug process groups / 26 operations cover CLI/HTTP/MCP/SDK, quiet portability, exact-boundary erase and an actual preceding schema 23 writer. Full native/model, sanitizer, optimized and signed package acceptance remains pending.
 
 ## What the range means
 
@@ -20,7 +20,7 @@ The logical library version is 24 so older writers refuse it. A quiet backup pre
 
 ## Work remaining
 
-- [x] 111 focused store/controller/query/race/UI-model checks; original compile failure retained.
+- [x] 112 focused store/controller/query/race/UI-model checks; original compile failure retained.
 - [x] Nine debug CLI/HTTP/MCP/SDK/portability groups and26 operations. The actual preceding schema 23 writer drops unknown span fields; upgrading those sources preserves exact payload bytes and installs an empty projection.
 - [ ] Native UI component renders and source/cadence descriptions.
 - [ ] Owned archive migration/query/write work measurements and independent source oracle.
@@ -33,3 +33,5 @@ The logical library version is 24 so older writers refuse it. A quiet backup pre
 The first million-source probe retained a roughly 20-second migration and 1.6–1.7-second broad query regression. Supported pre-24 writers cannot encode observation metadata, so their upgrade now installs the empty projection without a payload scan; schema 24 cache repair still rebuilds from bounded sources. Time queries use the validated 15-minute maximum span to bound the timestamp index, then a CASE-gated sparse lookup, avoiding the large OR sort.
 
 The corrected debug probe reports about 3 ms persistent MCP/SDK reads versus about 2.4–2.7ms for the preceding optimized build, with exact independent IDs. Open plus fixture verification is about 1.1 s versus the first 20-second result. These are warm development observations with different build modes and uncontrolled caches/background work. A paired signed optimized rerun is pending; no SQL-only, cold-start, energy or competitor ranking claim follows.
+
+The initial frozen qualification was intentionally stopped after review found that metadata edits bypassed the sampled-payload size bound. An actual pre-fix regression case has three failed assertions: the oversized tag edit succeeded and removed time lookup coverage. Metadata writes now enforce the same span/record bounds before SQL; the rejected edit preserves its source and sparse projection. The interrupted manifest/logs, verified stopped handles and failed regression receipt remain retained. A fresh full qualification will use the corrected source.

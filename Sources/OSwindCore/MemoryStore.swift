@@ -565,7 +565,12 @@ public final class MemoryStore: @unchecked Sendable {
     }
     private func updateMetadata(_ m: Memory,preservingPIIScan:Bool=false) throws {
         lock.lock(); defer { lock.unlock() };let scanToken=preservingPIIScan ? try piiScanFavoriteToken(m.id):nil
-        let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }; let data = try JSONEncoder().encode(m); _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m);if let scanToken {try preservePIIScanAfterFavorite(m.id,token:scanToken)}
+        try m.textObservation?.validated(for:m)
+        let data=try JSONEncoder().encode(m)
+        guard data.count<=Self.maximumRecordBytes else {throw OSwindError.invalid("Memory payload exceeds 128 MiB")}
+        guard m.textObservation==nil || data.count<=262144 else {throw OSwindError.invalid("Sampled text payload exceeds 256 KiB")}
+        let stmt = try prepare("UPDATE memories SET payload=?,favorite=? WHERE id=?"); defer { sqlite3_finalize(stmt) }
+        _ = data.withUnsafeBytes { sqlite3_bind_blob(stmt, 1, $0.baseAddress, Int32(data.count), transient) }; sqlite3_bind_int(stmt, 2, m.favorite ? 1 : 0); bind(stmt, 3, m.id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }; try replaceSpeakerProjection(m); try replaceSearchPreview(m); try replaceVisualProjection(m);if let scanToken {try preservePIIScanAfterFavorite(m.id,token:scanToken)}
     }
     @discardableResult public func deleteAll() throws -> LibraryWipeResult {try wipeLibrary()}
     public func diskBytes(includeStaging:Bool=true) -> Int64 {

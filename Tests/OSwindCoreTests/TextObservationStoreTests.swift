@@ -131,4 +131,10 @@ final class TextObservationStoreTests:XCTestCase {
             XCTAssertTrue(try store.search(f,mode:.keyword).isEmpty);XCTAssertEqual(try store.matchingCount(f),0);XCTAssertTrue(try store.timelineSample(f).isEmpty)
         }
     }
+    func testOversizedCurationCannotRemoveTheSampledTimeProjection()throws {
+        let m=memory();try store.insert(m);_=try extend(m)
+        XCTAssertThrowsError(try store.setTags(m.id,tags:[String(repeating:"x",count:300000)]))
+        XCTAssertTrue(try store.get(m.id)?.tags.isEmpty == true)
+        XCTAssertEqual(try store.matchingCount(SearchFilter(start:date.addingTimeInterval(3))),1)
+    }
 }

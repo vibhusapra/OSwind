@@ -34,7 +34,7 @@ The current sampled-span implementation uses schema 24 and optional `textObserva
 
 ## Verification
 
-The following frozen counts qualify the preceding source eadabc1. The sampled-span implementation has 111 focused passes and nine debug process groups / 26 operations; its final qualification is pending. See the [span contract](TEXT-OBSERVATION-SPANS.md).
+The following frozen counts qualify the preceding source eadabc1. The sampled-span implementation has 112 focused passes and nine debug process groups / 26 operations; its final qualification is pending. See the [span contract](TEXT-OBSERVATION-SPANS.md).
 
 Focused core/controller checks pass, including no-pixel/OCR seams, required Accessibility access, exclusions, changed context, cancellation during reads/model preparation, identical-byte policy replacement, root substitution, actual wipe ordering, dedupe, source deletion/manual capture and quiet backup. Separate app-model checks cover explicit saved mode changes and save failures. [Frozen source eadabc1 qualification](../benchmarks/accessibility-text-capture-v1.json) passes 1,252 full cases with two explicit skips, 163 selected TSan and 163 optimized cases with one session-admission skip each, and all 17 ordered stages over 588 unchanged declared inputs. The full skips are the opt-in owned system-audio fixture and an unlocked-session/thermal visual-admission check. Product, test, tool, model, SDK and asset bytes remain unchanged after qualification.
 
