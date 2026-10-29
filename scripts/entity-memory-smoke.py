@@ -40,7 +40,7 @@ assert cmd('search','--mode','keyword','--entity','missing','--literal')==[]
 assert len(cmd('entity','sources',project['id']))==100
 # Exact UTF-16 source spans are checked against the actual stored source text.
 with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:
-    assert db.execute('PRAGMA user_version').fetchone()[0]==23
+    assert db.execute('PRAGMA user_version').fetchone()[0]==24
     count=0
     for text,start,length,surface in db.execute("SELECT m.text,e.start,e.length,e.surface FROM entity_mentions e JOIN memories m ON m.id=e.memory_id WHERE e.origin='automatic'"):
         assert text.encode('utf-16-le')[2*start:2*(start+length)].decode('utf-16-le')==surface;count+=1

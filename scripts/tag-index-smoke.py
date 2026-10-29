@@ -15,10 +15,10 @@ def aligned(data=library):
         columns='memory_id,tag,timestamp,app,kind,favorite';oracle="SELECT DISTINCT m.id,t.value,m.timestamp,m.app,m.kind,m.favorite FROM memories m,json_each(CAST(m.payload AS TEXT),'$.tags') t WHERE t.type='text'"
         assert db.execute(f'SELECT COUNT(*) FROM (SELECT {columns} FROM memory_tags EXCEPT {oracle})').fetchone()[0]==0
         assert db.execute(f'SELECT COUNT(*) FROM ({oracle} EXCEPT SELECT {columns} FROM memory_tags)').fetchone()[0]==0
-        assert db.execute('PRAGMA user_version').fetchone()[0]==23
+        assert db.execute('PRAGMA user_version').fetchone()[0]==24
 rows=[source('first',['release','release','Review']),source('second',['release'])];write(rows,older)
 with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:
-    assert db.execute('PRAGMA user_version').fetchone()[0]==(20 if a.old_cli else 23)
+    assert db.execute('PRAGMA user_version').fetchone()[0]==(20 if a.old_cli else 24)
     if a.old_cli:assert db.execute("SELECT COUNT(*) FROM sqlite_master WHERE name='memory_tags'").fetchone()[0]==0
     else:
         db.executescript("DROP TRIGGER tag_index_insert; DROP TRIGGER tag_index_update; DROP TRIGGER tag_index_delete; DROP TABLE memory_tags; DELETE FROM store_metadata WHERE key='tag_index_version'; DROP INDEX memories_activity_time")

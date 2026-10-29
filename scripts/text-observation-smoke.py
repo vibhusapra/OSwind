@@ -48,8 +48,9 @@ try:
   assert client.get('owned-observation-0')['textObservation']['samples']==5
   tool=next(t for t in client.tools() if t['name']=='search_memory');assert tool['inputSchema']['properties']['sourceStartsOnly']['type']=='boolean'
  report['checks'].append('actual read-only Python SDK/MCP child preserves sampled metadata and source-start scope; tool schema advertises boolean')
- # Refuse a pre-existing listener rather than reusing or stopping another app.
- probe=socket.socket();probe.bind(('127.0.0.1',47831));probe.close()
+ # Reuse a recently closed socket address, while still refusing a live listener.
+ # The preceding integration smoke uses this same fixed local API port.
+ probe=socket.socket();probe.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);probe.bind(('127.0.0.1',47831));probe.close()
  server=subprocess.Popen([str(binary),'--data',str(library),'serve'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
  tokenfile=library/'api-token';deadline=time.monotonic()+10
  while not tokenfile.exists():
