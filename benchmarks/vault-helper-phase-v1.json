@@ -1,0 +1,782 @@
+{
+  "format": "OSwind owned helper phase and safe missing-member provenance",
+  "version": 1,
+  "date": "2026-10-29",
+  "codeCommit": "a5d4af424cd10e894cbbaf840f0f7f88e127c4c2",
+  "parentPublication": "5323bc4",
+  "schema": 24,
+  "scope": "Replace create/attach process-list polling with registered cancellation at owned post-stdin process phase; retain all completion, native image absence and history checks. Add safe missing-member diagnostics and fixed Busy test phases. No claim to resolve historical missing-member or detach failures.",
+  "implementation": {
+    "publicVaultObserverInstalled": false,
+    "processPhases": [
+      "child launch before stdin",
+      "parent stdin closure after delivery before transport completion"
+    ],
+    "nativeCancellationPhase": "post-stdin closure",
+    "observerData": "PID and fixed create/attach action only; no args, credential or output",
+    "missingErrorClassificationAndLocalizedMessage": "unchanged",
+    "safeDiagnostic": [
+      "fixed known-root-member category or other",
+      "original errno",
+      "retained root/parent/named-root identity booleans"
+    ],
+    "unknownNamesPathsContentsIdentifiers": "excluded"
+  },
+  "qualification": {
+    "state": "completed",
+    "frozenInputs": 605,
+    "frozenReport": {
+      "path": ".artifacts/vault-helper-phase-v1/qualification-v1/report.json",
+      "sha256": "a90afbdcbdb8abcee396388383a0a01d46f21ea94ca9285516c7bf035cd7e1af"
+    },
+    "full": {
+      "defined": 1302,
+      "passed": 1299,
+      "skipped": 3,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "unexpected": 0,
+      "reportedSeconds": 822.757,
+      "skipReasons": [
+        "Audio output unavailable on this host: Audio output could not start",
+        "Explicit owned system-audio fixtures; no microphone access",
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "2f8a80cfaaf317e2723da391ea8a780000b87f2c012893168b0a4f0ab304ebe5"
+    },
+    "selectedTSan": {
+      "defined": 360,
+      "passed": 359,
+      "skipped": 1,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "unexpected": 0,
+      "reportedSeconds": 187.939,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "cd11f3f589e27e69cc26035adbadca6cfe303a41fecdeedcdf086cf89833f58a"
+    },
+    "selectedOptimized": {
+      "defined": 360,
+      "passed": 359,
+      "skipped": 1,
+      "failedCases": 0,
+      "failedAssertions": 0,
+      "unexpected": 0,
+      "reportedSeconds": 418.146,
+      "skipReasons": [
+        "Visual admission requires an unlocked session and allowed thermal state; never changes device settings"
+      ],
+      "logSHA256": "56a2aa33119ef3704f73aad170d313fdf407eb94c25add1fd9bb081698ce5180"
+    },
+    "newCasesPassingEachBuild": 8,
+    "ownedNativePhases": {
+      "attach": {
+        "cycles": 5,
+        "inputClosed": 5,
+        "activeHelpers": 5,
+        "historyChecks": 5
+      },
+      "create": {
+        "cycles": 1,
+        "inputClosed": 1,
+        "activeHelpers": 1,
+        "resumed": 1
+      }
+    },
+    "busyReaderRetryPassedEachBuild": true,
+    "orderedStages": [
+      {
+        "name": "full-most-optins",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 739.7637136671692,
+        "logSHA256": "2f8a80cfaaf317e2723da391ea8a780000b87f2c012893168b0a4f0ab304ebe5"
+      },
+      {
+        "name": "selected-tsan",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 285.44284970802255,
+        "logSHA256": "cd11f3f589e27e69cc26035adbadca6cfe303a41fecdeedcdf086cf89833f58a"
+      },
+      {
+        "name": "selected-release",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 457.25317962490954,
+        "logSHA256": "56a2aa33119ef3704f73aad170d313fdf407eb94c25add1fd9bb081698ce5180"
+      },
+      {
+        "name": "package",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 247.64069429202937,
+        "logSHA256": "20827ae946e9cb75e5c725fa64f7df2b9233fc94663cb58b8b8e4a124d0e036f"
+      },
+      {
+        "name": "capture-region-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.8157440838404,
+        "logSHA256": "4b92ad8a744d5c2cf7447eea8842a693a56fd3f4f4c0bc2ee2568a8fab2716a5"
+      },
+      {
+        "name": "entity-memory-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 19.044806041987613,
+        "logSHA256": "37fa52cd50fa1341d9e9cdd37f17d8aef67239e087affb933377530c30af9fdd"
+      },
+      {
+        "name": "entity-vault-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 13.844159750035033,
+        "logSHA256": "8fde279fef7e13be37fbeef4d9b3fe83738d7029bfa50aaf9727bdce7443ac93"
+      },
+      {
+        "name": "project-corrections-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 4.743278957903385,
+        "logSHA256": "0caedcea047cc7676773ce44b8af00dc9c884eeb03e30e199cf5750036892bd1"
+      },
+      {
+        "name": "tag-index-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.9142310409806669,
+        "logSHA256": "ac0ed06e08739c2a58262ea402637bd13d90c71eeaf8545ce118654afa74b5b9"
+      },
+      {
+        "name": "tag-index-interruption-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 164.67872149986215,
+        "logSHA256": "5a33cd54e6a7fc2bb4f96e9ea626610767908f4809f9da2e5ea0cf339d781e5a"
+      },
+      {
+        "name": "hardware-replay-probe",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 4.8714706669561565,
+        "logSHA256": "a7763f197a705108a9db53179334e60e5ed12c7ddf8df6e5888ae3a029c9f2de"
+      },
+      {
+        "name": "replay-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 2.1403755000792444,
+        "logSHA256": "58c97006e8ae55baed6a280e8c50444b07bc5705e9b8f942b7723a353a72a857"
+      },
+      {
+        "name": "api-mcp-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 0.6614656248129904,
+        "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+      },
+      {
+        "name": "sdk-offline",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 6.340815583942458,
+        "logSHA256": "911b8a052bd30862825c1e4e7547bce1f31bdf0b117167734ab8e58c8a45dbd0"
+      },
+      {
+        "name": "pattern-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.282291749957949,
+        "logSHA256": "ac879a1e8af596d3be156728f7776f904e41f39a09ec79ec0537477007d5133a"
+      },
+      {
+        "name": "accessibility-text-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 2.576694875024259,
+        "logSHA256": "21b652845a0015dea67e7f9f7a445e7b7b0cbd4ba977bc1b839de3d817e79b2e"
+      },
+      {
+        "name": "text-observation-processes",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.3345230829436332,
+        "logSHA256": "42e421e809ec25f3195b4758dad13d063a28dea28f2b11b27320d202bf2604cf"
+      },
+      {
+        "name": "range-archive-benchmark",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 77.2403954169713,
+        "logSHA256": "5804df17ad15843ef37a7ca9e2fb59eb6fadcbb7c4bdf74d8648968ff6d6f448"
+      },
+      {
+        "name": "package-proof",
+        "state": "passed",
+        "returncode": 0,
+        "seconds": 1.9110727079678327,
+        "logSHA256": "1386e1cf6e151b8d0eb0bef9e19fe34e763cb22163cb0935a95082cebf660140"
+      }
+    ]
+  },
+  "retainedFocusedRuns": [
+    {
+      "path": ".artifacts/vault-helper-phase-v1/focused-v1.log",
+      "sha256": "974c6c84dbd808c53111783609b98fbde34e2b84272e166561f66cfb2f9eea82"
+    },
+    {
+      "path": ".artifacts/vault-helper-phase-v1/focused-v2.log",
+      "sha256": "c714190d2d165d3dc707284a3f834adb863658215d63c505fcd4cbf5bd096149"
+    },
+    {
+      "path": ".artifacts/vault-helper-phase-v1/focused-v3.log",
+      "sha256": "764ef257e05c4f887a9c2ac2f712ce61b57f60466c050aaf7dbd4c26bae1cb86"
+    },
+    {
+      "path": ".artifacts/vault-helper-phase-v1/focused-v4.log",
+      "sha256": "e28921152978843a8eb5afad9c3d51ca621b816b927cfd3ef0261e146a195675"
+    }
+  ],
+  "componentRenders": {
+    "receipt": {
+      "path": ".artifacts/vault-helper-phase-v1/ui-renders-v1/report.json",
+      "sha256": "8570b5e2d0b2716cf07779b9cd1d66f2ff66844fa72ebf798ef5ac4ab3e611ca"
+    },
+    "cases": [
+      {
+        "name": "observation-health-light",
+        "pid": 90047,
+        "state": "passed",
+        "seconds": 2.292932166950777,
+        "pngSHA256": "fae529c363e6c24f8647a2de07f75322aea7df08efef31cf98776ab29e0f1157",
+        "bytes": 43562
+      },
+      {
+        "name": "observation-health-dark",
+        "pid": 90051,
+        "state": "passed",
+        "seconds": 1.6986744578462094,
+        "pngSHA256": "4d696c229838039a237c13b7241150519b8e362058bac81108bc7762d7be337c",
+        "bytes": 44502
+      },
+      {
+        "name": "observation-detail-light",
+        "pid": 90055,
+        "state": "passed",
+        "seconds": 1.722639833111316,
+        "pngSHA256": "752813793033fde54fab30c48b3823679de21320d041804c295e2b027236b2a7",
+        "bytes": 174195
+      },
+      {
+        "name": "observation-detail-dark",
+        "pid": 90059,
+        "state": "passed",
+        "seconds": 1.788663666928187,
+        "pngSHA256": "e6630a9f03f46b1395fe94f228be25803902f6a90728c234238439c68b8de351",
+        "bytes": 177816
+      },
+      {
+        "name": "observation-card-light",
+        "pid": 90064,
+        "state": "passed",
+        "seconds": 1.8990399579051882,
+        "pngSHA256": "55afb8bed0fef94cf9703cf97a25546a4e0c58973d630bef4b73a9bce70c3427",
+        "bytes": 85731
+      },
+      {
+        "name": "observation-card-dark",
+        "pid": 90068,
+        "state": "passed",
+        "seconds": 1.8779756668955088,
+        "pngSHA256": "e16e15de6d6eafa7e51c824c89cacfda6c14ebbe5da6c2c074c0418d98a79966",
+        "bytes": 86999
+      },
+      {
+        "name": "text-ready-light",
+        "pid": 90072,
+        "state": "passed",
+        "seconds": 2.2116440418176353,
+        "pngSHA256": "75d754f59f7a3027e7b44dc1271356e8acb9ab3bf6fc4d2da37fa835abec6e64",
+        "bytes": 199050
+      },
+      {
+        "name": "text-ready-dark",
+        "pid": 90076,
+        "state": "passed",
+        "seconds": 2.158486124826595,
+        "pngSHA256": "6eb84e06d88089e00947373abaa784a15d377905a2aae9d60b0f752951566656",
+        "bytes": 203246
+      },
+      {
+        "name": "text-crop-blocked-light",
+        "pid": 90080,
+        "state": "passed",
+        "seconds": 1.988839458907023,
+        "pngSHA256": "ce5288d901b618125ff1d5041135123beb0b140b7586ccc7b8fb213c5010aa5c",
+        "bytes": 198556
+      },
+      {
+        "name": "text-crop-blocked-dark",
+        "pid": 90084,
+        "state": "passed",
+        "seconds": 1.9073644168674946,
+        "pngSHA256": "5b7489664043bae3f71047f6046dc451b62529ed976874ff62b6b1586111b150",
+        "bytes": 202546
+      }
+    ],
+    "rendererSHA256": "fdefeda348e2aa0e9e686bff8f21318ebe32a4f2aa9e56ec93b1e4506cf57b8d",
+    "sourceBytesMatchQualification": true,
+    "scope": "Only owned demo AppKit components; no normal history, desktop pixel capture, foreground target, permission changes, listeners or live signed-GUI/TCC acceptance."
+  },
+  "signedObservationProcesses": {
+    "receipt": {
+      "path": ".artifacts/vault-helper-phase-v1/qualification-v1/observation-processes/report.json",
+      "sha256": "42e421e809ec25f3195b4758dad13d063a28dea28f2b11b27320d202bf2604cf"
+    },
+    "groups": [
+      "authored spans retain metadata; inclusive last sample, exclusive query end and strict source-start CLI option",
+      "repeated civil hours retain start-based calendar counts; later span overlap does not inflate calendar buckets",
+      "actual read-only Python SDK/MCP child preserves sampled metadata and source-start scope; tool schema advertises boolean",
+      "owned authenticated loopback socket includes overlap, supports strict source-start filtering and refuses non-boolean input",
+      "quiet schema24 backup and JSON round trip preserve observed extent and rebuild sparse range lookup",
+      "portable Markdown identifies sample counts and gaps without claiming continuous activity",
+      "actual preceding signed23 client refuses schema24 library and archive; database bytes unchanged",
+      "actual prior23 writer strips unknown span fields; upgrade preserves exact typed source payloads and installs empty range projection",
+      "preview-guarded erasure includes exact last observed sample and removes its range from later retrieval"
+    ],
+    "operations": 26,
+    "authoredFixturesAreNativeCapture": false
+  },
+  "signedModeProcesses": {
+    "receipt": {
+      "path": ".artifacts/vault-helper-phase-v1/qualification-v1/text-processes/report.json",
+      "sha256": "21b652845a0015dea67e7f9f7a445e7b7b0cbd4ba977bc1b839de3d817e79b2e"
+    },
+    "groups": [
+      "mode-specific permission report and zero-source native refusal at the observed boundary",
+      "explicit replay cannot widen a saved text-only mode to pixels",
+      "saved display and crop constraints refuse before context/device admission",
+      "wrong or unknown modes cannot fall through to text or pixel capture",
+      "separate authored interchange source retains text-only shape and cannot imply a learned PII check",
+      "quiet full backup preserves text mode and source; no startup services or media introduced",
+      "preceding signed23 client refuses schema24 library and backup without modifying saved settings",
+      "plain JSON portability and independent source deletion preserve media-free source semantics"
+    ],
+    "operations": 27,
+    "nativeRefusalBoundary": "Locked-session gate before target lookup",
+    "mediaFiles": 0
+  },
+  "millionSourceRangeRecheck": {
+    "format": "OSwind sampled range query development probe",
+    "state": "completed",
+    "frozen": {
+      ".artifacts/accessibility-text-capture-v1/qualification-v1/release-v1/OSwind.app/Contents/MacOS/oswindctl": "12604c5e29a9df493380e76fe20eb5f2b01c03c8a603e92109b5e6e3808e61b3",
+      ".artifacts/vault-helper-phase-v1/qualification-v1/release-v1/OSwind.app/Contents/MacOS/oswindctl": "f6c5b3fd85fc2a7a6e352a66b67eaaf7ba4f0d87c534305fe9ef9e5ff225fe72",
+      ".artifacts/capture-budget-v1/qualification-v1/tag-index-interruption/library/memory.sqlite": "5d3572bf0f0b173e90f3bc2ef1ada310f08d796c1173e486fb1ffaff603954c0",
+      ".artifacts/vault-helper-phase-v1/benchmark-ranges-v1.py": "cf4d0bbdebc75c4b5298d3c4598ab5838b81cbef2cb4e58e4be83fecbdfa0202",
+      "sdk/python/oswind/__init__.py": "b6eb032bf2a1fe65900a88746bca8608b8cd0da9025d641ddfcdc35cd38d1924"
+    },
+    "fixture": {
+      "distribution": "year",
+      "format": "OSwind owned activity benchmark fixture v1",
+      "normalHistory": false,
+      "seed": 1729,
+      "sources": 1000000,
+      "textBytes": 1024
+    },
+    "builds": {
+      "previous": "signed optimized schema23",
+      "current": "ad-hoc signed optimized schema24"
+    },
+    "measurements": {
+      "previous-points": {
+        "near-start": {
+          "milliseconds": [
+            43.35612501017749,
+            7.450375007465482,
+            6.919875042513013,
+            6.912542041391134,
+            6.733624963089824
+          ],
+          "medianMS": 6.919875042513013,
+          "maxMS": 43.35612501017749,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "latest-day": {
+          "milliseconds": [
+            36.39108291827142,
+            7.304167142137885,
+            6.851583952084184,
+            6.671125069260597,
+            6.88258302398026
+          ],
+          "medianMS": 6.88258302398026,
+          "maxMS": 36.39108291827142,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "whole-year": {
+          "milliseconds": [
+            6.574917118996382,
+            6.656707962974906,
+            6.461916025727987,
+            6.502042058855295,
+            7.053333101794124
+          ],
+          "medianMS": 6.574917118996382,
+          "maxMS": 7.053333101794124,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "empty-before": {
+          "milliseconds": [
+            0.8060841355472803,
+            0.4450839478522539,
+            0.35799993202090263,
+            0.3346668090671301,
+            0.4060831852257252
+          ],
+          "medianMS": 0.4060831852257252,
+          "maxMS": 0.8060841355472803,
+          "hits": 0,
+          "exactIndependentIDs": true
+        },
+        "sparse-overlap": {
+          "milliseconds": [
+            0.5695831496268511,
+            0.3510829992592335,
+            0.399791169911623,
+            0.36758393980562687,
+            0.47920900397002697
+          ],
+          "medianMS": 0.399791169911623,
+          "maxMS": 0.5695831496268511,
+          "hits": 0,
+          "exactIndependentIDs": true
+        },
+        "empty-after-last": {
+          "milliseconds": [
+            0.3784999717026949,
+            0.3968339879065752,
+            0.3424999304115772,
+            0.36629196256399155,
+            0.3572080750018358
+          ],
+          "medianMS": 0.36629196256399155,
+          "maxMS": 0.3968339879065752,
+          "hits": 0,
+          "exactIndependentIDs": true
+        }
+      },
+      "current-points": {
+        "near-start": {
+          "milliseconds": [
+            47.96958318911493,
+            7.7850420493632555,
+            7.341833086684346,
+            6.946749985218048,
+            6.813166895881295
+          ],
+          "medianMS": 7.341833086684346,
+          "maxMS": 47.96958318911493,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "latest-day": {
+          "milliseconds": [
+            36.03408299386501,
+            7.5175410602241755,
+            6.981291808187962,
+            7.200916996225715,
+            7.009082939475775
+          ],
+          "medianMS": 7.200916996225715,
+          "maxMS": 36.03408299386501,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "whole-year": {
+          "milliseconds": [
+            7.069499930366874,
+            7.0991250686347485,
+            6.834791973233223,
+            6.711374968290329,
+            6.798666901886463
+          ],
+          "medianMS": 6.834791973233223,
+          "maxMS": 7.0991250686347485,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "empty-before": {
+          "milliseconds": [
+            0.7104580290615559,
+            0.4782499745488167,
+            0.4413330461829901,
+            0.3732498735189438,
+            0.3605419769883156
+          ],
+          "medianMS": 0.4413330461829901,
+          "maxMS": 0.7104580290615559,
+          "hits": 0,
+          "exactIndependentIDs": true
+        },
+        "sparse-overlap": {
+          "milliseconds": [
+            0.3327918238937855,
+            0.38595800288021564,
+            0.31737517565488815,
+            0.3857498522847891,
+            0.34133298322558403
+          ],
+          "medianMS": 0.34133298322558403,
+          "maxMS": 0.38595800288021564,
+          "hits": 0,
+          "exactIndependentIDs": true
+        },
+        "empty-after-last": {
+          "milliseconds": [
+            0.45441603288054466,
+            0.4461670760065317,
+            0.48883305862545967,
+            0.4027499817311764,
+            0.3755418583750725
+          ],
+          "medianMS": 0.4461670760065317,
+          "maxMS": 0.48883305862545967,
+          "hits": 0,
+          "exactIndependentIDs": true
+        }
+      },
+      "current-with-one-range": {
+        "near-start": {
+          "milliseconds": [
+            16.729124821722507,
+            7.5028338469564915,
+            6.8500840570777655,
+            7.224041968584061,
+            7.054375018924475
+          ],
+          "medianMS": 7.224041968584061,
+          "maxMS": 16.729124821722507,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "latest-day": {
+          "milliseconds": [
+            7.815625052899122,
+            6.924666929990053,
+            6.84029096737504,
+            7.029540836811066,
+            6.939249811694026
+          ],
+          "medianMS": 6.939249811694026,
+          "maxMS": 7.815625052899122,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "whole-year": {
+          "milliseconds": [
+            6.839708890765905,
+            6.8101659417152405,
+            6.804583827033639,
+            6.699749967083335,
+            6.755667040124536
+          ],
+          "medianMS": 6.804583827033639,
+          "maxMS": 6.839708890765905,
+          "hits": 100,
+          "exactIndependentIDs": true
+        },
+        "empty-before": {
+          "milliseconds": [
+            0.6229160353541374,
+            0.4535410553216934,
+            0.37433416582643986,
+            0.3325408324599266,
+            0.31991605646908283
+          ],
+          "medianMS": 0.37433416582643986,
+          "maxMS": 0.6229160353541374,
+          "hits": 0,
+          "exactIndependentIDs": true
+        },
+        "sparse-overlap": {
+          "milliseconds": [
+            0.6711659952998161,
+            0.39008306339383125,
+            0.5199161823838949,
+            0.41208299808204174,
+            0.6272909231483936
+          ],
+          "medianMS": 0.5199161823838949,
+          "maxMS": 0.6711659952998161,
+          "hits": 1,
+          "exactIndependentIDs": true
+        },
+        "empty-after-last": {
+          "milliseconds": [
+            0.6618751212954521,
+            0.3886250779032707,
+            0.3501658793538809,
+            0.3041669260710478,
+            0.2957500983029604
+          ],
+          "medianMS": 0.3501658793538809,
+          "maxMS": 0.6618751212954521,
+          "hits": 0,
+          "exactIndependentIDs": true
+        }
+      }
+    },
+    "scope": "Owned one-million-source APFS clones. Actual persistent MCP/SDK end-to-end keyword reads; both builds are signed optimized; this owned component probe is not a whole-product ranking. SQL oracles and hashing warm caches; host/framework/background activity uncontrolled. No desktop capture, isolated SQL/CPU/energy or competitor inference.",
+    "open": {
+      "previous": {
+        "seconds": 2.2794000420253724,
+        "schema": 23,
+        "sources": 1000000
+      },
+      "current": {
+        "seconds": 1.2436027089133859,
+        "schema": 24,
+        "sources": 1000000
+      }
+    },
+    "queryPlan": [
+      [
+        5,
+        0,
+        162,
+        "SEARCH m USING INDEX memories_time (timestamp>? AND timestamp<?)"
+      ],
+      [
+        21,
+        0,
+        0,
+        "CORRELATED SCALAR SUBQUERY 1"
+      ],
+      [
+        25,
+        21,
+        39,
+        "SEARCH _observed USING PRIMARY KEY (memory_id=?)"
+      ]
+    ],
+    "allMillionTypedSourceRowsUnchanged": true,
+    "logicalSourceSHA256": "6a4409dced43df42e6f041c922e6db2f48991e0d13bc3fa83dafa85260d4efa8",
+    "maximumLookbackSeconds": 901,
+    "sourceInputUnchanged": true,
+    "authoredRangeIsNativeCapture": false
+  },
+  "hardwareReplay": {
+    "receipt": {
+      "path": ".artifacts/vault-helper-phase-v1/qualification-v1/hardware-replay/report.json",
+      "sha256": "3533d1946ccb7fbf644429b8f9c52d224ba0ab6f0c9f30c2ecc2b37022b78947"
+    },
+    "frames": 12,
+    "scope": "Generated static desktop-like pixels with changing labels; actual Vision OCR, required-hardware HEVC (or explicit software H264), source storage, every-frame decode and decoded ownership/authored frame-token OCR checks. JPEG uses the same pixels at quality 0.75. Excludes desktop capture, natural workloads, power, database/metadata bytes and competitors."
+  },
+  "package": {
+    "scope": "Separately staged owned post-credential native cancellation observation and safe missing-member provenance with inherited capture/retrieval; controlled observations only. No live capture, calibrated physical energy, broad parity, hardened-distribution or competitive ranking acceptance.",
+    "codeCommit": "a5d4af424cd10e894cbbaf840f0f7f88e127c4c2",
+    "schema": 24,
+    "executables": {
+      "OSwind": {
+        "rawSHA256": "180f7a10d13d824478c973d5f77592681eb2b0575fbb2fe90bd46b2004faf23e",
+        "signedSHA256": "0f6b6ac6f68e0504d9814f986f53715e59f89ccba462dd740c93ed039b1da8c0",
+        "normalizedPayloadSHA256": "7a6a250826b8a0b294fb9cab95da86f527b60f04ee8b8505e77eb9dd90794ff0"
+      },
+      "oswindctl": {
+        "rawSHA256": "75ffa1c94df10d71afe7dd8a8952554df1bfccadbe74265130902004787ad5ee",
+        "signedSHA256": "f6c5b3fd85fc2a7a6e352a66b67eaaf7ba4f0d87c534305fe9ef9e5ff225fe72",
+        "normalizedPayloadSHA256": "2ce1fd12d16da6c7a4282feb37cb9ef2d223315521c9b45ea699831a388898ad"
+      },
+      "oswind-preparation-guardian": {
+        "rawSHA256": "f97e98082e64f8a029bafb8dbf58a9e5bcbfef39608856dae5c48c4e96185e32",
+        "signedSHA256": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "normalizedPayloadSHA256": "3de987ae14050c698e5a689d68027264847f979684e0e9e592b9fe91e7e6a6f2"
+      }
+    },
+    "zipSHA256": "323ff57a2f5a45b737040598c36c19213651b85218945dfa53536a79865d73f8",
+    "bundleFiles": 34,
+    "bundleTreeSHA256": "2b6a745a4cc7a233d6c39970ea5c20506dcc9897d82bc37cd785ac87805ea818",
+    "strictSignaturesPass": true,
+    "signatureNormalizedPayloadsMatch": true,
+    "entireExtractedZipMatches": true,
+    "releaseNotThreadSanitized": true,
+    "installedUnchanged": true
+  },
+  "publicationIntegrity": {
+    "allFrozenInputsStillMatch": true,
+    "productTestsToolsSDKCIModelsAndAssetsUnchanged": true,
+    "installedFiles": 15,
+    "installedTreeUnchanged": true,
+    "packageAndExtractedTreeEqual": true,
+    "noOwnCompilerOrEvaluationDriver": true,
+    "qualificationPrefixMountedImages": []
+  },
+  "staticReport": {
+    "canonicalVendors": 20,
+    "canonicalVendorBytesUnchanged": true,
+    "requirements": 78,
+    "prior77StatusesUnchanged": true,
+    "counts": {
+      "live verified": 4,
+      "partial": 39,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 4,
+      "out of v0 desktop scope": 2
+    },
+    "renderedCellsMatch": true,
+    "deterministicRender": true,
+    "htmlSHA256": "9d084a1bfa5b327ce712d97c7d6062e2dcb9f7e3324eacbb84e99fa052a3365d",
+    "browserQA": {
+      "path": ".artifacts/vault-helper-phase-v1/landscape-qa-v2/report.json",
+      "sha256": "cdc8aef89c81f4948a71d6fc69a167192ecf0fa124daa8dad08f2dde9d9155e5"
+    },
+    "nativeGUIAcceptance": false
+  },
+  "hostedCI": {
+    "source": "a5d4af424cd10e894cbbaf840f0f7f88e127c4c2",
+    "workflowRun": 40980792998,
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/40980792998",
+    "jobs": [
+      {
+        "id": 123820051524,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 123820051645,
+        "name": "native",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Exact product/source commit; later documentation publication CI is separate."
+  },
+  "priorActivityReceipt": {
+    "path": "benchmarks/native-input-activity-v1.json",
+    "sha256": "dfe704e52574ad4cf71b67f2235526a490d367e49c3ce2e4c8b522d3ccce8084"
+  },
+  "knownIndependentGates": [
+    "Current07f5de5 local broad run did not observe an active attach helper in one cancellation case; two assertions retained. Four unchanged native follow-up cases pass, but original18/19-stage result remains partial.",
+    "Preceding44e0bb1 hosted Busy vault app-session missing backup member and attached-fixture failure; cause unproven.",
+    "Earlier publication28a95f8 query-recovery normal detach exit16, run40889784746; cause unproven.",
+    "Earlier sourcec7fed19 visual-index final-lock normal detach exit16; cause unproven."
+  ],
+  "remaining": [
+    "Capture and resolve the historical missing-member/attached-fixture failure; safe provenance is not retroactive proof of its cause.",
+    "Closing/media-drain cancellation use separate phase observations; broad native lifecycle/older macOS/device acceptance remains open.",
+    "Resolve earlier independent normal-detach exit16 gates without forced cleanup.",
+    "Natural unattended capture cadence, representative app/secure-field transitions, matched sustained physical power and storage workloads.",
+    "Personal-device sync, notarized distribution/updates and whole-product competitor ranking."
+  ],
+  "limits": "Owned actual APFS fixtures and process ordering contracts; default public driver emits no observation. Started-before-input and post-input callbacks are distinct. Original failed broad-run/CI receipts remain immutable. New passes establish the current observed contracts, not a causal fix of the historical missing member or a general release/parity claim."
+}

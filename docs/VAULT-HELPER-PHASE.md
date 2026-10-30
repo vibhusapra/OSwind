@@ -1,6 +1,6 @@
 # Owned vault helper phases and missing-member provenance
 
-Implementation is in progress on top of PR #89. This work addresses the cancellation fixture's intermittent phase observation and makes a separate missing-backup-member failure diagnosable. It does not claim to fix the preceding missing member or earlier native detach failures.
+Implemented in draft PR #90 on top of PR #89 (source a5d4af4). This work addresses the cancellation fixture's intermittent phase observation and makes a separate missing-backup-member failure diagnosable. It does not claim to fix the preceding missing member or earlier native detach failures.
 
 ## Why this changes
 
@@ -23,7 +23,8 @@ The Busy app-session fixture reports fixed operation phases and the safe diagnos
 - [x] Initial launch-phase native/process run: 13 cases pass, including five attach cancellation/history cycles and create cancellation/resume. The final fixture uses the stronger post-input phase.
 - [x] Expanded run: 46 cases pass, including backup trees, safe missing-member metadata and all native app-session cases.
 - [x] Final focused run: 47 cases pass, including post-input native create/attach cancellation, stdin ordering, safe metadata, backups and all 13 app-session cases.
-- [ ] Normal, TSan, optimized and signed package/process qualification with retained immutable inputs.
-- [ ] Published current-source CI and requirement/benchmark receipts.
+- [x] All 19 ordered stages pass with 605 immutable inputs. Normal: 1,302 defined / 1,299 pass / three explicit skips. Expanded TSan and optimized: 360 defined / 359 pass / one skip each. All eight new cases, all 13 app-session cases, create/resume and five post-input attach/history cycles pass in every build. No TSan race warning.
+- [x] Signed capture/entity/tag/portability/API/MCP/SDK/privacy/span processes, interrupted million-source migration, 12 hardware replay frames and 90 million-source range reads pass. Original typed rows stay unchanged. All 34 signed bundle/ZIP files match, installed 15-file tree remains unchanged and no qualification-prefix image or compiler/driver survives. Warm current 100-result query medians are about 6.8–7.3 ms, without a causal speed, energy or ranking claim.
+- [x] Both exact-source CI jobs pass in run [40980792998](https://github.com/vibhusapra/OSwind/actions/runs/40980792998). [Benchmark receipt](../benchmarks/vault-helper-phase-v1.json) and requirement evidence are published; feature statuses remain unchanged. Ten current light/dark component renders and comparison-report browser checks pass separately from live GUI acceptance.
 - [ ] Reproduce or capture the independent missing-member failure's precise provenance and resolve its cause.
 - [ ] Resolve older independent detach exit-16 gates, physical desktop acceptance, sustained power/cadence and broad parity.
