@@ -22,7 +22,7 @@ enum VaultProcess {
         // that bounded action finish before its caller performs safe cleanup.
         case finishNativeAction
     }
-    static func run(_ executable:String,_ arguments:[String],secret:Data?=nil,timeout:Double=60,cancellation:CancellationPolicy = .terminateChild) async throws -> VaultProcessResult {
+    static func run(_ executable:String,_ arguments:[String],secret:Data?=nil,timeout:Double=60,cancellation:CancellationPolicy = .terminateChild,started:(@Sendable (Int32)->Void)?=nil,inputClosed:(@Sendable (Int32)->Void)?=nil) async throws -> VaultProcessResult {
         try Task.checkCancellation()
         if let secret {guard !secret.isEmpty,secret.count<=4096,!secret.contains(0) else {throw OSwindError.invalid("Use a nonempty passphrase without NUL characters")}}
         let job=Task.detached(priority:.utility) {() throws -> VaultProcessResult in
@@ -49,11 +49,18 @@ enum VaultProcess {
                     guard count>0 else {break};buffer.append(Data(bytes.prefix(count)));total+=count
                 }
             }
+            // Internal owned-fixture observation, after the child is launched
+            // and cleanup owns it, before any credential is delivered. Only
+            // the child PID is exposed; never arguments, stdin or output.
+            started?(process.processIdentifier)
             if let secret {
                 guard !secret.isEmpty,secret.count<=4096,!secret.contains(0) else {throw OSwindError.invalid("Use a nonempty passphrase without NUL characters")}
                 var payload=secret;payload.append(0);try input.fileHandleForWriting.write(contentsOf:payload);payload.resetBytes(in:0..<payload.count)
             }
             try input.fileHandleForWriting.close();try input.fileHandleForReading.close()
+            // A distinct phase for cancellation after credential delivery,
+            // before waiting for native action completion or publishing it.
+            inputClosed?(process.processIdentifier)
             let deadline=ContinuousClock.now.advanced(by:.seconds(timeout))
             while process.isRunning {drain(output.fileHandleForReading,stdout);drain(error.fileHandleForReading,stderr);guard !stdout.oversized,!stderr.oversized else {throw OSwindError.unavailable("Encrypted-library system output exceeded its limit")};try Task.checkCancellation();guard ContinuousClock.now<deadline else {throw OSwindError.unavailable("Encrypted-library system operation timed out. Check its status before retrying.")};Thread.sleep(forTimeInterval:0.02)}
             for _ in 0..<32 {drain(output.fileHandleForReading,stdout);drain(error.fileHandleForReading,stderr)}
@@ -89,6 +96,7 @@ struct VaultVolumeProof:Sendable {
         return roots && device==other.device && attachmentDevice==other.attachmentDevice && volumeUUID==other.volumeUUID && image.device==other.image.device && image.inode==other.image.inode
     }
 }
+enum VaultCredentialHelper:Sendable,Equatable {case create,attach}
 struct NativeVaultDriver:Sendable {
     private let observer:(@Sendable (VaultNativeDiagnostic)->Void)?
     private let willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?
@@ -96,7 +104,8 @@ struct NativeVaultDriver:Sendable {
     // Public LibraryVault construction supplies no override or trace observer.
     typealias QueryProcess = @Sendable (VaultNativeOperation,String,[String],Double) async throws -> VaultProcessResult
     private let queryProcess:QueryProcess?
-    init(observer:(@Sendable (VaultNativeDiagnostic)->Void)?=nil,willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?=nil,queryProcess:QueryProcess?=nil) {self.observer=observer;self.willMutate=willMutate;self.queryProcess=queryProcess}
+    private let credentialHelperReady:(@Sendable (VaultCredentialHelper,Int32)->Void)?
+    init(observer:(@Sendable (VaultNativeDiagnostic)->Void)?=nil,willMutate:(@Sendable (VaultNativeOperation,Int32?)->Void)?=nil,queryProcess:QueryProcess?=nil,credentialHelperReady:(@Sendable (VaultCredentialHelper,Int32)->Void)?=nil) {self.observer=observer;self.willMutate=willMutate;self.queryProcess=queryProcess;self.credentialHelperReady=credentialHelperReady}
     private func observed(_ operation:VaultNativeOperation,_ executable:String,_ arguments:[String],timeout:Double=60,cancellation:VaultProcess.CancellationPolicy = .terminateChild,mountedDevice:Int32?=nil) async throws -> VaultProcessResult {
         // This wrapper accepts no secret. Create/attach retain their separate
         // unobserved stdin-only credential path.
@@ -128,7 +137,7 @@ struct NativeVaultDriver:Sendable {
         try Self.attachmentList(await query(.attachmentInventory,"/usr/bin/hdiutil",["info","-plist"],identity:identity))
     }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
-        let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
+        let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction,inputClosed:{credentialHelperReady?(.create,$0)})
         guard result.succeeded else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
@@ -145,7 +154,7 @@ struct NativeVaultDriver:Sendable {
     }
     private func attachAndProve(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         do {
-            let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction)
+            let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction,inputClosed:{credentialHelperReady?(.attach,$0)})
             guard r.succeeded else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}
             guard let proof=try await attachment(paths:paths),proof.mounted,proof.mount.standardizedFileURL==mount.standardizedFileURL else {throw OSwindError.invalid("The attached vault did not match its requested location")};return proof
         } catch {
