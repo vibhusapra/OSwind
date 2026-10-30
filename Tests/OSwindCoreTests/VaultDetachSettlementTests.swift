@@ -144,77 +144,49 @@ private actor DetachPause {
     }
 }
 
-private final class OwnedVaultNativeTrace:@unchecked Sendable {
-    struct Item:Codable {let stage:String,event:VaultNativeDiagnostic}
-    struct Handle:Codable {let descriptor:Int,path:String?,mounted:Bool}
-    struct Boundary:Codable {let stage:String,operation:VaultNativeOperation,mountedDevice:Int32?,ownedHandles:[Handle]}
-    struct Report:Codable {let stage:String,failureStage:String?,total:Int,nonzero:Int,dropped:Int,events:[Item],beforeMutations:[Boundary]}
-    private let lock=NSLock()
-    private let root:URL
-    private let rootPrefix:String
-    private var stage="create",failureStage:String?,items=[Item](),total=0,nonzero=0,dropped=0
-    private var boundaries=[Boundary]()
-    init(root:URL) {let canonical=root.resolvingSymlinksInPath();self.root=canonical;rootPrefix=canonical.path.hasSuffix("/") ? canonical.path:canonical.path+"/"}
-    func beforeMutation(_ operation:VaultNativeOperation,_ mountedDevice:Int32?) {
-        // Inspect this test process's descriptor names only, without reading
-        // file contents or retaining unrelated paths. /dev/fd snapshots can
-        // race a concurrent close; failed lookups are simply omitted.
-        var owned=[Handle]()
-        for name in (try? FileManager.default.contentsOfDirectory(atPath:"/dev/fd")) ?? [] {
-            guard let descriptor=Int32(name) else {continue}
-            var metadata=stat();guard fstat(descriptor,&metadata)==0 else {continue}
-            let mounted=mountedDevice.map {$0==metadata.st_dev} ?? false
-            var bytes=[CChar](repeating:0,count:Int(MAXPATHLEN))
-            let found=bytes.withUnsafeMutableBytes {fcntl(descriptor,F_GETPATH,$0.baseAddress!)}
-            let path=found==0 ? String(cString:bytes):nil
-            if mounted || path?.hasPrefix(rootPrefix)==true {owned.append(.init(descriptor:Int(descriptor),path:path,mounted:mounted))}
-        }
-        lock.withLock {if boundaries.count<128 {boundaries.append(.init(stage:stage,operation:operation,mountedDevice:mountedDevice,ownedHandles:owned.sorted {$0.descriptor<$1.descriptor}))}}
-    }
-    func setStage(_ value:String) {lock.withLock {stage=value}}
-    func markFailure() {lock.withLock {failureStage=stage;stage="failure-cleanup"}}
-    func append(_ event:VaultNativeDiagnostic) {lock.withLock {total+=1;if event.summary.status != 0 {nonzero+=1};if items.count==512 {items.removeFirst();dropped+=1};items.append(.init(stage:stage,event:event))}}
-    func snapshot()->Report {lock.withLock {.init(stage:stage,failureStage:failureStage,total:total,nonzero:nonzero,dropped:dropped,events:items,beforeMutations:boundaries)}}
-    static func redactedJSON(_ encoded:Data,roots:[URL],secret:Data)throws->Data {
-        guard encoded.range(of:secret)==nil else {throw OSwindError.invalid("Fixture credential appeared in native diagnostic capture")}
-        let encoder=JSONEncoder()
-        var text=String(decoding:encoded,as:UTF8.self)
-        // Match JSON's escaped representation, including /private aliases and
-        // quoted/non-ASCII path components. Longer roots must be replaced first.
-        var paths:Set<String>=Set(roots.map { $0.path })
-        // Foundation may present /var even after resolving a /private/var
-        // symlink. F_GETPATH uses the kernel spelling; pin that spelling too.
-        for root in roots {
-            if let native=realpath(root.path,nil) {
-                paths.insert(String(cString:native));free(native)
-            }
-        }
-        let ordered=paths.sorted { (left:String,right:String)->Bool in
-            if left.count != right.count {return left.count>right.count}
-            return left<right
-        }
-        for path in ordered {
-            let quoted=String(decoding:try encoder.encode(path),as:UTF8.self)
-            text=text.replacingOccurrences(of:String(quoted.dropFirst().dropLast()),with:"<owned-fixture>")
-        }
-        return Data(text.utf8)
-    }
-    func save(root:URL,secret:Data,failed:Bool)throws {
-        let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys]
-        let encoded=try encoder.encode(snapshot())
-        // Fixture-only observation can contain owned system-tool text. Refuse
-        // to print/write any trace containing the generated credential.
-        let exported=try Self.redactedJSON(encoded,roots:[root,self.root],secret:secret)
-        let text=String(decoding:exported,as:UTF8.self)
-        if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_VAULT_TRACE_DIR"] {
-            let directory=URL(fileURLWithPath:destination,isDirectory:true);try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
-            try Data(text.utf8).write(to:directory.appendingPathComponent(root.lastPathComponent+(failed ? "-exception":"-completed")+".json"),options:.withoutOverwriting)
-        }
-        if failed || snapshot().nonzero>0 {print("Owned vault native result trace: "+text)}
-        else {let s=snapshot();print("Owned vault native trace: calls=\(s.total) nonzero=\(s.nonzero) dropped=\(s.dropped)")}
-    }
-}
 final class OwnedVaultNativeTraceTests:XCTestCase {
+    func testFailureReportKeepsOriginalCollectorLockPhaseAcrossSuccessfulCleanup() throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-trace-phase-"+UUID().uuidString)
+        try Paths.ensure(root)
+        defer {try? FileManager.default.removeItem(at:root)}
+        for phase in ["collector-first-lock","collector-second-lock"] {
+            let trace=OwnedVaultNativeTrace(root:root)
+            trace.setStage(phase)
+            let failed=VaultProcessResult(status:16,stdout:Data(),stderr:Data("owned detach busy".utf8))
+            trace.append(VaultNativeDiagnostic(operation:.imageDetach,result:failed))
+            trace.markFailure()
+            let recovered=VaultProcessResult(status:0,stdout:Data(),stderr:Data())
+            trace.append(VaultNativeDiagnostic(operation:.imageDetach,result:recovered))
+            let exported=try OwnedVaultNativeTrace.redactedJSON(JSONEncoder().encode(trace.snapshot()),roots:[root],secret:Data("fixture-credential".utf8))
+            let report=try JSONDecoder().decode(OwnedVaultNativeTrace.Report.self,from:exported)
+            XCTAssertEqual(report.failureStage,phase)
+            XCTAssertEqual(report.stage,"failure-cleanup")
+            XCTAssertEqual(report.nonzero,1)
+            XCTAssertEqual(report.events.map { $0.stage },[phase,"failure-cleanup"])
+            XCTAssertEqual(report.events.map { $0.event.summary.status },[16,0])
+        }
+    }
+    func testBoundaryRetainsOwnedHandleAndOmitsUnrelatedDescriptorPaths() throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-trace-boundary-"+UUID().uuidString)
+        let unrelated=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-trace-unrelated-"+UUID().uuidString)
+        try Paths.ensure(root)
+        defer {try? FileManager.default.removeItem(at:root);try? FileManager.default.removeItem(at:unrelated)}
+        let owned=root.appendingPathComponent("owned.txt")
+        try Data("authored owned text".utf8).write(to:owned)
+        try Data("authored unrelated text".utf8).write(to:unrelated)
+        let first=try FileHandle(forReadingFrom:owned),second=try FileHandle(forReadingFrom:unrelated)
+        defer {try? first.close();try? second.close()}
+        let trace=OwnedVaultNativeTrace(root:root)
+        trace.setStage("collector-first-lock")
+        trace.beforeMutation(.imageDetach,nil)
+        let boundary=try XCTUnwrap(trace.snapshot().beforeMutations.first)
+        XCTAssertEqual(boundary.stage,"collector-first-lock")
+        XCTAssertTrue(boundary.ownedHandles.contains {$0.descriptor==Int(first.fileDescriptor)})
+        XCTAssertFalse(boundary.ownedHandles.contains {$0.descriptor==Int(second.fileDescriptor)})
+        XCTAssertTrue(boundary.ownedHandles.allSatisfy {$0.path?.contains(root.lastPathComponent)==true})
+        let exported=try OwnedVaultNativeTrace.redactedJSON(JSONEncoder().encode(trace.snapshot()),roots:[root],secret:Data("fixture-credential".utf8))
+        XCTAssertNil(String(data:exported,encoding:.utf8)?.range(of:unrelated.path))
+    }
     func testEscapedAndCanonicalFixturePathsAreRedactedBeforeExport() throws {
         let roots=["/var/tmp/owned-\"café\"","/private/var/tmp/owned-\"café\""].map {URL(fileURLWithPath:$0)}
         let original=["alias":roots[0].path+"/Library/memory.sqlite","canonical":roots[1].path+"/Library/memory.sqlite","native":"Failure at "+roots[1].path+"/image"]

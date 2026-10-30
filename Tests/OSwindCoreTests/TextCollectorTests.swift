@@ -106,23 +106,149 @@ final class TextCollectorTests:XCTestCase {
 }
 
 final class NativeVaultCollectorTests:XCTestCase {
+    func testKnownHeldReaderAtFirstCollectorLockRetainsPhaseAndRecoversNormally() async throws {
+        try await knownHeldReader(atSecondLock:false)
+    }
+    func testKnownHeldReaderAtSecondCollectorLockRetainsPhaseAndRecoversNormally() async throws {
+        try await knownHeldReader(atSecondLock:true)
+    }
+    private func knownHeldReader(atSecondLock:Bool) async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned collector known-reader native control")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-collector-known-reader-"+UUID().uuidString)
+        try Paths.ensure(root)
+        let trace=OwnedVaultNativeTrace(root:root)
+        let driver=NativeVaultDriver(observer:{trace.append($0)},willMutate:{trace.beforeMutation($0,$1)})
+        let package=root.appendingPathComponent("Collector.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        let vault=try LibraryVault(package:package,nativeDriver:driver)
+        var active:MemoryStore?,reader:FileHandle?
+        do {
+            _=try await LibraryVault.create(at:package,name:"Owned collector reader control",capacityGiB:1,passphrase:secret,keepUnlocked:true)
+            var store=try MemoryStore(root:vault.libraryURL)
+            active=store
+            let data=Data(#"{"format":"OSwind collector batch","version":1,"collectorID":"dev.example.notes","records":[{"key":"owned","timestamp":"2026-10-25T12:00:00Z","app":"Fixture","bundleID":"dev.example.notes","title":"Owned collector control","text":"Owned collector source survives known-reader refusal"}]}"#.utf8)
+            let result=try store.importCollectorBatch(data)
+            if atSecondLock {
+                trace.setStage("collector-first-lock")
+                _=try await vault.lock(store:store)
+                active=nil
+                _=try await vault.unlock(passphrase:secret)
+                store=try MemoryStore(root:vault.libraryURL)
+                active=store
+                XCTAssertEqual(try store.get(result.sourceIDs[0])?.text,"Owned collector source survives known-reader refusal")
+            }
+            let phase=atSecondLock ? "collector-second-lock":"collector-first-lock"
+            reader=try FileHandle(forReadingFrom:vault.libraryURL.appendingPathComponent("memory.sqlite"))
+            let heldDescriptor=try XCTUnwrap(reader).fileDescriptor
+            trace.setStage(phase)
+            do {
+                _=try await vault.lock(store:store)
+                XCTFail("Known reader was detached")
+            } catch let failure as VaultNativeFailure {
+                XCTAssertEqual(failure.summary.operation,.imageDetach)
+                XCTAssertEqual(failure.summary.status,16)
+                XCTAssertEqual(failure.summary.termination,.exit)
+                trace.markFailure()
+            }
+            XCTAssertTrue(store.isClosed)
+            active=nil
+            let failed=trace.snapshot()
+            XCTAssertEqual(failed.failureStage,phase)
+            let boundary=try XCTUnwrap(failed.beforeMutations.first {$0.stage==phase && $0.operation == .imageDetach})
+            XCTAssertTrue(boundary.ownedHandles.contains {$0.descriptor==Int(heldDescriptor) && $0.mounted})
+            XCTAssertTrue(failed.events.contains {$0.stage==phase && $0.event.summary.operation == .imageDetach && $0.event.summary.status==16})
+            let attached=try await driver.attachment(paths:VaultPaths(package))
+            XCTAssertEqual(attached?.mounted,true)
+            try reader?.close()
+            reader=nil
+            let locked=try await vault.lock()
+            XCTAssertFalse(locked.imageAttached)
+            XCTAssertEqual(trace.snapshot().failureStage,phase)
+            trace.setStage("collector-control-history-reopen")
+            _=try await vault.unlock(passphrase:secret)
+            let reopened=try MemoryStore(root:vault.libraryURL)
+            active=reopened
+            XCTAssertEqual(try reopened.get(result.sourceIDs[0])?.text,"Owned collector source survives known-reader refusal")
+            trace.setStage("collector-control-final-lock")
+            _=try await vault.lock(store:reopened)
+            active=nil
+            let inventory=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"])
+            XCTAssertEqual(inventory.status,0)
+            let plist=try XCTUnwrap(PropertyListSerialization.propertyList(from:inventory.stdout,format:nil) as? [String:Any])
+            let images=try XCTUnwrap(plist["images"] as? [[String:Any]])
+            let image=package.appendingPathComponent("contents.sparsebundle").standardizedFileURL.resolvingSymlinksInPath()
+            XCTAssertFalse(images.contains {($0["image-path"] as? String).map {URL(fileURLWithPath:$0).standardizedFileURL.resolvingSymlinksInPath()==image} ?? false})
+            trace.setStage("collector-control-completed")
+            try trace.save(root:root,secret:secret,failed:false)
+            try FileManager.default.removeItem(at:root)
+        } catch {
+            let original=error
+            trace.markFailure()
+            try? reader?.close()
+            try? active?.close()
+            _=try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)} catch {print("Owned collector control trace could not be saved; original failure is preserved")}
+            throw original
+        }
+    }
+
     func testCollectorAdmissionAndReopenPreserveEncryptedHistoryWithoutPlaintextFallback()async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned synthetic encrypted collector fixture")}
-        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-collector-"+UUID().uuidString);try Paths.ensure(root)
-        let package=root.appendingPathComponent("Collector.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-collector-"+UUID().uuidString)
+        try Paths.ensure(root)
+        let trace=OwnedVaultNativeTrace(root:root)
+        let driver=NativeVaultDriver(observer:{trace.append($0)},willMutate:{trace.beforeMutation($0,$1)})
+        let package=root.appendingPathComponent("Collector.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        let vault=try LibraryVault(package:package,nativeDriver:driver)
         var active:MemoryStore?
         do {
+            // Keep the original public create-with-unlock path. Native output
+            // tracing is limited to subsequent credential-free inspections and mutations.
+            trace.setStage("collector-create-unlocked")
             _=try await LibraryVault.create(at:package,name:"Owned text collector",capacityGiB:1,passphrase:secret,keepUnlocked:true)
-            let store=try MemoryStore(root:vault.libraryURL);active=store
+            trace.setStage("collector-import")
+            let store=try MemoryStore(root:vault.libraryURL)
+            active=store
             let data=Data(#"{"format":"OSwind collector batch","version":1,"collectorID":"dev.example.notes","records":[{"key":"owned","timestamp":"2026-10-25T12:00:00Z","app":"Fixture","bundleID":"dev.example.notes","title":"Owned collector","text":"Owned collector source survives encrypted reopen"}]}"#.utf8)
-            let result=try store.importCollectorBatch(data);_ = try await vault.lock(store:store);active=nil
-            XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL));XCTAssertThrowsError(try store.importCollectorBatch(data))
-            _=try await vault.unlock(passphrase:secret);let reopened=try MemoryStore(root:vault.libraryURL);active=reopened
-            XCTAssertEqual(try reopened.get(result.sourceIDs[0])?.text,"Owned collector source survives encrypted reopen");_ = try await vault.lock(store:reopened);active=nil
-            let inventory=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"]);XCTAssertEqual(inventory.status,0)
-            let plist=try XCTUnwrap(PropertyListSerialization.propertyList(from:inventory.stdout,format:nil) as? [String:Any]),images=try XCTUnwrap(plist["images"] as? [[String:Any]])
+            let result=try store.importCollectorBatch(data)
+            trace.setStage("collector-first-lock")
+            _=try await vault.lock(store:store)
+            XCTAssertTrue(store.isClosed)
+            active=nil
+            trace.setStage("collector-closed-refusal")
+            XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
+            XCTAssertThrowsError(try store.importCollectorBatch(data))
+            trace.setStage("collector-reopen")
+            _=try await vault.unlock(passphrase:secret)
+            let reopened=try MemoryStore(root:vault.libraryURL)
+            active=reopened
+            trace.setStage("collector-preserved-history")
+            XCTAssertEqual(try reopened.get(result.sourceIDs[0])?.text,"Owned collector source survives encrypted reopen")
+            trace.setStage("collector-second-lock")
+            _=try await vault.lock(store:reopened)
+            XCTAssertTrue(reopened.isClosed)
+            active=nil
+            trace.setStage("collector-independent-absence")
+            let inventory=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"])
+            XCTAssertEqual(inventory.status,0)
+            let plist=try XCTUnwrap(PropertyListSerialization.propertyList(from:inventory.stdout,format:nil) as? [String:Any])
+            let images=try XCTUnwrap(plist["images"] as? [[String:Any]])
             let attached=images.contains {($0["image-path"] as? String).map {URL(fileURLWithPath:$0).standardizedFileURL.resolvingSymlinksInPath()==package.appendingPathComponent("contents.sparsebundle").standardizedFileURL.resolvingSymlinksInPath()} ?? false}
-            guard !attached else {throw OSwindError.unavailable("Owned collector image remains attached; fixture preserved")};try FileManager.default.removeItem(at:root)
-        } catch {try? active?.close();_ = try? await vault.lock();throw error}
+            guard !attached else {throw OSwindError.unavailable("Owned collector image remains attached; fixture preserved")}
+            let events=trace.snapshot()
+            for phase in ["collector-first-lock","collector-second-lock"] {
+                XCTAssertEqual(events.events.filter {$0.stage==phase && $0.event.summary.operation == .imageDetach}.count,1)
+                XCTAssertEqual(events.beforeMutations.filter {$0.stage==phase && $0.operation == .imageDetach}.count,1)
+            }
+            trace.setStage("collector-completed")
+            try trace.save(root:root,secret:secret,failed:false)
+            try FileManager.default.removeItem(at:root)
+        } catch {
+            let original=error
+            trace.markFailure()
+            try? active?.close()
+            _=try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)} catch {print("Owned collector trace could not be saved; original failure is preserved")}
+            throw original
+        }
     }
 }
