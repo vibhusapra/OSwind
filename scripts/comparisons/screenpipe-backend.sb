@@ -10,5 +10,5 @@
 (deny network*)
 (allow network-inbound (local ip (param "API_ADDRESS")))
 (allow network-outbound (remote ip (param "API_ADDRESS")))
-(deny mach-lookup (global-name-regex #"^com\.apple\.(tccd|axserver|accessibility|iohideventsystem|securityd|secd|appleeventsd|CalendarAgent|eventkitd|addressbook.*).*"))
+(deny mach-lookup (global-name-regex #"^com\.apple\.(tccd|axserver|accessibility|iohideventsystem|securityd|secd|appleeventsd|CalendarAgent|eventkitd|addressbook.*|metadata).*"))
 (deny appleevent-send)

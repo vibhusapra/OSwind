@@ -35,6 +35,7 @@ SCREENPIPE_ARCHIVE_SHA = 'b9fd0a4975808329fdbdd3948ffdfc59406e823ef41150c8cab94f
 # The official signed executable, rather than the compressed release asset.
 SCREENPIPE_SHA = '601fdd01a71cbd77c1cd1fafd8979e84cf1ccb0f4e028713cdd2d6b71026d895'
 ID = re.compile(r'^oswbench([0-9]{6})\n')
+CONTROL_IPC = ['com.apple.tccd', 'com.apple.metadata.mds', 'com.apple.metadata.mdwrite']
 
 
 def sha(path):
@@ -231,14 +232,14 @@ def sandbox_argv(binary, directory, port, metal, profile=None):
     return argv
 
 
-def permission_ipc_status():
+def permission_ipc_status(name='com.apple.tccd'):
     library = ctypes.CDLL('/usr/lib/libSystem.B.dylib')
     bootstrap = ctypes.c_uint.in_dll(library, 'bootstrap_port').value
     lookup = library.bootstrap_look_up
     lookup.argtypes = [ctypes.c_uint, ctypes.c_char_p, ctypes.POINTER(ctypes.c_uint)]
     lookup.restype = ctypes.c_int
     port = ctypes.c_uint()
-    status = lookup(bootstrap, b'com.apple.tccd', ctypes.byref(port))
+    status = lookup(bootstrap, name.encode(), ctypes.byref(port))
     if status == 0:
         library.mach_port_deallocate(library.mach_task_self(), port)
     return status
@@ -246,16 +247,17 @@ def permission_ipc_status():
 
 def sandbox_canary(binary, directory, port, metal, outside, profile=None):
     """Exercise denials on authored data before starting either real server."""
-    if permission_ipc_status() != 0:
-        raise ValueError('Permission IPC negative control needs a reachable parent baseline')
+    if any(permission_ipc_status(name) != 0 for name in CONTROL_IPC):
+        raise ValueError('Permission/Metadata IPC negative controls need reachable parent baselines')
     outside.write_text('AUTHORED_OUTSIDE_CANARY')
     script = directory/'sandbox-canary.py'
     script.write_text('''import ctypes,json,pathlib,socket,sys
 root=pathlib.Path(sys.argv[1]);outside=pathlib.Path(sys.argv[2]);port=int(sys.argv[3]);result={}
 library=ctypes.CDLL('/usr/lib/libSystem.B.dylib');bootstrap=ctypes.c_uint.in_dll(library,'bootstrap_port').value
 lookup=library.bootstrap_look_up;lookup.argtypes=[ctypes.c_uint,ctypes.c_char_p,ctypes.POINTER(ctypes.c_uint)];lookup.restype=ctypes.c_int
-permission_port=ctypes.c_uint();permission_status=lookup(bootstrap,b'com.apple.tccd',ctypes.byref(permission_port));result['knownPermissionIPCDenied']=permission_status!=0
-if permission_status==0:library.mach_port_deallocate(library.mach_task_self(),permission_port)
+for name,key in [('com.apple.tccd','knownPermissionIPCDenied'),('com.apple.metadata.mds','knownSpotlightIPCDenied'),('com.apple.metadata.mdwrite','knownMetadataWriteIPCDenied')]:
+ permission_port=ctypes.c_uint();permission_status=lookup(bootstrap,name.encode(),ctypes.byref(permission_port));result[key]=permission_status!=0
+ if permission_status==0:library.mach_port_deallocate(library.mach_task_self(),permission_port)
 (root/'inside.txt').write_text('AUTHORED_INSIDE')
 result['insideReadWrite']=(root/'inside.txt').read_text()=='AUTHORED_INSIDE'
 for operation in ['read','write']:
@@ -285,8 +287,8 @@ s.close();print(json.dumps(result));assert all(result.values())
     values = json.loads(result.stdout)
     if not values or not all(value is True for value in values.values()):
         raise ValueError('Sandbox canary did not prove all declared checks')
-    if permission_ipc_status() != 0:
-        raise ValueError('Permission IPC parent baseline disappeared')
+    if any(permission_ipc_status(name) != 0 for name in CONTROL_IPC):
+        raise ValueError('Permission/Metadata IPC parent baseline disappeared')
     return values
 
 

@@ -119,9 +119,26 @@ class IndependentStoredCorpusTests(unittest.TestCase):
 
 @unittest.skipUnless(sys.platform == 'darwin', 'macOS sandbox negative control')
 class PermissionBoundaryTests(unittest.TestCase):
+    def test_metadata_allowance_is_rejected_before_vendor_start(self):
+        if any(comparison.permission_ipc_status(name) != 0 for name in comparison.CONTROL_IPC):
+            self.skipTest('Permission/Metadata service is not reachable for parent baseline')
+        with tempfile.TemporaryDirectory(prefix='oswind-owned-metadata-control-', dir=pathlib.Path.home()) as temporary:
+            root = pathlib.Path(temporary)
+            allowed = root/'allowed'
+            allowed.mkdir()
+            (allowed/'tmp').mkdir()
+            profile = root/'metadata-allowed.sb'
+            original = (comparison.ROOT/'scripts/comparisons/screenpipe-backend.sb').read_text()
+            changed = original.replace('|metadata', '')
+            self.assertNotEqual(original, changed)
+            profile.write_text(changed)
+            with self.assertRaises(ValueError):
+                comparison.sandbox_canary(pathlib.Path('/usr/bin/true'), allowed, comparison.port_available(0),
+                                          pathlib.Path('/usr/bin/true'), root/'outside.txt', profile=profile)
+
     def test_valid_canary_leaves_api_port_immediately_bindable_without_reuse(self):
-        if comparison.permission_ipc_status() != 0:
-            self.skipTest('Permission service is not reachable for parent baseline')
+        if any(comparison.permission_ipc_status(name) != 0 for name in comparison.CONTROL_IPC):
+            self.skipTest('Permission/Metadata service is not reachable for parent baseline')
         with tempfile.TemporaryDirectory(prefix='oswind-owned-port-control-', dir=pathlib.Path.home()) as temporary:
             root = pathlib.Path(temporary)
             allowed = root/'allowed'
@@ -135,8 +152,8 @@ class PermissionBoundaryTests(unittest.TestCase):
                 server.bind(('127.0.0.1', port))
 
     def test_overescaped_ipc_policy_is_rejected_before_vendor_start(self):
-        if comparison.permission_ipc_status() != 0:
-            self.skipTest('Permission service is not reachable for parent baseline')
+        if any(comparison.permission_ipc_status(name) != 0 for name in comparison.CONTROL_IPC):
+            self.skipTest('Permission/Metadata service is not reachable for parent baseline')
         with tempfile.TemporaryDirectory(prefix='oswind-owned-ipc-control-', dir=pathlib.Path.home()) as temporary:
             root = pathlib.Path(temporary)
             allowed = root/'allowed'
