@@ -1,0 +1,4 @@
+# Independent developer-only Parquet reader. Python 3.12 macOS ARM64/x86_64.
+pyarrow==21.0.0 \
+    --hash=sha256:3a302f0e0963db37e0a24a70c56cf91a4faa0bca51c23812279ca2e23481fccd \
+    --hash=sha256:b6b27cf01e243871390474a211a7922bfbe3bda21e39bc9160daf0da3fe48876

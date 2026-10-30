@@ -6,19 +6,22 @@
       "name": "Screenpipe",
       "category": "Desktop memory + automation",
       "price": "Free limited history; Basic $250/year (~$21/month); Business $500/seat/year (~$42/month); Enterprise custom.",
-      "license": "Source available; commercial source builds and competing-product use require a commercial license.",
-      "features": "Screen + mic/system audio; accessibility text/OCR; local Whisper; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows; personal device sync; managed seats; Enterprise SSO/MDM/retention and shared context.",
+      "license": "Source available under a commercial license; source-based commercial/competing-product use is restricted. Official prebuilt builds have separate Terms of Service and plan terms.",
+      "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; optional async text/image redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context.",
       "difference": "Broadest reference for capture-to-automation and assistant context. Business explicitly does not include shared teammate context; Infinite Context/mobile are Max/Ultra beta.",
-      "caveat": "Rendered pricing defaults to annual. About/pricing pages have differing amounts; use checkout terms. ~30 GB/month and 600 MB\u20134 GB RAM are vendor estimates, not measured here.",
+      "caveat": "Rendered pricing defaults to annual; about/pricing pages differ, so use checkout terms. Storage/RAM numbers are vendor estimates. Official CLI 0.4.53 now has an isolated authenticated keyword-HTTP comparison against identical authored text; this does not qualify capture, GUI, power, transcription or whole-product parity. Default query semantics and result caching differ.",
       "sources": [
         "https://screenpipe.com/onboarding",
         "https://docs.screenpipe.com/home",
         "https://docs.screenpipe.com/recording-controls",
         "https://docs.screenpipe.com/local-or-cloud-ai",
         "https://docs.screenpipe.com/privacy-filter",
-        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md"
+        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md",
+        "https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/crates/screenpipe-engine/src/cli/mod.rs",
+        "https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/LICENSE.md",
+        "https://screenpipe.com/terms"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "October 29 primary documentation and pinned official CLI 0.4.53 backend inspection; restricted HTTP component runtime only."
     },
     {
       "name": "Original Rewind / Limitless",
