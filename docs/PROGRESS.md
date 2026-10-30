@@ -1,5 +1,10 @@
 # OSwind delivery ledger
 
+## Stock Screenpipe keyword HTTP comparison — work in progress
+
+- [Frozen protocol and acceptance boundaries](SCREENPIPE-COMPARISON.md) use official signed Screenpipe 0.4.53 and a receipt-matched signed OSwind CLI, identical authored original text, authenticated HTTP, independent stored-corpus checks and retained relevance misses. Both APIs use the same restricted benchmark sandbox; physical capture, audio inference, device power and whole-product ranking remain separate.
+- Help/version and isolated three-source ingestion/search pass with no screen/audio/UI sources. First unauthenticated mutation and incorrect order-enum probes fail and remain retained; neither is a timed result. Thirteen model-free identity/oracle/fault checks pass, including an overescaped IPC policy refused before vendor startup. Two earlier shared-profile failures are retained; the health-refused run has zero captured rows. Shared-sandbox canaries and a 64-record/two-round contract pass with exact stored originals and zero captured rows. The default quiet-mint query preserves an extra OSwind result below the correct first hit. A frozen larger run is next. F071 stays TODO until actual comparative evidence is reviewed.
+
 ## Owned native helper phases and missing-member provenance — PR #90 / source a5d4af4 — controlled qualification passed
 
 - [Internal process phase observations](VAULT-HELPER-PHASE.md) separate child launch before stdin from input closure after delivery. The owned create/attach cancellation fixture registers its worker before starting and cancels at the post-input phase, retaining native completion, image-absence and history-recovery assertions. Public vault construction installs no observer. Callbacks expose only a PID and fixed action; credentials remain on stdin.

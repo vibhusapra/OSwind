@@ -254,6 +254,8 @@ jobs:
           python3 scripts/test-entity-eval.py
       - name: Verify telemetry admission and owned-child boundaries without hardware
         run: python3 scripts/test-power-telemetry.py
+      - name: Verify competitor comparison identities and stored-source admission without vendor downloads
+        run: python3 scripts/test-compare-screenpipe.py
       - name: Verify independent scorers and process boundaries on generated fixtures
         run: |
           python3 -m venv "$RUNNER_TEMP/oswind-scorers"
