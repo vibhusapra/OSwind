@@ -3,6 +3,29 @@ import Foundation
 import Darwin
 @testable import OSwindCore
 
+/// Registration precedes the operation, so even an immediately launched helper
+/// cancels the correct worker after stdin delivery. No process-list race.
+private final class OwnedCredentialCancellation:@unchecked Sendable {
+    private let lock=NSLock(),action:VaultCredentialHelper
+    private var armed=false,cancelWorker:(@Sendable ()->Void)?,observation:(pid:Int32,live:Bool)?
+    init(_ action:VaultCredentialHelper) {self.action=action}
+    func started(_ action:VaultCredentialHelper,_ pid:Int32) {
+        lock.lock()
+        guard armed,self.action==action,observation==nil else {lock.unlock();return}
+        observation=(pid,kill(pid,0)==0);let cancel=cancelWorker;lock.unlock();cancel?()
+    }
+    func worker<T:Sendable>(_ operation:@escaping @Sendable () async throws ->T)->Task<T,Error> {
+        let (stream,start)=AsyncStream<Void>.makeStream()
+        lock.lock();precondition(!armed);armed=true;observation=nil;lock.unlock()
+        let task=Task {for await _ in stream {break};try Task.checkCancellation();return try await operation()}
+        lock.lock();cancelWorker={task.cancel()};lock.unlock()
+        start.yield(());start.finish();return task
+    }
+    func finish()->(pid:Int32,live:Bool)? {
+        lock.lock();defer {lock.unlock()};armed=false;cancelWorker=nil;return observation
+    }
+}
+
 final class NativeVaultCancellationTests:XCTestCase {
     private func ownedAttachmentCount(_ package:URL) async throws ->Int {
         let result=try await VaultProcess.run("/usr/bin/hdiutil",["info","-plist"])
@@ -26,20 +49,6 @@ final class NativeVaultCancellationTests:XCTestCase {
         }
         return matched.count
     }
-    private func observeOwnedHelper(_ action:String,target:String) async throws ->Bool {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(5))
-        while ContinuousClock.now<deadline {
-            let result=try await VaultProcess.run("/bin/ps",["-axo","pid=,ppid=,args="])
-            guard result.status==0,let text=String(data:result.stdout,encoding:.utf8) else {throw OSwindError.unavailable("Owned attach observation failed")}
-            let observed=text.split(separator:"\n").contains {line in
-                let parts=line.split(maxSplits:2,whereSeparator:{$0.isWhitespace})
-                return parts.count==3 && parts[1]==String(getpid()) && parts[2].hasPrefix("/usr/bin/hdiutil "+action+" ") && parts[2].contains(target)
-            }
-            if observed {return true}
-            try await Task.sleep(for:.milliseconds(10))
-        }
-        return false
-    }
     private func observeClosingPhase(_ paths:VaultPaths,store:MemoryStore) async throws ->Bool {
         let info=try paths.info(),deadline=ContinuousClock.now.advanced(by:.seconds(5))
         while ContinuousClock.now<deadline {
@@ -55,7 +64,8 @@ final class NativeVaultCancellationTests:XCTestCase {
     func testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned observed native attach cancellation/recovery fixture")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-cancel-recovery-"+UUID().uuidString);try Paths.ensure(root)
-        let package=root.appendingPathComponent("Owned.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
+        let package=root.appendingPathComponent("Owned.oswindvault"),secret=Data(UUID().uuidString.utf8),trigger=OwnedCredentialCancellation(.attach)
+        let vault=try LibraryVault(package:package,nativeDriver:NativeVaultDriver(credentialHelperReady:{trigger.started($0,$1)}))
         var activeStore:MemoryStore?
         do {
             _=try await LibraryVault.create(at:package,name:"Owned cancellation recovery",capacityGiB:1,passphrase:secret)
@@ -63,15 +73,13 @@ final class NativeVaultCancellationTests:XCTestCase {
             let initial=try MemoryStore(root:vault.libraryURL);activeStore=initial;try initial.insert(Memory(id:"owned-keep",text:"Owned source survives cancelled unlock"))
             _=try await vault.lock(store:initial);activeStore=nil
             for _ in 0..<5 {
-                let worker=Task {try await vault.unlock(passphrase:secret)}
-                let observed:Bool
-                do {observed=try await observeOwnedHelper("attach",target:VaultPaths(package).image.path)}
-                catch {worker.cancel();_ = try? await worker.value;throw error}
-                worker.cancel()
+                let worker=trigger.worker {try await vault.unlock(passphrase:secret)}
+                defer {_ = trigger.finish()}
                 do {_ = try await worker.value;XCTFail("Cancelled unlock published success")}
                 catch is CancellationError {}
                 catch {throw error}
-                guard observed else {throw OSwindError.unavailable("No owned active attach helper observed; cancellation phase not qualified")}
+                let observed=try XCTUnwrap(trigger.finish(),"Owned attach start was not observed")
+                XCTAssertGreaterThan(observed.pid,0);XCTAssertTrue(observed.live,"Attach helper was not active after credential delivery")
                 let afterCancellation=try await ownedAttachmentCount(package);XCTAssertEqual(afterCancellation,0)
                 let reopened=try await vault.unlock(passphrase:secret);XCTAssertEqual(reopened.state,.unlocked)
                 let store=try MemoryStore(root:vault.libraryURL);activeStore=store
@@ -80,6 +88,7 @@ final class NativeVaultCancellationTests:XCTestCase {
                 XCTAssertEqual(locked.state,.locked);XCTAssertFalse(locked.imageAttached)
                 let afterLock=try await ownedAttachmentCount(package);XCTAssertEqual(afterLock,0)
             }
+            print("NATIVE_CANCEL_PHASE attach cycles=5 inputClosed=5 activeHelpers=5 historyChecks=5")
             try await removeDetachedFixture(root,package:package)
         } catch {
             // Preserve the failed encrypted fixture. Only a normal product lock
@@ -91,12 +100,14 @@ final class NativeVaultCancellationTests:XCTestCase {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned observed native create cancellation/recovery fixture")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-create-cancel-"+UUID().uuidString);try Paths.ensure(root)
         let package=root.appendingPathComponent("Owned.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package)
-        let worker=Task {try await LibraryVault.create(at:package,name:"Owned cancelled creation",capacityGiB:1,passphrase:secret)}
+        let trigger=OwnedCredentialCancellation(.create),driver=NativeVaultDriver(credentialHelperReady:{trigger.started($0,$1)})
+        let worker=trigger.worker {try await LibraryVault.create(at:package,name:"Owned cancelled creation",capacityGiB:1,passphrase:secret,nativeDriver:driver)}
+        defer {_ = trigger.finish()}
         do {
-            let observed=try await observeOwnedHelper("create",target:VaultPaths(package).image.path);worker.cancel()
             do {_ = try await worker.value;XCTFail("Cancelled create published success")}
             catch is CancellationError {} catch {throw error}
-            guard observed else {throw OSwindError.unavailable("No owned active create observed")}
+            let observed=try XCTUnwrap(trigger.finish(),"Owned create start was not observed")
+            XCTAssertGreaterThan(observed.pid,0);XCTAssertTrue(observed.live,"Create helper was not active after credential delivery")
             let count=try await ownedAttachmentCount(package);XCTAssertEqual(count,0)
             XCTAssertFalse(try LibraryVault.metadata(at:package).setupComplete)
             XCTAssertThrowsError(try MemoryStore(root:vault.libraryURL))
@@ -104,6 +115,7 @@ final class NativeVaultCancellationTests:XCTestCase {
             let opened=try await vault.unlock(passphrase:secret);XCTAssertEqual(opened.state,.unlocked)
             let locked=try await vault.lock();XCTAssertEqual(locked.state,.locked)
             let afterLock=try await ownedAttachmentCount(package);XCTAssertEqual(afterLock,0)
+            print("NATIVE_CANCEL_PHASE create cycles=1 inputClosed=1 activeHelpers=1 resumed=1")
             try await removeDetachedFixture(root,package:package)
         } catch {worker.cancel();_ = try? await worker.value;_ = try? await vault.lock();throw error}
     }

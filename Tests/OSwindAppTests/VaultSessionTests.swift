@@ -71,11 +71,30 @@ import AppKit
     }
     func testNativeBusyReaderRemainsClosingUntilRetry() async throws {
         try native();let package=root.appendingPathComponent("Busy.oswindvault"),secret=UUID().uuidString
-        _=try await LibraryVault.create(at:package,name:"Busy fixture",capacityGiB:1,passphrase:Data(secret.utf8))
-        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
-        session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model),other=try MemoryStore(root:active.store.root)
-        session.requestLock();try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.closing);XCTAssertNotNil(session.failure)
-        try other.close();session.requestLock();try await finish(session);XCTAssertNil(session.failure);XCTAssertEqual(session.vaultStatus?.state,.locked)
+        var phase="create"
+        do {
+            _=try await LibraryVault.create(at:package,name:"Busy fixture",capacityGiB:1,passphrase:Data(secret.utf8))
+            phase="select-locked-package"
+            let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+            phase="unlock"
+            session.unlock(passphrase:secret,remember:false);try await finish(session)
+            phase="open-independent-reader"
+            let active=try XCTUnwrap(session.model),other=try MemoryStore(root:active.store.root)
+            phase="lock-with-held-reader"
+            session.requestLock();try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.closing);XCTAssertNotNil(session.failure)
+            phase="release-reader-and-retry-lock"
+            try other.close();session.requestLock();try await finish(session);XCTAssertNil(session.failure);XCTAssertEqual(session.vaultStatus?.state,.locked)
+            print("OWNED_BUSY_READER_PHASE verified=locked-after-reader-release")
+        } catch {
+            // Fixed phase labels and whitelisted metadata only. Never emit the
+            // fixture passphrase, arbitrary member name, path or error output.
+            var record:[String:Any]=["phase":phase,"errorType":String(reflecting:type(of:error))]
+            if let failure=error as? BackupFileError,case .missing(_,let access)=failure,let access {
+                record["memberAccess"]=try JSONSerialization.jsonObject(with:JSONEncoder().encode(access))
+            }
+            print("OWNED_BUSY_READER_FAILURE "+String(decoding:try JSONSerialization.data(withJSONObject:record,options:[.sortedKeys]),as:UTF8.self))
+            throw error
+        }
     }
     func testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture() async throws {
         try native();let package=root.appendingPathComponent("Import.oswindvault"),secret=UUID().uuidString

@@ -3,8 +3,28 @@ import CryptoKit
 import Darwin
 
 enum BackupFileError: LocalizedError {
-    case invalid(String), missing(String), changed(String), io(String)
-    var errorDescription: String? { switch self { case .invalid(let text),.missing(let text),.changed(let text),.io(let text): return text } }
+    case invalid(String), missing(String,memberAccess:BackupMemberAccess?=nil), changed(String), io(String)
+    var errorDescription: String? { switch self { case .invalid(let text),.missing(let text,_),.changed(let text),.io(let text): return text } }
+}
+/// Safe missing-member provenance. Unknown names and all paths/identifiers are
+/// excluded; these booleans distinguish missing entries from a changed root.
+struct BackupMemberAccess:Codable,Equatable,Sendable {
+    enum Member:String,Codable,Sendable {case vaultManifest,vaultSession,vaultLibraryMarker,settings,memoryDatabase,sqliteJournal,backupManifest,other}
+    let member:Member,code:Int32
+    let rootDescriptorMatchesInitial:Bool,parentDescriptorIsDirectory:Bool
+    let parentMatchesInitialRoot:Bool?,namedRootMatchesInitial:Bool
+    static func member(_ relative:String)->Member {
+        switch relative {
+        case "oswind-vault.json":return .vaultManifest
+        case "session.json":return .vaultSession
+        case ".oswind-vault-library.json":return .vaultLibraryMarker
+        case "settings.json":return .settings
+        case "memory.sqlite":return .memoryDatabase
+        case "memory.sqlite-wal","memory.sqlite-shm":return .sqliteJournal
+        case "manifest.json":return .backupManifest
+        default:return .other
+        }
+    }
 }
 struct BackupFileStamp: Equatable, Sendable {
     var device: Int32
@@ -26,6 +46,7 @@ final class BackupFileTree {
     let root: URL
     private let descriptor: Int32
     private let writable: Bool
+    private let initialIdentity:BackupFileStamp
     init(root: URL, writable: Bool = false) throws {
         guard root.isFileURL, !root.path.utf8.contains(0) else { throw BackupFileError.invalid("Invalid backup directory") }
         var metadata = stat()
@@ -42,7 +63,7 @@ final class BackupFileTree {
         if writable, actual.st_uid != getuid() || actual.st_mode & 0o077 != 0 {
             close(opened); throw BackupFileError.invalid("Backup workspace is no longer private")
         }
-        descriptor = opened; self.root = root; self.writable = writable
+        descriptor = opened; self.root = root; self.writable = writable;initialIdentity=BackupFileStamp(actual)
     }
     init(takingDirectory file: Int32, root: URL, writable: Bool) throws {
         var actual = stat()
@@ -50,7 +71,7 @@ final class BackupFileTree {
               !writable || (actual.st_uid == getuid() && actual.st_mode & 0o077 == 0) else {
             close(file); throw BackupFileError.invalid("Invalid owned backup workspace descriptor")
         }
-        descriptor = file; self.root = root; self.writable = writable
+        descriptor = file; self.root = root; self.writable = writable;initialIdentity=BackupFileStamp(actual)
     }
     func withRootDirectory<T>(_ body: (Int32) throws -> T) rethrows -> T { try body(descriptor) }
     /// Trusted live-library aliases may be followed, but must still resolve to
@@ -151,7 +172,19 @@ final class BackupFileTree {
         let parts = try Self.components(relative), parent = try directory(parts.dropLast())
         defer { close(parent) }
         let file = openat(parent,parts.last!,O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
-        guard file >= 0 else { throw Self.failure("Cannot read backup member") }
+        guard file >= 0 else {
+            let code=errno
+            if code==ENOENT {
+                var original=stat(),parentMetadata=stat(),named=stat()
+                func matches(_ value:stat)->Bool {value.st_mode&S_IFMT==S_IFDIR && value.st_dev==initialIdentity.device && value.st_ino==initialIdentity.inode}
+                let rootMatches=fstat(descriptor,&original)==0 && matches(original)
+                let parentValid=fstat(parent,&parentMetadata)==0 && parentMetadata.st_mode&S_IFMT==S_IFDIR
+                let namedMatches=lstat(root.path,&named)==0 && matches(named)
+                let access=BackupMemberAccess(member:BackupMemberAccess.member(relative),code:code,rootDescriptorMatchesInitial:rootMatches,parentDescriptorIsDirectory:parentValid,parentMatchesInitialRoot:parts.count==1 ? parentValid && matches(parentMetadata):nil,namedRootMatchesInitial:namedMatches)
+                throw BackupFileError.missing("Cannot read backup member: missing file",memberAccess:access)
+            }
+            throw Self.failure("Cannot read backup member",code:code)
+        }
         defer { close(file) }
         var metadata = stat()
         guard fstat(file,&metadata) == 0, metadata.st_mode & S_IFMT == S_IFREG, metadata.st_size >= 0 else { throw BackupFileError.invalid("Backup members must be regular files") }
