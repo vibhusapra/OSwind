@@ -75,11 +75,11 @@ class IndependentStoredCorpusTests(unittest.TestCase):
         self.other_path = self.root/'screenpipe/data/storage/owned/index.sqlite'
         self.rows = [dict(id='oswbench000000', label='known', text='oswbench000000\nExact text')]
         with sqlite3.connect(self.root/'oswind/data/memory.sqlite') as db:
-            db.execute('CREATE TABLE memories(text TEXT,embedding BLOB)')
-            db.execute('INSERT INTO memories(text) VALUES (?)', (self.rows[0]['text'],))
+            db.execute('CREATE TABLE memories(id TEXT PRIMARY KEY,text TEXT,embedding BLOB)')
+            db.execute('INSERT INTO memories(id,text) VALUES (?,?)', (self.rows[0]['id'], self.rows[0]['text']))
         with sqlite3.connect(self.other_path) as db:
-            db.execute('CREATE TABLE audio_transcriptions(transcription TEXT,_archive_file INTEGER)')
-            db.execute('INSERT INTO audio_transcriptions VALUES (?,NULL)', (self.rows[0]['text'],))
+            db.execute('CREATE TABLE audio_transcriptions(id INTEGER PRIMARY KEY,transcription TEXT,_archive_file INTEGER,_archive_mask INTEGER DEFAULT 1,_archive_generation INTEGER,_archive_digest BLOB)')
+            db.execute('INSERT INTO audio_transcriptions(id,transcription) VALUES (1,?)', (self.rows[0]['text'],))
             db.execute('CREATE TABLE audio_chunks(file_path TEXT)')
             db.execute("INSERT INTO audio_chunks VALUES ('')")
             for table in ['frames', 'ui_events', '_bulk_element_lookup']:

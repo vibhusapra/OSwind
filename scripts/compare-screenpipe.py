@@ -26,6 +26,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from screenpipe_oracle import text_rows as screenpipe_text_rows
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCREENPIPE_VERSION = '0.4.53'
@@ -45,6 +46,25 @@ def write(path, value):
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True)+'\n')
     temporary.replace(path)
+
+
+def clock_snapshot():
+    result = dict(utcUnix=time.time(), monotonicSeconds=time.monotonic())
+    for key in ['sleeptime', 'waketime']:
+        try:
+            raw = subprocess.run(['/usr/sbin/sysctl', '-n', 'kern.'+key], capture_output=True, text=True, timeout=2)
+            match = re.search(r'\bsec\s*=\s*(\d+)', raw.stdout)
+            result[key+'Unix'] = int(match.group(1)) if match else None
+        except (OSError, subprocess.TimeoutExpired):
+            result[key+'Unix'] = None
+    return result
+
+
+def clock_span(start, end):
+    wall = end['utcUnix']-start['utcUnix']
+    monotonic = end['monotonicSeconds']-start['monotonicSeconds']
+    return dict(utcElapsedSeconds=wall, monotonicElapsedSeconds=monotonic,
+                clockDifferenceSeconds=wall-monotonic, start=start, end=end)
 
 
 def quantiles(values):
@@ -282,16 +302,14 @@ def sqlite_rows(path, query):
         connection.close()
 
 
-def audit_sources(root, rows):
+def audit_sources(root, rows, use_parquet=False):
     expected = sorted(r['text'] for r in rows)
-    own = sqlite_rows(root/'oswind/data/memory.sqlite', 'SELECT text FROM memories ORDER BY text')
+    own = sqlite_rows(root/'oswind/data/memory.sqlite', 'SELECT id,text FROM memories ORDER BY id')
     indexes = list((root/'screenpipe/data').rglob('index.sqlite'))
     if len(indexes) != 1:
         raise ValueError('Expected one isolated Screenpipe index')
-    other = sqlite_rows(indexes[0], 'SELECT transcription,_archive_file FROM audio_transcriptions ORDER BY transcription')
-    if any(archive is not None for text, archive in other):
-        raise ValueError('Independent Parquet payload audit required; staging-only oracle cannot qualify this run')
-    if [r[0] for r in own] != expected or [r[0] for r in other] != expected:
+    other, archive = screenpipe_text_rows(indexes[0], root/'screenpipe/data', use_parquet=use_parquet)
+    if own != sorted((r['id'], r['text']) for r in rows) or sorted(r[1] for r in other) != expected:
         raise ValueError('Stored original corpus differs')
     counts = {table: sqlite_rows(indexes[0], 'SELECT COUNT(*) FROM '+table)[0][0]
               for table in ['frames', 'ui_events', '_bulk_element_lookup']}
@@ -303,8 +321,10 @@ def audit_sources(root, rows):
            for directory in ['screenpipe/data', 'oswind/data'] for p in (root/directory).rglob('*')):
         raise ValueError('Unexpected capture media')
     embedded = sqlite_rows(root/'oswind/data/memory.sqlite', 'SELECT COUNT(*) FROM memories WHERE embedding IS NOT NULL')[0][0]
+    own_digest = hashlib.sha256(json.dumps(own, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
     return dict(originalTextRowsEach=len(rows), originalTextsByteEqual=True, zeroCapturedCounts=counts, oswindEmbeddedSources=embedded,
-                mediaFiles=0, archivePayloads=0, method='Independent read-only Python SQLite over ordinary staging tables; no vendor extension loaded.')
+                oswindSourceIdentitySHA256=own_digest, screenpipeSourceIdentitySHA256=archive['sourceIdentitySHA256'],
+                mediaFiles=0, archive=archive, method='Independent read-only Python SQLite plus optional pinned Arrow decoder; physical file and per-row SHA256/generation checks; no vendor extension loaded.')
 
 
 def main():
@@ -315,6 +335,7 @@ def main():
     parser.add_argument('--root', type=pathlib.Path, required=True, help='New retained output directory')
     parser.add_argument('--count', type=int, default=1000)
     parser.add_argument('--repetitions', type=int, default=5)
+    parser.add_argument('--parquet', action='store_true', help='Read archived payloads with pinned pyarrow 21.0.0 (Python 3.12 wheels are hash-pinned)')
     args = parser.parse_args()
     if sys.platform != 'darwin' or not 64 <= args.count <= 10000 or not 2 <= args.repetitions <= 20:
         parser.error('Requires macOS, 64..10000 records and 2..20 repetitions')
@@ -341,8 +362,18 @@ def main():
     fixture = root/'corpus.json'
     write(fixture, rows)
     inputs = [pathlib.Path(__file__), ROOT/'scripts/comparisons/screenpipe-backend.sb',
+              ROOT/'scripts/screenpipe_oracle.py',
               ROOT/'benchmarks/fixtures/desktop-retrieval-v1.json', ROOT/'benchmarks/fixtures/lexical-comparison-v1.json',
               binary, binary.with_name('mlx.metallib'), own_binary, proof_path, fixture]
+    parquet_dependency = None
+    if args.parquet:
+        import pyarrow
+        if pyarrow.__version__ != '21.0.0':
+            parser.error('Use pinned pyarrow 21.0.0 for the physical payload oracle')
+        dependency_root = pathlib.Path(pyarrow.__file__).parent
+        dependencies = [p for p in dependency_root.rglob('*') if p.is_file() and p.suffix in ['.py', '.so', '.dylib']]
+        inputs += dependencies+[ROOT/'benchmarks/requirements-screenpipe-oracle.txt']
+        parquet_dependency = dict(version=pyarrow.__version__, frozenRuntimeFiles=len(dependencies))
     frozen = {str(p): sha(p) for p in inputs}
     report = dict(format='OSwind versus stock Screenpipe authenticated keyword HTTP component comparison',
                   version=1, state='running', oswindSource=proof['codeCommit'],
@@ -350,6 +381,8 @@ def main():
                   benchmarkCheckout=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
                   screenpipe=dict(version=SCREENPIPE_VERSION, sourceTagCommit=SCREENPIPE_SOURCE, archiveSHA256=SCREENPIPE_ARCHIVE_SHA),
                   records=len(rows), seed=1729, frozen=frozen, queries=queries, unmatchedAppQueries=unsupported,
+                  parquetDependency=parquet_dependency,
+                  initialClock=clock_snapshot(),
                   environment=dict(macOS=platform.mac_ver()[0], architecture=platform.machine(), python=platform.python_version(),
                                    cpu=subprocess.check_output(['/usr/sbin/sysctl', '-n', 'machdep.cpu.brand_string'], text=True).strip()),
                   measurements=[], cleanup={}, limits=[
@@ -357,7 +390,7 @@ def main():
                       'Both stock ARM64 CLI servers run under the same file/network/desktop-permission sandbox, limited to their own directory and API port. Screenpipe health is expected to report degraded UI.',
                       'Screenpipe /add transcription accepts text without audio or historical app/time identity. OSwind imports matching note text; app/time filters are not compared.',
                       'Both shipping response shapes and query semantics remain; relevance differences are retained. Same Python HTTP client opens each request without a proxy.',
-                      'Input/audit/warmup reads warm caches; no cold-start claim. Repeated Screenpipe requests may use its shipping result cache. Host/background work is uncontrolled.',
+                      'Input/audit/warmup reads warm caches; no cold-start claim. Repeated Screenpipe requests may use its shipping result cache. Host/background work and sleep are uncontrolled; UTC and monotonic clock spans are retained.',
                       'OSwind import rebuilds local Apple embeddings, which are not used for keyword queries. Ingestion timings and storage are descriptive, not matched model work.',
                       'No permission grants or settings changes, login services, normal history, cloud account, external API or external model calls are used.'])
     report_path = root/'report.json'
@@ -378,6 +411,7 @@ def main():
                          timestamp='2026-10-22T14:00:00Z', text=r['text'], regions=[], tags=[], favorite=False) for r in rows]
         write(root/'import.json', imported)
         start = time.monotonic()
+        import_clock = clock_snapshot()
         result = subprocess.run([str(own_binary), '--data', str(root/'oswind/data'), 'import', str(root/'import.json'), '--json'],
                                 capture_output=True, env=environment, timeout=900)
         (root/'import.stdout').write_bytes(result.stdout)
@@ -385,6 +419,7 @@ def main():
         if result.returncode != 0 or json.loads(result.stdout)['imported'] != len(rows):
             raise ValueError('OSwind import failed or omitted sources')
         report['oswindImportSeconds'] = time.monotonic()-start
+        report['oswindImportClock'] = clock_span(import_clock, clock_snapshot())
         argv = sandbox_argv(binary, root/'screenpipe', port, binary.with_name('mlx.metallib'))
         argv += [str(binary), 'record', '--data-dir', str(root/'screenpipe/data'), '--port', str(port),
                  '--disable-audio', '--disable-vision', '--disable-screenshots', '--app-context', 'off', '--disable-telemetry',
@@ -396,18 +431,20 @@ def main():
         report['initialHealth'] = screenpipe_health(ready(children['screenpipe'], other, '/health'))
         report['baselineStorage'] = dict(screenpipe=storage(root/'screenpipe/data'), oswind=own_baseline)
         start = time.monotonic()
+        import_clock = clock_snapshot()
         for row in rows:
             response, _, _ = other.request('/add', dict(device_name='OSwindAuthoredFixture', content=dict(
                 content_type='transcription', data=dict(transcription=row['text'], transcription_engine='authored-text-no-audio'))))
             if response.get('success') is not True:
                 raise ValueError('Screenpipe refused authored text')
         report['screenpipeImportSeconds'] = time.monotonic()-start
+        report['screenpipeImportClock'] = clock_span(import_clock, clock_snapshot())
         # The stock macOS database uses a process-exclusive VFS. Independently
         # inspect it only after a real graceful stop, then restart the same API.
         report['preAuditStop'] = children.pop('screenpipe').stop()
         if report['preAuditStop']['forced'] or not report['preAuditStop']['processGroupAbsent'] or report['preAuditStop']['returncode'] != 0:
             raise ValueError('Screenpipe did not close cleanly for independent audit')
-        report['beforeQueries'] = audit_sources(root, rows)
+        report['beforeQueries'] = audit_sources(root, rows, use_parquet=args.parquet)
         children['screenpipe'] = Child(argv, root/'screenpipe', dict(environment, TMPDIR=str(root/'screenpipe/tmp'), CI='1', SCREENPIPE_API_KEY=token),
                                         log_name='query-process.log')
         report['queryHealth'] = screenpipe_health(ready(children['screenpipe'], other, '/health'))
@@ -430,6 +467,7 @@ def main():
             response, milliseconds, size = clients[product].request(path+'?'+urllib.parse.urlencode(params))
             return decode_hits(product, response, rows), milliseconds, size
         report['warmup'] = []
+        query_clock = clock_snapshot()
         for query in queries:
             for product in ['screenpipe', 'oswind']:
                 labels, ms, size = search(product, query['query'])
@@ -441,6 +479,9 @@ def main():
                     report['measurements'].append(dict(product=product, queryID=query['id'], repetition=repetition,
                                                        labels=labels, milliseconds=ms, responseBytes=size, **score(query['expected'], labels)))
             write(report_path, report)
+        report['queryClock'] = clock_span(query_clock, clock_snapshot())
+        if abs(report['queryClock']['clockDifferenceSeconds']) > 1:
+            raise ValueError('Query UTC and monotonic clocks diverged; latency qualification refused')
         report['finalHealth'] = screenpipe_health(other.get('/health'))
         report['storageAtEnd'] = {k: storage(root/p) for k, p in [('screenpipe', 'screenpipe/data'), ('oswind', 'oswind/data')]}
         report['summary'] = {}
@@ -473,12 +514,14 @@ def main():
             report['state'] = 'failed'
         if report['state'] == 'completed':
             try:
-                report['afterShutdown'] = audit_sources(root, rows)
-                if report['afterShutdown'] != report['beforeQueries']:
+                report['afterShutdown'] = audit_sources(root, rows, use_parquet=args.parquet)
+                keys = ['oswindSourceIdentitySHA256', 'screenpipeSourceIdentitySHA256', 'oswindEmbeddedSources']
+                if any(report['afterShutdown'][key] != report['beforeQueries'][key] for key in keys):
                     raise ValueError('Corpus changed after shutdown')
             except Exception as error:
                 report.update(state='failed', auditError=str(error))
         report['finishedAtUTC'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        report['totalClock'] = clock_span(report['initialClock'], clock_snapshot())
         write(report_path, report)
     print(json.dumps(dict(state=report['state'], records=len(rows), summary=report.get('summary'), root=str(root)), indent=2))
     return 0 if report['state'] == 'completed' else 1

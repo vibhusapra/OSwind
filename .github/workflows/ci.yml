@@ -262,3 +262,10 @@ jobs:
           "$RUNNER_TEMP/oswind-scorers/bin/python" -m pip install -r benchmarks/requirements-speaker-eval.txt -r benchmarks/requirements-speech-eval.txt
           "$RUNNER_TEMP/oswind-scorers/bin/python" scripts/test-speaker-eval.py
           "$RUNNER_TEMP/oswind-scorers/bin/python" scripts/test-asr-corpus-eval.py
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Verify independent archived transcription payloads without vendor downloads
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: --no-deps --target "$RUNNER_TEMP/oswind-parquet-reader" -r benchmarks/requirements-screenpipe-oracle.txt
+          PYTHONPATH="$RUNNER_TEMP/oswind-parquet-reader" python3 scripts/test-screenpipe-parquet.py
