@@ -1,6 +1,23 @@
 # Screenpipe keyword HTTP comparison
 
-Work in progress on top of PR #90. This closes part of F071's measurement gap; it does not establish desktop capture, physical power, broad parity or a product ranking.
+PR #91 adds a completed authored keyword HTTP component study on top of PR #90. F071 is partial: desktop capture, physical power, broad parity and a product ranking remain open. Product source stays a5d4af4; benchmark source is 06c81a5.
+
+## Results
+
+The [machine-readable receipt](../benchmarks/screenpipe-keyword-http-v1.json) retains both complete final reports, every timed request and label, health and clock spans, 153 frozen hashes per run, independent corpus/physical payload evidence and prior failures. Twenty-one contract cases pass. Both fresh final runs pass the stronger Metadata-denying profile and all original-text, zero-capture, timing-clock and process cleanup gates.
+
+| Authored records | Product | Warm median HTTP | Warm p95 HTTP | Exact result sets |
+| --- | --- | --- | --- | --- |
+| 1,000 | Screenpipe 0.4.53 | 0.353 ms | 0.419 ms | 70/70 |
+| 1,000 | OSwind a5d4af4 | 0.553 ms | 0.782 ms | 65/70 |
+| 10,000 | Screenpipe 0.4.53 | 0.338 ms | 0.375 ms | 70/70 |
+| 10,000 | OSwind a5d4af4 | 0.458 ms | 0.606 ms | 65/70 |
+
+All positive first hits and mean positive recall are 1.0; the absent control returns empty for both. On `quiet mint`, OSwind returns the correct design note first plus a separate mint bicycle-paint note. That extra result repeats in all five rounds at both sizes. Its soft-cue query semantics are retained; product behavior was not tuned to match this fixture. Screenpipe is faster and more precise on this observed warm HTTP workload. The authored labels, deterministic filler, shipping cache and response differences preclude a broad natural-quality or speed ranking.
+
+At 10k, independent SQLite plus hash-pinned Arrow checks preserve all 10,000 original texts: 9,998 archived in 218 physical payloads and two inline, before and after queries. All 10,000 OSwind sources have local Apple vectors, unused by keyword queries. At 1k, all texts remain inline. Publication review rechecks the original text, all scores and quantiles, signed executable/input/log hashes and absent owned process groups. The installed 15-file app is unchanged.
+
+Screenpipe PII removal is explicitly disabled (`--use-pii-removal=false`; the pinned CLI default is true) so both products retain exact authored original text. Capture, semantic app context and background PII work are also disabled. OSwind uses ordinary JSON import including local embeddings. These configurations isolate keyword HTTP retrieval; import time/storage do not measure equivalent work and no privacy protection quality is compared. Query UTC and monotonic durations differ by less than a microsecond in both final runs; this narrow check does not control other host activity.
 
 ## Frozen protocol
 
@@ -24,7 +41,7 @@ Audits and warmup read the corpus, and repeated Screenpipe requests may use its 
 
 Both servers must stop, reap and leave no owned process group; forced termination invalidates a completed result. All declared binaries, corpus and runner inputs must retain their original hashes. Earlier failed adapter probes remain retained separately. Shared-profile parse, IPC escaping, first-token atomic setup, canary port closure and exclusive-database-read failures are retained. The port counterexample fails an immediate non-reuse bind before the client-active-close correction; its regression passes afterward. The overescaped IPC rule is retained; the latter fails the health gate before ingestion and independently retains zero captured rows. The corrected protocol adds the pre-start IPC negative control. The first 10,000-record run also remains failed because its staging-only oracle refused 9,991 archived rows. A separate independent replay verifies all 10,000 texts across its 224 Parquet payloads without running or inventing query measurements.
 
-## Run and remaining work
+## Reproduce and remaining work
 
 ```bash
 python3 scripts/test-compare-screenpipe.py
@@ -42,22 +59,24 @@ The proof may be a standalone package receipt or the `package` object in an OSwi
 
 - [x] Official archive checksum, native architecture, strict signature and help/version verified.
 - [x] Three-source authenticated ingestion/search probe, exact independent stored text and zero-capture checks pass. Earlier HTTP 403 authentication and HTTP 400 order-enum probe failures are retained.
-- [x] Thirteen model-free identity, scoring, fixture, independent stored-corpus and IPC-policy fault checks pass.
+- [x] Fourteen model-free identity, scoring, fixture, independent stored-corpus and IPC-policy fault checks pass, including rejection of a Metadata-allowed policy before vendor startup.
 - [x] Shared-sandbox canaries and 64-record/two-round contract run pass. Both retain exact stored originals and zero capture sources. The retained default-search difference on quiet mint is OSwind returning the correct first result plus a mint-paint note, while Screenpipe returns only the design note.
 - [x] Original source 24b06f4: frozen 1,000-record/five-round comparison passes all corpus, sandbox, process-group and frozen-input gates. Both products hit every positive first result. Screenpipe has 70/70 exact result sets; OSwind 65/70 because of the retained extra mint-paint result. Warm median/p95 HTTP times are Screenpipe 0.641/0.758 ms and OSwind 1.274/1.678 ms on this authored workload; default response/caching/semantics differ. No whole-product ranking follows.
 - [x] Seven independent Parquet corruption/identity/generation/path/overlay/state/non-regular-file checks pass. Both exact-source 24b06f4 CI jobs pass, including all 13 original contract tests. Source f9da0be has a passing benchmark job (13 original plus seven payload cases), but its native job retains a separate existing collector detach exit-16 failure; product Swift bytes are unchanged.
 - [x] Source f9da0be: 20 contract cases and the fresh 1,000-record comparison pass. The 10,000-record run fails its first Screenpipe startup before any log output. A bounded 180-second owned diagnostic samples the worker waiting in Apple Metadata `_MDCopyExclusionList`; source inspection confirms a pre-logging Spotlight-exclusion call. Denying Metadata IPC lets the same stock binary reach readiness in about one second. This is a benchmark-environment observation, not a vendor-wide startup claim.
-- [ ] Fresh 1,000- and 10,000-record comparisons with the stronger Metadata-denying profile.
-- [ ] Independently review misses, timings, stored corpus, cleanup and input hashes; publish every observed result.
+- [x] Fresh 1,000- and 10,000-record comparisons with the stronger Metadata-denying profile; all four ordered suite stages pass at source 06c81a5.
+- [x] Independently review misses, timings, stored corpus, process cleanup and input hashes; publish final measurements with all retained earlier failures.
+- [ ] Finish targeted restoration verification for the initial setup Spotlight exclusions; current count remains unknown.
+- [ ] Locate the native collector CI detach exit-16 phase and cause without force detach. The later source 06c81a5 native vault stage passes, separately from the original failure.
 - [ ] Matched capture/OCR/Accessibility quality and audio work, sustained physical energy/storage and wider current competitors.
 
 ## Setup side effect and cleanup boundary
 
 The first benchmark sandbox denied user-directory writes, external networking, desktop permissions and automation, but allowed Metadata IPC. The official CLI's pre-logging `get_base_dir` calls its Spotlight-exclusion helper, which can change the global search-privacy list through a service. File-write denials alone did not prevent this. The earlier raw reports' general no-settings-change assertion is therefore withdrawn; capture/network/source-quality observations keep their stated scope.
 
-An owned read-only AppKit helper found 14 task-created data directories in that exclusion list. Targeted restoration requested removal only for paths inside this task's newly created artifact root. One removal returned success, a later removal returned an error, and subsequent Metadata calls did not complete within the bounded helper window. Current remaining entries and final restoration are unverified. No Metadata service was reset, no unrelated exclusion was targeted and no TCC/authentication/power/lock setting was changed. Native UI inventory also timed out; no screen state or credential access was inferred.
+An owned read-only AppKit helper found 14 task-created data directories in that exclusion list. Targeted restoration requested removal only for paths inside this task's newly created artifact root. The first removal returned success; another returned an error and subsequent calls stalled. Later fresh-process read-only checks independently showed 13 and then 12 remaining task entries. Another removal returned zero before its verification stalled. Current remaining entries and final restoration are unverified. Per-call status is retained separately from independently observed absence. No Metadata service was reset, no unrelated exclusion was targeted and no TCC/authentication/power/lock setting was changed. Earlier native UI inventory timed out; a later inventory explicitly reports the Mac locked and automatic unlock unavailable. No unlock or credential access was attempted.
 
-The corrected sandbox denies the known Metadata read/write services before the vendor starts and tests those denials against reachable parent baselines. Its owned startup diagnostic reaches readiness with capture/UI hooks off, then stops and reaps cleanly. Complete the outstanding restoration check when the host indexing API or UI responds; do not mistake terminating a helper for restoration.
+The corrected sandbox denies the known Metadata read/write services before the vendor starts and tests those denials against reachable parent baselines. Its owned startup diagnostic reaches readiness with capture/UI hooks off, then stops and reaps cleanly. Complete the outstanding restoration check when the host indexing API or native session responds; do not mistake terminating a helper for restoration. The final comparison runs do not add new matching exclusions in the last successful read. This does not establish that the earlier entries are fully restored.
 
 ## Primary implementation references
 
