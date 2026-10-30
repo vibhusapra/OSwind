@@ -1,0 +1,13 @@
+# Owned collector vault phase diagnostics
+
+Work in progress after PR #91. The native collector admission/reopen test has two lock operations; the retained f9da0be CI exit-16 failure does not identify which one failed. Later passing runs do not establish its cause or a production fix.
+
+The test now retains distinct create, import, first lock, closed-handle refusal, reopen, preserved-history, second lock and independent-absence phases. Credential-free native observations and this test process's owned descriptor metadata are shared with the existing detach fixtures. A thrown error pins its original phase before cleanup; successful cleanup cannot turn that original run into a pass. Public vault construction and product behavior are unchanged.
+
+The original public create-with-unlock sequence stays intact. Two additional native controls deliberately hold an authored SQLite file open at the first or second collector lock. Normal detach must refuse, the trace must identify that exact phase and the known owned handle, closing the reader must permit normal recovery, and the original collector source must survive reopening. Final independent hdiutil inventory must show the owned image absent. No force detach, mutation retry or indexing-setting change is added.
+
+A new descriptor boundary check initially failed because Foundation's resolved temporary path can use `/var` while F_GETPATH uses the kernel spelling. The shared test helper now builds its exact owned prefix using realpath; it does not widen observation to unrelated temporary files. The unrelated-descriptor exclusion and existing path/credential export checks remain.
+
+Development evidence: 16 focused model-free checks pass after preserving the original one-assertion failure. Five owned native collector/detach cases pass, including the two new controls and the existing held-reader control; their three intentional normal exit-16 events are distinct from the unexplained historical CI failure. Independent inventory confirms no image from those five fixtures remains attached. Broader frozen full/sanitizer/optimized qualification and current-source CI are next.
+
+Remaining work: collect the failed phase and ownership evidence if the unforced historical class recurs; identify its cause before changing product closing policy. Real authentication, GUI/sleep, sustained daily use, physical power, OS/device coverage and release acceptance remain open. Benchmark-created task-only Spotlight exclusions still need final restoration verification while Metadata/native session access is unavailable; this work adds no global exclusion or settings change.

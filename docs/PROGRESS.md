@@ -1,5 +1,10 @@
 # OSwind delivery ledger
 
+## Owned collector vault phases — work in progress
+
+- [Collector lock-phase diagnostics](VAULT-COLLECTOR-TRACE.md) preserve the public create-with-unlock/import/lock/reopen sequence and identify each lock separately before cleanup. The shared test-only observer retains bounded credential-free native output and owned descriptor metadata; public/product behavior is unchanged.
+- A new handle boundary control initially fails because Foundation and kernel temporary-path spellings differ. Using the exact realpath prefix fixes that test helper while retaining unrelated-descriptor exclusion. All 16 focused checks then pass. Five actual owned native cases pass, with first/second-lock known-reader controls, preserved imported text, normal recovery and independent attachment absence. Three intentional exit-16 control observations are distinct from the unexplained f9da0be CI failure. Frozen broader qualification is next.
+
 ## Stock Screenpipe keyword HTTP comparison — PR #91 / source 06c81a5 — component qualification passed
 
 - [Published protocol and results](SCREENPIPE-COMPARISON.md) use official signed Screenpipe 0.4.53 and signed OSwind a5d4af4, identical authored original text and authenticated keyword HTTP under the same restricted sandbox. The [receipt](../benchmarks/screenpipe-keyword-http-v1.json) retains all 280 timed requests across 1k/10k, query labels, warmup, health, clocks, physical payload proofs and historical failures. Both fresh runs and all 21 contract cases pass. Both products hit every positive first result and return no result for the absent control. Screenpipe exact sets are 70/70 at each size; OSwind 65/70 with the extra quiet-mint paint note below the correct design result. Screenpipe warm median/p95: .353/.419 ms at 1k and .338/.375 ms at 10k; OSwind .553/.782 and .458/.606 ms. This observed component loses to Screenpipe; no whole-product ranking follows.
