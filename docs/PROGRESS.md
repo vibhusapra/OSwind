@@ -6,7 +6,7 @@
 
 [All 22 local stages pass](../benchmarks/sync-late-dependencies-v1.json):1,635 full passes / 82 skips; broad sanitizer and release 635 each / 22 skips. All16 new mandatory parents execute in each build; 17 sanitizer logs have no race warnings. All 727 frozen inputs match, including 725 repository inputs / 465 Sources/Tests/Vendor files. A strict signed/extracted 34-file app and inherited process/old30/backup/reader checks pass; installed 15 files and four prior staged trees are unchanged.
 
-F059 stays TODO. Optional retired scopes/run conversation provenance, publication-group visibility, epochs/compaction/service/providers/two-Mac and paired overhead remain open. Parent PR #113 native CI fails in a changed-source encrypted migration detach (exit16, five assertions, destination closing); traces do not establish its cause. A local pinned release single case passes but does not resolve the CI failure; debug group reproduction is running.
+F059 stays TODO. Optional retired scopes/run conversation provenance, publication-group visibility, epochs/compaction/service/providers/two-Mac and paired overhead remain open. Parent PR #113 native CI fails in a changed-source encrypted migration detach (exit16, five assertions, destination closing); traces do not establish its cause. A local pinned release single case passes but does not resolve the CI failure; the unmodified local debug group passes all 37 cases, with 23 limited reader samples across nine owned roots; its CI cause remains unproven.
 
 
 ## October31 scope refresh — five newly tracked gaps

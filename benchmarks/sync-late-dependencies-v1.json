@@ -281,7 +281,19 @@
     "benchmarkHarnesses": "success",
     "originalEvidenceArtifact": 13061034823,
     "localPinnedReleaseSingleCase": "Passed; no reader samples. Does not establish the cause or replace CI.",
-    "newHead": "Not part of this local qualification; inspect pull-request checks."
+    "newHead": "Not part of this local qualification; inspect pull-request checks.",
+    "localUnmodifiedParentDebugGroup": {
+      "state": "passed",
+      "defined": 37,
+      "passed": 37,
+      "sourceCommit": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+      "inputFiles": 719,
+      "inputsUnchanged": true,
+      "logSHA256": "b852ada4183fd70b6a535891a4f9401963b6195d957e0567c83944a3159d8839",
+      "readerSamples": 23,
+      "ownedRoots": 9,
+      "limitation": "Unprivileged descriptor observations in a successful local run do not identify the original CI cause or replace its failed result."
+    }
   },
   "ledger": {
     "requirements": 83,
