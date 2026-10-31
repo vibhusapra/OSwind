@@ -73,7 +73,8 @@ with tempfile.TemporaryDirectory(prefix='oswind-backup-benchmark-') as temporary
     assert concurrent, 'backup completed without a concurrent CLI write/search sample'
     report['inspect'] = measured('inspect',['backup','inspect',archive])
     report['restore'] = measured('restore',['backup','restore',archive,'--to',target,'--fingerprint',report['create']['result']['archiveFingerprint']])
-    assert report['create']['result']==report['inspect']['result']==report['restore']['result']
+    assert report['create']['result']==report['inspect']['result']
+    assert report['restore']['result']==dict(report['create']['result'],discardedVisualIndexes=0)
     assert args.count<=report['restore']['result']['memories']<=args.count+len(concurrent)+1
     assert report['restore']['result']['mediaFiles']==args.media
     with sqlite3.connect(target/'memory.sqlite') as restored:
