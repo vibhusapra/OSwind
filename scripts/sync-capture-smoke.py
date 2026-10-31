@@ -71,7 +71,7 @@ try:
  report['checks'].append('public single-delete purges the queued original body and preserves opaque deletion metadata/accounting')
  archive=base/'owned.oswindbackup';restored=base/'restored';info=json.loads(run('backup','create',archive).stdout);assert info['sourceSchema']==25
  if a.old_cli:run('backup','inspect',archive,cli=a.old_cli.resolve(),ok=False)
- run('backup','restore',archive,restored)
+ run('backup','restore',archive,'--to',restored)
  with sqlite3.connect(restored/'memory.sqlite') as db:assert db.execute('SELECT enabled FROM personal_sync_capture').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM personal_sync_changes').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM memories').fetchone()==(3,)
  report['checks'].append('schema25 backup restores complete current notes without reactivating capture or replaying pending changes; optional old24 inspector refuses')
  report.update(state='completed',scope='Authored fresh notes only, normal local CLI/collector/backup processes. No public pairing, complete typed peer adapters, transport, desktop capture, credentials, normal history, physical power or product ranking acceptance.');save();print(json.dumps(dict(state=report['state'],checks=len(report['checks']),old24=a.old_cli is not None)))
