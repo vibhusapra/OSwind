@@ -50,7 +50,8 @@ The local backup test preserves canonical data while restoring quietly without c
 - [x] Independent source/body/journal/timing review and bounded optimized scale observations; six reader admission/corruption contracts.
 - [x] Selected sanitizer/optimized checks and four real process-death parents.
 - [x] Full regression and staged package qualification, with signatures, extracted ZIP equality and installed-app preservation independently checked.
-- [ ] Complete automatic capture/bootstrap-to-journal processing and all typed incoming graph/media adapters.
+- [x] [Bounded automatic outgoing capture/bootstrap-to-journal processing](SYNC-OUTGOING-PROCESSOR.md), with durable work staging and mandatory caller admission.
+- [ ] Complete production service and typed incoming graph/media adapters, including exact-version citation materialization.
 - [ ] Current privacy/erasure epochs, portable provenance restore/migration, cache/backpressure workflow, trusted enrollment, native/CLI controls and provider/two-Mac acceptance.
 
 F059 and all 78 delivery requirement statuses remain unchanged. These components do not establish feature-complete parity, physical power performance or a competitor ranking.

@@ -1,0 +1,1499 @@
+[
+  {
+    "batches" : [
+      {
+        "objects" : 128,
+        "seconds" : 0.57798529160209
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58969912491738796
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58683583349920809
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59543737513013184
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58617029152810574
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56308041652664542
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59488620841875672
+      },
+      {
+        "objects" : 104,
+        "seconds" : 0.47309520817361772
+      }
+    ],
+    "batchLimit" : 128,
+    "count" : 1000,
+    "loadSeconds" : 0.0054943750146776438,
+    "metadata" : {
+      "outbox" : 1000,
+      "projections" : 1000,
+      "usedBytes" : 515893,
+      "versions" : 1000
+    },
+    "prepareSeconds" : 4.6760047916322947,
+    "scope" : "One warm authored text-source run; timer includes bounded automatic identity bootstrap, opaque work staging, dependency identity checks, actual canonical row read, typed export, journal, cache\/projection and work acknowledgement across all 13 bootstrap cursors. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence.",
+    "setupSeconds" : 0.0039188333321362734,
+    "sourceOriginalSHA256" : "e8adfe11ff08516295aba2103c3c56c0f3b58f7e35fac101019f9a6a00bf8d7b",
+    "steps" : [
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.0078473333269357681,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57798529160209
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.013605374842882156,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58969912491738796
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.010924708331003785,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58683583349920809
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.010942458407953382,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59543737513013184
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.019911791663616896,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58617029152810574
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011355958180502057,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56308041652664542
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012163083301857114,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59488620841875672
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 104,
+        "seconds" : 0.009675916749984026,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 104,
+        "seconds" : 0.47309520817361772
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00054925004951655865,
+        "table" : "chat_sessions"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00045570824295282364,
+        "table" : "chat_turns"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00038933334872126579,
+        "table" : "chat_sources"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0060238749720156193,
+        "table" : "recap_sources"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0019588333088904619,
+        "table" : "routines"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00040729180909693241,
+        "table" : "routine_runs"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00045341672375798225,
+        "table" : "memory_entities"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0004065418615937233,
+        "table" : "entity_aliases"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00037554162554442883,
+        "table" : "entity_mentions"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0003481665626168251,
+        "table" : "entity_ignored"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00034962501376867294,
+        "table" : "entity_project_ignored"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00035624997690320015,
+        "table" : "text_observation_pins"
+      },
+      {
+        "kind" : "idle",
+        "objects" : 0,
+        "seconds" : 0.00025225011631846428
+      }
+    ]
+  },
+  {
+    "batches" : [
+      {
+        "objects" : 128,
+        "seconds" : 0.58529650000855327
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56763720838353038
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58897825004532933
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5804624583106488
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56533762509934604
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55614362517371774
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55698270839639008
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56018037488684058
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57789012487046421
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55884950002655387
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56389679154381156
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57137112505733967
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5649966667406261
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55957204173319042
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58567041647620499
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58382254163734615
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56897433311678469
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57493262505158782
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5549564165994525
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58784900000318885
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58629387500695884
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5712267083581537
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57533404161222279
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56965974997729063
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58462387509644032
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5710162918549031
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59280020836740732
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58222591667436063
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56867887498810887
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59463866660371423
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57376904180273414
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58703533350490034
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56512658321298659
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.61182495835237205
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56869708327576518
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59478216664865613
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59264604165218771
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58949875016696751
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58197937486693263
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59582974994555116
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59141829167492688
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59339245827868581
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57261045835912228
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58712345827370882
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57982745836488903
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58086924999952316
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57487541669979692
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58196904184296727
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55464758328162134
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55594212491996586
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58363808342255652
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55947320838458836
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58730970835313201
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57185083348304033
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.5638071249704808
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.54940795851871371
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57616620836779475
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56162958336062729
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58244983339682221
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58714662492275238
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57644279161468148
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58115283329971135
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57517658337019384
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56269962503574789
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58637591660954058
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.61159683321602643
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55732670845463872
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58027049992233515
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58847166644409299
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56899575004354119
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58030662499368191
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58014395833015442
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.55583299999125302
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57292883330956101
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.59228854160755873
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.58409370831213892
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.57043316657654941
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.56233416660688818
+      },
+      {
+        "objects" : 16,
+        "seconds" : 0.075248625129461288
+      }
+    ],
+    "batchLimit" : 128,
+    "count" : 10000,
+    "loadSeconds" : 0.065515916561707854,
+    "metadata" : {
+      "outbox" : 10000,
+      "projections" : 10000,
+      "usedBytes" : 5168894,
+      "versions" : 10000
+    },
+    "prepareSeconds" : 46.581304708262905,
+    "scope" : "One warm authored text-source run; timer includes bounded automatic identity bootstrap, opaque work staging, dependency identity checks, actual canonical row read, typed export, journal, cache\/projection and work acknowledgement across all 13 bootstrap cursors. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence.",
+    "setupSeconds" : 0.0056984999682754278,
+    "sourceOriginalSHA256" : "bda6146376f2c7e9cc53a945f5ec0bb1fe40acca27967adc4d640ff825a7dbbb",
+    "steps" : [
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.0080207916907966137,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58529650000855327
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011147291632369161,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56763720838353038
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.010911458404734731,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58897825004532933
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.017344125080853701,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5804624583106488
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.01123254164122045,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56533762509934604
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014812291599810123,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55614362517371774
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011318916687741876,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55698270839639008
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011249749921262264,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56018037488684058
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.01150129153393209,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57789012487046421
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014098458224907517,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55884950002655387
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011728416662663221,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56389679154381156
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.0115190832875669,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57137112505733967
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012852666666731238,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5649966667406261
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.011832083342596889,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55957204173319042
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012164749903604388,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58567041647620499
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.017375041730701923,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58382254163734615
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.01237791683524847,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56897433311678469
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.025423000101000071,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57493262505158782
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012263874989002943,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5549564165994525
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014210375025868416,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58784900000318885
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.025347916642203927,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58629387500695884
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012176541611552238,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5712267083581537
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.021567666670307517,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57533404161222279
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012179708341136575,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56965974997729063
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.02998437499627471,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58462387509644032
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012658916646614671,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5710162918549031
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.036225416697561741,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59280020836740732
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012771333334967494,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58222591667436063
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.031499624950811267,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56867887498810887
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.013245833339169621,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59463866660371423
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.019070625072345138,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57376904180273414
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.012704708380624652,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58703533350490034
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.015191500075161457,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56512658321298659
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014160791644826531,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.61182495835237205
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.016177541809156537,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56869708327576518
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.015113916713744402,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59478216664865613
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.021280416753143072,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59264604165218771
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014426208334043622,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58949875016696751
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.016921750036999583,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58197937486693263
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.015631041489541531,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59582974994555116
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.017118749907240272,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59141829167492688
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.018410916673019528,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59339245827868581
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.030747541692107916,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57261045835912228
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.037837874842807651,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58712345827370882
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.018696833401918411,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57982745836488903
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.028654583264142275,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58086924999952316
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.036506041651591659,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57487541669979692
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014703916618600488,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58196904184296727
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.018025999888777733,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55464758328162134
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.028823041589930654,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55594212491996586
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014315791660919785,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58363808342255652
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.017469083424657583,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55947320838458836
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.041130000026896596,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58730970835313201
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.020609458442777395,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57185083348304033
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.016311458311975002,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.5638071249704808
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.035801125224679708,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.54940795851871371
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014223666861653328,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57616620836779475
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.020015374990180135,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56162958336062729
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.031255749985575676,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58244983339682221
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.016512583242729306,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58714662492275238
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.020633874926716089,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57644279161468148
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.038642916828393936,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58115283329971135
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014054583385586739,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57517658337019384
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.016251374967396259,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56269962503574789
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.040690708439797163,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58637591660954058
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.013936749892309308,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.61159683321602643
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.020999041618779302,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55732670845463872
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.031598499976098537,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58027049992233515
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.015363791724666953,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58847166644409299
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.023442291654646397,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56899575004354119
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.026029624976217747,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58030662499368191
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.01434383331798017,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58014395833015442
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.021939500002190471,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.55583299999125302
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.031707208370789886,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57292883330956101
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.014565458288416266,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.59228854160755873
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.021394416689872742,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.58409370831213892
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.040718166623264551,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.57043316657654941
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 128,
+        "seconds" : 0.024337250040844083,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 128,
+        "seconds" : 0.56233416660688818
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 16,
+        "seconds" : 0.0064669998828321695,
+        "table" : "memories"
+      },
+      {
+        "kind" : "prepared",
+        "objects" : 16,
+        "seconds" : 0.075248625129461288
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00059291673824191093,
+        "table" : "chat_sessions"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00066691660322248936,
+        "table" : "chat_turns"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0004082084633409977,
+        "table" : "chat_sources"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00038995826616883278,
+        "table" : "recap_sources"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.0003790000919252634,
+        "table" : "routines"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00071508320979773998,
+        "table" : "routine_runs"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00037145847454667091,
+        "table" : "memory_entities"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00040970835834741592,
+        "table" : "entity_aliases"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00036708335392177105,
+        "table" : "entity_mentions"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00039379158988595009,
+        "table" : "entity_ignored"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00034720823168754578,
+        "table" : "entity_project_ignored"
+      },
+      {
+        "kind" : "bootstrap",
+        "objects" : 0,
+        "seconds" : 0.00034362496808171272,
+        "table" : "text_observation_pins"
+      },
+      {
+        "kind" : "idle",
+        "objects" : 0,
+        "seconds" : 0.00023566652089357376
+      }
+    ]
+  }
+]

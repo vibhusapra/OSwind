@@ -60,7 +60,8 @@ The two full-suite skips are the explicit opt-in system-audio fixture and subpro
 - [x] Internal journal, transactional callbacks, restart, gap/dependency handling and sequence/scope fences.
 - [x] Local immutable encrypted folder and chunk transport; same-host two-library note/projection/conflict/deletion fixture.
 - [x] Disabled schema25 same-transaction canonical local intent capture, connection/old-writer fences and authored scale/process qualification. See [capture receipt](../benchmarks/sync-change-capture-v1.json).
-- [ ] Complete automatic capture-to-protocol processing. [Schema25 canonical capture](SYNC-CHANGE-CAPTURE.md) now installs disabled local intent hooks for all 13 tables and fences older writers; the full typed processor, initial bootstrap and public enablement remain unfinished.
+- [x] [Bounded automatic outgoing bootstrap/capture-to-work-to-typed-journal processor](SYNC-OUTGOING-PROCESSOR.md) across all 13 tables, with durable staging, dependency ordering, mandatory admission callbacks, real crash recovery and independently checked authored scale.
+- [ ] Deliver the complete capture-to-protocol service: production privacy/epoch admission, media staging/transport, lifecycle/scheduling and public enablement remain unfinished. Ordinary schema25 opening stays capture-disabled.
 - [ ] All typed graph/media adapters, persistent source-version/citation identity, current-policy egress and local scan provenance.
 - [ ] Scoped erasure, whole-library wipe/epoch barriers, deletion announcements, acknowledgement-based compaction and encrypted-cache retention.
 - [ ] Trusted initial bootstrap, Keychain enrollment/recovery, membership/revocation and rollback checkpoints.
