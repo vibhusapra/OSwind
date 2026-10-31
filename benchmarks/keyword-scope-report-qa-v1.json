@@ -1,0 +1,82 @@
+{
+  "format": "OSwind comparison browser QA",
+  "state": "completed",
+  "browserVersion": "156.0.8078.4",
+  "frozen": {
+    "docs/landscape.html": "e68517ce457489700ca1e02f08157c23d03ef287bf17568ffd7d472205570e05",
+    "docs/landscape.json": "1454572e294854876751c680f1b110c29f592084627e36b1166562e97e6763ad",
+    "docs/features.json": "cca273a184c3ae836f7c8a7e2ccba3a8330b2a891fbed92788d2005eb749babc",
+    "scripts/research-report.py": "2bb3fc3ee59bcfb54fa48fcde80228a11e34d2922200f444f5fe3d38535ee02d",
+    "benchmarks/screenpipe-keyword-http-v1.json": "da5df9be7955a0c20ed5ed84c380c9da11cc091b0f7b526d6535a74d74749d4f",
+    "benchmarks/vault-collector-trace-v1.json": "f7b23be65d51fb5ff9b4077f183a83178cc0c04ae7ce1fdd4a6e52e830e31803",
+    "benchmarks/personal-sync-foundation-v1.json": "724e5860ee20ecd19dc8f298189bbb5754ac980c522f25512cc78db96b27be54",
+    "benchmarks/sync-change-capture-v1.json": "ddc20fdde60e8cc0c545810a5d4fdef263cacbe4bd1375e08689c761c71c1c7e",
+    "benchmarks/keyword-scope-scale-v1.json": "d910b83839b34402fd9f71caecdf33ff323876ec900812baa3f18428f7c38f07",
+    "benchmarks/keyword-scope-raw-v1.zip": "e6e0ad479e890f2e940ddf1677171323796c40d298bb2c6b9b328a08e355e00b",
+    ".artifacts/keyword-scope-scale-v1/qa-landscape-v2.cjs": "5fcad5c319ff32777fb86519cae2f97197c649d1fb523fd764394c679c24b196"
+  },
+  "scope": "Own file:// artifact in an isolated headless browser. Clipboard adapter stubbed; no user clipboard, authenticated page, network request, native app/TCC or competitor runtime.",
+  "screenshots": [
+    {
+      "path": "desktop-top.png",
+      "sha256": "43cd584c4a851e77a6cfa050c391953ef0db75b9384556a8425a030bacf2f7b7"
+    },
+    {
+      "path": "desktop-new-profiles.png",
+      "sha256": "9c504fc22357c63171e16b182b6249ed231cd36cec89d3defe3602e65963c3e0"
+    },
+    {
+      "path": "desktop-component-benchmark.png",
+      "sha256": "ecacba4c93c1b39f3b0730354a46133baf5418f4bbb03f440bfc6f70eb1f6ef5"
+    },
+    {
+      "path": "desktop-keyword-scale.png",
+      "sha256": "7a57be54fe4742506453c966290005cab2ce6c5f16c8104ae51de4eaf2e34b71"
+    },
+    {
+      "path": "mobile-top.png",
+      "sha256": "2fa76a4bfdcac4da1cbfb0026cfb9568a6a1d1768739be1aa3e0f5aec16f9af5"
+    },
+    {
+      "path": "mobile-goldfish.png",
+      "sha256": "88ca28217e5f0eda2e26ddfb64c8f69971fb5ffaefb6f963f7fbad2267caced2"
+    },
+    {
+      "path": "mobile-ledger.png",
+      "sha256": "cc97a47b4473da419940dd12af9325bb59ba7c1132fc02040127489d8257a93b"
+    },
+    {
+      "path": "mobile-keyword-scale.png",
+      "sha256": "132e30e5678773039a0f5a73aa0ac870d3a1febf0948a8f043245e0aa2384288"
+    }
+  ],
+  "vendors": 20,
+  "requirements": 78,
+  "viewportSizes": {
+    "viewport": 390,
+    "document": 390,
+    "tableViewport": 356,
+    "tableContent": 850
+  },
+  "filterAndIntersectionPass": true,
+  "benchmarkCellsMatchReceipt": true,
+  "keywordScaleCellsMatchReceipt": true,
+  "copyThreeMultilineTODOs": true,
+  "copyLabelResets": true,
+  "outsideScopeExcludedFromCopy": true,
+  "withoutJavaScriptUsable": true,
+  "networkRequests": 0,
+  "pageErrors": [],
+  "publicationReview": {
+    "source": "7e0d88ad08750faa92b16d69625cdddb8216c9cc",
+    "all578BundleMembersHashed": true,
+    "all288ActualResponsesReopened": true,
+    "all144CompletePairedResponsesEqual": true,
+    "responseDurationsVerified": true,
+    "all192MedianAndP95ValuesRecomputed": true,
+    "featureIDsAndStatusesUnchanged": true,
+    "productTestsModelSDKCISourceUnchanged": true,
+    "exactSourceCIBothJobsPass": true,
+    "visualReview": "Desktop table heading/columns and contained narrow horizontal table inspected; source stock benchmark cells unchanged. Native GUI/TCC/VoiceOver not exercised."
+  }
+}

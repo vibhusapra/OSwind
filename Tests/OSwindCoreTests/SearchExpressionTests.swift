@@ -186,12 +186,12 @@ final class SearchExpressionTests: XCTestCase {
         }
         print("Metal required-expression trial: "+String(data:try JSONSerialization.data(withJSONObject:timings,options:[.sortedKeys]),encoding:.utf8)!)
     }
-    func testCancelledEligibilitySQLLeavesTheConnectionAndNextQueryUsable() async throws {
+    func testCancelledKeywordSQLLeavesTheConnectionAndNextQueryUsable() async throws {
         for i in 0..<1000 { try source("cancel-\(i)","alpha beta") }
         let latch = ExpressionCancelLatch(), context = Unmanaged.passUnretained(latch).toOpaque()
         try store.withRoutineDatabase { db in
             sqlite3_trace_v2(db.handle,UInt32(SQLITE_TRACE_STMT),{ _,context,_,sql in
-                if let context,let sql,String(cString:sql.assumingMemoryBound(to:CChar.self)).contains("INSERT INTO temp.search_expression_scope") {
+                if let context,let sql,String(cString:sql.assumingMemoryBound(to:CChar.self)).contains("FROM memory_fts f JOIN memories") {
                     Unmanaged<ExpressionCancelLatch>.fromOpaque(context).takeUnretainedValue().cancel()
                 }
                 return 0
@@ -210,7 +210,7 @@ final class SearchExpressionTests: XCTestCase {
         XCTAssertEqual(try ids(#""alpha beta""#).count,100)
         try store.withRoutineDatabase { db in
             var statement: OpaquePointer?
-            XCTAssertEqual(sqlite3_prepare_v2(db.handle,"SELECT COUNT(*) FROM temp.search_expression_scope",-1,&statement,nil),SQLITE_OK)
+            XCTAssertEqual(sqlite3_prepare_v2(db.handle,"SELECT COUNT(*) FROM sqlite_temp_master WHERE name='search_expression_scope'",-1,&statement,nil),SQLITE_OK)
             defer { sqlite3_finalize(statement) }
             XCTAssertEqual(sqlite3_step(statement),SQLITE_ROW); XCTAssertEqual(sqlite3_column_int(statement,0),0)
         }
