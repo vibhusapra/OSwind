@@ -1,5 +1,12 @@
 # OSwind delivery ledger
 
+## Sync object lifetimes and resumable bootstrap — draft implementation
+
+- [Identity catalog](SYNC-OBJECT-IDENTITY.md) maps all 13 canonical tables to separate origin/lifetime identities. Updates keep identity, delete/recreate and primary-key moves retire old lifetimes, current-key collisions refuse, and deleted raw key frames clear. Local intent consumption, caller protocol output and acknowledgement share a transaction. Unknown body-free wire deletes use the actual journal's durable barrier.
+- Keyset bootstrap has durable per-table cursors and count/key-byte budgets. Pending local intents must drain first; new keys behind a cursor remain captured. Completed cursors clear; deleting the cursor row clears its raw key and safely restarts that table. Schema/scope/preparation and current mappings are checked. No user enablement or capture activation is introduced by ordinary opening; schema25 remains unchanged.
+- Development passes 94 cases / one worker skip before the additional affinity regression. The first expanded sanitizer build retains a test-only Int/Int64 compile error. Corrected composite pagination passes 94 cases / one worker skip; the next isolated affinity counterexample fails one case/three assertions before its repair. Exact primary-key storage admission then passes 95 sanitizer cases / one worker skip, including all 25 new cases, with zero race warnings. Initial source snapshots and failed logs remain retained. The optimized selection also passes 95 cases / one worker skip, including all 25 new cases. The [development receipt](../benchmarks/sync-object-identity-development-v1.json) retains passing stages, source/input fingerprints and both failures. Broad qualification remains pending.
+- F059 stays TODO. This is a required identity/bootstrap layer, not complete graph/media/current-policy processing, versioned citation transfer, public pairing/status/conflict UI or provider/two-Mac acceptance. Process-death and authored 1k/100k/1m qualification are next; complete sync remains the delivery target.
+
 ## Phrase and Boolean query scaling — PR #95 / source 7e0d88a — component qualified
 
 - [Ranked-candidate constraints](KEYWORD-CONSTRAINT-SCALE.md) remove unnecessary global eligibility construction from keyword/vectorless searches while retaining eligibility before LIMIT and stable FTS keys. Actual vector stages retain full masks; indexed necessary metadata checks prove impossible scopes empty without caching. SQLite3.51 and schema25 remain unchanged.

@@ -1,0 +1,110 @@
+{
+  "format": "OSwind internal object identity and bootstrap development evidence",
+  "version": 1,
+  "publishedAtUTC": "2026-10-31T03:55:50.384577+00:00",
+  "baseSource": "e43b103e2d14bda0723b46d4e544e65e3002ea89",
+  "branch": "codex/sync-object-lifetimes",
+  "scope": "Development component only: canonical object/lifetime mapping, transactional capture consumer, peer mapping and bounded durable identity bootstrap. No user sync activation, full typed graph/media/current-policy processor, versioned citations, enrollment, provider/two-Mac or scale/package/native-release qualification.",
+  "sourceFiles": {
+    "Sources/OSwindCore/SyncIdentityCatalog.swift": "0f8713b250c898675806842a38fee8200ece6e35a91594db085b9d951e32dd1d",
+    "Sources/OSwindCore/PersonalSyncProtocol.swift": "c6d0a4dce01d7f90da84e1500d7b54bc21feba2fa4db64025921dd272b5e3eb3",
+    "Tests/OSwindCoreTests/SyncIdentityCatalogTests.swift": "84aec7d5d087790e9f713f256ca99613491f49f6e4a97235dc2c631be010d74d"
+  },
+  "developmentInputs": {
+    "count": 352,
+    "sha256": "baf7f8fb24d00d8be3d4564795762ac466f0b8d0bfc34b17cae9551ac865ad7e",
+    "allUnchangedAtReview": true
+  },
+  "checks": {
+    "development-v1.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 86,
+      "passed": 85,
+      "skipped": 1,
+      "newIdentityCases": 15,
+      "logSHA256": "997e33836c338a1a498a46faa66081f2e422c11e021d6d3b583f7fd5f30d2ff1"
+    },
+    "development-v2.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 89,
+      "passed": 88,
+      "skipped": 1,
+      "newIdentityCases": 18,
+      "logSHA256": "e65af40320865e2eb57ac0e766703f4d2a8eceaf3302af179dc0ef4956891b3c"
+    },
+    "development-v3.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 95,
+      "passed": 94,
+      "skipped": 1,
+      "newIdentityCases": 24,
+      "logSHA256": "0099283269063082c6e27d64ced2a84af93eb218797f9f6f406812d185f01561"
+    },
+    "development-v5.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 95,
+      "passed": 94,
+      "skipped": 1,
+      "newIdentityCases": 24,
+      "threadSanitizerWarnings": 0,
+      "logSHA256": "a67594ee72523b32b55de4210545a6924e513e2f8379cd541bdc39fc46ae4965"
+    },
+    "development-v7.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 96,
+      "passed": 95,
+      "skipped": 1,
+      "newIdentityCases": 25,
+      "threadSanitizerWarnings": 0,
+      "logSHA256": "f7a5e8d5f7cfb902a43c65b7eab8e10bfc98374158fbbe4b0a72775dc0d81de4"
+    },
+    "development-release-v1.json": {
+      "state": "completed",
+      "frozenAllUnchanged": true,
+      "defined": 96,
+      "passed": 95,
+      "skipped": 1,
+      "newIdentityCases": 25,
+      "logSHA256": "be0acf3b45e7a8e42851a4f2f832cd0baa3a09cf1cf2f6c67ef69958448d3517"
+    }
+  },
+  "retainedFailures": {
+    "development-v4-failure.json": {
+      "state": "compile-failed",
+      "testsRan": false,
+      "distinctCause": "New composite pagination XCTest compares Int bootstrapCount with Int64 SQLite count",
+      "logSHA256": "c25f97f4cf8c0a0a446cd9b671d63e875f7aa8e2016f59aa7d4b2b58cdba2580",
+      "frozenAllUnchanged": true,
+      "productCodeChangedForFix": false
+    },
+    "development-v6-affinity-failure.json": {
+      "state": "failed",
+      "defined": 1,
+      "failedCases": 1,
+      "assertionFailures": 3,
+      "threadSanitizerWarnings": 0,
+      "frozenAllUnchanged": true,
+      "scope": "Owned new internal catalog regression only. SQLite integer-to-text affinity admits a second catalog identity and lets its callback overwrite text ID 1. No public sync activation or normal history involved.",
+      "logSHA256": "bf2114b7a2c9d1f50855a67220f3c79cc48a655b8b68efeb38da30eec1d5be39"
+    }
+  },
+  "affinityRegression": {
+    "beforeFixSourceSHA256": "80a4fd39d0a87e0ecc97d403f62825152f0b6a9be2e5e71a2ea30aba34ef2ae4",
+    "beforeFixPrimaryValidation": "    static func keyFrame(_ table:SyncCanonicalTable,_ primary:[SyncRowCell])throws->Data {\n        guard primary.count==table.schema.primary.count else {throw OSwindError.invalid(\"Invalid canonical primary key width\")}\n        var bytes=0\n        for cell in primary {\n            switch cell {\n            case .integer:break\n            case .text(let value):guard !value.isEmpty,value.count<=SyncProtocolLimits.operationBytes,bytes<=SyncProtocolLimits.operationBytes-value.count else {throw OSwindError.invalid(\"Canonical primary key exceeds its bound\")};bytes+=value.count\n            default:throw OSwindError.invalid(\"Invalid canonical primary key storage\")\n            }\n        }\n        return try SyncRowSnapshot(primary).encoded()\n    }\n",
+    "fixedPrimaryValidation": "    static func keyFrame(_ table:SyncCanonicalTable,_ primary:[SyncRowCell])throws->Data {\n        guard primary.count==table.schema.primary.count else {throw OSwindError.invalid(\"Invalid canonical primary key width\")}\n        var bytes=0\n        for (column,cell) in zip(table.schema.primary,primary) {\n            let ordinal=(table == .conversationCitation || table == .recapCitation) && column==\"ordinal\"\n            switch cell {\n            case .integer:guard ordinal else {throw OSwindError.invalid(\"Canonical text key cannot use numeric affinity\")}\n            case .text(let value):guard !ordinal,!value.isEmpty,value.count<=SyncProtocolLimits.operationBytes,bytes<=SyncProtocolLimits.operationBytes-value.count else {throw OSwindError.invalid(\"Canonical primary key exceeds its bound\")};bytes+=value.count\n            default:throw OSwindError.invalid(\"Invalid canonical primary key storage\")\n            }\n        }\n        return try SyncRowSnapshot(primary).encoded()\n    }\n",
+    "failedAssertions": "<repo>/Tests/OSwindCoreTests/SyncIdentityCatalogTests.swift:295: error: -[OSwindCoreTests.SyncIdentityCatalogTests testPrimaryStorageAffinityCannotOverwriteAnExistingSourceUnderADifferentIdentity] : XCTAssertThrowsError failed: did not throw an error\n<repo>/Tests/OSwindCoreTests/SyncIdentityCatalogTests.swift:297: error: -[OSwindCoreTests.SyncIdentityCatalogTests testPrimaryStorageAffinityCannotOverwriteAnExistingSourceUnderADifferentIdentity] : XCTAssertEqual failed: (\"Optional(\"incorrect foreign overwrite\")\") is not equal to (\"Optional(\"existing authored source\")\")\n<repo>/Tests/OSwindCoreTests/SyncIdentityCatalogTests.swift:298: error: -[OSwindCoreTests.SyncIdentityCatalogTests testPrimaryStorageAffinityCannotOverwriteAnExistingSourceUnderADifferentIdentity] : XCTAssertEqual failed: (\"2\") is not equal to (\"1\")\n\t Executed 1 test, with 3 failures (0 unexpected) in 0.676 (0.688) seconds\n\t Executed 1 test, with 3 failures (0 unexpected) in 0.676 (0.688) seconds\n\t Executed 1 test, with 3 failures (0 unexpected) in 0.676 (0.689) seconds",
+    "actualNewRegressionPassedUnderSanitizer": true
+  },
+  "pending": [
+    "Owned pre/post-commit process death for catalog/queue/journal/bootstrap cursor",
+    "Authored 1k/100k/1m scaling and independent source/mapping/timing review",
+    "Frozen full/TSan/optimized/package/process qualification",
+    "Complete typed graph/media/current-policy and versioned-citation processor",
+    "Trusted bootstrap/enrollment, epochs/erasure/compaction, native/CLI and provider/two-Mac acceptance"
+  ]
+}

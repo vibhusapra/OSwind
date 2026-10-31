@@ -60,7 +60,7 @@ struct SyncClock:Codable,Equatable,Sendable {
     func observing(_ dot:SyncDot)throws->Self {try merged(with:Self([dot.replica:dot.counter]))}
 }
 enum SyncObjectKind:String,Codable,CaseIterable,Sendable {
-    case source,conversation,turn,routine,routineRun,entity,entityAlias,entityMention,entityRejection,projectRejection,evidencePin
+    case source,conversation,turn,conversationCitation,recapCitation,routine,routineRun,entity,entityAlias,entityMention,entityRejection,projectRejection,evidencePin
 }
 struct SyncObjectKey:Codable,Hashable,Sendable {
     let kind:SyncObjectKind
