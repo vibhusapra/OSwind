@@ -60,10 +60,14 @@ struct SyncIncomingEntityWriter {
         }
     }
     func applyDeletion(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws {
+        guard change.after.isDeleted else {throw OSwindError.invalid("Use an admitted entity deletion barrier")}
+        try applyDeletionKey(change.revision.key,admission:admission)
+    }
+    func applyDeletionKey(_ key:SyncObjectKey,admission:MediaAdmissionLease)throws {
         try admission.withActive(for:library.mediaRootIdentity) {}
         try library.withRoutineDatabase {connection in
-            guard connection.handle==db.handle,change.after.isDeleted,Self.tables.contains(where:{$0.kind==change.revision.key.kind}) else {throw OSwindError.invalid("Use the corresponding typed entity deletion adapter")}
-            try cache.catalog.deletePeerKey(change.revision.key,journal:cache.journal) {object in
+            guard connection.handle==db.handle,try cache.journal.state(for:key).isDeleted,Self.tables.contains(where:{$0.kind==key.kind}) else {throw OSwindError.invalid("Use the corresponding typed entity deletion adapter")}
+            try cache.catalog.deletePeerKey(key,journal:cache.journal) {object in
                 guard let object else {return}
                 let schema=object.identity.table.schema
                 guard Self.tables.contains(object.identity.table),let primary=object.primary,primary.count==schema.primary.count else {throw OSwindError.invalid("Incoming entity deletion key differs")}

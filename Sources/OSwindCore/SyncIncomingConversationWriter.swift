@@ -101,32 +101,39 @@ struct SyncIncomingConversationWriter {
             guard connection.handle==db.handle,change.after.isDeleted else {throw OSwindError.invalid("Use the incoming deletion library's own connection and barrier")}
             try erasureCancellable(db) {try SyncChangeCapture.transaction(db) {
                 try cache.validateIncomingDeletionContext()
-                if change.revision.key.kind == .source {
-                    try cache.catalog.deletePeerKey(change.revision.key,journal:cache.journal) {object in
-                        let key:Data?
-                        if let object {guard let primary=object.primary,primary.count==1,case .text(let bytes)=primary[0] else {throw OSwindError.invalid("Incoming source erasure key differs")};key=bytes}else{key=nil}
-                        defer {try? db.clearErasureSelection()}
-                        try db.preparePeerSourceErasure(change.revision.key.digest,activeKey:key)
-                        _=try library.incomingSourceErasure.eraseSelected(db,revokingObject:change.revision.key.digest)
-                    }
-                }else if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
-                    try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletion(change,admission:admission)
-                }else if SyncIncomingMetadataDeletion.accepts(change.revision.key.kind) {
-                    try SyncIncomingMetadataDeletion(cache:cache).apply(change)
-                }else {
-                    try retireRecapCitation(change)
-                }
+                try SyncDerivedRetirement.collect(cache:cache,root:change.revision.key,body:{
+                    try applyDeletionKey(change.revision.key,admission:admission)
+                    try cache.finishDeletedObject(change.revision.key)
+                },retire:{key in try applyDeletionKey(key,admission:admission)})
                 try cache.validateIncomingDeletionContext()
                 try Task.checkCancellation()
                 try admission.withActive(for:library.mediaRootIdentity) {}
             }}
         }
     }
+    private func applyDeletionKey(_ key:SyncObjectKey,admission:MediaAdmissionLease)throws {
+        if key.kind == .source {
+            try cache.catalog.deletePeerKey(key,journal:cache.journal) {object in
+                let nativeKey:Data?
+                if let object {guard let primary=object.primary,primary.count==1,case .text(let bytes)=primary[0] else {throw OSwindError.invalid("Incoming source erasure key differs")};nativeKey=bytes}else{nativeKey=nil}
+                defer {try? db.clearErasureSelection()}
+                let affected=try db.preparePeerSourceErasure(key.digest,activeKey:nativeKey)
+                _=try library.incomingSourceErasure.eraseSelected(db,revokingObject:key.digest)
+                try SyncDerivedRetirement.enqueue(affected,db:db)
+            }
+        }else if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==key.kind}) {
+            try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletionKey(key,admission:admission)
+        }else if SyncIncomingMetadataDeletion.accepts(key.kind) {
+            try SyncIncomingMetadataDeletion(cache:cache).applyKey(key)
+        }else {
+            try retireRecapCitation(key)
+        }
+    }
     /// Content-free recap deletion. The old global citation retires even when
     /// its current owner independently requires the same native derived row.
-    private func retireRecapCitation(_ change:SyncJournalChange)throws {
-        guard change.revision.key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
-        try cache.catalog.retireDerivedRecap(change.revision.key,journal:cache.journal) {object in
+    private func retireRecapCitation(_ key:SyncObjectKey)throws {
+        guard key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
+        try cache.catalog.retireDerivedRecap(key,journal:cache.journal) {object in
             guard let primary=object.primary,primary.count==2,case .text(let bytes)=primary[0],case .integer(let position)=primary[1],let owner=String(data:bytes,encoding:.utf8),let ordinal=Int(exactly:position),ordinal>=0 else {throw OSwindError.invalid("Incoming recap deletion key differs")}
             guard let native=try library.get(owner) else {return false}
             guard let identity=try cache.catalog.preparedIdentity(.source,primary:[.text(bytes)]) else {throw OSwindError.unavailable("Prepare the recap owner before derived retirement")}
@@ -144,6 +151,23 @@ struct SyncIncomingConversationWriter {
         }
     }
     @discardableResult func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {
+        try Task.checkCancellation();try admission.withActive(for:library.mediaRootIdentity) {}
+        return try library.withRoutineDatabase {connection in
+            guard connection.handle==db.handle else {throw OSwindError.invalid("Use the incoming library's own connection")}
+            return try SyncChangeCapture.transaction(db) {
+                try cache.validateIncomingDeletionContext();try record.validate()
+                let state=try cache.journal.state(for:record.identity.key),reference=try record.reference
+                guard !state.isDeleted,state.heads.count==1,state.heads.first?.content==reference.content else {throw OSwindError.unavailable("Admit one reviewed incoming head before projection; conflicts remain explicit")}
+                var local=""
+                try SyncDerivedRetirement.collect(cache:cache,root:record.identity.key,deleting:false,body:{
+                    local=try project(record,admission:admission,fetchExactSource:fetchExactSource)
+                },retire:{key in try applyDeletionKey(key,admission:admission)})
+                try cache.validateIncomingDeletionContext();try Task.checkCancellation();try admission.withActive(for:library.mediaRootIdentity) {}
+                return local
+            }
+        }
+    }
+    private func project(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {
         // The caller reserves media BEFORE journal/SQLite locks, then retains
         // this reservation through admission. Acquiring it here can deadlock
         // against erasure holding the exclusive lease while waiting for SQLite.

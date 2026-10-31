@@ -24,7 +24,9 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
-[Whole-source peer erasure](SYNC-SOURCE-ERASURE.md) passes twenty functional qualification stages on schema31, including cached citation owners, inactive lifetimes, cache-only media and actual old30 migration/refusal. All thirteen canonical kinds now have internal positive projection and tombstone paths. Replicated receiver-only child retirement, scoped/wipe epochs and the complete privacy/media/service workflow remain required. F059 stays TODO.
+[Derived child retirement](SYNC-DERIVED-RETIREMENT.md) passes twenty frozen functional stages on unchanged schema31. Common incoming puts/deletes publish barriers for actual native removals and selected source/citation lifetimes, with root causal observation, exact keys, atomic cache/mapping retirement and real process-death recovery. This closes the tested receiver-only child paths; scoped/wipe collection barriers, production admission/service, late unseen dependent records and actual two-device acceptance remain required. F059 stays TODO.
+
+[Whole-source peer erasure](SYNC-SOURCE-ERASURE.md) passes twenty functional qualification stages on schema31, including cached citation owners, inactive lifetimes, cache-only media and actual old30 migration/refusal. All thirteen canonical kinds now have internal positive projection and tombstone paths. The child-retirement component above follows this receipt. Scoped/wipe epochs and the complete privacy/media/service workflow remain required. F059 stays TODO.
 
 [Incoming metadata tombstones](SYNC-INCOMING-DELETIONS.md) pass twenty functional qualification stages for conversations, turns/citations, recipes/runs and pins. Entity/recap retirement paths are retained; unknown keys across all thirteen canonical kinds receive body-free barriers. Its schema30 receipt precedes the source-erasure component above. Replicated receiver-only child retirement/epochs remain required. No service is enabled.
 

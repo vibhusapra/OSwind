@@ -188,6 +188,19 @@ struct SyncVersionStore {
     /// A tombstone does not require a retained body, but still requires the
     /// complete current schema and durable, same-connection cache context.
     func validateIncomingDeletionContext()throws {try context()}
+    /// Purge a retired lifetime even if its native row disappeared earlier.
+    /// Resolve by global digest, so a reused local key keeps its replacement.
+    func finishDeletedObject(_ key:SyncObjectKey)throws {
+        try context();guard try journal.state(for:key).isDeleted else {throw OSwindError.invalid("Cache retirement requires its durable deletion barrier")}
+        if key.kind == .source,try database.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_evidence'")>0 {
+            try SyncOriginalEvidenceStore.validateForErasure(database)
+            let stage=try database.statement("INSERT OR IGNORE INTO erasure_assets SELECT j.value FROM personal_sync_evidence e,json_each(CAST(e.paths AS TEXT)) j WHERE e.object_digest=?");defer {sqlite3_finalize(stage)};database.bind(stage,1,key.digest);try database.done(stage)
+        }
+        let revoke=try database.statement("INSERT OR IGNORE INTO personal_sync_version_revoked VALUES(?)");defer {sqlite3_finalize(revoke)};database.bind(revoke,1,key.digest);try database.done(revoke)
+        for table in ["personal_sync_versions","personal_sync_version_recipes","personal_sync_version_sessions","personal_sync_version_runs"] {
+            let row=try database.statement("DELETE FROM "+table+" WHERE object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,key.digest);try database.done(row)
+        }
+    }
     private func owner(_ identity:SyncObjectIdentity)throws->(SyncLocalObject,Data) {
         let key=try identity.key,row=try database.statement("SELECT 1 FROM personal_sync_version_revoked WHERE object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,key.digest)
         guard sqlite3_step(row)==SQLITE_DONE,try !journal.state(for:key).isDeleted,let object=try catalog.object(identity),!object.deleted,let primary=object.primary else {throw OSwindError.invalid("Sync version owner was deleted or is not locally mapped")}

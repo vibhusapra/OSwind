@@ -30,7 +30,12 @@ extension SyncIncomingSourceTests {
             XCTAssertThrowsError(try b.historicalMemory(handle));XCTAssertNotNil(try b.get("independent"));XCTAssertTrue(FileManager.default.fileExists(atPath:b.root.appendingPathComponent("images/received.png").path));XCTAssertGreaterThan(try count(b,"erasure_assets"),0)
             XCTAssertEqual(try b.withRoutineDatabase {try $0.eraseCount("SELECT count(*) FROM personal_sync_versions WHERE instr(CAST(body AS TEXT),'OwnedOriginalCanary41')>0 OR instr(CAST(body AS TEXT),'OwnedNewerCanary42')>0")},0)
         }
-        let cleanup=b.retryErasureCleanup();XCTAssertEqual(cleanup.pendingMedia,0);XCTAssertFalse(FileManager.default.fileExists(atPath:b.root.appendingPathComponent("images/received.png").path));XCTAssertEqual(try bc.journal.outbox(),before)
+        let cleanup=b.retryErasureCleanup();XCTAssertEqual(cleanup.pendingMedia,0);XCTAssertFalse(FileManager.default.fileExists(atPath:b.root.appendingPathComponent("images/received.png").path));let after=try bc.journal.outbox();XCTAssertEqual(Array(after.prefix(before.count)),before)
+        let independent=try bc.catalog.localIdentity(.source,primary:[.text(Data("independent".utf8))]),independentKey=try independent.key
+        let children=Set(before.filter {[.source,.recapCitation,.turn,.conversationCitation,.evidencePin].contains($0.key.kind) && $0.key != independentKey}.map(\.key))
+        XCTAssertEqual(Set(after.dropFirst(before.count).map(\.key)),children)
+        XCTAssertTrue(after.dropFirst(before.count).allSatisfy {$0.mutation == .delete && $0.key != deletion.key})
+        XCTAssertFalse(try bc.journal.state(for:independentKey).isDeleted)
         let duplicate=try bc.journal.receive(deletion,contentAvailable:{_ in true}) {_ in XCTFail("Committed erasure ran again")};XCTAssertEqual(duplicate.applied,0)
     }
     func testIncomingSourceErasurePreservesSharedAssetUntilItsIndependentOwnerIsDeleted()throws {

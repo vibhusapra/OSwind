@@ -10,8 +10,12 @@ struct SyncIncomingMetadataDeletion {
     static let tables:Set<SyncCanonicalTable> = [.conversation,.turn,.conversationCitation,.routine,.routineRun,.evidencePin]
     static func accepts(_ kind:SyncObjectKind)->Bool {tables.contains {$0.kind==kind}}
     func apply(_ change:SyncJournalChange)throws {
-        guard change.after.isDeleted,Self.accepts(change.revision.key.kind) else {throw OSwindError.invalid("Use the corresponding typed metadata deletion adapter")}
-        try cache.catalog.deletePeerKey(change.revision.key,journal:cache.journal) {object in
+        guard change.after.isDeleted else {throw OSwindError.invalid("Use an admitted metadata deletion barrier")}
+        try applyKey(change.revision.key)
+    }
+    func applyKey(_ key:SyncObjectKey)throws {
+        guard try cache.journal.state(for:key).isDeleted,Self.accepts(key.kind) else {throw OSwindError.invalid("Use the corresponding typed metadata deletion adapter")}
+        try cache.catalog.deletePeerKey(key,journal:cache.journal) {object in
             // An unknown key only needs its durable journal barrier. There is
             // no native owner to erase and no peer body to download or trust.
             guard let object else {return}

@@ -5,10 +5,10 @@ import CSQLite
 /// wire citations, even when a current native projection differs. Owner keys
 /// are resolved by lifetime so retired mappings cannot erase replacement rows.
 enum SyncPeerSourceErasurePlan {
-    static func select(_ db:RoutineDatabase,object:String)throws {
+    static func select(_ db:RoutineDatabase,object:String)throws->[SyncObjectIdentity] {
         try SyncVersionStore.validateForErasure(db)
         let catalog=try SyncIdentityCatalog(database:db,scope:SyncChangeCapture.scope(db))
-        var versions=[String:Set<String>](),reverse=[String:Set<String>](),owners=[String:SyncObjectIdentity]()
+        var versions=[String:Set<String>](),reverse=[String:Set<String>](),owners=[String:SyncObjectIdentity](),identities=[String:SyncObjectIdentity]()
         for table in ["personal_sync_versions","historical_evidence"] {
             let row=try db.statement("SELECT object_digest,content_sha,body FROM \(table)");defer {sqlite3_finalize(row)}
             var code=sqlite3_step(row)
@@ -19,7 +19,7 @@ enum SyncPeerSourceErasurePlan {
                     guard sqlite3_column_type(row,2)==SQLITE_BLOB,size>0,size<=SyncProtocolLimits.contentBytes,let bytes=sqlite3_column_blob(row,2) else {throw OSwindError.database("Invalid source erasure evidence")}
                     let record=try SyncPortableRecord.decode(Data(bytes:bytes,count:size))
                     guard try record.identity.key.digest==digest,try record.reference.content.sha256==sha else {throw OSwindError.database("Source erasure evidence integrity differs")}
-                    let key=digest+sha;versions[digest,default:[]].insert(key)
+                    let key=digest+sha;versions[digest,default:[]].insert(key);identities[digest]=record.identity
                     for dependency in record.dependencies {
                         if let content=dependency.content {reverse[try dependency.identity.key.digest+content.sha256,default:[]].insert(key)}
                     }
@@ -63,5 +63,6 @@ enum SyncPeerSourceErasurePlan {
         for key in seen {
             try Task.checkCancellation();sqlite3_reset(insert);sqlite3_clear_bindings(insert);db.bind(insert,1,String(key.prefix(64)));db.bind(insert,2,String(key.suffix(64)));try db.done(insert)
         }
+        return Set(seen.map {String($0.prefix(64))}).sorted().compactMap {identities[$0]}
     }
 }

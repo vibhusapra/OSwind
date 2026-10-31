@@ -106,6 +106,7 @@ struct SyncIncomingSourceWriter {
                 let old=promotion.nodes.first {Data($0.before.id.utf8)==Data(local.utf8)}?.packet
                 let recapState=try recapBindings(memory,old:old,new:record)
                 try promotion.apply()
+                try SyncDerivedRetirement.enqueue(recapState.retire,db:db)
                 for identity in recapState.retire {
                     try cache.catalog.deletePeer(identity) {mapping in
                         guard let primary=mapping?.primary,primary.count==2,case .text(let owner)=primary[0],case .integer(let ordinal)=primary[1],owner==Data(local.utf8) else {throw OSwindError.invalid("Incoming obsolete recap binding differs")}
