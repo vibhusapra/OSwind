@@ -370,6 +370,29 @@ public final class MemoryStore: @unchecked Sendable {
         } catch { if Task.isCancelled { throw CancellationError() }; throw error }
         var result = input; result.materialized = true; return result
     }
+    /// Cheap indexed necessary conditions avoid ranking the whole FTS corpus
+    /// for a metadata scope that cannot contain a source. These are not cached
+    /// and do not replace the complete combined predicate before LIMIT.
+    private func searchMetadataCanMatch(_ filter:SearchFilter)throws->Bool {
+        var probes=[(String,[String])]()
+        if let app=filter.app,!app.isEmpty {probes.append(("SELECT 1 FROM memories WHERE app=? LIMIT 1",[app]))}
+        if let kind=filter.kind {probes.append(("SELECT 1 FROM memories WHERE kind=? LIMIT 1",[kind.rawValue]))}
+        if filter.favoritesOnly {probes.append(("SELECT 1 FROM memories WHERE favorite=1 LIMIT 1",[]))}
+        if let tag=filter.tag {probes.append(("SELECT 1 FROM memory_tags WHERE tag=? LIMIT 1",[tag]))}
+        if let entity=filter.entityID {probes.append(("SELECT 1 FROM entity_mentions WHERE entity_id=? LIMIT 1",[entity]))}
+        if let speaker=filter.speaker {probes.append(("SELECT 1 FROM audio_speakers WHERE label_key=? LIMIT 1",[SpeakerLabel.key(speaker)]))}
+        if filter.start != nil || filter.end != nil {
+            let time=SearchFilter(start:filter.start,end:filter.end,sourceStartsOnly:filter.sourceStartsOnly)
+            let (predicate,values)=conditions(time)
+            probes.append(("SELECT 1 FROM memories m WHERE "+predicate+" LIMIT 1",values))
+        }
+        for (sql,values) in probes {
+            let row=try prepare(sql);defer {sqlite3_finalize(row)}
+            for (index,value) in values.enumerated() {bind(row,Int32(index+1),value)}
+            let status=sqlite3_step(row);if status==SQLITE_DONE {return false};guard status==SQLITE_ROW else {throw failure()}
+        }
+        return true
+    }
     /// Inspect the actual source/vector tables inside the search snapshot. A
     /// caller's coverage hint may predate another connection's committed work.
     private func hasSearchVectors(_ model:String)throws->Bool {
@@ -412,6 +435,7 @@ public final class MemoryStore: @unchecked Sendable {
             try? exec("RELEASE search_snapshot")
         }
         sqlite3_progress_handler(db,1000,{_ in Task.isCancelled ? 1:0},nil)
+        guard try searchMetadataCanMatch(filter) else {try Task.checkCancellation();execution?(SearchExecution(strategy:"exact",warnings:[]));return []}
         var strategy = "exact", diagnostics = [String]()
         let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter,expression:queryPlan,rowLocalExpressions:true)
         let query = queryPlan.keywordFTS
