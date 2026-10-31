@@ -110,7 +110,7 @@ final class VisualIndexStoreTests:XCTestCase {
         try image();try store.close();store=nil
         var db:OpaquePointer?;XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
         XCTAssertEqual(sqlite3_exec(db,"DROP TABLE visual_vectors; DROP TABLE visual_manifests; DROP TABLE visual_sources; PRAGMA user_version=18",nil,nil,nil),SQLITE_OK);sqlite3_close(db)
-        store=try MemoryStore(root:root);XCTAssertEqual(MemoryStore.schemaVersion,25)
+        store=try MemoryStore(root:root);XCTAssertEqual(MemoryStore.schemaVersion,26)
         let coverage=try store.visualCoverage(modelID:model);XCTAssertEqual(coverage.sources,1);XCTAssertEqual(coverage.indexedSources,0)
     }
     func testBackupRestoreRemapsMediaAndPreservesVerifiedVisualVectors() throws {

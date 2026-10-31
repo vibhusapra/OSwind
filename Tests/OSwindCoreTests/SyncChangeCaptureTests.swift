@@ -16,7 +16,7 @@ final class SyncChangeCaptureTests:XCTestCase {
     func scalar(_ sql:String)throws->Int64 {try store.withRoutineDatabase {db in let s=try db.statement(sql);defer {sqlite3_finalize(s)};guard sqlite3_step(s)==SQLITE_ROW else {throw db.error()};return sqlite3_column_int64(s,0)}}
     func testDisabledByDefaultAndSchemaFence()throws {
         try store.insert(Memory(id:"owned",text:"no implicit enrollment"));XCTAssertEqual(try scalar("SELECT COUNT(*) FROM personal_sync_changes"),0)
-        XCTAssertEqual(try scalar("PRAGMA user_version"),25);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
+        XCTAssertEqual(try scalar("PRAGMA user_version"),26);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
     }
     func testOrdinaryMutationsRetainCurrentExactSnapshotsAndPurgeSupersededBodies()throws {
         let scope=try activate(),original=Memory(id:"owned",timestamp:Date(timeIntervalSince1970:Double.pi),text:"original")
@@ -91,8 +91,8 @@ final class SyncChangeCaptureTests:XCTestCase {
         try store.withRoutineDatabase {db in try db.transaction {try db.execute("""
         INSERT INTO chat_sessions VALUES('session','authored title',1,1);
         INSERT INTO chat_turns VALUES('turn','session',1,x'7b7d');
-        INSERT INTO chat_sources VALUES('turn','source',0,1,'fixture',NULL,NULL);
-        INSERT INTO recap_sources VALUES('summary','source',0,'fixture-revision',1,'fixture',NULL,NULL);
+        INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match,passage_start,passage_length) VALUES('turn','source',0,1,'fixture',NULL,NULL);
+        INSERT INTO recap_sources(recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length) VALUES('summary','source',0,'fixture-revision',1,'fixture',NULL,NULL);
         INSERT INTO routines VALUES('routine',1,0,1,x'7b7d');
         INSERT INTO routine_runs VALUES('run','routine',1,1,1,2,'manual','completed','session',NULL,x'7b7d');
         INSERT INTO memory_entities VALUES('entity','project','Authored entity','',1,1),('next-entity','project','Other entity','',1,1);
@@ -208,7 +208,7 @@ final class SyncChangeCaptureTests:XCTestCase {
         let scope=try activate();try store.insert(Memory(id:"owned",text:"current authored source"))
         let archive=root.appendingPathComponent("../capture-backup-"+UUID().uuidString+".oswindbackup"),restored=root.appendingPathComponent("../capture-restored-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:archive);try? FileManager.default.removeItem(at:restored)}
-        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,25)
+        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,26)
         _=try LibraryBackup.restore(archive,to:restored)
         let copy=try MemoryStore(root:restored);defer {try? copy.close()}
         XCTAssertEqual(try copy.get("owned")?.text,"current authored source")

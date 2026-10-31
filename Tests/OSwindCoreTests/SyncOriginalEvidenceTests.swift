@@ -29,7 +29,7 @@ final class SyncOriginalEvidenceTests:XCTestCase {
     }
     func testOrdinaryOpeningDoesNotInstallOriginalEvidenceOrChangeSchema()throws {
         try store.withRoutineDatabase {db in let s=try db.statement("SELECT COUNT(*) FROM sqlite_master WHERE name LIKE 'personal_sync_evidence%'");defer {sqlite3_finalize(s)};XCTAssertEqual(sqlite3_step(s),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(s,0),0)}
-        XCTAssertEqual(MemoryStore.schemaVersion,25)
+        XCTAssertEqual(MemoryStore.schemaVersion,26)
     }
     func testOriginalVersionDoesNotRetargetNewerHeadOrCreateCanonicalRowsOrJournalEcho()throws {
         try seed();try install();let old=try record(),one=try retain(old),original=try prepare(one)

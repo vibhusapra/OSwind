@@ -17,7 +17,7 @@ let package = Package(
         .target(name: "OSwindCore", dependencies: ["CSQLite","OSwindTokenizers","CPIIRuntime",.product(name:"USearch",package:"USearch"),.product(name:"FluidAudio",package:"FluidAudio"),.product(name:"Hub",package:"swift-transformers")], linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("NaturalLanguage"), .linkedFramework("Metal"), .linkedFramework("MetalPerformanceShaders")]),
         .executableTarget(name: "OSwind", dependencies: ["OSwindCore"]),
         .executableTarget(name: "OSwindCLI", dependencies: ["OSwindCore"]),
-        .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore","OSwindTokenizers",.product(name:"FluidAudio",package:"FluidAudio")],resources:[.copy("Fixtures/NativeANN")]),
+        .testTarget(name: "OSwindCoreTests", dependencies: ["OSwindCore","OSwindTokenizers",.product(name:"FluidAudio",package:"FluidAudio")],resources:[.copy("Fixtures/NativeANN"),.copy("Fixtures/HistoricalCitationMigration")]),
         .testTarget(name: "OSwindAppTests", dependencies: ["OSwind", "OSwindCore"])
     ], swiftLanguageModes: [.v5],cxxLanguageStandard:.cxx17
 )

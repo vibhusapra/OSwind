@@ -54,7 +54,8 @@ struct SyncOutgoingProcessor {
         var prepared=[String:SyncPortableRecord](),visiting=Set<String>(),objects=0,bytes=0
         var db:RoutineDatabase {processor.database}
         var cache:SyncVersionStore {processor.cache}
-        init(processor:SyncOutgoingProcessor) {self.processor=processor}
+        let historical:HistoricalEvidenceStore
+        init(processor:SyncOutgoingProcessor) {self.processor=processor;historical=HistoricalEvidenceStore(database:processor.database)}
         func current(_ identity:SyncObjectIdentity)throws->SyncRowSnapshot {
             guard let object=try processor.queue.catalog.object(identity),!object.deleted,let primary=object.primary else {throw OSwindError.invalid("Outgoing dependency has no live local lifetime")}
             let schema=identity.table.schema,row=try db.statement("SELECT "+schema.snapshot("t")+" FROM "+identity.table.rawValue+" t WHERE "+schema.primary.map {"t.\($0) IS ?"}.joined(separator:" AND "));defer {sqlite3_finalize(row)}
@@ -73,7 +74,8 @@ struct SyncOutgoingProcessor {
             // registerExisting verifies that invariant on every dependency.
             try processor.queue.catalog.registerExisting(table,primary:primary)
         }
-        var references:SyncPortableReferences {.init(identity:{try self.identity($0,$1)},source:{id,revision in
+        var references:SyncPortableReferences {
+            let base=SyncPortableReferences(identity:{try self.identity($0,$1)},source:{id,revision in
             let identity=try self.identity(.source,[.text(Data(id.utf8))]);_=try self.prepare(identity)
             return try self.cache.sourceVersion(localID:id,revision:revision,admit:self.processor.admitVersion)
         },media:processor.media,recipe:{id,ordinal in
@@ -86,7 +88,11 @@ struct SyncOutgoingProcessor {
         },runRecipe:{run,recipe,ordinal in
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
-        })}
+        })
+            return historical.decorating(base,admit:processor.admitVersion,verify:{value in
+                guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
+            })
+        }
         @discardableResult func prepare(_ identity:SyncObjectIdentity)throws->SyncPortableRecord {
             try Task.checkCancellation();let digest=try identity.key.digest
             if let value=prepared[digest] {return value}

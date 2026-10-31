@@ -1,0 +1,28 @@
+{
+  "format": "OSwind authored actual schema25 citation migration fixtures",
+  "version": 1,
+  "productSourceCommit": "e96bf4a8f0d670747ef0da8c62a549718146ad5e",
+  "generation": "Actual two-library XCTest execution with unchanged e96bf4a product sources and retained development-v3 SyncHistoricalCitationTests. SQLite files were closed normally, then copied byte-for-byte. No normal desktop history, provider credentials, transport keys or enrollment secrets.",
+  "producer": "Actual automatic outgoing source/conversation/turn/citation/evidence-pin graph with exact current-row version bindings.",
+  "receiver": "Deliberately incomplete pre-fix canonical-only incoming fixture: current text is newer while cached exact original remains. This is a regression fixture, not an exposed incoming service.",
+  "files": [
+    {
+      "file": "producer-schema25.sqlite",
+      "sha256": "166e2b8380f5b7091c60c8e48d32177d485489a795a3f032de2fdf59fa079527",
+      "bytes": 724992,
+      "sourceText": "Original Alice owns Orion.",
+      "sourceRows": 1,
+      "chatTurns": 1,
+      "typedPackets": 5
+    },
+    {
+      "file": "receiver-schema25.sqlite",
+      "sha256": "d65063d0f2934dbee488b21e83464d89b2c9316e31d3a5a4c919f655ea39b7a1",
+      "bytes": 741376,
+      "sourceText": "Receiver current text",
+      "sourceRows": 1,
+      "chatTurns": 1,
+      "typedPackets": 6
+    }
+  ]
+}
