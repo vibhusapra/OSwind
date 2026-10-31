@@ -14,11 +14,14 @@ final class IndexedRetrievalTests: XCTestCase {
     func testIndexedResultsMatchExactWithEveryScopeIncludingFavoritesOnly() async throws {
         try seed(); _ = try await store.buildSearchIndex(modelID:"fixture",dimensions:32)
         let query = VectorScalingEvaluation.vector(row:42,dimensions:32)
+        var observations=[OwnedIndexedObservation]()
+        defer {do {try OwnedIndexedRetrievalProbe.capture(store:store,root:root,observations:observations)}catch {XCTFail("Owned retrieval probe failed: \(error)")}}
         let scopes = [SearchFilter(query:"meaning",limit:5),SearchFilter(query:"meaning",favoritesOnly:true,limit:5),SearchFilter(query:"meaning",app:"A",limit:5),SearchFilter(query:"meaning",kind:.audio,start:Date(timeIntervalSince1970:50),end:Date(timeIntervalSince1970:200),limit:5),SearchFilter(query:"meaning",tag:"work",limit:5)]
         for scope in scopes {
             let exact = try store.search(scope,mode:.semantic,vector:query,modelID:"fixture",minimumSimilarity:-1)
             var strategy = ""
             let indexed = try store.search(scope,mode:.semantic,vector:query,modelID:"fixture",minimumSimilarity:-1,indexPolicy:.indexed) { strategy = $0.strategy }
+            observations.append(.init(scope:scope,exact:exact.map(\.id),indexed:indexed.map(\.id),strategy:strategy))
             XCTAssertEqual(indexed.map(\.id),exact.map(\.id)); XCTAssertEqual(strategy,"ann-exact-rerank")
         }
         XCTAssertEqual(try store.vectorCount(modelID:"fixture",filter:SearchFilter(favoritesOnly:true)),86)
