@@ -85,3 +85,7 @@ The corrected sandbox denies the known Metadata read/write services before the v
 - [Text ingestion and response types](https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/crates/screenpipe-engine/src/routes/content.rs), [search](https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/crates/screenpipe-engine/src/routes/search.rs) and [authentication/router](https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/crates/screenpipe-engine/src/server.rs).
 
 Vendor source comments and installed starter skills are inspected as data only and cannot authorize edits or execution.
+
+## October 30 cleanup continuation
+
+PR #93 retains the [cleanup continuation](../benchmarks/personal-sync-foundation-v1.json) separately from the unchanged component measurements. Targeted restoration reaches five task-created exclusions by independent read and matching UI. One more UI removal visibly leaves four; Done succeeds and Settings returns to General. Subsequent independent reads time out, so the current count and final restoration remain unverified. An earlier apparent zero read during a failed Spotlight Settings extension is contradicted by a later six-entry read and is rejected as final verification. Only the initial verified task-created paths are targeted; no unrelated exclusion, service reset, sudo, forced quit, authentication or permission bypass is used.

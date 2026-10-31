@@ -28,9 +28,24 @@ The internal SQLite journal now commits its metadata, outbox/cursors and a typed
 
 The encrypted folder transport stores only keyed opaque names and bounded authenticated objects. Content is chunked; immutable operations publish only after complete content is present. Staging files are flushed before an exclusive atomic link publishes the final name, so a failed or racing writer cannot overwrite another operation. Wrong keys/epochs, corruption, symlinks and root replacement refuse. The transport supports explicit close and starts no listener or watcher. Actual cloud/file-provider semantics and two-Mac behavior remain unqualified; encrypted storage still reveals object counts, lengths and timing.
 
-Forty-six passing focused development cases pass. The integration fixture uses two separate owned MemoryStores on one Mac and a local encrypted folder: notes flow both ways, keyword search sees the reviewed conflict resolution, and an offline edit/old packet cannot resurrect a deleted note. This fixture uses explicit note-only callbacks; it does not prove complete library synchronization, media erasure, semantic reindexing or current-policy egress protection. A seeded causal test covers 24 authored histories with 120 revisions each, four delivery permutations per history plus duplicate deliveries. Concurrent filesystem publishers and two SQLite connections are exercised too. Two intermediate test compilation failures (seeded fixture and new crash fixture) are retained. Two parent tests kill only their owned subprocess, before and after commit, and independently reopen the library to verify source/register/outbox/cursor rollback or persistence. The worker entry point skips outside that subprocess: 47 defined cases, 46 passes and one explicit worker skip. This tests process death, not physical power failure.
+Forty-six focused development cases pass. The integration fixture uses two separate owned MemoryStores on one Mac and a local encrypted folder: notes flow both ways, keyword search sees the reviewed conflict resolution, and an offline edit/old packet cannot resurrect a deleted note. This fixture uses explicit note-only callbacks; it does not prove complete library synchronization, media erasure, semantic reindexing or current-policy egress protection. A seeded causal test covers 24 authored histories with 120 revisions each, four delivery permutations per history plus duplicate deliveries. Concurrent filesystem publishers and two SQLite connections are exercised too. Two intermediate test compilation failures (seeded fixture and new crash fixture) are retained. Two parent tests kill only their owned subprocess, before and after commit, and independently reopen the library to verify source/register/outbox/cursor rollback or persistence. The worker entry point skips outside that subprocess: 47 defined cases, 46 passes and one explicit worker skip. This tests process death, not physical power failure.
 
-The first frozen broad run at fcf5d3f passes 1,351 full tests with two skips. Its sanitizer stage passes 163, skips the worker entry point and fails both crash-parent tests because the minimal child launcher omits early sanitizer loading. The child log identifies the runtime-interceptor startup error before either crash gate; no ThreadSanitizer race warning is emitted. The launcher now starts the existing xctest host directly and preloads only the sanitizer runtime already loaded by that host. Both crash-parent tests pass under TSan in development, with the worker-only skip. The original partial run is retained; complete qualification of the corrected source follows.
+The first frozen broad run at fcf5d3f passes 1,351 full tests with two skips. Its sanitizer stage passes 163, skips the worker entry point and fails both crash-parent tests because the minimal child launcher omits early sanitizer loading. The child log identifies the runtime-interceptor startup error before either crash gate; no ThreadSanitizer race warning is emitted. The launcher now starts the existing xctest host directly and preloads only the sanitizer runtime already loaded by that host. Both crash-parent tests pass under TSan in development, with the worker-only skip. The original partial run is retained; corrected-source qualification is recorded below.
+
+## Corrected frozen qualification
+
+[Source 57c1926 receipt](../benchmarks/personal-sync-foundation-v1.json), PR #93, retains all nine passing stages over 631 unchanged inputs:
+
+| Check | Result |
+| --- | --- |
+| Full suite | 1,353 defined; 1,351 pass; two skips; zero failures |
+| Thread Sanitizer selection | 166 defined; 165 pass; worker-only skip; zero failures/race warnings |
+| Optimized selection | 166 defined; 165 pass; worker-only skip; zero failures |
+| New sync cases in each build | 47 defined; 46 pass; worker-only skip |
+| Staged package and processes | Strict signatures, exact extracted ZIP/tree/payload equality, normal and indexed HTTP/MCP, offline SDK and original-source privacy checks pass |
+| Independent review | All frozen/log/trace hashes match; all 11 traced native images are absent; installed 15-file app is unchanged |
+
+The two full-suite skips are the explicit opt-in system-audio fixture and subprocess worker. Process-death parents execute in all three builds; no crash gate is skipped under TSan. The original partial run and both intermediate compilation failures remain retained. Exact-source CI benchmark checks pass; its native job is still running at publication review. This qualification covers the internal foundation and inherited regressions, not the complete sync feature or distribution acceptance.
 
 - [x] Bounded causal registers, conflict retention, deletion barriers and canonical byte identities.
 - [x] CryptoKit envelopes, context-separated keys/addresses, tamper/size controls and redacted key descriptions.
@@ -41,7 +56,8 @@ The first frozen broad run at fcf5d3f passes 1,351 full tests with two skips. It
 - [ ] Scoped erasure, whole-library wipe/epoch barriers, deletion announcements, acknowledgement-based compaction and encrypted-cache retention.
 - [ ] Trusted initial bootstrap, Keychain enrollment/recovery, membership/revocation and rollback checkpoints.
 - [ ] Native/CLI workflows, scheduler/lifecycle cancellation, background status and conflict review.
-- [ ] Full/TSan/optimized qualification, scale/performance, real providers and actual two-Mac acceptance.
+- [x] Frozen full/TSan/optimized, owned process-crash, staged package/process qualification.
+- [ ] Sync scale/performance, real providers and actual two-Mac acceptance.
 
 F059 remains TODO. No public Sync control, cloud transfer, device enrollment, watcher or automatic library-schema upgrade is enabled by these internal components. The complete feature remains the delivery target.
 

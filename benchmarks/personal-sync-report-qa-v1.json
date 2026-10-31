@@ -1,0 +1,67 @@
+{
+  "format": "OSwind comparison browser QA",
+  "state": "completed",
+  "browserVersion": "156.0.8078.4",
+  "frozen": {
+    "docs/landscape.html": "47bb89f3c850c8d8fd6ddb35f4892c2a16db4f114e19dafd3a4cb4df486d8260",
+    "docs/landscape.json": "1454572e294854876751c680f1b110c29f592084627e36b1166562e97e6763ad",
+    "docs/features.json": "d5e0191fed6d394972deea4d8c392d9ccf74cd92a81b629891e121f1c0baf184",
+    "scripts/research-report.py": "9cf757872e2f7ca81bf0ae44877372e02fc7a376819f43b0cf6476efd9eebf23",
+    "benchmarks/screenpipe-keyword-http-v1.json": "da5df9be7955a0c20ed5ed84c380c9da11cc091b0f7b526d6535a74d74749d4f",
+    "benchmarks/vault-collector-trace-v1.json": "f7b23be65d51fb5ff9b4077f183a83178cc0c04ae7ce1fdd4a6e52e830e31803",
+    "benchmarks/personal-sync-foundation-v1.json": "724e5860ee20ecd19dc8f298189bbb5754ac980c522f25512cc78db96b27be54",
+    ".artifacts/personal-sync-v1/qa-landscape-v2.cjs": "2d42cf6fdd141841f8d764e10b5d56393302f37742a9e3746e501ab148d2dccb"
+  },
+  "scope": "Own file:// artifact in an isolated headless browser. Clipboard adapter stubbed; no user clipboard, authenticated page, network request, native app/TCC or competitor runtime. Final comparison JSON preserves the repository ASCII escaping style; parsed/rendered content is unchanged from the initial visual review.",
+  "screenshots": [
+    {
+      "path": "desktop-top.png",
+      "sha256": "43cd584c4a851e77a6cfa050c391953ef0db75b9384556a8425a030bacf2f7b7"
+    },
+    {
+      "path": "desktop-new-profiles.png",
+      "sha256": "9c504fc22357c63171e16b182b6249ed231cd36cec89d3defe3602e65963c3e0"
+    },
+    {
+      "path": "desktop-component-benchmark.png",
+      "sha256": "19e5f151de2d2f7394dfc49a027e5d701e681490acee44e4f269afd5d03ad1e2"
+    },
+    {
+      "path": "mobile-top.png",
+      "sha256": "2fa76a4bfdcac4da1cbfb0026cfb9568a6a1d1768739be1aa3e0f5aec16f9af5"
+    },
+    {
+      "path": "mobile-goldfish.png",
+      "sha256": "88ca28217e5f0eda2e26ddfb64c8f69971fb5ffaefb6f963f7fbad2267caced2"
+    },
+    {
+      "path": "mobile-ledger.png",
+      "sha256": "4769cf95953e9e655cf8383e839aa911d57e6584250239309d741b870e17ccdb"
+    }
+  ],
+  "vendors": 20,
+  "requirements": 78,
+  "viewportSizes": {
+    "viewport": 390,
+    "document": 390,
+    "tableViewport": 356,
+    "tableContent": 850
+  },
+  "filterAndIntersectionPass": true,
+  "benchmarkCellsMatchReceipt": true,
+  "copyThreeMultilineTODOs": true,
+  "copyLabelResets": true,
+  "outsideScopeExcludedFromCopy": true,
+  "withoutJavaScriptUsable": true,
+  "networkRequests": 0,
+  "pageErrors": [],
+  "visualReview": {
+    "desktopAndMobileReviewed": true,
+    "method": "Viewed desktop-top and mobile-ledger images from v1; both are byte-identical to final v2 images.",
+    "reviewedScreenshots": [
+      "desktop-top.png",
+      "mobile-ledger.png"
+    ]
+  },
+  "driverSource": "const fs=require('fs'),path=require('path'),crypto=require('crypto');\nconst {chromium}=require('/Users/vibhusapra/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');\n(async()=>{\n const root=process.cwd(),base=path.join(root,'.artifacts/personal-sync-v1/landscape-qa-v2');fs.mkdirSync(base,{mode:0o700});\n const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');\n const files=['docs/landscape.html','docs/landscape.json','docs/features.json','scripts/research-report.py','benchmarks/screenpipe-keyword-http-v1.json','benchmarks/vault-collector-trace-v1.json','benchmarks/personal-sync-foundation-v1.json','.artifacts/personal-sync-v1/qa-landscape-v2.cjs'];const frozen=Object.fromEntries(files.map(f=>[f,sha(f)]));\n const browser=await chromium.launch({headless:true,executablePath:'/Users/vibhusapra/Library/Caches/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-mac-arm64/chrome-headless-shell'});\n const context=await browser.newContext({viewport:{width:1440,height:960}});\n await context.addInitScript(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.__ownedCopiedText=text}}})});\n const page=await context.newPage(),requests=[],errors=[];page.on('request',r=>requests.push(r.url()));page.on('pageerror',e=>errors.push(String(e)));\n const report={format:'OSwind comparison browser QA',state:'running',browserVersion:browser.version(),frozen,scope:'Own file:// artifact in an isolated headless browser. Clipboard adapter stubbed; no user clipboard, authenticated page, network request, native app/TCC or competitor runtime.',screenshots:[]};\n try {\n  await page.goto('file://'+path.join(root,'docs/landscape.html'));\n  if(await page.locator('article.vendor').count()!==20||await page.locator('#rows tr').count()!==78)throw Error('Catalog count');\n  await page.screenshot({path:path.join(base,'desktop-top.png')});report.screenshots.push('desktop-top.png');\n  await page.locator('article.vendor').nth(16).scrollIntoViewIfNeeded();await page.screenshot({path:path.join(base,'desktop-new-profiles.png')});report.screenshots.push('desktop-new-profiles.png');\n  const bench=JSON.parse(fs.readFileSync(path.join(root,'benchmarks/screenpipe-keyword-http-v1.json'),'utf8'));const actual=await page.locator('#screenpipe-http tbody tr').allTextContents();const expected=bench.runs.flatMap(r=>['screenpipe','oswind'].map(k=>r.records.toLocaleString('en-US')+(k==='screenpipe'?'Screenpipe 0.4.53':'OSwind a5d4af4')+r.summary[k].medianMS.toFixed(3)+' ms'+r.summary[k].p95MS.toFixed(3)+' ms'+r.summary[k].exactSets+'/'+r.summary[k].observations));if(JSON.stringify(actual)!==JSON.stringify(expected))throw Error('Measured benchmark cells differ from receipt');await page.locator('#screenpipe-http').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(base,'desktop-component-benchmark.png')});report.screenshots.push('desktop-component-benchmark.png');await page.locator('#filter').fill('Real competitor benchmarks');if(await page.locator('#rows tr:visible td').first().textContent()!=='F071'||await page.locator('#rows tr:visible').getAttribute('data-status')!=='partial')throw Error('F071 status');await page.locator('#filter').fill('Encrypted vault / biometric unlock');if(await page.locator('#rows tr:visible td').first().textContent()!=='F048'||!(await page.locator('#rows tr:visible').textContent()).includes('cf174b3'))throw Error('Collector evidence missing');await page.locator('#filter').fill('Personal device sync');if(await page.locator('#rows tr:visible td').first().textContent()!=='F059'||await page.locator('#rows tr:visible').getAttribute('data-status')!=='todo'||!(await page.locator('#rows tr:visible').textContent()).includes('46'))throw Error('Sync TODO/evidence boundary');await page.locator('#filter').fill('Sampled text observation spans');if(await page.locator('#rows tr:visible').count()!==1||await page.locator('#rows tr:visible td').first().textContent()!=='F078')throw Error('Span filter');\n  await page.locator('#filter').fill('Standalone Accessibility-only');if(await page.locator('#rows tr:visible').count()!==1)throw Error('AX filter');\n  if(await page.locator('#rows tr:visible td').first().textContent()!=='F077')throw Error('AX ID');\n  await page.locator('#status').selectOption('todo');if(await page.locator('#rows tr:visible').count()!==0)throw Error('Intersection filter');\n  await page.locator('#filter').fill('');if(await page.locator('#rows tr:visible').count()!==3)throw Error('TODO count');\n  await page.locator('#copy').click();const copied=await page.evaluate(()=>window.__ownedCopiedText);\n  if(copied.split('\\n').length!==3||!copied.startsWith('- [ ] F013')||copied.includes('F071'))throw Error('Multiline copied TODOs');\n  await page.locator('#status').selectOption('');if(await page.locator('#copy').textContent()!=='Copy visible TODOs as Markdown')throw Error('Stale copy label');\n  await page.locator('#status').selectOption('out of v0 desktop scope');await page.locator('#copy').click();if(await page.evaluate(()=>window.__ownedCopiedText)!=='')throw Error('Outside-scope tasks copied');\n  await page.locator('#status').selectOption('');\n  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:path.join(base,'mobile-top.png')});report.screenshots.push('mobile-top.png');\n  await page.locator('article.vendor').nth(19).scrollIntoViewIfNeeded();await page.screenshot({path:path.join(base,'mobile-goldfish.png')});report.screenshots.push('mobile-goldfish.png');\n  await page.locator('#filter').fill('Accessibility-only');await page.locator('#filter').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(base,'mobile-ledger.png')});report.screenshots.push('mobile-ledger.png');\n  const sizes=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth,tableViewport:document.querySelector('#parity .table-wrap').clientWidth,tableContent:document.querySelector('#parity .table-wrap').scrollWidth}));\n  if(sizes.document>sizes.viewport||sizes.tableContent<=sizes.tableViewport)throw Error('Narrow overflow containment');\n  if(errors.length||requests.some(u=>!u.startsWith('file:')))throw Error('JS error or network asset');\n  const noJS=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),plain=await noJS.newPage();await plain.goto('file://'+path.join(root,'docs/landscape.html'));if(await plain.locator('article.vendor').count()!==20||await plain.locator('#rows tr:visible').count()!==78)throw Error('No-JS content');await noJS.close();\n  if(files.some(f=>sha(f)!==frozen[f]))throw Error('QA inputs changed');\n  Object.assign(report,{state:'completed',vendors:20,requirements:78,viewportSizes:sizes,filterAndIntersectionPass:true,benchmarkCellsMatchReceipt:true,copyThreeMultilineTODOs:true,copyLabelResets:true,outsideScopeExcludedFromCopy:true,withoutJavaScriptUsable:true,networkRequests:0,pageErrors:errors});\n } catch(error){report.state='failed';report.error=String(error);throw error}\n finally{report.screenshots=report.screenshots.map(f=>({path:f,sha256:sha(path.join(base,f))}));fs.writeFileSync(path.join(base,'report.json'),JSON.stringify(report,null,2)+'\\n');await browser.close()}\n console.log(JSON.stringify({state:report.state,vendors:report.vendors,requirements:report.requirements,viewportSizes:report.viewportSizes},null,2));\n})().catch(e=>{console.error(e);process.exitCode=1});\n"
+}
