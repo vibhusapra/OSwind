@@ -9,6 +9,7 @@ struct SyncPortableReferences {
     let media:(Memory)throws->[SyncMediaManifest]
     let recipe:(String,Int64)throws->SyncRoutineRevision
     let session:(Memory)throws->SyncSessionToken?
+    var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
 }
 /// Converts the actual captured canonical row schema, not raw SQL supplied by a
 /// peer. Reference/media preparation and the writer's current-row/privacy checks
@@ -66,8 +67,9 @@ struct SyncPortableExporter {
             let value=try decode("payload",RoutineDefinition.self)
             guard try integer("revision")>0,Data(value.id.utf8)==Data(try text("id").utf8) else {throw OSwindError.invalid("Portable sync recipe columns differ")};body = .routine(try .init(value))
         case .routineRun:
-            let id=try text("routine_id"),ordinal=try integer("revision"),recipe=try references.recipe(id,ordinal),parent=try object("routine_id",.routine)
-            guard recipe.routine==parent,recipe.ordinal==ordinal,let trigger=RoutineTrigger(rawValue:try text("trigger")),let status=RoutineRunStatus(rawValue:try text("status")) else {throw OSwindError.invalid("Portable sync run metadata differs")}
+            let id=try text("routine_id"),ordinal=try integer("revision"),runID=try text("id")
+            let original=try references.runRecipe?(runID,id,ordinal),recipe=try original ?? references.recipe(id,ordinal),parent=try object("routine_id",.routine)
+            guard recipe.routine==parent,(original != nil || recipe.ordinal==ordinal),let trigger=RoutineTrigger(rawValue:try text("trigger")),let status=RoutineRunStatus(rawValue:try text("status")) else {throw OSwindError.invalid("Portable sync run metadata differs")}
             let chat=try optionalText("chat_id").map {try references.identity(.conversation,[.text(Data($0.utf8))])}
             body = try .routineRun(.init(recipe:recipe,scheduledAt:date("scheduled_at"),started:date("started"),finished:optionalDate("finished"),trigger:trigger,status:status,conversation:chat,message:optionalText("message"),filter:filter(decode("scope",SearchFilter.self))))
         case .entity:

@@ -1,0 +1,384 @@
+[
+  {
+    "batches" : [
+      {
+        "objects" : 128,
+        "seconds" : 0.92235195846296847
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.96050754166208208
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94716016668826342
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.96440537483431399
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.95263287494890392
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.95419329172000289
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.95609804149717093
+      },
+      {
+        "objects" : 104,
+        "seconds" : 0.77061629155650735
+      }
+    ],
+    "batchLimit" : 128,
+    "count" : 1000,
+    "loadSeconds" : 0.01817599986679852,
+    "metadata" : {
+      "outbox" : 1000,
+      "projections" : 1000,
+      "usedBytes" : 515893,
+      "versions" : 1000
+    },
+    "prepareSeconds" : 7.4279882500413805,
+    "scope" : "One warm authored text-source run; timer includes bounded identity bootstrap, actual canonical row read, typed export, journal and version\/projection transactions. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence.",
+    "setupSeconds" : 0.0041930833831429482,
+    "sourceOriginalSHA256" : "e8adfe11ff08516295aba2103c3c56c0f3b58f7e35fac101019f9a6a00bf8d7b"
+  },
+  {
+    "batches" : [
+      {
+        "objects" : 128,
+        "seconds" : 0.93200154160149395
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94257079181261361
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87007600022479892
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87208512495271862
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85848004161380231
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87108641676604748
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85802462487481534
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86098133330233395
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85635133320465684
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86242020828649402
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.858409124892205
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85770629183389246
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85627975012175739
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85577354161068797
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85868291673250496
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87791700009256601
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86566962511278689
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86569537501782179
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94400441669858992
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86390945850871503
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87018575007095933
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86982791661284864
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86650658352300525
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.88111820840276778
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85972816660068929
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87153008324094117
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86208870843984187
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94178341655060649
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85935637494549155
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86685991659760475
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.85926579171791673
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86445779167115688
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86122429161332548
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.88059920817613602
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.8833149999845773
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87126874993555248
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86483862507157028
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87247966672293842
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86101329163648188
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87042362499050796
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86160995834507048
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87346158339641988
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.8671256247907877
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87399145844392478
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86958708334714174
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87793508335016668
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87372454185970128
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87098583322949708
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86006520828232169
+      },
+      {
+        "objects" : 128,
+        "seconds" : 1.1000449585262686
+      },
+      {
+        "objects" : 128,
+        "seconds" : 1.0211609583348036
+      },
+      {
+        "objects" : 128,
+        "seconds" : 1.0809589582495391
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94393141660839319
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.90967220836319029
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.88102362514473498
+      },
+      {
+        "objects" : 128,
+        "seconds" : 1.0186754583846778
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.94721925002522767
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.93677662499248981
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.8930809167213738
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.92507087509147823
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.8610839166212827
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.88247362500987947
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86811137502081692
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87325216666795313
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86311641661450267
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87704716669395566
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86593079171143472
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.89150654175318778
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.92024129163473845
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.91793787479400635
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87242554174736142
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.88123158318921924
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.91513545834459364
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87738483329303563
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86410512495785952
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.87856924999505281
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86267908313311636
+      },
+      {
+        "objects" : 128,
+        "seconds" : 0.86593616660684347
+      },
+      {
+        "objects" : 16,
+        "seconds" : 0.10908312490209937
+      }
+    ],
+    "batchLimit" : 128,
+    "count" : 10000,
+    "loadSeconds" : 0.063942375127226114,
+    "metadata" : {
+      "outbox" : 10000,
+      "projections" : 10000,
+      "usedBytes" : 5168894,
+      "versions" : 10000
+    },
+    "prepareSeconds" : 69.359536875039339,
+    "scope" : "One warm authored text-source run; timer includes bounded identity bootstrap, actual canonical row read, typed export, journal and version\/projection transactions. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence.",
+    "setupSeconds" : 0.0054316665045917034,
+    "sourceOriginalSHA256" : "bda6146376f2c7e9cc53a945f5ec0bb1fe40acca27967adc4d640ff825a7dbbb"
+  }
+]
