@@ -7,7 +7,7 @@ import CSQLite
 enum SyncDerivedRetirement {
     static let queue="oswind_peer_retirements"
     static let state="oswind_peer_retirement_state"
-    private static var schemas:[String:String] {
+    private static let schemas:[String:String] = {
         var schemas=[queue:"CREATE TABLE \(queue)(object_digest TEXT PRIMARY KEY,table_name TEXT NOT NULL) WITHOUT ROWID",state:"CREATE TABLE \(state)(singleton INTEGER PRIMARY KEY CHECK(singleton=1),active INTEGER NOT NULL CHECK(active IN(0,1)))"]
         for table in SyncCanonicalTable.allCases {
             let name="oswind_peer_retirement_"+table.rawValue
@@ -22,7 +22,7 @@ enum SyncDerivedRetirement {
             END
             """
         };return schemas
-    }
+    }()
     private static func prepare(_ db:RoutineDatabase)throws {
         let row=try db.statement("SELECT name,sql FROM sqlite_temp_master WHERE name='\(queue)' OR name GLOB 'oswind_peer_retirement_*'")
         var found=[String:String](),code=sqlite3_step(row)
@@ -59,7 +59,7 @@ enum SyncDerivedRetirement {
         do {
             try db.execute("UPDATE temp.\(state) SET active=1 WHERE singleton=1")
             try body()
-            try cache.journal.observeAppliedRoot(root)
+            var observedRoot=false
             while true {
                 try Task.checkCancellation()
                 let row=try db.statement("SELECT object_digest,table_name FROM temp.\(queue) ORDER BY object_digest LIMIT 1")
@@ -77,7 +77,12 @@ enum SyncDerivedRetirement {
                     try cache.finishDeletedObject(key)
                 }
                 if try cache.journal.state(for:key).isDeleted {try apply()}
-                else {_=try cache.journal.delete(key:key) {_ in try apply()}}
+                else {
+                    // Only publication inside this callback needs the root
+                    // clock before the outer receive advances its cursor.
+                    if !observedRoot {try cache.journal.observeAppliedRoot(root);observedRoot=true}
+                    _=try cache.journal.delete(key:key) {_ in try apply()}
+                }
             }
             try finish(db)
         }catch {try? finish(db);throw error}

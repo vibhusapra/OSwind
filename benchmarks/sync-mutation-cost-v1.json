@@ -1,0 +1,2082 @@
+{
+  "state": "passed",
+  "summarizedAtUTC": "2026-10-31T22:59:33.743845+00:00",
+  "measurementSHA256": "fd2f1e5f641660e86fddcbee4ad7fe5a58755b48b41ac49cc155a1ee788b1beb",
+  "measurement": {
+    "state": "passed",
+    "driverPID": 47386,
+    "startedAtUTC": "2026-10-31T22:01:39.435091+00:00",
+    "trials": 3,
+    "profiles": {
+      "baseline": {
+        "state": "built",
+        "profile": "baseline",
+        "sourceBase": "32982f1419723045d7680b1d3e415c2106d8ab2b",
+        "startedAtUTC": "2026-10-31T21:59:00.926447+00:00",
+        "frozenInputs": 719,
+        "sourceInputsSHA256": "bbbf5b1b1a9960a01f944ae728a0f60a24b0e0764ea98faf7494f1a5038d2756",
+        "dependencyInputsSHA256": "f7cd27f33d24d88b91adcd7872837e012c4bbc738eae38be6ec423fc8c7f63c7",
+        "pid": 46403,
+        "returncode": 0,
+        "logSHA256": "2e86b543736fd5fee5f16a3819d42b00eea2df89afef30a204499c8b59b7c178",
+        "inputsUnchanged": true,
+        "finishedAtUTC": "2026-10-31T22:00:42.507125+00:00",
+        "payload": ".artifacts/sync-mutation-cost-index-v1/baseline/payload/OSwindPackageTests.xctest",
+        "payloadManifestSHA256": "fa3cdc22a33a2879c1d3fe3057b295e35c04c8cb60ac0e10fa0787e5fa038378",
+        "executableSHA256": "97fb650040ac02090ebb896eefd00e5ffa6be6ccc71f4f8b02bbc0a3be4ad099",
+        "systemAndXCTestLinkageOnly": true
+      },
+      "candidate": {
+        "state": "built",
+        "profile": "candidate",
+        "sourceBase": "32982f1419723045d7680b1d3e415c2106d8ab2b",
+        "startedAtUTC": "2026-10-31T21:55:16.097528+00:00",
+        "frozenInputs": 719,
+        "sourceInputsSHA256": "279ce081599eef137c12b76f60da2dc7004e371d70dc26bcd18794648bf383e1",
+        "dependencyInputsSHA256": "f7cd27f33d24d88b91adcd7872837e012c4bbc738eae38be6ec423fc8c7f63c7",
+        "pid": 44979,
+        "returncode": 0,
+        "logSHA256": "ee36a9e03a746b3f2db0d16b75a36d14bcb326ff39bd27f6e7e541afc29a6ab3",
+        "inputsUnchanged": true,
+        "finishedAtUTC": "2026-10-31T21:57:57.923699+00:00",
+        "payload": ".artifacts/sync-mutation-cost-index-v1/candidate/payload/OSwindPackageTests.xctest",
+        "payloadManifestSHA256": "afdb8c96985970d5c2d79f0f4c2fd92bb15d84d2c4f8a6f56cd2ec653380a0c2",
+        "executableSHA256": "517a5b833dd5cf97408d6a144eec8d4ef2e4958e9fbe1bb9a3ed27510dd091c8",
+        "systemAndXCTestLinkageOnly": true
+      }
+    },
+    "onlyCompiledInputDifferences": [
+      "Sources/OSwindCore/SyncIdentityCatalog.swift",
+      "Sources/OSwindCore/SyncDerivedRetirement.swift",
+      "Sources/OSwindCore/MemoryStore.swift",
+      "Sources/OSwindCore/PersonalSyncJournal.swift"
+    ],
+    "measurementInputsSHA256": "279ce081599eef137c12b76f60da2dc7004e371d70dc26bcd18794648bf383e1",
+    "stages": [
+      {
+        "trial": 0,
+        "profile": "baseline",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 355.689972165972,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "dec3e1c8283db65a58a4ceff6c4ec04cd71cb242bf8bad99da5c8ae1e8d28f19",
+        "reviewSHA256": "8f285b82e3c619e90c06c2b6b2730c9a11987a17c4f4d559a04b2328260c7f6e"
+      },
+      {
+        "trial": 0,
+        "profile": "baseline",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 226.97252791700885,
+        "logName": "fanout.log",
+        "logSHA256": "bd3f3f0a13ac02b17524ac572186236edd138950c1a267ee86ace7ea8e63c79e",
+        "reviewSHA256": "fbbb4f02bac843c56b9def60a45abbd5693c92ca5016cd1caf4cc44e916e916f"
+      },
+      {
+        "trial": 0,
+        "profile": "candidate",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 362.60957266716287,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "7f8c5d5ed1aedee5cac4510737279d91a22d841bd38883b90057a88c09d1c19a",
+        "reviewSHA256": "b1b6e569565db8f477dceff7e294692c766dafaea385d4b0b652f111d4608bd6"
+      },
+      {
+        "trial": 0,
+        "profile": "candidate",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 183.20243183290586,
+        "logName": "fanout.log",
+        "logSHA256": "976f2e14cecf84e46be04624d923df34db810931ff09e7788b4fa2a5331641f4",
+        "reviewSHA256": "58e9c5153c7015eae1f1cfb67ceb423136fce35ce5e87d63120273eeb229ddc0"
+      },
+      {
+        "trial": 1,
+        "profile": "candidate",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 360.2727132921573,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "17e67e2a2c30e3d85a16932457afa63553d77e01c7c8cd2e4066355c300e6c19",
+        "reviewSHA256": "2aa6555d53817c6756f4efc7ae4c68576ddeacf579d10fca4cdc630c124373ef"
+      },
+      {
+        "trial": 1,
+        "profile": "candidate",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 184.403397125192,
+        "logName": "fanout.log",
+        "logSHA256": "cb4b4b317cccb603ce77e6a3edb478e31fb77f4b5de86bfccd6187e0ad5b2330",
+        "reviewSHA256": "8646479ee609acd497dc649a8f084dd27f032677e046b785ae549b2756b9e301"
+      },
+      {
+        "trial": 1,
+        "profile": "baseline",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 345.64560966705903,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "ec4e8d6b059b78ce137116ba9ee6b1bafd8d8a4db081a0624b93ebf26f6c87b1",
+        "reviewSHA256": "36772ab63af0849080e65e57b62a037b3f8c2bcaa3c1a9a4a2a085e4c49ac43e"
+      },
+      {
+        "trial": 1,
+        "profile": "baseline",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 227.82443937496282,
+        "logName": "fanout.log",
+        "logSHA256": "2cd1935a00e7fb66820f08f7b2feae33f7b63bb0c052bc1ffd6f17123b91e689",
+        "reviewSHA256": "9c963c6498b187dbfba7933eed6717d82aa834d1f0b469faec5b3b01eb23fbd1"
+      },
+      {
+        "trial": 2,
+        "profile": "baseline",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 346.8120495839976,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "9935bc5e7797db1ff02ba6d3c44b4e492a3f9e8d2ad78724454c8f8d2b1feede",
+        "reviewSHA256": "ca10cfe4bdd00e26066081abc1516a45fea4299aceb5f390797b2eb6697b5f4a"
+      },
+      {
+        "trial": 2,
+        "profile": "baseline",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 231.16714870813303,
+        "logName": "fanout.log",
+        "logSHA256": "5af1a20b753a50a089183b228a96545998aebf155211723f88bc3af5c40f35a8",
+        "reviewSHA256": "3a9adc98043fcd88aed698ae558f6d33341758d2777f0c522eeaac96021d1bf4"
+      },
+      {
+        "trial": 2,
+        "profile": "candidate",
+        "kind": "projection",
+        "returncode": 0,
+        "wallSeconds": 359.99827379197814,
+        "logName": "source-projection-regression.log",
+        "logSHA256": "d957821bbafed393ec500938a5c92c0e790c89c5be8fda4386250e01111d11d2",
+        "reviewSHA256": "b2a3ccecc0a82c7dd702ba1581aecf5a32150a2f0225e6fe697eb85721554e52"
+      },
+      {
+        "trial": 2,
+        "profile": "candidate",
+        "kind": "fanout",
+        "returncode": 0,
+        "wallSeconds": 182.3398014169652,
+        "logName": "fanout.log",
+        "logSHA256": "210347c67b6af1353f40c7fcf05cb1bbc68312a5aa745cc0cdc5fb1b1f001d42",
+        "reviewSHA256": "3a15b3b17b4c13d05f633c46db6e19fa20bfa4f52c72c00c75a9b9d889fb3772"
+      }
+    ],
+    "idleSleepInhibited": true,
+    "scope": "Warm authored metadata component. Three alternating samples per size/profile/workload. No media/model/transport/cold-cache/physical-power/ranking result; caches and background remain uncontrolled.",
+    "host": {
+      "path": "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+      "sha256": "947f17b5df53b2871ed5d542bc53d49059c73a51bb610e2be9bc5bc0d0b2dc16"
+    },
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0\n",
+    "finishedAtUTC": "2026-10-31T22:59:08.850619+00:00",
+    "allInputAndPayloadHashesUnchanged": true
+  },
+  "perSizeSamples": [
+    {
+      "count": 1000,
+      "loadSeconds": 0.015376874944195151,
+      "outgoingPreparationSeconds": 13.344884499907494,
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 355.689972165972,
+      "incomingSeconds": 18.753956666681916,
+      "runUpdateSeconds": 0.23258166667073965,
+      "historyWarmMS": [
+        17.548916628584266,
+        17.778916750103235,
+        18.157833255827427,
+        17.557583283632994,
+        17.673833295702934,
+        18.00137502141297,
+        17.615833319723606
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.17199133336544037,
+      "outgoingPreparationSeconds": 144.4106169999577,
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 355.689972165972,
+      "incomingSeconds": 176.65011866670102,
+      "runUpdateSeconds": 0.2157244998961687,
+      "historyWarmMS": [
+        18.00375012680888,
+        17.43945828638971,
+        17.937291646376252,
+        17.17145834118128,
+        17.527583288028836,
+        17.78400014154613,
+        17.746375175192952
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.016759416554123163,
+      "outgoingPreparationSeconds": 14.497360166627914,
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 226.97252791700885,
+      "deletionSeconds": 1.6829865833278745
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.18575595831498504,
+      "outgoingPreparationSeconds": 138.33079533325508,
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 226.97252791700885,
+      "deletionSeconds": 71.76100066676736
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.016236958326771855,
+      "outgoingPreparationSeconds": 14.508565708296373,
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 362.60957266716287,
+      "incomingSeconds": 18.291500499937683,
+      "runUpdateSeconds": 0.21469612489454448,
+      "historyWarmMS": [
+        17.296249978244305,
+        17.559000058099627,
+        17.249291529878974,
+        17.273333156481385,
+        17.38874986767769,
+        17.41674984805286,
+        17.21558324061334
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.1752209581900388,
+      "outgoingPreparationSeconds": 146.29050012491643,
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 362.60957266716287,
+      "incomingSeconds": 180.86331166652963,
+      "runUpdateSeconds": 0.22048700018785894,
+      "historyWarmMS": [
+        17.854416742920876,
+        17.656999872997403,
+        17.663208302110434,
+        17.79066678136587,
+        17.670166678726673,
+        17.703458201140165,
+        17.859666608273983
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.017974500078707933,
+      "outgoingPreparationSeconds": 15.493632416706532,
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 183.20243183290586,
+      "deletionSeconds": 1.2306763750966638
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.18206941685639322,
+      "outgoingPreparationSeconds": 146.4120174164418,
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 183.20243183290586,
+      "deletionSeconds": 19.311862000031397
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.015397083247080445,
+      "outgoingPreparationSeconds": 14.518734583398327,
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 360.2727132921573,
+      "incomingSeconds": 18.139507791493088,
+      "runUpdateSeconds": 0.20509775006212294,
+      "historyWarmMS": [
+        16.255791764706373,
+        16.701916698366404,
+        16.871750121936202,
+        16.330374870449305,
+        16.509875189512968,
+        16.83637499809265,
+        16.6447083465755
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.15851525007747114,
+      "outgoingPreparationSeconds": 145.71570879174396,
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 360.2727132921573,
+      "incomingSeconds": 180.28708241670392,
+      "runUpdateSeconds": 0.22218349995091558,
+      "historyWarmMS": [
+        18.049291567876935,
+        17.59387506172061,
+        18.037458416074514,
+        17.678208416327834,
+        18.03612499497831,
+        17.841249937191606,
+        17.694708425551653
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.017070041736587882,
+      "outgoingPreparationSeconds": 15.19535966659896,
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 184.403397125192,
+      "deletionSeconds": 1.210474249906838
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.18419554154388607,
+      "outgoingPreparationSeconds": 148.30432508327067,
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 184.403397125192,
+      "deletionSeconds": 18.960734750144184
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.01565608335658908,
+      "outgoingPreparationSeconds": 13.615000791614875,
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 345.64560966705903,
+      "incomingSeconds": 17.43210612493567,
+      "runUpdateSeconds": 0.2059635417535901,
+      "historyWarmMS": [
+        16.614458290860057,
+        16.88558328896761,
+        16.820791643112898,
+        16.631125006824732,
+        16.39262493699789,
+        16.773666720837355,
+        16.624500043690205
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.1556358332745731,
+      "outgoingPreparationSeconds": 135.6214665416628,
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 345.64560966705903,
+      "incomingSeconds": 177.45019912486896,
+      "runUpdateSeconds": 0.2027881247922778,
+      "historyWarmMS": [
+        16.54841681011021,
+        16.356333391740918,
+        16.97233342565596,
+        16.84129168279469,
+        16.540749929845333,
+        16.4149166084826,
+        16.69104164466262
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.01596270827576518,
+      "outgoingPreparationSeconds": 13.764182500075549,
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 227.82443937496282,
+      "deletionSeconds": 1.5199227917473763
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.16809033346362412,
+      "outgoingPreparationSeconds": 139.66550004156306,
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 227.82443937496282,
+      "deletionSeconds": 72.2028266666457
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.01516375015489757,
+      "outgoingPreparationSeconds": 13.45385833317414,
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 346.8120495839976,
+      "incomingSeconds": 17.412096541607752,
+      "runUpdateSeconds": 0.21176770818419755,
+      "historyWarmMS": [
+        17.521333415061235,
+        17.22145825624466,
+        16.863750061020255,
+        17.08395848982036,
+        16.406291630119085,
+        16.615041764453053,
+        16.698416788131
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.15396658331155777,
+      "outgoingPreparationSeconds": 135.1415982914623,
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "projection",
+      "workloadWallSeconds": 346.8120495839976,
+      "incomingSeconds": 179.26558062504046,
+      "runUpdateSeconds": 0.2006169999949634,
+      "historyWarmMS": [
+        16.948583303019404,
+        17.135708360001445,
+        16.827916726469994,
+        16.90595829859376,
+        16.515541821718216,
+        16.743249958381057,
+        16.54925011098385
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.0155691250693053,
+      "outgoingPreparationSeconds": 13.957602916518226,
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 231.16714870813303,
+      "deletionSeconds": 1.5632955832406878
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.1680920000653714,
+      "outgoingPreparationSeconds": 139.22401837492362,
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "workloadWallSeconds": 231.16714870813303,
+      "deletionSeconds": 75.7750530000776
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.015261708525940776,
+      "outgoingPreparationSeconds": 14.501696750055999,
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 359.99827379197814,
+      "incomingSeconds": 17.894647791516036,
+      "runUpdateSeconds": 0.21553487493656576,
+      "historyWarmMS": [
+        16.666000010445714,
+        16.733958153054118,
+        16.95795846171677,
+        16.491624992340803,
+        16.603083116933703,
+        16.71358337625861,
+        16.736333491280675
+      ]
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.15771995834074914,
+      "outgoingPreparationSeconds": 142.3379477916751,
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "projection",
+      "workloadWallSeconds": 359.99827379197814,
+      "incomingSeconds": 183.6685553751886,
+      "runUpdateSeconds": 0.21909304172731936,
+      "historyWarmMS": [
+        17.4044999293983,
+        16.765208449214697,
+        17.05674990080297,
+        17.19604153186083,
+        16.907874960452318,
+        17.03870831988752,
+        16.85370854102075
+      ]
+    },
+    {
+      "count": 1000,
+      "loadSeconds": 0.015920916805043817,
+      "outgoingPreparationSeconds": 14.581142124952748,
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 182.3398014169652,
+      "deletionSeconds": 1.1138062917161733
+    },
+    {
+      "count": 10000,
+      "loadSeconds": 0.1645123332273215,
+      "outgoingPreparationSeconds": 145.75656324997544,
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "workloadWallSeconds": 182.3398014169652,
+      "deletionSeconds": 20.219983624992892
+    }
+  ],
+  "phaseComparisons": [
+    {
+      "kind": "projection",
+      "count": 1000,
+      "metric": "incomingSeconds",
+      "samples": {
+        "baseline": [
+          18.753956666681916,
+          17.43210612493567,
+          17.412096541607752
+        ],
+        "candidate": [
+          18.291500499937683,
+          18.139507791493088,
+          17.894647791516036
+        ]
+      },
+      "baselineMedian": 17.43210612493567,
+      "candidateMedian": 18.139507791493088,
+      "medianChangePercent": 4.058039008525283,
+      "pairedChangePercent": [
+        -2.465912526959324,
+        4.058039008525283,
+        2.7713563886760273
+      ]
+    },
+    {
+      "kind": "projection",
+      "count": 10000,
+      "metric": "incomingSeconds",
+      "samples": {
+        "baseline": [
+          176.65011866670102,
+          177.45019912486896,
+          179.26558062504046
+        ],
+        "candidate": [
+          180.86331166652963,
+          180.28708241670392,
+          183.6685553751886
+        ]
+      },
+      "baselineMedian": 177.45019912486896,
+      "candidateMedian": 180.86331166652963,
+      "medianChangePercent": 1.9234199558485265,
+      "pairedChangePercent": [
+        2.3850496289662626,
+        1.5986926505721755,
+        2.4561183104957474
+      ]
+    },
+    {
+      "kind": "projection",
+      "count": 1000,
+      "metric": "runUpdateSeconds",
+      "samples": {
+        "baseline": [
+          0.23258166667073965,
+          0.2059635417535901,
+          0.21176770818419755
+        ],
+        "candidate": [
+          0.21469612489454448,
+          0.20509775006212294,
+          0.21553487493656576
+        ]
+      },
+      "baselineMedian": 0.21176770818419755,
+      "candidateMedian": 0.21469612489454448,
+      "medianChangePercent": 1.3828438412337052,
+      "pairedChangePercent": [
+        -7.690004991457611,
+        -0.42036162521568166,
+        1.7789146346578466
+      ]
+    },
+    {
+      "kind": "projection",
+      "count": 10000,
+      "metric": "runUpdateSeconds",
+      "samples": {
+        "baseline": [
+          0.2157244998961687,
+          0.2027881247922778,
+          0.2006169999949634
+        ],
+        "candidate": [
+          0.22048700018785894,
+          0.22218349995091558,
+          0.21909304172731936
+        ]
+      },
+      "baselineMedian": 0.2027881247922778,
+      "candidateMedian": 0.22048700018785894,
+      "medianChangePercent": 8.727767177545843,
+      "pairedChangePercent": [
+        2.2076770575351956,
+        9.564354509666217,
+        9.209609221960147
+      ]
+    },
+    {
+      "kind": "fanout",
+      "count": 1000,
+      "metric": "deletionSeconds",
+      "samples": {
+        "baseline": [
+          1.6829865833278745,
+          1.5199227917473763,
+          1.5632955832406878
+        ],
+        "candidate": [
+          1.2306763750966638,
+          1.210474249906838,
+          1.1138062917161733
+        ]
+      },
+      "baselineMedian": 1.5632955832406878,
+      "candidateMedian": 1.210474249906838,
+      "medianChangePercent": -22.56907376418583,
+      "pairedChangePercent": [
+        -26.875449436847532,
+        -20.359490858399553,
+        -28.752674564123705
+      ]
+    },
+    {
+      "kind": "fanout",
+      "count": 10000,
+      "metric": "deletionSeconds",
+      "samples": {
+        "baseline": [
+          71.76100066676736,
+          72.2028266666457,
+          75.7750530000776
+        ],
+        "candidate": [
+          19.311862000031397,
+          18.960734750144184,
+          20.219983624992892
+        ]
+      },
+      "baselineMedian": 72.2028266666457,
+      "candidateMedian": 19.311862000031397,
+      "medianChangePercent": -73.25331584427765,
+      "pairedChangePercent": [
+        -73.08863892560692,
+        -73.73962263598864,
+        -73.31577765445815
+      ]
+    }
+  ],
+  "wholeWorkloadComparisons": [
+    {
+      "kind": "projection",
+      "baseline": [
+        355.689972165972,
+        345.64560966705903,
+        346.8120495839976
+      ],
+      "candidate": [
+        362.60957266716287,
+        360.2727132921573,
+        359.99827379197814
+      ],
+      "baselineMedian": 346.8120495839976,
+      "candidateMedian": 360.2727132921573,
+      "medianChangePercent": 3.881256064864469
+    },
+    {
+      "kind": "fanout",
+      "baseline": [
+        226.97252791700885,
+        227.82443937496282,
+        231.16714870813303
+      ],
+      "candidate": [
+        183.20243183290586,
+        184.403397125192,
+        182.3398014169652
+      ],
+      "baselineMedian": 227.82443937496282,
+      "candidateMedian": 183.20243183290586,
+      "medianChangePercent": -19.58613731892751
+    }
+  ],
+  "closedDatabaseStorage": [
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9601024,
+      "pageSize": 4096,
+      "pageCount": 2344,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "2a9b93d7840abf41a2d19193b7cca420ca8cfcfcb20effa212bc6559a9ac6c34",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "b6d11d8665b7a3d56c4b97227f0ffe5c7eca9727294dcc8ec13a43a33b96bced"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 88080384,
+      "pageSize": 4096,
+      "pageCount": 21504,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "45f3a5a4df7c019e581984205d014815d2f70056cd90ff720469d266e93b0526",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "59d42a9915615d9b2b695bb907180f43e88d0bdcd53ea222b8ba109438fd3a7d"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5668864,
+      "pageSize": 4096,
+      "pageCount": 1384,
+      "freePages": 5,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "81d2caa0581c204869a4f54c3d1230ae31088260c8efa3c21b3597fab75179c3",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5668864,
+      "pageSize": 4096,
+      "pageCount": 1384,
+      "freePages": 500,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "b22b862a9ee97830a95558e7e1842c6917a0b990a897c5113bb9ba29a0d77463",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "37c242b3e48e7dc3a6ba9ceae45aa5735c0e9d47343e3976f6085f01f2c309fe"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 48615424,
+      "pageSize": 4096,
+      "pageCount": 11869,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "5e3538fecf697a2ae0c437b5d74a2dbea64bb035bd1c3dd1399777ccc884f7f1",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 0,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 48615424,
+      "pageSize": 4096,
+      "pageCount": 11869,
+      "freePages": 5013,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "11a572f6bc3b15d49836dc8997a77069691a7beb42604c3c9250bf6325827899",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "e848d6fe648096948d3461b53baf3785de3e6cf3c7485caa8e9e35626b08b70c"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9736192,
+      "pageSize": 4096,
+      "pageCount": 2377,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "6151268dd3206e9a970d99c2001a6f483d4d5f42fde5e7f2cc9a4c96c82c456e",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "a67aaa5c8aeb078d0cf397fe5937d16a304f05f02c84ac1d485eb9d207b131a7"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 89530368,
+      "pageSize": 4096,
+      "pageCount": 21858,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1363968,
+      "sha256": "a7849be5c152db6caba40b1170f662576b361a9456dcd05bb6c9a7b39e7b7c49",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "1efbd340cf899b0579e90fa38d37d7e7123aa96007a6435063d6fc8d677f03fd"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5799936,
+      "pageSize": 4096,
+      "pageCount": 1416,
+      "freePages": 6,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "2ed197bf72d5b5facfa7c8f153c240557bff6a0f009689246de793bcfd41d642",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5799936,
+      "pageSize": 4096,
+      "pageCount": 1416,
+      "freePages": 500,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "76b7dea720b180c2a77b6b3be961ca812bfaaa0975ed9f28c690d8ba591fe0b0",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "09651ed95ebcfc768f7f9178f25e51f7c605e9e2a9ab92541971b79d85f549d2"
+        }
+      }
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 50008064,
+      "pageSize": 4096,
+      "pageCount": 12209,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "808270b414cd54a7654a5e12a9f4194b39d576b8f2b05ed31bb442fde5de18d6",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 0,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 50008064,
+      "pageSize": 4096,
+      "pageCount": 12209,
+      "freePages": 5019,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "eb5206b65aaa4483a44ee63413568a98cb21ccdce014bf304db90f0a0a018e5f",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "e9ff6917ea955b444a3f26084e9f0b3928b861fcb3e2fabcae48932d495fd99e"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9748480,
+      "pageSize": 4096,
+      "pageCount": 2380,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 143360,
+      "sha256": "80cf5a667ae452a81817a5a2ce03040e32a90b3a866c96e6fa806cd6f91c8fb0",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "bd3f661c58abd3932409ebf73b09cd41af8094e8bf46130619fd9921d7a48b6f"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 89485312,
+      "pageSize": 4096,
+      "pageCount": 21847,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1376256,
+      "sha256": "8d6fbe2c28ff69c4f960a68e4c2eca5bf37b3c00b8b97c53bbab52afe0b6c07a",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "0474c30398e0cf98206048d3a35b6dd1b707b49e9ddd2a7ee755f85f0e18eed3"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5791744,
+      "pageSize": 4096,
+      "pageCount": 1414,
+      "freePages": 5,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "39759dd81204f2d1df177bbae095574fc789c5a21ae511be18316705e1e7bf1c",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5791744,
+      "pageSize": 4096,
+      "pageCount": 1414,
+      "freePages": 499,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "e10c319e71a3ee41eae020187aa702e9293293ae5579c72ed645307c4a08cdb5",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "167b6bac75b3ca2370f825ac19792812ef68d00f37b7ab428f040aae45b36f32"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 49975296,
+      "pageSize": 4096,
+      "pageCount": 12201,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "434f860e2afcfb4b0e7620dc07c472aaf1f54ed962174761e3ee74a12c610c4f",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 1,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 49975296,
+      "pageSize": 4096,
+      "pageCount": 12201,
+      "freePages": 5016,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "233744612f37b5f2f2878b6a428062b2f743a0471a23fc82aa825a94c801651a",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "ae317e633aa95d5c7df5955c5a8a96c7ac1323dd2dc2851aac100f0e595a7b57"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9596928,
+      "pageSize": 4096,
+      "pageCount": 2343,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "0d2ef194a76b7231538a7a9853c46985c46a03c81c55387d45fc2daec2c48f4d",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "598791124d7a48db44cc3b7553a4cf17cc8bc09c33a4525f584e85c7d623e036"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 88080384,
+      "pageSize": 4096,
+      "pageCount": 21504,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "c91759c57cc42eb9eea53e5bfe838a369ddd6cc97356f9d5d7323b7c2b7999b0",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "33a2554f91985b634515dad6f7580a12ceb0ed1c4ca290c1387bf576815401cc"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5660672,
+      "pageSize": 4096,
+      "pageCount": 1382,
+      "freePages": 6,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "43893ea56914fc38188e53cef78503d4b02e5875c31e8ebced95e2c5fcd0e11b",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5660672,
+      "pageSize": 4096,
+      "pageCount": 1382,
+      "freePages": 500,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "430bc72bb64e5198d3a70744d6db829479569b62d6f915af93653a8b0e82b023",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "41dcfff4f254a740dc673d6fab2029d54a04baa25d450babd4f598547b71e353"
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 48599040,
+      "pageSize": 4096,
+      "pageCount": 11865,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "4da9123239b754ac41dc8785143ab06248d743dc3b213fc38d151f9a29a63b6b",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 1,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 48599040,
+      "pageSize": 4096,
+      "pageCount": 11865,
+      "freePages": 5015,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "b49568bada85fcd3f64d39c548b1d19105784c1cb91c88fe9570dddaf8aa16aa",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "342ade8ed0b92aac72cf91a41a763615e760b23e02a65c915c753c9cde736960"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9613312,
+      "pageSize": 4096,
+      "pageCount": 2347,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "1ff1b562cec836a202f048bd451c11bd2ce9977abd63e2c12c9fe94f0f056d0b",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "b36ff30c576680fed4cc8ae615284ceadc3602ff8498db8ed1ffc9d2fa789386"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 88027136,
+      "pageSize": 4096,
+      "pageCount": 21491,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "a8c489aafa4c58a8882b7ff3606cf5a7de4cd57f51cacb0ea6f5088a77d635c7",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "4b166c3014c5df14750ed6b4b014c5f0be4cbd43d15198ad60d21d940c272cae"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5664768,
+      "pageSize": 4096,
+      "pageCount": 1383,
+      "freePages": 5,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "401409b4884f8cf8d47131b8605e45c5c29d523581214ac613472feaf277f3e4",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5664768,
+      "pageSize": 4096,
+      "pageCount": 1383,
+      "freePages": 501,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "6db381481baf90a2196f85098a7c54f098404478da5a68262a67326b130667a6",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "af0a7fd48f37ae89c06d8265578f9ab34c960db02fd18f2524fe6ef0e8ea6751"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 48648192,
+      "pageSize": 4096,
+      "pageCount": 11877,
+      "freePages": 0,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "c3cb7ea1d1650c34b82177d806fe3c4554c3c58f885a1ec454b66359f23aad96",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 2,
+      "profile": "baseline",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 48648192,
+      "pageSize": 4096,
+      "pageCount": 11877,
+      "freePages": 5025,
+      "indexSQL": null,
+      "indexBytes": 0,
+      "sha256": "9a2a9971249718aee416ddd75a7413915af16d4dfb43b9decb493df7b383fd5a",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "a209754a06229bee8c5b419d69453055849da0250e19b659a595974a9d70fb80"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 9732096,
+      "pageSize": 4096,
+      "pageCount": 2376,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "ca82d6fb255550d816f08c55a4cb9a36d20f4afc39e291ae80025b312f6e6dc0",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "cc7c3d6e535485e0316774f34cf56f834026979adc691fb9352ca09185ad883a"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "projection",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 89407488,
+      "pageSize": 4096,
+      "pageCount": 21828,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1359872,
+      "sha256": "4f05069ef4292251b5f7089acdf3e69a3d6ab5b73fc5138f0649b99604ddb85b",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "2377edb46730dfc25b69c92a91dc5562409fe7966973afbe208b3853d4d6d5bf"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 5795840,
+      "pageSize": 4096,
+      "pageCount": 1415,
+      "freePages": 6,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "1a9372cb983c7216407a3d4be2271250757f0d6ea068923489fc871e21629918",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 1000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 5795840,
+      "pageSize": 4096,
+      "pageCount": 1415,
+      "freePages": 501,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 135168,
+      "sha256": "614b12898ac7bf0917ea1b113fffc71156c5af63b247fbc02d78ec492543eada",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 32768,
+          "sha256": "84255318eec0363e48bdc61968288ba9fa06a8f09919297edc843c63b04e9d9a"
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "before-delete.sqlite",
+      "fileBytes": 50036736,
+      "pageSize": 4096,
+      "pageCount": 12216,
+      "freePages": 0,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "7695fa4ace7c1c388dfed072c6632b505c6c79886c8888070378fcc30b5f89e7",
+      "readonlyHashUnchanged": true,
+      "sidecars": {}
+    },
+    {
+      "trial": 2,
+      "profile": "candidate",
+      "kind": "fanout",
+      "count": 10000,
+      "database": "receiver/memory.sqlite",
+      "fileBytes": 50036736,
+      "pageSize": 4096,
+      "pageCount": 12216,
+      "freePages": 5023,
+      "indexSQL": "CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)",
+      "indexBytes": 1355776,
+      "sha256": "4e65aa31c870b2dbc2a6bc5c86330bb83d58cdac8405d37144264ff2d90e560f",
+      "readonlyHashUnchanged": true,
+      "sidecars": {
+        "-wal": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "-shm": {
+          "bytes": 98304,
+          "sha256": "24292f4e0ba3b71f35f3db77e72f09ae95da88555670a275edd880fd13c0650b"
+        }
+      }
+    }
+  ],
+  "scope": "Three paired warm authored metadata samples per size; phase and whole workload costs are distinct. No controlled caches, isolated hardware, media, model, transport, energy or product ranking claim. Worktree setup/Git background activity occurred during trial1; see sideActivityDuringMeasurement in handoff.json.",
+  "sideActivityDuringMeasurement": [
+    {
+      "kind": "Managed worktree creation and app Git snapshot",
+      "startedApproxUTC": "2026-10-31T22:22:36+00:00",
+      "note": "Git checkout/snapshot IO and CPU activity occurred during warm run; no concurrent Swift build/test. Background activity remains uncontrolled, and setup/wall timings must be disclosed as such."
+    }
+  ],
+  "format": "OSwind.sync-mutation-cost",
+  "version": 1,
+  "sourceBase": "32982f1419723045d7680b1d3e415c2106d8ab2b",
+  "inputs": "sync-mutation-cost-inputs-v1.json",
+  "overallV0Complete": false,
+  "readerControls": {
+    "state": "passed",
+    "negativeControls": [
+      {
+        "case": "owned-marker",
+        "state": "refused",
+        "reason": "Owned marker differs",
+        "seconds": 0.11070999992080033
+      },
+      {
+        "case": "running-driver",
+        "state": "refused",
+        "reason": "Actual successful pinned execution required",
+        "seconds": 0.10655808309093118
+      },
+      {
+        "case": "zero-executed-tests",
+        "state": "refused",
+        "reason": "Exact executed case required",
+        "seconds": 0.10665154200978577
+      },
+      {
+        "case": "nonfinite-timer",
+        "state": "refused",
+        "reason": "Nonfinite timer",
+        "seconds": 0.10668329196050763
+      },
+      {
+        "case": "missing-size",
+        "state": "refused",
+        "reason": "Fanout coverage differs",
+        "seconds": 0.10631991596892476
+      },
+      {
+        "case": "missing-child-barrier",
+        "state": "refused",
+        "reason": "Child register not retired",
+        "seconds": 0.27275150013156235
+      },
+      {
+        "case": "missing-root-causality",
+        "state": "refused",
+        "reason": "Root or local causal frontier missing",
+        "seconds": 0.25192508287727833
+      },
+      {
+        "case": "duplicate-child-membership",
+        "state": "refused",
+        "reason": "Derived announcement differs",
+        "seconds": 0.2635965410154313
+      },
+      {
+        "case": "missing-cache-barrier",
+        "state": "refused",
+        "reason": "Child cache barrier absent",
+        "seconds": 0.28034116700291634
+      },
+      {
+        "case": "changed-authored-native-input",
+        "state": "refused",
+        "reason": "Authored native run differs",
+        "seconds": 0.13406545901671052
+      },
+      {
+        "case": "altered-lookup-index",
+        "state": "refused",
+        "reason": "Identity lookup index differs from pinned build",
+        "seconds": 0.12974979192949831
+      }
+    ],
+    "restoredPositive": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.1138062917161733,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 20.219983624992892,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n1000/before-delete.sqlite": "1a9372cb983c7216407a3d4be2271250757f0d6ea068923489fc871e21629918",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n1000/receiver/memory.sqlite": "614b12898ac7bf0917ea1b113fffc71156c5af63b247fbc02d78ec492543eada",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n1000/producer/memory.sqlite": "45e2f89873fad6add1e61cf76bffc26719710f1081fa05afb3fe2328a93c960b",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n10000/before-delete.sqlite": "7695fa4ace7c1c388dfed072c6632b505c6c79886c8888070378fcc30b5f89e7",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n10000/receiver/memory.sqlite": "4e65aa31c870b2dbc2a6bc5c86330bb83d58cdac8405d37144264ff2d90e560f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/indexed-reader-controls/fanout/n10000/producer/memory.sqlite": "9712bd88bce7c343ac3387178c297c1a5f85dff41a110fecc2cd2bca90a542a2"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "originalDatasetUnchanged": true
+  },
+  "coverage": {
+    "exactProjectionOriginals": 66000,
+    "retainedPriorWireVersions": 120,
+    "exactChildBarriers": 66000
+  },
+  "independentReviews": {
+    "runs/trial0-baseline/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.6829865833278745,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 71.76100066676736,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n1000/before-delete.sqlite": "81d2caa0581c204869a4f54c3d1230ae31088260c8efa3c21b3597fab75179c3",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n1000/receiver/memory.sqlite": "b22b862a9ee97830a95558e7e1842c6917a0b990a897c5113bb9ba29a0d77463",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n1000/producer/memory.sqlite": "cb30f228320a30e9c0e2939996d88e485401b5aaab9665c0aa412d9d188f893f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n10000/before-delete.sqlite": "5e3538fecf697a2ae0c437b5d74a2dbea64bb035bd1c3dd1399777ccc884f7f1",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n10000/receiver/memory.sqlite": "11a572f6bc3b15d49836dc8997a77069691a7beb42604c3c9250bf6325827899",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-baseline/fanout/n10000/producer/memory.sqlite": "6d5334a5283203480690242a3b82c15770323f53b54393cad4d5486271ec47ad"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial0-baseline/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 18.753956666681916,
+          "runUpdateSeconds": 0.23258166667073965,
+          "history100MedianMS": 17.673833295702934,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 176.65011866670102,
+          "runUpdateSeconds": 0.2157244998961687,
+          "history100MedianMS": 17.746375175192952,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "58a3b1fe2cff99c1ad2b05a3b093ff8fb8f3c6497df5877fbe816679eef656d6",
+        "n1000/receiver/memory.sqlite": "2a9b93d7840abf41a2d19193b7cca420ca8cfcfcb20effa212bc6559a9ac6c34",
+        "n10000/producer/memory.sqlite": "5ae25984b32639fc233a5727e4117d1a237843ab7936528135c71d335cc95808",
+        "n10000/receiver/memory.sqlite": "45f3a5a4df7c019e581984205d014815d2f70056cd90ff720469d266e93b0526"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    },
+    "runs/trial0-candidate/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.2306763750966638,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 19.311862000031397,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n1000/before-delete.sqlite": "2ed197bf72d5b5facfa7c8f153c240557bff6a0f009689246de793bcfd41d642",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n1000/receiver/memory.sqlite": "76b7dea720b180c2a77b6b3be961ca812bfaaa0975ed9f28c690d8ba591fe0b0",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n1000/producer/memory.sqlite": "005ff8ad53a48fb4a2850422f0275484af5170309935c60d02db230cde70e54f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n10000/before-delete.sqlite": "808270b414cd54a7654a5e12a9f4194b39d576b8f2b05ed31bb442fde5de18d6",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n10000/receiver/memory.sqlite": "eb5206b65aaa4483a44ee63413568a98cb21ccdce014bf304db90f0a0a018e5f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial0-candidate/fanout/n10000/producer/memory.sqlite": "4100fad272ab11fc36605403f6f7986692d200961742e8ebed580c9a770d0267"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial0-candidate/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 18.291500499937683,
+          "runUpdateSeconds": 0.21469612489454448,
+          "history100MedianMS": 17.296249978244305,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 180.86331166652963,
+          "runUpdateSeconds": 0.22048700018785894,
+          "history100MedianMS": 17.703458201140165,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "885072923172791915320e9cf63bc3d65041863d17637c08627ea8a511eae06f",
+        "n1000/receiver/memory.sqlite": "6151268dd3206e9a970d99c2001a6f483d4d5f42fde5e7f2cc9a4c96c82c456e",
+        "n10000/producer/memory.sqlite": "4fd7c6ba647130e895b10da4ad3d7760f23bde0810407b50115cdf2493389ed1",
+        "n10000/receiver/memory.sqlite": "a7849be5c152db6caba40b1170f662576b361a9456dcd05bb6c9a7b39e7b7c49"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    },
+    "runs/trial1-baseline/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.5199227917473763,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 72.2028266666457,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n1000/before-delete.sqlite": "43893ea56914fc38188e53cef78503d4b02e5875c31e8ebced95e2c5fcd0e11b",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n1000/receiver/memory.sqlite": "430bc72bb64e5198d3a70744d6db829479569b62d6f915af93653a8b0e82b023",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n1000/producer/memory.sqlite": "db7d3a9b27ce0d49c54faeae99a3a62f0800c4238eb71b4aaf2fffe58d54957c",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n10000/before-delete.sqlite": "4da9123239b754ac41dc8785143ab06248d743dc3b213fc38d151f9a29a63b6b",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n10000/receiver/memory.sqlite": "b49568bada85fcd3f64d39c548b1d19105784c1cb91c88fe9570dddaf8aa16aa",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-baseline/fanout/n10000/producer/memory.sqlite": "89f8b6dba2356540c0d2ccb77056e1e06049bf3444550b00c1c240e7c16b376f"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial1-baseline/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 17.43210612493567,
+          "runUpdateSeconds": 0.2059635417535901,
+          "history100MedianMS": 16.631125006824732,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 177.45019912486896,
+          "runUpdateSeconds": 0.2027881247922778,
+          "history100MedianMS": 16.54841681011021,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "cdcd512e115ba008eeefca12c68d515fb619e95b9bb8ded53f0b56dd69d0092c",
+        "n1000/receiver/memory.sqlite": "0d2ef194a76b7231538a7a9853c46985c46a03c81c55387d45fc2daec2c48f4d",
+        "n10000/producer/memory.sqlite": "5b3d16b75992a35dac46ff8bcfadbf01ee37ed9f477f117ff2768aa2f52eb143",
+        "n10000/receiver/memory.sqlite": "c91759c57cc42eb9eea53e5bfe838a369ddd6cc97356f9d5d7323b7c2b7999b0"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    },
+    "runs/trial1-candidate/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.210474249906838,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 18.960734750144184,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n1000/before-delete.sqlite": "39759dd81204f2d1df177bbae095574fc789c5a21ae511be18316705e1e7bf1c",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n1000/receiver/memory.sqlite": "e10c319e71a3ee41eae020187aa702e9293293ae5579c72ed645307c4a08cdb5",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n1000/producer/memory.sqlite": "e6e9d20b021bb89fd55884b837753280a10bfc88076927d68267b4929ede6abd",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n10000/before-delete.sqlite": "434f860e2afcfb4b0e7620dc07c472aaf1f54ed962174761e3ee74a12c610c4f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n10000/receiver/memory.sqlite": "233744612f37b5f2f2878b6a428062b2f743a0471a23fc82aa825a94c801651a",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial1-candidate/fanout/n10000/producer/memory.sqlite": "d63f0c68592d1f9b30ba8397f07b7d68502acceb7e1dc3aefca0bce19cf75889"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial1-candidate/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 18.139507791493088,
+          "runUpdateSeconds": 0.20509775006212294,
+          "history100MedianMS": 16.6447083465755,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 180.28708241670392,
+          "runUpdateSeconds": 0.22218349995091558,
+          "history100MedianMS": 17.841249937191606,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "267e3f20790806e815464dfe5928ffc279dee3996d5d93a4e07c1a4109f5c785",
+        "n1000/receiver/memory.sqlite": "80cf5a667ae452a81817a5a2ce03040e32a90b3a866c96e6fa806cd6f91c8fb0",
+        "n10000/producer/memory.sqlite": "7fccd1e51240f784610a446303493e90992638791d0cc5b7e8e95e06d0100d7d",
+        "n10000/receiver/memory.sqlite": "8d6fbe2c28ff69c4f960a68e4c2eca5bf37b3c00b8b97c53bbab52afe0b6c07a"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    },
+    "runs/trial2-baseline/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.5632955832406878,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 75.7750530000776,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": false,
+            "plan": [
+              "SCAN personal_sync_identities"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n1000/before-delete.sqlite": "401409b4884f8cf8d47131b8605e45c5c29d523581214ac613472feaf277f3e4",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n1000/receiver/memory.sqlite": "6db381481baf90a2196f85098a7c54f098404478da5a68262a67326b130667a6",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n1000/producer/memory.sqlite": "74c327adb4c0fe987cd80a74f013614dea2ac818db3d0a418f103bd229aa849b",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n10000/before-delete.sqlite": "c3cb7ea1d1650c34b82177d806fe3c4554c3c58f885a1ec454b66359f23aad96",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n10000/receiver/memory.sqlite": "9a2a9971249718aee416ddd75a7413915af16d4dfb43b9decb493df7b383fd5a",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-baseline/fanout/n10000/producer/memory.sqlite": "9c8f1ec90042c0664d631180152c33d36e83eedf54df4d7d2d1d782accafc27e"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial2-baseline/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 17.412096541607752,
+          "runUpdateSeconds": 0.21176770818419755,
+          "history100MedianMS": 16.863750061020255,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 179.26558062504046,
+          "runUpdateSeconds": 0.2006169999949634,
+          "history100MedianMS": 16.827916726469994,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "d207a6ff658f28fcd84b991a79c814b09f0be1df1b32c21d8d3d7c1bdc41de75",
+        "n1000/receiver/memory.sqlite": "1ff1b562cec836a202f048bd451c11bd2ce9977abd63e2c12c9fe94f0f056d0b",
+        "n10000/producer/memory.sqlite": "01e4299dbe1d4159dafb777b3d1714764f6e10e1cff64c148bd260b714a203ca",
+        "n10000/receiver/memory.sqlite": "a8c489aafa4c58a8882b7ff3606cf5a7de4cd57f51cacb0ea6f5088a77d635c7"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    },
+    "runs/trial2-candidate/fanout-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "deletionSeconds": 1.1138062917161733,
+          "exactNativeSources": 1000,
+          "exactChildBarriers": 1000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        },
+        {
+          "count": 10000,
+          "deletionSeconds": 20.219983624992892,
+          "exactNativeSources": 10000,
+          "exactChildBarriers": 10000,
+          "rootCausalityVerified": true,
+          "identityLookup": {
+            "indexExpected": true,
+            "plan": [
+              "SEARCH personal_sync_identities USING COVERING INDEX sync_identities_local (table_name=? AND local_key=?)"
+            ]
+          }
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n1000/before-delete.sqlite": "1a9372cb983c7216407a3d4be2271250757f0d6ea068923489fc871e21629918",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n1000/receiver/memory.sqlite": "614b12898ac7bf0917ea1b113fffc71156c5af63b247fbc02d78ec492543eada",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n1000/producer/memory.sqlite": "45e2f89873fad6add1e61cf76bffc26719710f1081fa05afb3fe2328a93c960b",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n10000/before-delete.sqlite": "7695fa4ace7c1c388dfed072c6632b505c6c79886c8888070378fcc30b5f89e7",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n10000/receiver/memory.sqlite": "4e65aa31c870b2dbc2a6bc5c86330bb83d58cdac8405d37144264ff2d90e560f",
+        "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-mutation-cost-index-v1/runs/trial2-candidate/fanout/n10000/producer/memory.sqlite": "9712bd88bce7c343ac3387178c297c1a5f85dff41a110fecc2cd2bca90a542a2"
+      },
+      "scope": "Owned warm metadata component, exact native/wire/global retirement. No media/model/transport/physical-power or ranking claim."
+    },
+    "runs/trial2-candidate/projection-review.json": {
+      "state": "passed",
+      "results": [
+        {
+          "count": 1000,
+          "incomingSeconds": 17.894647791516036,
+          "runUpdateSeconds": 0.21553487493656576,
+          "history100MedianMS": 16.71358337625861,
+          "exactOriginals": 1000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        },
+        {
+          "count": 10000,
+          "incomingSeconds": 183.6685553751886,
+          "runUpdateSeconds": 0.21909304172731936,
+          "history100MedianMS": 17.03870831988752,
+          "exactOriginals": 10000,
+          "retainedPriorWireVersions": 10,
+          "allActualProducerPacketsVerified": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "n1000/producer/memory.sqlite": "0cbe9c355478c7556f17671b0bb8514d7d5263c4551df5e901abe6a52b11e5a3",
+        "n1000/receiver/memory.sqlite": "ca82d6fb255550d816f08c55a4cb9a36d20f4afc39e291ae80025b312f6e6dc0",
+        "n10000/producer/memory.sqlite": "673906af39d767ccd0891e91ab71cb5d50394e764b30601fd0b24ca8ac6387a7",
+        "n10000/receiver/memory.sqlite": "4f05069ef4292251b5f7089acdf3e69a3d6ab5b73fc5138f0649b99604ddb85b"
+      },
+      "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+    }
+  }
+}

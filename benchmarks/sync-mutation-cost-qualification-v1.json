@@ -1,0 +1,367 @@
+{
+  "format": "OSwind indexed sync mutation functional qualification v1",
+  "version": 1,
+  "state": "functional-component-qualified",
+  "overallV0Complete": false,
+  "schema": 31,
+  "sourceBase": "32982f1419723045d7680b1d3e415c2106d8ab2b",
+  "branch": "codex/sync-mutation-cost",
+  "sourceState": "Qualified working-tree candidate; compiled repository blobs are pinned individually in the manifest. This is not an exact-head hosted CI claim.",
+  "scope": "Functional indexed sync metadata component. Paired performance pending; full sync service, enrollment/provider/two-Mac, physical power, distribution and ranking remain unverified.",
+  "inputs": {
+    "repositoryInputs": 719,
+    "identicalSourcesTestsVendorInputs": 459,
+    "repositoryManifest": "benchmarks/sync-mutation-cost-inputs-v1.json",
+    "manifestSHA256": "3ac297260d4b637b0c7b899154ad397362d8bf12b5dcce80860fc8af2239c8b3",
+    "rawFrozenInputs": 721,
+    "rawManifestSHA256": "16d8dac24eaab1d280f590b4aa90becba4bec921e3152efbfb8e939357537b6a",
+    "privateDrivers": {
+      ".artifacts/sync-mutation-cost-index-v1/qualification-v1/run.py": "0d3ea82f2c6ceabdaa64b3caffe3402df03c0193064d9a62ee57f56f2735ef2b",
+      ".artifacts/sync-mutation-cost-index-v1/qualification-v1/review-package.py": "cb3d2bc7b3d75c397a0ba23ebb2538404945fd69a4b010a3bb234662e9a4b32c"
+    },
+    "allQualificationInputsUnchanged": true
+  },
+  "tests": {
+    "test.log": {
+      "defined": 1700,
+      "passed": 1619,
+      "skipped": 81,
+      "failures": 0,
+      "newMandatoryCasesExecuted": 7
+    },
+    "thread-sanitizer.log": {
+      "defined": 640,
+      "passed": 619,
+      "skipped": 21,
+      "failures": 0,
+      "newMandatoryCasesExecuted": 7
+    },
+    "optimized.log": {
+      "defined": 640,
+      "passed": 619,
+      "skipped": 21,
+      "failures": 0,
+      "newMandatoryCasesExecuted": 7
+    }
+  },
+  "newCases": {
+    "defined": 8,
+    "mandatoryExecutedInEachBuild": 7,
+    "optInScaleNotInBroadSuite": 1
+  },
+  "threadSanitizer": {
+    "state": "passed",
+    "logs": [
+      {
+        "path": "thread-sanitizer.log",
+        "sha256": "067e1ca3a9038e5cf0c27a3d4463c806157cdf0b90363f2cdc8f48d85c73a2d2",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathAfterCommitRetainsBarriersAndPendingMedia_/retained-crash/child.log",
+        "sha256": "de6e78172ae9af99aaebd3d3ef38903a43bfa3d55c9652de8e34ca2d9d157bd8",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathAfterCommitRetainsBarriersAndPendingMedia_/retained-retry/child.log",
+        "sha256": "de6e78172ae9af99aaebd3d3ef38903a43bfa3d55c9652de8e34ca2d9d157bd8",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathBeforeCommitRollsBackSourceChildrenAndAnnouncements_/retained-crash/child.log",
+        "sha256": "0e631bac5378e3996f7db748cc3f5fbfbfb155defedb15c709dfdff770c15233",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathBeforeCommitRollsBackSourceChildrenAndAnnouncements_/retained-retry/child.log",
+        "sha256": "0e631bac5378e3996f7db748cc3f5fbfbfb155defedb15c709dfdff770c15233",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log",
+        "sha256": "fd4e707aac54de814e74ed3096b9538e448ccbae91ec5eb6afe94b62423edf14",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log",
+        "sha256": "fd4e707aac54de814e74ed3096b9538e448ccbae91ec5eb6afe94b62423edf14",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log",
+        "sha256": "9b07f029e7f94be9ee74e54c07bfc5c6b40f3ca31f043e5d435581a423f48185",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log",
+        "sha256": "9b07f029e7f94be9ee74e54c07bfc5c6b40f3ca31f043e5d435581a423f48185",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log",
+        "sha256": "9b168028091be2a33850039fe1a92eff8a66ef79aacb9e412e5d02dde95fcca5",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log",
+        "sha256": "9b168028091be2a33850039fe1a92eff8a66ef79aacb9e412e5d02dde95fcca5",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log",
+        "sha256": "ddae8606b95ff007057189e78028313987f35a6ea3eb65606c49b48195fdcf16",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log",
+        "sha256": "ddae8606b95ff007057189e78028313987f35a6ea3eb65606c49b48195fdcf16",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log",
+        "sha256": "22747137682b6879686d4b4fbb2b688b6a5da545bfda9a3ff92190c97e574b5d",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log",
+        "sha256": "f38eb56f0d09b09b86638ddb2cf03392a10070d9f1fd239cb578145d39274c75",
+        "raceWarnings": 0
+      }
+    ]
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "753d2ee3d2b4d7eaa09b4a15076f7422681a49089b7038d6e4f64e769b0a2754"
+    },
+    {
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "067e1ca3a9038e5cf0c27a3d4463c806157cdf0b90363f2cdc8f48d85c73a2d2"
+    },
+    {
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "1ceab3a6c996e3648014466e3a2364bdc37c351bfc07d4b00aa7ce49c9d80bf2"
+    },
+    {
+      "name": "owned-sqlite-contracts",
+      "returncode": 0,
+      "log": "owned-sqlite-contracts.log",
+      "logSHA256": "72f09eca554e87a45b7156c6109520cf15e8b6ec157dc5c033610649b49b8698"
+    },
+    {
+      "name": "mutation-review-contracts",
+      "returncode": 0,
+      "log": "mutation-review-contracts.log",
+      "logSHA256": "72d565e37fdce5a9a2847173570537eb86cb58e9a069402cdd5bed0aafd92111"
+    },
+    {
+      "name": "projection-review-prior",
+      "returncode": 0,
+      "log": "projection-review-prior.log",
+      "logSHA256": "14107654e369abe64b6f4b573ff2cb315d493349efb317a93b1dd4a3c5271a34"
+    },
+    {
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "1e50c011021203623bbca32cd556374c5bfcc84148c78306cb8bb1f97bfd80cc"
+    },
+    {
+      "name": "entity-process",
+      "returncode": 0,
+      "log": "entity-process.log",
+      "logSHA256": "12e1d008429cac95ed051a47582a3158b35a45e58c92ae4cac898c408212eb0e"
+    },
+    {
+      "name": "project-correction-process",
+      "returncode": 0,
+      "log": "project-correction-process.log",
+      "logSHA256": "35628423c288df315bfa89bb8e4c1f189a920b02e037e411139baefca745c508"
+    },
+    {
+      "name": "entity-metadata-process",
+      "returncode": 0,
+      "log": "entity-metadata-process.log",
+      "logSHA256": "b873624d2722274fced038bd2bfa8421702111ca6b8be75f63feb4f282fc32fc"
+    },
+    {
+      "name": "actual-old30-process",
+      "returncode": 0,
+      "log": "actual-old30-process.log",
+      "logSHA256": "18874e4a2fc31b2d0005f27f32f4efe2fff6d5628bea76860c9b145d643b2299"
+    },
+    {
+      "name": "capture-process",
+      "returncode": 0,
+      "log": "capture-process.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "original-erasure-process",
+      "returncode": 0,
+      "log": "original-erasure-process.log",
+      "logSHA256": "967ab7a5d43d4f78b6a177fdccd09d7eef6037bcbd9b7ad71f8a9924ec2485d4"
+    },
+    {
+      "name": "api-mcp-process",
+      "returncode": 0,
+      "log": "api-mcp-process.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp-process",
+      "returncode": 0,
+      "log": "indexed-api-mcp-process.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk-contracts",
+      "returncode": 0,
+      "log": "python-sdk-contracts.log",
+      "logSHA256": "7bd66263b4fcb25816eb7a88ff98389be5fec2335de96d188178ea3ecb0d23da"
+    },
+    {
+      "name": "single-delete-process",
+      "returncode": 0,
+      "log": "single-delete-process.log",
+      "logSHA256": "a7a3036a09ebfc837b354bcd2fec57e380ca4eed3b653e6bf9fc851f61da13da"
+    },
+    {
+      "name": "wipe-process",
+      "returncode": 0,
+      "log": "wipe-process.log",
+      "logSHA256": "22a33b83bf3d7502986a7f0edb34c5358569e43deb979448e28c08d68fe7a2ed"
+    },
+    {
+      "name": "recap-process",
+      "returncode": 0,
+      "log": "recap-process.log",
+      "logSHA256": "7e8e119506b273fbfec4af968fd64dcd008d73fca30d611f0bff5375a576cfaa"
+    },
+    {
+      "name": "routine-process",
+      "returncode": 0,
+      "log": "routine-process.log",
+      "logSHA256": "68e8bb38a4bc23c1af07eea80f132c9c8e155a59bf047eaca538cfed6e1cde38"
+    },
+    {
+      "name": "backup-interruption-process",
+      "returncode": 0,
+      "log": "backup-interruption-process.log",
+      "logSHA256": "b1be0c807598df60a16070234982a8fe6873bb2d093d1753eb49d74ea83ea8c5"
+    },
+    {
+      "name": "archive-review",
+      "returncode": 0,
+      "log": "archive-review.log",
+      "logSHA256": "e9aa45034548127f7c88bc135daf97e9284a0a2f0244118d12fef9b0290ade5a"
+    }
+  ],
+  "package": {
+    "stagedFiles": 34,
+    "allExtractedFilesEqualStaged": true,
+    "strictStagedAndExtractedVerification": true,
+    "cliSHA256": "9513c9371beb29388b87ba13976b2659fb044b9b12beb18938330abb005c6c9e",
+    "zipSHA256": "5cea671bedba7e0776cf126c67bd532b5d7afb7771060de9be0639f0346e5bc4",
+    "installed15FilesUnchanged": true,
+    "priorStagedTreesUnchanged": 5,
+    "notarizedDistributionAccepted": false
+  },
+  "independentReader": {
+    "negativeControls": 11,
+    "restoredPositivePassed": true,
+    "originalSQLiteUnchanged": true,
+    "contractsReportSHA256": "60ed5628daa3dba9044d55a406035ea266f253999ee0ea651f3a61ec50305035",
+    "qualificationReviewSHA256": "197a49a25540371459b7daddc9ee6bc90da1b58e613bf867d4b48877cdb34eb6"
+  },
+  "performance": {
+    "state": "passed-three-paired-rounds",
+    "acceptedSpeedup": true,
+    "protocol": "docs/SYNC-MUTATION-COST.md",
+    "earlierPartialExperiment": "Retained initial two-file candidate, first full pair near baseline. Original reader clock-field error corrected on same data. Deliberately interrupted round-two worker after readonly plan exposed per-child identity scans; no successful-only median or ranking accepted.",
+    "priorStopReasonSHA256": "310d3b9ddd741fbde5fa9c0c4e5ce2cef92bfa4b3e32bae77a69ba97e7ccaaa7",
+    "startedAtUTC": "2026-10-31T22:01:39.435091+00:00",
+    "profiles": {
+      "baseline": {
+        "sourceInputsSHA256": "bbbf5b1b1a9960a01f944ae728a0f60a24b0e0764ea98faf7494f1a5038d2756",
+        "executableSHA256": "97fb650040ac02090ebb896eefd00e5ffa6be6ccc71f4f8b02bbc0a3be4ad099",
+        "payloadManifestSHA256": "fa3cdc22a33a2879c1d3fe3057b295e35c04c8cb60ac0e10fa0787e5fa038378",
+        "dependencyInputsSHA256": "f7cd27f33d24d88b91adcd7872837e012c4bbc738eae38be6ec423fc8c7f63c7"
+      },
+      "candidate": {
+        "sourceInputsSHA256": "279ce081599eef137c12b76f60da2dc7004e371d70dc26bcd18794648bf383e1",
+        "executableSHA256": "517a5b833dd5cf97408d6a144eec8d4ef2e4958e9fbe1bb9a3ed27510dd091c8",
+        "payloadManifestSHA256": "afdb8c96985970d5c2d79f0f4c2fd92bb15d84d2c4f8a6f56cd2ec653380a0c2",
+        "dependencyInputsSHA256": "f7cd27f33d24d88b91adcd7872837e012c4bbc738eae38be6ec423fc8c7f63c7"
+      }
+    },
+    "acceptedScope": "Warm authored deletion phase and total deletion workload; projection/setup regressions and storage cost retained. No whole-product, energy or ranking claim.",
+    "receipt": "benchmarks/sync-mutation-cost-v1.json",
+    "measurementSHA256": "fd2f1e5f641660e86fddcbee4ad7fe5a58755b48b41ac49cc155a1ee788b1beb",
+    "finishedAtUTC": "2026-10-31T22:59:08.850619+00:00",
+    "indexedReaderControls": "11 refused corrupt copies plus restored positive; original files unchanged"
+  },
+  "earlierFailures": [
+    {
+      "kind": "SQL observation behavioral red",
+      "reportSHA256": "f4744f725e98535362a6157855cf188f54ddfcd44e1fd12304e8cefd22c4dff0"
+    },
+    {
+      "kind": "Index test fixture compile error",
+      "reportSHA256": "fdf18747496e3bc2aac42463531a3a94035821a9edcf027d7a31d6c8cb070a4d"
+    },
+    {
+      "kind": "Index behavioral red:three executed cases/ten assertions",
+      "reportSHA256": "b0718522e4948d402aa9802c7b48d1721ce42dc765f55e70891a7d975f8450b7"
+    },
+    {
+      "kind": "Original independent fanout reader nested-clock error",
+      "reportSHA256": "6a9f43015044c31937d42475ce03a8a0eb96ae5852d743af79efb33c15515ea0"
+    }
+  ],
+  "ledger": {
+    "requirements": 78,
+    "statuses": {
+      "live verified": 4,
+      "partial": 40,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 3,
+      "out of v0 desktop scope": 2
+    },
+    "F059": "todo",
+    "allStatusesUnchanged": true,
+    "scope": "Snapshot at qualification completion:78 requirements. October31 follow-up research adds five unimplemented requirements without promoting any prior status.",
+    "currentRequirements": 83,
+    "currentStatuses": {
+      "live verified": 4,
+      "partial": 40,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 8,
+      "out of v0 desktop scope": 2
+    },
+    "newTodoIDs": [
+      "F079",
+      "F080",
+      "F081",
+      "F082",
+      "F083"
+    ]
+  },
+  "remaining": [
+    "Fresh full paired1k/10k measurements and accepted comparisons",
+    "Late unseen dependent-record outcomes and sender-stream liveness",
+    "Scoped/wipe collection epochs, compaction and complete production privacy/media/transport service",
+    "Enrollment, Keychain recovery/revocation, native status/conflicts and actual providers/two-Mac acceptance",
+    "Sustained native capture/replay/power, notarized distribution and whole-product ranking"
+  ],
+  "startedAtUTC": "2026-10-31T21:40:55.691446+00:00",
+  "finishedAtUTC": "2026-10-31T21:54:24.292277+00:00"
+}

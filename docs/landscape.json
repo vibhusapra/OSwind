@@ -1,15 +1,15 @@
 {
-  "reviewed": "2026-10-29 America/Los_Angeles",
-  "method": "Initial16 profiles reviewed October22; primary-source documentation rechecks and four additional profiles checked October29. Publisher/cache snapshots may lag; current availability/prices remain unverified where flagged. Features and license labels are documentation claims, not application, billing, security, power or interoperability measurements.",
+  "reviewed": "October31,2026 America/Los_Angeles: targeted six-offering recheck; other fourteen last checked October29",
+  "method": "Initial16 profiles reviewed October22; twenty profiles checked October29; Screenpipe, original Rewind/Limitless, Rewind Desktop, Pieces, Littlebird and Granola targeted October31. Publisher text/search caches may lag. Failed direct fetches, plan ambiguity and conflicting help articles remain explicit. Documentation is not runtime, billing, security or power proof.",
   "vendors": [
     {
       "name": "Screenpipe",
       "category": "Desktop memory + automation",
       "price": "Free limited history; Basic $250/year (~$21/month); Business $500/seat/year (~$42/month); Enterprise custom.",
       "license": "Source available under a commercial license; source-based commercial/competing-product use is restricted. Official prebuilt builds have separate Terms of Service and plan terms.",
-      "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; optional async text/image redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context.",
-      "difference": "Broadest reference for capture-to-automation and assistant context. Business explicitly does not include shared teammate context; Infinite Context/mobile are Max/Ultra beta.",
-      "caveat": "Rendered pricing defaults to annual; about/pricing pages differ, so use checkout terms. Storage/RAM numbers are vendor estimates. Official CLI 0.4.53 now has an isolated authenticated keyword-HTTP comparison against identical authored text; this does not qualify capture, GUI, power, transcription or whole-product parity. Default query semantics and result caching differ.",
+      "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; optional async text/image redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context. Changelog also advertises calendar reminders, saved AI presets, timed starred sessions, custom MCP connections, clipboard context and narrated SOP exports.",
+      "difference": "Capture, assistant context and automation reference. Business excludes shared teammate context. The plan table lists Max/Ultra beta access, while nearby prose singles out Ultra; exact entitlement and capacity prices need account/checkout verification.",
+      "caveat": "Annual prices are displayed defaults, not a tested checkout. Pricing estimates ~30GB/month; architecture estimates ~5–10GB/month and ~600MB RAM, while pricing allows600MB–4GB. These are different vendor estimates, not matched energy/storage tests. Our official CLI0.4.53 keyword-HTTP result does not measure desktop2.7.84, capture, AI, audio or power.",
       "sources": [
         "https://screenpipe.com/onboarding",
         "https://docs.screenpipe.com/home",
@@ -19,42 +19,47 @@
         "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md",
         "https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/crates/screenpipe-engine/src/cli/mod.rs",
         "https://github.com/screenpipe/screenpipe/blob/6e237a53d877eb5470737874b4d213de4c76c421/LICENSE.md",
-        "https://screenpipe.com/terms"
+        "https://screenpipe.com/terms",
+        "https://screenpipe.com/changelog",
+        "https://docs.screenpipe.com/architecture",
+        "https://docs.screenpipe.com/storage-and-retention"
       ],
-      "checked": "October 29 primary documentation and pinned official CLI 0.4.53 backend inspection; restricted HTTP component runtime only."
+      "checked": "October31 pricing/docs/changelog/license recheck. Engine-only official CLI0.4.53 benchmark remains separate from advertised desktop v2.7.84; no new vendor runtime test."
     },
     {
       "name": "Original Rewind / Limitless",
       "category": "Historical desktop memory / pendant",
-      "price": "Historical October 22 announcement: no new Pendant sales; continuing customers described as Unlimited free through 2026. Current service/pricing not reverified October 29.",
+      "price": "Historical wind-down announcement: no new Pendant sales and free Unlimited for continuing customers through2026. Direct homepage fetch still times out; a conflicting help pricing article is not accepted as current availability.",
       "license": "Proprietary service.",
       "features": "Original Rewind combined screen/audio recall and AI retrieval. Limitless shifted toward meeting/lifelog transcripts and Pendant. Export can include transcripts, chats and audio.",
       "difference": "The authoritative legacy product reference, not an available new desktop competitor. Do not conflate it with rewind.app.",
-      "caveat": "Official announcement: Rewind capture disabled December 19, 2025; Limitless desktop/web no longer record. Existing meeting access continues through 2026; regional restrictions apply. October 29 homepage fetches timed out. Export help covers transcripts, chats and optional audio; it is not proof that current capture or pricing is available.",
+      "caveat": "The announcement disables original Rewind capture from December19,2025 and desktop/web recording, while keeping existing meeting access through2026. A September9,2026 help page still describes20 free transcription hours and paid upgrades, conflicting with that announcement. Legacy Rewind help says there is no supported API. Treat availability, Rewind data access and Limitless exports separately.",
       "sources": [
         "https://www.limitless.ai/",
-        "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info"
+        "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info",
+        "https://help.limitless.ai/en/articles/9129649-pricing-plans",
+        "https://help.limitless.ai/en/articles/13048802-where-can-i-find-my-rewind-data"
       ],
-      "checked": "October 22 announcement evidence; October 29 homepage timed out twice. Export-help documentation was reachable."
+      "checked": "October31 export, legacy-data and pricing-help recheck; homepage timeout. A publisher search snapshot repeats the wind-down FAQ."
     },
     {
       "name": "Rewind Desktop (rewind.app)",
       "category": "Visual desktop history",
-      "price": "Prior comparison-page quote: $30/month, reviewed October 22. Current price/free-tier availability not reverified October 29.",
+      "price": "Publisher comparison search snapshots retrieved October31 quote $30/month and no free tier. Direct article fetch still fails; live checkout is unverified.",
       "license": "Proprietary; distinct from original Rewind AI.",
       "features": "Always-on screen history; local OCR keyword search; full-screen timeline; global shortcut; private-window detection; H.264 compression; optional encrypted archive to user-owned S3 with on-demand older video.",
       "difference": "Visual replay and storage are its focus. Source says AI-powered search and meeting/audio transcription are not yet available.",
-      "caveat": "~2 GB/week is a vendor claim, not our measurement. Marketing comparisons about other vendors are not used as evidence for those other vendors. The price-comparison URL was unavailable on October 29; retain the quote as historical, not confirmed-current billing.",
+      "caveat": "~2GB/week and low resource use are publisher claims. Search snapshots repeat $30/month, but do not verify current billing. Other-vendor descriptions in Rewind marketing comparisons are not evidence for those other vendors.",
       "sources": [
         "https://rewind.app/",
         "https://rewind.app/blog/rewind-vs-rewind-desktop"
       ],
-      "checked": "October 29 homepage recheck; price comparison URL returned cache miss."
+      "checked": "October31 homepage recheck and publisher comparison search snapshots; direct comparison URLs return cache misses."
     },
     {
       "name": "Pieces",
       "category": "Work memory + assistant context",
-      "price": "Pro $18.99/user/month; Enterprise $22.99/user/month; 7-day card-required trial. Current page says no free plan.",
+      "price": "Pro $18.99/user/month; Enterprise $22.99/user/month, or $69.99/user/quarter as displayed. Seven-day card-required trial; no free plan. Annual discount advertised without a freshly selected annual price.",
       "license": "Proprietary desktop product.",
       "features": "On-device long-term memory across apps/websites; chronology and scoped recall; single-click standup, meeting prep and recaps; local/cloud model selection; unlimited MCP. Enterprise adds org capture/feature policies, approved providers and own API keys.",
       "difference": "Strong assistant/IDE context and prebuilt summary workflows. Enterprise governance is distinct from personal memory.",
@@ -62,7 +67,7 @@
       "sources": [
         "https://pieces.app/pricing"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "October31 pricing recheck; no app runtime or billing qualification."
     },
     {
       "name": "Littlebird",
@@ -71,12 +76,12 @@
       "license": "Proprietary cloud service.",
       "features": "Active-window work context; bot-free meeting notes; chat, routines, hover, MCP and connected email/calendar/files. Free: 25 total meeting notes, 5 routines, daily credits. Plus: unlimited notes, up to 100 routines, MCP. Higher tiers expand credits/modes.",
       "difference": "Integrated actions and routines, with desktop/web/mobile access. Security page explicitly says context is encrypted and stored in AWS US East, not local-only.",
-      "caveat": "Pricing includes credit limits; unlimited meeting notes are not unlimited AI. Audit/compliance statements are vendor claims, not reviewed reports. Desktop scope differs from full-screen video.",
+      "caveat": "Basic has daily credits,25 lifetime meeting notes,5 routines and2 Max messages/day. Plus trial requires a card. Power advertises2x Plus credits; selected Pro5x starts$100/month, while the12x price was not selected. Unlimited notes do not mean unlimited AI. AWS/cloud and audit statements remain publisher claims.",
       "sources": [
         "https://littlebird.ai/pricing",
         "https://littlebird.ai/privacy"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "October31 pricing and privacy recheck; no app runtime, account billing or certification audit."
     },
     {
       "name": "Microsoft Recall",
@@ -221,13 +226,13 @@
       "category": "Meeting-first adjacent competitor",
       "price": "Basic $0; Business $14/user/month; Enterprise $35/user/month as rendered.",
       "license": "Proprietary cloud product.",
-      "features": "Bot-free device-audio notes; speaker tags; templates, multilingual notes and recipes; cross-meeting chat; shared folders; MCP; paid unlimited history, advanced models/integrations, prep and follow-up; Enterprise SSO, policy, SCIM/audit and admin controls.",
+      "features": "Bot-free device-audio notes; speaker tags; templates, multilingual notes and recipes; cross-meeting chat; shared folders; MCP; paid unlimited history, advanced models/integrations, prep and follow-up; Enterprise SSO, policy, SCIM/audit and admin controls. Voice typing is advertised in all plans.",
       "difference": "Meeting usability, team workflow and note quality reference; not an always-on visual desktop recorder.",
-      "caveat": "Basic history is 30 days; audio deleted after transcription per pricing matrix. Model-training opt-out is a listed control. Not locally benchmarked.",
+      "caveat": "Basic history is30 days, with MCP limited to personal notes in that window. Pricing says audio is deleted after transcription. Training opt-out differs between individuals and enterprise defaults. No capture, ASR, privacy or energy benchmark was run here.",
       "sources": [
         "https://www.granola.ai/pricing"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "October31 pricing-matrix recheck; no app runtime or billing qualification."
     },
     {
       "name": "OpenRecall",
@@ -284,5 +289,6 @@
       ],
       "checked": "October 29 homepage/privacy check; privacy policy last updated October 13, 2026."
     }
-  ]
+  ],
+  "latestSourceCheck": "landscape-source-checks-2026-10-31.json"
 }
