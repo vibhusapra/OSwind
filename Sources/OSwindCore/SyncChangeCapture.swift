@@ -128,6 +128,7 @@ enum SyncChangeCapture {
             guard try scope(db)==expected else {throw OSwindError.invalid("Sync capture scope changed")}
             let pending=try db.statement("SELECT EXISTS(SELECT 1 FROM personal_sync_changes LIMIT 1)");defer {sqlite3_finalize(pending)}
             guard sqlite3_step(pending)==SQLITE_ROW,sqlite3_column_int(pending,0)==0 else {throw OSwindError.unavailable("Process pending local changes before applying peer changes")}
+            try SyncOutgoingWorkQueue.requireNoPending(db)
             try db.execute("UPDATE personal_sync_capture SET suppressed=suppressed+1 WHERE singleton=1")
             let result=try body();try db.execute("UPDATE personal_sync_capture SET suppressed=suppressed-1 WHERE singleton=1");return result
         }

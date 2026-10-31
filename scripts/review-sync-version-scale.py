@@ -14,10 +14,10 @@ def sha(path):
 def canonical_uuid(value):
     return type(value) is str and str(uuid.UUID(value))==value
 def digest(value):return hashlib.sha256(value).hexdigest()
-def review(root):
+def review(root,*,outgoing=False):
     root=pathlib.Path(root).absolute();need(root.resolve()==root and root.is_dir() and not root.is_symlink(),'Authored output must be a nonsymlink absolute directory')
     metadata=root.stat();need(metadata.st_uid==os.getuid() and stat.S_IMODE(metadata.st_mode)==0o700,'Private authored output ownership differs')
-    marker=root/'owned-fixture';need(marker.is_file() and not marker.is_symlink() and marker.read_bytes()==b'OSwind authored version preparation v1','Missing authored version fixture marker')
+    marker=root/'owned-fixture';expected_marker=b'OSwind authored outgoing preparation v1' if outgoing else b'OSwind authored version preparation v1';need(marker.is_file() and not marker.is_symlink() and marker.read_bytes()==expected_marker,'Missing authored version fixture marker')
     report_path=root/'report.json';need(report_path.is_file() and not report_path.is_symlink() and report_path.stat().st_size<2*1024*1024,'Invalid version report')
     reports=json.loads(report_path.read_text());need(type(reports) is list and [r.get('count') for r in reports]==[1000,10000],'Unexpected authored version fixture sizes')
     results=[]
@@ -36,7 +36,14 @@ def review(root):
             replica='00000000-0000-0000-0000-000000000711';group='00000000-0000-0000-0000-000000000712';epoch='00000000-0000-0000-0000-000000000713'
             need(connection.execute('SELECT replica,group_id,epoch,sequence FROM personal_sync_local').fetchall()==[(replica,group,epoch,count)],'Journal scope/counter differs')
             local=connection.execute('SELECT origin,generation,through_seq,processing FROM personal_sync_identity_state').fetchall();need(local==[(origin,generation,0,0)],'Identity state differs')
-            need(connection.execute('SELECT table_name,next_key,cursor_key,complete FROM personal_sync_identity_bootstrap').fetchall()==[('memories',None,None,1)],'Bootstrap did not finish without a raw cursor')
+            bootstrap=connection.execute('SELECT table_name,next_key,cursor_key,complete FROM personal_sync_identity_bootstrap ORDER BY table_name').fetchall()
+            tables=['memories','chat_sessions','chat_turns','chat_sources','recap_sources','routines','routine_runs','memory_entities','entity_aliases','entity_mentions','entity_ignored','entity_project_ignored','text_observation_pins'] if outgoing else ['memories']
+            need(bootstrap==[(table,None,None,1) for table in sorted(tables)],'Bootstrap did not finish without a raw cursor')
+            if outgoing:
+                for table in tables:
+                    if table!='memories':need(connection.execute('SELECT COUNT(*) FROM '+table).fetchone()[0]==0,'Unexpected canonical graph rows in note-only fixture')
+                need(connection.execute('SELECT COUNT(*) FROM personal_sync_work').fetchone()[0]==0,'Outgoing work remains')
+                need(connection.execute('SELECT origin,generation,processing,used_bytes,budget FROM personal_sync_work_state').fetchall()==[(origin,generation,0,0,67108864)],'Outgoing work context/accounting differs')
             identities=connection.execute('SELECT object_digest,table_name,origin,lifetime,local_key,key_frame,deleted FROM personal_sync_identities').fetchall();need(len(identities)==count,'Identity membership differs');by_key={x[4]:x for x in identities};need(len(by_key)==count,'Duplicate local identity key')
             current=dict(connection.execute("SELECT local_key,object_digest FROM personal_sync_identity_current WHERE table_name='memories'"));need(len(current)==count,'Current mappings differ')
             versions={x[0]:x[1:] for x in connection.execute('SELECT object_digest,content_sha,table_name,local_key,bytes,body FROM personal_sync_versions')};need(len(versions)==count,'Version membership differs')
@@ -71,12 +78,17 @@ def review(root):
         need({p.name:sha(p) for p in library.glob('memory.sqlite*') if p.is_file()}==files,'Readonly review changed authored SQLite files')
         batches=r['batches'];need(len(batches)==math.ceil(count/128) and sum(x['objects'] for x in batches)==count and all(type(x['objects']) is int and 0<x['objects']<=128 and math.isfinite(x['seconds']) and x['seconds']>=0 for x in batches),'Invalid bounded preparation batches')
         times=[x['seconds'] for x in batches];need(math.isfinite(r['prepareSeconds']) and r['prepareSeconds']>=sum(times),'Invalid preparation timer')
+        if outgoing:
+            steps=r['steps'];need(all(type(s) is dict and s.get('kind') in ['prepared','bootstrap','idle'] and type(s.get('objects')) is int and 0<=s['objects']<=128 and math.isfinite(s.get('seconds',-1)) and s['seconds']>=0 for s in steps),'Invalid outgoing step')
+            need(steps[-1]['kind']=='idle' and sum(s['kind']=='idle' for s in steps)==1 and sum(s['objects'] for s in steps if s['kind']=='bootstrap')==count,'Outgoing step membership differs')
+            need(set(s.get('table') for s in steps if s['kind']=='bootstrap')==set(tables),'Outgoing bootstrap table coverage differs')
+            need([dict(objects=s['objects'],seconds=s['seconds']) for s in steps if s['kind']=='prepared']==batches and r['prepareSeconds']>=sum(s['seconds'] for s in steps),'Outgoing step timing differs')
         results.append(dict(count=count,sourceOriginalSHA256=r['sourceOriginalSHA256'],sourceRowsAndTypedPacketsVerified=count,journalAndProjectionBindingsVerified=True,sqliteFilesUnchanged=files,reportSHA256=sha(own_report),prepareSeconds=r['prepareSeconds'],batchMedianSeconds=statistics.median(times),batchP95Seconds=sorted(times)[math.ceil(.95*len(times))-1],logicalCacheBytes=logical))
-    return dict(state='reviewed',readerSHA256=sha(pathlib.Path(__file__)),independentFrameReaderSHA256=sha(_helper),inputReportSHA256=sha(report_path),results=results,scope='All authored source cells/payloads, global lifetimes, local/wire version bindings, typed bytes, journal/registers, accounting and batch summaries independently checked. Immutable readonly closed snapshots. Warm note-only preparation, not model/media/transport/capture/energy or competitor ranking.')
+    return dict(state='reviewed',outgoing=outgoing,readerSHA256=sha(pathlib.Path(__file__)),independentFrameReaderSHA256=sha(_helper),inputReportSHA256=sha(report_path),results=results,scope='All authored source cells/payloads, global lifetimes, local/wire version bindings, typed bytes, journal/registers, accounting and batch summaries independently checked. Outgoing mode additionally verifies all 13 finished bootstrap cursors, drained work/context/accounting and step membership/timers. Immutable readonly closed snapshots. Warm note-only preparation, not model/media/transport/capture/energy or competitor ranking.')
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('root',type=pathlib.Path);args=parser.parse_args()
-    try:result=review(args.root)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('root',type=pathlib.Path);parser.add_argument('--outgoing',action='store_true');args=parser.parse_args()
+    try:result=review(args.root,outgoing=args.outgoing)
     except (ValueError,OSError,sqlite3.Error,KeyError,TypeError,IndexError) as error:parser.exit(1,'Review refused: '+str(error)+'\n')
     print(json.dumps(result,indent=2,sort_keys=True))
 if __name__=='__main__':main()
