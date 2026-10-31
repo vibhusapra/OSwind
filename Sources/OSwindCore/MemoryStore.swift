@@ -4,9 +4,10 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version28 admits typed source projections while preserving exact cited originals.
-    public static let schemaVersion = 28
+    // Version29 retains data-only peer run provenance without importing execution authority.
+    public static let schemaVersion = 29
     let incomingSourceProjection=SyncIncomingSourceProjection()
+    let incomingRunProjection=SyncIncomingRunProjection()
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -44,7 +45,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection)}
+        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection)}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
@@ -156,6 +157,7 @@ public final class MemoryStore: @unchecked Sendable {
         try exec("CREATE TABLE IF NOT EXISTS text_observation_pins(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE) WITHOUT ROWID")
         try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         let upgradedCitations=try CitationSchema.migrate(RoutineDatabase(handle:db!),sourceVersion:version)
+        try SyncVersionStore.migrateIncomingRunProtection(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncVersionStore.migrateIncomingSourceProtection(RoutineDatabase(handle:db!),sourceVersion:version)
         if missingPins {try SyncVersionStore.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
         if upgradedCitations {try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)}
@@ -164,6 +166,7 @@ public final class MemoryStore: @unchecked Sendable {
             try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins,repairCitationUpgrade:upgradedCitations)
         }
         try SyncIncomingSourceSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
+        try RoutineRunOriginalSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")

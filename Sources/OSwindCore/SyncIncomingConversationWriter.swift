@@ -23,7 +23,7 @@ struct SyncIncomingConversationWriter {
         guard !value.isEmpty,value.utf8.count<128,!value.utf8.contains(0) else {throw OSwindError.invalid("Invalid incoming local identifier")};return value
     }
     private var references:SyncPortableReferences {
-        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{_ in throw OSwindError.unavailable("Source projection uses its complete source/media adapter")},recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{_ in throw OSwindError.unavailable("Source projection needs its original session binding")},runRecipe:{try cache.runRecipe(localRunID:$0,recipeID:$1,ordinal:$2,admit:admit)})
+        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{_ in throw OSwindError.unavailable("Source projection uses its complete source/media adapter")},recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{_ in throw OSwindError.unavailable("Source projection needs its original session binding")},runRecipe:{try cache.runRecipe(localRunID:$0,recipeID:$1,ordinal:$2,admit:admit)},runOriginal:{try RoutineRunOriginalStore(db:db).read($0)})
         return history.decorating(base,admit:admit,verify:{value in
             guard case .source(let body)=value.record.body else {throw OSwindError.invalid("Historical source differs")}
             var paths=[SyncMediaRole:String]();if let path=value.memory.imagePath {paths[.image]=path};if let path=value.memory.audioPath {paths[.audio]=path};if let path=value.memory.videoPath {paths[.video]=path}
@@ -43,6 +43,54 @@ struct SyncIncomingConversationWriter {
     private func original(_ ref:SyncVersionReference,requestedBy:SyncPortableRecord,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->HistoricalEvidence {
         var visiting=Set<String>(),remaining=512;try ensureSource(ref,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)
         return try history.adopt(ref,cache:cache,pathsFor:pathsFor,admit:admit,verifyMedia:verifyMedia)
+    }
+    private struct RecipeProjection {let definition:RoutineDefinition,revision:Int,nextDue:Date}
+    private func projectRecipe(_ body:SyncRoutineBody,record:SyncPortableRecord,local:String)throws->RecipeProjection {
+        let current=try db.routine(local)
+        guard try cache.catalog.object(record.identity)==nil || current != nil else {throw OSwindError.unavailable("Incoming recipe's native owner disappeared")}
+        if current==nil {guard try db.eraseCount("SELECT count(*) FROM routines")<100 else {throw OSwindError.unavailable("At most 100 routines can be saved")}}
+        guard (current?.revision ?? 0)<Int.max-1 else {throw OSwindError.invalid("Incoming recipe revision limit reached")}
+        let value=try body.projected(id:local),revision=(current?.revision ?? 0)+1,next=try value.schedule.occurrence(relativeTo:Date(),next:true)
+        try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8))]) {
+            let row=try db.statement("INSERT INTO routines(id,revision,enabled,next_due,payload) VALUES(?,?,0,?,?) ON CONFLICT(id) DO UPDATE SET revision=excluded.revision,enabled=0,next_due=excluded.next_due,payload=excluded.payload");defer {sqlite3_finalize(row)}
+            db.bind(row,1,local);sqlite3_bind_int64(row,2,Int64(revision));sqlite3_bind_double(row,3,next.timeIntervalSince1970);try db.bind(row,4,json:value);try db.done(row)
+        }
+        return .init(definition:value,revision:revision,nextDue:next)
+    }
+    private func auditRecipe(_ expected:RecipeProjection,local:String)throws {
+        guard let actual=try db.routine(local),try SyncProtocolLimits.encode(actual.definition)==SyncProtocolLimits.encode(expected.definition),actual.revision==expected.revision,actual.nextDue==expected.nextDue else {throw OSwindError.invalid("Incoming recipe's local projection changed during admission")}
+        let row=try db.statement("SELECT enabled FROM routines WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,local)
+        guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_int(row,0)==0,!actual.definition.enabled,!actual.definition.allowRemote,!actual.definition.ai.allowRemote else {throw OSwindError.invalid("Incoming recipe cannot acquire local execution authority")}
+    }
+    private struct RunProjection {let original:RoutineRunOriginal,frame:SyncRowSnapshot}
+    private func projectRun(_ body:SyncRoutineRunBody,record:SyncPortableRecord,local:String,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->RunProjection {
+        let recipeID=try id(body.recipe.routine),store=RoutineRunOriginalStore(db:db)
+        guard let recipe=try db.routine(recipeID) else {throw OSwindError.unavailable("Prepare the incoming recipe before its run")}
+        _=try cache.resolve(body.recipe.routine,content:nil,admit:admit)
+        let previous=try db.run(local),prior=try store.read(local)
+        if let previous,prior==nil {throw OSwindError.unavailable(previous.status == .running ? "Review the active local run before peer replacement":"Existing run has no admitted peer provenance")}
+        if let prior,case .routineRun(let old)=prior.record.body {guard try SyncProtocolLimits.encode(old.recipe)==SyncProtocolLimits.encode(body.recipe) else {throw OSwindError.invalid("A run cannot change its original recipe")}}
+        let definition:SyncPortableRecord?
+        if let content=body.recipe.definition {
+            let reference=SyncVersionReference(identity:body.recipe.routine,content:content)
+            if let stored=try cache.record(reference,admit:admit) {definition=stored}
+            else {let packet=try fetch(reference);guard try packet.reference==reference else {throw OSwindError.invalid("Fetched recipe is not its requested version")};_=try cache.retain(packet,requiredBy:record,admit:admit);definition=packet}
+        }else{definition=nil}
+        let original=RoutineRunOriginal(record:record,definition:definition);let payload=try original.encoded(),ordinal=previous?.revision ?? recipe.revision,filter=try body.filter.projected {try id($0)},scope=try SyncProtocolLimits.encode(filter),chat=try body.conversation.map {try id($0)}
+        func text(_ value:String)->SyncRowCell {.text(Data(value.utf8))}
+        let frame=try SyncRowSnapshot([text(local),text(recipeID),.integer(Int64(ordinal)),.real(body.scheduledAt.timeIntervalSince1970.bitPattern),.real(body.started.timeIntervalSince1970.bitPattern),body.finished.map{.real($0.timeIntervalSince1970.bitPattern)} ?? .null,text(body.trigger.rawValue),text(body.projectedStatus.rawValue),chat.map(text) ?? .null,body.message.map(text) ?? .null,.blob(scope)])
+        try library.incomingRunProjection.withRun(frame,payload:payload) {
+            try cache.catalog.applyPeer(record.identity,primary:[text(local)]) {
+                let row=try db.statement("INSERT INTO routine_runs(id,routine_id,revision,scheduled_at,started,finished,trigger,status,chat_id,message,scope) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET routine_id=excluded.routine_id,revision=excluded.revision,scheduled_at=excluded.scheduled_at,started=excluded.started,finished=excluded.finished,trigger=excluded.trigger,status=excluded.status,chat_id=excluded.chat_id,message=excluded.message,scope=excluded.scope");defer {sqlite3_finalize(row)}
+                db.bind(row,1,local);db.bind(row,2,recipeID);sqlite3_bind_int64(row,3,Int64(ordinal));sqlite3_bind_double(row,4,body.scheduledAt.timeIntervalSince1970);sqlite3_bind_double(row,5,body.started.timeIntervalSince1970);if let end=body.finished {sqlite3_bind_double(row,6,end.timeIntervalSince1970)};db.bind(row,7,body.trigger.rawValue);db.bind(row,8,body.projectedStatus.rawValue);db.bind(row,9,chat);db.bind(row,10,body.message);scope.withUnsafeBytes {_=sqlite3_bind_blob(row,11,$0.baseAddress,Int32(scope.count),db.transient)};try db.done(row)
+                try store.replace(local,payload:payload,frame:frame)
+            }
+        }
+        return .init(original:original,frame:frame)
+    }
+    private func auditRun(_ expected:RunProjection,local:String)throws {
+        let store=RoutineRunOriginalStore(db:db)
+        guard let actual=try store.read(local),try actual.encoded()==expected.original.encoded(),try store.frame(local)==expected.frame else {throw OSwindError.invalid("Incoming run or original provenance changed during admission")}
     }
     /// Content-free recap deletion. The global old citation is retired even
     /// when its current owner still independently requires the same native row.
@@ -82,8 +130,12 @@ struct SyncIncomingConversationWriter {
             return try SyncChangeCapture.transaction(db) {
                 try record.validate();let reference=try record.reference,state=try cache.journal.state(for:record.identity.key)
                 guard !state.isDeleted,state.heads.count==1,state.heads.first?.content==reference.content else {throw OSwindError.unavailable("Admit one reviewed incoming head before projection; conflicts remain explicit")}
-                try admit(record);var local="",historical:HistoricalEvidence?
+                try admit(record);var local="",historical:HistoricalEvidence?,recipeProjection:RecipeProjection?,runProjection:RunProjection?
                 switch record.body {
+                case .routineRun(let body):
+                    local=try id(record.identity,create:true);runProjection=try projectRun(body,record:record,local:local,fetch:fetchExactSource)
+                case .routine(let body):
+                    local=try id(record.identity,create:true);recipeProjection=try projectRecipe(body,record:record,local:local)
                 case .conversation(let body):
                     local=try id(record.identity,create:true)
                     try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8))]) {
@@ -135,6 +187,8 @@ struct SyncIncomingConversationWriter {
                 try SyncIncomingDependencyAudit.check([record],cache:cache)
                 let after=try cache.journal.state(for:record.identity.key)
                 guard !after.isDeleted,after.heads.count==1,after.heads.first?.content==reference.content,try cache.resolve(record.identity,content:nil,admit:{_ in}).encoded()==record.encoded() else {throw OSwindError.invalid("Incoming head or exact projection changed during admission")}
+                if let recipeProjection {try auditRecipe(recipeProjection,local:local)}
+                if let runProjection {try auditRun(runProjection,local:local)}
                 try admission.withActive(for:library.mediaRootIdentity) {};return local
             }
         }

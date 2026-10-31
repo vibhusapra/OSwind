@@ -1,10 +1,18 @@
 # OSwind delivery ledger
 
+## Incoming recipes and run history — tested internal adapter
+
+[Schema29 work](SYNC-INCOMING-ROUTINES.md) projects recipes disabled with local AI defaults and records peer runs without execution. Exact original run/recipe attribution stays separate from current editor state and native safe status. Actual28 native/cache migration, restart, quiet restore/re-export, mutation cleanup, late-admission rollback and scoped permits pass.
+
+The [validation receipt](../benchmarks/sync-incoming-routines-v1.json) records 25 passing stages: 1,561 full passes/77 explicit skips, 429 TSan passes/15 skips/no race warnings and 429 optimized passes/15 skips. Independent producer/native/original checks and seven corruption controls pass. SDK, staged normal/indexed API/MCP, erasure/deletion/retention/wipe/recap/backup interruptions, actual old28 refusal, readonly old27 historical restore and original-run quiet portability pass. All 34 ZIP files/signatures match; the installed 15-file app remains unchanged and fixtures are excluded.
+
+All 439 tracked source/test inputs match. There are 686 common tracked repository inputs across builds and process checks; the final manifest has 687 after the separately corrected capture accounting oracle. Earlier failures remain retained. Run-specific SIGKILL and throughput gates, complete graph/deletion/privacy/epoch/media/service/enrollment/provider/two-Mac and physical/distribution acceptance remain open. F059 and all 78 statuses stay unchanged. Hosted CI for the forthcoming draft is pending.
+
 ## Incoming source projection and preservation — component qualified
 
 [Schema28 incoming source projection](SYNC-INCOMING-SOURCES.md) materializes typed source/media/session metadata and source-linked recaps, preserving exact previously cited originals and current recap/answer chains. Shared final typed dependency/head audits reject late ancestor deletions and stale heads. Connection-owned exact permits, byte-distinct IDs/links and older-writer fences preserve ordinary local-edit privacy semantics. No incoming service is enabled.
 
-The [24-stage receipt](../benchmarks/sync-incoming-sources-v1.json) verifies 679 unchanged repository inputs:1547 full passes / 77 explicit skips, 422 sanitizer / 10 skips and 424 optimized / 8 skips, zero race warnings. Sixteen SDK tests, signed normal/indexed HTTP/MCP, erasure/deletion/retention/wipe/recap/backup interruptions, actual initialized/fresh old25/26/27 refusal, real27 SQLite/archive migration and quiet restore pass. All 34 ZIP files/signatures match; the installed 15-file app stays unchanged and fixtures stay excluded.
+The [24-stage receipt](../benchmarks/sync-incoming-sources-v1.json) verifies 677 unchanged tracked repository inputs:1547 full passes / 77 explicit skips, 422 sanitizer / 10 skips and 424 optimized / 8 skips, zero race warnings. Sixteen SDK tests, signed normal/indexed HTTP/MCP, erasure/deletion/retention/wipe/recap/backup interruptions, actual initialized/fresh old25/26/27 refusal, real27 SQLite/archive migration and quiet restore pass. All 34 ZIP files/signatures match; the installed 15-file app stays unchanged and fixtures stay excluded.
 
 Independent review checks 11,000 incoming sources and actual producer packets, all current frames, 60 archival native projections/DAGs/accounting, exact citation/pin versions and original chain content. Eight corruption controls pass. A separate retained pre/postcommit process-death review preserves both receiver SQLite files. Final warm1k / 10k incoming times are 8.93 / 90.66s in 128-record batches; ten cited updates take 1.70 / 1.67s. No models/media/transport, cold-cache/power or competitor rank is measured. Real source/shared-adapter regressions and fixture/reader/compiler failures remain retained.
 

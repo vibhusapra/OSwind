@@ -54,7 +54,7 @@ private final class RestoreRows {
         guard result.allSatisfy(\.isFinite) else { throw BackupFileError.invalid("Invalid restored vector values") }; return result
     }
     func rows(_ table: String, columns: String, _ body: (OpaquePointer) throws -> Void) throws -> Int64 {
-        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","visual_manifests","memory_entities","entity_aliases","entity_mentions","entity_ignored","entity_project_ignored","pii_scan_records"]
+        let allowed = ["memories","semantic_vectors","semantic_passages","passage_manifests","chat_sessions","chat_turns","chat_sources","routines","routine_runs","routine_run_originals","visual_manifests","memory_entities","entity_aliases","entity_mentions","entity_ignored","entity_project_ignored","pii_scan_records"]
         guard allowed.contains(table) else { throw BackupFileError.invalid("Unsupported restore table") }
         let statement = try source.db.prepare("SELECT \(columns) FROM \(table) NOT INDEXED ORDER BY rowid"); defer { sqlite3_finalize(statement) }
         var count: Int64 = 0, status = sqlite3_step(statement)
@@ -325,6 +325,16 @@ private final class RestoreRows {
                     sqlite3_bind_text(insert,10,"Restored interrupted run; automatic execution stays off.",-1,transient)
                 }
             })
+            if source.schema>=29 {
+                let originals=RoutineRunOriginalStore(db:RoutineDatabase(handle:source.db.handle!)),target=RoutineRunOriginalStore(db:RoutineDatabase(handle:handle))
+                _=try rows("routine_run_originals",columns:"run_id") {row in
+                    let id=try self.source.db.text(row,0)
+                    guard let original=try originals.read(id),let frame=try target.frame(id),try originals.frame(id)==frame else {throw BackupFileError.invalid("Restored run differs from its recorded original")}
+                    let payload=try original.encoded()
+                    try self.destination.incomingRunProjection.withRun(frame,payload:payload) {try target.replace(id,payload:payload,frame:frame)}
+                    guard let retained=try target.read(id),try retained.encoded()==original.encoded() else {throw BackupFileError.invalid("Restored run original differs")}
+                }
+            }
         }
 
     }

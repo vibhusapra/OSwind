@@ -38,7 +38,8 @@ struct RoutineDatabase {
     static let runColumns="r.id,r.routine_id,r.revision,r.scheduled_at,r.started,r.finished,r.trigger,r.status,r.chat_id,r.message,r.scope,EXISTS(SELECT 1 FROM chat_turns t WHERE t.session_id=r.chat_id)"
     func run(_ row:OpaquePointer) throws -> RoutineRun {
         guard let trigger=RoutineTrigger(rawValue:text(row,6)),let status=RoutineRunStatus(rawValue:text(row,7)) else {throw OSwindError.database("Invalid routine status")}
-        return RoutineRun(id:text(row,0),routineID:text(row,1),revision:Int(sqlite3_column_int64(row,2)),scheduledAt:Date(timeIntervalSince1970:sqlite3_column_double(row,3)),started:Date(timeIntervalSince1970:sqlite3_column_double(row,4)),finished:sqlite3_column_type(row,5)==SQLITE_NULL ? nil : Date(timeIntervalSince1970:sqlite3_column_double(row,5)),trigger:trigger,status:status,chatID:optional(row,8),message:optional(row,9),filter:try decode(row,10,as:SearchFilter.self),resultAvailable:sqlite3_column_int(row,11) != 0)
+        var value=RoutineRun(id:text(row,0),routineID:text(row,1),revision:Int(sqlite3_column_int64(row,2)),scheduledAt:Date(timeIntervalSince1970:sqlite3_column_double(row,3)),started:Date(timeIntervalSince1970:sqlite3_column_double(row,4)),finished:sqlite3_column_type(row,5)==SQLITE_NULL ? nil : Date(timeIntervalSince1970:sqlite3_column_double(row,5)),trigger:trigger,status:status,chatID:optional(row,8),message:optional(row,9),filter:try decode(row,10,as:SearchFilter.self),resultAvailable:sqlite3_column_int(row,11) != 0)
+        value.original=try RoutineRunOriginalStore(db:self).read(value.id)?.info;return value
     }
     func run(_ id:String) throws -> RoutineRun? {
         let row=try statement("SELECT \(Self.runColumns) FROM routine_runs r WHERE r.id=?");defer {sqlite3_finalize(row)};bind(row,1,id)

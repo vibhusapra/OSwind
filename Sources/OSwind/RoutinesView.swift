@@ -50,8 +50,12 @@ struct RoutinesView:View {
                         HStack(alignment:.top,spacing:12) {
                             Image(systemName:run.status == .completed ? "checkmark.circle":"clock").foregroundStyle(.secondary)
                             VStack(alignment:.leading,spacing:4) {
-                                Text(model.items.first(where:{$0.id==run.routineID})?.definition.title ?? "Routine").font(.callout.weight(.medium))
+                                Text(run.original?.recipeTitle ?? model.items.first(where:{$0.id==run.routineID})?.definition.title ?? "Routine").font(.callout.weight(.medium))
                                 Text("\(run.trigger.rawValue.capitalized) · \(run.scheduledAt.formatted(date:.abbreviated,time:.shortened)) · \(run.status.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary)
+                                if let original=run.original {
+                                    Text("From another device · recorded as \(original.recordedStatus.rawValue) · recipe revision \(original.recipeOrdinal)").font(.caption).foregroundStyle(.secondary)
+                                    if original.recipeTitle==nil {Text("The original recipe definition is unavailable.").font(.caption).foregroundStyle(.secondary)}
+                                }
                                 if let message=run.message {Text(message).font(.caption).foregroundStyle(.secondary)}
                                 if run.status == .completed && !run.resultAvailable {Text("Result removed with its conversation or source evidence.").font(.caption).foregroundStyle(.secondary)}
                             };Spacer()

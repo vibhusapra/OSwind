@@ -1,0 +1,8 @@
+{
+  "format": "OSwind owned actual schema28 version-cache migration fixture v1",
+  "sha256": "4c3ddb02705c6b5b3ad3ba58fb12702bf9bd477bed4a889d06b2653aefeb23e4",
+  "bytes": 872448,
+  "source": ".artifacts/sync-incoming-sources-v1/qualification-v4/full-debug-source-owned-fixture/-_SyncIncomingSourceTests_testIncomingRecapAndDerivedCitationReplacementPreserveEvidenceAcrossSequence_/receiver/memory.sqlite",
+  "producerImplementation": "0446b8af3e28d898c4b5842279b93833a2a32359",
+  "scope": "Closed authored receipt-qualified producer/receiver sequence; no normal history or version-header rewrite"
+}

@@ -12,6 +12,7 @@ struct SyncPortableReferences {
     var historical:((String,String)throws->SyncVersionReference)? = nil
     var pin:((String)throws->SyncVersionReference?)? = nil
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
+    var runOriginal:((String)throws->RoutineRunOriginal?)? = nil
 }
 /// Converts the actual captured canonical row schema, not raw SQL supplied by a
 /// peer. Reference/media preparation and the writer's current-row/privacy checks
@@ -78,10 +79,16 @@ struct SyncPortableExporter {
             guard try integer("revision")>0,Data(value.id.utf8)==Data(try text("id").utf8) else {throw OSwindError.invalid("Portable sync recipe columns differ")};body = .routine(try .init(value))
         case .routineRun:
             let id=try text("routine_id"),ordinal=try integer("revision"),runID=try text("id")
-            let original=try references.runRecipe?(runID,id,ordinal),recipe=try original ?? references.recipe(id,ordinal),parent=try object("routine_id",.routine)
-            guard recipe.routine==parent,(original != nil || recipe.ordinal==ordinal),let trigger=RoutineTrigger(rawValue:try text("trigger")),let status=RoutineRunStatus(rawValue:try text("status")) else {throw OSwindError.invalid("Portable sync run metadata differs")}
+            let retained=try references.runOriginal?(runID),original=try references.runRecipe?(runID,id,ordinal),recipe:SyncRoutineRevision
+            let parent=try object("routine_id",.routine)
+            if let retained,case .routineRun(let body)=retained.record.body {
+                // Quiet restore retains attribution, but a new catalog has new
+                // object lifetimes. Never substitute the current definition.
+                recipe=body.recipe.routine==parent ? body.recipe:try .init(routine:parent,editorOrigin:body.recipe.editorOrigin,ordinal:body.recipe.ordinal,definition:nil)
+            }else{recipe=try original ?? references.recipe(id,ordinal)}
+            guard recipe.routine==parent,(retained != nil || original != nil || recipe.ordinal==ordinal),let trigger=RoutineTrigger(rawValue:try text("trigger")),let status=RoutineRunStatus(rawValue:try text("status")) else {throw OSwindError.invalid("Portable sync run metadata differs")}
             let chat=try optionalText("chat_id").map {try references.identity(.conversation,[.text(Data($0.utf8))])}
-            body = try .routineRun(.init(recipe:recipe,scheduledAt:date("scheduled_at"),started:date("started"),finished:optionalDate("finished"),trigger:trigger,status:status,conversation:chat,message:optionalText("message"),filter:filter(decode("scope",SearchFilter.self))))
+            body = try .routineRun(.init(recipe:recipe,scheduledAt:date("scheduled_at"),started:date("started"),finished:optionalDate("finished"),trigger:trigger,status:{if let retained,case .routineRun(let body)=retained.record.body {return body.status};return status}(),conversation:chat,message:optionalText("message"),filter:filter(decode("scope",SearchFilter.self))))
         case .entity:
             guard let kind=EntityKind(rawValue:try text("kind")) else {throw OSwindError.invalid("Portable sync entity kind differs")}
             body = try .entity(.init(kind:kind,name:text("name"),detail:text("detail"),curated:boolean("curated"),created:date("created")))

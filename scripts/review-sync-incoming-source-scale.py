@@ -44,7 +44,7 @@ def review(root):
  root=pathlib.Path(root).absolute();need(root.resolve()==root and root.is_dir() and not root.is_symlink(),'Invalid owned root');need(stat.S_IMODE(root.stat().st_mode)==0o700 and (root/'owned-fixture').read_bytes()==b'OSwind authored incoming source scale v1','Owned marker differs')
  reports=json.loads((root/'report.json').read_text());need([r['count'] for r in reports]==[1000,10000],'Scale sizes differ');results=[];pins={}
  for r in reports:
-  size=r['count'];base=root/('n%d'%size);need(json.loads((base/'report.json').read_text())==r and r['librarySchema']==28 and r['incomingObjects']==size and r['updatedObjects']==10,'Scale report differs')
+  size=r['count'];base=root/('n%d'%size);need(json.loads((base/'report.json').read_text())==r and r['librarySchema'] in (28,29) and r['incomingObjects']==size and r['updatedObjects']==10,'Scale report differs')
   need(r['batchSize']==128 and sum(b['objects'] for b in r['batches'])==size and all(0<b['objects']<=128 and math.isfinite(b['seconds']) and b['seconds']>=0 for b in r['batches']),'Batch coverage/timings differ')
   for name in ['loadSeconds','outgoingPreparationSeconds','incomingSeconds','citedUpdateSeconds']:need(type(r[name]) in [int,float] and math.isfinite(r[name]) and r[name]>=0,'Invalid timer')
   p=base/'receiver/memory.sqlite';need(p.resolve()==p and p.is_file() and not p.is_symlink(),'Invalid receiver file')
@@ -53,16 +53,17 @@ def review(root):
   for suffix in ['-wal','-journal']:need(not producer.with_name(producer.name+suffix).exists() or producer.with_name(producer.name+suffix).stat().st_size==0,'Producer journal remains')
   producer_before=sha(producer.read_bytes());expected_sources={}
   with contextlib.closing(sqlite3.connect(producer.as_uri()+'?mode=ro&immutable=1',uri=True)) as source_db:
-   need(source_db.execute('PRAGMA user_version').fetchone()==(28,) and source_db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not source_db.execute('PRAGMA foreign_key_check').fetchall(),'Producer integrity differs')
+   need(source_db.execute('PRAGMA user_version').fetchone()==(r['librarySchema'],) and source_db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not source_db.execute('PRAGMA foreign_key_check').fetchall(),'Producer integrity differs')
    for obj,raw,content,packet in source_db.execute("SELECT i.object_digest,i.key_frame,p.content_sha,v.body FROM personal_sync_identities i JOIN personal_sync_version_projection p ON p.object_digest=i.object_digest JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE i.table_name='memories' AND i.deleted=0"):
     primary=key(raw);need(len(primary)==1 and primary[0].startswith('incoming-'),'Producer source key differs');index=int(primary[0][9:]);need(primary[0]=='incoming-%08d'%index and 1<=index<=size and content==sha(packet),'Producer exact source differs');expected_sources[obj]=(index,content,packet)
    need(len(expected_sources)==size and source_db.execute('SELECT count(*) FROM personal_sync_changes').fetchone()==(0,),'Producer source membership/pending changes differ')
   need(sha(producer.read_bytes())==producer_before,'Readonly review changed producer');pins[str(producer.relative_to(root))]=producer_before
   before=sha(p.read_bytes())
   with contextlib.closing(sqlite3.connect(p.as_uri()+'?mode=ro&immutable=1',uri=True)) as db:
-   need(db.execute('PRAGMA user_version').fetchone()==(28,) and db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not db.execute('PRAGMA foreign_key_check').fetchall(),'Receiver integrity differs')
+   need(db.execute('PRAGMA user_version').fetchone()==(r['librarySchema'],) and db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not db.execute('PRAGMA foreign_key_check').fetchall(),'Receiver integrity differs')
    for prefix,marker in [('historical_scope_writer_','oswind_historical_scope_writer_v1'),('incoming_source_writer_','oswind_incoming_source_writer_v1')]:
     actual=dict(db.execute("SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name GLOB ?",(prefix+'*',)));expected={f'{prefix}{t}_{op}':f'CREATE TRIGGER {prefix}{t}_{op} BEFORE {op.upper()} ON {t} BEGIN SELECT {marker}(); END' for t in TABLES for op in ['insert','update','delete']};need(actual==expected,'Writer protection differs')
+   if r['librarySchema']>=29:frames.verify_run_original_schema(db,require_empty=True)
    for table in TABLES:
     if table not in SCHEMAS and table!='historical_evidence':need(db.execute('SELECT count(*) FROM '+table).fetchone()==(0,),'Unexpected unrelated native graph')
    need(db.execute('SELECT count(*) FROM personal_sync_changes').fetchone()==(0,),'Unexpected outgoing echo')

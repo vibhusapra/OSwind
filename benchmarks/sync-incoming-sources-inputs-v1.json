@@ -272,8 +272,6 @@
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/memory.sqlite": "55a97ce7016fcde140eaa2fad06aabdb7e6e0bd929fd39b5a9dda43ef1cb822c",
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/settings.json": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09",
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556",
-  "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
-  "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-source-schema27.sqlite": "fd9648b2a47421b3758185b17d4daf35ce1ee03204883e60d6526f64f142be7a",
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-schema27.json": "4e28fef84645c5d6e92d2db71ac68f1b6b12f8ebd371ef3493e4474717cdfab4",
   "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance.json": "fbb28e037f2e9c141c52557c74d3575bb7fe983a001e4080019379b3b117ba4e",

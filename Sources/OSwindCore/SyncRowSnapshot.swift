@@ -62,6 +62,7 @@ struct SyncRowSnapshot:Equatable,Sendable {
         try HistoricalErasureSchema.register(db)
         try SyncIncomingSourceSchema.register(db)
         try SyncIncomingSourceProjection.register(db)
+        try SyncIncomingRunProjection.register(db)
         let flags=SQLITE_UTF8|SQLITE_DETERMINISTIC|SQLITE_INNOCUOUS
         guard sqlite3_create_function_v2(db.handle,"oswind_sync_row_v1",-1,flags,nil,{context,count,values in
             SyncRowSnapshot.result(context,count,values,key:false)

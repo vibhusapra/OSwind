@@ -27,7 +27,7 @@ def key_name(data):
     n=struct.unpack('<Q',data[7:15])[0];need(15+n==len(data),'Truncated/trailing source primary frame');value=data[15:].decode('utf-8');need(frame([value])==data,'Noncanonical source primary frame');return value
 
 def verify_empty_historical_schema(connection,declared):
-    need(type(declared) is int and declared in (25,26,27,28),'Unsupported declared library schema')
+    need(type(declared) is int and declared in (25,26,27,28,29),'Unsupported declared library schema')
     need(connection.execute('PRAGMA user_version').fetchone()==(declared,),'Unexpected library schema')
     if declared>=26:
         for table in ['historical_evidence','historical_evidence_dependencies','historical_evidence_pins']:
@@ -48,6 +48,26 @@ def verify_empty_historical_schema(connection,declared):
         names=dict(connection.execute("SELECT name,sql FROM sqlite_master WHERE name GLOB 'incoming_source_writer_*'"))
         expected={f'incoming_source_writer_{table}_{op}':f'CREATE TRIGGER incoming_source_writer_{table}_{op} BEFORE {op.upper()} ON {table} BEGIN SELECT oswind_incoming_source_writer_v1(); END' for table in tables for op in ['insert','update','delete']}
         need(names==expected,'Incoming source protection membership or SQL differs')
+
+    if declared>=29:
+        verify_run_original_schema(connection,require_empty=True)
+
+def verify_run_original_schema(connection,require_empty=False):
+    tables=['memories','chat_sessions','chat_turns','chat_sources','recap_sources','routines','routine_runs','memory_entities','entity_aliases','entity_mentions','entity_ignored','entity_project_ignored','text_observation_pins','historical_evidence','routine_run_originals']
+    names=dict(connection.execute("SELECT name,sql FROM sqlite_master WHERE name GLOB 'run_original_writer_*'"))
+    expected={f'run_original_writer_{table}_{op}':f'CREATE TRIGGER run_original_writer_{table}_{op} BEFORE {op.upper()} ON {table} BEGIN SELECT oswind_run_original_writer_v1(); END' for table in tables for op in ['insert','update','delete']}
+    need(names==expected,'Run original writer protection differs')
+    need(connection.execute("SELECT sql FROM sqlite_master WHERE name='routine_run_originals'").fetchone()==("CREATE TABLE routine_run_originals(run_id TEXT PRIMARY KEY REFERENCES routine_runs(id) ON DELETE CASCADE,payload BLOB NOT NULL CHECK(typeof(payload)='blob' AND length(payload)>0 AND length(payload)<=131072),native_sha TEXT NOT NULL CHECK(length(native_sha)=64))",),'Run original storage differs')
+    columns='id,routine_id,revision,scheduled_at,started,finished,trigger,status,chat_id,message,scope'
+    frame=lambda alias:'oswind_sync_row_v1('+','.join(alias+'.'+c for c in columns.split(','))+')'
+    expected_originals={
+      'routine_original_insert':"CREATE TRIGGER routine_original_insert BEFORE INSERT ON routine_run_originals WHEN oswind_incoming_run_original_v1(new.run_id,new.payload,new.native_sha)<>1 BEGIN SELECT RAISE(ABORT,'Use typed run original admission'); END",
+      'routine_original_immutable':"CREATE TRIGGER routine_original_immutable BEFORE UPDATE ON routine_run_originals BEGIN SELECT RAISE(ABORT,'Run originals are immutable'); END",
+      'routine_original_delete':"CREATE TRIGGER routine_original_delete BEFORE DELETE ON routine_run_originals WHEN EXISTS(SELECT 1 FROM routine_runs r WHERE r.id=old.run_id AND old.native_sha=oswind_sync_run_fingerprint_v1("+frame('r')+") AND oswind_incoming_run_projection_v1("+frame('r')+")<>1) BEGIN SELECT RAISE(ABORT,'Erase the run with its original'); END",
+      'routine_original_change':'CREATE TRIGGER routine_original_change AFTER UPDATE OF '+columns+' ON routine_runs WHEN CASE WHEN EXISTS(SELECT 1 FROM routine_run_originals WHERE run_id=new.id) THEN oswind_incoming_run_projection_v1('+frame('new')+')<>1 ELSE 0 END BEGIN DELETE FROM routine_run_originals WHERE run_id=new.id AND native_sha<>oswind_sync_run_fingerprint_v1('+frame('new')+'); END'
+    }
+    need(dict(connection.execute("SELECT name,sql FROM sqlite_master WHERE name GLOB 'routine_original_*'"))==expected_originals,'Run original admission or cleanup differs')
+    if require_empty:need(connection.execute('SELECT count(*) FROM routine_run_originals').fetchone()==(0,),'Unexpected run originals in source-only fixture')
 
 def review(root):
     root=pathlib.Path(root).absolute();need(root.is_dir() and not root.is_symlink(),'Fixture root must be a real directory')
