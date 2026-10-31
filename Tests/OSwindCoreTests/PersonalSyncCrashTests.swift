@@ -1,5 +1,6 @@
 import XCTest
 import Darwin
+import MachO
 @testable import OSwindCore
 
 /// Own-child process death, not a simulated power cut or a production-library test.
@@ -24,11 +25,22 @@ final class PersonalSyncCrashTests:XCTestCase {
         let child=Process(),log=root.appendingPathComponent("child.log")
         XCTAssertTrue(fm.createFile(atPath:log.path,contents:nil,attributes:[.posixPermissions:0o600]))
         let output=try FileHandle(forWritingTo:log);defer {try? output.close()}
-        child.executableURL=URL(fileURLWithPath:"/usr/bin/xcrun")
-        child.arguments=["xctest","-XCTest","OSwindCoreTests.PersonalSyncCrashTests/testCrashWorker",Bundle(for:Self.self).bundleURL.path]
-        child.environment=["PATH":"/usr/bin:/bin","LANG":"en_US.UTF-8",
+        let runner=URL(fileURLWithPath:CommandLine.arguments[0]).resolvingSymlinksInPath()
+        guard runner.lastPathComponent=="xctest",fm.isExecutableFile(atPath:runner.path) else {throw FixtureError.invalidOwnership}
+        child.executableURL=runner
+        child.arguments=["-XCTest","OSwindCoreTests.PersonalSyncCrashTests/testCrashWorker",Bundle(for:Self.self).bundleURL.path]
+        var environment=["PATH":"/usr/bin:/bin","LANG":"en_US.UTF-8",
             "TMPDIR":fm.temporaryDirectory.path,"OSWIND_SYNC_CRASH_ROOT":root.path,
             "OSWIND_SYNC_CRASH_NONCE":nonce,"OSWIND_SYNC_CRASH_PHASE":phase]
+        // Preload only the TSan runtime already loaded by this test host. An
+        // instrumented test bundle cannot dlopen its runtime after host startup.
+        // Launch xctest directly: the protected /usr/bin/xcrun strips DYLD vars.
+        for index in 0..<_dyld_image_count() {
+            guard let name=_dyld_get_image_name(index) else {continue}
+            let image=URL(fileURLWithPath:String(cString:name)).resolvingSymlinksInPath()
+            if image.lastPathComponent=="libclang_rt.tsan_osx_dynamic.dylib" {environment["DYLD_INSERT_LIBRARIES"]=image.path}
+        }
+        child.environment=environment
         child.standardOutput=output;child.standardError=output
         try child.run()
         // This exact Process is our child. No process-name matching or other process is signalled.
