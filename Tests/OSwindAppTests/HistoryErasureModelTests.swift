@@ -1,5 +1,5 @@
 import XCTest
-import OSwindCore
+@testable import OSwindCore
 @testable import OSwind
 
 final class HistoryErasureModelTests:XCTestCase {
@@ -24,4 +24,20 @@ final class HistoryErasureModelTests:XCTestCase {
         model.inspect(store:store,scope:.init(app:"Safari"));for _ in 0..<200 where model.busy {try await Task.sleep(nanoseconds:10_000_000)}
         XCTAssertNil(model.error);XCTAssertEqual(model.preview?.sources,1)
     }
+    @MainActor func testHistoricalOnlyPreviewCanApplyAndPreservesCurrentOwner() async throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString);defer {try? FileManager.default.removeItem(at:root)}
+        let store=try MemoryStore(root:root);defer {try? store.close()};let model=HistoryErasureModel(),origin="00000000-0000-0000-0000-000000005901"
+        let current=Memory(id:"owner",kind:.note,app:"Notes",title:"Current",text:"New current owner");try store.insert(current)
+        let old=Memory(id:"old",kind:.screen,app:"Safari",title:"Old original",text:"Old original body"),body=try SyncSourceBody(memory:old,origin:origin,media:[]) {_,_ in throw OSwindError.invalid("No parents")}
+        let packet=try SyncPortableRecord(identity:.init(table:.source,origin:origin,lifetime:UUID().uuidString.lowercased()),body:.source(body))
+        let handle=UUID().uuidString.lowercased();try store.withRoutineDatabase {try HistoricalEvidenceStore(database:$0).insert(handle:handle,source:current.id,record:packet,paths:[:],parents:[])}
+        model.inspect(store:store,scope:.init(app:"Safari"))
+        for _ in 0..<500 where model.busy {try await Task.sleep(nanoseconds:1_000_000)}
+        XCTAssertEqual(model.preview?.sources,0);XCTAssertEqual(model.preview?.historicalVersions,1);XCTAssertTrue(model.preview?.canErase==true)
+        var complete=false;model.apply(store:store) {complete=true}
+        for _ in 0..<500 where model.busy {try await Task.sleep(nanoseconds:1_000_000)}
+        XCTAssertTrue(complete);XCTAssertNil(model.error);XCTAssertEqual(model.result?.historicalVersions,1);XCTAssertEqual(model.result?.sources,0)
+        XCTAssertEqual(try store.get(current.id),current);XCTAssertThrowsError(try store.historicalMemory(handle))
+    }
+
 }

@@ -26,6 +26,24 @@ def key_name(data):
     need(type(data) is bytes and data.startswith(b'OWSR\x01\x01\x03') and len(data)>=15,'Invalid source primary frame')
     n=struct.unpack('<Q',data[7:15])[0];need(15+n==len(data),'Truncated/trailing source primary frame');value=data[15:].decode('utf-8');need(frame([value])==data,'Noncanonical source primary frame');return value
 
+def verify_empty_historical_schema(connection,declared):
+    need(type(declared) is int and declared in (25,26,27),'Unsupported declared library schema')
+    need(connection.execute('PRAGMA user_version').fetchone()==(declared,),'Unexpected library schema')
+    if declared>=26:
+        for table in ['historical_evidence','historical_evidence_dependencies','historical_evidence_pins']:
+            need(connection.execute('SELECT count(*) FROM '+table).fetchone()==(0,),'Unexpected originals in note-only preparation fixture')
+    if declared==27:
+        names={r[0] for r in connection.execute("SELECT name FROM sqlite_master WHERE name GLOB 'historical_scope_*'")}
+        tables=['memories','chat_sessions','chat_turns','chat_sources','recap_sources','routines','routine_runs','memory_entities','entity_aliases','entity_mentions','entity_ignored','entity_project_ignored','text_observation_pins','historical_evidence']
+        expected={'historical_scope_'+n for n in ['start','end','app','bundle','kind','url']}|{'historical_scope_revoked_versions'}
+        need(connection.execute('SELECT count(*) FROM historical_scope_revoked_versions').fetchone()==(0,),'Unexpected original revocations in note-only preparation fixture')
+        expected.update('historical_scope_writer_'+t+'_'+op for t in tables for op in ['insert','update','delete'])
+        need(names==expected,'Scope protection membership differs')
+        for table in tables:
+            for op in ['insert','update','delete']:
+                name='historical_scope_writer_'+table+'_'+op
+                need(connection.execute('SELECT sql FROM sqlite_master WHERE name=?',(name,)).fetchone()==(f'CREATE TRIGGER {name} BEFORE {op.upper()} ON {table} BEGIN SELECT oswind_historical_scope_writer_v1(); END',),'Scope writer protection differs')
+
 def review(root):
     root=pathlib.Path(root).absolute();need(root.is_dir() and not root.is_symlink(),'Fixture root must be a real directory')
     need((root/'owned-fixture').read_bytes()==b'OSwind authored identity bootstrap scale fixture v1','Missing authored identity marker')
@@ -46,7 +64,7 @@ def review(root):
     before=sha(db);conn=sqlite3.connect('file:'+quote(str(db.resolve()))+'?mode=ro&immutable=1',uri=True)
     try:
         need(conn.execute('PRAGMA quick_check').fetchall()==[('ok',)],'Archive integrity check failed')
-        need(conn.execute('PRAGMA user_version').fetchone()==(25,),'Unexpected library schema')
+        verify_empty_historical_schema(conn,r.get('librarySchema',25))
         h=hashlib.sha256();seen=bytearray(count);rows=0
         sql='SELECT id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model FROM memories ORDER BY id COLLATE BINARY'
         for row in conn.execute(sql):

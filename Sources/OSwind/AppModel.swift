@@ -590,7 +590,7 @@ import UniformTypeIdentifiers
             defer {deletingID=nil}
             do {
                 let result=try await Task.detached(priority:.utility) {try store.delete(memory.id)}.value
-                deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
+                deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.historicalVersions) original versions · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
                 if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
                 activity.forgetCounts();invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats()
             } catch {deletionStatus="Source was not deleted.";errorMessage=error.localizedDescription}
@@ -612,7 +612,7 @@ import UniformTypeIdentifiers
                 }.value
                 if let result {
                     let budget=result.budgetMet==false ? "Storage target not reached.":"Storage target met."
-                    maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
+                    maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.historicalVersions) original versions · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
                 } else {maintenanceStatus="Automatic retention is off."}
                 if let indexError {maintenanceStatus += " "+indexError}
                 if let result,result.erasure.sources>0 {activity.forgetCounts();drafting.clear()}

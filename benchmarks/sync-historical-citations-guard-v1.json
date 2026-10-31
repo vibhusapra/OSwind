@@ -1,7 +1,7 @@
 {
   "format": "OSwind historical owner lazy guard repair",
   "version": 1,
-  "state": "local-repair-validated",
+  "state": "local-and-exact-head-hosted-repair-validated",
   "createdAtUTC": "2026-10-31T12:58:28.839692+00:00",
   "sourceBase": "f962e82077cb9a8e7bb2b7acd76edf3025a72519",
   "schema": 26,
@@ -56,8 +56,17 @@
   ],
   "limits": [
     "Original PR104 sanitizer/release/package/SDK receipts remain tied to their earlier source commit; not relabeled current",
-    "Current repair runs default full debug and formerly failing Python process; hosted CI pending new head",
+    "Current repair runs default full debug and formerly failing Python process; exact-head hosted CI now passes",
     "Schema27 original-field erasure work is preserved separately and is not included in this repair",
     "F059 and all78 statuses unchanged; no complete sync, media playback, physical power, notarization or ranking claim"
-  ]
+  ],
+  "hostedCI": {
+    "commit": "f57a0d52407baf4d6f593a0f685c3393c1d8e9d3",
+    "run": 41203453722,
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/41203453722",
+    "status": "completed",
+    "conclusion": "success",
+    "bothJobsPassed": true,
+    "formerlyFailingStep48Passed": true
+  }
 }

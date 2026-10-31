@@ -11,7 +11,7 @@ def register_inactive_sync_fixture(connection):
     version = connection.execute("PRAGMA user_version").fetchone()[0]
     if version < 25:
         return
-    if version not in (25, 26):
+    if version not in (25, 26, 27):
         raise ValueError("Unsupported owned fixture schema")
     state = connection.execute(
         "SELECT enabled,suppressed FROM personal_sync_capture"
@@ -26,18 +26,21 @@ def register_inactive_sync_fixture(connection):
     for name in ("oswind_sync_key_v1", "oswind_sync_row_v1"):
         connection.create_function(name, -1, refuse, deterministic=True)
 
-    if version == 26:
+    if version >= 26:
         # Name resolution is eager even when the indexed no-history guard is
         # false. Never fabricate a source revision for a historical owner.
         connection.create_function("oswind_sync_source_revision_v1", 1, refuse, deterministic=True)
 
     # The v26 compatibility marker is deliberately implemented only after this
     # caller-owned, inactive fixture check. It grants no sync or archival API.
-    if version == 26:
+    if version >= 26:
         def writer_marker():
-            if connection.execute("PRAGMA user_version").fetchone() != (26,) or connection.execute(
+            if connection.execute("PRAGMA user_version").fetchone() != (version,) or connection.execute(
                 "SELECT enabled,suppressed FROM personal_sync_capture"
             ).fetchall() != [(0, 0)]:
-                raise ValueError("Fixture marker requires unchanged inactive schema26")
+                raise ValueError("Fixture marker requires unchanged inactive library schema")
             return 1
         connection.create_function("oswind_historical_writer_v1", 0, writer_marker)
+
+    if version == 27:
+        connection.create_function("oswind_historical_scope_writer_v1", 0, writer_marker)

@@ -1,0 +1,860 @@
+{
+  "format": "OSwind original-field erasure and local exact-version revocation qualification",
+  "version": 1,
+  "state": "component-qualified",
+  "overallV0Complete": false,
+  "createdAtUTC": "2026-10-31T13:35:39.083893+00:00",
+  "sourceBase": "f57a0d52407baf4d6f593a0f685c3393c1d8e9d3",
+  "branch": "codex/historical-erasure-scope",
+  "schema": 27,
+  "repositoryInputs": 667,
+  "repositoryInputManifest": "benchmarks/historical-erasure-inputs-v1.json",
+  "repositoryInputManifestSHA256": "02e1c05df3c1c1514df9aba4cb01fd4e11c88237899759bc81beae4e416fa6cd",
+  "qualificationInputs": 668,
+  "packageInputs": 671,
+  "qualificationResultSHA256": "819a59792a7a5cc192b095bf04af336286dbb9edcddf755f03e913a61aa94174",
+  "packageResultSHA256": "a837c668e4fff938ac9c38e0818ccc4775835845f442b2532c821e038758afd0",
+  "qualificationInputManifestSHA256": "76c72697ecb1a01aec39dfdcda1d4104b3115ad77beb200e82c26ad69527144c",
+  "packageInputManifestSHA256": "e499070800143c78a8cd26fc41285e5e87be41345d69b977c29eeaaaf7070b59",
+  "sameRepositoryInputsAcrossAll21Stages": true,
+  "fullDefault": {
+    "defined": 1600,
+    "passed": 1525,
+    "skipped": 75,
+    "failures": 0
+  },
+  "threadSanitizer": {
+    "defined": 248,
+    "passed": 246,
+    "skipped": 2,
+    "failures": 0,
+    "raceWarnings": 0
+  },
+  "optimized": {
+    "defined": 248,
+    "passed": 247,
+    "skipped": 1,
+    "failures": 0
+  },
+  "SDKTests": 16,
+  "readerCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "forged selected original handle",
+      "nonfinite timer",
+      "unqualified future schema",
+      "unmarked library",
+      "missing writer protection",
+      "valid JSON original body with stale exact hash"
+    ],
+    "originalFixturesUnchanged": true
+  },
+  "identityReaderAdmissionTests": 9,
+  "stages": [
+    {
+      "driver": "qualification-v3",
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "3121d223bec8dc9dfedf92e5d608280ce3298c00b467d59738467abed6c46575"
+    },
+    {
+      "driver": "qualification-v3",
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "4d18f1e11b15e25037875840ed26e824dac13db29cf6e7f2fd9fde9aabf3807c"
+    },
+    {
+      "driver": "qualification-v3",
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "67b230ddb94ba45140f3b44d83bdf2695bc4b33e4317cd12ff973d9e329fc2d7"
+    },
+    {
+      "driver": "qualification-v3",
+      "name": "independent-scale",
+      "returncode": 0,
+      "log": "independent-scale.log",
+      "logSHA256": "42e763663db76c1e90abd12b9b267807334150ad9a41ed00d9b73c78a2e02906"
+    },
+    {
+      "driver": "qualification-v3",
+      "name": "reader-controls",
+      "returncode": 0,
+      "log": "reader-controls.log",
+      "logSHA256": "771cd1b2b194a483927952129151b174f32066276f231347b38614e53ad827ce"
+    },
+    {
+      "driver": "qualification-v3",
+      "name": "identity-reader-controls",
+      "returncode": 0,
+      "log": "identity-reader-controls.log",
+      "logSHA256": "1125f77d2ea220fa4d53ed4438d993ddadb4eda9065e06bdc833b9b9e0bb8f91"
+    },
+    {
+      "driver": "package-v1",
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "b7b76bb53ba3c3cce796d200b64d60ca217f7ce543327acaf2d742f2fde6cd84"
+    },
+    {
+      "driver": "package-v1",
+      "name": "sdk",
+      "returncode": 0,
+      "log": "sdk.log",
+      "logSHA256": "2a8804e918439cc1fd519295f4853537d05c4a759df84e9e34791231bcae9f5c"
+    },
+    {
+      "driver": "package-v1",
+      "name": "api",
+      "returncode": 0,
+      "log": "api.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "driver": "package-v1",
+      "name": "indexed-api",
+      "returncode": 0,
+      "log": "indexed-api.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "driver": "package-v1",
+      "name": "original-field-cli",
+      "returncode": 0,
+      "log": "original-field-cli.log",
+      "logSHA256": "ad8052e40beb3fb6715280aaed0fa432be6a2242316936d48b9d433adeb74ae8"
+    },
+    {
+      "driver": "package-v1",
+      "name": "erasure",
+      "returncode": 0,
+      "log": "erasure.log",
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d"
+    },
+    {
+      "driver": "package-v1",
+      "name": "deletion-retention",
+      "returncode": 0,
+      "log": "deletion-retention.log",
+      "logSHA256": "689bc967d58472ea19cfc0943da91b75d47a501176b7c106d433aa181da53a00"
+    },
+    {
+      "driver": "package-v1",
+      "name": "wipe",
+      "returncode": 0,
+      "log": "wipe.log",
+      "logSHA256": "9822be211c47f1af1f5dc38bbac078334b5bf807bfabdba879e77e60dcd32672"
+    },
+    {
+      "driver": "package-v1",
+      "name": "recap",
+      "returncode": 0,
+      "log": "recap.log",
+      "logSHA256": "c4ae46150774f24d28df66476de3d2d9d0065f534590004f8d063f5a9a42d112"
+    },
+    {
+      "driver": "package-v1",
+      "name": "backup",
+      "returncode": 0,
+      "log": "backup.log",
+      "logSHA256": "676c057971e5a154bec150b7cf9bd66326ac62083fcba5b2bf85f533c2dd3bd8"
+    },
+    {
+      "driver": "package-v1",
+      "name": "packaged-old26",
+      "returncode": 0,
+      "log": "packaged-old26.log",
+      "logSHA256": "9a004474b826154932002e208ca5ed1a6d5a7d178992efe1ffa19020feb268d1"
+    },
+    {
+      "driver": "package-v1",
+      "name": "packaged-old25",
+      "returncode": 0,
+      "log": "packaged-old25.log",
+      "logSHA256": "fd99548d4af7726fbcc9cf6ba2b7902a939f9acf8524d74a95925b994e7d9b84"
+    },
+    {
+      "driver": "package-v1",
+      "name": "reader-noteonly",
+      "returncode": 0,
+      "log": "reader-noteonly.log",
+      "logSHA256": "8616b9dc7eaeca57b13f01d69ce4479b2bebbd3583ddf1b6789cb846f13405ab"
+    },
+    {
+      "driver": "package-v1",
+      "name": "historical-backup",
+      "returncode": 0,
+      "log": "historical-backup.log",
+      "logSHA256": "b0c20b5c4d5889a5c61afd55ea53eb18e9e32b0dadc4de3733b098ec03af9ccf"
+    },
+    {
+      "driver": "package-v1",
+      "name": "package-review",
+      "returncode": 0,
+      "log": "package-review.log",
+      "logSHA256": "934f71cd79c7ff60cfd5d30d90c63f5cd04249f342bba780a84da4cd56a4f876"
+    }
+  ],
+  "packagedCLI_SHA256": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+  "packagedFiles": {
+    "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+    "Contents/_CodeSignature/CodeResources": "4f49e74553edfc68aedc5737ba4d3e6d7434a0f4a0667ed882733d76d9894690",
+    "Contents/MacOS/oswindctl": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+    "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+    "Contents/MacOS/OSwind": "72eea3a67a3fbd76f775f0818c0faa170be1dbe21fca844682f0760742d7fbd8",
+    "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+    "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+    "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+    "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+    "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+    "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+    "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+    "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+    "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+    "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+    "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+    "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+    "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+    "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+    "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+    "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+    "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+  },
+  "packageReview": {
+    "state": "passed",
+    "allExtractedFilesEqualStagedFiles": {
+      "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+      "Contents/_CodeSignature/CodeResources": "4f49e74553edfc68aedc5737ba4d3e6d7434a0f4a0667ed882733d76d9894690",
+      "Contents/MacOS/oswindctl": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+      "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+      "Contents/MacOS/OSwind": "72eea3a67a3fbd76f775f0818c0faa170be1dbe21fca844682f0760742d7fbd8",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "stagedAndExtractedStrictSignatures": true,
+    "zipSHA256": "3dcf9ced2fc10e0a0a40ebd39a9031146e195a174ad808912c136a8ad2f6be2c",
+    "testFixturesAbsent": true,
+    "installedAppNotTouched": true
+  },
+  "installedAppUnchanged": true,
+  "installedFilesBefore": {
+    "Contents/Info.plist": "cbe401ba3fea571e63103ce260d6b0946952c8ee62d1fe2a6a21ad9d079a7a16",
+    "Contents/_CodeSignature/CodeResources": "2f576adc15eb70ac542ed2e5fefd3892eb5e05fe9a9fbb6d412e749b3efebcf3",
+    "Contents/MacOS/oswindctl": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe",
+    "Contents/MacOS/OSwind": "22fa18945187ef4811c87f97ca52b2ef69eb5ac3acce130d3319041779ff3fb3",
+    "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+    "Contents/Resources/ThirdParty/NOTICES.txt": "ce022d68cf41ce4f2a9b98d98f7f9611cccd51fe250e48c57a71d84d910a9cf3",
+    "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+    "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+    "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+    "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4"
+  },
+  "testFixturesAbsentFromApp": true,
+  "actualOlderClientRefusals": [
+    {
+      "state": "passed",
+      "currentCLI_SHA256": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+      "oldCLI_SHA256": "fa4285dd0ee24924639a5ab822391a2a4a056aba3e48dff4b9560e78cc8c4f81",
+      "harnessSHA256": "550c2f7e6d1046af641fff0a544baaba8e4ceebae0c77e6fe7cdb0c00fc6c9a0",
+      "checks": [
+        "actual already-initialized older writer refuses after migration upgrade; source payloads unchanged",
+        "fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged",
+        "actual older backup inspector refuses newer package; all package bytes unchanged"
+      ],
+      "operations": [
+        {
+          "binary": "old26",
+          "arguments": [
+            "note",
+            "Owned original schema26 text"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "3e99b9c8ac7dfca51151a080ea0f8f69c5499e73902eebd5bcae6991b470b4e7",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "4ca10f221b397945d7aff821555f5e8d44f7af5c94a929e42e4ce19f6f61a2a0",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old26",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "old26",
+          "arguments": [
+            "note",
+            "Owned fresh older write must refuse"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "backup",
+            "create",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old26-owned/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "4b83e239263664e4a2c56be0bd8610bd40a0b1891f46aae7ef8326b6eb5ee519",
+          "stderrSHA256": "a54fdf50e95fb8b396398af388e9f1a3e999c8f7e361e95ea070afd7baaebd76"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old26-owned/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "4b83e239263664e4a2c56be0bd8610bd40a0b1891f46aae7ef8326b6eb5ee519",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old26",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old26-owned/copy.oswindbackup"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "0433de28417ba0e9be348d77737187af44a27a9c849b08bf6fc21223fd83560b"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "note",
+            "Owned current write still works"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "a1426f1b8d5d56f2de46cbaec36c3f7e056ea94dc398baf7c6bfdf3f20296fc1",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Actual older executable, owned synthetic text and complete process exits. No native recording, enrolled service, media playback, power or competitor evidence.",
+      "initializedOlderClient": {
+        "postOpenLeaseObserved": true,
+        "returncode": 1,
+        "stderrSHA256": "42973e520e398683e63aac68aadb3633f8a44bf32d4b671a44d749afed4b77d4"
+      },
+      "beforeFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "787d15f119a4b1d7e381c28e92b23a6c9ff717c3973787b5baed48789ec52cde"
+      },
+      "afterFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "787d15f119a4b1d7e381c28e92b23a6c9ff717c3973787b5baed48789ec52cde"
+      },
+      "sourceSchema": 26,
+      "targetSchema": 27,
+      "allChildrenTerminal": true
+    },
+    {
+      "state": "passed",
+      "currentCLI_SHA256": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+      "oldCLI_SHA256": "de59e366f45a7fa8c70109030eb4e668a6dd105acbcf6a184eb86d4e2e22b67a",
+      "harnessSHA256": "550c2f7e6d1046af641fff0a544baaba8e4ceebae0c77e6fe7cdb0c00fc6c9a0",
+      "checks": [
+        "actual already-initialized older writer refuses after migration upgrade; source payloads unchanged",
+        "fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged",
+        "actual older backup inspector refuses newer package; all package bytes unchanged"
+      ],
+      "operations": [
+        {
+          "binary": "old25",
+          "arguments": [
+            "note",
+            "Owned original schema25 text"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "ca838d587f83e28643b5af84dfc710d7dcf7eaa524c948b090c58c1c29a0409f",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "2fee9ecc096ab2d64bcad231d3dfb0bca8fce45d75dd0d8d70ab4c25a3977d1c",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old25",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "old25",
+          "arguments": [
+            "note",
+            "Owned fresh older write must refuse"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "backup",
+            "create",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old25-owned/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "ee373c6baccbc92d0f0ca013f9bf2194a71c334c81a157606a54e9f6dcade64c",
+          "stderrSHA256": "0892bfcd15a615758b89c605126e21fd4751cd4dd70719121a904d51095a9dea"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old25-owned/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "ee373c6baccbc92d0f0ca013f9bf2194a71c334c81a157606a54e9f6dcade64c",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old25",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/historical-erasure-scope-v1/package-v1/packaged-old25-owned/copy.oswindbackup"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "0433de28417ba0e9be348d77737187af44a27a9c849b08bf6fc21223fd83560b"
+        },
+        {
+          "binary": "current27",
+          "arguments": [
+            "note",
+            "Owned current write still works"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "86dc0013571d3a7090c3b543832bd33e129cd9e64d31d0e075ac48fc65086ecf",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Actual older executable, owned synthetic text and complete process exits. No native recording, enrolled service, media playback, power or competitor evidence.",
+      "initializedOlderClient": {
+        "postOpenLeaseObserved": true,
+        "returncode": 1,
+        "stderrSHA256": "42973e520e398683e63aac68aadb3633f8a44bf32d4b671a44d749afed4b77d4"
+      },
+      "beforeFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "984fd94d9b2f60c204ff01784582036eed1f2b75700c0706068c36aafcf7eb83"
+      },
+      "afterFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "984fd94d9b2f60c204ff01784582036eed1f2b75700c0706068c36aafcf7eb83"
+      },
+      "sourceSchema": 25,
+      "targetSchema": 27,
+      "allChildrenTerminal": true
+    }
+  ],
+  "historicalQuietBackup": {
+    "state": "passed",
+    "fixtureSHA256": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556",
+    "binarySHA256": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+    "archiveFilesUnchanged": {
+      "header.json": "d82c75cec6b4f8907e6551ed9b9325435281d6335643b6c666692ef8f9a16ad1",
+      "settings.json": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09",
+      "memory.sqlite": "72722c868d51d0e52e6b8f221c5527df02c026e8c9b6f59c1060803803a93a1b",
+      "media.ndjson": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exactOriginalBodiesBindingsPreserved": true,
+    "quietSettings": true,
+    "restoredOriginalFieldErasure": true,
+    "allChildrenTerminal": true
+  },
+  "positiveSchema27NoteOnlyReview": {
+    "state": "passed",
+    "declaredSchema27EmptyOriginalStateVerified": true,
+    "mismatched25_26AndFuture28Refused": true,
+    "sqliteFilesUnchanged": {
+      "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "memory.sqlite": "c32f7d76134d13e13e8dbb17676bb87d103a800ed5727f9e95b30dbc491113c1"
+    }
+  },
+  "optimizedArchiveScale": {
+    "hardware": {
+      "chip": "Apple M5 Max",
+      "memoryBytes": 137438953472,
+      "macOS": "26.6.2",
+      "build": "25G83"
+    },
+    "frameReaderSHA256": "8154516755c152ce83b0b80c8d0c1c57be4e83b1f096a104ab4f0658b11bc945",
+    "inputReportSHA256": "4395b6df6ea4907f99e5bbb8a45b3698b49397bb1a27a2e3525917df2a7d57e2",
+    "readerSHA256": "cd7663856db26dfdb9bdb93fa78b8d4e143ea43079c41c52a3e51aa969a36e50",
+    "results": [
+      {
+        "afterSHA256": "e51ba48e942cb1a5d8135e7d6cc1283f24aad2556bb9dcdc52d0214451b7b53a",
+        "allOriginalBodiesBindingsAndSelectionVerified": true,
+        "applyMS": 24.108041543513536,
+        "beforeSHA256": "05db21f9497661d5aa34aa4f88815d14848e9b69537e12be8c350cecd364b2ac",
+        "count": 1000,
+        "newerOwnerAndRetainedBytesUnchanged": true,
+        "preview": {
+          "app": {
+            "matches": 100,
+            "medianMS": 1.146166818216443,
+            "p95MS": 1.677416730672121,
+            "samples": 7
+          },
+          "domain": {
+            "matches": 100,
+            "medianMS": 2.029749797657132,
+            "p95MS": 2.1759166847914457,
+            "samples": 7
+          },
+          "kind": {
+            "matches": 500,
+            "medianMS": 1.8592500127851963,
+            "p95MS": 2.032375195994973,
+            "samples": 7
+          },
+          "time": {
+            "matches": 10,
+            "medianMS": 0.9601665660738945,
+            "p95MS": 1.0216666851192713,
+            "samples": 7
+          }
+        }
+      },
+      {
+        "afterSHA256": "839f44530589bd93632d6a62ba82c5e3cb7b51c0e1716f5642b97d45d11c811f",
+        "allOriginalBodiesBindingsAndSelectionVerified": true,
+        "applyMS": 192.58325011469424,
+        "beforeSHA256": "9bb1ef174301d276d7ec20f2fb286dae8b544948b047a94d53778b78cf441807",
+        "count": 10000,
+        "newerOwnerAndRetainedBytesUnchanged": true,
+        "preview": {
+          "app": {
+            "matches": 1000,
+            "medianMS": 3.636916633695364,
+            "p95MS": 4.653541604056954,
+            "samples": 7
+          },
+          "domain": {
+            "matches": 1000,
+            "medianMS": 13.197750085964799,
+            "p95MS": 14.437416568398476,
+            "samples": 7
+          },
+          "kind": {
+            "matches": 5000,
+            "medianMS": 15.619500074535608,
+            "p95MS": 15.787499956786633,
+            "samples": 7
+          },
+          "time": {
+            "matches": 10,
+            "medianMS": 1.1973748914897442,
+            "p95MS": 1.3695000670850277,
+            "samples": 7
+          }
+        }
+      }
+    ],
+    "scope": "Closed owned 1KiB originals under one newer owner. Seven warm complete previews and one apply per size. Every typed body, global identity, native binding, selected handle, remaining byte sequence and logical charge independently verified. p95 is nearest-rank of seven samples. Excludes real recording, model/media, cold cache, sustained capture, transport, physical energy and competitor ranking.",
+    "state": "reviewed"
+  },
+  "trueRegressions": [
+    {
+      "stage": "development-v1",
+      "caseCount": 1,
+      "assertionFailures": 42,
+      "unexpected": 0,
+      "problem": "Old Safari original escapes all six selectors after current owner becomes Notes"
+    },
+    {
+      "stage": "development-v4",
+      "problem": "Original start overlap OR chooses source-body table scan; fixed with independent indexed UNION ranges"
+    },
+    {
+      "stage": "development-v20",
+      "caseCount": 1,
+      "assertionFailures": 7,
+      "unexpected": 0,
+      "problem": "Original-only erasure leaves exact typed-cache body and derived cached recap readable and re-admittable"
+    }
+  ],
+  "retainedFailedRuns": [
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v1",
+      "resultSHA256": "2416e584564b70905ce3e32caa825c8a285ac52885fb4c743e115a502383dc85",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v13",
+      "resultSHA256": "e950d4af7e25ac8ed191aa94f306665b45cd15b0dc89b4a9650526afa208e3a9",
+      "stages": [
+        {
+          "name": "crash-debug",
+          "returncode": 1,
+          "log": "crash-debug.log",
+          "logSHA256": "1823faef9cbce2b061ba8537173321f805b681653c3e21ace027d8869c87c867"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v14",
+      "resultSHA256": "5fcf9a4903da0f07a1aa3620ba0bcd5328d7fadc664277b1158c241405e32e46",
+      "stages": [
+        {
+          "name": "crash-debug",
+          "returncode": 1,
+          "log": "crash-debug.log",
+          "logSHA256": "c492d20a8519af83c77ce3f6370d136b6a0f75d0af360091e7cd1b7b18c39264"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v16",
+      "resultSHA256": "1e83c0dade3c1240149bea3a5b70b987792b998850ca41c4e65a54e83c43722c",
+      "stages": [
+        {
+          "name": "scope-and-scale",
+          "returncode": 1,
+          "log": "scope-and-scale.log",
+          "logSHA256": "68807583b38316eaeb373b51f8112a1d85e7ee60704a2cd76ef97264542a5439"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v17",
+      "resultSHA256": "b593f8b7f4eb0c14b07aea3e85686bc8dc9106ae421a0135f59cbf75b119b123",
+      "stages": [
+        {
+          "name": "scope-and-scale",
+          "returncode": 1,
+          "log": "scope-and-scale.log",
+          "logSHA256": "0c07989e433b175d287e939f641dc91d9ab99e81bc8e3ee23ca2080554e4883c"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v19",
+      "resultSHA256": "04b8bdc74900c8df752999f6c48432ee4629431beedeae40ee9699d48ae98064",
+      "stages": [
+        {
+          "name": "cache-erasure-regression",
+          "returncode": 1,
+          "log": "cache-erasure-regression.log",
+          "logSHA256": "76dfa1bea21897387d3efdbed64c3d3e94cf24d71273cae304a2a0706b6fca6f"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v20",
+      "resultSHA256": "f2c6478aeadf771b78944988a1b44b4afb03a3adbcd0e1e4560e058faf334c65",
+      "stages": [
+        {
+          "name": "cache-erasure-regression",
+          "returncode": 1,
+          "log": "cache-erasure-regression.log",
+          "logSHA256": "6ac35456bc0edb0f32dbd49df76105705b7217b1263e80eee20ee33f915ace81"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v3",
+      "resultSHA256": "a3eccd73c5ffa33a92a629a53b7f42b54196b86beae6ccb9ae24d7a24cdf1227",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v4",
+      "resultSHA256": "d97ce5a5b629bca9584b80b142ff4f4cf538fb3a54c3709d8aafdc64631ed9e2",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v5",
+      "resultSHA256": "dfc148f260b240ca4f1dcb0415c6754b3d9eafffc9f0e7d3d619ac326ce35ccc",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v6",
+      "resultSHA256": "78b527cf39f2a08776cca0f459af618f22ec7c8dec69b3dbd0349045c0a89ae6",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/development-v7",
+      "resultSHA256": "56fba5268ec43fbc1b8982defdeb92ce5e571798d260f0f0891062f8cc8ac63c",
+      "stages": []
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/qualification-v1",
+      "resultSHA256": "c3ffbd78555d3c8492faa388782c5a8b37825cc62652afb8a0edce6b980e29ba",
+      "stages": [
+        {
+          "name": "full-debug",
+          "returncode": 0,
+          "log": "test.log",
+          "logSHA256": "39eec1b6929740f173e89d4645cb2ce8e7782c0989ed604afa6982f373f68bd3"
+        },
+        {
+          "name": "thread-sanitizer",
+          "returncode": 1,
+          "log": "thread-sanitizer.log",
+          "logSHA256": "f96ccb98eb0e84f132cf74fbfcdce33022fb78e688e800c04729786f91558546"
+        }
+      ]
+    },
+    {
+      "directory": ".artifacts/historical-erasure-scope-v1/qualification-v2",
+      "resultSHA256": "bf164b794187913307e5d0bb4ecb28cebd55fba110f7128cc111d696506f8622",
+      "stages": [
+        {
+          "name": "full-debug",
+          "returncode": 1,
+          "log": "test.log",
+          "logSHA256": "1a34fe015d69a62cbfabf717b7486cf5062edc954192b4f9726c348315c79175"
+        }
+      ]
+    }
+  ],
+  "localArtifacts": {
+    "qualification": ".artifacts/historical-erasure-scope-v1/qualification-v3",
+    "package": ".artifacts/historical-erasure-scope-v1/package-v1",
+    "preParentSnapshot": ".artifacts/historical-erasure-scope-v1/pre-parent-repair-snapshot"
+  },
+  "parent104ExactHeadHostedCI": {
+    "commit": "f57a0d52407baf4d6f593a0f685c3393c1d8e9d3",
+    "run": 41203453722,
+    "conclusion": "success",
+    "formerlyFailingStep48Passed": true
+  },
+  "limits": [
+    "Component qualification; F052 remains partial, F059 TODO and all78 statuses unchanged",
+    "Archive-selected local erasure only: complete cache-only scope selection, cross-device epochs/current-policy/reauthorization and incoming service/enrollment/transport/two-Mac acceptance remain unfinished",
+    "Seven warm synthetic 1KiB-original previews per selector and one 10%-match apply per size; no models/media/transport, cold-cache, sustained desktop recording, energy or competitor ranking",
+    "SIGKILL/interruptions prove owned process recovery, not physical power loss or forensic SSD erasure; backups/exports remain independent copies",
+    "Signed staged bundle and exact ZIP checks, not notarized distribution, app installation or native click/VoiceOver acceptance",
+    "Earlier development receipts remain tied to their own frozen inputs; raw artifacts/logs and changed-input snapshots are retained locally"
+  ],
+  "independentPersistedGraphAndMediaReview": {
+    "state": "reviewed",
+    "readerSHA256": "71009bdad6dadc006eae0fd0c38235e0e63b553c44861b463274217a7e183371",
+    "actual26FixtureSHA256": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556",
+    "independentOriginalScopeAndMixedClosure": {
+      "selectedCanonical": [
+        "linked-recap"
+      ],
+      "selectedOriginals": [
+        "181c126b-0578-44b5-9093-b5b814097cda"
+      ],
+      "affectedTurns": [
+        "8121683D-1521-46D1-81DA-8DE77098F815"
+      ]
+    },
+    "allFivePackagedCLISelectionsPreserveExactNewerOwner": true,
+    "media": [
+      {
+        "mode": "only",
+        "expectedQueue": [],
+        "newerOwnerPreserved": true
+      },
+      {
+        "mode": "shared",
+        "expectedQueue": [],
+        "newerOwnerPreserved": true
+      },
+      {
+        "mode": "symlink",
+        "expectedQueue": [
+          [
+            "images/owned-original.bin"
+          ]
+        ],
+        "newerOwnerPreserved": true
+      }
+    ],
+    "allSQLiteFilesUnchanged": {
+      "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556",
+      ".artifacts/historical-erasure-scope-v1/package-v1/original-field-owned/app/memory.sqlite": "431a5df980178aa83854f2db10bf28b6f5d100c3d33181a9301f34ed6d31bc70",
+      ".artifacts/historical-erasure-scope-v1/package-v1/original-field-owned/bundle/memory.sqlite": "f9c8219254396e3571ae0a48ce9df02f20440d78eabd0388ede8a40b303ed1ba",
+      ".artifacts/historical-erasure-scope-v1/package-v1/original-field-owned/domain/memory.sqlite": "4272e4de798bfd5db4cb47ec077dfe6f260fdb4eb84f0e01bf5227dd89d60d5f",
+      ".artifacts/historical-erasure-scope-v1/package-v1/original-field-owned/kind/memory.sqlite": "350e67096035c4bacf318c1dd362bfe6dcb194aeb73b19d8ab9fe76e7ced87dd",
+      ".artifacts/historical-erasure-scope-v1/package-v1/original-field-owned/time/memory.sqlite": "30fca4e4e23b80385ee71fac550a97ab6642f8f2ec07be4fecdbf390df3f5246",
+      ".artifacts/historical-erasure-scope-v1/qualification-v3/optimized-owned-fixture/-_HistoricalErasureScopeTests_testPhysicalMediaCleanupKeepsSharedPathsAndRefusesSymlinkTargets_/only/memory.sqlite": "33044bc25daecc2ac1c313b89299cdef3c28ccbf9a3134a1ef8946c94f654b71",
+      ".artifacts/historical-erasure-scope-v1/qualification-v3/optimized-owned-fixture/-_HistoricalErasureScopeTests_testPhysicalMediaCleanupKeepsSharedPathsAndRefusesSymlinkTargets_/shared/memory.sqlite": "e1654abc593f7e8dcfa465b86eef39b6fd847d9a47fe34899993a8dbcdd2c537",
+      ".artifacts/historical-erasure-scope-v1/qualification-v3/optimized-owned-fixture/-_HistoricalErasureScopeTests_testPhysicalMediaCleanupKeepsSharedPathsAndRefusesSymlinkTargets_/symlink/memory.sqlite": "75518fb40c33e33ff059776f602d38e00c27a33c87d83ad503fd68b3c7ee9e33"
+    },
+    "limits": "Independent actual26 flat historical/canonical recap/citation graph and current CLI results; deeper mixed chain is covered by explicit native assertions. Owned sole/shared/symlink outcomes checked after optimized product operations. Not natural corpus, complete incoming sync, power loss or secure SSD wiping."
+  }
+}

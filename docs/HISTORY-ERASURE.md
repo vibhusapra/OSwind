@@ -1,5 +1,7 @@
 # Selective history erasure
 
+[Schema-27 original-field erasure](HISTORICAL-ERASURE.md) also selects archived versions by their own app, bundle, URL, kind and recorded time, preserves out-of-scope newer owners, and revokes matching local typed-cache versions. Native previews and CLI JSON distinguish current sources and original versions. Current qualification is recorded separately.
+
 [Schema-14 individual deletion and retention](DELETION.md) now share the durable media queue and result reporting. The evidence below retains the earlier selective-erasure milestone.
 
 Open Settings → Privacy or Data → **Erase by time, app or website**. Choose an optional time range, exact application name, exact bundle ID, website hostname and source type. All selected filters intersect. **Pause & preview** pauses screen/audio capture and discards unfinished replay, then shows matching sources, dependent conversation turns and media references. Review up to five recent source titles before choosing Erase.
