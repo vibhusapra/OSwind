@@ -1,0 +1,10 @@
+{
+  "format": "OSwind authored actual schema28 migration fixture v1",
+  "createdAtUTC": "2026-10-31T16:08:02.098205+00:00",
+  "sha256": "8198bd15561e52423279fec45bede9813995e90893fd129d4977fead6f365f4a",
+  "bytes": 667648,
+  "producerCLI_SHA256": "c1b52698c2b1162fe5cf3bcc6bb1997b45b7f45ba74a7b5fcda0df59126cbeac",
+  "producerImplementation": "0446b8af3e28d898c4b5842279b93833a2a32359",
+  "inputFixtureSHA256": "fd9648b2a47421b3758185b17d4daf35ce1ee03204883e60d6526f64f142be7a",
+  "method": "Qualified actual schema28 CLI opens/migrates authored actual schema27 fixture; no user_version rewrite; closed checkpointed copy; no normal history"
+}

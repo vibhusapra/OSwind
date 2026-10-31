@@ -52,6 +52,15 @@ final class BackupDataReader {
         guard (6...MemoryStore.schemaVersion).contains(schema) else { throw BackupFileError.invalid("Unsupported backup database schema") }
         for name in ["memories","chat_sessions","chat_turns","chat_sources","semantic_vectors","semantic_passages","passage_manifests"] { try db.requireTable(name) }
         if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
+        if schema>=29 {
+            try db.requireTable("routine_run_originals")
+            let connection=RoutineDatabase(handle:db.handle!)
+            try SyncRowSnapshot.register(on:connection);try RoutineRunOriginalSchema.validate(connection)
+            let originals=RoutineRunOriginalStore(db:connection),row=try db.prepare("SELECT run_id FROM routine_run_originals NOT INDEXED ORDER BY rowid")
+            defer {sqlite3_finalize(row)};var code=sqlite3_step(row)
+            while code==SQLITE_ROW {guard try originals.read(db.text(row,0)) != nil else {throw BackupFileError.invalid("Archived run original is missing")};code=sqlite3_step(row)}
+            guard code==SQLITE_DONE else {throw db.error("Cannot validate archived run originals")}
+        }
         if schema>=15 {try db.requireTable("recap_sources")}
         if schema>=22 {try db.requireTable("entity_project_ignored")}
         if schema>=23 {try db.requireTable("pii_scan_records")}

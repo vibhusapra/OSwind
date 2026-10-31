@@ -16,7 +16,7 @@ A final callback-free audit checks up to 2,048 unique exact typed versions acros
 
 ## Verification
 
-The [receipt](../benchmarks/sync-incoming-sources-v1.json) passes all 24 stages across 679 identical repository inputs:
+The [receipt](../benchmarks/sync-incoming-sources-v1.json) passes all 24 stages across 677 identical tracked repository inputs:
 
 - Full default: 1,547 passed / 77 explicit skips, zero failures.
 - Thread Sanitizer: 422 passed / 10 skips, zero race warnings.
@@ -30,6 +30,8 @@ The final independently reviewed optimized fixture receives 1,000 / 10,000 notes
 The independent reader verifies actual producer packets, every receiver identity/current frame, 60 archived native projections and dependency graphs, accounting, exact citation/pin versions and original chain content. All four SQLite files stay unchanged. Eight negative controls pass, including a retargeted pin whose independent foreign keys remain valid.
 
 A separate readonly review checks the retained final-code receiver databases after real own-child pre/postcommit SIGKILL and recovery: current text and citation direction, eight current frame/packet bindings per case, two committed archival projections/one edge versus zero before commit, exact journal heads and unchanged outgoing counts. Both receiver files stay unchanged. This is text-only crash evidence.
+
+The raw qualification snapshots include two ignored, unused schema26 SQLite sidecars (empty WAL and shared-memory file), giving 679 raw entries. The portable manifest contains the 677 tracked files, all verified against implementation commit `0446b8a`; raw snapshot hashes and excluded sidecar hashes remain in the receipt. This metadata correction changes no implementation, fixture database, test result or package.
 
 ## Retained regressions
 

@@ -97,6 +97,7 @@ public struct RoutineRun:Identifiable,Codable,Sendable {
     public var message:String?
     public var filter:SearchFilter
     public var resultAvailable:Bool=false
+    public var original:RoutineRunOriginalInfo?=nil
 }
 struct RoutineClaim:Sendable {var routine:StoredRoutine;var run:RoutineRun}
 

@@ -82,7 +82,7 @@ class FixtureFunctions(unittest.TestCase):
 
     def test_unknown_future_schema_does_not_gain_fixture_functions(self):
         db = self.connection()
-        db.execute("PRAGMA user_version=29")
+        db.execute("PRAGMA user_version=30")
         with self.assertRaises(ValueError):
             register_inactive_sync_fixture(db)
         with self.assertRaises(sqlite3.OperationalError):
@@ -119,6 +119,20 @@ class FixtureFunctions(unittest.TestCase):
         db.execute("PRAGMA user_version=29")
         with self.assertRaises(sqlite3.OperationalError):
             db.execute("INSERT INTO source VALUES(3)")
+        self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
+
+    def test_schema29_run_permits_stay_default_deny_and_fingerprint_refuses(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=29")
+        db.execute("CREATE TRIGGER writer29 BEFORE INSERT ON source BEGIN SELECT oswind_run_original_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        self.assertEqual(db.execute("SELECT oswind_incoming_run_projection_v1(x'00'),oswind_incoming_run_original_v1('id',x'00','sha')").fetchone(), (0, 0))
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("SELECT oswind_sync_run_fingerprint_v1(x'00')")
+        db.execute("PRAGMA user_version=30")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(2)")
         self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
 
 

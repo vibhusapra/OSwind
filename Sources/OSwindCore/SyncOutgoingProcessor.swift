@@ -88,7 +88,7 @@ struct SyncOutgoingProcessor {
         },runRecipe:{run,recipe,ordinal in
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
-        })
+        },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)})
             return historical.decorating(base,admit:processor.admitVersion,verify:{value in
                 guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
             })

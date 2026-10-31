@@ -7,9 +7,9 @@
   "sourceBase": "39a0190641961134472b38e7246ddcb8c81006bc",
   "branch": "codex/sync-incoming-sources",
   "schema": 28,
-  "repositoryInputs": 679,
+  "repositoryInputs": 677,
   "repositoryInputManifest": "benchmarks/sync-incoming-sources-inputs-v1.json",
-  "repositoryInputManifestSHA256": "cd7826f0edccf34ffd3e5bec4f5d3e771362c3feb85765677cc3424004c28f0b",
+  "repositoryInputManifestSHA256": "cda697aadf0e8700f0ef5660762adc86db68907ec1d6b59611b9d47794cfbed1",
   "qualificationInputs": 680,
   "packageInputs": 683,
   "qualificationResultSHA256": "6b86914f95598e7574073b63c4f30552479e3f4c0568d23e54e4d1775ce579e1",
@@ -981,5 +981,16 @@
     "tested": 23,
     "todo": 3,
     "outsideV0Desktop": 2
+  },
+  "portableManifestCorrection": {
+    "updatedAtUTC": "2026-10-31T16:33:20.347055+00:00",
+    "rawFrozenRepositoryEntries": 679,
+    "trackedPortableInputs": 677,
+    "excludedIncidentalSQLiteSidecars": {
+      "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+      "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reason": "Two ignored, unused schema26 fixture sidecars were present in raw frozen snapshots. The WAL is empty and no process owns the fixture; tests copy the checksum-pinned main SQLite file. Preserve the raw snapshot/driver hashes, omit runtime sidecars from the portable manifest and retain all implementation, test and package evidence unchanged.",
+    "all677HashesVerifiedAgainstImplementationCommit": "0446b8af3e28d898c4b5842279b93833a2a32359"
   }
 }

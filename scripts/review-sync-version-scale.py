@@ -29,7 +29,7 @@ def review(root,*,outgoing=False,original_evidence=False):
         wal=library/'memory.sqlite-wal';need(not wal.exists() or (wal.is_file() and not wal.is_symlink() and wal.stat().st_size==0),'Review only a closed journal-free authored snapshot')
         files={p.name:sha(p) for p in library.glob('memory.sqlite*') if p.is_file()};connection=sqlite3.connect(db.as_uri()+'?mode=ro&immutable=1',uri=True)
         try:
-            declared_schema=r.get('librarySchema',25);need(type(declared_schema) is int and declared_schema in (25,26,27,28),'Unsupported declared library schema')
+            declared_schema=r.get('librarySchema',25);need(type(declared_schema) is int and declared_schema in (25,26,27,28,29),'Unsupported declared library schema')
             _frame_module.verify_empty_historical_schema(connection,declared_schema)
             need(connection.execute('SELECT COUNT(*) FROM memories').fetchone()[0]==count,'Source membership differs')
             columns='id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model'

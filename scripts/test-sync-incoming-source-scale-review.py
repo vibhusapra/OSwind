@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-incoming-oracle-') as temporary:
  mutate(lambda db:db.execute('DELETE FROM historical_evidence_dependencies WHERE (child,parent) IN (SELECT child,parent FROM historical_evidence_dependencies LIMIT 1)'));refuses('missing archival parent edge');restore()
  def projection(db):
   sql=db.execute("SELECT sql FROM sqlite_master WHERE name='historical_immutable'").fetchone()[0]
-  for marker in ['oswind_historical_writer_v1','oswind_historical_scope_writer_v1','oswind_incoming_source_writer_v1']:db.create_function(marker,0,lambda:1)
+  for marker in ['oswind_historical_writer_v1','oswind_historical_scope_writer_v1','oswind_incoming_source_writer_v1','oswind_run_original_writer_v1']:db.create_function(marker,0,lambda:1)
   db.execute('DROP TRIGGER historical_immutable');db.execute('UPDATE historical_evidence SET projection_sha=? WHERE handle=(SELECT handle FROM historical_evidence LIMIT 1)',('0'*64,));db.execute(sql)
  mutate(projection);refuses('forged original native projection');restore()
  def pin(db):
