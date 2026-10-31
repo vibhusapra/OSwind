@@ -24,7 +24,7 @@ SQLite cancellation handling now covers lexical statements too. The handler is r
 
 The first signed development pairing at source33bf9b7 passes all64 responses per size at100k and1m, with three timed rounds plus warmups. At1m, required-phrase median reported search time is2679→1209ms and empty-model hybrid3060→1301ms; rare lookups remain around1.5–1.7ms. Empty application scope still takes3824→2169ms, motivating the subsequent indexed empty-scope checks. These preflight results are retained and are not the final frozen measurements for the expanded implementation.
 
-A second read-only diagnostic uses the actual system SQLite3.51.0: stable-key and direct ranked-rowid checks take1233/1239ms with the same100 results. Direct rowid substitution is therefore not pursued. This also explains why the PythonSQLite3.54.1 diagnostic cannot be used as a product speed claim. The updated development selection passes all86 cases, including impossible metadata scopes, later cross-connection insertion, text-observation time scopes and the20k Metal workload.
+A second read-only diagnostic uses the actual system SQLite3.51.0: stable-key and direct ranked-rowid checks take1233/1239ms with the same100 results. Direct rowid substitution is therefore not pursued. This also explains why the PythonSQLite3.54.1 diagnostic cannot be used as a product speed claim. Separate review of all1k/100k/1m preflight responses verifies exact authored result ordering, RRF scores, complete paired responses/scopes, original typed rows/payloads, response hashes and timing quantiles. The updated development selection passes all86 cases, including impossible metadata scopes, later cross-connection insertion, text-observation time scopes and the20k Metal workload.
 
 ## Paired release protocol
 

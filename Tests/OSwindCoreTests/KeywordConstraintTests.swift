@@ -49,6 +49,7 @@ final class KeywordConstraintTests:XCTestCase {
         try other.insert(fresh)
         for filter in filters {XCTAssertEqual(try store.search(filter,mode:.keyword).map(\.id),["fresh"])}
         XCTAssertEqual(trace.count,filters.count)
+        XCTAssertTrue(try store.search(SearchFilter(query:query,app:"A",kind:.audio),mode:.keyword).isEmpty,"Independent presence checks must not broaden the combined scope")
         XCTAssertEqual(try temporaryScopes(),0)
     }
 
