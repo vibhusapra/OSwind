@@ -1,0 +1,123 @@
+{
+  "format": "OSwind targeted primary-source landscape refresh v1",
+  "checked": "2026-10-31",
+  "checkedAtUTC": "2026-10-31T22:11:13.239121+00:00",
+  "scope": "Six of twenty existing offering profiles rechecked. Others retain October29 dates. Publisher text/cache evidence only; no vendor app, checkout, account, local archive or clipboard was opened.",
+  "vendors": [
+    {
+      "name": "Screenpipe",
+      "sources": [
+        "https://screenpipe.com/onboarding",
+        "https://screenpipe.com/changelog",
+        "https://docs.screenpipe.com/architecture",
+        "https://docs.screenpipe.com/local-or-cloud-ai",
+        "https://docs.screenpipe.com/storage-and-retention",
+        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md"
+      ],
+      "observation": "Annual plan defaults unchanged. Entitlement prose/table differ. Source licensing remains restricted; desktop release numbers differ from the benchmarked CLI.",
+      "powerClaims": "Changelog describes battery-triggered audio/capture pauses and reduced idle work. Architecture describes event triggers with fallback capture. These are unmeasured publisher claims.",
+      "storageBoundary": "Documentation says switching data directories does not migrate old history and can fall back when an external drive disappears; OSwind needs independent failover-policy acceptance."
+    },
+    {
+      "name": "Original Rewind / Limitless",
+      "sources": [
+        "https://www.limitless.ai/",
+        "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info",
+        "https://help.limitless.ai/en/articles/9129649-pricing-plans",
+        "https://help.limitless.ai/en/articles/13048802-where-can-i-find-my-rewind-data"
+      ],
+      "directHomepage": "timeout",
+      "observation": "Reachable help pages cover exports and unsupported legacy Rewind API access. Pricing help conflicts with the wind-down announcement available in an older publisher search snapshot; current availability remains unresolved."
+    },
+    {
+      "name": "Rewind Desktop (rewind.app)",
+      "sources": [
+        "https://rewind.app/",
+        "https://rewind.app/blog/rewind-vs-rewind-desktop",
+        "https://rewind.app/blog/screenpipe-vs-rewind-desktop"
+      ],
+      "observation": "Homepage accessible; direct comparison fetches fail. Publisher search snapshots repeat the monthly quote. No checkout or runtime accepted."
+    },
+    {
+      "name": "Pieces",
+      "sources": [
+        "https://pieces.app/pricing"
+      ],
+      "observation": "Monthly prices, card-required trial and absence of a free plan remain displayed. Quarterly enterprise option is now recorded."
+    },
+    {
+      "name": "Littlebird",
+      "sources": [
+        "https://littlebird.ai/pricing",
+        "https://littlebird.ai/privacy"
+      ],
+      "observation": "Plan limits and AWS/cloud processing remain explicit; Pro12x pricing is not selected or inferred."
+    },
+    {
+      "name": "Granola",
+      "sources": [
+        "https://www.granola.ai/pricing"
+      ],
+      "observation": "Plan prices remain displayed. Free-plan MCP scope and voice typing are now explicit; voice typing becomes an unimplemented OSwind requirement."
+    }
+  ],
+  "requirements": {
+    "previousCount": 78,
+    "currentCount": 83,
+    "allExistingStatusesUnchanged": true,
+    "newTodoIDs": [
+      "F079",
+      "F080",
+      "F081",
+      "F082",
+      "F083"
+    ],
+    "currentStatuses": {
+      "live verified": 4,
+      "partial": 40,
+      "implemented": 6,
+      "tested": 23,
+      "todo": 8,
+      "out of v0 desktop scope": 2
+    }
+  },
+  "existingRequirementClarifications": [
+    {
+      "ids": [
+        "F009",
+        "F011",
+        "F012",
+        "F013",
+        "F076"
+      ],
+      "boundary": "Modes, adaptive policies and idle model release do not prove sustained physical power budgets."
+    },
+    {
+      "ids": [
+        "F030",
+        "F033"
+      ],
+      "boundary": "Per-routine AI configuration is distinct from a reusable preset management workflow."
+    },
+    {
+      "ids": [
+        "F020",
+        "F042"
+      ],
+      "boundary": "Source favorites and meeting grouping do not automatically establish timed/starred session workflows."
+    },
+    {
+      "ids": [
+        "F063",
+        "F065"
+      ],
+      "boundary": "Closing a window, quitting an app, search availability and continuing capture require separate explicit semantics."
+    }
+  ],
+  "rendering": {
+    "canonicalHTML": "landscape.html",
+    "state": "regenerated20offerings83requirements; structural checks pass, desktop/narrow browser QA pending after benchmark",
+    "copyControl": "Static byte inspection confirms the expected JavaScript newline escape (quote, backslash, n, quote); the earlier escaping suspicion is cleared. Runtime copy behavior remains part of pending browser QA. No renderer defect established or source patch needed."
+  },
+  "sourcePolicy": "Own-product claims use the publisher itself. Competitor comparisons are not treated as independent evidence about the other product. No source code copied or license acceptance inferred."
+}

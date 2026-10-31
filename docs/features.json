@@ -622,5 +622,45 @@
     "status": "partial",
     "evidence": "Schema 24 joins repeated automatic AX text into sampled first/last observations, capped at 15 minutes, 1,000 samples and 120-second gaps. Manual points stay separate; context/privacy/pause/lock/clock failures break continuity. Metadata-only admission preserves vectors/FTS/curation. Inspection/answers pin the extent before inference; later capture starts a new source. Edits invalidate dependent answers/recaps. Sparse overlap queries expose source-start options across calendar/CLI/HTTP/MCP/SDK. Original source 2d58589 retains 16/19 stage passes with three harness failures; fixture-only 44e0bb1 passes four affected follow-ups against the same signed CLI. Native input follow-up 07f5de5 corrects a false-idle bug and has a positive owned automatic-controller span/pinning probe; its original broad run retains one unobserved cancellation phase. Current a5d4af4 removes that process-list sampling and passes all 19 stages over 605 unchanged inputs: full 1299/three skips, TSan/optimized 359/one skip each, nine span process groups/26 operations, ten light/dark component renders and green exact-source CI. The current million-source probe verifies 90 reads/six scopes, exact IDs and unchanged typed rows; 100-result medians about 6.8–7.3 ms are warm component observations without a causal speed/power/ranking claim. Earlier failed receipts stay retained. Unattended native cadence, representative application coverage, physical power and broad parity remain open. See TEXT-OBSERVATION-SPANS.md, NATIVE-INPUT-ACTIVITY.md and vault-helper-phase-v1.json.",
     "references": "OpenHistory, silverfish, Goldfish, Littlebird, Pieces"
+  },
+  {
+    "id": "F079",
+    "axis": "Audio",
+    "feature": "Calendar-linked meeting briefs and join reminders",
+    "status": "todo",
+    "evidence": "New October31 parity requirement from publisher documentation. Existing meeting sessions/detection and the history heatmap do not establish external-calendar integration. Needs explicit calendar selection, timezone/recurrence and event-update handling, durable deduplicated reminders, bounded background work, and owned integration tests. A reminder must not silently join a call or send an invitation.",
+    "references": "Screenpipe desktop changelog; Littlebird; Granola"
+  },
+  {
+    "id": "F080",
+    "axis": "Developer",
+    "feature": "MCP client connections and tool-backed workflows",
+    "status": "todo",
+    "evidence": "New October31 parity requirement. The tested OSwind MCP stdio server exposes memory to clients; it does not prove OSwind can consume selected external MCP servers. Needs explicit local configuration and credentials, capability/tool allowlists, cancellation and size limits, provenance, and reviewed authority for external writes. Captured text must never authorize a tool action.",
+    "references": "Screenpipe custom MCP connections"
+  },
+  {
+    "id": "F081",
+    "axis": "AI",
+    "feature": "Source-linked narrated SOP / workflow video export",
+    "status": "todo",
+    "evidence": "New October31 parity requirement from a publisher changelog. Existing recaps, media exports and drafts do not generate narrated workflow videos. Needs an editable evidence-grounded script, selected source media with renewed privacy/erasure admission, local narration, timed steps/captions and verified non-silent muxed output. Publishing remains a separate explicit action.",
+    "references": "Screenpipe narrated SOPs"
+  },
+  {
+    "id": "F082",
+    "axis": "Capture",
+    "feature": "Optional automatic clipboard context",
+    "status": "todo",
+    "evidence": "New October31 parity requirement. Explicit text collectors and imported terminal text do not prove automatic clipboard capture. Needs visible opt-in, event/text scope and size/type bounds, fresh originating app/window privacy checks, secret handling, deduplication, pause/lock/library-close/erasure ordering and authored native tests. No personal clipboard is read for this research.",
+    "references": "Screenpipe architecture and clipboard changelog"
+  },
+  {
+    "id": "F083",
+    "axis": "Audio",
+    "feature": "Voice typing into a reviewed target app",
+    "status": "todo",
+    "evidence": "New October31 parity requirement from meeting-product pricing documentation. Microphone/ASR support and contextual draft insertion do not establish a usable voice-typing workflow. Needs deliberate start/stop, bounded local transcription, clear capture state, secure-field exclusion, target renewal after inference, preview/edit/cancel and owned-app insertion tests. No silent cloud fallback.",
+    "references": "Granola voice typing"
   }
 ]

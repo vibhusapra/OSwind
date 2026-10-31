@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+Latest: [sync mutation tradeoff](sync-mutation-cost-v1.json), three paired rounds with all12 workloads/reviews, setup/projection regressions and index storage cost retained. [Protocol](../docs/SYNC-MUTATION-COST.md).
+
 [Internal identity/bootstrap development](sync-object-identity-scale-v1.json), PR #96: one warm authored run per size; identity metadata bootstrap 0.034 s / 7.856 s / 125.205 s at 1k/100k/1m. All original typed rows/payloads and global/local mappings pass independent inspection. Four real own-child pre/post-commit catalog/journal/cursor crash parents pass under TSan; nine offline reviewer contracts pass. [Protocol and unfinished delivery work](../docs/SYNC-OBJECT-IDENTITY.md). Complete typed sync, full/package/process, provider and physical energy qualification remain open.
 
 [Phrase/Boolean keyword scaling](keyword-scope-scale-v1.json), source 7e0d88a / PR #95: all 40 stages across 819 unchanged inputs pass. Full 1,381 passes / 5 skips; TSan 405 and optimized 405 passes. Three authored archive sizes, exact prior/current responses, independent source/RRF/timing oracles and [all 288 raw responses](keyword-scope-raw-v1.zip) retained. [Protocol and limitations](../docs/KEYWORD-CONSTRAINT-SCALE.md).

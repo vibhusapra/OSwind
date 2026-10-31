@@ -111,7 +111,9 @@ struct SyncJournal {
         let data=try SyncProtocolLimits.encode(observed);data.withUnsafeBytes {_=sqlite3_bind_blob(row,1,$0.baseAddress,Int32(data.count),db.transient)};try db.done(row)
     }
     private func mergeObservedClock(_ clock:SyncClock)throws {
-        let merged=try observedClock().merged(with:clock),data=try SyncProtocolLimits.encode(merged)
+        let previous=try observedClock(),merged=try previous.merged(with:clock)
+        guard merged != previous else {return}
+        let data=try SyncProtocolLimits.encode(merged)
         let row=try database.statement("UPDATE personal_sync_observed SET clock=? WHERE singleton=1");defer {sqlite3_finalize(row)};bind(row,1,data);try database.done(row)
         guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Sync observation state changed")}
     }

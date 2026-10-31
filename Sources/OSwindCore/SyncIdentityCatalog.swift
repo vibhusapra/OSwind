@@ -67,8 +67,8 @@ struct SyncIdentityCatalog {
             var installed=Set<String>(),status=sqlite3_step(present)
             while status==SQLITE_ROW {installed.insert(db.text(present,0));status=sqlite3_step(present)};sqlite3_finalize(present)
             guard status==SQLITE_DONE,installed.isEmpty || installed==Set(Self.schemas.keys) else {throw OSwindError.database("Sync identity schema is incomplete; preserve its state")}
-            for (name,sql) in Self.schemas.sorted(by:{$0.key<$1.key}) {
-                let existing=try db.statement("SELECT sql FROM sqlite_master WHERE name=? AND type='table'");db.bind(existing,1,name)
+            for (name,sql) in Self.protectedSchemas.sorted(by:{$0.key<$1.key}) {
+                let existing=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(existing,1,name)
                 let code=sqlite3_step(existing),found=code==SQLITE_ROW ? db.text(existing,0):nil;sqlite3_finalize(existing)
                 guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
                 if let found {guard found==sql else {throw OSwindError.database("Sync identity schema differs")}}
@@ -85,9 +85,29 @@ struct SyncIdentityCatalog {
         "personal_sync_identities":"CREATE TABLE personal_sync_identities(object_digest TEXT PRIMARY KEY,table_name TEXT NOT NULL,origin TEXT NOT NULL,lifetime TEXT NOT NULL,local_key BLOB,key_frame BLOB,deleted INTEGER NOT NULL CHECK(deleted IN(0,1)),UNIQUE(origin,lifetime),CHECK(local_key IS NULL OR (typeof(local_key)='blob' AND length(local_key)=32)),CHECK(deleted=0 OR key_frame IS NULL))",
         "personal_sync_identity_current":"CREATE TABLE personal_sync_identity_current(table_name TEXT NOT NULL,local_key BLOB NOT NULL CHECK(typeof(local_key)='blob' AND length(local_key)=32),object_digest TEXT NOT NULL REFERENCES personal_sync_identities(object_digest),PRIMARY KEY(table_name,local_key))"
     ]
+    // Native deletion protection revokes every lifetime bound to a local key.
+    // Cover that lookup rather than scanning the global catalog per deleted row.
+    // Existing catalogs acquire this additive index transactionally on install;
+    // their lifetimes, frames and journal state do not change.
+    private static let protectedSchemas=schemas.merging([
+        "sync_identities_local":"CREATE INDEX sync_identities_local ON personal_sync_identities(table_name,local_key,object_digest)"
+    ],uniquingKeysWith:{_,value in value})
+    /// Ordinary opening upgrades an already-installed catalog without enabling
+    /// capture or creating sync identities in a library that never opted in.
+    static func migrateLookupIndexIfPresent(_ db:RoutineDatabase)throws {
+        let count=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_identity_state','personal_sync_identities','personal_sync_identity_current','personal_sync_identity_bootstrap')")
+        guard count>0 else {return}
+        guard count==schemas.count,sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.database("Upgrade the complete sync identity catalog in the library transaction")}
+        let name="sync_identities_local",sql=protectedSchemas[name]!,row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?")
+        db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
+        guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
+        if let found {guard found==sql else {throw OSwindError.database("Sync identity lookup index differs")}}
+        else {try db.execute(sql)}
+        _=try Self(database:db,scope:SyncChangeCapture.scope(db)).state()
+    }
     private func state()throws->(Int64,Bool) {
-        for (name,sql) in Self.schemas {
-            let s=try database.statement("SELECT sql FROM sqlite_master WHERE name=? AND type='table'");database.bind(s,1,name);defer {sqlite3_finalize(s)}
+        for (name,sql) in Self.protectedSchemas {
+            let s=try database.statement("SELECT sql FROM sqlite_master WHERE name=?");database.bind(s,1,name);defer {sqlite3_finalize(s)}
             guard sqlite3_step(s)==SQLITE_ROW,database.text(s,0)==sql else {throw OSwindError.database("Sync identity schema differs")}
         }
         guard try SyncChangeCapture.scope(database)==scope else {throw OSwindError.invalid("Sync identity capture scope changed")}
