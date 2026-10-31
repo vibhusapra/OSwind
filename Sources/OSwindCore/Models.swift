@@ -31,11 +31,19 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     public var embeddingModel: String?
     /// Search-only projection. Never admit this incomplete value as a source.
     public var searchPreview: MemorySearchPreview?
+    /// Read-only original evidence. Its handle resolves through the owning
+    /// library's exact-version adapter, never through the current source ID.
+    public var originalEvidence:MemoryOriginalEvidence?
     public var recap: RecapProvenance?
     public init(id: String = UUID().uuidString, timestamp: Date = Date(), endTimestamp: Date? = nil, kind: MemoryKind = .screen, app: String = "", bundleID: String = "", title: String = "", url: String? = nil, text: String, imagePath: String? = nil, audioPath: String? = nil, display: String? = nil, regions: [TextRegion] = [], favorite: Bool = false, tags: [String] = [], embedding: [Float]? = nil, embeddingModel: String? = nil) {
         self.id = id; self.timestamp = timestamp; self.endTimestamp = endTimestamp; self.kind = kind; self.app = app; self.bundleID = bundleID; self.title = title; self.url = url; self.text = text; self.imagePath = imagePath; self.audioPath = audioPath; self.display = display; self.regions = regions; self.favorite = favorite; self.tags = tags; self.embedding = embedding; self.embeddingModel = embeddingModel
     }
     public var searchableText: String { [title, app, url ?? "", text].joined(separator: "\n") }
+}
+public struct MemoryOriginalEvidence:Codable,Equatable,Sendable {
+    public let handle:String
+    public let contentSHA256:String
+    init(handle:String,contentSHA256:String) {self.handle=handle;self.contentSHA256=contentSHA256}
 }
 public enum SearchMode: String, Codable, CaseIterable {
     case hybrid,keyword,semantic,visual
