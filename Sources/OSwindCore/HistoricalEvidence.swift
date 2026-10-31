@@ -14,13 +14,14 @@ struct HistoricalEvidence {
 /// the sync cache, these exact originals are explicitly copied by quiet restore.
 struct HistoricalEvidenceStore {
     let database:RoutineDatabase
-    private final class SchemaStamp {let lock=NSLock();var value:Int64?}
+    private struct Stamp:Equatable {let cookie:Int64,version:Int32}
+    private final class SchemaStamp {let lock=NSLock();var value:Stamp?}
     private let schemaStamp=SchemaStamp()
     init(database:RoutineDatabase) {self.database=database}
     static let defaultBudget:Int64=256*1024*1024,maximumBudget:Int64=8*1024*1024*1024
     static let charge="256+length(new.body)+length(new.paths)+length(new.parents)+128*json_array_length(CAST(new.parents AS TEXT))"
     static func ancestors(_ root:String)->String {"WITH RECURSIVE affected(handle) AS (SELECT \(root) UNION SELECT d.child FROM historical_evidence_dependencies d JOIN affected a ON d.parent=a.handle) SELECT handle FROM affected"}
-    // Exact old26 trigger text remains readable in quiet legacy backups.
+    // Exact old26 text is admitted only for migration and read-only old backups.
     static let legacyOwnerRevision="CREATE TRIGGER historical_owner_revision BEFORE UPDATE OF timestamp,kind,app,title,url,text,payload ON memories WHEN EXISTS(SELECT 1 FROM historical_evidence WHERE source_id=old.id) AND (old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind OR old.app IS NOT new.app OR old.title IS NOT new.title OR old.url IS NOT new.url OR old.text IS NOT new.text OR oswind_sync_source_revision_v1(old.payload) IS NOT oswind_sync_source_revision_v1(new.payload)) BEGIN DELETE FROM historical_evidence WHERE source_id=old.id; END"
     static let schemas:[String:String] = {
         let affected=ancestors("old.handle"),cost=charge,oldCost=charge.replacingOccurrences(of:"new.",with:"old.")
@@ -66,22 +67,24 @@ struct HistoricalEvidenceStore {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
             guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
             if let found {
-                if name=="historical_owner_revision",found==legacyOwnerRevision {try db.execute("DROP TRIGGER historical_owner_revision");try db.execute(schemas[name]!)}
+                if name=="historical_owner_revision",sourceVersion<27,found==legacyOwnerRevision {try db.execute("DROP TRIGGER historical_owner_revision");try db.execute(schemas[name]!)}
                 else {guard found==schemas[name]! else {throw OSwindError.database("Historical evidence protection schema differs")}}
             }
             else {guard sourceVersion<26 || (repairMissingPins && (name.hasPrefix("historical_writer_text_observation_pins_") || name=="historical_pin_delete" || name=="historical_pin_move")) else {throw OSwindError.database("Historical evidence schema is missing")};try db.execute(schemas[name]!)}
         }
         if sourceVersion>=26 {let existing=try db.statement("SELECT COUNT(*) FROM historical_evidence_state");defer {sqlite3_finalize(existing)};guard sqlite3_step(existing)==SQLITE_ROW,sqlite3_column_int(existing,0)==1 else {throw OSwindError.database("Historical evidence accounting is missing")}}
         let row=try db.statement("INSERT INTO historical_evidence_state VALUES(1,0,?,randomblob(16)) ON CONFLICT(singleton) DO NOTHING");defer {sqlite3_finalize(row)};sqlite3_bind_int64(row,1,defaultBudget);try db.done(row)
-        try Self(database:db).checkAccounting(allowLegacyCitationUpgrade:sourceVersion<26)
+        try Self(database:db).checkAccounting(allowLegacyCitationUpgrade:sourceVersion<26,allowScopeInstallation:true)
     }
-    private func context(writing:Bool=false,requireCitations:Bool=true)throws {
-        let cookieRow=try database.statement("PRAGMA schema_version");defer {sqlite3_finalize(cookieRow)};guard sqlite3_step(cookieRow)==SQLITE_ROW else {throw database.error()};let cookie=sqlite3_column_int64(cookieRow,0)
+    private func context(writing:Bool=false,requireCitations:Bool=true,requireScopes:Bool=true)throws {
+        let cookieRow=try database.statement("SELECT schema_version,user_version FROM pragma_schema_version,pragma_user_version");defer {sqlite3_finalize(cookieRow)};guard sqlite3_step(cookieRow)==SQLITE_ROW else {throw database.error()};let stamp=Stamp(cookie:sqlite3_column_int64(cookieRow,0),version:sqlite3_column_int(cookieRow,1))
         schemaStamp.lock.lock()
         do {
-            if !requireCitations || schemaStamp.value != cookie {
-                for (name,sql) in Self.schemas {let row=try database.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};database.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.database("Historical evidence protection differs")};let actual=database.text(row,0);guard actual==sql || (name=="historical_owner_revision" && actual==Self.legacyOwnerRevision) else {throw OSwindError.database("Historical evidence protection differs")}}
-                if requireCitations {try CitationSchema.validate(database);schemaStamp.value=cookie}
+            if !requireCitations || !requireScopes || schemaStamp.value != stamp {
+                for (name,sql) in Self.schemas {let row=try database.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};database.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.database("Historical evidence protection differs")};let actual=database.text(row,0);guard actual==sql || (stamp.version==26 && name=="historical_owner_revision" && actual==Self.legacyOwnerRevision) else {throw OSwindError.database("Historical evidence protection differs")}}
+                if requireCitations {try CitationSchema.validate(database)}
+                if requireScopes && stamp.version>=27 {try HistoricalErasureSchema.validate(database)}
+                if requireCitations && requireScopes {schemaStamp.value=stamp}
             }
             schemaStamp.lock.unlock()
         }catch {schemaStamp.lock.unlock();throw error}
@@ -89,8 +92,8 @@ struct HistoricalEvidenceStore {
         guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_INTEGER,sqlite3_column_type(row,1)==SQLITE_INTEGER,(0...sqlite3_column_int64(row,1)).contains(sqlite3_column_int64(row,0)),(1...Self.maximumBudget).contains(sqlite3_column_int64(row,1)),((!writing && sqlite3_db_readonly(database.handle,"main")==1) || (sqlite3_column_int(row,2)==1 && sqlite3_column_int(row,3)==1)) else {throw OSwindError.database("Historical evidence accounting or writer protection differs")}
     }
     struct Row:Equatable {let source:String,object:String,sha:String,body:Data,paths:Data,parents:Data,projection:String}
-    func checkAccounting(allowLegacyCitationUpgrade:Bool=false)throws {
-        try context(requireCitations:!allowLegacyCitationUpgrade)
+    func checkAccounting(allowLegacyCitationUpgrade:Bool=false,allowScopeInstallation:Bool=false)throws {
+        try context(requireCitations:!allowLegacyCitationUpgrade,requireScopes:!allowScopeInstallation)
         let row=try database.statement("SELECT used_bytes=(SELECT COALESCE(SUM(256+length(body)+length(paths)+length(parents)+128*json_array_length(CAST(parents AS TEXT))),0) FROM historical_evidence) FROM historical_evidence_state WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_int(row,0)==1 else {throw OSwindError.database("Historical evidence accounting differs")}
     }
@@ -177,6 +180,7 @@ struct HistoricalEvidenceStore {
     /// media, and rebuilds this device-independent archival projection/checksum.
     func insert(handle:String,source:String,record:SyncPortableRecord,paths:[SyncMediaRole:String],parents:[HistoricalEvidence])throws {
         try context(writing:true);try SyncProtocolLimits.uuid(handle);try ownerExists(source);guard case .source(let body)=record.body else {throw OSwindError.invalid("Historical evidence must be a source")}
+        guard try !HistoricalErasureSchema.hasRevokedVersion(database,record) else {throw OSwindError.invalid("This exact original version was erased from this library")}
         let encodedPaths=try SyncProtocolLimits.encode(Dictionary(uniqueKeysWithValues:paths.map {($0.key.rawValue,$0.value)}));_=try Self.paths(encodedPaths);var index=0
         var memory=try body.projectedMemory(id:"original-"+handle,paths:paths) {ref in guard index<parents.count,try parents[index].reference==ref else {throw OSwindError.invalid("Historical restored parent differs")};defer {index+=1};return(parents[index].memory.id,parents[index].memory.evidenceHash)}
         guard index==parents.count else {throw OSwindError.invalid("Historical parent count differs")}

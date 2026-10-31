@@ -82,11 +82,27 @@ class FixtureFunctions(unittest.TestCase):
 
     def test_unknown_future_schema_does_not_gain_fixture_functions(self):
         db = self.connection()
-        db.execute("PRAGMA user_version=27")
+        db.execute("PRAGMA user_version=28")
         with self.assertRaises(ValueError):
             register_inactive_sync_fixture(db)
         with self.assertRaises(sqlite3.OperationalError):
             db.execute("SELECT oswind_sync_row_v1(1)")
+
+    def test_schema27_scope_marker_refuses_later_activation_or_schema_change(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=27")
+        db.execute("CREATE TRIGGER scope_writer BEFORE INSERT ON source BEGIN SELECT oswind_historical_scope_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        for state in [(1, 0), (0, 1), (1, 1)]:
+            db.execute("UPDATE personal_sync_capture SET enabled=?,suppressed=?", state)
+            with self.assertRaises(sqlite3.OperationalError):
+                db.execute("INSERT INTO source VALUES(2)")
+        db.execute("UPDATE personal_sync_capture SET enabled=0,suppressed=0")
+        db.execute("PRAGMA user_version=28")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(3)")
+        self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
 
 
 if __name__ == "__main__":

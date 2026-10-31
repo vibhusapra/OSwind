@@ -1,0 +1,18 @@
+{
+  "format": "OSwind owned actual schema26 original-scope fixture",
+  "productSourceCommit": "f962e82077cb9a8e7bb2b7acd76edf3025a72519",
+  "generation": "Closed actual schema26 native store from the retained failing original-field scope test. Newer canonical Notes body, old Safari archival source, one historical linked recap and conversation. No normal history or keys.",
+  "file": "original-scope-schema26.sqlite",
+  "sha256": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556",
+  "bytes": 610304,
+  "archive": {
+    "folder": "legacy26.oswindbackup",
+    "generation": "Actual pinned signed f962e820 schema26 CLI backed up the actual closed original-scope fixture. Synthetic data only.",
+    "files": {
+      "header.json": "4ee5a10db8a594c68c4072010ebf0beff07085e5706e0a643988644a2e153c63",
+      "settings.json": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09",
+      "memory.sqlite": "55a97ce7016fcde140eaa2fad06aabdb7e6e0bd929fd39b5a9dda43ef1cb822c",
+      "media.ndjson": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

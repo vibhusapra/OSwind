@@ -149,14 +149,21 @@ final class HistoricalRecapTests:XCTestCase {
     }
 
     func testLegacy26GuardUpgradesAndReadonlyBackupKeepsExactOriginals() throws {
-        let (_,_,second)=try graph(),archive=root.appendingPathComponent("legacy.oswindbackup"),destination=root.appendingPathComponent("legacy-copy")
-        try store.withRoutineDatabase {db in try db.execute("DROP TRIGGER historical_owner_revision");try db.execute(HistoricalEvidenceStore.legacyOwnerRevision)}
-        _=try LibraryBackup.create(store:store,destination:archive);_=try LibraryBackup.restore(archive,to:destination)
+        let fixture=try XCTUnwrap(Bundle.module.url(forResource:"original-scope-schema26",withExtension:"sqlite",subdirectory:"HistoricalErasureMigration")),archive=try XCTUnwrap(Bundle.module.url(forResource:"legacy26",withExtension:"oswindbackup",subdirectory:"HistoricalErasureMigration"))
+        func fileHashes() throws -> [String:String] {
+            let rows=try XCTUnwrap(FileManager.default.enumerator(at:archive,includingPropertiesForKeys:[.isRegularFileKey]));var result=[String:String]()
+            for case let file as URL in rows {if try file.resourceValues(forKeys:[.isRegularFileKey]).isRegularFile==true {result[file.path]=SyncProtocolLimits.hex(try Data(contentsOf:file))}}
+            return result
+        }
+        let before=try fileHashes();XCTAssertEqual(try LibraryBackup.inspect(archive).sourceSchema,26)
+        let destination=root.appendingPathComponent("legacy-copy");_=try LibraryBackup.restore(archive,to:destination)
         let copy=try MemoryStore(root:destination);defer {try? copy.close()}
-        XCTAssertEqual(try copy.historicalMemory(second.handle),second.memory)
-        try store.close();store=try MemoryStore(root:root.appendingPathComponent("library"))
-        XCTAssertEqual(try store.historicalMemory(second.handle),second.memory)
-        try store.withRoutineDatabase {db in
+        let handle=try copy.withRoutineDatabase {db -> String in let row=try db.statement("SELECT handle FROM historical_evidence");defer {sqlite3_finalize(row)};guard sqlite3_step(row)==SQLITE_ROW else {throw db.error()};return db.text(row,0)}
+        XCTAssertEqual(try copy.historicalMemory(handle).text,"Original private source body");XCTAssertEqual(try copy.get("source")?.text,"Newer independent current body");XCTAssertEqual(try fileHashes(),before)
+        let live=root.appendingPathComponent("legacy-live");try Paths.ensure(live);try FileManager.default.copyItem(at:fixture,to:live.appendingPathComponent("memory.sqlite"))
+        let reopened=try MemoryStore(root:live);defer {try? reopened.close()}
+        XCTAssertEqual(try reopened.historicalMemory(handle).text,"Original private source body")
+        try reopened.withRoutineDatabase {db in
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name='historical_owner_revision'");defer {sqlite3_finalize(row)}
             XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(db.text(row,0),HistoricalEvidenceStore.schemas["historical_owner_revision"])
         }

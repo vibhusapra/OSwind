@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version26 fences readers that would substitute current text for historical citations.
-    public static let schemaVersion = 26
+    // Version27 adds original-field erasure selection and fences older writers.
+    public static let schemaVersion = 27
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -157,6 +157,7 @@ public final class MemoryStore: @unchecked Sendable {
         let upgradedCitations=try CitationSchema.migrate(RoutineDatabase(handle:db!),sourceVersion:version)
         if missingPins {try SyncVersionStore.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
         if upgradedCitations {try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)}
+        try HistoricalErasureSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,missingPins:missingPins) {
             try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins,repairCitationUpgrade:upgradedCitations)
         }

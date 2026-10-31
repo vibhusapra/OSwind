@@ -54,3 +54,5 @@ The [separate repair receipt](../benchmarks/sync-historical-citations-guard-v1.j
 - [ ] Complete typed incoming sources/recaps and the remaining graph adapters.
 - [ ] Service lifecycle, enrollment, key rotation/revocation, production current-policy/erasure epochs, transport/providers and two-Mac acceptance.
 - [ ] Sustained capture/power and notarized release; matched competitor benchmarks before any top-three claim.
+
+The explicit-CASE repair at `f57a0d52407baf4d6f593a0f685c3393c1d8e9d3` passes both jobs in [hosted run 41203453722](https://github.com/vibhusapra/OSwind/actions/runs/41203453722), including the formerly failing Python erasure step48 and every later native stage. The original failed f962 run and its skipped later stages remain retained. This hosted result belongs to schema26; the schema27 original-field erasure follow-up is qualified separately.

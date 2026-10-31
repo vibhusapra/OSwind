@@ -134,6 +134,9 @@ struct SyncVersionStore {
             return value
         }
     }
+    static func validateForErasure(_ db:RoutineDatabase)throws {
+        for (name,sql) in expectedSchemas {try schema(db,name,sql,create:false)}
+    }
     private static func schema(_ db:RoutineDatabase,_ name:String,_ sql:String,create:Bool)throws {
         let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);let code=sqlite3_step(row)
         if code==SQLITE_ROW {guard db.text(row,0)==sql else {throw OSwindError.database("Sync version schema differs")}}
@@ -165,9 +168,11 @@ struct SyncVersionStore {
     }
     private func stored(_ reference:SyncVersionReference)throws->SyncPortableRecord? {
         try reference.validate(reference.identity.table);_=try owner(reference.identity)
+        if try HistoricalErasureSchema.isRevoked(database,reference) {return nil}
         let row=try database.statement("SELECT table_name,bytes,body,local_key FROM personal_sync_versions WHERE object_digest=? AND content_sha=?");defer {sqlite3_finalize(row)};database.bind(row,1,try reference.identity.key.digest);database.bind(row,2,reference.content.sha256)
         let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW,database.text(row,0)==reference.identity.table.rawValue,sqlite3_column_type(row,1)==SQLITE_INTEGER,sqlite3_column_int64(row,1)==reference.content.bytes,try blob(row,3,maximum:32)==owner(reference.identity).1 else {throw OSwindError.database("Sync version binding differs")}
-        return try SyncPortableRecord.decode(blob(row,2,maximum:Int(SyncProtocolLimits.contentBytes)),expected:reference)
+        let record=try SyncPortableRecord.decode(blob(row,2,maximum:Int(SyncProtocolLimits.contentBytes)),expected:reference)
+        return try HistoricalErasureSchema.hasRevokedVersion(database,record) ? nil:record
     }
     private func head(_ record:SyncPortableRecord)throws->Bool {
         let state=try journal.state(for:record.identity.key);guard !state.isDeleted else {return false}
@@ -176,6 +181,7 @@ struct SyncVersionStore {
     @discardableResult func retain(_ record:SyncPortableRecord,requiredBy requester:SyncPortableRecord?=nil,admit:(SyncPortableRecord)throws->Void)throws->SyncVersionReference {
         try SyncChangeCapture.transaction(database) {
             try context();try record.validate();let reference=try record.reference,(_,localKey)=try owner(record.identity)
+            guard try !HistoricalErasureSchema.hasRevokedVersion(database,record) else {throw OSwindError.invalid("This exact original version was erased from this library")}
             var authorized=try head(record)
             if !authorized,let requester {
                 try requester.validate();let authenticated=try head(requester) || stored(requester.reference) != nil
@@ -184,6 +190,7 @@ struct SyncVersionStore {
             }
             let prior=try stored(reference);guard authorized || prior != nil else {throw OSwindError.invalid("Sync version is neither an admitted head nor an exact requested dependency")}
             try admit(record);try context()
+            guard try !HistoricalErasureSchema.hasRevokedVersion(database,record) else {throw OSwindError.invalid("This exact original version was erased during admission")}
             guard try owner(record.identity).1==localKey else {throw OSwindError.invalid("Sync version local owner changed during admission")}
             if prior != nil {
                 guard try stored(reference) != nil else {throw OSwindError.invalid("Sync cached version disappeared during admission")};return reference

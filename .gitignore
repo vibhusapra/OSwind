@@ -13,3 +13,7 @@ __pycache__/
 # Hash-pinned authored legacy databases; test resources, never user history.
 !Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/producer-schema25.sqlite
 !Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/receiver-schema25.sqlite
+
+# Owned actual schema26 historical-erasure regression fixture.
+!Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite
+!Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/*.sqlite

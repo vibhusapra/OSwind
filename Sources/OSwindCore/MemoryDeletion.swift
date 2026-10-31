@@ -12,9 +12,9 @@ extension HistoryErasureResult {
     static var empty:Self {.init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:true,warnings:[])}
     func adding(_ next:Self) -> Self {
         var messages=warnings;for text in next.warnings where !messages.contains(text) {messages.append(text)}
-        return .init(sources:sources+next.sources,conversationTurns:conversationTurns+next.conversationTurns,removedMedia:removedMedia+next.removedMedia,sharedMedia:sharedMedia+next.sharedMedia,pendingMedia:next.pendingMedia,searchCacheRemoved:searchCacheRemoved && next.searchCacheRemoved,warnings:messages)
+        return .init(sources:sources+next.sources,conversationTurns:conversationTurns+next.conversationTurns,removedMedia:removedMedia+next.removedMedia,sharedMedia:sharedMedia+next.sharedMedia,pendingMedia:next.pendingMedia,searchCacheRemoved:searchCacheRemoved && next.searchCacheRemoved,warnings:messages,historicalVersions:historicalVersions+next.historicalVersions)
     }
-    func warning(_ text:String) -> Self {.init(sources:sources,conversationTurns:conversationTurns,removedMedia:removedMedia,sharedMedia:sharedMedia,pendingMedia:pendingMedia,searchCacheRemoved:searchCacheRemoved,warnings:warnings+[text])}
+    func warning(_ text:String) -> Self {.init(sources:sources,conversationTurns:conversationTurns,removedMedia:removedMedia,sharedMedia:sharedMedia,pendingMedia:pendingMedia,searchCacheRemoved:searchCacheRemoved,warnings:warnings+[text],historicalVersions:historicalVersions)}
 }
 private extension RoutineDatabase {
     /// A successful SQL step alone does not mean a checkpoint obtained its reader locks.
@@ -28,25 +28,19 @@ private extension RoutineDatabase {
         }
         try checkpoint();try execute("VACUUM");try checkpoint()
     }
-    func deletedSources(_ body:() throws -> Void) throws -> (sources:Int,turns:Int) {
-        let turns=try eraseCount("SELECT COUNT(*) FROM chat_turns"),before=try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")
-        try body();let count=before-(try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")),removed=turns-(try eraseCount("SELECT COUNT(*) FROM chat_turns"))
-        if count>0 {try execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
-        return (count,removed)
-    }
+
 }
 extension MemoryStore {
     /// Logical deletion commits with durable media admission. Postcommit cleanup failures
     /// return warnings and pending paths rather than falsely reporting no deletion.
     @discardableResult public func delete(_ id:String) throws -> HistoryErasureResult {
         try withRoutineDatabase {db in
+            defer {try? db.clearErasureSelection()}
             let deleted=try erasureCancellable(db) {try db.transaction {
-                try db.deletedSources {
-                    let row=try db.statement("DELETE FROM memories WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,id);try db.done(row)
-                }
+                try db.prepareCanonicalErasure(id);return try db.eraseSelectedHistory()
             }}
-            guard deleted.sources>0 else {return .empty}
-            return cleanupErasedAssets(db,sources:deleted.sources,turns:deleted.turns)
+            guard deleted.sources>0 || deleted.historical>0 else {return .empty}
+            return cleanupErasedAssets(db,sources:deleted.sources,turns:deleted.turns,histories:deleted.historical)
         }
     }
     /// Compatibility wrapper. Native/CLI callers use pruneHistory to surface file/budget outcomes.
@@ -54,17 +48,17 @@ extension MemoryStore {
     public func pruneHistory(before:Date,maxBytes:Int64?=nil) throws -> RetentionCleanupResult {
         guard before.timeIntervalSince1970.isFinite,maxBytes.map({$0>0}) ?? true else {throw OSwindError.invalid("Use a finite retention date and positive storage budget")}
         return try withRoutineDatabase {db in
-            let initial=try erasureCancellable(db) {try db.transaction { () -> (sources:Int,turns:Int) in
-                let beforeTurns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns"),beforeSources=try db.eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")
+            defer {try? db.clearErasureSelection()}
+            let initial=try erasureCancellable(db) {try db.transaction { () -> RoutineDatabase.ErasedCounts in
+                let beforeTurns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns")
                 let titles=try db.statement("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE timestamp<?)");defer {sqlite3_finalize(titles)};sqlite3_bind_double(titles,1,before.timeIntervalSince1970);try db.done(titles)
                 let chats=try db.statement("DELETE FROM chat_turns WHERE timestamp<?");defer {sqlite3_finalize(chats)};sqlite3_bind_double(chats,1,before.timeIntervalSince1970);try db.done(chats)
-                let row=try db.statement("DELETE FROM memories WHERE timestamp<?");defer {sqlite3_finalize(row)};sqlite3_bind_double(row,1,before.timeIntervalSince1970);try db.done(row);let count=beforeSources-(try db.eraseCount("SELECT total FROM memory_statistics WHERE singleton=1"))
-                if count>0 {try db.execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
-                return (count,beforeTurns-(try db.eraseCount("SELECT COUNT(*) FROM chat_turns")))
+                _=try db.prepareErasure(.init(end:before));let erased=try db.eraseSelectedHistory()
+                return .init(sources:erased.sources,turns:beforeTurns-(try db.eraseCount("SELECT COUNT(*) FROM chat_turns")),historical:erased.historical)
             }}
             var result=HistoryErasureResult.empty
             let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),dirty=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")
-            if initial.sources>0 || pending>0 || dirty>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns)}
+            if initial.sources>0 || initial.historical>0 || pending>0 || dirty>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns,histories:initial.historical)}
             else {result = .init(sources:0,conversationTurns:initial.turns,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:true,warnings:[])}
             var bytes=diskBytes(includeStaging:false),stopped=false
             if let maxBytes,bytes>maxBytes,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
@@ -79,12 +73,12 @@ extension MemoryStore {
             while let maxBytes,bytes>maxBytes,!stopped,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
                 do {
                     let batch=try erasureCancellable(db) {try db.transaction {
-                        try db.deletedSources {try db.execute("DELETE FROM memories WHERE id IN (SELECT id FROM memories ORDER BY timestamp,id LIMIT 16)")}
+                        try db.prepareOldestErasure(limit:16);return try db.eraseSelectedHistory()
                     }}
-                    guard batch.sources>0 else {break}
+                    guard batch.sources>0 || batch.historical>0 else {break}
                     // No per-source archive scan. Each bounded oldest-first batch commits and
                     // drains once; a failed queue stops further destructive budget trimming.
-                    result=result.adding(cleanupErasedAssets(db,sources:batch.sources,turns:batch.turns))
+                    result=result.adding(cleanupErasedAssets(db,sources:batch.sources,turns:batch.turns,histories:batch.historical))
                     if result.pendingMedia==0 {try db.compactRetentionStorage()}
                     bytes=diskBytes(includeStaging:false)
                 } catch is CancellationError {stopped=true}

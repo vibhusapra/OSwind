@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Original-field erasure and retention — component qualified
+
+[Schema27 implementation](HISTORICAL-ERASURE.md) selects exact original versions independently of newer owners, closes mixed original/current recap chains, reports historical-only native previews, and shares deletion/retention/storage-budget selection. Exact local typed-cache versions/dependents are purged and revoked; current owners and unrelated versions stay intact. Real actual26 SQLite/backup fixtures and pre/postcommit SIGKILL recovery cover migration and media cleanup.
+
+The [receipt](../benchmarks/historical-erasure-v1.json) passes all 21 stages over 667 unchanged repository inputs: 1,525 full passes/75 explicit skips, 246 sanitizer/2 skips and 247 optimized/1 worker skip, no race warnings. Six independent reader corruption controls, nine identity-reader admission cases, 16 SDK tests, signed normal/indexed API/MCP and deletion/wipe/backup/recap processes pass. Actual initialized old25/26 collectors, fresh clients and backup inspectors refuse; quiet historical restore and subsequent scoped erasure pass. All 34 extracted ZIP files/signatures match; the installed 15-file app stays unchanged.
+
+Independent review verifies all 11,000 original bodies, identities/native bindings, exact selected handles, retained bytes, local revocations and charges. At 1k/10k originals, median warm full app previews take 1.15/3.64ms, narrow time previews 0.96/1.20ms; one 10%-match apply takes 24.1/192.6ms. Seven warm samples per selector, one newer owner and 1KiB text bodies exclude models/media, cold cache, physical power and ranking. A separate readonly graph/media inspection preserves all 9 SQLite files. Real 42-scope and 7-cache failures and helper/compile/fixture failures stay retained.
+
+F052 remains partial; F059 remains TODO. Complete cache-only selection, cross-device policy/epochs, incoming graph/service/enrollment/transport/provider/two-Mac acceptance, historical playback/export/save-recap, native/physical power and distribution remain open. All 78 statuses are unchanged.
+
 ## Historical citations and quiet restore — draft PR #104
 
 - [Schema-26 archival citations](SYNC-HISTORICAL-CITATIONS.md) preserve exact historical originals through native text/recap navigation and quiet backup restore while current timeline text stays newer. Real schema-25 fixtures cover atomic migration/refusal, queued frames and cold-pin lifetime recovery. Incoming conversation/turn/citation/pin adapters remain internal.

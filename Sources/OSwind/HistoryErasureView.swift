@@ -13,7 +13,7 @@ import OSwindCore
     func cancel() {cancelWorker?()}
     func inspect(store:MemoryStore,scope:HistoryErasureScope) {
         guard !busy else {return};preview=nil;result=nil
-        run(phase:"Checking source records and dependent answers…",operation:{try store.previewErasure(scope)}) {self.preview=$0;self.phase="Preview ready. Capture stays paused."}
+        run(phase:"Checking current sources, original versions and dependent answers…",operation:{try store.previewErasure(scope)}) {self.preview=$0;self.phase="Preview ready. Capture stays paused."}
     }
     func apply(store:MemoryStore,completion:@escaping ()->Void) {
         guard !busy,let preview else {return}
@@ -52,7 +52,7 @@ struct HistoryErasureView:View {
     var body:some View {
         VStack(alignment:.leading,spacing:16) {
             HStack {Text("Erase part of your history.").font(.title2.weight(.medium));Spacer();Button("Done") {dismiss()}.disabled(model.busy).keyboardShortcut(.cancelAction)}
-            Text("Choose a time, app or website. Review the matching sources before deleting them.").foregroundStyle(.secondary)
+            Text("Choose a time, app or website. Review matching current sources and original versions before deleting them.").foregroundStyle(.secondary)
             ScrollView {
                 VStack(alignment:.leading,spacing:14) {
                     GroupBox {
@@ -66,7 +66,7 @@ struct HistoryErasureView:View {
                             Picker("Source type",selection:$kind) {Text("All types").tag("all");ForEach(MemoryKind.allCases,id:\.rawValue) {Text($0.rawValue.capitalized).tag($0.rawValue)}}
                         }.padding(8).textFieldStyle(.roundedBorder)
                     }.disabled(model.busy)
-                    Text("All selected filters intersect. Time matches overlapping recordings; entire clips are removed, including parts outside the range. Website filters match recorded HTTP(S) URLs. Saved notes and favorites are included when they match.").font(.caption).foregroundStyle(.secondary)
+                    Text("Each current source or original version must match every selected filter. Time matches overlapping recordings; entire clips are removed, including parts outside the range. Website filters match recorded HTTP(S) URLs. Saved notes and favorites are included when they match.").font(.caption).foregroundStyle(.secondary)
                     HStack {
                         Button("Pause & preview") {m.pauseAll(discardReplay:true);model.inspect(store:m.store,scope:scope)}.disabled(model.busy || m.libraryTransfer.busy)
                         if model.busy {ProgressView().controlSize(.small);Button("Cancel") {model.cancel()}}
@@ -79,16 +79,22 @@ struct HistoryErasureView:View {
                         GroupBox {
                             VStack(alignment:.leading,spacing:10) {
                                 if preview.linkedRecaps>0 {Text("\(preview.matchedSources) matching sources + \(preview.linkedRecaps) linked recaps outside these filters").font(.callout).foregroundStyle(.secondary)}
-                                Text("\(preview.sources) sources · \(preview.conversationTurns) dependent answers · \(preview.mediaReferences) media references").font(.headline)
+                                Text("\(preview.sources) current sources · \(preview.historicalVersions) original versions · \(preview.conversationTurns) dependent answers · \(preview.mediaReferences) media references").font(.headline)
                                 ForEach(preview.samples,id:\.id) {sample in VStack(alignment:.leading,spacing:2) {Text(sample.title).lineLimit(2);Text("\(sample.app) · \(sample.timestamp.formatted())").font(.caption).foregroundStyle(.secondary)}}
                                 if preview.sources>preview.samples.count {Text("Showing the latest \(preview.samples.count) of \(preview.sources) sources.").font(.caption).foregroundStyle(.secondary)}
-                                Button("Erase \(preview.sources) sources…",role:.destructive) {confirm=true}.disabled(preview.sources==0 || model.busy || m.libraryTransfer.busy)
+                                if preview.historicalVersions>0 {
+                                    Text("Original versions").font(.subheadline.weight(.semibold))
+                                    if preview.historicalVersions>preview.matchedHistoricalVersions {Text("Additional original versions are linked to the history being erased.").font(.caption).foregroundStyle(.secondary)}
+                                    ForEach(preview.historicalSamples,id:\.id) {sample in VStack(alignment:.leading,spacing:2) {Text(sample.title).lineLimit(2);Text("\(sample.app) · \(sample.timestamp.formatted())").font(.caption).foregroundStyle(.secondary)}}
+                                    if preview.historicalVersions>preview.historicalSamples.count {Text("Showing the latest \(preview.historicalSamples.count) of \(preview.historicalVersions) original versions.").font(.caption).foregroundStyle(.secondary)}
+                                }
+                                Button("Erase matching history…",role:.destructive) {confirm=true}.disabled(!preview.canErase || model.busy || m.libraryTransfer.busy)
                             }.frame(maxWidth:.infinity,alignment:.leading).padding(8)
                         }
                     }
                     if let result=model.result {
                         VStack(alignment:.leading,spacing:8) {
-                            Text("Removed \(result.sources) sources and \(result.conversationTurns) dependent answers.").font(.headline)
+                            Text("Removed \(result.sources) current sources, \(result.historicalVersions) original versions and \(result.conversationTurns) dependent answers.").font(.headline)
                             Text("\(result.removedMedia) media files removed · \(result.sharedMedia) still used by other sources · \(result.pendingMedia) pending cleanup").font(.callout)
                             ForEach(result.warnings,id:\.self) {Text($0).foregroundStyle(.orange)}
                         }.padding(12).frame(maxWidth:.infinity,alignment:.leading).background(.quaternary,in:RoundedRectangle(cornerRadius:10))
@@ -105,6 +111,6 @@ struct HistoryErasureView:View {
                 m.pauseForHistoryErasure()
                 model.apply(store:m.store) {m.refreshChats();m.routines.reload();m.invalidateStorageEstimate();m.refresh(forceStatistics:true)}
             }
-        } message: {Text("Matching sources, retained media and entire answers that cite them will be removed. Shared media stays when another source still uses it. If history changed, you will need a new preview.")}
+        } message: {Text("Matching current sources, original versions, retained media and entire answers that cite them will be removed. Shared media stays when another source still uses it. If history changed, you will need a new preview.")}
     }
 }
