@@ -87,7 +87,7 @@ final class HistoricalRecapTests:XCTestCase {
     func testOrdinaryMetadataDoesNotDecodeArchivalPayloadWhenNoOriginalExists() throws {
         let source=Memory(id:"ordinary",text:"Owned ordinary payload");try store.insert(source)
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(sqlite3_create_function_v2(db.handle,"oswind_sync_source_revision_v1",1,SQLITE_UTF8|SQLITE_INNOCUOUS,nil,{context,_,_ in sqlite3_result_error(context,"Owned decoder must not be called",-1)},nil,nil,nil),SQLITE_OK)
+            XCTAssertEqual(sqlite3_create_function_v2(db.handle,"oswind_sync_source_revision_v1",1,SQLITE_UTF8|SQLITE_INNOCUOUS|SQLITE_DETERMINISTIC,nil,{context,_,_ in sqlite3_result_error(context,"Owned decoder must not be called",-1)},nil,nil,nil),SQLITE_OK)
             // No archival row exists for this owner; the indexed existence gate
             // prevents parsing every ordinary source body on a metadata write.
             try store.setFavorite("ordinary",value:true)
@@ -146,6 +146,20 @@ final class HistoricalRecapTests:XCTestCase {
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM historical_evidence"),3)
         }
         XCTAssertEqual(try cache.journal.outbox(),operations)
+    }
+
+    func testLegacy26GuardUpgradesAndReadonlyBackupKeepsExactOriginals() throws {
+        let (_,_,second)=try graph(),archive=root.appendingPathComponent("legacy.oswindbackup"),destination=root.appendingPathComponent("legacy-copy")
+        try store.withRoutineDatabase {db in try db.execute("DROP TRIGGER historical_owner_revision");try db.execute(HistoricalEvidenceStore.legacyOwnerRevision)}
+        _=try LibraryBackup.create(store:store,destination:archive);_=try LibraryBackup.restore(archive,to:destination)
+        let copy=try MemoryStore(root:destination);defer {try? copy.close()}
+        XCTAssertEqual(try copy.historicalMemory(second.handle),second.memory)
+        try store.close();store=try MemoryStore(root:root.appendingPathComponent("library"))
+        XCTAssertEqual(try store.historicalMemory(second.handle),second.memory)
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT sql FROM sqlite_master WHERE name='historical_owner_revision'");defer {sqlite3_finalize(row)}
+            XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(db.text(row,0),HistoricalEvidenceStore.schemas["historical_owner_revision"])
+        }
     }
 
 }

@@ -20,6 +20,8 @@ struct HistoricalEvidenceStore {
     static let defaultBudget:Int64=256*1024*1024,maximumBudget:Int64=8*1024*1024*1024
     static let charge="256+length(new.body)+length(new.paths)+length(new.parents)+128*json_array_length(CAST(new.parents AS TEXT))"
     static func ancestors(_ root:String)->String {"WITH RECURSIVE affected(handle) AS (SELECT \(root) UNION SELECT d.child FROM historical_evidence_dependencies d JOIN affected a ON d.parent=a.handle) SELECT handle FROM affected"}
+    // Exact old26 trigger text remains readable in quiet legacy backups.
+    static let legacyOwnerRevision="CREATE TRIGGER historical_owner_revision BEFORE UPDATE OF timestamp,kind,app,title,url,text,payload ON memories WHEN EXISTS(SELECT 1 FROM historical_evidence WHERE source_id=old.id) AND (old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind OR old.app IS NOT new.app OR old.title IS NOT new.title OR old.url IS NOT new.url OR old.text IS NOT new.text OR oswind_sync_source_revision_v1(old.payload) IS NOT oswind_sync_source_revision_v1(new.payload)) BEGIN DELETE FROM historical_evidence WHERE source_id=old.id; END"
     static let schemas:[String:String] = {
         let affected=ancestors("old.handle"),cost=charge,oldCost=charge.replacingOccurrences(of:"new.",with:"old.")
         var result:[String:String] = [
@@ -31,7 +33,7 @@ struct HistoricalEvidenceStore {
             "historical_added":"CREATE TRIGGER historical_added AFTER INSERT ON historical_evidence BEGIN UPDATE historical_evidence_state SET used_bytes=used_bytes+\(cost),revision=randomblob(16) WHERE singleton=1; END",
             "historical_removed":"CREATE TRIGGER historical_removed AFTER DELETE ON historical_evidence BEGIN UPDATE historical_evidence_state SET used_bytes=used_bytes-(\(oldCost)),revision=randomblob(16) WHERE singleton=1; END",
             "historical_immutable":"CREATE TRIGGER historical_immutable BEFORE UPDATE ON historical_evidence BEGIN SELECT RAISE(ABORT,'Historical evidence is immutable'); END",
-            "historical_owner_revision":"CREATE TRIGGER historical_owner_revision BEFORE UPDATE OF timestamp,kind,app,title,url,text,payload ON memories WHEN EXISTS(SELECT 1 FROM historical_evidence WHERE source_id=old.id) AND (old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind OR old.app IS NOT new.app OR old.title IS NOT new.title OR old.url IS NOT new.url OR old.text IS NOT new.text OR oswind_sync_source_revision_v1(old.payload) IS NOT oswind_sync_source_revision_v1(new.payload)) BEGIN DELETE FROM historical_evidence WHERE source_id=old.id; END",
+            "historical_owner_revision":"CREATE TRIGGER historical_owner_revision BEFORE UPDATE OF timestamp,kind,app,title,url,text,payload ON memories WHEN CASE WHEN EXISTS(SELECT 1 FROM historical_evidence WHERE source_id=old.id) THEN CASE WHEN old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind OR old.app IS NOT new.app OR old.title IS NOT new.title OR old.url IS NOT new.url OR old.text IS NOT new.text THEN 1 ELSE oswind_sync_source_revision_v1(old.payload) IS NOT oswind_sync_source_revision_v1(new.payload) END ELSE 0 END BEGIN DELETE FROM historical_evidence WHERE source_id=old.id; END",
             "historical_owner_delete":"CREATE TRIGGER historical_owner_delete BEFORE DELETE ON memories BEGIN DELETE FROM historical_evidence WHERE source_id=old.id; END",
             "historical_erasure":"""
             CREATE TRIGGER historical_erasure BEFORE DELETE ON historical_evidence BEGIN
@@ -63,7 +65,10 @@ struct HistoricalEvidenceStore {
         for name in ["historical_evidence_state","historical_evidence","historical_evidence_dependencies","historical_evidence_pins"]+schemas.keys.filter({$0.hasPrefix("historical_") && !["historical_evidence_state","historical_evidence","historical_evidence_dependencies","historical_evidence_pins"].contains($0)}).sorted() {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
             guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
-            if let found {guard found==schemas[name]! else {throw OSwindError.database("Historical evidence protection schema differs")}}
+            if let found {
+                if name=="historical_owner_revision",found==legacyOwnerRevision {try db.execute("DROP TRIGGER historical_owner_revision");try db.execute(schemas[name]!)}
+                else {guard found==schemas[name]! else {throw OSwindError.database("Historical evidence protection schema differs")}}
+            }
             else {guard sourceVersion<26 || (repairMissingPins && (name.hasPrefix("historical_writer_text_observation_pins_") || name=="historical_pin_delete" || name=="historical_pin_move")) else {throw OSwindError.database("Historical evidence schema is missing")};try db.execute(schemas[name]!)}
         }
         if sourceVersion>=26 {let existing=try db.statement("SELECT COUNT(*) FROM historical_evidence_state");defer {sqlite3_finalize(existing)};guard sqlite3_step(existing)==SQLITE_ROW,sqlite3_column_int(existing,0)==1 else {throw OSwindError.database("Historical evidence accounting is missing")}}
@@ -75,7 +80,7 @@ struct HistoricalEvidenceStore {
         schemaStamp.lock.lock()
         do {
             if !requireCitations || schemaStamp.value != cookie {
-                for (name,sql) in Self.schemas {let row=try database.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};database.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW,database.text(row,0)==sql else {throw OSwindError.database("Historical evidence protection differs")}}
+                for (name,sql) in Self.schemas {let row=try database.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};database.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.database("Historical evidence protection differs")};let actual=database.text(row,0);guard actual==sql || (name=="historical_owner_revision" && actual==Self.legacyOwnerRevision) else {throw OSwindError.database("Historical evidence protection differs")}}
                 if requireCitations {try CitationSchema.validate(database);schemaStamp.value=cookie}
             }
             schemaStamp.lock.unlock()

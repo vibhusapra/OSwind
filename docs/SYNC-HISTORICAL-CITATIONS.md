@@ -32,6 +32,12 @@ The full debug stage passed before two process expectations were corrected for s
 
 Archive-specific media/no-follow/physical cleanup/crash/scale, scoped erasure and retention using original-version fields, service-level reauthorization barriers, complete historical JSON/Markdown/save-recap workflows and human native UI acceptance remain open. The current transitive erasure closure starts from canonical owner scope; do not infer full historical-field scope or epoch coverage. Parent PR #103's model/native opt-in receipts apply only to its frozen sources. Local logs and failures remain under `.artifacts/sync-historical-citations-v1/`; the public input manifest fingerprints the source/check inputs, and the receipt records exact log hashes without publishing local corpus or environment state.
 
+## Deterministic guard repair
+
+The first hosted run at `f962e820` failed its owned Python erasure fixture. Python SQLite 3.54.1 evaluated the deterministic source-revision callback in an `AND` expression even though no historical row existed; the helper correctly rejected an unexpected callback. An exact local reproduction against the prior signed26 CLI confirms the call with zero originals. The new nested `CASE` guard avoids decoding when no original exists, and avoids it when scalar metadata already establishes a revision. Only the exact compiled legacy trigger is upgraded; readonly old26 backups remain readable.
+
+The [separate repair receipt](../benchmarks/sync-historical-citations-guard-v1.json) passes the full default suite (1,504 pass /73 skips) plus the formerly failing Python erasure process and seven owned-fixture boundary tests. Its effective input manifest changes only the historical store and recap tests. Original sanitizer/optimized/package receipts remain tied to their frozen original commit. Hosted CI must rerun at the repair head; the earlier failure is retained, and later steps of that run did not execute.
+
 ## Remaining work
 
 - [x] Durable exact historical bodies and schema-26 citation representation.
