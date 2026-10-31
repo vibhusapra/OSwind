@@ -1,0 +1,4830 @@
+{
+  "archive_retained" : true,
+  "build" : "release",
+  "count" : 1000,
+  "coverage_counts_included" : true,
+  "dimensions" : 512,
+  "disk_bytes" : 9833298,
+  "gpu" : "Apple M5 Max",
+  "index_policy" : "indexed",
+  "index_prepare_seconds" : 0.13638794422149658,
+  "ingest_seconds" : 0.92523097991943359,
+  "latency_quantiles" : "median averages the center pair; p95 is nearest rank ceil(0.95*n); max includes every sample",
+  "layout" : "semantic_vectors",
+  "modes" : {
+    "all_candidates" : {
+      "app_filtered" : false,
+      "first_query_ms" : 2.5030374526977539,
+      "max_ms" : 2.5030374526977539,
+      "measurements" : [
+        {
+          "latency_ms" : 2.5030374526977539,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000",
+            "row-00000075",
+            "row-00000437",
+            "row-00000930",
+            "row-00000648"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 2.0349025726318359,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000940",
+            "row-00000339"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 2.0200014114379883,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000999",
+            "row-00000240",
+            "row-00000944",
+            "row-00000127",
+            "row-00000310"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.9479990005493164,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000",
+            "row-00000075",
+            "row-00000437",
+            "row-00000930",
+            "row-00000648"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 2.2341012954711914,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000940",
+            "row-00000339"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 2.0260810852050781,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000999",
+            "row-00000240",
+            "row-00000944",
+            "row-00000127",
+            "row-00000310"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.9909143447875977,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000",
+            "row-00000075",
+            "row-00000437",
+            "row-00000930",
+            "row-00000648"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.9209384918212891,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000940",
+            "row-00000339"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.9179582595825195,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000999",
+            "row-00000240",
+            "row-00000944",
+            "row-00000127",
+            "row-00000310"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : -1,
+      "p50_ms" : 2.0200014114379883,
+      "p95_ms" : 2.5030374526977539,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "filtered" : {
+      "app_filtered" : true,
+      "first_query_ms" : 4.073023796081543,
+      "max_ms" : 4.073023796081543,
+      "measurements" : [
+        {
+          "latency_ms" : 4.073023796081543,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000",
+            "row-00000930",
+            "row-00000648",
+            "row-00000576",
+            "row-00000104"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.9110183715820312,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000339",
+            "row-00000221"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.8690567016601562,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000999",
+            "row-00000127",
+            "row-00000331",
+            "row-00000667",
+            "row-00000225"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.7739276885986328,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000",
+            "row-00000930",
+            "row-00000648",
+            "row-00000576",
+            "row-00000104"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.8319826126098633,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000339",
+            "row-00000221"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.9180517196655273,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000999",
+            "row-00000127",
+            "row-00000331",
+            "row-00000667",
+            "row-00000225"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.7668943405151367,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000",
+            "row-00000930",
+            "row-00000648",
+            "row-00000576",
+            "row-00000104"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 4.0130615234375,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000333",
+            "row-00000741",
+            "row-00000967",
+            "row-00000339",
+            "row-00000221"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 3.8139820098876953,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000999",
+            "row-00000127",
+            "row-00000331",
+            "row-00000667",
+            "row-00000225"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : -1,
+      "p50_ms" : 3.8690567016601562,
+      "p95_ms" : 4.073023796081543,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    },
+    "thresholded" : {
+      "app_filtered" : false,
+      "first_query_ms" : 1.2189149856567383,
+      "max_ms" : 1.2189149856567383,
+      "measurements" : [
+        {
+          "latency_ms" : 1.2189149856567383,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.1368989944458008,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000333"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0980367660522461,
+          "repetition" : 0,
+          "returned" : [
+            "row-00000999"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.1069774627685547,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0770559310913086,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000333"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0700225830078125,
+          "repetition" : 1,
+          "returned" : [
+            "row-00000999"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0800361633300781,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000000"
+          ],
+          "row" : 0,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0689496994018555,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000333"
+          ],
+          "row" : 333,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "latency_ms" : 1.0820627212524414,
+          "repetition" : 2,
+          "returned" : [
+            "row-00000999"
+          ],
+          "row" : 999,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "minimum_similarity" : 0.25,
+      "p50_ms" : 1.0820627212524414,
+      "p95_ms" : 1.2189149856567383,
+      "query_samples" : 9,
+      "top1_exact_match_rate" : 1
+    }
+  },
+  "nonself_quality" : {
+    "all_candidates" : {
+      "exact_max_ms" : 1.3910531997680664,
+      "exact_p95_ms" : 1.3530254364013672,
+      "indexed_max_ms" : 2.5550127029418945,
+      "indexed_p95_ms" : 2.0860433578491211,
+      "measurements" : [
+        {
+          "exact_ids" : [
+            "row-00000158",
+            "row-00000119",
+            "row-00000548",
+            "row-00000170",
+            "row-00000311",
+            "row-00000573",
+            "row-00000580",
+            "row-00000575",
+            "row-00000419",
+            "row-00000417"
+          ],
+          "exact_ms" : 1.3259649276733398,
+          "indexed_ids" : [
+            "row-00000158",
+            "row-00000119",
+            "row-00000548",
+            "row-00000170",
+            "row-00000311",
+            "row-00000573",
+            "row-00000580",
+            "row-00000575",
+            "row-00000419",
+            "row-00000417"
+          ],
+          "indexed_ms" : 1.9379854202270508,
+          "query_seed" : 1017,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000665",
+            "row-00000850",
+            "row-00000832",
+            "row-00000906",
+            "row-00000777",
+            "row-00000571",
+            "row-00000250",
+            "row-00000840",
+            "row-00000209",
+            "row-00000137"
+          ],
+          "exact_ms" : 1.2780427932739258,
+          "indexed_ids" : [
+            "row-00000665",
+            "row-00000850",
+            "row-00000832",
+            "row-00000906",
+            "row-00000777",
+            "row-00000571",
+            "row-00000250",
+            "row-00000840",
+            "row-00000209",
+            "row-00000137"
+          ],
+          "indexed_ms" : 1.9819736480712891,
+          "query_seed" : 1018,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000525",
+            "row-00000950",
+            "row-00000143",
+            "row-00000940",
+            "row-00000356",
+            "row-00000716",
+            "row-00000965",
+            "row-00000289",
+            "row-00000906",
+            "row-00000374"
+          ],
+          "exact_ms" : 1.3190507888793945,
+          "indexed_ids" : [
+            "row-00000525",
+            "row-00000950",
+            "row-00000143",
+            "row-00000940",
+            "row-00000356",
+            "row-00000716",
+            "row-00000965",
+            "row-00000289",
+            "row-00000906",
+            "row-00000374"
+          ],
+          "indexed_ms" : 1.9450187683105469,
+          "query_seed" : 1019,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000726",
+            "row-00000299",
+            "row-00000373",
+            "row-00000722",
+            "row-00000099",
+            "row-00000945",
+            "row-00000125",
+            "row-00000892",
+            "row-00000103",
+            "row-00000603"
+          ],
+          "exact_ms" : 1.2919902801513672,
+          "indexed_ids" : [
+            "row-00000726",
+            "row-00000299",
+            "row-00000373",
+            "row-00000722",
+            "row-00000099",
+            "row-00000945",
+            "row-00000125",
+            "row-00000892",
+            "row-00000103",
+            "row-00000603"
+          ],
+          "indexed_ms" : 1.9400119781494141,
+          "query_seed" : 1020,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000611",
+            "row-00000541",
+            "row-00000683",
+            "row-00000113",
+            "row-00000511",
+            "row-00000640",
+            "row-00000031",
+            "row-00000377",
+            "row-00000831",
+            "row-00000411"
+          ],
+          "exact_ms" : 1.2699365615844727,
+          "indexed_ids" : [
+            "row-00000611",
+            "row-00000541",
+            "row-00000683",
+            "row-00000113",
+            "row-00000511",
+            "row-00000640",
+            "row-00000031",
+            "row-00000377",
+            "row-00000831",
+            "row-00000411"
+          ],
+          "indexed_ms" : 2.0020008087158203,
+          "query_seed" : 1021,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000896",
+            "row-00000281",
+            "row-00000038",
+            "row-00000257",
+            "row-00000208",
+            "row-00000472",
+            "row-00000489",
+            "row-00000196",
+            "row-00000974",
+            "row-00000575"
+          ],
+          "exact_ms" : 1.2919902801513672,
+          "indexed_ids" : [
+            "row-00000896",
+            "row-00000281",
+            "row-00000038",
+            "row-00000257",
+            "row-00000208",
+            "row-00000472",
+            "row-00000489",
+            "row-00000196",
+            "row-00000974",
+            "row-00000575"
+          ],
+          "indexed_ms" : 1.9840002059936523,
+          "query_seed" : 1022,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000591",
+            "row-00000025",
+            "row-00000793",
+            "row-00000749",
+            "row-00000488",
+            "row-00000615",
+            "row-00000826",
+            "row-00000040",
+            "row-00000435",
+            "row-00000352"
+          ],
+          "exact_ms" : 1.2769699096679688,
+          "indexed_ids" : [
+            "row-00000591",
+            "row-00000025",
+            "row-00000793",
+            "row-00000749",
+            "row-00000488",
+            "row-00000615",
+            "row-00000826",
+            "row-00000040",
+            "row-00000435",
+            "row-00000352"
+          ],
+          "indexed_ms" : 1.9270181655883789,
+          "query_seed" : 1023,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000991",
+            "row-00000302",
+            "row-00000139",
+            "row-00000528",
+            "row-00000973",
+            "row-00000698",
+            "row-00000971",
+            "row-00000816",
+            "row-00000253",
+            "row-00000761"
+          ],
+          "exact_ms" : 1.2739896774291992,
+          "indexed_ids" : [
+            "row-00000991",
+            "row-00000302",
+            "row-00000139",
+            "row-00000528",
+            "row-00000973",
+            "row-00000698",
+            "row-00000971",
+            "row-00000816",
+            "row-00000253",
+            "row-00000761"
+          ],
+          "indexed_ms" : 1.9880533218383789,
+          "query_seed" : 1024,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000157",
+            "row-00000190",
+            "row-00000322",
+            "row-00000986",
+            "row-00000400",
+            "row-00000992",
+            "row-00000382",
+            "row-00000055",
+            "row-00000757",
+            "row-00000932"
+          ],
+          "exact_ms" : 1.2999773025512695,
+          "indexed_ids" : [
+            "row-00000157",
+            "row-00000190",
+            "row-00000322",
+            "row-00000986",
+            "row-00000400",
+            "row-00000992",
+            "row-00000382",
+            "row-00000055",
+            "row-00000757",
+            "row-00000932"
+          ],
+          "indexed_ms" : 2.0049810409545898,
+          "query_seed" : 1025,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000142",
+            "row-00000691",
+            "row-00000095",
+            "row-00000263",
+            "row-00000903",
+            "row-00000950",
+            "row-00000881",
+            "row-00000349",
+            "row-00000230",
+            "row-00000828"
+          ],
+          "exact_ms" : 1.2919902801513672,
+          "indexed_ids" : [
+            "row-00000142",
+            "row-00000691",
+            "row-00000095",
+            "row-00000263",
+            "row-00000903",
+            "row-00000950",
+            "row-00000881",
+            "row-00000349",
+            "row-00000230",
+            "row-00000828"
+          ],
+          "indexed_ms" : 1.9730329513549805,
+          "query_seed" : 1026,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000791",
+            "row-00000921",
+            "row-00000930",
+            "row-00000319",
+            "row-00000280",
+            "row-00000235",
+            "row-00000853",
+            "row-00000160",
+            "row-00000949",
+            "row-00000488"
+          ],
+          "exact_ms" : 1.3030767440795898,
+          "indexed_ids" : [
+            "row-00000791",
+            "row-00000921",
+            "row-00000930",
+            "row-00000319",
+            "row-00000280",
+            "row-00000235",
+            "row-00000853",
+            "row-00000160",
+            "row-00000949",
+            "row-00000488"
+          ],
+          "indexed_ms" : 2.0430088043212891,
+          "query_seed" : 1027,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000026",
+            "row-00000913",
+            "row-00000622",
+            "row-00000031",
+            "row-00000876",
+            "row-00000391",
+            "row-00000297",
+            "row-00000074",
+            "row-00000210",
+            "row-00000440"
+          ],
+          "exact_ms" : 1.3060569763183594,
+          "indexed_ids" : [
+            "row-00000026",
+            "row-00000913",
+            "row-00000622",
+            "row-00000031",
+            "row-00000876",
+            "row-00000391",
+            "row-00000297",
+            "row-00000074",
+            "row-00000210",
+            "row-00000440"
+          ],
+          "indexed_ms" : 1.9990205764770508,
+          "query_seed" : 1028,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000547",
+            "row-00000248",
+            "row-00000913",
+            "row-00000325",
+            "row-00000034",
+            "row-00000599",
+            "row-00000712",
+            "row-00000375",
+            "row-00000884",
+            "row-00000445"
+          ],
+          "exact_ms" : 1.3010501861572266,
+          "indexed_ids" : [
+            "row-00000547",
+            "row-00000248",
+            "row-00000913",
+            "row-00000325",
+            "row-00000034",
+            "row-00000599",
+            "row-00000712",
+            "row-00000375",
+            "row-00000884",
+            "row-00000445"
+          ],
+          "indexed_ms" : 1.9710063934326172,
+          "query_seed" : 1029,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000123",
+            "row-00000392",
+            "row-00000777",
+            "row-00000804",
+            "row-00000970",
+            "row-00000535",
+            "row-00000412",
+            "row-00000179",
+            "row-00000388",
+            "row-00000747"
+          ],
+          "exact_ms" : 1.2940168380737305,
+          "indexed_ids" : [
+            "row-00000123",
+            "row-00000392",
+            "row-00000777",
+            "row-00000804",
+            "row-00000970",
+            "row-00000535",
+            "row-00000412",
+            "row-00000179",
+            "row-00000388",
+            "row-00000747"
+          ],
+          "indexed_ms" : 2.0070075988769531,
+          "query_seed" : 1030,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000757",
+            "row-00000489",
+            "row-00000536",
+            "row-00000812",
+            "row-00000220",
+            "row-00000127",
+            "row-00000043",
+            "row-00000771",
+            "row-00000165",
+            "row-00000075"
+          ],
+          "exact_ms" : 1.3240575790405273,
+          "indexed_ids" : [
+            "row-00000757",
+            "row-00000489",
+            "row-00000536",
+            "row-00000812",
+            "row-00000220",
+            "row-00000127",
+            "row-00000043",
+            "row-00000771",
+            "row-00000165",
+            "row-00000075"
+          ],
+          "indexed_ms" : 1.9819736480712891,
+          "query_seed" : 1031,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000111",
+            "row-00000625",
+            "row-00000512",
+            "row-00000990",
+            "row-00000429",
+            "row-00000876",
+            "row-00000450",
+            "row-00000442",
+            "row-00000751",
+            "row-00000443"
+          ],
+          "exact_ms" : 1.2810230255126953,
+          "indexed_ids" : [
+            "row-00000111",
+            "row-00000625",
+            "row-00000512",
+            "row-00000990",
+            "row-00000429",
+            "row-00000876",
+            "row-00000450",
+            "row-00000442",
+            "row-00000751",
+            "row-00000443"
+          ],
+          "indexed_ms" : 1.9910335540771484,
+          "query_seed" : 1032,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000699",
+            "row-00000431",
+            "row-00000890",
+            "row-00000960",
+            "row-00000348",
+            "row-00000141",
+            "row-00000085",
+            "row-00000484",
+            "row-00000939",
+            "row-00000994"
+          ],
+          "exact_ms" : 1.3080835342407227,
+          "indexed_ids" : [
+            "row-00000699",
+            "row-00000431",
+            "row-00000890",
+            "row-00000960",
+            "row-00000348",
+            "row-00000141",
+            "row-00000085",
+            "row-00000484",
+            "row-00000939",
+            "row-00000994"
+          ],
+          "indexed_ms" : 1.9669532775878906,
+          "query_seed" : 1033,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000832",
+            "row-00000689",
+            "row-00000351",
+            "row-00000800",
+            "row-00000602",
+            "row-00000875",
+            "row-00000811",
+            "row-00000421",
+            "row-00000470",
+            "row-00000629"
+          ],
+          "exact_ms" : 1.259922981262207,
+          "indexed_ids" : [
+            "row-00000832",
+            "row-00000689",
+            "row-00000351",
+            "row-00000800",
+            "row-00000602",
+            "row-00000875",
+            "row-00000811",
+            "row-00000421",
+            "row-00000470",
+            "row-00000629"
+          ],
+          "indexed_ms" : 1.9570589065551758,
+          "query_seed" : 1034,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000100",
+            "row-00000411",
+            "row-00000696",
+            "row-00000732",
+            "row-00000827",
+            "row-00000611",
+            "row-00000751",
+            "row-00000220",
+            "row-00000149",
+            "row-00000556"
+          ],
+          "exact_ms" : 1.3910531997680664,
+          "indexed_ids" : [
+            "row-00000100",
+            "row-00000411",
+            "row-00000696",
+            "row-00000732",
+            "row-00000827",
+            "row-00000611",
+            "row-00000751",
+            "row-00000220",
+            "row-00000149",
+            "row-00000556"
+          ],
+          "indexed_ms" : 2.0788908004760742,
+          "query_seed" : 1035,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000884",
+            "row-00000175",
+            "row-00000961",
+            "row-00000898",
+            "row-00000168",
+            "row-00000068",
+            "row-00000749",
+            "row-00000040",
+            "row-00000886",
+            "row-00000764"
+          ],
+          "exact_ms" : 1.3790130615234375,
+          "indexed_ids" : [
+            "row-00000884",
+            "row-00000175",
+            "row-00000961",
+            "row-00000898",
+            "row-00000168",
+            "row-00000068",
+            "row-00000749",
+            "row-00000040",
+            "row-00000886",
+            "row-00000764"
+          ],
+          "indexed_ms" : 2.102971076965332,
+          "query_seed" : 1036,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000103",
+            "row-00000231",
+            "row-00000683",
+            "row-00000884",
+            "row-00000875",
+            "row-00000524",
+            "row-00000970",
+            "row-00000032",
+            "row-00000581",
+            "row-00000364"
+          ],
+          "exact_ms" : 1.2849569320678711,
+          "indexed_ids" : [
+            "row-00000103",
+            "row-00000231",
+            "row-00000683",
+            "row-00000884",
+            "row-00000875",
+            "row-00000524",
+            "row-00000970",
+            "row-00000032",
+            "row-00000581",
+            "row-00000364"
+          ],
+          "indexed_ms" : 1.9400119781494141,
+          "query_seed" : 1037,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000559",
+            "row-00000713",
+            "row-00000551",
+            "row-00000907",
+            "row-00000874",
+            "row-00000077",
+            "row-00000140",
+            "row-00000472",
+            "row-00000962",
+            "row-00000949"
+          ],
+          "exact_ms" : 1.273036003112793,
+          "indexed_ids" : [
+            "row-00000559",
+            "row-00000713",
+            "row-00000551",
+            "row-00000907",
+            "row-00000874",
+            "row-00000077",
+            "row-00000140",
+            "row-00000472",
+            "row-00000962",
+            "row-00000949"
+          ],
+          "indexed_ms" : 1.9240379333496094,
+          "query_seed" : 1038,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000872",
+            "row-00000438",
+            "row-00000045",
+            "row-00000238",
+            "row-00000945",
+            "row-00000125",
+            "row-00000374",
+            "row-00000692",
+            "row-00000274",
+            "row-00000462"
+          ],
+          "exact_ms" : 1.2769699096679688,
+          "indexed_ids" : [
+            "row-00000872",
+            "row-00000438",
+            "row-00000045",
+            "row-00000238",
+            "row-00000945",
+            "row-00000125",
+            "row-00000374",
+            "row-00000692",
+            "row-00000274",
+            "row-00000462"
+          ],
+          "indexed_ms" : 1.9919872283935547,
+          "query_seed" : 1039,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000291",
+            "row-00000266",
+            "row-00000570",
+            "row-00000220",
+            "row-00000835",
+            "row-00000599",
+            "row-00000446",
+            "row-00000756",
+            "row-00000287",
+            "row-00000345"
+          ],
+          "exact_ms" : 1.2949705123901367,
+          "indexed_ids" : [
+            "row-00000291",
+            "row-00000266",
+            "row-00000570",
+            "row-00000220",
+            "row-00000835",
+            "row-00000599",
+            "row-00000446",
+            "row-00000756",
+            "row-00000287",
+            "row-00000345"
+          ],
+          "indexed_ms" : 1.995086669921875,
+          "query_seed" : 1040,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000439",
+            "row-00000441",
+            "row-00000824",
+            "row-00000742",
+            "row-00000656",
+            "row-00000786",
+            "row-00000730",
+            "row-00000160",
+            "row-00000176",
+            "row-00000422"
+          ],
+          "exact_ms" : 1.2719631195068359,
+          "indexed_ids" : [
+            "row-00000439",
+            "row-00000441",
+            "row-00000824",
+            "row-00000742",
+            "row-00000656",
+            "row-00000786",
+            "row-00000730",
+            "row-00000160",
+            "row-00000176",
+            "row-00000422"
+          ],
+          "indexed_ms" : 1.952052116394043,
+          "query_seed" : 1041,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000863",
+            "row-00000790",
+            "row-00000515",
+            "row-00000636",
+            "row-00000407",
+            "row-00000108",
+            "row-00000817",
+            "row-00000985",
+            "row-00000885",
+            "row-00000259"
+          ],
+          "exact_ms" : 1.2559890747070312,
+          "indexed_ids" : [
+            "row-00000863",
+            "row-00000790",
+            "row-00000515",
+            "row-00000636",
+            "row-00000407",
+            "row-00000108",
+            "row-00000817",
+            "row-00000985",
+            "row-00000885",
+            "row-00000259"
+          ],
+          "indexed_ms" : 1.932978630065918,
+          "query_seed" : 1042,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000908",
+            "row-00000629",
+            "row-00000691",
+            "row-00000913",
+            "row-00000906",
+            "row-00000232",
+            "row-00000359",
+            "row-00000248",
+            "row-00000819",
+            "row-00000613"
+          ],
+          "exact_ms" : 1.3489723205566406,
+          "indexed_ids" : [
+            "row-00000908",
+            "row-00000629",
+            "row-00000691",
+            "row-00000913",
+            "row-00000906",
+            "row-00000232",
+            "row-00000359",
+            "row-00000248",
+            "row-00000819",
+            "row-00000613"
+          ],
+          "indexed_ms" : 2.0440816879272461,
+          "query_seed" : 1043,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000104",
+            "row-00000574",
+            "row-00000895",
+            "row-00000454",
+            "row-00000340",
+            "row-00000994",
+            "row-00000976",
+            "row-00000778",
+            "row-00000025",
+            "row-00000421"
+          ],
+          "exact_ms" : 1.316070556640625,
+          "indexed_ids" : [
+            "row-00000104",
+            "row-00000574",
+            "row-00000895",
+            "row-00000454",
+            "row-00000340",
+            "row-00000994",
+            "row-00000976",
+            "row-00000778",
+            "row-00000025",
+            "row-00000421"
+          ],
+          "indexed_ms" : 1.9629001617431641,
+          "query_seed" : 1044,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000488",
+            "row-00000698",
+            "row-00000289",
+            "row-00000349",
+            "row-00000686",
+            "row-00000108",
+            "row-00000580",
+            "row-00000900",
+            "row-00000898",
+            "row-00000928"
+          ],
+          "exact_ms" : 1.2850761413574219,
+          "indexed_ids" : [
+            "row-00000488",
+            "row-00000698",
+            "row-00000289",
+            "row-00000349",
+            "row-00000686",
+            "row-00000108",
+            "row-00000580",
+            "row-00000900",
+            "row-00000898",
+            "row-00000928"
+          ],
+          "indexed_ms" : 1.9739866256713867,
+          "query_seed" : 1045,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000704",
+            "row-00000826",
+            "row-00000160",
+            "row-00000001",
+            "row-00000131",
+            "row-00000419",
+            "row-00000346",
+            "row-00000372",
+            "row-00000319",
+            "row-00000047"
+          ],
+          "exact_ms" : 1.3200044631958008,
+          "indexed_ids" : [
+            "row-00000704",
+            "row-00000826",
+            "row-00000160",
+            "row-00000001",
+            "row-00000131",
+            "row-00000419",
+            "row-00000346",
+            "row-00000372",
+            "row-00000319",
+            "row-00000047"
+          ],
+          "indexed_ms" : 1.9570589065551758,
+          "query_seed" : 1046,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000958",
+            "row-00000914",
+            "row-00000779",
+            "row-00000928",
+            "row-00000397",
+            "row-00000560",
+            "row-00000803",
+            "row-00000308",
+            "row-00000399",
+            "row-00000238"
+          ],
+          "exact_ms" : 1.2580156326293945,
+          "indexed_ids" : [
+            "row-00000958",
+            "row-00000914",
+            "row-00000779",
+            "row-00000928",
+            "row-00000397",
+            "row-00000560",
+            "row-00000803",
+            "row-00000308",
+            "row-00000399",
+            "row-00000238"
+          ],
+          "indexed_ms" : 1.9129514694213867,
+          "query_seed" : 1047,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000304",
+            "row-00000160",
+            "row-00000261",
+            "row-00000915",
+            "row-00000296",
+            "row-00000066",
+            "row-00000172",
+            "row-00000286",
+            "row-00000472",
+            "row-00000889"
+          ],
+          "exact_ms" : 1.2669563293457031,
+          "indexed_ids" : [
+            "row-00000304",
+            "row-00000160",
+            "row-00000261",
+            "row-00000915",
+            "row-00000296",
+            "row-00000066",
+            "row-00000172",
+            "row-00000286",
+            "row-00000472",
+            "row-00000889"
+          ],
+          "indexed_ms" : 1.9179582595825195,
+          "query_seed" : 1048,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000468",
+            "row-00000604",
+            "row-00000905",
+            "row-00000914",
+            "row-00000403",
+            "row-00000971",
+            "row-00000693",
+            "row-00000934",
+            "row-00000719",
+            "row-00000278"
+          ],
+          "exact_ms" : 1.2950897216796875,
+          "indexed_ids" : [
+            "row-00000468",
+            "row-00000604",
+            "row-00000905",
+            "row-00000914",
+            "row-00000403",
+            "row-00000971",
+            "row-00000693",
+            "row-00000934",
+            "row-00000719",
+            "row-00000278"
+          ],
+          "indexed_ms" : 1.9249916076660156,
+          "query_seed" : 1049,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000404",
+            "row-00000226",
+            "row-00000212",
+            "row-00000484",
+            "row-00000378",
+            "row-00000135",
+            "row-00000835",
+            "row-00000185",
+            "row-00000781",
+            "row-00000150"
+          ],
+          "exact_ms" : 1.2720823287963867,
+          "indexed_ids" : [
+            "row-00000404",
+            "row-00000226",
+            "row-00000212",
+            "row-00000484",
+            "row-00000378",
+            "row-00000135",
+            "row-00000835",
+            "row-00000185",
+            "row-00000781",
+            "row-00000150"
+          ],
+          "indexed_ms" : 1.9350051879882812,
+          "query_seed" : 1050,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000233",
+            "row-00000344",
+            "row-00000369",
+            "row-00000704",
+            "row-00000660",
+            "row-00000582",
+            "row-00000483",
+            "row-00000348",
+            "row-00000386",
+            "row-00000265"
+          ],
+          "exact_ms" : 1.2850761413574219,
+          "indexed_ids" : [
+            "row-00000233",
+            "row-00000344",
+            "row-00000369",
+            "row-00000704",
+            "row-00000660",
+            "row-00000582",
+            "row-00000483",
+            "row-00000348",
+            "row-00000386",
+            "row-00000265"
+          ],
+          "indexed_ms" : 1.9469261169433594,
+          "query_seed" : 1051,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000312",
+            "row-00000479",
+            "row-00000585",
+            "row-00000038",
+            "row-00000948",
+            "row-00000410",
+            "row-00000841",
+            "row-00000443",
+            "row-00000869",
+            "row-00000618"
+          ],
+          "exact_ms" : 1.2969970703125,
+          "indexed_ids" : [
+            "row-00000312",
+            "row-00000479",
+            "row-00000585",
+            "row-00000038",
+            "row-00000948",
+            "row-00000410",
+            "row-00000841",
+            "row-00000443",
+            "row-00000869",
+            "row-00000618"
+          ],
+          "indexed_ms" : 1.91497802734375,
+          "query_seed" : 1052,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000182",
+            "row-00000770",
+            "row-00000513",
+            "row-00000962",
+            "row-00000115",
+            "row-00000661",
+            "row-00000169",
+            "row-00000913",
+            "row-00000447",
+            "row-00000657"
+          ],
+          "exact_ms" : 1.2450218200683594,
+          "indexed_ids" : [
+            "row-00000182",
+            "row-00000770",
+            "row-00000513",
+            "row-00000962",
+            "row-00000115",
+            "row-00000661",
+            "row-00000169",
+            "row-00000913",
+            "row-00000447",
+            "row-00000657"
+          ],
+          "indexed_ms" : 1.8930435180664062,
+          "query_seed" : 1053,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000402",
+            "row-00000501",
+            "row-00000160",
+            "row-00000531",
+            "row-00000790",
+            "row-00000745",
+            "row-00000309",
+            "row-00000706",
+            "row-00000817",
+            "row-00000086"
+          ],
+          "exact_ms" : 1.2710094451904297,
+          "indexed_ids" : [
+            "row-00000402",
+            "row-00000501",
+            "row-00000160",
+            "row-00000531",
+            "row-00000790",
+            "row-00000745",
+            "row-00000309",
+            "row-00000706",
+            "row-00000817",
+            "row-00000086"
+          ],
+          "indexed_ms" : 1.9060373306274414,
+          "query_seed" : 1054,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000588",
+            "row-00000616",
+            "row-00000456",
+            "row-00000117",
+            "row-00000915",
+            "row-00000420",
+            "row-00000127",
+            "row-00000892",
+            "row-00000407",
+            "row-00000024"
+          ],
+          "exact_ms" : 1.3170242309570312,
+          "indexed_ids" : [
+            "row-00000588",
+            "row-00000616",
+            "row-00000456",
+            "row-00000117",
+            "row-00000915",
+            "row-00000420",
+            "row-00000127",
+            "row-00000892",
+            "row-00000407",
+            "row-00000024"
+          ],
+          "indexed_ms" : 2.0160675048828125,
+          "query_seed" : 1055,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000793",
+            "row-00000757",
+            "row-00000666",
+            "row-00000825",
+            "row-00000905",
+            "row-00000294",
+            "row-00000542",
+            "row-00000357",
+            "row-00000325",
+            "row-00000031"
+          ],
+          "exact_ms" : 1.2689828872680664,
+          "indexed_ids" : [
+            "row-00000793",
+            "row-00000757",
+            "row-00000666",
+            "row-00000825",
+            "row-00000905",
+            "row-00000294",
+            "row-00000542",
+            "row-00000357",
+            "row-00000325",
+            "row-00000031"
+          ],
+          "indexed_ms" : 1.9450187683105469,
+          "query_seed" : 1056,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000639",
+            "row-00000360",
+            "row-00000012",
+            "row-00000359",
+            "row-00000618",
+            "row-00000728",
+            "row-00000693",
+            "row-00000672",
+            "row-00000013",
+            "row-00000923"
+          ],
+          "exact_ms" : 1.2589693069458008,
+          "indexed_ids" : [
+            "row-00000639",
+            "row-00000360",
+            "row-00000012",
+            "row-00000359",
+            "row-00000618",
+            "row-00000728",
+            "row-00000693",
+            "row-00000672",
+            "row-00000013",
+            "row-00000923"
+          ],
+          "indexed_ms" : 1.9670724868774414,
+          "query_seed" : 1057,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000095",
+            "row-00000855",
+            "row-00000385",
+            "row-00000715",
+            "row-00000165",
+            "row-00000768",
+            "row-00000499",
+            "row-00000609",
+            "row-00000219",
+            "row-00000472"
+          ],
+          "exact_ms" : 1.2520551681518555,
+          "indexed_ids" : [
+            "row-00000095",
+            "row-00000855",
+            "row-00000385",
+            "row-00000715",
+            "row-00000165",
+            "row-00000768",
+            "row-00000499",
+            "row-00000609",
+            "row-00000219",
+            "row-00000472"
+          ],
+          "indexed_ms" : 1.9669532775878906,
+          "query_seed" : 1058,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000177",
+            "row-00000101",
+            "row-00000855",
+            "row-00000108",
+            "row-00000012",
+            "row-00000842",
+            "row-00000559",
+            "row-00000141",
+            "row-00000380",
+            "row-00000267"
+          ],
+          "exact_ms" : 1.259922981262207,
+          "indexed_ids" : [
+            "row-00000177",
+            "row-00000101",
+            "row-00000855",
+            "row-00000108",
+            "row-00000012",
+            "row-00000842",
+            "row-00000559",
+            "row-00000141",
+            "row-00000380",
+            "row-00000267"
+          ],
+          "indexed_ms" : 1.9490718841552734,
+          "query_seed" : 1059,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000906",
+            "row-00000471",
+            "row-00000094",
+            "row-00000449",
+            "row-00000964",
+            "row-00000923",
+            "row-00000522",
+            "row-00000036",
+            "row-00000231",
+            "row-00000421"
+          ],
+          "exact_ms" : 1.2559890747070312,
+          "indexed_ids" : [
+            "row-00000906",
+            "row-00000471",
+            "row-00000094",
+            "row-00000449",
+            "row-00000964",
+            "row-00000923",
+            "row-00000522",
+            "row-00000036",
+            "row-00000231",
+            "row-00000421"
+          ],
+          "indexed_ms" : 1.9230842590332031,
+          "query_seed" : 1060,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000658",
+            "row-00000633",
+            "row-00000237",
+            "row-00000425",
+            "row-00000451",
+            "row-00000440",
+            "row-00000471",
+            "row-00000705",
+            "row-00000965",
+            "row-00000664"
+          ],
+          "exact_ms" : 1.2760162353515625,
+          "indexed_ids" : [
+            "row-00000658",
+            "row-00000633",
+            "row-00000237",
+            "row-00000425",
+            "row-00000451",
+            "row-00000440",
+            "row-00000471",
+            "row-00000705",
+            "row-00000965",
+            "row-00000664"
+          ],
+          "indexed_ms" : 1.9810199737548828,
+          "query_seed" : 1061,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000387",
+            "row-00000827",
+            "row-00000968",
+            "row-00000633",
+            "row-00000475",
+            "row-00000394",
+            "row-00000768",
+            "row-00000283",
+            "row-00000459",
+            "row-00000122"
+          ],
+          "exact_ms" : 1.2809038162231445,
+          "indexed_ids" : [
+            "row-00000387",
+            "row-00000827",
+            "row-00000968",
+            "row-00000633",
+            "row-00000475",
+            "row-00000394",
+            "row-00000768",
+            "row-00000283",
+            "row-00000459",
+            "row-00000122"
+          ],
+          "indexed_ms" : 1.9479990005493164,
+          "query_seed" : 1062,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000398",
+            "row-00000795",
+            "row-00000529",
+            "row-00000742",
+            "row-00000705",
+            "row-00000686",
+            "row-00000361",
+            "row-00000783",
+            "row-00000167",
+            "row-00000540"
+          ],
+          "exact_ms" : 1.3010501861572266,
+          "indexed_ids" : [
+            "row-00000398",
+            "row-00000795",
+            "row-00000529",
+            "row-00000742",
+            "row-00000705",
+            "row-00000686",
+            "row-00000361",
+            "row-00000783",
+            "row-00000167",
+            "row-00000540"
+          ],
+          "indexed_ms" : 1.9479990005493164,
+          "query_seed" : 1063,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000135",
+            "row-00000747",
+            "row-00000047",
+            "row-00000617",
+            "row-00000869",
+            "row-00000714",
+            "row-00000621",
+            "row-00000573",
+            "row-00000603",
+            "row-00000845"
+          ],
+          "exact_ms" : 1.2910366058349609,
+          "indexed_ids" : [
+            "row-00000135",
+            "row-00000747",
+            "row-00000047",
+            "row-00000617",
+            "row-00000869",
+            "row-00000714",
+            "row-00000621",
+            "row-00000573",
+            "row-00000603",
+            "row-00000845"
+          ],
+          "indexed_ms" : 1.9619464874267578,
+          "query_seed" : 1064,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000520",
+            "row-00000730",
+            "row-00000440",
+            "row-00000435",
+            "row-00000394",
+            "row-00000782",
+            "row-00000723",
+            "row-00000761",
+            "row-00000438",
+            "row-00000049"
+          ],
+          "exact_ms" : 1.2429952621459961,
+          "indexed_ids" : [
+            "row-00000520",
+            "row-00000730",
+            "row-00000440",
+            "row-00000435",
+            "row-00000394",
+            "row-00000782",
+            "row-00000723",
+            "row-00000761",
+            "row-00000438",
+            "row-00000049"
+          ],
+          "indexed_ms" : 1.896977424621582,
+          "query_seed" : 1065,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000625",
+            "row-00000325",
+            "row-00000376",
+            "row-00000678",
+            "row-00000437",
+            "row-00000933",
+            "row-00000580",
+            "row-00000886",
+            "row-00000706",
+            "row-00000895"
+          ],
+          "exact_ms" : 1.2649297714233398,
+          "indexed_ids" : [
+            "row-00000625",
+            "row-00000325",
+            "row-00000376",
+            "row-00000678",
+            "row-00000437",
+            "row-00000933",
+            "row-00000580",
+            "row-00000886",
+            "row-00000706",
+            "row-00000895"
+          ],
+          "indexed_ms" : 2.079010009765625,
+          "query_seed" : 1066,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000896",
+            "row-00000655",
+            "row-00000955",
+            "row-00000986",
+            "row-00000591",
+            "row-00000983",
+            "row-00000682",
+            "row-00000659",
+            "row-00000451",
+            "row-00000996"
+          ],
+          "exact_ms" : 1.3530254364013672,
+          "indexed_ids" : [
+            "row-00000896",
+            "row-00000655",
+            "row-00000955",
+            "row-00000986",
+            "row-00000591",
+            "row-00000983",
+            "row-00000682",
+            "row-00000659",
+            "row-00000451",
+            "row-00000996"
+          ],
+          "indexed_ms" : 2.1209716796875,
+          "query_seed" : 1067,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000667",
+            "row-00000824",
+            "row-00000476",
+            "row-00000842",
+            "row-00000523",
+            "row-00000986",
+            "row-00000475",
+            "row-00000817",
+            "row-00000305",
+            "row-00000740"
+          ],
+          "exact_ms" : 1.2871026992797852,
+          "indexed_ids" : [
+            "row-00000667",
+            "row-00000824",
+            "row-00000476",
+            "row-00000842",
+            "row-00000523",
+            "row-00000986",
+            "row-00000475",
+            "row-00000817",
+            "row-00000305",
+            "row-00000740"
+          ],
+          "indexed_ms" : 1.9499063491821289,
+          "query_seed" : 1068,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000245",
+            "row-00000836",
+            "row-00000994",
+            "row-00000823",
+            "row-00000270",
+            "row-00000564",
+            "row-00000713",
+            "row-00000857",
+            "row-00000074",
+            "row-00000559"
+          ],
+          "exact_ms" : 1.2520551681518555,
+          "indexed_ids" : [
+            "row-00000245",
+            "row-00000836",
+            "row-00000994",
+            "row-00000823",
+            "row-00000270",
+            "row-00000564",
+            "row-00000713",
+            "row-00000857",
+            "row-00000074",
+            "row-00000559"
+          ],
+          "indexed_ms" : 1.956939697265625,
+          "query_seed" : 1069,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000528",
+            "row-00000316",
+            "row-00000569",
+            "row-00000180",
+            "row-00000561",
+            "row-00000706",
+            "row-00000039",
+            "row-00000179",
+            "row-00000075",
+            "row-00000980"
+          ],
+          "exact_ms" : 1.3250112533569336,
+          "indexed_ids" : [
+            "row-00000528",
+            "row-00000316",
+            "row-00000569",
+            "row-00000180",
+            "row-00000561",
+            "row-00000706",
+            "row-00000039",
+            "row-00000179",
+            "row-00000075",
+            "row-00000980"
+          ],
+          "indexed_ms" : 2.0860433578491211,
+          "query_seed" : 1070,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000283",
+            "row-00000500",
+            "row-00000409",
+            "row-00000373",
+            "row-00000822",
+            "row-00000146",
+            "row-00000121",
+            "row-00000191",
+            "row-00000158",
+            "row-00000750"
+          ],
+          "exact_ms" : 1.3689994812011719,
+          "indexed_ids" : [
+            "row-00000283",
+            "row-00000500",
+            "row-00000409",
+            "row-00000373",
+            "row-00000822",
+            "row-00000146",
+            "row-00000121",
+            "row-00000191",
+            "row-00000158",
+            "row-00000750"
+          ],
+          "indexed_ms" : 2.5550127029418945,
+          "query_seed" : 1071,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000583",
+            "row-00000003",
+            "row-00000113",
+            "row-00000540",
+            "row-00000849",
+            "row-00000650",
+            "row-00000219",
+            "row-00000447",
+            "row-00000496",
+            "row-00000153"
+          ],
+          "exact_ms" : 1.3240575790405273,
+          "indexed_ids" : [
+            "row-00000583",
+            "row-00000003",
+            "row-00000113",
+            "row-00000540",
+            "row-00000849",
+            "row-00000650",
+            "row-00000219",
+            "row-00000447",
+            "row-00000496",
+            "row-00000153"
+          ],
+          "indexed_ms" : 2.0059347152709961,
+          "query_seed" : 1072,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000391",
+            "row-00000193",
+            "row-00000217",
+            "row-00000465",
+            "row-00000909",
+            "row-00000746",
+            "row-00000709",
+            "row-00000117",
+            "row-00000761",
+            "row-00000488"
+          ],
+          "exact_ms" : 1.2869834899902344,
+          "indexed_ids" : [
+            "row-00000391",
+            "row-00000193",
+            "row-00000217",
+            "row-00000465",
+            "row-00000909",
+            "row-00000746",
+            "row-00000709",
+            "row-00000117",
+            "row-00000761",
+            "row-00000488"
+          ],
+          "indexed_ms" : 2.0079612731933594,
+          "query_seed" : 1073,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000306",
+            "row-00000221",
+            "row-00000266",
+            "row-00000777",
+            "row-00000619",
+            "row-00000325",
+            "row-00000592",
+            "row-00000597",
+            "row-00000989",
+            "row-00000363"
+          ],
+          "exact_ms" : 1.2570619583129883,
+          "indexed_ids" : [
+            "row-00000306",
+            "row-00000221",
+            "row-00000266",
+            "row-00000777",
+            "row-00000619",
+            "row-00000325",
+            "row-00000592",
+            "row-00000597",
+            "row-00000989",
+            "row-00000363"
+          ],
+          "indexed_ms" : 1.9019842147827148,
+          "query_seed" : 1074,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000026",
+            "row-00000905",
+            "row-00000364",
+            "row-00000215",
+            "row-00000515",
+            "row-00000642",
+            "row-00000458",
+            "row-00000727",
+            "row-00000951",
+            "row-00000416"
+          ],
+          "exact_ms" : 1.2689828872680664,
+          "indexed_ids" : [
+            "row-00000026",
+            "row-00000905",
+            "row-00000364",
+            "row-00000215",
+            "row-00000515",
+            "row-00000642",
+            "row-00000458",
+            "row-00000727",
+            "row-00000951",
+            "row-00000416"
+          ],
+          "indexed_ms" : 1.9170045852661133,
+          "query_seed" : 1075,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000945",
+            "row-00000662",
+            "row-00000478",
+            "row-00000601",
+            "row-00000134",
+            "row-00000821",
+            "row-00000544",
+            "row-00000195",
+            "row-00000947",
+            "row-00000810"
+          ],
+          "exact_ms" : 1.2549161911010742,
+          "indexed_ids" : [
+            "row-00000945",
+            "row-00000662",
+            "row-00000478",
+            "row-00000601",
+            "row-00000134",
+            "row-00000821",
+            "row-00000544",
+            "row-00000195",
+            "row-00000947",
+            "row-00000810"
+          ],
+          "indexed_ms" : 1.9640922546386719,
+          "query_seed" : 1076,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000053",
+            "row-00000172",
+            "row-00000797",
+            "row-00000191",
+            "row-00000262",
+            "row-00000914",
+            "row-00000806",
+            "row-00000959",
+            "row-00000517",
+            "row-00000943"
+          ],
+          "exact_ms" : 1.2590885162353516,
+          "indexed_ids" : [
+            "row-00000053",
+            "row-00000172",
+            "row-00000797",
+            "row-00000191",
+            "row-00000262",
+            "row-00000914",
+            "row-00000806",
+            "row-00000959",
+            "row-00000517",
+            "row-00000943"
+          ],
+          "indexed_ms" : 1.9629001617431641,
+          "query_seed" : 1077,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000800",
+            "row-00000106",
+            "row-00000975",
+            "row-00000280",
+            "row-00000516",
+            "row-00000364",
+            "row-00000351",
+            "row-00000955",
+            "row-00000666",
+            "row-00000429"
+          ],
+          "exact_ms" : 1.3039112091064453,
+          "indexed_ids" : [
+            "row-00000800",
+            "row-00000106",
+            "row-00000975",
+            "row-00000280",
+            "row-00000516",
+            "row-00000364",
+            "row-00000351",
+            "row-00000955",
+            "row-00000666",
+            "row-00000429"
+          ],
+          "indexed_ms" : 1.9890069961547852,
+          "query_seed" : 1078,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000059",
+            "row-00000565",
+            "row-00000280",
+            "row-00000226",
+            "row-00000489",
+            "row-00000853",
+            "row-00000999",
+            "row-00000768",
+            "row-00000645",
+            "row-00000735"
+          ],
+          "exact_ms" : 1.2390613555908203,
+          "indexed_ids" : [
+            "row-00000059",
+            "row-00000565",
+            "row-00000280",
+            "row-00000226",
+            "row-00000489",
+            "row-00000853",
+            "row-00000999",
+            "row-00000768",
+            "row-00000645",
+            "row-00000735"
+          ],
+          "indexed_ms" : 1.9979476928710938,
+          "query_seed" : 1079,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000639",
+            "row-00000852",
+            "row-00000914",
+            "row-00000667",
+            "row-00000604",
+            "row-00000713",
+            "row-00000184",
+            "row-00000744",
+            "row-00000574",
+            "row-00000710"
+          ],
+          "exact_ms" : 1.2769699096679688,
+          "indexed_ids" : [
+            "row-00000639",
+            "row-00000852",
+            "row-00000914",
+            "row-00000667",
+            "row-00000604",
+            "row-00000713",
+            "row-00000184",
+            "row-00000744",
+            "row-00000574",
+            "row-00000710"
+          ],
+          "indexed_ms" : 1.958012580871582,
+          "query_seed" : 1080,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "queries" : 64,
+      "recall_at_10" : 1
+    },
+    "filtered" : {
+      "exact_max_ms" : 1.3300180435180664,
+      "exact_p95_ms" : 1.2530088424682617,
+      "indexed_max_ms" : 5.1990747451782227,
+      "indexed_p95_ms" : 3.8820505142211914,
+      "measurements" : [
+        {
+          "exact_ids" : [
+            "row-00000158",
+            "row-00000548",
+            "row-00000170",
+            "row-00000580",
+            "row-00000164",
+            "row-00000056",
+            "row-00000474",
+            "row-00000550",
+            "row-00000134",
+            "row-00000396"
+          ],
+          "exact_ms" : 1.2009143829345703,
+          "indexed_ids" : [
+            "row-00000158",
+            "row-00000548",
+            "row-00000170",
+            "row-00000580",
+            "row-00000164",
+            "row-00000056",
+            "row-00000474",
+            "row-00000550",
+            "row-00000134",
+            "row-00000396"
+          ],
+          "indexed_ms" : 3.8770437240600586,
+          "query_seed" : 1017,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000850",
+            "row-00000832",
+            "row-00000906",
+            "row-00000250",
+            "row-00000840",
+            "row-00000972",
+            "row-00000746",
+            "row-00000842",
+            "row-00000022",
+            "row-00000010"
+          ],
+          "exact_ms" : 1.1661052703857422,
+          "indexed_ids" : [
+            "row-00000850",
+            "row-00000832",
+            "row-00000906",
+            "row-00000250",
+            "row-00000840",
+            "row-00000972",
+            "row-00000746",
+            "row-00000842",
+            "row-00000022",
+            "row-00000010"
+          ],
+          "indexed_ms" : 3.7099123001098633,
+          "query_seed" : 1018,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000950",
+            "row-00000940",
+            "row-00000356",
+            "row-00000716",
+            "row-00000906",
+            "row-00000374",
+            "row-00000226",
+            "row-00000782",
+            "row-00000154",
+            "row-00000044"
+          ],
+          "exact_ms" : 1.1780261993408203,
+          "indexed_ids" : [
+            "row-00000950",
+            "row-00000940",
+            "row-00000356",
+            "row-00000716",
+            "row-00000906",
+            "row-00000374",
+            "row-00000226",
+            "row-00000782",
+            "row-00000154",
+            "row-00000044"
+          ],
+          "indexed_ms" : 3.7549734115600586,
+          "query_seed" : 1019,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000726",
+            "row-00000722",
+            "row-00000892",
+            "row-00000894",
+            "row-00000384",
+            "row-00000110",
+            "row-00000798",
+            "row-00000432",
+            "row-00000082",
+            "row-00000014"
+          ],
+          "exact_ms" : 1.2929439544677734,
+          "indexed_ids" : [
+            "row-00000726",
+            "row-00000722",
+            "row-00000892",
+            "row-00000894",
+            "row-00000384",
+            "row-00000110",
+            "row-00000798",
+            "row-00000432",
+            "row-00000082",
+            "row-00000014"
+          ],
+          "indexed_ms" : 3.7889480590820312,
+          "query_seed" : 1020,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000640",
+            "row-00000038",
+            "row-00000090",
+            "row-00000620",
+            "row-00000720",
+            "row-00000198",
+            "row-00000600",
+            "row-00000512",
+            "row-00000104",
+            "row-00000838"
+          ],
+          "exact_ms" : 1.1960268020629883,
+          "indexed_ids" : [
+            "row-00000640",
+            "row-00000038",
+            "row-00000090",
+            "row-00000620",
+            "row-00000720",
+            "row-00000198",
+            "row-00000600",
+            "row-00000512",
+            "row-00000104",
+            "row-00000838"
+          ],
+          "indexed_ms" : 3.683924674987793,
+          "query_seed" : 1021,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000896",
+            "row-00000038",
+            "row-00000208",
+            "row-00000472",
+            "row-00000196",
+            "row-00000974",
+            "row-00000074",
+            "row-00000618",
+            "row-00000090",
+            "row-00000180"
+          ],
+          "exact_ms" : 1.1910200119018555,
+          "indexed_ids" : [
+            "row-00000896",
+            "row-00000038",
+            "row-00000208",
+            "row-00000472",
+            "row-00000196",
+            "row-00000974",
+            "row-00000074",
+            "row-00000618",
+            "row-00000090",
+            "row-00000180"
+          ],
+          "indexed_ms" : 3.7419795989990234,
+          "query_seed" : 1022,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000488",
+            "row-00000826",
+            "row-00000040",
+            "row-00000352",
+            "row-00000694",
+            "row-00000182",
+            "row-00000676",
+            "row-00000038",
+            "row-00000678",
+            "row-00000768"
+          ],
+          "exact_ms" : 1.2140274047851562,
+          "indexed_ids" : [
+            "row-00000488",
+            "row-00000826",
+            "row-00000040",
+            "row-00000352",
+            "row-00000694",
+            "row-00000182",
+            "row-00000676",
+            "row-00000038",
+            "row-00000678",
+            "row-00000768"
+          ],
+          "indexed_ms" : 3.8210153579711914,
+          "query_seed" : 1023,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000302",
+            "row-00000528",
+            "row-00000698",
+            "row-00000816",
+            "row-00000450",
+            "row-00000044",
+            "row-00000508",
+            "row-00000966",
+            "row-00000696",
+            "row-00000300"
+          ],
+          "exact_ms" : 1.3190507888793945,
+          "indexed_ids" : [
+            "row-00000302",
+            "row-00000528",
+            "row-00000698",
+            "row-00000816",
+            "row-00000450",
+            "row-00000044",
+            "row-00000508",
+            "row-00000966",
+            "row-00000696",
+            "row-00000300"
+          ],
+          "indexed_ms" : 3.7469863891601562,
+          "query_seed" : 1024,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000190",
+            "row-00000322",
+            "row-00000986",
+            "row-00000400",
+            "row-00000992",
+            "row-00000382",
+            "row-00000932",
+            "row-00000062",
+            "row-00000478",
+            "row-00000846"
+          ],
+          "exact_ms" : 1.217961311340332,
+          "indexed_ids" : [
+            "row-00000190",
+            "row-00000322",
+            "row-00000986",
+            "row-00000400",
+            "row-00000992",
+            "row-00000382",
+            "row-00000932",
+            "row-00000062",
+            "row-00000478",
+            "row-00000846"
+          ],
+          "indexed_ms" : 3.7440061569213867,
+          "query_seed" : 1025,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000142",
+            "row-00000950",
+            "row-00000230",
+            "row-00000828",
+            "row-00000526",
+            "row-00000470",
+            "row-00000766",
+            "row-00000344",
+            "row-00000250",
+            "row-00000688"
+          ],
+          "exact_ms" : 1.2079477310180664,
+          "indexed_ids" : [
+            "row-00000142",
+            "row-00000950",
+            "row-00000230",
+            "row-00000828",
+            "row-00000526",
+            "row-00000470",
+            "row-00000766",
+            "row-00000344",
+            "row-00000250",
+            "row-00000688"
+          ],
+          "indexed_ms" : 3.8820505142211914,
+          "query_seed" : 1026,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000930",
+            "row-00000280",
+            "row-00000160",
+            "row-00000488",
+            "row-00000866",
+            "row-00000698",
+            "row-00000246",
+            "row-00000944",
+            "row-00000406",
+            "row-00000118"
+          ],
+          "exact_ms" : 1.1830329895019531,
+          "indexed_ids" : [
+            "row-00000930",
+            "row-00000280",
+            "row-00000160",
+            "row-00000488",
+            "row-00000866",
+            "row-00000698",
+            "row-00000246",
+            "row-00000944",
+            "row-00000406",
+            "row-00000118"
+          ],
+          "indexed_ms" : 3.6540031433105469,
+          "query_seed" : 1027,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000026",
+            "row-00000622",
+            "row-00000876",
+            "row-00000074",
+            "row-00000210",
+            "row-00000440",
+            "row-00000418",
+            "row-00000988",
+            "row-00000408",
+            "row-00000360"
+          ],
+          "exact_ms" : 1.2279748916625977,
+          "indexed_ids" : [
+            "row-00000026",
+            "row-00000622",
+            "row-00000876",
+            "row-00000074",
+            "row-00000210",
+            "row-00000440",
+            "row-00000418",
+            "row-00000988",
+            "row-00000408",
+            "row-00000360"
+          ],
+          "indexed_ms" : 3.7080049514770508,
+          "query_seed" : 1028,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000248",
+            "row-00000034",
+            "row-00000712",
+            "row-00000884",
+            "row-00000858",
+            "row-00000006",
+            "row-00000564",
+            "row-00000052",
+            "row-00000370",
+            "row-00000856"
+          ],
+          "exact_ms" : 1.1969804763793945,
+          "indexed_ids" : [
+            "row-00000248",
+            "row-00000034",
+            "row-00000712",
+            "row-00000884",
+            "row-00000858",
+            "row-00000006",
+            "row-00000564",
+            "row-00000052",
+            "row-00000370",
+            "row-00000856"
+          ],
+          "indexed_ms" : 3.6649703979492188,
+          "query_seed" : 1029,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000392",
+            "row-00000804",
+            "row-00000970",
+            "row-00000412",
+            "row-00000388",
+            "row-00000234",
+            "row-00000454",
+            "row-00000228",
+            "row-00000706",
+            "row-00000674"
+          ],
+          "exact_ms" : 1.1740922927856445,
+          "indexed_ids" : [
+            "row-00000392",
+            "row-00000804",
+            "row-00000970",
+            "row-00000412",
+            "row-00000388",
+            "row-00000234",
+            "row-00000454",
+            "row-00000228",
+            "row-00000706",
+            "row-00000674"
+          ],
+          "indexed_ms" : 3.6818981170654297,
+          "query_seed" : 1030,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000536",
+            "row-00000812",
+            "row-00000220",
+            "row-00000322",
+            "row-00000390",
+            "row-00000466",
+            "row-00000476",
+            "row-00000764",
+            "row-00000848",
+            "row-00000246"
+          ],
+          "exact_ms" : 1.1849403381347656,
+          "indexed_ids" : [
+            "row-00000536",
+            "row-00000812",
+            "row-00000220",
+            "row-00000322",
+            "row-00000390",
+            "row-00000466",
+            "row-00000476",
+            "row-00000764",
+            "row-00000848",
+            "row-00000246"
+          ],
+          "indexed_ms" : 3.6410093307495117,
+          "query_seed" : 1031,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000512",
+            "row-00000990",
+            "row-00000876",
+            "row-00000450",
+            "row-00000442",
+            "row-00000830",
+            "row-00000312",
+            "row-00000550",
+            "row-00000082",
+            "row-00000276"
+          ],
+          "exact_ms" : 1.2149810791015625,
+          "indexed_ids" : [
+            "row-00000512",
+            "row-00000990",
+            "row-00000876",
+            "row-00000450",
+            "row-00000442",
+            "row-00000830",
+            "row-00000312",
+            "row-00000550",
+            "row-00000082",
+            "row-00000276"
+          ],
+          "indexed_ms" : 3.728032112121582,
+          "query_seed" : 1032,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000890",
+            "row-00000960",
+            "row-00000348",
+            "row-00000484",
+            "row-00000994",
+            "row-00000698",
+            "row-00000174",
+            "row-00000208",
+            "row-00000850",
+            "row-00000986"
+          ],
+          "exact_ms" : 1.1960268020629883,
+          "indexed_ids" : [
+            "row-00000890",
+            "row-00000960",
+            "row-00000348",
+            "row-00000484",
+            "row-00000994",
+            "row-00000698",
+            "row-00000174",
+            "row-00000208",
+            "row-00000850",
+            "row-00000986"
+          ],
+          "indexed_ms" : 3.7009716033935547,
+          "query_seed" : 1033,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000832",
+            "row-00000800",
+            "row-00000602",
+            "row-00000470",
+            "row-00000608",
+            "row-00000276",
+            "row-00000292",
+            "row-00000598",
+            "row-00000124",
+            "row-00000178"
+          ],
+          "exact_ms" : 1.1970996856689453,
+          "indexed_ids" : [
+            "row-00000832",
+            "row-00000800",
+            "row-00000602",
+            "row-00000470",
+            "row-00000608",
+            "row-00000276",
+            "row-00000292",
+            "row-00000598",
+            "row-00000124",
+            "row-00000178"
+          ],
+          "indexed_ms" : 3.8269758224487305,
+          "query_seed" : 1034,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000100",
+            "row-00000696",
+            "row-00000732",
+            "row-00000220",
+            "row-00000556",
+            "row-00000698",
+            "row-00000368",
+            "row-00000086",
+            "row-00000794",
+            "row-00000350"
+          ],
+          "exact_ms" : 1.2170076370239258,
+          "indexed_ids" : [
+            "row-00000100",
+            "row-00000696",
+            "row-00000732",
+            "row-00000220",
+            "row-00000556",
+            "row-00000698",
+            "row-00000368",
+            "row-00000086",
+            "row-00000794",
+            "row-00000350"
+          ],
+          "indexed_ms" : 3.7159919738769531,
+          "query_seed" : 1035,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000884",
+            "row-00000898",
+            "row-00000168",
+            "row-00000068",
+            "row-00000040",
+            "row-00000886",
+            "row-00000764",
+            "row-00000432",
+            "row-00000046",
+            "row-00000830"
+          ],
+          "exact_ms" : 1.1680126190185547,
+          "indexed_ids" : [
+            "row-00000884",
+            "row-00000898",
+            "row-00000168",
+            "row-00000068",
+            "row-00000040",
+            "row-00000886",
+            "row-00000764",
+            "row-00000432",
+            "row-00000046",
+            "row-00000830"
+          ],
+          "indexed_ms" : 3.7200450897216797,
+          "query_seed" : 1036,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000884",
+            "row-00000524",
+            "row-00000970",
+            "row-00000032",
+            "row-00000364",
+            "row-00000558",
+            "row-00000912",
+            "row-00000222",
+            "row-00000610",
+            "row-00000126"
+          ],
+          "exact_ms" : 1.1839866638183594,
+          "indexed_ids" : [
+            "row-00000884",
+            "row-00000524",
+            "row-00000970",
+            "row-00000032",
+            "row-00000364",
+            "row-00000558",
+            "row-00000912",
+            "row-00000222",
+            "row-00000610",
+            "row-00000126"
+          ],
+          "indexed_ms" : 3.6720037460327148,
+          "query_seed" : 1037,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000874",
+            "row-00000140",
+            "row-00000472",
+            "row-00000962",
+            "row-00000948",
+            "row-00000262",
+            "row-00000770",
+            "row-00000604",
+            "row-00000392",
+            "row-00000278"
+          ],
+          "exact_ms" : 1.1489391326904297,
+          "indexed_ids" : [
+            "row-00000874",
+            "row-00000140",
+            "row-00000472",
+            "row-00000962",
+            "row-00000948",
+            "row-00000262",
+            "row-00000770",
+            "row-00000604",
+            "row-00000392",
+            "row-00000278"
+          ],
+          "indexed_ms" : 3.7310123443603516,
+          "query_seed" : 1038,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000872",
+            "row-00000438",
+            "row-00000238",
+            "row-00000374",
+            "row-00000692",
+            "row-00000274",
+            "row-00000462",
+            "row-00000922",
+            "row-00000038",
+            "row-00000592"
+          ],
+          "exact_ms" : 1.1740922927856445,
+          "indexed_ids" : [
+            "row-00000872",
+            "row-00000438",
+            "row-00000238",
+            "row-00000374",
+            "row-00000692",
+            "row-00000274",
+            "row-00000462",
+            "row-00000922",
+            "row-00000038",
+            "row-00000592"
+          ],
+          "indexed_ms" : 3.7099123001098633,
+          "query_seed" : 1039,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000266",
+            "row-00000570",
+            "row-00000220",
+            "row-00000446",
+            "row-00000756",
+            "row-00000050",
+            "row-00000694",
+            "row-00000572",
+            "row-00000664",
+            "row-00000774"
+          ],
+          "exact_ms" : 1.1830329895019531,
+          "indexed_ids" : [
+            "row-00000266",
+            "row-00000570",
+            "row-00000220",
+            "row-00000446",
+            "row-00000756",
+            "row-00000050",
+            "row-00000694",
+            "row-00000572",
+            "row-00000664",
+            "row-00000774"
+          ],
+          "indexed_ms" : 3.7479400634765625,
+          "query_seed" : 1040,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000824",
+            "row-00000742",
+            "row-00000656",
+            "row-00000786",
+            "row-00000730",
+            "row-00000160",
+            "row-00000176",
+            "row-00000422",
+            "row-00000360",
+            "row-00000338"
+          ],
+          "exact_ms" : 1.1910200119018555,
+          "indexed_ids" : [
+            "row-00000824",
+            "row-00000742",
+            "row-00000656",
+            "row-00000786",
+            "row-00000730",
+            "row-00000160",
+            "row-00000176",
+            "row-00000422",
+            "row-00000360",
+            "row-00000338"
+          ],
+          "indexed_ms" : 3.6480426788330078,
+          "query_seed" : 1041,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000790",
+            "row-00000636",
+            "row-00000108",
+            "row-00000570",
+            "row-00000238",
+            "row-00000166",
+            "row-00000090",
+            "row-00000036",
+            "row-00000492",
+            "row-00000284"
+          ],
+          "exact_ms" : 1.1619329452514648,
+          "indexed_ids" : [
+            "row-00000790",
+            "row-00000636",
+            "row-00000108",
+            "row-00000570",
+            "row-00000238",
+            "row-00000166",
+            "row-00000090",
+            "row-00000036",
+            "row-00000492",
+            "row-00000284"
+          ],
+          "indexed_ms" : 3.6870241165161133,
+          "query_seed" : 1042,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000908",
+            "row-00000906",
+            "row-00000232",
+            "row-00000248",
+            "row-00000252",
+            "row-00000018",
+            "row-00000718",
+            "row-00000942",
+            "row-00000876",
+            "row-00000458"
+          ],
+          "exact_ms" : 1.1858940124511719,
+          "indexed_ids" : [
+            "row-00000908",
+            "row-00000906",
+            "row-00000232",
+            "row-00000248",
+            "row-00000252",
+            "row-00000018",
+            "row-00000718",
+            "row-00000942",
+            "row-00000876",
+            "row-00000458"
+          ],
+          "indexed_ms" : 3.6640167236328125,
+          "query_seed" : 1043,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000104",
+            "row-00000574",
+            "row-00000454",
+            "row-00000340",
+            "row-00000994",
+            "row-00000976",
+            "row-00000778",
+            "row-00000520",
+            "row-00000050",
+            "row-00000278"
+          ],
+          "exact_ms" : 1.156926155090332,
+          "indexed_ids" : [
+            "row-00000104",
+            "row-00000574",
+            "row-00000454",
+            "row-00000340",
+            "row-00000994",
+            "row-00000976",
+            "row-00000778",
+            "row-00000520",
+            "row-00000050",
+            "row-00000278"
+          ],
+          "indexed_ms" : 3.722071647644043,
+          "query_seed" : 1044,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000488",
+            "row-00000698",
+            "row-00000686",
+            "row-00000108",
+            "row-00000580",
+            "row-00000900",
+            "row-00000898",
+            "row-00000928",
+            "row-00000286",
+            "row-00000872"
+          ],
+          "exact_ms" : 1.2129545211791992,
+          "indexed_ids" : [
+            "row-00000488",
+            "row-00000698",
+            "row-00000686",
+            "row-00000108",
+            "row-00000580",
+            "row-00000900",
+            "row-00000898",
+            "row-00000928",
+            "row-00000286",
+            "row-00000872"
+          ],
+          "indexed_ms" : 3.6890506744384766,
+          "query_seed" : 1045,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000704",
+            "row-00000826",
+            "row-00000160",
+            "row-00000346",
+            "row-00000372",
+            "row-00000030",
+            "row-00000006",
+            "row-00000782",
+            "row-00000250",
+            "row-00000666"
+          ],
+          "exact_ms" : 1.194000244140625,
+          "indexed_ids" : [
+            "row-00000704",
+            "row-00000826",
+            "row-00000160",
+            "row-00000346",
+            "row-00000372",
+            "row-00000030",
+            "row-00000006",
+            "row-00000782",
+            "row-00000250",
+            "row-00000666"
+          ],
+          "indexed_ms" : 3.6900043487548828,
+          "query_seed" : 1046,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000958",
+            "row-00000914",
+            "row-00000928",
+            "row-00000560",
+            "row-00000308",
+            "row-00000238",
+            "row-00000372",
+            "row-00000424",
+            "row-00000936",
+            "row-00000364"
+          ],
+          "exact_ms" : 1.1780261993408203,
+          "indexed_ids" : [
+            "row-00000958",
+            "row-00000914",
+            "row-00000928",
+            "row-00000560",
+            "row-00000308",
+            "row-00000238",
+            "row-00000372",
+            "row-00000424",
+            "row-00000936",
+            "row-00000364"
+          ],
+          "indexed_ms" : 3.6929845809936523,
+          "query_seed" : 1047,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000304",
+            "row-00000160",
+            "row-00000296",
+            "row-00000066",
+            "row-00000172",
+            "row-00000286",
+            "row-00000472",
+            "row-00000292",
+            "row-00000482",
+            "row-00000844"
+          ],
+          "exact_ms" : 1.1630058288574219,
+          "indexed_ids" : [
+            "row-00000304",
+            "row-00000160",
+            "row-00000296",
+            "row-00000066",
+            "row-00000172",
+            "row-00000286",
+            "row-00000472",
+            "row-00000292",
+            "row-00000482",
+            "row-00000844"
+          ],
+          "indexed_ms" : 3.6909580230712891,
+          "query_seed" : 1048,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000468",
+            "row-00000604",
+            "row-00000914",
+            "row-00000934",
+            "row-00000278",
+            "row-00000710",
+            "row-00000312",
+            "row-00000116",
+            "row-00000602",
+            "row-00000490"
+          ],
+          "exact_ms" : 1.1719465255737305,
+          "indexed_ids" : [
+            "row-00000468",
+            "row-00000604",
+            "row-00000914",
+            "row-00000934",
+            "row-00000278",
+            "row-00000710",
+            "row-00000312",
+            "row-00000116",
+            "row-00000602",
+            "row-00000490"
+          ],
+          "indexed_ms" : 3.6619901657104492,
+          "query_seed" : 1049,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000404",
+            "row-00000226",
+            "row-00000212",
+            "row-00000484",
+            "row-00000378",
+            "row-00000150",
+            "row-00000490",
+            "row-00000406",
+            "row-00000686",
+            "row-00000756"
+          ],
+          "exact_ms" : 1.1670589447021484,
+          "indexed_ids" : [
+            "row-00000404",
+            "row-00000226",
+            "row-00000212",
+            "row-00000484",
+            "row-00000378",
+            "row-00000150",
+            "row-00000490",
+            "row-00000406",
+            "row-00000686",
+            "row-00000756"
+          ],
+          "indexed_ms" : 3.708958625793457,
+          "query_seed" : 1050,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000344",
+            "row-00000704",
+            "row-00000660",
+            "row-00000582",
+            "row-00000348",
+            "row-00000386",
+            "row-00000248",
+            "row-00000246",
+            "row-00000856",
+            "row-00000008"
+          ],
+          "exact_ms" : 1.1839866638183594,
+          "indexed_ids" : [
+            "row-00000344",
+            "row-00000704",
+            "row-00000660",
+            "row-00000582",
+            "row-00000348",
+            "row-00000386",
+            "row-00000248",
+            "row-00000246",
+            "row-00000856",
+            "row-00000008"
+          ],
+          "indexed_ms" : 3.6629438400268555,
+          "query_seed" : 1051,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000312",
+            "row-00000038",
+            "row-00000948",
+            "row-00000410",
+            "row-00000618",
+            "row-00000764",
+            "row-00000702",
+            "row-00000858",
+            "row-00000284",
+            "row-00000360"
+          ],
+          "exact_ms" : 1.1390447616577148,
+          "indexed_ids" : [
+            "row-00000312",
+            "row-00000038",
+            "row-00000948",
+            "row-00000410",
+            "row-00000618",
+            "row-00000764",
+            "row-00000702",
+            "row-00000858",
+            "row-00000284",
+            "row-00000360"
+          ],
+          "indexed_ms" : 3.6749839782714844,
+          "query_seed" : 1052,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000182",
+            "row-00000770",
+            "row-00000962",
+            "row-00000268",
+            "row-00000750",
+            "row-00000716",
+            "row-00000422",
+            "row-00000190",
+            "row-00000936",
+            "row-00000512"
+          ],
+          "exact_ms" : 1.2019872665405273,
+          "indexed_ids" : [
+            "row-00000182",
+            "row-00000770",
+            "row-00000962",
+            "row-00000268",
+            "row-00000750",
+            "row-00000716",
+            "row-00000422",
+            "row-00000190",
+            "row-00000936",
+            "row-00000512"
+          ],
+          "indexed_ms" : 3.7000179290771484,
+          "query_seed" : 1053,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000402",
+            "row-00000160",
+            "row-00000790",
+            "row-00000706",
+            "row-00000086",
+            "row-00000668",
+            "row-00000978",
+            "row-00000714",
+            "row-00000204",
+            "row-00000536"
+          ],
+          "exact_ms" : 1.1639595031738281,
+          "indexed_ids" : [
+            "row-00000402",
+            "row-00000160",
+            "row-00000790",
+            "row-00000706",
+            "row-00000086",
+            "row-00000668",
+            "row-00000978",
+            "row-00000714",
+            "row-00000204",
+            "row-00000536"
+          ],
+          "indexed_ms" : 5.1990747451782227,
+          "query_seed" : 1054,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000588",
+            "row-00000616",
+            "row-00000456",
+            "row-00000420",
+            "row-00000892",
+            "row-00000024",
+            "row-00000662",
+            "row-00000122",
+            "row-00000642",
+            "row-00000594"
+          ],
+          "exact_ms" : 1.3300180435180664,
+          "indexed_ids" : [
+            "row-00000588",
+            "row-00000616",
+            "row-00000456",
+            "row-00000420",
+            "row-00000892",
+            "row-00000024",
+            "row-00000662",
+            "row-00000122",
+            "row-00000642",
+            "row-00000594"
+          ],
+          "indexed_ms" : 4.0010213851928711,
+          "query_seed" : 1055,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000666",
+            "row-00000294",
+            "row-00000542",
+            "row-00000322",
+            "row-00000728",
+            "row-00000512",
+            "row-00000900",
+            "row-00000750",
+            "row-00000078",
+            "row-00000868"
+          ],
+          "exact_ms" : 1.2530088424682617,
+          "indexed_ids" : [
+            "row-00000666",
+            "row-00000294",
+            "row-00000542",
+            "row-00000322",
+            "row-00000728",
+            "row-00000512",
+            "row-00000900",
+            "row-00000750",
+            "row-00000078",
+            "row-00000868"
+          ],
+          "indexed_ms" : 3.8779973983764648,
+          "query_seed" : 1056,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000360",
+            "row-00000012",
+            "row-00000618",
+            "row-00000728",
+            "row-00000672",
+            "row-00000484",
+            "row-00000880",
+            "row-00000434",
+            "row-00000662",
+            "row-00000648"
+          ],
+          "exact_ms" : 1.2099742889404297,
+          "indexed_ids" : [
+            "row-00000360",
+            "row-00000012",
+            "row-00000618",
+            "row-00000728",
+            "row-00000672",
+            "row-00000484",
+            "row-00000880",
+            "row-00000434",
+            "row-00000662",
+            "row-00000648"
+          ],
+          "indexed_ms" : 3.7050247192382812,
+          "query_seed" : 1057,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000768",
+            "row-00000472",
+            "row-00000670",
+            "row-00000690",
+            "row-00000834",
+            "row-00000830",
+            "row-00000818",
+            "row-00000192",
+            "row-00000074",
+            "row-00000678"
+          ],
+          "exact_ms" : 1.1858940124511719,
+          "indexed_ids" : [
+            "row-00000768",
+            "row-00000472",
+            "row-00000670",
+            "row-00000690",
+            "row-00000834",
+            "row-00000830",
+            "row-00000818",
+            "row-00000192",
+            "row-00000074",
+            "row-00000678"
+          ],
+          "indexed_ms" : 3.8830041885375977,
+          "query_seed" : 1058,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000108",
+            "row-00000012",
+            "row-00000842",
+            "row-00000380",
+            "row-00000044",
+            "row-00000182",
+            "row-00000158",
+            "row-00000148",
+            "row-00000266",
+            "row-00000282"
+          ],
+          "exact_ms" : 1.2269020080566406,
+          "indexed_ids" : [
+            "row-00000108",
+            "row-00000012",
+            "row-00000842",
+            "row-00000380",
+            "row-00000044",
+            "row-00000182",
+            "row-00000158",
+            "row-00000148",
+            "row-00000266",
+            "row-00000282"
+          ],
+          "indexed_ms" : 3.7690401077270508,
+          "query_seed" : 1059,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000906",
+            "row-00000094",
+            "row-00000964",
+            "row-00000522",
+            "row-00000036",
+            "row-00000118",
+            "row-00000934",
+            "row-00000124",
+            "row-00000222",
+            "row-00000390"
+          ],
+          "exact_ms" : 1.2170076370239258,
+          "indexed_ids" : [
+            "row-00000906",
+            "row-00000094",
+            "row-00000964",
+            "row-00000522",
+            "row-00000036",
+            "row-00000118",
+            "row-00000934",
+            "row-00000124",
+            "row-00000222",
+            "row-00000390"
+          ],
+          "indexed_ms" : 3.7659406661987305,
+          "query_seed" : 1060,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000658",
+            "row-00000440",
+            "row-00000664",
+            "row-00000090",
+            "row-00000164",
+            "row-00000122",
+            "row-00000040",
+            "row-00000414",
+            "row-00000146",
+            "row-00000512"
+          ],
+          "exact_ms" : 1.2170076370239258,
+          "indexed_ids" : [
+            "row-00000658",
+            "row-00000440",
+            "row-00000664",
+            "row-00000090",
+            "row-00000164",
+            "row-00000122",
+            "row-00000040",
+            "row-00000414",
+            "row-00000146",
+            "row-00000512"
+          ],
+          "indexed_ms" : 3.708958625793457,
+          "query_seed" : 1061,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000968",
+            "row-00000394",
+            "row-00000768",
+            "row-00000122",
+            "row-00000140",
+            "row-00000596",
+            "row-00000104",
+            "row-00000574",
+            "row-00000476",
+            "row-00000128"
+          ],
+          "exact_ms" : 1.1949539184570312,
+          "indexed_ids" : [
+            "row-00000968",
+            "row-00000394",
+            "row-00000768",
+            "row-00000122",
+            "row-00000140",
+            "row-00000596",
+            "row-00000104",
+            "row-00000574",
+            "row-00000476",
+            "row-00000128"
+          ],
+          "indexed_ms" : 3.7250518798828125,
+          "query_seed" : 1062,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000398",
+            "row-00000742",
+            "row-00000686",
+            "row-00000540",
+            "row-00000290",
+            "row-00000652",
+            "row-00000696",
+            "row-00000976",
+            "row-00000300",
+            "row-00000456"
+          ],
+          "exact_ms" : 1.2149810791015625,
+          "indexed_ids" : [
+            "row-00000398",
+            "row-00000742",
+            "row-00000686",
+            "row-00000540",
+            "row-00000290",
+            "row-00000652",
+            "row-00000696",
+            "row-00000976",
+            "row-00000300",
+            "row-00000456"
+          ],
+          "indexed_ms" : 3.686070442199707,
+          "query_seed" : 1063,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000714",
+            "row-00000510",
+            "row-00000418",
+            "row-00000464",
+            "row-00000898",
+            "row-00000488",
+            "row-00000734",
+            "row-00000356",
+            "row-00000740",
+            "row-00000680"
+          ],
+          "exact_ms" : 1.1670589447021484,
+          "indexed_ids" : [
+            "row-00000714",
+            "row-00000510",
+            "row-00000418",
+            "row-00000464",
+            "row-00000898",
+            "row-00000488",
+            "row-00000734",
+            "row-00000356",
+            "row-00000740",
+            "row-00000680"
+          ],
+          "indexed_ms" : 3.7409067153930664,
+          "query_seed" : 1064,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000520",
+            "row-00000730",
+            "row-00000440",
+            "row-00000394",
+            "row-00000782",
+            "row-00000438",
+            "row-00000424",
+            "row-00000362",
+            "row-00000578",
+            "row-00000598"
+          ],
+          "exact_ms" : 1.1980533599853516,
+          "indexed_ids" : [
+            "row-00000520",
+            "row-00000730",
+            "row-00000440",
+            "row-00000394",
+            "row-00000782",
+            "row-00000438",
+            "row-00000424",
+            "row-00000362",
+            "row-00000578",
+            "row-00000598"
+          ],
+          "indexed_ms" : 3.7000179290771484,
+          "query_seed" : 1065,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000376",
+            "row-00000678",
+            "row-00000580",
+            "row-00000886",
+            "row-00000706",
+            "row-00000394",
+            "row-00000084",
+            "row-00000714",
+            "row-00000992",
+            "row-00000346"
+          ],
+          "exact_ms" : 1.1699199676513672,
+          "indexed_ids" : [
+            "row-00000376",
+            "row-00000678",
+            "row-00000580",
+            "row-00000886",
+            "row-00000706",
+            "row-00000394",
+            "row-00000084",
+            "row-00000714",
+            "row-00000992",
+            "row-00000346"
+          ],
+          "indexed_ms" : 3.6690235137939453,
+          "query_seed" : 1066,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000896",
+            "row-00000986",
+            "row-00000682",
+            "row-00000996",
+            "row-00000892",
+            "row-00000026",
+            "row-00000002",
+            "row-00000336",
+            "row-00000186",
+            "row-00000340"
+          ],
+          "exact_ms" : 1.1769533157348633,
+          "indexed_ids" : [
+            "row-00000896",
+            "row-00000986",
+            "row-00000682",
+            "row-00000996",
+            "row-00000892",
+            "row-00000026",
+            "row-00000002",
+            "row-00000336",
+            "row-00000186",
+            "row-00000340"
+          ],
+          "indexed_ms" : 3.6259889602661133,
+          "query_seed" : 1067,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000824",
+            "row-00000476",
+            "row-00000842",
+            "row-00000986",
+            "row-00000740",
+            "row-00000336",
+            "row-00000750",
+            "row-00000282",
+            "row-00000116",
+            "row-00000228"
+          ],
+          "exact_ms" : 1.15203857421875,
+          "indexed_ids" : [
+            "row-00000824",
+            "row-00000476",
+            "row-00000842",
+            "row-00000986",
+            "row-00000740",
+            "row-00000336",
+            "row-00000750",
+            "row-00000282",
+            "row-00000116",
+            "row-00000228"
+          ],
+          "indexed_ms" : 3.8309097290039062,
+          "query_seed" : 1068,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000836",
+            "row-00000994",
+            "row-00000270",
+            "row-00000564",
+            "row-00000074",
+            "row-00000160",
+            "row-00000222",
+            "row-00000050",
+            "row-00000162",
+            "row-00000740"
+          ],
+          "exact_ms" : 1.1750459671020508,
+          "indexed_ids" : [
+            "row-00000836",
+            "row-00000994",
+            "row-00000270",
+            "row-00000564",
+            "row-00000074",
+            "row-00000160",
+            "row-00000222",
+            "row-00000050",
+            "row-00000162",
+            "row-00000740"
+          ],
+          "indexed_ms" : 3.6890506744384766,
+          "query_seed" : 1069,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000528",
+            "row-00000316",
+            "row-00000180",
+            "row-00000706",
+            "row-00000980",
+            "row-00000290",
+            "row-00000658",
+            "row-00000668",
+            "row-00000082",
+            "row-00000504"
+          ],
+          "exact_ms" : 1.1779069900512695,
+          "indexed_ids" : [
+            "row-00000528",
+            "row-00000316",
+            "row-00000180",
+            "row-00000706",
+            "row-00000980",
+            "row-00000290",
+            "row-00000658",
+            "row-00000668",
+            "row-00000082",
+            "row-00000504"
+          ],
+          "indexed_ms" : 3.7389993667602539,
+          "query_seed" : 1070,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000500",
+            "row-00000822",
+            "row-00000146",
+            "row-00000158",
+            "row-00000750",
+            "row-00000826",
+            "row-00000814",
+            "row-00000056",
+            "row-00000730",
+            "row-00000244"
+          ],
+          "exact_ms" : 1.1949539184570312,
+          "indexed_ids" : [
+            "row-00000500",
+            "row-00000822",
+            "row-00000146",
+            "row-00000158",
+            "row-00000750",
+            "row-00000826",
+            "row-00000814",
+            "row-00000056",
+            "row-00000730",
+            "row-00000244"
+          ],
+          "indexed_ms" : 3.6710500717163086,
+          "query_seed" : 1071,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000540",
+            "row-00000650",
+            "row-00000496",
+            "row-00000928",
+            "row-00000712",
+            "row-00000412",
+            "row-00000800",
+            "row-00000398",
+            "row-00000250",
+            "row-00000710"
+          ],
+          "exact_ms" : 1.1669397354125977,
+          "indexed_ids" : [
+            "row-00000540",
+            "row-00000650",
+            "row-00000496",
+            "row-00000928",
+            "row-00000712",
+            "row-00000412",
+            "row-00000800",
+            "row-00000398",
+            "row-00000250",
+            "row-00000710"
+          ],
+          "indexed_ms" : 3.6970376968383789,
+          "query_seed" : 1072,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000746",
+            "row-00000488",
+            "row-00000244",
+            "row-00000152",
+            "row-00000316",
+            "row-00000622",
+            "row-00000246",
+            "row-00000798",
+            "row-00000354",
+            "row-00000434"
+          ],
+          "exact_ms" : 1.195073127746582,
+          "indexed_ids" : [
+            "row-00000746",
+            "row-00000488",
+            "row-00000244",
+            "row-00000152",
+            "row-00000316",
+            "row-00000622",
+            "row-00000246",
+            "row-00000798",
+            "row-00000354",
+            "row-00000434"
+          ],
+          "indexed_ms" : 3.6909580230712891,
+          "query_seed" : 1073,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000306",
+            "row-00000266",
+            "row-00000592",
+            "row-00000022",
+            "row-00000778",
+            "row-00000810",
+            "row-00000930",
+            "row-00000070",
+            "row-00000648",
+            "row-00000462"
+          ],
+          "exact_ms" : 1.1539459228515625,
+          "indexed_ids" : [
+            "row-00000306",
+            "row-00000266",
+            "row-00000592",
+            "row-00000022",
+            "row-00000778",
+            "row-00000810",
+            "row-00000930",
+            "row-00000070",
+            "row-00000648",
+            "row-00000462"
+          ],
+          "indexed_ms" : 3.6879777908325195,
+          "query_seed" : 1074,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000026",
+            "row-00000364",
+            "row-00000642",
+            "row-00000458",
+            "row-00000416",
+            "row-00000088",
+            "row-00000296",
+            "row-00000500",
+            "row-00000792",
+            "row-00000588"
+          ],
+          "exact_ms" : 1.1899471282958984,
+          "indexed_ids" : [
+            "row-00000026",
+            "row-00000364",
+            "row-00000642",
+            "row-00000458",
+            "row-00000416",
+            "row-00000088",
+            "row-00000296",
+            "row-00000500",
+            "row-00000792",
+            "row-00000588"
+          ],
+          "indexed_ms" : 3.6740303039550781,
+          "query_seed" : 1075,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000662",
+            "row-00000478",
+            "row-00000134",
+            "row-00000544",
+            "row-00000810",
+            "row-00000236",
+            "row-00000500",
+            "row-00000668",
+            "row-00000960",
+            "row-00000528"
+          ],
+          "exact_ms" : 1.1610984802246094,
+          "indexed_ids" : [
+            "row-00000662",
+            "row-00000478",
+            "row-00000134",
+            "row-00000544",
+            "row-00000810",
+            "row-00000236",
+            "row-00000500",
+            "row-00000668",
+            "row-00000960",
+            "row-00000528"
+          ],
+          "indexed_ms" : 3.6900043487548828,
+          "query_seed" : 1076,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000172",
+            "row-00000262",
+            "row-00000914",
+            "row-00000806",
+            "row-00000542",
+            "row-00000526",
+            "row-00000148",
+            "row-00000278",
+            "row-00000446",
+            "row-00000146"
+          ],
+          "exact_ms" : 1.1839866638183594,
+          "indexed_ids" : [
+            "row-00000172",
+            "row-00000262",
+            "row-00000914",
+            "row-00000806",
+            "row-00000542",
+            "row-00000526",
+            "row-00000148",
+            "row-00000278",
+            "row-00000446",
+            "row-00000146"
+          ],
+          "indexed_ms" : 3.6549568176269531,
+          "query_seed" : 1077,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000800",
+            "row-00000106",
+            "row-00000280",
+            "row-00000516",
+            "row-00000364",
+            "row-00000666",
+            "row-00000498",
+            "row-00000788",
+            "row-00000688",
+            "row-00000924"
+          ],
+          "exact_ms" : 1.2019872665405273,
+          "indexed_ids" : [
+            "row-00000800",
+            "row-00000106",
+            "row-00000280",
+            "row-00000516",
+            "row-00000364",
+            "row-00000666",
+            "row-00000498",
+            "row-00000788",
+            "row-00000688",
+            "row-00000924"
+          ],
+          "indexed_ms" : 3.8039684295654297,
+          "query_seed" : 1078,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000280",
+            "row-00000226",
+            "row-00000768",
+            "row-00000550",
+            "row-00000816",
+            "row-00000938",
+            "row-00000548",
+            "row-00000106",
+            "row-00000340",
+            "row-00000902"
+          ],
+          "exact_ms" : 1.1380910873413086,
+          "indexed_ids" : [
+            "row-00000280",
+            "row-00000226",
+            "row-00000768",
+            "row-00000550",
+            "row-00000816",
+            "row-00000938",
+            "row-00000548",
+            "row-00000106",
+            "row-00000340",
+            "row-00000902"
+          ],
+          "indexed_ms" : 3.6029815673828125,
+          "query_seed" : 1079,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        },
+        {
+          "exact_ids" : [
+            "row-00000852",
+            "row-00000914",
+            "row-00000604",
+            "row-00000184",
+            "row-00000744",
+            "row-00000574",
+            "row-00000710",
+            "row-00000832",
+            "row-00000936",
+            "row-00000128"
+          ],
+          "exact_ms" : 1.1140108108520508,
+          "indexed_ids" : [
+            "row-00000852",
+            "row-00000914",
+            "row-00000604",
+            "row-00000184",
+            "row-00000744",
+            "row-00000574",
+            "row-00000710",
+            "row-00000832",
+            "row-00000936",
+            "row-00000128"
+          ],
+          "indexed_ms" : 3.704071044921875,
+          "query_seed" : 1080,
+          "recall_at_10" : 1,
+          "strategy" : "ann-exact-rerank",
+          "warnings" : [
+
+          ]
+        }
+      ],
+      "queries" : 64,
+      "recall_at_10" : 1
+    }
+  },
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "process_peak_rss_bytes" : 39403520,
+  "quality_seed_offset" : 17,
+  "random_seed" : "row+xorshift64star-v1",
+  "reused_records" : 0,
+  "schema" : 6,
+  "scope" : "Normalized synthetic random vectors and exact self-match checks, plus optional non-self Recall@10 against exhaustive float32 ground truth. Timings include coverage-count lookup, the selected SQLite search path and live validation\/reranking but exclude embedding inference and index preparation. These are warm trials after ingestion\/preparation; first_query_ms is not a controlled cold-cache test. Not natural-language relevance, isolated GPU execution, power or competitor measurement. Retained archives are explicit benchmark-only directories and can be reused to investigate cold starts separately.",
+  "timestamp" : "2026-10-31T06:57:06Z"
+}

@@ -16,8 +16,17 @@ jobs:
         run: python3 scripts/check-pii-runtime-vendor.py
       - name: Verify pinned native PII preparation catalog
         run: python3 scripts/generate-pii-setup-catalog.py --check
+      - name: Prepare authored native-index diagnostics
+        run: python3 scripts/prepare-owned-index-probe.py "$RUNNER_TEMP/oswind-indexed-retrieval"
       - name: Build and test
-        run: swift test
+        run: OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT="$RUNNER_TEMP/oswind-indexed-retrieval" swift test
+      - name: Retain authored native-index diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-indexed-retrieval
+          path: ${{ runner.temp }}/oswind-indexed-retrieval
+          if-no-files-found: ignore
       - name: Verify tokenizer patch against resolved upstream
         run: python3 scripts/check-tokenizer-vendor.py --upstream .build/checkouts/swift-transformers
       - name: Verify owned encrypted APFS images and app sessions

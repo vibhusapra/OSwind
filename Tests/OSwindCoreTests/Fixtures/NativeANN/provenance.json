@@ -1,0 +1,26 @@
+{
+  "kind": "OSwind authored native graph regression v1",
+  "format": "usearch-2.26.5-f16-cos-m32-passages-v2",
+  "model": "fixture",
+  "dimensions": 32,
+  "rows": 256,
+  "keys": "row-i maps to key i+1, i in 0..<256",
+  "vectors": "VectorScalingEvaluation.vector(row:i,dimensions:32)",
+  "producerBase": "57594d59b5aaba13b7dad9597b25bbad11720b87",
+  "producerNativeSHA256": "e9679e6757087435fb03092b46c5642d37da0614ff49b87a369e4ca419a54dcf",
+  "graphSHA256": "536d92401f698f642d26ac4d238a8bc8382a760315d705d2c7ce9ed66f091289",
+  "missingKeys": [
+    115,
+    119,
+    120,
+    123,
+    124,
+    152,
+    156,
+    226
+  ],
+  "allMembersPresent": true,
+  "everyExhaustiveProbeEnumerated": 248,
+  "originalRow134FailingGraph": false,
+  "scope": "Generated solely from 256 authored vectors; no desktop history or model data. This retained graph reproduces the same omission class, not the unavailable original row-134 graph."
+}

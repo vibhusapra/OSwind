@@ -4,7 +4,8 @@ import USearchC
 /// Owns a mutable native HNSW index. All calls are serialized by its owning cache.
 /// The original float32 vectors stay in SQLite for exact candidate reranking.
 final class NativeANN {
-    static let format = "usearch-2.26.5-f16-cos-m32-passages-v2"
+    // Do not admit caches built by the former concurrent insertion policy.
+    static let format = "usearch-2.26.5-f16-cos-m32-serial-passages-v3"
     private let handle: usearch_index_t
     let dimensions: Int
     init(dimensions: Int, expansion: Int = 8192) throws {
@@ -29,16 +30,12 @@ final class NativeANN {
         var error: usearch_error_t?
         normalized.withUnsafeBufferPointer { usearch_add(handle,key,$0.baseAddress!,usearch_scalar_f32_k,&error) }; try check(error)
     }
-    /// Used only while building an unpublished index, after reserving capacity.
-    /// USearch supports concurrent insertions; each call has its own error slot.
+    /// The protocol's thread count is a hint. Pinned USearch concurrent adds
+    /// can leave present vectors unreachable, even with expansion above corpus
+    /// size. Serialize native insertion; Metal keeps its own batching policy.
     func addBatch(_ records: [IndexedVector], threads: Int = 4) throws {
-        let workers = max(1,min(threads,max(1,ProcessInfo.processInfo.activeProcessorCount/2),records.count)), errorLock = NSLock(); var firstError: Error?
-        var error: usearch_error_t?; usearch_change_threads_add(handle,workers,&error); try check(error)
-        DispatchQueue.concurrentPerform(iterations:workers) { worker in
-            do { for i in stride(from:worker,to:records.count,by:workers) { if let vector = records[i].vector { try self.add(records[i].key,vector:vector) } } }
-            catch { errorLock.lock(); if firstError == nil { firstError = error }; errorLock.unlock() }
-        }
-        if let firstError { throw firstError }
+        var error: usearch_error_t?; usearch_change_threads_add(handle,1,&error); try check(error)
+        for record in records { if let vector = record.vector { try add(record.key,vector:vector) } }
     }
     private final class FilterBox { let include: (UInt64) -> Bool; init(_ include: @escaping (UInt64) -> Bool) { self.include = include } }
     func search(_ vector: [Float], count: Int, include: @escaping (UInt64) -> Bool) throws -> [UInt64] {
