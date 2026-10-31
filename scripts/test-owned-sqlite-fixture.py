@@ -62,6 +62,32 @@ class FixtureFunctions(unittest.TestCase):
         with self.assertRaisesRegex(sqlite3.OperationalError, "no such function"):
             db.execute("SELECT oswind_sync_key_v1(1)")
 
+    def test_schema26_marker_allows_inactive_setup_and_refuses_later_state_changes(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=26")
+        db.execute("CREATE TRIGGER writer BEFORE INSERT ON source BEGIN SELECT oswind_historical_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("SELECT oswind_sync_source_revision_v1(1)")
+        for enabled, suppressed in [(1, 0), (0, 1), (1, 1)]:
+            db.execute("UPDATE personal_sync_capture SET enabled=?,suppressed=?", (enabled, suppressed))
+            with self.assertRaises(sqlite3.OperationalError):
+                db.execute("INSERT INTO source VALUES(2)")
+        self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
+        db.execute("UPDATE personal_sync_capture SET enabled=0,suppressed=0")
+        db.execute("PRAGMA user_version=27")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(3)")
+
+    def test_unknown_future_schema_does_not_gain_fixture_functions(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=27")
+        with self.assertRaises(ValueError):
+            register_inactive_sync_fixture(db)
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("SELECT oswind_sync_row_v1(1)")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -113,17 +113,19 @@ enum TextObservationSchema {
         END
         """
     ]
-    static func install(_ db:RoutineDatabase,sourceVersion:Int32,beforePinRepair:(()throws->Void)?=nil)throws {
+    static func install(_ db:RoutineDatabase,sourceVersion:Int32,missingPins:Bool=false,beforePinRepair:(()throws->Void)?=nil)throws {
         try Task.checkCancellation()
         // Pins have no source body. Existing citations rebuild the cold state;
         // an in-flight consumer pins before leaving its writer transaction.
         try db.execute("""
         CREATE TABLE IF NOT EXISTS text_observation_pins(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE) WITHOUT ROWID;
-        CREATE TRIGGER IF NOT EXISTS text_observation_pin_chat AFTER INSERT ON chat_sources BEGIN
-            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(new.memory_id);
+        DROP TRIGGER IF EXISTS text_observation_pin_chat;
+        DROP TRIGGER IF EXISTS text_observation_pin_recap;
+        CREATE TRIGGER text_observation_pin_chat AFTER INSERT ON chat_sources BEGIN
+            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(COALESCE(new.owner_id,new.memory_id));
         END;
-        CREATE TRIGGER IF NOT EXISTS text_observation_pin_recap AFTER INSERT ON recap_sources BEGIN
-            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(new.source_id);
+        CREATE TRIGGER text_observation_pin_recap AFTER INSERT ON recap_sources BEGIN
+            INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(COALESCE(new.owner_id,new.source_id));
         END;
         CREATE TRIGGER IF NOT EXISTS text_observation_pin_guard BEFORE UPDATE OF payload ON memories
         WHEN EXISTS(SELECT 1 FROM text_observation_pins WHERE memory_id=old.id)
@@ -137,7 +139,9 @@ enum TextObservationSchema {
         """)
         // Capture hooks must exist before a cold repair writes recovered pins.
         try beforePinRepair?()
-        try db.execute("INSERT OR IGNORE INTO text_observation_pins(memory_id) SELECT memory_id FROM chat_sources UNION SELECT source_id FROM recap_sources")
+        let sequence=missingPins ? Int64(try db.eraseCount("SELECT COALESCE(MAX(seq),0) FROM personal_sync_changes")):0
+        try db.execute("INSERT OR IGNORE INTO text_observation_pins(memory_id) SELECT COALESCE(owner_id,memory_id) FROM chat_sources UNION SELECT COALESCE(owner_id,source_id) FROM recap_sources UNION SELECT memory_id FROM historical_evidence_pins")
+        if missingPins {try SyncIdentityCatalog.recoverPinLifetimes(db,after:sequence)}
         let table=try db.statement("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_ranges'")
         let existed=sqlite3_step(table)==SQLITE_ROW;sqlite3_finalize(table)
         try db.execute("CREATE TABLE IF NOT EXISTS text_observation_ranges(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE,last_observed REAL NOT NULL) WITHOUT ROWID; CREATE INDEX IF NOT EXISTS text_observation_end ON text_observation_ranges(last_observed,memory_id)")

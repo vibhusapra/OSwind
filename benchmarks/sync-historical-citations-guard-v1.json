@@ -1,0 +1,63 @@
+{
+  "format": "OSwind historical owner lazy guard repair",
+  "version": 1,
+  "state": "local-repair-validated",
+  "createdAtUTC": "2026-10-31T12:58:28.839692+00:00",
+  "sourceBase": "f962e82077cb9a8e7bb2b7acd76edf3025a72519",
+  "schema": 26,
+  "originalInputManifest": "benchmarks/sync-historical-citations-inputs-v1.json",
+  "inputOverrides": {
+    "Sources/OSwindCore/HistoricalEvidence.swift": "cc46bfb73c9a857565b5f207c123f260c22fdc7d7d899bc1f7f4eb44c2ef2cc4",
+    "Tests/OSwindCoreTests/HistoricalRecapTests.swift": "248fc6de7eeb885617147820d7ffe613a82934dd1253ce535d34c92de7d876c4"
+  },
+  "effectiveRepositoryInputs": 651,
+  "effectiveInputManifestSHA256": "c533755119a2d8a4150dac555ea785e5535637180f92ac3e263110cba0af18f3",
+  "fullDefaultDebug": {
+    "defined": 1577,
+    "passed": 1504,
+    "skipped": 73,
+    "failures": 0
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "959c088901f658c0d63bd1d9260222180c29ae347e7966448c901cec1cf8f533"
+    },
+    {
+      "name": "erasure-process",
+      "returncode": 0,
+      "log": "erasure-process.log",
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d"
+    },
+    {
+      "name": "inactive-fixture",
+      "returncode": 0,
+      "log": "inactive-fixture.log",
+      "logSHA256": "83166b089fbcb82fac63f22522fa6ae99bb5e46368cd35d756277fd463dd6346"
+    }
+  ],
+  "rootCause": {
+    "failedHead": "f962e82077cb9a8e7bb2b7acd76edf3025a72519",
+    "hostedRun": 41199957761,
+    "nativeJob": 124533632575,
+    "step": 48,
+    "localPythonSQLiteVersion": "3.54.1",
+    "historicalRows": 0,
+    "calledRejectingFunction": "oswind_sync_source_revision_v1",
+    "reproducedAgainstActualPriorSigned26CLI": true
+  },
+  "repair": [
+    "Explicit nested CASE prevents the deterministic decoder from being evaluated when no historical source exists or scalar metadata already establishes revision",
+    "Only the exact compiled legacy26 trigger is atomically upgraded; unknown protection still refuses",
+    "Readonly old26 backups admit the exact legacy trigger without rewriting source data",
+    "The native no-history test now registers its rejecting decoder with real deterministic flags; a new backup/reopen regression executes"
+  ],
+  "limits": [
+    "Original PR104 sanitizer/release/package/SDK receipts remain tied to their earlier source commit; not relabeled current",
+    "Current repair runs default full debug and formerly failing Python process; hosted CI pending new head",
+    "Schema27 original-field erasure work is preserved separately and is not included in this repair",
+    "F059 and all78 statuses unchanged; no complete sync, media playback, physical power, notarization or ranking claim"
+  ]
+}

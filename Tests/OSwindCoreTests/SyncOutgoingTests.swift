@@ -46,7 +46,7 @@ final class SyncOutgoingTests:XCTestCase {
     }
     func testOrdinaryOpeningDoesNotInstallOrActivateOutgoingWork()throws {
         XCTAssertEqual(try n("SELECT COUNT(*) FROM sqlite_master WHERE name LIKE 'personal_sync_work%'"),0);XCTAssertEqual(try n("SELECT enabled FROM personal_sync_capture"),0)
-        XCTAssertEqual(MemoryStore.schemaVersion,25)
+        XCTAssertEqual(MemoryStore.schemaVersion,26)
     }
     func testSplitSupersededCaptureCoalescesWithoutStagingBodiesOrRawKeys()throws {
         try install();try seed("private-local-key","authored sensitive first body");try seed("private-local-key","authored replacement body")

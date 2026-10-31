@@ -64,7 +64,12 @@ extension IndexMigrationTests {
         DROP TABLE temporary_keys;
         CREATE INDEX vector_keys_model ON vector_keys(model,key); CREATE INDEX vector_keys_revision ON vector_keys(model,revision);
         INSERT INTO vector_keys(key,memory_id,model) VALUES(900,'source','deleted'); DELETE FROM vector_keys WHERE key=900;
-        ALTER TABLE chat_sources DROP COLUMN passage_start; ALTER TABLE chat_sources DROP COLUMN passage_length;
+        PRAGMA legacy_alter_table=ON;
+        CREATE TABLE legacy_chat_sources(turn_id TEXT NOT NULL REFERENCES chat_turns(id) ON DELETE CASCADE,memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,ordinal INTEGER NOT NULL,score REAL NOT NULL,match TEXT NOT NULL,PRIMARY KEY(turn_id,ordinal));
+        INSERT INTO legacy_chat_sources SELECT turn_id,memory_id,ordinal,score,match FROM chat_sources;
+        DROP TABLE chat_sources;
+        ALTER TABLE legacy_chat_sources RENAME TO chat_sources;
+        PRAGMA legacy_alter_table=OFF;
         UPDATE store_metadata SET value='old-identity' WHERE key='identity'; PRAGMA user_version=5;
         """
         XCTAssertEqual(sqlite3_exec(db,old,nil,nil,nil),SQLITE_OK,String(cString:sqlite3_errmsg(db))); sqlite3_close(db)

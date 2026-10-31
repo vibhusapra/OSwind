@@ -5,12 +5,14 @@ public struct RecapSource:Codable,Equatable,Sendable {
     public var id,revision,match:String
     public var score:Double
     public var passage:PassageRange?
+    public var historicalHandle:String? = nil
     public init(id:String,revision:String,match:String,score:Double,passage:PassageRange?=nil) {self.id=id;self.revision=revision;self.match=match;self.score=score;self.passage=passage}
 }
 public struct RecapSourceCard:Identifiable,Sendable {
     public let id,title,app,revision:String
     public let timestamp:Date
     public let passage:PassageRange?
+    public var historicalHandle:String? = nil
 }
 public struct RecapProvenance:Codable,Equatable,Sendable {
     public var provider:String
@@ -19,6 +21,7 @@ public struct RecapProvenance:Codable,Equatable,Sendable {
     func validated() throws -> Self {
         guard !provider.isEmpty,provider.utf8.count<=128,!provider.utf8.contains(0),(1...60).contains(sources.count),try JSONEncoder().encode(self).count<=65536 else {throw OSwindError.invalid("A linked recap needs 1–60 sources and bounded provider metadata")}
         for source in sources {
+            if let handle=source.historicalHandle {try SyncProtocolLimits.uuid(handle)}
             guard !source.id.isEmpty,source.id.count<200,!source.id.utf8.contains(0),!source.revision.isEmpty,source.revision.utf8.count<=512,source.match.utf8.count<=128,source.score.isFinite,abs(source.score)<=1_000_000 else {throw OSwindError.invalid("Invalid recap source metadata")}
         }
         return self
@@ -27,29 +30,25 @@ public struct RecapProvenance:Codable,Equatable,Sendable {
 enum RecapSchema {
     static let closure="""
     WITH RECURSIVE affected(id) AS (
-        SELECT recap_id FROM recap_sources WHERE source_id=?
-        UNION SELECT r.recap_id FROM recap_sources r JOIN affected a ON r.source_id=a.id
+        SELECT recap_id FROM recap_sources WHERE COALESCE(owner_id,source_id)=?
+        UNION SELECT r.recap_id FROM recap_sources r JOIN affected a ON COALESCE(r.owner_id,r.source_id)=a.id
     ) SELECT id FROM affected WHERE id<>?
     """
     static func descendants(_ root:String) -> String {"""
     WITH RECURSIVE affected(id) AS (
-        SELECT recap_id FROM recap_sources WHERE source_id=\(root)
-        UNION SELECT r.recap_id FROM recap_sources r JOIN affected a ON r.source_id=a.id
+        SELECT recap_id FROM recap_sources WHERE COALESCE(owner_id,source_id)=\(root)
+        UNION SELECT r.recap_id FROM recap_sources r JOIN affected a ON COALESCE(r.owner_id,r.source_id)=a.id
     ) SELECT id FROM affected WHERE id<>\(root)
     """}
     static let sql="""
-    CREATE TABLE IF NOT EXISTS recap_sources(
-        recap_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
-        source_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
-        ordinal INTEGER NOT NULL CHECK(ordinal>=0 AND ordinal<60),revision TEXT NOT NULL,
-        score REAL NOT NULL,match TEXT NOT NULL,passage_start INTEGER,passage_length INTEGER,
-        PRIMARY KEY(recap_id,ordinal),CHECK(recap_id<>source_id)
-    );
+    \(CitationSchema.recap().replacingOccurrences(of:"CREATE TABLE ",with:"CREATE TABLE IF NOT EXISTS "));
     CREATE INDEX IF NOT EXISTS recap_source ON recap_sources(source_id,recap_id);
-    CREATE TRIGGER IF NOT EXISTS recap_source_erasure BEFORE DELETE ON memories BEGIN
+    DROP TRIGGER IF EXISTS recap_source_erasure;
+    DROP TRIGGER IF EXISTS recap_source_revision;
+    CREATE TRIGGER recap_source_erasure BEFORE DELETE ON memories BEGIN
         DELETE FROM memories WHERE id IN (\(descendants("old.id")));
     END;
-    CREATE TRIGGER IF NOT EXISTS recap_source_revision BEFORE UPDATE OF title,app,text,url,timestamp,kind ON memories
+    CREATE TRIGGER recap_source_revision BEFORE UPDATE OF title,app,text,url,timestamp,kind ON memories
     WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind
     BEGIN DELETE FROM memories WHERE id IN (\(descendants("old.id"))); END;
     CREATE TRIGGER IF NOT EXISTS recap_cache_erasure AFTER DELETE ON memories
@@ -77,28 +76,52 @@ extension MemoryStore {
         return try saveRecap(turn.answer,title:title,policy:policy,embedder:embedder)
     }
     public func recapSourceCards(_ id:String) throws -> [RecapSourceCard] {
-        try withRoutineDatabase {db in
-            try db.execute("SAVEPOINT recap_cards");defer {try? db.execute("RELEASE recap_cards")}
-            guard try get(id)?.recap != nil else {throw OSwindError.invalid("Linked recap not found")}
-            let row=try db.statement("SELECT m.id,substr(m.title,1,500),m.app,m.timestamp,s.revision,s.passage_start,s.passage_length FROM recap_sources s JOIN memories m ON m.id=s.source_id WHERE s.recap_id=? ORDER BY s.ordinal");defer {sqlite3_finalize(row)};db.bind(row,1,id)
-            var result=[RecapSourceCard](),status=sqlite3_step(row)
-            while status==SQLITE_ROW {
-                guard result.count<60 else {throw OSwindError.invalid("Recap source count exceeds its bound")}
-                result.append(.init(id:db.text(row,0),title:db.text(row,1),app:db.text(row,2),revision:db.text(row,4),timestamp:Date(timeIntervalSince1970:sqlite3_column_double(row,3)),passage:sqlite3_column_type(row,5)==SQLITE_NULL ? nil:PassageRange(start:Int(sqlite3_column_int64(row,5)),length:Int(sqlite3_column_int64(row,6)))))
-                status=sqlite3_step(row)
-            }
-            guard status==SQLITE_DONE else {throw db.error()};return result
+        guard let memory=try get(id) else {throw OSwindError.invalid("Linked recap not found")}
+        return try recapSourceCards(memory)
+    }
+    /// Historical recaps carry ordered explicit parent handles. Neither this
+    /// path nor card navigation may resolve those links through current IDs.
+    public func recapSourceCards(_ memory:Memory) throws -> [RecapSourceCard] {
+        try recapEvidence(memory).map {hit in
+            .init(id:hit.id,title:String(hit.memory.title.prefix(500)),app:hit.memory.app,revision:hit.memory.evidenceHash,timestamp:hit.memory.timestamp,passage:hit.passage,historicalHandle:hit.memory.originalEvidence?.handle)
         }
     }
     public func recapEvidence(_ id:String) throws -> [SearchHit] {
-        try withRoutineDatabase {db in
+        guard let memory=try get(id) else {throw OSwindError.invalid("Linked recap not found")}
+        return try recapEvidence(memory)
+    }
+    public func recapEvidence(_ memory:Memory) throws -> [SearchHit] {
+        let activity=try mediaWriteLease();defer {activity.release()}
+        return try withRoutineDatabase {db in
             try db.execute("SAVEPOINT recap_evidence");defer {try? db.execute("RELEASE recap_evidence")}
-            guard let memory=try get(id),let recap=memory.recap else {throw OSwindError.invalid("Linked recap not found")}
+            let current=try hydrate(memory)
+            guard let recap=current.recap,current.recap==memory.recap else {throw OSwindError.invalid("Linked recap changed or was removed")}
+            _=try recap.validated()
             return try recap.sources.map {source in
-                guard let current=try get(source.id),current.evidenceHash==source.revision else {throw OSwindError.unavailable("Recap evidence changed or was removed")}
-                return SearchHit(memory:current,score:source.score,match:source.match,passage:source.passage)
+                let parent=try recapParent(source,db:db)
+                return SearchHit(memory:parent,score:source.score,match:source.match,passage:source.passage)
             }
         }
+    }
+    public func recapSourceMemory(_ card:RecapSourceCard) throws -> Memory {
+        let current:Memory
+        if let handle=card.historicalHandle {current=try historicalMemory(handle)}
+        else {guard let value=try get(card.id) else {throw OSwindError.unavailable("This original was removed")};current=value}
+        guard current.id==card.id,current.evidenceHash==card.revision else {throw OSwindError.unavailable("This original changed or was removed. Open the current history instead.")}
+        if let passage=card.passage,passage.text(in:current.text)==nil {throw OSwindError.invalid("The saved source anchor is no longer available")}
+        return current
+    }
+    private func recapParent(_ source:RecapSource,db:RoutineDatabase) throws -> Memory {
+        let current:Memory
+        if let handle=source.historicalHandle {
+            let native=source.id=="original-"+handle
+            current=try historicalEvidence(db,handle,sourceID:native ? nil:source.id).memory
+        } else {
+            guard let value=try get(source.id) else {throw OSwindError.unavailable("Recap evidence was removed")};current=value
+        }
+        guard current.evidenceHash==source.revision else {throw OSwindError.unavailable("Recap evidence changed or was removed")}
+        if let passage=source.passage,passage.text(in:current.text)==nil {throw OSwindError.invalid("Recap passage is outside its source")}
+        return current
     }
     func validateRecapInsertion(_ memory:Memory,deferred:Bool) throws {
         try withRoutineDatabase {db in
@@ -116,9 +139,9 @@ extension MemoryStore {
     private func validateRecapParents(_ id:String,recap:RecapProvenance,db:RoutineDatabase) throws {
         for source in recap.sources {
             try Task.checkCancellation()
-            guard source.id != id,let current=try get(source.id),current.evidenceHash==source.revision else {throw OSwindError.unavailable("Recap evidence changed or was removed. Ask again before saving.")}
-            if let passage=source.passage {guard passage.text(in:current.text) != nil else {throw OSwindError.invalid("Recap passage is outside its source")}}
-            let cycle=try db.statement("WITH RECURSIVE parents(id) AS (SELECT ? UNION SELECT r.source_id FROM recap_sources r JOIN parents p ON r.recap_id=p.id) SELECT 1 FROM parents WHERE id=? LIMIT 1");defer {sqlite3_finalize(cycle)};db.bind(cycle,1,source.id);db.bind(cycle,2,id)
+            guard source.id != id else {throw OSwindError.invalid("Recap source links must not form a cycle")}
+            _=try recapParent(source,db:db)
+            let cycle=try db.statement("WITH RECURSIVE parents(id) AS (SELECT ? UNION SELECT COALESCE(r.owner_id,r.source_id) FROM recap_sources r JOIN parents p ON r.recap_id=p.id) SELECT 1 FROM parents WHERE id=? LIMIT 1");defer {sqlite3_finalize(cycle)};db.bind(cycle,1,source.id);db.bind(cycle,2,id)
             let status=sqlite3_step(cycle);guard status==SQLITE_DONE else {if status==SQLITE_ROW {throw OSwindError.invalid("Recap source links must not form a cycle")};throw db.error()}
         }
     }
@@ -127,9 +150,9 @@ extension MemoryStore {
         try withRoutineDatabase {db in
             try validateRecapParents(memory.id,recap:recap,db:db)
             let remove=try db.statement("DELETE FROM recap_sources WHERE recap_id=?");defer {sqlite3_finalize(remove)};db.bind(remove,1,memory.id);try db.done(remove)
-            let row=try db.statement("INSERT INTO recap_sources(recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length) VALUES(?,?,?,?,?,?,?,?)");defer {sqlite3_finalize(row)}
+            let row=try db.statement("INSERT INTO recap_sources(recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length,owner_id,historical_handle) VALUES(?,?,?,?,?,?,?,?,?,?)");defer {sqlite3_finalize(row)}
             for (i,source) in recap.sources.enumerated() {
-                sqlite3_reset(row);sqlite3_clear_bindings(row);db.bind(row,1,memory.id);db.bind(row,2,source.id);sqlite3_bind_int(row,3,Int32(i));db.bind(row,4,source.revision);sqlite3_bind_double(row,5,source.score);db.bind(row,6,source.match)
+                sqlite3_reset(row);sqlite3_clear_bindings(row);db.bind(row,1,memory.id);if let handle=source.historicalHandle {db.bind(row,9,source.id);db.bind(row,10,handle)} else {db.bind(row,2,source.id)};sqlite3_bind_int(row,3,Int32(i));db.bind(row,4,source.revision);sqlite3_bind_double(row,5,source.score);db.bind(row,6,source.match)
                 if let range=source.passage {sqlite3_bind_int64(row,7,Int64(range.start));sqlite3_bind_int64(row,8,Int64(range.length))}
                 try db.done(row)
             }

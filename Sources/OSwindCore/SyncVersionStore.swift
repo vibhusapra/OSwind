@@ -53,7 +53,7 @@ struct SyncVersionStore {
         "sync_sessions_local":"CREATE INDEX sync_sessions_local ON personal_sync_version_sessions(local_key)",
         "sync_runs_local":"CREATE INDEX sync_runs_local ON personal_sync_version_runs(local_key)"
     ]
-    private static let triggers:[String:String] = {
+    private static func makeTriggers(overrides:[SyncCanonicalTable:SyncCaptureTable]=[:])->[String:String] {
         var result=[String:String]()
         result["sync_versions_budget"]="CREATE TRIGGER sync_versions_budget BEFORE INSERT ON personal_sync_versions BEGIN SELECT CASE WHEN (SELECT used_bytes+new.bytes+128>budget FROM personal_sync_version_state WHERE singleton=1) THEN RAISE(ABORT,'Sync version cache is full') END; END"
         result["sync_versions_added"]="CREATE TRIGGER sync_versions_added AFTER INSERT ON personal_sync_versions BEGIN UPDATE personal_sync_version_state SET used_bytes=used_bytes+new.bytes+128 WHERE singleton=1; END"
@@ -67,7 +67,7 @@ struct SyncVersionStore {
             result["sync_\(table)_immutable"]="CREATE TRIGGER sync_\(table)_immutable BEFORE UPDATE ON \(name) BEGIN SELECT RAISE(ABORT,'Sync version metadata is immutable'); END"
         }
         for table in SyncCanonicalTable.allCases {
-            let schema=table.schema,key=schema.snapshot("old",true),whereOld="table_name='\(table.rawValue)' AND local_key=\(key)"
+            let schema=overrides[table] ?? table.schema,key=schema.snapshot("old",true),whereOld="table_name='\(table.rawValue)' AND local_key=\(key)"
             let revoke="INSERT OR IGNORE INTO personal_sync_version_revoked SELECT object_digest FROM personal_sync_identities WHERE \(whereOld);"
             let purge="DELETE FROM personal_sync_versions WHERE \(whereOld);"
             let bindings=table == .source ? "DELETE FROM personal_sync_version_sessions WHERE local_key=\(key);":(table == .routineRun ? "DELETE FROM personal_sync_version_runs WHERE local_key=\(key);":(table == .routine ? "DELETE FROM personal_sync_version_recipes WHERE object_digest IN (SELECT object_digest FROM personal_sync_identities WHERE \(whereOld));":""))
@@ -83,8 +83,27 @@ struct SyncVersionStore {
             result["sync_versions_\(table.rawValue)_change"]="CREATE TRIGGER sync_versions_\(table.rawValue)_change BEFORE UPDATE OF \(schema.columns.joined(separator:",")) ON \(table.rawValue) WHEN \(sensitive) BEGIN \(purge) END"
         }
         return result
-    }()
+    }
+    private static let triggers=makeTriggers()
     private static let expectedSchemas=schemas.merging(indexes,uniquingKeysWith:{$1}).merging(triggers,uniquingKeysWith:{$1})
+    static func validateLegacyCitationTriggers(_ db:RoutineDatabase,table:SyncCanonicalTable)throws {
+        let check=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let present=sqlite3_step(check)==SQLITE_ROW;sqlite3_finalize(check);guard present else {return}
+        let legacy=makeTriggers(overrides:[table:CitationSchema.legacy(table)])
+        for suffix in ["delete","move","change"] {let name="sync_versions_"+table.rawValue+"_"+suffix,row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==legacy[name] else {throw OSwindError.database("Legacy citation version protection differs")}}
+    }
+    static func repairCitationUpgradeTriggers(_ db:RoutineDatabase)throws {
+        let check=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let present=sqlite3_step(check)==SQLITE_ROW;sqlite3_finalize(check);guard present else {return}
+        for table in [SyncCanonicalTable.conversationCitation,.recapCitation] {for suffix in ["delete","move","change"] {let name="sync_versions_"+table.rawValue+"_"+suffix;try db.execute(triggers[name]!)}}
+    }
+    static func repairMissingPinTriggers(_ db:RoutineDatabase)throws {
+        let row=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let exists=sqlite3_step(row)==SQLITE_ROW;sqlite3_finalize(row);guard exists else {return}
+        let allowed=Set(["delete","move","change"].map {"sync_versions_text_observation_pins_"+$0})
+        for (name,sql) in expectedSchemas where !allowed.contains(name) {
+            let check=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(check)};db.bind(check,1,name)
+            guard sqlite3_step(check)==SQLITE_ROW,db.text(check,0)==sql else {throw OSwindError.database("Preserve sync state; unrelated version protection differs during pin repair")}
+        }
+        for name in allowed {try db.execute(triggers[name]!)}
+    }
     static func register(on db:RoutineDatabase)throws {
         guard sqlite3_create_function_v2(db.handle,"oswind_sync_source_revision_v1",1,SQLITE_UTF8|SQLITE_DETERMINISTIC|SQLITE_INNOCUOUS,nil,{context,_,values in
             guard let context,let value=values?[0],sqlite3_value_type(value)==SQLITE_BLOB,sqlite3_value_bytes(value)>0,Int(sqlite3_value_bytes(value))<=MemoryStore.maximumRecordBytes,let bytes=sqlite3_value_blob(value) else {sqlite3_result_error(context,"Invalid sync source payload",-1);return}

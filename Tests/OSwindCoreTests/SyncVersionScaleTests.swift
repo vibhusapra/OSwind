@@ -68,7 +68,7 @@ final class SyncVersionScaleTests:XCTestCase {
             }
             for name in ["versions","projections","outbox"] {XCTAssertEqual(metadata[name],Int64(count))}
             try store.close()
-            let report:[String:Any]=["count":count,"sourceOriginalSHA256":original,"loadSeconds":loadSeconds,"setupSeconds":setupSeconds,"prepareSeconds":prepareSeconds,"batchLimit":128,"batches":batches,"metadata":metadata,"scope":"One warm authored text-source run; timer includes bounded identity bootstrap, actual canonical row read, typed export, journal and version/projection transactions. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence."]
+            let report:[String:Any]=["librarySchema":Int(MemoryStore.schemaVersion),"count":count,"sourceOriginalSHA256":original,"loadSeconds":loadSeconds,"setupSeconds":setupSeconds,"prepareSeconds":prepareSeconds,"batchLimit":128,"batches":batches,"metadata":metadata,"scope":"One warm authored text-source run; timer includes bounded identity bootstrap, actual canonical row read, typed export, journal and version/projection transactions. Raw SQL population, setup, source checks, models, media and transport excluded. Not sustained capture, physical power or competitor evidence."]
             try JSONSerialization.data(withJSONObject:report,options:[.sortedKeys,.prettyPrinted]).write(to:base.appendingPathComponent("report.json"),options:.withoutOverwriting);results.append(report)
             print("VERSION_PREPARE count=\(count) seconds=\(prepareSeconds)")
         }

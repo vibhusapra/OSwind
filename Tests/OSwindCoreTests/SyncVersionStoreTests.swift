@@ -46,7 +46,7 @@ final class SyncVersionStoreTests:XCTestCase {
     func drain()throws {_=try catalog.process {_ in}}
     func testOrdinaryLibraryDoesNotInstallOrEnableVersionStore()throws {
         try store.withRoutineDatabase {db in let row=try db.statement("SELECT COUNT(*) FROM sqlite_master WHERE name LIKE 'personal_sync_version%'");defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),0)}
-        XCTAssertEqual(MemoryStore.schemaVersion,25)
+        XCTAssertEqual(MemoryStore.schemaVersion,26)
     }
     func testDurableExactSourceBindingSurvivesReopenWithoutChangingOriginalFrames()throws {
         try seed();try install();let before=try rows(.source).map {try $0.encoded()},record=try source(),ref=try prepare(record),memory=try XCTUnwrap(store.get("owned-source"))

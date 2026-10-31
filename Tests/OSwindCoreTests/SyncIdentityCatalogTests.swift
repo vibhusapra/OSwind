@@ -146,8 +146,8 @@ final class SyncIdentityCatalogTests:XCTestCase {
         try store.withRoutineDatabase {db in try db.transaction {try db.execute("""
         INSERT INTO chat_sessions VALUES('session','authored title',1,1);
         INSERT INTO chat_turns VALUES('turn','session',1,x'7b7d');
-        INSERT INTO chat_sources VALUES('turn','source',0,1,'fixture',NULL,NULL),('turn','summary',2,1,'fixture',NULL,NULL),('turn','source',10,1,'fixture',NULL,NULL);
-        INSERT INTO recap_sources VALUES('summary','source',0,'fixture-revision',1,'fixture',NULL,NULL);
+        INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match,passage_start,passage_length) VALUES('turn','source',0,1,'fixture',NULL,NULL),('turn','summary',2,1,'fixture',NULL,NULL),('turn','source',10,1,'fixture',NULL,NULL);
+        INSERT INTO recap_sources(recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length) VALUES('summary','source',0,'fixture-revision',1,'fixture',NULL,NULL);
         INSERT INTO routines VALUES('routine',1,0,1,x'7b7d');
         INSERT INTO routine_runs VALUES('run','routine',1,1,1,2,'manual','completed','session',NULL,x'7b7d');
         INSERT INTO memory_entities VALUES('entity','project','Authored entity','',1,1);

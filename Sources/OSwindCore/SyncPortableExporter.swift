@@ -9,6 +9,8 @@ struct SyncPortableReferences {
     let media:(Memory)throws->[SyncMediaManifest]
     let recipe:(String,Int64)throws->SyncRoutineRevision
     let session:(Memory)throws->SyncSessionToken?
+    var historical:((String,String)throws->SyncVersionReference)? = nil
+    var pin:((String)throws->SyncVersionReference?)? = nil
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
 }
 /// Converts the actual captured canonical row schema, not raw SQL supplied by a
@@ -48,15 +50,23 @@ struct SyncPortableExporter {
         }
         func citation(recap:Bool)throws->SyncCitationBody {
             let ordinal=try integer("ordinal");guard let position=Int(exactly:ordinal) else {throw OSwindError.invalid("Portable sync ordinal overflow")}
-            let id=try text(recap ? "source_id":"memory_id"),revision:SyncLocalSourceRevision=recap ? .evidence(try text("revision")):.current
-            return try .init(owner:object(recap ? "recap_id":"turn_id",recap ? .source:.turn),ordinal:position,link:.init(source:references.source(id,revision),score:number("score"),match:text("match"),passage:passage()))
+            let reference:SyncVersionReference
+            if try cell("historical_handle") == .null {
+                guard try cell("owner_id") == .null else {throw OSwindError.invalid("Ordinary citation owner metadata differs")}
+                let id=try text(recap ? "source_id":"memory_id"),revision:SyncLocalSourceRevision=recap ? .evidence(try text("revision")):.current
+                reference=try references.source(id,revision)
+            }else {
+                guard try cell(recap ? "source_id":"memory_id") == .null,let resolve=references.historical else {throw OSwindError.unavailable("Historical citation resolver is required")}
+                reference=try resolve(text("historical_handle"),text("owner_id"))
+            }
+            return try .init(owner:object(recap ? "recap_id":"turn_id",recap ? .source:.turn),ordinal:position,link:.init(source:reference,score:number("score"),match:text("match"),passage:passage()))
         }
         let body:SyncPortableBody
         switch table {
         case .source:
             let memory=try decode("payload",Memory.self)
             guard Data(memory.id.utf8)==Data(try text("id").utf8),memory.timestamp.timeIntervalSince1970.bitPattern == (try number("timestamp")).bitPattern,memory.kind.rawValue == (try text("kind")),Data(memory.app.utf8)==Data(try text("app").utf8),Data(memory.title.utf8)==Data(try text("title").utf8),memory.url.map({Data($0.utf8)}) == (try optionalText("url")).map({Data($0.utf8)}),Data(memory.text.utf8)==Data(try text("text").utf8),memory.favorite == (try boolean("favorite")) else {throw OSwindError.invalid("Portable sync source columns differ from payload")}
-            body = .source(try .init(memory:memory,origin:identity.origin,media:references.media(memory),sessionBinding:references.session(memory)) {id,revision in try references.source(id,.evidence(revision))})
+            body = .source(try .init(memory:memory,origin:identity.origin,media:references.media(memory),sessionBinding:references.session(memory),historical:{source in guard let handle=source.historicalHandle,let resolve=references.historical else {throw OSwindError.unavailable("Historical recap version resolver is required")};return try resolve(handle,source.id)}) {id,revision in try references.source(id,.evidence(revision))})
         case .conversation:body = try .conversation(.init(title:text("title"),created:date("created"),updated:date("updated")))
         case .turn:
             let value=try decode("payload",ChatPayload.self)
@@ -88,7 +98,7 @@ struct SyncPortableExporter {
             guard let kind=EntityKind(rawValue:try text("kind")) else {throw OSwindError.invalid("Portable sync rejection kind differs")}
             body = try .entityRejection(.init(source:references.source(text("memory_id"),.current),kind:kind,key:text("key")))
         case .projectRejection:body = try .projectRejection(.init(source:references.source(text("memory_id"),.current),entity:object("entity_id",.entity)))
-        case .evidencePin:body = try .evidencePin(.init(source:references.source(text("memory_id"),.current)))
+        case .evidencePin:body = try .evidencePin(.init(source:references.pin?(text("memory_id")) ?? references.source(text("memory_id"),.current)))
         }
         return try .init(identity:identity,body:body)
     }

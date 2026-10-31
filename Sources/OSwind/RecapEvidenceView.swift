@@ -13,16 +13,16 @@ import OSwindCore
             var loaded=false
             while !Task.isCancelled {
                 do {
-                    let valid=try await Task.detached(priority:.utility) {let current=try store.get(memory.id);return current?.evidenceHash==memory.evidenceHash && current?.recap==memory.recap}.value
+                    let valid=try await Task.detached(priority:.utility) {let current=try store.hydrate(memory);return current.evidenceHash==memory.evidenceHash && current.recap==memory.recap}.value
                     guard !Task.isCancelled else {return}
                     guard valid else {self?.sources=[];self?.error="This recap changed or its original evidence was removed.";onInvalidated();return}
                     if !loaded {
-                        let evidence=try await Task.detached(priority:.utility) {try store.recapSourceCards(memory.id)}.value
+                        let evidence=try await Task.detached(priority:.utility) {try store.recapSourceCards(memory)}.value
                         guard !Task.isCancelled else {return};self?.sources=evidence;loaded=true
                     }
                     try await Task.sleep(nanoseconds:interval)
                 } catch is CancellationError {return}
-                catch {guard !Task.isCancelled else {return};self?.sources=[];self?.error=error.localizedDescription;return}
+                catch {guard !Task.isCancelled else {return};self?.sources=[];self?.error=error.localizedDescription;onInvalidated();return}
             }
         }
     }

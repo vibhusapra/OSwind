@@ -42,7 +42,7 @@ final class SearchScopeTests: XCTestCase {
         var previous = try nonce(); XCTAssertEqual(previous.count,32)
         try store.insert(Memory(id:"source",kind:.note,app:"A",text:"Scope fixture"))
         var current = try nonce(); XCTAssertNotEqual(previous,current); previous = current
-        for change in ["app='B'","kind='audio'","timestamp=1792700000","favorite=1","payload=json_set(CAST(payload AS TEXT),'$.tags',json('[\"changed\"]'))"] {
+        for change in ["app='B'","kind='audio'","timestamp=1792700000","favorite=1","payload=CAST(json_set(CAST(payload AS TEXT),'$.tags',json('[\"changed\"]')) AS BLOB)"] {
             try execute("UPDATE memories SET \(change) WHERE id='source'")
             current = try nonce(); XCTAssertNotEqual(previous,current); previous = current
         }

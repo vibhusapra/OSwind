@@ -87,7 +87,7 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
 
     /// Preparation must supply every retained asset; never silently drop media.
     /// resolve receives the recorded evidence revision, not just a local ID.
-    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,resolve:(String,String)throws->SyncVersionReference)throws {
+    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,resolve:(String,String)throws->SyncVersionReference)throws {
         guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Use a canonical complete source before sync preparation")}
         let roles:Set<SyncMediaRole>=Set([(memory.imagePath == nil ? nil:SyncMediaRole.image),(memory.audioPath == nil ? nil:SyncMediaRole.audio),(memory.videoPath == nil ? nil:SyncMediaRole.video)].compactMap {$0})
         guard roles==Set(media.map(\.role)),media.count==roles.count else {throw OSwindError.invalid("Prepare every source media asset exactly once")}
@@ -108,7 +108,10 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
         recap=try memory.recap.map {value in
             _=try value.validated()
             return SyncRecapBody(provider:value.provider,sources:try value.sources.map {source in
-                .init(source:try resolve(source.id,source.revision),score:source.score,match:source.match,passage:source.passage)
+                let reference:SyncVersionReference
+                if source.historicalHandle != nil {guard let historical else {throw OSwindError.unavailable("Historical recap version resolver is required")};reference=try historical(source)}
+                else {reference=try resolve(source.id,source.revision)}
+                return .init(source:reference,score:source.score,match:source.match,passage:source.passage)
             })
         }
         try validate()

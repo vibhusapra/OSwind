@@ -137,6 +137,10 @@ struct SyncIdentityCatalog {
         return SyncLocalObject(identity:identity,primary:primary,deleted:deleted)
     }
     func object(_ identity:SyncObjectIdentity)throws->SyncLocalObject? {_=try state();let value=try readObject(identity.key.digest);guard value==nil || value!.identity==identity else {throw OSwindError.database("Sync object identity differs")};return value}
+    func localIdentity(_ table:SyncCanonicalTable,primary:[SyncRowCell])throws->SyncObjectIdentity {
+        _=try state();let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
+        guard let value=try current(table,key),!value.deleted,value.primary==primary else {throw OSwindError.unavailable("The local sync lifetime is unavailable")};return value.identity
+    }
     private func current(_ table:SyncCanonicalTable,_ key:Data)throws->SyncLocalObject? {
         let s=try database.statement("SELECT c.object_digest,i.local_key FROM personal_sync_identity_current c LEFT JOIN personal_sync_identities i ON i.object_digest=c.object_digest WHERE c.table_name=? AND c.local_key=?");defer {sqlite3_finalize(s)};database.bind(s,1,table.rawValue);bind(s,2,key)
         let code=sqlite3_step(s);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW,let value=try readObject(database.text(s,0)),value.identity.table==table,try data(s,1,maximum:32)==key else {throw OSwindError.database("Sync current identity differs")};return value
@@ -292,6 +296,35 @@ struct SyncIdentityCatalog {
             try database.execute("UPDATE personal_sync_identity_state SET processing=0 WHERE singleton=1")
             return .init(objects:values.count,complete:complete)
         }
+    }
+    /// A missing derived pin table can be rebuilt without deleting its global
+    /// lifetimes. Interpret only the just-created repair inserts against the
+    /// prior raw intent prefix, then the already-validated catalog. No pending
+    /// body is acknowledged or dropped; budget accounting runs on the rewrite.
+    static func recoverPinLifetimes(_ db:RoutineDatabase,after:Int64)throws {
+        let active=try db.statement("SELECT enabled,suppressed FROM personal_sync_capture WHERE singleton=1");defer {sqlite3_finalize(active)};guard sqlite3_step(active)==SQLITE_ROW else {throw db.error()};if sqlite3_column_int(active,0)==0 {return};guard sqlite3_column_int(active,1)==0 else {throw OSwindError.invalid("Pin repair cannot run with suppressed capture")}
+        let present=try db.statement("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_identity_state','personal_sync_identities','personal_sync_identity_current','personal_sync_identity_bootstrap')");defer {sqlite3_finalize(present)};var names=Set<String>(),code=sqlite3_step(present)
+        while code==SQLITE_ROW {names.insert(db.text(present,0));code=sqlite3_step(present)};guard code==SQLITE_DONE,names.isEmpty || names==Set(schemas.keys) else {throw OSwindError.database("Pin repair identity metadata is incomplete")}
+        let catalog=names.isEmpty ? nil:Self(database:db,scope:try SyncChangeCapture.scope(db))
+        if let catalog {guard try !catalog.state().1 else {throw OSwindError.invalid("Pin repair cannot change an in-progress identity transaction")}}
+        let rows=try db.statement("SELECT seq,after_key,after_row FROM personal_sync_changes WHERE seq>? AND table_name='text_observation_pins' AND before_key IS NULL AND after_key IS NOT NULL AND after_row IS NOT NULL ORDER BY seq");defer {sqlite3_finalize(rows)};sqlite3_bind_int64(rows,1,after);code=sqlite3_step(rows)
+        while code==SQLITE_ROW {
+            let sequence=sqlite3_column_int64(rows,0)
+            guard let key=try catalogData(rows,1,maximum:32),key.count==32,let body=try catalogData(rows,2,maximum:SyncRowSnapshot.maximumBytes) else {throw OSwindError.database("Invalid recovered pin intent")}
+            let frame=try SyncRowSnapshot.decode(body);guard frame.cells.count==1,case .text=frame.cells[0],Data(SHA256.hash(data:try keyFrame(.evidencePin,frame.cells)))==key else {throw OSwindError.database("Recovered pin key differs")}
+            let prior=try db.statement("SELECT after_key FROM personal_sync_changes WHERE table_name='text_observation_pins' AND seq<? AND (before_key=? OR after_key=?) ORDER BY seq DESC LIMIT 1");defer {sqlite3_finalize(prior)};sqlite3_bind_int64(prior,1,sequence);key.withUnsafeBytes {p in _=sqlite3_bind_blob(prior,2,p.baseAddress,Int32(key.count),db.transient);_=sqlite3_bind_blob(prior,3,p.baseAddress,Int32(key.count),db.transient)}
+            let status=sqlite3_step(prior),live:Bool
+            if status==SQLITE_ROW {live=try catalogData(prior,0,maximum:32)==key}
+            else {guard status==SQLITE_DONE else {throw db.error()};live=try catalog?.current(.evidencePin,key)?.deleted==false}
+            if live {
+                let update=try db.statement("UPDATE personal_sync_changes SET before_key=after_key,after_row=after_row WHERE seq=? AND before_key IS NULL");defer {sqlite3_finalize(update)};sqlite3_bind_int64(update,1,sequence);try db.done(update)
+            }
+            code=sqlite3_step(rows)
+        };guard code==SQLITE_DONE else {throw db.error()}
+    }
+    private static func catalogData(_ row:OpaquePointer,_ column:Int32,maximum:Int)throws->Data? {
+        if sqlite3_column_type(row,column)==SQLITE_NULL {return nil}
+        let n=Int(sqlite3_column_bytes(row,column));guard sqlite3_column_type(row,column)==SQLITE_BLOB,n>0,n<=maximum,let bytes=sqlite3_column_blob(row,column) else {throw OSwindError.database("Invalid recovered pin bytes")};return Data(bytes:bytes,count:n)
     }
     /// Authenticated journal admission calls this with a complete typed adapter.
     /// Mapping, source mutation and echo suppression commit or roll back together.

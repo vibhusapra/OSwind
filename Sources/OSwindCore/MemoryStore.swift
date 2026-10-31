@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version25 fences writers that cannot maintain canonical sync intents.
-    public static let schemaVersion = 25
+    // Version26 fences readers that would substitute current text for historical citations.
+    public static let schemaVersion = 26
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -18,10 +18,12 @@ public final class MemoryStore: @unchecked Sendable {
     private var connection: OpaquePointer?
     private var db: OpaquePointer? {
         get { connectionLock.lock();defer {connectionLock.unlock()};return connection }
-        set { connectionLock.lock();connection=newValue;connectionLock.unlock() }
+        set { connectionLock.lock();connection=newValue;if newValue==nil {historicalEvidenceCatalog=nil};connectionLock.unlock() }
     }
     private let lock = NSRecursiveLock()
     private var syncCaptureInstalled=false
+    // Borrowed only while the store SQL lock is held; reset when it closes.
+    var historicalEvidenceCatalog:HistoricalEvidenceStore?
     private var metalScopeCache: MetalScopeCache?
     private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
     private let annCache: ANNCache
@@ -44,7 +46,7 @@ public final class MemoryStore: @unchecked Sendable {
         do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!))}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
-            try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
+            try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
             if version>=25 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db!))}
             try exec("BEGIN IMMEDIATE")
         } catch {sqlite3_close(db);db=nil;throw error}
@@ -88,12 +90,7 @@ public final class MemoryStore: @unchecked Sendable {
             timestamp REAL NOT NULL, payload BLOB NOT NULL
         );
         CREATE INDEX IF NOT EXISTS chat_session_time ON chat_turns(session_id,timestamp);
-        CREATE TABLE IF NOT EXISTS chat_sources (
-            turn_id TEXT NOT NULL REFERENCES chat_turns(id) ON DELETE CASCADE,
-            memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
-            ordinal INTEGER NOT NULL, score REAL NOT NULL, match TEXT NOT NULL, passage_start INTEGER, passage_length INTEGER,
-            PRIMARY KEY(turn_id,ordinal)
-        );
+        \(CitationSchema.chat().replacingOccurrences(of:"CREATE TABLE ",with:"CREATE TABLE IF NOT EXISTS "));
         CREATE INDEX IF NOT EXISTS chat_source_memory ON chat_sources(memory_id);
         DROP TRIGGER IF EXISTS chat_source_erasure;
         CREATE TRIGGER chat_source_erasure BEFORE DELETE ON memories BEGIN
@@ -155,8 +152,13 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(PIIScanSchema.sql)
         let pins=try prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_pins'")
         let missingPins=sqlite3_step(pins) != SQLITE_ROW;sqlite3_finalize(pins)
-        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version) {
-            try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins)
+        try exec("CREATE TABLE IF NOT EXISTS text_observation_pins(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE) WITHOUT ROWID")
+        try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
+        let upgradedCitations=try CitationSchema.migrate(RoutineDatabase(handle:db!),sourceVersion:version)
+        if missingPins {try SyncVersionStore.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
+        if upgradedCitations {try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)}
+        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,missingPins:missingPins) {
+            try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins,repairCitationUpgrade:upgradedCitations)
         }
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
@@ -207,6 +209,7 @@ public final class MemoryStore: @unchecked Sendable {
     func insertRestoringRecap(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:true)}
     private func insertValidated(_ memory:Memory,deferRecapLinks:Bool) throws {
         lock.lock(); defer { lock.unlock() }
+        guard deferRecapLinks || memory.recap?.sources.allSatisfy({$0.historicalHandle==nil}) != false else {throw OSwindError.invalid("Historical recap bindings require the trusted incoming or backup adapter")}
         guard memory.originalEvidence==nil else {throw OSwindError.invalid("Original evidence is read-only. Save an independent note to create a new source.")}
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
         try memory.textObservation?.validated(for:memory)
@@ -267,8 +270,8 @@ public final class MemoryStore: @unchecked Sendable {
     /// Revalidate and load complete evidence in one read snapshot. Deleted or
     /// revised sources fail explicitly, rather than silently retargeting offsets.
     public func hydrate(_ hits:[SearchHit],pinTextObservations:Bool=false) throws -> [SearchHit] {
-        let pins=pinTextObservations && hits.contains {$0.memory.textObservation != nil}
-        let activity=try (pins || hits.contains(where:{$0.visual != nil})) ? mediaWriteLease():nil
+        let pins=pinTextObservations && hits.contains {$0.memory.textObservation != nil && $0.memory.originalEvidence==nil}
+        let activity=try (pins || hits.contains(where:{$0.visual != nil || $0.memory.originalEvidence != nil})) ? mediaWriteLease():nil
         defer {activity?.release()}
         lock.lock();defer {lock.unlock()};try Task.checkCancellation()
         let owns=pins && db.map {sqlite3_get_autocommit($0) != 0} == true
@@ -276,6 +279,12 @@ public final class MemoryStore: @unchecked Sendable {
         do {let result=try hits.map { hit in
             try Task.checkCancellation()
             let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
+            if let original=hit.memory.originalEvidence {
+                guard hit.visual==nil,hit.memory.id=="original-"+original.handle else {throw OSwindError.invalid("Historical evidence locator differs")}
+                let current=try withRoutineDatabase {try historicalEvidence($0,original.handle).memory}
+                guard current.originalEvidence==original,current.evidenceHash==expected,hit.passage.map({$0.text(in:current.text) != nil}) ?? true else {throw OSwindError.unavailable("The exact historical evidence changed or was erased")}
+                return SearchHit(memory:current,score:hit.score,match:hit.match,passage:hit.passage,visual:nil)
+            }
             guard let current=try get(hit.id),current.searchPreview==nil,current.originalEvidence==nil,hit.memory.originalEvidence==nil else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
             let exact=current.evidenceHash==expected
             let appended = pinTextObservations && !exact ? try current.extendsTextObservation(hit.memory):false
@@ -954,9 +963,18 @@ extension MemoryStore {
             let id = string(stmt,0), date = Date(timeIntervalSince1970:sqlite3_column_double(stmt,1))
             guard let bytes = sqlite3_column_blob(stmt,2) else { throw OSwindError.database("Missing conversation payload") }
             let payload = try JSONDecoder().decode(ChatPayload.self,from:Data(bytes:bytes,count:Int(sqlite3_column_bytes(stmt,2))))
-            let source = try prepare("SELECT m.payload,s.score,s.match,s.passage_start,s.passage_length FROM chat_sources s JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
+            let source = try prepare("SELECT m.payload,s.score,s.match,s.passage_start,s.passage_length,s.historical_handle,s.owner_id FROM chat_sources s LEFT JOIN memories m ON m.id=s.memory_id WHERE s.turn_id=? ORDER BY s.ordinal"); defer { sqlite3_finalize(source) }; bind(source,1,id)
             var hits = [SearchHit]()
-            while sqlite3_step(source) == SQLITE_ROW { hits.append(SearchHit(memory:try decode(source),score:sqlite3_column_double(source,1),match:string(source,2),passage:sqlite3_column_type(source,3) == SQLITE_NULL ? nil : PassageRange(start:Int(sqlite3_column_int64(source,3)),length:Int(sqlite3_column_int64(source,4))))) }
+            var status=sqlite3_step(source)
+            while status == SQLITE_ROW {
+                let memory:Memory
+                if sqlite3_column_type(source,5) != SQLITE_NULL {memory=try withRoutineDatabase {try historicalEvidence($0,string(source,5),sourceID:string(source,6)).memory}}
+                else {memory=try decode(source)}
+                let passage=sqlite3_column_type(source,3) == SQLITE_NULL ? nil:PassageRange(start:Int(sqlite3_column_int64(source,3)),length:Int(sqlite3_column_int64(source,4)))
+                guard passage.map({$0.text(in:memory.text) != nil}) ?? true else {throw OSwindError.unavailable("The saved citation passage is unavailable")}
+                hits.append(SearchHit(memory:memory,score:sqlite3_column_double(source,1),match:string(source,2),passage:passage));status=sqlite3_step(source)
+            }
+            guard status==SQLITE_DONE else {throw OSwindError.unavailable("Historical citation bindings are incomplete")}
             turns.append(ChatTurn(id:id,sessionID:sessionID,timestamp:date,question:payload.question,answer:Answer(text:payload.text,sources:hits,provider:payload.provider,duration:payload.duration,warnings:payload.warnings),filter:payload.filter,timeZone:payload.timeZone))
         }
         return turns.reversed()
