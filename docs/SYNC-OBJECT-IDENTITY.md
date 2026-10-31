@@ -33,13 +33,31 @@ The four catalog tables are installed only by an explicit internal call. Ordinar
 - Bounded bootstrap expands it to 94 passes with one worker skip, including all 24 new cases. Reopen/resume, raw Unicode/NUL ordering, byte budgets, failed consumers, cursor deletion and new keys behind the cursor pass.
 - Expanded composite text/integer pagination initially fails compilation because its count assertion compares Int with Int64; no tests execute. The corrected sanitizer selection passes all 94 cases with one worker skip and zero race warnings.
 - A separately executed counterexample then fails one test with three assertions: integer 1 can address text ID "1" through SQLite affinity while producing another catalog digest, admitting an overwrite. Exact per-column primary-key storage checks fix admission before the callback. The unchanged overwrite regression plus numeric-ID/text-ordinal controls pass in the expanded sanitizer selection: 96 defined, 95 passes, one worker skip, zero failures/race warnings; all 25 identity/bootstrap cases execute. The failed source, test and logs remain retained.
-- The optimized selection also passes 95 cases with one worker skip; all 25 new cases execute. The [development receipt](../benchmarks/sync-object-identity-development-v1.json) retains current source/input fingerprints, every passing stage, both failures and the exact before/fixed primary-key admission code. Full/package/process regression, process-death bootstrap tests and authored scale qualification remain pending. Earlier runs remain separate.
+- The optimized selection also passes 95 cases with one worker skip; all 25 new cases execute. The [development receipt](../benchmarks/sync-object-identity-development-v1.json) retains current source/input fingerprints, every passing stage, both failures and the exact before/fixed primary-key admission code. At that snapshot, full/package/process regression, process-death and scale checks remained pending. The follow-up below completes development crash/scale checks; full/package/process qualification is still open. Earlier runs remain separate.
 
 Structural raw graph rows test local identity handling; they do not establish valid peer graph payloads. Current tests use owned temporary libraries, no normal history, provider or media capture.
 
+## Process death and authored scale follow-up
+
+All four owned pre/post-commit crash parents pass under Thread Sanitizer. Killing before commit rolls back catalog identity, journal output and acknowledgement/bootstrap cursor together; killing after commit preserves them, and restart finishes bootstrap without duplicating its first object. The combined selection passes 99 cases with two worker-entry skips and no race warning. These are real own-child SIGKILL fixtures, not physical power-loss evidence. The new optimized selection passes 30 cases with one worker skip, including all 25 catalog cases, four crash parents and the 1k scale entry.
+
+The [scale development receipt](../benchmarks/sync-object-identity-scale-v1.json) retains every actual batch timing, four lifecycle timings per size, input/source/test-bundle fingerprints and independent review at all three sizes.
+
+| Authored sources | Identity bootstrap | 128-object batch median / p95 | Whole fixture-process peak RSS |
+| --- | --- | --- | --- |
+| 1,000 | 0.034 s | 4.346 / 4.613 ms | 51.7 MiB |
+| 100,000 | 7.856 s | 6.375 / 19.501 ms | 147.8 MiB |
+| 1,000,000 | 125.205 s | 8.210 / 28.320 ms | 216.1 MiB |
+
+Each size has one warm run. Population uses explicit authored fixture SQL and is timed separately; it is not API ingestion. The table measures identity metadata bootstrap, excluding complete content validation, journal encryption, media, provider transfer and capture. Transaction timings share a growing archive; these observed p95 values do not establish a population tail. Peak RSS is the entire fixture test process, not standalone app memory. The 1k test host also runs the catalog/crash tests first; the larger hosts select only the scale entry. No causal memory comparison or product ranking follows.
+
+An independent Python reader verifies every original typed SQLite cell and exact payload, every global lifetime hash and local primary-key digest, all current mappings, two deleted probe lifetimes with no raw keys, zero pending intents and the completed raw-key-free cursor. It recomputes all batch counts/quantiles, checks the actual successful test entry/log and confirms its read-only inspection leaves the database byte-identical. All 362 declared large-run inputs stay unchanged, and historical source/test-bundle bytes are retained separately before later builds. Nine offline review contracts refuse unmarked/incomplete fixtures, failed or zero-test runs, changed inputs/logs, live journals and symlink roots/databases; independent typed-frame controls distinguish integer/text/blob and Unicode/NUL data. These contracts run in benchmark CI without downloads.
+
+The full typed transfer processor, cross-object causal dependencies, versioned citations and user-facing sync remain unfinished. Full/package/process qualification is still required; scale success does not complete F059.
+
 ## Remaining delivery work
 
-- Qualify real pre/post-commit process death, composite pagination and authored 1k/100k/1m behavior with independent original-source/mapping/timing checks.
+- [x] Development pre/post-commit process death, composite pagination and authored 1k/100k/1m behavior with independent original-source/mapping/timing checks. Preserve these observations in the final full/package/process qualification.
 - Finish complete typed graph/media bodies and reference rewriting, stable source versions/citations, and the bootstrap/capture-to-protocol processor. Keep private paths, credentials, local scheduling authority and peer scan claims out of transported authority.
 - Validate current privacy on outgoing and incoming content, with content revalidation after preparation outside the writer transaction.
 - Finish scoped erasure/wipe epochs, priority deletion, acknowledgement-based compaction, encrypted-cache retention and storage-pressure recovery. Catalog tombstones currently grow with object lifetimes.
