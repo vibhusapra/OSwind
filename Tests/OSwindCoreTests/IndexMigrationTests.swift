@@ -43,6 +43,14 @@ extension IndexMigrationTests {
         let chat = try store!.createChat(); _ = try store!.appendChatTurn(sessionID:chat.id,question:"What happened?",answer:Answer(text:"Evidence [1]",sources:[SearchHit(memory:original,score:1,match:"semantic")],provider:"evidence",duration:0))
         store = nil
         var db: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
+        // A genuine schema-five library predates these persistent hooks and state tables.
+        let fixtureDB=RoutineDatabase(handle:try XCTUnwrap(db))
+        let hooks=try fixtureDB.statement("SELECT name FROM sqlite_master WHERE type='trigger' AND name GLOB 'sync_capture_*'")
+        var futureHooks=[String]()
+        while sqlite3_step(hooks)==SQLITE_ROW {futureHooks.append(fixtureDB.text(hooks,0))}
+        sqlite3_finalize(hooks)
+        for name in futureHooks {try fixtureDB.execute("DROP TRIGGER \""+name.replacingOccurrences(of:"\"",with:"\"\"")+"\"")}
+        try fixtureDB.execute("DROP TABLE personal_sync_changes; DROP TABLE personal_sync_capture")
         let old = """
         PRAGMA foreign_keys=OFF;
         DROP TRIGGER vector_key_deleted; DROP TRIGGER vector_legacy_insert; DROP TRIGGER vector_legacy_update;
@@ -77,6 +85,14 @@ extension IndexMigrationTests {
         var store: MemoryStore? = try MemoryStore(root:root); store = nil
         var db: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
         // A minimal authentic old registry with no surviving rows.
+        // A genuine schema-five library predates these persistent hooks and state tables.
+        let fixtureDB=RoutineDatabase(handle:try XCTUnwrap(db))
+        let hooks=try fixtureDB.statement("SELECT name FROM sqlite_master WHERE type='trigger' AND name GLOB 'sync_capture_*'")
+        var futureHooks=[String]()
+        while sqlite3_step(hooks)==SQLITE_ROW {futureHooks.append(fixtureDB.text(hooks,0))}
+        sqlite3_finalize(hooks)
+        for name in futureHooks {try fixtureDB.execute("DROP TRIGGER \""+name.replacingOccurrences(of:"\"",with:"\"\"")+"\"")}
+        try fixtureDB.execute("DROP TABLE personal_sync_changes; DROP TABLE personal_sync_capture")
         let old = """
         DROP TRIGGER vector_key_deleted; DROP TRIGGER vector_legacy_insert; DROP TRIGGER vector_legacy_update;
         DROP TRIGGER vector_extra_insert; DROP TRIGGER vector_extra_update; DROP TRIGGER vector_extra_delete;

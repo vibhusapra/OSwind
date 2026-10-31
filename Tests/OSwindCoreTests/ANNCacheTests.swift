@@ -1,4 +1,5 @@
 import XCTest
+import CSQLite
 @testable import OSwindCore
 
 final class ANNCacheTests: XCTestCase {
@@ -62,6 +63,30 @@ final class ANNCacheTests: XCTestCase {
         try Data(repeating:0,count:2_000_000).write(to:directory.appendingPathComponent("synthetic-cache"))
         let deleted = try store.prune(before:.distantPast,maxBytes:1_000_000)
         XCTAssertEqual(deleted,0); XCTAssertEqual(try store.stats().count,3); XCTAssertFalse(FileManager.default.fileExists(atPath:directory.path))
+    }
+    func testBusyCheckpointRetainsEvidenceUntilReaderReleasesSnapshot() throws {
+        try seed(3)
+        let directory=root.appendingPathComponent("indexes")
+        try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        try Data(repeating:0,count:2_000_000).write(to:directory.appendingPathComponent("synthetic-cache"))
+        var reader:OpaquePointer?
+        XCTAssertEqual(sqlite3_open_v2(root.appendingPathComponent("memory.sqlite").path,&reader,SQLITE_OPEN_READONLY,nil),SQLITE_OK)
+        defer {sqlite3_close(reader)}
+        XCTAssertEqual(sqlite3_exec(reader,"BEGIN; SELECT id FROM memories",nil,nil,nil),SQLITE_OK)
+        try store.setFavorite("row-0",value:true) // Leave committed frames beyond the held read snapshot.
+        try store.withRoutineDatabase {db in try db.execute("PRAGMA busy_timeout=25")}
+        defer {try? store.withRoutineDatabase {db in try db.execute("PRAGMA busy_timeout=5000")}}
+        let blocked=try store.pruneHistory(before:.distantPast,maxBytes:1_000_000)
+        XCTAssertEqual(blocked.erasure.sources,0);XCTAssertEqual(try store.stats().count,3)
+        XCTAssertEqual(try store.vectorCount(modelID:"fixture"),3)
+        XCTAssertFalse(blocked.erasure.warnings.isEmpty);XCTAssertEqual(blocked.budgetMet,false)
+        XCTAssertFalse(FileManager.default.fileExists(atPath:directory.path))
+        XCTAssertEqual(sqlite3_exec(reader,"ROLLBACK",nil,nil,nil),SQLITE_OK)
+        let resumed=try store.pruneHistory(before:.distantPast,maxBytes:1_000_000)
+        XCTAssertEqual(resumed.erasure.sources,0);XCTAssertEqual(resumed.budgetMet,true)
+        XCTAssertTrue(resumed.erasure.warnings.isEmpty);XCTAssertEqual(try store.stats().count,3)
+        XCTAssertEqual(try store.vectorCount(modelID:"fixture"),3)
+        XCTAssertTrue(try XCTUnwrap(store.get("row-0")).favorite)
     }
     func testManualPauseSurvivesSearchPreparationUntilExplicitResume() async throws {
         try seed(); let cache = ANNCache(root:root)
