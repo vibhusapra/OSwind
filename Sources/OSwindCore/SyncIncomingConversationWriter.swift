@@ -101,7 +101,15 @@ struct SyncIncomingConversationWriter {
             guard connection.handle==db.handle,change.after.isDeleted else {throw OSwindError.invalid("Use the incoming deletion library's own connection and barrier")}
             try erasureCancellable(db) {try SyncChangeCapture.transaction(db) {
                 try cache.validateIncomingDeletionContext()
-                if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
+                if change.revision.key.kind == .source {
+                    try cache.catalog.deletePeerKey(change.revision.key,journal:cache.journal) {object in
+                        let key:Data?
+                        if let object {guard let primary=object.primary,primary.count==1,case .text(let bytes)=primary[0] else {throw OSwindError.invalid("Incoming source erasure key differs")};key=bytes}else{key=nil}
+                        defer {try? db.clearErasureSelection()}
+                        try db.preparePeerSourceErasure(change.revision.key.digest,activeKey:key)
+                        _=try library.incomingSourceErasure.eraseSelected(db,revokingObject:change.revision.key.digest)
+                    }
+                }else if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
                     try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletion(change,admission:admission)
                 }else if SyncIncomingMetadataDeletion.accepts(change.revision.key.kind) {
                     try SyncIncomingMetadataDeletion(cache:cache).apply(change)

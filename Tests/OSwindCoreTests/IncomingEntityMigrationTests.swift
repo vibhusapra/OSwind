@@ -25,7 +25,7 @@ extension HistoricalErasureMigrationTests {
         let library=try legacy29(),before=try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29);return try entityFingerprint(db)}
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30);XCTAssertEqual(try entityFingerprint(db),before);try SyncIncomingEntitySchema.validate(db)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),31);XCTAssertEqual(try entityFingerprint(db),before);try SyncIncomingEntitySchema.validate(db)
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM routine_run_originals"),1);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM entity_mentions"),1);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM entity_project_ignored"),1)
         }
     }
@@ -45,7 +45,7 @@ extension HistoricalErasureMigrationTests {
             let library=root.appendingPathComponent(name),store=try MemoryStore(root:library);try store.close()
             try withDB(library) {try $0.execute("DROP TRIGGER "+name)}
             XCTAssertThrowsError(try MemoryStore(root:library))
-            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)}
+            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),31);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)}
         }
     }
     func testCurrentOutgoingSequenceIndexCannotBeSilentlyRepairedAndSelectionIsIndexed()throws {

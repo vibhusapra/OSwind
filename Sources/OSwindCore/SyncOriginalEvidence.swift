@@ -24,6 +24,10 @@ struct SyncOriginalEvidenceStore {
         "sync_evidence_removed":"CREATE TRIGGER sync_evidence_removed AFTER DELETE ON personal_sync_evidence BEGIN UPDATE personal_sync_evidence_state SET used_bytes=used_bytes-192-length(old.paths)-length(old.parents) WHERE singleton=1; END",
         "sync_evidence_immutable":"CREATE TRIGGER sync_evidence_immutable BEFORE UPDATE ON personal_sync_evidence BEGIN SELECT RAISE(ABORT,'Sync original evidence projections are immutable'); END"
     ]
+    static func validateForErasure(_ db:RoutineDatabase)throws {
+        for (name,sql) in schemas {let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.database("Original projection protection differs during erasure")}}
+        guard try db.eraseCount("SELECT (SELECT COALESCE(SUM(192+length(paths)+length(parents)),0) FROM personal_sync_evidence)=used_bytes FROM personal_sync_evidence_state WHERE singleton=1")==1 else {throw OSwindError.database("Original projection accounting differs during erasure")}
+    }
     static func install(cache:SyncVersionStore,budget:Int64=defaultBudget)throws->Self {
         guard (1...maximumBudget).contains(budget) else {throw OSwindError.invalid("Invalid original evidence budget")}
         let value=Self(cache:cache),db=cache.database

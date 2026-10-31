@@ -57,6 +57,7 @@ final class BackupDataReader {
             let connection=RoutineDatabase(handle:db.handle!)
             try SyncRowSnapshot.register(on:connection);try RoutineRunOriginalSchema.validate(connection)
             if schema>=30 {try SyncIncomingEntitySchema.validate(connection)}
+            if schema>=31 {try SyncIncomingSourceErasureSchema.validate(connection)}
             let originals=RoutineRunOriginalStore(db:connection),row=try db.prepare("SELECT run_id FROM routine_run_originals NOT INDEXED ORDER BY rowid")
             defer {sqlite3_finalize(row)};var code=sqlite3_step(row)
             while code==SQLITE_ROW {guard try originals.read(db.text(row,0)) != nil else {throw BackupFileError.invalid("Archived run original is missing")};code=sqlite3_step(row)}

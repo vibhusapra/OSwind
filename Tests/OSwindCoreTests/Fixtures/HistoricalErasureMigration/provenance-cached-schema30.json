@@ -1,0 +1,17 @@
+{
+  "schema": 30,
+  "producerCLI_SHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+  "producerSource": "8587ab5d98ed2f31037a9a2da68192662eadfe8d",
+  "origin": "Actual schema29 owned native/cache/run-original fixture opened and upgraded by unchanged qualified schema30 CLI. SQLite backup after CLI exit. No user corpus or fabricated version downgrade.",
+  "counts": {
+    "memories": 1,
+    "memory_entities": 2,
+    "entity_aliases": 2,
+    "entity_mentions": 1,
+    "entity_project_ignored": 1,
+    "routine_runs": 1,
+    "routine_run_originals": 1,
+    "personal_sync_versions": 4
+  },
+  "sha256": "f7c5af147209b9debb3af36fdad2817ec4e9bfef85cc239d7f8a8c2d12228d71"
+}

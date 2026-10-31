@@ -24,7 +24,9 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
-[Incoming metadata tombstones](SYNC-INCOMING-DELETIONS.md) pass twenty functional qualification stages for conversations, turns/citations, recipes/runs and pins. Entity/recap retirement paths are retained; unknown keys across all thirteen canonical kinds receive body-free barriers. Known source erasure and replicated receiver-only child retirement/epochs remain required. No service is enabled.
+[Whole-source peer erasure](SYNC-SOURCE-ERASURE.md) passes twenty functional qualification stages on schema31, including cached citation owners, inactive lifetimes, cache-only media and actual old30 migration/refusal. All thirteen canonical kinds now have internal positive projection and tombstone paths. Replicated receiver-only child retirement, scoped/wipe epochs and the complete privacy/media/service workflow remain required. F059 stays TODO.
+
+[Incoming metadata tombstones](SYNC-INCOMING-DELETIONS.md) pass twenty functional qualification stages for conversations, turns/citations, recipes/runs and pins. Entity/recap retirement paths are retained; unknown keys across all thirteen canonical kinds receive body-free barriers. Its schema30 receipt precedes the source-erasure component above. Replicated receiver-only child retirement/epochs remain required. No service is enabled.
 
 [Incoming entity graph](SYNC-INCOMING-ENTITIES.md) passes twenty functional qualification stages on schema 30: typed entity/alias/link/correction admission, content-free entity-table deletion, scoped independent-definition preservation and indexed outgoing merge ordering. All thirteen canonical record types now have internal positive projection paths. Complete graph/deletion/policy/media/service and user enrollment remain open.
 
