@@ -49,7 +49,7 @@ try:
   run('note','Owned unsupported old24 write',cli=old,ok=False);assert snapshot()==before
  else:run('note','Owned initial schema27 source')
  with sqlite3.connect(library/'memory.sqlite') as db:
-  assert db.execute('PRAGMA user_version').fetchone()==(27,)
+  assert db.execute('PRAGMA user_version').fetchone()==(28,)
   assert db.execute('SELECT enabled FROM personal_sync_capture').fetchone()==(0,)
   assert db.execute('SELECT COUNT(*) FROM personal_sync_changes').fetchone()==(0,)
  report['checks'].append('new/migrated schema27 stays capture-disabled with no implicit backlog')
@@ -69,7 +69,7 @@ try:
   assert db.execute('SELECT COUNT(*) FROM personal_sync_changes WHERE before_key IS NOT NULL AND after_key IS NULL').fetchone()==(1,)
   assert db.execute('SELECT used_bytes FROM personal_sync_capture').fetchone()[0]==db.execute('SELECT SUM(128+COALESCE(length(before_key),0)+COALESCE(length(after_key),0)+COALESCE(length(after_row),0)) FROM personal_sync_changes').fetchone()[0]
  report['checks'].append('public single-delete purges the queued original body and preserves opaque deletion metadata/accounting')
- archive=base/'owned.oswindbackup';restored=base/'restored';info=json.loads(run('backup','create',archive).stdout);assert info['sourceSchema']==27
+ archive=base/'owned.oswindbackup';restored=base/'restored';info=json.loads(run('backup','create',archive).stdout);assert info['sourceSchema']==28
  if a.old_cli:run('backup','inspect',archive,cli=a.old_cli.resolve(),ok=False)
  run('backup','restore',archive,'--to',restored)
  with sqlite3.connect(restored/'memory.sqlite') as db:assert db.execute('SELECT enabled FROM personal_sync_capture').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM personal_sync_changes').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM memories').fetchone()==(3,)

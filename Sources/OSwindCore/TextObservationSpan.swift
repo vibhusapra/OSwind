@@ -100,7 +100,7 @@ enum TextObservationSchema {
         "text_observation_update":"CREATE TRIGGER text_observation_update AFTER UPDATE OF id,payload,timestamp,kind ON memories BEGIN DELETE FROM text_observation_ranges WHERE memory_id=old.id; \(fill) END",
         "text_observation_revision":"""
         CREATE TRIGGER text_observation_revision BEFORE UPDATE OF payload ON memories
-        WHEN (json_type(CAST(old.payload AS TEXT),'$.textObservation')='object' OR json_type(CAST(new.payload AS TEXT),'$.textObservation')='object') AND (
+        WHEN oswind_incoming_source_projection_v1(old.id,new.payload)<>1 AND (json_type(CAST(old.payload AS TEXT),'$.textObservation')='object' OR json_type(CAST(new.payload AS TEXT),'$.textObservation')='object') AND (
             json_extract(CAST(old.payload AS TEXT),'$.endTimestamp') IS NOT json_extract(CAST(new.payload AS TEXT),'$.endTimestamp') OR
             json_extract(CAST(old.payload AS TEXT),'$.textObservation.version') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.version') OR
             json_extract(CAST(old.payload AS TEXT),'$.textObservation.sessionID') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.sessionID') OR
@@ -127,8 +127,9 @@ enum TextObservationSchema {
         CREATE TRIGGER text_observation_pin_recap AFTER INSERT ON recap_sources BEGIN
             INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(COALESCE(new.owner_id,new.source_id));
         END;
-        CREATE TRIGGER IF NOT EXISTS text_observation_pin_guard BEFORE UPDATE OF payload ON memories
-        WHEN EXISTS(SELECT 1 FROM text_observation_pins WHERE memory_id=old.id)
+        DROP TRIGGER IF EXISTS text_observation_pin_guard;
+        CREATE TRIGGER text_observation_pin_guard BEFORE UPDATE OF payload ON memories
+        WHEN oswind_incoming_source_projection_v1(old.id,new.payload)<>1 AND EXISTS(SELECT 1 FROM text_observation_pins WHERE memory_id=old.id)
         AND json_type(CAST(old.payload AS TEXT),'$.textObservation')='object' AND (
             json_extract(CAST(old.payload AS TEXT),'$.endTimestamp') IS NOT json_extract(CAST(new.payload AS TEXT),'$.endTimestamp') OR
             json_extract(CAST(old.payload AS TEXT),'$.textObservation.version') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.version') OR

@@ -49,7 +49,7 @@ enum RecapSchema {
         DELETE FROM memories WHERE id IN (\(descendants("old.id")));
     END;
     CREATE TRIGGER recap_source_revision BEFORE UPDATE OF title,app,text,url,timestamp,kind ON memories
-    WHEN old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind
+    WHEN CASE WHEN oswind_incoming_source_projection_v1(old.id,new.payload)=1 THEN 0 ELSE old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind END
     BEGIN DELETE FROM memories WHERE id IN (\(descendants("old.id"))); END;
     CREATE TRIGGER IF NOT EXISTS recap_cache_erasure AFTER DELETE ON memories
     WHEN old.kind='summary' AND json_type(CAST(old.payload AS TEXT),'$.recap')='object'
@@ -129,19 +129,21 @@ extension MemoryStore {
             if sqlite3_step(old)==SQLITE_ROW,let text=db.optional(old,0) {
                 let prior=try JSONDecoder().decode(RecapProvenance.self,from:Data(text.utf8))
                 let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys]
-                guard let replacement=memory.recap,try encoder.encode(replacement)==encoder.encode(prior) else {throw OSwindError.invalid("A linked recap cannot silently lose or change its source links. Save a new note for an independent copy.")}
+                let permitted=try incomingSourceProjection.permits(memory),unchanged=try memory.recap.map({try encoder.encode($0)==encoder.encode(prior)}) ?? false
+                guard permitted || unchanged else {throw OSwindError.invalid("A linked recap cannot silently lose or change its source links. Save a new note for an independent copy.")}
             }
             guard let recap=memory.recap else {return};_ = try recap.validated()
             guard memory.kind == .summary,memory.transcript==nil,memory.visualRecording==nil,memory.imagePath==nil,memory.audioPath==nil,memory.videoPath==nil else {throw OSwindError.invalid("Linked recaps are text summaries")}
             if !deferred {try validateRecapParents(memory.id,recap:recap,db:db)}
         }
     }
-    private func validateRecapParents(_ id:String,recap:RecapProvenance,db:RoutineDatabase) throws {
+    func validateRecapParents(_ id:String,recap:RecapProvenance,db:RoutineDatabase) throws {
         for source in recap.sources {
             try Task.checkCancellation()
             guard source.id != id else {throw OSwindError.invalid("Recap source links must not form a cycle")}
             _=try recapParent(source,db:db)
-            let cycle=try db.statement("WITH RECURSIVE parents(id) AS (SELECT ? UNION SELECT COALESCE(r.owner_id,r.source_id) FROM recap_sources r JOIN parents p ON r.recap_id=p.id) SELECT 1 FROM parents WHERE id=? LIMIT 1");defer {sqlite3_finalize(cycle)};db.bind(cycle,1,source.id);db.bind(cycle,2,id)
+            if source.historicalHandle != nil {continue}
+            let cycle=try db.statement("WITH RECURSIVE parents(id) AS (SELECT ? UNION SELECT r.source_id FROM recap_sources r JOIN parents p ON r.recap_id=p.id WHERE r.source_id IS NOT NULL) SELECT 1 FROM parents WHERE id=? LIMIT 1");defer {sqlite3_finalize(cycle)};db.bind(cycle,1,source.id);db.bind(cycle,2,id)
             let status=sqlite3_step(cycle);guard status==SQLITE_DONE else {if status==SQLITE_ROW {throw OSwindError.invalid("Recap source links must not form a cycle")};throw db.error()}
         }
     }

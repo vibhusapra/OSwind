@@ -1,0 +1,10 @@
+{
+  "format": "OSwind authored actual schema27 incoming-source migration fixture v1",
+  "schema": 27,
+  "sourceCommit": "39a0190641961134472b38e7246ddcb8c81006bc",
+  "producerCLI_SHA256": "a1e4480f6ca7f6d6476b333ce438361dbd84c903d5fba1e07806398fcc696a9f",
+  "sha256": "fd9648b2a47421b3758185b17d4daf35ce1ee03204883e60d6526f64f142be7a",
+  "bytes": 659456,
+  "origin": "Qualified PR105 actual schema27 CLI, historical-backup-owned source; owned synthetic Notes current source, exact old Safari original, linked recap and cited answer. Sync disabled, no media.",
+  "sourceReceiptSHA256": "b0c20b5c4d5889a5c61afd55ea53eb18e9e32b0dadc4de3733b098ec03af9ccf"
+}

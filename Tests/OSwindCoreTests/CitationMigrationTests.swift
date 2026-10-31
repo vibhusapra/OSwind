@@ -55,7 +55,7 @@ final class CitationMigrationTests:XCTestCase {
         for key in ["source","outbox","packets","pending","capture"] {XCTAssertEqual(after[key],before[key],key)}
         XCTAssertEqual(try store.chatTurns(store.chats().first!.id).first?.answer.sources.first?.memory.text,"Original Alice owns Orion.")
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),27);XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM pragma_table_info('chat_sources')"),9);XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM pragma_table_info('recap_sources')"),10)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),28);XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM pragma_table_info('chat_sources')"),9);XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM pragma_table_info('recap_sources')"),10)
             XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM personal_sync_changes"),0);XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM historical_evidence"),0)
             let fk=try db.statement("PRAGMA foreign_key_check");defer {sqlite3_finalize(fk)};XCTAssertEqual(sqlite3_step(fk),SQLITE_DONE)
         }

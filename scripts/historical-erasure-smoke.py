@@ -20,7 +20,7 @@ try:
         assert preview['historicalSamples'][0]['app']=='Safari' and preview['historicalSamples'][0]['title']=='Old original source'
         result=run(library,'erase','apply',*flags,'--token',preview['token']);assert result['sources']==1 and result['historicalVersions']==1 and result['conversationTurns']==1 and result['pendingMedia']==0
         with contextlib.closing(sqlite3.connect((library/'memory.sqlite').as_uri()+'?mode=ro',uri=True)) as db:
-            assert db.execute('PRAGMA user_version').fetchone()==(27,)
+            assert db.execute('PRAGMA user_version').fetchone()==(28,)
             assert db.execute('SELECT id,text FROM memories').fetchall()==[('source','Newer independent current body')]
             assert db.execute('SELECT count(*) FROM historical_evidence').fetchone()==(0,)
             assert db.execute('SELECT count(*) FROM chat_turns').fetchone()==(0,)

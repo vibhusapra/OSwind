@@ -11,7 +11,7 @@ def register_inactive_sync_fixture(connection):
     version = connection.execute("PRAGMA user_version").fetchone()[0]
     if version < 25:
         return
-    if version not in (25, 26, 27):
+    if version not in (25, 26, 27, 28):
         raise ValueError("Unsupported owned fixture schema")
     state = connection.execute(
         "SELECT enabled,suppressed FROM personal_sync_capture"
@@ -42,5 +42,11 @@ def register_inactive_sync_fixture(connection):
             return 1
         connection.create_function("oswind_historical_writer_v1", 0, writer_marker)
 
-    if version == 27:
+    if version >= 27:
         connection.create_function("oswind_historical_scope_writer_v1", 0, writer_marker)
+
+    if version >= 28:
+        connection.create_function("oswind_incoming_source_writer_v1", 0, writer_marker)
+        # Default-deny even in owned inactive setup. Never grant a projection.
+        connection.create_function("oswind_incoming_source_projection_v1", 2, lambda *_: 0)
+        connection.create_function("oswind_incoming_binding_projection_v1", 3, lambda *_: 0)

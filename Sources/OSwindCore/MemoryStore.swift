@@ -4,8 +4,9 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version27 adds original-field erasure selection and fences older writers.
-    public static let schemaVersion = 27
+    // Version28 admits typed source projections while preserving exact cited originals.
+    public static let schemaVersion = 28
+    let incomingSourceProjection=SyncIncomingSourceProjection()
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -43,7 +44,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!))}
+        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection)}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
@@ -155,12 +156,14 @@ public final class MemoryStore: @unchecked Sendable {
         try exec("CREATE TABLE IF NOT EXISTS text_observation_pins(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE) WITHOUT ROWID")
         try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         let upgradedCitations=try CitationSchema.migrate(RoutineDatabase(handle:db!),sourceVersion:version)
+        try SyncVersionStore.migrateIncomingSourceProtection(RoutineDatabase(handle:db!),sourceVersion:version)
         if missingPins {try SyncVersionStore.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
         if upgradedCitations {try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)}
         try HistoricalErasureSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,missingPins:missingPins) {
             try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins,repairCitationUpgrade:upgradedCitations)
         }
+        try SyncIncomingSourceSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
@@ -227,11 +230,11 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
-        if let before=try get(memory.id),before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash {
+        if let before=try get(memory.id),before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash,try !incomingSourceProjection.permits(memory) {
             let unpin=try prepare("DELETE FROM text_observation_pins WHERE memory_id=?");defer {sqlite3_finalize(unpin)};bind(unpin,1,memory.id)
             guard sqlite3_step(unpin)==SQLITE_DONE else {throw failure()}
         }
-        if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording { try invalidateAudioEvidence(memory.id) }
+        if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording,try !incomingSourceProjection.permits(memory) { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
@@ -637,6 +640,20 @@ public final class MemoryStore: @unchecked Sendable {
             if label != speaker { try invalidateAudioEvidence(id) }
             memory.transcript=try transcript.validated(); try Task.checkCancellation(); try updateMetadata(memory); try exec("COMMIT");_ = finishRecapInvalidation(); return memory
         } catch { try? exec("ROLLBACK"); throw error }
+    }
+    func insertIncomingSource(_ memory:Memory)throws {
+        try withRoutineDatabase {_ in try incomingSourceProjection.withSource(memory) {try insertRestoringRecap(memory)}}
+    }
+    /// Links have already been rebound to authenticated archival originals;
+    /// changing only the local provenance encoding preserves the wire version.
+    func rebindIncomingRecap(_ before:Memory,to memory:Memory)throws {
+        guard before.id==memory.id,before.recap != nil,memory.recap != nil else {throw OSwindError.invalid("Incoming recap metadata differs")}
+        var expected=before;expected.recap=memory.recap
+        guard expected==memory else {throw OSwindError.invalid("Incoming recap rebinding changed source content")}
+        try withRoutineDatabase {_ in
+            guard try get(before.id)==before else {throw OSwindError.invalid("Incoming recap changed before rebinding")}
+            try incomingSourceProjection.withSource(memory) {try updateMetadata(memory)}
+        }
     }
     private func updateMetadata(_ m: Memory,preservingPIIScan:Bool=false) throws {
         lock.lock(); defer { lock.unlock() };let scanToken=preservingPIIScan ? try piiScanFavoriteToken(m.id):nil

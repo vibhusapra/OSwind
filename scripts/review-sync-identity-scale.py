@@ -27,12 +27,12 @@ def key_name(data):
     n=struct.unpack('<Q',data[7:15])[0];need(15+n==len(data),'Truncated/trailing source primary frame');value=data[15:].decode('utf-8');need(frame([value])==data,'Noncanonical source primary frame');return value
 
 def verify_empty_historical_schema(connection,declared):
-    need(type(declared) is int and declared in (25,26,27),'Unsupported declared library schema')
+    need(type(declared) is int and declared in (25,26,27,28),'Unsupported declared library schema')
     need(connection.execute('PRAGMA user_version').fetchone()==(declared,),'Unexpected library schema')
     if declared>=26:
         for table in ['historical_evidence','historical_evidence_dependencies','historical_evidence_pins']:
             need(connection.execute('SELECT count(*) FROM '+table).fetchone()==(0,),'Unexpected originals in note-only preparation fixture')
-    if declared==27:
+    if declared>=27:
         names={r[0] for r in connection.execute("SELECT name FROM sqlite_master WHERE name GLOB 'historical_scope_*'")}
         tables=['memories','chat_sessions','chat_turns','chat_sources','recap_sources','routines','routine_runs','memory_entities','entity_aliases','entity_mentions','entity_ignored','entity_project_ignored','text_observation_pins','historical_evidence']
         expected={'historical_scope_'+n for n in ['start','end','app','bundle','kind','url']}|{'historical_scope_revoked_versions'}
@@ -43,6 +43,11 @@ def verify_empty_historical_schema(connection,declared):
             for op in ['insert','update','delete']:
                 name='historical_scope_writer_'+table+'_'+op
                 need(connection.execute('SELECT sql FROM sqlite_master WHERE name=?',(name,)).fetchone()==(f'CREATE TRIGGER {name} BEFORE {op.upper()} ON {table} BEGIN SELECT oswind_historical_scope_writer_v1(); END',),'Scope writer protection differs')
+
+    if declared>=28:
+        names=dict(connection.execute("SELECT name,sql FROM sqlite_master WHERE name GLOB 'incoming_source_writer_*'"))
+        expected={f'incoming_source_writer_{table}_{op}':f'CREATE TRIGGER incoming_source_writer_{table}_{op} BEFORE {op.upper()} ON {table} BEGIN SELECT oswind_incoming_source_writer_v1(); END' for table in tables for op in ['insert','update','delete']}
+        need(names==expected,'Incoming source protection membership or SQL differs')
 
 def review(root):
     root=pathlib.Path(root).absolute();need(root.is_dir() and not root.is_symlink(),'Fixture root must be a real directory')
