@@ -228,7 +228,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
         case .turn(let value):_=try dependency(value.conversation);try filter(value.filter)
         case .conversationCitation(let value):_=try dependency(value.owner);try link(value.link)
         case .recapCitation(let value):
-            guard case .source(let parent)=try dependency(value.owner).body,let recap=parent.recap,value.ordinal<recap.sources.count,recap.sources[value.ordinal]==value.link else {throw OSwindError.invalid("Sync recap citation differs from its owner")};try link(value.link)
+            guard case .source(let parent)=try dependency(value.owner).body,let recap=parent.recap,value.ordinal<recap.sources.count,try SyncProtocolLimits.encode(recap.sources[value.ordinal])==SyncProtocolLimits.encode(value.link) else {throw OSwindError.invalid("Sync recap citation differs from its owner")};try link(value.link)
         case .routineRun(let value):_=try dependency(value.recipe.routine,value.recipe.definition);if let id=value.conversation {_=try dependency(id)};try filter(value.filter)
         case .entityAlias(let value):guard case .entity(let entity)=try dependency(value.entity).body,entity.kind==value.kind else {throw OSwindError.invalid("Sync alias entity kind differs")}
         case .entityMention(let value):

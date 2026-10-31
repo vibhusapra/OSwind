@@ -269,4 +269,18 @@ final class SyncPortableRecordTests:XCTestCase {
         packet=original;var body=packet["body"] as! [String:Any],source=body["source"] as! [String:Any],fields=source["_0"] as! [String:Any];fields["imagePath"]="/Users/OWNED-FAKE-DEVICE/image";source["_0"]=fields;body["source"]=source;packet["body"]=body
         XCTAssertThrowsError(try SyncPortableRecord.decode(JSONSerialization.data(withJSONObject:packet,options:[.sortedKeys,.withoutEscapingSlashes])))
     }
+    func testRecapCitationOwnerMatchRequiresExactUTF8DespiteSwiftCanonicalEquivalence()throws {
+        try seedGraph();let all=try prepareGraph(),citation=try XCTUnwrap(all.first {$0.identity.table == .recapCitation}),owner=try XCTUnwrap(all.first {if case .source(let value)=$0.body {return value.recap != nil};return false})
+        let nfc="caf\u{e9}",nfd="cafe\u{301}";XCTAssertEqual(nfc,nfd);XCTAssertNotEqual(Data(nfc.utf8),Data(nfd.utf8))
+        let current=try changed(owner) {fields in
+            var recap=fields["recap"] as! [String:Any],sources=recap["sources"] as! [[String:Any]];sources[0]["match"]=nfc;recap["sources"]=sources;fields["recap"]=recap
+        }
+        let exact=try changed(citation) {fields in var link=fields["link"] as! [String:Any];link["match"]=nfc;fields["link"]=link}
+        let different=try changed(citation) {fields in var link=fields["link"] as! [String:Any];link["match"]=nfd;fields["link"]=link}
+        func lookup(_ identity:SyncObjectIdentity,_ content:SyncContentReference?)throws->SyncPortableRecord {
+            if identity==current.identity {return current};return try resolve(identity,content)
+        }
+        XCTAssertNoThrow(try exact.validateDependencies(resolve:lookup));XCTAssertThrowsError(try different.validateDependencies(resolve:lookup))
+    }
+
 }

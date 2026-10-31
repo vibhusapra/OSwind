@@ -17,3 +17,6 @@ __pycache__/
 # Owned actual schema26 historical-erasure regression fixture.
 !Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite
 !Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/*.sqlite
+
+# Owned actual schema27 incoming-source migration fixture.
+!Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-source-schema27.sqlite

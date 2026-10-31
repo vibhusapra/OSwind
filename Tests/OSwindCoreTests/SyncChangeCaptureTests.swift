@@ -16,7 +16,7 @@ final class SyncChangeCaptureTests:XCTestCase {
     func scalar(_ sql:String)throws->Int64 {try store.withRoutineDatabase {db in let s=try db.statement(sql);defer {sqlite3_finalize(s)};guard sqlite3_step(s)==SQLITE_ROW else {throw db.error()};return sqlite3_column_int64(s,0)}}
     func testDisabledByDefaultAndSchemaFence()throws {
         try store.insert(Memory(id:"owned",text:"no implicit enrollment"));XCTAssertEqual(try scalar("SELECT COUNT(*) FROM personal_sync_changes"),0)
-        XCTAssertEqual(try scalar("PRAGMA user_version"),27);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
+        XCTAssertEqual(try scalar("PRAGMA user_version"),28);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
     }
     func testOrdinaryMutationsRetainCurrentExactSnapshotsAndPurgeSupersededBodies()throws {
         let scope=try activate(),original=Memory(id:"owned",timestamp:Date(timeIntervalSince1970:Double.pi),text:"original")
@@ -208,7 +208,7 @@ final class SyncChangeCaptureTests:XCTestCase {
         let scope=try activate();try store.insert(Memory(id:"owned",text:"current authored source"))
         let archive=root.appendingPathComponent("../capture-backup-"+UUID().uuidString+".oswindbackup"),restored=root.appendingPathComponent("../capture-restored-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:archive);try? FileManager.default.removeItem(at:restored)}
-        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,27)
+        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,28)
         _=try LibraryBackup.restore(archive,to:restored)
         let copy=try MemoryStore(root:restored);defer {try? copy.close()}
         XCTAssertEqual(try copy.get("owned")?.text,"current authored source")

@@ -141,6 +141,11 @@ struct SyncIdentityCatalog {
         _=try state();let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
         guard let value=try current(table,key),!value.deleted,value.primary==primary else {throw OSwindError.unavailable("The local sync lifetime is unavailable")};return value.identity
     }
+    func preparedIdentity(_ table:SyncCanonicalTable,primary:[SyncRowCell])throws->SyncObjectIdentity? {
+        _=try state();let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
+        guard let value=try current(table,key),!value.deleted else {return nil}
+        guard value.primary==primary else {throw OSwindError.database("Prepared local identity primary differs")};return value.identity
+    }
     private func current(_ table:SyncCanonicalTable,_ key:Data)throws->SyncLocalObject? {
         let s=try database.statement("SELECT c.object_digest,i.local_key FROM personal_sync_identity_current c LEFT JOIN personal_sync_identities i ON i.object_digest=c.object_digest WHERE c.table_name=? AND c.local_key=?");defer {sqlite3_finalize(s)};database.bind(s,1,table.rawValue);bind(s,2,key)
         let code=sqlite3_step(s);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW,let value=try readObject(database.text(s,0)),value.identity.table==table,try data(s,1,maximum:32)==key else {throw OSwindError.database("Sync current identity differs")};return value
@@ -354,6 +359,28 @@ struct SyncIdentityCatalog {
                 guard old.identity.table.kind==key.kind else {throw OSwindError.invalid("Peer key deletion kind differs")}
                 try deletePeer(old.identity,apply:apply)
             }else {try SyncChangeCapture.withoutEcho(database,scope:scope) {try apply(nil)}}
+        }
+    }
+    /// Recap relationship rows are also derived from the live source body's
+    /// complete provenance. Retiring a wire citation must not remove a still
+    /// required derived row while its replacement lifetime is in flight.
+    func retireDerivedRecap(_ key:SyncObjectKey,journal:SyncJournal,keep:(SyncLocalObject)throws->Bool)throws {
+        try scoped {
+            try emptyQueue()
+            guard key.kind == .recapCitation,journal.database.handle==database.handle,try journal.state(for:key).isDeleted else {throw OSwindError.invalid("Derived retirement requires its recap deletion barrier")}
+            guard let old=try readObject(key.digest) else {try deletePeerKey(key,journal:journal) {_ in};return}
+            guard old.identity.table == .recapCitation else {throw OSwindError.invalid("Derived retirement table differs")}
+            if old.deleted {return}
+            guard let primary=old.primary,primary.count==2,case .text(let owner)=primary[0],case .integer(let ordinal)=primary[1],let ownerID=String(data:owner,encoding:.utf8) else {throw OSwindError.invalid("Derived recap primary differs")}
+            let preserved=try keep(old);try markDeleted(old.identity)
+            try SyncChangeCapture.withoutEcho(database,scope:scope) {
+                let revoke=try database.statement("INSERT OR IGNORE INTO personal_sync_version_revoked VALUES(?)");defer {sqlite3_finalize(revoke)};database.bind(revoke,1,key.digest);try database.done(revoke)
+                let purge=try database.statement("DELETE FROM personal_sync_versions WHERE object_digest=?");defer {sqlite3_finalize(purge)};database.bind(purge,1,key.digest);try database.done(purge)
+                if !preserved {
+                    let remove=try database.statement("DELETE FROM recap_sources WHERE recap_id=? AND ordinal=?");defer {sqlite3_finalize(remove)};database.bind(remove,1,ownerID);sqlite3_bind_int64(remove,2,ordinal);try database.done(remove)
+                }
+            }
+            guard try exists(.recapCitation,primary)==preserved else {throw OSwindError.invalid("Derived retirement did not preserve its declared relationship")}
         }
     }
     /// An unknown early delete is durable. A late delete for an old lifetime does

@@ -44,10 +44,38 @@ struct SyncIncomingConversationWriter {
         var visiting=Set<String>(),remaining=512;try ensureSource(ref,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)
         return try history.adopt(ref,cache:cache,pathsFor:pathsFor,admit:admit,verifyMedia:verifyMedia)
     }
+    /// Content-free recap deletion. The global old citation is retired even
+    /// when its current owner still independently requires the same native row.
+    func applyDeletion(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws {
+        try admission.withActive(for:library.mediaRootIdentity) {}
+        try library.withRoutineDatabase {connection in
+            guard connection.handle==db.handle,change.after.isDeleted,change.revision.key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
+            try cache.catalog.retireDerivedRecap(change.revision.key,journal:cache.journal) {object in
+                guard let primary=object.primary,primary.count==2,case .text(let bytes)=primary[0],case .integer(let position)=primary[1],let owner=String(data:bytes,encoding:.utf8),let ordinal=Int(exactly:position),ordinal>=0 else {throw OSwindError.invalid("Incoming recap deletion key differs")}
+                guard let native=try library.get(owner) else {return false}
+                guard let identity=try cache.catalog.preparedIdentity(.source,primary:[.text(bytes)]) else {throw OSwindError.unavailable("Prepare the recap owner before derived retirement")}
+                let packet=try cache.resolve(identity,content:nil,admit:{_ in})
+                guard case .source(let body)=packet.body else {throw OSwindError.invalid("Incoming recap owner is not a source")}
+                guard let wire=body.recap,ordinal<wire.sources.count else {return false}
+                guard let recap=native.recap,ordinal<recap.sources.count else {throw OSwindError.invalid("Native recap provenance differs during retirement")}
+                let expected=recap.sources[ordinal],row=try db.statement("SELECT source_id,revision,score,match,passage_start,passage_length,owner_id,historical_handle FROM recap_sources WHERE recap_id=? AND ordinal=?");defer {sqlite3_finalize(row)};db.bind(row,1,owner);sqlite3_bind_int64(row,2,position)
+                guard sqlite3_step(row)==SQLITE_ROW,Data(db.text(row,1).utf8)==Data(expected.revision.utf8),sqlite3_column_double(row,2)==expected.score,Data(db.text(row,3).utf8)==Data(expected.match.utf8),db.optional(row,7).map({Data($0.utf8)})==expected.historicalHandle.map({Data($0.utf8)}) else {throw OSwindError.invalid("Derived recap row differs from its current owner")}
+                if expected.historicalHandle != nil {guard sqlite3_column_type(row,0)==SQLITE_NULL,Data(db.text(row,6).utf8)==Data(expected.id.utf8) else {throw OSwindError.invalid("Derived historical owner differs")}}
+                else {guard Data(db.text(row,0).utf8)==Data(expected.id.utf8),sqlite3_column_type(row,6)==SQLITE_NULL else {throw OSwindError.invalid("Derived current owner differs")}}
+                if let range=expected.passage {guard sqlite3_column_type(row,4)==SQLITE_INTEGER,sqlite3_column_int64(row,4)==range.start,sqlite3_column_type(row,5)==SQLITE_INTEGER,sqlite3_column_int64(row,5)==range.length else {throw OSwindError.invalid("Derived recap passage differs")}}
+                else {guard sqlite3_column_type(row,4)==SQLITE_NULL,sqlite3_column_type(row,5)==SQLITE_NULL else {throw OSwindError.invalid("Derived recap has an undeclared passage")}}
+                return true
+            }
+            try admission.withActive(for:library.mediaRootIdentity) {}
+        }
+    }
     @discardableResult func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {
         // The caller reserves media BEFORE journal/SQLite locks, then retains
         // this reservation through admission. Acquiring it here can deadlock
         // against erasure holding the exclusive lease while waiting for SQLite.
+        if case .source=record.body {
+            return try SyncIncomingSourceWriter(library:library,cache:cache,admit:admit,pathsFor:pathsFor,admitMedia:admitMedia,newID:newID).apply(record,admission:admission,fetchExactSource:fetchExactSource)
+        }
         try admission.withActive(for:library.mediaRootIdentity) {}
         return try library.withRoutineDatabase {connection in
             guard connection.handle==db.handle else {throw OSwindError.invalid("Use the incoming library's own connection")}
@@ -73,15 +101,26 @@ struct SyncIncomingConversationWriter {
                 case .conversationCitation(let body):
                     local=try id(body.owner);let source=try id(body.link.source.identity);_=try cache.resolve(body.owner,content:nil,admit:admit)
                     let evidence=try original(body.link.source,requestedBy:record,fetch:fetchExactSource);historical=evidence
-                    guard evidence.sourceID==source,body.link.passage.map({$0.text(in:evidence.memory.text) != nil}) ?? true else {throw OSwindError.invalid("Historical citation owner or passage differs")}
+                    guard Data(evidence.sourceID.utf8)==Data(source.utf8),body.link.passage.map({$0.text(in:evidence.memory.text) != nil}) ?? true else {throw OSwindError.invalid("Historical citation owner or passage differs")}
                     try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8)),.integer(Int64(body.ordinal))]) {
                         let row=try db.statement("INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match,passage_start,passage_length,owner_id,historical_handle) VALUES(?,NULL,?,?,?,?,?,?,?) ON CONFLICT(turn_id,ordinal) DO UPDATE SET memory_id=excluded.memory_id,score=excluded.score,match=excluded.match,passage_start=excluded.passage_start,passage_length=excluded.passage_length,owner_id=excluded.owner_id,historical_handle=excluded.historical_handle");defer {sqlite3_finalize(row)}
                         db.bind(row,1,local);sqlite3_bind_int64(row,2,Int64(body.ordinal));sqlite3_bind_double(row,3,body.link.score);db.bind(row,4,body.link.match)
                         if let range=body.link.passage {sqlite3_bind_int64(row,5,Int64(range.start));sqlite3_bind_int64(row,6,Int64(range.length))};db.bind(row,7,source);db.bind(row,8,evidence.handle);try db.done(row)
                     }
+                case .recapCitation(let body):
+                    local=try id(body.owner);let source=try id(body.link.source.identity)
+                    let owner=try cache.resolve(body.owner,content:nil,admit:admit)
+                    guard case .source(let root)=owner.body,let recap=root.recap,body.ordinal<recap.sources.count,try SyncProtocolLimits.encode(recap.sources[body.ordinal])==SyncProtocolLimits.encode(body.link) else {throw OSwindError.invalid("Incoming recap citation differs from its owner")}
+                    let evidence=try original(body.link.source,requestedBy:record,fetch:fetchExactSource);historical=evidence
+                    guard Data(evidence.sourceID.utf8)==Data(source.utf8),body.link.passage.map({$0.text(in:evidence.memory.text) != nil}) ?? true else {throw OSwindError.invalid("Incoming recap citation source or passage differs")}
+                    guard let native=try library.get(local),let links=native.recap?.sources,body.ordinal<links.count,links[body.ordinal].historicalHandle==evidence.handle,Data(links[body.ordinal].id.utf8)==Data(source.utf8),links[body.ordinal].revision==evidence.memory.evidenceHash else {throw OSwindError.invalid("Prepare the exact incoming recap owner before its citation")}
+                    try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8)),.integer(Int64(body.ordinal))]) {
+                        let row=try db.statement("UPDATE recap_sources SET revision=?,score=?,match=?,passage_start=?,passage_length=?,owner_id=?,historical_handle=? WHERE recap_id=? AND ordinal=? AND source_id IS NULL");defer {sqlite3_finalize(row)};db.bind(row,1,evidence.memory.evidenceHash);sqlite3_bind_double(row,2,body.link.score);db.bind(row,3,body.link.match)
+                        if let range=body.link.passage {sqlite3_bind_int64(row,4,Int64(range.start));sqlite3_bind_int64(row,5,Int64(range.length))};db.bind(row,6,source);db.bind(row,7,evidence.handle);db.bind(row,8,local);sqlite3_bind_int64(row,9,Int64(body.ordinal));try db.done(row);guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Incoming recap relationship disappeared")}
+                    }
                 case .evidencePin(let body):
                     local=try id(body.source.identity);let evidence=try original(body.source,requestedBy:record,fetch:fetchExactSource);historical=evidence
-                    guard evidence.sourceID==local else {throw OSwindError.invalid("Historical pin owner differs")}
+                    guard Data(evidence.sourceID.utf8)==Data(local.utf8) else {throw OSwindError.invalid("Historical pin owner differs")}
                     try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8))]) {
                         let row=try db.statement("INSERT OR IGNORE INTO text_observation_pins(memory_id) VALUES(?)");defer {sqlite3_finalize(row)};db.bind(row,1,local);try db.done(row)
                         let binding=try db.statement("INSERT INTO historical_evidence_pins VALUES(?,?) ON CONFLICT(memory_id) DO UPDATE SET handle=excluded.handle");defer {sqlite3_finalize(binding)};db.bind(binding,1,local);db.bind(binding,2,evidence.handle);try db.done(binding)
@@ -93,7 +132,10 @@ struct SyncIncomingConversationWriter {
                     let after=try history.read(historical.handle,sourceID:historical.sourceID,verifyMedia:{_,_,_ in})
                     guard try after.reference==historical.reference,try SyncProtocolLimits.encode(after.memory)==SyncProtocolLimits.encode(historical.memory) else {throw OSwindError.invalid("Incoming historical citation changed during admission")}
                 }
-                _=try cache.resolve(record.identity,content:nil,admit:{_ in});try admission.withActive(for:library.mediaRootIdentity) {};return local
+                try SyncIncomingDependencyAudit.check([record],cache:cache)
+                let after=try cache.journal.state(for:record.identity.key)
+                guard !after.isDeleted,after.heads.count==1,after.heads.first?.content==reference.content,try cache.resolve(record.identity,content:nil,admit:{_ in}).encoded()==record.encoded() else {throw OSwindError.invalid("Incoming head or exact projection changed during admission")}
+                try admission.withActive(for:library.mediaRootIdentity) {};return local
             }
         }
     }

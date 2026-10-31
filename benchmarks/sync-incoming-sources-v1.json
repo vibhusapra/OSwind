@@ -1,0 +1,985 @@
+{
+  "format": "OSwind incoming source projection and exact cited-original preservation qualification",
+  "version": 1,
+  "state": "component-qualified",
+  "overallV0Complete": false,
+  "createdAtUTC": "2026-10-31T15:33:08.366497+00:00",
+  "sourceBase": "39a0190641961134472b38e7246ddcb8c81006bc",
+  "branch": "codex/sync-incoming-sources",
+  "schema": 28,
+  "repositoryInputs": 679,
+  "repositoryInputManifest": "benchmarks/sync-incoming-sources-inputs-v1.json",
+  "repositoryInputManifestSHA256": "cd7826f0edccf34ffd3e5bec4f5d3e771362c3feb85765677cc3424004c28f0b",
+  "qualificationInputs": 680,
+  "packageInputs": 683,
+  "qualificationResultSHA256": "6b86914f95598e7574073b63c4f30552479e3f4c0568d23e54e4d1775ce579e1",
+  "packageResultSHA256": "3d54b732d5862b381d8ba58cd7f2c6909cb3131c730a649f8edd8e3b39c1f1f8",
+  "qualificationInputManifestSHA256": "b405ec5a9470dbdd656350b98af061781715c31b6e6559921bc633e48809388c",
+  "packageInputManifestSHA256": "be2f4aedcd446af35e87c9e5608147e7ec592502c91e79a318461eb8eb21da2f",
+  "masterDriverSHA256": "463c62d1f7e29aea8c3a9b8f840e5d7a49384fde3647d6cddac6e756411c6a56",
+  "sameRepositoryInputsAcrossAll24Stages": true,
+  "fullDefault": {
+    "defined": 1624,
+    "passed": 1547,
+    "skipped": 77,
+    "failures": 0
+  },
+  "threadSanitizer": {
+    "defined": 432,
+    "passed": 422,
+    "skipped": 10,
+    "failures": 0,
+    "raceWarnings": 0
+  },
+  "optimized": {
+    "defined": 432,
+    "passed": 424,
+    "skipped": 8,
+    "failures": 0
+  },
+  "SDKTests": 16,
+  "stages": [
+    {
+      "driver": "qualification-v4",
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "a46f84cb32284a25f95de3723db723bf25ddf299f29388cad9253a2df9dd4c54"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "a0ac9d634669c0780347aca36fc0b0e3d03af1bfc233a575f076346e53d4f22d"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "bc6ac26a59efb44b91ae97f325fdd078b36daf6d85397fd292748d5bb0333783"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "independent-scale",
+      "returncode": 0,
+      "log": "independent-scale.log",
+      "logSHA256": "5e6c4aaea9dbb74ff2a090e759e2ec424420363a462d31b91b296368448074a8"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "reader-controls",
+      "returncode": 0,
+      "log": "reader-controls.log",
+      "logSHA256": "771cd1b2b194a483927952129151b174f32066276f231347b38614e53ad827ce"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "identity-reader-controls",
+      "returncode": 0,
+      "log": "identity-reader-controls.log",
+      "logSHA256": "f9c9f4386d419e2fe5e6d9fc0f77e9890f330920006d0e62967998b510cf2de6"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "source-independent-scale",
+      "returncode": 0,
+      "log": "source-independent-scale.log",
+      "logSHA256": "8341ee65816441448d15a0150a41c7ae3f2f43c321393c99a58d5c0b5a985360"
+    },
+    {
+      "driver": "qualification-v4",
+      "name": "source-reader-controls",
+      "returncode": 0,
+      "log": "source-reader-controls.log",
+      "logSHA256": "db470cb0858492a8e31e9698b7cf5da6b22eea64da148291cb1797bf46c0a1bd"
+    },
+    {
+      "driver": "package-v1",
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "75085920b52e8b4563d2d7002a31717b8967dd8153136e506b90803690be04ae"
+    },
+    {
+      "driver": "package-v1",
+      "name": "sdk",
+      "returncode": 0,
+      "log": "sdk.log",
+      "logSHA256": "aeb3c5d67ffa4fcdc9c3a11b6c8f7b63c59f7be339948ec9e009158d8051226f"
+    },
+    {
+      "driver": "package-v1",
+      "name": "api",
+      "returncode": 0,
+      "log": "api.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "driver": "package-v1",
+      "name": "indexed-api",
+      "returncode": 0,
+      "log": "indexed-api.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "driver": "package-v1",
+      "name": "original-field-cli",
+      "returncode": 0,
+      "log": "original-field-cli.log",
+      "logSHA256": "50efdf948376f657a3eebbc99947f5c0ee83433bcbd61209c252833713134631"
+    },
+    {
+      "driver": "package-v1",
+      "name": "erasure",
+      "returncode": 0,
+      "log": "erasure.log",
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d"
+    },
+    {
+      "driver": "package-v1",
+      "name": "deletion-retention",
+      "returncode": 0,
+      "log": "deletion-retention.log",
+      "logSHA256": "88a6356015056179a95ee06adbfb9dda487510bcfbf2c1e57d0c372b6d15610c"
+    },
+    {
+      "driver": "package-v1",
+      "name": "wipe",
+      "returncode": 0,
+      "log": "wipe.log",
+      "logSHA256": "7d2f413b030f9efd79d06e18a89ca492355da9aa13cbefc86265c20884f40390"
+    },
+    {
+      "driver": "package-v1",
+      "name": "recap",
+      "returncode": 0,
+      "log": "recap.log",
+      "logSHA256": "0c030ac296fc00e52b35e43a3e9158a401f391325567c9e7f7ffe5fa727d6dfc"
+    },
+    {
+      "driver": "package-v1",
+      "name": "backup",
+      "returncode": 0,
+      "log": "backup.log",
+      "logSHA256": "96cdfbb19a8e3432a3eff13b55fdabb8fb4351fd97b9117f9799f2c0cf6e335a"
+    },
+    {
+      "driver": "package-v1",
+      "name": "packaged-old27",
+      "returncode": 0,
+      "log": "packaged-old27.log",
+      "logSHA256": "eb127cb5407131cbbd5b50f88746d5c51a963ab8be2d1fac14c5141e3de94328"
+    },
+    {
+      "driver": "package-v1",
+      "name": "packaged-old26",
+      "returncode": 0,
+      "log": "packaged-old26.log",
+      "logSHA256": "e98affe07437ad45e75c01fc6b9b55a61669da7651e6f3c46d30279b1c9bc2df"
+    },
+    {
+      "driver": "package-v1",
+      "name": "packaged-old25",
+      "returncode": 0,
+      "log": "packaged-old25.log",
+      "logSHA256": "d245e247421a80698cd5ff3a863a5a0c01786b095f570641202d23899675ef5f"
+    },
+    {
+      "driver": "package-v1",
+      "name": "reader-noteonly",
+      "returncode": 0,
+      "log": "reader-noteonly.log",
+      "logSHA256": "2818b7ec231ff73f99659c957f0ba0e6636e5ca9daab70e20bb0c764ea1822ac"
+    },
+    {
+      "driver": "package-v1",
+      "name": "historical-backup",
+      "returncode": 0,
+      "log": "historical-backup.log",
+      "logSHA256": "0445e01eb1a2da067b793b99becb5de8684eec3aaa6856e1726296bce251a6b3"
+    },
+    {
+      "driver": "package-v1",
+      "name": "package-review",
+      "returncode": 0,
+      "log": "package-review.log",
+      "logSHA256": "1c0951f0395a3363a39824d9d368628399e595fa3d96fafe11e4b22bc593de16"
+    }
+  ],
+  "incomingSourceScale": {
+    "state": "reviewed",
+    "readerSHA256": "f4e4e983dbd02a79476ceaa5d6e1b530e926b74d3c587767e6d8c16fc893c883",
+    "frameReaderSHA256": "d1d748ee9aa03ac6b3f3c34897bce259143757079686d02ed5f162b01a65ff95",
+    "results": [
+      {
+        "count": 1000,
+        "currentProjections": 1120,
+        "cachedVersions": 1130,
+        "originals": 30,
+        "incomingSeconds": 8.928084708284587,
+        "citedUpdateSeconds": 1.696341208415106
+      },
+      {
+        "count": 10000,
+        "currentProjections": 10120,
+        "cachedVersions": 10130,
+        "originals": 30,
+        "incomingSeconds": 90.66416437504813,
+        "citedUpdateSeconds": 1.6654803750570863
+      }
+    ],
+    "unchangedProducerAndReceiverSQLiteFiles": {
+      "n1000/producer/memory.sqlite": "a4f49a798942b275f70943abcdcfb3822fc8bb5b28bf18f59a0ba616e2cb5de5",
+      "n1000/receiver/memory.sqlite": "ae275c865b8a253b979b3553ffde0916cb12724d9cce1f76fa6d41d55b3af7ad",
+      "n10000/producer/memory.sqlite": "67c131ce0e1602d6c17348b3588cd989592868dd9c620c5a6bd7c974b19066b4",
+      "n10000/receiver/memory.sqlite": "4357180e9a7e759b9304e740149457edc111e8b75836f53becd35b6801662f6f"
+    },
+    "scope": "One warm authored 1KiB note run per size,128-record incoming transactions and ten cited updates with two recap levels. Exact current frames/packets, archival native projections/DAG/accounting and old chain content independently verified. Excludes media, models, transport, policy inference, cold cache, physical power and competitor ranking."
+  },
+  "sourceReaderCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "unrun incoming phase",
+      "nonfinite incoming timer",
+      "unmarked corpus",
+      "missing source writer protection",
+      "forged current native frame binding",
+      "missing archival parent edge",
+      "forged original native projection",
+      "retargeted pin with valid independent foreign keys"
+    ],
+    "originalFixturesUnchanged": true
+  },
+  "historicalReaderCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "forged selected original handle",
+      "nonfinite timer",
+      "unqualified future schema",
+      "unmarked library",
+      "missing writer protection",
+      "valid JSON original body with stale exact hash"
+    ],
+    "originalFixturesUnchanged": true
+  },
+  "identityReaderAdmissionTests": 9,
+  "independentClosedReceivers": {
+    "state": "reviewed",
+    "fixture": "development-v14",
+    "results": [
+      {
+        "case": "-_SyncIncomingSourceTests_testDeniedPolicyForeignAndReleasedReservationsAndIdentifierCollisionRollbackReceipt_",
+        "projections": 2,
+        "cachedVersions": 2,
+        "originals": 0,
+        "canonicalSources": 2,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testIncomingAudioPreservesSessionAndAttributionWithoutLocalModelAuthority_",
+        "projections": 1,
+        "cachedVersions": 1,
+        "originals": 0,
+        "canonicalSources": 1,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testIncomingRecapAndDerivedCitationReplacementPreserveEvidenceAcrossSequence_",
+        "projections": 8,
+        "cachedVersions": 9,
+        "originals": 2,
+        "canonicalSources": 2,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testIncomingSampledSpanMovesExistingPinToOldVersionAndOrdinaryEditStillInvalidates_",
+        "projections": 0,
+        "cachedVersions": 0,
+        "originals": 0,
+        "canonicalSources": 1,
+        "pendingRawLocalChanges": 2
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testIncomingSourceProjectsExactScreenMediaMetadataAndWireBindingWithoutEcho_",
+        "projections": 1,
+        "cachedVersions": 1,
+        "originals": 0,
+        "canonicalSources": 1,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testLateAncestorJournalDeletionCannotCommitNewRecapGraph_",
+        "projections": 4,
+        "cachedVersions": 4,
+        "originals": 1,
+        "canonicalSources": 2,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testLateHeadAndNativeMutationRefuseAndRollbackEntireIncomingReceipt_",
+        "projections": 1,
+        "cachedVersions": 1,
+        "originals": 0,
+        "canonicalSources": 1,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testLateMediaByteMutationRefusesDatabaseProjectionWithoutPretendingToUndoCallerWrites_",
+        "projections": 1,
+        "cachedVersions": 1,
+        "originals": 0,
+        "canonicalSources": 1,
+        "pendingRawLocalChanges": 0
+      },
+      {
+        "case": "-_SyncIncomingSourceTests_testNewIncomingHeadPreservesCurrentAndHistoricalRecapChainsAndCitedOriginals_",
+        "projections": 13,
+        "cachedVersions": 14,
+        "originals": 3,
+        "canonicalSources": 3,
+        "pendingRawLocalChanges": 0
+      }
+    ],
+    "unchangedSQLiteFiles": {
+      "-_SyncIncomingSourceTests_testDeniedPolicyForeignAndReleasedReservationsAndIdentifierCollisionRollbackReceipt_/receiver/memory.sqlite": "510e243c119a73f361a3aee592827bdc8b7cb012d19fa1dabe857ba9147b4a04",
+      "-_SyncIncomingSourceTests_testIncomingAudioPreservesSessionAndAttributionWithoutLocalModelAuthority_/receiver/memory.sqlite": "1615136d2e061dc8403449320293bbf4aa8be6c8be284748d1276ef720a5104d",
+      "-_SyncIncomingSourceTests_testIncomingRecapAndDerivedCitationReplacementPreserveEvidenceAcrossSequence_/receiver/memory.sqlite": "957d44b0f7774cbe65bb34e1cf1bfc27c6a326a8f8e6ca0c596395ef2fd64942",
+      "-_SyncIncomingSourceTests_testIncomingSampledSpanMovesExistingPinToOldVersionAndOrdinaryEditStillInvalidates_/receiver/memory.sqlite": "c3afcef622d1be372fe6005ed5d5d00e177998b31e1c5943f32c82bc42b4fccb",
+      "-_SyncIncomingSourceTests_testIncomingSourceProjectsExactScreenMediaMetadataAndWireBindingWithoutEcho_/receiver/memory.sqlite": "dec2dfda844c5e60269300268f57a5ad76a7fdac50575172562aed184ffee0a4",
+      "-_SyncIncomingSourceTests_testLateAncestorJournalDeletionCannotCommitNewRecapGraph_/receiver/memory.sqlite": "1ba2a3ea65205d4252f670fe59d17c3c91e19a4c0324e1dd55e33df08e0fe8bf",
+      "-_SyncIncomingSourceTests_testLateHeadAndNativeMutationRefuseAndRollbackEntireIncomingReceipt_/receiver/memory.sqlite": "20d1e371c6f7a870ff5a6d08b440e716b7ac6ac3f9b729e5770ca207783ed272",
+      "-_SyncIncomingSourceTests_testLateMediaByteMutationRefusesDatabaseProjectionWithoutPretendingToUndoCallerWrites_/receiver/memory.sqlite": "bb05efba5524531678678121333044d86525cf8247a9fbafc74457461db0da36",
+      "-_SyncIncomingSourceTests_testNewIncomingHeadPreservesCurrentAndHistoricalRecapChainsAndCitedOriginals_/receiver/memory.sqlite": "f314f3d6628534edd34627b9ff03c28c5d0956878c4140a0686cfab5bb2d9df2"
+    },
+    "scope": "Closed owned receiver databases; independently recomputed every current row frame/projection digest and cached packet hash/length, checked foreign keys and expected pending local changes. Sampled-span case intentionally ends after ordinary local correction. Does not independently reconstruct every portable source or archival projection, and is not service, power, crash or competitor evidence."
+  },
+  "independentRetainedSourceCrashRecovery": {
+    "state": "reviewed",
+    "fixture": "development-v24 retained own-child pre/postcommit source crashes",
+    "readerDependencies": {
+      "sourceReaderSHA256": "f4e4e983dbd02a79476ceaa5d6e1b530e926b74d3c587767e6d8c16fc893c883",
+      "frameReaderSHA256": "d1d748ee9aa03ac6b3f3c34897bce259143757079686d02ed5f162b01a65ff95"
+    },
+    "results": [
+      {
+        "phase": "after",
+        "currentProjections": 8,
+        "originals": 2,
+        "nativeCitationsExact": true,
+        "exactJournalHead": true,
+        "noEcho": true
+      },
+      {
+        "phase": "before",
+        "currentProjections": 8,
+        "originals": 0,
+        "nativeCitationsExact": true,
+        "exactJournalHead": true,
+        "noEcho": true
+      }
+    ],
+    "unchangedReceiverSQLiteFiles": {
+      "-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/receiver/memory.sqlite": "51e314e5c615c62b280f4e11fb051656eccf8225b685d364518d91d650509b88",
+      "-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/receiver/memory.sqlite": "9120c3466f4070baf22066ab74bbdc9a88712b7baf5bb40f19d9facb56f11cc6"
+    },
+    "scope": "Closed receiver databases after real own-child SIGKILL and product recovery. Native current text/citation direction, exact projection/packet hashes, archival native fingerprints/dependency edge, journal head and outgoing counts independently verified. Text-only fixture; no media byte crash, physical power loss, service or competitor claim."
+  },
+  "actual27BackupAndCurrentRestore": {
+    "state": "passed",
+    "fixtureSHA256": "fd9648b2a47421b3758185b17d4daf35ce1ee03204883e60d6526f64f142be7a",
+    "binarySHA256": "c1b52698c2b1162fe5cf3bcc6bb1997b45b7f45ba74a7b5fcda0df59126cbeac",
+    "actual27BackupReadOnlyAndQuietRestore": true,
+    "actual27SQLiteMigrationPreservesOriginalBodies": true,
+    "current28ArchiveQuietRestore": true,
+    "originalBindingsPreserved": true,
+    "restoredOriginalFieldErasure": true,
+    "allChildrenTerminal": true,
+    "old27ArchiveFilesUnchanged": {
+      "header.json": "d82c75cec6b4f8907e6551ed9b9325435281d6335643b6c666692ef8f9a16ad1",
+      "settings.json": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09",
+      "memory.sqlite": "72722c868d51d0e52e6b8f221c5527df02c026e8c9b6f59c1060803803a93a1b",
+      "media.ndjson": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "current28ArchiveFilesUnchanged": {
+      "header.json": "0d048749ad6ebefaa9d6c502e40a37c81599c00320f59b0fe45b8087a7f3126b",
+      "settings.json": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09",
+      "memory.sqlite": "87220b9749654f9f7663412c768796489e343db4d61726d616ea2a2833b5306f",
+      "media.ndjson": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "packageReview": {
+    "state": "passed",
+    "allExtractedFilesEqualStagedFiles": {
+      "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+      "Contents/_CodeSignature/CodeResources": "eba55d573f0637eb554655a5726c1ebbcd2d75794caa4990aac18de1bfc88bcf",
+      "Contents/MacOS/oswindctl": "c1b52698c2b1162fe5cf3bcc6bb1997b45b7f45ba74a7b5fcda0df59126cbeac",
+      "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+      "Contents/MacOS/OSwind": "02f125c54e723d509b0278e1a143ef9e59d833bb57888ad7f737fe4f610c39f7",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "stagedAndExtractedStrictSignatures": true,
+    "zipSHA256": "173c7a888e09a623f8f59d654f5fa0f57b8bbe55135d8b7b5033c8ddf5b699f8",
+    "testFixturesAbsent": true,
+    "installedAppNotTouched": true
+  },
+  "packagedCLI_SHA256": "c1b52698c2b1162fe5cf3bcc6bb1997b45b7f45ba74a7b5fcda0df59126cbeac",
+  "packagedFiles": {
+    "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+    "Contents/_CodeSignature/CodeResources": "eba55d573f0637eb554655a5726c1ebbcd2d75794caa4990aac18de1bfc88bcf",
+    "Contents/MacOS/oswindctl": "c1b52698c2b1162fe5cf3bcc6bb1997b45b7f45ba74a7b5fcda0df59126cbeac",
+    "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+    "Contents/MacOS/OSwind": "02f125c54e723d509b0278e1a143ef9e59d833bb57888ad7f737fe4f610c39f7",
+    "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+    "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+    "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+    "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+    "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+    "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+    "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+    "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+    "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+    "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+    "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+    "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+    "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+    "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+    "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+    "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+    "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+  },
+  "testFixturesAbsentFromApp": true,
+  "installedAppUnchanged": true,
+  "installedFilesBefore": {
+    "Contents/Info.plist": "cbe401ba3fea571e63103ce260d6b0946952c8ee62d1fe2a6a21ad9d079a7a16",
+    "Contents/_CodeSignature/CodeResources": "2f576adc15eb70ac542ed2e5fefd3892eb5e05fe9a9fbb6d412e749b3efebcf3",
+    "Contents/MacOS/oswindctl": "426f86c9abcc4207e3f18e61a6178065cf96e703349da8c534ee7985cd250efe",
+    "Contents/MacOS/OSwind": "22fa18945187ef4811c87f97ca52b2ef69eb5ac3acce130d3319041779ff3fb3",
+    "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+    "Contents/Resources/ThirdParty/NOTICES.txt": "ce022d68cf41ce4f2a9b98d98f7f9611cccd51fe250e48c57a71d84d910a9cf3",
+    "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+    "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+    "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+    "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+    "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4"
+  },
+  "hardware": {
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2"
+  },
+  "retainedAttempts": [
+    {
+      "attempt": "development-v1",
+      "state": "failed",
+      "sourceInputsSHA256": "9dc35fc1d46e406962f251e4ae9cdae3479bf3834bb449a84296cbe4c4828491",
+      "resultSHA256": "00d5ef455d56428ae77a429e4882e5396593458c6727d3919f86d90f2ba97b36",
+      "stages": [
+        {
+          "name": "cache-erasure-regression",
+          "returncode": 1,
+          "log": "cache-erasure-regression.log",
+          "logSHA256": "6684329e6a8235b845a22ab6c89bc3a938538093620ad9e69bad1581216451f0"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v2",
+      "state": "failed",
+      "sourceInputsSHA256": "1746a41a2a48eb24fb304a890b5d93d69a01dedda4b68757fac09758cbc4302e",
+      "resultSHA256": "41fcfe61b6e7bc881dc0b075e885fc18ca8876e71cb07a401fa853474216974e",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "cbe4c658c94f6a16f9bd1a155e4846a5f2fce343889f719602a1574b74f95153"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v3",
+      "state": "failed",
+      "sourceInputsSHA256": "cdf46c80441171bed63af126fe9eb75f6bc6c7b3af7b7dbbf6a127bf414c068c",
+      "resultSHA256": "a1829b497f64ac11f9e04942de79f4d016bf062d8511a99bea51558570a5fc9e",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "0fbab0a49db1b0e78ca079b0fc9ac8ff44f1ad782239d5628d30a89ee0d5ca9b"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v4",
+      "state": "failed",
+      "sourceInputsSHA256": "b26f2997735c3dc7eb2bc9f0bf92b10d6c42e276ab55ce2b3b37a8ebe8123bb0",
+      "resultSHA256": "15934f716ea6e03f9e112bc586927af06654630b13d12df44a40a2aea733b791",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "64aad84b9b3181c71cd6b519d1c5ea95c13008111ae86a3042050c300ed21d4d"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v5",
+      "state": "failed",
+      "sourceInputsSHA256": "31eced1e84cba6916cd89549e20623e88653eed24c370aeb10e8374d916e4c6a",
+      "resultSHA256": "7afa94c086660077970fc652deb87f99df547cc710f9aa48b61aef203b34b64f",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "0e8302c2b4310148e1aca488f4019e30f2951a3cea5a6e41c2aaa147b0b3012e"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v6",
+      "state": "passed",
+      "sourceInputsSHA256": "cae3804cc5ee594bc7f392b6dd6bdc46c0f4cbff4a2f447a61db19ce006cb1c0",
+      "resultSHA256": "f284f061f1882abc0393a4484939c6061a5ddac61aabc94e91d940d02ae539e4",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "700f36929935aa70172202f7c50130c47270ba089f8a0a70f855386a6a817e51"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v7",
+      "state": "failed",
+      "sourceInputsSHA256": "78778db3bddc1d478bf52001bec107c0d119855dbd2bfcc38a532457c8981b1b",
+      "resultSHA256": "acdd44fd5b8223ee56c619a8ba4ad65dd80665cb66fc542bad54c32ce18551d2",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "5c73849e6db774b1caad9b72d71c8f6bb7412d08ace96e3483c9f2fddd5bd2bb"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v8",
+      "state": "passed",
+      "sourceInputsSHA256": "82f2fcc65d1de951bd114f3c7391215637a38aef0c99d40b82a8965d60b5cfa2",
+      "resultSHA256": "71b506151e347c51a6754deba90c991b9ce0af1c72e00bac8b87828d767f43ed",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "2dbf7d423046286898d4ecba3f33673a73637d0fa92b2fff4c6ee9211c09be2f"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v9",
+      "state": "passed",
+      "sourceInputsSHA256": "142e513010954a6a8374555c7320acfc13f5485809e23346fca53f5689750d66",
+      "resultSHA256": "b3a8385acbcfcf1b58384a99c61bded57a888cb6ab5d383097d7921dfa7c67c3",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "be5c882b5d1815adffdb7b4bf8b3c4a4ae10e59b1f32b716974827272850ab87"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v10",
+      "state": "passed",
+      "sourceInputsSHA256": "d40e302984f8dc367397e7d4259e3573a35414ec3e3bb7ad9cfde5acc9d73d9f",
+      "resultSHA256": "780e9907b4225d763053b644576d00deaf0b7007a4f379d2be31d9b37bf13247",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "2c12e37cf1177b1bf3235060f33810f130c2f6e98250fb6ea7501856410f6fe7"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v11",
+      "state": "failed",
+      "sourceInputsSHA256": "3bd58a633d5848d0bc5aff5b3674c89b5318e1c624506aed8ef4fa3751229b57",
+      "resultSHA256": "bfe74e0114bea3675475709803f747ef7505356e77b46407fd1a4f0f6a6afc8d",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "b7fa8e0e8e254ef901a68e2f8b6407cd7b6541678b74fcbb161eb3d33d3022c9"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v12",
+      "state": "passed",
+      "sourceInputsSHA256": "8e961eed6c4a7175a9b72f3211b33d89b1c6d164e250d0a8e8bea8bc17a73627",
+      "resultSHA256": "909673b52d17729c68332bae4c2c03436874f34d5e8e6074f97085939c0cb23d",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "2305163ec25d43a075975da73de2127d01d9dc553340081357026dc6e58421db"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v13",
+      "state": "failed",
+      "sourceInputsSHA256": "2c8d504a0d5ab1d0f1f35422b6c8d3c2594d978778be685dc4c2048faa589dfc",
+      "resultSHA256": "4ed5092320bf3373bfec51f8f9d4a260ea6d2cfd4eef6e78db8a56a883077514",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "6063f63f55c6072e8cb539ea6605516ff491063bb459c550f88a60239719321e"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v14",
+      "state": "passed",
+      "sourceInputsSHA256": "3bebe133dbc5d78b002c952b759514fe37bd7321346ccee0ef404f7659c4e336",
+      "resultSHA256": "b2f92fd201f8bda29262dd6be64f4eded53ff67f873045991542cf4aaa4f99a4",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "1dc2409814c6334011f64c3efe83fa581b7d7eb226cad550b890683b16da8375"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v15",
+      "state": "passed",
+      "sourceInputsSHA256": "d97b95a2bbc254fa22587e1b2b0c5a6b12c897cb5a5ed669f5dfabbb858edf78",
+      "resultSHA256": "e8fee37b61d59b64d5279ed07dbeb4a20dcd80a168bcd80ee6357dd32eb7015f",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "008d9daca58cf7ca4db1b3f11d947c8a5b27ff275c05f61d2fd87690f723b307"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v16",
+      "state": "passed",
+      "sourceInputsSHA256": "920cba1d662ed8a277ff0f13a2b02690c1909d27cb8c287386e2ddf845653451",
+      "resultSHA256": "af3a838451c93e0ea855a5f6d40e5837caff4df26fc579ed553df850ba0ab4a9",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "f206200988321fde3fe7db813b57d7d428e72f51b33f0cf7c3004365bd3f982c"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v17",
+      "state": "passed",
+      "sourceInputsSHA256": "ad5dfae18e1e520a09f5a94a524868fffc4a609c3cf81b1cb451327402733fdd",
+      "resultSHA256": "a9f47ab195f4510162d1b1505f359ef51ee155bbbef2cfa147c29bbb2e890f4c",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "d230b88965124881befb573b4eb18e8fa9e920da414d292bef5b705964df3581"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v18",
+      "state": "failed",
+      "sourceInputsSHA256": "bf189f6f460a2d0b02997742ce6e19beb7cd52177b20bf96de1667b1976824a8",
+      "resultSHA256": "f26231949e86465e8e14cb5ca5d68b42be8c7d237557518fa15822174445f721",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "4b782cbf57062d3c982c7ed10706e031769b9f56989bd8bb2983d8720ff4236b"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v19",
+      "state": "passed",
+      "sourceInputsSHA256": "41c5d0817563624def3036cac1206d165278f4b1007226892404e6f915d52cc1",
+      "resultSHA256": "1528667566d595600c8fcda8ce221914b29627ef1b344ca9685ef9f59ce83599",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "a0a6cb03a41173f9d281cd36077efcf972ad65bea7a7440db95c48c06b6cdbd5"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v20",
+      "state": "failed",
+      "sourceInputsSHA256": "4d6970603d38b7c05a8cc835f390e420b8b0ac15fa61df12a44fff53f5b2913d",
+      "resultSHA256": "4ba85de03835f2a919e0cc4aa03d371aeced7a0da2b24089d5b7b48ac7aeb480",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "175f2eff1d05bf2c29d3922f547f0bb77ea16c411a6824a7863be6ee027fbeae"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v21",
+      "state": "failed",
+      "sourceInputsSHA256": "4264ed051d202c8fc4236dd5d5716e036f79425b8452914ce2e1e507de3631c4",
+      "resultSHA256": "2e09b582cb336ab39fb31e6f7641e9d918d603bf892e256fbc38a4dfcd306f1f",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "782e9fe238b0aec96ae2499a9ef398fe5ddee452ec27c76e4cad128c0a81c114"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v22",
+      "state": "failed",
+      "sourceInputsSHA256": "02e4d9055f3f4d9cb5c606cb1ee022cab036f341facc39177e4849a88578c7d1",
+      "resultSHA256": "aeaadf9b5ba31bb8a2813948ff16926b9911427bc8773e564869306ae7ccedca",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 1,
+          "log": "source-projection-regression.log",
+          "logSHA256": "e34cb0cb19b6a5d24ee33dd10739d4d9e0429dd3cafa1c827fdc1578644efd0f"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v23",
+      "state": "passed",
+      "sourceInputsSHA256": "b356438e4455d10751ca2c078b91f9720eef9150d0d322f23a5b6cde1775e53b",
+      "resultSHA256": "422db081887a42a1273b87743db64f80631d8d0ef1f4ba482f02a17f86f081e8",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "db32547c021301c98e45bc820a3e34612d5a5b24805ea41be839403b456c7ead"
+        }
+      ]
+    },
+    {
+      "attempt": "development-v24",
+      "state": "passed",
+      "sourceInputsSHA256": "11beb4257b9fed13de2f595a6b56fb818ce1090d9defc9007757e85738c98307",
+      "resultSHA256": "3466c0803d91c14c0836741359f3c3e70dc102757ad5b690e1d7cc51aa5f7e4a",
+      "stages": [
+        {
+          "name": "source-projection-regression",
+          "returncode": 0,
+          "log": "source-projection-regression.log",
+          "logSHA256": "c122789e74f6b82de8772c427b80d4f6c99e1731cd38e9523868f8a6a081a530"
+        }
+      ]
+    },
+    {
+      "attempt": "qualification-v1",
+      "state": "failed",
+      "sourceInputsSHA256": "e32bdafc0e941b5275d57837ee133ea33d7e5222d8ad4ca32e2f0cacb986484a",
+      "resultSHA256": "69c71b9fdb36d510e31e13d9643369e7521a977baa33ace7ce1ccb9ff4d6f9aa",
+      "stages": [
+        {
+          "name": "full-debug",
+          "returncode": 1,
+          "log": "test.log",
+          "logSHA256": "e2c7ea8263a28a04630ea2745cf2398bb4ecd4a17797873f4f7150cdf8ca93bc"
+        }
+      ]
+    },
+    {
+      "attempt": "qualification-v2",
+      "state": "passed",
+      "sourceInputsSHA256": "4c2f7b93d3710a9f9ee0df2ba3eef42ae77c3bf12763ce2d9400f24c0c3f8b8e",
+      "resultSHA256": "a25cb53d84e750ac88f2766089174d80896692c322347708de96628de05ca097",
+      "stages": [
+        {
+          "name": "full-debug",
+          "returncode": 0,
+          "log": "test.log",
+          "logSHA256": "834d1d91ed9668e96004af759100315c59a29db2caa31801dcb30775a8bc889e"
+        },
+        {
+          "name": "thread-sanitizer",
+          "returncode": 0,
+          "log": "thread-sanitizer.log",
+          "logSHA256": "a9dba43ad5893291105abc253e3e48d40df72d4b24dcffab899ec3d251b2edb9"
+        },
+        {
+          "name": "optimized",
+          "returncode": 0,
+          "log": "optimized.log",
+          "logSHA256": "72c55e9eec4306a7ad020d9c19861356c39b378d8515867b4cf41818b02f7fad"
+        },
+        {
+          "name": "independent-scale",
+          "returncode": 0,
+          "log": "independent-scale.log",
+          "logSHA256": "e51acfade98e59165ed7ca937b6c07dc0d438b04a275d8f9cf7a88562f92b1c4"
+        },
+        {
+          "name": "reader-controls",
+          "returncode": 0,
+          "log": "reader-controls.log",
+          "logSHA256": "771cd1b2b194a483927952129151b174f32066276f231347b38614e53ad827ce"
+        },
+        {
+          "name": "identity-reader-controls",
+          "returncode": 0,
+          "log": "identity-reader-controls.log",
+          "logSHA256": "9fb488c853b982cb61235adb30644810fbd5f49f993b05822a87ba2a867f0741"
+        }
+      ]
+    },
+    {
+      "attempt": "qualification-v3",
+      "state": "passed",
+      "sourceInputsSHA256": "d6bae95965fadab361993999decc96a1572840cbaa3c4246ac28e22de43b02b4",
+      "resultSHA256": "7f3bf958a8d2b083f2f5240e6c1617770a9a56fd59c96544fff304e56b4de910",
+      "stages": [
+        {
+          "name": "full-debug",
+          "returncode": 0,
+          "log": "test.log",
+          "logSHA256": "6f470fc344b4936fa0cb8acae8faae608f8e027bdad4d8e18a711f3318286471"
+        },
+        {
+          "name": "thread-sanitizer",
+          "returncode": 0,
+          "log": "thread-sanitizer.log",
+          "logSHA256": "d301c9866e6afe56aa855ae6d3d3a4765518554508f7a406ccd924809f7abacb"
+        },
+        {
+          "name": "optimized",
+          "returncode": 0,
+          "log": "optimized.log",
+          "logSHA256": "f030feedd597bb521e53a9f89a63dfef415665cc0262581563ea9d011fe02d5f"
+        },
+        {
+          "name": "independent-scale",
+          "returncode": 0,
+          "log": "independent-scale.log",
+          "logSHA256": "5fd46b2dd4a0c2ef68072de3f272a948c5b64c18023584f809bd033ad691d31a"
+        },
+        {
+          "name": "reader-controls",
+          "returncode": 0,
+          "log": "reader-controls.log",
+          "logSHA256": "771cd1b2b194a483927952129151b174f32066276f231347b38614e53ad827ce"
+        },
+        {
+          "name": "identity-reader-controls",
+          "returncode": 0,
+          "log": "identity-reader-controls.log",
+          "logSHA256": "f9c9f4386d419e2fe5e6d9fc0f77e9890f330920006d0e62967998b510cf2de6"
+        },
+        {
+          "name": "source-independent-scale",
+          "returncode": 0,
+          "log": "source-independent-scale.log",
+          "logSHA256": "2e92f8982b170ee19f3b35991ec799d1360eb24562056552f582af10c7087817"
+        },
+        {
+          "name": "source-reader-controls",
+          "returncode": 0,
+          "log": "source-reader-controls.log",
+          "logSHA256": "db470cb0858492a8e31e9698b7cf5da6b22eea64da148291cb1797bf46c0a1bd"
+        }
+      ]
+    }
+  ],
+  "scope": "Internal source/recap/citation adapter component. Real outgoing/journal/native projection, exact originals, shared typed dependency/head audit and schema28 fences. No background service, enrollment, transport, model/media/power or whole-product ranking claim.",
+  "remaining": [
+    "Typed incoming recipes/run history/entities/aliases/mentions/corrections and complete deletion adapters",
+    "Safe format-admitted content-addressed media staging and lifecycle/backpressure",
+    "Current-policy/erasure epochs, cache-only scope selection and late provider semantics",
+    "Enrollment/keys/Keychain, transport/providers, provenance/service/UI and two-Mac acceptance",
+    "Historical media/playback/export/save-recap and combined graph/replay cases",
+    "Native unattended capture, calibrated physical energy, distribution and competitor ranking"
+  ],
+  "featureStatusesUnchanged": {
+    "liveVerified": 4,
+    "partial": 40,
+    "implemented": 6,
+    "tested": 23,
+    "todo": 3,
+    "outsideV0Desktop": 2
+  }
+}

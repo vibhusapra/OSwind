@@ -14,7 +14,7 @@ def review(root):
     need(stat.S_IMODE(root.stat().st_mode)==0o700 and (root/'owned-fixture').read_bytes()==b'OSwind authored historical erasure scale v1','Missing private authored marker')
     reports=json.loads((root/'report.json').read_text());need([r['count'] for r in reports]==[1000,10000],'Unexpected scale sizes');results=[]
     for report in reports:
-        n=report['count'];base=root/('n%d'%n);need(json.loads((base/'report.json').read_text())==report and report['librarySchema']==27,'Schema/report differs')
+        n=report['count'];base=root/('n%d'%n);need(json.loads((base/'report.json').read_text())==report and report['librarySchema'] in (27,28),'Schema/report differs')
         snapshots=[]
         for name,path in [('before',base/'before.sqlite'),('after',base/'library/memory.sqlite')]:
             need(path.resolve()==path and path.is_file() and not path.is_symlink(),'Invalid snapshot')
@@ -22,7 +22,7 @@ def review(root):
                 side=path.with_name(path.name+suffix);need(not side.exists() or side.stat().st_size==0,'Snapshot journal remains')
             digest=file_sha(path);rows={};sources={};logical=0
             with contextlib.closing(sqlite3.connect(path.as_uri()+'?mode=ro&immutable=1',uri=True)) as db:
-                need(db.execute('PRAGMA user_version').fetchone()==(27,) and db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not db.execute('PRAGMA foreign_key_check').fetchall(),'Snapshot integrity differs')
+                need(db.execute('PRAGMA user_version').fetchone()==(report['librarySchema'],) and db.execute('PRAGMA quick_check').fetchall()==[('ok',)] and not db.execute('PRAGMA foreign_key_check').fetchall(),'Snapshot integrity differs')
                 for table in ['chat_turns','chat_sources','recap_sources','historical_evidence_dependencies','historical_evidence_pins','erasure_assets']:
                     need(db.execute('SELECT count(*) FROM '+table).fetchone()==(0,),'Unexpected authored graph/media state')
                 for ident,payload in db.execute('SELECT id,payload FROM memories'):
@@ -47,6 +47,10 @@ def review(root):
                 indexes={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='index' AND name GLOB 'historical_scope_*'")};need(indexes=={'historical_scope_'+k for k in ['start','end','app','bundle','kind','url']},'Scope index membership differs')
                 tables=['memories','chat_sessions','chat_turns','chat_sources','recap_sources','routines','routine_runs','memory_entities','entity_aliases','entity_mentions','entity_ignored','entity_project_ignored','text_observation_pins','historical_evidence']
                 guards=dict(db.execute("SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name GLOB 'historical_scope_*'"));expected={f'historical_scope_writer_{t}_{op}':f'CREATE TRIGGER historical_scope_writer_{t}_{op} BEFORE {op.upper()} ON {t} BEGIN SELECT oswind_historical_scope_writer_v1(); END' for t in tables for op in ['insert','update','delete']};need(guards==expected,'Writer protection differs')
+                if report['librarySchema']>=28:
+                    incoming=dict(db.execute("SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name GLOB 'incoming_source_writer_*'"))
+                    expectedIncoming={f'incoming_source_writer_{t}_{op}':f'CREATE TRIGGER incoming_source_writer_{t}_{op} BEFORE {op.upper()} ON {t} BEGIN SELECT oswind_incoming_source_writer_v1(); END' for t in tables for op in ['insert','update','delete']}
+                    need(incoming==expectedIncoming,'Incoming source protection differs')
             need(file_sha(path)==digest,'Readonly review changed snapshot');snapshots.append((rows,sources,digest,revoked))
         before,after=snapshots;need(set(before[0])==set(range(n)) and set(after[0])=={i for i in range(n) if i%10!=0},'Erased/retained version membership differs')
         need(set(after[3])=={(sha(b'OSwind.sync.object.v1\0source\0'+module.frame(['memories','00000000-0000-0000-0000-000000005201','00000000-0000-0000-0000-000000005202'])),v[1]) for i,v in before[0].items() if i%10==0},'Revoked exact versions differ')

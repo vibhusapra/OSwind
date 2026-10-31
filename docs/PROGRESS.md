@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Incoming source projection and preservation — component qualified
+
+[Schema28 incoming source projection](SYNC-INCOMING-SOURCES.md) materializes typed source/media/session metadata and source-linked recaps, preserving exact previously cited originals and current recap/answer chains. Shared final typed dependency/head audits reject late ancestor deletions and stale heads. Connection-owned exact permits, byte-distinct IDs/links and older-writer fences preserve ordinary local-edit privacy semantics. No incoming service is enabled.
+
+The [24-stage receipt](../benchmarks/sync-incoming-sources-v1.json) verifies 679 unchanged repository inputs:1547 full passes / 77 explicit skips, 422 sanitizer / 10 skips and 424 optimized / 8 skips, zero race warnings. Sixteen SDK tests, signed normal/indexed HTTP/MCP, erasure/deletion/retention/wipe/recap/backup interruptions, actual initialized/fresh old25/26/27 refusal, real27 SQLite/archive migration and quiet restore pass. All 34 ZIP files/signatures match; the installed 15-file app stays unchanged and fixtures stay excluded.
+
+Independent review checks 11,000 incoming sources and actual producer packets, all current frames, 60 archival native projections/DAGs/accounting, exact citation/pin versions and original chain content. Eight corruption controls pass. A separate retained pre/postcommit process-death review preserves both receiver SQLite files. Final warm1k / 10k incoming times are 8.93 / 90.66s in 128-record batches; ten cited updates take 1.70 / 1.67s. No models/media/transport, cold-cache/power or competitor rank is measured. Real source/shared-adapter regressions and fixture/reader/compiler failures remain retained.
+
+F059 remains TODO and all 78 feature statuses stay unchanged. Complete recipe/entity/correction/deletion adapters, safe media staging, current-policy/epochs, service/enrollment/transport/provenance/providers/two-Mac, historical media/export/save-recap, native/physical capture/power and distribution remain open. New exact-head hosted CI is pending.
+
 ## Original-field erasure and retention — component qualified
 
 [Schema27 implementation](HISTORICAL-ERASURE.md) selects exact original versions independently of newer owners, closes mixed original/current recap chains, reports historical-only native previews, and shares deletion/retention/storage-budget selection. Exact local typed-cache versions/dependents are purged and revoked; current owners and unrelated versions stay intact. Real actual26 SQLite/backup fixtures and pre/postcommit SIGKILL recovery cover migration and media cleanup.

@@ -53,7 +53,7 @@ struct SyncVersionStore {
         "sync_sessions_local":"CREATE INDEX sync_sessions_local ON personal_sync_version_sessions(local_key)",
         "sync_runs_local":"CREATE INDEX sync_runs_local ON personal_sync_version_runs(local_key)"
     ]
-    private static func makeTriggers(overrides:[SyncCanonicalTable:SyncCaptureTable]=[:])->[String:String] {
+    private static func makeTriggers(overrides:[SyncCanonicalTable:SyncCaptureTable]=[:],projectionProtection:Bool=true)->[String:String] {
         var result=[String:String]()
         result["sync_versions_budget"]="CREATE TRIGGER sync_versions_budget BEFORE INSERT ON personal_sync_versions BEGIN SELECT CASE WHEN (SELECT used_bytes+new.bytes+128>budget FROM personal_sync_version_state WHERE singleton=1) THEN RAISE(ABORT,'Sync version cache is full') END; END"
         result["sync_versions_added"]="CREATE TRIGGER sync_versions_added AFTER INSERT ON personal_sync_versions BEGIN UPDATE personal_sync_version_state SET used_bytes=used_bytes+new.bytes+128 WHERE singleton=1; END"
@@ -74,10 +74,14 @@ struct SyncVersionStore {
             result["sync_versions_\(table.rawValue)_delete"]="CREATE TRIGGER sync_versions_\(table.rawValue)_delete BEFORE DELETE ON \(table.rawValue) BEGIN \(revoke) \(purge) \(bindings) END"
             let moved=schema.primary.map {"old.\($0) IS NOT new.\($0)"}.joined(separator:" OR ")
             result["sync_versions_\(table.rawValue)_move"]="CREATE TRIGGER sync_versions_\(table.rawValue)_move BEFORE UPDATE OF \(schema.primary.joined(separator:",")) ON \(table.rawValue) WHEN \(moved) BEGIN \(revoke) \(purge) \(bindings) END"
-            let sensitive:String
+            var sensitive:String
             if table == .source {sensitive=schema.columns.filter {$0 != "favorite" && $0 != "payload"}.map {"old.\($0) IS NOT new.\($0)"}.joined(separator:" OR ")+" OR oswind_sync_source_revision_v1(old.payload) IS NOT oswind_sync_source_revision_v1(new.payload)"}
             else if table == .routine {continue} // Explicit immutable historical definitions remain until deletion.
             else {sensitive=schema.columns.map {"old.\($0) IS NOT new.\($0)"}.joined(separator:" OR ")}
+            if projectionProtection {
+                if table == .source {sensitive="CASE WHEN oswind_incoming_source_projection_v1(old.id,new.payload)=1 THEN 0 ELSE ("+sensitive+") END"}
+                else if table == .conversationCitation || table == .recapCitation {sensitive="CASE WHEN oswind_incoming_binding_projection_v1('\(table.rawValue)',\(schema.snapshot("old")),\(schema.snapshot("new")))=1 THEN 0 ELSE ("+sensitive+") END"}
+            }
             if table == .source {result["sync_sessions_source_change"]="CREATE TRIGGER sync_sessions_source_change BEFORE UPDATE OF payload ON memories WHEN json_extract(old.payload,'$.audioSessionID') IS NOT json_extract(new.payload,'$.audioSessionID') BEGIN DELETE FROM personal_sync_version_sessions WHERE local_key=\(key); END"}
             if table == .routineRun {result["sync_runs_recipe_change"]="CREATE TRIGGER sync_runs_recipe_change BEFORE UPDATE OF routine_id,revision ON routine_runs WHEN old.routine_id IS NOT new.routine_id OR old.revision IS NOT new.revision BEGIN DELETE FROM personal_sync_version_runs WHERE local_key=\(key); END"}
             result["sync_versions_\(table.rawValue)_change"]="CREATE TRIGGER sync_versions_\(table.rawValue)_change BEFORE UPDATE OF \(schema.columns.joined(separator:",")) ON \(table.rawValue) WHEN \(sensitive) BEGIN \(purge) END"
@@ -88,8 +92,19 @@ struct SyncVersionStore {
     private static let expectedSchemas=schemas.merging(indexes,uniquingKeysWith:{$1}).merging(triggers,uniquingKeysWith:{$1})
     static func validateLegacyCitationTriggers(_ db:RoutineDatabase,table:SyncCanonicalTable)throws {
         let check=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let present=sqlite3_step(check)==SQLITE_ROW;sqlite3_finalize(check);guard present else {return}
-        let legacy=makeTriggers(overrides:[table:CitationSchema.legacy(table)])
+        let legacy=makeTriggers(overrides:[table:CitationSchema.legacy(table)],projectionProtection:false)
         for suffix in ["delete","move","change"] {let name="sync_versions_"+table.rawValue+"_"+suffix,row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==legacy[name] else {throw OSwindError.database("Legacy citation version protection differs")}}
+    }
+    static func migrateIncomingSourceProtection(_ db:RoutineDatabase,sourceVersion:Int32)throws {
+        let present=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_version_state'")
+        guard present>0 else {return};let legacy=makeTriggers(projectionProtection:false)
+        for table in [SyncCanonicalTable.source,.conversationCitation,.recapCitation] {
+            let name="sync_versions_"+table.rawValue+"_change",row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name)
+            let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
+            if found==triggers[name] {continue}
+            guard sourceVersion<28,found != nil,found==legacy[name] else {throw OSwindError.database("Preserve sync versions; incoming projection protection differs")}
+            try db.execute("DROP TRIGGER "+name);try db.execute(triggers[name]!)
+        }
     }
     static func repairCitationUpgradeTriggers(_ db:RoutineDatabase)throws {
         let check=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let present=sqlite3_step(check)==SQLITE_ROW;sqlite3_finalize(check);guard present else {return}
@@ -251,6 +266,12 @@ struct SyncVersionStore {
             switch revision {case .current:break;case .evidence(let expected):guard Data(expected.utf8)==Data(database.text(row,2).utf8) else {throw OSwindError.invalid("Local sync evidence revision differs")};case .entity(let expected):guard Data(expected.utf8)==Data(database.text(row,3).utf8) else {throw OSwindError.invalid("Local sync entity revision differs")}}
             let current=try resolve(value.identity,content:nil,admit:admit);guard try current.reference==value.reference else {throw OSwindError.invalid("Sync source projection changed during admission")};return try value.reference
         }
+    }
+    func projectedReference(_ identity:SyncObjectIdentity)throws->SyncVersionReference? {
+        try context();let row=try database.statement("SELECT p.content_sha,v.bytes FROM personal_sync_version_projection p JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE p.object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,try identity.key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
+        let reference=try SyncVersionReference(identity:identity,content:.init(sha256:database.text(row,0),bytes:sqlite3_column_int64(row,1)))
+        guard try resolve(identity,content:nil,admit:{_ in}).reference==reference else {throw OSwindError.database("Sync current projection reference differs")};return reference
     }
     private func mappedIdentity(_ table:SyncCanonicalTable,_ primary:[SyncRowCell])throws->SyncObjectIdentity {
         let key=Data(SHA256.hash(data:try SyncIdentityCatalog.keyFrame(table,primary)))
