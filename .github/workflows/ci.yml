@@ -70,6 +70,8 @@ jobs:
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
       - name: Verify inactive owned SQLite fixture boundaries
         run: python3 scripts/test-owned-sqlite-fixture.py
+      - name: Verify owned vault diagnostic admission without native tools
+        run: python3 scripts/test-owned-vault-diagnostics.py
       - name: Verify authored phrase Boolean speaker and metadata query contracts
         run: python3 scripts/keyword-scope-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --baseline dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-keyword-scope"
       - name: Retain authored query contract receipt
@@ -133,8 +135,10 @@ jobs:
             ${{ runner.temp }}/oswind-pattern-privacy/report.json
             ${{ runner.temp }}/oswind-vault-terminal/report.json
             ${{ runner.temp }}/oswind-vault-terminal/*.pty-output
+            ${{ runner.temp }}/oswind-vault-terminal/failure-*.json
             ${{ runner.temp }}/oswind-vault-terminal-busy/report.json
             ${{ runner.temp }}/oswind-vault-terminal-busy/*.pty-output
+            ${{ runner.temp }}/oswind-vault-terminal-busy/failure-*.json
             ${{ runner.temp }}/oswind-vault-query-interruptions/report.json
             ${{ runner.temp }}/oswind-vault-query-interruptions/*.stdout
             ${{ runner.temp }}/oswind-vault-query-interruptions/*.stderr

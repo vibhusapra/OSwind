@@ -7,12 +7,24 @@ terminals, libraries, Keychain and permission settings are never selected.
 Packages and raw synthetic output stay under --root for inspection.
 """
 import argparse,pathlib,os,pty,termios,fcntl,subprocess,plistlib,json,secrets,signal,time,errno,hashlib,sys,sqlite3
+from owned_vault_diagnostics import OwnedVaultDiagnostics
 parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('binary',type=pathlib.Path);parser.add_argument('--root',type=pathlib.Path,required=True);parser.add_argument('--held-reader',action='store_true',help='Verify Ctrl-C preserves a deliberate busy error, then recover normally');args=parser.parse_args()
 if sys.platform!='darwin':parser.error('Requires macOS encrypted APFS disk-image tools')
-cli=args.binary.resolve(strict=True);base=args.root.resolve();base.mkdir(mode=0o700,exist_ok=False);secret=secrets.token_urlsafe(32).encode();results=[]
+cli=args.binary.resolve(strict=True);secret=secrets.token_urlsafe(32).encode();diagnostics=OwnedVaultDiagnostics.create(args.root,secret,hashlib.sha256(cli.read_bytes()).hexdigest());base=diagnostics.root;results=[]
+def failure_receipt(package,action,code,stdout=b'',stderr=b''):
+ try:
+  path=diagnostics.save_failure(package,action,code,stdout=stdout,stderr=stderr)
+  print('Owned failure receipt: '+path.name,flush=True)
+  return json.loads(path.read_text())
+ except Exception as error:
+  # Never replace the original CLI/terminal failure with diagnostic failure or
+  # print arbitrary exception text, paths or credentials from a diagnostic.
+  print('Owned diagnostic refused: '+type(error).__name__,flush=True)
+  return None
 def run(*args,password=None):
  p=subprocess.run([str(cli),*map(str,args)],input=b'' if password is None else password+b'\0',capture_output=True,timeout=180)
  assert secret not in p.stdout+p.stderr,'Fixture credential appeared in output'
+ if p.returncode and len(args)>=3 and args[0]=='vault':failure_receipt(pathlib.Path(args[2]),str(args[1]),p.returncode,p.stdout,p.stderr)
  assert p.returncode==0,(p.returncode,p.stderr.decode(errors='replace'))
  return json.loads(p.stdout)
 def images(package):
@@ -74,6 +86,7 @@ def interrupt(action,package,expectBusy=False):
   code=os.waitstatus_to_exitcode(status);outputFile=base/(action+'.pty-output');outputFile.write_bytes(output)
   record=dict(action=action,exitCode=code,wallSeconds=time.monotonic()-start,terminalCtrlC=signalled,observed=observed,outputSHA256=hashlib.sha256(output).hexdigest(),ownedImageAttachedAfterExit=bool(images(package)))
   results.append(record);save()
+  if code != 130:failure_receipt(package,action,code,bytes(output))
   assert signalled and code==(1 if expectBusy else 130),(action,record)
   assert b'Stopping vault work safely' in output,record
   if expectBusy:
@@ -98,6 +111,8 @@ if args.held_reader:
   identifier=subprocess.run([str(cli),'--data',str(package/'Library'),'note','Owned cancellation must preserve busy failure'],capture_output=True,text=True,check=True).stdout.strip()
   held=sqlite3.connect(package/'Library'/'memory.sqlite');held.execute('BEGIN');held.execute('SELECT COUNT(*) FROM memories').fetchone()
   interrupt('lock',package,expectBusy=True)
+  receipts=[json.loads(p.read_text()) for p in base.glob('failure-*.json')]
+  assert any(any(r['pid']==os.getpid() and r['path'].endswith('/Library/memory.sqlite') for r in d.get('observation',{}).get('readers',[])) for d in receipts),'Owned known reader was not observed after failed detach'
   assert run('vault','status',package)['state']=='closing' and images(package)
   assert (package/'Library').is_file() and not (package/'Library').is_symlink()
  finally:

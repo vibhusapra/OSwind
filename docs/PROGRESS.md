@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Owned terminal lock failure diagnostics — harness qualified
+
+- [Failure observations](VAULT-TERMINAL-DIAGNOSTICS.md) now preserve the exact CLI binary/status and separately reported native exit/signal before the original terminal/ordinary-command assertion. CI retains after-failure receipts. Fresh-root ownership, marker, session/device/inode and own-image inventory admission bound read-only reader inspection; only exact owned mount/device descriptors survive, with redacted paths and credential refusal. No retry, force detach or settings change is added.
+- The [receipt](../benchmarks/vault-terminal-diagnostics-v1.json) passes 19 offline contracts and fresh normal/held-reader native terminal flows over 637 unchanged inputs. The held control retains CLI1 / reported hdiutil exit16 and observes the actual harness PID's database/WAL/SHM descriptors. Normal recovery preserves the authored note; all owned images are absent. Swift/native/SDK inputs, qualified CLI payload and installed app stay unchanged; no new full Swift-suite claim is made. The initial 17-contract version and both native flows also pass and remain retained.
+- The original PR #100 hosted ordinary-lock failure remains unexplained. These after-failure observations establish no causal attribution or proof of reader absence. All 78 delivery statuses stay unchanged; sync, physical acceptance, distribution and broad parity/ranking remain open.
+
 ## Bounded automatic outgoing sync — component qualified
 
 - [Outgoing processor](SYNC-OUTGOING-PROCESSOR.md) drains raw capture into durable opaque lifetime work before typed export. It automatically advances all 13 bootstrap cursors, prepares bounded dependency graphs and commits journal/cache/projection output with work acknowledgement. Pending work fences peer writes even after raw capture drains. Delete/recreate lifetimes, explicit conflicts, recipe history, policy refusal and logical backpressure preserve their boundaries. Ordinary opening remains capture-disabled; no service, enrollment or transfer is enabled.
