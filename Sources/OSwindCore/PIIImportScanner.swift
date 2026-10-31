@@ -127,7 +127,7 @@ private struct ImportPIIDocument {
     let original:Memory,tree:ImportPIIValue
     var fields=[Field](),source="",redacted=false
     init(_ original:Memory)throws {
-        guard original.searchPreview==nil else {throw OSwindError.invalid("A search preview cannot be imported as a complete source")}
+        guard original.searchPreview==nil,original.originalEvidence==nil else {throw OSwindError.invalid("A search preview cannot be imported as a complete source")}
         guard original.text.utf8.count<=PIIDocument.maximumBytes else {throw OSwindError.invalid("Experimental PII import main text exceeds 128 KiB")}
         if let transcript=original.transcript {
             _ = try transcript.validated();guard Data(original.text.utf8)==Data(transcript.text.utf8),original.visualRecording==nil else {throw OSwindError.invalid("Imported transcript and source differ")}

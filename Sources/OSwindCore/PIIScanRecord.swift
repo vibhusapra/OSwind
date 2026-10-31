@@ -33,7 +33,7 @@ enum PIIScanContent {
     static let maximumBytes=1024*1024
     static func digest(_ memory:Memory) throws -> String {
         try Task.checkCancellation()
-        guard memory.searchPreview==nil else {throw OSwindError.invalid("A privacy check requires a complete memory")}
+        guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("A privacy check requires a complete memory")}
         var value=memory;value.favorite=false;value.embedding=nil;value.embeddingModel=nil
         value.imagePath=nil;value.audioPath=nil;value.videoPath=nil
         let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys,.withoutEscapingSlashes]
@@ -85,7 +85,7 @@ extension MemoryStore {
     public func piiScanStatus(_ id:String,matching expected:Memory?=nil) throws -> PIIScanStatus {
         try Task.checkCancellation()
         guard !id.isEmpty,id.count<200,!id.utf8.contains(0) else {throw OSwindError.invalid("Invalid memory id")}
-        if let expected {guard Data(expected.id.utf8)==Data(id.utf8),expected.searchPreview==nil else {throw OSwindError.invalid("Privacy check source identity or completeness mismatch")}}
+        if let expected {guard Data(expected.id.utf8)==Data(id.utf8),expected.searchPreview==nil,expected.originalEvidence==nil else {throw OSwindError.invalid("Privacy check source identity or completeness mismatch")}}
         struct Snapshot {let current:Bool,receipt:Data?,digest:String?,payload:Data?}
         let snapshot:Snapshot=try withRoutineDatabase {db in
             let row=try db.statement("SELECT p.is_current,p.receipt,p.content_sha256,CASE WHEN p.is_current=1 THEN m.payload END FROM memories m LEFT JOIN pii_scan_records p ON p.memory_id=m.id WHERE m.id=?")

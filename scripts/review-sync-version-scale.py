@@ -14,10 +14,11 @@ def sha(path):
 def canonical_uuid(value):
     return type(value) is str and str(uuid.UUID(value))==value
 def digest(value):return hashlib.sha256(value).hexdigest()
-def review(root,*,outgoing=False):
+def review(root,*,outgoing=False,original_evidence=False):
+    outgoing=outgoing or original_evidence
     root=pathlib.Path(root).absolute();need(root.resolve()==root and root.is_dir() and not root.is_symlink(),'Authored output must be a nonsymlink absolute directory')
     metadata=root.stat();need(metadata.st_uid==os.getuid() and stat.S_IMODE(metadata.st_mode)==0o700,'Private authored output ownership differs')
-    marker=root/'owned-fixture';expected_marker=b'OSwind authored outgoing preparation v1' if outgoing else b'OSwind authored version preparation v1';need(marker.is_file() and not marker.is_symlink() and marker.read_bytes()==expected_marker,'Missing authored version fixture marker')
+    marker=root/'owned-fixture';expected_marker=b'OSwind authored original evidence preparation v1' if original_evidence else (b'OSwind authored outgoing preparation v1' if outgoing else b'OSwind authored version preparation v1');need(marker.is_file() and not marker.is_symlink() and marker.read_bytes()==expected_marker,'Missing authored version fixture marker')
     report_path=root/'report.json';need(report_path.is_file() and not report_path.is_symlink() and report_path.stat().st_size<2*1024*1024,'Invalid version report')
     reports=json.loads(report_path.read_text());need(type(reports) is list and [r.get('count') for r in reports]==[1000,10000],'Unexpected authored version fixture sizes')
     results=[]
@@ -53,6 +54,7 @@ def review(root,*,outgoing=False):
             for name in ['personal_sync_changes','personal_sync_pending','personal_sync_version_recipes','personal_sync_version_sessions','personal_sync_version_runs','personal_sync_version_revoked']:
                 need(connection.execute('SELECT COUNT(*) FROM '+name).fetchone()[0]==0,'Unexpected authored pending/graph state')
             original_hash=hashlib.sha256();logical=0
+            originals_by_object={}
             for ordinal,row in enumerate(originals,1):
                 identifier='version-%08d'%ordinal;text='Owned version source %d'%ordinal
                 need(row[:8]==(identifier,1700000000.0,'note','Owned version scale','Version source',None,text,0) and row[9:]==(None,None),'Authored source columns differ')
@@ -71,9 +73,23 @@ def review(root,*,outgoing=False):
                 need(projections.get(object_digest)==(content_sha,digest(frame(row[:9])),evidence,entity),'Exact local projection/evidence domains differ')
                 key_object=dict(kind='source',digest=object_digest);reference=dict(sha256=content_sha,bytes=size);head=dict(key=key_object,dot=dict(replica=replica,counter=ordinal),context={} if ordinal==1 else {replica:ordinal-1},mutation='put',content=reference)
                 need(outbox.get(ordinal)==head,'Typed journal operation differs');need(registers.get(object_digest)==dict(key=key_object,clock={replica:ordinal},deletions={},heads=[head]),'Durable typed register differs')
+                originals_by_object[object_digest]=(expected,content_sha)
             need(original_hash.hexdigest()==r['sourceOriginalSHA256'],'Original typed source hash differs')
             state=connection.execute('SELECT origin,generation,group_id,epoch,used_bytes,budget FROM personal_sync_version_state').fetchall();need(state==[(origin,generation,group,epoch,logical,1073741824)],'Version scope/accounting differs')
             need(r['metadata']==dict(versions=count,projections=count,outbox=count,usedBytes=logical),'Reported accounting differs')
+            if original_evidence:
+                projections=connection.execute('SELECT handle,object_digest,content_sha,paths,parents,projection_sha FROM personal_sync_evidence ORDER BY handle COLLATE BINARY').fetchall();need(len(projections)==count,'Original evidence membership differs')
+                native_hash=hashlib.sha256();objects=set();metadata_bytes=0
+                for handle,object_digest,content_sha,paths,parents,projection_sha in projections:
+                    need(canonical_uuid(handle) and object_digest not in objects and object_digest in originals_by_object,'Original evidence identity differs');objects.add(object_digest)
+                    expected,wire_sha=originals_by_object[object_digest];need(content_sha==wire_sha and paths==b'{}' and parents==b'[]','Original evidence exact version/media/parent metadata differs')
+                    native={**expected,'id':'original-'+handle};encoded=json.dumps(native,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+                    binding=json.dumps([handle,origin,generation,group,epoch,object_digest,content_sha,str(versions[object_digest][3])],separators=(',',':')).encode()
+                    need(projection_sha==digest(b'OSwind.sync.original-evidence.v1\0'+binding+b'\0'+encoded),'Original native projection scope/version binding differs from original payload')
+                    native['originalEvidence']=dict(handle=handle,contentSHA256=content_sha);encoded=json.dumps(native,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode();native_hash.update(struct.pack('<Q',len(encoded)));native_hash.update(encoded);metadata_bytes+=192+len(paths)+len(parents)
+                need(native_hash.hexdigest()==r['nativeOriginalReadSHA256'],'Actual native original read frames differ')
+                need(connection.execute('SELECT origin,generation,group_id,epoch,used_bytes,budget FROM personal_sync_evidence_state').fetchall()==[(origin,generation,group,epoch,metadata_bytes,67108864)],'Original evidence context/accounting differs')
+                need(r['originalEvidenceMetadata']==dict(projections=count,usedBytes=metadata_bytes),'Reported original evidence accounting differs')
         finally:connection.close()
         need({p.name:sha(p) for p in library.glob('memory.sqlite*') if p.is_file()}==files,'Readonly review changed authored SQLite files')
         batches=r['batches'];need(len(batches)==math.ceil(count/128) and sum(x['objects'] for x in batches)==count and all(type(x['objects']) is int and 0<x['objects']<=128 and math.isfinite(x['seconds']) and x['seconds']>=0 for x in batches),'Invalid bounded preparation batches')
@@ -83,12 +99,16 @@ def review(root,*,outgoing=False):
             need(steps[-1]['kind']=='idle' and sum(s['kind']=='idle' for s in steps)==1 and sum(s['objects'] for s in steps if s['kind']=='bootstrap')==count,'Outgoing step membership differs')
             need(set(s.get('table') for s in steps if s['kind']=='bootstrap')==set(tables),'Outgoing bootstrap table coverage differs')
             need([dict(objects=s['objects'],seconds=s['seconds']) for s in steps if s['kind']=='prepared']==batches and r['prepareSeconds']>=sum(s['seconds'] for s in steps),'Outgoing step timing differs')
+        if original_evidence:
+            for name,timer in [('originalEvidenceBatches','originalEvidencePrepareSeconds'),('originalEvidenceReadBatches','originalEvidenceReadSeconds')]:
+                values=r[name];need(len(values)==math.ceil(count/128) and sum(v['objects'] for v in values)==count and all(type(v['objects']) is int and 0<v['objects']<=128 and math.isfinite(v['seconds']) and v['seconds']>=0 for v in values),'Original evidence batches differ')
+                need(math.isfinite(r[timer]) and r[timer]>=sum(v['seconds'] for v in values),'Original evidence timer differs')
         results.append(dict(count=count,sourceOriginalSHA256=r['sourceOriginalSHA256'],sourceRowsAndTypedPacketsVerified=count,journalAndProjectionBindingsVerified=True,sqliteFilesUnchanged=files,reportSHA256=sha(own_report),prepareSeconds=r['prepareSeconds'],batchMedianSeconds=statistics.median(times),batchP95Seconds=sorted(times)[math.ceil(.95*len(times))-1],logicalCacheBytes=logical))
-    return dict(state='reviewed',outgoing=outgoing,readerSHA256=sha(pathlib.Path(__file__)),independentFrameReaderSHA256=sha(_helper),inputReportSHA256=sha(report_path),results=results,scope='All authored source cells/payloads, global lifetimes, local/wire version bindings, typed bytes, journal/registers, accounting and batch summaries independently checked. Outgoing mode additionally verifies all 13 finished bootstrap cursors, drained work/context/accounting and step membership/timers. Immutable readonly closed snapshots. Warm note-only preparation, not model/media/transport/capture/energy or competitor ranking.')
+    return dict(state='reviewed',outgoing=outgoing,originalEvidence=original_evidence,readerSHA256=sha(pathlib.Path(__file__)),independentFrameReaderSHA256=sha(_helper),inputReportSHA256=sha(report_path),results=results,scope='All authored source cells/payloads, global lifetimes, local/wire version bindings, typed bytes, journal/registers, accounting and batch summaries independently checked. Outgoing mode additionally verifies all 13 finished bootstrap cursors, drained work/context/accounting and step membership/timers. Original-evidence mode verifies every native projection, actual original read-frame digest, metadata accounting and phase timers. Immutable readonly closed snapshots. Warm note-only preparation, not model/media/transport/capture/energy or competitor ranking.')
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('root',type=pathlib.Path);parser.add_argument('--outgoing',action='store_true');args=parser.parse_args()
-    try:result=review(args.root,outgoing=args.outgoing)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('root',type=pathlib.Path);parser.add_argument('--outgoing',action='store_true');parser.add_argument('--original-evidence',action='store_true');args=parser.parse_args()
+    try:result=review(args.root,outgoing=args.outgoing,original_evidence=args.original_evidence)
     except (ValueError,OSError,sqlite3.Error,KeyError,TypeError,IndexError) as error:parser.exit(1,'Review refused: '+str(error)+'\n')
     print(json.dumps(result,indent=2,sort_keys=True))
 if __name__=='__main__':main()

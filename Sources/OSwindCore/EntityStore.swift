@@ -129,7 +129,7 @@ extension MemoryStore {
     }
     public func linkEntity(_ id:String,to memoryID:String)throws {
         try entityWrite {db in
-            let previous=try db.entityDefinition(id);guard let memory=try get(memoryID),memory.searchPreview==nil else {throw OSwindError.invalid("Source no longer exists")}
+            let previous=try db.entityDefinition(id);guard let memory=try get(memoryID),memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Source no longer exists")}
             let row=try db.statement("INSERT INTO entity_mentions VALUES(?,?,'manual',?,-1,0,'','manual') ON CONFLICT(memory_id,entity_id,origin) DO UPDATE SET revision=excluded.revision");defer {sqlite3_finalize(row)};db.bind(row,1,memoryID);db.bind(row,2,id);db.bind(row,3,memory.entityRevision);try db.done(row)
             let unignore=try db.statement("DELETE FROM entity_ignored WHERE memory_id=? AND (kind,key) IN (SELECT kind,key FROM entity_aliases WHERE entity_id=?)");defer {sqlite3_finalize(unignore)};db.bind(unignore,1,memoryID);db.bind(unignore,2,id);try db.done(unignore)
             let projectIgnore=try db.statement("DELETE FROM entity_project_ignored WHERE memory_id=? AND entity_id=?");defer {sqlite3_finalize(projectIgnore)};db.bind(projectIgnore,1,memoryID);db.bind(projectIgnore,2,id);try db.done(projectIgnore)

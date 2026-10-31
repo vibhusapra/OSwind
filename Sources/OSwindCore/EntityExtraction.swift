@@ -96,7 +96,7 @@ extension MemoryStore {
         try saveEntityExtraction(memory:memory,plan:prepared.plan,result:result);return true
     }
     public func saveEntityExtraction(memory:Memory,plan:EntityIndexPlan,result:EntityExtraction)throws {
-        guard memory.searchPreview==nil,memory.kind != .summary,result.candidates.count<=EntityExtractor.maximumEntitiesPerSource else {throw OSwindError.invalid("Use a complete non-summary source and bounded entity results")}
+        guard memory.searchPreview==nil,memory.originalEvidence==nil,memory.kind != .summary,result.candidates.count<=EntityExtractor.maximumEntitiesPerSource else {throw OSwindError.invalid("Use a complete non-summary source and bounded entity results")}
         let source=memory.text as NSString
         for candidate in result.candidates {
             guard candidate.start>=0,candidate.length>0,candidate.length<=2048,["apple-nameType","project-alias"].contains(candidate.method),candidate.start<=source.length,candidate.length<=source.length-candidate.start,PassageRange(start:candidate.start,length:candidate.length).text(in:memory.text) != nil else {throw OSwindError.invalid("Entity span is outside its source")}

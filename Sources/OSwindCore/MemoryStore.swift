@@ -207,6 +207,7 @@ public final class MemoryStore: @unchecked Sendable {
     func insertRestoringRecap(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:true)}
     private func insertValidated(_ memory:Memory,deferRecapLinks:Bool) throws {
         lock.lock(); defer { lock.unlock() }
+        guard memory.originalEvidence==nil else {throw OSwindError.invalid("Original evidence is read-only. Save an independent note to create a new source.")}
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
         try memory.textObservation?.validated(for:memory)
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
@@ -244,7 +245,7 @@ public final class MemoryStore: @unchecked Sendable {
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
     }
     private func replaceSearchPreview(_ memory:Memory) throws {
-        guard memory.searchPreview==nil else { throw OSwindError.invalid("Cannot cache an incomplete source") }
+        guard memory.searchPreview==nil,memory.originalEvidence==nil else { throw OSwindError.invalid("Cannot cache an incomplete source") }
         guard memory.kind == .audio,let transcript=memory.transcript else {
             let remove=try prepare("DELETE FROM audio_search_previews WHERE memory_id=?");defer {sqlite3_finalize(remove)};bind(remove,1,memory.id)
             guard sqlite3_step(remove)==SQLITE_DONE else {throw failure()};return
@@ -275,7 +276,7 @@ public final class MemoryStore: @unchecked Sendable {
         do {let result=try hits.map { hit in
             try Task.checkCancellation()
             let expected=hit.memory.searchPreview?.sourceRevision ?? hit.memory.evidenceHash
-            guard let current=try get(hit.id),current.searchPreview==nil else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
+            guard let current=try get(hit.id),current.searchPreview==nil,current.originalEvidence==nil,hit.memory.originalEvidence==nil else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
             let exact=current.evidenceHash==expected
             let appended = pinTextObservations && !exact ? try current.extendsTextObservation(hit.memory):false
             guard exact || appended else {throw OSwindError.unavailable("This source changed or was removed. Refresh the results and open it again.")}
@@ -918,7 +919,7 @@ extension MemoryStore {
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT chat_append")
         do {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
-            for hit in answer.sources { guard hit.memory.searchPreview==nil,let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
+            for hit in answer.sources { guard hit.memory.searchPreview==nil,hit.memory.originalEvidence==nil,let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
             var scope = answer.resolution?.filter ?? filter; scope.query = ""
             scope.speaker=scope.speaker.map { policy.sanitize($0).text }
             let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope,timeZone:answer.resolution?.timeZone)

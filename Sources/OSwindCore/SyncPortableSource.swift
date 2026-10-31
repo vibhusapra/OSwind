@@ -88,7 +88,7 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
     /// Preparation must supply every retained asset; never silently drop media.
     /// resolve receives the recorded evidence revision, not just a local ID.
     init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,resolve:(String,String)throws->SyncVersionReference)throws {
-        guard memory.searchPreview==nil else {throw OSwindError.invalid("Hydrate source before sync preparation")}
+        guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Use a canonical complete source before sync preparation")}
         let roles:Set<SyncMediaRole>=Set([(memory.imagePath == nil ? nil:SyncMediaRole.image),(memory.audioPath == nil ? nil:SyncMediaRole.audio),(memory.videoPath == nil ? nil:SyncMediaRole.video)].compactMap {$0})
         guard roles==Set(media.map(\.role)),media.count==roles.count else {throw OSwindError.invalid("Prepare every source media asset exactly once")}
         timestamp=memory.timestamp;endTimestamp=memory.endTimestamp;textObservation=memory.textObservation;kind=memory.kind

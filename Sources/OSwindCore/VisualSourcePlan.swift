@@ -22,7 +22,7 @@ struct VisualSourcePlan:Equatable,Sendable {
         var points:[Point]
     }
     static func make(_ memory:Memory) throws -> Self? {
-        guard memory.searchPreview==nil else {throw OSwindError.invalid("Hydrate the source before planning visual indexing")}
+        guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Hydrate the source before planning visual indexing")}
         guard memory.imagePath != nil || memory.videoPath != nil else {return nil}
         guard memory.kind == .screen,memory.transcript==nil,memory.recap==nil else {throw OSwindError.invalid("Retained visual indexing requires a complete screen source")}
         let kind:Kind,path:String,points:[Point]

@@ -64,7 +64,7 @@ extension MemoryStore {
     /// Saves a local source-linked memory. Source revisions are rechecked by insert's writer transaction.
     public func saveRecap(_ answer:Answer,title:String="Saved recap",policy:PrivacyPolicy=PrivacyPolicy(),embedder:LocalEmbedder?=nil) throws -> Memory {
         try Task.checkCancellation()
-        guard !answer.text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,answer.text.count<=100_000,(1...60).contains(answer.sources.count),answer.sources.allSatisfy({$0.memory.searchPreview==nil}) else {throw OSwindError.invalid("Save a recap with 1–60 complete recorded sources")}
+        guard !answer.text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,answer.text.count<=100_000,(1...60).contains(answer.sources.count),answer.sources.allSatisfy({$0.memory.searchPreview==nil && $0.memory.originalEvidence==nil}) else {throw OSwindError.invalid("Save a recap with 1–60 complete recorded sources")}
         guard answer.sources.allSatisfy({policy.exclusion(app:$0.memory.bundleID,title:$0.memory.title,url:$0.memory.url)==nil}) else {throw OSwindError.unavailable("An original is excluded by the current privacy rules. Ask again before saving.")}
         var memory=Memory(kind:.summary,app:"OSwind",title:String(policy.sanitize(title).text.prefix(300)),text:policy.sanitize(answer.text).text)
         memory.recap=RecapProvenance(provider:policy.sanitize(answer.provider).text,sources:answer.sources.map {.init(id:$0.id,revision:$0.memory.evidenceHash,match:$0.match,score:$0.score,passage:$0.passage)})
