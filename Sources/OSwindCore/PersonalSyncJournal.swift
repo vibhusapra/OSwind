@@ -24,6 +24,8 @@ struct SyncJournal {
         let row=try database.statement("SELECT replica,group_id,epoch FROM personal_sync_local WHERE singleton=1")
         defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,database.text(row,0)==replica,database.text(row,1)==group,database.text(row,2)==epoch else {throw OSwindError.invalid("Sync workspace identity differs")}
+        let peers=try Self.peerSnapshot(database),observed=try observedClock()
+        guard observed.counters.keys.allSatisfy(peers.ids.contains) else {throw OSwindError.invalid("Sync observation names an unknown peer")}
     }
     static func install(database db:RoutineDatabase,replica:String,group:String,epoch:String)throws->Self {
         try SyncProtocolLimits.uuid(replica);try SyncProtocolLimits.uuid(group);try SyncProtocolLimits.uuid(epoch)
@@ -36,11 +38,13 @@ struct SyncJournal {
             CREATE TABLE IF NOT EXISTS personal_sync_receipts(replica TEXT NOT NULL,sequence INTEGER NOT NULL,digest TEXT NOT NULL,PRIMARY KEY(replica,sequence));
             CREATE TABLE IF NOT EXISTS personal_sync_outbox(sequence INTEGER PRIMARY KEY,revision BLOB NOT NULL);
             CREATE TABLE IF NOT EXISTS personal_sync_pending(replica TEXT NOT NULL,sequence INTEGER NOT NULL,revision BLOB NOT NULL,PRIMARY KEY(replica,sequence));
+            CREATE TABLE IF NOT EXISTS personal_sync_observed(singleton INTEGER PRIMARY KEY CHECK(singleton=1),clock BLOB NOT NULL CHECK(typeof(clock)='blob' AND length(clock)>=2 AND length(clock)<=1048576));
             """)
             let row=try db.statement("INSERT INTO personal_sync_local(singleton,replica,group_id,epoch,sequence) VALUES(1,?,?,?,0) ON CONFLICT(singleton) DO NOTHING")
             defer {sqlite3_finalize(row)};db.bind(row,1,replica);db.bind(row,2,group);db.bind(row,3,epoch);try db.done(row)
             let peer=try db.statement("INSERT INTO personal_sync_peers(replica,cursor) VALUES(?,0) ON CONFLICT(replica) DO NOTHING")
             defer {sqlite3_finalize(peer)};db.bind(peer,1,replica);try db.done(peer)
+            try initializeObserved(db)
             _=try Self(database:db,replica:replica,group:group,epoch:epoch)
         }
         return try Self(database:db,replica:replica,group:group,epoch:epoch)
@@ -59,6 +63,58 @@ struct SyncJournal {
         catch {try? db.execute(outer ? "ROLLBACK":"ROLLBACK TO personal_sync_operation; RELEASE personal_sync_operation");throw error}
     }
     private func validateIdentity()throws {_ = try Self(database:database,replica:replica,group:group,epoch:epoch)}
+    /// A bounded workspace frontier, including zero-cursor enrollment validation.
+    /// Capture this inside the writer transaction, alongside the object state.
+    private static func peerSnapshot(_ db:RoutineDatabase)throws->(clock:SyncClock,ids:Set<String>) {
+        let s=try db.statement("SELECT replica,cursor FROM personal_sync_peers ORDER BY replica LIMIT ?");defer {sqlite3_finalize(s)}
+        sqlite3_bind_int(s,1,Int32(SyncProtocolLimits.peers+1));var counters=[String:Int64](),ids=Set<String>(),code=sqlite3_step(s)
+        while code==SQLITE_ROW {
+            let id=db.text(s,0),cursor=sqlite3_column_int64(s,1);try SyncProtocolLimits.uuid(id)
+            guard ids.count<SyncProtocolLimits.peers,ids.insert(id).inserted,sqlite3_column_type(s,1)==SQLITE_INTEGER,cursor>=0 else {throw OSwindError.invalid("Invalid sync peer frontier")}
+            if cursor>0 {counters[id]=cursor};code=sqlite3_step(s)
+        }
+        guard code==SQLITE_DONE else {throw db.error()};return(try SyncClock(counters),ids)
+    }
+    private static func decodeObserved(_ db:RoutineDatabase,_ row:OpaquePointer)throws->SyncClock {
+            let size=Int(sqlite3_column_bytes(row,0))
+            guard sqlite3_column_type(row,0)==SQLITE_BLOB,size>=2,size<=SyncProtocolLimits.stateBytes,let p=sqlite3_column_blob(row,0) else {throw OSwindError.invalid("Invalid sync observation clock")}
+            let bytes=Data(bytes:p,count:size),clock=try JSONDecoder().decode(SyncClock.self,from:bytes)
+            guard try SyncProtocolLimits.encode(clock)==bytes else {throw OSwindError.invalid("Noncanonical sync observation clock")};return clock
+    }
+    private func observedClock()throws->SyncClock {
+        let s=try database.statement("SELECT clock,(SELECT COUNT(*) FROM personal_sync_observed) FROM personal_sync_observed WHERE singleton=1");defer {sqlite3_finalize(s)}
+        guard sqlite3_step(s)==SQLITE_ROW,sqlite3_column_int64(s,1)==1 else {throw OSwindError.invalid("Sync observation state missing; complete internal journal migration")}
+        return try Self.decodeObserved(database,s)
+    }
+    private static func initializeObserved(_ db:RoutineDatabase)throws {
+        let existing=try db.statement("SELECT clock FROM personal_sync_observed WHERE singleton=1"),code=sqlite3_step(existing)
+        if code==SQLITE_ROW {defer {sqlite3_finalize(existing)};_=try decodeObserved(db,existing);return}
+        sqlite3_finalize(existing);guard code==SQLITE_DONE else {throw db.error()}
+        let count=try db.statement("SELECT COUNT(*) FROM personal_sync_observed");defer {sqlite3_finalize(count)}
+        guard sqlite3_step(count)==SQLITE_ROW,sqlite3_column_int64(count,0)==0 else {throw OSwindError.invalid("Invalid sync observation singleton")}
+        // Legacy journals already have a bounded pending queue. Only early
+        // deletions can have observable effects ahead of contiguous cursors;
+        // rebuild them once, never scan the archive's complete register set.
+        let peers=try peerSnapshot(db),limit=pendingLimit+SyncProtocolLimits.peers
+        let pending=try db.statement("SELECT replica,sequence,revision FROM personal_sync_pending ORDER BY replica,sequence LIMIT ?");defer {sqlite3_finalize(pending)};sqlite3_bind_int(pending,1,Int32(limit+1))
+        var observed=SyncClock.empty,rows=0,status=sqlite3_step(pending)
+        while status==SQLITE_ROW {
+            rows+=1;let size=Int(sqlite3_column_bytes(pending,2))
+            guard rows<=limit,sqlite3_column_type(pending,2)==SQLITE_BLOB,size>0,size<=SyncProtocolLimits.operationBytes,let bytes=sqlite3_column_blob(pending,2) else {throw OSwindError.invalid("Invalid pending sync migration record")}
+            let revision=try SyncRevision.decode(Data(bytes:bytes,count:size))
+            guard peers.ids.contains(revision.dot.replica),revision.context.counters.keys.allSatisfy(peers.ids.contains),revision.dot.replica==db.text(pending,0),sqlite3_column_type(pending,1)==SQLITE_INTEGER,revision.dot.counter==sqlite3_column_int64(pending,1) else {throw OSwindError.invalid("Pending sync migration identity differs")}
+            if revision.mutation == .delete {observed=try observed.merged(with:revision.clock)}
+            status=sqlite3_step(pending)
+        }
+        guard status==SQLITE_DONE else {throw db.error()}
+        let row=try db.statement("INSERT INTO personal_sync_observed(singleton,clock) VALUES(1,?)");defer {sqlite3_finalize(row)}
+        let data=try SyncProtocolLimits.encode(observed);data.withUnsafeBytes {_=sqlite3_bind_blob(row,1,$0.baseAddress,Int32(data.count),db.transient)};try db.done(row)
+    }
+    private func observeDeletion(_ clock:SyncClock)throws {
+        let merged=try observedClock().merged(with:clock),data=try SyncProtocolLimits.encode(merged)
+        let row=try database.statement("UPDATE personal_sync_observed SET clock=? WHERE singleton=1");defer {sqlite3_finalize(row)};bind(row,1,data);try database.done(row)
+        guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Sync observation state changed")}
+    }
     private func scoped<T>(_ body:()throws->T)throws->T {
         try Self.transaction(database) {
             try validateIdentity()
@@ -136,7 +192,10 @@ struct SyncJournal {
             guard sqlite3_step(counter)==SQLITE_ROW,sqlite3_column_type(counter,0)==SQLITE_INTEGER else {throw database.error()}
             let previous=sqlite3_column_int64(counter,0)
             guard previous>=0,previous<Int64.max,try readCursor(for:replica)==previous else {throw OSwindError.invalid("Sync sequence exhausted")}
-            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:old.clock,mutation:mutation,content:content)
+            let peers=try Self.peerSnapshot(database)
+            let context=try old.clock.merged(with:peers.clock).merged(with:observedClock())
+            guard context.counters.keys.allSatisfy(peers.ids.contains) else {throw OSwindError.invalid("Sync object context names an unknown peer")}
+            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:context,mutation:mutation,content:content)
             var next=old;try next.integrate(revision);try save(next)
             let data=try revision.encoded();guard try recordReceipt(revision,data:data) else {throw OSwindError.invalid("Local sync sequence already exists")}
             let outbox=try database.statement("INSERT INTO personal_sync_outbox(sequence,revision) VALUES(?,?)")
@@ -188,6 +247,7 @@ struct SyncJournal {
                 defer {sqlite3_finalize(pending)};database.bind(pending,1,revision.dot.replica);sqlite3_bind_int64(pending,2,revision.dot.counter);bind(pending,3,encoded);try database.done(pending)
                 if revision.mutation == .delete {
                     let old=try readState(for:revision.key);var next=old;try next.integrate(revision);try save(next)
+                    try observeDeletion(next.clock)
                     if !old.isDeleted {try apply(.init(revision:revision,before:old,after:next))}
                 }
             }

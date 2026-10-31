@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Cross-object sync ordering — component qualified
+
+- [Causal frontier](SYNC-CAUSALITY.md) fixes the case where a chat turn reaches a third library before an observed source it cites. New local writes/resolutions carry all applied peer observations; unadmitted puts do not create false dependencies. A durable early-deletion clock carries privacy observations through restart and rolls back with failed source admission. Explicit internal migration scans only the bounded pending queue and refuses corruption transactionally.
+- Eight new owned-library cases pass in functional, Thread Sanitizer and optimized selections: 107 passes / two worker-entry skips each, including all four identity crash parents. The [frozen receipt](../benchmarks/sync-causality-development-v1.json) passes 1,418 full cases / seven explicit skips and all 11 staged package/process checks over 828 unchanged inputs. Strict signatures, normalized payloads, all 34 extracted ZIP files, five traced image absences and unchanged installed 15-file app pass independent review. The exact corrected fixture also fails three cases / 16 assertions against old source, then passes all eight after exact restoration. Initial compile, overbroad body-stub and reviewer trace-count failures remain retained. Structural graph foreign keys do not establish complete typed graph decoding.
+- F059 remains TODO; no public sync control or capture activation is added. Complete typed graph/media/versioned-citation processing, current privacy, epochs/compaction, trusted enrollment, native workflows and actual providers/two Macs remain required.
+
 ## Sync object lifetimes and resumable bootstrap — draft implementation
 
 - [Identity catalog](SYNC-OBJECT-IDENTITY.md) maps all 13 canonical tables to separate origin/lifetime identities. Updates keep identity, delete/recreate and primary-key moves retire old lifetimes, current-key collisions refuse, and deleted raw key frames clear. Local intent consumption, caller protocol output and acknowledgement share a transaction. Unknown body-free wire deletes use the actual journal's durable barrier.

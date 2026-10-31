@@ -53,7 +53,7 @@ Each size has one warm run. Population uses explicit authored fixture SQL and is
 
 An independent Python reader verifies every original typed SQLite cell and exact payload, every global lifetime hash and local primary-key digest, all current mappings, two deleted probe lifetimes with no raw keys, zero pending intents and the completed raw-key-free cursor. It recomputes all batch counts/quantiles, checks the actual successful test entry/log and confirms its read-only inspection leaves the database byte-identical. All 362 declared large-run inputs stay unchanged, and historical source/test-bundle bytes are retained separately before later builds. Nine offline review contracts refuse unmarked/incomplete fixtures, failed or zero-test runs, changed inputs/logs, live journals and symlink roots/databases; independent typed-frame controls distinguish integer/text/blob and Unicode/NUL data. These contracts run in benchmark CI without downloads.
 
-The full typed transfer processor, cross-object causal dependencies, versioned citations and user-facing sync remain unfinished. Full/package/process qualification is still required; scale success does not complete F059.
+The [causal frontier follow-up](SYNC-CAUSALITY.md) fixes cross-object journal ordering and records frozen full/selected sanitizer/optimized plus staged package/process regression qualification. The full typed transfer processor, versioned citations and user-facing sync remain unfinished; metadata scale and ordering success do not complete F059.
 
 ## Remaining delivery work
 
