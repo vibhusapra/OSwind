@@ -82,7 +82,7 @@ class FixtureFunctions(unittest.TestCase):
 
     def test_unknown_future_schema_does_not_gain_fixture_functions(self):
         db = self.connection()
-        db.execute("PRAGMA user_version=31")
+        db.execute("PRAGMA user_version=32")
         with self.assertRaises(ValueError):
             register_inactive_sync_fixture(db)
         with self.assertRaises(sqlite3.OperationalError):
@@ -148,6 +148,24 @@ class FixtureFunctions(unittest.TestCase):
                 db.execute("INSERT INTO source VALUES(2)")
         db.execute("UPDATE personal_sync_capture SET enabled=0,suppressed=0")
         db.execute("PRAGMA user_version=31")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(3)")
+        self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
+
+    def test_schema31_erasure_marker_refuses_live_state_drift_and_never_grants_erase(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=31")
+        db.execute("CREATE TRIGGER writer31 BEFORE INSERT ON source BEGIN SELECT oswind_source_erasure_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        self.assertEqual(db.execute("SELECT oswind_incoming_source_erasure_v1()").fetchone(), (0,))
+        for state in [(1, 0), (0, 1), (1, 1)]:
+            db.execute("UPDATE personal_sync_capture SET enabled=?,suppressed=?", state)
+            with self.assertRaises(sqlite3.OperationalError):
+                db.execute("INSERT INTO source VALUES(2)")
+            self.assertEqual(db.execute("SELECT oswind_incoming_source_erasure_v1()").fetchone(), (0,))
+        db.execute("UPDATE personal_sync_capture SET enabled=0,suppressed=0")
+        db.execute("PRAGMA user_version=32")
         with self.assertRaises(sqlite3.OperationalError):
             db.execute("INSERT INTO source VALUES(3)")
         self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])

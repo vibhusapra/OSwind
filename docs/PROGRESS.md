@@ -1,10 +1,18 @@
 # OSwind delivery ledger
 
+## Incoming source erasure — functional component verified
+
+Schema31 routes peer source tombstones through native/original/cache erasure in the receipt transaction. Retained exact citations select their answer/recap lifetime even when the native citation differs; inactive mappings preserve replacement rows. Cache-only media stages before projection removal and waits for exclusive post-commit cleanup. Incoming deletion preserves independent entity definitions for deferred sources.
+
+The retained cached-answer counterexample is red then green. Seven source-erasure and five actual schema30 migration/permit cases pass. The [twenty-stage receipt](../benchmarks/sync-source-erasure-v1.json) passes 1,603 full cases / 78 explicit skips and 583 sanitizer / 583 optimized cases, each with 19 skips. Eleven sanitizer logs have no race warnings. All 707 repository inputs and 453 Sources/Tests/Vendor inputs stay unchanged. A new strict signed/extracted 34-file app passes actual old30 refusal, entity/correction/metadata, CLI/API/MCP/SDK, erasure/wipe, recaps/routines and interrupted backups. Installed 15 and three prior staged trees stay unchanged. Parent `8587ab5` passes both hosted jobs in run 41232019348.
+
+[Design and boundaries](SYNC-SOURCE-ERASURE.md). Global child retirement and scoped/wipe epochs, privacy/media service, enrollment/UI, providers/two-Mac, representative scale/power and distribution remain open. F059 and all 78 statuses remain unchanged.
+
 ## Incoming metadata deletions — functional component verified
 
 [Six additional native tombstone paths](SYNC-INCOMING-DELETIONS.md) preserve independent sources/conversations and erase owned run originals without fetching deleted bodies. Eight cases cover exact key bytes, cache-protection rollback/repair/retry, reservations/connections and direct old-lifetime retry. Cancellable SQL and shared transaction validation protect all deletion dispatch paths.
 
-The [twenty-stage receipt](../benchmarks/sync-incoming-deletions-v1.json) passes 1,590 full cases/79 skips, 571 sanitizer and 571 optimized cases/19 skips each. Parent plus ten retained worker logs have no race warnings. All 701 repository inputs and 447 Sources/Tests/Vendor inputs match across gates. New strict signed/extracted 34-file package, API/MCP/SDK, actual29 refusal, entity/correction, erasure/wipe, recap/routine and backup interruptions pass. Installed15 and both prior packages remain unchanged. Parent `8a172c8` passes both hosted jobs in run 41228502794.
+The [twenty-stage receipt](../benchmarks/sync-incoming-deletions-v1.json) passes 1,590 full cases/79 skips, 571 sanitizer and 571 optimized cases/19 skips each. Parent plus ten retained worker logs have no race warnings. All 701 repository inputs and 447 Sources/Tests/Vendor inputs match across gates. New strict signed/extracted 34-file package, API/MCP/SDK, actual29 refusal, entity/correction, erasure/wipe, recap/routine and backup interruptions pass. Installed 15 and both prior packages remain unchanged. Parent `8a172c8` passes both hosted jobs in run 41228502794.
 
 Schema30 stays unchanged. Known source erasure, cache-only/orphan original cleanup, independently live entity preservation, graph-wide child retirement/epochs, service/enrollment and physical/distribution/ranking remain open. F059 and all 78 statuses stay unchanged.
 

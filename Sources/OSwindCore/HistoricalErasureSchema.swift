@@ -82,11 +82,20 @@ enum HistoricalErasureSchema {
     /// Revoke the exact archived versions and any cached versions that depend
     /// on them, before deleting archival roots in the same transaction. The
     /// native current owner and unrelated versions keep their lifetimes.
-    static func revokeSelected(_ db:RoutineDatabase)throws {
+    static func revokeSelected(_ db:RoutineDatabase,additionalObject:String?=nil)throws {
         try db.execute("CREATE TEMP TABLE IF NOT EXISTS erasure_version_ids(object_digest TEXT NOT NULL,content_sha TEXT NOT NULL,PRIMARY KEY(object_digest,content_sha)) WITHOUT ROWID; DELETE FROM temp.erasure_version_ids; INSERT INTO temp.erasure_version_ids SELECT h.object_digest,h.content_sha FROM historical_evidence h JOIN temp.erasure_historical_ids e ON e.handle=h.handle")
         defer {try? db.execute("DELETE FROM temp.erasure_version_ids")}
-        guard try db.eraseCount("SELECT count(*) FROM temp.erasure_version_ids")>0 else {return}
         let hasCache=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_versions'")>0
+        if let additionalObject {
+            try SyncProtocolLimits.digest(additionalObject)
+            try db.execute("INSERT OR IGNORE INTO temp.erasure_version_ids SELECT object_digest,content_sha FROM temp.erasure_extra_version_ids")
+            if hasCache {
+                try SyncVersionStore.validateForErasure(db)
+                let root=try db.statement("INSERT OR IGNORE INTO temp.erasure_version_ids SELECT object_digest,content_sha FROM personal_sync_versions WHERE object_digest=?");defer {sqlite3_finalize(root)};db.bind(root,1,additionalObject);try db.done(root)
+                let revoke=try db.statement("INSERT OR IGNORE INTO personal_sync_version_revoked VALUES(?)");defer {sqlite3_finalize(revoke)};db.bind(revoke,1,additionalObject);try db.done(revoke)
+            }
+        }
+        guard try db.eraseCount("SELECT count(*) FROM temp.erasure_version_ids")>0 else {return}
         if hasCache {
             try SyncVersionStore.validateForErasure(db)
             var reverse=[String:[String]](),queue=[String]()
@@ -115,7 +124,15 @@ enum HistoricalErasureSchema {
             }
         }
         try db.execute("INSERT OR IGNORE INTO historical_scope_revoked_versions SELECT object_digest,content_sha FROM temp.erasure_version_ids")
-        if hasCache {try db.execute("DELETE FROM personal_sync_versions WHERE (object_digest,content_sha) IN (SELECT object_digest,content_sha FROM temp.erasure_version_ids)")}
+        if hasCache {
+            // Cache-only original projections may own local media even when no
+            // canonical or historical row remains. Stage before FK removal.
+            if try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_evidence'")>0 {
+                try SyncOriginalEvidenceStore.validateForErasure(db)
+                try db.execute("INSERT OR IGNORE INTO erasure_assets SELECT j.value FROM personal_sync_evidence e,json_each(CAST(e.paths AS TEXT)) j WHERE (e.object_digest,e.content_sha) IN (SELECT object_digest,content_sha FROM temp.erasure_version_ids)")
+            }
+            try db.execute("DELETE FROM personal_sync_versions WHERE (object_digest,content_sha) IN (SELECT object_digest,content_sha FROM temp.erasure_version_ids)")
+        }
     }
     struct Query {let sql:String;let bind:(OpaquePointer)throws->Void}
     static func query(_ scope:HistoryErasureScope,db:RoutineDatabase)->Query {

@@ -61,13 +61,7 @@ enum EntitySchema {
     BEGIN DELETE FROM entity_mentions WHERE memory_id=new.memory_id AND entity_id=new.entity_id AND origin='automatic'; END;
     INSERT INTO store_metadata(key,value) VALUES('entity_rules_revision',lower(hex(randomblob(16)))) ON CONFLICT(key) DO NOTHING;
     DROP TRIGGER IF EXISTS entity_source_delete;
-    CREATE TRIGGER entity_source_delete BEFORE DELETE ON memories BEGIN
-        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id UNION SELECT entity_id FROM entity_project_ignored WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id) AND NOT EXISTS(SELECT 1 FROM entity_project_ignored e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
-        DELETE FROM entity_mentions WHERE memory_id=old.id;
-        DELETE FROM entity_index_state WHERE memory_id=old.id;
-        DELETE FROM entity_ignored WHERE memory_id=old.id;
-        DELETE FROM entity_project_ignored WHERE memory_id=old.id;
-    END;
+    \(sourceDeleteSQL);
     DROP TRIGGER IF EXISTS entity_source_revision;
     \(sourceRevisionSQL);
     """
@@ -87,6 +81,18 @@ enum EntitySchema {
     static let sourceRevisionSQL=legacySourceRevisionSQL.replacingOccurrences(
         of:"DELETE FROM memory_entities WHERE curated=0",
         with:"DELETE FROM memory_entities WHERE oswind_incoming_source_projection_v1(old.id,new.payload)<>1 AND curated=0")
+    static let legacySourceDeleteSQL="""
+    CREATE TRIGGER entity_source_delete BEFORE DELETE ON memories BEGIN
+        DELETE FROM memory_entities WHERE curated=0 AND id IN (SELECT entity_id FROM entity_mentions WHERE memory_id=old.id UNION SELECT entity_id FROM entity_project_ignored WHERE memory_id=old.id) AND NOT EXISTS(SELECT 1 FROM entity_mentions e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id) AND NOT EXISTS(SELECT 1 FROM entity_project_ignored e WHERE e.entity_id=memory_entities.id AND e.memory_id<>old.id);
+        DELETE FROM entity_mentions WHERE memory_id=old.id;
+        DELETE FROM entity_index_state WHERE memory_id=old.id;
+        DELETE FROM entity_ignored WHERE memory_id=old.id;
+        DELETE FROM entity_project_ignored WHERE memory_id=old.id;
+    END
+    """
+    static let sourceDeleteSQL=legacySourceDeleteSQL.replacingOccurrences(
+        of:"DELETE FROM memory_entities WHERE curated=0",
+        with:"DELETE FROM memory_entities WHERE oswind_incoming_source_erasure_v1()<>1 AND curated=0")
     // Legacy labels have a unique owner within a kind. Bind only known project
     // aliases, leaving unmapped legacy feedback intact rather than guessing IDs.
     static let migrateProjectRejections="""

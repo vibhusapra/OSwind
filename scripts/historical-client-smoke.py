@@ -4,7 +4,7 @@ No desktop capture, normal history, settings/TCC changes or provider credentials
 """
 import argparse,contextlib,hashlib,json,pathlib,sqlite3,subprocess,time
 
-p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--old-cli',type=pathlib.Path,required=True);p.add_argument('--old-sha256',required=True);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-schema',type=int,choices=[25,26,27,28,29],default=27);p.add_argument('--current-schema',type=int,choices=[26,27,28,29,30],default=30);a=p.parse_args();assert a.current_schema>a.old_schema
+p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--old-cli',type=pathlib.Path,required=True);p.add_argument('--old-sha256',required=True);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-schema',type=int,choices=[25,26,27,28,29,30],default=27);p.add_argument('--current-schema',type=int,choices=[26,27,28,29,30,31],default=31);a=p.parse_args();assert a.current_schema>a.old_schema
 def sha(path):
     with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 binary=a.binary.resolve();old=a.old_cli.resolve();base=a.root.absolute()
@@ -46,7 +46,7 @@ try:
     report['initializedOlderClient']=dict(postOpenLeaseObserved=ready,returncode=child.returncode,stderrSHA256=hashlib.sha256(error.encode()).hexdigest())
     assert child.returncode!=0 and source_snapshot()==before
     # Require a product compatibility refusal, not malformed collector input.
-    assert ('newer OSwind' in error or 'oswind_historical_writer_v1' in error or 'oswind_historical_scope_writer_v1' in error or 'oswind_incoming_source_writer_v1' in error or 'oswind_run_original_writer_v1' in error or 'oswind_incoming_entity_writer_v1' in error),error
+    assert ('newer OSwind' in error or 'oswind_historical_writer_v1' in error or 'oswind_historical_scope_writer_v1' in error or 'oswind_incoming_source_writer_v1' in error or 'oswind_run_original_writer_v1' in error or 'oswind_incoming_entity_writer_v1' in error or 'oswind_source_erasure_writer_v1' in error),error
     report['checks'].append('actual already-initialized older writer refuses after migration upgrade; source payloads unchanged')
     stable=physical();report['beforeFreshRefusalsSQLiteFiles']=stable;save()
     for args in [('stats',),('note','Owned fresh older write must refuse')]:

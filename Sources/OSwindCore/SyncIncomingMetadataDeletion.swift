@@ -8,7 +8,7 @@ struct SyncIncomingMetadataDeletion {
     let cache:SyncVersionStore
     var db:RoutineDatabase {cache.database}
     static let tables:Set<SyncCanonicalTable> = [.conversation,.turn,.conversationCitation,.routine,.routineRun,.evidencePin]
-    static func accepts(_ kind:SyncObjectKind)->Bool {kind == .source || tables.contains {$0.kind==kind}}
+    static func accepts(_ kind:SyncObjectKind)->Bool {tables.contains {$0.kind==kind}}
     func apply(_ change:SyncJournalChange)throws {
         guard change.after.isDeleted,Self.accepts(change.revision.key.kind) else {throw OSwindError.invalid("Use the corresponding typed metadata deletion adapter")}
         try cache.catalog.deletePeerKey(change.revision.key,journal:cache.journal) {object in

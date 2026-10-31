@@ -69,7 +69,7 @@ try:
  assert status==200 and ids(body)==['owned-observation-0'];assert ids(http(params|dict(sourceStartsOnly='true'))[1])==[];assert http(params|dict(sourceStartsOnly='1'))[0]==400
  server.terminate();server.wait(timeout=10);server=None
  report['checks'].append('owned authenticated loopback socket includes overlap, supports strict source-start filtering and refuses non-boolean input')
- archive=base/'observations.oswindbackup';assert value('backup','create',archive)['sourceSchema']==30
+ archive=base/'observations.oswindbackup';assert value('backup','create',archive)['sourceSchema']==31
  restored=base/'restored';run('backup','restore',archive,'--to',restored)
  quiet=json.loads((restored/'settings.json').read_text());assert not quiet['captureOnLaunch'] and not quiet['apiEnabled'];assert ids(cli_search(data=restored))==['owned-observation-0']
  assert value('get','owned-observation-0',data=restored)['textObservation']==sources[0]['textObservation']
@@ -81,7 +81,7 @@ try:
  report['checks'].append('portable Markdown identifies sample counts and gaps without claiming continuous activity')
  if a.old_cli:
   old=a.old_cli.resolve();before=sha(library/'memory.sqlite');refusal=run('stats','--json',cli=old,ok=False);assert 'newer OSwind version' in refusal.stderr;assert sha(library/'memory.sqlite')==before
-  run('backup','inspect',archive,cli=old,ok=False);report['olderCLI_SHA256']=sha(old);report['checks'].append('actual preceding signed23 client refuses schema30 library and archive; database bytes unchanged')
+  run('backup','inspect',archive,cli=old,ok=False);report['olderCLI_SHA256']=sha(old);report['checks'].append('actual preceding signed23 client refuses schema31 library and archive; database bytes unchanged')
   legacy=base/'actual-older23-library';assert value('import',fixture,'--json',cli=old,data=legacy)['imported']==2
   def legacy_snapshot():
    with sqlite3.connect('file:'+str(legacy/'memory.sqlite')+'?mode=ro',uri=True) as db:
@@ -89,14 +89,14 @@ try:
     return version,rows
   version,beforeRows=legacy_snapshot();assert version==23 and all('textObservation' not in bytes.fromhex(row[1]).decode() for row in beforeRows)
   assert value('stats','--json',data=legacy)['count']==2
-  version,afterRows=legacy_snapshot();assert version==30 and afterRows==beforeRows
+  version,afterRows=legacy_snapshot();assert version==31 and afterRows==beforeRows
   with sqlite3.connect('file:'+str(legacy/'memory.sqlite')+'?mode=ro',uri=True) as db:assert db.execute('SELECT COUNT(*) FROM text_observation_ranges').fetchone()[0]==0
   report['checks'].append('actual prior23 writer strips unknown span fields; upgrade preserves exact typed source payloads and installs empty range projection')
 
  preview=value('erase','preview','--from',stamp(last),'--to',upper);assert preview['sources']==1
  erased=value('erase','apply','--from',stamp(last),'--to',upper,'--token',preview['token']);assert erased['sources']==1;assert ids(cli_search())==[]
  report['checks'].append('preview-guarded erasure includes exact last observed sample and removes its range from later retrieval')
- report.update(state='completed',schema=30,fixtureIsNativeCapture=False,scope='Authored bounded span fixtures, actual CLI/HTTP/MCP/SDK/backup/Markdown/erase processes and optional older-client refusal. No positive native AX capture, normal history, calibrated performance/power or whole-product competitor acceptance.');save();print(json.dumps(report,indent=2))
+ report.update(state='completed',schema=31,fixtureIsNativeCapture=False,scope='Authored bounded span fixtures, actual CLI/HTTP/MCP/SDK/backup/Markdown/erase processes and optional older-client refusal. No positive native AX capture, normal history, calibrated performance/power or whole-product competitor acceptance.');save();print(json.dumps(report,indent=2))
 except BaseException as error:report.update(state='failed',failure=str(error));save();raise
 finally:
  if server is not None:

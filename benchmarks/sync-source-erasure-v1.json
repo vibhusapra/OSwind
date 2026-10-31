@@ -1,0 +1,425 @@
+{
+  "format": "OSwind incoming source erasure functional qualification v1",
+  "version": 1,
+  "state": "functional-component-qualified",
+  "overallV0Complete": false,
+  "schema": 31,
+  "sourceBase": "8587ab5d98ed2f31037a9a2da68192662eadfe8d",
+  "branch": "codex/sync-source-erasure",
+  "scope": "Whole-source peer deletion across active native keys, retired original lifetimes, exact cached dependency versions and citing answer/recap owners; durable media staging and independent entity preservation. Internal component only. No replicated child/collection epochs or personal sync service.",
+  "inputs": {
+    "repositoryInputs": 707,
+    "identicalSourcesTestsVendorInputs": 453,
+    "repositoryManifest": "benchmarks/sync-source-erasure-inputs-v1.json",
+    "manifestSHA256": "92f32b0616880dd7d44a18d6867f9235be51400eff4ca0801fbddbd65299eb5c",
+    "rawFrozenInputs": 709,
+    "rawManifestSHA256": "de4e74d502c8c901b11b64554c997554fc13181eacf243e4411ec1f0ec338ac3",
+    "driverSHA256": "7d568cab44015d33c8bd536f428bac79d1d471517e81bd2ad1c4be3c6bc9ffe7",
+    "allQualificationInputsUnchanged": true
+  },
+  "tests": {
+    "full": {
+      "defined": 1681,
+      "passed": 1603,
+      "skipped": 78
+    },
+    "threadSanitizer": {
+      "defined": 602,
+      "passed": 583,
+      "skipped": 19
+    },
+    "optimized": {
+      "defined": 602,
+      "passed": 583,
+      "skipped": 19
+    },
+    "newCases": 12
+  },
+  "threadSanitizer": {
+    "state": "passed",
+    "logs": [
+      {
+        "path": "thread-sanitizer.log",
+        "sha256": "086ed9063a3dd8c11285ed0d371ca31f932144003fb89862c105ca8699b9809a",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log",
+        "sha256": "c27cc592301ebd0d9f3a19f0f298ecc4c3289ed4de3ce40a1a203509d3a2fde7",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log",
+        "sha256": "c27cc592301ebd0d9f3a19f0f298ecc4c3289ed4de3ce40a1a203509d3a2fde7",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log",
+        "sha256": "cb3ccb2209267828ac67d3bab4b3467c30394c46b4b069a5d5dd124c15bf8681",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log",
+        "sha256": "cb3ccb2209267828ac67d3bab4b3467c30394c46b4b069a5d5dd124c15bf8681",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log",
+        "sha256": "7c50e912b27a1a39382498b0bea8de5271e8dd94a9a8811c493a44b0a2d7dcd2",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log",
+        "sha256": "7c50e912b27a1a39382498b0bea8de5271e8dd94a9a8811c493a44b0a2d7dcd2",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log",
+        "sha256": "6d6b14c93c8b013aad5822a3ada17300498371d8073633ce3b7c8fb805614ca2",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log",
+        "sha256": "6d6b14c93c8b013aad5822a3ada17300498371d8073633ce3b7c8fb805614ca2",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log",
+        "sha256": "b94c75bdf9dc0d3b5cede88e896d900bdc12e85b31f12c94112b1fd2ec49a14b",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log",
+        "sha256": "a360c256ccf8ba219d1be95b96c315bad2188be0f26621fd6050eae049f79390",
+        "raceWarnings": 0
+      }
+    ],
+    "parentAndRetainedChildLogs": 11
+  },
+  "passingQualificationStages": [
+    {
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "89b791cb0d681abb67623d8014b63da1171b538cf3caff7e6a193f3bd0281879"
+    },
+    {
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "086ed9063a3dd8c11285ed0d371ca31f932144003fb89862c105ca8699b9809a"
+    },
+    {
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "b89d8993a97b17f5f4ffc1ca581ce64e575da5a0b89ddcbbb6e7f2f0bfded834"
+    },
+    {
+      "name": "owned-sqlite-contracts",
+      "returncode": 0,
+      "log": "owned-sqlite-contracts.log",
+      "logSHA256": "3af354abd6afd2f4f662a367159a8b8107385935ded6c8a2b929734becedb43c"
+    },
+    {
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "f6c5f110cbc5b9f5b0223bb3bac25bedb4992e1e4a51974920523b8c5d988795"
+    },
+    {
+      "name": "entity-process",
+      "returncode": 0,
+      "log": "entity-process.log",
+      "logSHA256": "f08b3f532c49b27504f67e3cc72e786e4f2a2d2bcdb468ae9c31f25768eb8cc6"
+    },
+    {
+      "name": "project-correction-process",
+      "returncode": 0,
+      "log": "project-correction-process.log",
+      "logSHA256": "8d061f703515b73f5cecff0c966aeb8cad453b617ad99d28cea446c978f0b6d2"
+    },
+    {
+      "name": "entity-metadata-process",
+      "returncode": 0,
+      "log": "entity-metadata-process.log",
+      "logSHA256": "685fe846d7e8c07d48e90a93182c7967bb9bdeb1482985fef9f601dc55d704e6"
+    },
+    {
+      "name": "actual-old30-process",
+      "returncode": 0,
+      "log": "actual-old30-process.log",
+      "logSHA256": "a7de6527487f535b3e7ddae1e098c5dc82da23f0c020093a873b1b6b339fea85"
+    },
+    {
+      "name": "capture-process",
+      "returncode": 0,
+      "log": "capture-process.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "original-erasure-process",
+      "returncode": 0,
+      "log": "original-erasure-process.log",
+      "logSHA256": "7d786708469807c620cf80b3d3ab685f52e98a3862b87857461a145688795ba4"
+    },
+    {
+      "name": "api-mcp-process",
+      "returncode": 0,
+      "log": "api-mcp-process.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp-process",
+      "returncode": 0,
+      "log": "indexed-api-mcp-process.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk-contracts",
+      "returncode": 0,
+      "log": "python-sdk-contracts.log",
+      "logSHA256": "1c6e0f307d5442cb540f2702c25dcda92600845d1294e23984e150c298ab3876"
+    },
+    {
+      "name": "single-delete-process",
+      "returncode": 0,
+      "log": "single-delete-process.log",
+      "logSHA256": "b111f16d29df6d6919116defad0a0971fc7d942987c3f3e4f38afa0e1d748f97"
+    },
+    {
+      "name": "wipe-process",
+      "returncode": 0,
+      "log": "wipe-process.log",
+      "logSHA256": "36754ca8d34b66dade828b3d86f6725e9e8a82549ce8b1716a7b0853a8d51959"
+    },
+    {
+      "name": "recap-process",
+      "returncode": 0,
+      "log": "recap-process.log",
+      "logSHA256": "b2ab856577709204162064ad69a75b9c57dedb6f01dc16825e4a35cde6bf9674"
+    },
+    {
+      "name": "routine-process",
+      "returncode": 0,
+      "log": "routine-process.log",
+      "logSHA256": "68e8bb38a4bc23c1af07eea80f132c9c8e155a59bf047eaca538cfed6e1cde38"
+    },
+    {
+      "name": "backup-interruption-process",
+      "returncode": 0,
+      "log": "backup-interruption-process.log",
+      "logSHA256": "a41283a313d641e80461638ed1379130a834ba1a62a19a392eadf0683200f153"
+    },
+    {
+      "name": "archive-review",
+      "returncode": 0,
+      "log": "archive-review.log",
+      "logSHA256": "71b0440fcf7d49c3fe67c8370255dee62dcb0c0231ed6df6721b96a9e7d5b1e9"
+    }
+  ],
+  "package": {
+    "cliSHA256": "f34ed0513012f8a25e6b8256f893d4d6fdc4a47cc640a2cefe49d1e6bd5dac86",
+    "zipSHA256": "6407ff05e34ae15eacb6c6e9d685af91175625996dd331915d0ff949cb9bb513",
+    "stagedFiles": 34,
+    "strictStagedAndExtractedSignatures": true,
+    "allExtractedFilesEqualStagedFiles": true,
+    "testFixturesAbsent": true,
+    "installedFilesUnchanged": true,
+    "threePriorStagedTreesUnchanged": true
+  },
+  "migrationFixture": {
+    "schema": 30,
+    "producerCLI_SHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+    "producerSource": "8587ab5d98ed2f31037a9a2da68192662eadfe8d",
+    "origin": "Actual schema29 owned native/cache/run-original fixture opened and upgraded by unchanged qualified schema30 CLI. SQLite backup after CLI exit. No user corpus or fabricated version downgrade.",
+    "counts": {
+      "memories": 1,
+      "memory_entities": 2,
+      "entity_aliases": 2,
+      "entity_mentions": 1,
+      "entity_project_ignored": 1,
+      "routine_runs": 1,
+      "routine_run_originals": 1,
+      "personal_sync_versions": 4
+    },
+    "sha256": "f7c5af147209b9debb3af36fdad2817ec4e9bfef85cc239d7f8a8c2d12228d71"
+  },
+  "developmentCounterexample": {
+    "state": "retained-red-then-green",
+    "test": "testIncomingSourceErasureRemovesCachedCitingAnswerWhenNativeCitationProjectionDiffers",
+    "failedRun": "development-v4",
+    "logSHA256": "a7953e70ea153f1c7f2417f32820f96bf201264871c34eb87ce824e7a200e9ff",
+    "observed": "One native answer and two cached question/answer bodies remained after source deletion when retained wire citation differed from native citation",
+    "fixedRun": "development-v5",
+    "fixedLogSHA256": "fa97a35806cdbb9240798e9834d8e4afd76a08f2d25cb9b9a0caeea37dfb4e35"
+  },
+  "openGates": [
+    "Receiver-only derived child identities and replicated deletion convergence",
+    "Scoped erasure and wipe collection/epoch barriers",
+    "Current-policy and media transport service admission",
+    "Enrollment/key recovery, background lifecycle and native conflict/status UI",
+    "Provider semantics and actual two-Mac acceptance",
+    "Representative source-erasure/replay scale, physical capture/power and distribution",
+    "Broad parity and comparative ranking"
+  ],
+  "processEvidence": {
+    "actual-old30-process/report.json": {
+      "state": "passed",
+      "currentCLI_SHA256": "f34ed0513012f8a25e6b8256f893d4d6fdc4a47cc640a2cefe49d1e6bd5dac86",
+      "oldCLI_SHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+      "harnessSHA256": "fc4e67e254720793aeb9f3489471076bc26beaf36c3f37ef7f76d85bfa59ae5f",
+      "checks": [
+        "actual already-initialized older writer refuses after migration upgrade; source payloads unchanged",
+        "fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged",
+        "actual older backup inspector refuses newer package; all package bytes unchanged"
+      ],
+      "operations": [
+        {
+          "binary": "old30",
+          "arguments": [
+            "note",
+            "Owned original schema30 text"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "3a343816ff8dc3f568516968b28a024b70f00fc4887d20625d9dbb2849799a14",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "current31",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "93f9d5143b3bc4663a5e742cd20b0673198d5aa05d9e20345e33ca438e8d5b41",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old30",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "old30",
+          "arguments": [
+            "note",
+            "Owned fresh older write must refuse"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "current31",
+          "arguments": [
+            "backup",
+            "create",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-source-erasure-v1/qualification-v1/actual-old30-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "85b71ea0a2333f5b3aef88c75ab97f27fd93030c86caea8ea8730f831ff77bc1",
+          "stderrSHA256": "6e89ec84007572347b06d9a68e740ddd8d7f355fc82d371e73f94140b67888a8"
+        },
+        {
+          "binary": "current31",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-source-erasure-v1/qualification-v1/actual-old30-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "85b71ea0a2333f5b3aef88c75ab97f27fd93030c86caea8ea8730f831ff77bc1",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old30",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-source-erasure-v1/qualification-v1/actual-old30-process/copy.oswindbackup"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "0433de28417ba0e9be348d77737187af44a27a9c849b08bf6fc21223fd83560b"
+        },
+        {
+          "binary": "current31",
+          "arguments": [
+            "note",
+            "Owned current write still works"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "4e523ae5a446b373bd2ba7fbb3e688490ad947d27e364af752674a922a563ef2",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Actual older executable, owned synthetic text and complete process exits. No native recording, enrolled service, media playback, power or competitor evidence.",
+      "initializedOlderClient": {
+        "postOpenLeaseObserved": true,
+        "returncode": 1,
+        "stderrSHA256": "76816770e9a44078d241a3a3f55eae9c1c50674d55792ce5facdae2a4801fc62"
+      },
+      "beforeFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "578e468f24e6a0fb6875129f25d5d412cb7f669567aaec1c9d7c2b90680ea669"
+      },
+      "afterFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "578e468f24e6a0fb6875129f25d5d412cb7f669567aaec1c9d7c2b90680ea669"
+      },
+      "sourceSchema": 30,
+      "targetSchema": 31,
+      "allChildrenTerminal": true
+    },
+    "package-review.json": {
+      "state": "passed",
+      "allExtractedFilesEqualStagedFiles": {
+        "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+        "Contents/_CodeSignature/CodeResources": "78397288caa1401ed6af4608779b618a42758faac724d647389d39185be04b09",
+        "Contents/MacOS/oswindctl": "f34ed0513012f8a25e6b8256f893d4d6fdc4a47cc640a2cefe49d1e6bd5dac86",
+        "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+        "Contents/MacOS/OSwind": "6f0b1925dd7964effaa9c1675b60cc97ad7a620ba2f78fc6bb1a76def96b10c7",
+        "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+        "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+        "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+        "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+        "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+        "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+        "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+        "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+        "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+        "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+        "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+        "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+        "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+        "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+        "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+        "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+        "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+        "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+        "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+        "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+        "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+      },
+      "stagedAndExtractedStrictSignatures": true,
+      "zipSHA256": "6407ff05e34ae15eacb6c6e9d685af91175625996dd331915d0ff949cb9bb513",
+      "testFixturesAbsent": true,
+      "installed15FilesUnchanged": true,
+      "prior34StagedFilesUnchanged": true
+    }
+  }
+}

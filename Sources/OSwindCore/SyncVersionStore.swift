@@ -178,6 +178,7 @@ struct SyncVersionStore {
         for (name,sql) in Self.expectedSchemas {try Self.schema(database,name,sql,create:false)}
         if try database.eraseCount("PRAGMA user_version")>=29 {try RoutineRunOriginalSchema.validate(database)}
         if try database.eraseCount("PRAGMA user_version")>=30 {try SyncIncomingEntitySchema.validate(database)}
+        if try database.eraseCount("PRAGMA user_version")>=31 {try SyncIncomingSourceErasureSchema.validate(database)}
         schemaStamp.value=cookie
     }
     private func bind(_ row:OpaquePointer,_ index:Int32,_ data:Data) {data.withUnsafeBytes {_ = sqlite3_bind_blob(row,index,$0.baseAddress,Int32(data.count),database.transient)}}
