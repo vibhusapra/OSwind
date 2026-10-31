@@ -32,6 +32,8 @@ Forty-six focused development cases pass. The integration fixture uses two separ
 
 The first frozen broad run at fcf5d3f passes 1,351 full tests with two skips. Its sanitizer stage passes 163, skips the worker entry point and fails both crash-parent tests because the minimal child launcher omits early sanitizer loading. The child log identifies the runtime-interceptor startup error before either crash gate; no ThreadSanitizer race warning is emitted. The launcher now starts the existing xctest host directly and preloads only the sanitizer runtime already loaded by that host. Both crash-parent tests pass under TSan in development, with the worker-only skip. The original partial run is retained; corrected-source qualification is recorded below.
 
+The [object-lifetime catalog and bounded identity bootstrap](SYNC-OBJECT-IDENTITY.md) are now in development across all 13 canonical tables. Focused sanitizer checks pass, including a retained/fixed SQLite-affinity collision counterexample. This does not complete typed body/media processing, source-version citations or user enrollment; full qualification is pending.
+
 ## Corrected frozen qualification
 
 [Source 57c1926 receipt](../benchmarks/personal-sync-foundation-v1.json), PR #93, retains all nine passing stages over 631 unchanged inputs:

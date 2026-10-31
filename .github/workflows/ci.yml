@@ -276,6 +276,8 @@ jobs:
         run: python3 scripts/test-power-telemetry.py
       - name: Verify paired keyword benchmark result and archive admission offline
         run: python3 scripts/test-keyword-scope-benchmark.py
+      - name: Verify authored identity-scale review admission and typed frames offline
+        run: python3 scripts/test-sync-identity-scale.py
       - name: Verify competitor comparison identities and stored-source admission without vendor downloads
         run: python3 scripts/test-compare-screenpipe.py
       - name: Verify independent scorers and process boundaries on generated fixtures
