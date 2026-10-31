@@ -59,6 +59,8 @@ jobs:
         run: |
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Verify inactive owned SQLite fixture boundaries
+        run: python3 scripts/test-owned-sqlite-fixture.py
       - name: Verify owned canonical capture schema and process boundaries
         run: python3 scripts/sync-capture-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-sync-capture"
       - name: Retain canonical capture process receipt

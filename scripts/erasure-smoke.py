@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Owned process contracts for guarded selective history erasure; no capture/normal library."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse, concurrent.futures, json, pathlib, sqlite3, subprocess, tempfile
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary');o=p.parse_args();binary=pathlib.Path(o.binary).resolve()
 with tempfile.TemporaryDirectory(prefix='oswind-erasure-contract-') as temporary:
@@ -14,6 +15,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-erasure-contract-') as temporary
     (library/'images/shared').write_bytes(b'shared owned bytes');(library/'images/unique').write_bytes(b'unique owned bytes')
     # Owned fixture attaches media to imported sources; normal interchange deliberately strips raw paths.
     with sqlite3.connect(library/'memory.sqlite') as db:
+        register_inactive_sync_fixture(db)
         for identifier,path in [('a','images/shared'),('b','images/./shared'),('c','images/unique')]:
             payload=json.loads(db.execute('SELECT payload FROM memories WHERE id=?',(identifier,)).fetchone()[0]);payload['imagePath']=path;db.execute('UPDATE memories SET payload=? WHERE id=?',(json.dumps(payload).encode(),identifier))
     scope=['--from',stamp(20),'--to',stamp(30),'--app','Safari','--domain','ALPHA.test']

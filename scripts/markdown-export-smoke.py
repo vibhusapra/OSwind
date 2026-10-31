@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Portable export process contracts using only an owned generated replay library."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse
 import hashlib
 import json
@@ -68,6 +69,7 @@ with tempfile.TemporaryDirectory(prefix="oswind-markdown-contract-") as temporar
         settings["privacy"]["excludedApps"].remove(memory["bundleID"])
         (library / "settings.json").write_text(json.dumps(settings))
         connection = sqlite3.connect(library / "memory.sqlite")
+        register_inactive_sync_fixture(connection)
         template = json.loads(connection.execute("SELECT payload FROM memories LIMIT 1").fetchone()[0])
         now = time.time()
         def records():

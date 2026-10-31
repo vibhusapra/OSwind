@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Owned full-library wipe, media admission, retry and interruption contracts."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,contextlib,fcntl,hashlib,json,pathlib,select,signal,sqlite3,subprocess,tempfile,time,os
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary');p.add_argument('--older-binary');p.add_argument('--interruptions',action='store_true');p.add_argument('--output');a=p.parse_args();binary=pathlib.Path(a.binary).resolve();older=pathlib.Path(a.older_binary).resolve() if a.older_binary else None;pins={str(x):hashlib.sha256(x.read_bytes()).hexdigest() for x in [binary,older] if x}
 @contextlib.contextmanager
 def db(root):
     conn=sqlite3.connect(root/'memory.sqlite')
+    register_inactive_sync_fixture(conn)
     try:
         with conn:yield conn
     finally:conn.close()

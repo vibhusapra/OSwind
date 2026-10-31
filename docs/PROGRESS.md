@@ -8,6 +8,8 @@
 
 - The first frozen full run (6908af6) fails seven cases: retention prematurely counts the fresh VACUUM WAL; a schema-five fixture retains future hooks; five raw fixture writers lack new per-connection functions. Keep 1,369 passes / five explicit skips / seven failures separate from later results. Compaction now checks checkpoint locks before and after VACUUM, with a held-reader regression preserving all evidence/vectors and a safe retry. Targeted selection defines 140 cases: 138 pass / two worker skips; full and remaining qualification are pending.
 
+- A legacy raw deletion-fixture writer also reproduces missing functions. Qualification attempt two is deliberately stopped and retained before fixture edits. Six owned CLI scripts now admit only disabled/unsuppressed fixture setup with callbacks that always refuse if executed. Five offline refusal contracts and all six development process groups pass (including interruption and CPU/CoreML PII checks) against the earlier staged binary. Fresh corrected-source qualification repeats these processes; no active sync-writer behavior is inferred from this helper.
+
 ## Personal device sync — PR #93 / source 57c1926 — internal foundation qualified
 
 - [Delivery requirements and implementation state](PERSONAL-SYNC.md) retain the complete sync scope: bidirectional offline changes, original evidence and user state, conflict handling, privacy erasure, encrypted transport, enrollment/revocation and native/CLI workflows. F059 stays TODO until a user can configure and use complete supported-library sync.
