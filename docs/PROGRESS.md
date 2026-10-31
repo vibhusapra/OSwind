@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Incoming metadata deletions — functional component verified
+
+[Six additional native tombstone paths](SYNC-INCOMING-DELETIONS.md) preserve independent sources/conversations and erase owned run originals without fetching deleted bodies. Eight cases cover exact key bytes, cache-protection rollback/repair/retry, reservations/connections and direct old-lifetime retry. Cancellable SQL and shared transaction validation protect all deletion dispatch paths.
+
+The [twenty-stage receipt](../benchmarks/sync-incoming-deletions-v1.json) passes 1,590 full cases/79 skips, 571 sanitizer and 571 optimized cases/19 skips each. Parent plus ten retained worker logs have no race warnings. All 701 repository inputs and 447 Sources/Tests/Vendor inputs match across gates. New strict signed/extracted 34-file package, API/MCP/SDK, actual29 refusal, entity/correction, erasure/wipe, recap/routine and backup interruptions pass. Installed15 and both prior packages remain unchanged. Parent `8a172c8` passes both hosted jobs in run 41228502794.
+
+Schema30 stays unchanged. Known source erasure, cache-only/orphan original cleanup, independently live entity preservation, graph-wide child retirement/epochs, service/enrollment and physical/distribution/ranking remain open. F059 and all 78 statuses stay unchanged.
+
 ## Incoming entity graph — functional component verified
 
 [The internal entity adapter](SYNC-INCOMING-ENTITIES.md) closes positive projection paths for all thirteen canonical record types: definitions, aliases, manual/automatic links and name/stable-project corrections now project natively without echo. Schema 30 scopes source-update preservation to an exact incoming write and fences old clients. Indexed outgoing sequencing preserves explicit alias transfers before parent retirement across one-object batches. Person/alias deletion does not force a project rescan.

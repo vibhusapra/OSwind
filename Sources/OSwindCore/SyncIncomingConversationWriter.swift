@@ -92,32 +92,47 @@ struct SyncIncomingConversationWriter {
         let store=RoutineRunOriginalStore(db:db)
         guard let actual=try store.read(local),try actual.encoded()==expected.original.encoded(),try store.frame(local)==expected.frame else {throw OSwindError.invalid("Incoming run or original provenance changed during admission")}
     }
-    /// Content-free recap deletion. The global old citation is retired even
-    /// when its current owner still independently requires the same native row.
+    /// Journal barrier, native retirement, cache protection and the reservation
+    /// share one transaction, including a direct internal retry after receipt.
     func applyDeletion(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws {
-        if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
-            return try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletion(change,admission:admission)
-        }
+        try Task.checkCancellation()
         try admission.withActive(for:library.mediaRootIdentity) {}
         try library.withRoutineDatabase {connection in
-            guard connection.handle==db.handle,change.after.isDeleted,change.revision.key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
-            try cache.catalog.retireDerivedRecap(change.revision.key,journal:cache.journal) {object in
-                guard let primary=object.primary,primary.count==2,case .text(let bytes)=primary[0],case .integer(let position)=primary[1],let owner=String(data:bytes,encoding:.utf8),let ordinal=Int(exactly:position),ordinal>=0 else {throw OSwindError.invalid("Incoming recap deletion key differs")}
-                guard let native=try library.get(owner) else {return false}
-                guard let identity=try cache.catalog.preparedIdentity(.source,primary:[.text(bytes)]) else {throw OSwindError.unavailable("Prepare the recap owner before derived retirement")}
-                let packet=try cache.resolve(identity,content:nil,admit:{_ in})
-                guard case .source(let body)=packet.body else {throw OSwindError.invalid("Incoming recap owner is not a source")}
-                guard let wire=body.recap,ordinal<wire.sources.count else {return false}
-                guard let recap=native.recap,ordinal<recap.sources.count else {throw OSwindError.invalid("Native recap provenance differs during retirement")}
-                let expected=recap.sources[ordinal],row=try db.statement("SELECT source_id,revision,score,match,passage_start,passage_length,owner_id,historical_handle FROM recap_sources WHERE recap_id=? AND ordinal=?");defer {sqlite3_finalize(row)};db.bind(row,1,owner);sqlite3_bind_int64(row,2,position)
-                guard sqlite3_step(row)==SQLITE_ROW,Data(db.text(row,1).utf8)==Data(expected.revision.utf8),sqlite3_column_double(row,2)==expected.score,Data(db.text(row,3).utf8)==Data(expected.match.utf8),db.optional(row,7).map({Data($0.utf8)})==expected.historicalHandle.map({Data($0.utf8)}) else {throw OSwindError.invalid("Derived recap row differs from its current owner")}
-                if expected.historicalHandle != nil {guard sqlite3_column_type(row,0)==SQLITE_NULL,Data(db.text(row,6).utf8)==Data(expected.id.utf8) else {throw OSwindError.invalid("Derived historical owner differs")}}
-                else {guard Data(db.text(row,0).utf8)==Data(expected.id.utf8),sqlite3_column_type(row,6)==SQLITE_NULL else {throw OSwindError.invalid("Derived current owner differs")}}
-                if let range=expected.passage {guard sqlite3_column_type(row,4)==SQLITE_INTEGER,sqlite3_column_int64(row,4)==range.start,sqlite3_column_type(row,5)==SQLITE_INTEGER,sqlite3_column_int64(row,5)==range.length else {throw OSwindError.invalid("Derived recap passage differs")}}
-                else {guard sqlite3_column_type(row,4)==SQLITE_NULL,sqlite3_column_type(row,5)==SQLITE_NULL else {throw OSwindError.invalid("Derived recap has an undeclared passage")}}
-                return true
-            }
-            try admission.withActive(for:library.mediaRootIdentity) {}
+            guard connection.handle==db.handle,change.after.isDeleted else {throw OSwindError.invalid("Use the incoming deletion library's own connection and barrier")}
+            try erasureCancellable(db) {try SyncChangeCapture.transaction(db) {
+                try cache.validateIncomingDeletionContext()
+                if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
+                    try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletion(change,admission:admission)
+                }else if SyncIncomingMetadataDeletion.accepts(change.revision.key.kind) {
+                    try SyncIncomingMetadataDeletion(cache:cache).apply(change)
+                }else {
+                    try retireRecapCitation(change)
+                }
+                try cache.validateIncomingDeletionContext()
+                try Task.checkCancellation()
+                try admission.withActive(for:library.mediaRootIdentity) {}
+            }}
+        }
+    }
+    /// Content-free recap deletion. The old global citation retires even when
+    /// its current owner independently requires the same native derived row.
+    private func retireRecapCitation(_ change:SyncJournalChange)throws {
+        guard change.revision.key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
+        try cache.catalog.retireDerivedRecap(change.revision.key,journal:cache.journal) {object in
+            guard let primary=object.primary,primary.count==2,case .text(let bytes)=primary[0],case .integer(let position)=primary[1],let owner=String(data:bytes,encoding:.utf8),let ordinal=Int(exactly:position),ordinal>=0 else {throw OSwindError.invalid("Incoming recap deletion key differs")}
+            guard let native=try library.get(owner) else {return false}
+            guard let identity=try cache.catalog.preparedIdentity(.source,primary:[.text(bytes)]) else {throw OSwindError.unavailable("Prepare the recap owner before derived retirement")}
+            let packet=try cache.resolve(identity,content:nil,admit:{_ in})
+            guard case .source(let body)=packet.body else {throw OSwindError.invalid("Incoming recap owner is not a source")}
+            guard let wire=body.recap,ordinal<wire.sources.count else {return false}
+            guard let recap=native.recap,ordinal<recap.sources.count else {throw OSwindError.invalid("Native recap provenance differs during retirement")}
+            let expected=recap.sources[ordinal],row=try db.statement("SELECT source_id,revision,score,match,passage_start,passage_length,owner_id,historical_handle FROM recap_sources WHERE recap_id=? AND ordinal=?");defer {sqlite3_finalize(row)};db.bind(row,1,owner);sqlite3_bind_int64(row,2,position)
+            guard sqlite3_step(row)==SQLITE_ROW,Data(db.text(row,1).utf8)==Data(expected.revision.utf8),sqlite3_column_double(row,2)==expected.score,Data(db.text(row,3).utf8)==Data(expected.match.utf8),db.optional(row,7).map({Data($0.utf8)})==expected.historicalHandle.map({Data($0.utf8)}) else {throw OSwindError.invalid("Derived recap row differs from its current owner")}
+            if expected.historicalHandle != nil {guard sqlite3_column_type(row,0)==SQLITE_NULL,Data(db.text(row,6).utf8)==Data(expected.id.utf8) else {throw OSwindError.invalid("Derived historical owner differs")}}
+            else {guard Data(db.text(row,0).utf8)==Data(expected.id.utf8),sqlite3_column_type(row,6)==SQLITE_NULL else {throw OSwindError.invalid("Derived current owner differs")}}
+            if let range=expected.passage {guard sqlite3_column_type(row,4)==SQLITE_INTEGER,sqlite3_column_int64(row,4)==range.start,sqlite3_column_type(row,5)==SQLITE_INTEGER,sqlite3_column_int64(row,5)==range.length else {throw OSwindError.invalid("Derived recap passage differs")}}
+            else {guard sqlite3_column_type(row,4)==SQLITE_NULL,sqlite3_column_type(row,5)==SQLITE_NULL else {throw OSwindError.invalid("Derived recap has an undeclared passage")}}
+            return true
         }
     }
     @discardableResult func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {

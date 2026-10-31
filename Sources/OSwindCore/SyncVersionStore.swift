@@ -184,6 +184,9 @@ struct SyncVersionStore {
     private func blob(_ row:OpaquePointer,_ column:Int32,maximum:Int)throws->Data {
         let size=Int(sqlite3_column_bytes(row,column));guard sqlite3_column_type(row,column)==SQLITE_BLOB,size>0,size<=maximum,let p=sqlite3_column_blob(row,column) else {throw OSwindError.database("Invalid sync version bytes")};return Data(bytes:p,count:size)
     }
+    /// A tombstone does not require a retained body, but still requires the
+    /// complete current schema and durable, same-connection cache context.
+    func validateIncomingDeletionContext()throws {try context()}
     private func owner(_ identity:SyncObjectIdentity)throws->(SyncLocalObject,Data) {
         let key=try identity.key,row=try database.statement("SELECT 1 FROM personal_sync_version_revoked WHERE object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,key.digest)
         guard sqlite3_step(row)==SQLITE_DONE,try !journal.state(for:key).isDeleted,let object=try catalog.object(identity),!object.deleted,let primary=object.primary else {throw OSwindError.invalid("Sync version owner was deleted or is not locally mapped")}
