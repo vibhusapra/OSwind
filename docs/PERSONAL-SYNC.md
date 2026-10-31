@@ -51,7 +51,7 @@ The two full-suite skips are the explicit opt-in system-audio fixture and subpro
 - [x] CryptoKit envelopes, context-separated keys/addresses, tamper/size controls and redacted key descriptions.
 - [x] Internal journal, transactional callbacks, restart, gap/dependency handling and sequence/scope fences.
 - [x] Local immutable encrypted folder and chunk transport; same-host two-library note/projection/conflict/deletion fixture.
-- [ ] Schema-version-fenced automatic change capture for every supported writer and canonical table. MemoryStore does not install the prototype's tables automatically.
+- [ ] Complete automatic capture-to-protocol processing. [Schema25 canonical capture](SYNC-CHANGE-CAPTURE.md) now installs disabled local intent hooks for all 13 tables and fences older writers; the full typed processor, initial bootstrap and public enablement remain unfinished.
 - [ ] All typed graph/media adapters, persistent source-version/citation identity, current-policy egress and local scan provenance.
 - [ ] Scoped erasure, whole-library wipe/epoch barriers, deletion announcements, acknowledgement-based compaction and encrypted-cache retention.
 - [ ] Trusted initial bootstrap, Keychain enrollment/recovery, membership/revocation and rollback checkpoints.

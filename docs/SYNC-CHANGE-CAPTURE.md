@@ -1,0 +1,43 @@
+# Canonical mutation capture
+
+Schema25 adds an internal local change feed for personal sync. Capture is disabled by default. There is no public activation control, peer enrollment, background sender or automatic transfer. F059 remains TODO until the complete supported-library sync workflow is usable and verified.
+
+## Captured state
+
+Persistent non-TEMP triggers record changes in the same transaction as each ordinary source/graph mutation. They cover 13 canonical tables: memories; chat sessions, turns and citations; recap citations; routine definitions and run history; entities, aliases, mentions, label/project rejections; and persistent evidence pins. The complete primary key and selected columns are checked against SQLite's actual schema. Derived vectors, FTS/statistics/range caches and entity-index completion do not create source intents. Routine scheduler columns stay local; the future typed adapter must also strip activation, provider paths/credentials and execution authority from definition payloads.
+
+A small versioned binary frame preserves SQLite null/integer/real/text/blob storage classes, raw UTF-8 including NUL, and finite Float64 bits. Row frames are bounded at 136 MiB; primary-key framing at 64 KiB. Keys in the queue are 32-byte SHA256 digests of the byte-framed complete primary key, scoped by table and local capture identity. They do not contain raw source IDs or alias names, but are not a promise of resistance to guessing known inputs. This local format is not a validated peer payload and must never be published directly.
+
+Every committed intent retains its sequence and old/new key relationship. Only the latest pending put body for a key remains: superseded bodies are cleared, and a canonical deletion clears its previously pending body and records an opaque deletion intent. This keeps removed source/chat/recap/title/alias text out of the live queue. It does not claim forensic erasure of filesystem/provider versions, complete collection/wipe barriers, or an immutable history of every intermediate edit. The processor must assign object lifetimes before consuming superseded insert/delete metadata and preserve already-published evidence versions separately.
+
+Four accounting triggers join 39 table triggers. The default logical queue budget is 1 GiB, with an 8 GiB upper bound; accounting includes key/body lengths and a fixed per-entry allowance. This is not a filesystem quota. Budget or SQL failure rolls back both source and intent changes. Full offline retention/compaction/backpressure behavior must be finished before this internal mode is exposed: an undrained full queue currently refuses the source mutation rather than silently dropping its intent.
+
+## Connections, recovery and boundaries
+
+Every MemoryStore connection registers the bounded, pure row/key functions. When capture is active, ordinary writers prepare SQLite FULL synchronization and recursive triggers, including connections opened before activation. Persistent triggers refuse unregistered or unprepared writers; schema25 also fences older supported clients on open. FULL is a requested SQLite durability mode, not physical power-loss evidence.
+
+Startup verifies exact capture trigger definitions. Missing or changed ordinary hooks refuse instead of silently repairing an unknown gap. The established cold evidence-pin table repair is preserved as a specific exception: only that table's three missing capture hooks are recreated, before recovered references repopulate its pins. Active reopening prepares durability before this repair. Existing source extents and citation pins stay protected.
+
+A scoped peer-apply transaction may suppress echoes. It first requires the local intent queue to be drained, so incoming peer state cannot leapfrog an unconverted local edit. Suppression and original writes roll back together on failure; no other connection sees an uncommitted suppression flag. The processor must commit validated protocol/cache output and acknowledgement in the same transaction and revalidate any content prepared outside it. The capture origin/generation identifies this local intent history; it is not delivered global source-origin/lifetime mapping.
+
+Current backup/restore copies canonical data through the existing typed path; restored libraries stay capture-disabled with no pending intent replay. Complete sync origin/membership recovery still requires its own validated bootstrap. Public single-delete and full-wipe fixtures verify that live queued original bodies disappear; peer deletion announcements, collection/wipe epochs, encrypted-cache retention and provider-version handling remain delivery requirements.
+
+## Development evidence and next gates
+
+The development sequence retains a C callback compilation failure, an incorrect Date-bit fixture expectation, and a real cold-pin-repair regression. The repaired broad selection passes 218 cases with one existing worker skip. The final focused selection and sanitizer selection each define 74 cases: 72 pass and two subprocess-worker entry points skip. Both automatic-capture crash parents execute: a killed pre-commit child leaves neither source nor intent; post-commit recovery keeps both and the next sequence.
+
+A structural fixture independently enumerates all 13 tables and exercises insert, update, primary-key changes and cascading deletion. Public operations separately cover source-linked chat/recap deletion, queued title/body removal, full wipe, active backup/quiet restore, two concurrent connections and cold pin repair. Structural raw SQL snapshots alone do not establish valid peer admission or full graph synchronization.
+
+The scale fixture measures actual favorite transactions and default-prefix, required-phrase and broad 100-result keyword queries. Controls use the same owned library, alternating rounds and FULL/recursive mode for both profiles. An independent Python SQLite/struct/hash reader checks all original IDs/text/payloads, current snapshot bytes/key digests, sequence/accounting and raw timing quantiles. An initial fixture wrongly assumed unquoted numeric search was exact; its 12 failed assertions and invalidated completion JSON remain retained. Product search is unchanged. The corrected fixture measures default prefix behavior and explicit required phrases separately, and includes broad archive queries. Development timings are not frozen qualification, cold-cache, import, GPU, desktop energy or competitor-ranking evidence.
+
+Before F059 can be delivered:
+
+- Complete the typed processor for every graph/media object, durable origin/lifetime and versioned-citation mappings, initial bootstrap and cross-peer causal ordering.
+- Admit outgoing data under current privacy rules; keep secrets, machine-local permissions/paths, scheduling authority and peer scan claims from becoming local authority.
+- Finish deletion priority, collection/wipe epochs, acknowledgements, compaction, encrypted private cache and storage-pressure recovery.
+- Add Keychain pairing/recovery, membership/revocation, native/CLI setup, status, conflict review and lifecycle cancellation.
+- Qualify full/sanitizer/optimized/package/process paths, actual older-client refusal, scale, real file providers and two Macs. Preserve every failed run with its source and scope.
+
+## Primary references
+
+[SQLite application-defined functions](https://www.sqlite.org/appfunc.html) are registered per connection; the pure framing functions are marked deterministic and innocuous. [Function creation and flags](https://www.sqlite.org/c3ref/create_function.html) distinguish functions allowed in schema elements from direct-only functions. [Trigger semantics](https://www.sqlite.org/lang_createtrigger.html) motivate checking real columns/primary keys rather than trusting an UPDATE OF list.

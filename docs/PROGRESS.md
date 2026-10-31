@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Canonical mutation capture — schema25 — in progress
+
+- [Implementation and remaining gates](SYNC-CHANGE-CAPTURE.md) add a disabled-by-default local feed for 13 canonical source/graph tables, with same-transaction sequence/snapshot capture, byte-preserving bounded frames, opaque complete-key digests, coalesced pending bodies and accounting. Derived indexes stay outside the feed. This is not complete peer sync or a public enrollment control; F059 stays TODO.
+- Current and already-open MemoryStore connections prepare FULL/recursive mode when active; older/unregistered writers refuse. Missing/changed hooks refuse, with the specific cold pin-table repair preserved and captured before reference refill. Public source/chat/recap deletion and full wipe remove queued original bodies; active backups restore quietly without replay.
+- The C callback compile failure, Date fixture mismatch and cold-pin-repair regression are retained. The repaired broad selection passes 218 / one worker skip; normal and sanitizer focused each pass 72 / two worker skips, including both ordinary-source crash gates and concurrent connections. The 100k development scale fixture and independent source/body/quantile reader pass; broad queries remain measured separately from rare lookups. Full frozen and actual older-client/package qualification follows.
+
 ## Personal device sync — PR #93 / source 57c1926 — internal foundation qualified
 
 - [Delivery requirements and implementation state](PERSONAL-SYNC.md) retain the complete sync scope: bidirectional offline changes, original evidence and user state, conflict handling, privacy erasure, encrypted transport, enrollment/revocation and native/CLI workflows. F059 stays TODO until a user can configure and use complete supported-library sync.

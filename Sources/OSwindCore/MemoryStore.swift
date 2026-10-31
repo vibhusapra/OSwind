@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version24 fences writers that cannot preserve sampled text spans.
-    public static let schemaVersion = 24
+    // Version25 fences writers that cannot maintain canonical sync intents.
+    public static let schemaVersion = 25
     public static let maximumRecordBytes = 128*1024*1024
     public let root: URL
     private var closeDirectory:BackupFileTree?
@@ -21,6 +21,7 @@ public final class MemoryStore: @unchecked Sendable {
         set { connectionLock.lock();connection=newValue;connectionLock.unlock() }
     }
     private let lock = NSRecursiveLock()
+    private var syncCaptureInstalled=false
     private var metalScopeCache: MetalScopeCache?
     private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
     private let annCache: ANNCache
@@ -40,8 +41,13 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
-        try exec("BEGIN IMMEDIATE")
+        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!))}
+        catch {sqlite3_close(db);db=nil;throw error}
+        do {
+            try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
+            if version>=25 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db!))}
+            try exec("BEGIN IMMEDIATE")
+        } catch {sqlite3_close(db);db=nil;throw error}
         do {
         try exec("""
         CREATE TABLE IF NOT EXISTS memories (
@@ -147,11 +153,16 @@ public final class MemoryStore: @unchecked Sendable {
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try exec(EntitySchema.sql)
         try exec(PIIScanSchema.sql)
-        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version)
+        let pins=try prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_pins'")
+        let missingPins=sqlite3_step(pins) != SQLITE_ROW;sqlite3_finalize(pins)
+        try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version) {
+            try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins)
+        }
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
+        syncCaptureInstalled=true
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
         _ = finishRecapInvalidation()
     }
@@ -180,11 +191,12 @@ public final class MemoryStore: @unchecked Sendable {
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
         lock.lock();defer {lock.unlock()}
         guard let db else {throw OSwindError.database("Library connection closed")}
+        if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))}
         return try body(RoutineDatabase(handle:db))
     }
-    private func exec(_ sql: String) throws {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
+    private func exec(_ sql: String) throws {guard let db else {throw OSwindError.unavailable("The library connection is closed")};if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
     private func failure() -> OSwindError {guard db != nil else {return .unavailable("The library connection is closed")};return .database(String(cString: sqlite3_errmsg(db))) }
-    private func prepare(_ sql: String) throws -> OpaquePointer {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; return stmt }
+    private func prepare(_ sql: String) throws -> OpaquePointer {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; do {if syncCaptureInstalled,sqlite3_stmt_readonly(stmt)==0 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db!))}}catch {sqlite3_finalize(stmt);throw error};return stmt }
     private func bind(_ stmt: OpaquePointer, _ index: Int32, _ value: String?) { if let value { sqlite3_bind_text64(stmt,index,value,UInt64(value.utf8.count),transient,UInt8(SQLITE_UTF8)) } else { sqlite3_bind_null(stmt, index) } }
     private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {
