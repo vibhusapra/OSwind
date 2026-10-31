@@ -1,0 +1,66 @@
+{
+  "format": "OSwind comparison browser QA",
+  "state": "completed",
+  "browserVersion": "156.0.8078.4",
+  "frozen": {
+    "docs/landscape.html": "6dfe196cfaaacddfd75270a63021cf2bcc7759ea3441f3191e275500ba9b4de5",
+    "docs/landscape.json": "1454572e294854876751c680f1b110c29f592084627e36b1166562e97e6763ad",
+    "docs/features.json": "846e68ade356528188864864f8f80f828d9f85a92f077e266df579b3a4b41505",
+    "scripts/research-report.py": "9cf757872e2f7ca81bf0ae44877372e02fc7a376819f43b0cf6476efd9eebf23",
+    "benchmarks/screenpipe-keyword-http-v1.json": "da5df9be7955a0c20ed5ed84c380c9da11cc091b0f7b526d6535a74d74749d4f",
+    "benchmarks/vault-collector-trace-v1.json": "f7b23be65d51fb5ff9b4077f183a83178cc0c04ae7ce1fdd4a6e52e830e31803",
+    "benchmarks/personal-sync-foundation-v1.json": "724e5860ee20ecd19dc8f298189bbb5754ac980c522f25512cc78db96b27be54",
+    "benchmarks/sync-change-capture-v1.json": "ddc20fdde60e8cc0c545810a5d4fdef263cacbe4bd1375e08689c761c71c1c7e",
+    ".artifacts/sync-change-capture-v1/qa-landscape-v1.cjs": "1b28a6095e1c5def240950c0de68c50700a9ba5aeafee123f5e14d1a6ba14011"
+  },
+  "scope": "Owned self-contained comparison HTML in isolated headless Chromium. DOM checks include exact competitor measurement cells, current793 capture evidence and F059TODO. Clipboard stubbed; no user clipboard, authentication, network request or signed native/TCC/VoiceOver acceptance.",
+  "screenshots": [
+    {
+      "path": "desktop-top.png",
+      "sha256": "43cd584c4a851e77a6cfa050c391953ef0db75b9384556a8425a030bacf2f7b7"
+    },
+    {
+      "path": "desktop-new-profiles.png",
+      "sha256": "9c504fc22357c63171e16b182b6249ed231cd36cec89d3defe3602e65963c3e0"
+    },
+    {
+      "path": "desktop-component-benchmark.png",
+      "sha256": "6fec9551d6dcc03a5682948cf999314351b883738956b02f233a21e526ab1584"
+    },
+    {
+      "path": "mobile-top.png",
+      "sha256": "2fa76a4bfdcac4da1cbfb0026cfb9568a6a1d1768739be1aa3e0f5aec16f9af5"
+    },
+    {
+      "path": "mobile-goldfish.png",
+      "sha256": "88ca28217e5f0eda2e26ddfb64c8f69971fb5ffaefb6f963f7fbad2267caced2"
+    },
+    {
+      "path": "mobile-ledger.png",
+      "sha256": "4769cf95953e9e655cf8383e839aa911d57e6584250239309d741b870e17ccdb"
+    }
+  ],
+  "vendors": 20,
+  "requirements": 78,
+  "viewportSizes": {
+    "viewport": 390,
+    "document": 390,
+    "tableViewport": 356,
+    "tableContent": 850
+  },
+  "filterAndIntersectionPass": true,
+  "benchmarkCellsMatchReceipt": true,
+  "copyThreeMultilineTODOs": true,
+  "copyLabelResets": true,
+  "outsideScopeExcludedFromCopy": true,
+  "withoutJavaScriptUsable": true,
+  "networkRequests": 0,
+  "pageErrors": [],
+  "publishedAtUTC": "2026-10-31T02:08:41.005355+00:00",
+  "productSource": "793574ee89a054283bdefa517feab2a9d050016d",
+  "fixtureFollowupSource": "ba0f3db9c9dbad0e0c57a181fc30296bbe629efa",
+  "visualReview": {
+    "desktop-top.png": "Inspected: clear heading, navigation, three product groups and scope; no clipping.",
+    "mobile-ledger.png": "Inspected at390px: contained page width, readable stacked cards, ledger introduction and filter."
+  }
+}
