@@ -1,0 +1,82 @@
+import XCTest
+import Darwin
+@testable import OSwindCore
+
+/// Own-child process death, not a simulated power cut or a production-library test.
+final class PersonalSyncCrashTests:XCTestCase {
+    private enum FixtureError:Error {case invalidOwnership}
+    private let replica="00000000-0000-0000-0000-000000000001"
+    private let group="00000000-0000-0000-0000-000000000004"
+    private let epoch="00000000-0000-0000-0000-000000000005"
+    private func key()throws->SyncObjectKey {try .make(kind:.source,identity:Data("crash-owned-note".utf8))}
+
+    func testDeathBeforeCommitRollsBackSourceJournalAndSequence()throws {try crash(at:"before")}
+    func testDeathAfterCommitRetainsSourceJournalAndSequence()throws {try crash(at:"after")}
+
+    private func crash(at phase:String)throws {
+        let fm=FileManager.default,nonce=UUID().uuidString
+        let root=fm.temporaryDirectory.appendingPathComponent("oswind-sync-crash-"+nonce,isDirectory:true)
+        try fm.createDirectory(at:root,withIntermediateDirectories:false,attributes:[.posixPermissions:0o700])
+        defer {try? fm.removeItem(at:root)}
+        let authority=root.appendingPathComponent("owner"),gate=root.appendingPathComponent("ready")
+        try Data(nonce.utf8).write(to:authority,options:.withoutOverwriting)
+        try fm.setAttributes([.posixPermissions:0o600],ofItemAtPath:authority.path)
+        let child=Process(),log=root.appendingPathComponent("child.log")
+        XCTAssertTrue(fm.createFile(atPath:log.path,contents:nil,attributes:[.posixPermissions:0o600]))
+        let output=try FileHandle(forWritingTo:log);defer {try? output.close()}
+        child.executableURL=URL(fileURLWithPath:"/usr/bin/xcrun")
+        child.arguments=["xctest","-XCTest","OSwindCoreTests.PersonalSyncCrashTests/testCrashWorker",Bundle(for:Self.self).bundleURL.path]
+        child.environment=["PATH":"/usr/bin:/bin","LANG":"en_US.UTF-8",
+            "TMPDIR":fm.temporaryDirectory.path,"OSWIND_SYNC_CRASH_ROOT":root.path,
+            "OSWIND_SYNC_CRASH_NONCE":nonce,"OSWIND_SYNC_CRASH_PHASE":phase]
+        child.standardOutput=output;child.standardError=output
+        try child.run()
+        // This exact Process is our child. No process-name matching or other process is signalled.
+        defer {if child.isRunning {_=Darwin.kill(child.processIdentifier,SIGKILL)};child.waitUntilExit()}
+        let deadline=ProcessInfo.processInfo.systemUptime+30
+        while child.isRunning && !fm.fileExists(atPath:gate.path) && ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.01)}
+        guard child.isRunning,(try? String(contentsOf:gate,encoding:.utf8))==phase else {
+            XCTFail("Owned crash worker failed to reach its gate: "+((try? String(contentsOf:log,encoding:.utf8)) ?? "no log"));return
+        }
+        XCTAssertEqual(Darwin.kill(child.processIdentifier,SIGKILL),0)
+        child.waitUntilExit()
+        XCTAssertEqual(child.terminationReason,.uncaughtSignal);XCTAssertEqual(child.terminationStatus,SIGKILL)
+        let store=try MemoryStore(root:root.appendingPathComponent("library"));defer {try? store.close()}
+        let committed=phase=="after"
+        XCTAssertEqual(try store.get("crash-owned-note")?.text,committed ? "authored crash recovery evidence":nil)
+        try store.withRoutineDatabase {db in
+            try SyncJournal.prepareConnection(db)
+            let journal=try SyncJournal(database:db,replica:replica,group:group,epoch:epoch)
+            XCTAssertEqual(try journal.cursor(for:replica),committed ? 1:0)
+            let outbox=try journal.outbox();XCTAssertEqual(outbox.count,committed ? 1:0)
+            XCTAssertEqual(try journal.state(for:key()).preferred,outbox.first)
+            // A rolled-back reservation is reusable; a committed reservation cannot be lost/reused.
+            let next=try journal.put(key:.make(kind:.source,identity:Data("next".utf8)),content:.init(data:Data("next".utf8)))
+            XCTAssertEqual(next.dot.counter,committed ? 2:1)
+        }
+    }
+
+    func testCrashWorker()throws {
+        let env=ProcessInfo.processInfo.environment,fm=FileManager.default
+        guard let path=env["OSWIND_SYNC_CRASH_ROOT"],let nonce=env["OSWIND_SYNC_CRASH_NONCE"],let phase=env["OSWIND_SYNC_CRASH_PHASE"] else {throw XCTSkip("Only run as the owned crash-test subprocess")}
+        guard UUID(uuidString:nonce)?.uuidString==nonce,["before","after"].contains(phase) else {throw FixtureError.invalidOwnership}
+        let root=URL(fileURLWithPath:path,isDirectory:true),expected=fm.temporaryDirectory.appendingPathComponent("oswind-sync-crash-"+nonce,isDirectory:true)
+        guard root.resolvingSymlinksInPath().standardizedFileURL==expected.resolvingSymlinksInPath().standardizedFileURL,
+              try String(contentsOf:root.appendingPathComponent("owner"),encoding:.utf8)==nonce else {throw FixtureError.invalidOwnership}
+        let store=try MemoryStore(root:root.appendingPathComponent("library"))
+        func hold()throws {
+            try Data(phase.utf8).write(to:root.appendingPathComponent("ready"),options:.atomic)
+            Thread.sleep(forTimeInterval:60)
+            XCTFail("Parent did not stop its owned child at the crash gate")
+        }
+        try store.withRoutineDatabase {db in
+            let journal=try SyncJournal.install(database:db,replica:replica,group:group,epoch:epoch)
+            try journal.put(key:key(),content:.init(data:Data("authored crash recovery evidence".utf8))) {_ in
+                try store.insert(Memory(id:"crash-owned-note",text:"authored crash recovery evidence"))
+                if phase=="before" {try hold()}
+            }
+        }
+        if phase=="after" {try hold()}
+        try store.close()
+    }
+}
