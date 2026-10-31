@@ -1,0 +1,669 @@
+{
+  "format": "OSwind incoming entity functional qualification v1",
+  "version": 1,
+  "state": "functional-component-qualified",
+  "overallV0Complete": false,
+  "performanceQualified": false,
+  "createdAtUTC": "2026-10-31T18:08:52.544929+00:00",
+  "sourceBase": "a3e91ca8c36aac0a280e6b2f38eae7f44970cd48",
+  "branch": "codex/sync-incoming-entities",
+  "schema": 30,
+  "scope": "Internal incoming entity definitions, aliases, mentions, name and stable-project rejections; typed content-free entity-table deletion; schema30 source-update preservation and compatibility fencing; indexed outgoing sequencing for explicit merges. No public sync enablement.",
+  "inputs": {
+    "currentRepositoryInputs": 699,
+    "repositoryManifest": "benchmarks/sync-incoming-entities-inputs-v1.json",
+    "manifestSHA256": "5d7543fffcaa3611aa55f3871810c7800975746dabc2d53cea6b6785e9700b8b",
+    "identicalSourcesTestsVendorInputs": 445,
+    "identicalProductSourcesVendorPackageInputs": 234,
+    "identicalCommonRepositoryInputs": 696,
+    "changedTestHarnessesAfterBuildGates": [
+      "scripts/historical-client-smoke.py",
+      "scripts/sync-capture-smoke.py",
+      "scripts/test-owned-sqlite-fixture.py"
+    ],
+    "harnessChangeScope": "Only unknown-future probe30->31 and the exact new compatibility-marker refusal in two process oracles. Product sources, Swift tests, fixtures, Vendor, Package and staged binary remain identical.",
+    "phaseManifests": {
+      "qualification-v2": {
+        "rawFrozenInputs": 701,
+        "manifestSHA256": "ee72f5f995d2dbe0ecbaa21b48c1ebf0fa8fa4846b2ceb82ce0f76ac96008ffd",
+        "driverSHA256": "479bbe2cb373e417a58fa0321d1a25cc091a4a66b374e048bc915acc185a96dd"
+      },
+      "qualification-v3": {
+        "rawFrozenInputs": 701,
+        "manifestSHA256": "37e9dd4c434ebdc6fcdfa821d857e8c88a38c076ffac6e87177d7bfb61f80be8",
+        "driverSHA256": "c14577d505aec26d9df99b7a8ba2b06bb9c054d11616d04b3f7174faf10a9007"
+      },
+      "qualification-v4": {
+        "rawFrozenInputs": 735,
+        "manifestSHA256": "359790b2f4e7f1ecbc1f912fd68fedb604f8f15d3e13f45b423e6fa99f1f17e2",
+        "driverSHA256": "7a8c8275508122130a0b18ed232a7429384c81bb3deb6d225f67287985e26141"
+      },
+      "qualification-v5": {
+        "rawFrozenInputs": 735,
+        "manifestSHA256": "09c816362ddbe70bba1566b23c3880862571224a596488d8759899a9fb842097",
+        "driverSHA256": "1ae35338e434359d3f45e95a3990fade2809ba0417a04bcb52236ce9979b7d9a"
+      }
+    }
+  },
+  "tests": {
+    "full": {
+      "defined": 1661,
+      "passed": 1582,
+      "skipped": 79
+    },
+    "threadSanitizer": {
+      "defined": 582,
+      "passed": 563,
+      "skipped": 19,
+      "parentAndRetainedChildLogsWithoutRaceWarnings": 11
+    },
+    "optimized": {
+      "defined": 582,
+      "passed": 563,
+      "skipped": 19
+    }
+  },
+  "threadSanitizer": {
+    "state": "passed",
+    "logs": [
+      {
+        "log": "thread-sanitizer.log",
+        "sha256": "d56511f5497eb7b38dea6a48b05620b5f89e8fbcdcf5c04dee551adf9d24424e",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log",
+        "sha256": "7bab133cbfcb4aead03f40cae55d6ecbca47e530a2a717924aa1fc03df920035",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log",
+        "sha256": "7bab133cbfcb4aead03f40cae55d6ecbca47e530a2a717924aa1fc03df920035",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log",
+        "sha256": "45715e28b63292136c5e4a360b9986a0368943525fb6090c914cabe886c07561",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log",
+        "sha256": "45715e28b63292136c5e4a360b9986a0368943525fb6090c914cabe886c07561",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log",
+        "sha256": "74b33461296bd0a85b1b87bc1356f8b7f77502b5b5e8827398215f81f0e6de20",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log",
+        "sha256": "b9587990cc6e841343e0b95614400d29c3114bc967371012390240be27890a9a",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log",
+        "sha256": "b9587990cc6e841343e0b95614400d29c3114bc967371012390240be27890a9a",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log",
+        "sha256": "b27bf5adc9c17da9208dc7b1d830267ca29d2df1b80c164c701524a952110696",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log",
+        "sha256": "b27bf5adc9c17da9208dc7b1d830267ca29d2df1b80c164c701524a952110696",
+        "raceWarnings": 0
+      },
+      {
+        "log": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log",
+        "sha256": "35d4267bb58df035a30fd1e46ef600bbce8b64cc9f993715ffc4fcb4c02eb431",
+        "raceWarnings": 0
+      }
+    ],
+    "retainedChildLogs": 10,
+    "scope": "Actual parent sanitizer log and retained owned incoming-source/run worker logs. Other temporary worker logs are not claimed as independently retained."
+  },
+  "passingQualificationStages": [
+    {
+      "phase": "qualification-v2",
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "0e1f8ea14437ebfa3a36f5fc4d1053744a029e120d6516bf336eccfcf1919b28"
+    },
+    {
+      "phase": "qualification-v2",
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "d56511f5497eb7b38dea6a48b05620b5f89e8fbcdcf5c04dee551adf9d24424e"
+    },
+    {
+      "phase": "qualification-v2",
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "8229c14e2b043adb39ead39be0b2498954d6dd17d51dc2fc060e555939c6a70e"
+    },
+    {
+      "phase": "qualification-v3",
+      "name": "owned-sqlite-contracts",
+      "returncode": 0,
+      "log": "owned-sqlite-contracts.log",
+      "logSHA256": "4c3b3b2f85f7f81206f2731efca1a5c61f58b2f6c54d820b4003b988757b84ec"
+    },
+    {
+      "phase": "qualification-v3",
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "f967cdb2c0ec453441a40ba03d683ef04b903ac57c02163257192b6c816182ca"
+    },
+    {
+      "phase": "qualification-v3",
+      "name": "entity-process",
+      "returncode": 0,
+      "log": "entity-process.log",
+      "logSHA256": "55a4af46b36441315e9eae5462f2900cc47a982182a129847da1ceb56bb29d31"
+    },
+    {
+      "phase": "qualification-v3",
+      "name": "project-correction-process",
+      "returncode": 0,
+      "log": "project-correction-process.log",
+      "logSHA256": "9327931c3bf43d580ef73198fe7107c561d92844a22627a2911dee087be5429e"
+    },
+    {
+      "phase": "qualification-v3",
+      "name": "entity-metadata-process",
+      "returncode": 0,
+      "log": "entity-metadata-process.log",
+      "logSHA256": "ebbc7d881e4b0fc730aa37f1ea6c759be46e649eab8e6097c872141949b7b4fb"
+    },
+    {
+      "phase": "qualification-v4",
+      "name": "actual-old29-process",
+      "returncode": 0,
+      "log": "actual-old29-process.log",
+      "logSHA256": "4801c5321f7560495d37e9770bba58687c8f8f65ff80ae49666ba83e6ab04cb4"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "capture-process",
+      "returncode": 0,
+      "log": "capture-process.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "original-erasure-process",
+      "returncode": 0,
+      "log": "original-erasure-process.log",
+      "logSHA256": "5b23f9efb902faee49958c49a0cda748dd51e5fba636abc04934be6f5640824d"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "api-mcp-process",
+      "returncode": 0,
+      "log": "api-mcp-process.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "indexed-api-mcp-process",
+      "returncode": 0,
+      "log": "indexed-api-mcp-process.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "python-sdk-contracts",
+      "returncode": 0,
+      "log": "python-sdk-contracts.log",
+      "logSHA256": "af4593ccc2e95484ace8acb17504ab53255670976ee3ea43dd40ccb7ad87a9a4"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "single-delete-process",
+      "returncode": 0,
+      "log": "single-delete-process.log",
+      "logSHA256": "a1a08aa06a2f9c160822612f6be51b1f99d35969ee0ed1f67d32f8faa81ad799"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "wipe-process",
+      "returncode": 0,
+      "log": "wipe-process.log",
+      "logSHA256": "1252ae8787045e81f3a38851d66eb59da0cf5d5eeea6186838d076b1e914c0a6"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "recap-process",
+      "returncode": 0,
+      "log": "recap-process.log",
+      "logSHA256": "4ea3939e6fa50f4926cbc867d3de59403ba05d71de20db56f010380b70f3674b"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "routine-process",
+      "returncode": 0,
+      "log": "routine-process.log",
+      "logSHA256": "68e8bb38a4bc23c1af07eea80f132c9c8e155a59bf047eaca538cfed6e1cde38"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "backup-interruption-process",
+      "returncode": 0,
+      "log": "backup-interruption-process.log",
+      "logSHA256": "589c9220e3a0136c1976a2493aff04adde9801eee5e9daf1d805fbd87a67ca5d"
+    },
+    {
+      "phase": "qualification-v5",
+      "name": "archive-review",
+      "returncode": 0,
+      "log": "archive-review.log",
+      "logSHA256": "e4155adc663bfe725c036f708c4ea8538f810625b146641e6402a637d132945c"
+    }
+  ],
+  "actual29MigrationFixture": {
+    "schema": 29,
+    "producerCLI_SHA256": "71a7591d1666a69e63f10d11b49c4a7fd8000849a23c9240a4f155f58c1381ed",
+    "producerSource": "f0aac3606b856f1c4977fd6ff4ded8078f7b4968",
+    "origin": "Copy of retained owned routine-backup producer; two curated entity definitions authored through unchanged schema29 CLI. SQLite backup after children exit. No user corpus or version downgrade. Added one owned CLI note, manual person link and project rejection using same old CLI.",
+    "counts": {
+      "memories": 1,
+      "memory_entities": 2,
+      "entity_aliases": 2,
+      "entity_mentions": 1,
+      "entity_project_ignored": 1,
+      "routine_runs": 1,
+      "routine_run_originals": 1,
+      "personal_sync_versions": 4
+    },
+    "sha256": "8da14d5ce4eafa1abea8ffb4a971c24ec7a39940c86dc85d562ad451adea8f7a"
+  },
+  "packagedCLI_SHA256": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+  "stagedPackage": {
+    "state": "passed",
+    "allExtractedFilesEqualStagedFiles": {
+      "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+      "Contents/_CodeSignature/CodeResources": "894a4227dbcbe6debecf04cd8ad40b55c4d93083d78cdcdb26cbb618eb3358ed",
+      "Contents/MacOS/oswindctl": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+      "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+      "Contents/MacOS/OSwind": "9a807ca19acc5f4f0ec8d90756f5afade9c6dcfd22ed6c9c60194d41beef527b",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "stagedAndExtractedStrictSignatures": true,
+    "zipSHA256": "cbd861236f05f0db17f8233c6b3a9ed5c342661f09c1eb13bf33a9bfe3077e7e",
+    "testFixturesAbsent": true,
+    "installed15FilesUnchanged": true,
+    "prior34StagedFilesUnchanged": true
+  },
+  "hardware": {
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "parentCI": {
+    "pr": 108,
+    "head": "a3e91ca8c36aac0a280e6b2f38eae7f44970cd48",
+    "run": 41223575011,
+    "native": "success",
+    "benchmarkHarnesses": "success"
+  },
+  "retainedFailures": [
+    {
+      "phase": "development-v1",
+      "reason": "Test fixture used a nonexistent search API; corrected before runtime tests.",
+      "resultSHA256": "c274a8609eaac8c31c51987b158d976dc3a0c6977ac05762a0aebdab7a63da20",
+      "inputManifestSHA256": "e303cf27b8f6bb0ec8c3d6ae944e99b1f31756c81ea4f01487abc47e33d2845e",
+      "logSHA256": "052f89b3401e7cb4359c57ec4632a615d021c497412a20ac56717b5a13de0fb2"
+    },
+    {
+      "phase": "development-v2",
+      "reason": "Three baseline cases reached the missing typed entity adapter.",
+      "resultSHA256": "df42cb7cd8dd3607efae90c57e185ffb9bf3cf990c98feff6f47c3dc16f55722",
+      "inputManifestSHA256": "7de22e9736b27dea549f62f052b927b7976924730c75c13fb86ee3aedfc6b4f6",
+      "logSHA256": "7d76f630810ee341aebc6406f286ffb42934e0f61093d591bf34b1d025434591"
+    },
+    {
+      "phase": "development-v4",
+      "reason": "New causal-delivery fixtures omitted predecessor journal receipts; corrected fixtures are retained.",
+      "resultSHA256": "b2204f9e332ebe08b8d9eea976a1f1831d2976603337fa66341d4945213301a3",
+      "inputManifestSHA256": "1be8cddf1b14ed82afcad6e457e992c04ac0f9726c41b66185f334ff4f76bde4",
+      "logSHA256": "64e24512ae061ba14a4947def641b0ffb7161f56dda40f9651faaa3bc7429f76"
+    },
+    {
+      "phase": "development-v6",
+      "reason": "Deferred relationship projection exposed independent uncurated entity pruning during incoming source replacement.",
+      "resultSHA256": "35ab4c515a5d41b605136400df453dd1a0f0df1dd45ba41cdd4d30285740c2b6",
+      "inputManifestSHA256": "5792ca025d02ccd55432351cbb83ba3bc1494365bb7bea7e64a92c3ce9230b62",
+      "logSHA256": "810a4ba69678ad4d68320ac686105444805a44ba1655d387f791582bd0210a16"
+    },
+    {
+      "phase": "development-v8",
+      "reason": "Real explicit merge deleted the parent before live alias transfer.",
+      "resultSHA256": "7099bbd4796ddf32da2a355d63631d1d699898c57661b0e23ada8f16afdc340c",
+      "inputManifestSHA256": "4bf72d0522be5a7d9e30fcc779c6bf3ff495c3fcea5e6a59167084db1a828b4c",
+      "logSHA256": "db5e5864587b9ef713b9c513bcaeeb8c28c3b126d43a353b63fc161bad254eda"
+    },
+    {
+      "phase": "development-v9",
+      "reason": "Narrowed the retained merge failure to the incoming stage.",
+      "resultSHA256": "730041760d407307b23a59d3cfc02692be1f930a900a39f473934866d1434740",
+      "inputManifestSHA256": "5c91697f6995effe98db2711062c79422dbc001d1160edccbadc501529c388aa",
+      "logSHA256": "13f33c9eb09b120d2009dcf3b1d80208c2e0d53fa56840b95d5c47f42ddb9748"
+    },
+    {
+      "phase": "development-v10",
+      "reason": "An initial broad outgoing reordering broke the established recap replacement order; final sequencing retains relationship retirement order.",
+      "resultSHA256": "f744a651939ddcfc280f9e66256e4b02d929ea54bd304fc62b636d1d72a6cd46",
+      "inputManifestSHA256": "ef2fd3c5c65b3edfce1e79b3352de758c3f2c6e178b685e155222402f6e9d42f",
+      "logSHA256": "08fbe000e6774fba51dcb6129261d14bbf3561d3d76641e54ac0092e9251484e"
+    },
+    {
+      "phase": "development-v12",
+      "reason": "The index-corruption test held its EXPLAIN statement during DDL; finalized before DDL.",
+      "resultSHA256": "458e1e835768ac1857fc34b3d3e8794dd5322fffea3022e7e51c9ae84445c32d",
+      "inputManifestSHA256": "cfc710f9142f6413b7cc0913efdd7d758492bd8ffddfef42f58c88b53ccdc543",
+      "logSHA256": "bdfd1648beb4308675359f56e6ea345626384247f9da40002ddc16718e721c02"
+    },
+    {
+      "phase": "qualification-v1",
+      "reason": "The PII derived-table test mislabeled a current database as schema22; replaced by direct current derived-table repair coverage.",
+      "resultSHA256": "50a3342293d71710e82a76e8753e8a18747083c70d1858cf0068dc5622925f18",
+      "inputManifestSHA256": "b0b6762bada507aecf144545576bd34da564b3585c8cf0c9c0bcd4444732fd62",
+      "logSHA256": "3f3bdf0540d8cd8ffae8d5d4a011402d82e3983052859d8c912bce50bad2b12b"
+    },
+    {
+      "phase": "qualification-v2",
+      "reason": "Unknown-future-schema fixture still used the newly supported schema30; advanced the probe to31.",
+      "resultSHA256": "43adf9a6d46c3317c4d8a4b3b76fa60c51af49b2b883e6c952324522bc6834ea",
+      "inputManifestSHA256": "ee72f5f995d2dbe0ecbaa21b48c1ebf0fa8fa4846b2ceb82ce0f76ac96008ffd",
+      "logSHA256": "0e1f8ea14437ebfa3a36f5fc4d1053744a029e120d6516bf336eccfcf1919b28"
+    },
+    {
+      "phase": "qualification-v3",
+      "reason": "Actual initialized old29 client refused via the new entity guard; exact compatibility-error whitelist needed that guard.",
+      "resultSHA256": "da388c517e8163ba3ab5233b901caa2618452f54a5b5c55c64527c8026e79550",
+      "inputManifestSHA256": "37e9dd4c434ebdc6fcdfa821d857e8c88a38c076ffac6e87177d7bfb61f80be8",
+      "logSHA256": "4c3b3b2f85f7f81206f2731efca1a5c61f58b2f6c54d820b4003b988757b84ec"
+    },
+    {
+      "phase": "qualification-v4",
+      "reason": "Raw unregistered SQLite writer refused via the new entity guard; exact capture-probe whitelist needed that guard.",
+      "resultSHA256": "85462c93099e08f54c3be1091987a314b90ea59de6540132260a712e2a3442f0",
+      "inputManifestSHA256": "359790b2f4e7f1ecbc1f912fd68fedb604f8f15d3e13f45b423e6fa99f1f17e2",
+      "logSHA256": "4801c5321f7560495d37e9770bba58687c8f8f65ff80ae49666ba83e6ab04cb4"
+    }
+  ],
+  "featureStatusesUnchanged": true,
+  "F059": "todo",
+  "remaining": [
+    "Entity-specific large replay and process-death qualification",
+    "Typed source/conversation/turn/routine/run/pin deletions and graph-wide erasure/epochs",
+    "Current-policy/media/service/enrollment/key recovery/conflict UI/provider/two-device acceptance",
+    "Physical capture/power, distribution, matched whole-product competitor qualification"
+  ],
+  "interpretation": "Authored native/storage/process correctness, including one1000-source entity/project fixture. Project alias oracle checks do not establish native NLP identity accuracy. No new representative sync throughput, model quality, physical power, full privacy/media/service/enrollment, two-device or competitor ranking acceptance.",
+  "entityProcess": {
+    "reportSHA256": "55a4af46b36441315e9eae5462f2900cc47a982182a129847da1ceb56bb29d31",
+    "observations": {
+      "format": "OSwind source-linked entity memory qualification v1",
+      "binarySHA256": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+      "olderSchema20BinarySHA256": null,
+      "olderClientRefusalChecked": false,
+      "harnessSHA256": "a4ef2598622404f2140205d8e5bf6ed966577af203110017371e81c312a4448b",
+      "schema": 30,
+      "passed": true,
+      "sources": 1000,
+      "projectOracleSources": 667,
+      "projectPrecision": 1.0,
+      "projectRecall": 1.0,
+      "automaticSpansVerified": 1335,
+      "firstIndexWallSeconds": 0.7530464169103652,
+      "resumeWallSeconds": 0.0590657910797745,
+      "observedNLPAndProjectGroups": [
+        {
+          "kind": "organization",
+          "name": "Apollo",
+          "sources": 334
+        },
+        {
+          "kind": "person",
+          "name": "Chen",
+          "sources": 334
+        },
+        {
+          "kind": "project",
+          "name": "Apollo Launch",
+          "sources": 667
+        }
+      ],
+      "checks": [
+        "exact project alias oracle",
+        "UTF16 source anchors",
+        "scoped keyword retrieval",
+        "metadata-only edit preserves completion and source links",
+        "correction survives actual alias-rule rescan",
+        "read-only MCP membership and validation",
+        "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+        "quiet backup restore retains definitions, aliases and links",
+        "restored completion reset",
+        "source erasure",
+        "full wipe erases curated definitions"
+      ],
+      "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+    }
+  },
+  "projectCorrectionProcess": {
+    "reportSHA256": "9327931c3bf43d580ef73198fe7107c561d92844a22627a2911dee087be5429e",
+    "observations": {
+      "format": "OSwind stable project correction process qualification v1",
+      "passed": true,
+      "schema": 30,
+      "binarySHA256": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+      "harnessSHA256": "843de84de0795d65e71c5151f088f8b4f91598005aa61118dfd8126cf75e4664",
+      "legacy21": null,
+      "checks": [
+        "rename and merge retain rejected project source",
+        "favorite/tags preserve exclusion",
+        "manual override restores automatic matching",
+        "deleting project erases its stable exclusions before name reuse",
+        "MCP/HTTP and scoped keyword retrieval omit rejected source",
+        "quiet25 backup resets completion and preserves correction after rescan",
+        "source deletion and full wipe erase stable exclusions"
+      ],
+      "scope": "Three authored notes and actual CLI/HTTP/MCP/storage processes; optional exact older21 binary covers native format migration/refusal and legacy archive repair. No normal history, representative NLP accuracy, native UI, device, power or competitor claim."
+    }
+  },
+  "entityMetadataProcess": {
+    "reportSHA256": "ebbc7d881e4b0fc730aa37f1ea6c759be46e649eab8e6097c872141949b7b4fb",
+    "observations": {
+      "format": "OSwind project metadata preservation observations v1",
+      "passed": true,
+      "sources": 1000,
+      "repetitions": 1,
+      "syntheticInputSHA256": "f5ea5501bd3ab44c2e10d7dcfd6ebad428db5396e290a58979fc67d6891d94bc",
+      "harnessSHA256": "3ffaf67d3dde67f74addaf9458fd9f0d004d5f53d1bdeae722f479345e61e67d",
+      "results": [
+        {
+          "label": "candidate",
+          "binarySHA256": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+          "metadataPreserved": true,
+          "trials": [
+            {
+              "editWallSeconds": 0.056398625019937754,
+              "resumeWallSeconds": 0.0558312910143286,
+              "totalWallSeconds": 0.11222991603426635,
+              "pendingSourcesAfterEdit": 0,
+              "automaticLinksAfterEdit": 999,
+              "manualLinksAfterEdit": 1,
+              "rejectedSourceStillSuppressed": true
+            }
+          ],
+          "medianEditWallSeconds": 0.056398625019937754,
+          "medianResumeWallSeconds": 0.0558312910143286,
+          "medianTotalWallSeconds": 0.11222991603426635,
+          "checks": [
+            "source anchors unchanged after resume",
+            "manual link retained",
+            "rejected automatic source remains suppressed",
+            "real alias change invalidates completion/automatic links",
+            "quiet full backup preserves edited definitions and memberships",
+            "restored completion resets and resumed extraction retains correction",
+            "restored uncurated project activation by edit/create invalidates its completed plan"
+          ]
+        }
+      ],
+      "scope": "Owned short synthetic sources and project metadata/alias/correction/backup contracts. Sequential CLI trials include startup, SQLite and extraction/resume with uncontrolled caches and host activity. Required rescan counts are exact for this fixture; no representative workload, energy or competitor claim."
+    }
+  },
+  "actualOlderClient": {
+    "reportSHA256": "4801c5321f7560495d37e9770bba58687c8f8f65ff80ae49666ba83e6ab04cb4",
+    "observations": {
+      "state": "passed",
+      "currentCLI_SHA256": "d3dba5258caae4d1e1dc586d59f2f269e1bd4d5b3ab7aa4bacf3d0106ae4be5e",
+      "oldCLI_SHA256": "71a7591d1666a69e63f10d11b49c4a7fd8000849a23c9240a4f155f58c1381ed",
+      "harnessSHA256": "d69a80d99518efa36edeb91f181eb4d8b48f8ffb581d0a644208b09e54466404",
+      "checks": [
+        "actual already-initialized older writer refuses after migration upgrade; source payloads unchanged",
+        "fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged",
+        "actual older backup inspector refuses newer package; all package bytes unchanged"
+      ],
+      "operations": [
+        {
+          "binary": "old29",
+          "arguments": [
+            "note",
+            "Owned original schema29 text"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "65c0862675250b027862fa17bbc767dfae11215b1b073f7cdbe81e9808ecaf49",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "6d924729b570af8f90f8ecc34745804f07c2785accb30a64acc797dc3e8c3917",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "note",
+            "Owned fresh older write must refuse"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "backup",
+            "create",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-entities-v1/qualification-v4/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "570eb6135bd69d95559d93b26aa464c72fce3de727b23e50a38a185cf51a0bc6",
+          "stderrSHA256": "2ad84d7971e3566263fc4bfffe00241ce24b4425c265a276fb69f86c6ab7e395"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-entities-v1/qualification-v4/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "570eb6135bd69d95559d93b26aa464c72fce3de727b23e50a38a185cf51a0bc6",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-entities-v1/qualification-v4/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "0433de28417ba0e9be348d77737187af44a27a9c849b08bf6fc21223fd83560b"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "note",
+            "Owned current write still works"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "d0b966b1da1bc2955391518690fbef85cde3496c05e15c5f21553ec45558e4db",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Actual older executable, owned synthetic text and complete process exits. No native recording, enrolled service, media playback, power or competitor evidence.",
+      "initializedOlderClient": {
+        "postOpenLeaseObserved": true,
+        "returncode": 1,
+        "stderrSHA256": "8ba9c8e66eca5e09ae96bedd0eb68fea63ad2e37943763b2595617b30bd22c0c"
+      },
+      "beforeFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "681033c8d33b891c2bcec98dd37aac652edb1e8afddbbda5be84d9242aabb186"
+      },
+      "afterFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "681033c8d33b891c2bcec98dd37aac652edb1e8afddbbda5be84d9242aabb186"
+      },
+      "sourceSchema": 29,
+      "targetSchema": 30,
+      "allChildrenTerminal": true
+    }
+  }
+}

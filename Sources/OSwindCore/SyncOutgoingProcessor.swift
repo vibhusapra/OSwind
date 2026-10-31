@@ -31,12 +31,18 @@ struct SyncOutgoingProcessor {
             if try any("personal_sync_work") {
                 let batch=Batch(processor:self)
                 let count=try queue.process(limit:limit) {values in
-                    // Erasures never require reading deleted source content.
-                    for value in values where value.deleted {
+                    // Relationship retirements precede replacement lifetimes.
+                    // Entity parents retire after live alias transfers, which
+                    // otherwise cascade-delete aliases that remain live globally.
+                    for value in values where value.deleted && value.identity.table != .entity {
                         let state=try cache.journal.state(for:value.identity.key)
                         if !state.isDeleted {_=try cache.journal.delete(key:value.identity.key)}
                     }
                     for value in values where !value.deleted {_=try batch.prepare(value.identity)}
+                    for value in values where value.deleted && value.identity.table == .entity {
+                        let state=try cache.journal.state(for:value.identity.key)
+                        if !state.isDeleted {_=try cache.journal.delete(key:value.identity.key)}
+                    }
                 }
                 return .prepared(count)
             }

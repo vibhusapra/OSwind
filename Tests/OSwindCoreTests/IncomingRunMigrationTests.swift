@@ -18,7 +18,7 @@ extension HistoricalErasureMigrationTests {
         }
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29);XCTAssertEqual(try fingerprint(db),before)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30);XCTAssertEqual(try fingerprint(db),before)
             try RoutineRunOriginalSchema.validate(db);try SyncIncomingSourceSchema.validate(db)
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM routine_run_originals"),0)
 
@@ -57,7 +57,7 @@ extension HistoricalErasureMigrationTests {
             let library=root.appendingPathComponent(name),store=try MemoryStore(root:library);try store.close()
             try withDB(library) {db in try db.execute((name=="routine_run_originals" ? "DROP TABLE ":"DROP TRIGGER ")+name)}
             XCTAssertThrowsError(try MemoryStore(root:library))
-            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29)}
+            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30)}
         }
     }
 }

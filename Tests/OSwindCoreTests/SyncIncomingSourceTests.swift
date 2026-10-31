@@ -40,11 +40,11 @@ final class SyncIncomingSourceTests:XCTestCase {
     func paths(_ memory:Memory)->[SyncMediaRole:String] {
         var result=[SyncMediaRole:String]();result[.image]=memory.imagePath;result[.audio]=memory.audioPath;result[.video]=memory.videoPath;return result
     }
-    func drain(_ store:MemoryStore,_ cache:SyncVersionStore)throws {
+    func drain(_ store:MemoryStore,_ cache:SyncVersionStore,limit:Int=128)throws {
         let processor=SyncOutgoingProcessor(queue:try .install(catalog:cache.catalog),cache:cache,admitRow:{_,_ in},admitVersion:{_ in},media:{memory in
             try self.paths(memory).map {role,path in let bytes=try Data(contentsOf:store.root.appendingPathComponent(path)),ref=try SyncContentReference(data:bytes);return SyncMediaManifest(role:role,sha256:ref.sha256,bytes:ref.bytes,chunks:[ref])}.sorted {$0.role.rawValue<$1.role.rawValue}
         })
-        for _ in 0..<2000 {if try processor.step() == .idle {return}}
+        for _ in 0..<2000 {if try processor.step(limit:limit) == .idle {return}}
         throw OSwindError.invalid("Owned source queue did not drain")
     }
     func packet(_ revision:SyncRevision,_ cache:SyncVersionStore)throws->SyncPortableRecord {

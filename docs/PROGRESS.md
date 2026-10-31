@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Incoming entity graph — functional component verified
+
+[The internal entity adapter](SYNC-INCOMING-ENTITIES.md) closes positive projection paths for all thirteen canonical record types: definitions, aliases, manual/automatic links and name/stable-project corrections now project natively without echo. Schema 30 scopes source-update preservation to an exact incoming write and fences old clients. Indexed outgoing sequencing preserves explicit alias transfers before parent retirement across one-object batches. Person/alias deletion does not force a project rescan.
+
+The [twenty-stage receipt](../benchmarks/sync-incoming-entities-v1.json) passes 1,582 full cases/79 skips, 563 sanitizer and 563 optimized cases/19 skips each, with no race warnings in the parent plus ten retained worker logs. Packaged 1,000-source memberships/spans, metadata/corrections, initialized/fresh actual29 refusal, API/MCP/SDK, erasure/wipe, recaps/routines and interrupted backup pass. Strict staged/extracted signatures and all 34 files agree; installed 15/prior staged34 remain unchanged.
+
+All 445 Sources/Tests/Vendor inputs match. The 699-file final manifest has 696 unchanged repository inputs across phases; only the future-version probe and two compatibility-marker test oracles changed after build gates. Earlier compiler, fixture, pruning, merge and oracle failures remain retained. Representative entity replay/death, remaining typed deletions, graph policy/epochs/media/service/enrollment/providers/two-device, physical/distribution and ranking acceptance remain open. F059 and all 78 statuses stay unchanged.
+
 ## Routine import recovery and authored scale — component qualified
 
 [Recovery/scale evidence](SYNC-RUN-RECOVERY.md) closes the run-specific process-death and metadata-scale gates without changing product sources. Four actual owned-worker create/update pre/postcommit SIGKILL cases and their idempotent retries preserve exact originals, native frames, cached versions, durable recipe bindings, causal heads/receipts and no outgoing echo. Independent three-build reviews preserve all 48 inspected SQLite files; ten recovery controls pass.
@@ -8,7 +16,7 @@ The [thirteen-stage receipt](../benchmarks/sync-run-recovery-v1.json) passes 1,5
 
 One warm 1k/10k run import takes 18.71/187.32 seconds in 128-record transactions; ten updates take 0.268/0.215 seconds. Seven warm 100-item history reads have medians 20.36/19.14ms. All 11,000 originals/current packets and twenty retained pre-update records pass independent producer/native/journal checks and twelve corruption/admission controls. A genuine old-oracle false admission is retained; final validation anchors prior traces to actual producer journal references. No runtime/benchmark code changed for that correction.
 
-Schema 29 source receive takes 9.56/93.29 seconds versus the prior single warm 8.93/90.66-second sample. Uncontrolled cache/system/thermal state prevents attributing the +7.1%/+2.9% observed deltas. All 11,000 sources/60 archival projections and eight controls pass. Model/media/policy inference/transport/cold-cache/power and ranking remain excluded. Entity/correction/deletion, privacy/epoch/media/service/enrollment/providers/two-Mac and physical/distribution gates remain open. F059 and all 78 statuses stay unchanged.
+Schema 29 source receive takes 9.56/93.29 seconds versus the prior single warm 8.93/90.66-second sample. Uncontrolled cache/system/thermal state prevents attributing the +7.1%/+2.9% observed deltas. All 11,000 sources/60 archival projections and eight controls pass. Model/media/policy inference/transport/cold-cache/power and ranking remain excluded. Entity/correction/deletion, privacy/epoch/media/service/enrollment/providers/two-Mac and physical/distribution gates remain open. F059 and all 78 statuses stay unchanged. Exact recovery head `a3e91ca8` passes both hosted jobs in run 41223575011.
 
 ## Incoming recipes and run history — tested internal adapter
 

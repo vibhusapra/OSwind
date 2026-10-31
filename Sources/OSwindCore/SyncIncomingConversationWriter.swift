@@ -95,6 +95,9 @@ struct SyncIncomingConversationWriter {
     /// Content-free recap deletion. The global old citation is retired even
     /// when its current owner still independently requires the same native row.
     func applyDeletion(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws {
+        if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==change.revision.key.kind}) {
+            return try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletion(change,admission:admission)
+        }
         try admission.withActive(for:library.mediaRootIdentity) {}
         try library.withRoutineDatabase {connection in
             guard connection.handle==db.handle,change.after.isDeleted,change.revision.key.kind == .recapCitation else {throw OSwindError.invalid("Use the corresponding typed deletion adapter")}
@@ -123,6 +126,9 @@ struct SyncIncomingConversationWriter {
         // against erasure holding the exclusive lease while waiting for SQLite.
         if case .source=record.body {
             return try SyncIncomingSourceWriter(library:library,cache:cache,admit:admit,pathsFor:pathsFor,admitMedia:admitMedia,newID:newID).apply(record,admission:admission,fetchExactSource:fetchExactSource)
+        }
+        if SyncIncomingEntityWriter.tables.contains(record.identity.table) {
+            return try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).apply(record,admission:admission,fetchExactSource:fetchExactSource)
         }
         try admission.withActive(for:library.mediaRootIdentity) {}
         return try library.withRoutineDatabase {connection in

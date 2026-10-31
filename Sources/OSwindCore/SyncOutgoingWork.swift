@@ -16,6 +16,7 @@ struct SyncOutgoingWorkQueue {
     var database:RoutineDatabase {catalog.database}
     static let rowBytes:Int64=192,defaultBudget:Int64=64*1024*1024,maximumBudget:Int64=8*1024*1024*1024
     private static let schemas:[String:String]=[
+        "sync_work_sequence":"CREATE INDEX sync_work_sequence ON personal_sync_work(last_seq,ordinal)",
         "personal_sync_work_state":"CREATE TABLE personal_sync_work_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,processing INTEGER NOT NULL CHECK(processing IN(0,1)),used_bytes INTEGER NOT NULL CHECK(typeof(used_bytes)='integer' AND used_bytes>=0 AND used_bytes<=budget),budget INTEGER NOT NULL CHECK(typeof(budget)='integer' AND budget>0 AND budget<=8589934592))",
         "personal_sync_work":"CREATE TABLE personal_sync_work(ordinal INTEGER PRIMARY KEY AUTOINCREMENT,object_digest TEXT NOT NULL UNIQUE REFERENCES personal_sync_identities(object_digest),deleted INTEGER NOT NULL CHECK(deleted IN(0,1)),last_seq INTEGER NOT NULL CHECK(typeof(last_seq)='integer' AND last_seq>=0))",
         "sync_work_budget":"CREATE TRIGGER sync_work_budget BEFORE INSERT ON personal_sync_work BEGIN SELECT CASE WHEN (SELECT used_bytes+192>budget FROM personal_sync_work_state WHERE singleton=1) THEN RAISE(ABORT,'Sync outgoing work is full') END; END",
@@ -48,6 +49,18 @@ struct SyncOutgoingWorkQueue {
             guard sqlite3_step(sum)==SQLITE_ROW,sqlite3_column_int(sum,0)==1 else {throw OSwindError.database("Sync work accounting differs")}
             return value
         }
+    }
+    /// Native capture sequences preserve alias transfers before deleting their
+    /// former parent, even when unrelated earlier work was coalesced. The index
+    /// keeps selection bounded instead of sorting the complete pending queue.
+    static func migrateEntityOrdering(_ db:RoutineDatabase,sourceVersion:Int32)throws {
+        let present=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='personal_sync_work'")
+        guard present>0 else {return}
+        let row=try db.statement("SELECT sql FROM sqlite_master WHERE name='sync_work_sequence'");defer {sqlite3_finalize(row)}
+        let code=sqlite3_step(row)
+        if code==SQLITE_ROW {guard db.text(row,0)==schemas["sync_work_sequence"] else {throw OSwindError.database("Outgoing entity ordering protection differs")}}
+        else {guard code==SQLITE_DONE,sourceVersion<30 else {throw OSwindError.database("Outgoing entity ordering protection is missing")};try db.execute(schemas["sync_work_sequence"]!)}
+        try validateSchema(db)
     }
     private func context()throws {
         try Self.validateSchema(database)
@@ -120,7 +133,7 @@ struct SyncOutgoingWorkQueue {
         guard (1...256).contains(limit) else {throw OSwindError.invalid("Invalid sync work batch limit")}
         return try scoped {
             try idleCapture()
-            let row=try database.statement("SELECT w.ordinal,w.object_digest,w.deleted,w.last_seq,i.table_name,i.origin,i.lifetime FROM personal_sync_work w LEFT JOIN personal_sync_identities i USING(object_digest) ORDER BY w.ordinal LIMIT ?");defer {sqlite3_finalize(row)};sqlite3_bind_int(row,1,Int32(limit));var batch=[SyncOutgoingWork](),code=sqlite3_step(row)
+            let row=try database.statement("SELECT w.ordinal,w.object_digest,w.deleted,w.last_seq,i.table_name,i.origin,i.lifetime FROM personal_sync_work w LEFT JOIN personal_sync_identities i USING(object_digest) ORDER BY w.last_seq,w.ordinal LIMIT ?");defer {sqlite3_finalize(row)};sqlite3_bind_int(row,1,Int32(limit));var batch=[SyncOutgoingWork](),code=sqlite3_step(row)
             while code==SQLITE_ROW {
                 guard let table=SyncCanonicalTable(rawValue:database.text(row,4)),(0...1).contains(sqlite3_column_int(row,2)) else {throw OSwindError.database("Sync work identity differs")}
                 let identity=try SyncObjectIdentity(table:table,origin:database.text(row,5),lifetime:database.text(row,6)),deleted=sqlite3_column_int(row,2)==1

@@ -1,0 +1,17 @@
+{
+  "schema": 29,
+  "producerCLI_SHA256": "71a7591d1666a69e63f10d11b49c4a7fd8000849a23c9240a4f155f58c1381ed",
+  "producerSource": "f0aac3606b856f1c4977fd6ff4ded8078f7b4968",
+  "origin": "Copy of retained owned routine-backup producer; two curated entity definitions authored through unchanged schema29 CLI. SQLite backup after children exit. No user corpus or version downgrade. Added one owned CLI note, manual person link and project rejection using same old CLI.",
+  "counts": {
+    "memories": 1,
+    "memory_entities": 2,
+    "entity_aliases": 2,
+    "entity_mentions": 1,
+    "entity_project_ignored": 1,
+    "routine_runs": 1,
+    "routine_run_originals": 1,
+    "personal_sync_versions": 4
+  },
+  "sha256": "8da14d5ce4eafa1abea8ffb4a971c24ec7a39940c86dc85d562ad451adea8f7a"
+}
