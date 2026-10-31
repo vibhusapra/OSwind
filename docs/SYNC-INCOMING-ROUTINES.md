@@ -1,6 +1,6 @@
 # Incoming recipes and run history
 
-Tested internal adapter on `codex/sync-incoming-routines`; run-specific process-death and throughput gates remain open. F059 remains TODO. This adds internal typed adapters; it enables no pairing, transfer service or automatic peer execution. The schema-28 [incoming-source receipt](../benchmarks/sync-incoming-sources-v1.json) covers its frozen parent implementation, not this schema-29 work.
+Tested internal adapter on `codex/sync-incoming-routines`; [run-specific process recovery and authored scale](SYNC-RUN-RECOVERY.md) are now component qualified. F059 remains TODO. This adds internal typed adapters; it enables no pairing, transfer service or automatic peer execution. The schema-28 [incoming-source receipt](../benchmarks/sync-incoming-sources-v1.json) covers its frozen parent implementation, not this schema-29 work.
 
 ## Behavior
 
@@ -41,7 +41,7 @@ All 439 tracked source/test inputs are identical across builds and process gates
 - [x] Corrected fresh-catalog re-export broad regression and full/default test suite.
 - [x] Frozen sanitizer/optimized checks, independent original/native/wire review and corruption controls.
 - [x] Staged signed package/process checks, actual old28 client refusal and quiet old28/current29 portability.
-- [ ] Run-update process-death gates and an authored bounded throughput comparison.
+- [x] [Owned-worker create/update crash recovery, idempotent retry and authored metadata scale](SYNC-RUN-RECOVERY.md).
 - [ ] Complete entity/correction/deletion adapters, current privacy/erasure epochs and safe media staging.
 - [ ] Production lifecycle/service, enrollment/recovery/conflict UI, encrypted provider transport and actual two-Mac acceptance.
 
