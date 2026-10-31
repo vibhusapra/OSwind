@@ -24,6 +24,8 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
+[Incoming metadata tombstones](SYNC-INCOMING-DELETIONS.md) pass twenty functional qualification stages for conversations, turns/citations, recipes/runs and pins. Entity/recap retirement paths are retained; unknown keys across all thirteen canonical kinds receive body-free barriers. Known source erasure and replicated receiver-only child retirement/epochs remain required. No service is enabled.
+
 [Incoming entity graph](SYNC-INCOMING-ENTITIES.md) passes twenty functional qualification stages on schema 30: typed entity/alias/link/correction admission, content-free entity-table deletion, scoped independent-definition preservation and indexed outgoing merge ordering. All thirteen canonical record types now have internal positive projection paths. Complete graph/deletion/policy/media/service and user enrollment remain open.
 
 [Incoming sources and original preservation](SYNC-INCOMING-SOURCES.md) are component-qualified schema-28 work in [PR #106](https://github.com/vibhusapra/OSwind/pull/106), stacked on the qualified historical-citation and original-field erasure components. Exact source/recap/answer/pin graphs and ordinary local privacy invalidation have retained frozen evidence. [Incoming recipes and run history](SYNC-INCOMING-ROUTINES.md) are tested internal schema-29 adapters; [run-specific recovery and authored scale](SYNC-RUN-RECOVERY.md) now have frozen evidence. Complete graph/deletion/policy/media/service and two-Mac acceptance remain unfinished; F059 stays TODO.

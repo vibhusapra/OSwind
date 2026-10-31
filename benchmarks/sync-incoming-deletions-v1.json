@@ -1,0 +1,532 @@
+{
+  "format": "OSwind incoming metadata tombstone functional qualification v1",
+  "version": 1,
+  "state": "functional-component-qualified",
+  "overallV0Complete": false,
+  "schema": 30,
+  "sourceBase": "8a172c836879e1c6f6e9c504d8b146135761e517",
+  "branch": "codex/sync-incoming-deletions",
+  "scope": "Native metadata deletion for conversation, turn, conversation citation, recipe, run and evidence pin. Typed catalog keys, no deleted-body fetch, same-connection/reservation/transaction and cache-schema protection. Unknown barriers for all13 canonical kinds. This is not complete source erasure, replicated graph convergence or a sync service.",
+  "inputs": {
+    "repositoryInputs": 701,
+    "identicalSourcesTestsVendorInputs": 447,
+    "repositoryManifest": "benchmarks/sync-incoming-deletions-inputs-v1.json",
+    "manifestSHA256": "7f9743b435122de0942e0bd48c2cbbd4c7358374a31351e95e484334cb9405b9",
+    "rawFrozenInputs": 703,
+    "rawManifestSHA256": "53d402875f9ce580bde02031516aa8d896f91990efb63d34c0936265141848aa",
+    "driverSHA256": "1137ff826193dfb1f6155a3899c19d0a6c46e002a755f8eed9958fa55cce19fd",
+    "allQualificationInputsUnchanged": true
+  },
+  "tests": {
+    "full": {
+      "defined": 1669,
+      "passed": 1590,
+      "skipped": 79
+    },
+    "threadSanitizer": {
+      "defined": 590,
+      "passed": 571,
+      "skipped": 19
+    },
+    "optimized": {
+      "defined": 590,
+      "passed": 571,
+      "skipped": 19
+    },
+    "newCases": 8
+  },
+  "threadSanitizer": {
+    "state": "passed",
+    "logs": [
+      {
+        "path": "thread-sanitizer.log",
+        "sha256": "fc173165db602ef09c5315adbb4c39a80c8e86c5a9cd42098784982e6961431a",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log",
+        "sha256": "d2a638434448449d1bcc58c9ac71c731f7047818f412b18e61a0b03f81e354e1",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log",
+        "sha256": "d2a638434448449d1bcc58c9ac71c731f7047818f412b18e61a0b03f81e354e1",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log",
+        "sha256": "830d4b3a08df911bb1640b7ee338dcdb7d03d810388d277e4a6af5e3234fd63b",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log",
+        "sha256": "830d4b3a08df911bb1640b7ee338dcdb7d03d810388d277e4a6af5e3234fd63b",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log",
+        "sha256": "bc336b33c3699c49ba07668c715ccc1cfb5002817fa4443d3ce4ad0bd01af19b",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log",
+        "sha256": "9cd44c64dd3b2b67a7a640bee85c32f019fac2025b4716679cf88cf64418f446",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log",
+        "sha256": "9cd44c64dd3b2b67a7a640bee85c32f019fac2025b4716679cf88cf64418f446",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log",
+        "sha256": "b2725e89c2e777c70a7e7f57565cc5f7614ef4b1f1d8d39c95b881a1ba81dcd1",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log",
+        "sha256": "b2725e89c2e777c70a7e7f57565cc5f7614ef4b1f1d8d39c95b881a1ba81dcd1",
+        "raceWarnings": 0
+      },
+      {
+        "path": "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log",
+        "sha256": "4bba429ec6e2f62a32727778d260af670f39842bb32d0de502989df68ee1bf50",
+        "raceWarnings": 0
+      }
+    ],
+    "parentAndRetainedChildLogs": 11
+  },
+  "passingQualificationStages": [
+    {
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "cad5f58f66416217919ff14965eccdf8595b50bc7ab39fece458078690d7ab51"
+    },
+    {
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "fc173165db602ef09c5315adbb4c39a80c8e86c5a9cd42098784982e6961431a"
+    },
+    {
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "588fa8fe0421ba108814e92221482827b98ecfeba55ab70f630d6112d80eb035"
+    },
+    {
+      "name": "owned-sqlite-contracts",
+      "returncode": 0,
+      "log": "owned-sqlite-contracts.log",
+      "logSHA256": "4c3b3b2f85f7f81206f2731efca1a5c61f58b2f6c54d820b4003b988757b84ec"
+    },
+    {
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "8372bd0ddaf588e48f40c79d62dde55c1639dbd15927cfdcd26f82447dda417f"
+    },
+    {
+      "name": "entity-process",
+      "returncode": 0,
+      "log": "entity-process.log",
+      "logSHA256": "c7c4b5f71ae1177f3e1df47785b491386aca52d36720e06e8f7fe900356cd4ac"
+    },
+    {
+      "name": "project-correction-process",
+      "returncode": 0,
+      "log": "project-correction-process.log",
+      "logSHA256": "4eb17ac5cc96ad3353121f222716103ab7de0b9ddf83df047d096799ca939583"
+    },
+    {
+      "name": "entity-metadata-process",
+      "returncode": 0,
+      "log": "entity-metadata-process.log",
+      "logSHA256": "cc66eb65a70e683e44ba5c8ac6e2afc77800ffba62aeba9a2f499c2f830cfacf"
+    },
+    {
+      "name": "actual-old29-process",
+      "returncode": 0,
+      "log": "actual-old29-process.log",
+      "logSHA256": "6594d1a105ea552d90b82066db7a4dc6b9c392dbd9f7b61e0e0fd7480be4c73f"
+    },
+    {
+      "name": "capture-process",
+      "returncode": 0,
+      "log": "capture-process.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "original-erasure-process",
+      "returncode": 0,
+      "log": "original-erasure-process.log",
+      "logSHA256": "43b407eb69355247669d6f20f823cbe8c5652ceb70e68465edf62e9dda91e890"
+    },
+    {
+      "name": "api-mcp-process",
+      "returncode": 0,
+      "log": "api-mcp-process.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp-process",
+      "returncode": 0,
+      "log": "indexed-api-mcp-process.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk-contracts",
+      "returncode": 0,
+      "log": "python-sdk-contracts.log",
+      "logSHA256": "09e828d595463bc517a2429a8d249c78984b499303fd809a8bf0c8d4cb898cfa"
+    },
+    {
+      "name": "single-delete-process",
+      "returncode": 0,
+      "log": "single-delete-process.log",
+      "logSHA256": "c4f9c217f361d3e0b4ded3ad6faadc897d1de70975d7e4165ccbb4d08467e140"
+    },
+    {
+      "name": "wipe-process",
+      "returncode": 0,
+      "log": "wipe-process.log",
+      "logSHA256": "fd386eeaa77bf8288aea78829bdf7c2d219c2a33796d7311a3581ecac91fa94f"
+    },
+    {
+      "name": "recap-process",
+      "returncode": 0,
+      "log": "recap-process.log",
+      "logSHA256": "37c4dac718aad3571d96b2db417cf2ce4e47ce1da22d087a028e7b05d2e16f77"
+    },
+    {
+      "name": "routine-process",
+      "returncode": 0,
+      "log": "routine-process.log",
+      "logSHA256": "68e8bb38a4bc23c1af07eea80f132c9c8e155a59bf047eaca538cfed6e1cde38"
+    },
+    {
+      "name": "backup-interruption-process",
+      "returncode": 0,
+      "log": "backup-interruption-process.log",
+      "logSHA256": "4ba62f0b8333b24ecf04c42d08e9efae5f73c4c5621b2b101c8b5f64a03ef19e"
+    },
+    {
+      "name": "archive-review",
+      "returncode": 0,
+      "log": "archive-review.log",
+      "logSHA256": "be5864062fd8f44d324e47d6baa1ca857650e7ec5b5df12defaf99a3f9a75230"
+    }
+  ],
+  "packagedCLI_SHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+  "stagedPackage": {
+    "state": "passed",
+    "allExtractedFilesEqualStagedFiles": {
+      "Contents/Info.plist": "85f70ef35e2a0960e9d67c2787737be4a106bfb74bdf68464063373fc5579498",
+      "Contents/_CodeSignature/CodeResources": "e96ea876844da3a49931db2dcd088eeb8d681825567d88d466bef87e8202cfec",
+      "Contents/MacOS/oswindctl": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+      "Contents/MacOS/oswind-preparation-guardian": "d52f4079908e0f9ba742add8b281501079f833163b89034a6f8ebaee208e8a55",
+      "Contents/MacOS/OSwind": "a6d0ad6daaef5514f907859699f74459af39f1017063571ab8ccdddd9affd552",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "stagedAndExtractedStrictSignatures": true,
+    "zipSHA256": "69b9d0be8d172b88ba0239c538efd22e894b39aa9fcd20d424dfdca1a3e6acac",
+    "testFixturesAbsent": true,
+    "installed15FilesUnchanged": true,
+    "prior34StagedFilesUnchanged": true
+  },
+  "priorEntity34FilesAndZIPUnchanged": true,
+  "retainedFailures": [
+    {
+      "phase": "development-v1",
+      "reason": "Four actual incoming metadata deletion cases reached the missing adapter.",
+      "inputManifestSHA256": "20164d9e68683eeb33b9d61c14536293c393bf6db8f885f31df0d640be8e3556",
+      "logSHA256": "588371c655e02cdf376909269237a09f380ed5afc39f3dd93bbf6b870c4a6f0f"
+    },
+    {
+      "phase": "development-v2",
+      "reason": "Extra primary argument label in new typed key validation; corrected before runtime tests.",
+      "inputManifestSHA256": "3f480b84a5c17d04305bfda420f6c574826d2a50b3fd3e3fe82da03a50149c9a",
+      "logSHA256": "7066a7a549937a65b58d31d3c86b7c8f00ddbc57464cc51dbaceb45be0d54673"
+    }
+  ],
+  "parentCI": {
+    "pr": 109,
+    "head": "8a172c836879e1c6f6e9c504d8b146135761e517",
+    "run": 41228502794,
+    "native": "success",
+    "benchmark-harnesses": "success"
+  },
+  "hardware": {
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "featureStatusesUnchanged": true,
+  "F059": "todo",
+  "remaining": [
+    "Mapped source erasure with original/cache-only remnants, independently live entity preservation and durable media cleanup after shared lease release",
+    "Graph-wide current-policy/erasure epochs and receiver-only owned child identity retirement; no complete replicated convergence claim",
+    "Media/service/enrollment/key recovery/status/conflict UI/provider/two-device acceptance",
+    "Entity/deletion-specific large replay and process death; representative power/performance/distribution and whole-product competitor qualification"
+  ],
+  "interpretation": "Authored correctness and process checks. No schema bump, public sync enablement, new representative throughput/identity accuracy, physical power or product-ranking claim. Native FK cleanup does not establish global child tombstone convergence.",
+  "entityProcess": {
+    "reportSHA256": "c7c4b5f71ae1177f3e1df47785b491386aca52d36720e06e8f7fe900356cd4ac",
+    "observations": {
+      "format": "OSwind source-linked entity memory qualification v1",
+      "binarySHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+      "olderSchema20BinarySHA256": null,
+      "olderClientRefusalChecked": false,
+      "harnessSHA256": "a4ef2598622404f2140205d8e5bf6ed966577af203110017371e81c312a4448b",
+      "schema": 30,
+      "passed": true,
+      "sources": 1000,
+      "projectOracleSources": 667,
+      "projectPrecision": 1.0,
+      "projectRecall": 1.0,
+      "automaticSpansVerified": 1335,
+      "firstIndexWallSeconds": 0.7641249580774456,
+      "resumeWallSeconds": 0.057828166987746954,
+      "observedNLPAndProjectGroups": [
+        {
+          "kind": "organization",
+          "name": "Apollo",
+          "sources": 334
+        },
+        {
+          "kind": "person",
+          "name": "Chen",
+          "sources": 334
+        },
+        {
+          "kind": "project",
+          "name": "Apollo Launch",
+          "sources": 667
+        }
+      ],
+      "checks": [
+        "exact project alias oracle",
+        "UTF16 source anchors",
+        "scoped keyword retrieval",
+        "metadata-only edit preserves completion and source links",
+        "correction survives actual alias-rule rescan",
+        "read-only MCP membership and validation",
+        "authenticated loopback HTTP list, sources and entity scope; unauthenticated refusal",
+        "quiet backup restore retains definitions, aliases and links",
+        "restored completion reset",
+        "source erasure",
+        "full wipe erases curated definitions"
+      ],
+      "scope": "Synthetic local project-alias fixture and observed Apple NLP outputs. Wall times include CLI startup, SQLite and native NLP with uncontrolled caches; no native NLP precision/recall, real desktop identity, power, latest 24h capture or competitor claim."
+    }
+  },
+  "projectCorrectionProcess": {
+    "reportSHA256": "4eb17ac5cc96ad3353121f222716103ab7de0b9ddf83df047d096799ca939583",
+    "observations": {
+      "format": "OSwind stable project correction process qualification v1",
+      "passed": true,
+      "schema": 30,
+      "binarySHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+      "harnessSHA256": "843de84de0795d65e71c5151f088f8b4f91598005aa61118dfd8126cf75e4664",
+      "legacy21": null,
+      "checks": [
+        "rename and merge retain rejected project source",
+        "favorite/tags preserve exclusion",
+        "manual override restores automatic matching",
+        "deleting project erases its stable exclusions before name reuse",
+        "MCP/HTTP and scoped keyword retrieval omit rejected source",
+        "quiet25 backup resets completion and preserves correction after rescan",
+        "source deletion and full wipe erase stable exclusions"
+      ],
+      "scope": "Three authored notes and actual CLI/HTTP/MCP/storage processes; optional exact older21 binary covers native format migration/refusal and legacy archive repair. No normal history, representative NLP accuracy, native UI, device, power or competitor claim."
+    }
+  },
+  "entityMetadataProcess": {
+    "reportSHA256": "cc66eb65a70e683e44ba5c8ac6e2afc77800ffba62aeba9a2f499c2f830cfacf",
+    "observations": {
+      "format": "OSwind project metadata preservation observations v1",
+      "passed": true,
+      "sources": 1000,
+      "repetitions": 1,
+      "syntheticInputSHA256": "f5ea5501bd3ab44c2e10d7dcfd6ebad428db5396e290a58979fc67d6891d94bc",
+      "harnessSHA256": "3ffaf67d3dde67f74addaf9458fd9f0d004d5f53d1bdeae722f479345e61e67d",
+      "results": [
+        {
+          "label": "candidate",
+          "binarySHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+          "metadataPreserved": true,
+          "trials": [
+            {
+              "editWallSeconds": 0.05601066700182855,
+              "resumeWallSeconds": 0.05797054199501872,
+              "totalWallSeconds": 0.11398120899684727,
+              "pendingSourcesAfterEdit": 0,
+              "automaticLinksAfterEdit": 999,
+              "manualLinksAfterEdit": 1,
+              "rejectedSourceStillSuppressed": true
+            }
+          ],
+          "medianEditWallSeconds": 0.05601066700182855,
+          "medianResumeWallSeconds": 0.05797054199501872,
+          "medianTotalWallSeconds": 0.11398120899684727,
+          "checks": [
+            "source anchors unchanged after resume",
+            "manual link retained",
+            "rejected automatic source remains suppressed",
+            "real alias change invalidates completion/automatic links",
+            "quiet full backup preserves edited definitions and memberships",
+            "restored completion resets and resumed extraction retains correction",
+            "restored uncurated project activation by edit/create invalidates its completed plan"
+          ]
+        }
+      ],
+      "scope": "Owned short synthetic sources and project metadata/alias/correction/backup contracts. Sequential CLI trials include startup, SQLite and extraction/resume with uncontrolled caches and host activity. Required rescan counts are exact for this fixture; no representative workload, energy or competitor claim."
+    }
+  },
+  "actualOlderClient": {
+    "reportSHA256": "6594d1a105ea552d90b82066db7a4dc6b9c392dbd9f7b61e0e0fd7480be4c73f",
+    "observations": {
+      "state": "passed",
+      "currentCLI_SHA256": "371394024ba3f7c0e10d3fd3ce01ce075f345cdf58980345bf326254e52ab6c5",
+      "oldCLI_SHA256": "71a7591d1666a69e63f10d11b49c4a7fd8000849a23c9240a4f155f58c1381ed",
+      "harnessSHA256": "d69a80d99518efa36edeb91f181eb4d8b48f8ffb581d0a644208b09e54466404",
+      "checks": [
+        "actual already-initialized older writer refuses after migration upgrade; source payloads unchanged",
+        "fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged",
+        "actual older backup inspector refuses newer package; all package bytes unchanged"
+      ],
+      "operations": [
+        {
+          "binary": "old29",
+          "arguments": [
+            "note",
+            "Owned original schema29 text"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "e61b29c774b3327ccb32257020837e8832ac359a5f99b167c0dd4f6aa0d5a848",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "31825f1fe879b53dccefea2efaf36574ccc1de40c15cd7ff0cb28da30f37dc9f",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "stats"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "note",
+            "Owned fresh older write must refuse"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "e828293cefe2b63381b69170f7326e0006ad14cf836d62ae6ef889bc9be526f8"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "backup",
+            "create",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-deletions-v1/qualification-v1/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "3df91274915297e8cc03a8c1497e37063ad9dbef7be5fe33676c95486b6ecd27",
+          "stderrSHA256": "2ad84d7971e3566263fc4bfffe00241ce24b4425c265a276fb69f86c6ab7e395"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-deletions-v1/qualification-v1/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "3df91274915297e8cc03a8c1497e37063ad9dbef7be5fe33676c95486b6ecd27",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "binary": "old29",
+          "arguments": [
+            "backup",
+            "inspect",
+            "/Users/vibhusapra/Documents/ChatGPT/oswind/.artifacts/sync-incoming-deletions-v1/qualification-v1/actual-old29-process/copy.oswindbackup"
+          ],
+          "returncode": 1,
+          "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderrSHA256": "0433de28417ba0e9be348d77737187af44a27a9c849b08bf6fc21223fd83560b"
+        },
+        {
+          "binary": "current30",
+          "arguments": [
+            "note",
+            "Owned current write still works"
+          ],
+          "returncode": 0,
+          "stdoutSHA256": "a3d7e8c0b6f9ffc594e5fc5abf86c83e1829f35966c49fd181e28d89a57f96aa",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "scope": "Actual older executable, owned synthetic text and complete process exits. No native recording, enrolled service, media playback, power or competitor evidence.",
+      "initializedOlderClient": {
+        "postOpenLeaseObserved": true,
+        "returncode": 1,
+        "stderrSHA256": "8ba9c8e66eca5e09ae96bedd0eb68fea63ad2e37943763b2595617b30bd22c0c"
+      },
+      "beforeFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "1b7bd1fd0c3a1869aebc088d92f113093ce1d19b008b5d7e6975dc0f84c90db2"
+      },
+      "afterFreshRefusalsSQLiteFiles": {
+        "memory.sqlite-wal": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "memory.sqlite-shm": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb",
+        "memory.sqlite": "1b7bd1fd0c3a1869aebc088d92f113093ce1d19b008b5d7e6975dc0f84c90db2"
+      },
+      "sourceSchema": 29,
+      "targetSchema": 30,
+      "allChildrenTerminal": true
+    }
+  }
+}
