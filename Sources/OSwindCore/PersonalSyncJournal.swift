@@ -110,10 +110,20 @@ struct SyncJournal {
         let row=try db.statement("INSERT INTO personal_sync_observed(singleton,clock) VALUES(1,?)");defer {sqlite3_finalize(row)}
         let data=try SyncProtocolLimits.encode(observed);data.withUnsafeBytes {_=sqlite3_bind_blob(row,1,$0.baseAddress,Int32(data.count),db.transient)};try db.done(row)
     }
-    private func observeDeletion(_ clock:SyncClock)throws {
+    private func mergeObservedClock(_ clock:SyncClock)throws {
         let merged=try observedClock().merged(with:clock),data=try SyncProtocolLimits.encode(merged)
         let row=try database.statement("UPDATE personal_sync_observed SET clock=? WHERE singleton=1");defer {sqlite3_finalize(row)};bind(row,1,data);try database.done(row)
         guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Sync observation state changed")}
+    }
+    /// Typed admission can publish derived local changes before the outer
+    /// receive advances its peer cursor. Carry the admitted root's clock into
+    /// those writes; callers cannot supply an unauthenticated clock.
+    func observeAppliedRoot(_ key:SyncObjectKey)throws {
+        try scoped {
+            let root=try readState(for:key)
+            guard root.isDeleted || root.heads.count==1 else {throw OSwindError.invalid("Observe one admitted root before derived publication")}
+            try mergeObservedClock(root.clock)
+        }
     }
     private func scoped<T>(_ body:()throws->T)throws->T {
         try Self.transaction(database) {
@@ -247,7 +257,7 @@ struct SyncJournal {
                 defer {sqlite3_finalize(pending)};database.bind(pending,1,revision.dot.replica);sqlite3_bind_int64(pending,2,revision.dot.counter);bind(pending,3,encoded);try database.done(pending)
                 if revision.mutation == .delete {
                     let old=try readState(for:revision.key);var next=old;try next.integrate(revision);try save(next)
-                    try observeDeletion(next.clock)
+                    try mergeObservedClock(next.clock)
                     if !old.isDeleted {try apply(.init(revision:revision,before:old,after:next))}
                 }
             }

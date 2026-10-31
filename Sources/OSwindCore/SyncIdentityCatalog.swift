@@ -137,6 +137,12 @@ struct SyncIdentityCatalog {
         return SyncLocalObject(identity:identity,primary:primary,deleted:deleted)
     }
     func object(_ identity:SyncObjectIdentity)throws->SyncLocalObject? {_=try state();let value=try readObject(identity.key.digest);guard value==nil || value!.identity==identity else {throw OSwindError.database("Sync object identity differs")};return value}
+    func nativeExists(for key:SyncObjectKey)throws->Bool {
+        _=try state();guard let object=try readObject(key.digest) else {return false}
+        guard object.identity.table.kind==key.kind else {throw OSwindError.database("Derived retirement identity kind differs")}
+        guard !object.deleted,let primary=object.primary else {return false}
+        return try exists(object.identity.table,primary)
+    }
     func localIdentity(_ table:SyncCanonicalTable,primary:[SyncRowCell])throws->SyncObjectIdentity {
         _=try state();let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
         guard let value=try current(table,key),!value.deleted,value.primary==primary else {throw OSwindError.unavailable("The local sync lifetime is unavailable")};return value.identity

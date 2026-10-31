@@ -1,5 +1,14 @@
 # OSwind delivery ledger
 
+
+## Derived child retirement — functional component verified
+
+The common incoming update/deletion entry now captures exact native child removals and explicit source/citation retirements, then publishes genuine child barriers and retires their mappings/cache in the same receipt transaction. TEMP state is inactive between operations and absent after reopening. The admitted root clock is observed before child publication, including incoming updates whose peer cursor has not advanced yet.
+
+[Eleven new cases](SYNC-DERIVED-RETIREMENT.md) cover three replicas, late offline put, update-removed receiver mention, independent objects, recipe/run and entity/mention, second-announcement rollback, NUL keys, TEMP protection/lifetime, and actual owned pre/postcommit SIGKILL/media/retry. Three real counterexamples are retained red then green. The [twenty-stage receipt](../benchmarks/sync-derived-retirement-v1.json) passes 1,612 full cases/80 explicit skips and 612 sanitizer/612 optimized cases, each with 20 skips. All 15 sanitizer logs have no race warnings; all 710 repository inputs and 456 Sources/Tests/Vendor inputs match across gates. A new strict signed/extracted 34-file app passes CLI/API/MCP/SDK, old30 refusal, entity/correction/metadata, erasure/wipe, recaps/routines and backup interruptions. Installed 15 and four prior staged trees stay unchanged. Parent `17b6bdf` passes both hosted jobs in run 41237079460.
+
+Schema31 and all 78 statuses remain unchanged; F059 stays TODO. Scoped/wipe epochs and compaction, production current-policy/media/transport admission, enrollment/key recovery, native status/conflict UI, actual providers/two-Mac, representative scale/power and distribution remain open. Collector batching/no-child observation cost and late unseen dependent-record handling need further measurement/integration.
+
 ## Incoming source erasure — functional component verified
 
 Schema31 routes peer source tombstones through native/original/cache erasure in the receipt transaction. Retained exact citations select their answer/recap lifetime even when the native citation differs; inactive mappings preserve replacement rows. Cache-only media stages before projection removal and waits for exclusive post-commit cleanup. Incoming deletion preserves independent entity definitions for deferred sources.

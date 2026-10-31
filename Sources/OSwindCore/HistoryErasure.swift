@@ -114,13 +114,13 @@ extension RoutineDatabase {
     }
     /// The current native key is supplied only for the active mapped lifetime.
     /// Originals are selected by global digest even when that mapping is gone.
-    func preparePeerSourceErasure(_ digest:String,activeKey:Data?)throws {
+    func preparePeerSourceErasure(_ digest:String,activeKey:Data?)throws->[SyncObjectIdentity] {
         try SyncProtocolLimits.digest(digest);try resetErasureSelection();try HistoricalErasureSchema.validate(self)
         if let activeKey {
             let row=try statement("INSERT INTO temp.erasure_ids SELECT id FROM memories WHERE id IS ?");defer {sqlite3_finalize(row)}
             activeKey.withUnsafeBytes {_=sqlite3_bind_text64(row,1,$0.baseAddress?.assumingMemoryBound(to:CChar.self),UInt64(activeKey.count),transient,UInt8(SQLITE_UTF8))};try done(row)
         }
-        let originals=try statement("INSERT INTO temp.erasure_historical_ids SELECT handle,1 FROM historical_evidence WHERE object_digest=?");defer {sqlite3_finalize(originals)};bind(originals,1,digest);try done(originals);try expandErasureSelection();try SyncPeerSourceErasurePlan.select(self,object:digest)
+        let originals=try statement("INSERT INTO temp.erasure_historical_ids SELECT handle,1 FROM historical_evidence WHERE object_digest=?");defer {sqlite3_finalize(originals)};bind(originals,1,digest);try done(originals);try expandErasureSelection();return try SyncPeerSourceErasurePlan.select(self,object:digest)
     }
     func prepareOldestErasure(limit:Int) throws {
         guard (1...128).contains(limit) else {throw OSwindError.invalid("Invalid erasure batch bound")}
