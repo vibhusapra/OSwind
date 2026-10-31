@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Synthetic text export size/scaling check; not a competitor or power benchmark."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse
 import hashlib
 import json
@@ -27,6 +28,7 @@ with tempfile.TemporaryDirectory(prefix="oswind-markdown-benchmark-") as tempora
         return subprocess.run([str(binary), "--data", str(library), *map(str, args)], capture_output=True, text=True, check=True, timeout=1800).stdout
     identifier = cli("note", "Synthetic template").strip()
     connection = sqlite3.connect(library / "memory.sqlite")
+    register_inactive_sync_fixture(connection)
     connection.execute("PRAGMA foreign_keys=ON")
     template = json.loads(connection.execute("SELECT payload FROM memories WHERE id=?", (identifier,)).fetchone()[0])
     connection.execute("DELETE FROM memories")

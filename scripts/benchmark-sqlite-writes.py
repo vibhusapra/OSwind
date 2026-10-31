@@ -4,6 +4,7 @@
 Uses the supplied OSwind CLI to create isolated libraries, then exercises their
 actual triggers/indexes through SQLite. Not an end-to-end ingestion benchmark.
 """
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,contextlib,hashlib,json,pathlib,sqlite3,statistics,subprocess,time
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',required=True,type=pathlib.Path);p.add_argument('--records',type=int,default=2000);p.add_argument('--repetitions',type=int,default=3);a=p.parse_args()
 assert 100<=a.records<=10000 and 1<=a.repetitions<=10
@@ -22,6 +23,7 @@ for case,text_bytes,tags in [('untagged1k',1024,[]),('tagged1k',1024,['release',
             source['favorite']=True;updates.append((1,json.dumps(source,separators=(',',':')).encode(),id))
             source['tags']=['review','shared'];edits.append((json.dumps(source,separators=(',',':')).encode(),id));identifiers.append((id,))
         with contextlib.closing(sqlite3.connect(library/'memory.sqlite')) as db:
+            register_inactive_sync_fixture(db)
             db.execute('PRAGMA foreign_keys=ON');db.execute('PRAGMA secure_delete=ON');db.execute('PRAGMA synchronous=NORMAL');db.execute('PRAGMA busy_timeout=5000')
             indexed=bool(db.execute("SELECT COUNT(*) FROM sqlite_master WHERE name='memory_tags'").fetchone()[0])
             phases={}

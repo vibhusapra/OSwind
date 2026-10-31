@@ -4,6 +4,7 @@
 Only generated text is imported. Roots must not exist. Timings include CLI startup,
 SQLite and extraction/resume with uncontrolled caches; no power/competitor claim.
 """
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,contextlib,hashlib,json,pathlib,sqlite3,statistics,subprocess,time
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',required=True,type=pathlib.Path);p.add_argument('--baseline-cli',type=pathlib.Path);p.add_argument('--sources',type=int,default=1000);p.add_argument('--repetitions',type=int,default=3);a=p.parse_args()
 assert 3<=a.sources<=100000 and 1<=a.repetitions<=10
@@ -54,6 +55,7 @@ def qualify(label,binary,preserves):
  # Restores may contain an uncurated project. Completing a plan without it
  # and subsequently curating it adds rules, even with identical aliases/name.
  with contextlib.closing(sqlite3.connect(restored/'memory.sqlite')) as db:
+  register_inactive_sync_fixture(db)
   db.execute('UPDATE memory_entities SET curated=0 WHERE id=?',(project['id'],))
   db.execute("DELETE FROM entity_mentions WHERE entity_id=? AND origin='automatic'",(project['id'],));db.commit()
  uncuratedArchive=library.parent/'uncurated.oswindbackup'

@@ -45,3 +45,7 @@ Before F059 can be delivered:
 ## Primary references
 
 [SQLite application-defined functions](https://www.sqlite.org/appfunc.html) are registered per connection; the pure framing functions are marked deterministic and innocuous. [Function creation and flags](https://www.sqlite.org/c3ref/create_function.html) distinguish functions allowed in schema elements from direct-only functions. [Trigger semantics](https://www.sqlite.org/lang_createtrigger.html) motivate checking real columns/primary keys rather than trusting an UPDATE OF list.
+
+## Additional direct-SQL fixture audit
+
+The 31-stage local run at 793574e passes and independent review verifies all 774 inputs, 1,377 full passes / five skips, 322 sanitizer and 322 optimized passes / two worker skips each, authored 1k/100k/1m oracles, signed package/process paths and 11 absent native images. The installed 15-file app remains unchanged. This does not supersede hosted CI: source13ec fails its project-metadata smoke at an additional raw uncurated-project setup write, reproduced locally against the qualified 793 binary. The same inactive-only helper is now applied there and to five maintained authored benchmark loaders. An AST inventory distinguishes these current loaders from explicit unregistered-writer controls, synthetic mock databases and the pinned historical schema13 harness. No Swift, test, SDK, CI, model, asset or packaged product bytes change in this follow-up. Fresh small-fixture process checks are pending; original local/hosted failure evidence and the completed 31-stage run stay retained.

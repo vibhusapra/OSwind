@@ -10,6 +10,8 @@
 
 - A legacy raw deletion-fixture writer also reproduces missing functions. Qualification attempt two is deliberately stopped and retained before fixture edits. Six owned CLI scripts now admit only disabled/unsuppressed fixture setup with callbacks that always refuse if executed. Five offline refusal contracts and all six development process groups pass (including interruption and CPU/CoreML PII checks) against the earlier staged binary. Fresh corrected-source qualification repeats these processes; no active sync-writer behavior is inferred from this helper.
 
+- The 31-stage run at 793574e and independent review pass (1,377 full, 322 TSan, 322 optimized passes; explicit skips retained; 1m oracle and signed package pass). Hosted13ec then exposes a seventh raw smoke fixture writer, reproduced locally against793. An AST audit adapts project-metadata setup and five maintained benchmark loaders with the inactive-only helper. Product Swift/test/SDK/CI/model/asset/package bytes stay unchanged; focused fixture follow-up remains pending. The completed run is source-specific and is not a claim that hosted CI passed.
+
 ## Personal device sync — PR #93 / source 57c1926 — internal foundation qualified
 
 - [Delivery requirements and implementation state](PERSONAL-SYNC.md) retain the complete sync scope: bidirectional offline changes, original evidence and user state, conflict handling, privacy erasure, encrypted transport, enrollment/revocation and native/CLI workflows. F059 stays TODO until a user can configure and use complete supported-library sync.

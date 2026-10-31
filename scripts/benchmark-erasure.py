@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generated source/media erasure scaling trial. Never opens an existing fixture/library."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse, hashlib, json, pathlib, re, sqlite3, subprocess, time
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary');p.add_argument('--root',required=True);p.add_argument('--records',type=int,default=20000);p.add_argument('--retention',action='store_true',help='Exercise age-based prune with alternating old/future captures');o=p.parse_args()
 assert o.records>=2 and o.records%2==0
@@ -12,6 +13,7 @@ def run(label,*args):
     return json.loads(stdout.read_text()) if stdout.read_text().lstrip().startswith(('{','[')) else stdout.read_text().strip(),dict(wall_seconds=elapsed,peak_rss_bytes=int(match[1]) if match else None)
 seed,_=run('seed','note','Owned generated erasure seed')
 with sqlite3.connect(library/'memory.sqlite') as db:
+    register_inactive_sync_fixture(db)
     db.execute('PRAGMA foreign_keys=ON');template=json.loads(db.execute('SELECT payload FROM memories').fetchone()[0]);db.execute('DELETE FROM memories')
     for i in range(o.records):
         identifier='generated-'+str(i);domain='alpha.test' if i%2==0 else 'beta.test';captured=4070908800 if o.retention and i%2 else 1000;payload=dict(template,id=identifier,timestamp=captured-978307200,app='Safari',bundleID='com.oswind.generated',title='Generated '+str(i),kind='screen',url='https://'+domain+'/item',text='Owned generated text '+str(i),imagePath='images/pair-'+str(i//2))
@@ -23,6 +25,7 @@ for name,domain in [('shared','alpha.test'),('unique','beta.test')]:
     if o.retention:
         if name=='unique':
             with sqlite3.connect(library/'memory.sqlite') as db:
+                register_inactive_sync_fixture(db)
                 db.execute("UPDATE memories SET timestamp=1000,payload=json_set(CAST(payload AS TEXT),'$.timestamp',1000-978307200)")
         raw,measurement=run(name+'-apply','prune','--days','1','--json');result=raw['erasure'];measurement['retention']=raw
         assert raw['budgetMet'] and not raw['cancelled']
