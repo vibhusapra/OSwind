@@ -1,0 +1,665 @@
+{
+  "format": "OSwind incoming run process recovery and authored scale qualification v1",
+  "version": 1,
+  "state": "component-qualified",
+  "overallV0Complete": false,
+  "createdAtUTC": "2026-10-31T17:11:06.296122+00:00",
+  "sourceBase": "f0aac3606b856f1c4977fd6ff4ded8078f7b4968",
+  "branch": "codex/sync-routine-recovery",
+  "schema": 29,
+  "scope": "Test/reader/evidence additions only. Actual owned-worker run creation/update pre/postcommit SIGKILL and idempotent retries, plus authored warm metadata scale. Product sources unchanged. No sync delivery, physical power-loss, model/media/network/energy or ranking acceptance.",
+  "inputs": {
+    "repositoryInputs": 693,
+    "repositoryManifest": "benchmarks/sync-run-recovery-inputs-v1.json",
+    "manifestSHA256": "3f9e7b3fe54e0648b60bed3001f22e3f8a55298313bf76716448e1686b5955a9",
+    "identicalSourceAndTestInputs": 441,
+    "productInputsIdenticalToPriorImplementation": 330,
+    "phaseManifests": {
+      "qualification": {
+        "frozenInputs": 694,
+        "manifestSHA256": "bc92de5ef5412d55eba2b0fdd1049d569a49b71a40cc2e2c8c555c4cbd5c072d",
+        "driverSHA256": "4aab4df855943dde2b29d2befc475774540f4cb96a5ab706ca8e31d2b41cffa1"
+      },
+      "readerHardening": {
+        "frozenInputs": 694,
+        "manifestSHA256": "23441bfd405d2226112cfd039aabd95550ae887118de236d0a52dad57f5926a5",
+        "driverSHA256": "ed5e1958733d973168d258a8c27f8611b49f392f0cd972a112197e194ff1c2ce"
+      },
+      "measurement": {
+        "frozenInputs": 692,
+        "manifestSHA256": "7eca705530982b66c7dfc7fbbb663d80f13e0f9a0433bf3535fc5a8f719e0533",
+        "driverSHA256": "e3d82043429fbabfe5cfc58d2953fec0c76f0780dfcb12f1153c14b38de68b9f"
+      }
+    },
+    "readerEvolution": {
+      "scripts/test-sync-run-scale-review.py": {
+        "qualification": "4359c4a7ae92611abb68a6032cb26f608491779633d114e7c5febce50ffb67a0",
+        "readerHardening": "3d670e844b8e50b4db5bcbd184ed0c721d38b691515c38a385ce30e2845526dc",
+        "measurement": null
+      },
+      "scripts/test-sync-run-recovery-review.py": {
+        "qualification": "d5afbc4b2f717eace00fe8a7787d63e3aca5b4b82753402fc15e194cbf014c11",
+        "readerHardening": "d5afbc4b2f717eace00fe8a7787d63e3aca5b4b82753402fc15e194cbf014c11",
+        "measurement": "3ed3d1f48a7defc60cf82763f696031476044912608c9e45d9804748230c3984"
+      },
+      "scripts/review-sync-run-scale.py": {
+        "qualification": "70ea2955e67a7d3f24442067408fbe640a6ea59d692cea8c942a5b395f60aa12",
+        "readerHardening": "95600b2ea3e0e681b0d4fb8b2382d4b97fb960a4220de76f575e269f1e334188",
+        "measurement": null
+      },
+      "scripts/review-sync-run-recovery.py": {
+        "qualification": "4c62f18661735dae75ac04f524cbc6fb227ccf69273cd44f0787d75f7b45276b",
+        "readerHardening": "4c62f18661735dae75ac04f524cbc6fb227ccf69273cd44f0787d75f7b45276b",
+        "measurement": "dd12d62ada26d67c6c7006e6688da882242215ff9cc4d381ae2f213554d1e22a"
+      }
+    },
+    "readerEvolutionScope": "Compiled runtime/test inputs are identical. Measurement preceded new independent readers. The final scale reader/control were strengthened after qualification to bind prior traces to actual producer journal references; affected independent checks rerun on unchanged databases."
+  },
+  "tests": {
+    "full": {
+      "defined": 1644,
+      "passed": 1565,
+      "skipped": 79,
+      "failures": 0,
+      "logSHA256": "1c366de7e5076bce08343d6d5e35f1b3d8ded3168f36e3d1cbf20657d95a335b"
+    },
+    "threadSanitizer": {
+      "defined": 46,
+      "passed": 42,
+      "skipped": 4,
+      "failures": 0,
+      "logSHA256": "c6d6909b3f95755368221ed91d52cf35347a2a239a8ec91b5b2f044a59aa803d"
+    },
+    "optimized": {
+      "defined": 46,
+      "passed": 43,
+      "skipped": 3,
+      "failures": 0,
+      "logSHA256": "1e9bc82f59e79e3afadbc1d2f332f47c21800e0e23484ef8e19aa3de0c8c816f"
+    }
+  },
+  "threadSanitizer": {
+    "parentAndChildRaceWarnings": 0,
+    "retainedChildLogs": 10,
+    "logHashes": {
+      "thread-sanitizer.log": "c6d6909b3f95755368221ed91d52cf35347a2a239a8ec91b5b2f044a59aa803d",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log": "110a883c4628528ddf0b243a83a40cbf625610cfef16f17c9574dd7eb8ef1acf",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log": "110a883c4628528ddf0b243a83a40cbf625610cfef16f17c9574dd7eb8ef1acf",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log": "2e7725302a600aef17e328929aa07e87c8b6330047e469c1ef720d5a10f415a7",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log": "2e7725302a600aef17e328929aa07e87c8b6330047e469c1ef720d5a10f415a7",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log": "8557e7ce736f45d250525bb53e75b9b9ba600390d52faa5f3993d9f8b89391cc",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log": "0a7df2711822613c8c89ba71a275329faafb97d822a7505093f69d55c8883174",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log": "0a7df2711822613c8c89ba71a275329faafb97d822a7505093f69d55c8883174",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log": "2f0ff86181831fb0cf9d00176f4e2d3c787473e8f26727563d4453f410735368",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log": "2f0ff86181831fb0cf9d00176f4e2d3c787473e8f26727563d4453f410735368",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log": "61271b993f3103fcc03add8d20a101372d3df7519997c61f872eb9b45ec2051b"
+    }
+  },
+  "passingQualificationStages": [
+    {
+      "group": "qualification",
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "1c366de7e5076bce08343d6d5e35f1b3d8ded3168f36e3d1cbf20657d95a335b"
+    },
+    {
+      "group": "qualification",
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "c6d6909b3f95755368221ed91d52cf35347a2a239a8ec91b5b2f044a59aa803d"
+    },
+    {
+      "group": "qualification",
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "1e9bc82f59e79e3afadbc1d2f332f47c21800e0e23484ef8e19aa3de0c8c816f"
+    },
+    {
+      "group": "qualification",
+      "name": "debug-crash-review",
+      "returncode": 0,
+      "log": "debug-crash-review.log",
+      "logSHA256": "0c5604637f3e2a732fd8d87665827ef4abc08cf4725c48d7020e7892642dfb3d"
+    },
+    {
+      "group": "qualification",
+      "name": "sanitizer-crash-review",
+      "returncode": 0,
+      "log": "sanitizer-crash-review.log",
+      "logSHA256": "17d0f47e4c6e2f6275925b80e2710d3f2c1215975c141727e3a9be0d7f9d0417"
+    },
+    {
+      "group": "qualification",
+      "name": "optimized-crash-review",
+      "returncode": 0,
+      "log": "optimized-crash-review.log",
+      "logSHA256": "54d2118f35ce92bbae39982280b4eda6286c169dfcefe03a997a96e9dbaab36e"
+    },
+    {
+      "group": "qualification",
+      "name": "crash-reader-controls",
+      "returncode": 0,
+      "log": "crash-reader-controls.log",
+      "logSHA256": "4863e754abf1c926052da92ff85edb5028de3b43bce5de0d0ffa8bc33c73019d"
+    },
+    {
+      "group": "qualification",
+      "name": "run-scale-review",
+      "returncode": 0,
+      "log": "run-scale-review.log",
+      "logSHA256": "2c8c88446247f50472761d248f9c093a1235ea61d6f24c9b1985ef2c041ece79"
+    },
+    {
+      "group": "qualification",
+      "name": "run-scale-controls",
+      "returncode": 0,
+      "log": "run-scale-controls.log",
+      "logSHA256": "f6e5e2399d8f8655fe20b610d3ce61830ac04d0ed715fd6dd52a5e1fb46370af"
+    },
+    {
+      "group": "qualification",
+      "name": "source-scale-review",
+      "returncode": 0,
+      "log": "source-scale-review.log",
+      "logSHA256": "b3ea9e060de1a992be2d97755839a534d7a06712d701649da651ae28fec665f1"
+    },
+    {
+      "group": "qualification",
+      "name": "source-scale-controls",
+      "returncode": 0,
+      "log": "source-scale-controls.log",
+      "logSHA256": "db470cb0858492a8e31e9698b7cf5da6b22eea64da148291cb1797bf46c0a1bd"
+    },
+    {
+      "group": "readerHardening",
+      "name": "run-scale-review",
+      "returncode": 0,
+      "log": "run-scale-review.log",
+      "logSHA256": "2c8c88446247f50472761d248f9c093a1235ea61d6f24c9b1985ef2c041ece79"
+    },
+    {
+      "group": "readerHardening",
+      "name": "run-scale-controls",
+      "returncode": 0,
+      "log": "run-scale-controls.log",
+      "logSHA256": "087009b7c0c54cb92eab5f3fc233ea8ba48b43464235b8125a153d3dd6504f95"
+    }
+  ],
+  "recovery": {
+    "debug": {
+      "state": "passed",
+      "scope": "Four actual owned-worker SIGKILL cases and their retries; readonly closed producer/receiver SQLite, native frames, exact originals/wire versions, journal heads/cursors/receipts, accounting and no echo. Process death, not physical power or full sync acceptance.",
+      "results": [
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/producer/memory.sqlite": "b87891362e982aed00bd43bc6d2ae8493856449110ccfe5acace3eeba5b0cdcc",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/receiver/memory.sqlite": "33bec837439baca243b45a518854ebe654ed5650fe51e83a1e424ec407d4bf30",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/producer/memory.sqlite": "b87891362e982aed00bd43bc6d2ae8493856449110ccfe5acace3eeba5b0cdcc",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/receiver/memory.sqlite": "c4faffb3a61e0982d8cf9dd0c407ea309c8bbf66d516a73aa95ba7b25ddae2dc",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/producer/memory.sqlite": "18a5ca039cfc2626c473f4de1b5ec4a975d2661a4d1d431eaf9e2321a22497fd",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/receiver/memory.sqlite": "5aa5e39e1d400356d28114bc210823a717c8fff4e8b2b5249cb65036f6db2c32",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/producer/memory.sqlite": "18a5ca039cfc2626c473f4de1b5ec4a975d2661a4d1d431eaf9e2321a22497fd",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/receiver/memory.sqlite": "7b6e543459b064926230f88344c18c3b355543ae37bc126e2e57bb628037c891",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/producer/memory.sqlite": "e5a42489d316f63c1153dc99ce03a3a604532c18a9a0d9a9c8537aa0845430ae",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/receiver/memory.sqlite": "0dee05ee7017c7af4eba81f33e543023fa3017bc10814df2a1e621320de201ab",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/producer/memory.sqlite": "e5a42489d316f63c1153dc99ce03a3a604532c18a9a0d9a9c8537aa0845430ae",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/receiver/memory.sqlite": "15b980884d3b157df912ee1e071af0a0722ec3f1e40041bd4cbe7240ad72de39",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/producer/memory.sqlite": "f756eabac62239ef86b18c8ce36f20949fe47e84a80637337630c095b19e3bcc",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/receiver/memory.sqlite": "71419aa40b86757f5b6101e64dec3fa36d081712d449f9b18378961345609c6f",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/producer/memory.sqlite": "f756eabac62239ef86b18c8ce36f20949fe47e84a80637337630c095b19e3bcc",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/receiver/memory.sqlite": "db020edb4d4c90e6f4c111f492e3757f5e5f3d349129cfecdba7124327bc4303"
+      }
+    },
+    "threadSanitizer": {
+      "state": "passed",
+      "scope": "Four actual owned-worker SIGKILL cases and their retries; readonly closed producer/receiver SQLite, native frames, exact originals/wire versions, journal heads/cursors/receipts, accounting and no echo. Process death, not physical power or full sync acceptance.",
+      "results": [
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/producer/memory.sqlite": "2e7b18285a862674eaf9c97e5af1c7c7b2ef5f29a44bbc67487dc17c2e4da3fb",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/receiver/memory.sqlite": "31d71f27861594a5094ce2ecee2c10b7289366842daaa17df4d10259f525cace",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/producer/memory.sqlite": "2e7b18285a862674eaf9c97e5af1c7c7b2ef5f29a44bbc67487dc17c2e4da3fb",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/receiver/memory.sqlite": "9db6b58ba7072766bec66c0bf6699f659b9eb77797d22fd8ce0821e584baf981",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/producer/memory.sqlite": "c5bbba75ebad1cfc840baf8cb4d7cb6701480d6faf5ac5152eb8096279a5e07f",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/receiver/memory.sqlite": "f67ec151f84d5adc83925ef37b2dc1a9e2714bdb3f9d5ef8fc4238a4171f0948",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/producer/memory.sqlite": "c5bbba75ebad1cfc840baf8cb4d7cb6701480d6faf5ac5152eb8096279a5e07f",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/receiver/memory.sqlite": "399b08a01cce75d676239d9cadf24285ebb23e6ac5c5149c3fd1776cfdff6342",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/producer/memory.sqlite": "c8d4e8f8741ede06dd3ea2cd39c8acdd646fbae280e56d84e0eb1675b517160e",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/receiver/memory.sqlite": "d58ef55e2b044641e5f34d969af398facd8dddc404ae35a3d0573299e6b2262d",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/producer/memory.sqlite": "c8d4e8f8741ede06dd3ea2cd39c8acdd646fbae280e56d84e0eb1675b517160e",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/receiver/memory.sqlite": "47a1208c559b35b4bf2b8817a6cf5b8d46a89b76a520e6635c242f7df56b19a3",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/producer/memory.sqlite": "2eaa407cad7b12fe3cb7837a34d1abb00ff946765c4cc81241038d4250c35825",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/receiver/memory.sqlite": "9fc5c6770f27863c9577cb01d61a14e247346a53b5b6066970bdb2368a7970e0",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/producer/memory.sqlite": "2eaa407cad7b12fe3cb7837a34d1abb00ff946765c4cc81241038d4250c35825",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/receiver/memory.sqlite": "96dcd57eb9566dccaecbad09811d3eca26995e36526d0661704f47385a3f05f1"
+      }
+    },
+    "optimized": {
+      "state": "passed",
+      "scope": "Four actual owned-worker SIGKILL cases and their retries; readonly closed producer/receiver SQLite, native frames, exact originals/wire versions, journal heads/cursors/receipts, accounting and no echo. Process death, not physical power or full sync acceptance.",
+      "results": [
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "create",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-crash",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "after",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-crash",
+          "committed": false,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        },
+        {
+          "action": "update",
+          "phase": "before",
+          "state": "retained-retry",
+          "committed": true,
+          "exactOriginal": true,
+          "exactCausalHead": true,
+          "noEcho": true
+        }
+      ],
+      "unchangedSQLiteFiles": {
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/producer/memory.sqlite": "a289b75e65f038b5f13872234d36ff3b6ed5cfa90f2fd37d4e01ad475051d97a",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/receiver/memory.sqlite": "19d9bd5229f9e95eb8f0c600d709db9dff60d5b9defcb0ea2663e001a314e93a",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/producer/memory.sqlite": "a289b75e65f038b5f13872234d36ff3b6ed5cfa90f2fd37d4e01ad475051d97a",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/receiver/memory.sqlite": "7395894a17dc7054a3c9a08628d5efe491e728258c8193e2ebec228f100d6374",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/producer/memory.sqlite": "6bb99e56f16074213c982b591785ac3b81a159e678526b9351d343d0697730d9",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/receiver/memory.sqlite": "e943a27b1cc65d68bceed7a5acae8b89b39aff1c3e7e18256fcd1150a19a8595",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/producer/memory.sqlite": "6bb99e56f16074213c982b591785ac3b81a159e678526b9351d343d0697730d9",
+        "-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/receiver/memory.sqlite": "94b50b6f4ddf4e526a5afaabf26b1a2db53092f358f2ca310ad856ea67555332",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/producer/memory.sqlite": "f6b853c316059a87cc82e62f65facd894c0bfed83fab7838b3b19b8affaed770",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/receiver/memory.sqlite": "56d07d3af476a1382d273734a1a12d9cb112e7a8b54b4d28534d4516e074568a",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/producer/memory.sqlite": "f6b853c316059a87cc82e62f65facd894c0bfed83fab7838b3b19b8affaed770",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/receiver/memory.sqlite": "50b0a09d0cb8d2f3fd7b0325b2631420c3d37b00b3e5908e77127654b84ab814",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/producer/memory.sqlite": "d6f34b6b06f9b665fb585ed1bc0aed82cdfa273fdf8a2698fb9cc6ccf2fa0a84",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/receiver/memory.sqlite": "eca100bddb5f39e8fc41104cb2dfa87adc0837b3988bd8dc445f80a532fa8f2e",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/producer/memory.sqlite": "d6f34b6b06f9b665fb585ed1bc0aed82cdfa273fdf8a2698fb9cc6ccf2fa0a84",
+        "-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/receiver/memory.sqlite": "469ba7c0d174e3e26a88a9c4482659889d20b57cb4130b942824f941c9ff2d21"
+      }
+    }
+  },
+  "recoveryCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "unmarked fixture",
+      "missing committed causal head",
+      "rolled-back cursor with committed native row",
+      "forged target receipt digest",
+      "forged causal clock with exact head intact",
+      "retargeted durable recipe with recomputed checksum",
+      "missing committed target receipt",
+      "missing prior running wire version",
+      "changed native message with recomputed frame hashes",
+      "missing original deletion guard"
+    ],
+    "all16OriginalSQLiteFilesUnchanged": true
+  },
+  "runScale": {
+    "state": "passed",
+    "results": [
+      {
+        "count": 1000,
+        "incomingSeconds": 18.710689041763544,
+        "runUpdateSeconds": 0.2678395416587591,
+        "history100MedianMS": 20.35679155960679,
+        "exactOriginals": 1000,
+        "retainedPriorWireVersions": 10,
+        "allActualProducerPacketsVerified": true
+      },
+      {
+        "count": 10000,
+        "incomingSeconds": 187.32205583318137,
+        "runUpdateSeconds": 0.21535083325579762,
+        "history100MedianMS": 19.138250034302473,
+        "exactOriginals": 10000,
+        "retainedPriorWireVersions": 10,
+        "allActualProducerPacketsVerified": true
+      }
+    ],
+    "unchangedSQLiteFiles": {
+      "n1000/producer/memory.sqlite": "0fb5a9c0f4be0d8e9f0ed760c9491074ede0dea45b9dae3c730611935d0a4f2d",
+      "n1000/receiver/memory.sqlite": "779723edaaf9ec68c1a28e41f5252f3cd320aafb49f8ec905f7936e158609f9d",
+      "n10000/producer/memory.sqlite": "68aeaf33825ecccef234e44773db5edf1e7d5fa3475f71d7c5c3f4864914ae13",
+      "n10000/receiver/memory.sqlite": "82509cc16e9d5f1a0b883164610fbd78760af01f333b3707ff5ae8f65e6f50c1"
+    },
+    "scope": "One warm metadata run per size; all11000 exact actual producer/current/native/original/recipe bindings and twenty retained pre-update packets, journal receipts and accounting. No models/media/transport/cold-cache/energy/product-ranking acceptance."
+  },
+  "runScaleCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "unmarked fixture",
+      "incomplete driver",
+      "zero-test substitution with recomputed log hash",
+      "changed compiled input with recomputed manifest pin",
+      "nonfinite incoming timer with recomputed report pin",
+      "forged prior wire and matching trace with valid current state",
+      "missing native run writer fence",
+      "retargeted original recipe with recomputed reference",
+      "native correction with recomputed frame bindings",
+      "retargeted durable run recipe with recomputed checksum",
+      "missing exact pre-update wire version",
+      "forged receipt digest"
+    ],
+    "all4OriginalSQLiteFilesUnchanged": true
+  },
+  "sourceScale": {
+    "state": "reviewed",
+    "readerSHA256": "a6215b423cf015a20a2d71d1ba51ae1b7344a56afada7678f5c91f273562cf1a",
+    "frameReaderSHA256": "3f6300be9221e95bd67cb349a32d143b65533440c859a61919663ddc7e77e336",
+    "results": [
+      {
+        "count": 1000,
+        "currentProjections": 1120,
+        "cachedVersions": 1130,
+        "originals": 30,
+        "incomingSeconds": 9.564559708349407,
+        "citedUpdateSeconds": 1.7044362917076796
+      },
+      {
+        "count": 10000,
+        "currentProjections": 10120,
+        "cachedVersions": 10130,
+        "originals": 30,
+        "incomingSeconds": 93.2910562499892,
+        "citedUpdateSeconds": 1.7494977915193886
+      }
+    ],
+    "unchangedProducerAndReceiverSQLiteFiles": {
+      "n1000/producer/memory.sqlite": "bd840a3acc3fbdbda4171b7063ab9b5f2bc6b85f5ceba9f2cde54eca60ff2fb6",
+      "n1000/receiver/memory.sqlite": "65026fd84b697575360a54b02852093eb8051dc1acd05745b686c17f471ee07b",
+      "n10000/producer/memory.sqlite": "e57587125c090c857f8857fa2cc076d79d71285d0de48c45a118c2f711d6358d",
+      "n10000/receiver/memory.sqlite": "2bfcfc24193d76bd5399db8b171bcc905149ad5ec52f767153ec1ff3c9aab73c"
+    },
+    "scope": "One warm authored 1KiB note run per size,128-record incoming transactions and ten cited updates with two recap levels. Exact current frames/packets, archival native projections/DAG/accounting and old chain content independently verified. Excludes media, models, transport, policy inference, cold cache, physical power and competitor ranking."
+  },
+  "sourceScaleCorruptionControls": {
+    "state": "passed",
+    "controls": [
+      "unrun incoming phase",
+      "nonfinite incoming timer",
+      "unmarked corpus",
+      "missing source writer protection",
+      "forged current native frame binding",
+      "missing archival parent edge",
+      "forged original native projection",
+      "retargeted pin with valid independent foreign keys"
+    ],
+    "originalFixturesUnchanged": true
+  },
+  "sourceSingleWarmReference": {
+    "results": [
+      {
+        "count": 1000,
+        "priorSchema28ReceiveSeconds": 8.928084708284587,
+        "schema29ReceiveSeconds": 9.564559708349407,
+        "observedSingleSampleDeltaPercent": 7.128908616584018,
+        "priorCitedUpdateSeconds": 1.696341208415106,
+        "schema29CitedUpdateSeconds": 1.7044362917076796
+      },
+      {
+        "count": 10000,
+        "priorSchema28ReceiveSeconds": 90.66416437504813,
+        "schema29ReceiveSeconds": 93.2910562499892,
+        "observedSingleSampleDeltaPercent": 2.897387179431199,
+        "priorCitedUpdateSeconds": 1.6654803750570863,
+        "schema29CitedUpdateSeconds": 1.7494977915193886
+      }
+    ],
+    "identicalScaleTestSHA256": "89fd6cdc4a7805e5b972988f46aa1e2084bf6a7b1eb1c76da86aa9486046370b",
+    "scope": "Same authored workload/test source; separate warm samples with uncontrolled cache/system/thermal state. Observed deltas are not a controlled attribution or statistical regression estimate."
+  },
+  "retainedFailures": [
+    {
+      "attempt": "development-v2",
+      "kind": "Test-only throwing boolean guard compile error; fixed before measurement",
+      "logSHA256": "6fc066036b27fa021edcb462863c466219f25f7387c05c38dd0efec77d43dce6"
+    },
+    {
+      "attempt": "reader-hardening-v1",
+      "kind": "Actual false admission of forged prior wire plus matching trace; fixed producer-journal anchor and rerun12 controls",
+      "logSHA256": "48576a3f42197cea4a4151ad624ac76b8b33c912a2e00b563925314441c860c7",
+      "oldOracleFiles": {
+        "test-sync-run-scale-review.py": "3d670e844b8e50b4db5bcbd184ed0c721d38b691515c38a385ce30e2845526dc",
+        "review-sync-incoming-routines.py": "1d5a71eac84b4e6e1aa761ed9d59f1d9d30976cb78c0a5029732b277bb048e93",
+        "review-sync-run-scale.py": "70ea2955e67a7d3f24442067408fbe640a6ea59d692cea8c942a5b395f60aa12",
+        "review-sync-identity-scale.py": "3f6300be9221e95bd67cb349a32d143b65533440c859a61919663ddc7e77e336"
+      }
+    }
+  ],
+  "inheritedStagedPackage": {
+    "implementation": "f0aac3606b856f1c4977fd6ff4ded8078f7b4968",
+    "newBuildPerformed": false,
+    "productSourceInputsUnchanged": true,
+    "all34StagedFilesUnchanged": true,
+    "strictSignatureReverified": true,
+    "cliSHA256": "71a7591d1666a69e63f10d11b49c4a7fd8000849a23c9240a4f155f58c1381ed",
+    "zipSHA256": "9a41a9306e7afb38c90c8ec9f82dcf8190a112fb2d1ecbe192d1012afd286ba5",
+    "installed15FilesUnchanged": true,
+    "scope": "Prior25-stage recipe/run adapter validation and exact existing signed package, retained unchanged. No new distribution/native UI acceptance."
+  },
+  "featureStatusesUnchanged": true,
+  "F059": "TODO",
+  "remaining": [
+    "Complete entity/alias/mention/correction/deletion adapters",
+    "Current privacy/erasure epochs and safe media staging",
+    "Production service/lifecycle, enrollment/recovery/conflict UX and encrypted provider integration",
+    "Actual two-Mac/native capture/power/physical/distribution acceptance",
+    "Representative paired benchmarks and competitor ranking"
+  ],
+  "hardwareSnapshotAfterMeasurement": {
+    "observedAtUTC": "2026-10-31T17:14:18.709732+00:00",
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "macOSBuild": "25G83",
+    "swift": "Apple Swift6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)",
+    "target": "arm64-apple-macosx26.0",
+    "powerAndThermalStateDuringMeasurement": "not captured"
+  },
+  "parentCI": {
+    "head": "f0aac3606b856f1c4977fd6ff4ded8078f7b4968",
+    "run": 41220332251,
+    "native": "success",
+    "benchmarkHarnesses": "success"
+  }
+}

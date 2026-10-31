@@ -1,12 +1,22 @@
 # OSwind delivery ledger
 
+## Routine import recovery and authored scale — component qualified
+
+[Recovery/scale evidence](SYNC-RUN-RECOVERY.md) closes the run-specific process-death and metadata-scale gates without changing product sources. Four actual owned-worker create/update pre/postcommit SIGKILL cases and their idempotent retries preserve exact originals, native frames, cached versions, durable recipe bindings, causal heads/receipts and no outgoing echo. Independent three-build reviews preserve all 48 inspected SQLite files; ten recovery controls pass.
+
+The [thirteen-stage receipt](../benchmarks/sync-run-recovery-v1.json) passes 1,565 full cases/79 explicit skips, 42 selected TSan/four skips and 43 optimized/three skips. Parent plus ten child logs have no race warnings. All 441 source/test inputs match; 330 product inputs equal `f0aac360`. The exact prior 34-file app/ZIP, strict staged signature and installed 15 files remain unchanged; no new app build is claimed.
+
+One warm 1k/10k run import takes 18.71/187.32 seconds in 128-record transactions; ten updates take 0.268/0.215 seconds. Seven warm 100-item history reads have medians 20.36/19.14ms. All 11,000 originals/current packets and twenty retained pre-update records pass independent producer/native/journal checks and twelve corruption/admission controls. A genuine old-oracle false admission is retained; final validation anchors prior traces to actual producer journal references. No runtime/benchmark code changed for that correction.
+
+Schema 29 source receive takes 9.56/93.29 seconds versus the prior single warm 8.93/90.66-second sample. Uncontrolled cache/system/thermal state prevents attributing the +7.1%/+2.9% observed deltas. All 11,000 sources/60 archival projections and eight controls pass. Model/media/policy inference/transport/cold-cache/power and ranking remain excluded. Entity/correction/deletion, privacy/epoch/media/service/enrollment/providers/two-Mac and physical/distribution gates remain open. F059 and all 78 statuses stay unchanged.
+
 ## Incoming recipes and run history — tested internal adapter
 
-[Schema29 work](SYNC-INCOMING-ROUTINES.md) projects recipes disabled with local AI defaults and records peer runs without execution. Exact original run/recipe attribution stays separate from current editor state and native safe status. Actual28 native/cache migration, restart, quiet restore/re-export, mutation cleanup, late-admission rollback and scoped permits pass.
+[Schema 29 work](SYNC-INCOMING-ROUTINES.md) projects recipes disabled with local AI defaults and records peer runs without execution. Exact original run/recipe attribution stays separate from current editor state and native safe status. Actual28 native/cache migration, restart, quiet restore/re-export, mutation cleanup, late-admission rollback and scoped permits pass.
 
 The [validation receipt](../benchmarks/sync-incoming-routines-v1.json) records 25 passing stages: 1,561 full passes/77 explicit skips, 429 TSan passes/15 skips/no race warnings and 429 optimized passes/15 skips. Independent producer/native/original checks and seven corruption controls pass. SDK, staged normal/indexed API/MCP, erasure/deletion/retention/wipe/recap/backup interruptions, actual old28 refusal, readonly old27 historical restore and original-run quiet portability pass. All 34 ZIP files/signatures match; the installed 15-file app remains unchanged and fixtures are excluded.
 
-All 439 tracked source/test inputs match. There are 686 common tracked repository inputs across builds and process checks; the final manifest has 687 after the separately corrected capture accounting oracle. Earlier failures remain retained. Run-specific SIGKILL and throughput gates, complete graph/deletion/privacy/epoch/media/service/enrollment/provider/two-Mac and physical/distribution acceptance remain open. F059 and all 78 statuses stay unchanged. Hosted CI for the forthcoming draft is pending.
+All 439 tracked source/test inputs match. There are 686 common tracked repository inputs across builds and process checks; the final manifest has 687 after the separately corrected capture accounting oracle. Earlier failures remain retained. Run-specific SIGKILL and throughput gates, complete graph/deletion/privacy/epoch/media/service/enrollment/provider/two-Mac and physical/distribution acceptance remain open. F059 and all 78 statuses stay unchanged. The exact adapter head `f0aac360` passes hosted run 41220332251 in both jobs.
 
 ## Incoming source projection and preservation — component qualified
 
@@ -16,7 +26,7 @@ The [24-stage receipt](../benchmarks/sync-incoming-sources-v1.json) verifies 677
 
 Independent review checks 11,000 incoming sources and actual producer packets, all current frames, 60 archival native projections/DAGs/accounting, exact citation/pin versions and original chain content. Eight corruption controls pass. A separate retained pre/postcommit process-death review preserves both receiver SQLite files. Final warm1k / 10k incoming times are 8.93 / 90.66s in 128-record batches; ten cited updates take 1.70 / 1.67s. No models/media/transport, cold-cache/power or competitor rank is measured. Real source/shared-adapter regressions and fixture/reader/compiler failures remain retained.
 
-F059 remains TODO and all 78 feature statuses stay unchanged. Complete recipe/entity/correction/deletion adapters, safe media staging, current-policy/epochs, service/enrollment/transport/provenance/providers/two-Mac, historical media/export/save-recap, native/physical capture/power and distribution remain open. New exact-head hosted CI is pending.
+F059 remains TODO and all 78 feature statuses stay unchanged. Complete recipe/entity/correction/deletion adapters, safe media staging, current-policy/epochs, service/enrollment/transport/provenance/providers/two-Mac, historical media/export/save-recap, native/physical capture/power and distribution remain open. Exact source-head `99cf659` passes hosted run 41217816734 in both jobs.
 
 ## Original-field erasure and retention — component qualified
 

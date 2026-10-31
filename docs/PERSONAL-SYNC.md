@@ -24,7 +24,7 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
-[Incoming sources and original preservation](SYNC-INCOMING-SOURCES.md) are component-qualified schema-28 work in [PR #106](https://github.com/vibhusapra/OSwind/pull/106), stacked on the qualified historical-citation and original-field erasure components. Exact source/recap/answer/pin graphs and ordinary local privacy invalidation have retained frozen evidence. [Incoming recipes and run history](SYNC-INCOMING-ROUTINES.md) are schema-29 work in development. Complete graph/deletion/policy/media/service and two-Mac acceptance remain unfinished; F059 stays TODO.
+[Incoming sources and original preservation](SYNC-INCOMING-SOURCES.md) are component-qualified schema-28 work in [PR #106](https://github.com/vibhusapra/OSwind/pull/106), stacked on the qualified historical-citation and original-field erasure components. Exact source/recap/answer/pin graphs and ordinary local privacy invalidation have retained frozen evidence. [Incoming recipes and run history](SYNC-INCOMING-ROUTINES.md) are tested internal schema-29 adapters; [run-specific recovery and authored scale](SYNC-RUN-RECOVERY.md) now have frozen evidence. Complete graph/deletion/policy/media/service and two-Mac acceptance remain unfinished; F059 stays TODO.
 
 The internal SQLite journal now commits its metadata, outbox/cursors and a typed caller's source mutation in the same transaction. Failed admission rolls back all of them; nested library transactions can roll back released inner savepoints. Membership is explicit, durable receipts refuse reused sequences, reordered packets persist until predecessors/content arrive, and deletion barriers apply before an older missing body can be reintroduced. Each writing connection must explicitly prepare SQLite FULL synchronization. Workspace identity and monotonic cursor checks refuse stale or corrupted writer state. Concurrent edits require explicit resolution against the exact reviewed heads.
 
@@ -66,6 +66,8 @@ The two full-suite skips are the explicit opt-in system-audio fixture and subpro
 - [x] Disabled schema25 same-transaction canonical local intent capture, connection/old-writer fences and authored scale/process qualification. See [capture receipt](../benchmarks/sync-change-capture-v1.json).
 - [x] [Bounded automatic outgoing bootstrap/capture-to-work-to-typed-journal processor](SYNC-OUTGOING-PROCESSOR.md) across all 13 tables, with durable staging, dependency ordering, mandatory admission callbacks, real crash recovery and independently checked authored scale.
 - [ ] Deliver the complete capture-to-protocol service: production privacy/epoch admission, media staging/transport, lifecycle/scheduling and public enablement remain unfinished. Ordinary schema25 opening stays capture-disabled.
+- [x] Internal incoming source/recap/answer/pin graphs with exact cited originals.
+- [x] Internal paused recipe/run projection, exact old prompts/status, quiet restore/re-export and run-specific recovery/scale.
 - [ ] All typed graph/media adapters, persistent source-version/citation identity, current-policy egress and local scan provenance.
 - [ ] Scoped erasure, whole-library wipe/epoch barriers, deletion announcements, acknowledgement-based compaction and encrypted-cache retention.
 - [ ] Trusted initial bootstrap, Keychain enrollment/recovery, membership/revocation and rollback checkpoints.
