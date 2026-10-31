@@ -1,5 +1,14 @@
 # OSwind delivery ledger
 
+## Late dependent records - local functional qualification passed
+
+[The component](SYNC-LATE-DEPENDENCIES.md) retires late owning/evidence children whose parent barrier is already admitted, publishes real causal deletions atomically and permits unrelated later sender records. Seventeen new methods include conflict heads, cancellation/reservation guards, stale recap ownership and real pre/postcommit SIGKILL. Final 23 selected: 22 pass / one worker skip, versus45 assertions / 14 unexpected errors on the old writer.
+
+[All 22 local stages pass](../benchmarks/sync-late-dependencies-v1.json):1,635 full passes / 82 skips; broad sanitizer and release 635 each / 22 skips. All16 new mandatory parents execute in each build; 17 sanitizer logs have no race warnings. All 727 frozen inputs match, including 725 repository inputs / 465 Sources/Tests/Vendor files. A strict signed/extracted 34-file app and inherited process/old30/backup/reader checks pass; installed 15 files and four prior staged trees are unchanged.
+
+F059 stays TODO. Optional retired scopes/run conversation provenance, publication-group visibility, epochs/compaction/service/providers/two-Mac and paired overhead remain open. Parent PR #113 native CI fails in a changed-source encrypted migration detach (exit16, five assertions, destination closing); traces do not establish its cause. A local pinned release single case passes but does not resolve the CI failure; debug group reproduction is running.
+
+
 ## October31 scope refresh — five newly tracked gaps
 
 [Primary-source notes](landscape-source-checks-2026-10-31.json) refresh six of the twenty offering profiles: Screenpipe, original Rewind/Limitless, Rewind Desktop, Pieces, Littlebird and Granola. Existing profile dates stay explicit for the other fourteen. Plan/entitlement conflicts, failed direct fetches, search-cache-only quotes and different resource estimates remain separate from runtime and checkout evidence.

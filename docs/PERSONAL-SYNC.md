@@ -98,3 +98,5 @@ F059 remains TODO. No public Sync control, cloud transfer, device enrollment or 
 
 - [Apple AES.GCM](https://developer.apple.com/documentation/cryptokit/aes/gcm) and [HKDF](https://developer.apple.com/documentation/cryptokit/hkdf); SDK interfaces are also checked locally when web Markdown is unavailable.
 - [SQLite trigger semantics](https://sqlite.org/lang_createtrigger.html): durable non-TEMP triggers are needed for cross-connection mutation coverage. Install-time validation must verify actual columns because unknown UPDATE OF columns are silently ignored by SQLite.
+
+[Late dependent retirement](SYNC-LATE-DEPENDENCIES.md) passes 22 local functional stages over 725 repository inputs. Known erased owning/evidence parents no longer force an endless dependency-fetch refusal for the tested late child kinds; genuine barriers and later sender progress are verified. Optional references, unseen citation visibility, early out-of-order gap acceptance, service/providers/two-Mac and representative performance remain required. F059 remains TODO.

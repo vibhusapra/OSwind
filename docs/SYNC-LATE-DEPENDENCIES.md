@@ -1,0 +1,49 @@
+# Late dependent sync records
+
+An offline device can create an answer, recap, run or entity link before learning that another device erased its parent. Previously, receiving that unseen child tried to prepare an erased dependency, rolled back and blocked later records from the same sender. The internal common writer now retires that admitted lifetime in the receipt transaction and can continue to an independent later record.
+
+This is a functionally qualified internal component on schema 31. [All 22 local stages pass](../benchmarks/sync-late-dependencies-v1.json), with [725 repository input hashes](../benchmarks/sync-late-dependencies-inputs-v1.json). Complete synchronization and F059 remain unfinished. The new writer's performance has not yet been paired against the published parent.
+
+## Behavior and ownership
+
+Canonical packet bytes must match an actual admitted head. The writer reads durable parent states before body-policy, dependency-fetch or media callbacks. If an owning/evidence parent is already deleted, it publishes a genuine local deletion and uses the existing native/catalog/cache retirement transaction. The deletion context must dominate the parent barriers and every admitted child head. A failed announcement rolls back the incoming receipt, cursor, local sequence, observed clock and barriers together.
+
+| Incoming kind | Owning/evidence dependency |
+| --- | --- |
+| Recap source | Sources embedded in its authoritative recap packet |
+| Turn | Conversation |
+| Answer/recap citation | Owner and exact source lifetime |
+| Routine run | Recipe lifetime |
+| Alias | Entity definition |
+| Mention | Source and entity definition |
+| Name correction | Source |
+| Project correction | Source and project definition |
+| Evidence pin | Source |
+
+Independent conversation, recipe and entity definitions acquire no dependency retirement solely to make projection easier. Missing live owners remain retryable, with no false barrier or acknowledged child. Ordinary positive conflicts still require review. Privacy retirement may retire a conflicted lifetime only when its supplied packet matches an admitted head; its barrier observes all concurrent heads.
+
+An erased answer citation also retires its answer lifetime conservatively. A derived recap row cannot erase an independent named source merely by claiming it as owner; the recap source's own packet carries its authoritative source list. A canonically valid stale row referencing erased evidence can be retired without projecting its body or inventing a dependency fetch.
+
+`applyOutcome` returns either a projected local identifier or an explicit retired lifetime/parent list. The internal compatibility `apply` returns an empty string for retirement. Future service code must distinguish outcomes explicitly and route already-deleted journal changes through deletion handling.
+
+## Verified evidence
+
+Seventeen new methods cover turns, runs, aliases, mentions, name/project corrections, recaps, pins, answer-citation owner retirement, stale recap ownership, missing-live preparation, concurrent heads, reservations/connections, cancellation and actual pre/postcommit process death. Sixteen are mandatory parent cases; the guarded crash worker runs only in its owned subprocess.
+
+The finalized 23-case selection passes 22 / one worker skip. The same exact fixtures fail against the old writer with 45 assertions / 14 unexpected errors; compilation and fixture mistakes are retained separately. The final frozen qualification reports:
+
+- Full debug: 1,635 passes / 82 explicit skips/zero failures.
+- Broad Thread Sanitizer and release: 635 passes / 22 explicit skips each; all 16 new mandatory cases execute in every build.
+- Seventeen retained parent/worker sanitizer logs contain no race warnings. Both new crash-worker logs are retained. Parents SIGKILL only their own worker before/after receipt commit, inspect the actual database before opening, then verify retry, causal barriers and later sender progress.
+- Eleven corrupt copies of actual indexed benchmark output refuse; restored positive review passes and original databases remain unchanged. Prior actual projection/original evidence also passes independent review.
+- A new ad-hoc-signed app passes SDK/API/MCP, actual old30 refusal, entity/correction/metadata, capture, original erasure, deletion/wipe, recap/routine and interrupted-backup processes. Strict staged/extracted signatures and all 34 file hashes agree. Installed 15 files and four prior staged trees remain unchanged.
+
+## Remaining delivery gates
+
+- Verify early out-of-order parent tombstones followed by unseen children while predecessor gaps remain.
+- Preserve optional deleted references separately: an erased entity filter must not become an unscoped query; deleting an independent optional conversation must not delete an unrelated run or discard exact original provenance. These paths are unimplemented.
+- Add publication-group/epoch visibility before exposing an answer whose citation edges have not arrived. Per-record retirement cannot infer unseen edges.
+- Finish scoped/wipe collection barriers, compaction, production policy/media/transport admission, service/enrollment/recovery/conflict UI and actual providers/two-Mac acceptance.
+- Measure positive-path overhead and candidate-only late-record scale. Warm component results do not establish physical power, native sustained capture, distribution or competitor rank.
+
+Parent PR #113's hosted native job fails in `testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal`: detach exits 16, its destination remains closing and its owned image is preserved. The build/test step and benchmark job pass. Artifact 13061034823 and all five assertions are retained; those uploaded traces do not cover this exact migration, so its cause remains unproven. A pinned local release single-case reproduction passes without reader samples; a debug 37-case reproduction with owned-reader metadata is underway. This local qualification does not resolve or replace that CI failure.

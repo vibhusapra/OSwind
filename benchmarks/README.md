@@ -1,5 +1,8 @@
 # Benchmark protocol and results
 
+[Late dependent records](sync-late-dependencies-v1.json):22 local stages, 1,635 full passes / 82 skips, 635 sanitizer and 635 release passes / 22 skips each. Source 725-input manifest and 17 retained sanitizer logs; complete sync/performance and parent native migration CI remain open.
+
+
 Latest: [sync mutation tradeoff](sync-mutation-cost-v1.json), three paired rounds with all12 workloads/reviews, setup/projection regressions and index storage cost retained. [Protocol](../docs/SYNC-MUTATION-COST.md).
 
 [Internal identity/bootstrap development](sync-object-identity-scale-v1.json), PR #96: one warm authored run per size; identity metadata bootstrap 0.034 s / 7.856 s / 125.205 s at 1k/100k/1m. All original typed rows/payloads and global/local mappings pass independent inspection. Four real own-child pre/post-commit catalog/journal/cursor crash parents pass under TSan; nine offline reviewer contracts pass. [Protocol and unfinished delivery work](../docs/SYNC-OBJECT-IDENTITY.md). Complete typed sync, full/package/process, provider and physical energy qualification remain open.
