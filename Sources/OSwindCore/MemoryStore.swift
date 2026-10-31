@@ -5,7 +5,7 @@ import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
     // Version29 retains data-only peer run provenance without importing execution authority.
-    public static let schemaVersion = 29
+    public static let schemaVersion = 30
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     public static let maximumRecordBytes = 128*1024*1024
@@ -150,6 +150,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
+        try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
         try exec(PIIScanSchema.sql)
         let pins=try prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_pins'")
@@ -167,6 +168,8 @@ public final class MemoryStore: @unchecked Sendable {
         }
         try SyncIncomingSourceSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try RoutineRunOriginalSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
+        try SyncIncomingEntitySchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
+        try SyncOutgoingWorkQueue.migrateEntityOrdering(RoutineDatabase(handle:db!),sourceVersion:version)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")

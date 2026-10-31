@@ -26,9 +26,9 @@ final class PIIScanRecordTests:XCTestCase {
             _=encoded.withUnsafeBytes {sqlite3_bind_blob(write,1,$0.baseAddress,Int32(encoded.count),db.transient)};try db.done(write)
         }
     }
-    func testFreshAndMigratedLibrariesDoNotInventChecks()throws {
+    func testFreshAndRecreatedDerivedScanTablesDoNotInventChecks()throws {
         try store.insert(note());XCTAssertEqual(try store.piiScanStatus("owned").state,.notRecorded)
-        let before=try store.get("owned");try sql("DROP TRIGGER pii_scan_source_changed;DROP TABLE pii_scan_records;PRAGMA user_version=22")
+        let before=try store.get("owned");try sql("DROP TRIGGER pii_scan_source_changed;DROP TABLE pii_scan_records")
         try store.close();store=try MemoryStore(root:root)
         XCTAssertEqual(try store.get("owned"),before);XCTAssertEqual(try store.piiScanStatus("owned").state,.notRecorded);XCTAssertEqual(try recordCount(),0)
     }

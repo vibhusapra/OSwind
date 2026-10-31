@@ -69,6 +69,11 @@ enum EntitySchema {
         DELETE FROM entity_project_ignored WHERE memory_id=old.id;
     END;
     DROP TRIGGER IF EXISTS entity_source_revision;
+    \(sourceRevisionSQL);
+    """
+    // Keep the exact legacy shape for atomic upgrade admission. Current
+    // protection is checked before the general entity setup can recreate it.
+    static let legacySourceRevisionSQL="""
     CREATE TRIGGER entity_source_revision BEFORE UPDATE OF id,title,app,text,url,timestamp,kind ON memories
     WHEN old.id IS NOT new.id OR old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind
     BEGIN
@@ -77,8 +82,11 @@ enum EntitySchema {
         DELETE FROM entity_index_state WHERE memory_id=old.id;
         DELETE FROM entity_ignored WHERE memory_id=old.id;
         DELETE FROM entity_project_ignored WHERE memory_id=old.id;
-    END;
+    END
     """
+    static let sourceRevisionSQL=legacySourceRevisionSQL.replacingOccurrences(
+        of:"DELETE FROM memory_entities WHERE curated=0",
+        with:"DELETE FROM memory_entities WHERE oswind_incoming_source_projection_v1(old.id,new.payload)<>1 AND curated=0")
     // Legacy labels have a unique owner within a kind. Bind only known project
     // aliases, leaving unmapped legacy feedback intact rather than guessing IDs.
     static let migrateProjectRejections="""

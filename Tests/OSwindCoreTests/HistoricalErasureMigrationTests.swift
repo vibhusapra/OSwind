@@ -33,7 +33,7 @@ final class HistoricalErasureMigrationTests:XCTestCase {
     func testActualSchema26MigrationKeepsOriginalBodiesBindingsAndCaptureState() throws {
         let library=try legacy(),before=try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),26);return try fingerprint(db)}
         let store=try MemoryStore(root:library);defer {try? store.close()}
-        try store.withRoutineDatabase {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29);XCTAssertEqual(try fingerprint(db),before);try HistoricalErasureSchema.validate(db)}
+        try store.withRoutineDatabase {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30);XCTAssertEqual(try fingerprint(db),before);try HistoricalErasureSchema.validate(db)}
         let p=try store.previewErasure(.init(app:"Safari"));XCTAssertEqual(p.historicalVersions,1);XCTAssertEqual(p.sources,1);XCTAssertEqual(p.conversationTurns,1)
         let result=try store.eraseHistory(p.scope,expectedToken:p.token);XCTAssertEqual(result.historicalVersions,1);XCTAssertEqual(try store.get("source")?.text,"Newer independent current body")
     }
@@ -67,7 +67,7 @@ final class HistoricalErasureMigrationTests:XCTestCase {
         let library=try legacy(),store=try MemoryStore(root:library);try store.close()
         let before=try withDB(library) {db in try db.execute("DROP INDEX historical_scope_app");return try fingerprint(db)}
         XCTAssertThrowsError(try MemoryStore(root:library)) {XCTAssertTrue($0.localizedDescription.contains("Historical erasure scope protection is missing"))}
-        try withDB(library) {db in XCTAssertEqual(try fingerprint(db),before);XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29)}
+        try withDB(library) {db in XCTAssertEqual(try fingerprint(db),before);XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),30)}
     }
     func testOldPreviewAndResultJSONDecodeWithZeroOriginalCounts() throws {
         let preview=Data(#"{"scope":{"app":"Safari","includeSubdomains":true},"token":"old","sources":1,"conversationTurns":2,"mediaReferences":3,"matchedSources":1,"samples":[]}"#.utf8)
