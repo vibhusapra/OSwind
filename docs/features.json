@@ -468,7 +468,7 @@
     "axis": "Data",
     "feature": "Personal device sync",
     "status": "todo",
-    "evidence": "No sync backend",
+    "evidence": "Internal causal/encrypted-object/journal/folder foundation at 57c1926: 46 new passes / one worker-only skip in full, TSan and optimized builds; same-host two-library bidirectional note/conflict/keyword/deletion fixture and process-crash recovery. Nine stages / 631 inputs pass; original sanitizer-launch failure retained. No automatic mutation hooks/schema fence, complete typed graph/media/current-policy adapters, enrollment, public Sync workflow or actual two-Mac/provider qualification. F059 remains TODO; see PERSONAL-SYNC.md and benchmarks/personal-sync-foundation-v1.json.",
     "references": "Screenpipe Business"
   },
   {
