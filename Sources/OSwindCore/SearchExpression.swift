@@ -25,6 +25,20 @@ public struct SearchExpressionPlan: Sendable {
         var positive: [Atom] {
             switch self { case .atom(let atom): return [atom]; case .not: return []; case .and(let a,let b),.or(let a,let b): return a.positive+b.positive }
         }
+        /// Rank candidates already have a canonical source ID. Test its stable
+        /// FTS key instead of building a complete archive-wide content ID set.
+        /// Speaker operands still use per-atom sets so different labels/body
+        /// fields may satisfy separate Boolean terms, as in the global predicate.
+        func candidatePredicate(prefix:String,values:inout [String])->String {
+            switch self {
+            case .atom(let atom):
+                values += [atom.fts,atom.fts]
+                return "(EXISTS(SELECT 1 FROM memory_fts WHERE rowid=(SELECT key FROM memory_fts_keys WHERE memory_id=\(prefix)id) AND memory_fts MATCH ?) OR \(prefix)id IN (SELECT memory_id FROM speaker_fts WHERE speaker_fts MATCH ?))"
+            case .not(let child):return "NOT ("+child.candidatePredicate(prefix:prefix,values:&values)+")"
+            case .and(let a,let b):return "("+a.candidatePredicate(prefix:prefix,values:&values)+" AND "+b.candidatePredicate(prefix:prefix,values:&values)+")"
+            case .or(let a,let b):return "("+a.candidatePredicate(prefix:prefix,values:&values)+" OR "+b.candidatePredicate(prefix:prefix,values:&values)+")"
+            }
+        }
         func predicate(prefix: String, values: inout [String]) -> String {
             switch self {
             case .atom(let atom):

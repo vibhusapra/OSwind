@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Candidate-local phrase and Boolean eligibility — in progress
+
+- [Implementation and qualification plan](KEYWORD-CONSTRAINT-SCALE.md) address the preceding 1m-source broad phrase cost. Keyword and vectorless/empty-model fallback check constraints on ranked candidates, using stable FTS keys; eligibility remains before LIMIT. Actual semantic scans/native masks retain their full scope set. Model presence is checked in the current snapshot, independently of stale caller hints.
+- Expanded development passes63 cases, including the 20k Metal scope workload with exact top-ten agreement. Actual old/new CLI fixtures pass36 keyword/hybrid comparisons with explicit memberships, metadata/speaker/Unicode coverage and unchanged payloads. The initial test argument-order failure and public import NUL-ID refusal remain retained. Five offline benchmark admission contracts pass; matched optimized measurements and frozen broad qualification are pending.
+- An inherited CI statistics assertion still expected24. The qualified signed schema25 binary passes its exact1,000-source statistics/mode contract; cc6762e backports the one-line assertion correction to PR94 without changing product bytes. New query implementation stays on the stacked keyword branch.
+
 ## Canonical mutation capture — PR #94 / source 793574e — component qualified
 
 - [Disabled canonical capture](SYNC-CHANGE-CAPTURE.md) records bounded local intents in the same transaction as ordinary edits across 13 source/graph tables. It preserves raw SQLite cell bytes and complete-key digests, clears superseded pending bodies and enforces a logical queue budget. Derived indexes stay outside the feed; no public activation control is exposed.

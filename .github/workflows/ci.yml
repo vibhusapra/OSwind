@@ -61,6 +61,15 @@ jobs:
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
       - name: Verify inactive owned SQLite fixture boundaries
         run: python3 scripts/test-owned-sqlite-fixture.py
+      - name: Verify authored phrase Boolean speaker and metadata query contracts
+        run: python3 scripts/keyword-scope-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --baseline dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-keyword-scope"
+      - name: Retain authored query contract receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-keyword-scope-receipt
+          path: ${{ runner.temp }}/oswind-keyword-scope/report.json
+          if-no-files-found: ignore
       - name: Verify owned canonical capture schema and process boundaries
         run: python3 scripts/sync-capture-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-sync-capture"
       - name: Retain canonical capture process receipt
@@ -265,6 +274,8 @@ jobs:
           python3 scripts/test-entity-eval.py
       - name: Verify telemetry admission and owned-child boundaries without hardware
         run: python3 scripts/test-power-telemetry.py
+      - name: Verify paired keyword benchmark result and archive admission offline
+        run: python3 scripts/test-keyword-scope-benchmark.py
       - name: Verify competitor comparison identities and stored-source admission without vendor downloads
         run: python3 scripts/test-compare-screenpipe.py
       - name: Verify independent scorers and process boundaries on generated fixtures

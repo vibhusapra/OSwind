@@ -322,7 +322,7 @@ public final class MemoryStore: @unchecked Sendable {
     public func get(_ id: String) throws -> Memory? {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
-    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true) -> (String, [String]) {
+    func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true,rowLocalExpressions:Bool=false) -> (String, [String]) {
         // An inverted interval can otherwise match a span crossing both bounds.
         // Public query resolution reports the error; raw store APIs fail closed.
         if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
@@ -348,6 +348,7 @@ public final class MemoryStore: @unchecked Sendable {
         if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
         if let constraint = expression?.constraint {
             if expression?.materialized == true { parts.append("\(prefix)id IN (SELECT id FROM temp.search_expression_scope)") }
+            else if rowLocalExpressions {parts.append(constraint.candidatePredicate(prefix:prefix,values:&values))}
             else { parts.append(constraint.predicate(prefix:prefix,values:&values)) }
         }
         return (parts.joined(separator: " AND "), values)
@@ -368,6 +369,13 @@ public final class MemoryStore: @unchecked Sendable {
             guard sqlite3_step(statement) == SQLITE_DONE else { throw failure() }
         } catch { if Task.isCancelled { throw CancellationError() }; throw error }
         var result = input; result.materialized = true; return result
+    }
+    /// Inspect the actual source/vector tables inside the search snapshot. A
+    /// caller's coverage hint may predate another connection's committed work.
+    private func hasSearchVectors(_ model:String)throws->Bool {
+        let row=try prepare("SELECT EXISTS(SELECT 1 FROM memories WHERE embedding_model=? AND embedding IS NOT NULL) OR EXISTS(SELECT 1 FROM semantic_vectors WHERE model=?) OR EXISTS(SELECT 1 FROM semantic_passages WHERE model=?)");defer {sqlite3_finalize(row)}
+        for index:Int32 in 1...3 {bind(row,index,model)}
+        guard sqlite3_step(row)==SQLITE_ROW else {throw failure()};return sqlite3_column_int(row,0) != 0
     }
     public static func queryTerms(_ input: String) -> [String] {
         let stopwords: Set<String> = ["a","an","the","and","or","is","are","was","were","be","been","being","to","of","for","in","on","at","by","from","with","as","it","its","s","t","do","does","did","can","could","would","should","will","we","our","i","my","me","you","your","they","their","this","that","these","those","what","which","who","when","where","how","why","about","before","after","la","le","les","el","los","las","de","del","du","des","un","une","en","et","y","que","qui","comment","por","para"]
@@ -397,13 +405,15 @@ public final class MemoryStore: @unchecked Sendable {
             if indexPolicy == .indexed || count >= 20_000 { indexStatus = annCache.prepare(modelID:modelID,dimensions:vector.count,count:count,allowLowPower:allowIndexOnLowPower) }
         }
         lock.lock(); defer { lock.unlock() }
+        do {
         try exec("SAVEPOINT search_snapshot"); defer {
-            if queryPlan.hasConstraints { try? exec("DELETE FROM temp.search_expression_scope") }
+            sqlite3_progress_handler(db,0,nil,nil)
+            if queryPlan.materialized { try? exec("DELETE FROM temp.search_expression_scope") }
             try? exec("RELEASE search_snapshot")
         }
-        queryPlan = try materializeExpression(queryPlan)
+        sqlite3_progress_handler(db,1000,{_ in Task.isCancelled ? 1:0},nil)
         var strategy = "exact", diagnostics = [String]()
-        let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter,expression:queryPlan)
+        let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter,expression:queryPlan,rowLocalExpressions:true)
         let query = queryPlan.keywordFTS
         let payload=detail == .preview ? "COALESCE(preview.payload,m.payload)":"m.payload"
         let previewJoin=detail == .preview ? " LEFT JOIN audio_search_previews preview ON preview.memory_id=m.id":""
@@ -434,7 +444,13 @@ public final class MemoryStore: @unchecked Sendable {
                 guard speakerStatus == SQLITE_DONE else { throw failure() }
             }
         }
-        if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector) {
+        if !query.isEmpty, mode != .keyword, let vector, let modelID, let scorer = CosineScorer(vector), try hasSearchVectors(modelID) {
+            // Native masks and full vector scans benefit from one indexed set.
+            // Delay that work until there is a real semantic stage; keyword and
+            // vectorless fallback searches only inspect their ranked candidates.
+            queryPlan = try materializeExpression(queryPlan)
+            sqlite3_progress_handler(db,1000,{_ in Task.isCancelled ? 1:0},nil)
+            let (whereSQL,values)=conditions(filter,expression:queryPlan)
             var indexed: [SemanticCandidate]?
             var candidateStrategy = "ann-exact-rerank"
             if indexStatus != nil {
@@ -472,6 +488,7 @@ public final class MemoryStore: @unchecked Sendable {
         }
         try Task.checkCancellation(); execution?(SearchExecution(strategy:strategy,warnings:diagnostics))
         return Array(scored.values.sorted { a,b in a.score != b.score ? a.score > b.score : a.memory.timestamp != b.memory.timestamp ? a.memory.timestamp > b.memory.timestamp : a.id < b.id }.prefix(limit))
+        } catch {try Task.checkCancellation();throw error}
     }
     public func matchingCount(_ filter: SearchFilter = SearchFilter()) throws -> Int {
         lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
