@@ -32,6 +32,7 @@ final class SearchScopeTests: XCTestCase {
         var raw: OpaquePointer?
         XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&raw),SQLITE_OK)
         defer { sqlite3_close(raw) }
+        try SyncChangeCapture.register(on:RoutineDatabase(handle:try XCTUnwrap(raw)))
         func execute(_ sql: String) throws { guard sqlite3_exec(raw,sql,nil,nil,nil) == SQLITE_OK else { throw OSwindError.database(String(cString:sqlite3_errmsg(raw))) } }
         func nonce() throws -> String {
             var query: OpaquePointer?; XCTAssertEqual(sqlite3_prepare_v2(raw,"SELECT hex(revision) FROM search_scope_revision WHERE singleton=1",-1,&query,nil),SQLITE_OK)

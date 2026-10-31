@@ -51,15 +51,16 @@ The two full-suite skips are the explicit opt-in system-audio fixture and subpro
 - [x] CryptoKit envelopes, context-separated keys/addresses, tamper/size controls and redacted key descriptions.
 - [x] Internal journal, transactional callbacks, restart, gap/dependency handling and sequence/scope fences.
 - [x] Local immutable encrypted folder and chunk transport; same-host two-library note/projection/conflict/deletion fixture.
-- [ ] Schema-version-fenced automatic change capture for every supported writer and canonical table. MemoryStore does not install the prototype's tables automatically.
+- [x] Disabled schema25 same-transaction canonical local intent capture, connection/old-writer fences and authored scale/process qualification. See [capture receipt](../benchmarks/sync-change-capture-v1.json).
+- [ ] Complete automatic capture-to-protocol processing. [Schema25 canonical capture](SYNC-CHANGE-CAPTURE.md) now installs disabled local intent hooks for all 13 tables and fences older writers; the full typed processor, initial bootstrap and public enablement remain unfinished.
 - [ ] All typed graph/media adapters, persistent source-version/citation identity, current-policy egress and local scan provenance.
 - [ ] Scoped erasure, whole-library wipe/epoch barriers, deletion announcements, acknowledgement-based compaction and encrypted-cache retention.
 - [ ] Trusted initial bootstrap, Keychain enrollment/recovery, membership/revocation and rollback checkpoints.
 - [ ] Native/CLI workflows, scheduler/lifecycle cancellation, background status and conflict review.
 - [x] Frozen full/TSan/optimized, owned process-crash, staged package/process qualification.
-- [ ] Sync scale/performance, real providers and actual two-Mac acceptance.
+- [ ] End-to-end sync/replay scale, real providers and actual two-Mac acceptance.
 
-F059 remains TODO. No public Sync control, cloud transfer, device enrollment, watcher or automatic library-schema upgrade is enabled by these internal components. The complete feature remains the delivery target.
+F059 remains TODO. No public Sync control, cloud transfer, device enrollment or watcher is enabled by these internal components. Ordinary opening upgrades the library to schema25 and installs capture hooks; capture remains disabled. The complete feature remains the delivery target.
 
 ## Primary references
 

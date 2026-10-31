@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Marked synthetic calendar archive + independent Python civil-time count oracle."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,collections,datetime,hashlib,json,pathlib,sqlite3,subprocess,time,zoneinfo
 p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--sources',type=int,default=100000);p.add_argument('--text-bytes',type=int,default=1024);p.add_argument('--distribution',choices=['year','month'],default='year');p.add_argument('--repetitions',type=int,default=5);p.add_argument('--reuse-owned',action='store_true');p.add_argument('--output',type=pathlib.Path);a=p.parse_args()
 assert 1<=a.sources<=2000000 and 32<=a.text_bytes<=16384 and 1<=a.repetitions<=50
@@ -15,6 +16,7 @@ if a.reuse_owned:
 else:
  base.mkdir(mode=0o700,exist_ok=False);seed=run('note','Owned synthetic calendar benchmark seed').strip()
  connection=sqlite3.connect(library/'memory.sqlite')
+ register_inactive_sync_fixture(connection)
  try:
   row=connection.execute('SELECT payload FROM memories WHERE id=?',(seed,)).fetchone();template=json.loads(row[0]);connection.execute('DELETE FROM memories');connection.commit();connection.execute('PRAGMA synchronous=OFF');connection.execute('BEGIN')
   sql='INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload) VALUES(?,?,?,?,?,NULL,?,?,?)';chunk=[];began=time.monotonic()

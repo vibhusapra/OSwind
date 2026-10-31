@@ -110,6 +110,7 @@ final class SearchPreviewTests:XCTestCase {
     func testMetadataWriteWaitsBeforeReadingConcurrentAttributionRevision() async throws {
         let original=source();try store.insert(original);let other=try MemoryStore(root:store.root)
         var db:OpaquePointer?;XCTAssertEqual(sqlite3_open(store.root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK);defer {sqlite3_close(db)}
+        try SyncChangeCapture.register(on:RoutineDatabase(handle:try XCTUnwrap(db)))
         XCTAssertEqual(sqlite3_exec(db,"BEGIN IMMEDIATE",nil,nil,nil),SQLITE_OK)
         var revised=original
         for index in revised.transcript!.segments.indices where revised.transcript!.segments[index].speaker=="Maya" {revised.transcript!.segments[index].speaker="Robin"}

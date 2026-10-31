@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Synthetic separate-process backup/restore, corruption and interruption checks."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse, base64, hashlib, json, os, pathlib, signal, sqlite3, subprocess, tempfile, time, wave
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -32,6 +33,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-backup-smoke-') as temporary:
     with wave.open(str(audio),'wb') as file:
         file.setnchannels(1); file.setsampwidth(2); file.setframerate(16000); file.writeframes(b'\0\0'*1600)
     with sqlite3.connect(source/'memory.sqlite') as connection:
+        register_inactive_sync_fixture(connection)
         payload = json.loads(connection.execute('SELECT payload FROM memories WHERE id=?',(identifier,)).fetchone()[0])
         payload.update(imagePath='images/synthetic.png',audioPath='audio/synthetic.wav',favorite=True,tags=['synthetic','backup'])
         connection.execute('UPDATE memories SET payload=?,favorite=1 WHERE id=?',(json.dumps(payload).encode(),identifier))

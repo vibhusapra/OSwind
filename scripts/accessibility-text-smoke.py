@@ -49,7 +49,7 @@ try:
  assert all(memory.get(k) is None for k in ['imagePath','videoPath','audioPath','visualRecording','transcript'])
  assert value('privacy-status',source['id'])['state']=='notRecorded'
  report['checks'].append('separate authored interchange source retains text-only shape and cannot imply a learned PII check')
- archive=base/'text.oswindbackup';assert value('backup','create',archive)['sourceSchema']==24
+ archive=base/'text.oswindbackup';assert value('backup','create',archive)['sourceSchema']==25
  restored=base/'restored';run('backup','restore',archive,'--to',restored)
  quiet=json.loads((restored/'settings.json').read_text());assert quiet['visualCaptureMode']=='accessibility' and not quiet['captureOnLaunch'] and not quiet['apiEnabled']
  assert value('get',source['id'],data=restored)['text']==source['text'] and media_empty(restored)
@@ -59,7 +59,7 @@ try:
   refusal=run('stats','--json',cli=old,ok=False);assert 'newer OSwind version' in refusal.stderr
   assert sha(library/'settings.json')==before
   run('backup','inspect',archive,cli=old,ok=False)
-  report['checks'].append('preceding signed23 client refuses schema24 library and backup without modifying saved settings')
+  report['checks'].append('preceding signed23 client refuses schema25 library and backup without modifying saved settings')
  exported=base/'text.json';run('export',exported);again=base/'json-copy';assert value('import',exported,'--json',data=again)['imported']==2
  assert value('get',source['id'],data=again)['display']=='accessibility-window' and media_empty(again)
  run('delete',source['id']);assert count()==1 and media_empty(library)

@@ -2,6 +2,7 @@
 """Owned CLI, SDK and backup checks for text-import PII provenance.
 Without --cache-root only offline/forged-report contracts run. Never downloads.
 """
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,hashlib,json,sqlite3,subprocess,sys,time
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'sdk/python'))
@@ -39,12 +40,14 @@ def main():
    run(library,['backup','create',str(archive)]);run(library,['backup','restore',str(archive),'--to',str(destination)])
    assert run(destination,['privacy-status',label])==status
    with sqlite3.connect(library/'memory.sqlite') as db:
+    register_inactive_sync_fixture(db)
     value=json.loads(db.execute('SELECT payload FROM memories WHERE id=?',(label,)).fetchone()[0]);value['tags']=['changed after scan']
     db.execute('UPDATE memories SET payload=? WHERE id=?',(json.dumps(value).encode(),label))
    changed=run(library,['privacy-status',label]);assert changed['state']=='changed' and changed['record']==record
    exported=base/(label+'-export.json');run(library,['export',str(exported)])
    plain=base/('library-json-'+label);run(plain,['import',str(exported),'--json']);assert run(plain,['privacy-status',label])['state']=='notRecorded'
    with sqlite3.connect(library/'memory.sqlite') as db:
+    register_inactive_sync_fixture(db)
     db.execute('PRAGMA foreign_keys=ON');db.execute('DELETE FROM memories WHERE id=?',(label,));assert db.execute('SELECT COUNT(*) FROM pii_scan_records').fetchone()[0]==0
    run(library,['privacy-status',label],False)
    native.append(dict(compute=compute,recorded=True,SDK=True,backupPreservesRecord=True,contentWriteInvalidates=True,JSONCannotMint=True,eraseCascades=True))

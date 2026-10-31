@@ -4,6 +4,7 @@
 One APFS run with uncontrolled caches is a workload check, not a population tail
 estimate, a power benchmark, or a comparison against another product.
 """
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse, base64, copy, hashlib, json, math, os, pathlib, re, sqlite3, subprocess, tempfile, threading, time
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('binary', nargs='?', default='.build/release/oswindctl')
@@ -22,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-backup-benchmark-') as temporary
         if result.returncode: raise RuntimeError((arguments,result.returncode,result.stderr))
         return result.stdout
     source_id = cli('note','Synthetic fixture template').strip()
-    connection = sqlite3.connect(source/'memory.sqlite'); connection.execute('PRAGMA foreign_keys=ON'); template = json.loads(connection.execute('SELECT payload FROM memories WHERE id=?',(source_id,)).fetchone()[0])
+    connection = sqlite3.connect(source/'memory.sqlite'); register_inactive_sync_fixture(connection); connection.execute('PRAGMA foreign_keys=ON'); template = json.loads(connection.execute('SELECT payload FROM memories WHERE id=?',(source_id,)).fetchone()[0])
     connection.execute('DELETE FROM memories'); connection.commit()
     image = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aM3sAAAAASUVORK5CYII=')
     image += b'\0'*(args.media_bytes-len(image)); media_names = []
@@ -72,7 +73,8 @@ with tempfile.TemporaryDirectory(prefix='oswind-backup-benchmark-') as temporary
     assert concurrent, 'backup completed without a concurrent CLI write/search sample'
     report['inspect'] = measured('inspect',['backup','inspect',archive])
     report['restore'] = measured('restore',['backup','restore',archive,'--to',target,'--fingerprint',report['create']['result']['archiveFingerprint']])
-    assert report['create']['result']==report['inspect']['result']==report['restore']['result']
+    assert report['create']['result']==report['inspect']['result']
+    assert report['restore']['result']==dict(report['create']['result'],discardedVisualIndexes=0)
     assert args.count<=report['restore']['result']['memories']<=args.count+len(concurrent)+1
     assert report['restore']['result']['mediaFiles']==args.media
     with sqlite3.connect(target/'memory.sqlite') as restored:

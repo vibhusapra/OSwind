@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Owned single-delete/retention media contracts and optional actual old-writer refusal."""
+from owned_sqlite_fixture import register_inactive_sync_fixture
 import argparse,contextlib,hashlib,json,pathlib,shutil,sqlite3,subprocess,tempfile
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('binary');p.add_argument('--older-binary');p.add_argument('--output');o=p.parse_args();binary=pathlib.Path(o.binary).resolve();older=pathlib.Path(o.older_binary).resolve() if o.older_binary else None;pins={str(b):hashlib.sha256(b.read_bytes()).hexdigest() for b in [binary,older] if b}
 @contextlib.contextmanager
 def connect(path):
     db=sqlite3.connect(path)
+    register_inactive_sync_fixture(db)
     try:
         with db:yield db
     finally:db.close()

@@ -468,7 +468,7 @@
     "axis": "Data",
     "feature": "Personal device sync",
     "status": "todo",
-    "evidence": "Internal causal/encrypted-object/journal/folder foundation at 57c1926: 46 new passes / one worker-only skip in full, TSan and optimized builds; same-host two-library bidirectional note/conflict/keyword/deletion fixture and process-crash recovery. Nine stages / 631 inputs pass; original sanitizer-launch failure retained. No automatic mutation hooks/schema fence, complete typed graph/media/current-policy adapters, enrollment, public Sync workflow or actual two-Mac/provider qualification. F059 remains TODO; see PERSONAL-SYNC.md and benchmarks/personal-sync-foundation-v1.json.",
+    "evidence": "Internal encrypted causal/journal/folder foundation at 57c1926 plus disabled schema25 canonical capture at 793574e: 13 tables, ordinary mutation/rollback, obsolete-body purge, active connection and older-writer fences. All 31 stages / 774 inputs pass; 1,377 full passes / 5 skips; 322 TSan and 322 optimized passes / 2 worker skips. New capture cases: 26 pass / one worker skip per build. Authored 1k/100k/1m source/frame/timing oracles and signed process boundaries pass; prior failures retained. No complete typed graph/media/current-policy processor, global origin/lifetime/versioned-citation bootstrap, public pairing or actual provider/two-Mac acceptance. F059 remains TODO. See PERSONAL-SYNC.md, SYNC-CHANGE-CAPTURE.md and benchmarks/sync-change-capture-v1.json. Script-only ba0f3db follow-up passes eight fixture stages against identical product bytes; hosted793 project-metadata setup failure is retained and latest hosted native CI is pending.",
     "references": "Screenpipe Business"
   },
   {

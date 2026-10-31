@@ -17,6 +17,17 @@ extension HistoryErasureResult {
     func warning(_ text:String) -> Self {.init(sources:sources,conversationTurns:conversationTurns,removedMedia:removedMedia,sharedMedia:sharedMedia,pendingMedia:pendingMedia,searchCacheRemoved:searchCacheRemoved,warnings:warnings+[text])}
 }
 private extension RoutineDatabase {
+    /// A successful SQL step alone does not mean a checkpoint obtained its reader locks.
+    /// VACUUM writes a new WAL, which must also be reclaimed before measuring the budget.
+    func compactRetentionStorage() throws {
+        func checkpoint() throws {
+            let row=try statement("PRAGMA wal_checkpoint(TRUNCATE)");defer {sqlite3_finalize(row)}
+            guard sqlite3_step(row)==SQLITE_ROW else {throw error()}
+            guard sqlite3_column_int(row,0)==0 else {throw OSwindError.database("Storage checkpoint is busy; retain remaining history")}
+            guard sqlite3_step(row)==SQLITE_DONE else {throw error()}
+        }
+        try checkpoint();try execute("VACUUM");try checkpoint()
+    }
     func deletedSources(_ body:() throws -> Void) throws -> (sources:Int,turns:Int) {
         let turns=try eraseCount("SELECT COUNT(*) FROM chat_turns"),before=try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")
         try body();let count=before-(try eraseCount("SELECT total FROM memory_statistics WHERE singleton=1")),removed=turns-(try eraseCount("SELECT COUNT(*) FROM chat_turns"))
@@ -61,7 +72,7 @@ extension MemoryStore {
                 do {
                     try db.transaction {try db.execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
                     result=result.adding(cleanupErasedAssets(db,sources:0,turns:0))
-                    if result.searchCacheRemoved {try db.execute("PRAGMA wal_checkpoint(TRUNCATE); VACUUM")}
+                    if result.searchCacheRemoved {try db.compactRetentionStorage()}
                 } catch {result=result.warning("Storage compaction did not finish; remaining history was retained.");stopped=true}
                 bytes=diskBytes(includeStaging:false)
             }
@@ -74,7 +85,7 @@ extension MemoryStore {
                     // No per-source archive scan. Each bounded oldest-first batch commits and
                     // drains once; a failed queue stops further destructive budget trimming.
                     result=result.adding(cleanupErasedAssets(db,sources:batch.sources,turns:batch.turns))
-                    if result.pendingMedia==0 {try db.execute("PRAGMA wal_checkpoint(TRUNCATE); VACUUM")}
+                    if result.pendingMedia==0 {try db.compactRetentionStorage()}
                     bytes=diskBytes(includeStaging:false)
                 } catch is CancellationError {stopped=true}
                 catch {result=result.warning("Storage cleanup stopped after committed deletions; remaining history was retained.");stopped=true}

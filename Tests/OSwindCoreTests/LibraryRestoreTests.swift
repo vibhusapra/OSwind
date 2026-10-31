@@ -23,6 +23,7 @@ final class LibraryRestoreTests: XCTestCase {
     }
     func rewriteDatabase(_ sql: String) throws {
         var db: OpaquePointer?; XCTAssertEqual(sqlite3_open(archive.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
+        try SyncChangeCapture.register(on:RoutineDatabase(handle:try XCTUnwrap(db)))
         let code = sqlite3_exec(db,sql,nil,nil,nil), message = String(cString:sqlite3_errmsg(db)); sqlite3_close(db); XCTAssertEqual(code,SQLITE_OK,message)
         let tree = try BackupFileTree(root:archive)
         var header = try JSONDecoder().decode(LibraryBackupHeader.self,from:tree.read("header.json",limit:65536)); let previous = header.database.bytes

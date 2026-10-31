@@ -113,7 +113,7 @@ enum TextObservationSchema {
         END
         """
     ]
-    static func install(_ db:RoutineDatabase,sourceVersion:Int32)throws {
+    static func install(_ db:RoutineDatabase,sourceVersion:Int32,beforePinRepair:(()throws->Void)?=nil)throws {
         try Task.checkCancellation()
         // Pins have no source body. Existing citations rebuild the cold state;
         // an in-flight consumer pins before leaving its writer transaction.
@@ -134,8 +134,10 @@ enum TextObservationSchema {
             json_extract(CAST(old.payload AS TEXT),'$.textObservation.samples') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.samples') OR
             json_extract(CAST(old.payload AS TEXT),'$.textObservation.largestGapSeconds') IS NOT json_extract(CAST(new.payload AS TEXT),'$.textObservation.largestGapSeconds'))
         BEGIN SELECT RAISE(ABORT,'Text observation is pinned; start a new source'); END;
-        INSERT OR IGNORE INTO text_observation_pins(memory_id) SELECT memory_id FROM chat_sources UNION SELECT source_id FROM recap_sources;
         """)
+        // Capture hooks must exist before a cold repair writes recovered pins.
+        try beforePinRepair?()
+        try db.execute("INSERT OR IGNORE INTO text_observation_pins(memory_id) SELECT memory_id FROM chat_sources UNION SELECT source_id FROM recap_sources")
         let table=try db.statement("SELECT 1 FROM sqlite_master WHERE type='table' AND name='text_observation_ranges'")
         let existed=sqlite3_step(table)==SQLITE_ROW;sqlite3_finalize(table)
         try db.execute("CREATE TABLE IF NOT EXISTS text_observation_ranges(memory_id TEXT PRIMARY KEY REFERENCES memories(id) ON DELETE CASCADE,last_observed REAL NOT NULL) WITHOUT ROWID; CREATE INDEX IF NOT EXISTS text_observation_end ON text_observation_ranges(last_observed,memory_id)")
