@@ -188,5 +188,7 @@
     "Default suite opt-ins only; parent PR103 full model/native opt-in results are not reused as current acceptance",
     "No physical capture/power, notarization, fresh historical performance measurement, parity or competitor ranking claim"
   ],
-  "overallGoalComplete": false
+  "overallGoalComplete": false,
+  "implementationCommit": "6275b1904211a0f16cc68399f6c48703d07823e7",
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/104"
 }

@@ -1,6 +1,6 @@
 # OSwind delivery ledger
 
-## Historical citations and quiet restore — implementation WIP
+## Historical citations and quiet restore — draft PR #104
 
 - [Schema-26 archival citations](SYNC-HISTORICAL-CITATIONS.md) preserve exact historical originals through native text/recap navigation and quiet backup restore while current timeline text stays newer. Real schema-25 fixtures cover atomic migration/refusal, queued frames and cold-pin lifetime recovery. Incoming conversation/turn/citation/pin adapters remain internal.
 - 87 focused cases pass, including native read-only actions/selection invalidation, recursive budget rollback and late graph-mutation refusal. An actual initialized old25 collector refuses after migration; fresh old25 clients and backup inspector refuse, with unchanged payloads and SQLite/package bytes. Independent readonly checks recompute flat-graph original/body/projection hashes and bindings in three databases. The full default debug suite now passes 1,503 / 1,576 with 73 explicit skips. All 87 selected sanitizer and optimized cases pass with no race warnings. Current process checks, 16 SDK tests, normal/indexed API/MCP and packaged old25 checks pass; all 34 ZIP files/signatures and unchanged installed 15-file app pass. Retained fixture/harness failures and the two harness-only changes after the full debug stage stay explicit in the [receipt](../benchmarks/sync-historical-citations-v1.json).

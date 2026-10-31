@@ -1,6 +1,6 @@
 # Historical citations and quiet restore
 
-Draft component on `codex/sync-historical-citations`, based on PR #103. This is an internal incoming-conversation and archival-data component, not an enabled sync service. F059 and the 78 feature statuses are unchanged.
+Draft component in [PR #104](https://github.com/vibhusapra/OSwind/pull/104), on `codex/sync-historical-citations` and based on PR #103. This is an internal incoming-conversation and archival-data component, not an enabled sync service. F059 and the 78 feature statuses are unchanged.
 
 An incoming conversation may cite a source version older than this Mac's offline edit. A plain foreign key to the current memory returns the wrong words. The retained development-v3 two-library regression demonstrates this substitution in both a live conversation and a quiet backup restore. The fix keeps exact original data separately and leaves current timeline text unchanged.
 

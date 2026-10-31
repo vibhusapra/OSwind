@@ -24,7 +24,7 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
-[Historical citations and quiet restore](SYNC-HISTORICAL-CITATIONS.md) are currently uncommitted schema-26 work. Internal conversation/citation/pin writes and historical recap navigation have focused tests; complete incoming sources/graphs, historical media playback and the background service remain unfinished. This does not change F059 status.
+[Historical citations and quiet restore](SYNC-HISTORICAL-CITATIONS.md) are draft schema-26 work in [PR #104](https://github.com/vibhusapra/OSwind/pull/104). Internal conversation/citation/pin writes and historical recap navigation have focused tests; complete incoming sources/graphs, historical media playback and the background service remain unfinished. This does not change F059 status.
 
 The internal SQLite journal now commits its metadata, outbox/cursors and a typed caller's source mutation in the same transaction. Failed admission rolls back all of them; nested library transactions can roll back released inner savepoints. Membership is explicit, durable receipts refuse reused sequences, reordered packets persist until predecessors/content arrive, and deletion barriers apply before an older missing body can be reintroduced. Each writing connection must explicitly prepare SQLite FULL synchronization. Workspace identity and monotonic cursor checks refuse stale or corrupted writer state. Concurrent edits require explicit resolution against the exact reviewed heads.
 
