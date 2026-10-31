@@ -468,7 +468,7 @@
     "axis": "Data",
     "feature": "Personal device sync",
     "status": "todo",
-    "evidence": "No sync backend",
+    "evidence": "Internal causal/encrypted-object/journal/folder foundation is in progress with 44 focused checks and a same-host two-library note, conflict, keyword-search and late-deletion fixture. No automatic mutation hooks/schema fence, complete typed graph/media/current-policy adapters, enrollment, public Sync workflow or actual two-Mac/provider qualification. F059 remains TODO; see PERSONAL-SYNC.md.",
     "references": "Screenpipe Business"
   },
   {

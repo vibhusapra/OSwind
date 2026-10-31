@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Personal device sync — internal foundation in progress
+
+- [Delivery requirements and implementation state](PERSONAL-SYNC.md) retain the complete sync scope: bidirectional offline changes, original evidence and user state, conflict handling, privacy erasure, encrypted transport, enrollment/revocation and native/CLI workflows. F059 stays TODO until a user can configure and use complete supported-library sync.
+- Four new internal components provide bounded causal registers, authenticated context-bound objects, a same-connection transactional journal and an immutable encrypted folder/chunk transport. Forty-four focused cases pass, including two owned same-host libraries exchanging notes in both directions, explicit conflict resolution, keyword findability and deletion barriers against late/offline packets. Seeded reordering/duplicate tests, concurrent filesystem writers and two SQLite connections pass. The intermediate seeded-test compile error is retained.
+- No automatic writer hooks/schema fence, complete graph/media/current-policy adapter, enrollment, public UI, watcher or two-Mac/provider/power acceptance is delivered yet. Broader frozen qualification is next. Existing capture and model workflows remain unchanged.
+
 ## Owned collector vault phases — PR #92 / source cf174b3 — controlled qualification passed
 
 - [Collector phase diagnostics](VAULT-COLLECTOR-TRACE.md) retain the public create-with-unlock/import/lock/reopen sequence and identify each lock before cleanup. The shared test-only observer retains bounded credential-free native output and owned descriptor metadata; product source and closing policy remain a5d4af4.
