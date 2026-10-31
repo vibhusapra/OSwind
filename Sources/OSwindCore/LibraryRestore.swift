@@ -200,8 +200,50 @@ private final class RestoreRows {
             guard sqlite3_bind_int(insert,3,current ? 1:0)==SQLITE_OK else {throw OSwindError.database("Cannot restore PII check validity")}
         })
     }
+    func restoreHistoricalData(into handle:OpaquePointer)throws {
+        guard source.schema>=26 else {return}
+        let old=HistoricalEvidenceStore(database:RoutineDatabase(handle:source.db.handle!)),target=HistoricalEvidenceStore(database:RoutineDatabase(handle:handle))
+        try old.checkAccounting()
+        let budget=try source.db.integer("SELECT budget FROM historical_evidence_state WHERE singleton=1")
+        guard (1...HistoricalEvidenceStore.maximumBudget).contains(budget) else {throw BackupFileError.invalid("Invalid historical archive budget")}
+        try target.database.execute("UPDATE historical_evidence_state SET budget=\(max(budget,HistoricalEvidenceStore.defaultBudget)) WHERE singleton=1 AND used_bytes=0")
+        func restoreNode(_ id:String,visiting:inout Set<String>,remaining:inout Int)throws->HistoricalEvidence {
+            if try target.row(id) != nil {return try target.read(id,verifyMedia:{_,_,_ in})}
+            guard remaining>0,visiting.count<32,visiting.insert(id).inserted else {throw BackupFileError.invalid("Historical restore graph exceeds its bound")};remaining-=1;defer {visiting.remove(id)}
+            let value=try old.read(id,verifyMedia:{_,manifests,paths in
+                for manifest in manifests {guard let path=paths[manifest.role],let entry=try self.index.entry(for:path),entry.bytes==manifest.bytes,entry.sha256==manifest.sha256 else {throw BackupFileError.invalid("Historical media manifest differs from verified archive bytes")}}
+            })
+            guard let metadata=try old.row(id) else {throw BackupFileError.invalid("Historical archive row disappeared")}
+            let parentIDs=try JSONDecoder().decode([String].self,from:metadata.parents)
+            var parents=[HistoricalEvidence]();for parent in parentIDs {parents.append(try restoreNode(parent,visiting:&visiting,remaining:&remaining))}
+            var paths=[SyncMediaRole:String]();for (role,path) in try HistoricalEvidenceStore.paths(metadata.paths) {paths[role]=try mappedPath(path)}
+            try target.insert(handle:id,source:value.sourceID,record:value.record,paths:paths,parents:parents)
+            // Every target media file was copied and hashed before this private,
+            // unpublished restore transaction; the archive manifest was matched
+            // to the immutable original above. No enrollment authority is copied.
+            return try target.read(id,verifyMedia:{_,_,_ in})
+        }
+        let row=try source.db.prepare("SELECT handle FROM historical_evidence ORDER BY rowid");defer {sqlite3_finalize(row)};var code=sqlite3_step(row)
+        while code==SQLITE_ROW {var visiting=Set<String>(),remaining=512;_=try restoreNode(source.db.text(row,0),visiting:&visiting,remaining:&remaining);code=sqlite3_step(row)}
+        guard code==SQLITE_DONE else {throw source.db.error("Cannot restore historical evidence")};try target.checkAccounting()
+    }
+    func restoreEvidencePins(into handle:OpaquePointer)throws {
+        guard source.schema>=26 else {return}
+        let db=RoutineDatabase(handle:handle),rows=try source.db.prepare("SELECT memory_id FROM text_observation_pins ORDER BY memory_id COLLATE BINARY");defer {sqlite3_finalize(rows)};var code=sqlite3_step(rows)
+        while code==SQLITE_ROW {
+            let id=try source.db.text(rows,0);_=try cachedMemory(id)
+            let row=try db.statement("INSERT OR IGNORE INTO text_observation_pins VALUES(?)");defer {sqlite3_finalize(row)};db.bind(row,1,id);try db.done(row);code=sqlite3_step(rows)
+        };guard code==SQLITE_DONE else {throw source.db.error("Cannot restore evidence pins")}
+        let bindings=try source.db.prepare("SELECT memory_id,handle FROM historical_evidence_pins ORDER BY memory_id COLLATE BINARY");defer {sqlite3_finalize(bindings)};code=sqlite3_step(bindings)
+        while code==SQLITE_ROW {
+            let id=try source.db.text(bindings,0),original=try source.db.text(bindings,1)
+            _=try HistoricalEvidenceStore(database:db).read(original,sourceID:id,verifyMedia:{_,_,_ in})
+            let row=try db.statement("INSERT INTO historical_evidence_pins VALUES(?,?)");defer {sqlite3_finalize(row)};db.bind(row,1,id);db.bind(row,2,original);try db.done(row);code=sqlite3_step(bindings)
+        };guard code==SQLITE_DONE else {throw source.db.error("Cannot restore historical pins")}
+    }
     func restore(into handle: OpaquePointer, progress: (LibraryBackupProgress) throws -> Void) throws {
         _ = try memories { try progress(LibraryBackupProgress(phase:"Restoring sources",completedItems:$0,unit:"records")) }
+        try restoreHistoricalData(into:handle)
         try destination.rebuildRecapLinks()
         try restoreVisualIndexes(into:handle)
         try restoreEntities(into:handle)
@@ -240,13 +282,22 @@ private final class RestoreRows {
             let payload = try JSONDecoder().decode(ChatPayload.self,from:self.payload(row,3))
             guard !payload.question.isEmpty, payload.question.count<=8000, payload.text.count<=100000,payload.duration.isFinite else { throw BackupFileError.invalid("Invalid restored conversation payload") }
         })
-        _ = try copy("chat_sources",columns:["turn_id","memory_id","ordinal","score","match","passage_start","passage_length"],into:handle,validate:{ row in
-            _ = try self.source.db.text(row,0); let id = try self.source.db.text(row,1), memory = try self.cachedMemory(id), ordinal = try self.integer(row,2)
-            guard (0..<60).contains(ordinal) else { throw BackupFileError.invalid("Invalid restored source ordinal") }; _ = try self.number(row,3); _ = try self.source.db.text(row,4)
-            let startNull = sqlite3_column_type(row,5)==SQLITE_NULL, lengthNull = sqlite3_column_type(row,6)==SQLITE_NULL
-            guard startNull==lengthNull else { throw BackupFileError.invalid("Incomplete restored evidence anchor") }
-            if !startNull { let start = try self.integer(row,5), length = try self.integer(row,6); guard start>=0,length>0, PassageRange(start:Int(start),length:Int(length)).text(in:memory.text) != nil else { throw BackupFileError.invalid("Invalid restored evidence anchor") } }
-        },progress:{ try progress(LibraryBackupProgress(phase:"Restoring conversations",completedItems:$0,unit:"sources")) })
+        let citationColumns=["turn_id","memory_id","ordinal","score","match","passage_start","passage_length"]+(source.schema>=26 ? ["owner_id","historical_handle"]:[])
+        _ = try copy("chat_sources",columns:citationColumns,into:handle,validate:{row in
+            _=try self.source.db.text(row,0);let ordinal=try self.integer(row,2),memory:Memory
+            if self.source.schema>=26,sqlite3_column_type(row,8) != SQLITE_NULL {
+                guard sqlite3_column_type(row,1)==SQLITE_NULL else {throw BackupFileError.invalid("Historical citation cannot name mutable current text")}
+                let owner=try self.source.db.text(row,7),original=try self.source.db.text(row,8)
+                memory=try HistoricalEvidenceStore(database:RoutineDatabase(handle:handle)).read(original,sourceID:owner,verifyMedia:{_,_,_ in}).memory
+            }else {
+                if self.source.schema>=26 {guard sqlite3_column_type(row,7)==SQLITE_NULL else {throw BackupFileError.invalid("Ordinary citation owner differs")}}
+                memory=try self.cachedMemory(self.source.db.text(row,1))
+            }
+            guard (0..<60).contains(ordinal) else {throw BackupFileError.invalid("Invalid restored source ordinal")};_=try self.number(row,3);_=try self.source.db.text(row,4)
+            let startNull=sqlite3_column_type(row,5)==SQLITE_NULL,lengthNull=sqlite3_column_type(row,6)==SQLITE_NULL;guard startNull==lengthNull else {throw BackupFileError.invalid("Incomplete restored evidence anchor")}
+            if !startNull {let start=try self.integer(row,5),length=try self.integer(row,6);guard start>=0,length>0,PassageRange(start:Int(start),length:Int(length)).text(in:memory.text) != nil else {throw BackupFileError.invalid("Invalid restored evidence anchor")}}
+        },progress:{try progress(LibraryBackupProgress(phase:"Restoring conversations",completedItems:$0,unit:"sources"))})
+        try restoreEvidencePins(into:handle)
         if source.schema>=13 {
             var routineCount=0
             _ = try copy("routines",columns:["id","revision","enabled","next_due","payload"],into:handle,validate:{ row in

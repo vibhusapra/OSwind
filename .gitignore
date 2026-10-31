@@ -9,3 +9,7 @@ __pycache__/
 *.pyc
 *.wav
 *.mp4
+
+# Hash-pinned authored legacy databases; test resources, never user history.
+!Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/producer-schema25.sqlite
+!Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/receiver-schema25.sqlite

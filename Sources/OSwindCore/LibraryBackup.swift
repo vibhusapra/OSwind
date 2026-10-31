@@ -55,29 +55,37 @@ final class BackupDataReader {
         if schema>=15 {try db.requireTable("recap_sources")}
         if schema>=22 {try db.requireTable("entity_project_ignored")}
         if schema>=23 {try db.requireTable("pii_scan_records")}
+        if schema>=26 {for table in ["historical_evidence_state","historical_evidence","historical_evidence_dependencies","historical_evidence_pins","text_observation_pins"] {try db.requireTable(table)}}
         if schema>=21 {for name in ["memory_entities","entity_aliases","entity_mentions","entity_index_state","entity_ignored"] {try db.requireTable(name)}}
         if schema>=19 {for name in ["visual_sources","visual_manifests","visual_vectors"] {try db.requireTable(name)}}
         guard try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED WHERE length(payload)>\(MemoryStore.maximumRecordBytes)")==0 else { throw BackupFileError.invalid("A source payload exceeds the backup format's 128 MiB record bound") }
     }
     func close() { db.close() }
     func counts() throws -> (Int64,Int64,Int64) { (try db.integer("SELECT COUNT(*) FROM memories NOT INDEXED"),try db.integer("SELECT COUNT(*) FROM chat_sessions NOT INDEXED"),try db.integer("SELECT COUNT(*) FROM chat_turns NOT INDEXED")) }
-    func forEachAsset(_ body: (String) throws -> Void) throws {
-        var cursor = Int64.min, first = true
-        while true {
-            try Task.checkCancellation()
-            let statement = try db.prepare("SELECT rowid,json_extract(CAST(payload AS TEXT),'$.imagePath'),json_extract(CAST(payload AS TEXT),'$.audioPath'),json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories NOT INDEXED WHERE rowid\(first ? ">=" : ">")? ORDER BY rowid LIMIT 128")
-            sqlite3_bind_int64(statement,1,cursor); var paths = [String](), last: Int64?, status = sqlite3_step(statement)
-            do {
-                while status == SQLITE_ROW {
-                    last = sqlite3_column_int64(statement,0)
-                    for column: Int32 in [1,2,3] where sqlite3_column_type(statement,column) != SQLITE_NULL { let path = try db.text(statement,column); try BackupMediaEntry.validateSourcePath(path); paths.append(path) }
-                    status = sqlite3_step(statement)
-                }
-                guard status == SQLITE_DONE else { throw db.error("Cannot read source media references") }; sqlite3_finalize(statement)
-            } catch { sqlite3_finalize(statement); throw error }
-            guard let last else { return }; cursor = last; first = false
-            for path in paths { try Task.checkCancellation(); try body(path) }
+    func forEachAsset(_ body:(String)throws->Void)throws {
+        let tables=[("memories","payload",["imagePath","audioPath","videoPath"])]+(schema>=26 ? [("historical_evidence","paths",["image","audio","video"])]:[])
+        for (table,column,keys) in tables {
+            var cursor=Int64.min,first=true
+            while true {
+                try Task.checkCancellation()
+                let expressions=keys.map {"json_extract(CAST("+column+" AS TEXT),'$."+$0+"')"}.joined(separator:",")
+                let row=try db.prepare("SELECT rowid,"+expressions+" FROM "+table+" NOT INDEXED WHERE rowid"+(first ? ">=":">")+"? ORDER BY rowid LIMIT 128");defer {sqlite3_finalize(row)};sqlite3_bind_int64(row,1,cursor)
+                var paths=[String](),last:Int64?,code=sqlite3_step(row)
+                while code==SQLITE_ROW {last=sqlite3_column_int64(row,0);for index:Int32 in 1...3 where sqlite3_column_type(row,index) != SQLITE_NULL {let path=try db.text(row,index);try BackupMediaEntry.validateSourcePath(path);paths.append(path)};code=sqlite3_step(row)}
+                guard code==SQLITE_DONE else {throw db.error("Cannot read archived source media")};guard let last else {break};cursor=last;first=false
+                for path in paths {try Task.checkCancellation();try body(path)}
+            }
         }
+    }
+    func validateHistoricalData(_ index:BackupManifestIndex)throws {
+        guard schema>=26 else {return}
+        let history=HistoricalEvidenceStore(database:RoutineDatabase(handle:db.handle!));try history.checkAccounting()
+        let row=try db.prepare("SELECT handle FROM historical_evidence ORDER BY rowid");defer {sqlite3_finalize(row)};var code=sqlite3_step(row)
+        while code==SQLITE_ROW {
+            _=try history.read(db.text(row,0),verifyMedia:{_,manifests,paths in
+                for manifest in manifests {guard let path=paths[manifest.role],let entry=try index.entry(for:path),entry.bytes==manifest.bytes,entry.sha256==manifest.sha256 else {throw BackupFileError.invalid("Archived original media differs from its exact manifest")}}
+            });code=sqlite3_step(row)
+        };guard code==SQLITE_DONE else {throw db.error("Cannot validate archived originals")}
     }
 }
 
@@ -210,6 +218,7 @@ public enum LibraryBackup {
             guard let entry = try index.entry(for:pending.sourcePath), try tree.digest(entry.member) == BackupFileDigest(bytes:entry.bytes,sha256:entry.sha256) else { throw BackupFileError.invalid("Backup media checksum differs") }
             files = try BackupMath.add(files,1); try progress(LibraryBackupProgress(phase:"Verifying media",completedItems:files,totalItems:header.info.mediaFiles))
         }
+        try reader.validateHistoricalData(index)
         let expectedBytes = try BackupMath.add(BackupMath.add(header.database.bytes,header.settings.bytes),index.activeBytes)
         guard expectedBytes == header.info.payloadBytes else { throw BackupFileError.invalid("Backup total bytes differ") }
         let allowed = Set(["header.json","media.ndjson","memory.sqlite","settings.json","media"])

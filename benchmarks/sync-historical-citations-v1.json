@@ -1,0 +1,192 @@
+{
+  "format": "OSwind historical-citation draft component validation",
+  "version": 1,
+  "state": "development-validated-draft",
+  "createdAtUTC": "2026-10-31T12:09:26.920641+00:00",
+  "sourceBase": "e96bf4a8f0d670747ef0da8c62a549718146ad5e",
+  "implementationBranch": "codex/sync-historical-citations",
+  "librarySchema": 26,
+  "canonicalTables": 13,
+  "newOrdinaryCases": 21,
+  "sourceInputManifest": "benchmarks/sync-historical-citations-inputs-v1.json",
+  "sourceInputManifestSHA256": "4ce265099afc1aa9dd9707d16889e09ce508ccebf7e9d209e5e8b012abcf3f0c",
+  "frozenRepositoryInputs": 651,
+  "fullDefaultDebug": {
+    "defined": 1576,
+    "passed": 1503,
+    "skipped": 73,
+    "failures": 0,
+    "logSHA256": "30255591601c841186e4a4ff45e0019fd7de2407bf03791d92b6bf4962cc298d"
+  },
+  "threadSanitizer": {
+    "defined": 87,
+    "passed": 87,
+    "skipped": 0,
+    "failures": 0,
+    "raceWarnings": 0,
+    "logSHA256": "f91d9750e781fd48bd9f3b3ac9410d1f8885979d16edf11d0f87e709fa97d964"
+  },
+  "optimized": {
+    "defined": 87,
+    "passed": 87,
+    "skipped": 0,
+    "failures": 0,
+    "logSHA256": "59fe9ed531773edfe5a11cf2c72a00647d8f74f748ab2d92f20570c8feba60f6"
+  },
+  "fullDebugLineage": {
+    "productAndTestsAndPackageInputsUnchanged": true,
+    "subsequentHarnessOnlyChanges": [
+      "scripts/sync-capture-smoke.py",
+      "scripts/tag-index-smoke.py"
+    ],
+    "reason": "The full debug stage passed before two process expectations were corrected for schema26. The enclosing original pipeline retained its later harness failure; it is not relabeled passed."
+  },
+  "currentProcessStages": [
+    {
+      "name": "inactive-fixture",
+      "returncode": 0,
+      "log": "inactive-fixture.log",
+      "logSHA256": "83166b089fbcb82fac63f22522fa6ae99bb5e46368cd35d756277fd463dd6346"
+    },
+    {
+      "name": "capture",
+      "returncode": 0,
+      "log": "capture.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "accessibility-text",
+      "returncode": 0,
+      "log": "accessibility-text.log",
+      "logSHA256": "90393b8a227a4e8c571625f4e5734b34e2b94cb792c12df17ec632839dea097d"
+    },
+    {
+      "name": "text-observation",
+      "returncode": 0,
+      "log": "text-observation.log",
+      "logSHA256": "b44fea3e7c973e8f160415c688ac8b77a97bf256cae6fc410930581d0c5381c3"
+    },
+    {
+      "name": "project-corrections",
+      "returncode": 0,
+      "log": "project-corrections.log",
+      "logSHA256": "02f90cba09e9e3f8391f7abf85bbc7cc3d7a8049da7c519133f5c1114881a68e"
+    },
+    {
+      "name": "tags",
+      "returncode": 0,
+      "log": "tags.log",
+      "logSHA256": "23b5f9819fa617349c650be68a9f017ac4f7cd2fdac4d1b06ff3bdd8af2ba4df"
+    }
+  ],
+  "packageProcessStages": [
+    {
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "ec3136f653d3ee0e438610eccf96c305615ce5754fd8854e5fb619d5e35ff4ab"
+    },
+    {
+      "name": "sdk",
+      "returncode": 0,
+      "log": "sdk.log",
+      "logSHA256": "103fed16f2f3724e5e9afd0f7743e455c2c7cd5f7f296d5374832b7f4ed33f66"
+    },
+    {
+      "name": "api",
+      "returncode": 0,
+      "log": "api.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api",
+      "returncode": 0,
+      "log": "indexed-api.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "packaged-old25",
+      "returncode": 0,
+      "log": "packaged-old25.log",
+      "logSHA256": "8b7f98204970a9aa65bf289a05768f712addd9e066f1737d5486026bdeab9a11"
+    }
+  ],
+  "sdkTests": 16,
+  "packageFiles": 34,
+  "installedAppFilesUnchanged": 15,
+  "testFixturesAbsentFromApp": true,
+  "strictAdHocSignatureVerified": true,
+  "packagedCLI_SHA256": "fa4285dd0ee24924639a5ab822391a2a4a056aba3e48dff4b9560e78cc8c4f81",
+  "archive": {
+    "state": "passed",
+    "zipSHA256": "f4dc675ec0cf87b9259991b45d9e6a08a241320664582020b221191dce3eb056",
+    "bytes": 19711434,
+    "allExtractedFilesMatch": 34,
+    "strictSignatureVerified": true,
+    "scope": "Owned staged draft app archive; all extracted files match the already tested signed package. No install, notarization or full-product acceptance."
+  },
+  "independentReview": {
+    "databases": 3,
+    "SQLiteFilesUnchanged": 10,
+    "readerSHA256": "a5add681ee8e1be537071ab125616cdb5d8ad99c34e90c466659b3d9bcce0766",
+    "receiptSHA256": "58e24b7fef723f59ad74e4eba7079fd2fcc61b1f7f5b06215293a45f8b7625d8",
+    "checks": [
+      "canonical current text remains newer",
+      "original global object/body hashes and native projection checksum independently recomputed",
+      "nullable historical citation and pin bindings",
+      "logical accounting",
+      "quiet restore retains exact body/handle and omits journal authority"
+    ]
+  },
+  "actualOld25": {
+    "binarySHA256": "de59e366f45a7fa8c70109030eb4e668a6dd105acbcf6a184eb86d4e2e22b67a",
+    "debugAndPackagedCurrentPass": true,
+    "alreadyInitializedCollectorObservedPostOpenLease": true,
+    "lateWriteRefused": true,
+    "freshReaderAndWriterRefuse26": true,
+    "currentValidBackupRejectedByOldInspector": true,
+    "payloadAndFreshRefusalSQLiteAndArchiveBytesUnchanged": true
+  },
+  "legacyFixtures": [
+    {
+      "file": "producer-schema25.sqlite",
+      "sha256": "166e2b8380f5b7091c60c8e48d32177d485489a795a3f032de2fdf59fa079527",
+      "bytes": 724992,
+      "sourceText": "Original Alice owns Orion.",
+      "sourceRows": 1,
+      "chatTurns": 1,
+      "typedPackets": 5
+    },
+    {
+      "file": "receiver-schema25.sqlite",
+      "sha256": "d65063d0f2934dbee488b21e83464d89b2c9316e31d3a5a4c919f655ea39b7a1",
+      "bytes": 741376,
+      "sourceText": "Receiver current text",
+      "sourceRows": 1,
+      "chatTurns": 1,
+      "typedPackets": 6
+    }
+  ],
+  "retainedFailures": [
+    "Development-v3 demonstrates canonical-current text substitution in live and restored conversations",
+    "Development-v10 demonstrates cold pin INSERT collision with an existing live global lifetime",
+    "Development-v12/v16/v18 test compilation errors, v13 backup-inside-source fixture refusal, v15 four legacy/raw-row fixture failures",
+    "Client compatibility-v1 sidecar bookkeeping and v2 expected refusal-message failures",
+    "Development-v20 passes full debug but then fails capture expected old function name; v21 passes five stages then fails tag fixture else25 expectation"
+  ],
+  "scope": [
+    "Authority-free archival source bodies, bounded exact reads, nullable schema26 citations and internal typed incoming conversation/turn/citation/pin writes",
+    "Exact historical text and nested recap parent navigation, read-only controls and model selection invalidation",
+    "Actual legacy25 migrations, budget/late-callback rollback, pin lifetime recovery, quiet backup/restore and old executable fencing",
+    "Signed staged package, SDK and owned normal/indexed loopback HTTP/MCP tests; no app installation"
+  ],
+  "limits": [
+    "Complete personal sync F059 remains TODO; all78 requirement statuses unchanged",
+    "Historical image/audio/video playback explicitly unavailable pending verified lifetime/pins and vault shutdown integration",
+    "Incoming canonical source/recap and remaining graph adapters, enrollment/keys, current-policy/erasure epochs, service/transport/providers and actual two-Mac acceptance unfinished",
+    "Historical scoped erasure/retention by original-version fields, reauthorization barriers, archive-specific physical media/crash/scale and complete JSON/Markdown/save-recap workflows need qualification; current transitive closure is rooted in canonical owner scope",
+    "Default suite opt-ins only; parent PR103 full model/native opt-in results are not reused as current acceptance",
+    "No physical capture/power, notarization, fresh historical performance measurement, parity or competitor ranking claim"
+  ],
+  "overallGoalComplete": false
+}

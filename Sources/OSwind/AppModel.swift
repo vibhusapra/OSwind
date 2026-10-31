@@ -53,12 +53,14 @@ import UniformTypeIdentifiers
     @Published var hits = [SearchHit]()
     @Published var stats = StoreStats()
     @Published var storageUpdatedAt: Date?
-    @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil};refreshSelectedPIIScan()}}
+    @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil};refreshSelectedPIIScan();watchSelectedOriginal()}}
     @Published var selectedPIIScan:PIIScanStatus?
     @Published var selectedPIIScanError:String?
     private var piiScanStatusTask:Task<Void,Never>?
     private var piiScanStatusGeneration=UUID()
     @Published private(set) var openingMemoryID:String?
+    private var historicalDetailTask:Task<Void,Never>?
+    private var historicalDetailGeneration=UUID()
     private var detailTask:Task<Void,Never>?
     private var detailGeneration=UUID()
     @Published var selectedEvidenceQuery = ""
@@ -283,7 +285,7 @@ import UniformTypeIdentifiers
     @discardableResult func refreshSelectedPIIScan(read:(@Sendable (Memory)throws->PIIScanStatus)?=nil) -> Task<Void,Never>? {
         piiScanStatusTask?.cancel();piiScanStatusTask=nil;piiScanStatusGeneration=UUID()
         selectedPIIScan=nil;selectedPIIScanError=nil
-        guard let memory=selected else {return nil}
+        guard let memory=selected,memory.originalEvidence==nil else {return nil}
         let store=self.store,generation=piiScanStatusGeneration
         let worker=Task.detached(priority:.utility) {
             try Task.checkCancellation()
@@ -302,6 +304,29 @@ import UniformTypeIdentifiers
         }
         return piiScanStatusTask
     }
+    /// Selection reads are revalidated while visible. Erasure or library shutdown
+    /// closes historical text as well as historical recap cards; no current ID
+    /// can replace the selected original. Media playback remains unavailable.
+    func watchSelectedOriginal(interval:UInt64=2_000_000_000) {
+        historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
+        guard let memory=selected,memory.originalEvidence != nil else {return}
+        let store=self.store,generation=historicalDetailGeneration
+        historicalDetailTask=Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    let worker=Task.detached(priority:.utility) {try store.hydrate(memory)}
+                    let current=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+                    guard !Task.isCancelled,self?.historicalDetailGeneration==generation else {return}
+                    guard current.originalEvidence==memory.originalEvidence,current.recap==memory.recap else {throw OSwindError.unavailable("Original evidence changed")}
+                    try await Task.sleep(nanoseconds:interval)
+                } catch is CancellationError {return}
+                catch {
+                    guard !Task.isCancelled,self?.historicalDetailGeneration==generation else {return}
+                    self?.selected=nil;self?.deletionStatus="The selected original changed or was removed.";return
+                }
+            }
+        }
+    }
     func cancelOpeningMemory() {
         detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
     }
@@ -316,9 +341,7 @@ import UniformTypeIdentifiers
     func openRecapSource(_ card:RecapSourceCard) {
         let store=self.store
         openSource(id:card.id,query:"",passage:card.passage) {
-            guard let current=try store.get(card.id),current.evidenceHash==card.revision else {throw OSwindError.unavailable("This original changed or was removed. Open the current history instead.")}
-            if let passage=card.passage,passage.text(in:current.text)==nil {throw OSwindError.invalid("The saved source anchor is no longer available")}
-            return current
+            try store.recapSourceMemory(card)
         }
     }
     private func openSource(id:String,query:String,passage:PassageRange?,visual:VisualMatch?=nil,load:@escaping @Sendable () throws -> Memory) {
@@ -557,8 +580,9 @@ import UniformTypeIdentifiers
         }
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
-    func favorite(_ memory: Memory) { do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
+    func favorite(_ memory: Memory) { guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory:Memory) {
+        guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only. Delete its source from the library to erase it and dependent citations.";return}
         guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};drafting.clear();deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
         if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
         let store=self.store

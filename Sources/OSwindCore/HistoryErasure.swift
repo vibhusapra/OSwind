@@ -91,19 +91,30 @@ extension RoutineDatabase {
         }
         guard status==SQLITE_DONE else {throw error()}
         let matched=try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids")
-        try execute("INSERT OR IGNORE INTO temp.erasure_ids WITH RECURSIVE linked(id) AS (SELECT id FROM temp.erasure_ids UNION SELECT r.recap_id FROM recap_sources r JOIN linked l ON r.source_id=l.id) SELECT id FROM linked")
+        try execute("""
+        INSERT OR IGNORE INTO temp.erasure_ids
+        WITH RECURSIVE linked(kind,id) AS (
+            SELECT 0,id FROM temp.erasure_ids
+            UNION SELECT 0,r.recap_id FROM recap_sources r JOIN linked l ON l.kind=0 AND COALESCE(r.owner_id,r.source_id)=l.id
+            UNION SELECT 1,h.handle FROM historical_evidence h JOIN linked l ON l.kind=0 AND h.source_id=l.id
+            UNION SELECT 1,d.child FROM historical_evidence_dependencies d JOIN linked l ON l.kind=1 AND d.parent=l.id
+            UNION SELECT 0,r.recap_id FROM recap_sources r JOIN linked l ON l.kind=1 AND r.historical_handle=l.id
+        ) SELECT id FROM linked WHERE kind=0
+        """)
         return matched
     }
-    static let affectedTurns="SELECT DISTINCT s.turn_id FROM chat_sources s JOIN temp.erasure_ids e ON e.id=s.memory_id"
+    static let historicalErasureIDs="WITH RECURSIVE originals(handle) AS (SELECT h.handle FROM historical_evidence h JOIN temp.erasure_ids e ON h.source_id=e.id UNION SELECT d.child FROM historical_evidence_dependencies d JOIN originals o ON d.parent=o.handle) SELECT handle FROM originals"
+    static let affectedTurns="SELECT DISTINCT s.turn_id FROM chat_sources s WHERE COALESCE(s.owner_id,s.memory_id) IN (SELECT id FROM temp.erasure_ids) OR s.historical_handle IN (\(historicalErasureIDs))"
     static let selectedAssets="""
     SELECT json_extract(CAST(payload AS TEXT),'$.imagePath') AS path FROM memories m JOIN temp.erasure_ids e ON e.id=m.id
     UNION SELECT json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories m JOIN temp.erasure_ids e ON e.id=m.id
     UNION SELECT json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories m JOIN temp.erasure_ids e ON e.id=m.id
+    UNION SELECT j.value FROM historical_evidence h,json_each(CAST(h.paths AS TEXT)) j WHERE h.handle IN (\(historicalErasureIDs))
     """
     func erasurePreview(_ scope:HistoryErasureScope,matched:Int) throws -> HistoryErasurePreview {
         var hash=SHA256();let encoder=JSONEncoder();encoder.outputFormatting=[.sortedKeys];hash.update(data:try encoder.encode(scope))
         // Any source mutation invalidates a preview. Dependency IDs also catch new cited answers.
-        for sql in ["SELECT value FROM store_metadata WHERE key='identity'","SELECT hex(revision) FROM search_scope_revision WHERE singleton=1","SELECT id FROM temp.erasure_ids ORDER BY id","\(Self.affectedTurns) ORDER BY s.turn_id"] {
+        for sql in ["SELECT value FROM store_metadata WHERE key='identity'","SELECT hex(revision) FROM search_scope_revision WHERE singleton=1","SELECT hex(revision) FROM historical_evidence_state WHERE singleton=1","SELECT id FROM temp.erasure_ids ORDER BY id","\(Self.affectedTurns) ORDER BY s.turn_id"] {
             let row=try statement(sql);defer {sqlite3_finalize(row)};var status=sqlite3_step(row)
             while status==SQLITE_ROW {hash.update(data:Data((text(row,0)+"\n").utf8));status=sqlite3_step(row)}
             guard status==SQLITE_DONE else {throw error()}
@@ -174,6 +185,7 @@ extension MemoryStore {
                         SELECT json_extract(CAST(payload AS TEXT),'$.imagePath') AS path FROM memories
                         UNION SELECT json_extract(CAST(payload AS TEXT),'$.audioPath') FROM memories
                         UNION SELECT json_extract(CAST(payload AS TEXT),'$.videoPath') FROM memories
+                        UNION SELECT j.value FROM historical_evidence h,json_each(CAST(h.paths AS TEXT)) j
                     ) WHERE path IS NOT NULL
                     """)
                     defer {sqlite3_finalize(live)}

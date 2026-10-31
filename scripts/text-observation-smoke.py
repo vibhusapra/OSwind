@@ -69,19 +69,19 @@ try:
  assert status==200 and ids(body)==['owned-observation-0'];assert ids(http(params|dict(sourceStartsOnly='true'))[1])==[];assert http(params|dict(sourceStartsOnly='1'))[0]==400
  server.terminate();server.wait(timeout=10);server=None
  report['checks'].append('owned authenticated loopback socket includes overlap, supports strict source-start filtering and refuses non-boolean input')
- archive=base/'observations.oswindbackup';assert value('backup','create',archive)['sourceSchema']==25
+ archive=base/'observations.oswindbackup';assert value('backup','create',archive)['sourceSchema']==26
  restored=base/'restored';run('backup','restore',archive,'--to',restored)
  quiet=json.loads((restored/'settings.json').read_text());assert not quiet['captureOnLaunch'] and not quiet['apiEnabled'];assert ids(cli_search(data=restored))==['owned-observation-0']
  assert value('get','owned-observation-0',data=restored)['textObservation']==sources[0]['textObservation']
  exported=base/'observations.json';run('export',exported);copied=base/'json-copy';assert value('import',exported,'--json',data=copied)['imported']==3;assert ids(cli_search(data=copied))==['owned-observation-0']
- report['checks'].append('quiet schema25 backup and JSON round trip preserve observed extent and rebuild sparse range lookup')
+ report['checks'].append('quiet schema26 backup and JSON round trip preserve observed extent and rebuild sparse range lookup')
  markdown=base/'markdown';run('export-markdown',markdown)
  pages=list(markdown.rglob('*.md'));observed=[f.read_text() for f in pages if 'text_observation_samples:' in f.read_text()]
  assert len(observed)==2 and all('largest_observation_gap_seconds:' in s and 'not continuous activity' in s for s in observed)
  report['checks'].append('portable Markdown identifies sample counts and gaps without claiming continuous activity')
  if a.old_cli:
   old=a.old_cli.resolve();before=sha(library/'memory.sqlite');refusal=run('stats','--json',cli=old,ok=False);assert 'newer OSwind version' in refusal.stderr;assert sha(library/'memory.sqlite')==before
-  run('backup','inspect',archive,cli=old,ok=False);report['olderCLI_SHA256']=sha(old);report['checks'].append('actual preceding signed23 client refuses schema25 library and archive; database bytes unchanged')
+  run('backup','inspect',archive,cli=old,ok=False);report['olderCLI_SHA256']=sha(old);report['checks'].append('actual preceding signed23 client refuses schema26 library and archive; database bytes unchanged')
   legacy=base/'actual-older23-library';assert value('import',fixture,'--json',cli=old,data=legacy)['imported']==2
   def legacy_snapshot():
    with sqlite3.connect('file:'+str(legacy/'memory.sqlite')+'?mode=ro',uri=True) as db:
@@ -89,14 +89,14 @@ try:
     return version,rows
   version,beforeRows=legacy_snapshot();assert version==23 and all('textObservation' not in bytes.fromhex(row[1]).decode() for row in beforeRows)
   assert value('stats','--json',data=legacy)['count']==2
-  version,afterRows=legacy_snapshot();assert version==25 and afterRows==beforeRows
+  version,afterRows=legacy_snapshot();assert version==26 and afterRows==beforeRows
   with sqlite3.connect('file:'+str(legacy/'memory.sqlite')+'?mode=ro',uri=True) as db:assert db.execute('SELECT COUNT(*) FROM text_observation_ranges').fetchone()[0]==0
   report['checks'].append('actual prior23 writer strips unknown span fields; upgrade preserves exact typed source payloads and installs empty range projection')
 
  preview=value('erase','preview','--from',stamp(last),'--to',upper);assert preview['sources']==1
  erased=value('erase','apply','--from',stamp(last),'--to',upper,'--token',preview['token']);assert erased['sources']==1;assert ids(cli_search())==[]
  report['checks'].append('preview-guarded erasure includes exact last observed sample and removes its range from later retrieval')
- report.update(state='completed',schema=25,fixtureIsNativeCapture=False,scope='Authored bounded span fixtures, actual CLI/HTTP/MCP/SDK/backup/Markdown/erase processes and optional older-client refusal. No positive native AX capture, normal history, calibrated performance/power or whole-product competitor acceptance.');save();print(json.dumps(report,indent=2))
+ report.update(state='completed',schema=26,fixtureIsNativeCapture=False,scope='Authored bounded span fixtures, actual CLI/HTTP/MCP/SDK/backup/Markdown/erase processes and optional older-client refusal. No positive native AX capture, normal history, calibrated performance/power or whole-product competitor acceptance.');save();print(json.dumps(report,indent=2))
 except BaseException as error:report.update(state='failed',failure=str(error));save();raise
 finally:
  if server is not None:

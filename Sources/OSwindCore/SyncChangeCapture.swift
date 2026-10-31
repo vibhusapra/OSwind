@@ -25,8 +25,8 @@ enum SyncChangeCapture {
         .init("memories","id,timestamp,kind,app,title,url,text,favorite,payload","id"),
         .init("chat_sessions","id,title,created,updated","id"),
         .init("chat_turns","id,session_id,timestamp,payload","id"),
-        .init("chat_sources","turn_id,memory_id,ordinal,score,match,passage_start,passage_length","turn_id,ordinal"),
-        .init("recap_sources","recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length","recap_id,ordinal"),
+        .init("chat_sources","turn_id,memory_id,ordinal,score,match,passage_start,passage_length,owner_id,historical_handle","turn_id,ordinal"),
+        .init("recap_sources","recap_id,source_id,ordinal,revision,score,match,passage_start,passage_length,owner_id,historical_handle","recap_id,ordinal"),
         .init("routines","id,revision,payload","id"),
         .init("routine_runs","id,routine_id,revision,scheduled_at,started,finished,trigger,status,chat_id,message,scope","id"),
         .init("memory_entities","id,kind,name,detail,curated,created","id"),
@@ -54,7 +54,14 @@ enum SyncChangeCapture {
         END
         """
     }
-    static func install(on db:RoutineDatabase,sourceVersion:Int32,repairMissingPins:Bool=false)throws {
+    static func validateLegacyCitationTriggers(_ db:RoutineDatabase,table:SyncCanonicalTable)throws {
+        let old=CitationSchema.legacy(table)
+        for operation in ["insert","update","delete"] {
+            let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,"sync_capture_"+table.rawValue+"_"+operation)
+            guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==trigger(old,operation) else {throw OSwindError.database("Legacy citation capture protection differs")}
+        }
+    }
+    static func install(on db:RoutineDatabase,sourceVersion:Int32,repairMissingPins:Bool=false,repairCitationUpgrade:Bool=false)throws {
         if sourceVersion>=25 {
             for name in ["personal_sync_capture","personal_sync_changes"] {
                 let existing=try db.statement("SELECT type FROM sqlite_master WHERE name=?");db.bind(existing,1,name)
@@ -89,7 +96,7 @@ enum SyncChangeCapture {
             let existing=try db.statement("SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?");db.bind(existing,1,name);let status=sqlite3_step(existing),found=status==SQLITE_ROW ? db.text(existing,0):nil;sqlite3_finalize(existing)
             guard status==SQLITE_ROW || status==SQLITE_DONE else {throw db.error()}
             if let found {guard found==sql else {throw OSwindError.database("Sync capture trigger differs; preserve the library and repair its schema")}}
-            else {guard sourceVersion<25 || (repairMissingPins && name.hasPrefix("sync_capture_text_observation_pins_")) else {throw OSwindError.database("Sync capture trigger missing")};try db.execute(sql)}
+            else {guard sourceVersion<25 || (repairMissingPins && name.hasPrefix("sync_capture_text_observation_pins_")) || (repairCitationUpgrade && (name.hasPrefix("sync_capture_chat_sources_") || name.hasPrefix("sync_capture_recap_sources_"))) else {throw OSwindError.database("Sync capture trigger missing")};try db.execute(sql)}
         }
         _=try scope(db)
     }

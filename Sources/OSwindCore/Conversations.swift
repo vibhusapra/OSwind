@@ -16,7 +16,8 @@ public struct ChatTurn: Identifiable, Codable, Sendable {
     public var filter: SearchFilter
     public var timeZone: String? = nil
 }
-/// No source text snapshots: source links are hydrated from the live memory store.
+/// Ordinary links hydrate current sources. Historical links resolve only their
+/// explicit archived handle, including after quiet restore.
 struct ChatPayload: Codable {
     var question: String
     var text: String
@@ -25,6 +26,7 @@ struct ChatPayload: Codable {
     var warnings: [String]
     var filter: SearchFilter
     var timeZone: String? = nil
+
 }
 public enum ConversationContext {
     public static func questions(_ turns: [ChatTurn]) -> [String] { turns.suffix(3).map { String($0.question.prefix(500)) } }

@@ -1,6 +1,6 @@
 # Exact-version original evidence
 
-Internal component qualified, 2026-10-31. An incoming citation can request an older source while this Mac has a newer offline edit. This layer materializes the admitted exact original as a read-only native `Memory`, separately from the current canonical source. Canonical incoming citation binding and native opening are still unfinished; [complete personal sync](PERSONAL-SYNC.md), F059, remains TODO.
+Parent PR #103 component qualified against its frozen schema-25 sources, 2026-10-31. Subsequent unqualified schema-26 work is tracked in [historical citations](SYNC-HISTORICAL-CITATIONS.md). An incoming citation can request an older source while this Mac has a newer offline edit. This layer materializes the admitted exact original as a read-only native `Memory`, separately from the current canonical source. Canonical incoming citation binding and native opening are still unfinished; [complete personal sync](PERSONAL-SYNC.md), F059, remains TODO.
 
 ## Storage and admission
 

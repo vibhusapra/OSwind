@@ -54,21 +54,21 @@ struct AudioPlaybackView: View {
                     Text(time(playback.position)+" / "+time(playback.duration)).font(.system(.caption,design:.monospaced)).monospacedDigit()
                 }.onAppear { playback.load(url) }.onChange(of:url) { _,value in playback.load(value) }
                 HStack { Image(systemName:playback.volume==0 ? "speaker.slash":"speaker.wave.2"); Slider(value:$playback.volume,in:0...1).frame(maxWidth:140).accessibilityLabel("Playback volume") }.font(.caption).foregroundStyle(.secondary)
-            } else { Label("Audio was not retained for this transcript",systemImage:"waveform.slash").font(.caption).foregroundStyle(.secondary) }
+            } else { Label(memory.originalEvidence==nil ? "Audio was not retained for this transcript":"Playback is unavailable for this original",systemImage:"waveform.slash").font(.caption).foregroundStyle(.secondary) }
             if let error=playback.error { HStack { Text(error).font(.caption).foregroundStyle(.orange); if let url { Button("Retry") { playback.load(url) } } } }
             if let error=renameError { Text(error).font(.caption).foregroundStyle(.orange) }
             if let transcript=editedTranscript ?? memory.transcript {
                 Text(transcript.model+" · "+time(transcript.duration)).font(.caption2).foregroundStyle(.secondary)
                 if let info=transcript.diarization {
                     Text("\(info.detectedSpeakers) estimated speakers · \(transcript.segments.count-info.unassignedSegments)/\(transcript.segments.count) timed spans assigned").font(.caption).foregroundStyle(.secondary)
-                    Text("Labels apply to this recording only. Select a speaker label to name it.").font(.caption2).foregroundStyle(.secondary)
+                    Text("Labels apply to this recording only.").font(.caption2).foregroundStyle(.secondary)
                 }
                 LazyVStack(alignment:.leading,spacing:12) { ForEach(paragraphs) { paragraph in
                     HStack(alignment:.top,spacing:12) {
                         Button(time(paragraph.start)) { playback.seek(paragraph.start) }.font(.system(.caption,design:.monospaced)).buttonStyle(.borderless).disabled(url == nil || playback.error != nil)
                         VStack(alignment:.leading,spacing:4) {
                             if let speaker=paragraph.speaker {
-                                Button(speaker) { renameOriginal=speaker; speakerName=speaker; renameError=nil; renaming=true }.buttonStyle(.plain).font(.caption.weight(.semibold)).foregroundStyle(OSwindTheme.accent).help("Name this speaker for this recording")
+                                Button(speaker) { renameOriginal=speaker; speakerName=speaker; renameError=nil; renaming=true }.disabled(memory.originalEvidence != nil).buttonStyle(.plain).font(.caption.weight(.semibold)).foregroundStyle(OSwindTheme.accent).help("Name this speaker for this recording")
                             } else if transcript.diarization != nil { Text("Unassigned or mixed").font(.caption2).foregroundStyle(.secondary) }
                             Text(words(paragraph,in:transcript)).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading).help(url == nil ? "Transcript":"Select a word to seek")
                         }
@@ -81,6 +81,7 @@ struct AudioPlaybackView: View {
         }.alert("Name this speaker",isPresented:$renaming) {
             TextField("Speaker name",text:$speakerName)
             Button("Save") {
+                guard memory.originalEvidence==nil else {renameError="Original evidence is read-only.";return}
                 do { editedTranscript=try model.store.renameAudioSpeaker(memory.id,from:renameOriginal,to:speakerName,policy:model.settings.privacy).transcript; rebuildParagraphs(); model.refresh() }
                 catch { renameError=error.localizedDescription }
             }

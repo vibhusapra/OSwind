@@ -27,7 +27,7 @@ final class PersonalSyncCausalityTests:XCTestCase {
         else if try change.revision.key==key("session",.conversation) {try j.database.execute("INSERT INTO chat_sessions VALUES('session','Owned causal chat',1,1)")}
         else if try change.revision.key==key("turn",.turn) {
             guard try store.get("parent") != nil else {throw DependencyError.sourceAppliedTooLate}
-            try j.database.execute("INSERT INTO chat_turns VALUES('turn','session',1,x'7b7d'); INSERT INTO chat_sources VALUES('turn','parent',0,1,'authored',NULL,NULL)")
+            try j.database.execute("INSERT INTO chat_turns VALUES('turn','session',1,x'7b7d'); INSERT INTO chat_sources(turn_id,memory_id,ordinal,score,match,passage_start,passage_length) VALUES('turn','parent',0,1,'authored',NULL,NULL)")
         }else if !change.after.isDeleted {try store.insert(Memory(id:"after-delete-"+change.revision.key.digest,text:"authored after observing deletion"))}
     }
     func testNewTurnWaitsForObservedSourceAcrossObjectsAndSurvivesReopen()throws {
