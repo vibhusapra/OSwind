@@ -186,12 +186,18 @@ public enum AccessibilityContext {
         guard let app=application,!app.isTerminated else {return nil}
         return WindowContext(app:app.localizedName ?? "Unknown",bundle:app.bundleIdentifier ?? "",pid:app.processIdentifier,title:"",accessibilityText:"",secure:false)
     }
-    @MainActor static func identityCurrent(_ context:WindowContext,targetBundleID:String?)->Bool {
+    @MainActor public static func identityCurrent(_ context:WindowContext,targetBundleID:String?)->Bool {
         guard let now=identity(targetBundleID:targetBundleID) else {return false}
         return context.pid==now.pid && context.bundle==now.bundle
     }
     @MainActor public static func read(targetBundleID:String?=nil) async -> WindowContext? {
         await observe(targetBundleID:targetBundleID,scope:.full)
+    }
+    @MainActor public static func readPrivacyContext() async ->WindowContext? {
+        guard AXIsProcessTrusted() else {return nil}
+        var context=await observe(targetBundleID:nil,scope:.full)
+        context?.accessibilityText=""
+        return context
     }
     @MainActor static func readBinding(targetBundleID:String?=nil) async -> WindowContext? {
         await observe(targetBundleID:targetBundleID,scope:.binding)

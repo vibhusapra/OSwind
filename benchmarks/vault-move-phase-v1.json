@@ -48,5 +48,22 @@
   "format": "OSwind.owned-vault-move-phase",
   "version": 1,
   "overallV0Complete": false,
-  "schema": 31
+  "schema": 31,
+  "hostedFollowup": {
+    "head": "bcfaf5b33f8fb00e7e0ac1c9fbd7c4ea6b8ebbe4",
+    "run": 41291021469,
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/41291021469",
+    "movedCase": "passed;all11phases observed",
+    "appSessions": "13/13passed",
+    "nativeSuite": "36/37passed;1unexpectedfailure",
+    "failedCase": "NativeVaultDetachSettlementTests.testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment",
+    "failureStage": "final-lock",
+    "operation": "imageDetach",
+    "exit": 16,
+    "stderr": "Resource busy",
+    "cleanupObservation": "trace records later normal imageDetach exit0 and inventory queries; no force used",
+    "cause": "unproven",
+    "traceSHA256": "3206493d326d8cf885cb328b18e7b75cbd811f0d98401823006b6a71217a394e",
+    "nativeLogSHA256": "7e379687c9587acba7e29f3010485f0e51f31b9c1bf5c2d048746ddade7f6300"
+  }
 }

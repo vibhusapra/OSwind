@@ -1,0 +1,288 @@
+{
+  "format": "OSwind.reviewed-local-voice-typing.qualification",
+  "version": 1,
+  "state": "passed-local-software-functional",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "6ac71ff9d3dcbf42ca8439603ff6ef0a17194546",
+  "branch": "codex/voice-typing",
+  "parent": "codex/vault-move-phase",
+  "scope": "Deliberate bounded local dictation, preview/edit and renewed reviewed-target handoff. Injected microphone/AX/target/permission fixtures; actual local ASR on owned public WAV; no physical mic, OS permission, general clipboard, native input or power acceptance.",
+  "inputs": {
+    "repository": 774,
+    "manifest": "voice-typing-inputs-v1.json",
+    "manifestSHA256": "01686e18a7140c222a36ae971e8e6c1413d9a1568aeb2f61d66e011f31427d05",
+    "allUnchanged": true,
+    "externalOwnedModelFixtureAndBinaryFiles": 27
+  },
+  "review": {
+    "state": "passed-local-software-functional",
+    "source": "6ac71ff9d3dcbf42ca8439603ff6ef0a17194546",
+    "inputs": 774,
+    "allGitBlobsLiveAndStageHashesMatch": true,
+    "stages": 15,
+    "tests": {
+      "full-debug": {
+        "defined": 1902,
+        "passed": 1818,
+        "skipped": 84,
+        "failures": 0,
+        "mandatory": 155
+      },
+      "thread-sanitizer": {
+        "defined": 155,
+        "passed": 155,
+        "skipped": 0,
+        "failures": 0,
+        "mandatory": 155
+      },
+      "optimized": {
+        "defined": 155,
+        "passed": 155,
+        "skipped": 0,
+        "failures": 0,
+        "mandatory": 155
+      }
+    },
+    "externalInputs": 27,
+    "extraSkip": [
+      "OSwindCoreTests.OwnedDictationASRTests testOwnedPublicSpeechThroughProductionDictation"
+    ],
+    "actualLocalASR": [
+      "Core ML GPU+CPU selection: two stable public-fixture decodes",
+      "Configured Whisper executable: two stable public-fixture decodes"
+    ],
+    "protectedPriorApps": 21,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "limits": [
+      "No physical microphone, permission prompt, foreground/native input, device interruption, dictation quality, sustained power or actual GPU/ANE utilization measurement.",
+      "Parent PR118 hosted native moved-package failure remains retained/unresolved; this software qualification does not include those actual APFS tests."
+    ],
+    "reviewedAtUTC": "2026-11-01T09:45:57.958458+00:00"
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 326.97202095901594,
+      "logSHA256": "7e315f49ddf1ce57750295b7a2609f51dcfbc206835f3d11cdd19fe2ffcb17d5",
+      "tests": {
+        "defined": 1902,
+        "passed": 1818,
+        "skipped": 84,
+        "failures": 0,
+        "newMandatory": 155
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 67.1634196669329,
+      "logSHA256": "20285c2261967c23346b1017676a5e51fd960b0025d347e2960329e8f4869f23",
+      "tests": {
+        "defined": 155,
+        "passed": 155,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 155
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 210.28023412497714,
+      "logSHA256": "9c2308f2647edfd9652cc7bc19e8a40fd401c8178dd90fba135e68ef59f31d89",
+      "tests": {
+        "defined": 155,
+        "passed": 155,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 155
+      }
+    },
+    {
+      "name": "real-gpu-dictation",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 2.701193290995434,
+      "logSHA256": "88e470a52675bd17658f11b7eb2d36d0a9cbe2d5501afe8ce435f5a0d8e65429"
+    },
+    {
+      "name": "real-whisper-dictation",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.818419124931097,
+      "logSHA256": "a8172d4de40d98164051cefee556ee56ca7190aa8107024e37fef7a5753bd71c"
+    },
+    {
+      "name": "sdk",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 5.124111833050847,
+      "logSHA256": "44c0340a7a1b12ad2bdb3cdf54936ce0015a298d40f5ff9e02e12e3c47c5cb90"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 115.06433300022036,
+      "logSHA256": "563fa5c2ea5534e776fd13ebf2ef5180c33069cf20ce03bed528ad147f529f10"
+    },
+    {
+      "name": "manual-client-process",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 2.4733541670721024,
+      "logSHA256": "7eb1a3d632062b27a03de0d2b46625e93d93dd7a6f7b5eb2aca318c6878bc7e6"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.45921908412128687,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.1435734170954674,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "backup-restore",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.106630333000794,
+      "logSHA256": "2585edf89f6d84b532d935040c98fad81579557b244460f96612368eb7516225"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.2394309579394758,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.10137329204007983,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.03789587505161762,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.03771829092875123,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "newDictationMethods": 24,
+  "otherMandatoryMethods": 131,
+  "mandatoryEachBuild": 155,
+  "strictSignedFiles": 34,
+  "archiveExtractionEqual": true,
+  "installedFilesUnchanged": 15,
+  "protectedPriorAppsUnchanged": 21,
+  "cliSHA256": "94e91aa5c3c166bd67652aaf23f99c7be67565477e2eb66e425de472de14907a",
+  "appSHA256": "ab43dfbcec33b0435a22adcdf1337dd90836549d0fbd15ed5545d60ce8cb4f6d",
+  "zipSHA256": "03d269f79e42440a7ab4cce85a34af84e0a37e7527751f4c25ef89f2972b5b96",
+  "componentUI": {
+    "state": "reviewed-by-byte-identity-to-inspected-v2",
+    "source": "6ac71ff",
+    "files": {
+      "VoiceReview-dark.png": "fff919c40af8e0515350c71c4b81dbb2110a583ade3b2b30398f09dea09f9cb9",
+      "VoiceTranscribing-dark.png": "bb3357a4ffefe3f4e449ca6341480456689fa803b6e79f0cbb9d1f56886ccf69",
+      "VoiceReady-dark.png": "d62e55bf8a7b91514f9f2a8ff05e57ffdd1325e4e73f52318b52c08b61cabcb9",
+      "VoiceReady-light.png": "7caf671552a060bf59d0e5ff559fe0e68d02c09f54fe1d85e87ba28337094cbe",
+      "VoiceTranscribing-light.png": "fab517c036a6a7aecd9ad3c2a367927b9727d1b23305b6811da30179f29cdb5b",
+      "VoiceListening-dark.png": "918ab5f838e5885df2d7ac5cffa29c43a51ca821b6a5ed1ee51c95861efd200c",
+      "VoiceListening-light.png": "dbded49cfe82c53ef253d2f32a3e5bf38d93993a34e7d1d6d459340f5360db05",
+      "VoiceReview-light.png": "68fca5bbeac248e83f62ff73a82539f3895030d0cdfc5c6f4173b527d510b036"
+    },
+    "allEightEqualPreviouslyInspectedV2": true,
+    "binarySHA256": "a186f2adf335932b8c66f3bf31a0754160205faab5d5cbe274c651de96bd4ebe",
+    "scope": "Authored component layout only; no physical mic/permissions/native input. Updated native readiness interface; all eight regenerated PNGs are exactly equal to inspected v2.",
+    "reviewedAtUTC": "2026-11-01T09:31:54.577945+00:00"
+  },
+  "retainedCounterexamples": [
+    {
+      "file": "finish-authorization-red-14.log",
+      "state": "one case /two failures; injected late engine factory attempted once, no real engine",
+      "sha256": "d9fbf7b906d5c3aa68c2e37f216db7eb403db067c9d1b57b1b937d983196c9d6"
+    },
+    {
+      "file": "finish-authorization-green-15.log",
+      "state": "52 focused passes; pending authorization revoked before engine factory",
+      "sha256": "065d01b78f827bf54560a77c40a663fe80fe66c3d4aeabad23ddca5ddca39de9"
+    },
+    {
+      "file": "terminal-pcm-red-16.log",
+      "state": "one case /four failures; terminal signal did not stop recording",
+      "sha256": "a15fe53c8358c22c9dc98455704fda725e22fdf974810f09dbe99c089072d086"
+    },
+    {
+      "file": "terminal-pcm-green-17.log",
+      "state": "53 focused passes; terminal readiness stops and refuses failed PCM",
+      "sha256": "ca8e7df58a993544d17d2df18246064e855a81c84d89877f58197910fe685a68"
+    }
+  ],
+  "earlierCheckpoints": [
+    {
+      "source": "0cb448a15267e5b8e21d5ffed702950b86987ec4",
+      "state": "all15stages+independent774input/18priorapp review passed",
+      "supersededReason": "Additional pending-authorization Finish counterexample"
+    },
+    {
+      "source": "392ea57af999a79a505c2dd0eeb965b532fd405c",
+      "state": "all15stages+independent774input/19priorapp review passed",
+      "supersededReason": "Additional terminal-PCM readiness counterexample"
+    }
+  ],
+  "actualDecoding": {
+    "finalGPUPlusCPU": "Production dictation path twice; stable owned JFK text; empty staging/history. Configuration selection; hardware utilization and dictation accuracy not measured.",
+    "finalWhisper": "Configured local executable/model; production dictation path twice; stable owned JFK text and empty staging/history.",
+    "earlierNeuralEnginePlusCPU": {
+      "source": "0cb448a15267e5b8e21d5ffed702950b86987ec4",
+      "logSHA256": "ddb979c0977e5717b6833bf7806f49992679be1cc7b6fc95de179212be08f366",
+      "state": "one owned-public-file smoke passes two production-path decodes; no microphone or utilization claim"
+    }
+  },
+  "hostedNativeBaselines": [
+    {
+      "head": "0c9b5b76702cdacbeef17a472491f0fed7062572",
+      "run": 41288968230,
+      "url": "https://github.com/vibhusapra/OSwind/actions/runs/41288968230",
+      "state": "benchmark and full software pass; native APFS move case fails with missing vaultSession; attached owned fixture preserved; cause unproven"
+    },
+    {
+      "head": "bcfaf5b33f8fb00e7e0ac1c9fbd7c4ea6b8ebbe4",
+      "run": 41291021469,
+      "url": "https://github.com/vibhusapra/OSwind/actions/runs/41291021469",
+      "state": "benchmark/full software and13app-session cases pass, including all11move phases; native suite36/37 with rapid-lock final imageDetach exit16 ResourceBusy; cleanup trace records a later normal detach0; cause unproven",
+      "traceSHA256": "3206493d326d8cf885cb328b18e7b75cbd811f0d98401823006b6a71217a394e"
+    }
+  ],
+  "limits": [
+    "F083 partial; overall v0 and whole-product/top-three parity incomplete",
+    "No real microphone, permission dialogs, owned foreground-app insertion, device/configuration interruption or missing-callback acceptance",
+    "PCM buffer hardcap30seconds; microphone stop depends on actor/privacy-read scheduling",
+    "No local or competitor dictation WER/latency/energy benchmark; public11-second fixture is smoke only",
+    "Physical GPU/ANE utilization not measured; configuration selection is explicit",
+    "Parent hosted native failures retained and not blindly rerun; no native-vault fix claimed",
+    "Thirty seconds and current draft-target restrictions are deliberate v0 limits; broader languages/voice typing ergonomics and distribution remain open"
+  ],
+  "publishedAtUTC": "2026-11-01T09:51:38.014886+00:00"
+}

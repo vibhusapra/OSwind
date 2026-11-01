@@ -58,7 +58,7 @@ import OSwindCore
         GlobalShortcutModel.shared.configure {
             // Capture explicit external focus before OSwind activates. Opening
             // the app normally never inspects a different application's field.
-            if let session=AppSession.current,!session.busy,let model=session.model,!model.store.isClosed,!model.libraryWipe.busy,!model.libraryWipe.pendingCleanup {model.drafting.chooseDestination(privacy:model.settings.privacy)}
+            if let session=AppSession.current,!session.busy,let model=session.model,!model.store.isClosed,!model.libraryWipe.busy,!model.libraryWipe.pendingCleanup {model.voice.cancel();model.drafting.chooseDestination(privacy:model.settings.privacy)}
             NotificationCenter.default.post(name:.oswindOpenMain,object:nil)
             if AppSession.current?.model?.drafting.showing != true {NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)}
         }

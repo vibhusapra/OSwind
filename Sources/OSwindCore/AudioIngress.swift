@@ -6,7 +6,11 @@ import Accelerate
 
 /// Each device owns one sink. Callbacks copy into a bounded buffer immediately;
 /// they never enqueue one actor task or Dispatch block per PCM callback.
-final class AudioAccumulator: @unchecked Sendable {
+protocol AudioPCMSink:AnyObject,Sendable {
+    func add(_ input:UnsafeBufferPointer<Float>,at end:Date)
+    func fail(_ message:String)
+}
+final class AudioAccumulator: AudioPCMSink, @unchecked Sendable {
     static let segmentSamples=480_000
     static let maximumCallbackSamples=32_768
     static let maximumWaitingSegments=3
@@ -113,8 +117,8 @@ final class SystemAudioOutput:NSObject,SCStreamOutput,SCStreamDelegate,@unchecke
 /// AVAudioEngine serializes callbacks for a tap. This converter is owned by that
 /// tap, with no actor dispatch and no input-buffer retention after consume().
 final class MicrophoneAudioInput:@unchecked Sendable {
-    let source:AVAudioFormat,target:AVAudioFormat,converter:AVAudioConverter,sink:AudioAccumulator
-    init(source:AVAudioFormat,sink:AudioAccumulator) throws {
+    let source:AVAudioFormat,target:AVAudioFormat,converter:AVAudioConverter,sink:any AudioPCMSink
+    init(source:AVAudioFormat,sink:any AudioPCMSink) throws {
         guard source.sampleRate.isFinite,source.sampleRate>0,let target=AVAudioFormat(commonFormat:.pcmFormatFloat32,sampleRate:16000,channels:1,interleaved:false),let converter=AVAudioConverter(from:source,to:target) else {throw OSwindError.unavailable("Microphone audio format unavailable")}
         self.source=source;self.target=target;self.converter=converter;self.sink=sink
     }
@@ -129,6 +133,6 @@ final class MicrophoneAudioInput:@unchecked Sendable {
         }
         guard status != .error,error==nil,let floats=output.floatChannelData?[0] else {sink.fail("Microphone conversion failed · start to retry");return}
         guard output.frameLength>0 else {return}
-        sink.add(UnsafeBufferPointer(start:floats,count:Int(output.frameLength)))
+        sink.add(UnsafeBufferPointer(start:floats,count:Int(output.frameLength)),at:Date())
     }
 }

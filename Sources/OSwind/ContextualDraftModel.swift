@@ -17,6 +17,7 @@ import OSwindCore
     private let copyText:(String) throws ->Void
     private var validateSources:(() async throws ->Void)?
     private var generation=UUID()
+    var revision:UUID {generation}
     private var work:Task<Void,Never>?
     init(transport:(any DraftInsertionTransport)?=nil,
          settle:@escaping () async throws ->Void={try await Task.sleep(for:.milliseconds(300))},
@@ -29,6 +30,11 @@ import OSwindCore
         generation=UUID();work?.cancel();busy=false;destination=nil;transport.clear();error=nil;status=nil
         do {destination=try transport.capture(privacy:privacy);destinationStatus="Destination chosen with ⇧⌘Space. It expires after five minutes."}
         catch {destinationStatus=error.localizedDescription}
+    }
+    func revokeDestination() {
+        guard !busy else {return}
+        generation=UUID();destination=nil;transport.clear()
+        destinationStatus="Choose a fresh destination with ⇧⌘Space after reviewing your words."
     }
     func review(_ answer:Answer,validate:@escaping () async throws ->Void) {
         guard !busy else {return}
@@ -64,7 +70,7 @@ import OSwindCore
             defer {if generation==value.generation {busy=false;work=nil}}
             do {
                 try await validate();try Task.checkCancellation()
-                guard generation==value.generation,text==value.text else {throw CancellationError()}
+                guard generation==value.generation,text.utf8.elementsEqual(value.text.utf8) else {throw CancellationError()}
                 try await operation(value)
             }catch is CancellationError {if generation==value.generation {error="Draft handoff cancelled."}}
             catch {if generation==value.generation {self.error=error.localizedDescription}}
