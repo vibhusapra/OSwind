@@ -18,6 +18,16 @@ struct SyncPublicationAdmission {
     let writer:SyncIncomingConversationWriter
     let inbox:SyncObjectFolder
     var cache:SyncVersionStore {queue.cache}
+    private func validateRetentionContext(outsideTransaction:Bool=false)throws {
+        try writer.library.withRoutineDatabase {connection in
+            guard connection.handle==cache.database.handle,writer.cache.database.handle==connection.handle,
+                  writer.cache.catalog.scope==cache.catalog.scope,writer.cache.journal.replica==cache.journal.replica,
+                  writer.cache.journal.group==cache.journal.group,writer.cache.journal.epoch==cache.journal.epoch else {throw OSwindError.invalid("Use one publication library, connection and trusted namespace")}
+            if outsideTransaction,sqlite3_get_autocommit(connection.handle)==0 {throw OSwindError.invalid("Declaration arrival must reserve media outside a SQLite transaction")}
+            try queue.context()
+        }
+        try inbox.requireNamespace(group:cache.journal.group,epoch:cache.journal.epoch)
+    }
     private func declaration(_ state:SyncRegister)throws->SyncTurnPublication? {
         guard state.heads.count==1,let reference=state.heads[0].publication,let bytes=try inbox.content(reference) else {return nil}
         let value=try SyncTurnPublication.decode(bytes,expected:reference)
@@ -139,7 +149,7 @@ struct SyncPublicationAdmission {
     /// the local content space may retain an unreferenced encrypted object.
     func receive(_ operation:SyncRevision,record:SyncPortableRecord?,admission:MediaAdmissionLease,fetchSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationAdmissionResult {
         try admission.withActive(for:writer.library.mediaRootIdentity) {}
-        guard writer.cache.database.handle==cache.database.handle else {throw OSwindError.invalid("Use one publication admission connection")}
+        try validateRetentionContext()
         if operation.mutation == .put {
             guard let record,try record.identity.key==operation.key,try record.reference.content==operation.content else {throw OSwindError.invalid("Received publication record differs from its operation")}
             try inbox.publishContent(record.encoded(),reference:record.reference.content)
@@ -195,6 +205,13 @@ struct SyncPublicationAdmission {
     /// The content-arrival event is explicit and authenticated by the supplied
     /// hash. Wake only matching declarations, then caller runs a bounded retry.
     func retainDeclaration(_ bytes:Data,reference:SyncContentReference)throws {
+        // Refuse stale/closed/mismatched scopes before writing encrypted bytes.
+        // The shared reservation spans validation, retention and its wakeup;
+        // native wipe/close cannot pass their exclusive barrier in the middle.
+        // Reject reentrant SQL before acquiring media to preserve lock order.
+        try validateRetentionContext(outsideTransaction:true)
+        let admission=try writer.library.mediaWriteLease();defer {admission.release()}
+        try validateRetentionContext(outsideTransaction:true)
         let value=try SyncTurnPublication.decode(bytes,expected:reference)
         guard value.group==cache.journal.group,value.epoch==cache.journal.epoch else {throw OSwindError.invalid("Declaration belongs to another trusted namespace")}
         try inbox.publishContent(bytes,reference:reference)
@@ -202,6 +219,7 @@ struct SyncPublicationAdmission {
     }
     func retry(limit:Int=64,admission:MediaAdmissionLease,fetchSource:(SyncVersionReference)throws->SyncPortableRecord)throws->[SyncPublicationOutcome] {
         try admission.withActive(for:writer.library.mediaRootIdentity) {}
+        try validateRetentionContext()
         return try writer.library.withRoutineDatabase {connection in
             guard connection.handle==cache.database.handle else {throw OSwindError.invalid("Use the retry library connection")}
             let jobs=try queue.jobs(limit:limit);var results=[SyncPublicationOutcome]()
