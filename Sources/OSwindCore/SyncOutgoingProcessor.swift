@@ -13,6 +13,9 @@ struct SyncOutgoingProcessor {
     let admitRow:(SyncObjectIdentity,SyncRowSnapshot)throws->Void
     let admitVersion:(SyncPortableRecord)throws->Void
     let media:(Memory)throws->[SyncMediaManifest]
+    /// Required by future service delivery; nil retains the internal legacy adapter.
+    /// The sink durably retains immutable manifest bytes before its revision.
+    var retainTurnPublication:((SyncContentReference,Data)throws->Void)? = nil
     var maximumObjects=512
     var maximumBytes=16*1024*1024
     var maximumDepth=32
@@ -118,9 +121,34 @@ struct SyncOutgoingProcessor {
             guard try current(identity).encoded()==row.encoded() else {throw OSwindError.invalid("Outgoing row changed during dependency preparation")}
             let ref=try record.reference,state=try cache.journal.state(for:identity.key)
             guard !state.isConflicted else {throw OSwindError.unavailable("Resolve sync conflicts explicitly before outgoing preparation")}
+            var publication:SyncContentReference?,publicationAudit:(()throws->Void)?,citationRows=[(SyncObjectIdentity,SyncRowSnapshot)]()
+            if identity.table == .turn,let sink=processor.retainTurnPublication {
+                guard row.cells.count==4,case .text(let local)=row.cells[0],let turn=String(data:local,encoding:.utf8) else {throw OSwindError.invalid("Outgoing answer primary differs")}
+                let query=try db.statement("SELECT ordinal FROM chat_sources WHERE turn_id=? ORDER BY ordinal LIMIT 61");defer {sqlite3_finalize(query)};db.bind(query,1,turn)
+                var citations=[SyncPortableRecord](),code=sqlite3_step(query)
+                while code==SQLITE_ROW {
+                    guard citations.count<60,sqlite3_column_type(query,0)==SQLITE_INTEGER,sqlite3_column_int64(query,0)==Int64(citations.count) else {throw OSwindError.invalid("Outgoing answer citation declaration is incomplete")}
+                    let id=try self.identity(.conversationCitation,[.text(local),.integer(Int64(citations.count))]),snapshot=try current(id)
+                    try processor.admitRow(id,snapshot)
+                    let child=try SyncPortableExporter(references:references).record(identity:id,row:snapshot)
+                    try processor.admitVersion(child);citations.append(child);citationRows.append((id,snapshot));code=sqlite3_step(query)
+                }
+                guard code==SQLITE_DONE else {throw db.error()}
+                let manifest=try SyncTurnPublication(group:cache.journal.group,epoch:cache.journal.epoch,owner:ref,citations:citations),data=try manifest.encoded()
+                guard data.count<=processor.maximumBytes-bytes else {throw OSwindError.unavailable("Outgoing publication exceeds its typed byte budget")};bytes+=data.count
+                let proof=try manifest.reference;publication=proof;try sink(proof,data)
+                publicationAudit={
+                    let count=try self.db.statement("SELECT count(*) FROM chat_sources WHERE turn_id=?");defer {sqlite3_finalize(count)};self.db.bind(count,1,turn)
+                    guard sqlite3_step(count)==SQLITE_ROW,sqlite3_column_int64(count,0)==Int64(citations.count) else {throw OSwindError.invalid("Outgoing citations changed during publication retention")}
+                    for (id,snapshot) in citationRows {guard try self.current(id)==snapshot else {throw OSwindError.invalid("Outgoing citation changed during publication retention")}}
+                    guard try self.current(identity)==row else {throw OSwindError.invalid("Outgoing answer changed during publication retention")}
+                }
+                try publicationAudit?()
+            }
             func retain()throws {_=try cache.retain(record,admit:processor.admitVersion);try cache.bindProjection(ref,references:references,admit:processor.admitVersion)}
-            if state.heads.count==1,state.heads[0].content==ref.content {try retain()}
-            else {_=try cache.journal.put(key:identity.key,content:ref.content) {_ in try retain()}}
+            if state.heads.count==1,state.heads[0].content==ref.content,state.heads[0].publication==publication {try retain()}
+            else {_=try cache.journal.put(key:identity.key,content:ref.content,publication:publication) {_ in try retain()}}
+            try publicationAudit?()
             prepared[digest]=record;return record
         }
     }

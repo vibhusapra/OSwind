@@ -106,16 +106,21 @@ struct SyncRevision:Codable,Equatable,Sendable {
     let context:SyncClock
     let mutation:SyncMutation
     let content:SyncContentReference?
+    /// Complete turn-evidence declaration, authenticated with this revision.
+    /// Missing is a legacy record, never an empty evidence declaration.
+    let publication:SyncContentReference?
     var clock:SyncClock {get throws {try context.observing(dot)}}
-    init(key:SyncObjectKey,dot:SyncDot,context:SyncClock,mutation:SyncMutation,content:SyncContentReference?=nil)throws {
+    init(key:SyncObjectKey,dot:SyncDot,context:SyncClock,mutation:SyncMutation,content:SyncContentReference?=nil,publication:SyncContentReference?=nil)throws {
         guard dot.counter>context[dot.replica],(mutation == .put)==(content != nil) else {throw OSwindError.invalid("Invalid sync revision context or content")}
+        guard publication==nil || (mutation == .put && key.kind == .turn && publication!.bytes>0 && publication!.bytes<=SyncTurnPublication.maximumBytes) else {throw OSwindError.invalid("Publication declaration requires a bounded turn put")}
         _=try context.observing(dot)
+        self.publication=publication
         self.key=key;self.dot=dot;self.context=context;self.mutation=mutation;self.content=content
     }
-    private enum CodingKeys:String,CodingKey {case key,dot,context,mutation,content}
+    private enum CodingKeys:String,CodingKey {case key,dot,context,mutation,content,publication}
     init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
-        try self.init(key:c.decode(SyncObjectKey.self,forKey:.key),dot:c.decode(SyncDot.self,forKey:.dot),context:c.decode(SyncClock.self,forKey:.context),mutation:c.decode(SyncMutation.self,forKey:.mutation),content:c.decodeIfPresent(SyncContentReference.self,forKey:.content))
+        try self.init(key:c.decode(SyncObjectKey.self,forKey:.key),dot:c.decode(SyncDot.self,forKey:.dot),context:c.decode(SyncClock.self,forKey:.context),mutation:c.decode(SyncMutation.self,forKey:.mutation),content:c.decodeIfPresent(SyncContentReference.self,forKey:.content),publication:c.decodeIfPresent(SyncContentReference.self,forKey:.publication))
     }
     func encoded()throws->Data {let data=try SyncProtocolLimits.encode(self);guard data.count<=SyncProtocolLimits.operationBytes else {throw OSwindError.invalid("Sync operation exceeds its bound")};return data}
     static func decode(_ data:Data)throws->Self {
