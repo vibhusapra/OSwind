@@ -270,7 +270,7 @@ struct SyncVersionStore {
                     // A quiet restore preserves provenance while a later catalog
                     // gives canonical objects new lifetimes. Rebuild all native
                     // fields and references; never equate two different packets.
-                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original})
+                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)})
                     let rebuilt=try SyncPortableExporter(references:references).record(identity:identity,row:currentRow(identity))
                     guard try rebuilt.encoded()==value.encoded() else {throw OSwindError.invalid("Run original differs from cached projection")}
                 }
@@ -283,7 +283,7 @@ struct SyncVersionStore {
             try context();guard let record=try self.record(reference,admit:admit) else {throw OSwindError.unavailable("Prepare the exact sync version before binding")}
             let row=try currentRow(reference.identity),rebuilt=try SyncPortableExporter(references:references).record(identity:reference.identity,row:row)
             guard try rebuilt.encoded()==record.encoded() else {throw OSwindError.invalid("Sync projection differs from its original local row")}
-            try record.validateDependencies {try resolve($0,content:$1,admit:admit)}
+            try record.validateDependencies(conversationIsErased:{try self.isErasedOptionalConversation(record,identity:$0)}) {try resolve($0,content:$1,admit:admit)}
             var evidence:String?,entity:String?
             if reference.identity.table == .source,case .blob(let data)=row.cells[8] {let memory=try JSONDecoder().decode(Memory.self,from:data);evidence=memory.evidenceHash;entity=memory.entityRevision}
             try context();guard try currentRow(reference.identity).encoded()==row.encoded(),try stored(reference) != nil else {throw OSwindError.invalid("Sync projection source changed during dependency admission")}
@@ -306,7 +306,7 @@ struct SyncVersionStore {
         }
     }
     func projectedReference(_ identity:SyncObjectIdentity)throws->SyncVersionReference? {
-        try context();let row=try database.statement("SELECT p.content_sha,v.bytes FROM personal_sync_version_projection p JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE p.object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,try identity.key.digest)
+        try context();let row=try database.statement("SELECT p.content_sha,v.bytes FROM personal_sync_version_projection p LEFT JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE p.object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,try identity.key.digest)
         let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
         let reference=try SyncVersionReference(identity:identity,content:.init(sha256:database.text(row,0),bytes:sqlite3_column_int64(row,1)))
         guard try resolve(identity,content:nil,admit:{_ in}).reference==reference else {throw OSwindError.database("Sync current projection reference differs")};return reference
@@ -392,4 +392,51 @@ struct SyncVersionStore {
         }
     }
 
+}
+
+// Only the nullable conversation of an independent run may omit a live lookup.
+// Missing live references and every owning/evidence dependency remain required.
+extension SyncPortableRecord {
+    func liveDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool)throws->[SyncPortableDependency] {
+        guard case .routineRun(let body)=self.body,let conversation=body.conversation else {return dependencies}
+        return try dependencies.filter {dependency in
+            guard conversation==dependency.identity,dependency.content==nil else {return true}
+            return try !conversationIsErased(dependency.identity)
+        }
+    }
+}
+extension SyncVersionStore {
+    func isErasedOptionalConversation(_ record:SyncPortableRecord,identity:SyncObjectIdentity)throws->Bool {
+        try context()
+        guard case .routineRun(let body)=record.body,body.conversation==identity else {return false}
+        try SyncWireCheck.identity(identity,.conversation)
+        return try journal.state(for:identity.key).isDeleted
+    }
+    /// Read a retained projection without rebuilding its optional native link.
+    /// Record() still checks owner, immutable bytes and version revocation.
+    func retainedRunProjection(localRunID:String)throws->SyncPortableRecord? {
+        try context()
+        let identity=try catalog.localIdentity(.routineRun,primary:[.text(Data(localRunID.utf8))])
+        if let original=try RoutineRunOriginalStore(db:database).read(localRunID),original.record.identity==identity {
+            guard let value=try record(original.record.reference,admit:{_ in}) else {throw OSwindError.unavailable("Prepare the run's exact original cached packet before detachment")}
+            return value
+        }
+        let row=try database.statement("SELECT p.content_sha,v.bytes FROM personal_sync_version_projection p LEFT JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE p.object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,try identity.key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
+        guard sqlite3_column_type(row,1)==SQLITE_INTEGER else {throw OSwindError.unavailable("Prepare the run's current cached projection before detachment")}
+        let ref=try SyncContentReference(sha256:database.text(row,0),bytes:sqlite3_column_int64(row,1))
+        guard let value=try record(.init(identity:identity,content:ref),admit:{_ in}) else {throw OSwindError.unavailable("Run cached projection body is missing")}
+        return value
+    }
+    /// A null native link preserves only a locally fingerprint-bound original
+    /// and an authenticated projection in this catalog's current lifetime.
+    /// Quiet restore cannot acquire authority from old wire identities alone.
+    func erasedRunConversation(localRunID:String)throws->SyncObjectIdentity? {
+        try context()
+        let store=RoutineRunOriginalStore(db:database)
+        guard try store.read(localRunID) != nil,let frame=try store.frame(localRunID),frame.cells.count==11,frame.cells[8] == .null,
+              let packet=try retainedRunProjection(localRunID:localRunID),case .routineRun(let body)=packet.body,let conversation=body.conversation,
+              try isErasedOptionalConversation(packet,identity:conversation) else {return nil}
+        return conversation
+    }
 }

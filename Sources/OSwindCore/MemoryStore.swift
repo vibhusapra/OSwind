@@ -946,7 +946,12 @@ extension MemoryStore {
         return ChatSession(id:id,title:string(stmt,0),created:Date(timeIntervalSince1970:sqlite3_column_double(stmt,1)),updated:Date(timeIntervalSince1970:sqlite3_column_double(stmt,2)),turnCount:Int(sqlite3_column_int(stmt,3)))
     }
     public func deleteChat(_ id: String) throws {
-        lock.lock(); defer { lock.unlock() }; let stmt = try prepare("DELETE FROM chat_sessions WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt,1,id); guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
+        try withRoutineDatabase {db in try db.transaction {
+            try RoutineRunOriginalStore(db:db).forEachLinkedRun(chatID:id) {local,original,before in
+                _=try detachRunOriginalConversation(local,from:id,original:original,before:before,db:db)
+            }
+            let stmt=try db.statement("DELETE FROM chat_sessions WHERE id=?");defer {sqlite3_finalize(stmt)};db.bind(stmt,1,id);try db.done(stmt)
+        }}
     }
     @discardableResult public func appendChatTurn(sessionID: String, question: String, answer: Answer, filter: SearchFilter = SearchFilter(), policy: PrivacyPolicy = PrivacyPolicy()) throws -> ChatTurn {
         lock.lock(); defer { lock.unlock() }

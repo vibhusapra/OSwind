@@ -160,8 +160,8 @@ enum SyncIncomingDependencyAudit {
             if visited.contains(key) {return}
             guard remaining>0,let stored=try cache.record(ref,admit:{_ in}),try stored.encoded()==packet.encoded() else {throw OSwindError.invalid("Incoming exact dependency admission changed during projection")}
             remaining-=1;visiting.insert(key);defer {visiting.remove(key)}
-            for dependency in packet.dependencies {try walk(resolve(dependency.identity,dependency.content))}
-            try packet.validateDependencies(resolve:resolve)
+            for dependency in try packet.liveDependencies(conversationIsErased:{try cache.isErasedOptionalConversation(packet,identity:$0)}) {try walk(resolve(dependency.identity,dependency.content))}
+            try packet.validateDependencies(conversationIsErased:{try cache.isErasedOptionalConversation(packet,identity:$0)},resolve:resolve)
             visited.insert(key)
         }
         for packet in packets {try walk(packet)}

@@ -207,7 +207,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
     var reference:SyncVersionReference {get throws {try .init(identity:identity,content:.init(data:encoded()))}}
     /// Dependency lookup must return the requested immutable content version.
     /// No fallback to current source data, no local IDs or raw peer SQL.
-    func validateDependencies(resolve:(SyncObjectIdentity,SyncContentReference?)throws->SyncPortableRecord)throws {
+    func validateDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool={_ in false},resolve:(SyncObjectIdentity,SyncContentReference?)throws->SyncPortableRecord)throws {
         try validate()
         func dependency(_ id:SyncObjectIdentity,_ content:SyncContentReference?=nil)throws->SyncPortableRecord {
             let record=try resolve(id,content);try record.validate()
@@ -229,7 +229,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
         case .conversationCitation(let value):_=try dependency(value.owner);try link(value.link)
         case .recapCitation(let value):
             guard case .source(let parent)=try dependency(value.owner).body,let recap=parent.recap,value.ordinal<recap.sources.count,try SyncProtocolLimits.encode(recap.sources[value.ordinal])==SyncProtocolLimits.encode(value.link) else {throw OSwindError.invalid("Sync recap citation differs from its owner")};try link(value.link)
-        case .routineRun(let value):_=try dependency(value.recipe.routine,value.recipe.definition);if let id=value.conversation {_=try dependency(id)};try filter(value.filter)
+        case .routineRun(let value):_=try dependency(value.recipe.routine,value.recipe.definition);if let id=value.conversation,try !conversationIsErased(id) {_=try dependency(id)};try filter(value.filter)
         case .entityAlias(let value):guard case .entity(let entity)=try dependency(value.entity).body,entity.kind==value.kind else {throw OSwindError.invalid("Sync alias entity kind differs")}
         case .entityMention(let value):
             let original=try source(value.source);_=try dependency(value.entity)
