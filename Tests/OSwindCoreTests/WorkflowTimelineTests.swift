@@ -13,7 +13,7 @@ final class WorkflowTimelineTests:XCTestCase {
         let source=WorkflowSourceBinding(library:String(repeating:"a",count:64),memoryID:"owned-screen",revision:String(repeating:"b",count:64),mediaSHA256:String(repeating:"c",count:64),kind:.image)
         return .init(title:"Owned audio timeline",steps:[.init(source:source,title:"First",narration:"First owned narration."),.init(source:source,title:"Second",narration:"Second owned narration.")])
     }
-    func populate(_ workspace:BackupWorkspace,draft:WorkflowDraft)throws->[WorkflowNarrationResult] {
+    static func populate(_ workspace:BackupWorkspace,draft:WorkflowDraft)throws->[WorkflowNarrationResult] {
         var result=[WorkflowNarrationResult]()
         for (index,step) in draft.steps.enumerated() {
             let stem=String(format:"step-%02d-narration",index+1),count=index==0 ? 2400:3600,duration=Double(count)/24000
@@ -28,7 +28,7 @@ final class WorkflowTimelineTests:XCTestCase {
     }
     func testCombinationPreservesEveryPCMByteAndMeasuredStepBoundary()throws {
         try withWorkspace {workspace in
-            let d=draft(),inputs=try populate(workspace,draft:d),timeline=try LocalWorkflowTimeline.combine(draft:d,narrations:inputs,workspace:workspace)
+            let d=draft(),inputs=try Self.populate(workspace,draft:d),timeline=try LocalWorkflowTimeline.combine(draft:d,narrations:inputs,workspace:workspace)
             XCTAssertEqual(timeline.frames,6000);XCTAssertEqual(timeline.duration,0.25,accuracy:0.000001);XCTAssertEqual(timeline.draftRevision,try d.revision)
             XCTAssertEqual(timeline.steps.map(\.startFrame),[0,2400]);XCTAssertEqual(timeline.steps.map(\.endFrame),[2400,6000]);XCTAssertEqual(timeline.steps.map(\.stepID),d.steps.map(\.id))
             let joined=try workspace.tree.read("narration.wav",limit:1024*1024),first=try workspace.tree.read(inputs[0].stem+".wav",limit:1024*1024),second=try workspace.tree.read(inputs[1].stem+".wav",limit:1024*1024)
@@ -40,14 +40,14 @@ final class WorkflowTimelineTests:XCTestCase {
     }
     func testChangedReviewedScriptRefusesBeforeCombinedFilesExist()throws {
         try withWorkspace {workspace in
-            var d=draft();let inputs=try populate(workspace,draft:d);d.steps[0].narration="Edited after measurement"
+            var d=draft();let inputs=try Self.populate(workspace,draft:d);d.steps[0].narration="Edited after measurement"
             XCTAssertThrowsError(try LocalWorkflowTimeline.combine(draft:d,narrations:inputs,workspace:workspace))
             XCTAssertThrowsError(try workspace.tree.read("narration.txt",limit:12300));XCTAssertThrowsError(try workspace.tree.read("narration.wav",limit:1024))
         }
     }
     func testChangedValidPCMRefusesBeforeCombinationAndPreservesReplacement()throws {
         try withWorkspace {workspace in
-            let d=draft(),inputs=try populate(workspace,draft:d),replacement=WAV.data(samples:Array(repeating:0.25,count:2400),sampleRate:24000)
+            let d=draft(),inputs=try Self.populate(workspace,draft:d),replacement=WAV.data(samples:Array(repeating:0.25,count:2400),sampleRate:24000)
             try replacement.write(to:workspace.url.appendingPathComponent(inputs[0].stem+".wav"),options:.atomic)
             XCTAssertThrowsError(try LocalWorkflowTimeline.combine(draft:d,narrations:inputs,workspace:workspace))
             XCTAssertEqual(try workspace.tree.read(inputs[0].stem+".wav",limit:1024*1024),replacement)
