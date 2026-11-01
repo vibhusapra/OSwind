@@ -2,7 +2,7 @@
 
 In development. F059 remains TODO until a user can pair devices and synchronize the complete supported library. The protocol below is a foundation, not delivered sync or a replacement for the existing complete backup/restore feature.
 
-The latest internal component qualifies [optional conversation references](SYNC-OPTIONAL-REFERENCES.md): preserve independent exact run provenance across deletion, late arrival, quiet restore, rollback/cancellation and actual pre/postcommit death. This does not enable the service or change F059; erased entity scopes, collection/publication epochs, production media/policy/transport and enrollment/provider/two-device delivery remain required. Older component checklists below describe their dated milestones.
+The latest internal component qualifies [unavailable entity scopes](SYNC-UNAVAILABLE-SCOPES.md): preserve independent history across native/peer entity deletion, late arrival, source pruning, quiet restore and actual crash recovery, with scope-preserving calendar/Markdown export and schema32 old-client refusal. This enables no service or F059 promotion. Publication/collection epochs, compaction, production current-policy/media/transport, enrollment/recovery/conflict UI and actual providers/two Macs remain required. Older component checklists below describe their dated milestones.
 
 ## Delivery requirements
 

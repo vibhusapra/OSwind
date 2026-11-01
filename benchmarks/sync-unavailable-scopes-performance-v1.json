@@ -1,0 +1,67 @@
+{
+  "state": "passed",
+  "source": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+  "buildAssociation": "Exact source-qualified staged binary and qualification receipt",
+  "cliSHA256": "ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2",
+  "driverSHA256": "704378d6fda78e927f8905a28a2feb1de472c29ab685e55cc2315c5ec8aac60f",
+  "startedAtUTC": "2026-11-01T16:31:59.751343+00:00",
+  "observations": [
+    {
+      "rowsPerHistory": 1000,
+      "retiredFilters": 2000,
+      "unaffectedControls": 2,
+      "populationSeconds": 0.0563613751437515,
+      "wholeCLIWallSeconds": 0.18913095793686807,
+      "wholeProcessPeakRSSBytes": 22396928,
+      "fullNativeRowOraclePassed": true,
+      "originalSourceUnchanged": true,
+      "sqliteIntegrityPassed": true,
+      "minimumNegativeRowIDIncluded": true,
+      "beforeTypedSHA256": {
+        "chat_turns": "02f0f12850690b1ec8abf50d6bad38e4116762ccc4b91b116e7a03a09d6e5000",
+        "routine_runs": "d0ee7e7c95e9bcdac7642fa1c8253a88f23a4e871bc1489b74df7ecf371de258",
+        "memories": "b77b31e622c50b2978c92d330115d1d5e7514412f7fa1307549dbbcdc7291d89"
+      },
+      "afterTypedSHA256": {
+        "chat_turns": "89eb8f0182e5375fb4d735911e4f130357e671c295d705a33013236379b27065",
+        "routine_runs": "5e2b60abaa2fc390578c92594aaaa51957ddd1f57634a32690667494e2f50583",
+        "memories": "b77b31e622c50b2978c92d330115d1d5e7514412f7fa1307549dbbcdc7291d89"
+      },
+      "stdoutSHA256": "4a4e2e22fcc87be62043c905213d8484c34f88ee354b24118f9eddff2af07caf",
+      "stderrSHA256": "cecf7bc185ced206d1bddc0c4f5a64139bf011c8c8f382f4335236362edfed41"
+    },
+    {
+      "rowsPerHistory": 10000,
+      "retiredFilters": 20000,
+      "unaffectedControls": 2,
+      "populationSeconds": 0.6048877499997616,
+      "wholeCLIWallSeconds": 1.3474192079156637,
+      "wholeProcessPeakRSSBytes": 30507008,
+      "fullNativeRowOraclePassed": true,
+      "originalSourceUnchanged": true,
+      "sqliteIntegrityPassed": true,
+      "minimumNegativeRowIDIncluded": true,
+      "beforeTypedSHA256": {
+        "chat_turns": "7abcf5f586a847f5ce9d39cb21c76581a24273812b4a578bde0beb02af67e7cb",
+        "routine_runs": "88cfa56fb6a9275d5c2ce4fc1c2674f3ef51dd2cdb5cc4a6572ecc51eed2bd36",
+        "memories": "13fba6a82c973c1645ce80aac06cf5b1eb0feae44e0fcf7478625f45a5d51b49"
+      },
+      "afterTypedSHA256": {
+        "chat_turns": "9186f016bfcdd930ab52c0c196b9e2c6ec011a25525b36d17ca0be917e3840d1",
+        "routine_runs": "8e0616cfd9336cca030010e93463cc6b07f34b56e8edaca7badd9356d54e9dac",
+        "memories": "13fba6a82c973c1645ce80aac06cf5b1eb0feae44e0fcf7478625f45a5d51b49"
+      },
+      "stdoutSHA256": "4a4e2e22fcc87be62043c905213d8484c34f88ee354b24118f9eddff2af07caf",
+      "stderrSHA256": "8de59fe630e298d757e06186340654e5b8df49219a5898866cae97514ad7dd65"
+    }
+  ],
+  "scope": "One warm owned native CLI entity deletion per size, with N scoped turns plus N stored-run filters and unaffected controls. Timer includes CLI startup, schema checks, exact native scope retirement and process exit. Population is authored raw SQLite with inactive capture and current default-deny fixture registration, not API ingestion. Setup/source-control creation including its ordinary local embedding is outside the measured interval. No imported run originals, journal/transport, timed model inference, capture, energy, causal comparison or competitive ranking.",
+  "host": {
+    "architecture": "arm64",
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "finishedAtUTC": "2026-11-01T16:32:02.966477+00:00"
+}
