@@ -1,0 +1,396 @@
+{
+  "format": "OSwind narrated workflows qualification",
+  "version": 1,
+  "state": "passed-owned-software-native-process-and-reviewed-media",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "415db23f07e906ecd394264ee828e7fe5b7dbd75",
+  "branch": "codex/narrated-workflow",
+  "parent": {
+    "pr": "https://github.com/vibhusapra/OSwind/pull/121",
+    "branch": "codex/vault-busy-detach"
+  },
+  "scope": "Reviewed app/CLI retained-source narrated export; eight steps,120 measured seconds,1280x720H264/AAC,stock local Kokoro af_heart1.0. F081partial; no complete parity or top-three claim.",
+  "inputs": {
+    "trackedRepositoryFiles": 803,
+    "manifestSHA256": "b74fd5e2048afb1c70b4e3451710bd7ff2dff6158f97894bcedd2c53829c980a",
+    "allSourceGitBlobsVerified": true,
+    "localHelperAndCachedModelAssetsUnchanged": true,
+    "externalManifestSHA256": "b228b47e0ce16a5574e445a5c700f0ccef776742278cc2e0e85fac6f2880857f"
+  },
+  "review": {
+    "receiptSHA256": "3bede66ece5bd5d1af4c9be8827ad0a36b13378aba9719daf609d1a1afa2ee09",
+    "sourceAndStageLogHashesVerified": true,
+    "coverage": {
+      "fullPassMethods": 1883,
+      "nativePassMethods": 39,
+      "nativeAdditionalPassMethods": 37,
+      "actualNarrationAdditionalMethods": 4,
+      "distinctPassedMethods": 1924,
+      "remainingOptInSkippedMethods": [
+        "OSwindAppTests.ImportLifecycleModelTests testActualNativeGUIJSONAndLimitlessImportWorkers",
+        "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse",
+        "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardReturnsExactUTF8WithoutOpeningGeneralClipboard",
+        "OSwindAppTests.NativeClipboardReaderTests testMismatchedSourceIsRefusedBeforeLazyTextProviderRuns",
+        "OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured",
+        "OSwindAppTests.PIIModelSetupTests testOwnedSettingsStatesRenderWithoutNetworkOrLibrary",
+        "OSwindAppTests.PIIScanRecordViewTests testOwnedPrivacyRecordStatesRenderInBothThemes",
+        "OSwindAppTests.WorkspaceWakeLifecycleTests testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup",
+        "OSwindCoreTests.EntityWordPieceTests testPinnedVocabularyMatchesIndependentTokenAndOffsetReferences",
+        "OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker",
+        "OSwindCoreTests.HistoricalErasureScaleTests testOwnedOriginalScopeAtBoundedScale",
+        "OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle",
+        "OSwindCoreTests.MeetingReminderCrashTests testMeetingReminderCrashWorker",
+        "OSwindCoreTests.NativeANNBuildMeasurementsTests testAuthoredNativePreparationAndSampledSelfRecall",
+        "OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured",
+        "OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder",
+        "OSwindCoreTests.OwnedDictationASRTests testOwnedPublicSpeechThroughProductionDictation",
+        "OSwindCoreTests.PIIImportTests testActualNativeCPUImportPaths",
+        "OSwindCoreTests.PIIImportTests testActualNativeCoreMLImportPaths",
+        "OSwindCoreTests.PIIImportTests testPinnedNativeEmailMissIsRetainedAsKnownQualityLimitation",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualBackendsPreserveCoordinatesAcrossLongWhitespaceGap",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCPUCohortMatchesPinnedIndependentReference",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCPULongDocumentKeepsCompleteOriginalCoordinates",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLCohortMatchesPinnedIndependentReference",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLLongDocumentKeepsCompleteOriginalCoordinates",
+        "OSwindCoreTests.PIIModelPreparationTests testNativeStreamingMetadataDerivativeMatchesIndependentONNXBytes",
+        "OSwindCoreTests.PIIModelPreparationTests testRealPreparedReuseAndVerifyNeverInvokeNetworkExtractorOrInference",
+        "OSwindCoreTests.PIITokenizerTests testConcurrentEncodingKeepsImmutableSourceTensors",
+        "OSwindCoreTests.PIITokenizerTests testPinnedTokenizerMatchesIndependentGLiNERAndRustTensors",
+        "OSwindCoreTests.PersonalSyncCrashTests testCrashWorker",
+        "OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange",
+        "OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured",
+        "OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured",
+        "OSwindCoreTests.SyncCaptureCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncCaptureScaleTests testOwnedArchiveScaleAndIncrementalCost",
+        "OSwindCoreTests.SyncIdentityCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncIdentityScaleTests testOwnedIdentityBootstrapAndIncrementalLifetimeScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale",
+        "OSwindCoreTests.SyncOriginalEvidenceCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncOriginalEvidenceScaleTests testOwnedOriginalEvidenceAtBoundedScale",
+        "OSwindCoreTests.SyncOutgoingCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncOutgoingScaleTests testOwnedOutgoingPreparationAtBoundedScale",
+        "OSwindCoreTests.SyncVersionCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncVersionScaleTests testOwnedVersionPreparationAtBoundedScale",
+        "OSwindCoreTests.VisualEncoderTests testPinnedNativeTokenizerParityAndModelLifecycle",
+        "OSwindCoreTests.VisualTokenizerDataTests testPinnedCompleteVocabularyMergesAndIndependentTokenReferences"
+      ]
+    }
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "wallSeconds": 329.82489300007,
+      "logSHA256": "5615c995c03da69377d14a4b8c38b06ea1de53bc4083a28236d948622bb0751a",
+      "tests": {
+        "defined": 1976,
+        "passed": 1883,
+        "skipped": 93,
+        "failures": 0
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "wallSeconds": 63.228634709026664,
+      "logSHA256": "8f1e20c9f34032c870a2a90f1066acadaf7b7bffbad8d24b3c24fe1365f999c8",
+      "tests": {
+        "defined": 76,
+        "passed": 60,
+        "skipped": 16,
+        "failures": 0
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "wallSeconds": 163.25952295819297,
+      "logSHA256": "b087d3df09930605c3c0ca07fe9393a2b7dd1c9812e53d782a4329f635e96c28",
+      "tests": {
+        "defined": 76,
+        "passed": 60,
+        "skipped": 16,
+        "failures": 0
+      }
+    },
+    {
+      "name": "actual-local-narration-v2",
+      "state": "passed",
+      "wallSeconds": 31.402988916030154,
+      "logSHA256": "a885b8e6c70c3c522b273ba0a0b05f6d43dc1769ada0c4828f2aee699daa9275",
+      "tests": {
+        "defined": 58,
+        "passed": 58,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "actual-spoken-component-v2",
+      "state": "passed",
+      "wallSeconds": 10.723854582989588,
+      "logSHA256": "fae82dcfe6b71b6802b5de7740022c11ef780ec7173e4edcef9aaeecf36a0e43",
+      "tests": {
+        "defined": 1,
+        "passed": 1,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "wallSeconds": 186.8626117501408,
+      "logSHA256": "59cbc3af9b779e509cdfc4ddb1bbff6e431238abc4e74930fd289d4d5f425dcd",
+      "tests": {
+        "defined": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "wallSeconds": 122.7424245828297,
+      "logSHA256": "8e6d2f5f07e86665ba68a323a23dfe58486013c97dcc94ba2ca10879b3b70705"
+    },
+    {
+      "name": "signed-workflow",
+      "state": "passed",
+      "wallSeconds": 6.640243666945025,
+      "logSHA256": "39e3a43f6b2d523abffc6be63f566ebeac7fe003e2a980718d0597e5a6c4c3b8"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "wallSeconds": 0.4324559171218425,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "wallSeconds": 1.103838708018884,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "wallSeconds": 5.072736374801025,
+      "logSHA256": "b0907fd7b92b0cb1df38e1066d0b45a40aa3b526dfd386d3060ce2f535037897"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "wallSeconds": 1.0577354170382023,
+      "logSHA256": "a3b018813afcfe7d91b5c9095bd8164ccd25f17b0bc68ca33bbb7d13e814f1d1"
+    },
+    {
+      "name": "debug-package",
+      "state": "passed",
+      "wallSeconds": 5.0888860418926924,
+      "logSHA256": "5ab7fec3887ca6e157eb35d675deed8a5ef9dfa82fa67ad498fce5f869629d72"
+    },
+    {
+      "name": "owned-layouts",
+      "state": "passed",
+      "wallSeconds": 11.44517558417283,
+      "logSHA256": "2caa9aae8bb584f80a51700488e93f116dc5e4c77c84bb8d7f9352afac296e45"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "wallSeconds": 17.5306494589895,
+      "logSHA256": "d0d0db0849c0219df596aee65a8cec92d2dccb5b0446e749e110f364a626d0d3"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "wallSeconds": 7.934709208086133,
+      "logSHA256": "5ae1500eebbbd4958fc4872f35f5ad28f9e817fd765cedc754472df22a5506e5"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "wallSeconds": 6.580392875010148,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "wallSeconds": 1.1676364580634981,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "wallSeconds": 0.09950420912355185,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "wallSeconds": 0.036947499960660934,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "wallSeconds": 0.03694112505763769,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "newWorkflowMethods": 59,
+  "mandatorySoftwareMethodsEachBuild": 54,
+  "all58WorkflowSoftwareMethodsExecutedWithLocalModelOptIns": true,
+  "ownedNativeVaultMethods": 39,
+  "signedCLIWorkflowChecks": 35,
+  "workflowProcessChecks": [
+    "initialize",
+    "import-source",
+    "owned SQL image association installed",
+    "inspect-frame",
+    "source binding hashes original pixels",
+    "invalid-frame",
+    "duplicate-frame",
+    "unknown-option",
+    "blank-script",
+    "sigint owned worker entered",
+    "sigint process result",
+    "sigint actual child stopped",
+    "sigint never published",
+    "sigint removed private workspaces",
+    "sigkill owned worker entered",
+    "sigkill process result",
+    "sigkill actual child stopped",
+    "sigkill never published",
+    "real-local-export",
+    "actual speech has measured duration",
+    "every portable payload hash matches",
+    "movie hash matches result",
+    "narration.timing.json portable audio path",
+    "step-01-narration.timing.json portable audio path",
+    "scripts captions and retained frames included",
+    "no database or credentials exported",
+    "orphan workspace recovered on next export",
+    "existing-destination",
+    "existing output bytes preserved",
+    "inside-library",
+    "update-source",
+    "stale-source",
+    "original pixels unchanged",
+    "get-source",
+    "history remains readable"
+  ],
+  "package": {
+    "stagedFiles": 34,
+    "archiveExtractionEqual": true,
+    "protectedAppsUnchanged": 24,
+    "cliSHA256": "baa9d955c36c2a1634129cacd5a11ce886e3ab21e87ccc48e336e94402e7150e",
+    "appSHA256": "df928e101689b5f6c499d397e5dfd02d18554736069542b1f3b28435d8d3ec8c",
+    "zipSHA256": "419f35cc3eedb8ba4799ace701a973d39d05cca3a26fb77e971656aa66f9914f"
+  },
+  "media": {
+    "state": "passed-owned-complete-core-export-audio-and-visual",
+    "sourceMovieSHA256": "0faaa6a3fdd7b8ce73634dcba0006201b809dfee82997369f0a0bbd77ac063c2",
+    "sourceFrames": 186600,
+    "decodedFrames": 186600,
+    "duration": 7.775,
+    "unshiftedCorrelation": 0.9971573193106594,
+    "script": "This retained screen has a blue rectangle on a white background. OSwind keeps the original source linked to this step.",
+    "transcript": "This retained screen has a blue rectangle on a white background. O Swind keeps the original source linked to this step.",
+    "exactNormalizedWordMatch": false,
+    "explicitBrandCorrection": {
+      "observed": "O Swind",
+      "canonical": "OSwind"
+    },
+    "wordMatchAfterExplicitBrandCorrection": true,
+    "manifestPayloadsVerified": 11,
+    "limits": [
+      "Owned complete Core export only; native user input, live acquisition, arbitrary seeking, physical power and whole-product parity unaccepted"
+    ],
+    "visualReview": "Viewed frozen candidate decoded first frame: upright/readable walkthrough and step titles, accurate blue rectangle on white source, correct STEP01/01 and retained snapshot label. Arbitrary seeking not accepted."
+  },
+  "componentUI": {
+    "images": {
+      "WorkflowEditing-light": {
+        "sha256": "eda0d7bc64a15d6658a147e16c90ad56224cb467207734c87ddfe49099f22baf",
+        "bytes": 254054
+      },
+      "WorkflowEditing-dark": {
+        "sha256": "be1645cb1ae165ba7c852852b02d1f46776e236fa8089077d4f773f29c1378bc",
+        "bytes": 256740
+      },
+      "WorkflowCompact-light": {
+        "sha256": "0a615302fdf704a7eb8b052fe344710beb215af827dbb9dfd70f591d2a2e3087",
+        "bytes": 208415
+      },
+      "WorkflowCompact-dark": {
+        "sha256": "bd1a1205a93925d7e7e7a19ce53643f40b300573194541a6d6dfc1bb444c61ef",
+        "bytes": 210832
+      },
+      "WorkflowEmpty-light": {
+        "sha256": "13a66f7d70bac6ad2f8c928aff1885db735c4a65ed457271526c0593aae1cb19",
+        "bytes": 185448
+      },
+      "WorkflowEmpty-dark": {
+        "sha256": "ac28c872872b9e44736425f9a57af0201a691aa0877e113b46ead9ed379015a1",
+        "bytes": 187120
+      }
+    },
+    "reviewSHA256": "23e7ab4ed39d16cbe0003766c46fd20c5ef40991833ada683a061c98eb4d9dd5",
+    "nativeInteractionAccepted": false
+  },
+  "retainedCounterexamples": [
+    {
+      "scope": "Cross-player AAC priming",
+      "outcome": "Native duration/non-silence/correlation alone admitted wrong composition MP4. Independent FFmpeg showed unshifted correlation0.26578; one-MP4 writer and measured portable-edit checks corrected it. Authored bad movie/source remain mandatory resources.",
+      "paths": [
+        "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/unaligned.mp4",
+        "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/source.wav"
+      ]
+    },
+    {
+      "scope": "Trusted mounted-vault library alias",
+      "outcome": "Original native export refused directory alias; normal failure cleanup detached. Canonical source tree plus renewed alias identity passes export/normal-lock/history."
+    },
+    {
+      "scope": "One-still long narration",
+      "outcome": "Actual speech timed out65.154s; EOF-only correction still timed out64.704s and eight-second control60.246s. Consume empty native markers before timestamp ordering and mark each stream finished promptly. Regression and actual speech now pass."
+    },
+    {
+      "scope": "Qualification harness output collision",
+      "outcome": "Original59-case real-model group had57passes/1skip/1failure: both spoken and synthetic fixtures requested the same explicit output and the second refused overwrite. Frozen source unchanged; separate destinations/exact class filter produce58/58 plus separately retained spoken1/1. Successful full/sanitizer/optimized receipts reused after hash verification.",
+      "originalResultSHA256": "91fdf60040761531753e8751e5fffe895f78a2e621ed306e783cd46dbf6ce46b",
+      "failedGroupLogSHA256": "05fd83358840bc0e1a8793e922656e87ff601d98beaf218db5f5aebf9c780994",
+      "bootstrapGuard": "Continuationv2 counted error: twice on the same XCTest line and refused before mutation. v3 counts error lines."
+    },
+    {
+      "scope": "Owned CLI fixture",
+      "outcome": "Initial fixture omitted required Memory fields, then assumed JSON text import preserves media. Corrected owned SQL media association is explicit; no live-ingestion claim."
+    },
+    {
+      "scope": "ASR and seeking",
+      "outcome": "Strict transcript words differ OSwind versus O Swind; original transcription and explicit brand normalization preserved. Initial FFmpeg post-input seek1 produced no image despite exit0; first decoded image reviewed. Arbitrary seeking remains unaccepted."
+    }
+  ],
+  "hostedCI": {
+    "state": "pending-at-publication",
+    "resultsLocation": "Pull request checks; source-bound local qualification is separate"
+  },
+  "limits": [
+    "Native user input, permissions/player/main-window acceptance remain open while Maclocked; owned offscreen renders are layout evidence only",
+    "Kokoro helper/model must be installed and cached; fresh-machine setup/download, durable draft UX, automatic action/script reconstruction and representative speech quality remain open",
+    "Per-step caption timing only; arbitrary cross-player seeking/browser local-file acceptance remain open",
+    "No personal corpus, general clipboard, real Keychain, cloud inference, external upload or installed-app replacement",
+    "Sustained physical power, complete device sync, notarized distribution, broad parity and matched competitor ranking remain open"
+  ],
+  "publishedAtUTC": "2026-11-01T12:44:59.577478+00:00"
+}

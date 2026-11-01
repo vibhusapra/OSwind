@@ -20,3 +20,7 @@ __pycache__/
 
 # Owned actual schema27 incoming-source migration fixture.
 !Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-source-schema27.sqlite
+
+# Small authored AAC playback regression; generated user media stays ignored.
+!Tests/OSwindCoreTests/Fixtures/WorkflowPriming/unaligned.mp4
+!Tests/OSwindCoreTests/Fixtures/WorkflowPriming/source.wav

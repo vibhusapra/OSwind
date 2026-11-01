@@ -12,7 +12,11 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if ["VoiceReady","VoiceListening","VoiceTranscribing","VoiceReview"].contains(model.section) {
+        if ["WorkflowEditing","WorkflowEmpty","WorkflowCompact"].contains(model.section) {
+            let workflow=try await WorkflowPreview.make(store:model.store,empty:model.section=="WorkflowEmpty")
+            size=model.section=="WorkflowCompact" ? NSSize(width:860,height:760):NSSize(width:1120,height:900)
+            content=AnyView(WorkflowView(model:workflow,openMemories:{}))
+        } else if ["VoiceReady","VoiceListening","VoiceTranscribing","VoiceReview"].contains(model.section) {
             let voice=VoiceTypingModel.preview(store:model.store,draft:model.drafting,stage:model.section)
             size=NSSize(width:760,height:740);content=AnyView(ContextualDraftView(draft:model.drafting,privacy:model.settings.privacy,voice:voice))
         } else if ["ClipboardOff","ClipboardReady","ClipboardPermission","ClipboardPaused"].contains(model.section) {

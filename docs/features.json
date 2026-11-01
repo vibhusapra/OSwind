@@ -643,8 +643,8 @@
     "id": "F081",
     "axis": "AI",
     "feature": "Source-linked narrated SOP / workflow video export",
-    "status": "todo",
-    "evidence": "New October31 parity requirement from a publisher changelog. Existing recaps, media exports and drafts do not generate narrated workflow videos. Needs an editable evidence-grounded script, selected source media with renewed privacy/erasure admission, local narration, timed steps/captions and verified non-silent muxed output. Publishing remains a separate explicit action.",
+    "status": "partial",
+    "evidence": "App/CLI reviewed source-linked narrated workflows qualify at415db23 over803 repository inputs:21 stages,1883 full passes/93optin skips,60 sanitizer and60 optimized passes/16skips each,all58 actual local-narration methods,no skips,39 owned APFS cases,no skips,35 signed CLI checks,API/MCP/SDK/backup and interruption regressions,strict34-file archive equality,24 old app trees unchanged.54 mandatory new software methods run in all-three builds;1924 distinct methods pass across normal/native/actual-speech groups,52 other optins remain. Independent Core export preserves186600frames/7.775s at correlation0.99716; ASR brand spelling differs explicitly. Six final owned layouts reviewed. Source/pixel/ordinal/privacy bindings, local af_heart1.0, explicit independent new-folder export,portable scripts/WAVs/timing/captions/hash manifests and actual-worker lifecycle implemented. Priming,alias,one-still and harness counterexamples retained. Native input, fresh-Mac helper/model setup, durable drafts, arbitrary seek, representative quality/power and whole-product parity remain open. See docs/NARRATED-WORKFLOWS.md and benchmarks/narrated-workflows-v1.json.",
     "references": "Screenpipe narrated SOPs"
   },
   {

@@ -18,6 +18,7 @@ import EventKit
     let tools:MCPToolsModel
     let clipboard:ClipboardContextModel
     let voice:VoiceTypingModel
+    let workflow:WorkflowModel
     private var libraryRetired=false
     private var resumeMeetingsAfterPause=false,resumeScreenWithMeetings=false,resumeOnlyClipboard=false
     let activity:ActivityCalendarModel
@@ -32,7 +33,7 @@ import EventKit
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
-        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings)
+        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
         if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelAnswer()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
@@ -100,7 +101,7 @@ import EventKit
     private var jsonImportWorker:Task<String,Error>?
     private var jsonImportDrainers=0
     var hasPendingJSONImport:Bool {jsonImportWorker != nil || jsonImportTask != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy || clipboard.busy || voice.busy}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
@@ -143,7 +144,7 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
@@ -168,6 +169,12 @@ import EventKit
         tools=toolsSetup?(store,loaded) ?? MCPToolsModel(store:store,settings:loaded)
         clipboard=clipboardSetup?(store,loaded) ?? ClipboardContextModel(store:store,settings:loaded)
         voice=voiceSetup?(store,loaded,self.drafting) ?? VoiceTypingModel(store:store,settings:loaded,draft:self.drafting,environment:.live(store:store,recognizer:audio.recognizer))
+        workflow=workflowSetup?(store,loaded) ?? WorkflowModel(store:store,settings:loaded,environment:.live(store:store))
+        workflow.allowed = {[weak self] in
+            guard let self else {return false}
+            return !self.demo && !self.libraryRetired && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy && !self.maintenanceBusy && self.deletingID==nil
+        }
+        workflow.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         voice.allowed = {[weak self] in
             guard let self else {return false}
             return !self.demo && !self.libraryRetired && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy && !self.maintenanceBusy && !self.audio.hasActiveWork && !self.importingAudio
@@ -218,7 +225,7 @@ import EventKit
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
-            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.voice.cancel(clearDraft:true);self?.drafting.clear();self?.meetings.sleep();self?.tools.suspend() }.store(in:&cancellables)
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.voice.cancel(clearDraft:true);self?.workflow.cancel(clear:true);self?.drafting.clear();self?.meetings.sleep();self?.tools.suspend() }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.resumeConfiguredWorkAfterWake() }.store(in:&cancellables)
         NotificationCenter.default.publisher(for:.EKEventStoreChanged).sink {[weak self] _ in Task {@MainActor in self?.meetings.invalidate()}}.store(in:&cancellables)
@@ -289,7 +296,7 @@ import EventKit
     }
     func prepareForLibrarySwitch() {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
-        libraryRetired=true;meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true)
+        libraryRetired=true;meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -398,6 +405,14 @@ import EventKit
     func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil,visual:VisualMatch?=nil) {
         let store=self.store
         openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)],pinTextObservations:true)[0].memory}
+    }
+    func openWorkflowSource(_ source:WorkflowSourceBinding) {
+        guard !libraryRetired,!store.isClosed else {return}
+        let store=self.store
+        openSource(id:source.memoryID,query:"",passage:nil,load:{
+            guard let memory=try store.get(source.memoryID) else {throw OSwindError.unavailable("This workflow source is no longer available")}
+            return memory
+        })
     }
     func openMCPSource(_ id:String) {
         let store=self.store
@@ -614,7 +629,7 @@ import EventKit
         // detached preparation not yet holding a lease must finish too.
         jsonImportDrainers+=1;defer {jsonImportDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
-        voice.cancel(clearDraft:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait()
+        voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
     }
     private var lastObservationRefresh = -Double.infinity
@@ -713,12 +728,13 @@ import EventKit
     func favorite(_ memory: Memory) { guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     func delete(_ memory:Memory) {
         guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only. Delete its source from the library to erase it and dependent citations.";return}
-        guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};drafting.clear();tools.suspend();clipboard.invalidate();deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
+        guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};drafting.clear();tools.suspend();clipboard.invalidate();workflow.cancel(clear:true);deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
         if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
         let store=self.store
         Task {
             defer {deletingID=nil}
             do {
+                await workflow.cancelAndWait()
                 let result=try await Task.detached(priority:.utility) {try store.delete(memory.id)}.value
                 deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.historicalVersions) original versions · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
                 if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
@@ -729,12 +745,14 @@ import EventKit
     func maintain(automatic:Bool=false) {
         guard !automatic || !libraryWipe.pendingCleanup else {return}
         guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil else {return}
-        if automatic {guard housekeepingActive,!showOnboarding else {return}}
+        if automatic {guard housekeepingActive,!showOnboarding,!workflow.busy else {return}}
         let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance
+        if shouldPrune {workflow.cancel(clear:true)}
         maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
         Task {
             defer {maintenanceBusy=false}
             do {
+                if shouldPrune {await workflow.cancelAndWait()}
                 let (result,indexError)=try await Task.detached(priority:.utility) { () -> (RetentionCleanupResult?,String?) in
                     let report=shouldPrune ? try store.pruneHistory(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000):nil
                     do {try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower);return (report,nil)}
@@ -772,7 +790,7 @@ import EventKit
         prepareForLibrarySwitch()
         settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.meetings = .init()
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry) {[weak self] result in
+        libraryWipe.run(store:store,retry:retry,before:{[workflow] in await workflow.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
             self.libraryRetired=false;self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping()
@@ -781,7 +799,7 @@ import EventKit
     func pauseAll(discardReplay:Bool=false,manualMeetingPause:Bool=true) {
         if isCollecting {resumeOnlyClipboard=clipboard.running && !isCapturing && !meetings.active;resumeMeetingsAfterPause=meetings.active;resumeScreenWithMeetings=capture.running}
         pauseTimer?.invalidate();pauseTimer=nil;pauseUntil=nil;capture.pause(discardReplay:discardReplay);audio.stop()
-        if manualMeetingPause {meetings.pause()}else {meetings.sleep()};tools.suspend();clipboard.stop();voice.cancel(clearDraft:true)
+        if manualMeetingPause {meetings.pause()}else {meetings.sleep()};tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel()
     }
     func pauseForHistoryErasure() {
         drafting.clear()
@@ -801,6 +819,7 @@ import EventKit
     }
     var collectionStatus:String {
         if voice.busy {return voice.status}
+        if workflow.busy {return workflow.status}
         if audio.running {return audio.status+(clipboard.running ? " · Clipboard on":"")}
         if capture.running {return capture.status+(clipboard.running ? " · Clipboard on":"")}
         if clipboard.running {return "Clipboard · "+clipboard.status}
@@ -808,7 +827,7 @@ import EventKit
     }
     var isCapturing: Bool { capture.running || audio.running }
     var isCollecting:Bool {isCapturing || meetings.active || clipboard.running}
-    var hasPausableWork:Bool {isCollecting || tools.busy || clipboard.busy || voice.busy}
+    var hasPausableWork:Bool {isCollecting || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     func captureNow() async {guard !libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
     func toggleAudio() async {guard !libraryWipe.busy,!voice.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
     func toggleCapture() {
