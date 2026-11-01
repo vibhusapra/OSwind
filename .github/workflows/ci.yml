@@ -70,6 +70,17 @@ jobs:
         run: |
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Verify packaged media reservations and backup erasure fencing
+        run: python3 scripts/media-cleanup-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-media-cleanup"
+      - name: Retain packaged media cleanup process receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-media-cleanup-receipt
+          path: |
+            ${{ runner.temp }}/oswind-media-cleanup/report.json
+            ${{ runner.temp }}/oswind-media-cleanup/backup.stderr
+          if-no-files-found: ignore
       - name: Verify inactive owned SQLite fixture boundaries
         run: python3 scripts/test-owned-sqlite-fixture.py
       - name: Verify owned vault diagnostic admission without native tools

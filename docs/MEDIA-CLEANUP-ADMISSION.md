@@ -24,8 +24,24 @@ The [generated scaling receipt](../benchmarks/media-cleanup-scaling-v1.json) sta
 
 Controls include opening after genuine recap invalidation, supported writer and actual image-snapshot reservations, separate-process admission, single/scoped/retention/retry paths, rollback, replaced folder, invalid lease authority, unavailable counts, pinned and text-only erasure retries, copy/verification/publication refusal, recreation at the same media path, append-only capture, marker tampering and exact frozen older-client deletion.
 
+## Current app and native qualification
+
+The [native/package receipt](../benchmarks/media-cleanup-native-v1.json) binds 1,334 repository inputs at qualification head `029d169`, with production/test Swift bytes equal to tested native source `ab571d4`. All **27 package/process stages** pass, including **39 owned native APFS/app-session methods with no skips**. Full plus native coverage is **2060 distinct methods**; build repetitions are not added as new coverage. Independent review checks every byte of all 34 app/ZIP/extracted files, strict ad hoc signatures and all 38 earlier app trees unchanged.
+
+The actual packaged CLI preserves an externally reserved PNG/cache during source deletion and reports pending work. After release, cleanup may run as the CLI opens the library, so an explicit retry can correctly report zero additional removals. The original probe's contrary counter assumption is retained as a harness failure; strict pending counts, byte preservation and physical absence remain required.
+
+A separate packaged backup is positively stopped during its copying phase. Another actual CLI process commits source erasure while the backup still holds its shared reservation. On resumption the backup refuses the changed generation and publishes no archive; explicit cleanup then completes. Both read-only fixture databases pass integrity/FK checks with empty source and erasure queues. These authored probes establish process behavior, not desktop/media capture or storage-power-loss acceptance.
+
+Reproduce the public packaged regression with a fresh root:
+
+```sh
+python3 scripts/media-cleanup-smoke.py /path/to/OSwind.app/Contents/MacOS/oswindctl --root /new/owned-fixture
+```
+
+CI now runs this check against its packaged app and retains the process report. The new hosted run must pass separately. This local package is ad hoc signed; native input, sustained capture/power, notarization/distribution and complete sync remain open.
+
 ## Boundaries
 
 This is cooperative current-client software verification. An older executable that removes files without the new exclusive gate, raw SQL/file mutation, already-rendered GUI state, arbitrary immutable-path replacement, secure SSD erasure and storage power loss require separate treatment. The exact older executable can demonstrate plain-SQL generation-trigger compatibility without establishing general held-reader safety for its legacy cleanup code.
 
-No new signed app/native-vault/GUI qualification is claimed by this component. It establishes no throughput, energy, competitor ranking or product parity result. All 83 feature statuses remain unchanged; complete sync F059 stays TODO.
+The initial software receipt and the later app/native receipt have distinct source bindings. Native GUI acceptance remains open. It establishes no throughput, energy, competitor ranking or product parity result. All 83 feature statuses remain unchanged; complete sync F059 stays TODO.

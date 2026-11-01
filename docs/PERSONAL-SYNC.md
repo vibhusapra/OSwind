@@ -2,7 +2,7 @@
 
 In development. F059 remains TODO until a user can pair devices and synchronize the complete supported library. The protocol below is a foundation, not delivered sync or a replacement for the existing complete backup/restore feature.
 
-The latest internal component qualifies [unavailable entity scopes](SYNC-UNAVAILABLE-SCOPES.md): preserve independent history across native/peer entity deletion, late arrival, source pruning, quiet restore and actual crash recovery, with scope-preserving calendar/Markdown export and schema32 old-client refusal. This enables no service or F059 promotion. Publication/collection epochs, compaction, production current-policy/media/transport, enrollment/recovery/conflict UI and actual providers/two Macs remain required. Older component checklists below describe their dated milestones.
+The current internal foundation includes [durable answer admission and version-aware erasure](SYNC-DURABLE-PUBLICATION.md) plus [reserved-media cleanup and backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md). The [current app/native receipt](../benchmarks/media-cleanup-native-v1.json) freezes native source `ab571d4` and qualification head `029d169`: all 70 required software controls execute in three builds, and 27 package/process stages plus 39 owned native methods pass. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
 
 ## Delivery requirements
 
@@ -26,9 +26,20 @@ The encryption layer uses CryptoKit's authenticated encryption and key derivatio
 
 ## Current implementation and remaining work
 
-The mutation-cost candidate is in development after a partial paired experiment exposed an unindexed native deletion lookup; it has no accepted throughput or energy result yet. See the current WIP in [the delivery ledger](PROGRESS.md). The published derived-retirement head `32982f1` passes both hosted jobs in [run 41240426119](https://github.com/vibhusapra/OSwind/actions/runs/41240426119).
+Internal typed components now cover all thirteen canonical kinds, exact source/run originals, optional references, unavailable entity scopes, causal gaps, durable withheld answer work, physical stale-projection retraction and version-aware source/citation retirement. Current code keeps independent future/concurrent owner versions while honoring genuine required-source/pin barriers. Older source-bound milestones below are historical receipts; their counts and unchecked prerequisite boxes do not replace the current end-to-end gates.
 
-### Required before enabling the service
+Before enabling public sync:
+
+- Integrate the owning dispatcher for the complete graph, current privacy/provenance policy, media admission and encrypted transport. No peer may provide execution authority or a locally verified scan claim.
+- Deliver collection erasure/wipe epochs for unknown offline objects, durable deletion announcements and acknowledgement-based compaction. Per-object component barriers are insufficient for complete collection erasure.
+- Give erasure a production strategy under queue pressure, compact terminal work, and finish encrypted orphan/quarantine/cache retention. Current explicit refusal/rollback is verified; permanent full-queue progress is unfinished.
+- Complete trusted bootstrap, membership/key enrollment, recovery/rotation/revocation and rollback checkpoints. Keep secrets out of settings, argv, environment and ordinary logs.
+- Add native/CLI pairing, status, pause, conflicts and lifecycle cancellation. Finish cleanup scheduling after reservations release; old cleanup binaries remain outside the new exclusive gate.
+- Qualify real providers and actual two Macs, interrupted/offline replay, complete source/media identity and representative incremental/idle/large-archive behavior. Physical power and product ranking remain separate.
+
+### Historical prerequisite checklist
+
+The following four items record an earlier checkpoint. Later internal receipts address many of their fixtures; the service must integrate and qualify every invariant, so end-to-end acceptance remains open.
 
 - [ ] **Late unseen dependent records:** distinguish a temporarily missing dependency from an authenticated deletion barrier. Static review shows that `SyncVersionStore.resolve` refuses an unavailable/deleted dependency and an exception from the typed writer rolls back `SyncJournal.receive`, including its receipt and cursor. Refusal preserves the current privacy boundary but does not prove forward progress for the rest of that sender's stream. Reproduce this with three owned replicas before changing behavior. A child that never existed on the receiver needs an explicit, durable outcome; do not silently acknowledge it or clear a parent barrier.
 - [ ] **Deletion semantics across all thirteen kinds:** define retirement edges separately from optional scope references, matching reviewed native erasure behavior. A removed source link must not delete an independent curated entity. Test late answers/recaps, runs, aliases, mentions, corrections and pins as well as already-materialized descendants. A newer intentional restoration must use a new lifetime.
