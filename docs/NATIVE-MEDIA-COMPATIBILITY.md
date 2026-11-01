@@ -22,17 +22,25 @@ Current search graphs use `indexes-v33`. An older worker that already committed 
 
 Cancellation before commit rolls back the queue, marker and schema. Cancellation after commit returns the committed library with pending cleanup. Upgrade callbacks expose queue-copy, before-commit and after-commit phases for deterministic cancellation/process-death tests; callers must not reenter the opening library.
 
-## Verification in progress
+## Qualified component
 
-The focused debug run passes **18 methods**, with one subprocess-only helper skipped. It includes two actual already-initialized prior32 collectors, ten fresh-command refusals across two publication/erasure fixtures, queue/schema corruption controls, migration rollback and cancellation, cached statement invalidation, and three real SIGKILL recovery cases. The exact older executable hash is `ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2` from source `36a0e66b71133b032cbcf435e01fbfa86e1a68b1`.
+The [source-bound receipt](../benchmarks/native-media-compatibility-v1.json) binds **1,346 inputs** at `fe54050`. Full debug: **2,042 passed / 99 skipped / zero failures**. Thread Sanitizer: **755 passed / 40 skipped / zero failures**, with no race warning. Optimized: **755 passed / 40 skipped / zero failures**. All **88 mandatory controls** execute in all three builds, including four exact frozen prior32 methods: two initialized collectors and ten fresh-command refusals across two publication/erasure fixtures.
 
-The frozen schema32 migration fixture was produced by that real executable and its native deletion triggers. Its provenance records source/body/media custody; it is never relabeled from current code. Read-only independent inspection of all three killed databases includes WAL, preserved identity/source/queue bytes, original PNG, SQLite integrity and foreign keys. The postcommit WAL contains the new schema; precommit unflushed pages need not produce WAL frames. Main database and WAL hashes remain unchanged by review; volatile SHM marks are excluded.
+Optimized source `14c2a92` retains its own binding. Every native, test, package and runtime input is byte-equal to `fe54050`; the sole difference is final owned SQL inspection registration in `scripts/erasure-smoke.py`. The complete corrected erasure CLI harness is freshly executed. All four erasure, deletion, wipe and backup process harnesses pass.
 
-CI retains these owned crash snapshots and runs a separate Python reader:
+The exact older executable is `ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2`, produced at `36a0e66`. The frozen schema32 migration database was produced by that real executable and its native deletion triggers. Its provenance preserves source/body/media custody; it is never relabeled from current code. Queued byte paths, source identity and bodies survive migration. An earlier SQL writer must finish before the migration copies its newly committed queue entries.
+
+Three actual SIGKILL snapshots are retained before product reopen. Separate read-only SQLite inspection includes WAL, original PNG, identity, source/queue counts, dirty marker transfer, integrity and foreign keys. Precommit unflushed pages need not produce WAL frames. Main database and WAL bytes remain unchanged by inspection; volatile SHM marks are excluded. Reopening recovers the whole committed state and completes cleanup. CI retains the snapshots and runs this independent reader:
 
 ```sh
 OSWIND_TEST_NATIVE_MEDIA_RETAIN=/new/owned-crashes swift test --filter NativeMediaMigrationTests
 python3 scripts/review-native-media-migration.py --root /new/owned-crashes --output /new/review.json
 ```
 
-Full debug, sanitizer, optimized, package and owned native qualification of schema33 remain pending. Prior schema32 receipts describe their own frozen sources and are not promoted to this version. No sustained-capture, power, storage-power-loss, native-input, distribution, complete-sync, parity or competitive-rank acceptance follows from these tests. F059 and all other feature statuses remain unchanged.
+All **30 app/package/process stages** pass, including **39 owned native APFS/app-session methods with no skips**, actual packaged media reservations, concurrent backup-erasure refusal and an actual prior32 compatibility process. Independent review checks every byte of all **34 app/ZIP/extracted files**, strict ad hoc signatures and all **40 prior app trees unchanged**. Full plus native coverage is **2079 distinct methods**; repeated builds are not added as new coverage.
+
+## Retained failures and acceptance limits
+
+The original reserved-PNG/cache loss has three genuine failing assertions. Initial migration WAL-bootstrap/empty-scalar harness mistakes, stale schema/cache expectations and raw-reader function omissions remain retained separately. One real 40-second calendar timer expectation expired during a concurrent full run. The exact isolated method then passed without a source/timeout change, and the fresh full run passes it at30.066s before sanitizer starts. That timing-sensitive failure is preserved, rather than suppressed or reclassified as a passing run.
+
+This is a cooperative native compatibility boundary. It does not authenticate peers or prevent arbitrary SQL/filesystem mutation, revoke an already-rendered old GUI, or establish storage power-loss safety. The app is ad hoc signed. Native input/TCC, sustained capture/power, notarization/distribution, actual providers/two Macs, cleanup scheduling/lifecycle and complete sync remain open. F059 and all other feature statuses stay unchanged. No feature-parity or competitive-rank claim follows.

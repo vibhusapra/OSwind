@@ -1,5 +1,14 @@
 # OSwind delivery ledger
 
+## Native33 media compatibility — component qualified
+
+[Native media compatibility](NATIVE-MEDIA-COMPATIBILITY.md) closes a genuine reserved-media deletion by an actual initialized prior32 collector. Native33 migrates the durable queue atomically into a guarded view, fences stale metadata writers and separates current caches from legacy cache removal. Four actual old-client methods execute in every software build; fresh clients refuse without changing database/WAL bytes. Cancellation, cached statements, concurrent SQL writers and three real migration SIGKILL states preserve whole committed data.
+
+The [1,346-input receipt](../benchmarks/native-media-compatibility-v1.json) binds full/Tsan/package source `fe54050`: **2,042 full passes / 99 skips**, **755 sanitizer passes / 40 skips**, all **88 mandatory controls**. Optimized source `14c2a92` passes **755 / 40 skips** with identical native/test/package/runtime bytes; only a corrected final CLI-inspection registration differs. Four current CLI harnesses and all **30 app/package/process stages** pass, including **39 native APFS/app-session methods / no skips**. Independent review verifies34 app/ZIP/extracted files, strict ad hoc signing, three killed-database WAL states and40 prior app trees unchanged.
+
+The initial native32 PNG/cache loss, migration/reader oracle failures and a real concurrent-run calendar timer timeout remain retained. The unchanged timer passes in isolation and in the new full run. **All83 statuses stay unchanged; F059 remains TODO.** Full service/lifecycle, collection epochs, cleanup scheduling, actual providers/two Macs, native input, sustained power and notarized distribution remain open. This component establishes no product parity or competitive rank.
+
+
 ## Current media cleanup app — owned native/package qualification passed
 
 [Current qualification](MEDIA-CLEANUP-ADMISSION.md#current-app-and-native-qualification) freezes native `ab571d4` and package head `029d169`. The [1,334-input receipt](../benchmarks/media-cleanup-native-v1.json) passes **27 package/process stages**, **39 native APFS/app-session methods / no skips**, and an independent review of all **34 app/ZIP/extracted files**, strict ad hoc signatures and **38 unchanged prior app trees**. Existing software evidence remains source-bound: 2,023 full passes/99 skips, 702 sanitizer and optimized passes/39 skips each, all70 required controls. Full plus native covers 2060 distinct methods.

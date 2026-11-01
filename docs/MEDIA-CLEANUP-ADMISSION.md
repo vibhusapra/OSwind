@@ -1,5 +1,7 @@
 # Media cleanup admission and backup erasure fencing
 
+This page preserves the frozen schema32 component. [Native33 compatibility](NATIVE-MEDIA-COMPATIBILITY.md) now fences the actual initialized prior32 cleanup path, requires old binaries to update, and carries its own current-source software/app receipts. Earlier counts and source bindings below remain historical.
+
 A supported media writer or visual snapshot holds a shared reservation while its files are in use or await database admission. Opening the library, deleting one source, scoped erasure and retention now preserve those files until an exclusive cleanup reservation is available. Logical deletion still commits immediately: removed sources and their dependent results cannot be used for new admission.
 
 Cleanup attempts under the store SQL mutex never wait for a media lock. A nonblocking exclusive attempt either drains the durable queue or returns committed source counts, pending media, an uncleared cache indicator and a retry warning. Retention stops further storage-budget trimming while cleanup is deferred. Explicit retry uses the same rule. A closed library reports an unavailable pending count as -1, rather than zero. A replacement library folder, shared/foreign/released reservation or open SQL transaction cannot authorize unlinking.
@@ -24,7 +26,7 @@ The [generated scaling receipt](../benchmarks/media-cleanup-scaling-v1.json) sta
 
 Controls include opening after genuine recap invalidation, supported writer and actual image-snapshot reservations, separate-process admission, single/scoped/retention/retry paths, rollback, replaced folder, invalid lease authority, unavailable counts, pinned and text-only erasure retries, copy/verification/publication refusal, recreation at the same media path, append-only capture, marker tampering and exact frozen older-client deletion.
 
-## Current app and native qualification
+## Schema32 app and native qualification
 
 The [native/package receipt](../benchmarks/media-cleanup-native-v1.json) binds 1,334 repository inputs at qualification head `029d169`, with production/test Swift bytes equal to tested native source `ab571d4`. All **27 package/process stages** pass, including **39 owned native APFS/app-session methods with no skips**. Full plus native coverage is **2060 distinct methods**; build repetitions are not added as new coverage. Independent review checks every byte of all 34 app/ZIP/extracted files, strict ad hoc signatures and all 38 earlier app trees unchanged.
 

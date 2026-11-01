@@ -1,5 +1,7 @@
 # Full library backup and restore
 
+Native schema33 now [fences older media cleanup and stale initializers](NATIVE-MEDIA-COMPATIBILITY.md). Current supported writers/readers preserve the reservation contract; older native executables must update. Queue migration, actual older-client refusals and current package evidence have separate source-bound receipts.
+
 Use **Settings → Data → Complete backup & restore** to create a `.oswindbackup` package, inspect one, or restore a new library. After restoration, choose **Open restored library**. **Choose another library** opens an existing library; a missing selected drive shows a recovery screen on the next launch. The current library is left intact.
 
 A package contains its source database, notes, tags, favorites, timestamps, retained screenshots/audio, saved conversations and source anchors, supported search vectors/passages, people/project definitions and aliases, source links and rejected matches, and settings. Entity index completion is rebuilt on restore; entity catch-up stays off. See [entity portability and erasure](ENTITY-MEMORY.md). It excludes Keychain credentials, the local API bearer token, downloaded model weights and disposable search caches. Hashes detect corruption; they do not establish who created a package.

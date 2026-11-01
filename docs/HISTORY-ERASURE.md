@@ -1,5 +1,7 @@
 # Selective history erasure
 
+Native schema33 now [fences older media cleanup and stale initializers](NATIVE-MEDIA-COMPATIBILITY.md). Current supported writers/readers preserve the reservation contract; older native executables must update. Queue migration, actual older-client refusals and current package evidence have separate source-bound receipts.
+
 [Schema-27 original-field erasure](HISTORICAL-ERASURE.md) also selects archived versions by their own app, bundle, URL, kind and recorded time, preserves out-of-scope newer owners, and revokes matching local typed-cache versions. Native previews and CLI JSON distinguish current sources and original versions. Current qualification is recorded separately.
 
 [Schema-14 individual deletion and retention](DELETION.md) now share the durable media queue and result reporting. The evidence below retains the earlier selective-erasure milestone.
