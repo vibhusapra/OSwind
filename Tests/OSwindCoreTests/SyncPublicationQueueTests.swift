@@ -114,4 +114,59 @@ extension SyncIncomingSourceTests {
             XCTAssertEqual(try count(f.b,"personal_sync_publication_jobs"),0)
         }
     }
+
+    func testPublicationQueueGapDrainUsesEachOperationsOwnDurableBody()throws {
+        try withQueueFixture(answers:2) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turns=f.operations.filter{$0.key.kind == .turn};XCTAssertEqual(turns.count,2)
+            try supplyDeclarations(f.operations,f.producer,service)
+            let early=try queueReceive(turns[1],f.ac,service);XCTAssertTrue(early.receipt.inserted);XCTAssertEqual(early.receipt.applied,0)
+            XCTAssertEqual(try count(f.b,"chat_turns"),0)
+            for op in f.operations where op.dot.counter<turns[0].dot.counter {_=try queueReceive(op,f.ac,service)}
+            let drained=try queueReceive(turns[0],f.ac,service);XCTAssertEqual(drained.receipt.applied,2);XCTAssertEqual(drained.publications.count,2)
+            let chat=try XCTUnwrap(f.b.chats().first),questions=try f.b.chatTurns(chat.id).map(\.question)
+            XCTAssertEqual(Set(questions),["Queue question 0?","Queue question 1?"]);XCTAssertEqual(try count(f.b,"chat_turns"),2)
+            for op in turns {XCTAssertTrue(try f.queue.isComplete(packet(op,f.ac).identity))};try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueBindingBudgetRecoveryWakesStoragePressureAfterBlockedRetry()throws {
+        try withQueueFixture(answers:2) {f in
+            try f.queue.setBudgets(pending:SyncPublicationQueue.defaultBudget,binding:256)
+            let service=queueService(f.b,f.bc,f.queue,f.inbox)
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            XCTAssertEqual(try count(f.b,"chat_turns"),1);XCTAssertEqual(try f.queue.jobs(readyOnly:false).map(\.reason),[.storagePressure])
+            XCTAssertEqual(try queueRetry(f.ac,service),[.withheld(.storagePressure)]);XCTAssertTrue(try f.queue.jobs().isEmpty)
+            try f.queue.setBudgets(pending:SyncPublicationQueue.defaultBudget,binding:512)
+            guard case .projected=try queueRetry(f.ac,service).first else {return XCTFail("Capacity recovery must wake durable storage-blocked work")}
+            XCTAssertEqual(try count(f.b,"chat_turns"),2);XCTAssertEqual(try count(f.b,"personal_sync_publication_bindings"),2);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueAuthenticEarlyDeletionFreesCapacityWithoutAnswerBody()throws {
+        try withQueueFixture(answers:2) {f in
+            try f.queue.setBudgets(pending:640,binding:SyncPublicationQueue.defaultBudget)
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turns=f.operations.filter{$0.key.kind == .turn},second=try packet(turns[1],f.ac)
+            for op in f.operations where op.dot.counter<turns[1].dot.counter {_=try queueReceive(op,f.ac,service)}
+            XCTAssertThrowsError(try queueReceive(turns[1],f.ac,service));XCTAssertEqual(try f.queue.jobs(readyOnly:false).count,1)
+            let chat=try XCTUnwrap(f.a.chats().first);try f.a.deleteChat(chat.id);try publicationDrain(f.a,f.ac,f.producer)
+            let deletions=try f.ac.journal.outbox(after:f.operations.last!.dot.counter),first=try XCTUnwrap(deletions.first{$0.key==turns[0].key})
+            let early=try queueReceive(first,f.ac,service);XCTAssertEqual(early.receipt.applied,0,"Exercise the genuine early barrier while a prior put is still missing")
+            XCTAssertTrue(try f.bc.journal.state(for:turns[0].key).isDeleted);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty);try f.queue.checkAccounting()
+            let lease=try f.b.mediaWriteLease();defer {lease.release()}
+            _=try service.receive(turns[1],record:second,admission:lease,fetchSource:{_ in throw OSwindError.invalid("Source-free deletion fixture must not fetch evidence")})
+            for deletion in deletions where deletion.dot.counter != first.dot.counter {_=try queueReceive(deletion,f.ac,service)}
+            XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty);XCTAssertEqual(try count(f.b,"chat_turns"),0);XCTAssertEqual(try f.bc.journal.outbox().count,0);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueNativeWipeInvalidatesOldLifetimeWithoutReusingPendingAuthority()throws {
+        try withQueueFixture {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            XCTAssertEqual(try f.queue.jobs(readyOnly:false).count,1)
+            _=try f.b.wipeLibrary()
+            XCTAssertThrowsError(try f.queue.jobs());XCTAssertThrowsError(try SyncPublicationQueue.install(cache:f.bc));XCTAssertEqual(try count(f.b,"chat_turns"),0)
+        }
+    }
 }

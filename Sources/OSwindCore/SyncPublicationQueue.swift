@@ -167,16 +167,21 @@ struct SyncPublicationQueue {
         guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Publication completion belongs to its native transaction")}
         try context();let key=try identity.key,state=try cache.journal.state(for:key)
         guard !state.isDeleted,state.heads.count==1,let proof=state.heads[0].publication,let content=state.heads[0].content else {throw OSwindError.invalid("Bind one complete current publication")}
-        guard try publication.reference==proof,publication.owner.identity==identity,publication.owner.content==content,try cache.resolve(identity,content:nil,admit:{_ in}).reference==publication.owner else {throw OSwindError.invalid("Publication completion differs from its admitted owner")}
-        for citation in publication.citations {guard try cache.resolve(citation.identity,content:nil,admit:{_ in}).reference==citation.reference else {throw OSwindError.invalid("Publication completion has an incomplete citation")}}
+        guard publication.group==cache.journal.group,publication.epoch==cache.journal.epoch,try publication.reference==proof,publication.owner.identity==identity,publication.owner.content==content,try cache.resolve(identity,content:nil,admit:{_ in}).reference==publication.owner else {throw OSwindError.invalid("Publication completion differs from its admitted owner")}
+        guard let mapping=try cache.catalog.object(identity),!mapping.deleted,let primary=mapping.primary,primary.count==1,case .text(let local)=primary[0],let id=String(data:local,encoding:.utf8) else {throw OSwindError.invalid("Publication completion has no exact native owner")}
+        let count=try db.statement("SELECT count(*) FROM chat_sources WHERE turn_id=?");defer {sqlite3_finalize(count)};db.bind(count,1,id)
+        guard sqlite3_step(count)==SQLITE_ROW,sqlite3_column_int64(count,0)==Int64(publication.citations.count) else {throw OSwindError.invalid("Publication completion has undeclared native citations")}
+        for (ordinal,citation) in publication.citations.enumerated() {
+            guard try cache.resolve(citation.identity,content:nil,admit:{_ in}).reference==citation.reference,let child=try cache.catalog.object(citation.identity),!child.deleted,child.primary==[.text(local),.integer(Int64(ordinal))] else {throw OSwindError.invalid("Publication completion has an incomplete or differently owned citation")}
+        }
         let row=try db.statement("INSERT INTO personal_sync_publication_bindings VALUES(?,?,?,?) ON CONFLICT(object_digest) DO UPDATE SET state_sha=excluded.state_sha,declaration_sha=excluded.declaration_sha,content_sha=excluded.content_sha");defer {sqlite3_finalize(row)}
         db.bind(row,1,key.digest);db.bind(row,2,SyncProtocolLimits.hex(try state.encoded()));db.bind(row,3,proof.sha256);db.bind(row,4,content.sha256);try db.done(row);try remove(key)
     }
     func isComplete(_ identity:SyncObjectIdentity)throws->Bool {
         try context();let state=try cache.journal.state(for:identity.key)
         guard !state.isDeleted,state.heads.count==1,let proof=state.heads[0].publication,let content=state.heads[0].content else {return false}
-        _=try cache.resolve(identity,content:nil,admit:{_ in})
         let row=try db.statement("SELECT 1 FROM personal_sync_publication_bindings b JOIN personal_sync_version_projection p USING(object_digest) WHERE b.object_digest=? AND b.state_sha=? AND b.declaration_sha=? AND b.content_sha=? AND p.content_sha=b.content_sha");defer {sqlite3_finalize(row)}
-        db.bind(row,1,try identity.key.digest);db.bind(row,2,SyncProtocolLimits.hex(try state.encoded()));db.bind(row,3,proof.sha256);db.bind(row,4,content.sha256);let code=sqlite3_step(row);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()};return code==SQLITE_ROW
+        db.bind(row,1,try identity.key.digest);db.bind(row,2,SyncProtocolLimits.hex(try state.encoded()));db.bind(row,3,proof.sha256);db.bind(row,4,content.sha256);let code=sqlite3_step(row);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()};guard code==SQLITE_ROW else {return false}
+        _=try cache.resolve(identity,content:nil,admit:{_ in});return true
     }
 }
