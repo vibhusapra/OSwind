@@ -1,0 +1,548 @@
+{
+  "format": "OSwind.native-MCP-workspace.qualification",
+  "version": 1,
+  "state": "passed-local-functional",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "46c81b37ff45cf7d7e3a683f09bda118705f5a4c",
+  "branch": "codex/mcp-workspace",
+  "parent": "codex/mcp-client",
+  "sourceState": "All752 qualified input hashes match committed source Git blobs and live bytes. Documentation and authored screenshot followups have a later head.",
+  "scope": "Native manual local stdio connection setup, scoped credentials, exact per-operation reviews and explicit privacy-admitted plain-text result import. Owned fixtures; real Keychain/native input/platform acceptance remains open.",
+  "inputs": {
+    "repository": 752,
+    "manifest": "mcp-workspace-inputs-v1.json",
+    "manifestSHA256": "b02eecc5399cce6d38879d74073ae68c5a4ce20b6472a1b39b4c9ed451045762",
+    "allUnchanged": true
+  },
+  "review": {
+    "state": "passed-local-functional",
+    "source": "46c81b37ff45cf7d7e3a683f09bda118705f5a4c",
+    "inputs": 752,
+    "all752GitBlobsAndLiveHashesMatch": true,
+    "all13StageHashesMatch": true,
+    "tests": {
+      "full-debug": {
+        "defined": 1845,
+        "passed": 1763,
+        "skipped": 82,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      },
+      "thread-sanitizer": {
+        "defined": 70,
+        "passed": 70,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      },
+      "optimized": {
+        "defined": 70,
+        "passed": 70,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      }
+    },
+    "mandatoryMCPMethodsEachBuild": 70,
+    "raceWarnings": 0,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "protectedAppsUnchanged": 13,
+    "installedFilesUnchanged": 15,
+    "cliSHA256": "0ad25078e6cc9acf39c66a2df8349271a4283e5d47737203db3cbbefc904f5e6",
+    "appSHA256": "8a201a9cc476d3013b2d938732277050afab5df13abace170ea4e23728e9119c",
+    "zipSHA256": "179f4bf08b948cf6fedb0d27ddb062730803429f0cfa43ddeb3b54b5822c57a6",
+    "manualProcessChecks": 22,
+    "skipChangesFromEarlierCheckpoint": {
+      "new": [],
+      "removed": [
+        "OSwindAppTests.WorkspaceWakeLifecycleTests testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup"
+      ]
+    },
+    "componentRenderReview": true,
+    "realKeychainOrNativeInputAcceptance": false,
+    "httpOrOAuthAcceptance": false,
+    "fullParity": false,
+    "reviewedAtUTC": "2026-11-01T07:20:15.224883+00:00"
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "log": "full-debug.log",
+      "startedAtUTC": "2026-11-01T07:07:10.962891+00:00",
+      "returncode": 0,
+      "wallSeconds": 329.1506168330088,
+      "finishedAtUTC": "2026-11-01T07:12:40.112829+00:00",
+      "logSHA256": "683d1695bf69c004857cf10823f8f402bda2a533d9fe7729afdb50fcec990ad7",
+      "tests": {
+        "defined": 1845,
+        "passed": 1763,
+        "skipped": 82,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        ".artifacts/mcp-workspace-v1/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "MCP(JSON|Client|Connection|ToolsModel|Workspace)Tests"
+      ],
+      "log": "thread-sanitizer.log",
+      "startedAtUTC": "2026-11-01T07:12:41.029847+00:00",
+      "returncode": 0,
+      "wallSeconds": 66.1704646248836,
+      "finishedAtUTC": "2026-11-01T07:13:47.200365+00:00",
+      "logSHA256": "2a997933fe59fdfe33a40bbd12c92194a3e0591ae6799293f65abb701e9d4678",
+      "tests": {
+        "defined": 70,
+        "passed": 70,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "MCP(JSON|Client|Connection|ToolsModel|Workspace)Tests"
+      ],
+      "log": "optimized.log",
+      "startedAtUTC": "2026-11-01T07:13:47.954578+00:00",
+      "returncode": 0,
+      "wallSeconds": 216.10971745895222,
+      "finishedAtUTC": "2026-11-01T07:17:24.063949+00:00",
+      "logSHA256": "c52fb93732327f6c4bc6269775eb602608084a050a719867d948ade15dc33f9c",
+      "tests": {
+        "defined": 70,
+        "passed": 70,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMCPMethods": 70
+      }
+    },
+    {
+      "name": "sdk",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/test-python-sdk.py"
+      ],
+      "log": "sdk.log",
+      "startedAtUTC": "2026-11-01T07:17:24.984266+00:00",
+      "returncode": 0,
+      "wallSeconds": 5.180318417027593,
+      "finishedAtUTC": "2026-11-01T07:17:30.164792+00:00",
+      "logSHA256": "774a35818ac3358dfc3230aa50bb088710b8d3a1c8b54f8f6b943236c5f2cc14"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ],
+      "log": "package.log",
+      "startedAtUTC": "2026-11-01T07:17:30.924535+00:00",
+      "returncode": 0,
+      "wallSeconds": 118.54717025021091,
+      "finishedAtUTC": "2026-11-01T07:19:29.471593+00:00",
+      "logSHA256": "eb1eaf5c7dbf4360390902b0cdc650ad74e239952950586e34b5564ccfbe7ef6"
+    },
+    {
+      "name": "manual-client-process",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/mcp-client-smoke.py",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/manual-client-process.json"
+      ],
+      "log": "manual-client-process.log",
+      "startedAtUTC": "2026-11-01T07:19:30.413516+00:00",
+      "returncode": 0,
+      "wallSeconds": 2.569185124943033,
+      "finishedAtUTC": "2026-11-01T07:19:32.982923+00:00",
+      "logSHA256": "25c2ce0ae682969bec03716e3abc7798199e78dc0a9ae4230361ed9d64745013"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app/Contents/MacOS/oswindctl"
+      ],
+      "log": "api-mcp.log",
+      "startedAtUTC": "2026-11-01T07:19:33.780314+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.5297935828566551,
+      "finishedAtUTC": "2026-11-01T07:19:34.310308+00:00",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ],
+      "log": "indexed-api-mcp.log",
+      "startedAtUTC": "2026-11-01T07:19:35.109627+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.1684960830025375,
+      "finishedAtUTC": "2026-11-01T07:19:36.278322+00:00",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "backup-restore",
+      "state": "passed",
+      "command": [
+        "python3",
+        "<checkout>/.artifacts/mcp-workspace-v1/backup-mcp-restore.py",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/backup-restore.json"
+      ],
+      "log": "backup-restore.log",
+      "startedAtUTC": "2026-11-01T07:19:37.075823+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.209224957972765,
+      "finishedAtUTC": "2026-11-01T07:19:38.285232+00:00",
+      "logSHA256": "a42b2c29a4de34457e3b67748083d23998768362d838e2146b5d77dd74eb6a96"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind-macos.zip"
+      ],
+      "log": "archive.log",
+      "startedAtUTC": "2026-11-01T07:19:39.092496+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.2393440001178533,
+      "finishedAtUTC": "2026-11-01T07:19:40.332056+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind-macos.zip",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/extracted"
+      ],
+      "log": "extract.log",
+      "startedAtUTC": "2026-11-01T07:19:41.135913+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.10563758388161659,
+      "finishedAtUTC": "2026-11-01T07:19:41.241711+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/OSwind.app"
+      ],
+      "log": "strict-app.log",
+      "startedAtUTC": "2026-11-01T07:19:42.046446+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.03954049991443753,
+      "finishedAtUTC": "2026-11-01T07:19:42.086148+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/mcp-workspace-v1/qualification-v3/extracted/OSwind.app"
+      ],
+      "log": "strict-extracted.log",
+      "startedAtUTC": "2026-11-01T07:19:42.893073+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.03930775006301701,
+      "finishedAtUTC": "2026-11-01T07:19:42.932570+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "expectedMandatoryMCPMethods": {
+    "OSwindCoreTests.MCPJSONTests": [
+      "testStrictRoundTripPreservesNumbersAndLeadingBOM",
+      "testRejectsDuplicateEscapedAndCanonicallyEquivalentKeys",
+      "testRejectsNonJSONNumbersTrailingBytesAndBrokenUTF8",
+      "testDepthNodeAndByteBounds",
+      "testCommandFileRejectsDuplicateKeysAndUnknownOptions",
+      "testCommandRejectsImplicitShellAndRuntimeEnvironmentOverrides"
+    ],
+    "OSwindCoreTests.MCPClientTests": [
+      "testModernDiscoveryAndExplicitCallCarryRequestMetadataAndProvenance",
+      "testLegacyUnknownPreinitializeErrorFallsBackWithoutSpecificCodeAssumption",
+      "testSilentLegacyProbeTimeoutFallsBack",
+      "testLateProbeReplyIsDiscardedWithoutAdmittingWrongResponseID",
+      "testModernUnsupportedVersionNeverFallsBackToInitialize",
+      "testWrongResponseIDAndAmbiguousEnvelopeRefuse",
+      "testDuplicateJSONKeysAndInvalidUTF8Refuse",
+      "testUnexpectedServerRequestCannotAuthorizeSamplingOrRoots",
+      "testFrameAndStderrFloodsAreBounded",
+      "testNotificationFloodIsBounded",
+      "testPaginationAndDuplicateToolNamesRefuseWithoutReturningTruncatedList",
+      "testToolSchemaChangeRequiresNewReviewBeforeAnyCall",
+      "testExecutableChangeRefusesBeforeLaunchingNewBytes",
+      "testUnreviewedToolAndMalformedArgumentsDoNotLaunch",
+      "testMinimalEnvironmentUsesOnlyExplicitFixtureCredentialAndOwnedHome",
+      "testCancelledCallTerminatesAndReapsOwnedChildWithoutReplay",
+      "testInputRequiredAndProtocolErrorsNeverReplayCall",
+      "testFragmentedUTF8FramesRemainExactAndPartialEOFRefuses",
+      "testFinitePaginationReturnsEveryToolWithoutFetchingIcons",
+      "testForgedReviewDisplayMetadataRefusesBeforeLaunching",
+      "testCallTimeoutDoesNotReplayAndReapsOwnedChild",
+      "testArbitraryLegacyErrorCodeFallsBackButModernHeaderErrorDoesNot",
+      "testPublicReviewJSONRoundTripsThroughCLIISOEncoding",
+      "testReviewCatalogIsReadableAndRoundTripsOrRefusesBeforePublication",
+      "testUnsupportedReviewProtocolRefusesBeforeAnyProcessLaunch",
+      "testCancellationSendsMatchingProtocolNotificationBeforeGracefulExit"
+    ],
+    "OSwindCoreTests.MCPConnectionTests": [
+      "testSettingsRoundTripKeepsInertProfilesWithoutCredentials",
+      "testMalformedAndDuplicateSavedProfilesFailClosed",
+      "testProfileBoundsAndReservedCredentialNames",
+      "testAuthorityComparisonIsByteExactDespiteUnicodeCanonicalEquality",
+      "testQuietRestoreClearsAllExternalConnectionChoices",
+      "testResultDraftKeepsTextAndProvenanceButNotArgumentsPathsOrRawContent",
+      "testRepeatedExplicitSaveHasOneStableOriginalSource",
+      "testResultAdmissionUsesPatternRedactionAndApplicationExclusion",
+      "testEmptyNULAndOversizedTextCannotBecomeRecordedSources",
+      "testIncompleteProvenanceIsRejectedBeforeAnyImport",
+      "testAChangedSettingsSnapshotRefusesStaleResultAdmission"
+    ],
+    "OSwindAppTests.MCPWorkspaceTests": [
+      "testSavingVisibleTextUsesActualPrivacyAdmissionAndBecomesSearchable",
+      "testPrivacyChangeDuringPreparationCancelsBeforeSourcePublication",
+      "testGlobalPauseStopsToolOnlyWorkWithoutStartingScreenCapture",
+      "testLibraryDepartureJoinsToolWorkerBeforeReturning",
+      "testOnboardingAndRetiredLibraryCannotLaunchOrSaveTools",
+      "testToolsWorkspaceRefreshDoesNotRunUnrelatedMemorySearch",
+      "testActualAppSessionSwitchWaitsForToolDrainBeforeClosingStore",
+      "testPlainQuitDelegateWaitsForCancellationIgnoringToolBeforeFinishing"
+    ],
+    "OSwindAppTests.MCPToolsModelTests": [
+      "testLoadingAndReviewingNeverLaunchesOrReadsCredentials",
+      "testOnlyExplicitCurrentReviewLaunches",
+      "testCallUsesOnlyReviewedArgumentsAndDoesNotAutomaticallySave",
+      "testMalformedArgumentsRefuseBeforeRunnerOrCredentialRead",
+      "testEditingArgumentsInvalidatesCallConsent",
+      "testCanonicalEquivalentCommandEditInvalidatesReview",
+      "testUnavailableAndLockedScopesNeverReadCredentials",
+      "testCredentialsResolveOnlyThisProfileNamespaceAfterConfirmation",
+      "testSavingCredentialRevokesReviewAndClearsDraft",
+      "testSuspensionClearsPrivateStateWithoutRestart",
+      "testCancelledIgnoringDiscoveryMustDrainBeforeNewWork",
+      "testPrivacyChangeDropsLateCallResult",
+      "testCancelAndWaitJoinsActualOutstandingWork",
+      "testExplicitSaveUsesStableSourceAndCannotDoubleSubmit",
+      "testConfigurationAndRemovalNeverLaunchAndTouchOnlyOwnCredentialEntries",
+      "testUnknownCredentialNameCannotAccessAnotherAccount",
+      "testRootReplacementRefusesBeforeCredentialsOrProcess",
+      "testKeychainDeletionChecksStatusAndRefusesOtherCredentialNamespaces",
+      "testFailedCredentialRemovalKeepsConnectionForRetry"
+    ]
+  },
+  "newMethods": 38,
+  "parentMethods": 32,
+  "totalMandatoryMethods": 70,
+  "signedOfficialSDKInterop": {
+    "state": "passed-signed-release-modern-official-sdk-interop",
+    "sdkVersion": "2.3.0",
+    "license": "MIT",
+    "protocol": "2026-07-28",
+    "transport": "stdio",
+    "cliSHA256": "0ad25078e6cc9acf39c66a2df8349271a4283e5d47737203db3cbbefc904f5e6",
+    "all127PinnedSDKFilesUnchangedBeforeAndAfter": true,
+    "artifacts": {
+      "arguments.json": "c94f765f65583b7378a02b9f63c9cc676042fd1d8d7d176fe0d00cecc12a43e4",
+      "server.py": "d0c49f728095617dbbff37ac257f9aac486405600fcec99ff3b1cea0a66e4195",
+      "config.json": "04f50bc56da53f66be6a9bf8fa49a275ff24df7d0ae6a1d444bda75558356ada",
+      "output.json": "5cdb08012db4560cc7ea6dc44f2ae6373ae15671a3c30a110d192b57fafeb058",
+      "discovery.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "review.json": "40f5547bac70110cdc26f5d25dc3bdef0ba518d117fab01dcd0474bee9bed85c",
+      "call.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scope": "Authored Unicode echo only; isolated test dependency, no real account/credential, HTTP/auth/model-loop or arbitrary-server acceptance.",
+    "recordedAtUTC": "2026-11-01T07:20:16.038537+00:00"
+  },
+  "manualProcess": {
+    "format": "OSwind MCP manual client process check",
+    "state": "passed",
+    "checks": [
+      "exit 0: mcp-client; OSwind: Review the configured executable/arguments, then use --allow-server-process; it runs local code with your account authority\n",
+      "discovery requires explicit local-code authorization",
+      "exit 2: --data; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "exit 3: --vault; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "client refuses data/vault before library access",
+      "exit 5: mcp-client; ",
+      "legacy negotiation with existing server",
+      "all seven independently implemented server tools discovered",
+      "review definitions are literal readable JSON tied to each tool",
+      "exit 9: mcp-client; OSwind: Review exact tool/arguments and use --confirm-call for a call; list takes only --config and --allow-server-process\n",
+      "exit 10: mcp-client; ",
+      "reviewed tool call reads actual authored empty library",
+      "result carries command/tool provenance",
+      "complete original tool text preserved",
+      "exit 14: mcp-client; OSwind: MCP JSON is malformed, ambiguous or exceeds its complexity limit\n",
+      "exit 15: mcp-client; OSwind: MCP review metadata does not match its definition\n",
+      "manual list/call never open ambient/default client history",
+      "unrelated parent secret absent from returned tool context",
+      "exit 18: mcp-client; ",
+      "interrupt fixture reached actual tool call",
+      "CLI Ctrl-C joins cancellation without a false result",
+      "CLI cancellation reaped only its owned server"
+    ],
+    "binarySHA256": "0ad25078e6cc9acf39c66a2df8349271a4283e5d47737203db3cbbefc904f5e6",
+    "scope": "Owned local existing-server interoperability and manual review gates. No HTTP, third-party server, model loop, automatic ingestion or native UI acceptance."
+  },
+  "signedBackupRestore": {
+    "fixture": "synthetic note, 1px PNG, silent PCM WAV, saved evidence chat",
+    "checks": [
+      "actual signed CLI backup/restore clears MCP connection choices, original settings remain intact; no executable or credential used",
+      "media/chat/metadata round trip, fingerprint, private permissions, quiet settings, isolated routing and reusable library",
+      "existing destinations, fingerprint mismatch and corrupted media refused without target publication",
+      {
+        "interrupt": "SIGINT",
+        "elapsed_s": 0.10626695887185633,
+        "destination_jobs_removed": 0,
+        "scratch_jobs_removed": 0
+      },
+      {
+        "interrupt": "SIGKILL",
+        "elapsed_s": 0.10677337506785989,
+        "destination_jobs_removed": 1,
+        "scratch_jobs_removed": 1
+      }
+    ],
+    "passed": true,
+    "interruptions": true
+  },
+  "componentVisualReview": {
+    "state": "reviewed-component-layout",
+    "reviewedAtUTC": "2026-11-01T06:51:37.053277+00:00",
+    "files": {
+      "ToolsReady-light.png": "2989483b75a784b786a2e7705ec4eda8f124afedda47a5f1cf3d31d9e6224db5",
+      "ToolsReady-dark.png": "52eb55555ca35339c76d82d942833cb3b35dc501d4d209c03b73d39d9847dfaf",
+      "ToolsCompact-light.png": "0f38558a98028b75e17eb4ea67377df10f8a4ce172e29d211eed2e743334a773",
+      "ToolsCompact-dark.png": "ff8c05a5e1a941305680aff053c957db69bac2d58f06c1adab8cd4db382acf42",
+      "ToolsResult-light.png": "9282c234b9573114e96d4d37245cd9efe78580e895605816bf821e841cfa58c9",
+      "ToolsResult-dark.png": "7d024b1472bdc0617e1bf1e133e2b76e3f2edf5cba724574f12fc8832f376c2f",
+      "ToolsReview-light.png": "2ba417adf4641fd2488a3d2f05451769675dbeb89ed0a9856be6fb834fd902f1",
+      "ToolsReview-dark.png": "66a4c6bac8a94a15f9ef424e0c6bba840e0577470df181d5f0a985e66aebe73c",
+      "ToolsEmpty-light.png": "07bbb41dd7bd66e1d670e0d2036c74f21bf0a7b0b0cd8713e7f1ce7f55c2c6c5",
+      "ToolsEmpty-dark.png": "ceaf0dc39f1686e958abb7fc963abeb375109914cb12f4d6fcb8702bd069b18d",
+      "ToolsSetup-light.png": "81a49f7424a2b7326d71d05032562d9e20100ce2a392c64bc36d7954209376b6",
+      "ToolsSetup-dark.png": "ef2383cbf418083f3fa31c43ecd0aaa1c93861c06ec08268ee9ed39e978f002e"
+    },
+    "findings": [
+      "All12 actual component PNGs inspected, light/dark; readable and no overlapping controls in the observed viewports.",
+      "Result autoscroll exposes result and save control. Review command and arguments top-left and legible.",
+      "Compact main form uses outer scrolling; review button lies below shown viewport. Review sheet lower explanation also scrolls with fixed action footer.",
+      "Inactive exporter renders native buttons gray despite tint. No active theme or interaction acceptance claimed."
+    ],
+    "limits": [
+      "Authored data/injected runners only; no real process or Keychain.",
+      "No native keyboard/mouse/VoiceOver/platform/TCC/physical power acceptance.",
+      "Earlier v1 layout issues retained separately."
+    ]
+  },
+  "visualDebugBinarySHA256": "b4e0523fe4fc3ac46ca21c34f009245e8fcac72f334523d7628c3f7b522aca7a",
+  "development": [
+    "Initial Swift property-wrapper multi-declarations and test helper visibility/async capture compile errors were corrected; original logs remain retained.",
+    "A credential test helper compared optional String to Substring; corrected;37 focused cases pass.",
+    "All12 first renders were retained; observed result below viewport, centered review code and singular-tool copy were corrected. All12 revised light/dark component PNGs were inspected. These earlier debug renders cover unchanged view source; they do not demonstrate the later termination-gate fix. Compact forms and review explanation scroll; action footers stay visible. Inactive exporter buttons remain gray; no active theme/native input claim.",
+    "The first full run returns0 with1844 tests/zero failures. Its harness then uses the wrong OSwind module prefix for app test identities. The original failure and complete log remain retained. The corrected driver independently admits the same log after checking all752 identical inputs/protected trees and all69 exact OSwindCoreTests/OSwindAppTests pass identities; it does not repeat or hide the full run."
+  ],
+  "boundaries": [
+    "Saved connection configuration does not start a server or read credentials. Every discovery and tool call requires a fresh exact review; changed command/profile/arguments/credential/privacy, pause, lock, onboarding and library departure revoke reviews.",
+    "Keychain adapter validates connection-specific names and checks deletion status. Tests inject fake stores and exercise pure status validation; no real Keychain read/write acceptance is claimed. Removal can partly delete earlier entries before a later Keychain error; profile remains visible for retry.",
+    "Owned stdio processes run with the Mac account filesystem/network authority. Minimal environment/temporary working directory are not a sandbox. Direct-child cleanup does not promise ownership of spawned descendants.",
+    "Stop keeps busy until actual worker exit; stale late responses cannot publish into changed scope. Vault/library transitions join external work and imported-source preparation before closing SQLite. No automatic retry/resume occurs.",
+    "Only explicitly selected plain text/provenance enters memory through collector admission/current settings snapshot/media lease/pattern and optional learned PII handling. Exact arguments, credential values, executable paths and raw/binary result are omitted. No links or remote resources are fetched.",
+    "Saved tool results are labeled unverified external content and can be searched/used by Ask. No server-supplied content authorizes a later action. One call uses one stable original source identity; explicit retry does not silently duplicate that source.",
+    "Plain-library Quit includes pending tools in asynchronous exit admission, waits for real workers and prevents duplicate exit callbacks. The delegate regression fails before correction; both tool/import paths pass afterward.",
+    "Quiet restore clears all external connection choices. Signed separate-process backup/restore and SIGINT/SIGKILL interruptions pass with an authored inert connection, leaving original settings intact. No credential or actual command is needed."
+  ],
+  "earlierNativeCandidate": {
+    "source": "caf367c21bd75c639d2cac7ec30209db46fcf365",
+    "stages": 13,
+    "fullPasses": 1762,
+    "skips": 82,
+    "mandatoryEachBuild": 69,
+    "qualifiedBeforeDiscoveryOfPlainQuitGap": true,
+    "notFinalSource": true
+  },
+  "quitCounterexample": {
+    "redLogSHA256": "52c3c90eba72c8a25d4ac2288e85b91ccefa2d54b99b1abf76c8ef013c2a1a58",
+    "correctedTwoCaseLogSHA256": "c4907ce160ce6e193f94d43cd8fe2f47c3ac60ed38092c54180321c0c98483e9",
+    "red": "Owned delegate immediately returns terminateNow while a cancellation-ignoring MCP call is still busy",
+    "green": "Tool and existing import quit cases pass; no finish callback until actual worker drain; repeated quit does not duplicate exit"
+  },
+  "hostedCI": {
+    "state": "pending-publication"
+  },
+  "remaining": [
+    "Real stored-key/signed-GUI/native input and accessibility acceptance",
+    "HTTP/auth, broader third-party account behavior and model-driven tool workflows",
+    "Full sync, sustained physical battery/power, supported-hardware acceptance and notarized distribution",
+    "Matched whole-product competitor testing and top-three ranking"
+  ],
+  "recordedAtUTC": "2026-11-01T07:20:51.669984+00:00",
+  "nativeInputAttempt": {
+    "state": "blocked-native-input-mac-locked",
+    "launchLivenessConfirmed": false,
+    "launchExitStatusAvailable": false,
+    "ownedPIDAlreadyAbsentAtCleanup": true,
+    "noMatchingOwnedAppProcessRemains": true,
+    "cleanupSignalSent": false,
+    "initialCleanupAssertionRetained": "Expected the owned PID to be live; ps returned no command. No signal was sent. Later checks find no matching app process, no SQLite file and no server-start artifact.",
+    "ownedLibraryCreated": false,
+    "serverStartArtifacts": 0,
+    "workaroundAttempted": false,
+    "credentialConfiguredOrRead": false
+  }
+}

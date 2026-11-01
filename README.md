@@ -1,6 +1,6 @@
 # OSwind
 
-[External MCP client](docs/MCP-CLIENT.md) supports explicitly reviewed manual calls to local stdio servers using modern or legacy protocols. The signed CLI and32 focused cases pass qualification; native setup, HTTP/auth, model loops and result-to-memory workflows remain open. [744-input receipt](benchmarks/mcp-client-v1.json).
+[Native external tools](docs/MCP-WORKSPACE.md) adds local stdio MCP connections, per-operation command/tool/argument review, a scoped Keychain adapter and explicit privacy-checked result-text saving to searchable memory. All70 MCP cases and13 package/process stages pass over752 pinned inputs. [Receipt and limits](benchmarks/mcp-workspace-v1.json). Native input/real Keychain acceptance, HTTP/auth and model-driven tool workflows remain open. The [manual CLI client](docs/MCP-CLIENT.md) remains available.
 
 [Calendar-linked meeting context](docs/MEETINGS.md) adds opt-in calendar selection, upcoming meetings, source-linked briefs using the selected local/BYOK engine, reviewed join links and generic reminder attempts. Software and package checks pass; real Calendar/notification acceptance remains open. [737-input qualification and retained native failures](benchmarks/calendar-context-v1.json).
 

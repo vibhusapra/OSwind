@@ -1,6 +1,8 @@
 # Native external tools workspace
 
-Status: **work in progress**, based on the qualified manual client. The first native checkpoint passes13 software/package stages over752 inputs:1,762 full passes/82 skips and all69 MCP cases under sanitizer/optimization. A subsequent review found that plain-library Quit bypassed pending tool drainage. The new delegate regression fails before correction; the corrected tool and existing import quit checks both pass. Final full/sanitizer/optimized/package qualification is being rerun on the corrected source (38 new cases,70 MCP total). All12 revised light/dark component renders were inspected after retained layout fixes. Real Keychain/native input/platform acceptance and the native workspace PR remain open.
+Status: **software/package qualified; native platform acceptance open (F080 partial)**. The [752-input receipt](../benchmarks/mcp-workspace-v1.json) binds source `46c81b3` to13 passing stages:1,763 full passes/82 explicit skips; all70 MCP cases under sanitizer and optimization without skips or race warnings (38 new native cases,32 parent client cases);22 signed CLI process checks; normal/indexed API/MCP; actual quiet backup/restore and SIGINT/SIGKILL interruptions; strict signed/extracted34-file equality. Installed15 files and13 prior app trees stay unchanged. The signed CLI interoperates with isolated official Python SDK2.3.0 using exact Unicode text.
+
+All12 revised light/dark component renders were inspected after retained layout fixes. They cover authored data and unchanged view source in an earlier debug binary. A final signed-app input attempt was blocked because the Mac was locked. The launched PID was already absent at cleanup; no matching app process, SQLite library or server-start artifact remained. Its startup outcome is unknown. No unlock workaround, real credentials or personal history were used; no native interaction pass is claimed.
 
 ## User flow
 
@@ -24,4 +26,13 @@ The server may access files itself; OSwind does not automatically attach its mem
 
 Owned tests cover no launch/read before consent, exact argument review, malformed input, canonical-byte edits, credential namespaces, secret-draft clearing, stale result refusal, worker drain, current-policy source admission, duplicate-save identity, direct source search/open, privacy changes during actual import preparation, global pause and actual AppSession library switching. They use injected credentials/runners; no real user keys or calendars are read.
 
-The debug exporter renders the actual components with authored data and an injected server. It does not establish native mouse/keyboard/VoiceOver behavior, real Keychain access, real third-party account behavior, or physical power. The earlier752-input candidate passed full/debug/TSan/optimized/package/API/MCP/archive checks, but did not cover the subsequently discovered plain-Quit gap. Corrected-source gates and final manifests still need completion; earlier compiler, visual, harness and quit failures remain retained.
+The debug exporter renders the actual components with authored data and an injected server. It does not establish native mouse/keyboard/VoiceOver behavior, real Keychain access, real third-party account behavior, or physical power. The earlier752-input candidate passed full/debug/TSan/optimized/package/API/MCP/archive checks, but did not cover the subsequently discovered plain-Quit gap. The corrected source passes the final gates and Git-blob/input audit. Earlier compiler, visual, harness and quit failures remain retained. The original full run passed but its postvalidation used an incorrect app-test module prefix; its retained log was separately admitted against the correct identities. The final corrected-source full run is fresh, with all70 mandatory identities checked directly.
+
+
+## Reviewed samples
+
+These are actual component renders with authored data, not a live native-input receipt.
+
+![Tools and exact arguments](../assets/mcp-tools-sample.png)
+
+![Selected result and explicit save](../assets/mcp-tools-result-sample.png)
