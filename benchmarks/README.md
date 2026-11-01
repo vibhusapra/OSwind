@@ -1,6 +1,10 @@
 # Benchmark protocol and results
 
-[Late dependent records](sync-late-dependencies-v1.json):22 local stages, 1,635 full passes / 82 skips, 635 sanitizer and 635 release passes / 22 skips each. Source 725-input manifest and 17 retained sanitizer logs; complete sync/performance and parent native migration CI remain open.
+## Late-dependency writer positive-path pairs
+
+[`sync-late-dependency-performance-v1.json`](sync-late-dependency-performance-v1.json) retains all12 original AB/BA/AB workloads, 24 size/workload samples, all setup/wall costs, 60 closed SQLite storage checks and11 copied-data corruption refusals. Whole-workload median changes are under1%; the three warm metadata pairs do not establish statistical significance, physical power or competitor rank. The sole compiled difference is the incoming writer; the baseline includes the same unused new helper and identical tests. [Scope and medians](../docs/SYNC-LATE-DEPENDENCIES.md#positive-path-paired-observations--october-31-2026).
+
+[Late dependent records](sync-late-dependencies-v1.json):22 local stages, 1,635 full passes / 82 skips, 635 sanitizer and 635 release passes / 22 skips each. Source 725-input manifest and 17 retained sanitizer logs; complete sync and broad performance acceptance remain open. Both published heads pass hosted checks; the original parent native migration failure's cause remains unresolved.
 
 
 Latest: [sync mutation tradeoff](sync-mutation-cost-v1.json), three paired rounds with all12 workloads/reviews, setup/projection regressions and index storage cost retained. [Protocol](../docs/SYNC-MUTATION-COST.md).
