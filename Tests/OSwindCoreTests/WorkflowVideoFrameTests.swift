@@ -15,12 +15,18 @@ final class WorkflowVideoFrameTests:XCTestCase {
         let data=NSMutableData(),destination=try XCTUnwrap(CGImageDestinationCreateWithData(data,UTType.png.identifier as CFString,1,nil))
         CGImageDestinationAddImage(destination,image,nil);XCTAssertTrue(CGImageDestinationFinalize(destination));return data as Data
     }
-    func testNativeH264FramesFollowMeasuredNarrationAndKeepOriginalColors()async throws {
+    func testNativeH264FramesFollowMeasuredNarrationAndKeepOriginalColors()async throws {try await withFixture(spoken:false)}
+    func testActualSpokenKokoroWorkflowPreservesFullNarrationAcrossNativeMovie()async throws {
+        let env=ProcessInfo.processInfo.environment
+        guard env["OSWIND_TEST_WORKFLOW_KOKORO_HELPER"] != nil,env["OSWIND_TEST_WORKFLOW_GUARDIAN"] != nil else {throw XCTSkip("Explicit authored stock Kokoro movie fixture")}
+        try await withFixture(spoken:true)
+    }
+    private func withFixture(spoken:Bool)async throws {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-video-"+UUID().uuidString),store=try MemoryStore(root:root)
         defer {try? FileManager.default.removeItem(at:root)}
         var workspace:BackupWorkspace?=try store.libraryWorkspace("oswind-workflow",bucket:.video)
         do {
-            try await renderFixture(store:store,workspace:try XCTUnwrap(workspace))
+            try await renderFixture(store:store,workspace:try XCTUnwrap(workspace),spoken:spoken)
             try workspace?.cleanup();workspace=nil;try store.close();XCTAssertTrue(store.isClosed)
         }catch {let original=error;try? workspace?.cleanup();workspace=nil;try? store.close();throw original}
     }
@@ -32,7 +38,7 @@ final class WorkflowVideoFrameTests:XCTestCase {
             XCTFail("Retained shifted and clipped narration passed")
         }catch OSwindError.invalid(let message) {XCTAssertEqual(message,"Workflow AAC edit leaves more than one packet outside the measured narration")}
     }
-    private func renderFixture(store:MemoryStore,workspace:BackupWorkspace)async throws {
+    private func renderFixture(store:MemoryStore,workspace:BackupWorkspace,spoken:Bool)async throws {
         var frames=[WorkflowFramePreview]()
         for index in 0..<2 {
             let path="images/owned-\(index).png",id="owned-video-source-\(index)"
@@ -40,8 +46,13 @@ final class WorkflowVideoFrameTests:XCTestCase {
             try store.insert(Memory(id:id,timestamp:Date(timeIntervalSince1970:Double(100+index)),app:"Owned fixture",bundleID:"dev.oswind.fixture",title:index==0 ? "Authored red frame":"Authored blue frame",text:"Owned source",imagePath:path))
             frames.append(try await NarratedWorkflow.preview(store:store,memoryID:id))
         }
-        let draft=WorkflowDraft(title:"Owned source walkthrough",steps:frames.enumerated().map {index,frame in WorkflowStep(source:frame.source,title:frame.title,narration:index==0 ? "First owned narration.":"Second owned narration.")})
-        let audio=try WorkflowTimelineTests.populate(workspace,draft:draft),timeline=try LocalWorkflowTimeline.combine(draft:draft,narrations:audio,workspace:workspace)
+        let draft=WorkflowDraft(title:"Owned source walkthrough",steps:frames.enumerated().map {index,frame in WorkflowStep(source:frame.source,title:frame.title,narration:spoken ? (index==0 ? "This retained screen is red. Its white marker appears in the upper left.":"This retained screen is blue. OSwind keeps the original source linked to this step."):(index==0 ? "First owned narration.":"Second owned narration."))})
+        var audio=[WorkflowNarrationResult]()
+        if spoken {
+            let env=ProcessInfo.processInfo.environment,helper=URL(fileURLWithPath:try XCTUnwrap(env["OSWIND_TEST_WORKFLOW_KOKORO_HELPER"])),guardian=URL(fileURLWithPath:try XCTUnwrap(env["OSWIND_TEST_WORKFLOW_GUARDIAN"]))
+            for (index,step) in draft.steps.enumerated() {audio.append(try await LocalWorkflowNarrator.generate(script:step.narration,step:index+1,workspace:workspace,helper:helper,environment:.production(guardian:guardian)))}
+        }else{audio=try WorkflowTimelineTests.populate(workspace,draft:draft)}
+        let timeline=try LocalWorkflowTimeline.combine(draft:draft,narrations:audio,workspace:workspace)
         let hardware=ProcessInfo.processInfo.environment["OSWIND_TEST_WORKFLOW_VIDEO_HARDWARE"]=="1"
         let url=try await WorkflowVideoFrames.render(draft:draft,frames:frames,timeline:timeline,workspace:workspace,hardwareRequired:hardware)
         let asset=AVURLAsset(url:url),duration=try await asset.load(.duration).seconds,tracks=try await asset.loadTracks(withMediaType:.video)
@@ -68,10 +79,17 @@ final class WorkflowVideoFrameTests:XCTestCase {
             try Paths.ensure(output);let tree=try BackupFileTree(root:output,writable:true)
             _ = try workspace.tree.copy("workflow-video.mov",to:tree,as:"workflow-video.mov")
             for name in ["workflow.mp4","narration.wav","narration.txt","narration.timing.json"] {_ = try workspace.tree.copy(name,to:tree,as:name)}
+            for result in audio {for ext in ["txt","wav","timing.json"] {let name=result.stem+"."+ext;_ = try workspace.tree.copy(name,to:tree,as:name)}}
+            let sourceTree=try BackupFileTree(root:store.root)
+            for (index,frame) in frames.enumerated() {
+                let copied=try sourceTree.copy("images/owned-\(index).png",to:tree,as:String(format:"source-%02d.png",index+1))
+                XCTAssertEqual(copied.sha256,frame.source.mediaSHA256)
+            }
             try tree.write(png(first.image),as:"decoded-first.png");try tree.write(png(second.image),as:"decoded-second.png")
             try tree.write(JSONEncoder().encode(verification),as:"movie-verification.json")
             try tree.write(JSONEncoder().encode(draft),as:"draft.json");try tree.write(JSONEncoder().encode(timeline),as:"timeline.json")
-            try tree.write(Data("Owned H264/AAC movie with synthetic tone narration for timing and codec tests only; this is not a spoken walkthrough. Hardware required: \(hardware)".utf8),as:"scope.txt")
+            let scope=spoken ? "Owned retained sources with actual local stock Kokoro af_heart1.0, native H264/AAC and complete decoded/source-aligned narration. Core fixture only: no CoreExport/App integration or live acquisition acceptance.":"Owned H264/AAC movie with synthetic tone narration for timing and codec tests only; this is not a spoken walkthrough."
+            try tree.write(Data((scope+" Hardware required: \(hardware)").utf8),as:"scope.txt")
         }
     }
 }

@@ -644,7 +644,7 @@
     "axis": "AI",
     "feature": "Source-linked narrated SOP / workflow video export",
     "status": "todo",
-    "evidence": "New October31 parity requirement from a publisher changelog. Existing recaps, media exports and drafts do not generate narrated workflow videos. Needs an editable evidence-grounded script, selected source media with renewed privacy/erasure admission, local narration, timed steps/captions and verified non-silent muxed output. Publishing remains a separate explicit action.",
+    "evidence": "WIP Core drafts bind library/source revision/pixel hash/frame; retained image/replay previews revalidate privacy, OCR and selected local PII. Guarded offline stock Kokoro af_heart1.0, exact scripts, lossless measured audio, hardware-required H264, native AAC/MP4 and portable priming/full PCM/source-correlation checks work on authored fixtures. A two-step actual spoken movie preserves all 250,200 audio frames; independent FFmpeg correlation 0.9981 and local Whisper normalized words match the full script. Earlier cross-player AAC priming failure remains a mandatory authored fixture. No CoreExport destination publication, portable timing/captions, App editor/lifecycle, fresh-Mac setup, native acquisition/power or whole-feature qualification yet; status stays TODO. See docs/PROGRESS.md.",
     "references": "Screenpipe narrated SOPs"
   },
   {

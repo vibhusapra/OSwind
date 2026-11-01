@@ -348,11 +348,16 @@
   ],
   "voiceParentHostedCI": {
     "headSha": "bba9e0546320ba254b39a9df1c38e2d137ce5ea3",
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "url": "https://github.com/vibhusapra/OSwind/actions/runs/41295080255"
   },
-  "hostedRecoveryCI": "Pending PR publication; no unchanged rerun requested",
+  "hostedRecoveryCI": {
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/41297577807",
+    "head": "9cacf46f232011c22fd2101a3859a76eebe8ee92",
+    "state": "both-jobs-passed",
+    "previousFailuresRetained": true
+  },
   "skipEnvironmentComparison": {
     "additionalOptInSkips": [
       "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse",
