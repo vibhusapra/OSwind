@@ -108,7 +108,7 @@ struct SyncOutgoingProcessor {
             guard try current(identity).encoded()==row.encoded() else {throw OSwindError.invalid("Outgoing row changed during policy admission")}
             let record=try SyncPortableExporter(references:references).record(identity:identity,row:row),data=try record.encoded()
             guard data.count<=processor.maximumBytes-bytes else {throw OSwindError.unavailable("Outgoing graph exceeds its typed byte budget")};bytes+=data.count
-            for dependency in try record.liveDependencies(conversationIsErased:{try cache.isErasedOptionalConversation(record,identity:$0)}) {
+            for dependency in try record.liveDependencies(conversationIsErased:{try cache.isErasedOptionalConversation(record,identity:$0)},entityScopeIsErased:{try cache.isErasedOptionalEntityScope(record,identity:$0)}) {
                 if let content=dependency.content {
                     if try cache.record(.init(identity:dependency.identity,content:content),admit:processor.admitVersion)==nil {_=try prepare(dependency.identity)}
                     _=try cache.resolve(dependency.identity,content:content,admit:processor.admitVersion)

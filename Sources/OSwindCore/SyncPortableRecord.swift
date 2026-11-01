@@ -28,6 +28,19 @@ enum SyncWireCheck {
     static func label(_ value:String)throws {let clean=try EntityLabel.clean(value);guard Data(clean.utf8)==Data(value.utf8) else {throw OSwindError.invalid("Noncanonical sync entity label")}}
     static func entityKey(_ value:String)throws {try text(value,bytes:1024,empty:false,nul:false);guard Data(EntityLabel.key(value).utf8)==Data(value.utf8) else {throw OSwindError.invalid("Noncanonical sync entity key")}}
 }
+/// Provenance in this marker never requests or authorizes an active entity.
+struct SyncUnavailableEntityScope:Codable,Equatable,Sendable {
+    let original:SyncObjectIdentity?
+    init(_ value:UnavailableEntityScope)throws {
+        original=try value.original.map {try .init(table:.entity,origin:$0.origin,lifetime:$0.lifetime)}
+        try validate()
+    }
+    func validate()throws {if let original {try SyncWireCheck.identity(original,.entity)}}
+    func projected()throws->UnavailableEntityScope {
+        try validate();return .init(original:try original.map {try .init(origin:$0.origin,lifetime:$0.lifetime)})
+    }
+}
+enum SyncFilterScope {case entity(SyncObjectIdentity),unavailable(SyncUnavailableEntityScope)}
 struct SyncFilterBody:Codable,Equatable,Sendable {
     let query:String
     let app:String?
@@ -37,23 +50,35 @@ struct SyncFilterBody:Codable,Equatable,Sendable {
     let favoritesOnly:Bool
     let tag:String?,speaker:String?
     let entity:SyncObjectIdentity?
+    let unavailableEntityScope:SyncUnavailableEntityScope?
     let limit:Int
-    init(_ filter:SearchFilter,resolve:(String)throws->SyncObjectIdentity)throws {
-        // Until an explicit unavailable wire representation is admitted, never
-        // serialize this native restriction as an ordinary unscoped filter.
-        try filter.requireAvailableEntityScope()
+    init(_ filter:SearchFilter,unavailable:((UnavailableEntityScope)throws->SyncFilterScope)?=nil,resolve:(String)throws->SyncObjectIdentity)throws {
         query=filter.query;app=filter.app;kind=filter.kind;start=filter.start;end=filter.end;sourceStartsOnly=filter.sourceStartsOnly;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;limit=filter.limit
-        entity=try filter.entityID.map(resolve);try validate()
+        if let marker=filter.unavailableEntityScope {
+            guard filter.entityID==nil else {throw OSwindError.invalid("Unavailable entity scope cannot also select an active entity")}
+            let scope:SyncFilterScope
+            if let unavailable {scope=try unavailable(marker)}else{scope = .unavailable(try .init(marker))}
+            switch scope {case .entity(let value):entity=value;unavailableEntityScope=nil;case .unavailable(let value):entity=nil;unavailableEntityScope=value}
+        }else{entity=try filter.entityID.map(resolve);unavailableEntityScope=nil}
+        try validate()
     }
     func validate()throws {
         try SyncWireCheck.text(query,bytes:32768)
         for s in [app,tag,speaker].compactMap({$0}) {try SyncWireCheck.text(s,bytes:4096,nul:false)}
         if let start {try SyncWireCheck.date(start)};if let end {try SyncWireCheck.date(end)}
         guard (1...10000).contains(limit),start==nil || end==nil || start!<=end! else {throw OSwindError.invalid("Invalid sync query bounds")}
+        guard entity==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("Sync entity scope cannot be active and unavailable")}
         if let entity {try SyncWireCheck.identity(entity,.entity)}
+        try unavailableEntityScope?.validate()
     }
-    func projected(resolve:(SyncObjectIdentity)throws->String)throws->SearchFilter {
-        try validate();return SearchFilter(query:query,app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:try entity.map(resolve),limit:limit,sourceStartsOnly:sourceStartsOnly)
+    func projected(erasedEntity:((SyncObjectIdentity)throws->UnavailableEntityScope?)?=nil,resolve:(SyncObjectIdentity)throws->String)throws->SearchFilter {
+        try validate();var value=SearchFilter(query:query,app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,limit:limit,sourceStartsOnly:sourceStartsOnly)
+        if let unavailableEntityScope {value.unavailableEntityScope=try unavailableEntityScope.projected()}
+        else if let entity {
+            if let marker=try erasedEntity?(entity) {value.unavailableEntityScope=marker}
+            else{value.entityID=try resolve(entity)}
+        }
+        return value
     }
 }
 struct SyncConversationBody:Codable,Equatable,Sendable {
@@ -210,7 +235,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
     var reference:SyncVersionReference {get throws {try .init(identity:identity,content:.init(data:encoded()))}}
     /// Dependency lookup must return the requested immutable content version.
     /// No fallback to current source data, no local IDs or raw peer SQL.
-    func validateDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool={_ in false},resolve:(SyncObjectIdentity,SyncContentReference?)throws->SyncPortableRecord)throws {
+    func validateDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool={_ in false},entityScopeIsErased:(SyncObjectIdentity)throws->Bool={_ in false},resolve:(SyncObjectIdentity,SyncContentReference?)throws->SyncPortableRecord)throws {
         try validate()
         func dependency(_ id:SyncObjectIdentity,_ content:SyncContentReference?=nil)throws->SyncPortableRecord {
             let record=try resolve(id,content);try record.validate()
@@ -225,7 +250,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
             let original=try source(value.source)
             guard value.passage.map({$0.text(in:original.text) != nil}) ?? true else {throw OSwindError.invalid("Sync citation passage is outside its source version")}
         }
-        func filter(_ value:SyncFilterBody)throws {if let id=value.entity {_=try dependency(id)}}
+        func filter(_ value:SyncFilterBody)throws {if let id=value.entity,try !entityScopeIsErased(id) {_=try dependency(id)}}
         switch body {
         case .source(let value):for entry in value.recap?.sources ?? [] {try link(entry)}
         case .turn(let value):_=try dependency(value.conversation);try filter(value.filter)

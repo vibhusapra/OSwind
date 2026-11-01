@@ -270,7 +270,7 @@ struct SyncVersionStore {
                     // A quiet restore preserves provenance while a later catalog
                     // gives canonical objects new lifetimes. Rebuild all native
                     // fields and references; never equate two different packets.
-                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)})
+                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)},unavailableFilterScope:{try self.projectionFilterScope($0,record:value)})
                     let rebuilt=try SyncPortableExporter(references:references).record(identity:identity,row:currentRow(identity))
                     guard try rebuilt.encoded()==value.encoded() else {throw OSwindError.invalid("Run original differs from cached projection")}
                 }
@@ -281,9 +281,11 @@ struct SyncVersionStore {
     func bindProjection(_ reference:SyncVersionReference,references:SyncPortableReferences,admit:(SyncPortableRecord)throws->Void)throws {
         try SyncChangeCapture.transaction(database) {
             try context();guard let record=try self.record(reference,admit:admit) else {throw OSwindError.unavailable("Prepare the exact sync version before binding")}
-            let row=try currentRow(reference.identity),rebuilt=try SyncPortableExporter(references:references).record(identity:reference.identity,row:row)
+            var projectionReferences=references
+            projectionReferences.unavailableFilterScope={try self.projectionFilterScope($0,record:record)}
+            let row=try currentRow(reference.identity),rebuilt=try SyncPortableExporter(references:projectionReferences).record(identity:reference.identity,row:row)
             guard try rebuilt.encoded()==record.encoded() else {throw OSwindError.invalid("Sync projection differs from its original local row")}
-            try record.validateDependencies(conversationIsErased:{try self.isErasedOptionalConversation(record,identity:$0)}) {try resolve($0,content:$1,admit:admit)}
+            try record.validateDependencies(conversationIsErased:{try self.isErasedOptionalConversation(record,identity:$0)},entityScopeIsErased:{try self.isErasedOptionalEntityScope(record,identity:$0)}) {try resolve($0,content:$1,admit:admit)}
             var evidence:String?,entity:String?
             if reference.identity.table == .source,case .blob(let data)=row.cells[8] {let memory=try JSONDecoder().decode(Memory.self,from:data);evidence=memory.evidenceHash;entity=memory.entityRevision}
             try context();guard try currentRow(reference.identity).encoded()==row.encoded(),try stored(reference) != nil else {throw OSwindError.invalid("Sync projection source changed during dependency admission")}
@@ -394,14 +396,23 @@ struct SyncVersionStore {
 
 }
 
-// Only the nullable conversation of an independent run may omit a live lookup.
-// Missing live references and every owning/evidence dependency remain required.
+// Optional run conversations and entity-filter references can omit a live
+// lookup only under their admitted barriers. Entity filters project unavailable;
+// missing live references and all owning/evidence dependencies stay required.
 extension SyncPortableRecord {
-    func liveDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool)throws->[SyncPortableDependency] {
-        guard case .routineRun(let body)=self.body,let conversation=body.conversation else {return dependencies}
+    var scopeFilter:SyncFilterBody? {
+        switch body {case .turn(let value):return value.filter;case .routineRun(let value):return value.filter;default:return nil}
+    }
+    func liveDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool,entityScopeIsErased:(SyncObjectIdentity)throws->Bool={_ in false})throws->[SyncPortableDependency] {
+        let conversation:SyncObjectIdentity?
+        if case .routineRun(let value)=body {conversation=value.conversation}else{conversation=nil}
+        let entity=scopeFilter?.entity
+        guard conversation != nil || entity != nil else {return dependencies}
         return try dependencies.filter {dependency in
-            guard conversation==dependency.identity,dependency.content==nil else {return true}
-            return try !conversationIsErased(dependency.identity)
+            guard dependency.content==nil else {return true}
+            if dependency.identity==conversation,try conversationIsErased(dependency.identity) {return false}
+            if dependency.identity==entity,try entityScopeIsErased(dependency.identity) {return false}
+            return true
         }
     }
 }
@@ -438,5 +449,35 @@ extension SyncVersionStore {
               let packet=try retainedRunProjection(localRunID:localRunID),case .routineRun(let body)=packet.body,let conversation=body.conversation,
               try isErasedOptionalConversation(packet,identity:conversation) else {return nil}
         return conversation
+    }
+}
+
+extension SyncVersionStore {
+    private var currentScopeProjection:UnavailableEntityScope.Projection {
+        .init(origin:catalog.scope.origin,generation:catalog.scope.generation,group:journal.group,epoch:journal.epoch)
+    }
+    func isErasedOptionalEntityScope(_ record:SyncPortableRecord,identity:SyncObjectIdentity)throws->Bool {
+        try context();guard record.scopeFilter?.entity==identity else {return false}
+        try SyncWireCheck.identity(identity,.entity)
+        return try journal.state(for:identity.key).isDeleted
+    }
+    func projectErasedFilterScope(_ identity:SyncObjectIdentity)throws->UnavailableEntityScope? {
+        try context();try SyncWireCheck.identity(identity,.entity)
+        guard try journal.state(for:identity.key).isDeleted else {return nil}
+        return try .init(original:.init(origin:identity.origin,lifetime:identity.lifetime),projection:currentScopeProjection)
+    }
+    /// The actual cached packet chooses the representation. New outgoing packets
+    /// use explicit unavailable provenance; only an exact older admitted packet
+    /// may reconstruct its reference under this generation's genuine barrier.
+    func projectionFilterScope(_ marker:UnavailableEntityScope,record:SyncPortableRecord)throws->SyncFilterScope {
+        try context();guard let expected=record.scopeFilter else {throw OSwindError.invalid("This packet has no entity filter projection")}
+        if let unavailable=expected.unavailableEntityScope {
+            let emitted=try SyncUnavailableEntityScope(marker)
+            guard emitted==unavailable else {throw OSwindError.invalid("Unavailable scope provenance differs from its packet")}
+            return .unavailable(emitted)
+        }
+        guard let entity=expected.entity,marker.original?.origin==entity.origin,marker.original?.lifetime==entity.lifetime,
+              marker.projection==currentScopeProjection,try isErasedOptionalEntityScope(record,identity:entity) else {throw OSwindError.unavailable("Prepare the exact unavailable scope and current deletion barrier")}
+        return .entity(entity)
     }
 }

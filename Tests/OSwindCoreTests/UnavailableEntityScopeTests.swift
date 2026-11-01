@@ -33,7 +33,25 @@ final class UnavailableEntityScopeTests:XCTestCase {
     }
     func testUnavailableNativeFilterCannotExportAsAnUnscopedWireFilter()throws {
         let filter=SearchFilter(unavailableEntityScope:.init())
-        XCTAssertThrowsError(try SyncFilterBody(filter,resolve:{_ in XCTFail("Unavailable scope must not look up an active entity");throw OSwindError.invalid("No lookup")}))
+        let wire=try SyncFilterBody(filter,resolve:{_ in XCTFail("Unavailable scope must not look up an active entity");throw OSwindError.invalid("No lookup")})
+        XCTAssertNil(wire.entity);XCTAssertNotNil(wire.unavailableEntityScope)
+        let decoded=try JSONDecoder().decode(SyncFilterBody.self,from:SyncProtocolLimits.encode(wire)),restored=try decoded.projected { _ in XCTFail("Unavailable provenance is not a lookup");return "unused" }
+        XCTAssertNotNil(restored.unavailableEntityScope);XCTAssertThrowsError(try restored.requireAvailableEntityScope())
+    }
+    func testWireUnavailableProvenanceHasNoProjectionAuthorityOrEntityDependency()throws {
+        let origin="00000000-0000-0000-0000-000000006201",lifetime="00000000-0000-0000-0000-000000006202"
+        let reference=try UnavailableEntityScope.Reference(origin:origin,lifetime:lifetime)
+        let marker=try UnavailableEntityScope(original:reference,projection:.init(origin:origin,generation:lifetime,group:origin,epoch:lifetime)),wire=try SyncFilterBody(SearchFilter(unavailableEntityScope:marker),resolve:{_ in throw OSwindError.invalid("No active entity")})
+        let bytes=try SyncProtocolLimits.encode(wire)
+        XCTAssertFalse(String(decoding:bytes,as:UTF8.self).contains("projection"))
+        let restored=try wire.projected { _ in XCTFail("Provenance must not request an active definition");return "unused" }
+        XCTAssertEqual(restored.unavailableEntityScope?.original,reference);XCTAssertNil(restored.unavailableEntityScope?.projection)
+        let parent=try SyncPortableRecord(identity:.init(table:.conversation,origin:origin,lifetime:lifetime),body:.conversation(.init(title:"Owned",created:Date(timeIntervalSince1970:1700000000),updated:Date(timeIntervalSince1970:1700000000))))
+        let record=try SyncPortableRecord(identity:.init(table:.turn,origin:origin,lifetime:"00000000-0000-0000-0000-000000006203"),body:.turn(.init(conversation:parent.identity,timestamp:Date(timeIntervalSince1970:1700000000),question:"Owned",text:"Answer",provider:"owned",duration:0,warnings:[],filter:wire,timeZone:nil)))
+        XCTAssertEqual(record.dependencies.map(\.identity),[parent.identity])
+        XCTAssertNoThrow(try record.validateDependencies {id,_ in XCTAssertEqual(id,parent.identity);return parent})
+        XCTAssertThrowsError(try record.validateDependencies {_,_ in throw OSwindError.unavailable("Owning conversation still required")})
+        XCTAssertEqual(try SyncPortableRecord.decode(record.encoded()),record)
     }
     func testMalformedScopeProvenanceCannotDisappearDuringDecoding()throws {
         var object=try XCTUnwrap(JSONSerialization.jsonObject(with:SyncProtocolLimits.encode(SearchFilter())) as? [String:Any])
