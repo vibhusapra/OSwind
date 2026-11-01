@@ -57,6 +57,10 @@ struct SyncPublicationQueue {
             value[name]="CREATE TRIGGER \(name) AFTER \(operation.uppercased()) ON chat_sources BEGIN \(old) \(new) END"
         }
         value["sync_publication_native_turn_change"]="CREATE TRIGGER sync_publication_native_turn_change AFTER UPDATE ON chat_turns WHEN old.id IS NOT new.id OR old.session_id IS NOT new.session_id OR old.timestamp IS NOT new.timestamp OR old.payload IS NOT new.payload BEGIN \(invalidate("old.id")) \(invalidate("new.id")) END"
+        for operation in ["insert","update"] {
+            let name="sync_publication_native_wipe_"+operation
+            value[name]="CREATE TRIGGER \(name) AFTER \(operation.uppercased()) ON store_metadata WHEN new.key='library_wipe_dirty' AND new.value='1' BEGIN DELETE FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'; END"
+        }
         return value
     }()
     static func install(cache:SyncVersionStore,pendingBudget:Int64=defaultBudget,bindingBudget:Int64=defaultBudget)throws->Self {
@@ -70,6 +74,7 @@ struct SyncPublicationQueue {
             guard count==0 || count==names.count else {throw OSwindError.database("Publication queue installation is incomplete")}
             if count==0 {
                 for name in ["personal_sync_publication_state","personal_sync_publication_jobs","personal_sync_publication_dependencies","personal_sync_publication_bindings"] {try db.execute(schemas[name]!)}
+                try db.execute("INSERT INTO store_metadata(key,value) VALUES('sync-publication-library-lifetime-v1',lower(hex(randomblob(16)))) ON CONFLICT(key) DO NOTHING")
                 let insert=try db.statement("INSERT INTO personal_sync_publication_state VALUES(1,?,?,?,?,?,0,0,?,0,?)");defer {sqlite3_finalize(insert)}
                 db.bind(insert,1,cache.catalog.scope.origin);db.bind(insert,2,cache.catalog.scope.generation);db.bind(insert,3,cache.journal.group);db.bind(insert,4,cache.journal.epoch);db.bind(insert,5,try value.libraryID())
                 sqlite3_bind_int64(insert,6,pendingBudget);sqlite3_bind_int64(insert,7,bindingBudget);try db.done(insert)
@@ -79,7 +84,7 @@ struct SyncPublicationQueue {
         }
     }
     private func libraryID()throws->String {
-        let row=try db.statement("SELECT value FROM store_metadata WHERE key='identity'");defer {sqlite3_finalize(row)}
+        let row=try db.statement("SELECT value FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,!db.text(row,0).isEmpty else {throw OSwindError.database("Library lifetime identity missing")};return db.text(row,0)
     }
     func context()throws {
@@ -105,6 +110,18 @@ struct SyncPublicationQueue {
             guard sqlite3_changes(db.handle)==1 else {throw OSwindError.unavailable("Publication budget is smaller than retained work")}
             _=try wakeReason(.storagePressure)
         }
+    }
+    /// Only a live, byte-exact native citation covered by a completed *current*
+    /// owner declaration grants content-free owner-retirement authority. Old
+    /// lifetimes and pending newer declarations must take the withdrawal path.
+    func completedOwner(ofCitation key:SyncObjectKey)throws->SyncObjectIdentity? {
+        try context();guard key.kind == .conversationCitation else {return nil}
+        let row=try db.statement("SELECT i.key_frame FROM personal_sync_identities i JOIN personal_sync_identity_current c USING(object_digest) WHERE i.object_digest=? AND i.table_name='chat_sources' AND c.table_name=i.table_name AND c.local_key=i.local_key AND i.deleted=0");defer {sqlite3_finalize(row)};db.bind(row,1,key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil}
+        guard code==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_BLOB,let bytes=sqlite3_column_blob(row,0),sqlite3_column_bytes(row,0)>0,sqlite3_column_bytes(row,0)<=66048 else {throw OSwindError.database("Declared citation native key differs")}
+        let frame=try SyncRowSnapshot.decode(Data(bytes:bytes,count:Int(sqlite3_column_bytes(row,0))))
+        guard frame.cells.count==2,case .text=frame.cells[0],case .integer=frame.cells[1] else {throw OSwindError.database("Declared citation key shape differs")}
+        guard let owner=try cache.catalog.preparedIdentity(.turn,primary:[frame.cells[0]]),try isComplete(owner) else {return nil};return owner
     }
     func retire(_ key:SyncObjectKey)throws {
         try context();guard key.kind == .turn,try cache.journal.state(for:key).isDeleted else {throw OSwindError.invalid("Publication retirement requires its genuine answer barrier")}

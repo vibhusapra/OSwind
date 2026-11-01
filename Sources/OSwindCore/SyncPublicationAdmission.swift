@@ -82,6 +82,11 @@ struct SyncPublicationAdmission {
             try queue.context();var outcomes=[SyncPublicationOutcome]()
             let received=try cache.journal.receive(operation,contentAvailable:{try inbox.content($0) != nil}) {change in
                 if change.after.isDeleted {
+                    if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
+                        try cache.journal.observeAppliedRoot(change.revision.key)
+                        _=try cache.journal.delete(key:owner.key) {try writer.applyDeletion($0,admission:admission)}
+                        try queue.retire(owner.key);outcomes.append(.retired(try owner.key))
+                    }
                     try writer.applyDeletion(change,admission:admission)
                     if change.revision.key.kind == .turn {try queue.retire(change.revision.key)}
                 }else {
