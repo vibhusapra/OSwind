@@ -11,7 +11,7 @@ def register_inactive_sync_fixture(connection):
     version = connection.execute("PRAGMA user_version").fetchone()[0]
     if version < 25:
         return
-    if version not in (25, 26, 27, 28, 29, 30, 31, 32):
+    if version not in (25, 26, 27, 28, 29, 30, 31, 32, 33):
         raise ValueError("Unsupported owned fixture schema")
     state = connection.execute(
         "SELECT enabled,suppressed FROM personal_sync_capture"
@@ -68,3 +68,8 @@ def register_inactive_sync_fixture(connection):
         connection.create_function("oswind_unavailable_scope_writer_v1", 0, writer_marker)
         # An ordinary owned fixture writer cannot preserve a scoped projection.
         connection.create_function("oswind_unavailable_scope_projection_v1", 2, lambda *_: 0)
+
+    if version >= 33:
+        # Explicitly limited to this unchanged, caller-owned inactive fixture.
+        # This is not permission to act as a real media writer or unlink files.
+        connection.create_function("oswind_media_admission_writer_v1", 0, writer_marker)

@@ -78,7 +78,7 @@ final class MetalRetrievalTests: XCTestCase {
             memory.embedding = VectorScalingEvaluation.vector(row:i,dimensions:32); memory.embeddingModel = model; try store.insert(memory)
         }
         _ = try await store.buildSearchIndex(modelID:model,dimensions:32)
-        let graphs = try FileManager.default.contentsOfDirectory(atPath:root.appendingPathComponent("indexes").path)
+        let graphs = try FileManager.default.contentsOfDirectory(atPath:root.appendingPathComponent(NativeMediaSchema.cacheDirectory).path)
         XCTAssertEqual(graphs.filter {$0.hasSuffix(".metal")}.count,1)
         func compare(_ source: MemoryStore,_ scope: SearchFilter) throws -> [SearchHit] {
             let exact = try source.search(scope,mode:.semantic,vector:query,modelID:model,minimumSimilarity:-1,indexPolicy:.exact)

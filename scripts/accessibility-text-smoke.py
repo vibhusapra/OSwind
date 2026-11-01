@@ -49,7 +49,7 @@ try:
  assert all(memory.get(k) is None for k in ['imagePath','videoPath','audioPath','visualRecording','transcript'])
  assert value('privacy-status',source['id'])['state']=='notRecorded'
  report['checks'].append('separate authored interchange source retains text-only shape and cannot imply a learned PII check')
- archive=base/'text.oswindbackup';assert value('backup','create',archive)['sourceSchema']==32
+ archive=base/'text.oswindbackup';assert value('backup','create',archive)['sourceSchema']==33
  restored=base/'restored';run('backup','restore',archive,'--to',restored)
  quiet=json.loads((restored/'settings.json').read_text());assert quiet['visualCaptureMode']=='accessibility' and not quiet['captureOnLaunch'] and not quiet['apiEnabled']
  assert value('get',source['id'],data=restored)['text']==source['text'] and media_empty(restored)

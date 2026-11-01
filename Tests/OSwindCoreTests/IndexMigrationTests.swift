@@ -3,6 +3,15 @@ import CSQLite
 @testable import OSwindCore
 
 final class IndexMigrationTests: XCTestCase {
+    /// These constructed highwater fixtures remove newer media gates before
+    /// labeling the selected registry as v5. Frozen old-binary migration cases
+    /// live in their own resource fixtures.
+    private func removeCurrentMediaFixtureObjects(_ db:RoutineDatabase)throws {
+        try NativeMediaSchema.register(db)
+        XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM erasure_assets"),0)
+        for name in NativeMediaSchema.metadataTriggers.keys {try db.execute("DROP TRIGGER "+name)}
+        try db.execute("DROP VIEW erasure_assets; DROP TABLE erasure_assets_v33; CREATE TABLE erasure_assets(path TEXT PRIMARY KEY) WITHOUT ROWID")
+    }
     func testActualSchemaThreeRowsAreBackfilledWithoutLosingEitherVectorModel() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString); try Paths.ensure(root); defer { try? FileManager.default.removeItem(at:root) }
         var connection: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&connection),SQLITE_OK)
@@ -43,8 +52,9 @@ extension IndexMigrationTests {
         let chat = try store!.createChat(); _ = try store!.appendChatTurn(sessionID:chat.id,question:"What happened?",answer:Answer(text:"Evidence [1]",sources:[SearchHit(memory:original,score:1,match:"semantic")],provider:"evidence",duration:0))
         store = nil
         var db: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
-        // A genuine schema-five library predates these persistent hooks and state tables.
+        // The constructed schema-five registry predates these hooks/state tables.
         let fixtureDB=RoutineDatabase(handle:try XCTUnwrap(db))
+        try removeCurrentMediaFixtureObjects(fixtureDB)
         let hooks=try fixtureDB.statement("SELECT name FROM sqlite_master WHERE type='trigger' AND name GLOB 'sync_capture_*'")
         var futureHooks=[String]()
         while sqlite3_step(hooks)==SQLITE_ROW {futureHooks.append(fixtureDB.text(hooks,0))}
@@ -90,8 +100,9 @@ extension IndexMigrationTests {
         var store: MemoryStore? = try MemoryStore(root:root); store = nil
         var db: OpaquePointer?; XCTAssertEqual(sqlite3_open(root.appendingPathComponent("memory.sqlite").path,&db),SQLITE_OK)
         // A minimal authentic old registry with no surviving rows.
-        // A genuine schema-five library predates these persistent hooks and state tables.
+        // The constructed schema-five registry predates these hooks/state tables.
         let fixtureDB=RoutineDatabase(handle:try XCTUnwrap(db))
+        try removeCurrentMediaFixtureObjects(fixtureDB)
         let hooks=try fixtureDB.statement("SELECT name FROM sqlite_master WHERE type='trigger' AND name GLOB 'sync_capture_*'")
         var futureHooks=[String]()
         while sqlite3_step(hooks)==SQLITE_ROW {futureHooks.append(fixtureDB.text(hooks,0))}

@@ -18,7 +18,7 @@ extension HistoricalErasureMigrationTests {
         }
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try fingerprint(db),before)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try fingerprint(db),before)
             try RoutineRunOriginalSchema.validate(db);try SyncIncomingSourceSchema.validate(db)
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM routine_run_originals"),0)
 
@@ -47,7 +47,7 @@ extension HistoricalErasureMigrationTests {
             let store=try MemoryStore(root:library);defer {try? store.close()};let before=try fingerprint(old)
             for sql in ["UPDATE memories SET favorite=0 WHERE id='source'","DELETE FROM memories WHERE id='absent-owned-id'","DELETE FROM routine_runs WHERE id='absent-owned-id'"] {
                 XCTAssertNotEqual(sqlite3_exec(old.handle,sql,nil,nil,nil),SQLITE_OK)
-                XCTAssertTrue(String(cString:sqlite3_errmsg(old.handle)).contains("oswind_run_original_writer_v1"))
+                XCTAssertTrue((String(cString:sqlite3_errmsg(old.handle)).contains("oswind_run_original_writer_v1") || String(cString:sqlite3_errmsg(old.handle)).contains(NativeMediaSchema.function)))
             }
             XCTAssertEqual(try fingerprint(old),before)
         }
@@ -57,7 +57,7 @@ extension HistoricalErasureMigrationTests {
             let library=root.appendingPathComponent(name),store=try MemoryStore(root:library);try store.close()
             try withDB(library) {db in try db.execute((name=="routine_run_originals" ? "DROP TABLE ":"DROP TRIGGER ")+name)}
             XCTAssertThrowsError(try MemoryStore(root:library))
-            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32)}
+            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33)}
         }
     }
 }

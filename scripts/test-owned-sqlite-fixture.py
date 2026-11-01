@@ -96,11 +96,37 @@ class FixtureFunctions(unittest.TestCase):
 
     def test_unknown_future_schema_does_not_gain_fixture_functions(self):
         db = self.connection()
-        db.execute("PRAGMA user_version=33")
+        db.execute("PRAGMA user_version=34")
         with self.assertRaises(ValueError):
             register_inactive_sync_fixture(db)
         with self.assertRaises(sqlite3.OperationalError):
             db.execute("SELECT oswind_sync_row_v1(1)")
+
+    def test_schema33_media_marker_checks_live_schema_and_capture_state(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=33")
+        db.execute("CREATE TRIGGER writer33 BEFORE INSERT ON source BEGIN SELECT oswind_media_admission_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        for state in [(1, 0), (0, 1), (1, 1)]:
+            db.execute("UPDATE personal_sync_capture SET enabled=?,suppressed=?", state)
+            with self.assertRaises(sqlite3.OperationalError):
+                db.execute("INSERT INTO source VALUES(2)")
+        db.execute("UPDATE personal_sync_capture SET enabled=0,suppressed=0")
+        db.execute("PRAGMA user_version=34")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(3)")
+        self.assertEqual(db.execute("SELECT id FROM source").fetchall(), [(1,)])
+
+    def test_schema33_active_or_suppressed_library_never_gains_media_marker(self):
+        for state in ("1,0", "0,1", "1,1"):
+            with self.subTest(state=state):
+                db = self.connection(state)
+                db.execute("PRAGMA user_version=33")
+                with self.assertRaises(ValueError):
+                    register_inactive_sync_fixture(db)
+                with self.assertRaisesRegex(sqlite3.OperationalError, "no such function"):
+                    db.execute("SELECT oswind_media_admission_writer_v1()")
 
     def test_schema27_scope_marker_refuses_later_activation_or_schema_change(self):
         db = self.connection()

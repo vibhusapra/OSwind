@@ -32,7 +32,7 @@ final class NativeANNIntegrityTests:XCTestCase {
         let provenance=try XCTUnwrap(Bundle.module.url(forResource:"provenance",withExtension:"json",subdirectory:"NativeANN")),metadata=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:provenance)) as? [String:Any])
         XCTAssertEqual(digest,metadata["graphSHA256"] as? String)
         let legacy="usearch-2.26.5-f16-cos-m32-passages-v2",source=try VectorIndexSource(root:root,modelID:"fixture",dimensions:32),state=try source.state()
-        let prefix=SHA256.hash(data:Data("\(state.identity)\nfixture\n32\n\(legacy)".utf8)).map {String(format:"%02x",$0)}.joined(),directory=root.appendingPathComponent("indexes",isDirectory:true)
+        let prefix=SHA256.hash(data:Data("\(state.identity)\nfixture\n32\n\(legacy)".utf8)).map {String(format:"%02x",$0)}.joined(),directory=root.appendingPathComponent(NativeMediaSchema.cacheDirectory,isDirectory:true)
         try Paths.ensure(directory);let name=prefix+"-owned-legacy.usearch",graph=directory.appendingPathComponent(name);try data.write(to:graph,options:.atomic)
         let manifest=ANNManifest(storeID:state.identity,modelID:"fixture",dimensions:32,format:legacy,sequence:state.head,count:256,graph:name,sha256:digest)
         try JSONEncoder().encode(manifest).write(to:directory.appendingPathComponent(prefix+".json"),options:.atomic)

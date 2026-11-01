@@ -25,7 +25,7 @@ extension HistoricalErasureMigrationTests {
         let library=try legacy29(),before=try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),29);return try entityFingerprint(db)}
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try entityFingerprint(db),before);try SyncIncomingEntitySchema.validate(db)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try entityFingerprint(db),before);try SyncIncomingEntitySchema.validate(db)
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM routine_run_originals"),1);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM entity_mentions"),1);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM entity_project_ignored"),1)
         }
     }
@@ -36,7 +36,7 @@ extension HistoricalErasureMigrationTests {
             try old.execute("UPDATE memories SET favorite=favorite")
             let store=try MemoryStore(root:library);defer {try? store.close()};let before=try entityFingerprint(old)
             for sql in ["UPDATE memories SET favorite=1","DELETE FROM memory_entities WHERE id='absent'","DELETE FROM entity_mentions WHERE memory_id='absent'","DELETE FROM routine_run_originals WHERE run_id='absent'"] {
-                XCTAssertNotEqual(sqlite3_exec(old.handle,sql,nil,nil,nil),SQLITE_OK);XCTAssertTrue(String(cString:sqlite3_errmsg(old.handle)).contains("oswind_incoming_entity_writer_v1"))
+                XCTAssertNotEqual(sqlite3_exec(old.handle,sql,nil,nil,nil),SQLITE_OK);XCTAssertTrue((String(cString:sqlite3_errmsg(old.handle)).contains("oswind_incoming_entity_writer_v1") || String(cString:sqlite3_errmsg(old.handle)).contains(NativeMediaSchema.function)))
             };XCTAssertEqual(try entityFingerprint(old),before)
         }
     }
@@ -45,7 +45,7 @@ extension HistoricalErasureMigrationTests {
             let library=root.appendingPathComponent(name),store=try MemoryStore(root:library);try store.close()
             try withDB(library) {try $0.execute("DROP TRIGGER "+name)}
             XCTAssertThrowsError(try MemoryStore(root:library))
-            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)}
+            try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)}
         }
     }
     func testCurrentOutgoingSequenceIndexCannotBeSilentlyRepairedAndSelectionIsIndexed()throws {

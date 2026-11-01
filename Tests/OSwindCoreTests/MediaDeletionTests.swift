@@ -44,7 +44,7 @@ final class MediaDeletionTests:XCTestCase {
         XCTAssertEqual(result.erasure.sources,0);XCTAssertEqual(result.erasure.pendingMedia,1);XCTAssertEqual(result.budgetMet,false);XCTAssertEqual(try store.stats().count,40);XCTAssertFalse(result.erasure.warnings.isEmpty)
     }
     func testBudgetDropsDisposableGraphBeforeSourceEvidence() throws {
-        try store.insert(Memory(id:"keep",text:"source evidence"));let cache=root.appendingPathComponent("indexes");try Paths.ensure(cache);try Data(repeating:8,count:2_000_000).write(to:cache.appendingPathComponent("owned"))
+        try store.insert(Memory(id:"keep",text:"source evidence"));let cache=root.appendingPathComponent(NativeMediaSchema.cacheDirectory);try Paths.ensure(cache);try Data(repeating:8,count:2_000_000).write(to:cache.appendingPathComponent("owned"))
         let result=try store.pruneHistory(before:Date(timeIntervalSince1970:0),maxBytes:store.diskBytes()-1_000_000)
         XCTAssertEqual(result.erasure.sources,0);XCTAssertEqual(result.budgetMet,true);XCTAssertNotNil(try store.get("keep"));XCTAssertFalse(FileManager.default.fileExists(atPath:cache.path))
     }

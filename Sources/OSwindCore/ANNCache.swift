@@ -64,7 +64,7 @@ final class ANNCache: @unchecked Sendable {
         defer { lock.unlock() }; return currentStatus
     }
     private func completedStatus() -> SearchIndexStatus { lock.lock(); defer { lock.unlock() }; return currentStatus }
-    private var directory: URL { root.appendingPathComponent("indexes",isDirectory:true) }
+    private var directory: URL { root.appendingPathComponent(NativeMediaSchema.cacheDirectory,isDirectory:true) }
     private func ensureDirectory() throws {
         if let attrs = try? FileManager.default.attributesOfItem(atPath:directory.path), attrs[.type] as? FileAttributeType == .typeSymbolicLink { throw OSwindError.invalid("Search index directory cannot be a symbolic link") }
         try Paths.ensure(directory); try FileManager.default.setAttributes([.posixPermissions:0o700],ofItemAtPath:directory.path)

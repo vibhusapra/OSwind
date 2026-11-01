@@ -234,6 +234,7 @@ extension MemoryStore {
         // snapshot, or awaiting a writer's SQL admission under a shared lease.
         cancelSearchIndexBuild();releaseSearchIndex()
         do {
+            try NativeMediaSchema.validate(db)
             guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Commit logical deletion before removing retained files")}
             let owned:MediaAdmissionLease?
             if reservation==nil {
@@ -250,16 +251,18 @@ extension MemoryStore {
         } catch {
             // Keep the queue and cache marker durable. Budget trimming must stop
             // here rather than sacrifice more history while cleanup is deferred.
-            try? db.execute("INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
-            let pending=(try? db.eraseCount("SELECT COUNT(*) FROM erasure_assets")) ?? -1
+            try? db.execute("INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty_v33','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+            let pending=(try? {try NativeMediaSchema.validate(db);return try db.eraseCount("SELECT COUNT(*) FROM erasure_assets")}()) ?? -1
             return .init(sources:sources,conversationTurns:turns,removedMedia:0,sharedMedia:0,pendingMedia:pending,searchCacheRemoved:false,warnings:["Media cleanup is pending. Let active media work finish, then retry cleanup in the intended library."],historicalVersions:histories)
         }
     }
     private func cleanupReservedErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,histories:Int,stopOnCancellation:Bool) -> HistoryErasureResult {
-        var removed=0,shared=0,warnings=[String](),cursor=""
+        var removed=0,shared=0,warnings=[String](),cursor="",protectionValid=false
         do {
             try db.execute("BEGIN IMMEDIATE")
             do {
+                try NativeMediaSchema.validate(db)
+                protectionValid=true
                 // One source scan and indexed lookups, rather than decoding the entire archive per asset.
                 // This writer reservation protects a shared path against concurrent reference admission.
                 try db.execute("CREATE TEMP TABLE IF NOT EXISTS erasure_live_assets(path TEXT PRIMARY KEY) WITHOUT ROWID; DELETE FROM temp.erasure_live_assets")
@@ -305,11 +308,14 @@ extension MemoryStore {
                 }
                 try db.execute("DELETE FROM temp.erasure_live_assets; COMMIT")
             } catch {try? db.execute("ROLLBACK");throw error}
-        } catch {warnings.append("Pending media cleanup did not finish; retry cleanup.")}
+        } catch {
+            guard protectionValid else {return .init(sources:sources,conversationTurns:turns,removedMedia:0,sharedMedia:0,pendingMedia:-1,searchCacheRemoved:false,warnings:["Native media cleanup protection changed. Reopen the intended library before retrying."],historicalVersions:histories)}
+            warnings.append("Pending media cleanup did not finish; retry cleanup.")
+        }
         cancelSearchIndexBuild();releaseSearchIndex()
         var cacheRemoved=true
-        do {let cache=root.appendingPathComponent("indexes");if FileManager.default.fileExists(atPath:cache.path) {try FileManager.default.removeItem(at:cache)}} catch {cacheRemoved=false;warnings.append("Disposable search files could not be removed. They are invalidated; retry cleanup to remove the files.")}
-        if cacheRemoved {try? db.execute("DELETE FROM store_metadata WHERE key='recap_cache_dirty'")}
+        do {for name in ["indexes",NativeMediaSchema.cacheDirectory] {let cache=root.appendingPathComponent(name);if FileManager.default.fileExists(atPath:cache.path) {try FileManager.default.removeItem(at:cache)}}} catch {cacheRemoved=false;warnings.append("Disposable search files could not be removed. They are invalidated; retry cleanup to remove the files.")}
+        if cacheRemoved {try? db.execute("DELETE FROM store_metadata WHERE key='recap_cache_dirty_v33'")}
         // Best effort: concurrent readers may keep WAL pages. This is logical deletion, not secure wiping.
         try? db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         let pending=(try? db.eraseCount("SELECT COUNT(*) FROM erasure_assets")) ?? -1

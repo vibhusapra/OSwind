@@ -34,7 +34,7 @@ final class RecapTests:XCTestCase {
     }
     func testSourceRevisionInvalidatesRecapsButFavoriteAndTagsDoNot() throws {
         var parent=try source();let recap=try store.saveRecap(answer(parent));try store.setFavorite(parent.id,value:true);try store.setTags(parent.id,tags:["tag"]);XCTAssertNotNil(try store.get(recap.id))
-        let index=root.appendingPathComponent("indexes");try Paths.ensure(index);try Data([1]).write(to:index.appendingPathComponent("private-cache"))
+        let index=root.appendingPathComponent(NativeMediaSchema.cacheDirectory);try Paths.ensure(index);try Data([1]).write(to:index.appendingPathComponent("private-cache"))
         parent.title="Changed owner";try store.insert(parent);XCTAssertNil(try store.get(recap.id));XCTAssertFalse(FileManager.default.fileExists(atPath:index.path))
     }
     func testTypedSpeakerChangeInvalidatesLinkedRecaps() throws {

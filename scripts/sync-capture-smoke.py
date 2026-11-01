@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Owned schema32 canonical-capture process checks, optionally with actual old24.
+"""Owned schema33 canonical-capture process checks, optionally with actual old24.
 
 The hidden capture flag is changed only in the fresh authored fixture. This is
 not a public enrollment workflow, device sync or normal-history inspection.
@@ -40,19 +40,19 @@ try:
    (base/'old-initialized-writer.stdout').write_text(output);(base/'old-initialized-writer.stderr').write_text(error)
    assert snapshot()==before
    report['oldClient']=dict(binarySHA256=sha(old),sourceSchema=24,alreadyInitializedLeaseObserved=True,lateWriteRefused=True,sourcePayloadsPreserved=True,returncode=child.returncode,stderrSHA256=hashlib.sha256(error.encode()).hexdigest())
-   report['checks'].append('actual initialized schema24 writer refuses after schema32 migration without changing original source payloads')
+   report['checks'].append('actual initialized schema24 writer refuses after schema33 migration without changing original source payloads')
   finally:
    if child.poll() is None:
     child.terminate()
     try:child.communicate(timeout=5)
     except subprocess.TimeoutExpired:child.kill();child.communicate(timeout=5)
   run('note','Owned unsupported old24 write',cli=old,ok=False);assert snapshot()==before
- else:run('note','Owned initial schema32 source')
+ else:run('note','Owned initial schema33 source')
  with sqlite3.connect(library/'memory.sqlite') as db:
-  assert db.execute('PRAGMA user_version').fetchone()==(32,)
+  assert db.execute('PRAGMA user_version').fetchone()==(33,)
   assert db.execute('SELECT enabled FROM personal_sync_capture').fetchone()==(0,)
   assert db.execute('SELECT COUNT(*) FROM personal_sync_changes').fetchone()==(0,)
- report['checks'].append('new/migrated schema32 stays capture-disabled with no implicit backlog')
+ report['checks'].append('new/migrated schema33 stays capture-disabled with no implicit backlog')
  activate();collected=run('collect','--stdin',input=wire);assert json.loads(collected.stdout)['imported']==1
  with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:results=list(executor.map(lambda n:invoke('note','Owned parallel source '+str(n)),[1,2]))
  for result in results:record(result,'parallel-note');assert result.returncode==0,result.stderr
@@ -69,10 +69,10 @@ try:
   assert db.execute('SELECT COUNT(*) FROM personal_sync_changes WHERE before_key IS NOT NULL AND after_key IS NULL').fetchone()==(1,)
   assert db.execute('SELECT used_bytes FROM personal_sync_capture').fetchone()[0]==db.execute('SELECT SUM(128+COALESCE(length(before_key),0)+COALESCE(length(after_key),0)+COALESCE(length(after_row),0)) FROM personal_sync_changes').fetchone()[0]
  report['checks'].append('public single-delete purges the queued original body and preserves opaque deletion metadata/accounting')
- archive=base/'owned.oswindbackup';restored=base/'restored';info=json.loads(run('backup','create',archive).stdout);assert info['sourceSchema']==32
+ archive=base/'owned.oswindbackup';restored=base/'restored';info=json.loads(run('backup','create',archive).stdout);assert info['sourceSchema']==33
  if a.old_cli:run('backup','inspect',archive,cli=a.old_cli.resolve(),ok=False)
  run('backup','restore',archive,'--to',restored)
  with sqlite3.connect(restored/'memory.sqlite') as db:assert db.execute('SELECT enabled FROM personal_sync_capture').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM personal_sync_changes').fetchone()==(0,) and db.execute('SELECT COUNT(*) FROM memories').fetchone()==(3,)
- report['checks'].append('schema32 backup restores complete current notes without reactivating capture or replaying pending changes; optional old24 inspector refuses')
+ report['checks'].append('schema33 backup restores complete current notes without reactivating capture or replaying pending changes; optional old24 inspector refuses')
  report.update(state='completed',scope='Authored fresh notes only, normal local CLI/collector/backup processes. No public pairing, complete typed peer adapters, transport, desktop capture, credentials, normal history, physical power or product ranking acceptance.');save();print(json.dumps(dict(state=report['state'],checks=len(report['checks']),old24=a.old_cli is not None)))
 except BaseException as e:report.update(state='failed',errorType=type(e).__name__,error=str(e)[:1500]);save();raise

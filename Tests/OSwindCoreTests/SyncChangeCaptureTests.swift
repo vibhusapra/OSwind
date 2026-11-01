@@ -16,7 +16,7 @@ final class SyncChangeCaptureTests:XCTestCase {
     func scalar(_ sql:String)throws->Int64 {try store.withRoutineDatabase {db in let s=try db.statement(sql);defer {sqlite3_finalize(s)};guard sqlite3_step(s)==SQLITE_ROW else {throw db.error()};return sqlite3_column_int64(s,0)}}
     func testDisabledByDefaultAndSchemaFence()throws {
         try store.insert(Memory(id:"owned",text:"no implicit enrollment"));XCTAssertEqual(try scalar("SELECT COUNT(*) FROM personal_sync_changes"),0)
-        XCTAssertEqual(try scalar("PRAGMA user_version"),32);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
+        XCTAssertEqual(try scalar("PRAGMA user_version"),33);XCTAssertEqual(try scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'sync_capture_%'"),43)
     }
     func testOrdinaryMutationsRetainCurrentExactSnapshotsAndPurgeSupersededBodies()throws {
         let scope=try activate(),original=Memory(id:"owned",timestamp:Date(timeIntervalSince1970:Double.pi),text:"original")
