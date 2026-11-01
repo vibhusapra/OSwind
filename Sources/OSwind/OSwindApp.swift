@@ -132,7 +132,7 @@ struct LibraryMenuContent: View {
     @EnvironmentObject var model: AppModel
     var body: some View {
         VStack(alignment:.leading,spacing:12) {
-            Text("OSwind").font(.headline); Text(model.meetings.active && !model.isCapturing ? "Calendar context active":model.capture.status).font(.caption)
+            Text("OSwind").font(.headline); Text(model.meetings.active && !model.isCapturing && !model.clipboard.running ? "Calendar context active":model.collectionStatus).font(.caption)
             Button("Open OSwind  ⇧⌘Space") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }
             Button(model.hasPausableWork ? "Pause" : "Resume capture") { model.toggleCapture() }
             Menu("Pause for…") { ForEach([5,15,30,60],id:\.self) { minutes in Button("\(minutes) minutes") { model.pauseFor(minutes:minutes) } } }

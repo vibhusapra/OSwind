@@ -70,6 +70,7 @@ struct SettingsView: View {
                     }
                 } else {SnapshotRegionsView(configuration:$m.settings.snapshotRegions,displayMode:m.settings.allDisplays,replay:m.settings.visualCaptureMode == .replay)}
             }
+            ClipboardContextSettingsView(model:m.clipboard,enabled:Binding(get:{m.settings.clipboard.enabled},set:{m.configureClipboard($0)}))
             Section("macOS access") {
                 if textCaptureActive {Label("Screen Recording is not required for text-only desktop capture",systemImage:"text.viewfinder")}
                 else {

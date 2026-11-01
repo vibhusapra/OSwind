@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Optional clipboard context — software qualified, native acceptance open
+
+[F082 moves from TODO to partial](CLIPBOARD-CONTEXT.md). Default-off capture ignores existing contents and admits only bounded new plain text after fresh observed-context app/site/secure-field checks. Known secret text and confidential/transient/generated/restored/Handoff/file/image markers refuse. Matching source markers remain claims; app/window labels do not authenticate origin. Current-policy/optional local PII collector admission makes saved text searchable and available to Ask. Privacy/erasure/retired libraries revoke work; actual preparation/readers drain before close and plain Quit. Clipboard-only Pause/Resume avoids screen capture. Permission requests are a separate explicit action; background polling never requests OS access.
+
+The [765-input/Git-bound receipt](../benchmarks/clipboard-context-v1.json) passes13 stages at8799e3f:1,794 full passes/83 skips,102 sanitizer and102 optimized passes without focused skips/race warnings, all32 new clipboard cases plus70 parent MCP methods. Signed22-check MCP/SDK/API/MCP, actual quiet backup/restore and SIGINT/SIGKILL, strict34-file extraction and unchanged installed15/prior15 trees pass. Final signed modern officialPythonSDK2.3.0 Unicode interoperability passes. The pre-existing visual-wake guard accounts for the extra skip relative to the native parent.
+
+Three actual named-pasteboard tests cover Unicode, confidentiality/counts and a cold lazy-provider counterexample: mismatch already refused storage but fetched text first; the native reader now refuses before fetching it, withzero lazy-provider calls. The original red log also emits an AppKit background-promise warning. Valid promised-provider behavior remains an acceptance gap. Twenty unchanged authored polls performzero text/context/source/embedding/UI work; this is not a CPU, cadence or energy measurement. All eight component renders are inspected. General/personal clipboard, permission dialogs, native foreground/AX/input and physical power were not accepted.
+
+Ledger counts are4 live verified/43 partial/6 implemented/23 tested/5 TODO/2 outside scope,83 total. Full sync, sustained power, signed/notarized distribution, narrated SOPs, voice typing and matched whole-product ranking remain open.
+
 ## Native MCP workspace — software qualified, native acceptance open
 
 [F080 stays partial](MCP-WORKSPACE.md). Tools now supports eight inert local stdio connections, scoped credential accounts, exact discovery/call reviews, cancellation and explicit result-text saving through current privacy admission. Saved unverified text becomes searchable and available to Ask. Pause/lock/settings changes revoke reviews; library departure and plain Quit join actual workers before acknowledging completion. No automatic calls or retries occur.
