@@ -1,5 +1,7 @@
 # OSwind
 
+[Source-linked narrated workflows](docs/NARRATED-WORKFLOWS.md) now have an app editor and deliberate CLI export using offline local Kokoro, original retained frames, complete narration and portable source manifests. The [803-input receipt](benchmarks/narrated-workflows-v1.json) passes all 21 local stages, including 58 actual local-narration methods, 39 owned native cases and 35 signed CLI checks. F081 is partial: native input, fresh-machine narration setup and broad parity remain open.
+
 [Bounded vault busy recovery](docs/VAULT-BUSY-RECOVERY.md) retries normal exit-16 detaches at most twice after fresh same-image checks. Held readers still block locking; two fresh absent observations remain required. The [source-bound receipt](benchmarks/vault-busy-recovery-v1.json) passes all 12 local stages, including 38 owned native cases and signed CLI interruption checks. Earlier hosted failures and broader acceptance gaps remain explicit.
 
 [Reviewed local voice typing](docs/VOICE-TYPING.md) adds deliberate30-second recording, local Whisper/Parakeet decoding, an editable preview and a fresh target choice after inference. The774-input [receipt](benchmarks/voice-typing-v1.json) passes all15 software/package stages,1,818 full cases/84 skips and155 mandatory sanitizer/optimized cases. Actual microphone/permission/native input, dictation quality and power remain open; inherited native-vault CI failures are retained.
