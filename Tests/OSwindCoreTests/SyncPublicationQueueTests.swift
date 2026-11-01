@@ -8,7 +8,7 @@ extension SyncIncomingSourceTests {
         let producer:SyncObjectFolder,inbox:SyncObjectFolder,secret:SyncGroupSecret
         let operations:[SyncRevision],queue:SyncPublicationQueue
     }
-    func withQueueFixture(citations:Int=0,answers:Int=1,secret:SyncGroupSecret=SyncGroupSecret(),_ body:(PublicationQueueFixture)throws->Void)throws {
+    func withQueueFixture(citations:Int=0,answers:Int=1,secret:SyncGroupSecret=SyncGroupSecret(),beforeQueueInstall:((MemoryStore,SyncVersionStore)throws->Void)?=nil,_ body:(PublicationQueueFixture)throws->Void)throws {
         let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID),producer=try publicationSpace("queue-producer")
         let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("queue-inbox"),secret:secret,group:group,epoch:epoch)
         defer {try? a.close();try? b.close();producer.close();inbox.close()};try bc.journal.allowPeer(producerID)
@@ -17,6 +17,7 @@ extension SyncIncomingSourceTests {
         let chat=try a.createChat(title:"Owned queue conversation")
         for index in 0..<answers {_=try a.appendChatTurn(sessionID:chat.id,question:"Queue question \(index)?",answer:.init(text:"Owned queue answer \(index) 👩🏽‍💻 e\u{301}",sources:sources.map{.init(memory:$0,score:1,match:"owned queue")},provider:"owned",duration:0))}
         try publicationDrain(a,ac,producer)
+        try beforeQueueInstall?(b,bc)
         let queue=try b.withRoutineDatabase {db in XCTAssertEqual(db.handle,bc.database.handle);return try SyncPublicationQueue.install(cache:bc)}
         try body(.init(a:a,ac:ac,b:b,bc:bc,producer:producer,inbox:inbox,secret:secret,operations:ac.journal.outbox(),queue:queue))
     }
