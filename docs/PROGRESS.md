@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## External MCP manual client — locally qualified, native workflow still open
+
+[F080](MCP-CLIENT.md) moves from TODO to **partial**. Explicit local command/credential-name configuration, modern/legacy stdio discovery, complete readable tool review, deliberate exact-argument calls, changed-executable/schema refusal, bounded I/O/deadlines, provenance and verified direct-child cancellation are implemented. The signed CLI list→review→call/Ctrl-C workflow passes22 checks against the independent existing seven-tool server; an isolated official Python SDK2.3.0 server passes modern interoperability with exact Unicode text.
+
+[The744-input receipt](../benchmarks/mcp-client-v1.json) passes all12 stages: **1,724 full passes/83 skips;32 sanitizer and32 optimized passes/no skips or race warnings**. All32 mandatory MCP methods run once per build; the signed/extracted34-file app agrees and installed15 files/nine protected app trees stay unchanged. A pre-existing visual-wake guard accounts for the extra skip relative to the earlier checkpoint. Actual ISO roundtrip and2.43MB review-export failures, harness failures and host-sleep-confounded positive timeouts remain retained with separate corrections/evidence.
+
+Native setup/Keychain UI, HTTP/auth, model loops and privacy-admitted result-to-memory remain open. Native work is being authored in a separate checkout and is not part of this qualified receipt. Current ledger:4 live verified/42 partial/6 implemented/23 tested/6 TODO/2 outside current desktop scope,83 total. Full parity, physical power, complete sync, notarized distribution and top-three ranking remain unfinished. [Hosted CI at publication head29ee471](https://github.com/vibhusapra/OSwind/actions/runs/41280138020) passes both jobs:1,725 full passes/82 skips,37 owned native vault passes and22 manual-client process checks. This documentation update has a later head.
+
 ## Calendar-linked meeting context — software-tested, native acceptance open
 
 [F079](MEETINGS.md) moves from TODO to **partial**: explicit calendar selection, a distinct Meetings workspace, freshly verified brief/join actions, privacy-filtered literal calendar metadata in source-linked Ask, generic reminders and durable library-bound deduplication are implemented. All **57 mandatory new cases** pass in debug, TSan and optimized builds, including actual SQLite competition, pre/postcommit process death, request interception and a real 30-second timer refresh. [737-input evidence](../benchmarks/calendar-context-v1.json): **1,692 full passes / 83 skips**, **247 sanitizer and 247 optimized passes / three skips each**; twelve additional SDK/package/process/archive checks and eight component renders pass. Installed and prior app bytes are preserved.

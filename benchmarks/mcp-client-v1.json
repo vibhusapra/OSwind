@@ -1,0 +1,502 @@
+{
+  "format": "OSwind.manual-MCP-client.qualification",
+  "version": 1,
+  "state": "passed-local-functional",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "29fbb21bf0326aef2df097269c42eb3830c007c6",
+  "branch": "codex/mcp-client",
+  "sourceState": "All744 repository input hashes match committed Git blobs and the bytes used for qualification. Documentation/receipt followups may have a later head.",
+  "scope": "Explicit manual local stdio discovery and exact reviewed tool calls; no background service, native client setup, HTTP/OAuth, automatic model tool loop or result ingestion.",
+  "inputs": {
+    "repository": 744,
+    "manifest": "mcp-client-inputs-v1.json",
+    "manifestSHA256": "d9f2ef0aa2d2761295a0ece27a0f384e4461324d74e5f81972d254832c27c307",
+    "allUnchanged": true
+  },
+  "review": {
+    "state": "passed-local-functional",
+    "source": "29fbb21bf0326aef2df097269c42eb3830c007c6",
+    "inputs": 744,
+    "all744GitBlobsAndLiveHashesMatch": true,
+    "all12StageHashesMatch": true,
+    "tests": {
+      "full-debug": {
+        "defined": 1807,
+        "passed": 1724,
+        "skipped": 83,
+        "failures": 0,
+        "newMandatory": 32
+      },
+      "thread-sanitizer": {
+        "defined": 32,
+        "passed": 32,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 32
+      },
+      "optimized": {
+        "defined": 32,
+        "passed": 32,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 32
+      }
+    },
+    "mandatoryMCPMethodsEachBuild": 32,
+    "raceWarnings": 0,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "protectedAppsUnchanged": 9,
+    "installedFilesUnchanged": 15,
+    "cliSHA256": "451c76519efbe43a931ff829f7536ef45cc0d9e30e86ef6040ea5ab4d37e9b7a",
+    "appSHA256": "9c5d38db47081486259c57d3d599fc7be7100208e5540427bae5beb65404462a",
+    "zipSHA256": "660baca341b78798e699ae31a7465b818be4e36e21e43b7d2a3b4ca81921c4cd",
+    "manualProcessChecks": 22,
+    "skipChangesFromEarlierCheckpoint": {
+      "new": [
+        "OSwindAppTests.WorkspaceWakeLifecycleTests testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup"
+      ],
+      "removed": []
+    },
+    "nativeUIAcceptance": false,
+    "httpOrOAuthAcceptance": false,
+    "fullParity": false,
+    "reviewedAtUTC": "2026-11-01T06:12:38.543298+00:00"
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "log": "full-debug.log",
+      "startedAtUTC": "2026-11-01T05:58:01.010908+00:00",
+      "returncode": 0,
+      "wallSeconds": 320.6051408338826,
+      "finishedAtUTC": "2026-11-01T06:03:21.639845+00:00",
+      "logSHA256": "3eb8f36dcf29751267977f8cbcf6a0551201867168fa1f069139368bb865f166",
+      "tests": {
+        "defined": 1807,
+        "passed": 1724,
+        "skipped": 83,
+        "failures": 0,
+        "newMandatory": 32
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        ".artifacts/mcp-client-v1/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "MCP(JSON|Client)Tests"
+      ],
+      "log": "thread-sanitizer.log",
+      "startedAtUTC": "2026-11-01T06:03:22.276026+00:00",
+      "returncode": 0,
+      "wallSeconds": 59.150120083009824,
+      "finishedAtUTC": "2026-11-01T06:04:21.426557+00:00",
+      "logSHA256": "08c3290ffd865db5d242f8e9e41969c9fb5e001a92a5a85f26da258b5d962585",
+      "tests": {
+        "defined": 32,
+        "passed": 32,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 32
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "MCP(JSON|Client)Tests"
+      ],
+      "log": "optimized.log",
+      "startedAtUTC": "2026-11-01T06:04:21.929068+00:00",
+      "returncode": 0,
+      "wallSeconds": 203.48604229209013,
+      "finishedAtUTC": "2026-11-01T06:07:45.416040+00:00",
+      "logSHA256": "c50d5035e4927661e7c4ac31bc2a02f8c1c7becd265f2137691be0caf035cf0d",
+      "tests": {
+        "defined": 32,
+        "passed": 32,
+        "skipped": 0,
+        "failures": 0,
+        "newMandatory": 32
+      }
+    },
+    {
+      "name": "sdk",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/test-python-sdk.py"
+      ],
+      "log": "sdk.log",
+      "startedAtUTC": "2026-11-01T06:07:46.000883+00:00",
+      "returncode": 0,
+      "wallSeconds": 5.169561417074874,
+      "finishedAtUTC": "2026-11-01T06:07:51.170653+00:00",
+      "logSHA256": "9c8b89642482d1883df5aa99d29077b9dc5338a8ad1bf84e25fbcaacc8211e68"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ],
+      "log": "package.log",
+      "startedAtUTC": "2026-11-01T06:07:51.645034+00:00",
+      "returncode": 0,
+      "wallSeconds": 117.94227316696197,
+      "finishedAtUTC": "2026-11-01T06:09:49.587984+00:00",
+      "logSHA256": "ba5a28bcff8ad2da942eb4a11dedc526e5c7ffa618c3b8c13afad1aa526e8dca"
+    },
+    {
+      "name": "manual-client-process",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/mcp-client-smoke.py",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/manual-client-process.json"
+      ],
+      "log": "manual-client-process.log",
+      "startedAtUTC": "2026-11-01T06:09:50.103717+00:00",
+      "returncode": 0,
+      "wallSeconds": 2.5104704170953482,
+      "finishedAtUTC": "2026-11-01T06:09:52.614392+00:00",
+      "logSHA256": "38744c180ba3984131f40e7795a4c193477ba2ac33803b80e2a03d9e80a5b7da"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind.app/Contents/MacOS/oswindctl"
+      ],
+      "log": "api-mcp.log",
+      "startedAtUTC": "2026-11-01T06:09:53.155668+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.5055297079961747,
+      "finishedAtUTC": "2026-11-01T06:09:53.661405+00:00",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ],
+      "log": "indexed-api-mcp.log",
+      "startedAtUTC": "2026-11-01T06:09:54.168436+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.142283875029534,
+      "finishedAtUTC": "2026-11-01T06:09:55.310915+00:00",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind.app",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind-macos.zip"
+      ],
+      "log": "archive.log",
+      "startedAtUTC": "2026-11-01T06:09:55.821257+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.2259991250466555,
+      "finishedAtUTC": "2026-11-01T06:09:57.047445+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind-macos.zip",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/extracted"
+      ],
+      "log": "extract.log",
+      "startedAtUTC": "2026-11-01T06:09:57.547524+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.11094620893709362,
+      "finishedAtUTC": "2026-11-01T06:09:57.658645+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/OSwind.app"
+      ],
+      "log": "strict-app.log",
+      "startedAtUTC": "2026-11-01T06:09:58.162815+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.03690058412030339,
+      "finishedAtUTC": "2026-11-01T06:09:58.199876+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/mcp-client-v1/qualification-v2/extracted/OSwind.app"
+      ],
+      "log": "strict-extracted.log",
+      "startedAtUTC": "2026-11-01T06:09:58.695562+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.036968667060136795,
+      "finishedAtUTC": "2026-11-01T06:09:58.732709+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "expectedMCPMethods": {
+    "OSwindCoreTests.MCPJSONTests": [
+      "testStrictRoundTripPreservesNumbersAndLeadingBOM",
+      "testRejectsDuplicateEscapedAndCanonicallyEquivalentKeys",
+      "testRejectsNonJSONNumbersTrailingBytesAndBrokenUTF8",
+      "testDepthNodeAndByteBounds",
+      "testCommandFileRejectsDuplicateKeysAndUnknownOptions",
+      "testCommandRejectsImplicitShellAndRuntimeEnvironmentOverrides"
+    ],
+    "OSwindCoreTests.MCPClientTests": [
+      "testModernDiscoveryAndExplicitCallCarryRequestMetadataAndProvenance",
+      "testLegacyUnknownPreinitializeErrorFallsBackWithoutSpecificCodeAssumption",
+      "testSilentLegacyProbeTimeoutFallsBack",
+      "testLateProbeReplyIsDiscardedWithoutAdmittingWrongResponseID",
+      "testModernUnsupportedVersionNeverFallsBackToInitialize",
+      "testWrongResponseIDAndAmbiguousEnvelopeRefuse",
+      "testDuplicateJSONKeysAndInvalidUTF8Refuse",
+      "testUnexpectedServerRequestCannotAuthorizeSamplingOrRoots",
+      "testFrameAndStderrFloodsAreBounded",
+      "testNotificationFloodIsBounded",
+      "testPaginationAndDuplicateToolNamesRefuseWithoutReturningTruncatedList",
+      "testToolSchemaChangeRequiresNewReviewBeforeAnyCall",
+      "testExecutableChangeRefusesBeforeLaunchingNewBytes",
+      "testUnreviewedToolAndMalformedArgumentsDoNotLaunch",
+      "testMinimalEnvironmentUsesOnlyExplicitFixtureCredentialAndOwnedHome",
+      "testCancelledCallTerminatesAndReapsOwnedChildWithoutReplay",
+      "testInputRequiredAndProtocolErrorsNeverReplayCall",
+      "testFragmentedUTF8FramesRemainExactAndPartialEOFRefuses",
+      "testFinitePaginationReturnsEveryToolWithoutFetchingIcons",
+      "testForgedReviewDisplayMetadataRefusesBeforeLaunching",
+      "testCallTimeoutDoesNotReplayAndReapsOwnedChild",
+      "testArbitraryLegacyErrorCodeFallsBackButModernHeaderErrorDoesNot",
+      "testPublicReviewJSONRoundTripsThroughCLIISOEncoding",
+      "testReviewCatalogIsReadableAndRoundTripsOrRefusesBeforePublication",
+      "testUnsupportedReviewProtocolRefusesBeforeAnyProcessLaunch",
+      "testCancellationSendsMatchingProtocolNotificationBeforeGracefulExit"
+    ]
+  },
+  "signedOfficialSDKInterop": {
+    "state": "passed-signed-release-modern-official-sdk-interop",
+    "sdkVersion": "2.3.0",
+    "publisherRelease": "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.3.0",
+    "license": "MIT",
+    "protocol": "2026-07-28",
+    "transport": "stdio",
+    "cliSHA256": "451c76519efbe43a931ff829f7536ef45cc0d9e30e86ef6040ea5ab4d37e9b7a",
+    "all127PinnedSDKFilesUnchanged": true,
+    "dependencies": [
+      "annotated-types==0.8.0",
+      "anyio==4.15.1",
+      "attrs==26.1.0",
+      "cffi==2.1.1",
+      "click==8.5.0",
+      "cryptography==50.0.2",
+      "h11==0.16.0",
+      "httpcore2==2.16.0",
+      "httpx2==2.16.0",
+      "idna==3.20",
+      "jsonschema==4.26.0",
+      "jsonschema-specifications==2025.9.1",
+      "mcp==2.3.0",
+      "mcp-types==2.3.0",
+      "opentelemetry-api==1.45.2",
+      "pycparser==3.12",
+      "pydantic==2.14.2",
+      "pydantic-core==2.50.2",
+      "pyjwt==2.15.1",
+      "python-multipart==0.0.33",
+      "referencing==0.37.0",
+      "rpds-py==2026.9.1",
+      "sse-starlette==3.6.0",
+      "starlette==1.10.0",
+      "truststore==0.10.5",
+      "typing-extensions==4.16.0",
+      "typing-inspection==0.4.4",
+      "uvicorn==0.54.0"
+    ],
+    "artifacts": {
+      "arguments.json": "b3bc6b59e4ea1461dbb82a52bb980529c2bd9676e3ef66534324168abd82e310",
+      "server.py": "d0c49f728095617dbbff37ac257f9aac486405600fcec99ff3b1cea0a66e4195",
+      "config.json": "4f69f3d6b504b4ee219dd18f937256705804e3308a17abb58821ab79d9d1dbdb",
+      "output.json": "7f4451d2c84d6837328dd0147a5e17e32c2d0df10c55beec34bd6589a1848918",
+      "discovery.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "review.json": "1a07efd0e187c282a0f56c4fb0d8f784c3a5df570a7c0f452c0439a67751dc81",
+      "call.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scope": "One authored echo tool and exact Unicode text; no real account/credentials, HTTP/auth/model loop or arbitrary-server compatibility claim. SDK is an isolated test dependency, not shipped.",
+    "all127PinnedSDKFilesUnchangedAfter": true
+  },
+  "manualProcess": {
+    "format": "OSwind MCP manual client process check",
+    "state": "passed",
+    "checks": [
+      "exit 0: mcp-client; OSwind: Review the configured executable/arguments, then use --allow-server-process; it runs local code with your account authority\n",
+      "discovery requires explicit local-code authorization",
+      "exit 2: --data; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "exit 3: --vault; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "client refuses data/vault before library access",
+      "exit 5: mcp-client; ",
+      "legacy negotiation with existing server",
+      "all seven independently implemented server tools discovered",
+      "review definitions are literal readable JSON tied to each tool",
+      "exit 9: mcp-client; OSwind: Review exact tool/arguments and use --confirm-call for a call; list takes only --config and --allow-server-process\n",
+      "exit 10: mcp-client; ",
+      "reviewed tool call reads actual authored empty library",
+      "result carries command/tool provenance",
+      "complete original tool text preserved",
+      "exit 14: mcp-client; OSwind: MCP JSON is malformed, ambiguous or exceeds its complexity limit\n",
+      "exit 15: mcp-client; OSwind: MCP review metadata does not match its definition\n",
+      "manual list/call never open ambient/default client history",
+      "unrelated parent secret absent from returned tool context",
+      "exit 18: mcp-client; ",
+      "interrupt fixture reached actual tool call",
+      "CLI Ctrl-C joins cancellation without a false result",
+      "CLI cancellation reaped only its owned server"
+    ],
+    "binarySHA256": "451c76519efbe43a931ff829f7536ef45cc0d9e30e86ef6040ea5ab4d37e9b7a",
+    "scope": "Owned local existing-server interoperability and manual review gates. No HTTP, third-party server, model loop, automatic ingestion or native UI acceptance."
+  },
+  "catalogCounterexample": {
+    "state": "counterexample-retained-own-review-exceeds-decoder-bound",
+    "tools": 128,
+    "eachDefinitionWithin64KiB": true,
+    "exportedReviewBytes": 2425050,
+    "reviewSHA256": "8a67e4504c77736eaf366411d0651f4b83e4e5a3a7c0e8abbe327d9794501c6b",
+    "exportExit": 0,
+    "reloadExit": 1,
+    "calls": 0,
+    "binarySHA256": "b401b351a3cd46a6d0e6fa3aa212f50cf96c308b9b42f85ff101fae4c3d6f6ae"
+  },
+  "catalogCorrection": {
+    "state": "passed-oversized-review-refusal",
+    "returncode": 1,
+    "exportedBytes": 0,
+    "binarySHA256": "c54773c1f32dd03baac856bffe231318206bdc192614db46683324fbbf6bda31",
+    "originalCounterexample": "result.json"
+  },
+  "development": [
+    "Compile-only initial run executeszero tests; not validation.",
+    "Focus01:20passes/two failures; Apple Python launcher adds SDK environment keys, and silent-probe positive timed out across host sleep. Environment expectation diagnosed separately.",
+    "Focus03/04:all22 then-current methods pass; parent fake secret is withheld.",
+    "Focus05:26passes/one fixture call-count failure because a previous legitimate call was counted. Actual30s timeout and owned-child reaping pass, with sleep-confounded wall duration.",
+    "Focus06:27passes/one silent-probe positive timeout during host sleep. Original failure retained; no device setting change or product timeout fix claimed.",
+    "CLI process01/02:actual ISO timestamp encoding/decoding mismatch prevented reloading a review. Explicit ISO coding and a regression fix the roundtrip; process03/04 pass afterward.",
+    "Earlier744-source checkpoint87f3e17 passes12 local stages, all29 MCP methods under debug/TSan/optimization; original746 manifest also includes two owned ignored SQLite sidecars. The WALs were empty, no handles were open, and eight source/cache copies were preserved separately before final canonical-input qualification. Original fixture bytes stay unchanged.",
+    "Actual128-tool server exports2,425,050bytes that cannot be reloaded; counterexample retained. Three new hardening cases have two assertion failures before correction; matching cancellation signaling passes already. Five selected cases pass after readable literal definitions,1MiB aggregate admission and unsupported-review prelaunch refusal.",
+    "Final32 mandatory MCP methods execute once each in debug, TSan and optimized builds. One pre-existing visual-wake test skips on its unlocked-session/thermal guard in this final run; it passed in the earlier checkpoint. No live visual/power acceptance follows."
+  ],
+  "protocols": {
+    "modern": "2026-07-28",
+    "legacy": [
+      "2024-11-05",
+      "2025-03-26",
+      "2025-06-18",
+      "2025-11-25"
+    ],
+    "transport": "stdio",
+    "officialSDK": "Python mcp2.3.0; MIT; isolated test dependency only"
+  },
+  "boundaries": [
+    "Manual launch/call authorization flags; exact command/executable and full definition fingerprint checks; no shell or inherited full environment. Local servers still execute with the user account authority, including filesystem/network access.",
+    "Only explicitly named credential variables are forwarded. Values are not encoded into configuration or reviews. They are not zeroization/sandbox guarantees.",
+    "Tool annotations/descriptions/results are untrusted; no automatic calls or retries, including after timeout/crash/input-required results.",
+    "Strict bounded JSON/framing and pagination, known protocol versions, at most128 tools/16pages/64notifications,64KiB definitions/arguments,256KiB frames/stderr,2MiB stdout,1MiB exported review and2MiB formatted review input. Over-bound catalogs refuse without truncation.",
+    "Best-effort protocol cancellation, stdin close and bounded direct-child terminate/kill with exit verification. Child-created descendants are not claimed as owned or sandboxed. Deadlines/cleanup cannot execute while the host is asleep.",
+    "Returned plain text and raw result plus provenance remain output only; no automatic memory ingestion, model context, URLs/media fetching or captured-text authorization."
+  ],
+  "hostedCI": {
+    "state": "passed",
+    "head": "29ee471300102af41ef38172f41e1a4d2ab735c3",
+    "runURL": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020",
+    "jobs": [
+      {
+        "name": "benchmark-harnesses",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020/job/124770209811"
+      },
+      {
+        "name": "native",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020/job/124770209994"
+      }
+    ],
+    "fullTests": {
+      "defined": 1807,
+      "passed": 1725,
+      "skipped": 82,
+      "failures": 0
+    },
+    "ownedNativeVaultTests": {
+      "defined": 37,
+      "passed": 37,
+      "skipped": 0,
+      "failures": 0
+    },
+    "manualClientProcessChecks": 22,
+    "nativeLogSHA256": "c63104d926d16430bc0df6ef952f3412a5eec4010e3aa9ae5f8f9ddc056f8070",
+    "scope": "Hosted macOS CI at the stated head; owned fixtures. Does not establish user-machine native acceptance. Documentation followups can have a later head."
+  },
+  "remaining": [
+    "Native connection/credential setup and per-call preview UI",
+    "HTTP/auth and broader third-party compatibility",
+    "Explicit privacy-admitted result-to-memory workflow and model-backed tool use",
+    "Startup/long-running/persistent-server behavior and process-crash recovery",
+    "Full parity/full sync, sustained physical power, supported-hardware acceptance, notarized distribution and matched top-three ranking"
+  ],
+  "recordedAtUTC": "2026-11-01T06:14:18.669721+00:00",
+  "catalogCorrectionSigned": {
+    "state": "passed-signed-release-catalog-refusal",
+    "returncode": 1,
+    "exportedBytes": 0,
+    "cliSHA256": "451c76519efbe43a931ff829f7536ef45cc0d9e30e86ef6040ea5ab4d37e9b7a",
+    "original": "catalogCounterexample",
+    "scope": "The actual original128-tool owned counterexample, using the final signed CLI. No call or incomplete review is exported."
+  }
+}

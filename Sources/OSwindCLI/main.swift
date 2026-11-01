@@ -83,6 +83,7 @@ func vaultPassphrase() throws -> Data {
     return data
 }
 do {
+    guard command != "mcp-client" || (selectedVault==nil && explicitData==nil) else {throw OSwindError.invalid("MCP client does not open a library; omit --data and --vault")}
     guard command != "pii" || (selectedVault==nil && explicitData==nil) else {throw OSwindError.invalid("PII inspection does not use --vault or --data")}
     guard selectedVault==nil || explicitData==nil else {throw OSwindError.invalid("Choose --vault or --data, not both")}
     if let selectedVault,command != "vault" {
@@ -166,6 +167,7 @@ do {
           transcribe FILE --model PATH   Local whisper.cpp transcription
           serve                          Read-only token-auth API at 127.0.0.1:47831
           mcp                            Read-only MCP over stdio
+          mcp-client list|call            Explicit selected local MCP server/tools; run without arguments for required flags
           benchmark [--count N]          Isolated synthetic retrieval benchmark
           benchmark-visual --fixture JSON --root NEW_DIR --model-dir DIR
                                         Real visual index/query/source-validation benchmark on explicit images
@@ -176,6 +178,9 @@ do {
         No cloud model is used unless explicitly configured. BYOK keys are read
         from Keychain; use the app's Models settings to configure them.
         """)
+    } else if command == "mcp-client" {
+        guard selectedVault==nil,explicitData==nil else {throw OSwindError.invalid("MCP client does not open a library; omit --data and --vault")}
+        try await runMCPClientCLI(args)
     } else if command == "vault" {
         guard selectedVault==nil,let action=args.first else {throw OSwindError.invalid("Use vault create|unlock|lock|status PACKAGE")};args.removeFirst()
         if action=="create" || action=="migrate" {
