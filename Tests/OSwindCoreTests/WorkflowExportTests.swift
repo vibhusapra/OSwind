@@ -10,6 +10,20 @@ private actor WorkflowExportGate {
     func open() {opened=true;continuation?.resume();continuation=nil}
 }
 final class WorkflowExportTests:XCTestCase {
+    func testOptInActualKokoroHardwarePortableExport()async throws {
+        let variables=ProcessInfo.processInfo.environment
+        guard let helper=variables["OSWIND_TEST_WORKFLOW_KOKORO_HELPER"],let guardian=variables["OSWIND_TEST_WORKFLOW_GUARDIAN"],let output=variables["OSWIND_TEST_WORKFLOW_EXPORT_OUTPUT"] else {throw XCTSkip("Explicit local Kokoro, guardian and new owned export destination required")}
+        try await withFixture {_,store,original,_ in
+            var draft=original;draft.title="Owned retained source walkthrough";draft.steps[0].title="Inspect the retained screen"
+            draft.steps[0].narration="This retained screen has a blue rectangle on a white background. OSwind keeps the original source linked to this step."
+            let destination=URL(fileURLWithPath:output),environment=WorkflowExportEnvironment(narration:.production(guardian:URL(fileURLWithPath:guardian)),hardwareRequired:true)
+            let info=try await NarratedWorkflow.export(store:store,draft:draft,destination:destination,options:.init(narrationHelper:URL(fileURLWithPath:helper)),permit:.init(),environment:environment,progress:{_ in})
+            XCTAssertTrue(info.duration>1);XCTAssertEqual(info.steps,1)
+            let tree=try BackupFileTree(root:destination),manifest=try XCTUnwrap(JSONSerialization.jsonObject(with:tree.read("workflow.json",limit:1024*1024)) as? [String:Any])
+            for file in try XCTUnwrap(manifest["files"] as? [[String:Any]]) {XCTAssertEqual(try tree.digest(try XCTUnwrap(file["path"] as? String)).sha256,try XCTUnwrap(file["sha256"] as? String))}
+            let timing=try XCTUnwrap(JSONSerialization.jsonObject(with:tree.read("narration.timing.json",limit:64*1024)) as? [String:Any]);XCTAssertEqual(timing["audio"] as? String,"narration.wav")
+        }
+    }
     func withFixture(_ body:(URL,MemoryStore,WorkflowDraft,URL)async throws->Void)async throws {
         let (root,store)=try WorkflowFrameTests.fixture(),parent=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-output-"+UUID().uuidString)
         try Paths.ensure(parent)
@@ -20,15 +34,23 @@ final class WorkflowExportTests:XCTestCase {
             try store.close();XCTAssertTrue(store.isClosed)
         }catch {let original=error;try? store.close();throw original}
     }
-    static var environment:WorkflowExportEnvironment {
+    static var environment:WorkflowExportEnvironment {toneEnvironment(frames:12000)}
+    static func toneEnvironment(frames:Int)->WorkflowExportEnvironment {
         .init(narration:.init(run:{_,args,_,_ in
             let input=URL(fileURLWithPath:args[1]),output=URL(fileURLWithPath:args[3]),script=try String(contentsOf:input,encoding:.utf8)
             XCTAssertFalse(script.isEmpty)
-            let samples=(0..<12000).map {Float(sin(Double($0)*2*Double.pi*440/24000)*0.1)}
+            let seconds=Double(frames)/24000
+            let samples=(0..<frames).map {Float(sin(Double($0)*2*Double.pi*440/24000)*0.1)}
             try WAV.data(samples:samples,sampleRate:24000).write(to:output)
-            let timing:[String:Any] = ["model":"mlx-community/Kokoro-82M-bf16","voice":"af_heart","speed":1.0,"audio":output.path,"audio_seconds":0.5,"chunks":[["start_seconds":0.0,"end_seconds":0.5]]]
+            let timing:[String:Any] = ["model":"mlx-community/Kokoro-82M-bf16","voice":"af_heart","speed":1.0,"audio":output.path,"audio_seconds":seconds,"chunks":[["start_seconds":0.0,"end_seconds":seconds]]]
             try JSONSerialization.data(withJSONObject:timing).write(to:output.deletingPathExtension().appendingPathExtension("timing.json"))
         }),hardwareRequired:false)
+    }
+    func testSingleRetainedImageWithEightSecondNarrationCompletesBothInputs()async throws {
+        try await withFixture {_,store,draft,parent in
+            let result=try await run(store:store,draft:draft,to:parent.appendingPathComponent("OwnedLongStill"),environment:Self.toneEnvironment(frames:8*24000))
+            XCTAssertEqual(result.duration,8,accuracy:1.0/24000);XCTAssertEqual(result.steps,1)
+        }
     }
     func run(store:MemoryStore,draft:WorkflowDraft,to destination:URL,permit:WorkflowExportPermit = .init(),environment:WorkflowExportEnvironment = WorkflowExportTests.environment,progress:@escaping @Sendable(WorkflowExportProgress)async throws->Void={_ in})async throws->WorkflowExportInfo {
         try await NarratedWorkflow.export(store:store,draft:draft,destination:destination,options:.init(narrationHelper:URL(fileURLWithPath:"/usr/bin/true")),permit:permit,environment:environment,progress:progress)

@@ -10,14 +10,16 @@ import OSwindCore
     @Published private(set) var error:String?
     private var task:Task<Void,Never>?
     private var cancelWorker:(()->Void)?
-    func cancel() {cancelWorker?()}
-    func run(store:MemoryStore,retry:Bool,completion:@escaping (LibraryWipeResult)->Void,onFailure:@escaping ()->Void={}) {
+    func cancel() {cancelWorker?();task?.cancel()}
+    func run(store:MemoryStore,retry:Bool,before:@escaping () async->Void={},completion:@escaping (LibraryWipeResult)->Void,onFailure:@escaping ()->Void={}) {
         guard !busy else {return};busy=true;result=nil;error=nil;status=retry ? "Retrying unfinished cleanup…":"Deleting local history…";progress = .init(phase:"Preparing")
-        let relay=LibraryProgressRelay(),worker=Task.detached(priority:.utility) {try retry ? store.retryLibraryWipeCleanup(progress:{relay.set($0)}):store.wipeLibrary(progress:{relay.set($0)})};cancelWorker={worker.cancel()}
+        let relay=LibraryProgressRelay()
         task=Task {
             let observer=Task {while !Task.isCancelled {do {try await Task.sleep(nanoseconds:100_000_000)} catch {break};self.progress=relay.get()}}
             defer {observer.cancel();busy=false;progress=nil;task=nil;cancelWorker=nil}
             do {
+                await before();try Task.checkCancellation()
+                let worker=Task.detached(priority:.utility) {try retry ? store.retryLibraryWipeCleanup(progress:{relay.set($0)}):store.wipeLibrary(progress:{relay.set($0)})};cancelWorker={worker.cancel()}
                 let value=try await worker.value;result=value;pendingCleanup = !value.cleanupComplete
                 status=retry ? "Cleanup retry checked the earlier pending files.":"Deleted \(value.erasure.sources) sources, \(value.conversations) conversations and \(value.routines) routines."
                 if value.cancelled {status+=" Cleanup stopped after the deletion committed."}

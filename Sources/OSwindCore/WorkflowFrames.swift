@@ -39,7 +39,7 @@ final class WorkflowFrameReservation:@unchecked Sendable {
     let preview:WorkflowFramePreview
     let snapshot:any VisualMediaSnapshot
     private init(preview:WorkflowFramePreview,snapshot:any VisualMediaSnapshot) {self.preview=preview;self.snapshot=snapshot}
-    static func make(store:MemoryStore,memoryID:String,frameOrdinal:Int,settings:LibrarySettingsSnapshot,scanner:PIIImportScanner?,ocr:@Sendable (CGImage)throws->[TextRegion]=VisualOCR.regions) async throws ->WorkflowFrameReservation {
+    static func make(store:MemoryStore,memoryID:String,frameOrdinal:Int,settings:LibrarySettingsSnapshot,scanner:PIIImportScanner?,ocr:@Sendable (CGImage)throws->[TextRegion] = {try VisualOCR.regions($0)}) async throws ->WorkflowFrameReservation {
         let pii=settings.settings.piiImports
         guard pii.enabled == (scanner != nil),scanner.map({$0.compute==pii.compute && $0.threshold==pii.threshold}) ?? true else {throw OSwindError.invalid("Use the selected local privacy scanner for workflow frames")}
         guard (0..<240).contains(frameOrdinal),let memory=try store.get(memoryID),let plan=try VisualSourcePlan.make(memory),let point=plan.points.first(where:{$0.ordinal==frameOrdinal}) else {throw OSwindError.invalid("Choose an available retained screen frame")}

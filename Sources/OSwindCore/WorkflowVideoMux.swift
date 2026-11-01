@@ -33,18 +33,38 @@ enum WorkflowVideoMux {
             try Task.checkCancellation()
             guard writer.startWriting(),videoReader.startReading(),audioReader.startReading() else {throw writer.error ?? videoReader.error ?? audioReader.error ?? OSwindError.unavailable("Cannot start native workflow muxing")}
             writer.startSession(atSourceTime:.zero)
-            var picture=videoOutput.copyNextSampleBuffer(),audio=audioOutput.copyNextSampleBuffer(),samples:Int64=0,images=0
+            func nextMedia(_ output:AVAssetReaderTrackOutput)throws->CMSampleBuffer? {
+                var markers=0
+                while let value=output.copyNextSampleBuffer() {
+                    if CMSampleBufferGetNumSamples(value)>0 {return value}
+                    markers+=1
+                    guard markers<=1024,CMSampleBufferGetTotalSampleSize(value)==0 else {throw OSwindError.invalid("Invalid workflow media boundary markers")}
+                    // Empty edit/drain markers may have invalid PTS. Consume
+                    // them before timestamp ordering, so EOF reaches the writer.
+                }
+                return nil
+            }
+            var picture=try nextMedia(videoOutput),audio=try nextMedia(audioOutput),samples:Int64=0,images=0
+            var videoFinished=false,audioFinished=false
+            func finishExhaustedInputs()throws {
+                // Mark EOF immediately. Waiting until both streams end can
+                // stall AAC while the writer waits for another still image.
+                if picture==nil,!videoFinished {
+                    guard videoReader.status == .completed else {throw videoReader.error ?? OSwindError.invalid("Workflow video ended before reader completion")}
+                    videoInput.markAsFinished();videoFinished=true
+                }
+                if audio==nil,!audioFinished {
+                    guard audioReader.status == .completed else {throw audioReader.error ?? OSwindError.invalid("Workflow audio ended before reader completion")}
+                    audioInput.markAsFinished();audioFinished=true
+                }
+            }
+            try finishExhaustedInputs()
             let deadline=ContinuousClock.now.advanced(by:.seconds(60))
             while picture != nil || audio != nil {
                 try Task.checkCancellation()
                 let isVideo:Bool
                 if let picture {isVideo=audio.map {CMTimeCompare(CMSampleBufferGetPresentationTimeStamp(picture),CMSampleBufferGetPresentationTimeStamp($0))<=0} ?? true}else{isVideo=false}
                 guard let buffer=isVideo ? picture:audio else {throw OSwindError.invalid("Workflow media buffer disappeared")}
-                if CMSampleBufferGetNumSamples(buffer)==0 {
-                    guard CMSampleBufferGetTotalSampleSize(buffer)==0 else {throw OSwindError.invalid("A workflow boundary marker contains media bytes")}
-                    if isVideo {picture=videoOutput.copyNextSampleBuffer()}else{audio=audioOutput.copyNextSampleBuffer()}
-                    continue
-                }
                 let input=isVideo ? videoInput:audioInput,pts=CMSampleBufferGetPresentationTimeStamp(buffer).seconds
                 guard pts.isFinite,pts>=0,pts<timeline.duration+1.0/600 else {throw OSwindError.invalid("Workflow sample timestamp exceeds narration")}
                 if !isVideo {
@@ -54,14 +74,15 @@ enum WorkflowVideoMux {
                 }
                 while !input.isReadyForMoreMediaData {
                     try Task.checkCancellation()
-                    guard writer.status == .writing,ContinuousClock.now<deadline else {throw writer.error ?? OSwindError.unavailable("Native workflow encoding timed out")}
+                    guard writer.status == .writing,ContinuousClock.now<deadline else {throw writer.error ?? OSwindError.unavailable("Native workflow encoding timed out (\(isVideo ? "video":"audio"), \(images) images, \(samples) PCM frames)")}
                     try await Task.sleep(for:.milliseconds(2))
                 }
                 guard input.append(buffer) else {throw writer.error ?? OSwindError.unavailable("Cannot append complete workflow media")}
-                if isVideo {images+=1;picture=videoOutput.copyNextSampleBuffer()}else{audio=audioOutput.copyNextSampleBuffer()}
+                if isVideo {images+=1;picture=try nextMedia(videoOutput)}else{audio=try nextMedia(audioOutput)}
+                try finishExhaustedInputs()
             }
             guard videoReader.status == .completed,audioReader.status == .completed,samples==timeline.frames,images==timeline.steps.count else {throw videoReader.error ?? audioReader.error ?? OSwindError.invalid("Native workflow muxing omitted source media")}
-            writer.endSession(atSourceTime:CMTime(value:timeline.frames,timescale:24000));videoInput.markAsFinished();audioInput.markAsFinished()
+            writer.endSession(atSourceTime:CMTime(value:timeline.frames,timescale:24000))
             await finish(writer);try Task.checkCancellation()
             guard writer.status == .completed else {throw writer.error ?? OSwindError.unavailable("Workflow movie finalization failed")}
             guard try workspace.tree.digest("workflow-video.mov",limit:256*1024*1024)==videoDigest,

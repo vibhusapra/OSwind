@@ -131,6 +131,9 @@ do {
           backup restore PATH --to DIR   Restore into a new, quiet library
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
           export-markdown NEW_DIR [--include-media]  Export portable Markdown sources and conversations
+          workflow frame ID [--frame N]   Inspect a retained frame; JSON includes an editable draft
+          workflow export --draft JSON --output NEW_DIR [--helper FILE]
+                                         Local narrated video and portable independent files
           export PATH                    Export text and metadata JSON
           import PATH                    Import OSwind JSON, redact, rebuild vectors
           import-limitless PATH [--json]  Import saved Limitless API text response
@@ -259,6 +262,8 @@ do {
                 }
             }
         }
+    } else if command == "workflow" {
+        try await runWorkflowCLI()
     } else if command == "vision" {
         try await runVisualModelCLI()
     } else if command == "wipe" {
