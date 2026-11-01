@@ -143,6 +143,8 @@ jobs:
             ${{ runner.temp }}/oswind-vault-query-interruptions/*.stdout
             ${{ runner.temp }}/oswind-vault-query-interruptions/*.stderr
           if-no-files-found: ignore
+      - name: Exercise explicit external MCP client processes
+        run: python3 scripts/mcp-client-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl
       - name: Exercise API and MCP processes
         run: python3 scripts/integration-smoke.py .build/release/oswindctl
       - name: Exercise explicit text collectors and Python SDK on encrypted APFS

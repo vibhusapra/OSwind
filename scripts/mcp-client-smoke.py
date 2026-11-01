@@ -18,6 +18,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-mcp-process-') as scratch:
  run(['--data',str(root/'rejected-data'),*base,'--allow-server-process'],False);run(['--vault',str(root/'rejected-vault'),*base,'--allow-server-process'],False)
  require(not quiet.exists() and not (root/'rejected-data').exists() and not (root/'rejected-vault').exists(),'client refuses data/vault before library access')
  review=run([*base,'--allow-server-process']);require(review['protocolVersion']=='2025-11-25','legacy negotiation with existing server');require(len(review['tools'])==7 and 'memory_stats'in [t['name']for t in review['tools']],'all seven independently implemented server tools discovered')
+ require(all(isinstance(t['definitionJSON'],str) and json.loads(t['definitionJSON'])['name']==t['name']for t in review['tools']),'review definitions are literal readable JSON tied to each tool')
  reviewfile=root/'review.json';reviewfile.write_text(json.dumps(review));argsfile=root/'arguments.json';argsfile.write_text('{}')
  call=['mcp-client','call','--config',str(config),'--review',str(reviewfile),'--tool','memory_stats','--arguments',str(argsfile),'--allow-server-process']
  run(call,False)

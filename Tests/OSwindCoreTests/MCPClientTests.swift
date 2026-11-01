@@ -61,6 +61,7 @@ final class MCPClientTests:XCTestCase {
         try "#!/bin/sh\nexec /usr/bin/python3 \"$@\"\n".write(to:wrapper,atomically:true,encoding:.utf8);try FileManager.default.setAttributes([.posixPermissions:0o700],ofItemAtPath:wrapper.path);c.executable=wrapper.path
         let r=try await MCPClient.discover(c),before=try events().count
         try ("#!/bin/sh\ntouch "+root.appendingPathComponent("changed-launched").path+"\nexit 99\n").write(to:wrapper,atomically:true,encoding:.utf8)
+        try FileManager.default.setAttributes([.posixPermissions:0o700],ofItemAtPath:wrapper.path);XCTAssertTrue(FileManager.default.isExecutableFile(atPath:wrapper.path))
         do {_ = try await MCPClient.call(c,review:r,tool:"echo",argumentsJSON:Data("{}".utf8));XCTFail("Launched changed executable")}catch {}
         XCTAssertEqual(try events().count,before);XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("changed-launched").path))
     }
@@ -98,6 +99,9 @@ final class MCPClientTests:XCTestCase {
             do {_ = try await MCPClient.call(c,review:r,tool:"echo",argumentsJSON:Data("{}".utf8));XCTFail(mode)}catch {}
             XCTAssertEqual(try events().filter {$0["method"] as? String=="tools/call"}.count,before+1)
         }
+        let c=try command("tool-error-result"),r=try await MCPClient.discover(c)
+        let result=try await MCPClient.call(c,review:r,tool:"echo",argumentsJSON:Data("{}".utf8))
+        XCTAssertTrue(result.isError);XCTAssertEqual(result.text,"empty")
     }
     func testFragmentedUTF8FramesRemainExactAndPartialEOFRefuses() async throws {
         let c=try command("split-utf8"),r=try await MCPClient.discover(c)
@@ -134,6 +138,35 @@ final class MCPClientTests:XCTestCase {
         XCTAssertEqual(try MCPToolReview.decodeReview(data),r)
         XCTAssertEqual(try MCPToolReview.decodeReview(JSONEncoder().encode(r)),r)
     }
+    func testReviewCatalogIsReadableAndRoundTripsOrRefusesBeforePublication() async throws {
+        let small=try command("small-catalog"),review=try await MCPClient.discover(small)
+        let object=try Integration.json(review) as! [String:Any],tools=object["tools"] as! [[String:Any]]
+        XCTAssertEqual(tools.count,16)
+        XCTAssertTrue((tools[0]["definitionJSON"] as? String)?.hasPrefix("{")==true,"A reviewer must see literal tool/schema JSON, not an opaque blob")
+        XCTAssertEqual(try MCPToolReview.decodeReview(JSONEncoder().encode(review)),review)
+        let output=try await MCPClient.call(small,review:review,tool:review.tools[0].name,argumentsJSON:Data("{}".utf8));XCTAssertEqual(output.text,"empty")
+        let before=try events().count,large=try command("large-catalog")
+        do {_ = try await MCPClient.discover(large);XCTFail("Accepted a catalog beyond the aggregate review bound")}
+        catch {XCTAssertTrue(error.localizedDescription.contains("aggregate review"),"Wrong refusal: "+error.localizedDescription)}
+        XCTAssertEqual(try events().dropFirst(before).filter {$0["method"] as? String=="tools/list"}.count,8)
+    }
+    func testUnsupportedReviewProtocolRefusesBeforeAnyProcessLaunch() async throws {
+        let c=try command("modern"),review=try await MCPClient.discover(c),before=try events().count
+        var object=try Integration.json(review) as! [String:Any];object["protocolVersion"]="2099-01-01"
+        let forged=try JSONDecoder().decode(MCPToolReview.self,from:JSONSerialization.data(withJSONObject:object))
+        do {_ = try await MCPClient.call(c,review:forged,tool:"echo",argumentsJSON:Data("{}".utf8));XCTFail("Accepted unsupported reviewed protocol")}catch {}
+        XCTAssertEqual(try events().count,before)
+    }
+    func testCancellationSendsMatchingProtocolNotificationBeforeGracefulExit() async throws {
+        let c=try command("cancel-notification"),review=try await MCPClient.discover(c)
+        let task=Task {try await MCPClient.call(c,review:review,tool:"echo",argumentsJSON:Data("{}".utf8))}
+        let end=ContinuousClock.now.advanced(by:.seconds(8));var request:[String:Any]?
+        while ContinuousClock.now<end {if let found=try events().first(where:{$0["method"] as? String=="tools/call"}) {request=found;break};try await Task.sleep(for:.milliseconds(20))}
+        XCTAssertNotNil(request);task.cancel()
+        do {_ = try await task.value;XCTFail("Cancelled call produced a result")}catch is CancellationError {}catch {XCTFail("Unexpected cancellation error")}
+        let notes=try events().filter {$0["method"] as? String=="notifications/cancelled"};XCTAssertEqual(notes.count,1)
+        let params=notes.first?["params"] as? [String:Any];XCTAssertEqual(params?["requestId"] as? String,request?["id"] as? String)
+    }
     private static let fixture = #"""
 import os,sys,json,time,signal
 mode,root=sys.argv[1:]
@@ -144,10 +177,12 @@ def send(v):
  if mode=='split-utf8':
   for byte in (json.dumps(v,ensure_ascii=False)+'\n').encode('utf-8'):sys.stdout.buffer.write(bytes([byte]));sys.stdout.buffer.flush();time.sleep(.0002)
  else:sys.stdout.write(json.dumps(v,ensure_ascii=False)+'\n');sys.stdout.flush()
-if mode=='environment':log({'environment':dict(os.environ)})
+if mode=='environment':log({'environment':{k:(v if k in ['HOME','TMPDIR','PATH','LANG','OSWIND_TEST_CREDENTIAL'] else '<present>')for k,v in os.environ.items()}})
 for line in sys.stdin:
  q=json.loads(line);log(q);method=q['method'];i=q.get('id')
- if i is None:continue
+ if i is None:
+  if mode=='cancel-notification' and method=='notifications/cancelled':sys.exit(0)
+  continue
  if method=='server/discover':
   if mode=='legacy-silent':continue
   if mode in ['legacy-arbitrary-error','modern-header-error','fractional-error-code']:send({'jsonrpc':'2.0','id':i,'error':{'code':{'legacy-arbitrary-error':-32023,'modern-header-error':-32020,'fractional-error-code':-32602.5}[mode],'message':'owned refusal'}});continue
@@ -172,18 +207,23 @@ for line in sys.stdin:
   result={'resultType':'complete','tools':[tool]}
   if mode=='cursor-cycle':result['tools']=[];result['nextCursor']='repeat'
   if mode=='duplicate-tool':result['tools']=[tool,tool]
+  if mode in ['small-catalog','large-catalog']:
+   page=int(q.get('params',{}).get('cursor','0'));total=16 if mode=='small-catalog' else 128
+   result['tools']=[{'name':'owned_'+str(n),'description':'x'*(4000 if total==16 else 8000),'inputSchema':{'type':'object'}}for n in range(page*16,(page+1)*16)]
+   if (page+1)*16<total:result['nextCursor']=str(page+1)
   if mode=='two-pages':
    tool['icons']=[{'src':'https://never-fetch.invalid/icon.svg'}]
    if q.get('params',{}).get('cursor')=='second':tool['name']='other'
    else:result['nextCursor']='second'
   send({'jsonrpc':'2.0','id':i,'result':result})
  elif method=='tools/call':
+  if mode=='cancel-notification':continue
   if mode in ['block-call','timeout-call']:
    signal.signal(signal.SIGTERM,signal.SIG_IGN)
    while True:time.sleep(0.1)
   if mode=='exit-call':sys.exit(17)
   if mode=='call-error':send({'jsonrpc':'2.0','id':i,'error':{'code':-32603,'message':'owned fixture error'}});continue
   if mode=='input-required':send({'jsonrpc':'2.0','id':i,'result':{'resultType':'input_required','inputRequests':{}}});continue
-  send({'jsonrpc':'2.0','id':i,'result':{'resultType':'complete','content':[{'type':'text','text':q.get('params',{}).get('arguments',{}).get('text','empty')}],'isError':False}})
+  send({'jsonrpc':'2.0','id':i,'result':{'resultType':'complete','content':[{'type':'text','text':q.get('params',{}).get('arguments',{}).get('text','empty')}],'isError':(mode=='tool-error-result')}})
 """#
 }

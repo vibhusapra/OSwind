@@ -6,6 +6,7 @@ private enum MCPWireFailure:Error {case timeout,rpc(MCPValue)}
 /// and finite byte/time budgets apply even when the child never reads stdin.
 final class MCPWire {
     static let modern="2026-07-28"
+    static let legacyVersions=["2024-11-05","2025-03-26","2025-06-18","2025-11-25"]
     private let process=Process(),input=Pipe(),output=Pipe(),errors=Pipe()
     private let root:URL
     private var buffer=Data(),outputBytes=0,errorBytes=0,notifications=0,serial=0
@@ -123,7 +124,7 @@ final class MCPWire {
         }catch MCPWireFailure.timeout {legacy=true}
         guard legacy else {throw OSwindError.unavailable("MCP negotiation failed")}
         let result=try request("initialize",fields:["protocolVersion":.string("2025-11-25"),"capabilities":.object([:]),"clientInfo":.object(["name":.string("OSwind"),"version":.string("0.1.0")])],version:"2025-11-25")
-        guard let version=result["protocolVersion"]?.text,["2024-11-05","2025-03-26","2025-06-18","2025-11-25"].contains(version),result["capabilities"]?["tools"]?.fields != nil else {throw OSwindError.unavailable("Legacy MCP server has no supported tools protocol")}
+        guard let version=result["protocolVersion"]?.text,Self.legacyVersions.contains(version),result["capabilities"]?["tools"]?.fields != nil else {throw OSwindError.unavailable("Legacy MCP server has no supported tools protocol")}
         try send(.object(["jsonrpc":.string("2.0"),"method":.string("notifications/initialized"),"params":.object([:])]),end:ContinuousClock.now.advanced(by:.seconds(2)))
         return version
     }

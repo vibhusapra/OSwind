@@ -20,7 +20,7 @@ Review the executable and arguments before authorizing discovery. A server is ar
 oswindctl mcp-client list --config server.json --allow-server-process > review.json
 ```
 
-Read the review, including the selected tool's actual `definitionJSON` (base64 JSON), and prepare exact arguments in another JSON file. The description and read-only annotations are server claims; they grant no authority. A selected tool can change external data. Each call requires deliberate confirmation:
+Read the review, including the selected tool's actual `definitionJSON` (literal JSON text), and prepare exact arguments in another JSON file. The description and read-only annotations are server claims; they grant no authority. A selected tool can change external data. Each call requires deliberate confirmation:
 
 ```sh
 oswindctl mcp-client call --config server.json --review review.json \
@@ -39,7 +39,7 @@ The CLI never opens a client memory library; `--data` and `--vault` are refused 
 - Strict UTF-8/JSON framing, duplicate/canonically equivalent key refusal, finite numbers, bounded depth/nodes, exact request IDs and explicit result/error envelopes.
 - At most128 tools,16 pages,64 server notifications;64KiB tool definitions/arguments;256KiB individual frames and stderr;2MiB cumulative stdout. Repeated cursors or tool names fail without returning a truncated list.
 - Probe2s, ordinary requests8s, calls30s, operation120s; cancellation sends a best-effort protocol notification and closes stdin, then escalates only the owned direct child through termination/kill and verifies exit. Child-created descendants are not sandboxed or claimed as owned. Cleanup cannot run while the host is asleep; deadlines may expire before a resumed request can complete.
-- The aggregate review-file bound/round-trip is still under review before publication. Do not assume every individually bounded large catalog can yet be exported and reloaded.
+- The complete encoded review is capped at1MiB before publication; reload files accept up to2MiB for formatting overhead. Oversized catalogs refuse as a whole instead of exporting an unreadable or truncated review.
 
 ## Qualification in progress
 
@@ -49,7 +49,9 @@ Initial checks retained an environment-test assumption (Apple's Python launcher 
 
 An isolated MIT official Python SDK2.3.0 server completes modern discovery and exact authored-text echo with the development CLI. This does not establish release-package or arbitrary-server compatibility. The first source-frozen broad run passes1,804 defined cases (1,722 pass/82 skip), and all29 MCP cases pass separately under sanitizer and optimization with no skips. Signed package/process qualification is still running; this source precedes the aggregate-review correction, so no final release receipt or completion claim exists yet.
 
-Next: close aggregate review bounds; final-source qualification and published receipt; native configuration/credential setup and visible per-call preview; scoped source-backed tool results; HTTP/auth and model-loop workflows with renewed authority and provenance checks. Captured text, model plans and server descriptions/results cannot authorize an external write.
+The retained actual128-tool counterexample exported2,425,050 bytes and could not reload its own review. The correction now refuses an oversized aggregate before returning it, exposes readable literal definitions and rejects unsupported review versions before process launch. Five selected hardening cases pass, including real eight-page catalogs and a matching cancellation notification. Final-source qualification follows.
+
+Next: final-source qualification and published receipt; native configuration/credential setup and visible per-call preview; scoped source-backed tool results; HTTP/auth and model-loop workflows with renewed authority and provenance checks. Captured text, model plans and server descriptions/results cannot authorize an external write.
 
 ## Primary protocol references
 

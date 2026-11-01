@@ -33,12 +33,12 @@ public struct MCPReviewedTool:Codable,Equatable,Sendable,Identifiable {
     public var id:String {name}
     public let name:String
     public let description:String
-    public let definitionJSON:Data
+    public let definitionJSON:String
     public let fingerprint:String
     init(_ value:MCPValue)throws {
         guard let name=value["name"]?.text,name.range(of:#"^[A-Za-z0-9_.-]{1,128}$"#,options:.regularExpression) != nil,value["inputSchema"]?.fields != nil else {throw OSwindError.invalid("MCP tool needs a bounded name and object schema")}
         let raw=value.encoded();guard raw.count<=65536 else {throw OSwindError.invalid("MCP tool definition exceeds64KiB")}
-        self.name=name;description=value["description"]?.text ?? "";definitionJSON=raw;fingerprint=Self.hash(raw)
+        self.name=name;description=value["description"]?.text ?? "";definitionJSON=String(decoding:raw,as:UTF8.self);fingerprint=Self.hash(raw)
     }
     static func hash(_ data:Data)->String {SHA256.hash(data:data).map {String(format:"%02x",$0)}.joined()}
 }
@@ -62,8 +62,9 @@ public struct MCPToolReview:Codable,Equatable,Sendable {
         let review=try JSONDecoder().decode(Self.self,from:data);try review.validate();return review
     }
     func validate()throws {
-        guard format=="OSwind MCP tool review v1",commandFingerprint.range(of:#"^[0-9a-f]{64}$"#,options:.regularExpression) != nil,tools.count<=128,Set(tools.map(\.name)).count==tools.count else {throw OSwindError.invalid("Invalid MCP review record")}
-        for tool in tools {guard tool.definitionJSON.count<=65536,try MCPReviewedTool(MCPValue.decode(tool.definitionJSON))==tool else {throw OSwindError.invalid("MCP review metadata does not match its definition")}}
+        guard ([MCPWire.modern]+MCPWire.legacyVersions).contains(protocolVersion),format=="OSwind MCP tool review v1",commandFingerprint.range(of:#"^[0-9a-f]{64}$"#,options:.regularExpression) != nil,tools.count<=128,Set(tools.map(\.name)).count==tools.count else {throw OSwindError.invalid("Invalid MCP review record")}
+        for tool in tools {guard tool.definitionJSON.utf8.count<=65536,tool.description.utf8.count<=65536,try MCPReviewedTool(MCPValue.decode(Data(tool.definitionJSON.utf8)))==tool else {throw OSwindError.invalid("MCP review metadata does not match its definition")}}
+        guard try JSONEncoder().encode(self).count<=1_048_576 else {throw OSwindError.invalid("MCP aggregate review exceeds1MiB; choose a server with a smaller tool catalog")}
     }
     init(commandFingerprint:String,protocolVersion:String,tools:[MCPReviewedTool]) {format="OSwind MCP tool review v1";self.commandFingerprint=commandFingerprint;self.protocolVersion=protocolVersion;self.tools=tools;reviewedAt=Date()}
 }
@@ -83,7 +84,7 @@ public struct MCPToolOutput:Codable,Sendable {
 public enum MCPClient {
     public static func discover(_ command:MCPServerCommand,credentials:[String:String]=[:]) async throws->MCPToolReview {
         try await perform(command,credentials:credentials) {wire,identity in
-            let version=try wire.negotiate();return try MCPToolReview(commandFingerprint:identity,protocolVersion:version,tools:wire.tools(version))
+            let version=try wire.negotiate();let review=try MCPToolReview(commandFingerprint:identity,protocolVersion:version,tools:wire.tools(version));try review.validate();return review
         }
     }
     /// The caller must explicitly review the exact tool and JSON arguments.
@@ -96,7 +97,7 @@ public enum MCPClient {
             guard identity==review.commandFingerprint else {throw OSwindError.invalid("MCP command changed; discover and review it again")}
             let version=try wire.negotiate();guard version==review.protocolVersion else {throw OSwindError.invalid("MCP protocol changed; review again")}
             let current=try wire.tools(version)
-            guard let fresh=current.first(where:{$0.name==tool}),fresh.fingerprint==selected.fingerprint,MCPReviewedTool.hash(selected.definitionJSON)==selected.fingerprint else {throw OSwindError.invalid("MCP tool changed or was removed; review again")}
+            guard let fresh=current.first(where:{$0.name==tool}),fresh.fingerprint==selected.fingerprint,MCPReviewedTool.hash(Data(selected.definitionJSON.utf8))==selected.fingerprint else {throw OSwindError.invalid("MCP tool changed or was removed; review again")}
             let result=try wire.request("tools/call",fields:["name":.string(tool),"arguments":arguments],version:version,timeout:30)
             if version==MCPWire.modern {guard result["resultType"]?.text=="complete" else {throw OSwindError.unavailable("MCP server requires an unsupported additional-input workflow; call was not retried")}}
             guard let content=result["content"]?.items,content.count<=128,result["isError"]==nil || result["isError"]?.boolean != nil else {throw OSwindError.invalid("MCP tool returned an unsupported result")}
