@@ -55,4 +55,16 @@ final class NativeMediaSchemaTests:XCTestCase {
         XCTAssertThrowsError(try MemoryStore(root:root))
         try raw {db in var row:OpaquePointer?;defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_prepare_v2(db,"PRAGMA user_version",-1,&row,nil),SQLITE_OK);XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),33)}
     }
+    func testNativeMediaCleanupRemovesBothCacheGenerationsOnlyAfterReservationRelease()throws {
+        let image=root.appendingPathComponent("images/owned"),bytes=Data([4,3,2,1])
+        try bytes.write(to:image)
+        let caches=["indexes",NativeMediaSchema.cacheDirectory].map {root.appendingPathComponent($0+"/owned")}
+        for file in caches {try Paths.ensure(file.deletingLastPathComponent());try bytes.write(to:file)}
+        try store.withRoutineDatabase {try $0.execute("INSERT INTO erasure_assets VALUES('images/owned')")}
+        let lease=try store.mediaWriteLease();defer {lease.release()}
+        let pending=store.retryErasureCleanup();XCTAssertEqual(pending.pendingMedia,1);XCTAssertFalse(pending.searchCacheRemoved)
+        for file in caches+[image] {XCTAssertEqual(try Data(contentsOf:file),bytes)}
+        lease.release();let cleaned=store.retryErasureCleanup();XCTAssertEqual(cleaned.removedMedia,1);XCTAssertEqual(cleaned.pendingMedia,0);XCTAssertTrue(cleaned.searchCacheRemoved);XCTAssertTrue(cleaned.warnings.isEmpty)
+        for file in caches+[image] {XCTAssertFalse(FileManager.default.fileExists(atPath:file.path))}
+    }
 }
