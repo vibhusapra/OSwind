@@ -452,7 +452,36 @@
     "Returned plain text and raw result plus provenance remain output only; no automatic memory ingestion, model context, URLs/media fetching or captured-text authorization."
   ],
   "hostedCI": {
-    "state": "pending-publication"
+    "state": "passed",
+    "head": "29ee471300102af41ef38172f41e1a4d2ab735c3",
+    "runURL": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020",
+    "jobs": [
+      {
+        "name": "benchmark-harnesses",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020/job/124770209811"
+      },
+      {
+        "name": "native",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41280138020/job/124770209994"
+      }
+    ],
+    "fullTests": {
+      "defined": 1807,
+      "passed": 1725,
+      "skipped": 82,
+      "failures": 0
+    },
+    "ownedNativeVaultTests": {
+      "defined": 37,
+      "passed": 37,
+      "skipped": 0,
+      "failures": 0
+    },
+    "manualClientProcessChecks": 22,
+    "nativeLogSHA256": "c63104d926d16430bc0df6ef952f3412a5eec4010e3aa9ae5f8f9ddc056f8070",
+    "scope": "Hosted macOS CI at the stated head; owned fixtures. Does not establish user-machine native acceptance. Documentation followups can have a later head."
   },
   "remaining": [
     "Native connection/credential setup and per-call preview UI",
