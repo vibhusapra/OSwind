@@ -1,6 +1,8 @@
 # Optional clipboard context
 
-Status: **work in progress; F082 remains TODO until qualification**. Automatic observation, current-policy result import, settings/status UI, quiet restore and pause/quit/library-switch wiring are implemented. The latest focused run passes40 cases:32 new clipboard cases plus eight MCP workspace regressions. Eight off/ready/permission/paused light/dark component renders were inspected. Full/sanitizer/optimized/package/process qualification and a PR are still pending. No personal pasteboard was read and no permission was changed.
+Status: **software/package qualified; native permission/foreground/power acceptance open (F082 partial)**. The [765-input receipt](../benchmarks/clipboard-context-v1.json) binds source `8799e3f` to13 passing stages:1,794 full passes/83 explicit skips; all102 mandatory clipboard/MCP methods under debug, sanitizer and optimization (32 new clipboard cases,70 parent MCP cases), no focused skips or race warnings;22 signed MCP process checks, SDK/API/MCP, actual quiet backup/restore with SIGINT/SIGKILL interruptions, strict signed/extracted34-file equality. Installed15 files and15 prior app trees remain unchanged. Signed modern officialPythonSDK2.3.0 Unicode interoperability also passes. The extra full-suite skip relative to the native parent is the existing visual-wake guard; it is not new clipboard acceptance.
+
+Eight actual off/ready/permission/paused light/dark component renders were inspected. They use an injected reader and constant UI binding in an earlier debug binary with unchanged view source. No general/personal clipboard, actual permission request, foreground AX/native input, cloud inference or device setting change was used. The native UI tool is blocked by the locked Mac; no unlock workaround was attempted.
 
 Collection defaults off. Starting or resuming baselines the current change count and ignores existing contents; only new eligible plain-text changes can be admitted. Quiet restore resets the choice to off. Global pause, sleep/lock, settings changes, erasure and library departure invalidate pending observations. Current-policy admission and active imports join before SQLite closes or the app exits.
 
@@ -16,8 +18,15 @@ The injected controller checks permission/count first, ignores existing contents
 
 Implemented tests cover actual searchable source admission, disable during held import preparation, source deletion during a cancellation-ignoring read, clipboard-only Pause/Resume without starting screen capture, actual plain Quit/session switching, retired/replaced libraries, permission denial/reapproval with no backfill and zero quiet-poll UI invalidations. Quiet polls perform no text/context read, source write or embedding request. These are work-count and software checks, not physical energy measurements.
 
-Remaining work: source review and full/sanitizer/optimized/package/API/MCP/SDK/quiet-restore qualification, authored native/provider/permission and physical power acceptance, final manifests/receipts and a reviewable PR stacked on117. The Mac is currently locked; do not retry or bypass the refused native UI path.
+Remaining work: actual general clipboard and permission/foreground/native input acceptance, valid promised-provider behavior, real scheduler/wake/physical power acceptance, broader user acceptance and hosted PR validation. The software receipt does not establish these gates or full parity. The Mac is currently locked; do not retry or bypass the refused native UI path.
 
 The native adapter tests create and release only names prefixed `org.oswind.owned.clipboard.`; they never select the general pasteboard. Exact Unicode, confidential markers and changed counters pass with `OSWIND_TEST_NATIVE_CLIPBOARD=1`. This is independent owned API evidence, not a native UI/unlock test. The first worker test compile failed because an async helper closure lacked an escaping annotation; its log remains retained. No automatic clipboard capture or F082 parity is claimed.
 
 A retained cold lazy-provider counterexample shows that source mismatch already refused storage but fetched text first. The native reader now accepts the observed bundle and rejects a mismatched/unknown source claim before requesting text; the corrected case records zero lazy text-provider calls. The original red log emits an AppKit warning about synchronous promise fulfillment from a background thread. Valid promised-provider behavior remains native acceptance work; no no-warning or full provider-compatibility claim is made. The current GUI attempt stays blocked by the locked Mac, with no unlock workaround.
+
+
+## Reviewed component samples
+
+![Optional copied-text setup](../assets/clipboard-settings-sample.png)
+
+![Permission-needed state with an injected reader](../assets/clipboard-permission-sample.png)

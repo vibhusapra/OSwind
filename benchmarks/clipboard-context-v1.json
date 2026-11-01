@@ -1,0 +1,591 @@
+{
+  "format": "OSwind.optional-clipboard-context.qualification",
+  "version": 1,
+  "state": "passed-local-functional",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "8799e3f2595ee22a43a03b0bb5f07871f897a492",
+  "branch": "codex/clipboard-context",
+  "parent": "codex/mcp-workspace",
+  "sourceState": "All765 qualified input bytes match source Git blobs and live bytes. Documentation/screenshots/receipt followups have a later head.",
+  "scope": "Optional plain-text clipboard observation with current-policy source admission. Owned named pasteboards and injected context/lifecycle fixtures; no general/personal clipboard, OS permission dialog, real AX/native input or physical power acceptance.",
+  "inputs": {
+    "repository": 765,
+    "manifest": "clipboard-context-inputs-v1.json",
+    "manifestSHA256": "df2f49bfd194c2a82935c76576d985f4f7b4e77cfeffc7095d1d0b4876d68782",
+    "allUnchanged": true
+  },
+  "review": {
+    "state": "passed-local-functional",
+    "source": "8799e3f2595ee22a43a03b0bb5f07871f897a492",
+    "inputs": 765,
+    "all765GitBlobsAndLiveHashesMatch": true,
+    "all13StageHashesMatch": true,
+    "tests": {
+      "full-debug": {
+        "defined": 1877,
+        "passed": 1794,
+        "skipped": 83,
+        "failures": 0,
+        "mandatoryMethods": 102
+      },
+      "thread-sanitizer": {
+        "defined": 102,
+        "passed": 102,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMethods": 102
+      },
+      "optimized": {
+        "defined": 102,
+        "passed": 102,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMethods": 102
+      }
+    },
+    "mandatoryMethodsEachBuild": 102,
+    "raceWarnings": 0,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "protectedAppsUnchanged": 15,
+    "installedFilesUnchanged": 15,
+    "cliSHA256": "2a3a764d01a57cf7bfc63347db0816e515d65ef3cb38d53ea816e365d0626aec",
+    "appSHA256": "8ddd7a98b0386c4bcac7304d0458208239d974021e11e12a62b79dffd8431ffc",
+    "zipSHA256": "fef91d3ec7ad2c3b4cd2ed556cd755ec77a61606ad30633b04319c4c9475fa77",
+    "manualProcessChecks": 22,
+    "skipChangesFromEarlierCheckpoint": {
+      "new": [
+        "OSwindAppTests.WorkspaceWakeLifecycleTests testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup"
+      ],
+      "removed": []
+    },
+    "componentRenderReview": true,
+    "generalOrPersonalClipboardAcceptance": false,
+    "nativePermissionOrAXAcceptance": false,
+    "physicalPowerAcceptance": false,
+    "httpOrOAuthAcceptance": false,
+    "fullParity": false,
+    "reviewedAtUTC": "2026-11-01T08:25:23.997258+00:00"
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "log": "full-debug.log",
+      "startedAtUTC": "2026-11-01T08:11:40.316826+00:00",
+      "returncode": 0,
+      "wallSeconds": 334.60352841601707,
+      "finishedAtUTC": "2026-11-01T08:17:14.923196+00:00",
+      "logSHA256": "d4381262020fb3900483142c94c02f94dcb7cc650e060cdf68f6677285a62434",
+      "tests": {
+        "defined": 1877,
+        "passed": 1794,
+        "skipped": 83,
+        "failures": 0,
+        "mandatoryMethods": 102
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        ".artifacts/clipboard-context-v1/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "MCP(JSON|Client|Connection|ToolsModel|Workspace)Tests|Clipboard(Context|ReadWorker|ContextModel|Workspace)Tests|NativeClipboardReaderTests"
+      ],
+      "log": "thread-sanitizer.log",
+      "startedAtUTC": "2026-11-01T08:17:16.016195+00:00",
+      "returncode": 0,
+      "wallSeconds": 101.80016512516886,
+      "finishedAtUTC": "2026-11-01T08:18:57.817350+00:00",
+      "logSHA256": "57b334e24d03722616df83986557f201c2596928f41fa4fb4a96ff593cbfd572",
+      "tests": {
+        "defined": 102,
+        "passed": 102,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMethods": 102
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "MCP(JSON|Client|Connection|ToolsModel|Workspace)Tests|Clipboard(Context|ReadWorker|ContextModel|Workspace)Tests|NativeClipboardReaderTests"
+      ],
+      "log": "optimized.log",
+      "startedAtUTC": "2026-11-01T08:18:58.739339+00:00",
+      "returncode": 0,
+      "wallSeconds": 210.28140591597185,
+      "finishedAtUTC": "2026-11-01T08:22:29.022704+00:00",
+      "logSHA256": "54de8975cafc9a1bf0c680af6bcd36c72d90bf1e8e71f868d8236053a465ee58",
+      "tests": {
+        "defined": 102,
+        "passed": 102,
+        "skipped": 0,
+        "failures": 0,
+        "mandatoryMethods": 102
+      }
+    },
+    {
+      "name": "sdk",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/test-python-sdk.py"
+      ],
+      "log": "sdk.log",
+      "startedAtUTC": "2026-11-01T08:22:30.101062+00:00",
+      "returncode": 0,
+      "wallSeconds": 5.482356833992526,
+      "finishedAtUTC": "2026-11-01T08:22:35.583696+00:00",
+      "logSHA256": "b314738f4243ffc756aa675b0620b6e3c7f4773127630e71fcae50f8217b3a8d"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ],
+      "log": "package.log",
+      "startedAtUTC": "2026-11-01T08:22:36.490075+00:00",
+      "returncode": 0,
+      "wallSeconds": 118.20057537499815,
+      "finishedAtUTC": "2026-11-01T08:24:34.691811+00:00",
+      "logSHA256": "2e4c3b2c1d96b14a61d14af04a16e84cb5aadafd8a7d98bcdcebf02db968f8cb"
+    },
+    {
+      "name": "manual-client-process",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/mcp-client-smoke.py",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/manual-client-process.json"
+      ],
+      "log": "manual-client-process.log",
+      "startedAtUTC": "2026-11-01T08:24:35.604894+00:00",
+      "returncode": 0,
+      "wallSeconds": 2.4903883340302855,
+      "finishedAtUTC": "2026-11-01T08:24:38.095587+00:00",
+      "logSHA256": "67f10184f752acc6716a8154e68511428ccf049a365515d8426ee675e6b6a44e"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl"
+      ],
+      "log": "api-mcp.log",
+      "startedAtUTC": "2026-11-01T08:24:39.007226+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.4610624578781426,
+      "finishedAtUTC": "2026-11-01T08:24:39.468467+00:00",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ],
+      "log": "indexed-api-mcp.log",
+      "startedAtUTC": "2026-11-01T08:24:40.386337+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.1300917498301715,
+      "finishedAtUTC": "2026-11-01T08:24:41.516614+00:00",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "backup-restore",
+      "state": "passed",
+      "command": [
+        "python3",
+        "<checkout>/.artifacts/clipboard-context-v1/backup-quiet-restore.py",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/backup-restore.json"
+      ],
+      "log": "backup-restore.log",
+      "startedAtUTC": "2026-11-01T08:24:42.433453+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.1705845829565078,
+      "finishedAtUTC": "2026-11-01T08:24:43.604223+00:00",
+      "logSHA256": "d2f49a3bb9183e34d77132c4f193708ac714f4345be1de8c9f865a6dd642343b"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind-macos.zip"
+      ],
+      "log": "archive.log",
+      "startedAtUTC": "2026-11-01T08:24:44.516569+00:00",
+      "returncode": 0,
+      "wallSeconds": 1.2203022080939263,
+      "finishedAtUTC": "2026-11-01T08:24:45.737049+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind-macos.zip",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/extracted"
+      ],
+      "log": "extract.log",
+      "startedAtUTC": "2026-11-01T08:24:46.646093+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.10596349998377264,
+      "finishedAtUTC": "2026-11-01T08:24:46.752229+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/OSwind.app"
+      ],
+      "log": "strict-app.log",
+      "startedAtUTC": "2026-11-01T08:24:47.662152+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.03806412499397993,
+      "finishedAtUTC": "2026-11-01T08:24:47.700379+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/clipboard-context-v1/qualification-v1/extracted/OSwind.app"
+      ],
+      "log": "strict-extracted.log",
+      "startedAtUTC": "2026-11-01T08:24:48.605029+00:00",
+      "returncode": 0,
+      "wallSeconds": 0.038107499945908785,
+      "finishedAtUTC": "2026-11-01T08:24:48.643331+00:00",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "expectedMandatoryMethods": {
+    "OSwindCoreTests.MCPJSONTests": [
+      "testStrictRoundTripPreservesNumbersAndLeadingBOM",
+      "testRejectsDuplicateEscapedAndCanonicallyEquivalentKeys",
+      "testRejectsNonJSONNumbersTrailingBytesAndBrokenUTF8",
+      "testDepthNodeAndByteBounds",
+      "testCommandFileRejectsDuplicateKeysAndUnknownOptions",
+      "testCommandRejectsImplicitShellAndRuntimeEnvironmentOverrides"
+    ],
+    "OSwindCoreTests.ClipboardContextTests": [
+      "testDefaultMissingAndMalformedSettingsStayOff",
+      "testPlainTextDraftLabelsObservedContextWithoutClaimingOrigin",
+      "testProtectedTransientRemoteFileAndImageMarkersRefuse",
+      "testSourceClaimsNeverOverrideForegroundPrivacy",
+      "testMissingBrowserURLExcludedTitleSecureFieldAndSelfRefuse",
+      "testChangedCountIdentityWindowAndTimeoutRefuse",
+      "testTextBoundsMalformedUTF8NULAndWhitespaceRefuse",
+      "testSecretPatternsAlwaysDropWholeClipboardEvenWhenGlobalRedactionOff",
+      "testStableEventIdentityAndSmallDigestDoNotDuplicateOriginals"
+    ],
+    "OSwindCoreTests.ClipboardReadWorkerTests": [
+      "testDeadlineReleasesWaiterButKeepsOnlyOneActualProvider",
+      "testCancellationReturnsWithoutReleasingActualProviderSlot",
+      "testAlreadyCancelledTaskNeverStartsIO",
+      "testProviderFailureAndInvalidDeadlinesLeaveNoReservedSlot"
+    ],
+    "OSwindCoreTests.MCPClientTests": [
+      "testModernDiscoveryAndExplicitCallCarryRequestMetadataAndProvenance",
+      "testLegacyUnknownPreinitializeErrorFallsBackWithoutSpecificCodeAssumption",
+      "testSilentLegacyProbeTimeoutFallsBack",
+      "testLateProbeReplyIsDiscardedWithoutAdmittingWrongResponseID",
+      "testModernUnsupportedVersionNeverFallsBackToInitialize",
+      "testWrongResponseIDAndAmbiguousEnvelopeRefuse",
+      "testDuplicateJSONKeysAndInvalidUTF8Refuse",
+      "testUnexpectedServerRequestCannotAuthorizeSamplingOrRoots",
+      "testFrameAndStderrFloodsAreBounded",
+      "testNotificationFloodIsBounded",
+      "testPaginationAndDuplicateToolNamesRefuseWithoutReturningTruncatedList",
+      "testToolSchemaChangeRequiresNewReviewBeforeAnyCall",
+      "testExecutableChangeRefusesBeforeLaunchingNewBytes",
+      "testUnreviewedToolAndMalformedArgumentsDoNotLaunch",
+      "testMinimalEnvironmentUsesOnlyExplicitFixtureCredentialAndOwnedHome",
+      "testCancelledCallTerminatesAndReapsOwnedChildWithoutReplay",
+      "testInputRequiredAndProtocolErrorsNeverReplayCall",
+      "testFragmentedUTF8FramesRemainExactAndPartialEOFRefuses",
+      "testFinitePaginationReturnsEveryToolWithoutFetchingIcons",
+      "testForgedReviewDisplayMetadataRefusesBeforeLaunching",
+      "testCallTimeoutDoesNotReplayAndReapsOwnedChild",
+      "testArbitraryLegacyErrorCodeFallsBackButModernHeaderErrorDoesNot",
+      "testPublicReviewJSONRoundTripsThroughCLIISOEncoding",
+      "testReviewCatalogIsReadableAndRoundTripsOrRefusesBeforePublication",
+      "testUnsupportedReviewProtocolRefusesBeforeAnyProcessLaunch",
+      "testCancellationSendsMatchingProtocolNotificationBeforeGracefulExit"
+    ],
+    "OSwindCoreTests.MCPConnectionTests": [
+      "testSettingsRoundTripKeepsInertProfilesWithoutCredentials",
+      "testMalformedAndDuplicateSavedProfilesFailClosed",
+      "testProfileBoundsAndReservedCredentialNames",
+      "testAuthorityComparisonIsByteExactDespiteUnicodeCanonicalEquality",
+      "testQuietRestoreClearsAllExternalConnectionChoices",
+      "testResultDraftKeepsTextAndProvenanceButNotArgumentsPathsOrRawContent",
+      "testRepeatedExplicitSaveHasOneStableOriginalSource",
+      "testResultAdmissionUsesPatternRedactionAndApplicationExclusion",
+      "testEmptyNULAndOversizedTextCannotBecomeRecordedSources",
+      "testIncompleteProvenanceIsRejectedBeforeAnyImport",
+      "testAChangedSettingsSnapshotRefusesStaleResultAdmission"
+    ],
+    "OSwindAppTests.ClipboardContextModelTests": [
+      "testBaselineAndUnchangedPollsNeverReadTextOrContext",
+      "testOffLockedAndIdleScopesDoNotProbeOrBackfill",
+      "testProtectedBeforeContextSkipsIOAndChangedAfterContextSkipsSave",
+      "testStopJoinsIgnoringReadAndDiscardsLateData",
+      "testPrivacyChangeRevokesHeldReadAndStartsFreshBaseline",
+      "testQuietPollsDoNotInvalidateVisibleUI",
+      "testPermissionRequestsRequireExplicitActionAndNeverSaveCurrentText",
+      "testDeniedAndAskPermissionsNeverReadOrRequestAndReapprovalDoesNotBackfill",
+      "testReplacedLibraryRefusesBeforeTextOrWindowRead"
+    ],
+    "OSwindAppTests.MCPWorkspaceTests": [
+      "testSavingVisibleTextUsesActualPrivacyAdmissionAndBecomesSearchable",
+      "testPrivacyChangeDuringPreparationCancelsBeforeSourcePublication",
+      "testGlobalPauseStopsToolOnlyWorkWithoutStartingScreenCapture",
+      "testLibraryDepartureJoinsToolWorkerBeforeReturning",
+      "testOnboardingAndRetiredLibraryCannotLaunchOrSaveTools",
+      "testToolsWorkspaceRefreshDoesNotRunUnrelatedMemorySearch",
+      "testActualAppSessionSwitchWaitsForToolDrainBeforeClosingStore",
+      "testPlainQuitDelegateWaitsForCancellationIgnoringToolBeforeFinishing"
+    ],
+    "OSwindAppTests.NativeClipboardReaderTests": [
+      "testActualNamedBoardReturnsExactUTF8WithoutOpeningGeneralClipboard",
+      "testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse",
+      "testMismatchedSourceIsRefusedBeforeLazyTextProviderRuns"
+    ],
+    "OSwindAppTests.MCPToolsModelTests": [
+      "testLoadingAndReviewingNeverLaunchesOrReadsCredentials",
+      "testOnlyExplicitCurrentReviewLaunches",
+      "testCallUsesOnlyReviewedArgumentsAndDoesNotAutomaticallySave",
+      "testMalformedArgumentsRefuseBeforeRunnerOrCredentialRead",
+      "testEditingArgumentsInvalidatesCallConsent",
+      "testCanonicalEquivalentCommandEditInvalidatesReview",
+      "testUnavailableAndLockedScopesNeverReadCredentials",
+      "testCredentialsResolveOnlyThisProfileNamespaceAfterConfirmation",
+      "testSavingCredentialRevokesReviewAndClearsDraft",
+      "testSuspensionClearsPrivateStateWithoutRestart",
+      "testCancelledIgnoringDiscoveryMustDrainBeforeNewWork",
+      "testPrivacyChangeDropsLateCallResult",
+      "testCancelAndWaitJoinsActualOutstandingWork",
+      "testExplicitSaveUsesStableSourceAndCannotDoubleSubmit",
+      "testConfigurationAndRemovalNeverLaunchAndTouchOnlyOwnCredentialEntries",
+      "testUnknownCredentialNameCannotAccessAnotherAccount",
+      "testRootReplacementRefusesBeforeCredentialsOrProcess",
+      "testKeychainDeletionChecksStatusAndRefusesOtherCredentialNamespaces",
+      "testFailedCredentialRemovalKeepsConnectionForRetry"
+    ],
+    "OSwindAppTests.ClipboardWorkspaceTests": [
+      "testActualAdmissionSavesSearchableTextWithoutMedia",
+      "testDisableDuringActualPreparationRefusesSourcePublication",
+      "testClipboardOnlyGlobalPauseResumeDoesNotStartScreenCaptureOrBackfill",
+      "testPlainQuitWaitsForActualClipboardPreparation",
+      "testActualSessionSwitchJoinsIgnoringReaderBeforeClose",
+      "testRetiredLibraryCannotEnableOrResumeClipboard",
+      "testSourceDeletionRevokesHeldCopyAndDoesNotReappearFromCurrentClipboard"
+    ]
+  },
+  "newClipboardMethods": 32,
+  "parentMCPMethods": 70,
+  "totalMandatoryMethods": 102,
+  "signedOfficialSDKInterop": {
+    "state": "passed-signed-release-modern-official-sdk-interop",
+    "sdkVersion": "2.3.0",
+    "license": "MIT",
+    "protocol": "2026-07-28",
+    "transport": "stdio",
+    "cliSHA256": "2a3a764d01a57cf7bfc63347db0816e515d65ef3cb38d53ea816e365d0626aec",
+    "all127PinnedSDKFilesUnchangedBeforeAndAfter": true,
+    "artifacts": {
+      "arguments.json": "c94f765f65583b7378a02b9f63c9cc676042fd1d8d7d176fe0d00cecc12a43e4",
+      "server.py": "d0c49f728095617dbbff37ac257f9aac486405600fcec99ff3b1cea0a66e4195",
+      "config.json": "4147fea3029e32e4423e525249fc477fc07a954c1a576f6dd86d680b883437d3",
+      "output.json": "8a310c81cae807b02e2b1be32b703ee4edd5760a483ae9869096090b437a15db",
+      "discovery.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "review.json": "2e93c043e9f025f531d8a0a6b5f0fd3e70e759b81a34f203e698b38de4ffb5b6",
+      "call.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scope": "Authored Unicode echo only; isolated test dependency, no real account/credential, HTTP/auth/model-loop or arbitrary-server acceptance.",
+    "recordedAtUTC": "2026-11-01T08:25:01.672428+00:00"
+  },
+  "manualMCPProcess": {
+    "format": "OSwind MCP manual client process check",
+    "state": "passed",
+    "checks": [
+      "exit 0: mcp-client; OSwind: Review the configured executable/arguments, then use --allow-server-process; it runs local code with your account authority\n",
+      "discovery requires explicit local-code authorization",
+      "exit 2: --data; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "exit 3: --vault; OSwind: MCP client does not open a library; omit --data and --vault\n",
+      "client refuses data/vault before library access",
+      "exit 5: mcp-client; ",
+      "legacy negotiation with existing server",
+      "all seven independently implemented server tools discovered",
+      "review definitions are literal readable JSON tied to each tool",
+      "exit 9: mcp-client; OSwind: Review exact tool/arguments and use --confirm-call for a call; list takes only --config and --allow-server-process\n",
+      "exit 10: mcp-client; ",
+      "reviewed tool call reads actual authored empty library",
+      "result carries command/tool provenance",
+      "complete original tool text preserved",
+      "exit 14: mcp-client; OSwind: MCP JSON is malformed, ambiguous or exceeds its complexity limit\n",
+      "exit 15: mcp-client; OSwind: MCP review metadata does not match its definition\n",
+      "manual list/call never open ambient/default client history",
+      "unrelated parent secret absent from returned tool context",
+      "exit 18: mcp-client; ",
+      "interrupt fixture reached actual tool call",
+      "CLI Ctrl-C joins cancellation without a false result",
+      "CLI cancellation reaped only its owned server"
+    ],
+    "binarySHA256": "2a3a764d01a57cf7bfc63347db0816e515d65ef3cb38d53ea816e365d0626aec",
+    "scope": "Owned local existing-server interoperability and manual review gates. No HTTP, third-party server, model loop, automatic ingestion or native UI acceptance."
+  },
+  "signedBackupRestore": {
+    "fixture": "synthetic note, 1px PNG, silent PCM WAV, saved evidence chat",
+    "checks": [
+      "actual signed CLI backup/restore disables clipboard and clears MCP choices; original enabled clipboard/settings remain intact; no clipboard, executable or credential used",
+      "media/chat/metadata round trip, fingerprint, private permissions, quiet settings, isolated routing and reusable library",
+      "existing destinations, fingerprint mismatch and corrupted media refused without target publication",
+      {
+        "interrupt": "SIGINT",
+        "elapsed_s": 0.09649804211221635,
+        "destination_jobs_removed": 0,
+        "scratch_jobs_removed": 0
+      },
+      {
+        "interrupt": "SIGKILL",
+        "elapsed_s": 0.09657820803113282,
+        "destination_jobs_removed": 1,
+        "scratch_jobs_removed": 1
+      }
+    ],
+    "passed": true,
+    "interruptions": true
+  },
+  "componentVisualReview": {
+    "state": "reviewed-component-layout",
+    "reviewedAtUTC": "2026-11-01T07:58:47.017381+00:00",
+    "files": {
+      "ClipboardOff-light.png": "bdff4876d153f915565b5926be0175c65d5d9e17e4b504282e31ab316b9da112",
+      "ClipboardOff-dark.png": "b11a016eefd92a504f322c3f2953bf326464bef798a99b0363322f2120b8d211",
+      "ClipboardReady-light.png": "4113785bcdfda0a1a934b6a290b17eb8928e05cb51ac39475508004a17be41bf",
+      "ClipboardReady-dark.png": "1ab89f6812a7d89382c62f7ae04994c32c80b1281ea03d4dc41364fc1be23f8f",
+      "ClipboardPermission-light.png": "3a7c6351938aabf0a6a2b0090c4d29d53b41090fa15821e8e0a7eed2434f6755",
+      "ClipboardPermission-dark.png": "effb9ea67b823d8ca9c254fd39d5adc06aa80564e94d425d9135b36be9d40c52",
+      "ClipboardPaused-light.png": "54cb56b2bd8560258798c57966d3b4e0b07316f3c539a2b7d5b79abfed9a6957",
+      "ClipboardPaused-dark.png": "be549ca2315c42bf76651633d179150f8f9a78da87a6a540e9d3a0f01612141c"
+    },
+    "findings": [
+      "All8 actual off/ready/permission/paused light/dark component PNGs inspected. Text and controls fit without overlap or clipping at940x660points.",
+      "Inactive component exporter renders buttons/toggles gray; positions distinguish on/off. No active tint/native input acceptance claimed.",
+      "Injected reader and constant enabled binding; no general or personal pasteboard or OS permission request."
+    ],
+    "limits": [
+      "This is an offscreen component renderer, not a workaround for the locked native UI tool.",
+      "No real pasteboard permission dialog, AX/native input, sleep/power or personal clipboard acceptance."
+    ]
+  },
+  "visualDebugBinarySHA256": "b7c08a0d972795b828b1a7f0b9a061f4a318594db270af0fa4767185716e03bb",
+  "development": [
+    "The first async worker test helper lacked an escaping annotation; compile failure retained. Corrected13-case run passes. Deadline-race fixture then uses an explicit injected deadline rather than a tight scheduling assertion.",
+    "The initial32-clipboard/eight-parent-workspace focused run passes40 tests. The final full/sanitizer/optimized runs cover all102 mandatory clipboard+MCP methods, including all32 new clipboard cases.",
+    "Cold actual named-pasteboard lazy-provider counterexample: storage already refuses a mismatched source, but the provider runs once before that refusal. The native reader now accepts the observed bundle and rejects the mismatched/unknown source before retrieving text. Corrected native test recordszero lazy-provider calls.",
+    "The red lazy-provider log also emits an AppKit warning about synchronous promise fulfillment from a background thread. General/valid promised-provider behavior remains a native acceptance gap; the correction is not a full provider-compatibility or no-warning claim."
+  ],
+  "sourceReadCounterexample": {
+    "redLogSHA256": "07df7b36f23d7d511b37ee35e5c6202b4590e3c56dc9965d8d8eeb97bcac5b5b",
+    "correctedFocusedLogSHA256": "70719433916e33f3c1ee962d389de1be2bb7ab0e4f1aee091f0f6f894aa2cb09",
+    "before": "Core source mismatch already prevented saving, but actual cold lazy provider ran once",
+    "after": "Native pre-text source check refuses; zero lazy-provider calls"
+  },
+  "ownedNativePasteboards": {
+    "methods": 3,
+    "namespace": "org.oswind.owned.clipboard.<random UUID>",
+    "coverage": [
+      "Exact Unicode bytes using actual AppKit named board",
+      "Confidential-marker and changed-counter refusal",
+      "Cold lazy-provider mismatch refusal before text retrieval"
+    ],
+    "generalOrPersonalClipboard": false,
+    "permissionGranted": false,
+    "scope": "Named-board API fixtures only; no foreground/native input or system permission acceptance"
+  },
+  "quietWorkCountFixture": {
+    "unchangedPolls": 20,
+    "textReads": 0,
+    "contextReads": 0,
+    "sourceWrites": 0,
+    "embeddingRequests": 0,
+    "visibleUIInvalidations": 0,
+    "scope": "Injected controller counts, not real cadence, native IPC timing, battery or CPU measurement"
+  },
+  "boundaries": [
+    "Opt-in starts with a baseline and ignores existing content. Off/locked/idle/ineligible scopes do not request text. Reapproval and resume establish a new baseline; missed copies are not backfilled.",
+    "Native adapter respects macOS15.4+ accessBehavior; background polling never requests permission. A separate explicit UI action may read and discard current text once to request OS approval; that action was never invoked on the general clipboard during qualification.",
+    "At most one actual native provider call per process. Deadline/cancellation releases the waiter but retains the worker slot until the provider returns. Native IO captures no library/admission lease/model callback. AppKit may allocate provider data before oversized data is rejected; this is not a provider-allocation or RSS bound.",
+    "One <=64KiB UTF-8 plain-text item, bounded/unique/control-free types, secret-pattern drop regardless of ordinary-import redaction setting, confidential/transient/generated/restored/Handoff/file/image/PDF refusals. Markers and patterns are incomplete protection.",
+    "Fresh matching observed foreground contexts must pass app/title/domain/secure-field checks. Unknown/mismatched declared source refuses before text retrieval; a matching marker is informational only and cannot authenticate origin. Unmarked background writes may come from another app. Saved app/window labels are explicitly observed, not verified origin.",
+    "Only collector-admitted text/provenance enters note/search/Ask storage using current settings snapshot, media admission and optional local learned PII handling. Raw images/audio/files are not copied. Captured text never authorizes an external action.",
+    "Quiet restore disables clipboard and clears MCP choices, leaving source choices intact. Pause/source erasure/library retirement revoke work; actual import/reader workers drain before library close or plain Quit. Clipboard-only Resume does not start screen capture.",
+    "Metadata-first quiet polls do not retrieve text/context, write sources, embed text or invalidate visible UI. Configured one/five-second cadence is not a measured energy result. Rapid intermediate copies, ineligible transitions and unavailable contexts can be missed."
+  ],
+  "hostedCI": {
+    "state": "pending-publication"
+  },
+  "remaining": [
+    "General clipboard permission dialog and actual foreground/AX/native input acceptance",
+    "Valid promised-provider behavior and long-run/native availability under real app changes",
+    "Physical battery/CPU budget, scheduler cadence and sustained power/wake acceptance",
+    "Complete sync, notarized distribution, SOP video export, voice typing and matched whole-product ranking"
+  ],
+  "recordedAtUTC": "2026-11-01T08:26:08.587762+00:00",
+  "reviewBaselineCorrection": {
+    "initialComparison": "manual-client qualification-v2 with83skips",
+    "correctedComparison": "native-MCP-workspace qualification-v3 with82skips",
+    "retainedInitialReview": true,
+    "result": "All source/test/stage/package checks remain passed; corrected comparison identifies the existing visual-wake skip explicitly."
+  }
+}

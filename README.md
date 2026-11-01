@@ -1,5 +1,7 @@
 # OSwind
 
+[Optional clipboard context](docs/CLIPBOARD-CONTEXT.md) adds default-off copied-text capture, privacy/context/secret checks, current-policy source admission, quiet restore and pause/quit/library-switch drainage. The765-input [receipt](benchmarks/clipboard-context-v1.json) passes13 software/package stages and all102 mandatory clipboard/MCP cases, including32 new cases. General clipboard permission/foreground/native input, valid promised providers and physical power remain open.
+
 [Native external tools](docs/MCP-WORKSPACE.md) adds local stdio MCP connections, per-operation command/tool/argument review, a scoped Keychain adapter and explicit privacy-checked result-text saving to searchable memory. All70 MCP cases and13 package/process stages pass over752 pinned inputs. [Receipt and limits](benchmarks/mcp-workspace-v1.json). Native input/real Keychain acceptance, HTTP/auth and model-driven tool workflows remain open. The [manual CLI client](docs/MCP-CLIENT.md) remains available.
 
 [Calendar-linked meeting context](docs/MEETINGS.md) adds opt-in calendar selection, upcoming meetings, source-linked briefs using the selected local/BYOK engine, reviewed join links and generic reminder attempts. Software and package checks pass; real Calendar/notification acceptance remains open. [737-input qualification and retained native failures](benchmarks/calendar-context-v1.json).

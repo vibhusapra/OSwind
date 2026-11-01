@@ -651,8 +651,8 @@
     "id": "F082",
     "axis": "Capture",
     "feature": "Optional automatic clipboard context",
-    "status": "todo",
-    "evidence": "New October31 parity requirement. Explicit text collectors and imported terminal text do not prove automatic clipboard capture. Needs visible opt-in, event/text scope and size/type bounds, fresh originating app/window privacy checks, secret handling, deduplication, pause/lock/library-close/erasure ordering and authored native tests. No personal clipboard is read for this research.",
+    "status": "partial",
+    "evidence": "Optional clipboard text now has default-off setup, permission-aware native IO, baseline/no-backfill/dedup, fresh observed-context privacy checks, known-secret/marker refusals, current-policy local PII/source admission and searchable memory. Source erasure, pause, ordinary Quit and actual library switching revoke/drain work; quiet restore disables it. The765-input/Git-bound13-stage receipt passes all102 mandatory MCP/clipboard methods, including32 new cases, plus signedprocess/SDK/API/MCP/backup/signature/archive gates. Three actual named-board cases verify Unicode/markers/counters and a retained cold lazy-provider source-mismatch red/green; eight component layouts are reviewed. Quiet20-poll authored counts havezero text/context/source/embedding/UI work. General clipboard/permission/AX/native input, valid promised providers, physical power and real cadence remain open. Origin is observed, not authenticated; rapid copies can be missed. See CLIPBOARD-CONTEXT.md and benchmarks/clipboard-context-v1.json.",
     "references": "Screenpipe architecture and clipboard changelog"
   },
   {
