@@ -72,7 +72,7 @@ struct SyncTurnPublication:Codable,Equatable,Sendable {
 /// service must durably schedule explicit withheld outcomes for later retry;
 /// this component does not claim to supply that scheduler or a complete service.
 enum SyncPublicationWithheld:String,Equatable {
-    case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,unlistedCitation,missingOwner,replacementRequiresReview
+    case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,unlistedCitation,missingOwner,replacementRequiresReview,missingOwnerContent,policyDenied,storagePressure
 }
 enum SyncPublicationOutcome:Equatable {
     case projected(String)
