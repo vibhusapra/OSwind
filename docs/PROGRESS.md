@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Calendar-linked meeting context — software-tested, native acceptance open
+
+[F079](MEETINGS.md) moves from TODO to **partial**: explicit calendar selection, a distinct Meetings workspace, freshly verified brief/join actions, privacy-filtered literal calendar metadata in source-linked Ask, generic reminders and durable library-bound deduplication are implemented. All **57 mandatory new cases** pass in debug, TSan and optimized builds, including actual SQLite competition, pre/postcommit process death, request interception and a real 30-second timer refresh. [737-input evidence](../benchmarks/calendar-context-v1.json): **1,692 full passes / 83 skips**, **247 sanitizer and 247 optimized passes / three skips each**; twelve additional SDK/package/process/archive checks and eight component renders pass. Installed and prior app bytes are preserved.
+
+The original native vault group passes35/37, with two system-operation timeouts under repeated recorded sleep/wake activity. One unchanged-build targeted comparison passes both failed cases, while still recording maintenance sleep. Original failures and the unresolved cause remain explicit. No real Calendar/account read, native notification/Focus delivery, interactive main-window/manual-join or physical-power acceptance is claimed. Ledger:4 live verified /41 partial /6 implemented /23 tested /7 TODO /2 outside current desktop scope,83 total. Complete parity and top-three ranking remain unfinished.
+
+Hosted CI run [41271095273](https://github.com/vibhusapra/OSwind/actions/runs/41271095273) passes both jobs at `70a03fc`: **1,693 debug passes / 82 skips** and a separate **37/37 native-vault pass**. This hosted result does not erase the original local timeouts or establish native Calendar/notification acceptance.
+
 ## Late-writer positive-path measurement — all original pairs reviewed
 
 [The complete paired receipt](../benchmarks/sync-late-dependency-performance-v1.json) passes all twelve original AB/BA/AB slots, independent content checks, 60 closed-database storage checks and eleven real copied-data corruption controls. All1,450 compiled input pins and copied payloads match. Warm10k incoming median183.884→182.226s; complete projection365.624→364.284s; complete deletion184.897→183.244s. Small differences over three pairs do not establish a speedup. Setup, each raw pair, page/index costs, source-only separate calendar editing and uncontrolled caches/background remain explicit. Late-only scale, full sync, power and ranking stay open; all83 feature statuses are unchanged.

@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+[Calendar-linked meeting context](calendar-context-v1.json): 737 pinned inputs; 1,692 debug passes/83 skips; 247 selected sanitizer and optimized passes/three skips each; all57 mandatory meeting methods; twelve package/process checks; eight reviewed component renders. Original native vault35/37 failures retained; both failed cases pass one unchanged-build targeted comparison. Real Calendar/notification and physical-power acceptance remain open. [Details](../docs/MEETINGS.md).
+
 ## Late-dependency writer positive-path pairs
 
 [`sync-late-dependency-performance-v1.json`](sync-late-dependency-performance-v1.json) retains all12 original AB/BA/AB workloads, 24 size/workload samples, all setup/wall costs, 60 closed SQLite storage checks and11 copied-data corruption refusals. Whole-workload median changes are under1%; the three warm metadata pairs do not establish statistical significance, physical power or competitor rank. The sole compiled difference is the incoming writer; the baseline includes the same unused new helper and identical tests. [Scope and medians](../docs/SYNC-LATE-DEPENDENCIES.md#positive-path-paired-observations--october-31-2026).

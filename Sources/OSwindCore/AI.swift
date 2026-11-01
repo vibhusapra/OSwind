@@ -62,7 +62,8 @@ public struct Answer: Codable, Sendable {
 public final class AnswerEngine {
     private let store: MemoryStore
     private let embedder: LocalEmbedder
-    public init(store: MemoryStore, embedder: LocalEmbedder) { self.store = store; self.embedder = embedder }
+    private let session:URLSession?
+    public init(store: MemoryStore, embedder: LocalEmbedder,session:URLSession?=nil) { self.store = store; self.embedder = embedder;self.session=session }
     public static func visibleAnswer(_ text: String) -> String {
         var result = text
         if let close = result.range(of:"</think>", options:.backwards) { result = String(result[close.upperBound...]) }
@@ -100,7 +101,7 @@ public final class AnswerEngine {
         }
         if ["length","max_tokens","model_length"].contains(reason ?? "") { throw OSwindError.network("The model reached its output limit before finishing. No completed answer was saved. Narrow the question or choose Evidence only.") }
     }
-    public func answer(_ question: String, configuration: AIConfiguration, filter: SearchFilter = SearchFilter(), summarize: Bool = false, key: String? = nil, searchConfiguration: SearchConfiguration = SearchConfiguration(), previousQuestions: [String] = [], interpretQuery: Bool = true, now: Date = Date(), timeZone: TimeZone = .current) async throws -> Answer {
+    public func answer(_ question: String, configuration: AIConfiguration, filter: SearchFilter = SearchFilter(), summarize: Bool = false, key: String? = nil, searchConfiguration: SearchConfiguration = SearchConfiguration(), previousQuestions: [String] = [], interpretQuery: Bool = true, now: Date = Date(), timeZone: TimeZone = .current, evidencePolicy:PrivacyPolicy?=nil) async throws -> Answer {
         try Task.checkCancellation()
         let start = Date(); var current = filter; current.query = question
         let resolution = try store.resolveQueryScope(current,interpret:interpretQuery,now:now,timeZone:timeZone)
@@ -113,16 +114,28 @@ public final class AnswerEngine {
         var retrievalWarnings = [String]()
         if summarize { candidates = try store.timelineSample(f, limit: configuration.provider == .apple ? 12 : 24,detail:.preview).map { SearchHit(memory:$0, score:0, match:"timeline sample") } }
         else { let result = try await RetrievalEngine(store:store,apple:embedder).search(f,configuration:searchConfiguration,interpretQuery:false,now:now,timeZone:timeZone,detail:.preview,expressionPlan:contentPlan); candidates = result.hits; retrievalWarnings = result.warnings }
+        // Explicit meeting briefs apply current rules before context leaves
+        // this process. Derived summaries are conservatively omitted because
+        // their transitive evidence needs separate policy admission.
+        let permitted=candidates.filter {hit in
+            guard let policy=evidencePolicy else {return true}
+            return hit.memory.kind != .summary && hit.memory.recap==nil && policy.exclusion(app:hit.memory.bundleID,title:hit.memory.title,url:hit.memory.url)==nil
+        }
+        if evidencePolicy != nil && permitted.count != candidates.count {retrievalWarnings.append("Meeting context omits excluded sources and saved summaries; briefs use original recorded evidence.")}
         var fingerprints = Set<String>()
-        let selected = Array(candidates.filter { fingerprints.insert($0.memory.kind == .audio || $0.memory.textObservation != nil ? ($0.memory.searchPreview?.sourceRevision ?? $0.memory.evidenceHash):$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
-        let hits=try store.hydrate(selected,pinTextObservations:true)
+        let selected = Array(permitted.filter { fingerprints.insert($0.memory.kind == .audio || $0.memory.textObservation != nil ? ($0.memory.searchPreview?.sourceRevision ?? $0.memory.evidenceHash):$0.memory.contentHash).inserted }.prefix(summarize ? 24 : 12))
+        let hits=try store.hydrate(selected,pinTextObservations:true).filter {hit in
+            guard let policy=evidencePolicy else {return true}
+            return hit.memory.kind != .summary && hit.memory.recap==nil && policy.exclusion(app:hit.memory.bundleID,title:hit.memory.title,url:hit.memory.url)==nil
+        }
         guard !hits.isEmpty else { return Answer(text: "I couldn’t find recorded evidence for that question. Try a different phrase or date range.", sources: [], provider: "evidence", duration: Date().timeIntervalSince(start),warnings:retrievalWarnings,resolution:resolution) }
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800
         let passages = hits.map { hit in
             let origin=hit.memory.recap==nil ? "":"AI-generated saved recap. This timestamp is save time, not the date of the original evidence. Verify facts and dates against its linked originals.\n"
             let observation=hit.memory.textObservation.map {$0.evidenceDescription(for:hit.memory)+"\n"} ?? ""
-            return "\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + origin + observation + hit.answerEvidence(query:excerptQuery,budget:excerptBudget,summary:summarize,speaker:resolution.filter.speaker)
+            let passage="\(hit.memory.timestamp.formatted(date:.abbreviated,time:.shortened)) · \(hit.memory.kind.rawValue) · \(hit.memory.app) · \(hit.memory.title)\n" + origin + observation + hit.answerEvidence(query:excerptQuery,budget:excerptBudget,summary:summarize,speaker:resolution.filter.speaker)
+            return evidencePolicy?.sanitize(passage).text ?? passage
         }
         if hits.contains(where:{$0.memory.recap != nil}) {retrievalWarnings.append("Saved recaps are AI-generated copies. Their timestamps show when saved; open linked originals to verify facts and dates.")}
         if hits.contains(where:{$0.memory.textObservation != nil}) {retrievalWarnings.append("Text spans contain sampled first/last observations with unobserved gaps; they do not establish continuous activity or attention.")}
@@ -168,7 +181,7 @@ public final class AnswerEngine {
             else { if let credential, !credential.isEmpty { request.setValue("Bearer " + credential, forHTTPHeaderField: "Authorization") }; body["max_completion_tokens"] = 1200; body["store"] = false }
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
             let config = URLSessionConfiguration.ephemeral; config.timeoutIntervalForResource = 150
-            let session = URLSession(configuration: config, delegate: NoRedirect(), delegateQueue: nil); defer { session.invalidateAndCancel() }
+            let session = self.session ?? URLSession(configuration: config, delegate: NoRedirect(), delegateQueue: nil); defer {if self.session==nil {session.invalidateAndCancel()}}
             let (data,response) = try await session.data(for: request)
             guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else { throw OSwindError.network("Model server returned HTTP \((response as? HTTPURLResponse)?.statusCode ?? 0). Check endpoint, model and API key.") }
             guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw OSwindError.network("Invalid model response") }

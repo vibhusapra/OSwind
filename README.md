@@ -1,5 +1,7 @@
 # OSwind
 
+[Calendar-linked meeting context](docs/MEETINGS.md) adds opt-in calendar selection, upcoming meetings, source-linked briefs using the selected local/BYOK engine, reviewed join links and generic reminder attempts. Software and package checks pass; real Calendar/notification acceptance remains open. [737-input qualification and retained native failures](benchmarks/calendar-context-v1.json).
+
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.
 
 **v0 is in active development.** The [feature ledger](docs/features.json) tracks 83 requirements across [20 researched offerings](docs/landscape.html). Broad parity and a top-three ranking remain goals. Sustained desktop power, complete migrations/sync, notarized distribution and matched whole-product competitor measurements are still open.

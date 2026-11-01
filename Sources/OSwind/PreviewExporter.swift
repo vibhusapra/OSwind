@@ -30,6 +30,17 @@ import OSwindCore
             while (model.activity.busy || model.activity.snapshot?.selectedDay != "2024-11-03"),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
             guard let snapshot=model.activity.snapshot,!model.activity.busy,snapshot.totalSources>0,snapshot.hours.count==25 else {throw OSwindError.unavailable("Calendar sample did not finish with complete counts")}
             content=AnyView(WorkspaceView().environmentObject(model))
+        } else if ["MeetingsUpcoming","MeetingsCompact","MeetingsQuiet","MeetingsSetup"].contains(model.section) {
+            let requested=model.section,date=Date()
+            let calendar=try MeetingCalendar(id:"owned-meeting-preview",title:"Work · sample",account:"Authored local calendar")
+            let events=[try MeetingOccurrence(calendarID:calendar.id,seriesID:"owned-review",start:date.addingTimeInterval(180),end:date.addingTimeInterval(1980),title:"Orion release review · sample",participants:["Mira Chen","Alex Rivera"],joinURL:URL(string:"https://meet.example/owned-sample"),timeZone:"America/Los_Angeles"),try MeetingOccurrence(calendarID:calendar.id,seriesID:"owned-research",start:date.addingTimeInterval(7200),end:date.addingTimeInterval(10800),title:"Retrieval benchmark working session · sample",timeZone:"Europe/London")]
+            var settings=AppSettings();settings.meetings.enabled=true;settings.meetings.calendarIDs=[calendar.id];settings.meetings.boundLibrary=try model.store.authorizeMeetingLibrary();settings.meetings.reminders=true;settings.meetings.includeParticipants=true
+            let provider=MeetingCalendarProvider(access:{.full},request:{.full},calendars:{[calendar]},events:{_,_,_,_ in .init(events:events,revision:0)},revision:{0})
+            let delivery=MeetingNotificationDelivery(allowed:{false},request:{false},post:{_ in throw OSwindError.invalid("Preview cannot post notifications")},remove:{_ in},clear:{_ in})
+            let meetings=MeetingsModel(store:model.store,settings:requested=="MeetingsQuiet" ? AppSettings():settings,provider:provider,delivery:delivery,now:{date},locked:{false},automaticPolling:false)
+            if requested != "MeetingsQuiet" {meetings.start();let deadline=ContinuousClock.now.advanced(by:.seconds(10));while meetings.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))};guard meetings.events.count==2 else {throw OSwindError.unavailable("Authored meeting preview did not load")}}
+            if requested=="MeetingsSetup" {meetings.connect();let deadline=ContinuousClock.now.advanced(by:.seconds(10));while meetings.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(10))};size=NSSize(width:820,height:900);content=AnyView(Form {MeetingSettingsSections(model:meetings)}.formStyle(.grouped).padding())}
+            else {size=requested=="MeetingsCompact" ? NSSize(width:770,height:570):NSSize(width:1100,height:780);content=AnyView(MeetingsView(model:meetings).environmentObject(model))}
         } else if model.section == "VisualSearch" {
             model.section="Memories";model.mode = .visual;model.refresh()
             let deadline=ContinuousClock.now.advanced(by:.seconds(30))

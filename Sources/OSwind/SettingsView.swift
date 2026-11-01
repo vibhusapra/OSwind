@@ -225,6 +225,7 @@ struct SettingsView: View {
     }
     private var connect: some View {
         Group {
+            MeetingSettingsSections(model:m.meetings)
             Section("Local API") {
                 Toggle("Enable authenticated loopback API",isOn:Binding(get:{m.settings.apiEnabled},set:{if $0 { m.startAPI() } else { m.stopAPI() }}))
                 Text(m.apiStatus).font(.caption)
@@ -233,7 +234,7 @@ struct SettingsView: View {
                 Button("Reveal token file") { NSWorkspace.shared.activateFileViewerSelecting([m.store.root.appendingPathComponent("api-token")]) }
             }
             Section("MCP for Claude, Cursor, Codex and other clients") {
-                Text("Use oswindctl mcp for six read-only tools: source search and reads, stats, activity, entities and entity sources. The client runs locally with access to this user's OSwind store; configure only clients you trust.").font(.caption)
+                Text("Use oswindctl mcp for read-only source search and reads, stats, activity, entities, entity sources and recorded privacy-check status. The client runs locally with access to this user's OSwind store; configure only clients you trust.").font(.caption)
                 Text(mcpConfiguration).font(.system(size:11,design:.monospaced)).textSelection(.enabled)
             }
         }
