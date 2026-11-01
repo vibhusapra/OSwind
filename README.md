@@ -1,5 +1,7 @@
 # OSwind
 
+[External MCP client](docs/MCP-CLIENT.md) supports explicitly reviewed manual calls to local stdio servers using modern or legacy protocols. The signed CLI and32 focused cases pass qualification; native setup, HTTP/auth, model loops and result-to-memory workflows remain open. [744-input receipt](benchmarks/mcp-client-v1.json).
+
 [Calendar-linked meeting context](docs/MEETINGS.md) adds opt-in calendar selection, upcoming meetings, source-linked briefs using the selected local/BYOK engine, reviewed join links and generic reminder attempts. Software and package checks pass; real Calendar/notification acceptance remains open. [737-input qualification and retained native failures](benchmarks/calendar-context-v1.json).
 
 A native, local-first memory for your Mac. Capture the windows you choose, search what you saw and heard, and ask questions with the original evidence alongside the answer.

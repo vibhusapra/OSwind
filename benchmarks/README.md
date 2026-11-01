@@ -1,5 +1,7 @@
 # Benchmark protocol and results
 
+[Manual MCP client](mcp-client-v1.json):744 pinned/Git-matched inputs,1,724 debug passes/83 skips,32 TSan and32 optimized passes/no skips; all12 stages,22 signed CLI process checks, officialPythonSDK2.3.0 interoperability and corrected oversized-catalog refusal. Installed and nine prior app trees stay unchanged. Native UI, HTTP/auth, model loops and result ingestion remain open. [Scope](../docs/MCP-CLIENT.md).
+
 [Calendar-linked meeting context](calendar-context-v1.json): 737 pinned inputs; 1,692 debug passes/83 skips; 247 selected sanitizer and optimized passes/three skips each; all57 mandatory meeting methods; twelve package/process checks; eight reviewed component renders. Original native vault35/37 failures retained; both failed cases pass one unchanged-build targeted comparison. Real Calendar/notification and physical-power acceptance remain open. [Details](../docs/MEETINGS.md).
 
 ## Late-dependency writer positive-path pairs
