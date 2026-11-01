@@ -1,0 +1,154 @@
+{
+  "format": "OSwind media cleanup generated scaling observations",
+  "version": 1,
+  "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+  "state": "passed",
+  "platformAndScope": {
+    "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+    "CLI_SHA256": "c2b0e95f3972a6a12d15587b498c5f3b6e89497e75836d993802f7acac3ecf83",
+    "harnessSHA256": "2cec931593e32311633eb850dbc51d0fd25ed9677ebac2ded3ff8d925680e256",
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "scope": "One generated warm observation per scenario; own test/build stages terminal before launch; uncontrolled background/cache/thermal state; no baseline, speedup, energy or competitor result",
+    "atUTC": "2026-11-01T20:39:27.776233+00:00"
+  },
+  "observations": {
+    "selective": {
+      "format": "OSwind generated erasure scaling v1",
+      "records": 20000,
+      "media_files": 10000,
+      "binary_sha256": "c2b0e95f3972a6a12d15587b498c5f3b6e89497e75836d993802f7acac3ecf83",
+      "measurements": {
+        "shared_preview": {
+          "wall_seconds": 0.10005645803175867,
+          "peak_rss_bytes": 28475392,
+          "sources": 10000
+        },
+        "shared_apply": {
+          "wall_seconds": 2.7302924999967217,
+          "peak_rss_bytes": 38977536,
+          "result": {
+            "conversationTurns": 0,
+            "historicalVersions": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "unique_preview": {
+          "wall_seconds": 0.07476729108020663,
+          "peak_rss_bytes": 28475392,
+          "sources": 10000
+        },
+        "unique_apply": {
+          "wall_seconds": 3.4026714169885963,
+          "peak_rss_bytes": 38338560,
+          "result": {
+            "conversationTurns": 0,
+            "historicalVersions": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        }
+      },
+      "sqlite_integrity_pass": true,
+      "all_media_identities_accounted": true,
+      "all_remaining_source_ids_verified": true,
+      "harness_sha256": "2cec931593e32311633eb850dbc51d0fd25ed9677ebac2ded3ff8d925680e256",
+      "limits": [
+        "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+        "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+      ]
+    },
+    "retention": {
+      "format": "OSwind generated retention scaling v1",
+      "records": 20000,
+      "media_files": 10000,
+      "binary_sha256": "c2b0e95f3972a6a12d15587b498c5f3b6e89497e75836d993802f7acac3ecf83",
+      "measurements": {
+        "shared_apply": {
+          "wall_seconds": 2.6796902080532163,
+          "peak_rss_bytes": 40566784,
+          "retention": {
+            "budgetBytes": 20000000000,
+            "budgetMet": true,
+            "bytesAfter": 17728330,
+            "cancelled": false,
+            "erasure": {
+              "conversationTurns": 0,
+              "historicalVersions": 0,
+              "pendingMedia": 0,
+              "removedMedia": 0,
+              "searchCacheRemoved": true,
+              "sharedMedia": 10000,
+              "sources": 10000,
+              "warnings": []
+            }
+          },
+          "result": {
+            "conversationTurns": 0,
+            "historicalVersions": 0,
+            "pendingMedia": 0,
+            "removedMedia": 0,
+            "searchCacheRemoved": true,
+            "sharedMedia": 10000,
+            "sources": 10000,
+            "warnings": []
+          }
+        },
+        "unique_apply": {
+          "wall_seconds": 3.4294692089315504,
+          "peak_rss_bytes": 36536320,
+          "retention": {
+            "budgetBytes": 20000000000,
+            "budgetMet": true,
+            "bytesAfter": 17469440,
+            "cancelled": false,
+            "erasure": {
+              "conversationTurns": 0,
+              "historicalVersions": 0,
+              "pendingMedia": 0,
+              "removedMedia": 10000,
+              "searchCacheRemoved": true,
+              "sharedMedia": 0,
+              "sources": 10000,
+              "warnings": []
+            }
+          },
+          "result": {
+            "conversationTurns": 0,
+            "historicalVersions": 0,
+            "pendingMedia": 0,
+            "removedMedia": 10000,
+            "searchCacheRemoved": true,
+            "sharedMedia": 0,
+            "sources": 10000,
+            "warnings": []
+          }
+        }
+      },
+      "sqlite_integrity_pass": true,
+      "all_media_identities_accounted": true,
+      "all_remaining_source_ids_verified": true,
+      "harness_sha256": "2cec931593e32311633eb850dbc51d0fd25ed9677ebac2ded3ff8d925680e256",
+      "limits": [
+        "One generated cached trial on this Mac, concurrent background activity; not natural media, energy, durability or competitor evidence",
+        "Preview, transaction, queue and physical cleanup wall time included; peak RSS includes that individual CLI only"
+      ]
+    }
+  },
+  "limits": [
+    "One warm generated observation per scenario after own test/build jobs completed, with uncontrolled cache, thermal and background state.",
+    "Each scenario starts with 20000 records and 10000 small owned media files; the first 10000-source erase preserves 10000 shared media, the second removes all files.",
+    "Exact remaining IDs, media contents and SQLite integrity/foreign keys/empty cleanup queue are checked.",
+    "No paired baseline, causal speedup, ordinary desktop capture, power, energy, sync throughput, competitor or rank result."
+  ]
+}

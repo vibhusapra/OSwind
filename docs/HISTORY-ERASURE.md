@@ -19,6 +19,8 @@ The source delete triggers remove FTS entries, speaker labels, previews, vectors
 
 ## Retained-media cleanup
 
+[Media cleanup admission](MEDIA-CLEANUP-ADMISSION.md) now requires an exclusive reservation before physical removal. Active supported writers or snapshots defer media and disposable-cache deletion while logical deletion remains committed. Pending counts and retry warnings remain explicit; storage-budget trimming stops until cleanup can progress. Release followed by retry/reopen/invalidation can drain work. Older cleanup binaries and raw file writers do not gain this gate.
+
 Only the selected sources' media references enter a durable SQLite queue. Cleanup scans remaining references once and uses indexed lookups; a live canonical-path reference keeps a shared file, including dot-path and case aliases on an insensitive volume. Separate hard-link entries can be unlinked independently. A writer reservation prevents a new reference appearing between its check and unlink. Paths must resolve inside the owned media folders and name regular files; traversal, symlinks and directories are refused. Missing files count as already absent. Failed removals remain queued across launches and can be retried with **Retry media cleanup**.
 
 The operation invalidates the search identity, releases current native caches and removes disposable index files. Another process may still hold old memory or rebuild a stale disposable file; source validation prevents using it as current evidence. WAL checkpointing is best effort when readers are active. Erasure is logical deletion, **not a secure overwrite guarantee for SSDs, filesystem snapshots or external copies**.
