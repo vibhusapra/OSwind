@@ -1,5 +1,18 @@
 # OSwind delivery ledger
 
+## Late-writer positive-path measurement — all original pairs reviewed
+
+[The complete paired receipt](../benchmarks/sync-late-dependency-performance-v1.json) passes all twelve original AB/BA/AB slots, independent content checks, 60 closed-database storage checks and eleven real copied-data corruption controls. All1,450 compiled input pins and copied payloads match. Warm10k incoming median183.884→182.226s; complete projection365.624→364.284s; complete deletion184.897→183.244s. Small differences over three pairs do not establish a speedup. Setup, each raw pair, page/index costs, source-only separate calendar editing and uncontrolled caches/background remain explicit. Late-only scale, full sync, power and ranking stay open; all83 feature statuses are unchanged.
+
+## Late dependent records - local functional qualification passed
+
+[The component](SYNC-LATE-DEPENDENCIES.md) retires late owning/evidence children whose parent barrier is already admitted, publishes real causal deletions atomically and permits unrelated later sender records. Seventeen new methods include conflict heads, cancellation/reservation guards, stale recap ownership and real pre/postcommit SIGKILL. Final 23 selected: 22 pass / one worker skip, versus45 assertions / 14 unexpected errors on the old writer.
+
+[All 22 local stages pass](../benchmarks/sync-late-dependencies-v1.json):1,635 full passes / 82 skips; broad sanitizer and release 635 each / 22 skips. All16 new mandatory parents execute in each build; 17 sanitizer logs have no race warnings. All 727 frozen inputs match, including 725 repository inputs / 465 Sources/Tests/Vendor files. A strict signed/extracted 34-file app and inherited process/old30/backup/reader checks pass; installed 15 files and four prior staged trees are unchanged.
+
+F059 stays TODO. Optional retired scopes/run conversation provenance, publication-group visibility, epochs/compaction/service/providers/two-Mac and late-only scale remain open. Parent PR #113 first native CI failed in a changed-source encrypted migration detach (exit16, five assertions, destination closing); its one unchanged-head comparison and PR114 now pass both hosted jobs. The original failure remains retained and its cause unproven. A local pinned release single case passes but does not resolve the CI failure; the unmodified local debug group passes all 37 cases, with 23 limited reader samples across nine owned roots; its CI cause remains unproven.
+
+
 ## October31 scope refresh — five newly tracked gaps
 
 [Primary-source notes](landscape-source-checks-2026-10-31.json) refresh six of the twenty offering profiles: Screenpipe, original Rewind/Limitless, Rewind Desktop, Pieces, Littlebird and Granola. Existing profile dates stay explicit for the other fourteen. Plan/entitlement conflicts, failed direct fetches, search-cache-only quotes and different resource estimates remain separate from runtime and checkout evidence.

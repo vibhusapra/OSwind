@@ -95,15 +95,22 @@ struct SyncIncomingConversationWriter {
     /// Journal barrier, native retirement, cache protection and the reservation
     /// share one transaction, including a direct internal retry after receipt.
     func applyDeletion(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws {
+        guard change.after.isDeleted else {throw OSwindError.invalid("Use the incoming deletion barrier")}
+        try applyDeletionBarrier(change.revision.key,admission:admission)
+    }
+    /// Retry an already committed barrier without inventing a revision or
+    /// publishing another local tombstone. Only the actual stored state grants
+    /// authority to this same-connection native/cache retirement path.
+    func applyDeletionBarrier(_ key:SyncObjectKey,admission:MediaAdmissionLease)throws {
         try Task.checkCancellation()
         try admission.withActive(for:library.mediaRootIdentity) {}
         try library.withRoutineDatabase {connection in
-            guard connection.handle==db.handle,change.after.isDeleted else {throw OSwindError.invalid("Use the incoming deletion library's own connection and barrier")}
+            guard connection.handle==db.handle,try cache.journal.state(for:key).isDeleted else {throw OSwindError.invalid("Use the incoming deletion library's own connection and barrier")}
             try erasureCancellable(db) {try SyncChangeCapture.transaction(db) {
                 try cache.validateIncomingDeletionContext()
-                try SyncDerivedRetirement.collect(cache:cache,root:change.revision.key,body:{
-                    try applyDeletionKey(change.revision.key,admission:admission)
-                    try cache.finishDeletedObject(change.revision.key)
+                try SyncDerivedRetirement.collect(cache:cache,root:key,body:{
+                    try applyDeletionKey(key,admission:admission)
+                    try cache.finishDeletedObject(key)
                 },retire:{key in try applyDeletionKey(key,admission:admission)})
                 try cache.validateIncomingDeletionContext()
                 try Task.checkCancellation()
@@ -151,21 +158,55 @@ struct SyncIncomingConversationWriter {
         }
     }
     @discardableResult func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {
+        // Existing internal callers consume local IDs. New service code should
+        // use the explicit outcome; an empty string is never a native owner.
+        switch try applyOutcome(record,admission:admission,fetchExactSource:fetchExactSource) {
+        case .projected(let local):return local
+        case .retired:return ""
+        }
+    }
+    func applyOutcome(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncIncomingProjectionOutcome {
         try Task.checkCancellation();try admission.withActive(for:library.mediaRootIdentity) {}
         return try library.withRoutineDatabase {connection in
             guard connection.handle==db.handle else {throw OSwindError.invalid("Use the incoming library's own connection")}
             return try SyncChangeCapture.transaction(db) {
                 try cache.validateIncomingDeletionContext();try record.validate()
                 let state=try cache.journal.state(for:record.identity.key),reference=try record.reference
-                guard !state.isDeleted,state.heads.count==1,state.heads.first?.content==reference.content else {throw OSwindError.unavailable("Admit one reviewed incoming head before projection; conflicts remain explicit")}
+                guard !state.isDeleted,state.heads.contains(where:{$0.content==reference.content}) else {throw OSwindError.unavailable("Admit the exact incoming head before projection")}
+                let erased=try record.erasedParents(cache:cache)
+                if !erased.isEmpty {return try retireLate(record,parents:erased,admission:admission)}
+                guard state.heads.count==1 else {throw OSwindError.unavailable("Review incoming conflicts before projection")}
                 var local=""
                 try SyncDerivedRetirement.collect(cache:cache,root:record.identity.key,deleting:false,body:{
                     local=try project(record,admission:admission,fetchExactSource:fetchExactSource)
                 },retire:{key in try applyDeletionKey(key,admission:admission)})
                 try cache.validateIncomingDeletionContext();try Task.checkCancellation();try admission.withActive(for:library.mediaRootIdentity) {}
-                return local
+                return .projected(local)
             }
         }
+    }
+    private func retireLate(_ record:SyncPortableRecord,parents:[SyncRetiredDependency],admission:MediaAdmissionLease)throws->SyncIncomingProjectionOutcome {
+        let key=try record.identity.key,causes=Set(parents.map(\.key))
+        // No body/media policy or fetch callback is invoked for retired data.
+        // Its exact canonical bytes already match an authenticated stored head;
+        // only opaque metadata and genuine deletion revisions are retained.
+        let deletion=try cache.journal.delete(key:key) {try applyDeletion($0,admission:admission)}
+        for parent in parents {
+            guard parent.clock.counters.allSatisfy({(deletion.context.counters[$0.key] ?? 0)>=$0.value}),try cache.journal.state(for:parent.key).isDeleted else {throw OSwindError.invalid("Late retirement lost its admitted dependency barrier")}
+        }
+        let owners=try Set(record.ownersOfErasedEvidence(causes)).sorted(by:SyncPortableRecord.retirementOrder)
+        for owner in owners where owner != key {
+            if try cache.journal.state(for:owner).isDeleted {try applyDeletionBarrier(owner,admission:admission)}
+            else {
+                // Root deletion includes every admitted/conflicting root head.
+                // Observe it before publishing a different object's barrier.
+                try cache.journal.observeAppliedRoot(key)
+                _=try cache.journal.delete(key:owner) {try applyDeletion($0,admission:admission)}
+            }
+        }
+        guard try cache.journal.state(for:key).isDeleted else {throw OSwindError.invalid("Late incoming lifetime was not retired")}
+        try cache.validateIncomingDeletionContext();try Task.checkCancellation();try admission.withActive(for:library.mediaRootIdentity) {}
+        return .retired(key:key,parents:parents.map(\.key))
     }
     private func project(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {
         // The caller reserves media BEFORE journal/SQLite locks, then retains

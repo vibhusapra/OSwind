@@ -1,0 +1,312 @@
+{
+  "format": "OSwind.sync-late-dependencies.qualification",
+  "version": 1,
+  "state": "passed-local-functional",
+  "overallV0Complete": false,
+  "schema": 31,
+  "sourceBase": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+  "branch": "codex/sync-late-dependencies",
+  "sourceState": "The manifest identifies the qualified input bytes; publication review checks each repository blob against Git.",
+  "scope": "Internal typed late owning/evidence dependency retirement and ordered receive liveness. No public sync service or enrollment enabled.",
+  "inputs": {
+    "repository": 725,
+    "includingSourcesTestsVendor": 465,
+    "privateQualificationDrivers": 2,
+    "all727Unchanged": true,
+    "manifest": "sync-late-dependencies-inputs-v1.json",
+    "manifestSHA256": "ca1e01a2d2b6feedd8422165f294464ec95d0927632f2718184917c4d422a9d1"
+  },
+  "review": {
+    "state": "passed",
+    "reviewedAtUTC": "2026-10-31T23:32:45.540804+00:00",
+    "sourceBase": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+    "frozenInputs": 727,
+    "repositoryInputs": 725,
+    "sourceTestVendorInputs": 465,
+    "allInputAnd22StageHashesUnchanged": true,
+    "tests": {
+      "test.log": {
+        "defined": 1717,
+        "passed": 1635,
+        "skipped": 82,
+        "failures": 0,
+        "newMandatoryExecuted": 16,
+        "guardedWorkerSkipped": 1,
+        "logSHA256": "5c92e465889a98daa080d61a182219fbfd7d5c8cdddeb133b1769d35e8f16fdd"
+      },
+      "thread-sanitizer.log": {
+        "defined": 657,
+        "passed": 635,
+        "skipped": 22,
+        "failures": 0,
+        "newMandatoryExecuted": 16,
+        "guardedWorkerSkipped": 1,
+        "logSHA256": "7b10a27597bc142a8ba2870581fe54a2b29bd90d155348ffbde9b030e07f5fa6"
+      },
+      "optimized.log": {
+        "defined": 657,
+        "passed": 635,
+        "skipped": 22,
+        "failures": 0,
+        "newMandatoryExecuted": 16,
+        "guardedWorkerSkipped": 1,
+        "logSHA256": "7d51aa340358d99c84305e16e254b4ab1d02e72c5bb89c935a66876feefc567b"
+      }
+    },
+    "newCases": [
+      "testLateConversationChildRetiresAndLaterSenderRecordProgresses",
+      "testLateRoutineRunRetiresAndLaterSenderRecordProgresses",
+      "testLateMissingLiveOwnerStaysRetryableAndIsNotAcknowledgedAsErased",
+      "testLateSourceMentionRetiresWithoutDeletingCuratedDefinition",
+      "testLateSourceNameCorrectionRetiresWithoutDeletingCuratedDefinition",
+      "testLateSourceProjectCorrectionsRetireWithoutDeletingCuratedDefinition",
+      "testLateRecapAndCitationRetireWithoutBlockingLaterSenderRecord",
+      "testLateEvidencePinRetiresWithoutReadingDeletedOriginal",
+      "testLateAliasRetiresAfterDefinitionDeletionAndSenderProgresses",
+      "testLateAnswerCitationRetiresOwnerAtomicallyAndSenderProgresses",
+      "testLateDerivedRecapRowCannotEraseIndependentNamedSource",
+      "testLateConflictedChildRetirementObservesEveryAdmittedHeadAndLaterRecordProgresses",
+      "testLateConflictedLiveChildStillRequiresExplicitReview",
+      "testLateDependencyDeathBeforeCommitRollsBackBarrierAndReceipt",
+      "testLateDependencyDeathAfterCommitRetainsBarrierAndReceipt",
+      "testLateDependencyCrashWorker",
+      "testLateRetirementRejectsForeignReleasedAndWrongConnectionReservationsAndCancellation"
+    ],
+    "sanitizerLogs": {
+      "thread-sanitizer.log": "7b10a27597bc142a8ba2870581fe54a2b29bd90d155348ffbde9b030e07f5fa6",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathAfterCommitRetainsBarriersAndPendingMedia_/retained-crash/child.log": "30bf52de664b865345712423fc238fd1461e1aee483d9b1c21dfc5230f529379",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathAfterCommitRetainsBarriersAndPendingMedia_/retained-retry/child.log": "30bf52de664b865345712423fc238fd1461e1aee483d9b1c21dfc5230f529379",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathBeforeCommitRollsBackSourceChildrenAndAnnouncements_/retained-crash/child.log": "11e65906808fcd57ae9348b85d81fa6651bb9cd349175f35a86cced71267f4bc",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testDerivedRetirementDeathBeforeCommitRollsBackSourceChildrenAndAnnouncements_/retained-retry/child.log": "11e65906808fcd57ae9348b85d81fa6651bb9cd349175f35a86cced71267f4bc",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-crash/child.log": "beec84d730c61cd52257f4a61dc2d23abb0b9475226f4bd60350a2901622d4f5",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathAfterCommitRetainsExactOriginal_/retained-retry/child.log": "beec84d730c61cd52257f4a61dc2d23abb0b9475226f4bd60350a2901622d4f5",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-crash/child.log": "1c355d465e9e9096fe3aadc1b046bce52e7f46e6246b05028a88f7c44b6489d3",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunCreateDeathBeforeCommitLeavesNoPartialOriginal_/retained-retry/child.log": "1c355d465e9e9096fe3aadc1b046bce52e7f46e6246b05028a88f7c44b6489d3",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-crash/child.log": "c4f6ae8ec2632cf8cd32745a994e06fd81314c190921d87e82c0332aea451c9f",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathAfterCommitKeepsOldWireAndNewStatus_/retained-retry/child.log": "c4f6ae8ec2632cf8cd32745a994e06fd81314c190921d87e82c0332aea451c9f",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-crash/child.log": "4a0c4d59e812e56a373592173be26c93b8c753630f8dfd966fa92783b5b182a6",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingRunUpdateDeathBeforeCommitKeepsPriorOriginalAndHead_/retained-retry/child.log": "4a0c4d59e812e56a373592173be26c93b8c753630f8dfd966fa92783b5b182a6",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathAfterCommitRetainsNewHeadAndOldEvidenceWithoutEcho_/retained-crash/child.log": "9d6c2d929d7f59f556ef0a76b3adb6f959cd99eb60a78bc5cfe6a01bfe6457b6",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testIncomingSourceDeathBeforeCommitPreservesCurrentGraph_/retained-crash/child.log": "9b6d783cfa4cf81e70c886bc05c245c8921cc4d22a0ba326f96713c1ad23e0fc",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testLateDependencyDeathAfterCommitRetainsBarrierAndReceipt_/retained-late-after/child.log": "428a514d53724e095ec78ff9a65d37dd68f17f33074f803db91704aa0f8cb134",
+      "thread-sanitizer-owned-fixture/-_SyncIncomingSourceTests_testLateDependencyDeathBeforeCommitRollsBackBarrierAndReceipt_/retained-late-before/child.log": "3a003ae44add409ec9bbef10564ed6b81e8d28e38e28e7c18b1a843297312009"
+    },
+    "raceWarnings": 0,
+    "newLateCrashWorkerLogsRetained": 2,
+    "readerNegativeControls": 11,
+    "restoredReaderPositive": true,
+    "stagedFiles": 34,
+    "stagedAndExtractedStrictSignatures": true,
+    "allExtractedFilesEqual": true,
+    "installedFilesUnchanged": 15,
+    "priorStagedTreesUnchanged": 4,
+    "cliSHA256": "1b1c4ddd5fff5f92f38ec8b1c6d54b349a21f1f49a938c6470edd61e8aec4478",
+    "appSHA256": "b3e34e303e8034b9f4de2edf2fb658e73f294f70337d94290dbf35b2faa8690f",
+    "zipSHA256": "57cd81718dc439897b81455716c02952025c9b95d1f0861ad6fe4bc31c1cf350",
+    "performanceAcceptance": false,
+    "overallV0Complete": false,
+    "hostedCILimitation": "Parent b38 / PR #113 native CI fails during encrypted migration detach (exit 16). The original failure is retained. A local pinned release single case passes, but its cause remains unproven. This receipt makes no fully-green hosted claim."
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "returncode": 0,
+      "log": "test.log",
+      "logSHA256": "5c92e465889a98daa080d61a182219fbfd7d5c8cdddeb133b1769d35e8f16fdd"
+    },
+    {
+      "name": "thread-sanitizer",
+      "returncode": 0,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "7b10a27597bc142a8ba2870581fe54a2b29bd90d155348ffbde9b030e07f5fa6"
+    },
+    {
+      "name": "optimized",
+      "returncode": 0,
+      "log": "optimized.log",
+      "logSHA256": "7d51aa340358d99c84305e16e254b4ab1d02e72c5bb89c935a66876feefc567b"
+    },
+    {
+      "name": "owned-sqlite-contracts",
+      "returncode": 0,
+      "log": "owned-sqlite-contracts.log",
+      "logSHA256": "3af354abd6afd2f4f662a367159a8b8107385935ded6c8a2b929734becedb43c"
+    },
+    {
+      "name": "mutation-review-contracts",
+      "returncode": 0,
+      "log": "mutation-review-contracts.log",
+      "logSHA256": "72d565e37fdce5a9a2847173570537eb86cb58e9a069402cdd5bed0aafd92111"
+    },
+    {
+      "name": "projection-review-prior",
+      "returncode": 0,
+      "log": "projection-review-prior.log",
+      "logSHA256": "b2a3ccecc0a82c7dd702ba1581aecf5a32150a2f0225e6fe697eb85721554e52"
+    },
+    {
+      "name": "package",
+      "returncode": 0,
+      "log": "package.log",
+      "logSHA256": "6955b7afb37b4a32e670d5e9e94ab7295c79ed4aeb781a3e46263cb557e5d749"
+    },
+    {
+      "name": "entity-process",
+      "returncode": 0,
+      "log": "entity-process.log",
+      "logSHA256": "63823f78c3c5a5d4de60220158685dd021cffda39b185620267c10f7b9d2ecf4"
+    },
+    {
+      "name": "project-correction-process",
+      "returncode": 0,
+      "log": "project-correction-process.log",
+      "logSHA256": "965cce5a28d4fdd1525f800e7ca72f4ff897fc7f5a91e5267bb9fff672297230"
+    },
+    {
+      "name": "entity-metadata-process",
+      "returncode": 0,
+      "log": "entity-metadata-process.log",
+      "logSHA256": "973f374ca1f0b48bfe6fbe7e6a4427d992cc3e0f8519844ad101caa2a53e417f"
+    },
+    {
+      "name": "actual-old30-process",
+      "returncode": 0,
+      "log": "actual-old30-process.log",
+      "logSHA256": "a6653cba2e210f683b24ada0d071eddf96978ac044ecfe5edfa5af866d2f5ec8"
+    },
+    {
+      "name": "capture-process",
+      "returncode": 0,
+      "log": "capture-process.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "original-erasure-process",
+      "returncode": 0,
+      "log": "original-erasure-process.log",
+      "logSHA256": "6ffcf6fb68ad3b5b3266371f872fe7365d20bdcd79976e0d7c1a8ae8da2cfb12"
+    },
+    {
+      "name": "api-mcp-process",
+      "returncode": 0,
+      "log": "api-mcp-process.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp-process",
+      "returncode": 0,
+      "log": "indexed-api-mcp-process.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk-contracts",
+      "returncode": 0,
+      "log": "python-sdk-contracts.log",
+      "logSHA256": "a65a4b3999ea1d949e0e551a05c3caac29f9f4066a68cded5b3756f5ab013882"
+    },
+    {
+      "name": "single-delete-process",
+      "returncode": 0,
+      "log": "single-delete-process.log",
+      "logSHA256": "9e7de335d7955ce66f0a994343ebc45650b6db1831e4d90858e23d604002431b"
+    },
+    {
+      "name": "wipe-process",
+      "returncode": 0,
+      "log": "wipe-process.log",
+      "logSHA256": "aeb040afca742e369d8e1fb8b5760e1f132a5f566a9c34efc3cfeaa9f71b0f61"
+    },
+    {
+      "name": "recap-process",
+      "returncode": 0,
+      "log": "recap-process.log",
+      "logSHA256": "97b55b4ba855649c92f123124647d3b6b790ed8832a954a786489cd55f97a5ff"
+    },
+    {
+      "name": "routine-process",
+      "returncode": 0,
+      "log": "routine-process.log",
+      "logSHA256": "68e8bb38a4bc23c1af07eea80f132c9c8e155a59bf047eaca538cfed6e1cde38"
+    },
+    {
+      "name": "backup-interruption-process",
+      "returncode": 0,
+      "log": "backup-interruption-process.log",
+      "logSHA256": "203ad81d640a4b28c1d1a12ff85495ce53db368edc127bda866df43069610dd6"
+    },
+    {
+      "name": "archive-review",
+      "returncode": 0,
+      "log": "archive-review.log",
+      "logSHA256": "cee810924b19871493aeb16b83d795923e3fe76ed10b0552ffe6c7208184209f"
+    }
+  ],
+  "startedAtUTC": "2026-10-31T23:14:54.702149+00:00",
+  "finishedAtUTC": "2026-10-31T23:29:50.654976+00:00",
+  "development": {
+    "state": "passed",
+    "startedAtUTC": "2026-10-31T23:13:21.653139+00:00",
+    "sourceBase": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+    "candidateWriterSHA256": "f5c6c848c8d13498f5d3dfdc0b74903cc9a68180157805ba1f7fca7ac06d98b4",
+    "red": {
+      "returncode": 1,
+      "defined": 23,
+      "workerSkipped": 1,
+      "logSHA256": "08425ba1e29b07c1688719fb526ae77b8fcd276ffa9f841407863fe25d656403"
+    },
+    "green": {
+      "returncode": 0,
+      "defined": 23,
+      "passed": 22,
+      "workerSkipped": 1,
+      "logSHA256": "5ac4261cd7a3277f48d9cff4c974834eece73794883ef51b28bd6059c0d8efd1",
+      "ownedOutput": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/late-final23-owned"
+    },
+    "finishedAtUTC": "2026-10-31T23:13:55.244895+00:00"
+  },
+  "earlierFailures": [
+    "Retained optional-cursor and missing-try fixture compilation errors.",
+    "Retained skipped-sender-predecessor, changed automatic title/pin and correction-count fixture mistakes. Corrected exact final fixtures replayed red then green."
+  ],
+  "performance": {
+    "state": "not-measured-for-new-writer",
+    "pairedProtocol": "Prepared privately; same helper/tests/toolchain/dependencies, old/new writer only difference.",
+    "stagingAdmissionControls": "Actual candidate validation plus12negative no-build cases passed; baseline/payload controls pending."
+  },
+  "hostedCI": {
+    "parentHead": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+    "parentPR": 113,
+    "run": 41250799261,
+    "native": "Failed AppSession changed-source migration: detach exit 16, five assertions, destination closing and attachment preserved.",
+    "benchmarkHarnesses": "success",
+    "originalEvidenceArtifact": 13061034823,
+    "localPinnedReleaseSingleCase": "Passed; no reader samples. Does not establish the cause or replace CI.",
+    "newHead": "Not part of this local qualification; inspect pull-request checks.",
+    "localUnmodifiedParentDebugGroup": {
+      "state": "passed",
+      "defined": 37,
+      "passed": 37,
+      "sourceCommit": "b38a9de7592a1b61f16c177c5273faaa857c8cf9",
+      "inputFiles": 719,
+      "inputsUnchanged": true,
+      "logSHA256": "b852ada4183fd70b6a535891a4f9401963b6195d957e0567c83944a3159d8839",
+      "readerSamples": 23,
+      "ownedRoots": 9,
+      "limitation": "Unprivileged descriptor observations in a successful local run do not identify the original CI cause or replace its failed result."
+    }
+  },
+  "ledger": {
+    "requirements": 83,
+    "F059": "todo",
+    "statusesUnchanged": true
+  },
+  "remaining": [
+    "Early out-of-order parent barrier plus late unseen child acceptance.",
+    "Optional erased entity filters must remain scoped/unavailable; nullable run conversation and exact original provenance must survive together.",
+    "Publication-group visibility before exposing answers with unseen citation rows.",
+    "Collection/wipe epochs, compaction, production privacy/media/transport admission, service/enrollment/key recovery/status/conflict UI.",
+    "Actual providers and two Macs, sustained capture/power, distribution and competitor ranking.",
+    "Paired positive-path overhead and candidate late-record scale.",
+    "Unresolved parent native migration detach CI failure;new-head hosted validation."
+  ]
+}
