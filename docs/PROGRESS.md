@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## External MCP manual client — development, qualification running
+
+The [F080 implementation draft](MCP-CLIENT.md) adds explicit local command/credential-name configuration, modern/legacy stdio discovery, complete-tool review, deliberate manual calls, changed-executable/schema refusal, finite I/O/deadlines, provenance and owned-child cancellation. The real CLI list→review→call path and actual Ctrl-C checks pass with owned data; an isolated official Python SDK2.3.0 server also returns an exact modern-protocol echo. Initial failures and host-sleep-confounded positive timeouts remain retained. Final source/package qualification and aggregate review bounds are still in progress; no MCP client PR or final receipt exists. Native setup, HTTP/auth, model loops and source ingestion remain open; F080 stays TODO.
+
 ## Calendar-linked meeting context — software-tested, native acceptance open
 
 [F079](MEETINGS.md) moves from TODO to **partial**: explicit calendar selection, a distinct Meetings workspace, freshly verified brief/join actions, privacy-filtered literal calendar metadata in source-linked Ask, generic reminders and durable library-bound deduplication are implemented. All **57 mandatory new cases** pass in debug, TSan and optimized builds, including actual SQLite competition, pre/postcommit process death, request interception and a real 30-second timer refresh. [737-input evidence](../benchmarks/calendar-context-v1.json): **1,692 full passes / 83 skips**, **247 sanitizer and 247 optimized passes / three skips each**; twelve additional SDK/package/process/archive checks and eight component renders pass. Installed and prior app bytes are preserved.
