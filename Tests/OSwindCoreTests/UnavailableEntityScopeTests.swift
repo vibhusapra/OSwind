@@ -2,6 +2,26 @@ import XCTest
 @testable import OSwindCore
 
 final class UnavailableEntityScopeTests:XCTestCase {
+    func testCalendarScopeAndSnapshotRoundTripsNeverBroadenUnavailableRestriction()throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-unavailable-calendar-"+UUID().uuidString);defer {try? FileManager.default.removeItem(at:root)}
+        let store=try MemoryStore(root:root);defer {try? store.close()}
+        try store.insert(Memory(id:"unrelated",timestamp:QueryScopeResolver.instant("2024-03-10T12:00:00Z"),kind:.note,app:"Owned",text:"Unrelated source"))
+        let filter=SearchFilter(unavailableEntityScope:.init()),scope=ActivitySourceScope(filter)
+        XCTAssertEqual(scope.filter.unavailableEntityScope,filter.unavailableEntityScope)
+        let restored=try JSONDecoder().decode(ActivitySourceScope.self,from:SyncProtocolLimits.encode(scope));XCTAssertEqual(restored.filter.unavailableEntityScope,filter.unavailableEntityScope)
+        let snapshot=try store.activityCalendar(.init(month:"2024-03",timeZone:.gmt,selectedDay:"2024-03-10",filter:filter));XCTAssertEqual(snapshot.totalSources,0)
+        XCTAssertEqual(snapshot.scope.filter.unavailableEntityScope,filter.unavailableEntityScope);XCTAssertEqual(try store.matchingCount(snapshot.scope.filter),0)
+        XCTAssertThrowsError(try QueryScopeResolver.resolve(snapshot.scope.filter))
+        let plain=ActivitySourceScope(SearchFilter());XCTAssertNotEqual(scope,plain,"Unavailable scope must not share an unrestricted calendar cache key")
+    }
+    func testMarkdownSavedHistoryLabelsUnavailableEntityInsteadOfAnyEntity()throws {
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-unavailable-export-"+UUID().uuidString);defer {try? FileManager.default.removeItem(at:root)}
+        let store=try MemoryStore(root:root);defer {try? store.close()}
+        let entity=try store.createEntity(kind:.project,name:"Owned original scope"),chat=try store.createChat(title:"Owned exported answer")
+        _=try store.appendChatTurn(sessionID:chat.id,question:"Exact question",answer:.init(text:"Exact answer 👩🏽‍💻 e\u{301}",sources:[],provider:"owned",duration:0),filter:.init(entityID:entity.id));try store.deleteEntity(entity.id)
+        let markdown=ConversationContext.markdown(try XCTUnwrap(store.chat(chat.id)),turns:try store.chatTurns(chat.id))
+        XCTAssertTrue(markdown.contains("Exact answer 👩🏽‍💻 e\u{301}"));XCTAssertTrue(markdown.contains("Entity: unavailable"));XCTAssertFalse(markdown.contains("Entity: any"))
+    }
     func testUnavailableRestrictionRefusesSearchAndCannotMatchUnrelatedContent()throws {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-unavailable-scope-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:root)}
