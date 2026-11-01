@@ -6,7 +6,7 @@ public struct WorkflowNarrationChunk:Codable,Equatable,Sendable {
     public let startSeconds:Double
     public let endSeconds:Double
 }
-public struct WorkflowNarrationReceipt:Codable,Sendable {
+public struct WorkflowNarrationReceipt:Codable,Equatable,Sendable {
     public let model:String
     public let voice:String
     public let speed:Double
@@ -31,13 +31,13 @@ enum WorkflowNarrationAudio {
         var chunks:[Chunk]
         struct Chunk:Decodable {var start_seconds:Double,end_seconds:Double}
     }
-    static func inspect(tree:BackupFileTree,stem:String,script:String)throws->WorkflowNarrationReceipt {
+    static func inspect(tree:BackupFileTree,stem:String,script:String,scriptLimit:Int=4000)throws->WorkflowNarrationReceipt {
         try Task.checkCancellation()
         guard !stem.isEmpty,stem.utf8.count<=64,stem.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)||$0==45}),
-              !script.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,script.utf8.count<=4000,!script.utf8.contains(0) else {throw OSwindError.invalid("Invalid narration script or member name")}
+              (1...12300).contains(scriptLimit),!script.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,script.utf8.count<=scriptLimit,!script.utf8.contains(0) else {throw OSwindError.invalid("Invalid narration script or member name")}
         try tree.requireRootIdentity(at:tree.root)
         let expectedScript=Data(script.utf8),scriptName=stem+".txt",wavName=stem+".wav",timingName=stem+".timing.json"
-        guard try tree.read(scriptName,limit:4000)==expectedScript else {throw OSwindError.unavailable("The reviewed narration script changed")}
+        guard try tree.read(scriptName,limit:scriptLimit)==expectedScript else {throw OSwindError.unavailable("The reviewed narration script changed")}
         let timingBytes=try tree.read(timingName,limit:64*1024),timing=try JSONDecoder().decode(Timing.self,from:timingBytes)
         let url=tree.root.appendingPathComponent(wavName)
         guard timing.model=="mlx-community/Kokoro-82M-bf16",timing.voice=="af_heart",timing.speed==1,
@@ -72,7 +72,7 @@ enum WorkflowNarrationAudio {
             chunks.append(.init(startSeconds:chunk.start_seconds,endSeconds:chunk.end_seconds));previous=chunk.end_seconds
         }
         guard abs(previous-duration)<=tolerance,try tree.digest(wavName,limit:8*1024*1024)==before,
-              try tree.read(scriptName,limit:4000)==expectedScript,try tree.read(timingName,limit:64*1024)==timingBytes else {throw OSwindError.unavailable("Narration files changed during verification")}
+              try tree.read(scriptName,limit:scriptLimit)==expectedScript,try tree.read(timingName,limit:64*1024)==timingBytes else {throw OSwindError.unavailable("Narration files changed during verification")}
         try tree.requireRootIdentity(at:tree.root);try Task.checkCancellation()
         return .init(model:timing.model,voice:timing.voice,speed:timing.speed,sampleRate:sampleRate,frames:count,audioSeconds:duration,rms:rms,peak:peak,
                      scriptSHA256:WorkflowDraft.digest(expectedScript),wavSHA256:before.sha256,timingSHA256:WorkflowDraft.digest(timingBytes),chunks:chunks)
