@@ -78,8 +78,9 @@ final class NativeMediaLegacyTests:XCTestCase {
         guard !child.isRunning else {return XCTFail("Owned legacy writer did not finish")};child.waitUntilExit()
         let outcome=try String(contentsOf:log,encoding:.utf8)
         print("NATIVE_LEGACY_MEDIA initializedBeforeUpgrade=true sourceSchema=32 currentSchema=\(MemoryStore.schemaVersion) forcedLegacyDirty=\(forceOldDirty) status=\(child.terminationStatus) mediaReserved=true")
-        if child.terminationStatus==0 {XCTAssertEqual(try store.stats().count,1);XCTAssertTrue(outcome.contains("imported"))}
-        else {XCTAssertFalse(outcome.isEmpty);XCTAssertEqual(try store.stats().count,0)}
+        XCTAssertEqual(child.terminationReason,.exit);XCTAssertEqual(child.terminationStatus,1)
+        XCTAssertTrue(outcome.contains(NativeMediaSchema.function),"Require the media compatibility refusal, not another process error: "+outcome)
+        XCTAssertEqual(try store.stats().count,0)
         XCTAssertTrue(fm.fileExists(atPath:image.path),"An unrelated legacy insert must not unlink media held by a current snapshot")
         XCTAssertTrue(fm.fileExists(atPath:cache.path),"Legacy invalidation must not remove a currently reserved cache")
         XCTAssertEqual(try store.withRoutineDatabase {try $0.eraseCount("SELECT count(*) FROM erasure_assets")},1)

@@ -80,7 +80,7 @@ extension SyncIncomingSourceTests {
         guard child.isRunning,(try? String(contentsOf:gate,encoding:.utf8))==phase else {return XCTFail("Source-withdrawal worker missed gate: "+((try? String(contentsOf:log,encoding:.utf8)) ?? "missing log"))}
         let committed=phase=="after"
         var reader:OpaquePointer?;XCTAssertEqual(sqlite3_open_v2(base.appendingPathComponent("receiver/memory.sqlite").path,&reader,SQLITE_OPEN_READONLY,nil),SQLITE_OK)
-        if let reader {defer {sqlite3_close(reader)};var row:OpaquePointer?
+        if let reader {defer {sqlite3_close(reader)};try NativeMediaSchema.register(RoutineDatabase(handle:reader));var row:OpaquePointer?
             XCTAssertEqual(sqlite3_prepare_v2(reader,"SELECT (SELECT count(*) FROM memories),(SELECT count(*) FROM chat_turns),(SELECT title FROM chat_sessions),(SELECT count(*) FROM personal_sync_publication_jobs),(SELECT count(*) FROM erasure_assets),(SELECT count(*) FROM personal_sync_identities WHERE instr(key_frame,CAST('projection-retract-' AS BLOB))>0)",-1,&row,nil),SQLITE_OK)
             if let row {defer {sqlite3_finalize(row)};XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),committed ? 0:1);XCTAssertEqual(sqlite3_column_int(row,1),committed ? 0:1);XCTAssertEqual(String(cString:sqlite3_column_text(row,2)),committed ? "Conversation":"Queue question 0?");XCTAssertEqual(sqlite3_column_int(row,3),committed ? 1:0);XCTAssertEqual(sqlite3_column_int(row,4),committed ? 1:0);XCTAssertEqual(sqlite3_column_int(row,5),0)}
         }

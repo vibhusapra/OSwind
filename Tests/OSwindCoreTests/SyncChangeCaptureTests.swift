@@ -208,7 +208,7 @@ final class SyncChangeCaptureTests:XCTestCase {
         let scope=try activate();try store.insert(Memory(id:"owned",text:"current authored source"))
         let archive=root.appendingPathComponent("../capture-backup-"+UUID().uuidString+".oswindbackup"),restored=root.appendingPathComponent("../capture-restored-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:archive);try? FileManager.default.removeItem(at:restored)}
-        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,32)
+        let info=try LibraryBackup.create(store:store,destination:archive);XCTAssertEqual(info.sourceSchema,33)
         _=try LibraryBackup.restore(archive,to:restored)
         let copy=try MemoryStore(root:restored);defer {try? copy.close()}
         XCTAssertEqual(try copy.get("owned")?.text,"current authored source")
