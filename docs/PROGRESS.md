@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Bounded busy vault recovery — owned native qualification passed
+
+[Normal detach recovery](VAULT-BUSY-RECOVERY.md) permits at most two extra normal detach calls after normal exit 16, with fresh original mounted-image identity after each pause. Held readers still refuse locking; unknown, changed, cancelled or non-busy outcomes cannot authorize another mutation. Two fresh absent observations remain required before locked. Busy requests may spend up to 60 extra seconds in native helpers, plus pauses/queries; no force flag is used.
+
+The [774-input/Git-bound receipt](../benchmarks/vault-busy-recovery-v1.json) passes all 12 stages at `0538b9d`: 1,829 full passes/88 opt-in skips, 46 sanitizer and 46 optimized passes/14 opt-in skips each, and all 38 actual owned native cases without skips. All 29 transition methods pass in all three software builds. Native tests add 36 distinct passes, yielding 1,865 distinct methods across general/native runs; 52 opt-in methods remain separate. Signed CLI vault, held-reader terminal interruption, inventory-query interruption, strict 34-file archive/extraction and unchanged 22 prior app trees pass. Independent review checks source Git blobs, logs, native traces and process receipts.
+
+The new native control records normal detach `[16, 0]` within one lock request after releasing its known reader; a held reader records `[16, 16, 16]` and stays closing. Both original red fixtures remain. Earlier hosted missing-session/busy failures are retained; their owners/causes remain unproven and those runs remain failed. Hosted CI for this recovery awaits publication. Feature statuses stay unchanged: 83 requirements/20 offerings, with broad parity, sustained power, complete sync, distribution, narrated workflow export and ranking unfinished.
+
 ## Reviewed local voice typing — software qualified, native acceptance open
 
 [F083 moves to partial](VOICE-TYPING.md): deliberate30-second recording, local model preparation before microphone permission, preview/edit/cancel and a renewed target after inference. No automatic history, cloud fallback or submission. Actual preparation/permission/inference workers drain through pause/privacy/lock/library switch and ordinary Quit; private on-library audio workspaces remain held until the real work returns.

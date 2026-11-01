@@ -1,5 +1,7 @@
 # OSwind
 
+[Bounded vault busy recovery](docs/VAULT-BUSY-RECOVERY.md) retries normal exit-16 detaches at most twice after fresh same-image checks. Held readers still block locking; two fresh absent observations remain required. The [source-bound receipt](benchmarks/vault-busy-recovery-v1.json) passes all 12 local stages, including 38 owned native cases and signed CLI interruption checks. Earlier hosted failures and broader acceptance gaps remain explicit.
+
 [Reviewed local voice typing](docs/VOICE-TYPING.md) adds deliberate30-second recording, local Whisper/Parakeet decoding, an editable preview and a fresh target choice after inference. The774-input [receipt](benchmarks/voice-typing-v1.json) passes all15 software/package stages,1,818 full cases/84 skips and155 mandatory sanitizer/optimized cases. Actual microphone/permission/native input, dictation quality and power remain open; inherited native-vault CI failures are retained.
 
 [Optional clipboard context](docs/CLIPBOARD-CONTEXT.md) adds default-off copied-text capture, privacy/context/secret checks, current-policy source admission, quiet restore and pause/quit/library-switch drainage. The765-input [receipt](benchmarks/clipboard-context-v1.json) passes13 software/package stages and all102 mandatory clipboard/MCP cases, including32 new cases. General clipboard permission/foreground/native input, valid promised providers and physical power remain open.
