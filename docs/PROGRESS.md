@@ -1,8 +1,12 @@
 # OSwind delivery ledger
 
-## External MCP manual client — development, qualification running
+## External MCP manual client — locally qualified, native workflow still open
 
-The [F080 implementation draft](MCP-CLIENT.md) adds explicit local command/credential-name configuration, modern/legacy stdio discovery, complete-tool review, deliberate manual calls, changed-executable/schema refusal, finite I/O/deadlines, provenance and owned-child cancellation. The real CLI list→review→call path and actual Ctrl-C checks pass with owned data; an isolated official Python SDK2.3.0 server also returns an exact modern-protocol echo. Initial failures and host-sleep-confounded positive timeouts remain retained. The first checkpoint passes all12 stages, including1,804 debug cases (1,722 pass/82 skip) and29 each under TSan/optimization. A retained2.43MB aggregate-review counterexample now has bounded/readable review corrections and five passing hardening cases; final-source requalification follows. No MCP client PR or final receipt exists. Native setup, HTTP/auth, model loops and source ingestion remain open; F080 stays TODO.
+[F080](MCP-CLIENT.md) moves from TODO to **partial**. Explicit local command/credential-name configuration, modern/legacy stdio discovery, complete readable tool review, deliberate exact-argument calls, changed-executable/schema refusal, bounded I/O/deadlines, provenance and verified direct-child cancellation are implemented. The signed CLI list→review→call/Ctrl-C workflow passes22 checks against the independent existing seven-tool server; an isolated official Python SDK2.3.0 server passes modern interoperability with exact Unicode text.
+
+[The744-input receipt](../benchmarks/mcp-client-v1.json) passes all12 stages: **1,724 full passes/83 skips;32 sanitizer and32 optimized passes/no skips or race warnings**. All32 mandatory MCP methods run once per build; the signed/extracted34-file app agrees and installed15 files/nine protected app trees stay unchanged. A pre-existing visual-wake guard accounts for the extra skip relative to the earlier checkpoint. Actual ISO roundtrip and2.43MB review-export failures, harness failures and host-sleep-confounded positive timeouts remain retained with separate corrections/evidence.
+
+Native setup/Keychain UI, HTTP/auth, model loops and privacy-admitted result-to-memory remain open. Native work is being authored in a separate checkout and is not part of this qualified receipt. Current ledger:4 live verified/42 partial/6 implemented/23 tested/6 TODO/2 outside current desktop scope,83 total. Full parity, physical power, complete sync, notarized distribution and top-three ranking remain unfinished. Hosted CI is pending publication.
 
 ## Calendar-linked meeting context — software-tested, native acceptance open
 

@@ -635,8 +635,8 @@
     "id": "F080",
     "axis": "Developer",
     "feature": "MCP client connections and tool-backed workflows",
-    "status": "todo",
-    "evidence": "New October31 parity requirement. The tested OSwind MCP stdio server exposes memory to clients; it does not prove OSwind can consume selected external MCP servers. Needs explicit local configuration and credentials, capability/tool allowlists, cancellation and size limits, provenance, and reviewed authority for external writes. Captured text must never authorize a tool action.",
+    "status": "partial",
+    "evidence": "Manual CLI client now consumes explicitly configured local stdio servers using modern2026-07-28 or four legacy versions. Complete readable tool definitions and exact arguments require deliberate call confirmation; executable/schema changes, malformed/oversized output, repeated pagination, unreviewed tools and forged reviews refuse. Explicit named credential variables, provenance, cancellation and verified direct-child exit are covered. All12 local stages pass over744 input/Git blobs:1,724 full passes/83 skips;32 TSan and32 optimized passes/no skips or race warnings; signed22-check manual CLI workflow and officialPythonSDK2.3.0 modern interoperability pass. Real2.43MB review-export and ISO-roundtrip failures are retained with corrections. Native setup/Keychain UI, HTTP/auth, privacy-admitted source ingestion and model-loop workflows remain open. Captured text never authorizes an action. See MCP-CLIENT.md and benchmarks/mcp-client-v1.json.",
     "references": "Screenpipe custom MCP connections"
   },
   {
