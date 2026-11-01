@@ -3,7 +3,8 @@ import Foundation
 /// Closing policy independent of native IPC, so failure/observation interleavings
 /// can be tested without changing the real driver's kernel identity checks.
 /// Native exit status never replaces fresh attachment observations. Mutations
-/// remain one normal detach, with the existing moved-mount fallback only.
+/// remain normal detaches, with bounded recovery for explicit busy exits and
+/// the existing moved-mount fallback. No force or blind mutation retry.
 enum VaultEjectTransition {
     static func run(verified:VaultVolumeProof,
                     expectedImage:@escaping @Sendable () throws ->URL,
@@ -12,8 +13,11 @@ enum VaultEjectTransition {
                     detach:@escaping @Sendable (String,Int32?) async throws ->VaultProcessResult,
                     unmount:@escaping @Sendable (URL,Int32?) async throws ->VaultProcessResult,
                     attempts:Int=16,
+                    busyRetries:Int=2,
+                    busyPause:@escaping @Sendable (Int) async throws ->Void={try await Task.sleep(for:.milliseconds($0 == 0 ? 150:400))},
                     pause:@escaping @Sendable (Int) async throws ->Void={try await Task.sleep(for:.milliseconds(VaultDetachSettlement.delayMilliseconds($0)))}) async throws {
         guard (2...16).contains(attempts) else {throw OSwindError.invalid("Invalid native detach confirmation budget")}
+        guard (0...2).contains(busyRetries) else {throw OSwindError.invalid("Invalid native busy recovery budget")}
         try Task.checkCancellation();try validate()
         let confirmDetached:@Sendable () async throws ->Void = {
             try await VaultDetachSettlement.confirm(attempts:attempts,pause:pause) {
@@ -29,9 +33,28 @@ enum VaultEjectTransition {
         let first=try await detach(verified.attachmentDevice,verified.root?.device)
         if !first.succeeded,let current=try await afterFailure() {
             let actual=try expectedImage().standardizedFileURL.resolvingSymlinksInPath()
-            guard verified.mounted,current.mounted,
-                  URL(fileURLWithPath:verified.reportedImagePath).standardizedFileURL.resolvingSymlinksInPath() != actual,
-                  verified.sameIdentity(as:current) else {throw VaultNativeFailure(operation:.imageDetach,result:first)}
+            let moved=verified.mounted && current.mounted &&
+                  URL(fileURLWithPath:verified.reportedImagePath).standardizedFileURL.resolvingSymlinksInPath() != actual
+            let same=verified.sameIdentity(as:current)
+            if !moved || !same {
+                var failed=first
+                for retry in 0..<busyRetries {
+                    // Only the observed normal exit 16 is eligible. Signals,
+                    // unknown termination and other exits never broaden policy.
+                    guard failed.termination == .exit,failed.status == 16,
+                          verified.mounted,current.mounted,same else {throw VaultNativeFailure(operation:.imageDetach,result:failed)}
+                    try await busyPause(retry)
+                    try Task.checkCancellation();try validate()
+                    guard let fresh=try await afterFailure() else {try await confirmDetached();return}
+                    guard verified.sameIdentity(as:fresh),fresh.mounted else {throw OSwindError.invalid("The attachment changed before busy recovery")}
+                    try Task.checkCancellation();try validate()
+                    let result=try await detach(fresh.attachmentDevice,fresh.root?.device)
+                    if result.succeeded {try await confirmDetached();return}
+                    failed=result
+                    if try await afterFailure()==nil {try await confirmDetached();return}
+                }
+                throw VaultNativeFailure(operation:.imageDetach,result:failed)
+            }
             try validate()
             let result=try await unmount(current.mount,current.root?.device)
             if !result.succeeded {

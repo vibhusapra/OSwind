@@ -209,6 +209,22 @@ final class OwnedVaultNativeTraceTests:XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode([String:String].self,from:exported),["path":"<owned-fixture>/Library/memory.sqlite"])
     }
 }
+/// Owns one fixture reader. Only an explicit normal busy exit releases it.
+private final class ReleasedBusyReader:@unchecked Sendable {
+    private let lock=NSLock()
+    private var reader:FileHandle?,releases=0
+    func hold(_ value:FileHandle) {lock.withLock {reader=value}}
+    var releaseCount:Int {lock.withLock {releases}}
+    func observe(_ event:VaultNativeDiagnostic) {
+        guard event.summary.operation == .imageDetach,event.summary.termination == .exit,event.summary.status==16 else {return}
+        release()
+    }
+    func release() {
+        let value:FileHandle?=lock.withLock {let value=reader;reader=nil;if value != nil {releases+=1};return value}
+        try? value?.close()
+    }
+    deinit {release()}
+}
 final class NativeVaultDetachSettlementTests:XCTestCase {
     func testKnownHeldReaderCapturesBusyExitAndPreservesHistoryUntilNormalRecovery() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned held-reader encrypted-volume fixture")}
@@ -236,14 +252,47 @@ final class NativeVaultDetachSettlementTests:XCTestCase {
             let final=try MemoryStore(root:vault.libraryURL);activeStore=final
             XCTAssertEqual(try final.get("owned-busy")?.text,"Owned busy control must survive normal recovery")
             _ = try await vault.lock(store:final);activeStore=nil
-            let busy=trace.snapshot().events.filter {$0.event.summary.operation == .imageDetach && $0.event.summary.status != 0}
-            XCTAssertEqual(busy.count,1);XCTAssertTrue(busy.first?.event.stderrSuffix.lowercased().contains("busy") == true)
+            let busy=trace.snapshot().events.filter {$0.stage=="expected-held-reader-lock" && $0.event.summary.operation == .imageDetach && $0.event.summary.status != 0}
+            XCTAssertEqual(busy.count,3);XCTAssertTrue(busy.first?.event.stderrSuffix.lowercased().contains("busy") == true)
             let blocked=trace.snapshot().beforeMutations.filter {$0.stage=="expected-held-reader-lock"}
-            XCTAssertEqual(blocked.count,1);XCTAssertTrue(blocked[0].ownedHandles.contains {$0.mounted && $0.path?.hasSuffix("/memory.sqlite")==true})
+            XCTAssertEqual(blocked.count,3);XCTAssertTrue(blocked.allSatisfy {$0.ownedHandles.contains {$0.mounted && $0.path?.hasSuffix("/memory.sqlite")==true}})
             try trace.save(root:root,secret:secret,failed:false);try FileManager.default.removeItem(at:root)
         } catch {
             let original=error;trace.markFailure();try? reader?.close();try? activeStore?.close();_ = try? await vault.lock()
             do {try trace.save(root:root,secret:secret,failed:true)} catch {print("Owned native trace could not be saved; original failure is preserved")};throw original
+        }
+    }
+    func testReleasedNativeReaderRecoversWithinOneLockRequestWithoutForce()async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned released-reader normal-recovery fixture")}
+        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-busy-recovery-"+UUID().uuidString);try Paths.ensure(root)
+        let trace=OwnedVaultNativeTrace(root:root),reader=ReleasedBusyReader()
+        let driver=NativeVaultDriver(observer:{event in trace.append(event);reader.observe(event)},willMutate:{trace.beforeMutation($0,$1)})
+        let package=root.appendingPathComponent("Fixture.oswindvault"),secret=Data(UUID().uuidString.utf8),vault=try LibraryVault(package:package,nativeDriver:driver)
+        var active:MemoryStore?
+        do {
+            _ = try await LibraryVault.create(at:package,name:"Owned bounded busy recovery",capacityGiB:1,passphrase:secret,nativeDriver:driver)
+            trace.setStage("prepare-owned-reader");_ = try await vault.unlock(passphrase:secret)
+            let store=try MemoryStore(root:vault.libraryURL);active=store
+            try store.insert(Memory(id:"preserve",text:"Owned released-reader history must survive automatic normal recovery"))
+            let path=vault.libraryURL.appendingPathComponent("owned-reader.txt");try Data("Owned reader".utf8).write(to:path)
+            let handle=try FileHandle(forReadingFrom:path),descriptor=handle.fileDescriptor;reader.hold(handle)
+            trace.setStage("released-reader-lock")
+            let result=try await vault.lock(store:store);active=nil
+            XCTAssertTrue(store.isClosed);XCTAssertEqual(result.state,.locked);XCTAssertFalse(result.imageAttached);XCTAssertEqual(reader.releaseCount,1)
+            let report=trace.snapshot(),events=report.events.filter {$0.stage=="released-reader-lock" && $0.event.summary.operation == .imageDetach}
+            XCTAssertTrue((2...3).contains(events.count));XCTAssertEqual(events.first?.event.summary.status,16);XCTAssertEqual(events.last?.event.summary.status,0)
+            XCTAssertTrue(events.dropLast().allSatisfy {$0.event.summary.termination == .exit && $0.event.summary.status==16})
+            XCTAssertFalse(report.events.contains {$0.stage=="released-reader-lock" && $0.event.summary.operation == .filesystemUnmount})
+            let boundaries=report.beforeMutations.filter {$0.stage=="released-reader-lock" && $0.operation == .imageDetach}
+            XCTAssertTrue(boundaries.first?.ownedHandles.contains {$0.descriptor==Int(descriptor) && $0.mounted} == true)
+            XCTAssertTrue(boundaries.dropFirst().allSatisfy {$0.ownedHandles.allSatisfy {!$0.mounted}})
+            trace.setStage("verify-preserved-history");_ = try await vault.unlock(passphrase:secret)
+            let final=try MemoryStore(root:vault.libraryURL);active=final;XCTAssertEqual(try final.get("preserve")?.text,"Owned released-reader history must survive automatic normal recovery")
+            _ = try await vault.lock(store:final);active=nil
+            try trace.save(root:root,secret:secret,failed:false);try FileManager.default.removeItem(at:root)
+        }catch {
+            let original=error;trace.markFailure();reader.release();try? active?.close();_ = try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)}catch {print("Owned recovery trace could not be saved; original failure preserved")};throw original
         }
     }
     func testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment() async throws {
