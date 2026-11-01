@@ -30,3 +30,7 @@ A retained cold lazy-provider counterexample shows that source mismatch already 
 ![Optional copied-text setup](../assets/clipboard-settings-sample.png)
 
 ![Permission-needed state with an injected reader](../assets/clipboard-permission-sample.png)
+
+## Hosted follow-up
+
+Publication0c9b5b7 passes the benchmark job and full1,877-case software suite in [run41288968230](https://github.com/vibhusapra/OSwind/actions/runs/41288968230), but its native owned-APFS move case fails with a missing vaultSession member. The attached fixture is preserved. [Phase diagnostics](VAULT-MOVE-PHASE.md) retain that failure and add an instrumented comparison; the cause and hosted native qualification remain open. This does not change the source8799e3f local software qualification.

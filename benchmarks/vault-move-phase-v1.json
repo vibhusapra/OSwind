@@ -1,0 +1,52 @@
+{
+  "state": "one-instrumented-native-comparison-passed-cause-unproven",
+  "source": "ac94977cdf30564c4f220855aa59c286a0249072",
+  "parent": "0c9b5b76702cdacbeef17a472491f0fed7062572",
+  "onlyTestInputChanged": "Tests/OSwindAppTests/VaultSessionTests.swift",
+  "testSourceSHA256": "20fb903ac50785ebd811e627bbba0305cbfae26620088f8acd77803f073269c7",
+  "logSHA256": "cbf7cd9eab697b0ccbc33a2ae25039684f8ee8291f316010fb493f1c378754eb",
+  "phases": [
+    "create",
+    "select-locked-package",
+    "unlock-before-move",
+    "write-owned-history",
+    "move-package",
+    "observe-move-and-lock",
+    "verify-move-lock",
+    "verify-saved-location",
+    "reopen-moved-history",
+    "close-reopened-library",
+    "verified-locked"
+  ],
+  "newPhaseCount": 11,
+  "defined": 1,
+  "passed": 1,
+  "failures": 0,
+  "originalFailure": {
+    "head": "0c9b5b76702cdacbeef17a472491f0fed7062572",
+    "run": 41288968230,
+    "job": 124796035524,
+    "case": "VaultSessionTests.testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback",
+    "category": "vaultSession",
+    "errno": 2,
+    "rootDescriptorMatchesInitial": true,
+    "parentDescriptorIsDirectory": true,
+    "parentMatchesInitialRoot": true,
+    "namedRootMatchesInitial": true,
+    "attachedOwnedFixturePreserved": true,
+    "phase": "unknown",
+    "cause": "unproven",
+    "nativeLogSHA256": "5d88d97a785baca737abc6be9dd75e5d209373b075324cae392ac19466ebe7c1"
+  },
+  "limits": [
+    "No production change or failure fix is claimed",
+    "One passing instrumented fixture does not establish a harmless or flaky cause",
+    "No unchanged CI rerun was requested; original failure retained",
+    "Physical desktop acceptance, sustained power and broad parity remain open"
+  ],
+  "checkedAtUTC": "2026-11-01T08:57:15.143414+00:00",
+  "format": "OSwind.owned-vault-move-phase",
+  "version": 1,
+  "overallV0Complete": false,
+  "schema": 31
+}
