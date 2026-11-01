@@ -104,7 +104,16 @@ struct SyncPublicationAdmission {
                     guard try packet.identity.key==change.revision.key,try packet.reference.content==content else {throw OSwindError.invalid("Journal callback body differs")}
                     switch packet.body {
                     case .turn:outcomes.append(try offer(packet.identity,admission:admission,fetchSource:fetchSource))
-                    case .conversationCitation(let body):outcomes.append(try offer(body.owner,citation:packet,admission:admission,fetchSource:fetchSource))
+                    case .conversationCitation(let body):
+                        // A new version of an actually declared native child
+                        // must recheck its old owner's complete declaration.
+                        // Its incoming claimed owner is not reverse-lookup
+                        // authority; unrelated unlisted child IDs still cannot
+                        // consume work or withdraw an independent publication.
+                        if let previous=try queue.completedOwner(ofCitation:packet.identity.key) {
+                            outcomes.append(try offer(previous,admission:admission,fetchSource:fetchSource))
+                            if previous != body.owner {outcomes.append(try offer(body.owner,citation:packet,admission:admission,fetchSource:fetchSource))}
+                        }else {outcomes.append(try offer(body.owner,citation:packet,admission:admission,fetchSource:fetchSource))}
                     default:_=try writer.apply(packet,admission:admission,fetchExactSource:fetchSource)
                     }
                 }
