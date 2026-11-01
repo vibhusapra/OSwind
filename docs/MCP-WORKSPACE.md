@@ -2,6 +2,8 @@
 
 Status: **software/package qualified; native platform acceptance open (F080 partial)**. The [752-input receipt](../benchmarks/mcp-workspace-v1.json) binds source `46c81b3` to13 passing stages:1,763 full passes/82 explicit skips; all70 MCP cases under sanitizer and optimization without skips or race warnings (38 new native cases,32 parent client cases);22 signed CLI process checks; normal/indexed API/MCP; actual quiet backup/restore and SIGINT/SIGKILL interruptions; strict signed/extracted34-file equality. Installed15 files and13 prior app trees stay unchanged. The signed CLI interoperates with isolated official Python SDK2.3.0 using exact Unicode text.
 
+[Hosted CI](https://github.com/vibhusapra/OSwind/actions/runs/41284551394) passes both jobs at publication head `c75a051`:1,763 full passes/82 skips,37 owned native vault passes and22 manual-client process checks. This documentation followup has a later head; no local UI/platform acceptance follows.
+
 All12 revised light/dark component renders were inspected after retained layout fixes. They cover authored data and unchanged view source in an earlier debug binary. A final signed-app input attempt was blocked because the Mac was locked. The launched PID was already absent at cleanup; no matching app process, SQLite library or server-start artifact remained. Its startup outcome is unknown. No unlock workaround, real credentials or personal history were used; no native interaction pass is claimed.
 
 ## User flow

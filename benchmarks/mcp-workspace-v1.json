@@ -523,7 +523,36 @@
     "green": "Tool and existing import quit cases pass; no finish callback until actual worker drain; repeated quit does not duplicate exit"
   },
   "hostedCI": {
-    "state": "pending-publication"
+    "state": "passed",
+    "head": "c75a051ffece8e82b1a2462d4fc1c795b2983c83",
+    "runURL": "https://github.com/vibhusapra/OSwind/actions/runs/41284551394",
+    "jobs": [
+      {
+        "name": "benchmark-harnesses",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41284551394/job/124783089420"
+      },
+      {
+        "name": "native",
+        "conclusion": "success",
+        "url": "https://github.com/vibhusapra/OSwind/actions/runs/41284551394/job/124783089624"
+      }
+    ],
+    "fullTests": {
+      "defined": 1845,
+      "passed": 1763,
+      "skipped": 82,
+      "failures": 0
+    },
+    "ownedNativeVaultTests": {
+      "defined": 37,
+      "passed": 37,
+      "skipped": 0,
+      "failures": 0
+    },
+    "manualClientProcessChecks": 22,
+    "nativeLogSHA256": "2ae6ad35211906e2ca08b554c400b0128cc576d2957db7716a9b7014816b3a15",
+    "scope": "Hosted macOS software/owned native fixture checks at publication headc75a051. Documentation followups have a later head. Real user-machine native input/Keychain acceptance remains open."
   },
   "remaining": [
     "Real stored-key/signed-GUI/native input and accessibility acceptance",
