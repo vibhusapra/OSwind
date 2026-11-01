@@ -70,7 +70,10 @@ struct SyncPublicationAdmission {
         while code==SQLITE_ROW {
             let size=Int(sqlite3_column_bytes(chats,0))
             guard redactions.count<SyncPublicationQueue.maximumJobs,sqlite3_column_type(chats,0)==SQLITE_TEXT,size>0,size<=SyncProtocolLimits.operationBytes,let pointer=sqlite3_column_text(chats,0),let identity=try cache.catalog.preparedIdentity(.conversation,primary:[.text(Data(bytes:pointer,count:size))]) else {throw OSwindError.unavailable("Prepare bounded source-erasure conversation identities")}
-            let record=try SyncPortableRecord(identity:identity,body:.conversation(.init(title:"Conversation",created:Date(timeIntervalSince1970:sqlite3_column_double(chats,1)),updated:Date(timeIntervalSince1970:sqlite3_column_double(chats,2)))))
+            guard [SQLITE_INTEGER,SQLITE_FLOAT].contains(sqlite3_column_type(chats,1)),[SQLITE_INTEGER,SQLITE_FLOAT].contains(sqlite3_column_type(chats,2)) else {throw OSwindError.database("Source redaction requires a native numeric date; do not coerce malformed storage")}
+            let created=sqlite3_column_double(chats,1),updated=sqlite3_column_double(chats,2)
+            guard created.isFinite,updated.isFinite else {throw OSwindError.database("Source redaction requires a finite native numeric date")}
+            let record=try SyncPortableRecord(identity:identity,body:.conversation(.init(title:"Conversation",created:Date(timeIntervalSince1970:created),updated:Date(timeIntervalSince1970:updated))))
             redactions.append(record);code=sqlite3_step(chats)
         };guard code==SQLITE_DONE else {throw db.error()}
         if !redactions.isEmpty {
