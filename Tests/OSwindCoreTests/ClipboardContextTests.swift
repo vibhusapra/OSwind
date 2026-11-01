@@ -23,7 +23,7 @@ final class ClipboardContextTests:XCTestCase {
     }
     func testProtectedTransientRemoteFileAndImageMarkersRefuse() {
         for marker in ClipboardTextDraft.ignoredTypes {XCTAssertThrowsError(try draft(snapshot(types:["public.utf8-plain-text",marker.uppercased()])))}
-        XCTAssertThrowsError(try draft(snapshot(types:["public.html"])));XCTAssertThrowsError(try draft(snapshot(items:2)))
+        XCTAssertThrowsError(try draft(snapshot(types:["public.utf8-plain-text","PUBLIC.UTF8-PLAIN-TEXT"])));XCTAssertThrowsError(try draft(snapshot(types:["public.utf8-plain-text","bad\0type"])));XCTAssertThrowsError(try draft(snapshot(types:["public.html"])));XCTAssertThrowsError(try draft(snapshot(items:2)))
     }
     func testSourceClaimsNeverOverrideForegroundPrivacy()throws {
         let types=["public.utf8-plain-text","org.nspasteboard.source"]

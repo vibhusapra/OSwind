@@ -1,11 +1,13 @@
 import XCTest
+import Combine
 @testable import OSwind
 @testable import OSwindCore
 
 actor ClipboardOwnedFixture {
-    private var count=7,probes=0,reads=0,held=false
+    private var count=7,probes=0,reads=0,requests=0,held=false
+    private var permission:ClipboardAccess = .allowed
     private var text="Mira owns the Marigold release.",waiters=[CheckedContinuation<Void,Never>]()
-    func probe()->ClipboardProbe {probes+=1;return .init(access:.allowed,changeCount:count)}
+    func probe()->ClipboardProbe {probes+=1;return .init(access:permission,changeCount:permission == .allowed ? count:nil)}
     func read(_ expected:Int)async->ClipboardTextSnapshot {
         reads+=1;if held {await withCheckedContinuation {waiters.append($0)}}
         return .init(changeCount:expected,finalChangeCount:count,itemCount:1,types:["public.utf8-plain-text"],text:Data(text.utf8))
@@ -13,7 +15,9 @@ actor ClipboardOwnedFixture {
     func change(_ value:Int,text:String?=nil){count=value;if let text {self.text=text}}
     func hold(){held=true}
     func release(){held=false;let values=waiters;waiters=[];for value in values {value.resume()}}
-    func counts()->(probes:Int,reads:Int){(probes,reads)}
+    func request()->ClipboardAccess {requests+=1;return permission}
+    func access(_ value:ClipboardAccess){permission=value}
+    func counts()->(probes:Int,reads:Int,requests:Int){(probes,reads,requests)}
 }
 
 @MainActor final class ClipboardContextModelTests:XCTestCase {
@@ -28,7 +32,7 @@ actor ClipboardOwnedFixture {
     }
     func install(){
         let fixture=self.fixture!,store=self.store!
-        let reader=ClipboardReader(probe:{await fixture.probe()},read:{await fixture.read($0)})
+        let reader=ClipboardReader(probe:{await fixture.probe()},read:{count,_ in await fixture.read(count)},requestAccess:{await fixture.request()})
         model=ClipboardContextModel(store:store,settings:settings,reader:reader,context:{[unowned self] in self.contextReads+=1;return self.contextReads%2==0 ? self.after ?? self.observed:self.observed},locked:{[unowned self] in self.locked},idle:{[unowned self] in self.idle},limited:{false},schedulesTimers:false,workspaceNotifications:NotificationCenter())
         model.saveSource={draft in try Task.checkCancellation();return try store.importCollectorBatch(draft.batch)}
     }
@@ -70,4 +74,30 @@ actor ClipboardOwnedFixture {
         model.poll();try await settled();await fixture.change(9);model.poll();try await settled()
         let counts=await fixture.counts();XCTAssertEqual(counts.reads,1);XCTAssertEqual(model.saved,0);XCTAssertEqual(try store.stats().count,0)
     }
+    func testQuietPollsDoNotInvalidateVisibleUI()async throws {
+        try await start();var updates=0;let subscription=model.objectWillChange.sink {updates+=1};defer {subscription.cancel()}
+        for _ in 0..<20 {model.poll();try await settled()}
+        XCTAssertEqual(updates,0);let counts=await fixture.counts();XCTAssertEqual(counts.reads,0);XCTAssertEqual(contextReads,0)
+    }
+    func testPermissionRequestsRequireExplicitActionAndNeverSaveCurrentText()async throws {
+        try await start();let initial=await fixture.counts();XCTAssertEqual(initial.requests,0)
+        model.requestAccess();try await settled();let requested=await fixture.counts();XCTAssertEqual(requested.requests,1);XCTAssertEqual(requested.reads,0);XCTAssertEqual(try store.stats().count,0)
+        model.poll();try await settled();let baseline=await fixture.counts();XCTAssertEqual(baseline.reads,0);XCTAssertEqual(baseline.requests,1)
+    }
+
+    func testDeniedAndAskPermissionsNeverReadOrRequestAndReapprovalDoesNotBackfill()async throws {
+        await fixture.access(.approvalRequired);try await start();for _ in 0..<3 {model.poll();try await settled()}
+        let waiting=await fixture.counts();XCTAssertEqual(waiting.requests,0);XCTAssertEqual(waiting.reads,0);XCTAssertEqual(contextReads,0)
+        await fixture.change(8);await fixture.access(.allowed);model.poll();try await settled();let first=await fixture.counts();XCTAssertEqual(first.reads,0)
+        await fixture.change(9);model.poll();try await settled();XCTAssertEqual(model.saved,1)
+        await fixture.access(.denied);await fixture.change(10);model.poll();try await settled();await fixture.access(.allowed);model.poll();try await settled()
+        let restored=await fixture.counts();XCTAssertEqual(restored.reads,1);XCTAssertEqual(restored.requests,0);XCTAssertEqual(model.saved,1)
+    }
+
+    func testReplacedLibraryRefusesBeforeTextOrWindowRead()async throws {
+        try await start();let retired=root.appendingPathExtension("retired");try FileManager.default.moveItem(at:root,to:retired);try FileManager.default.createDirectory(at:root,withIntermediateDirectories:false)
+        defer {try? FileManager.default.removeItem(at:root);try? FileManager.default.moveItem(at:retired,to:root)}
+        await fixture.change(8);model.poll();try await settled();let counts=await fixture.counts();XCTAssertEqual(counts.reads,0);XCTAssertEqual(contextReads,0);XCTAssertEqual(model.saved,0)
+    }
+
 }

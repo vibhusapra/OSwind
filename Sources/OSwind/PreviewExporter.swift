@@ -12,7 +12,11 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if ["ToolsReady","ToolsCompact","ToolsResult","ToolsReview","ToolsEmpty","ToolsSetup"].contains(model.section) {
+        if ["ClipboardOff","ClipboardReady","ClipboardPermission","ClipboardPaused"].contains(model.section) {
+            let sample=try await ClipboardSettingsPreview.make(store:model.store,stage:model.section)
+            size=NSSize(width:940,height:660)
+            content=AnyView(VStack(alignment:.leading,spacing:12) {Text("Copied text · sample").font(.title2.weight(.medium));Form {ClipboardContextSettingsView(model:sample.model,enabled:.constant(sample.enabled))}.formStyle(.grouped);Spacer()}.padding(24))
+        } else if ["ToolsReady","ToolsCompact","ToolsResult","ToolsReview","ToolsEmpty","ToolsSetup"].contains(model.section) {
             let stage=model.section,tools=try await MCPToolsPreview.make(store:model.store,stage:stage)
             if stage=="ToolsReview",let review=tools.pendingReview {size=NSSize(width:680,height:720);content=AnyView(MCPActionReviewView(review:review,cancel:{},confirm:{}))}
             else if stage=="ToolsSetup" {size=NSSize(width:700,height:680);content=AnyView(MCPConnectionsView(model:tools))}

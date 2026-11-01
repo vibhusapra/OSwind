@@ -6,7 +6,8 @@ enum ClipboardAccess:Sendable {case allowed,approvalRequired,denied}
 struct ClipboardProbe:Sendable {let access:ClipboardAccess;let changeCount:Int?}
 struct ClipboardReader:Sendable {
     var probe:@Sendable ()async throws->ClipboardProbe
-    var read:@Sendable (Int)async throws->ClipboardTextSnapshot
+    var read:@Sendable (Int,String)async throws->ClipboardTextSnapshot
+    var requestAccess:@Sendable ()async throws->ClipboardAccess={throw OSwindError.unavailable("Clipboard permission request is unavailable")}
     static var native:Self {NativeClipboardBackend().reader}
 }
 
@@ -34,8 +35,9 @@ struct NativeClipboardBackend:Sendable {
     }
     var reader:ClipboardReader {.init(probe:{
         try await worker.read {let pasteboard=board(),permission=access(pasteboard);return .init(access:permission,changeCount:permission == .allowed ? pasteboard.changeCount:nil)}
-    },read:{expected in
+    },read:{expected,observedBundle in
         try await worker.read {
+            guard !observedBundle.isEmpty,observedBundle.utf8.count<=512,!observedBundle.utf8.contains(0) else {throw ClipboardObservationSkip("Observed clipboard app is invalid")}
             let pasteboard=board()
             guard access(pasteboard) == .allowed else {throw ClipboardObservationSkip("Clipboard access needs explicit macOS approval")}
             guard pasteboard.changeCount==expected,let items=pasteboard.pasteboardItems,items.count==1 else {throw ClipboardObservationSkip("Clipboard contents changed or are outside single-item scope")}
@@ -43,10 +45,20 @@ struct NativeClipboardBackend:Sendable {
             try ClipboardTextDraft.admittedTypes(types,itemCount:items.count)
             var source:String?
             if let type=item.types.first(where:{$0.rawValue.lowercased()=="org.nspasteboard.source"}) {
-                guard let data=item.data(forType:type),data.count<=512,let value=String(data:data,encoding:.utf8) else {throw ClipboardObservationSkip("Clipboard source marker is malformed or oversized")};source=value
+                guard let data=item.data(forType:type),data.count<=512,let value=String(data:data,encoding:.utf8) else {throw ClipboardObservationSkip("Clipboard source marker is malformed or oversized")}
+                guard !value.isEmpty,Data(value.utf8)==Data(observedBundle.utf8) else {throw ClipboardObservationSkip("Clipboard source claim does not match the observed foreground app")};source=value
             }
             guard let data=item.data(forType:.string),!data.isEmpty,data.count<=ClipboardTextDraft.maximumTextBytes else {throw ClipboardObservationSkip("Clipboard text is unavailable or exceeds64KiB")}
             return .init(changeCount:expected,finalChangeCount:pasteboard.changeCount,itemCount:items.count,types:types,text:data,declaredSource:source)
+        }
+    },requestAccess:{
+        try await worker.read {
+            let pasteboard=board(),permission=access(pasteboard)
+            guard permission == .approvalRequired else {return permission}
+            // A separate explicit UI action authorizes this one access request.
+            // Existing text is discarded, never returned to the observer/saved.
+            _ = pasteboard.data(forType:.string)
+            return access(pasteboard)
         }
     })}
 }

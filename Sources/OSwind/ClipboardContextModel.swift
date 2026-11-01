@@ -6,11 +6,15 @@ import OSwindCore
 
 @MainActor final class ClipboardContextModel:ObservableObject {
     @Published private(set) var running=false
-    @Published private(set) var busy=false
-    @Published private(set) var status="Clipboard context is off"
+    private(set) var busy=false
+    private var statusValue="Clipboard context is off"
+    private(set) var status:String {
+        get {statusValue}
+        set {guard statusValue != newValue else {return};objectWillChange.send();statusValue=newValue}
+    }
     @Published private(set) var saved=0
-    @Published private(set) var skipped=0
-    @Published private(set) var unchanged=0
+    private(set) var skipped=0
+    private(set) var unchanged=0
     var allowed:()->Bool={true}
     var saveSource:((ClipboardTextDraft)async throws->CollectorImportResult)?
     private let store:MemoryStore,reader:ClipboardReader
@@ -46,6 +50,23 @@ import OSwindCore
         if !running {invalidate();session=UUID().uuidString.lowercased();running=true}
         status="Waiting for a new eligible clipboard change";schedule();poll()
     }
+    func requestAccess() {
+        guard !busy,settings.clipboard.enabled,!store.isClosed,!suspended,!locked(),allowed() else {return}
+        invalidate();let generation=epoch,id=UUID();operationID=id;busy=true
+        status="Asking macOS for clipboard access…"
+        worker=Task {[weak self] in
+            guard let self else {return};defer {finish(id)}
+            do {
+                let permission=try await reader.requestAccess()
+                guard generation==epoch,!Task.isCancelled,!store.isClosed,!locked(),allowed(),settings.clipboard.enabled else {return}
+                switch permission {
+                case .allowed:status=running ? "Clipboard access available · waiting for a new change":"Clipboard access available · resume when ready"
+                case .approvalRequired:status="Choose Always Allow for OSwind in macOS Clipboard settings to monitor future changes"
+                case .denied:status="macOS denied clipboard access · review Privacy settings"
+                }
+            }catch is CancellationError {}catch {if generation==epoch {status=error.localizedDescription}}
+        }
+    }
     func stop(){running=false;invalidate();timer?.invalidate();timer=nil;status=busy ? "Stopping clipboard work…":"Clipboard paused"}
     func cancelAndWait()async {stop();let task=worker;await task?.value}
     /// Erasure/privacy transitions establish a fresh baseline, not a backfill.
@@ -55,7 +76,7 @@ import OSwindCore
         timer=Timer.scheduledTimer(withTimeInterval:limited() ? 5:1,repeats:true) {[weak self] _ in Task {@MainActor in self?.poll()}}
     }
     private func current(_ value:UUID)->Bool {running && value==epoch && !Task.isCancelled && usable}
-    private func finish(_ id:UUID){guard operationID==id else {return};worker=nil;operationID=nil;busy=false;if !running {status="Clipboard paused"}}
+    private func finish(_ id:UUID){guard operationID==id else {return};worker=nil;operationID=nil;busy=false;if !running,status=="Stopping clipboard work…" {status="Clipboard paused"}}
     /// The timer checks only permission/count until a new change is observed.
     /// Off, locked, idle and retired scopes do not probe pasteboard contents.
     func poll() {
@@ -77,7 +98,7 @@ import OSwindCore
                 guard let before=await context() else {throw ClipboardObservationSkip("Accessibility or foreground window context is unavailable")}
                 guard current(generation) else {return}
                 try ClipboardTextDraft.admittedContext(before,policy:settings.privacy)
-                let began=ProcessInfo.processInfo.systemUptime,snapshot=try await reader.read(count)
+                let began=ProcessInfo.processInfo.systemUptime,snapshot=try await reader.read(count,before.bundle)
                 guard current(generation) else {return}
                 guard let after=await context() else {throw ClipboardObservationSkip("Foreground context could not be renewed")}
                 guard current(generation) else {return}

@@ -43,7 +43,7 @@ public struct ClipboardTextDraft:Sendable {
     public let digest:Data
     public let batch:Data
     public static func admittedTypes(_ types:[String],itemCount:Int)throws {
-        guard itemCount==1,types.count<=64,types.allSatisfy({!$0.isEmpty && $0.utf8.count<=256}),types.contains("public.utf8-plain-text"),
+        guard itemCount==1,types.count<=64,Set(types.map {$0.lowercased()}).count==types.count,types.allSatisfy({!$0.isEmpty && $0.utf8.count<=256 && !$0.unicodeScalars.contains(where:{$0.value<32 || (127...159).contains($0.value)})}),types.contains("public.utf8-plain-text"),
               !types.contains(where:{ignoredTypes.contains($0.lowercased())}) else {throw ClipboardObservationSkip("Clipboard format is protected, transient, remote or outside plain-text scope")}
     }
     public static func admittedContext(_ context:WindowContext,policy:PrivacyPolicy)throws {
