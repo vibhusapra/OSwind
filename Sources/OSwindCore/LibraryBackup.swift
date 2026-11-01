@@ -104,6 +104,7 @@ public enum LibraryBackup {
     static func quietSettings(_ settings: AppSettings) -> AppSettings {
         var result = settings
         result.captureOnLaunch = false; result.audioEnabled = false; result.systemAudioEnabled = false; result.apiEnabled = false
+        result.meetings = .init()
         result.entityAutomaticIndex = false;result.routinesEnabled = false;result.automaticMaintenance = false; result.ai.allowRemote = false; result.ai.provider = .evidence
         result.ai.endpoint = AIConfiguration().endpoint; result.search.provider = .apple; result.search.endpoint = SearchConfiguration().endpoint
         // Restored archives cannot select a machine-local model or start inference.

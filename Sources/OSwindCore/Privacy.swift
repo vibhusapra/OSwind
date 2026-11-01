@@ -93,6 +93,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var search = SearchConfiguration()
     public var automaticMaintenance = true
     public var apiEnabled = false
+    public var meetings = MeetingContextConfiguration()
     public var routinesEnabled = false
     public var entityAutomaticIndex = false
     public var nativeModelRetention:NativeModelRetention = .twoMinutes
@@ -105,7 +106,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,piiImports,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,piiImports,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,meetings,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
@@ -120,6 +121,9 @@ public struct AppSettings: Codable, Equatable, Sendable {
         search = try c.decodeIfPresent(SearchConfiguration.self,forKey:.search) ?? search
         automaticMaintenance = try c.decodeIfPresent(Bool.self,forKey:.automaticMaintenance) ?? automaticMaintenance
         apiEnabled = try c.decodeIfPresent(Bool.self,forKey:.apiEnabled) ?? apiEnabled
+        // Malformed calendar preferences never broaden selection or start a service.
+        if c.contains(.meetings) {meetings=(try? c.decode(MeetingContextConfiguration.self,forKey:.meetings)) ?? MeetingContextConfiguration()}
+        if (try? meetings.validate()) == nil {meetings=MeetingContextConfiguration()}
         routinesEnabled = try c.decodeIfPresent(Bool.self,forKey:.routinesEnabled) ?? routinesEnabled
         entityAutomaticIndex = try c.decodeIfPresent(Bool.self,forKey:.entityAutomaticIndex) ?? entityAutomaticIndex
         diarization = try c.decodeIfPresent(DiarizationConfiguration.self,forKey:.diarization) ?? diarization

@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Calendar-linked meeting context — software-tested, native acceptance open
+
+[F079](MEETINGS.md) moves from TODO to **partial**: explicit calendar selection, a distinct Meetings workspace, freshly verified brief/join actions, privacy-filtered literal calendar metadata in source-linked Ask, generic reminders and durable library-bound deduplication are implemented. All **57 mandatory new cases** pass in debug, TSan and optimized builds, including actual SQLite competition, pre/postcommit process death, request interception and a real 30-second timer refresh. [737-input evidence](../benchmarks/calendar-context-v1.json): **1,692 full passes / 83 skips**, **247 sanitizer and 247 optimized passes / three skips each**; twelve additional SDK/package/process/archive checks and eight component renders pass. Installed and prior app bytes are preserved.
+
+The original native vault group passes35/37, with two system-operation timeouts under repeated recorded sleep/wake activity. One unchanged-build targeted comparison passes both failed cases, while still recording maintenance sleep. Original failures and the unresolved cause remain explicit. No real Calendar/account read, native notification/Focus delivery, interactive main-window/manual-join or physical-power acceptance is claimed. Ledger:4 live verified /41 partial /6 implemented /23 tested /7 TODO /2 outside current desktop scope,83 total. Complete parity and top-three ranking remain unfinished.
+
 ## Late dependent records - local functional qualification passed
 
 [The component](SYNC-LATE-DEPENDENCIES.md) retires late owning/evidence children whose parent barrier is already admitted, publishes real causal deletions atomically and permits unrelated later sender records. Seventeen new methods include conflict heads, cancellation/reservation guards, stale recap ownership and real pre/postcommit SIGKILL. Final 23 selected: 22 pass / one worker skip, versus45 assertions / 14 unexpected errors on the old writer.

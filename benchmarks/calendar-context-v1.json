@@ -1,0 +1,600 @@
+{
+  "format": "OSwind.calendar-context.qualification",
+  "version": 1,
+  "state": "software-checks-passed-original-native-failures-retained",
+  "overallV0Complete": false,
+  "schema": 31,
+  "sourceBase": "e453bf633b7b642a2b3504338ea938bd41e4edf6",
+  "branch": "codex/calendar-meeting-context",
+  "scope": "Opt-in selected-calendar context, freshly verified source-linked meeting briefs and reviewed HTTPS join actions; generic notification attempts with durable library-bound deduplication.",
+  "inputs": {
+    "repository": 737,
+    "manifest": "calendar-context-inputs-v1.json",
+    "manifestSHA256": "bcc06088298c7f1db7838a26bc16752e0e17cc277a711b532c429733bb95a6de",
+    "allUnchanged": true
+  },
+  "review": {
+    "state": "software-checks-passed-original-native-failures-retained",
+    "reviewedAtUTC": "2026-11-01T03:53:42.276809+00:00",
+    "frozenInputs": 737,
+    "allInputAnd15PassedStageHashesUnchanged": true,
+    "tests": {
+      "full-debug": {
+        "defined": 1775,
+        "passed": 1692,
+        "skipped": 83,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      },
+      "thread-sanitizer": {
+        "defined": 250,
+        "passed": 247,
+        "skipped": 3,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      },
+      "optimized": {
+        "defined": 250,
+        "passed": 247,
+        "skipped": 3,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      }
+    },
+    "newMeetingCases": 58,
+    "newMeetingMandatoryExecutedEachBuild": 57,
+    "sanitizerLogs": {
+      "thread-sanitizer.log": "bfc1824065714e1513ea7b646a26fa842cbb013b172177456aeaf22e9ea8e4dd",
+      "thread-sanitizer-meeting-workers/meeting-after-0EB1F7A4-D219-44D9-8F17-395AFA388E36.log": "5fef74d256a603292ea6126f3247f073c2c8f778ace768db5820f8ebf92f8ed1",
+      "thread-sanitizer-meeting-workers/meeting-before-A787A14F-99E4-488A-A1A8-8CECA8966EEF.log": "22339ca1c3e90b040f55a29d788bfae53d862ba8866cca6134e57b95b576c110"
+    },
+    "raceWarnings": 0,
+    "uiComponentRenders": 8,
+    "compact770x570": true,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "installedFilesUnchanged": 15,
+    "protectedAppsUnchanged": 7,
+    "cliSHA256": "be4b358f9d470f53aa70e0798aefa1ee322a47801ebda6481ca2d200f70a4756",
+    "appSHA256": "110fadf7d3c587e8383712b5c6cab366491a519f406d615e6ff4b96e24a0b0ab",
+    "zipSHA256": "d41c974ffd4dd95f7cc26dc769f6f4eea779cff645ff7d0ac22bbbfd4e1bd5b7",
+    "nativeOriginal": {
+      "passed": 35,
+      "failed": 2,
+      "scope": "Actual system-operation timeouts under recorded clamshell/maintenance sleep; retained, no root-cause fix claimed."
+    },
+    "nativeCalendarAcceptance": false,
+    "overallV0Complete": false,
+    "nativeComparison": {
+      "state": "passed-host-transitions-observed",
+      "startedAtUTC": "2026-11-01T03:49:44.635948+00:00",
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--filter",
+        "^(OSwindCoreTests\\.NativeVaultCancellationTests/testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact|OSwindCoreTests\\.NativeVaultQueryRecoveryTests/testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation)$"
+      ],
+      "frozenInputs": 737,
+      "priorNativeDefined": 37,
+      "priorNativePassed": 35,
+      "priorNativeFailed": 2,
+      "controlledComparison": true,
+      "condition": "Temporary idle-sleep assertion; actual sleep/wake activity checked. No clamshell override or device setting change.",
+      "sourceUnchangedBefore": true,
+      "returncode": 0,
+      "finishedAtUTC": "2026-11-01T03:50:24.796020+00:00",
+      "monotonicSeconds": 36.3147961248178,
+      "wallSeconds": 40.160072,
+      "logSHA256": "9a33c3cb5cc2f0f6f5c6161d8a7e412d10cf6db83a37332e0e0e214ecf009c7b",
+      "observedSleepWakeEvents": 1,
+      "sourceUnchangedAfter": true,
+      "tests": {
+        "defined": 2,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "powerLogSHA256": "a8e62fab3b41e769667dbe79967e43fc3b5bccb1f974026652ec8004b326cf67"
+    },
+    "nativeSingleFullGroupPass": false,
+    "nativeFailureCauseResolved": false
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "log": "full-debug.log",
+      "returncode": 0,
+      "wallSeconds": 284.90691637503915,
+      "logSHA256": "4a871b627a0d13a9f19112fdc94add60627b57f64ca768502417e415b1422788",
+      "tests": {
+        "defined": 1775,
+        "passed": 1692,
+        "skipped": 83,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      },
+      "workerLogs": {
+        "full-debug-meeting-workers/meeting-after-B5F8BED6-D627-4C08-B5B7-7CC7A1CBAD18.log": "af44895f5ada8d5417c95126c9d2a13f5b0d9eb7124eee2777bccfaf5294e9f0",
+        "full-debug-meeting-workers/meeting-before-8E05E204-F19C-4277-A04D-3160FD836BD3.log": "fd83a68784bd44fcbab7dbc0094f05ba8327a1b23e11f306b1d6d0cfc925a054"
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        ".build-meetings-tsan",
+        "--sanitize=thread",
+        "--filter",
+        "^(OSwindCoreTests\\.(Meeting.*|.*Privacy.*|.*Backup.*|.*Recap.*|Conversation|LibraryWipe)Tests|OSwindAppTests\\.(Meeting.*|LibraryWipeModel|WorkspaceWakeLifecycle|RecapModel|HistoryErasureModel|MaintenanceStartup|ImportLifecycleModel)Tests)/"
+      ],
+      "log": "thread-sanitizer.log",
+      "returncode": 0,
+      "wallSeconds": 129.9245867920108,
+      "logSHA256": "bfc1824065714e1513ea7b646a26fa842cbb013b172177456aeaf22e9ea8e4dd",
+      "tests": {
+        "defined": 250,
+        "passed": 247,
+        "skipped": 3,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      },
+      "workerLogs": {
+        "thread-sanitizer-meeting-workers/meeting-after-0EB1F7A4-D219-44D9-8F17-395AFA388E36.log": "5fef74d256a603292ea6126f3247f073c2c8f778ace768db5820f8ebf92f8ed1",
+        "thread-sanitizer-meeting-workers/meeting-before-A787A14F-99E4-488A-A1A8-8CECA8966EEF.log": "22339ca1c3e90b040f55a29d788bfae53d862ba8866cca6134e57b95b576c110"
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "^(OSwindCoreTests\\.(Meeting.*|.*Privacy.*|.*Backup.*|.*Recap.*|Conversation|LibraryWipe)Tests|OSwindAppTests\\.(Meeting.*|LibraryWipeModel|WorkspaceWakeLifecycle|RecapModel|HistoryErasureModel|MaintenanceStartup|ImportLifecycleModel)Tests)/"
+      ],
+      "log": "optimized.log",
+      "returncode": 0,
+      "wallSeconds": 229.34080075006932,
+      "logSHA256": "9b39ab3a18f9df69ede0e7c4a2173925c4b75e8cc20bd57330696c8cd42886df",
+      "tests": {
+        "defined": 250,
+        "passed": 247,
+        "skipped": 3,
+        "failures": 0,
+        "newMeetingMethodsExecuted": 57,
+        "guardedWorkerSkipped": 1
+      },
+      "workerLogs": {
+        "optimized-meeting-workers/meeting-after-407A2ADE-5B83-4985-9E83-619908246469.log": "0cebcb2864ffbed7a01dbb22a54207e31e1b9c83c789fbcdad78ac2cd774f085",
+        "optimized-meeting-workers/meeting-before-10E562A5-299F-4870-906A-82F2708FB754.log": "1a17fe4ffbd0fdd489bfbf8c021f3730d9ec5993bd5d51ea3dc081c0ef09f28f"
+      }
+    },
+    {
+      "name": "sdk",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/test-python-sdk.py"
+      ],
+      "log": "sdk.log",
+      "returncode": 0,
+      "wallSeconds": 8.67311216588132,
+      "logSHA256": "e23d74aa9b05cd82b1e0a19f7b5e2f1f4d9a94b0bb2f87da55c4c216700f8580"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ],
+      "log": "package.log",
+      "returncode": 0,
+      "wallSeconds": 262.3084050419275,
+      "logSHA256": "5f3a87fd1515fad33764b12c73457fcd31784db7553a155a76aef2c48477df2d"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl"
+      ],
+      "log": "api-mcp.log",
+      "returncode": 0,
+      "wallSeconds": 1.074394082883373,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ],
+      "log": "indexed-api-mcp.log",
+      "returncode": 0,
+      "wallSeconds": 1.1803794580046088,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "conversation",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/conversation-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/conversation.json"
+      ],
+      "log": "conversation.log",
+      "returncode": 0,
+      "wallSeconds": 0.5325702910777181,
+      "logSHA256": "68486499d88bdf809d9e3033d1897b0af10539cf69233caaa56f95d64d3b25cd"
+    },
+    {
+      "name": "recap",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/recap-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/recap.json"
+      ],
+      "log": "recap.log",
+      "returncode": 0,
+      "wallSeconds": 1.6097452910616994,
+      "logSHA256": "1c1aa2b67b528b501a54339d1b1a2236860e8d06b0a347e3fd83e9dd9d9f73a1"
+    },
+    {
+      "name": "wipe-interruptions",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/wipe-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/wipe.json"
+      ],
+      "log": "wipe-interruptions.log",
+      "returncode": 0,
+      "wallSeconds": 16.699461166048422,
+      "logSHA256": "e5192ebd7e7e36d58b6af9f729cb691655444aceef257f5776d0bbc7011f83cd"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "command": [
+        "python3",
+        "scripts/backup-smoke.py",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/backup.json"
+      ],
+      "log": "backup-interruptions.log",
+      "returncode": 0,
+      "wallSeconds": 3.0511002079583704,
+      "logSHA256": "8decbf903845753a3092ff3da4e433490bbfb946d355a0d06cdf3cc33fd773db"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind-macos.zip"
+      ],
+      "log": "archive.log",
+      "returncode": 0,
+      "wallSeconds": 2.7022707918658853,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind-macos.zip",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/extracted"
+      ],
+      "log": "extract.log",
+      "returncode": 0,
+      "wallSeconds": 0.19392549991607666,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/OSwind.app"
+      ],
+      "log": "strict-app.log",
+      "returncode": 0,
+      "wallSeconds": 0.0766263750847429,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/calendar-context-v1/qualification-followup-v1/extracted/OSwind.app"
+      ],
+      "log": "strict-extracted.log",
+      "returncode": 0,
+      "wallSeconds": 0.08024791697971523,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "expectedMeetingMethods": {
+    "OSwindCoreTests.MeetingReminderCrashTests": [
+      "testDeathBeforeReminderCommitAllowsOneRetry",
+      "testDeathAfterReminderCommitDoesNotRepeatAttempt",
+      "testMeetingReminderCrashWorker"
+    ],
+    "OSwindCoreTests.MeetingRequestTests": [
+      "testCompatibleAdapterReceivesOnlySanitizedPermittedMeetingContext"
+    ],
+    "OSwindCoreTests.MeetingContextTests": [
+      "testDefaultsAndLegacySettingsNeverEnableCalendarReads",
+      "testMalformedCalendarSettingsPreserveOtherPrivacyAndStayDisabled",
+      "testInvalidSelectionAndReminderIntervalsRefuse",
+      "testSelectionComparesCompleteIdentifierBytes",
+      "testWrongLibraryNeverProducesMeetingsOrReminders",
+      "testSelectedScopeAndDueWindowExcludeOtherCalendarsCancelledDeclinedAndAllDayReminders",
+      "testPrivacyBlocksCalendarApplicationTitlesAndJoinDomains",
+      "testMovedRecurrenceKeepsOccurrenceIdentityButGetsNewReminderTime",
+      "testConflictingSnapshotsRefuseInsteadOfSelectingAnOldOccurrence",
+      "testModelQuestionOmitsJoinTokensAndParticipantsUnlessEnabled",
+      "testJoinLinksOnlyAcceptBoundedHTTPSWithoutEmbeddedCredentials",
+      "testQuietRestoreClearsExecutionSelectionAndLibraryBinding",
+      "testReminderReceiptsSurviveReopenAndDoNotRewriteDuplicates",
+      "testMalformedLedgerDoesNotResetAndDuplicateAClaim",
+      "testScalarAndByteBoundsDoNotExpandForOneHugeGraphemeOrCutAJoinURL",
+      "testJoinURLsAndEmailAddressesEmbeddedInLabelsAreOmittedFromBrief",
+      "testClaimBatchRefusalRollsBackAndRestoresConnectionDurability",
+      "testTwoConnectionsCompeteForOneDurableReminderClaim",
+      "testWipeRemovesReminderMetadataAndRejectsOldLibraryAuthorization",
+      "testCalendarAuthorizationIsReadOnlyUntilSelectionAndSurvivesCacheEpochRotation",
+      "testFullReceiptWindowRefusesNewClaimsWithoutEvictingUnexpiredOnes",
+      "testBriefMetadataFitsModelQuestionBoundWithWorstCaseQuotedNames",
+      "testLibraryTokenRejectsNULTailAndBlobInsteadOfAcceptingTextPrefix",
+      "testLedgerRejectsNULTrailingBytesRatherThanDecodingOnlyTheJSONPrefix"
+    ],
+    "OSwindCoreTests.MeetingEvidencePolicyTests": [
+      "testMeetingContextExcludesCurrentPrivateSourcesAndDerivedSummariesBeforePromptAssembly",
+      "testNoEligibleMeetingEvidenceReturnsWithoutCredentialOrRemoteRequest"
+    ],
+    "OSwindAppTests.MeetingsModelTests": [
+      "testDisabledStartupQuietWakeAndRefreshNeverReadOrPrompt",
+      "testSelectedFeedUsesCacheUntilRevisionChangesAndNeverRequestsPermission",
+      "testRevokedAccessStopsWithoutReadingEventsOrRequestingAgain",
+      "testWrongLibraryBindingStopsBeforeCalendarRead",
+      "testPauseClearsDetailsAndWakeCannotResumeManualPause",
+      "testSleepClearsDetailsAndRequestedWakeRefreshes",
+      "testLateCalendarResponseCannotPublishAfterPause",
+      "testPrivacyEditRevokesInflightReadAndLeavesNoCalendarNames",
+      "testLockGateRejectsReadAndExplicitConnectionWithoutPrompt",
+      "testChangedOccurrenceRefusesBriefAndJoinUntilRefreshed",
+      "testOnlyExplicitVerifiedJoinOpensLink",
+      "testReminderAttemptIsDeduplicatedAcrossControllerRestart",
+      "testLateNotificationCompletionRemovesOnlyRetiredGeneration",
+      "testExplicitSelectionBindsLibraryAndPersistsOnlySelectedIdentifiers",
+      "testStaleNotificationPermissionReplyCannotRestoreDisconnectedPreferences",
+      "testExternalLibraryWipeDuringFeedReadRequiresNewSelection",
+      "testPowerModeChangesPollingIntervalWithoutAnEnergyClaim",
+      "testEventRevisionChangeRemovesLateNotificationCompletion",
+      "testChangedLibraryRootCannotRequestPermissionOrListCalendars",
+      "testActualTimerRefreshesChangedFeedWithoutAnInvalidationCallback"
+    ],
+    "OSwindAppTests.MeetingWorkspaceTests": [
+      "testQuietPreparedWorkspaceDoesNotReadCalendarsOnWake",
+      "testOnboardingDefersSavedCalendarAndSwitchPreventsRestart",
+      "testScreenSleepClearsContextAndPauseAllPreventsWakeResume",
+      "testBriefUsesExistingEvidenceConversationAndTreatsCalendarFiltersAsLiteral",
+      "testGlobalPauseAlsoStopsCalendarOnlyCollection",
+      "testCalendarSelectionPersistCallbackUpdatesRealSettingsWithoutLosingOtherPrivacy",
+      "testOpeningMeetingsDoesNotStartCalendarOrUnrelatedVisualRetrieval",
+      "testCompletedWipeClearsSelectionAndAllowsFreshCalendarConnect"
+    ]
+  },
+  "nativeOriginal": {
+    "state": "failed",
+    "command": [
+      "swift",
+      "test",
+      "--filter",
+      "NativeVault|VaultSessionTests"
+    ],
+    "returncode": 1,
+    "logSHA256": "68619a50bff5d09b1b5b84aa50706206bc747ab3a8396d1ddd7af2a3ceb03012",
+    "defined": 37,
+    "passed": 35,
+    "failed": 2,
+    "failedCases": [
+      "NativeVaultCancellationTests/testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact",
+      "NativeVaultQueryRecoveryTests/testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation"
+    ],
+    "sleepWakeEvents": 15,
+    "subsequentFailedFixtureAttachments": [],
+    "causeResolved": false
+  },
+  "nativeComparison": {
+    "state": "passed-host-transitions-observed",
+    "startedAtUTC": "2026-11-01T03:49:44.635948+00:00",
+    "command": [
+      "swift",
+      "test",
+      "--skip-build",
+      "--filter",
+      "^(OSwindCoreTests\\.NativeVaultCancellationTests/testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact|OSwindCoreTests\\.NativeVaultQueryRecoveryTests/testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation)$"
+    ],
+    "frozenInputs": 737,
+    "priorNativeDefined": 37,
+    "priorNativePassed": 35,
+    "priorNativeFailed": 2,
+    "controlledComparison": true,
+    "condition": "Temporary idle-sleep assertion; actual sleep/wake activity checked. No clamshell override or device setting change.",
+    "sourceUnchangedBefore": true,
+    "returncode": 0,
+    "finishedAtUTC": "2026-11-01T03:50:24.796020+00:00",
+    "monotonicSeconds": 36.3147961248178,
+    "wallSeconds": 40.160072,
+    "logSHA256": "9a33c3cb5cc2f0f6f5c6161d8a7e412d10cf6db83a37332e0e0e214ecf009c7b",
+    "observedSleepWakeEvents": 1,
+    "sourceUnchangedAfter": true,
+    "tests": {
+      "defined": 2,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    },
+    "powerLogSHA256": "a8e62fab3b41e769667dbe79967e43fc3b5bccb1f974026652ec8004b326cf67"
+  },
+  "ui": {
+    "state": "component visual review passed",
+    "startedAtUTC": "2026-11-01T00:51:06.631949+00:00",
+    "binarySHA256": "5b8c77fddf2335f416e0c12ee78e03ad5ce2cef1521db53f7d0523eac5c75742",
+    "cases": [
+      {
+        "section": "MeetingsUpcoming",
+        "appearance": "light",
+        "returncode": 0,
+        "png": "MeetingsUpcoming-light.png",
+        "pixelWidth": 1100,
+        "pixelHeight": 780,
+        "sha256": "5c9a3a37a7b310d858b3072e62a4b1c6490eb79c35b1099f1b9a90bfadba5cc3",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsUpcoming",
+        "appearance": "dark",
+        "returncode": 0,
+        "png": "MeetingsUpcoming-dark.png",
+        "pixelWidth": 1100,
+        "pixelHeight": 780,
+        "sha256": "d1c5c10917d3a01179254538c76831f9f5066d71a5269deab7e653cea7de7904",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsCompact",
+        "appearance": "light",
+        "returncode": 0,
+        "png": "MeetingsCompact-light.png",
+        "pixelWidth": 770,
+        "pixelHeight": 570,
+        "sha256": "2401f7c55e9de9d4a5570086e23954120b8cc369405f257ba7d178340ebe193c",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsCompact",
+        "appearance": "dark",
+        "returncode": 0,
+        "png": "MeetingsCompact-dark.png",
+        "pixelWidth": 770,
+        "pixelHeight": 570,
+        "sha256": "5fc0aa28291397ed6dcce0b10bb3b0cc7c681b0dfd3362cebd8c557e9a74f4d2",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsQuiet",
+        "appearance": "light",
+        "returncode": 0,
+        "png": "MeetingsQuiet-light.png",
+        "pixelWidth": 1100,
+        "pixelHeight": 780,
+        "sha256": "c87ac5651513040987fb34338dd2584c831127ec0b565639e648ba52687bd2ee",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsQuiet",
+        "appearance": "dark",
+        "returncode": 0,
+        "png": "MeetingsQuiet-dark.png",
+        "pixelWidth": 1100,
+        "pixelHeight": 780,
+        "sha256": "89610e581b73ae87623fb9239e7ad17c4f1b8a3b6f1eed10eac6e5d48e831dc9",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsSetup",
+        "appearance": "light",
+        "returncode": 0,
+        "png": "MeetingsSetup-light.png",
+        "pixelWidth": 820,
+        "pixelHeight": 900,
+        "sha256": "9be4e702f09b30df55bf57cd33fc2e5da453f5575f71822898ca43ce31add2d0",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "section": "MeetingsSetup",
+        "appearance": "dark",
+        "returncode": 0,
+        "png": "MeetingsSetup-dark.png",
+        "pixelWidth": 820,
+        "pixelHeight": 900,
+        "sha256": "7663d22ac9dc45ae22c50394a7cf05733cd937b3d48695cb9fd07f845aec5f77",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "scope": "Authored injected-provider component render; not live native calendar/notification/UI acceptance",
+    "finishedAtUTC": "2026-11-01T00:51:21.327164+00:00",
+    "reviewedAtUTC": "2026-11-01T00:54:01.281769+00:00",
+    "visualChecks": [
+      "All eight PNGs inspected: light/dark upcoming, quiet and setup, plus770x570 compact.",
+      "No clipped or overlapping headings/buttons/cards/setup controls; times, source-scope help and empty-state actions readable.",
+      "Injected authored calendars and no native prompts or notifications; this is not interactive main-window/native account acceptance."
+    ]
+  },
+  "developmentFailures": [
+    "Focus01: split a Core map/sort expression after Swift type-check timeout.",
+    "Focus02: qualify self.error to avoid catch-variable shadowing.",
+    "Focus03: explicitly capture test source in escaping predicates.",
+    "Focus04: raw SQLite reader rejected a /var symlink before inspecting bytes; resolve the owned temp path first.",
+    "Focus04: actual AppModel onboarding suspension incorrectly became a manual meeting pause; preserve separate lifecycle/manual pause state and cover wake behavior."
+  ],
+  "limitations": [
+    "The original full native-vault group failed35/37; the targeted unchanged-build comparison passed2/2 while one maintenance sleep was still recorded. Neither a single all-pass full group nor a resolved timeout cause is claimed.",
+    "No real Calendar permission/account read, native notification delivery/Focus, manual browser joining or interactive main-window acceptance was attempted.",
+    "Component renders use authored injected providers. Timer policies and Low Power Mode cadence are not physical power measurements.",
+    "At-most-once notification attempts may miss a reminder after a committed claim and before delivery.",
+    "Privacy-aware briefs omit saved summaries/recaps conservatively; production learned-PII completeness is not established.",
+    "No full sync, notarized distribution, complete parity, or top-three ranking acceptance."
+  ],
+  "recordedAtUTC": "2026-11-01T03:54:10.915645+00:00"
+}

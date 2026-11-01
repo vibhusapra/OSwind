@@ -4,6 +4,7 @@ import OSwindCore
 import AppKit
 import ServiceManagement
 import UniformTypeIdentifiers
+import EventKit
 
 @MainActor final class AppModel: ObservableObject {
     let store: MemoryStore
@@ -13,6 +14,9 @@ import UniformTypeIdentifiers
     let audio: AudioController
     let entityMemory:EntityMemoryModel
     @Published var entityScope:MemoryEntity?
+    let meetings:MeetingsModel
+    private var meetingLibraryRetired=false
+    private var resumeMeetingsAfterPause=false,resumeScreenWithMeetings=false
     let activity:ActivityCalendarModel
     @Published var calendarSlice:DateInterval?
     @Published var calendarSliceZone:String?
@@ -25,8 +29,8 @@ import UniformTypeIdentifiers
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
-        capture.settings = settings; audio.settings = settings;routines.apply(settings)
-        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport()}
+        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings)
+        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelAnswer()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
@@ -135,7 +139,7 @@ import UniformTypeIdentifiers
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
@@ -155,7 +159,19 @@ import UniformTypeIdentifiers
         audio = AudioController(store:store, embedder:embedder, settings:loaded)
         entityMemory=EntityMemoryModel(store:store)
         activity=ActivityCalendarModel(store:store)
+        meetings=meetingsSetup?(store,loaded) ?? MeetingsModel(store:store,settings:loaded)
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
+        meetings.allowed = {[weak self] in
+            guard let self else {return false}
+            return !self.demo && !self.meetingLibraryRetired && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy && !self.maintenanceBusy
+        }
+        meetings.savePreferences = {[weak self] configuration in
+            guard let self,!self.store.isClosed,!self.meetingLibraryRetired else {throw OSwindError.unavailable("The calendar library is closed.")}
+            try self.store.validateDirectoryIdentity()
+            var next=self.settings;next.meetings=configuration;try next.save(root:self.store.root);self.settings=next
+        }
+        meetings.prepareBrief = {[weak self] event in self?.prepareMeetingBrief(event)}
+        meetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         routines.onChange = {[weak self] in self?.refreshChats()}
         libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
         visualModelSetup.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
@@ -167,14 +183,18 @@ import UniformTypeIdentifiers
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
-            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.drafting.clear() }.store(in:&cancellables)
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.drafting.clear();self?.meetings.sleep() }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.resumeConfiguredWorkAfterWake() }.store(in:&cancellables)
+        NotificationCenter.default.publisher(for:.EKEventStoreChanged).sink {[weak self] _ in Task {@MainActor in self?.meetings.invalidate()}}.store(in:&cancellables)
+        for name in [NSWorkspace.screensDidWakeNotification,NSWorkspace.sessionDidBecomeActiveNotification] {
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink {[weak self] _ in Task {@MainActor in self?.meetings.wake()}}.store(in:&cancellables)
+        }
         if demo { try? seedDemo() }
         showOnboarding = !demo && !UserDefaults.standard.bool(forKey:"onboarded")
         refresh(forceStatistics:true); refreshChats(); if startServices { startConfiguredServices() }
         for name in [Notification.Name.NSProcessInfoPowerStateDidChange,ProcessInfo.thermalStateDidChangeNotification] {
-            NotificationCenter.default.publisher(for:name).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
+            NotificationCenter.default.publisher(for:name).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex();self?.meetings.configureTimer()} }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.sessionDidBecomeActiveNotification).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
     }
@@ -197,6 +217,7 @@ import UniformTypeIdentifiers
         guard configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
         configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping()
         if !demo && settings.routinesEnabled {routines.start()}
+        if !demo && settings.meetings.enabled {meetings.start()}
         if settings.apiEnabled {startAPI()}
         if settings.captureOnLaunch && !demo {capture.start()}
         if settings.entityAutomaticIndex && !demo {entityMemory.build()}
@@ -205,11 +226,11 @@ import UniformTypeIdentifiers
     private func suspendConfiguredServices() {
         configuredServicesActive=false;stopHousekeeping();drafting.clear()
         visualAutoResumeAllowed=false;cancelVisualIndexing();entityMemory.cancel();routines.stop()
-        pauseAll(discardReplay:true);stopAPI(preservePreference:true)
+        pauseAll(discardReplay:true,manualMeetingPause:false);stopAPI(preservePreference:true)
     }
     private func resumeConfiguredWorkAfterWake() {
         guard !showOnboarding,!demo,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
-        routines.tickIfStarted()
+        routines.tickIfStarted();meetings.wake()
         if configuredServicesActive && settings.entityAutomaticIndex {entityMemory.build()}
         resumeAutomaticVisualIndex()
     }
@@ -226,6 +247,8 @@ import UniformTypeIdentifiers
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
     func prepareForLibrarySwitch() {
+        resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
+        meetingLibraryRetired=true;meetings.stop(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -247,6 +270,7 @@ import UniformTypeIdentifiers
         case "Today": let day = calendar.dateInterval(of:.day,for:now); start = day?.start; end = day?.end
         case "Yesterday": end = calendar.startOfDay(for:now); start = calendar.date(byAdding:.day,value:-1,to:end!)
         case "7 days": start = calendar.date(byAdding:.day,value:-7,to:now); end = now
+        case "30 days": start = calendar.date(byAdding:.day,value:-30,to:now); end = now
         case "Calendar slice":
             start=calendarSlice?.start ?? .distantFuture;end=calendarSlice?.end ?? .distantPast
         case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
@@ -363,6 +387,7 @@ import UniformTypeIdentifiers
         refreshStatistics(force:forceStatistics)
         if section=="People & projects" {refreshTask?.cancel();refreshing=false;entityMemory.reload();return}
         if section=="Calendar" {refreshTask?.cancel();refreshing=false;activity.resumeAndInvalidate();return}
+        if section=="Meetings" {refreshTask?.cancel();refreshing=false;return}
         searchInputError = nil
         refreshTask?.cancel(); let now = Date(), mode = self.mode
         let filter = self.filter(at:now), interpret = interpretQuery, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
@@ -405,19 +430,28 @@ import UniformTypeIdentifiers
             else { self.refreshStorageEstimate() }
         }
     }
-    func ask(_ prompt: String? = nil, summarize: Bool = false) {
+    func prepareMeetingBrief(_ event:MeetingOccurrence) {
+        guard !store.isClosed,!meetingLibraryRetired,!showOnboarding,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        guard !asking else {errorMessage="Finish or cancel the current answer before preparing a meeting brief.";return}
+        do {
+            let prompt=try event.briefQuestion(policy:settings.privacy,includeParticipants:settings.meetings.includeParticipants)
+            newChat();section="Ask";query="";appFilter="All apps";range="30 days";entityScope=nil;calendarSlice=nil;calendarSliceZone=nil;interpretQuery=false
+            ask(prompt,interpretation:false,evidencePolicy:settings.privacy)
+        }catch {errorMessage="This meeting is excluded by the current privacy policy."}
+    }
+    func ask(_ prompt: String? = nil, summarize: Bool = false, interpretation:Bool?=nil,evidencePolicy:PrivacyPolicy?=nil) {
         let text = settings.privacy.sanitize(prompt ?? question).text
         guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
         answerInputError = nil
         if prompt != nil { question = text }
-        let now = Date(), sessionID = currentChatID, interpret = interpretQuery
+        let now = Date(), sessionID = currentChatID, interpret = interpretation ?? interpretQuery
         let f = filter(at:now)
         let config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder)
         let history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
         asking = true
         answerTask = Task {
             do {
-                let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now)
+                let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now,evidencePolicy:evidencePolicy)
                 try Task.checkCancellation()
                 let targetID: String
                 if let sessionID { targetID = sessionID }
@@ -640,15 +674,19 @@ import UniformTypeIdentifiers
     func wipeLocalLibrary(retry:Bool=false) {
         guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
         prepareForLibrarySwitch()
-        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false
+        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.meetings = .init()
         let generation=libraryOperationGeneration
         libraryWipe.run(store:store,retry:retry) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
-            self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
+            self.meetingLibraryRetired=false;self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping()
-        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.startHousekeeping()}
+        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.meetingLibraryRetired=false;self.startHousekeeping()}
     }
-    func pauseAll(discardReplay:Bool=false) { pauseTimer?.invalidate(); pauseTimer = nil; pauseUntil = nil; capture.pause(discardReplay:discardReplay); audio.stop() }
+    func pauseAll(discardReplay:Bool=false,manualMeetingPause:Bool=true) {
+        if isCollecting {resumeMeetingsAfterPause=meetings.active;resumeScreenWithMeetings=capture.running}
+        pauseTimer?.invalidate();pauseTimer=nil;pauseUntil=nil;capture.pause(discardReplay:discardReplay);audio.stop()
+        if manualMeetingPause {meetings.pause()}else {meetings.sleep()}
+    }
     func pauseForHistoryErasure() {
         drafting.clear()
         entityMemory.clear();entityScope=nil
@@ -659,16 +697,26 @@ import UniformTypeIdentifiers
         pauseAll(discardReplay:true);cancelAnswer();routines.cancel();cancelOpeningMemory();selected=nil;answer=nil
     }
     func pauseFor(minutes: Int) {
-        let screenWasRunning = capture.running, audioWasRunning = audio.running
+        let screenWasRunning = capture.running, audioWasRunning = audio.running, meetingsWereRunning=meetings.active
         pauseAll(); pauseUntil = Date().addingTimeInterval(Double(minutes)*60)
         pauseTimer = Timer.scheduledTimer(withTimeInterval:Double(minutes)*60,repeats:false) { [weak self] _ in
-            Task { @MainActor in guard let self else { return }; self.pauseUntil = nil; if screenWasRunning { self.capture.start() }; if audioWasRunning && !SessionState.locked { await self.audio.start() } }
+            Task { @MainActor in guard let self else { return }; self.pauseUntil = nil;if meetingsWereRunning {self.meetings.resume()}; if screenWasRunning { self.capture.start() }; if audioWasRunning && !SessionState.locked { await self.audio.start() } }
         }
     }
     var isCapturing: Bool { capture.running || audio.running }
+    var isCollecting:Bool {isCapturing || meetings.active}
     func captureNow() async {guard !libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
     func toggleAudio() async {guard !libraryWipe.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
-    func toggleCapture() {guard !libraryWipe.busy else {return};pauseTimer?.invalidate(); pauseUntil = nil; if isCapturing { pauseAll() } else { capture.start() } }
+    func toggleCapture() {
+        guard !libraryWipe.busy else {return};pauseTimer?.invalidate();pauseUntil=nil
+        if isCollecting {pauseAll()}
+        else {
+            let calendar=resumeMeetingsAfterPause,screen=resumeScreenWithMeetings
+            resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
+            if !calendar || screen {capture.start()}
+            if calendar {meetings.resume()}
+        }
+    }
     func installNativeModel(_ kind:NativeModelKind,cache:URL?=nil,verifyOnly:Bool=false) {
         let speech=settings.speech,diarization=settings.diarization
         nativeModels.start(kind,cache:cache,verifyOnly:verifyOnly) { [weak self] result in

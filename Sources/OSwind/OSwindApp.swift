@@ -1,9 +1,10 @@
 import SwiftUI
 import AppKit
 import Carbon
+import UserNotifications
 import OSwindCore
 
-@MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     private var terminationReady=false
     private var terminationInProgress=false
     var finishTermination:(NSApplication)->Void={application in application.terminate(nil)}
@@ -52,6 +53,7 @@ import OSwindCore
             return
         }
         #endif
+        if Bundle.main.bundleIdentifier != nil {UNUserNotificationCenter.current().delegate=self}
         NSApp.setActivationPolicy(.regular)
         GlobalShortcutModel.shared.configure {
             // Capture explicit external focus before OSwind activates. Opening
@@ -61,6 +63,14 @@ import OSwindCore
             if AppSession.current?.model?.drafting.showing != true {NotificationCenter.default.post(name:.oswindFocusSearch,object:nil)}
         }
     }
+    nonisolated func userNotificationCenter(_ center:UNUserNotificationCenter,didReceive response:UNNotificationResponse,withCompletionHandler completionHandler:@escaping ()->Void) {
+        guard response.actionIdentifier==UNNotificationDefaultActionIdentifier,response.notification.request.identifier.hasPrefix("com.oswind.meeting.") else {completionHandler();return}
+        Task {@MainActor in
+            if let model=AppSession.current?.model,!model.store.isClosed {model.section="Meetings";model.meetings.invalidate()}
+            NotificationCenter.default.post(name:.oswindOpenMain,object:nil);completionHandler()
+        }
+    }
+    nonisolated func userNotificationCenter(_ center:UNUserNotificationCenter,willPresent notification:UNNotification,withCompletionHandler completionHandler:@escaping (UNNotificationPresentationOptions)->Void) {completionHandler([.banner,.list])}
     func applicationWillTerminate(_ notification:Notification) {GlobalShortcutModel.shared.stop()}
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
@@ -106,7 +116,7 @@ import OSwindCore
         }.defaultSize(width:1320,height:850)
             .commands { CommandGroup(after:.newItem) {
                 Button("Search memories") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); NotificationCenter.default.post(name:.oswindFocusSearch,object:nil) }.keyboardShortcut("k")
-                Button(session.model?.isCapturing == true ? "Pause capture" : "Resume capture") { session.model?.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]).disabled(session.model == nil)
+                Button(session.model?.isCollecting == true ? "Pause collection" : "Resume collection") { session.model?.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]).disabled(session.model == nil)
                 Button("Settings…") { if let model = session.model {model.showSettings=true} else {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)} }.keyboardShortcut(",")
             } }
         MenuBarExtra {
@@ -122,9 +132,9 @@ struct LibraryMenuContent: View {
     @EnvironmentObject var model: AppModel
     var body: some View {
         VStack(alignment:.leading,spacing:12) {
-            Text("OSwind").font(.headline); Text(model.capture.status).font(.caption)
+            Text("OSwind").font(.headline); Text(model.meetings.active && !model.isCapturing ? "Calendar context active":model.capture.status).font(.caption)
             Button("Open OSwind  ⇧⌘Space") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }
-            Button(model.isCapturing ? "Pause capture" : "Resume capture") { model.toggleCapture() }
+            Button(model.isCollecting ? "Pause collection" : "Resume collection") { model.toggleCapture() }
             Menu("Pause for…") { ForEach([5,15,30,60],id:\.self) { minutes in Button("\(minutes) minutes") { model.pauseFor(minutes:minutes) } } }
             Button("Capture now") { Task { await model.captureNow() } }
             Button(model.audio.running ? "Stop audio" : "Start audio") { Task {await model.toggleAudio()} }
@@ -154,7 +164,7 @@ struct MenuBarIcon: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.openWindow) var openWindow
     var body: some View {
-        Image(systemName:model.capture.running ? "wind.circle.fill" : model.audio.running ? "waveform.circle.fill" : "wind")
+        Image(systemName:model.capture.running ? "wind.circle.fill" : model.audio.running ? "waveform.circle.fill" : model.meetings.active ? "calendar.circle.fill" : "wind")
             .onReceive(NotificationCenter.default.publisher(for:.oswindOpenMain)) { _ in
                 openWindow(id:"main"); NSApp.activate(ignoringOtherApps:true)
             }

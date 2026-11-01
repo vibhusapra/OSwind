@@ -22,6 +22,7 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>NSSupportsAutomaticTermination</key><false/>
+<key>NSCalendarsFullAccessUsageDescription</key><string>OSwind reads only calendars you select to show upcoming meetings and prepare source-linked briefs. It never edits events or sends invitations.</string>
 <key>NSMicrophoneUsageDescription</key><string>OSwind optionally transcribes your microphone locally to help you recall conversations.</string>
 <key>NSScreenCaptureUsageDescription</key><string>OSwind captures your chosen windows to build a private, searchable memory on this Mac.</string>
 <key>NSAppleEventsUsageDescription</key><string>OSwind uses application context to apply your privacy rules.</string>
