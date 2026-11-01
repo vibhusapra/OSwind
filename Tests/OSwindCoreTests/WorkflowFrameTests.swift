@@ -15,7 +15,7 @@ private final class WorkflowPIIBackend:PIINativeBackend,@unchecked Sendable {
     }
 }
 final class WorkflowFrameTests:XCTestCase {
-    func fixture()throws->(URL,MemoryStore) {
+    static func fixture()throws->(URL,MemoryStore) {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-frame-"+UUID().uuidString)
         let store=try MemoryStore(root:root)
         try Paths.ensure(root.appendingPathComponent("images"))
@@ -31,7 +31,7 @@ final class WorkflowFrameTests:XCTestCase {
     }
     func cleanup(_ root:URL,_ store:MemoryStore) {try? store.close();try? FileManager.default.removeItem(at:root)}
     func testActualOwnedImagePreviewBindsPixelsAndReleasesBeforeStoreClose()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let preview=try await NarratedWorkflow.preview(store:store,memoryID:"owned-screen")
         XCTAssertEqual(preview.source.kind,.image);XCTAssertEqual(preview.source.frameOrdinal,0);XCTAssertNil(preview.source.frameTime)
         XCTAssertEqual(preview.source.mediaSHA256,WorkflowDraft.digest(try Data(contentsOf:root.appendingPathComponent("images/owned.png"))))
@@ -40,7 +40,7 @@ final class WorkflowFrameTests:XCTestCase {
         try store.close();XCTAssertTrue(store.isClosed)
     }
     func testReplacedPixelsCannotPassCurrentSourceAdmission()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         let frame=try await WorkflowFrameReservation.make(store:store,memoryID:"owned-screen",frameOrdinal:0,settings:settings,scanner:nil,ocr:{_ in []});defer {frame.release()}
         let replacement=Data("Owned changed bytes".utf8);try replacement.write(to:root.appendingPathComponent("images/owned.png"),options:.atomic)
@@ -48,14 +48,14 @@ final class WorkflowFrameTests:XCTestCase {
         XCTAssertEqual(try Data(contentsOf:root.appendingPathComponent("images/owned.png")),replacement)
     }
     func testChangedSourceMetadataCannotPassCurrentAdmission()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         let frame=try await WorkflowFrameReservation.make(store:store,memoryID:"owned-screen",frameOrdinal:0,settings:settings,scanner:nil,ocr:{_ in []});defer {frame.release()}
         var changed=try XCTUnwrap(store.get("owned-screen"));changed.text="Changed owned source";try store.insert(changed)
         XCTAssertThrowsError(try frame.withCurrent(store:store,settings:settings){_ in XCTFail("Changed metadata admitted")})
     }
     func testSensitiveRecognizedPixelsRefuseAndReleaseReservation()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         do {
             let frame=try await WorkflowFrameReservation.make(store:store,memoryID:"owned-screen",frameOrdinal:0,settings:settings,scanner:nil,ocr:{_ in [.init(text:"password: owned-fixture-secret",x:0,y:0,width:1,height:1)]})
@@ -64,7 +64,7 @@ final class WorkflowFrameTests:XCTestCase {
         try store.close();XCTAssertTrue(store.isClosed)
     }
     func testSettingsChangedDuringInspectionRefusePreview()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         do {
             let frame=try await WorkflowFrameReservation.make(store:store,memoryID:"owned-screen",frameOrdinal:0,settings:settings,scanner:nil,ocr:{_ in var changed=AppSettings();changed.privacy.retainImages=false;try changed.save(root:root);return []})
@@ -73,7 +73,7 @@ final class WorkflowFrameTests:XCTestCase {
         try store.close();XCTAssertTrue(store.isClosed)
     }
     func testSensitiveSourceRefusesBeforePixelInspection()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         var changed=try XCTUnwrap(store.get("owned-screen"));changed.text="password: owned-fixture-secret";try store.insert(changed)
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         do {
@@ -82,14 +82,14 @@ final class WorkflowFrameTests:XCTestCase {
         }catch {}
     }
     func testCancellationDuringInspectionDoesNotReturnLatePreviewOrPinStore()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         let task=Task {try await WorkflowFrameReservation.make(store:store,memoryID:"owned-screen",frameOrdinal:0,settings:settings,scanner:nil,ocr:{_ in withUnsafeCurrentTask {$0?.cancel()};return []})}
         do {let frame=try await task.value;frame.release();XCTFail("Cancelled preview returned")}catch is CancellationError {}catch {throw error}
         try store.close();XCTAssertTrue(store.isClosed)
     }
     func testEnabledLearnedPrivacyCannotBeBypassedWithMissingScanner()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         var saved=AppSettings();saved.piiImports.enabled=true;try saved.save(root:root)
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         do {
@@ -98,7 +98,7 @@ final class WorkflowFrameTests:XCTestCase {
         }catch {}
     }
     func testSelectedLearnedScannerAllowsOwnedFrameWithNoRecognizedText()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         var saved=AppSettings();saved.piiImports.enabled=true;saved.piiImports.compute = .cpu;try saved.save(root:root)
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         let scanner=PIIImportScanner(inspector:PIIInspector(loader:{WorkflowPIIBackend()}))
@@ -108,7 +108,7 @@ final class WorkflowFrameTests:XCTestCase {
         }catch {await scanner.shutdown();throw error}
     }
     func testSelectedLearnedScannerRefusesDetectedPixelText()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         var saved=AppSettings();saved.piiImports.enabled=true;saved.piiImports.compute = .cpu;try saved.save(root:root)
         let settings=try LibrarySettingsSnapshot.capture(root:root);defer {settings.release()}
         let scanner=PIIImportScanner(inspector:PIIInspector(loader:{WorkflowPIIBackend()}))
@@ -120,7 +120,7 @@ final class WorkflowFrameTests:XCTestCase {
         await scanner.shutdown();try store.close();XCTAssertTrue(store.isClosed)
     }
     func testActualReplaySelectsRecordedFrameAndReleasesPrivatePin()async throws {
-        let (root,store)=try fixture();defer {cleanup(root,store)}
+        let (root,store)=try Self.fixture();defer {cleanup(root,store)}
         try Paths.ensure(root.appendingPathComponent("video"))
         func buffer(red:Bool)throws->CVPixelBuffer {
             var result:CVPixelBuffer?

@@ -31,7 +31,7 @@ enum WorkflowNarrationAudio {
         var chunks:[Chunk]
         struct Chunk:Decodable {var start_seconds:Double,end_seconds:Double}
     }
-    static func inspect(tree:BackupFileTree,stem:String,script:String,scriptLimit:Int=4000)throws->WorkflowNarrationReceipt {
+    static func inspect(tree:BackupFileTree,stem:String,script:String,scriptLimit:Int=4000,allowRelativeAudio:Bool=false)throws->WorkflowNarrationReceipt {
         try Task.checkCancellation()
         guard !stem.isEmpty,stem.utf8.count<=64,stem.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)||$0==45}),
               (1...12300).contains(scriptLimit),!script.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty,script.utf8.count<=scriptLimit,!script.utf8.contains(0) else {throw OSwindError.invalid("Invalid narration script or member name")}
@@ -40,10 +40,13 @@ enum WorkflowNarrationAudio {
         guard try tree.read(scriptName,limit:scriptLimit)==expectedScript else {throw OSwindError.unavailable("The reviewed narration script changed")}
         let timingBytes=try tree.read(timingName,limit:64*1024),timing=try JSONDecoder().decode(Timing.self,from:timingBytes)
         let url=tree.root.appendingPathComponent(wavName)
+        let audioMatches:Bool
+        if allowRelativeAudio,timing.audio==wavName {audioMatches=true}
+        else if !timing.audio.utf8.contains(0),timing.audio.hasPrefix("/") {audioMatches=try canonical(URL(fileURLWithPath:timing.audio))==canonical(url)}
+        else {audioMatches=false}
         guard timing.model=="mlx-community/Kokoro-82M-bf16",timing.voice=="af_heart",timing.speed==1,
               timing.audio_seconds.isFinite,timing.audio_seconds>0,timing.audio_seconds<=WorkflowDraft.maximumDuration,
-              !timing.audio.utf8.contains(0),timing.audio.hasPrefix("/"),
-              try canonical(URL(fileURLWithPath:timing.audio))==canonical(url) else {throw OSwindError.invalid("Narration receipt does not match the selected local stock voice and output")}
+              audioMatches else {throw OSwindError.invalid("Narration receipt does not match the selected local stock voice and output")}
         let before=try tree.digest(wavName,limit:8*1024*1024)
         let audio=try AVAudioFile(forReading:url,commonFormat:.pcmFormatFloat32,interleaved:false),format=audio.fileFormat.streamDescription.pointee
         guard format.mFormatID==kAudioFormatLinearPCM,format.mSampleRate==Double(sampleRate),format.mChannelsPerFrame==1,format.mBitsPerChannel==16,
