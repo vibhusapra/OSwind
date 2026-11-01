@@ -72,7 +72,7 @@ struct SyncTurnPublication:Codable,Equatable,Sendable {
 /// service must durably schedule explicit withheld outcomes for later retry;
 /// this component does not claim to supply that scheduler or a complete service.
 enum SyncPublicationWithheld:String,Equatable {
-    case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,unlistedCitation,missingOwner,replacementRequiresReview,missingOwnerContent,policyDenied,storagePressure,causalGap
+    case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,unlistedCitation,missingOwner,replacementRequiresReview,missingOwnerContent,policyDenied,storagePressure,causalGap,erasedEvidence
 }
 enum SyncPublicationOutcome:Equatable {
     case projected(String)
@@ -83,8 +83,10 @@ enum SyncPublicationOutcome:Equatable {
 /// Use inside the authenticated journal receive transaction, or as an explicit
 /// retry of its current head. Reserve media before acquiring SQLite locks. Only
 /// an authenticated owner's declared children may authorize owner retirement.
+enum SyncPublicationDependencyRetirement {case wholeLifetime,currentVersion}
 struct SyncIncomingTurnPublicationWriter {
     let writer:SyncIncomingConversationWriter
+    var dependencyRetirement:SyncPublicationDependencyRetirement = .wholeLifetime
     var cache:SyncVersionStore {writer.cache}
     func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchManifest:(SyncContentReference)throws->Data?,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationOutcome {
         try admission.withActive(for:writer.library.mediaRootIdentity) {}
@@ -113,6 +115,7 @@ struct SyncIncomingTurnPublicationWriter {
                 var erased=[SyncObjectKey:SyncClock]()
                 for parent in parents {let k=try parent.key,s=try cache.journal.state(for:k);if s.isDeleted {erased[k]=s.clock}}
                 if !erased.isEmpty {
+                    if dependencyRetirement == .currentVersion,erased.keys.allSatisfy({[SyncObjectKind.source,.conversationCitation,.recapCitation].contains($0.kind)}) {return .withheld(.erasedEvidence)}
                     let deletion=try cache.journal.delete(key:key) {try writer.applyDeletion($0,admission:admission)}
                     for (parent,clock) in erased {guard try cache.journal.state(for:parent).isDeleted,deletion.context.covers(clock) else {throw OSwindError.invalid("Answer retirement lost its authentic evidence barrier")}}
                     try Task.checkCancellation();try admission.withActive(for:writer.library.mediaRootIdentity) {};return .retired(key)

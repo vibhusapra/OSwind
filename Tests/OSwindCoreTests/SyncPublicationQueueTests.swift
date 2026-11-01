@@ -193,10 +193,10 @@ extension SyncIncomingSourceTests {
             try c.delete(local);try drain(c,cc)
             for deletion in try cc.journal.outbox() {_=try queueReceive(deletion,f.ac,service)}
             try supplyDeclarations(f.operations,f.producer,service)
-            XCTAssertEqual(try queueRetry(f.ac,service),[.retired(turn.key)])
-            XCTAssertTrue(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty)
+            XCTAssertEqual(try queueRetry(f.ac,service),[.withheld(.erasedEvidence)])
+            XCTAssertFalse(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertEqual(try f.queue.jobs(readyOnly:false).map(\.reason),[.erasedEvidence])
             XCTAssertEqual(try count(f.b,"chat_turns"),0);XCTAssertEqual(try count(f.b,"chat_sources"),0);try f.queue.checkAccounting()
-            let announced=try XCTUnwrap(f.bc.journal.outbox().first{$0.key==turn.key});XCTAssertTrue(announced.context.contains(turn.dot));XCTAssertTrue(try announced.context.contains(XCTUnwrap(cc.journal.outbox().last).dot))
+            XCTAssertTrue(try f.bc.journal.outbox().isEmpty,"Exact-version evidence invalidation must not announce an irreversible owner-lifetime tombstone")
         }
     }
 
@@ -214,7 +214,7 @@ extension SyncIncomingSourceTests {
         }
     }
 
-    func testPublicationQueueDeclaredCitationDeletionRetiresItsReadableOwner()throws {
+    func testPublicationQueueDeclaredCitationDeletionWithdrawsReadableVersionWithoutRetiringOwnerLifetime()throws {
         try withQueueFixture(citations:1) {f in
             let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation})
             try supplyDeclarations(f.operations,f.producer,service)
@@ -224,7 +224,7 @@ extension SyncIncomingSourceTests {
             // lifetime; no fabricated child body supplies owner authority.
             let deletion=try f.ac.journal.delete(key:citation.key);_=try queueReceive(deletion,f.ac,service)
             XCTAssertEqual(try count(f.b,"chat_turns"),0,"An admitted answer cannot remain readable after required citation retirement")
-            XCTAssertTrue(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty);try f.queue.checkAccounting()
+            XCTAssertFalse(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertEqual(try f.queue.jobs(readyOnly:false).map(\.reason),[.erasedEvidence]);XCTAssertTrue(try f.bc.journal.outbox().isEmpty);try f.queue.checkAccounting()
         }
     }
 

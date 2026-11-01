@@ -49,7 +49,7 @@ struct SyncPublicationAdmission {
         // Preflight a genuine deletion using the same declared ownership set.
         let erased=try ([key]+parents).contains{try cache.journal.state(for:$0).isDeleted}
         if !erased,try !queue.hasBindingCapacity(key) {try queue.stage(identity,reason:.storagePressure,dependencies:parents);try queue.retractWithheldProjection(identity);return .withheld(.storagePressure)}
-        let coordinator=SyncIncomingTurnPublicationWriter(writer:writer),outcome:SyncPublicationOutcome
+        let coordinator=SyncIncomingTurnPublicationWriter(writer:writer,dependencyRetirement:.currentVersion),outcome:SyncPublicationOutcome
         do {
             outcome=try SyncChangeCapture.transaction(cache.database) {
                 let value:SyncPublicationOutcome
@@ -86,9 +86,8 @@ struct SyncPublicationAdmission {
                     if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
                         let contiguous=try cache.journal.cursor(for:change.revision.dot.replica)==change.revision.dot.counter-1
                         if contiguous,try queue.hasApplied(change.revision.context) {
-                            try cache.journal.observeAppliedRoot(change.revision.key)
-                            _=try cache.journal.delete(key:owner.key) {try writer.applyDeletion($0,admission:admission)}
-                            try queue.retire(owner.key);outcomes.append(.retired(try owner.key))
+                            try queue.stage(owner,reason:.erasedEvidence,dependencies:[change.revision.key])
+                            try queue.retractWithheldProjection(owner);outcomes.append(.withheld(.erasedEvidence))
                         }else {
                             try queue.stage(owner,reason:.causalGap,dependencies:[change.revision.key])
                             try queue.retractWithheldProjection(owner);outcomes.append(.withheld(.causalGap))

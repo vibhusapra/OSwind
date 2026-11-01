@@ -3,7 +3,7 @@ import CSQLite
 
 enum SyncPublicationPendingReason:String,Codable,Sendable {
     case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,missingOwner,replacementRequiresReview
-    case missingOwnerContent,policyDenied,storagePressure,causalGap
+    case missingOwnerContent,policyDenied,storagePressure,causalGap,erasedEvidence
     init(_ reason:SyncPublicationWithheld) throws {
         guard let value=Self(rawValue:reason.rawValue) else {throw OSwindError.invalid("Unlisted citations cannot enqueue or change an independent owner")};self=value
     }
@@ -111,9 +111,9 @@ struct SyncPublicationQueue {
             _=try wakeReason(.storagePressure)
         }
     }
-    /// Only a live, byte-exact native citation covered by a completed *current*
-    /// owner declaration grants content-free owner-retirement authority. Old
-    /// lifetimes and pending newer declarations must take the withdrawal path.
+    /// A live, byte-exact native citation covered by a completed current owner
+    /// declaration identifies the projection to withdraw. This is not authority
+    /// to delete every future/concurrent version of that owner's global lifetime.
     func completedOwner(ofCitation key:SyncObjectKey)throws->SyncObjectIdentity? {
         try context();guard key.kind == .conversationCitation else {return nil}
         let row=try db.statement("SELECT i.key_frame FROM personal_sync_identities i JOIN personal_sync_identity_current c USING(object_digest) WHERE i.object_digest=? AND i.table_name='chat_sources' AND c.table_name=i.table_name AND c.local_key=i.local_key AND i.deleted=0");defer {sqlite3_finalize(row)};db.bind(row,1,key.digest)

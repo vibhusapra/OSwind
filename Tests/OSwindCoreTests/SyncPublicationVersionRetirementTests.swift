@@ -8,12 +8,18 @@ extension SyncIncomingSourceTests {
     func testPublicationQueueIndependentConcurrentHeadSurvivesThirdPeerCitationRetirement()throws {
         try queueIndependentHeadAfterRetirement(concurrent:true)
     }
-    private func queueIndependentHeadAfterRetirement(concurrent:Bool)throws {
+    func testPublicationQueueIndependentFutureHeadSurvivesPriorWholeSourceRetirement()throws {
+        try queueIndependentHeadAfterRetirement(concurrent:false,wholeSource:true)
+    }
+    func testPublicationQueueIndependentConcurrentHeadSurvivesThirdPeerWholeSourceRetirement()throws {
+        try queueIndependentHeadAfterRetirement(concurrent:true,wholeSource:true)
+    }
+    private func queueIndependentHeadAfterRetirement(concurrent:Bool,wholeSource:Bool=false)throws {
         try withQueueFixture(citations:1) {f in
             let service=queueService(f.b,f.bc,f.queue,f.inbox)
             try supplyDeclarations(f.operations,f.producer,service)
             for operation in f.operations {_=try queueReceive(operation,f.ac,service)}
-            let citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation})
+            let dependency=try XCTUnwrap(f.operations.first{$0.key.kind == (wholeSource ? .source:.conversationCitation)})
             let next:SyncPortableRecord,proof:SyncTurnPublication,update:SyncRevision,deletion:SyncRevision
             if concurrent {
                 let third="00000000-0000-0000-0000-000000006214",(c,cc)=try endpoint("concurrent-eraser",third);defer {try? c.close()}
@@ -22,16 +28,17 @@ extension SyncIncomingSourceTests {
                 // has never seen the separately authored independent update.
                 for operation in f.operations {_=try cc.journal.receive(operation,contentAvailable:{_ in true})}
                 (next,proof,update)=try queueReplacement(f,text:"Independent concurrent answer")
-                deletion=try cc.journal.delete(key:citation.key)
+                deletion=try cc.journal.delete(key:dependency.key)
                 XCTAssertEqual(try update.clock.relation(to:deletion.clock),.concurrent)
                 _=try queueReceive(deletion,cc,service)
             }else {
-                deletion=try f.ac.journal.delete(key:citation.key);_=try queueReceive(deletion,f.ac,service)
+                deletion=try f.ac.journal.delete(key:dependency.key);_=try queueReceive(deletion,f.ac,service)
                 (next,proof,update)=try queueReplacement(f,text:"Independent future answer")
                 XCTAssertTrue(update.context.contains(deletion.dot))
             }
             XCTAssertFalse(try f.ac.journal.state(for:next.identity.key).isDeleted,"The producing journal legitimately permits this same-owner version")
             XCTAssertEqual(try count(f.b,"chat_turns"),0,"The old source-derived body must be removed immediately")
+            if wholeSource {XCTAssertEqual(try count(f.b,"memories"),0,"Exercise actual whole-source native erasure")}
             try service.retainDeclaration(proof.encoded(),reference:proof.reference)
             let lease=try f.b.mediaWriteLease();defer {lease.release()}
             _=try service.receive(update,record:next,admission:lease,fetchSource:{_ in throw OSwindError.invalid("Independent version must not fetch retired evidence")})
