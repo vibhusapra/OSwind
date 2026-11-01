@@ -65,5 +65,6 @@ def register_inactive_sync_fixture(connection):
         connection.create_function("oswind_incoming_source_erasure_v1", 0, lambda: 0)
 
     if version >= 32:
+        connection.create_function("oswind_unavailable_scope_writer_v1", 0, writer_marker)
         # An ordinary owned fixture writer cannot preserve a scoped projection.
         connection.create_function("oswind_unavailable_scope_projection_v1", 2, lambda *_: 0)

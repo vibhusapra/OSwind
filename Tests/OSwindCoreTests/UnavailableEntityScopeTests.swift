@@ -28,8 +28,16 @@ final class UnavailableEntityScopeTests:XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(SearchFilter.self,from:old),ordinary)
         let unavailable=SearchFilter(unavailableEntityScope:.init()),bytes=try SyncProtocolLimits.encode(unavailable)
         XCTAssertNotNil((try JSONSerialization.jsonObject(with:bytes) as? [String:Any])?["unavailableEntityScope"])
+        XCTAssertEqual(((try JSONSerialization.jsonObject(with:bytes) as? [String:Any])?["entityID"] as? [String:String])?["state"],"unavailable")
         let restored=try JSONDecoder().decode(SearchFilter.self,from:bytes)
         XCTAssertEqual(restored,unavailable);XCTAssertThrowsError(try restored.requireAvailableEntityScope())
+    }
+    func testUnavailableNativeSelectorCannotLoseItsRestrictionOrHaveAnActiveID()throws {
+        var object=try XCTUnwrap(JSONSerialization.jsonObject(with:SyncProtocolLimits.encode(SearchFilter(unavailableEntityScope:.init()))) as? [String:Any])
+        object.removeValue(forKey:"unavailableEntityScope");XCTAssertThrowsError(try JSONDecoder().decode(SearchFilter.self,from:JSONSerialization.data(withJSONObject:object)))
+        object["unavailableEntityScope"]=[String:String]();object["entityID"]="active-entity";XCTAssertThrowsError(try JSONDecoder().decode(SearchFilter.self,from:JSONSerialization.data(withJSONObject:object)))
+        object["entityID"]=["state":"unknown"];XCTAssertThrowsError(try JSONDecoder().decode(SearchFilter.self,from:JSONSerialization.data(withJSONObject:object)))
+        XCTAssertThrowsError(try SyncProtocolLimits.encode(SearchFilter(entityID:"active-entity",unavailableEntityScope:.init())))
     }
     func testUnavailableNativeFilterCannotExportAsAnUnscopedWireFilter()throws {
         let filter=SearchFilter(unavailableEntityScope:.init())

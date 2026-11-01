@@ -18,7 +18,7 @@ extension HistoricalErasureMigrationTests {
         }
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),31);XCTAssertEqual(try fingerprint(db),before)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try fingerprint(db),before)
             try HistoricalErasureSchema.validate(db);try SyncIncomingSourceSchema.validate(db)
         }
         XCTAssertEqual(try store.get("source")?.text,"Newer independent current body")
@@ -54,6 +54,6 @@ extension HistoricalErasureMigrationTests {
         let library=try legacy27(),store=try MemoryStore(root:library);try store.close()
         let before=try withDB(library) {db in try db.execute("DROP TRIGGER incoming_source_writer_chat_sources_update");return try fingerprint(db)}
         XCTAssertThrowsError(try MemoryStore(root:library)) {XCTAssertTrue($0.localizedDescription.contains("Incoming source writer protection is missing"))}
-        try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),31);XCTAssertEqual(try fingerprint(db),before)}
+        try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try fingerprint(db),before)}
     }
 }

@@ -12,7 +12,14 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if ["WorkflowEditing","WorkflowEmpty","WorkflowCompact"].contains(model.section) {
+        if ["UnavailableScopeHistory","UnavailableScopeCompact"].contains(model.section) {
+            let compact=model.section=="UnavailableScopeCompact"
+            let entity=try model.store.createEntity(kind:.project,name:"Launch review · authored sample"),chat=try model.store.createChat(title:"Launch decision · authored sample")
+            _=try model.store.appendChatTurn(sessionID:chat.id,question:"What did we decide about the launch?",answer:.init(text:"Keep the rollout small and finish the device check before expanding it.\n\nThis is an authored saved answer. Its original project was removed; the answer retains its recorded restriction.",sources:[],provider:"Evidence only · authored sample",duration:0),filter:.init(app:"Notes",entityID:entity.id))
+            try model.store.deleteEntity(entity.id);model.section="Ask";model.selectChat(chat.id)
+            guard model.chatTurns.count==1,model.chatTurns[0].filter.unavailableEntityScope != nil else {throw OSwindError.unavailable("Authored unavailable history did not load")}
+            size=compact ? NSSize(width:1000,height:700):NSSize(width:1320,height:900);content=AnyView(WorkspaceView().environmentObject(model))
+        } else if ["WorkflowEditing","WorkflowEmpty","WorkflowCompact"].contains(model.section) {
             let workflow=try await WorkflowPreview.make(store:model.store,empty:model.section=="WorkflowEmpty")
             size=model.section=="WorkflowCompact" ? NSSize(width:860,height:760):NSSize(width:1120,height:900)
             content=AnyView(WorkflowView(model:workflow,openMemories:{}))

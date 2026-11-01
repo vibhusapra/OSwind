@@ -176,7 +176,7 @@ public final class MemoryStore: @unchecked Sendable {
         try SyncOutgoingWorkQueue.migrateEntityOrdering(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try SyncIdentityCatalog.migrateLookupIndexIfPresent(RoutineDatabase(handle:db!))
-        try EntityScopeSchema.install(RoutineDatabase(handle:db!),sourceVersion:version)
+        try EntityScopeSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")

@@ -4,7 +4,7 @@ No desktop capture, normal history, settings/TCC changes or provider credentials
 """
 import argparse,contextlib,hashlib,json,pathlib,sqlite3,subprocess,time
 
-p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--old-cli',type=pathlib.Path,required=True);p.add_argument('--old-sha256',required=True);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-schema',type=int,choices=[25,26,27,28,29,30],default=27);p.add_argument('--current-schema',type=int,choices=[26,27,28,29,30,31],default=31);a=p.parse_args();assert a.current_schema>a.old_schema
+p=argparse.ArgumentParser();p.add_argument('binary',type=pathlib.Path);p.add_argument('--old-cli',type=pathlib.Path,required=True);p.add_argument('--old-sha256',required=True);p.add_argument('--root',type=pathlib.Path,required=True);p.add_argument('--old-schema',type=int,choices=[25,26,27,28,29,30,31],default=27);p.add_argument('--current-schema',type=int,choices=[26,27,28,29,30,31,32],default=32);a=p.parse_args();assert a.current_schema>a.old_schema
 def sha(path):
     with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 binary=a.binary.resolve();old=a.old_cli.resolve();base=a.root.absolute()
@@ -46,12 +46,16 @@ try:
     report['initializedOlderClient']=dict(postOpenLeaseObserved=ready,returncode=child.returncode,stderrSHA256=hashlib.sha256(error.encode()).hexdigest())
     assert child.returncode!=0 and source_snapshot()==before
     # Require a product compatibility refusal, not malformed collector input.
-    assert ('newer OSwind' in error or 'oswind_historical_writer_v1' in error or 'oswind_historical_scope_writer_v1' in error or 'oswind_incoming_source_writer_v1' in error or 'oswind_run_original_writer_v1' in error or 'oswind_incoming_entity_writer_v1' in error or 'oswind_source_erasure_writer_v1' in error),error
+    assert ('newer OSwind' in error or 'oswind_historical_writer_v1' in error or 'oswind_historical_scope_writer_v1' in error or 'oswind_incoming_source_writer_v1' in error or 'oswind_run_original_writer_v1' in error or 'oswind_incoming_entity_writer_v1' in error or 'oswind_source_erasure_writer_v1' in error or 'oswind_unavailable_scope_writer_v1' in error),error
     report['checks'].append('actual already-initialized older writer refuses after migration upgrade; source payloads unchanged')
     stable=physical();report['beforeFreshRefusalsSQLiteFiles']=stable;save()
     for args in [('stats',),('note','Owned fresh older write must refuse')]:
-        r=run(old,*args,ok=False);report['afterFreshRefusalsSQLiteFiles']=physical();save();assert 'newer OSwind' in r.stderr and physical()==stable
-    report['checks'].append('fresh actual older reader and writer refuse newer schema; all existing SQLite file bytes unchanged')
+        r=run(old,*args,ok=False);after=physical();report['afterFreshRefusalsSQLiteFiles']=after;save()
+        # SQLite's transient WAL read marks may change during a refused open.
+        # Keep those hashes as evidence; require durable database/WAL bytes and
+        # all original source payloads to remain exactly unchanged.
+        assert 'newer OSwind' in r.stderr and {k:v for k,v in after.items() if not k.endswith('-shm')}=={k:v for k,v in stable.items() if not k.endswith('-shm')} and source_snapshot()==before
+    report['checks'].append('fresh actual older reader and writer refuse newer schema; original payload/main database/WAL bytes unchanged; volatile SHM hashes recorded')
     archive=base/'copy.oswindbackup';created=json.loads(run(binary,'backup','create',archive).stdout);assert created['sourceSchema']==a.current_schema
     inspected=json.loads(run(binary,'backup','inspect',archive).stdout);assert inspected['sourceSchema']==a.current_schema
     archive_before={str(x.relative_to(archive)):sha(x) for x in archive.rglob('*') if x.is_file()}

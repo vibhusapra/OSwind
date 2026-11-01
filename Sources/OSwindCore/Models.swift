@@ -67,6 +67,34 @@ public struct SearchFilter: Codable, Equatable, Sendable {
     public var unavailableEntityScope:UnavailableEntityScope?
     public var limit = 100
     public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, entityID: String? = nil, limit: Int = 100,sourceStartsOnly:Bool?=nil,unavailableEntityScope:UnavailableEntityScope?=nil) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.entityID = entityID; self.limit = limit;self.sourceStartsOnly=sourceStartsOnly;self.unavailableEntityScope=unavailableEntityScope }
+    private enum CodingKeys:String,CodingKey {case query,app,kind,start,end,sourceStartsOnly,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,limit}
+    private struct UnavailableSelector:Codable {
+        enum State:String,Codable {case unavailable}
+        let state:State
+        init() {state = .unavailable}
+    }
+    public init(from decoder:Decoder)throws {
+        let c=try decoder.container(keyedBy:CodingKeys.self)
+        query=try c.decode(String.self,forKey:.query);app=try c.decodeIfPresent(String.self,forKey:.app);kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)
+        start=try c.decodeIfPresent(Date.self,forKey:.start);end=try c.decodeIfPresent(Date.self,forKey:.end);sourceStartsOnly=try c.decodeIfPresent(Bool.self,forKey:.sourceStartsOnly)
+        favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly);tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker);limit=try c.decode(Int.self,forKey:.limit)
+        unavailableEntityScope=try c.decodeIfPresent(UnavailableEntityScope.self,forKey:.unavailableEntityScope)
+        if unavailableEntityScope != nil {
+            _=try c.decode(UnavailableSelector.self,forKey:.entityID);entityID=nil
+        }else {entityID=try c.decodeIfPresent(String.self,forKey:.entityID)}
+    }
+    public func encode(to encoder:Encoder)throws {
+        guard entityID==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("An entity filter cannot be active and unavailable together")}
+        var c=encoder.container(keyedBy:CodingKeys.self)
+        try c.encode(query,forKey:.query);try c.encodeIfPresent(app,forKey:.app);try c.encodeIfPresent(kind,forKey:.kind);try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
+        try c.encodeIfPresent(sourceStartsOnly,forKey:.sourceStartsOnly);try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker);try c.encode(limit,forKey:.limit)
+        if let unavailableEntityScope {
+            // An already-open old client must fail decoding, rather than
+            // ignore an unknown key and broaden this saved filter. The typed
+            // selector is deliberately not a String or a synthetic entity ID.
+            try c.encode(UnavailableSelector(),forKey:.entityID);try c.encode(unavailableEntityScope,forKey:.unavailableEntityScope)
+        }else {try c.encodeIfPresent(entityID,forKey:.entityID)}
+    }
 }
 public struct SearchHit: Identifiable, Codable, Sendable {
     public var memory: Memory

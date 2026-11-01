@@ -89,4 +89,39 @@ final class NativeEntityScopeRetirementTests:XCTestCase {
         let copy=try MemoryStore(root:restored);defer {try? copy.close()};let turn=try XCTUnwrap(copy.chatTurns(chat).first)
         XCTAssertNotNil(turn.filter.unavailableEntityScope);XCTAssertNil(turn.filter.entityID);XCTAssertThrowsError(try copy.search(turn.filter,mode:.keyword));XCTAssertEqual(Data(turn.answer.text.utf8),Data("Exact answer e\u{301} / 👩🏽‍💻".utf8))
     }
+    func testCurrentScopeIndexesCannotBeSilentlyRepaired()throws {
+        for name in EntityScopeSchema.indexes.keys.sorted() {
+            for altered in [false,true] {
+                let library=root.appendingPathComponent(name+(altered ? "-altered":"-missing")),owned=try MemoryStore(root:library);try owned.close()
+                var handle:OpaquePointer?;XCTAssertEqual(sqlite3_open(library.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK);let db=RoutineDatabase(handle:try XCTUnwrap(handle));defer {sqlite3_close(handle)}
+                try db.execute("DROP INDEX "+name);if altered {try db.execute("CREATE INDEX "+name+" ON "+(name=="entity_scope_turn" ? "chat_turns(session_id)":"routine_runs(routine_id)"))}
+                let before=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'")
+                XCTAssertThrowsError(try MemoryStore(root:library));XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),before)
+                XCTAssertThrowsError(try EntityScopeSchema.validate(db))
+            }
+        }
+    }
+    func testCurrentScopeWriterGuardsCannotBeSilentlyRepaired()throws {
+        for name in ["unavailable_scope_writer_memories_update","unavailable_scope_writer_chat_turns_insert","unavailable_scope_writer_routine_run_originals_delete"] {
+            let library=root.appendingPathComponent(name),owned=try MemoryStore(root:library);try owned.close()
+            var handle:OpaquePointer?;XCTAssertEqual(sqlite3_open(library.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK);let db=RoutineDatabase(handle:try XCTUnwrap(handle));defer {sqlite3_close(handle)}
+            try db.execute("DROP TRIGGER "+name);XCTAssertThrowsError(try MemoryStore(root:library))
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)
+        }
+    }
+    func testCancellationAfterNativeScopeRewriteRollsBackAndNextDeletionSucceeds()throws {
+        let entity=try store.createEntity(kind:.project,name:"Cancelled scope"),chat=try history(entity.id)
+        try store.withRoutineDatabase {db in
+            guard sqlite3_create_function_v2(db.handle,"owned_cancel_scope",0,SQLITE_UTF8,nil,{context,_,_ in withUnsafeCurrentTask {$0?.cancel()};sqlite3_result_int(context,1)},nil,nil,nil)==SQLITE_OK else {throw db.error()}
+            try db.execute("CREATE TEMP TRIGGER owned_scope_cancel BEFORE DELETE ON memory_entities BEGIN SELECT owned_cancel_scope(); END")
+        }
+        let finished=expectation(description:"Owned cancellation unwinds")
+        Task.detached {
+            defer {finished.fulfill()}
+            do {try self.store.deleteEntity(entity.id);XCTFail("Cancelled deletion must refuse")}
+            catch {XCTAssertTrue(error is CancellationError,"Unexpected cancellation: \(error)")}
+        };wait(for:[finished],timeout:10)
+        try check(chat,active:entity.id);XCTAssertNotNil(try store.entity(entity.id))
+        try store.withRoutineDatabase {try $0.execute("DROP TRIGGER owned_scope_cancel")};try store.deleteEntity(entity.id);try check(chat)
+    }
 }

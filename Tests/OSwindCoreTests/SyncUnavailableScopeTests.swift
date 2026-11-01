@@ -93,6 +93,15 @@ extension SyncIncomingSourceTests {
             wrong.projection = .init(origin:field==0 ? other:current.origin,generation:field==1 ? other:current.generation,group:field==2 ? other:current.group,epoch:field==3 ? other:current.epoch)
             XCTAssertThrowsError(try bc.projectionFilterScope(wrong,record:turnPacket),"Old scope authority must match every current namespace component")
         }
+        let archive=root.appendingPathComponent("unavailable-scope.oswindbackup"),restored=root.appendingPathComponent("quiet-restored")
+        _=try LibraryBackup.create(store:b,destination:archive);_=try LibraryBackup.restore(archive,to:restored)
+        let (copy,fresh)=try endpoint("quiet-restored","00000000-0000-0000-0000-000000006194");defer {try? copy.close()}
+        let copied=try XCTUnwrap(copy.chatTurns(conversation).first?.filter.unavailableEntityScope)
+        XCTAssertEqual(copied,marker);XCTAssertThrowsError(try fresh.projectionFilterScope(copied,record:turnPacket),"Quiet restore cannot grant the old catalog's deletion authority")
+        let forwarded=try packet(XCTUnwrap(fresh.journal.outbox().last {$0.key.kind == .turn}),fresh)
+        guard case .turn(let forwardedTurn)=forwarded.body else {return XCTFail("No restored turn")}
+        XCTAssertNil(forwardedTurn.filter.entity);XCTAssertNotNil(forwardedTurn.filter.unavailableEntityScope);XCTAssertTrue(forwarded.dependencies.allSatisfy {$0.identity.table != .entity})
+        XCTAssertThrowsError(try copy.search(try XCTUnwrap(copy.chatTurns(conversation).first?.filter),mode:.keyword))
         _=try a.createEntity(kind:.project,name:"Owned new independent scope");try drain(a,ac)
         let next=try XCTUnwrap(ac.journal.outbox(after:cursor).first),value=try packet(next,ac)
         guard case .entity=value.body else {return XCTFail("Expected actual new entity definition before its alias")}

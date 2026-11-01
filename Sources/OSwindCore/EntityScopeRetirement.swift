@@ -2,6 +2,19 @@ import Foundation
 import CSQLite
 
 enum EntityScopeSchema {
+    // A schema32 writer understands unavailable restrictions. The distinct
+    // function name also makes already-open schema31 connections refuse DML,
+    // including empty statements, after another process upgrades the library.
+    static let writers:[String:String] = {
+        var result=[String:String]()
+        for table in SyncChangeCapture.tables.map(\.name)+["historical_evidence",RoutineRunOriginalSchema.table] {for operation in ["insert","update","delete"] {
+            let name="unavailable_scope_writer_"+table+"_"+operation
+            result[name]="CREATE TRIGGER \(name) BEFORE \(operation.uppercased()) ON \(table) BEGIN SELECT oswind_unavailable_scope_writer_v1(); END"
+        }};return result
+    }()
+    static func register(_ db:RoutineDatabase)throws {
+        guard sqlite3_create_function_v2(db.handle,"oswind_unavailable_scope_writer_v1",0,SQLITE_UTF8|SQLITE_INNOCUOUS|SQLITE_DETERMINISTIC,nil,{context,_,_ in sqlite3_result_int(context,1)},nil,nil,nil)==SQLITE_OK else {throw db.error()}
+    }
     static let indexes:[String:String] = [
         "entity_scope_turn":"CREATE INDEX entity_scope_turn ON chat_turns(json_extract(CAST(payload AS TEXT),'$.filter.entityID')) WHERE json_type(CAST(payload AS TEXT),'$.filter.entityID')='text'",
         "entity_scope_run":"CREATE INDEX entity_scope_run ON routine_runs(json_extract(CAST(scope AS TEXT),'$.entityID')) WHERE json_type(CAST(scope AS TEXT),'$.entityID')='text'"
@@ -11,12 +24,21 @@ enum EntityScopeSchema {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name)
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.database("Unavailable entity scope index differs or is missing")}
         }
+        let row=try db.statement("SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name GLOB 'unavailable_scope_writer_*'");defer {sqlite3_finalize(row)};var names=Set<String>()
+        while true {let code=sqlite3_step(row);if code==SQLITE_DONE {break};guard code==SQLITE_ROW,writers[db.text(row,0)]==db.text(row,1),names.insert(db.text(row,0)).inserted else {throw OSwindError.database("Unavailable scope writer protection differs")}}
+        guard names==Set(writers.keys) else {throw OSwindError.database("Unavailable scope writer protection is missing")}
     }
-    static func install(_ db:RoutineDatabase,sourceVersion:Int32)throws {
+    static func install(_ db:RoutineDatabase,sourceVersion:Int32,repairMissingPins:Bool=false)throws {
         for (name,sql) in indexes {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
             if let found {guard found==sql else {throw OSwindError.database("Unavailable entity scope index differs")}}
             else {guard code==SQLITE_DONE,sourceVersion<32 else {throw OSwindError.database("Unavailable entity scope index is missing")};try db.execute(sql)}
+        }
+        for (name,sql) in writers.sorted(by:{$0.key<$1.key}) {
+            let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
+            guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
+            if let found {guard found==sql else {throw OSwindError.database("Unavailable scope writer protection differs")}}
+            else {guard sourceVersion<32 || (repairMissingPins && name.hasPrefix("unavailable_scope_writer_text_observation_pins_")) else {throw OSwindError.database("Unavailable scope writer protection is missing")};try db.execute(sql)}
         };try validate(db)
     }
 }
@@ -39,6 +61,7 @@ extension MemoryStore {
                 }()
                 guard !ids.isEmpty else {break}
                 for (position,id) in ids {
+                    try autoreleasepool {
                     try Task.checkCancellation();after=position
                     let before=try entityScopeFrame(table,id:id,db:db),cell=table == .turn ? 3:10
                     guard case .blob(let payload)=before.cells[cell] else {throw OSwindError.invalid("Entity scope payload storage differs")}
@@ -71,6 +94,7 @@ extension MemoryStore {
                     }
                     if let around {try around(table,id,update)}else{try update()}
                     guard applied else {throw OSwindError.invalid("Scoped history retirement was not applied")}
+                    }
                 }
             }
         }
