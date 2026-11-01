@@ -98,6 +98,7 @@ import EventKit
     private var jsonImportWorker:Task<String,Error>?
     private var jsonImportDrainers=0
     var hasPendingJSONImport:Bool {jsonImportWorker != nil || jsonImportTask != nil}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false

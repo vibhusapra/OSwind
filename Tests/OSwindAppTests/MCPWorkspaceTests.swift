@@ -1,5 +1,6 @@
 import XCTest
 import Foundation
+import AppKit
 @testable import OSwind
 @testable import OSwindCore
 
@@ -76,6 +77,27 @@ final class MCPAdmissionBarrier:@unchecked Sendable {
         XCTAssertFalse(app.store.isClosed);XCTAssertTrue(app.tools.stopping)
         await gate.release();try await wait {!session.busy};XCTAssertNil(session.failure);XCTAssertTrue(app.store.isClosed)
         let next=try XCTUnwrap(session.model);XCTAssertEqual(next.store.root.standardizedFileURL,destination.standardizedFileURL);next.prepareForLibrarySwitch();await next.cancelExternalWorkAndWait();try next.store.close();session.model=nil
+    }
+
+    func testPlainQuitDelegateWaitsForCancellationIgnoringToolBeforeFinishing()async throws {
+        app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close()
+        let gate=MCPUIGate();defer {Task {await gate.release()}};try install(callGate:gate)
+        let previous=AppSession.current;defer {AppSession.current=previous}
+        let session=AppSession(selection:.init(url:root,requiresExisting:true,origin:"owned MCP quit test"),defaults:UserDefaults(suiteName:"oswind-owned-mcp-quit-"+UUID().uuidString)!,locked:{false})
+        try await wait {session.model != nil && !session.busy}
+        if let initial=session.model {initial.prepareForLibrarySwitch();await initial.cancelExternalWorkAndWait();try initial.store.close()}
+        session.model=app;try await prepareCall();try await wait {[self] in probe.calls==1}
+        XCTAssertFalse(app.hasPendingJSONImport);XCTAssertTrue(app.tools.busy);XCTAssertTrue(app.hasPendingExitWork)
+        let delegate=AppDelegate();var exits=0;delegate.finishTermination={_ in exits+=1}
+        let reply=delegate.applicationShouldTerminate(NSApplication.shared)
+        XCTAssertEqual(reply,.terminateCancel,"Plain-library quit must join the actual MCP worker")
+        guard reply == .terminateCancel else {await gate.release();await app.tools.cancelAndWait();session.model=nil;return}
+        XCTAssertEqual(delegate.applicationShouldTerminate(NSApplication.shared),.terminateCancel)
+        try await wait {[self] in app.tools.stopping};XCTAssertEqual(exits,0);XCTAssertFalse(app.store.isClosed)
+        await gate.release();try await wait {exits==1}
+        XCTAssertFalse(app.tools.busy);XCTAssertFalse(app.hasPendingExitWork);XCTAssertNil(app.tools.result);XCTAssertEqual(probe.calls,1)
+        XCTAssertEqual(delegate.applicationShouldTerminate(NSApplication.shared),.terminateNow);XCTAssertEqual(exits,1)
+        session.model=nil
     }
 
 }
