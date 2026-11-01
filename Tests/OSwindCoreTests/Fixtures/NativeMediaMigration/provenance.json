@@ -1,0 +1,22 @@
+{
+  "format": "OSwind owned native media migration fixture provenance",
+  "version": 1,
+  "nativeSchema": 32,
+  "producerSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+  "producerCLI_SHA256": "ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2",
+  "databaseSHA256": "8fb6509f6cedeb6707e5a458b8412196b598726bd8e101978aa89b3528418bc9",
+  "PNG_SHA256": "0254bbb96343f9806745d47d11df8af03364d722e342b380abbfe1b02353d74f",
+  "generatorSHA256": "87cb8dcbf945bc6bae970670c1bb3d7b454b7f572036d24dd2930bb855d04175",
+  "keepID": "3E61EFEE-B284-4908-A03F-81F8BB0993FE",
+  "retiredID": "424C106A-1ADF-4780-BC7B-C7AE78196AA9",
+  "retiredRecapID": "5B685945-474C-4508-8FCD-C5F437DB2B49",
+  "nativeSources": 1,
+  "pendingPath": "images/owned-pending.png",
+  "legacyDirty": "1",
+  "captureEnabled": false,
+  "scope": "Actual frozen32 bootstrap/note/chat/grounded recap; owned inactive setup adds PNG metadata. Native raw SQL source deletion commits its real source/recap/chat/media admission triggers, then checkpoints before any physical cleanup. Synthetic data only.",
+  "limits": [
+    "Committed logical-deletion/pre-filesystem-cleanup fixture; not a power-loss image or earlier binary relabeled through current code.",
+    "Do not regenerate or modify this frozen source32 fixture in place; create a new version if needed."
+  ]
+}

@@ -23,7 +23,7 @@ final class MediaCleanupAdmissionTests:XCTestCase {
         if ProcessInfo.processInfo.environment["OSWIND_MEDIA_CLEANUP_WORKER_ROOT"]==nil {try? FileManager.default.removeItem(at:root)}
     }
     var file:URL {root.appendingPathComponent(relative)}
-    var cache:URL {root.appendingPathComponent("indexes/owned-cache")}
+    var cache:URL {root.appendingPathComponent(NativeMediaSchema.cacheDirectory+"/owned-cache")}
     func seed() throws {
         try bytes.write(to:file)
         try store.insert(Memory(id:"old",timestamp:Date(timeIntervalSince1970:100),app:"Owned",text:"owned source",imagePath:relative))
@@ -55,7 +55,7 @@ final class MediaCleanupAdmissionTests:XCTestCase {
         XCTAssertEqual(try Data(contentsOf:file),replacement)
         XCTAssertEqual(try Data(contentsOf:cache),bytes)
         XCTAssertEqual(try count("SELECT COUNT(*) FROM erasure_assets"),1)
-        XCTAssertEqual(try count("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'"),1)
+        XCTAssertEqual(try count("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty_v33' AND value='1'"),1)
         // The same writer may now admit the reference, before releasing its lease.
         try opened.insert(Memory(id:"new",text:"new owned source",imagePath:relative))
         lease.release()

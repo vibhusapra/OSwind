@@ -41,7 +41,7 @@ final class ANNCacheTests: XCTestCase {
     }
     func testCorruptSnapshotIsRebuiltBeforeNativeLoading() async throws {
         try seed(); let cache = ANNCache(root:root); cache.prepare(modelID:"fixture",dimensions:32,count:128,force:true); _ = try await cache.waitForBuild()
-        let folder = root.appendingPathComponent("indexes"), files = try FileManager.default.contentsOfDirectory(at:folder,includingPropertiesForKeys:nil)
+        let folder = root.appendingPathComponent(NativeMediaSchema.cacheDirectory), files = try FileManager.default.contentsOfDirectory(at:folder,includingPropertiesForKeys:nil)
         let graph = try XCTUnwrap(files.first { $0.pathExtension == "usearch" }); try Data("invalid native graph".utf8).write(to:graph,options:.atomic)
         let rebuilt = ANNCache(root:root); rebuilt.prepare(modelID:"fixture",dimensions:32,count:128); _ = try await rebuilt.waitForBuild()
         XCTAssertFalse(try hits(rebuilt).isEmpty)
@@ -55,18 +55,18 @@ final class ANNCacheTests: XCTestCase {
         let otherCache = ANNCache(root:root); otherCache.prepare(modelID:"fixture",dimensions:32,count:128)
         try store.deleteAll(); let after = try reader.state()
         XCTAssertNotEqual(after.identity,before.identity); XCTAssertEqual(after.count,0)
-        XCTAssertEqual(store.searchIndexStatus.state,"idle"); XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("indexes").path))
+        XCTAssertEqual(store.searchIndexStatus.state,"idle"); XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent(NativeMediaSchema.cacheDirectory).path))
         XCTAssertNil(otherCache.withReady(modelID:"fixture",dimensions:32,identity:after.identity,snapshotHead:after.head) { _,_ in true })
     }
     func testBudgetEvictsDisposableCacheBeforeEvidence() throws {
-        try seed(3); let directory = root.appendingPathComponent("indexes"); try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        try seed(3); let directory = root.appendingPathComponent(NativeMediaSchema.cacheDirectory); try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         try Data(repeating:0,count:2_000_000).write(to:directory.appendingPathComponent("synthetic-cache"))
         let deleted = try store.prune(before:.distantPast,maxBytes:1_000_000)
         XCTAssertEqual(deleted,0); XCTAssertEqual(try store.stats().count,3); XCTAssertFalse(FileManager.default.fileExists(atPath:directory.path))
     }
     func testBusyCheckpointRetainsEvidenceUntilReaderReleasesSnapshot() throws {
         try seed(3)
-        let directory=root.appendingPathComponent("indexes")
+        let directory=root.appendingPathComponent(NativeMediaSchema.cacheDirectory)
         try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
         try Data(repeating:0,count:2_000_000).write(to:directory.appendingPathComponent("synthetic-cache"))
         var reader:OpaquePointer?

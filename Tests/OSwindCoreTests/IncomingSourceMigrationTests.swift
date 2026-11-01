@@ -18,7 +18,7 @@ extension HistoricalErasureMigrationTests {
         }
         let store=try MemoryStore(root:library);defer {try? store.close()}
         try store.withRoutineDatabase {db in
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try fingerprint(db),before)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try fingerprint(db),before)
             try HistoricalErasureSchema.validate(db);try SyncIncomingSourceSchema.validate(db)
         }
         XCTAssertEqual(try store.get("source")?.text,"Newer independent current body")
@@ -34,7 +34,7 @@ extension HistoricalErasureMigrationTests {
             let before=try fingerprint(old)
             for sql in ["UPDATE memories SET favorite=0 WHERE id='source'","DELETE FROM memories WHERE id='absent-owned-id'","DELETE FROM recap_sources WHERE recap_id='absent-owned-id'"] {
                 XCTAssertNotEqual(sqlite3_exec(old.handle,sql,nil,nil,nil),SQLITE_OK)
-                XCTAssertTrue(String(cString:sqlite3_errmsg(old.handle)).contains("oswind_incoming_source_writer_v1"))
+                XCTAssertTrue((String(cString:sqlite3_errmsg(old.handle)).contains("oswind_incoming_source_writer_v1") || String(cString:sqlite3_errmsg(old.handle)).contains(NativeMediaSchema.function)))
             }
             XCTAssertEqual(try fingerprint(old),before)
         }
@@ -54,6 +54,6 @@ extension HistoricalErasureMigrationTests {
         let library=try legacy27(),store=try MemoryStore(root:library);try store.close()
         let before=try withDB(library) {db in try db.execute("DROP TRIGGER incoming_source_writer_chat_sources_update");return try fingerprint(db)}
         XCTAssertThrowsError(try MemoryStore(root:library)) {XCTAssertTrue($0.localizedDescription.contains("Incoming source writer protection is missing"))}
-        try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try fingerprint(db),before)}
+        try withDB(library) {db in XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try fingerprint(db),before)}
     }
 }

@@ -57,7 +57,7 @@ extension MemoryStore {
                 return .init(sources:erased.sources,turns:beforeTurns-(try db.eraseCount("SELECT COUNT(*) FROM chat_turns")),historical:erased.historical)
             }}
             var result=HistoryErasureResult.empty
-            let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),dirty=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")
+            let pending=try db.eraseCount("SELECT COUNT(*) FROM erasure_assets"),dirty=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty_v33' AND value='1'")
             if initial.sources>0 || initial.historical>0 || pending>0 || dirty>0 {result=cleanupErasedAssets(db,sources:initial.sources,turns:initial.turns,histories:initial.historical)}
             else {result = .init(sources:0,conversationTurns:initial.turns,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:true,warnings:[])}
             var bytes=diskBytes(includeStaging:false),stopped=false

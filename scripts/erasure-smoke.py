@@ -41,6 +41,7 @@ with tempfile.TemporaryDirectory(prefix='oswind-erasure-contract-') as temporary
     assert cli('stats')['count']==3 and not (library/'images/shared').exists()
     assert cli('erase','retry-media')['pendingMedia']==0
     with sqlite3.connect(library/'memory.sqlite') as db:
+        register_inactive_sync_fixture(db)
         assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok';assert not db.execute('PRAGMA foreign_key_check').fetchall()
         assert db.execute('SELECT COUNT(*) FROM erasure_assets').fetchone()[0]==0
     print('PASS: CLI preview, overlap/domain/app intersection, stale dependency token, invalid input, derived answers/media/shared references, 8-process single commit, retry and SQLite integrity')

@@ -96,7 +96,7 @@ final class NativeEntityScopeRetirementTests:XCTestCase {
                 var handle:OpaquePointer?;XCTAssertEqual(sqlite3_open(library.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK);let db=RoutineDatabase(handle:try XCTUnwrap(handle));defer {sqlite3_close(handle)}
                 try db.execute("DROP INDEX "+name);if altered {try db.execute("CREATE INDEX "+name+" ON "+(name=="entity_scope_turn" ? "chat_turns(session_id)":"routine_runs(routine_id)"))}
                 let before=try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'")
-                XCTAssertThrowsError(try MemoryStore(root:library));XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),before)
+                XCTAssertThrowsError(try MemoryStore(root:library));XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),before)
                 XCTAssertThrowsError(try EntityScopeSchema.validate(db))
             }
         }
@@ -106,7 +106,7 @@ final class NativeEntityScopeRetirementTests:XCTestCase {
             let library=root.appendingPathComponent(name),owned=try MemoryStore(root:library);try owned.close()
             var handle:OpaquePointer?;XCTAssertEqual(sqlite3_open(library.appendingPathComponent("memory.sqlite").path,&handle),SQLITE_OK);let db=RoutineDatabase(handle:try XCTUnwrap(handle));defer {sqlite3_close(handle)}
             try db.execute("DROP TRIGGER "+name);XCTAssertThrowsError(try MemoryStore(root:library))
-            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),32);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)
+            XCTAssertEqual(try db.eraseCount("PRAGMA user_version"),33);XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='"+name+"'"),0)
         }
     }
     func testCancellationAfterNativeScopeRewriteRollsBackAndNextDeletionSucceeds()throws {

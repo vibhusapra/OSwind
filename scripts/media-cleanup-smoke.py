@@ -47,7 +47,7 @@ def seed(root,path,data=None,sparse=None):
 save()
 try:
  root=base/'held-writer';pixels=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aM3sAAAAASUVORK5CYII=');id,file=seed(root,'images/owned.png',data=pixels)
- cache=root/'indexes/owned';cache.parent.mkdir(exist_ok=True);cache.write_bytes(b'owned disposable cache');before=generation(root)
+ cache=root/'indexes-v33/owned';cache.parent.mkdir(exist_ok=True);cache.write_bytes(b'owned disposable cache');before=generation(root)
  with (root/'.media-admission.lock').open('a+b') as lock:
   os.chmod(root/'.media-admission.lock',0o600);fcntl.flock(lock,fcntl.LOCK_SH)
   result=json.loads(call(root,'delete',id,'--json'));assert result['sources']==1 and result['removedMedia']==0 and result['pendingMedia']==1 and not result['searchCacheRemoved'] and result['warnings'],result

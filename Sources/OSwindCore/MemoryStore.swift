@@ -4,8 +4,8 @@ import Darwin
 import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
-    // Version29 retains data-only peer run provenance without importing execution authority.
-    public static let schemaVersion = 32
+    // Version33 fences legacy cleanup and stale initializers at the native boundary.
+    public static let schemaVersion = 33
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -32,7 +32,9 @@ public final class MemoryStore: @unchecked Sendable {
     private var coverageCache = [(key:MetalScopeKey,indexed:Int,total:Int)]()
     private let annCache: ANNCache
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
-    public init(root: URL = Paths.data) throws {
+    /// Upgrade callbacks run on the opening worker; afterCommit runs after the
+    /// SQL transaction. Queue UI updates asynchronously; do not reenter this library.
+    public init(root: URL = Paths.data,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil) throws {
         _ = try VaultAccess.context(at:root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
@@ -47,7 +49,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
+        do {try NativeMediaSchema.register(RoutineDatabase(handle:db!));try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
@@ -180,8 +182,12 @@ public final class MemoryStore: @unchecked Sendable {
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try BackupErasureFence.install(RoutineDatabase(handle:db!))
-        try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
+        try erasureCancellable(RoutineDatabase(handle:db!)) {try NativeMediaSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,observe:observeUpgrade)}
+        try exec("PRAGMA user_version=\(Self.schemaVersion)")
+        if version<Int32(Self.schemaVersion) {observeUpgrade?(.beforeCommit)}
+        try Task.checkCancellation();try exec("COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
+        if version<Int32(Self.schemaVersion) {observeUpgrade?(.afterCommit)}
         syncCaptureInstalled=true
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
         _ = finishRecapInvalidation()

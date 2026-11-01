@@ -63,7 +63,7 @@ extension SyncIncomingSourceTests {
         guard let path=realpath(databaseFile.path,nil) else {throw OSwindError.invalid("Missing owned retirement crash database")};defer {free(path)}
         var handle:OpaquePointer?;let status=sqlite3_open_v2(path,&handle,SQLITE_OPEN_READONLY|SQLITE_OPEN_FULLMUTEX|SQLITE_OPEN_NOFOLLOW,nil)
         guard status==SQLITE_OK,let handle else {sqlite3_close(handle);throw OSwindError.invalid("Cannot inspect owned retirement crash database")}
-        do {let raw=RoutineDatabase(handle:handle);XCTAssertEqual(try raw.eraseCount("SELECT count(*) FROM erasure_assets"),phase=="after" ? 1:0);sqlite3_close(handle)}catch {sqlite3_close(handle);throw error}
+        do {let raw=RoutineDatabase(handle:handle);try NativeMediaSchema.register(raw);XCTAssertEqual(try raw.eraseCount("SELECT count(*) FROM erasure_assets"),phase=="after" ? 1:0);sqlite3_close(handle)}catch {sqlite3_close(handle);throw error}
         XCTAssertTrue(fm.fileExists(atPath:base.appendingPathComponent("receiver/images/received.png").path))
         let (store,cache)=try openRetirementCrash(base);try checkRetirementCrash(state,phase=="after",store,cache);try store.close()
         if keep {try fm.copyItem(at:base,to:root.appendingPathComponent("retained-crash"))}

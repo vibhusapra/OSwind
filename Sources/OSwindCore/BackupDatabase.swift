@@ -21,6 +21,7 @@ final class BackupDatabase {
         let flags = (createPrivate ? SQLITE_OPEN_READWRITE : SQLITE_OPEN_READONLY) | SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_NOFOLLOW
         guard sqlite3_open_v2(path,&handle,flags,nil) == SQLITE_OK else { let failure = error("Cannot open backup database"); sqlite3_close(handle); handle = nil; throw failure }
         sqlite3_busy_timeout(handle,1000)
+        do {try NativeMediaSchema.register(RoutineDatabase(handle:handle!))} catch {sqlite3_close(handle);handle=nil;throw error}
         sqlite3_limit(handle,SQLITE_LIMIT_LENGTH,Int32(2*MemoryStore.maximumRecordBytes+1_048_576))
         sqlite3_limit(handle,SQLITE_LIMIT_SQL_LENGTH,1_048_576)
         sqlite3_limit(handle,SQLITE_LIMIT_EXPR_DEPTH,128)

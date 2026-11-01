@@ -51,11 +51,12 @@ enum RecapSchema {
     CREATE TRIGGER recap_source_revision BEFORE UPDATE OF title,app,text,url,timestamp,kind ON memories
     WHEN CASE WHEN oswind_incoming_source_projection_v1(old.id,new.payload)=1 THEN 0 ELSE old.title IS NOT new.title OR old.app IS NOT new.app OR old.text IS NOT new.text OR old.url IS NOT new.url OR old.timestamp IS NOT new.timestamp OR old.kind IS NOT new.kind END
     BEGIN DELETE FROM memories WHERE id IN (\(descendants("old.id"))); END;
-    CREATE TRIGGER IF NOT EXISTS recap_cache_erasure AFTER DELETE ON memories
+    DROP TRIGGER IF EXISTS recap_cache_erasure;
+    CREATE TRIGGER recap_cache_erasure AFTER DELETE ON memories
     WHEN old.kind='summary' AND json_type(CAST(old.payload AS TEXT),'$.recap')='object'
     BEGIN
         UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity';
-        INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1';
+        INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty_v33','1') ON CONFLICT(key) DO UPDATE SET value='1';
     END;
     """
 }
@@ -181,7 +182,7 @@ extension MemoryStore {
             // A killed full wipe owns this queue. Opening the library must not
             // synchronously drain its orphan inventory or bypass its admission barrier.
             guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")==0 else {return nil}
-            guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty' AND value='1'")>0 else {return nil}
+            guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty_v33' AND value='1'")>0 else {return nil}
             return cleanupErasedAssets(db,sources:0,turns:0)
         }
     }

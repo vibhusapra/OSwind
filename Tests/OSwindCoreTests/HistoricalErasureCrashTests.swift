@@ -42,7 +42,7 @@ final class HistoricalErasureCrashTests:XCTestCase {
         // Inspect recovered WAL state before MemoryStore's startup cleanup.
         guard let resolved=realpath(library.appendingPathComponent("memory.sqlite").path,nil) else {throw OSwindError.invalid("Owned database missing")};defer {free(resolved)}
         var raw:OpaquePointer?;XCTAssertEqual(sqlite3_open_v2(resolved,&raw,SQLITE_OPEN_READONLY|SQLITE_OPEN_FULLMUTEX|SQLITE_OPEN_NOFOLLOW,nil),SQLITE_OK)
-        let inspection=RoutineDatabase(handle:try XCTUnwrap(raw))
+        let inspection=RoutineDatabase(handle:try XCTUnwrap(raw));try NativeMediaSchema.register(inspection)
         do {
             XCTAssertEqual(try inspection.eraseCount("SELECT count(*) FROM erasure_assets"),committed ? 1:0)
             XCTAssertEqual(try inspection.eraseCount("SELECT count(*) FROM historical_evidence"),committed ? 1:3)

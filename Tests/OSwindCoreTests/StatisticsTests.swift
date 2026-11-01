@@ -66,7 +66,7 @@ final class StatisticsTests: XCTestCase {
         try store.insert(memory); let chat = try store.createChat()
         _ = try store.appendChatTurn(sessionID:chat.id,question:"Migration?",answer:Answer(text:"Recorded [1]",sources:[SearchHit(memory:memory,score:1,match:"fixture")],provider:"fixture",duration:0))
         _ = try await store.buildSearchIndex(modelID:"fixture",dimensions:2)
-        let manifests = try FileManager.default.contentsOfDirectory(at:root.appendingPathComponent("indexes"),includingPropertiesForKeys:nil).filter { $0.pathExtension == "json" }
+        let manifests = try FileManager.default.contentsOfDirectory(at:root.appendingPathComponent(NativeMediaSchema.cacheDirectory),includingPropertiesForKeys:nil).filter { $0.pathExtension == "json" }
         let manifest = try XCTUnwrap(manifests.first), data = try Data(contentsOf:manifest)
         store = nil
         try execute("DROP TRIGGER statistics_insert; DROP TRIGGER statistics_update; DROP TRIGGER statistics_delete; DROP TABLE memory_statistics; DROP TABLE application_statistics; PRAGMA user_version=4;")

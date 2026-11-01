@@ -2,7 +2,7 @@
 
 In development. F059 remains TODO until a user can pair devices and synchronize the complete supported library. The protocol below is a foundation, not delivered sync or a replacement for the existing complete backup/restore feature.
 
-The current internal foundation includes [durable answer admission and version-aware erasure](SYNC-DURABLE-PUBLICATION.md) plus [reserved-media cleanup and backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md). The [current app/native receipt](../benchmarks/media-cleanup-native-v1.json) freezes native source `ab571d4` and qualification head `029d169`: all 70 required software controls execute in three builds, and 27 package/process stages plus 39 owned native methods pass. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
+The current internal foundation includes [durable answer admission](SYNC-DURABLE-PUBLICATION.md), [backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md) and [native33 media compatibility](NATIVE-MEDIA-COMPATIBILITY.md). The [current component receipt](../benchmarks/native-media-compatibility-v1.json) binds source `fe54050`, all88 mandatory controls in three builds,30 package/process stages and39 owned native methods. Optimized source14c has identical native/test/package/runtime bytes and a separately declared final-inspection script delta. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
 
 ## Delivery requirements
 

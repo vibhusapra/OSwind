@@ -61,7 +61,7 @@ final class HistoryErasureTests:XCTestCase {
     func testSharedMediaPreservedAndUniqueMediaDeletedAndCacheDiscarded() throws {
         for name in ["shared","unique"] {try Data(name.utf8).write(to:root.appendingPathComponent("images/"+name))}
         try add("a",path:"images/shared");try add("b",app:"Notes",path:"images/shared");try add("c",path:"images/unique")
-        let cache=root.appendingPathComponent("indexes");try Paths.ensure(cache);try Data([1]).write(to:cache.appendingPathComponent("fixture"))
+        let cache=root.appendingPathComponent(NativeMediaSchema.cacheDirectory);try Paths.ensure(cache);try Data([1]).write(to:cache.appendingPathComponent("fixture"))
         let p=try store.previewErasure(.init(app:"Safari"));XCTAssertEqual(p.mediaReferences,2);let r=try store.eraseHistory(p.scope,expectedToken:p.token)
         XCTAssertEqual(r.removedMedia,1);XCTAssertEqual(r.sharedMedia,1);XCTAssertEqual(r.pendingMedia,0);XCTAssertTrue(r.searchCacheRemoved);XCTAssertTrue(r.warnings.isEmpty)
         XCTAssertTrue(FileManager.default.fileExists(atPath:root.appendingPathComponent("images/shared").path));XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("images/unique").path));XCTAssertFalse(FileManager.default.fileExists(atPath:cache.path))

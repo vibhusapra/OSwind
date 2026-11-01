@@ -43,7 +43,7 @@ final class LibraryWipeTests:XCTestCase {
         let worker=Task.detached {try local.wipeLibrary {if $0.phase=="Removing retained media" {withUnsafeCurrentTask {$0?.cancel()}}}}
         let result=try await worker.value;XCTAssertEqual(result.erasure.sources,2);XCTAssertTrue(result.cancelled);XCTAssertFalse(result.cleanupComplete);XCTAssertEqual(result.erasure.pendingMedia,1)
         // A kill immediately after COMMIT leaves the recap cache marker as well as the wipe queue.
-        try store.withRoutineDatabase {try $0.execute("INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")}
+        try store.withRoutineDatabase {try $0.execute("INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty_v33','1') ON CONFLICT(key) DO UPDATE SET value='1'")}
         XCTAssertEqual(try store.stats().count,0);store=nil;store=try MemoryStore(root:root)
         XCTAssertEqual(try count("SELECT COUNT(*) FROM erasure_assets"),1);XCTAssertTrue(FileManager.default.fileExists(atPath:root.appendingPathComponent("audio/orphan").path))
         XCTAssertTrue(try store.retryLibraryWipeCleanup().cleanupComplete)
