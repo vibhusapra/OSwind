@@ -103,12 +103,14 @@ struct SyncPublicationQueue {
             try context();let row=try db.statement("UPDATE personal_sync_publication_state SET pending_budget=?,binding_budget=? WHERE singleton=1 AND pending_bytes<=? AND binding_bytes<=?");defer {sqlite3_finalize(row)}
             sqlite3_bind_int64(row,1,pending);sqlite3_bind_int64(row,2,binding);sqlite3_bind_int64(row,3,pending);sqlite3_bind_int64(row,4,binding);try db.done(row)
             guard sqlite3_changes(db.handle)==1 else {throw OSwindError.unavailable("Publication budget is smaller than retained work")}
+            _=try wakeReason(.storagePressure)
         }
     }
     func retire(_ key:SyncObjectKey)throws {
         try context();guard key.kind == .turn,try cache.journal.state(for:key).isDeleted else {throw OSwindError.invalid("Publication retirement requires its genuine answer barrier")}
         try remove(key)
         let row=try db.statement("DELETE FROM personal_sync_publication_bindings WHERE object_digest=?");defer {sqlite3_finalize(row)};db.bind(row,1,key.digest);try db.done(row)
+        _=try wakeReason(.storagePressure)
     }
     func checkAccounting()throws {
         let row=try db.statement("SELECT pending_count=(SELECT count(*) FROM personal_sync_publication_jobs),pending_bytes=512*(SELECT count(*) FROM personal_sync_publication_jobs)+128*(SELECT count(*) FROM personal_sync_publication_dependencies),binding_bytes=256*(SELECT count(*) FROM personal_sync_publication_bindings) FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(row)}
@@ -145,6 +147,15 @@ struct SyncPublicationQueue {
         try SyncChangeCapture.transaction(db) {
             try context();let row=try db.statement("UPDATE personal_sync_publication_jobs SET ready=1 WHERE object_digest=? OR object_digest IN (SELECT owner_digest FROM personal_sync_publication_dependencies INDEXED BY sync_publication_dependency WHERE kind=? AND digest=?)");defer {sqlite3_finalize(row)}
             db.bind(row,1,key.digest);db.bind(row,2,key.kind.rawValue);db.bind(row,3,key.digest);try db.done(row)
+        }
+    }
+    /// Explicit local events (policy review or storage recovery) wake a bounded
+    /// reason bucket. No full archive scan or unbounded spinning of blocked work.
+    @discardableResult func wakeReason(_ reason:SyncPublicationPendingReason,limit:Int=64)throws->Int {
+        guard (1...256).contains(limit) else {throw OSwindError.invalid("Invalid publication wake bound")}
+        return try SyncChangeCapture.transaction(db) {
+            try context();let row=try db.statement("UPDATE personal_sync_publication_jobs SET ready=1 WHERE ordinal IN (SELECT ordinal FROM personal_sync_publication_jobs INDEXED BY sync_publication_reason WHERE reason=? AND ready=0 ORDER BY ordinal LIMIT ?)");defer {sqlite3_finalize(row)}
+            db.bind(row,1,reason.rawValue);sqlite3_bind_int(row,2,Int32(limit));try db.done(row);let count=Int(sqlite3_changes(db.handle));guard count<=limit else {throw OSwindError.invalid("Publication wake exceeded its bound")};return count
         }
     }
     func wakeDeclaration(_ reference:SyncContentReference)throws {

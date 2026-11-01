@@ -3,13 +3,13 @@ import CSQLite
 @testable import OSwindCore
 
 extension SyncIncomingSourceTests {
-    private struct PublicationQueueFixture {
+    struct PublicationQueueFixture {
         let a:MemoryStore,ac:SyncVersionStore,b:MemoryStore,bc:SyncVersionStore
         let producer:SyncObjectFolder,inbox:SyncObjectFolder,secret:SyncGroupSecret
         let operations:[SyncRevision],queue:SyncPublicationQueue
     }
-    private func withQueueFixture(citations:Int=0,answers:Int=1,_ body:(PublicationQueueFixture)throws->Void)throws {
-        let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID),producer=try publicationSpace("queue-producer"),secret=SyncGroupSecret()
+    func withQueueFixture(citations:Int=0,answers:Int=1,secret:SyncGroupSecret=SyncGroupSecret(),_ body:(PublicationQueueFixture)throws->Void)throws {
+        let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID),producer=try publicationSpace("queue-producer")
         let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("queue-inbox"),secret:secret,group:group,epoch:epoch)
         defer {try? a.close();try? b.close();producer.close();inbox.close()};try bc.journal.allowPeer(producerID)
         var sources=[Memory]()
@@ -20,18 +20,18 @@ extension SyncIncomingSourceTests {
         let queue=try b.withRoutineDatabase {db in XCTAssertEqual(db.handle,bc.database.handle);return try SyncPublicationQueue.install(cache:bc)}
         try body(.init(a:a,ac:ac,b:b,bc:bc,producer:producer,inbox:inbox,secret:secret,operations:ac.journal.outbox(),queue:queue))
     }
-    private func queueService(_ store:MemoryStore,_ cache:SyncVersionStore,_ queue:SyncPublicationQueue,_ inbox:SyncObjectFolder,admit:@escaping (SyncPortableRecord)throws->Void={_ in})->SyncPublicationAdmission {
+    func queueService(_ store:MemoryStore,_ cache:SyncVersionStore,_ queue:SyncPublicationQueue,_ inbox:SyncObjectFolder,admit:@escaping (SyncPortableRecord)throws->Void={_ in})->SyncPublicationAdmission {
         .init(queue:queue,writer:.init(library:store,cache:cache,admit:admit,pathsFor:{_,_ in [:]},admitMedia:{_,_,_ in}),inbox:inbox)
     }
-    @discardableResult private func queueReceive(_ operation:SyncRevision,_ producer:SyncVersionStore,_ service:SyncPublicationAdmission)throws->SyncPublicationAdmissionResult {
+    @discardableResult func queueReceive(_ operation:SyncRevision,_ producer:SyncVersionStore,_ service:SyncPublicationAdmission)throws->SyncPublicationAdmissionResult {
         let lease=try service.writer.library.mediaWriteLease();defer {lease.release()}
         return try service.receive(operation,record:operation.mutation == .put ? packet(operation,producer):nil,admission:lease,fetchSource:{try XCTUnwrap(producer.record($0,admit:{_ in}))})
     }
-    private func queueRetry(_ producer:SyncVersionStore,_ service:SyncPublicationAdmission,limit:Int=64)throws->[SyncPublicationOutcome] {
+    func queueRetry(_ producer:SyncVersionStore,_ service:SyncPublicationAdmission,limit:Int=64)throws->[SyncPublicationOutcome] {
         let lease=try service.writer.library.mediaWriteLease();defer {lease.release()}
         return try service.retry(limit:limit,admission:lease,fetchSource:{try XCTUnwrap(producer.record($0,admit:{_ in}))})
     }
-    private func supplyDeclarations(_ operations:[SyncRevision],_ producer:SyncObjectFolder,_ service:SyncPublicationAdmission)throws {
+    func supplyDeclarations(_ operations:[SyncRevision],_ producer:SyncObjectFolder,_ service:SyncPublicationAdmission)throws {
         for ref in operations.compactMap(\.publication) {try service.retainDeclaration(XCTUnwrap(producer.content(ref)),reference:ref)}
     }
 
@@ -167,6 +167,87 @@ extension SyncIncomingSourceTests {
             XCTAssertEqual(try f.queue.jobs(readyOnly:false).count,1)
             _=try f.b.wipeLibrary()
             XCTAssertThrowsError(try f.queue.jobs());XCTAssertThrowsError(try SyncPublicationQueue.install(cache:f.bc));XCTAssertEqual(try count(f.b,"chat_turns"),0)
+        }
+    }
+
+    func testPublicationQueueExplicitPolicyReviewWakesOnlyBlockedWorkAfterRepeatedDenial()throws {
+        try withQueueFixture {f in
+            let denied=queueService(f.b,f.bc,f.queue,f.inbox,admit:{packet in if packet.identity.table == .turn {throw SyncPublicationPolicyDenied()}})
+            try supplyDeclarations(f.operations,f.producer,denied)
+            for op in f.operations {_=try queueReceive(op,f.ac,denied)}
+            XCTAssertEqual(try queueRetry(f.ac,denied),[.withheld(.policyDenied)]);XCTAssertTrue(try f.queue.jobs().isEmpty)
+            XCTAssertEqual(try f.queue.wakeReason(.policyDenied,limit:1),1)
+            guard case .projected=try queueRetry(f.ac,queueService(f.b,f.bc,f.queue,f.inbox)).first else {return XCTFail("Explicit local policy review must wake its durable reason bucket")}
+            XCTAssertEqual(try count(f.b,"chat_turns"),1);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueLateDeclarationRetiresAuthenticErasedEvidenceBeforePolicyAtBindingCapacity()throws {
+        try withQueueFixture(citations:1) {f in
+            let third="00000000-0000-0000-0000-000000006211",(c,cc)=try endpoint("queue-eraser",third);defer {try? c.close()}
+            try cc.journal.allowPeer(producerID);try f.bc.journal.allowPeer(third)
+            let initial=try XCTUnwrap(f.operations.first{$0.key.kind == .source}),source=try packet(initial,f.ac),local=try receive(initial,source,c,cc,fetch:{_ in source})
+            let service=queueService(f.b,f.bc,f.queue,f.inbox,admit:{packet in if packet.identity.table == .turn {XCTFail("Known-erased evidence must not reach answer policy")}}),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn})
+            for op in f.operations where op.dot.counter<=turn.dot.counter {_=try queueReceive(op,f.ac,service)}
+            try f.queue.setBudgets(pending:SyncPublicationQueue.defaultBudget,binding:1)
+            try c.delete(local);try drain(c,cc)
+            for deletion in try cc.journal.outbox() {_=try queueReceive(deletion,f.ac,service)}
+            try supplyDeclarations(f.operations,f.producer,service)
+            XCTAssertEqual(try queueRetry(f.ac,service),[.retired(turn.key)])
+            XCTAssertTrue(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty)
+            XCTAssertEqual(try count(f.b,"chat_turns"),0);XCTAssertEqual(try count(f.b,"chat_sources"),0);try f.queue.checkAccounting()
+            let announced=try XCTUnwrap(f.bc.journal.outbox().first{$0.key==turn.key});XCTAssertTrue(announced.context.contains(turn.dot));XCTAssertTrue(try announced.context.contains(XCTUnwrap(cc.journal.outbox().last).dot))
+        }
+    }
+
+    func testPublicationQueueCoalescesOneOwnerAndIndexesOnlyDeclaredDependencyKeys()throws {
+        try withQueueFixture(citations:1) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),owner=try packet(turn,f.ac)
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations where op.dot.counter<=turn.dot.counter {_=try queueReceive(op,f.ac,service)}
+            let initial=try XCTUnwrap(f.queue.jobs(readyOnly:false).first)
+            _=try queueRetry(f.ac,service);XCTAssertEqual(try f.queue.jobs(readyOnly:false).count,1)
+            XCTAssertEqual(try f.queue.jobs(readyOnly:false).first?.ordinal,initial.ordinal);XCTAssertEqual(try count(f.b,"personal_sync_publication_dependencies"),3)
+            let unrelated=try SyncObjectKey(kind:.source,digest:String(repeating:"a",count:64));try f.queue.wake(unrelated);XCTAssertTrue(try f.queue.jobs().isEmpty)
+            let citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation});try f.queue.wake(citation.key)
+            XCTAssertEqual(try f.queue.jobs().map(\.identity),[owner.identity]);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueDeclaredCitationDeletionRetiresItsReadableOwner()throws {
+        try withQueueFixture(citations:1) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation})
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            XCTAssertEqual(try count(f.b,"chat_turns"),1)
+            // Authenticated content-free wire deletion of an actual declared
+            // lifetime; no fabricated child body supplies owner authority.
+            let deletion=try f.ac.journal.delete(key:citation.key);_=try queueReceive(deletion,f.ac,service)
+            XCTAssertEqual(try count(f.b,"chat_turns"),0,"An admitted answer cannot remain readable after required citation retirement")
+            XCTAssertTrue(try f.bc.journal.state(for:turn.key).isDeleted);XCTAssertTrue(try f.queue.jobs(readyOnly:false).isEmpty);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueuePendingIndependentHeadWithdrawsOldReadableBodyWithoutGlobalRetirement()throws {
+        try withQueueFixture(citations:1) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation}),old=try packet(turn,f.ac)
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            guard case .turn(let body)=old.body else {return XCTFail("Owned prior turn missing")}
+            // Authored supported wire-version update, not a claim that the app
+            // exposes a public stored-answer editing UI. The newer version is
+            // independently source-free and its declaration is withheld.
+            let next=try SyncPortableRecord(identity:old.identity,body:.turn(.init(conversation:body.conversation,timestamp:body.timestamp,question:body.question,text:"Independent newer answer",provider:body.provider,duration:body.duration,warnings:body.warnings,filter:body.filter,timeZone:body.timeZone)))
+            let declaration=try SyncTurnPublication(group:group,epoch:epoch,owner:next.reference,citations:[]),revision=try f.ac.journal.put(key:turn.key,content:next.reference.content,publication:declaration.reference)
+            let lease=try f.b.mediaWriteLease();defer {lease.release()}
+            _=try service.receive(revision,record:next,admission:lease,fetchSource:{try XCTUnwrap(f.ac.record($0,admit:{_ in}))})
+            let deletion=try f.ac.journal.delete(key:citation.key);_=try queueReceive(deletion,f.ac,service)
+            let chat=try XCTUnwrap(f.b.chats().first)
+            XCTAssertTrue(try f.b.chatTurns(chat.id).isEmpty,"The old source-derived body must be withdrawn while the new declaration is missing")
+            XCTAssertFalse(try f.bc.journal.state(for:turn.key).isDeleted,"An old citation cannot globally erase an independent newer head")
+            try service.retainDeclaration(declaration.encoded(),reference:declaration.reference)
+            guard case .projected=try queueRetry(f.ac,service).first else {return XCTFail("The independent new head must survive and complete")}
+            XCTAssertEqual(try f.b.chatTurns(chat.id).first?.answer.text,"Independent newer answer");XCTAssertTrue(try f.queue.isComplete(next.identity));try f.queue.checkAccounting()
         }
     }
 }
