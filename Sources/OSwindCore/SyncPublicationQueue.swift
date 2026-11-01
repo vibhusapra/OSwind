@@ -115,7 +115,7 @@ struct SyncPublicationQueue {
     /// declaration identifies the projection to withdraw. This is not authority
     /// to delete every future/concurrent version of that owner's global lifetime.
     func completedOwner(ofCitation key:SyncObjectKey)throws->SyncObjectIdentity? {
-        try context();guard key.kind == .conversationCitation else {return nil}
+        try context();guard key.kind == .conversationCitation,try cache.catalog.nativeExists(for:key) else {return nil}
         let row=try db.statement("SELECT i.key_frame FROM personal_sync_identities i JOIN personal_sync_identity_current c USING(object_digest) WHERE i.object_digest=? AND i.table_name='chat_sources' AND c.table_name=i.table_name AND c.local_key=i.local_key AND i.deleted=0");defer {sqlite3_finalize(row)};db.bind(row,1,key.digest)
         let code=sqlite3_step(row);if code==SQLITE_DONE {return nil}
         guard code==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_BLOB,let bytes=sqlite3_column_blob(row,0),sqlite3_column_bytes(row,0)>0,sqlite3_column_bytes(row,0)<=66048 else {throw OSwindError.database("Declared citation native key differs")}
