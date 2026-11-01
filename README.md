@@ -1,5 +1,7 @@
 # OSwind
 
+[Reviewed local voice typing](docs/VOICE-TYPING.md) adds deliberate30-second recording, local Whisper/Parakeet decoding, an editable preview and a fresh target choice after inference. The774-input [receipt](benchmarks/voice-typing-v1.json) passes all15 software/package stages,1,818 full cases/84 skips and155 mandatory sanitizer/optimized cases. Actual microphone/permission/native input, dictation quality and power remain open; inherited native-vault CI failures are retained.
+
 [Optional clipboard context](docs/CLIPBOARD-CONTEXT.md) adds default-off copied-text capture, privacy/context/secret checks, current-policy source admission, quiet restore and pause/quit/library-switch drainage. The765-input [receipt](benchmarks/clipboard-context-v1.json) passes13 software/package stages and all102 mandatory clipboard/MCP cases, including32 new cases. General clipboard permission/foreground/native input, valid promised providers and physical power remain open.
 
 [Native external tools](docs/MCP-WORKSPACE.md) adds local stdio MCP connections, per-operation command/tool/argument review, a scoped Keychain adapter and explicit privacy-checked result-text saving to searchable memory. All70 MCP cases and13 package/process stages pass over752 pinned inputs. [Receipt and limits](benchmarks/mcp-workspace-v1.json). Native input/real Keychain acceptance, HTTP/auth and model-driven tool workflows remain open. The [manual CLI client](docs/MCP-CLIENT.md) remains available.

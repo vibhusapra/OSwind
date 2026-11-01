@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Reviewed local voice typing — software qualified, native acceptance open
+
+[F083 moves to partial](VOICE-TYPING.md): deliberate30-second recording, local model preparation before microphone permission, preview/edit/cancel and a renewed target after inference. No automatic history, cloud fallback or submission. Actual preparation/permission/inference workers drain through pause/privacy/lock/library switch and ordinary Quit; private on-library audio workspaces remain held until the real work returns.
+
+The [774-input/Git-bound receipt](../benchmarks/voice-typing-v1.json) passes all15 stages at6ac71ff:1,818 full passes/84 skips; all155 mandatory methods pass under debug, TSan and optimization without focused skips/race warnings. All24 new dictation cases, actual production GPU+CPU/Whisper public-file decoding,22 signed CLI checks, SDK/API/MCP, actual quiet backup/restore and interruptions, strict34-file extraction and unchanged installed15/prior21 app trees pass. Eight regenerated light/dark component PNGs exactly match inspected layouts. Native mic/permissions/foreground insertion, real device transitions, quality/latency/power and hardware utilization are not established.
+
+Two passing earlier15-stage checkpoints remain: an extra Finish-during-authorization test then exposed a late engine-factory attempt; a terminal-PCM fixture exposed delayed error propagation. Both red logs remain and the final candidate passes their fixes. Parent hosted APFS failures remain: original missing session at0c9; instrumented move/13app cases pass atbcfaf but a separate rapid final detach returns16 ResourceBusy. No blind rerun, forced detach or causal fix is claimed.
+
+Current ledger:4 live verified,44 partial,6 implemented,23 tested,4 TODO and2 outside desktop v0, across83 requirements/20 researched offerings. The four TODOs are sustained power (F013), complete personal sync (F059), notarized distribution/updates (F067) and narrated source-linked workflow export (F081). The44 partial requirements still have open work; broad parity/top-three ranking are unfinished.
+
 ## Clipboard hosted native failure — phase diagnosis remains open
 
 Publication0c9b5b7 passes the benchmark job and full1,877-case software suite (1,792 passes/85 skips) in run41288968230, but the owned APFS move case fails with a missing vaultSession member and retains its attached fixture. [Fixed phase diagnostics](VAULT-MOVE-PHASE.md) add eleven nonsecret labels; one instrumented native comparison passes at ac94977. No production fix, harmless-race explanation or unchanged CI rerun is claimed. Hosted native acceptance remains unfinished; feature statuses are unchanged. [Receipt](../benchmarks/vault-move-phase-v1.json).

@@ -659,8 +659,8 @@
     "id": "F083",
     "axis": "Audio",
     "feature": "Voice typing into a reviewed target app",
-    "status": "todo",
-    "evidence": "New October31 parity requirement from meeting-product pricing documentation. Microphone/ASR support and contextual draft insertion do not establish a usable voice-typing workflow. Needs deliberate start/stop, bounded local transcription, clear capture state, secure-field exclusion, target renewal after inference, preview/edit/cancel and owned-app insertion tests. No silent cloud fallback.",
+    "status": "partial",
+    "evidence": "Deliberate30-second local microphone dictation now prepares the selected Whisper/Parakeet model before permission, previews editable text, revokes old targets after inference and requires fresh reviewed insertion. One worker drains actual preparation/permission/inference before close or ordinary Quit; pause/lock/privacy/root changes discard late work. Private on-library WAVs clean up; no automatic history or cloud fallback. The774-input/Git-bound15-stage receipt passes1,818 full cases/84 skips and155 each under TSan/optimization, including24 new dictation methods, actual GPU+CPU/Whisper public-file decoding, signedprocess/API/MCP/backup/archive gates and eight regenerated component layouts. Pending-authorization Finish and terminal-PCM red/green counterexamples remain. Native mic/permissions/input/device interruption, dictation WER/power and broader destinations remain open; parent hosted native-vault failures are retained. See VOICE-TYPING.md and benchmarks/voice-typing-v1.json.",
     "references": "Granola voice typing"
   }
 ]
