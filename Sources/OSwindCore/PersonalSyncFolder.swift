@@ -40,6 +40,13 @@ final class SyncObjectFolder:@unchecked Sendable {
     static func create(at root:URL,secret:SyncGroupSecret,group:String,epoch:String)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:true)}
     static func open(at root:URL,secret:SyncGroupSecret,group:String,epoch:String)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:false)}
     var isClosed:Bool {lock.lock();defer {lock.unlock()};return tree==nil}
+    /// The caller's owning journal must match this immutable cipher namespace
+    /// before retaining any private canonical bytes, not only at declaration
+    /// decode time. Marker authentication alone proves this space's own scope.
+    func requireNamespace(group:String,epoch:String)throws {
+        guard operations.group==group,operations.epoch==epoch else {throw OSwindError.invalid("Publication inbox belongs to another trusted group or epoch")}
+        try withTree {_ in ()}
+    }
     func close() {lock.lock();defer {lock.unlock()};tree=nil}
     private func withTree<T>(_ body:(BackupFileTree)throws->T)throws->T {
         lock.lock();defer {lock.unlock()}

@@ -1,0 +1,198 @@
+{
+  "format": "OSwind durable answer admission software evidence",
+  "version": 1,
+  "state": "software_passed",
+  "feature": "F059",
+  "featureStatus": "TODO",
+  "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+  "nativeSchema": 32,
+  "repositoryTrackedInputs": 1324,
+  "inputManifest": "sync-durable-publication-inputs-v1.json",
+  "inputManifestSHA256": "b275ff32f7bea6333f58c6bff9480ab2dc257946b568cfbe0adf92ec2d1cc933",
+  "newMandatoryControlsAllThreeBuilds": 51,
+  "softwareStages": [
+    {
+      "stage": "full-debug",
+      "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+      "returncode": 0,
+      "wallSeconds": 489.5858400829602,
+      "logSHA256": "4a766a5867b7d380676a11b8fe98194501bb3cb35d4696ab320c6c993ed75b71",
+      "tests": {
+        "defined": 2102,
+        "passed": 2005,
+        "skipped": 97,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 51,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+      "returncode": 0,
+      "wallSeconds": 445.66992554208264,
+      "logSHA256": "253ca86df1ae467e97abe0c3accfe99cea89533788fbe9ec4278e1799efac3e3",
+      "tests": {
+        "defined": 632,
+        "passed": 594,
+        "skipped": 38,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 51,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    },
+    {
+      "stage": "optimized",
+      "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+      "returncode": 0,
+      "wallSeconds": 407.484462833032,
+      "logSHA256": "b85bc995d0bd9399db2e003de69e4c4543b30cd75a12e1aad67c6df0a974fa4b",
+      "tests": {
+        "defined": 632,
+        "passed": 594,
+        "skipped": 38,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 51,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    }
+  ],
+  "retainedDebugGroups": [
+    {
+      "stage": "retained-debug",
+      "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+      "returncode": 0,
+      "wallSeconds": 8.358664375031367,
+      "logSHA256": "93dad6800ffc5e166408b86f6c59a87d7687b80fd1cfd7ac988456de6f0f3808",
+      "tests": {
+        "defined": 3,
+        "passed": 3,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 3,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    },
+    {
+      "stage": "retained-source-debug",
+      "source": "4cbe8988f23e61e3c7125e05305bf8dbfed253f1",
+      "returncode": 0,
+      "wallSeconds": 16.40273466706276,
+      "logSHA256": "3435015e77e403628984be757f8d80548f6782f73fffa393fbd094629ecdc02a",
+      "tests": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 5,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    }
+  ],
+  "recoveredDebugCrashDatabases": {
+    "retraction": 3,
+    "sourceWithdrawal": 5,
+    "sourceIndependentReviewSHA256": "3c7a67ae12608487019ef827c430cd2f857928ab99ea7478a1903dd2e642d4f2",
+    "sourceReviewerSHA256": "b52cd53ade04e9381b3725520fa3ebb24753193d18ca8c194cf4ae0324607575",
+    "retractionIndependentReviewSHA256": "cd94ffa7d3a6f43cdb2760edaa4d42c3d7ed210818e6d779e190f3923a3ee67f",
+    "retractionReviewerSHA256": "806c7f19a81619c09d1930b4aec9b6a10d31fef379a599a7be263a5fc574b518",
+    "scope": "Current-source closed database/WAL review before cleanup; exact native frames/live keys, cache and queue accounting, authentic root/pin barriers, canonical metadata, receipts/cursors, and owned PNG cleanup queue. Parents separately verify authenticated durable inbox, replay, independent future answer and explicit media cleanup."
+  },
+  "actualPrior32Client": {
+    "source": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+    "CLI_SHA256": "ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2",
+    "methodsAllThreeBuilds": 2,
+    "postOpenWitness": "actual file descriptor plus exclusive-blocked/shared-succeeds flock probe, before queue installation",
+    "scope": "Initialized native collector write after retraction/source erasure, fresh read/export/delete, stable local IDs, binding invalidation/accounting, unchanged executable bytes; no already-rendered GUI or general held-reader media acceptance"
+  },
+  "platform": {
+    "CPU": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "wallTimeScope": "Concurrent build/test bookkeeping, not throughput/energy/competitor measurements"
+  },
+  "earlierCheckpoint": {
+    "source": "72c14f07ffb94118d56335fa21e99b819ca52bb0",
+    "fullPassed": 1997,
+    "fullSkipped": 98,
+    "currentNewlyExecutedQuietWakeMethod": "OSwindAppTests.WorkspaceWakeLifecycleTests.testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup",
+    "scope": "One previously skipped quiet-wake method executed in the current full run; current counts are independently parsed."
+  },
+  "retainedDevelopmentFailures": [
+    {
+      "kind": "production",
+      "log": "native-date-red-01.log",
+      "cases": 4,
+      "assertions": 44,
+      "unexpected": 0,
+      "cause": "Malformed TEXT/BLOB native dates silently coerced to zero before source redaction."
+    },
+    {
+      "kind": "fixture then production",
+      "logs": [
+        "native-mutation-red-01.log",
+        "native-mutation-red-02.log"
+      ],
+      "cause": "First fixture included actual direct owner deletions from producer source edit; a real third native source editor correctly preserves exact original. Separate late old-citation case exposed surviving catalogue keys incorrectly withdrawing an independent completed owner."
+    },
+    {
+      "kind": "production",
+      "log": "retention-scope-red-01.log",
+      "cases": 7,
+      "assertions": 21,
+      "unexpected": 0,
+      "cause": "Wrong group/epoch or stale/closed library could retain encrypted content before later rejection; foreign retry could overwrite work reason; nested declaration arrival did not enforce media-before-SQL ordering."
+    },
+    {
+      "kind": "harness",
+      "logs": [
+        "old32-initialized-01.log",
+        "old32-initialized-02.log",
+        "old32-initialized-03.log"
+      ],
+      "cause": "Initial compiler/autoclosure fixes and unreliable path/lock-mode readiness oracle; actual frozen executable succeeds with canonical path plus direct flock witness."
+    },
+    {
+      "kind": "harness",
+      "log": "source-crash-01.log",
+      "cause": "Old note-only helper supplied no media manifest for owned PNG; fixed real source manifest preparation before actual crash phases."
+    },
+    {
+      "kind": "independent reviewer",
+      "log": "source-crash-independent-review-v2.log",
+      "cause": "Assumed optional personal_sync_evidence table existed; v3 accepts absence and requires zero rows when present, retaining strict native/original/cache checks."
+    }
+  ],
+  "qualifiedPackage": false,
+  "newAppArtifact": null,
+  "protectedPriorAppTreesClaimed": false,
+  "limits": [
+    "Internal metadata/dispatcher prerequisite; no public service, enrollment, watcher, provider connection or automatic capture enabled.",
+    "Current-source package/signing/native vault and hosted CI remain separate; no previous app qualification is applied to this source.",
+    "Logical queue quotas are not filesystem disk limits. Permanently full work can explicitly refuse erasure; erasure-priority service strategy remains open.",
+    "Encrypted orphan/quarantine cleanup, collection epochs/unknown offline erasure, recovery/backup rollback, revocation, compaction, full policy/media/transport and lifecycle/status/conflict UI remain open.",
+    "Transitive recap/version retirement, actual providers/two Macs, already-rendered GUI behavior and held-reader media cleanup need separate acceptance.",
+    "No physical power, competitive throughput, energy, whole-product parity or top-three ranking claim. All 83 feature statuses remain unchanged."
+  ],
+  "recordedAtUTC": "2026-11-01T20:07:20.646574+00:00"
+}
