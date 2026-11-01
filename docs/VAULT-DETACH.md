@@ -8,7 +8,7 @@ During schema-21 entity qualification, the earlier eight-observation/350 ms paus
 
 ## Confirmation contract
 
-The normal detach path keeps the existing image, device, volume UUID, mount and root identity checks. The moved-image fallback still uses only a verified normal kernel unmount and normal detach; busy readers are not overridden. No force flag or additional detach attempt is introduced by verification.
+The normal detach path keeps the existing image, device, volume UUID, mount and root identity checks. The moved-image fallback still uses only a verified normal kernel unmount and normal detach; busy readers are not overridden. Verification itself adds no mutation. A separate [bounded busy recovery](VAULT-BUSY-RECOVERY.md) policy now permits at most two additional normal detach calls after normal exit 16, with fresh original mounted-image proof before each call. No force flag is used.
 
 Before the detach command, the verifier captures package/manifest/image identity, including an explicit current package stamp even if the vault object was constructed before the package existed. After successful detach it performs up to sixteen observations. The first asynchronous pause is 50 ms, followed by 100, 200, 400 and 800 ms, then pauses capped at one second. Across fifteen pauses the configured maximum is 11.55 seconds. Every observation validates the original package, manifest vault/volume/setup identity and image device/inode before native inspection and again after a usable reply. The image's mutable directory size/timestamps are not treated as identity.
 

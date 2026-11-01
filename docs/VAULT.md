@@ -101,4 +101,4 @@ These are synthetic application-owned renders, reviewed in light and dark appear
 
 ![Busy lock sample](../assets/vault-closing-dark.png)
 
-After a successful normal detach, [bounded verification](VAULT-DETACH.md) requires two consecutive fresh absent observations while retaining original package/manifest/image identity. Known missing-volume observations can settle within the configured budget; ambiguous/unknown states remain pending. No extra detach or force flag is introduced.
+After a successful normal detach, [bounded verification](VAULT-DETACH.md) requires two consecutive fresh absent observations while retaining original package/manifest/image identity. Known missing-volume observations can settle within the configured budget; ambiguous/unknown states remain pending. After an explicit normal busy exit 16, [bounded recovery](VAULT-BUSY-RECOVERY.md) permits at most two extra normal detach calls, each requiring fresh same-image mounted proof. Held readers still block locking; no force flag is used.

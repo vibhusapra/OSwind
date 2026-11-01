@@ -1,0 +1,374 @@
+{
+  "format": "OSwind.bounded-normal-vault-busy-recovery.qualification",
+  "version": 1,
+  "state": "passed-owned-software-native-and-process",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "0538b9dcf432e4c046623ad40b5d3700048ff9e8",
+  "branch": "codex/vault-busy-detach",
+  "parent": "codex/voice-typing",
+  "scope": "At most two normal detach retries for explicit normal exit16 with fresh same-image mounted proofs; two fresh absent observations still required. Owned encrypted APFS only.",
+  "inputs": {
+    "repository": 774,
+    "manifest": "vault-busy-recovery-inputs-v1.json",
+    "manifestSHA256": "4f415b385f38e2b7cdbdd82949ade70245b9fcaa49aa8309c12cbcd67078550f",
+    "allGitBlobsLiveAndStageHashesMatch": true
+  },
+  "review": {
+    "state": "passed-owned-software-native-and-process",
+    "source": "0538b9dcf432e4c046623ad40b5d3700048ff9e8",
+    "inputs": 774,
+    "allGitBlobsLiveAndStageHashesMatch": true,
+    "stages": 12,
+    "coverage": {
+      "fullPassMethods": 1829,
+      "nativePassMethods": 38,
+      "nativeAdditionalPassMethods": 36,
+      "distinctPassedMethods": 1865,
+      "remainingOptInSkippedMethods": [
+        "OSwindAppTests.ImportLifecycleModelTests testActualNativeGUIJSONAndLimitlessImportWorkers",
+        "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse",
+        "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardReturnsExactUTF8WithoutOpeningGeneralClipboard",
+        "OSwindAppTests.NativeClipboardReaderTests testMismatchedSourceIsRefusedBeforeLazyTextProviderRuns",
+        "OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured",
+        "OSwindAppTests.PIIModelSetupTests testOwnedSettingsStatesRenderWithoutNetworkOrLibrary",
+        "OSwindAppTests.PIIScanRecordViewTests testOwnedPrivacyRecordStatesRenderInBothThemes",
+        "OSwindAppTests.WorkspaceWakeLifecycleTests testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup",
+        "OSwindCoreTests.EntityWordPieceTests testPinnedVocabularyMatchesIndependentTokenAndOffsetReferences",
+        "OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker",
+        "OSwindCoreTests.HistoricalErasureScaleTests testOwnedOriginalScopeAtBoundedScale",
+        "OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle",
+        "OSwindCoreTests.MeetingReminderCrashTests testMeetingReminderCrashWorker",
+        "OSwindCoreTests.NativeANNBuildMeasurementsTests testAuthoredNativePreparationAndSampledSelfRecall",
+        "OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured",
+        "OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder",
+        "OSwindCoreTests.OwnedDictationASRTests testOwnedPublicSpeechThroughProductionDictation",
+        "OSwindCoreTests.PIIImportTests testActualNativeCPUImportPaths",
+        "OSwindCoreTests.PIIImportTests testActualNativeCoreMLImportPaths",
+        "OSwindCoreTests.PIIImportTests testPinnedNativeEmailMissIsRetainedAsKnownQualityLimitation",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualBackendsPreserveCoordinatesAcrossLongWhitespaceGap",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCPUCohortMatchesPinnedIndependentReference",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCPULongDocumentKeepsCompleteOriginalCoordinates",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLCohortMatchesPinnedIndependentReference",
+        "OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLLongDocumentKeepsCompleteOriginalCoordinates",
+        "OSwindCoreTests.PIIModelPreparationTests testNativeStreamingMetadataDerivativeMatchesIndependentONNXBytes",
+        "OSwindCoreTests.PIIModelPreparationTests testRealPreparedReuseAndVerifyNeverInvokeNetworkExtractorOrInference",
+        "OSwindCoreTests.PIITokenizerTests testConcurrentEncodingKeepsImmutableSourceTensors",
+        "OSwindCoreTests.PIITokenizerTests testPinnedTokenizerMatchesIndependentGLiNERAndRustTensors",
+        "OSwindCoreTests.PersonalSyncCrashTests testCrashWorker",
+        "OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange",
+        "OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured",
+        "OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured",
+        "OSwindCoreTests.SyncCaptureCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncCaptureScaleTests testOwnedArchiveScaleAndIncrementalCost",
+        "OSwindCoreTests.SyncIdentityCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncIdentityScaleTests testOwnedIdentityBootstrapAndIncrementalLifetimeScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale",
+        "OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale",
+        "OSwindCoreTests.SyncOriginalEvidenceCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncOriginalEvidenceScaleTests testOwnedOriginalEvidenceAtBoundedScale",
+        "OSwindCoreTests.SyncOutgoingCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncOutgoingScaleTests testOwnedOutgoingPreparationAtBoundedScale",
+        "OSwindCoreTests.SyncVersionCrashTests testCrashWorker",
+        "OSwindCoreTests.SyncVersionScaleTests testOwnedVersionPreparationAtBoundedScale",
+        "OSwindCoreTests.VisualEncoderTests testPinnedNativeTokenizerParityAndModelLifecycle",
+        "OSwindCoreTests.VisualTokenizerDataTests testPinnedCompleteVocabularyMergesAndIndependentTokenReferences"
+      ],
+      "additionalNativeMethods": [
+        "OSwindAppTests.LibraryOpeningTests testNativeVaultLockDuringPreparationClosesLateStoreAndDetaches",
+        "OSwindAppTests.VaultSessionTests testNativeBusyReaderRemainsClosingUntilRetry",
+        "OSwindAppTests.VaultSessionTests testNativeCancelledSetupKeepsOriginalSelectedAndQuiet",
+        "OSwindAppTests.VaultSessionTests testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal",
+        "OSwindAppTests.VaultSessionTests testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal",
+        "OSwindAppTests.VaultSessionTests testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore",
+        "OSwindAppTests.VaultSessionTests testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture",
+        "OSwindAppTests.VaultSessionTests testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback",
+        "OSwindAppTests.VaultSessionTests testNativeSessionLockAtStartupDetachesWithoutOpeningHistory",
+        "OSwindAppTests.VaultSessionTests testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent",
+        "OSwindAppTests.VaultSessionTests testNormalTerminationAwaitsCancelledSetupBeforeReturning",
+        "OSwindAppTests.VaultSessionTests testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes",
+        "OSwindCoreTests.NativeVaultActivityCalendarTests testRetainedCalendarValueCannotPinEncryptedDeviceOrQueryClosedStore",
+        "OSwindCoreTests.NativeVaultCancellationTests testCancellationDuringMediaDrainStillClosesStoreAliasAndOwnedImage",
+        "OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedCreateKeepsClosedEncryptedSetupAndCanResume",
+        "OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact",
+        "OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory",
+        "OSwindCoreTests.NativeVaultCollectorTests testCollectorAdmissionAndReopenPreserveEncryptedHistoryWithoutPlaintextFallback",
+        "OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtFirstCollectorLockRetainsPhaseAndRecoversNormally",
+        "OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtSecondCollectorLockRetainsPhaseAndRecoversNormally",
+        "OSwindCoreTests.NativeVaultDetachSettlementTests testKnownHeldReaderCapturesBusyExitAndPreservesHistoryUntilNormalRecovery",
+        "OSwindCoreTests.NativeVaultDetachSettlementTests testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment",
+        "OSwindCoreTests.NativeVaultDetachSettlementTests testReleasedNativeReaderRecoversWithinOneLockRequestWithoutForce",
+        "OSwindCoreTests.NativeVaultImportPreparationTests testSettingsAndImportReservationsReleaseBeforeVerifiedDetach",
+        "OSwindCoreTests.NativeVaultMigrationTests testCancellationDuringCopyClosesHandleAndDetachesWithoutRemovingOriginal",
+        "OSwindCoreTests.NativeVaultMigrationTests testChangedSourceIsReportedAndOriginalIsRetained",
+        "OSwindCoreTests.NativeVaultMigrationTests testHistoryMediaVectorsChatsSettingsAndOriginalSurviveCopy",
+        "OSwindCoreTests.NativeVaultQueryRecoveryTests testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation",
+        "OSwindCoreTests.NativeVaultQueryRecoveryTests testRepeatedInterruptsRefuseStatusAfterTwoCallsAndPermitOrdinaryRecovery",
+        "OSwindCoreTests.NativeVaultTests testMissingOrUnencryptedImageCannotReportAProtectedLockedLibrary",
+        "OSwindCoreTests.NativeVaultTests testMovedAttachedPackageRemainsVisibleAndCanCloseThroughRetainedDirectory",
+        "OSwindCoreTests.NativeVaultTests testOptionalCredentialLifecycleUsesVerifiedPassphraseAndPreservesFallback",
+        "OSwindCoreTests.NativeVaultTests testOwnedEncryptedVolumeAndSQLiteTemporaryPolicies",
+        "OSwindCoreTests.NativeVaultTests testUnmountedImageIsNotCryptographicallyLockedUntilBackingDeviceDetaches",
+        "OSwindCoreTests.NativeVaultVisualIndexTests testEncryptedVisualSnapshotsReleasePinsAndDescriptorsBeforeVerifiedDetach",
+        "OSwindCoreTests.SnapshotAdmissionTests testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach"
+      ]
+    },
+    "tests": {
+      "full-debug": {
+        "defined": 1917,
+        "passed": 1829,
+        "skipped": 88,
+        "failures": 0
+      },
+      "thread-sanitizer": {
+        "defined": 60,
+        "passed": 46,
+        "skipped": 14,
+        "failures": 0
+      },
+      "optimized": {
+        "defined": 60,
+        "passed": 46,
+        "skipped": 14,
+        "failures": 0
+      },
+      "native-vault": {
+        "defined": 38,
+        "passed": 38,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    "protectedPriorApps": 22,
+    "strictSignedFiles": 34,
+    "archiveExtractionEqual": true,
+    "releasedReaderDetachStatuses": [
+      16,
+      0
+    ],
+    "heldReaderDetachStatuses": [
+      16,
+      16,
+      16
+    ],
+    "traceHashes": {
+      "oswind-native-busy-recovery-84AA4B10-47B2-4438-BE9A-FA23E0B4F6E6-completed.json": "7231580d88005591d037942f03827a7907a268caf13db59c6057a8aa3589d8ae",
+      "oswind-native-collector-known-reader-00E6529B-B7B0-431D-870D-F69E76B9A2B6-completed.json": "6998ed95fc2943a162fb5ebe459745085f62a5027dae33780fd3b4c6a79e0a5e",
+      "oswind-native-collector-7684B285-3D68-4D7C-A00B-36AF1C4950D1-completed.json": "0287f47d978d232624505e82e79823699710ba18044f66f19300ee78e5dc2b6e",
+      "oswind-native-detach-held-reader-DF27D50F-02B7-406E-86CB-B3EEB5E1A6EF-completed.json": "7e1c22859d802d932c18f76e4760f3e10b692a9de27c610b88e438ccc9358bc0",
+      "oswind-native-detach-settling-691BC7FB-F30D-4367-8CBD-8D03D2556AAB-completed.json": "c63d50d0ece3ee8aae4b4e7f808517c88c5a3668cba3111e6f4c6a3fba3e9996",
+      "oswind-native-collector-known-reader-CF4A7E0A-BCBB-4F75-8EC2-564F95A81F90-completed.json": "50484bb4373728f87206644a782560bc327db2033e6d40215d5d82343294136f"
+    },
+    "reviewedAtUTC": "2026-11-01T10:26:25.279357+00:00",
+    "limits": [
+      "Owned encrypted fixtures only; no personal history, credentials, Keychain, clipboard or device settings",
+      "Retains earlier native failures; new bounded recovery does not identify the original busy owner or missing-session cause",
+      "Ad hoc signing only; no notarization, native UI or hardware power qualification"
+    ]
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 331.063054083148,
+      "log": "full-debug.log",
+      "logSHA256": "478306785850ac2125e1d094311effd46c882f7896b393600491ca59f172b509",
+      "tests": {
+        "defined": 1917,
+        "passed": 1829,
+        "skipped": 88,
+        "failures": 0
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 47.42287008394487,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "28fd071cdeb3a7954d78a84f7d4bac09e018d3171207561b20cf0162ae90da92",
+      "tests": {
+        "defined": 60,
+        "passed": 46,
+        "skipped": 14,
+        "failures": 0
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 158.8254414999392,
+      "log": "optimized.log",
+      "logSHA256": "3ca3782b1430908c1ecd5a74a36fbb3b9a91eae82080315624a61b668ea223f5",
+      "tests": {
+        "defined": 60,
+        "passed": 46,
+        "skipped": 14,
+        "failures": 0
+      }
+    },
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 195.11743275006302,
+      "log": "native-vault.log",
+      "logSHA256": "506499c6607321725fb75b99b7ca3dfc99c27f708ace73b669293752cebf0cd6",
+      "tests": {
+        "defined": 38,
+        "passed": 38,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 118.84522633301094,
+      "log": "package.log",
+      "logSHA256": "64e1ba34be972cd92b4fb89cdfc99410071d04b79f5754f56ca2d4e58e33711d"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 17.918912041001022,
+      "log": "vault-process.log",
+      "logSHA256": "2df13a4a47a589d1cb2c96285c574b6c586347f5aeb53de49d9b506418878abd"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 7.565600249916315,
+      "log": "terminal-held-reader.log",
+      "logSHA256": "24914a28308a50a90ab01710fa0b4961d469d8cf16c1c5b519048cd9b67b6d02"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 6.3793562091887,
+      "log": "query-interruption.log",
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.276488667121157,
+      "log": "archive.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.1051135000307113,
+      "log": "extract.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.03857879084534943,
+      "log": "strict-app.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.038078707875683904,
+      "log": "strict-extracted.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "package": {
+    "stagedFiles": 34,
+    "archiveExtractionEqual": true,
+    "protectedAppsUnchanged": 22,
+    "cliSHA256": "a90031c4ab37e440561aafae677e452257fe7ba4c4d643a30491b2693e628364",
+    "appSHA256": "38d806460706e17989f063fafe8b965702fc54e6b2ad0401184b37e7fe0fe01e",
+    "zipSHA256": "ec2cb87f524e37ddf0231fb35f2e72f313a0e47c2cfcc8521a7cd335284b3ae7"
+  },
+  "retainedDevelopment": [
+    {
+      "name": "busy-red-01.log",
+      "sha256": "b3529267993905ab0064cfbfce48f0f9a7c91479af83c231e8784e3d41a822a2",
+      "outcome": "Four contract cases fail in eight assertions before implementation"
+    },
+    {
+      "name": "native-busy-red-02.log",
+      "sha256": "967bda38bb6c15decd82a7c28387ee500a2300a0ec5ae02d6e104df3a3be8c00",
+      "outcome": "Real released-reader fixture gets normal busy16 and fails the original lock call; normal failure cleanup later succeeds"
+    },
+    {
+      "name": "transition-green-03.log",
+      "sha256": "903f83e055fa69cd28d059b4a9b1d97cd94c9d1370f30e6eb71c5403cf05021c",
+      "outcome": "Initial19transition cases pass"
+    },
+    {
+      "name": "transition-green-04.log",
+      "sha256": "fa2aebbb5fec43db356cd2e4057e22c1e83c0cb2f2e69a3fdefd437c2c9b3d08",
+      "outcome": "45cases/42pass3nativeoptinskips"
+    },
+    {
+      "name": "native-green-05.log",
+      "sha256": "131780089a23c6cb5c7a630d049eef3760dd3afda7adc45c17287e55e5e26f38",
+      "outcome": "Three actual APFS development cases pass"
+    },
+    {
+      "name": "transition-green-06.log",
+      "sha256": "6c2ad016da0116df1aafa2f9042b739672fd6998b86a2f319ee8bdaf48b2ca86",
+      "outcome": "All29transition cases pass"
+    }
+  ],
+  "retainedDiagnosticParserFailure": "Development green stdout trace was split/truncated and not treated as complete JSON evidence; qualification writes and independently checks complete redacted trace files.",
+  "priorHostedFailures": [
+    {
+      "run": "https://github.com/vibhusapra/OSwind/actions/runs/41288968230",
+      "head": "0c9b5b76702cdacbeef17a472491f0fed7062572",
+      "outcome": "Benchmark/fullsoftware pass; moved native missing vaultSession failure, causeunproven"
+    },
+    {
+      "run": "https://github.com/vibhusapra/OSwind/actions/runs/41291021469",
+      "head": "bcfaf5b33f8fb00e7e0ac1c9fbd7c4ea6b8ebbe4",
+      "outcome": "Benchmarkpass, instrumentedmove/all13appcasespass; separate rapid final-lock normaldetach16ResourceBusy; later normal cleanup0; original busy owner unknown"
+    }
+  ],
+  "voiceParentHostedCI": {
+    "headSha": "bba9e0546320ba254b39a9df1c38e2d137ce5ea3",
+    "status": "in_progress",
+    "conclusion": "",
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/41295080255"
+  },
+  "hostedRecoveryCI": "Pending PR publication; no unchanged rerun requested",
+  "skipEnvironmentComparison": {
+    "additionalOptInSkips": [
+      "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse",
+      "OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardReturnsExactUTF8WithoutOpeningGeneralClipboard",
+      "OSwindAppTests.NativeClipboardReaderTests testMismatchedSourceIsRefusedBeforeLazyTextProviderRuns",
+      "OSwindCoreTests.NativeVaultDetachSettlementTests testReleasedNativeReaderRecoversWithinOneLockRequestWithoutForce"
+    ],
+    "removedOptInSkips": [],
+    "explanation": "Current general suite leaves named-pasteboard opt-in off; native APFS suite is separately enabled. Previous voice general suite enabled three named-pasteboard tests. The new released-reader APFS test adds one opt-in skip. No source regression inferred from unlike environment counts."
+  },
+  "limits": [
+    "Owned encrypted fixtures only; no personal history, credentials, Keychain, clipboard or device settings",
+    "Retains earlier native failures; new bounded recovery does not identify the original busy owner or missing-session cause",
+    "Ad hoc signing only; no notarization, native UI or hardware power qualification",
+    "No force detach, no general clipboard, no user library or real Keychain used.",
+    "No original busy-owner, operating-system root-cause or missing-session causal fix claim.",
+    "Feature statuses unchanged:83requirements/20offerings;4live44partial6implemented23tested4TODO2outside. Broad parity and top-three ranking remain unfinished."
+  ]
+}
