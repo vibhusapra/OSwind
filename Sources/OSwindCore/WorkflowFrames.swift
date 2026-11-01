@@ -71,8 +71,14 @@ final class WorkflowFrameReservation:@unchecked Sendable {
         try safeText(recognized,policy:settings.settings.privacy)
         if let scanner {
             let original=try await scanner.sanitize(memory,policy:settings.settings.privacy)
-            let pixels=try await scanner.sanitize(Memory(kind:.note,text:recognized),policy:settings.settings.privacy)
-            guard !original.redacted,!pixels.redacted else {throw OSwindError.unavailable("Local privacy inspection found sensitive content in this screen source")}
+            guard !original.redacted else {throw OSwindError.unavailable("Local privacy inspection found sensitive content in this screen source")}
+            // The inspector deliberately refuses an empty document. There is
+            // no recognized text to inspect here; the original typed source
+            // is still scanned, and this is not an image-PII absence claim.
+            if !recognized.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty {
+                let pixels=try await scanner.sanitize(Memory(kind:.note,text:recognized),policy:settings.settings.privacy)
+                guard !pixels.redacted else {throw OSwindError.unavailable("Local privacy inspection found sensitive content in this screen source")}
+            }
         }
         try Task.checkCancellation()
         let binding=WorkflowSourceBinding(library:WorkflowSourceBinding.libraryKey(store),memoryID:memoryID,revision:plan.revision,mediaSHA256:snapshot.sha256,kind:plan.kind == .image ? .image:.video,frameOrdinal:point.ordinal,frameTime:point.time)
