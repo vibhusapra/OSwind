@@ -589,7 +589,7 @@
     "Focus04: actual AppModel onboarding suspension incorrectly became a manual meeting pause; preserve separate lifecycle/manual pause state and cover wake behavior."
   ],
   "limitations": [
-    "The original full native-vault group failed35/37; the targeted unchanged-build comparison passed2/2 while one maintenance sleep was still recorded. Neither a single all-pass full group nor a resolved timeout cause is claimed.",
+    "The original local native-vault group failed35/37; its unchanged-build targeted comparison passed2/2 with one maintenance sleep still recorded. This local failure remains retained. A separate published-head hosted run passes37/37; a resolved timeout cause is not established.",
     "No real Calendar permission/account read, native notification delivery/Focus, manual browser joining or interactive main-window acceptance was attempted.",
     "Component renders use authored injected providers. Timer policies and Low Power Mode cadence are not physical power measurements.",
     "At-most-once notification attempts may miss a reminder after a committed claim and before delivery.",
