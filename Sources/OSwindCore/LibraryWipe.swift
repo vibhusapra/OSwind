@@ -62,7 +62,7 @@ public extension MemoryStore {
                 return (sources,turns,chats,routines,runs,originals)
             }}
             progress(.init(phase:"Removing retained media"))
-            return finishLibraryWipe(db,sources:counts.0,turns:counts.1,chats:counts.2,routines:counts.3,runs:counts.4,histories:counts.5,progress:progress)
+            return finishLibraryWipe(db,sources:counts.0,turns:counts.1,chats:counts.2,routines:counts.3,runs:counts.4,histories:counts.5,reservation:lease,progress:progress)
         }
     }
     func hasPendingLibraryWipeCleanup() throws -> Bool {try withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")>0}}
@@ -71,19 +71,19 @@ public extension MemoryStore {
         progress(.init(phase:"Waiting for active media writers"));let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
         return try withRoutineDatabase {db in
             progress(.init(phase:"Retrying retained-media cleanup"))
-            return finishLibraryWipe(db,sources:0,turns:0,chats:0,routines:0,runs:0,progress:progress)
+            return finishLibraryWipe(db,sources:0,turns:0,chats:0,routines:0,runs:0,reservation:lease,progress:progress)
         }
     }
 }
 private extension MemoryStore {
-    func finishLibraryWipe(_ db:RoutineDatabase,sources:Int,turns:Int,chats:Int,routines:Int,runs:Int,histories:Int=0,progress:@escaping @Sendable (LibraryBackupProgress)->Void) -> LibraryWipeResult {
+    func finishLibraryWipe(_ db:RoutineDatabase,sources:Int,turns:Int,chats:Int,routines:Int,runs:Int,histories:Int=0,reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void) -> LibraryWipeResult {
         cancelSearchIndexBuild();releaseSearchIndex()
         do {try requireMediaRootIdentity()} catch {
             let pending=(try? db.eraseCount("SELECT COUNT(*) FROM erasure_assets")) ?? -1
             let erasure=HistoryErasureResult(sources:sources,conversationTurns:turns,removedMedia:0,sharedMedia:0,pendingMedia:pending,searchCacheRemoved:false,warnings:["History deletion committed, but the library folder changed. Reopen the intended library and retry cleanup. No files in the replacement folder were removed."],historicalVersions:histories)
             return .init(erasure:erasure,conversations:chats,routines:routines,routineRuns:runs,compacted:false,cleanupComplete:false,cancelled:Task.isCancelled)
         }
-        var result=cleanupErasedAssets(db,sources:sources,turns:turns,histories:histories,stopOnCancellation:true),directories=true,compacted=false
+        var result=cleanupErasedAssets(db,sources:sources,turns:turns,histories:histories,stopOnCancellation:true,reservation:reservation),directories=true,compacted=false
         if !Task.isCancelled {
             do {try WipeInventory.walk(root:root,expectedRoot:mediaRootIdentity,stage:nil,removeEmpty:true)} catch {directories=false;result=result.warning("Some media directories could not be cleaned. Retry library cleanup after checking file access.")}
             progress(.init(phase:"Compacting deleted history"))

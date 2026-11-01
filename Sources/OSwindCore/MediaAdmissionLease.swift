@@ -2,15 +2,22 @@ import Foundation
 import Darwin
 
 /// Shared by supported retained-media writers; full-library inventory/cleanup takes
-/// an exclusive lease. Acquired before SQLite/store locks, never while holding them.
+/// an exclusive lease. Waiting acquisitions precede SQLite/store locks. Cleanup
+/// already under a store lock may only attempt a nonblocking exclusive reservation.
 public final class MediaAdmissionLease:@unchecked Sendable {
     private let lock=NSLock()
     private var file:Int32
     private let rootDevice:Int32,rootInode:UInt64
-    private init(_ file:Int32,root:stat) {self.file=file;rootDevice=root.st_dev;rootInode=root.st_ino}
+    private let exclusive:Bool
+    private init(_ file:Int32,root:stat,exclusive:Bool) {self.file=file;rootDevice=root.st_dev;rootInode=root.st_ino;self.exclusive=exclusive}
     func withActive<T>(for identity:BackupFileStamp,_ body:() throws -> T) throws -> T {
         lock.lock();defer {lock.unlock()}
         guard file>=0,rootDevice==identity.device,rootInode==identity.inode else {throw OSwindError.invalid("Use an active media reservation from this library")}
+        return try body()
+    }
+    func withExclusive<T>(for identity:BackupFileStamp,_ body:() throws -> T) throws -> T {
+        lock.lock();defer {lock.unlock()}
+        guard exclusive,file>=0,rootDevice==identity.device,rootInode==identity.inode else {throw OSwindError.invalid("Cleanup requires an active exclusive reservation from this library")}
         return try body()
     }
     public func release() {lock.lock();defer {lock.unlock()};if file>=0 {flock(file,LOCK_UN);close(file);file = -1}}
@@ -37,7 +44,7 @@ public final class MediaAdmissionLease:@unchecked Sendable {
             Thread.sleep(forTimeInterval:0.02)
         }
         var current=stat();guard fstatat(directory,name,&current,AT_SYMLINK_NOFOLLOW)==0,current.st_dev==initial.st_dev,current.st_ino==initial.st_ino else {throw OSwindError.invalid("The media admission lock changed")}
-        try Task.checkCancellation();retained=true;return MediaAdmissionLease(file,root:rootMetadata)
+        try Task.checkCancellation();retained=true;return MediaAdmissionLease(file,root:rootMetadata,exclusive:exclusive)
     }
 }
 public extension MemoryStore {
