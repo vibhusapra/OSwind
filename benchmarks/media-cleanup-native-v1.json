@@ -1,0 +1,542 @@
+{
+  "format": "OSwind media cleanup current app and owned native qualification",
+  "version": 1,
+  "state": "passed",
+  "source": "029d16997795b8cdfbf6899c67aa8c1f07a48e58",
+  "testedNativeSource": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+  "nativeSchema": 32,
+  "inputManifest": "media-cleanup-native-inputs-v1.json",
+  "inputManifestSHA256": "cae8a625d5628141c3f3c528b87fa4527b906cc34b8a19fafa407e4e6c545b75",
+  "repositoryTrackedInputs": 1334,
+  "softwareReceipt": "media-cleanup-admission-v1.json",
+  "reusedSoftware": [
+    {
+      "path": ".artifacts/media-cleanup-admission-v1/stages-v3/full-debug.json",
+      "receiptSHA256": "a623860f4028b80b29c3e9444b80f3a36ecdf1f3a082361513810675ca589610",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "tests": {
+        "defined": 2122,
+        "passed": 2023,
+        "skipped": 99,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70
+    },
+    {
+      "path": ".artifacts/media-cleanup-admission-v1/stages-v3/thread-sanitizer.json",
+      "receiptSHA256": "ab6574dcc0cc7b5e9aaacb076c2d4edc08c5b5dc150a7b1d6c8e6c2396aebf84",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "tests": {
+        "defined": 741,
+        "passed": 702,
+        "skipped": 39,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70
+    },
+    {
+      "path": ".artifacts/media-cleanup-admission-v1/stages-v3/optimized.json",
+      "receiptSHA256": "6e34f9d8e06631ffd35d659f2094e1b3c1059bc598cf40fa1c3037bd1f736671",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "tests": {
+        "defined": 741,
+        "passed": 702,
+        "skipped": 39,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70
+    }
+  ],
+  "stages": [
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 202.39558745804243,
+      "logSHA256": "5ab680f3e2443d35a5ea63c9fc0684019e1e575b3d22563e06a03313b3055ce6",
+      "tests": {
+        "defined": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--filter",
+        "NativeVault|VaultSessionTests"
+      ]
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.0678159159142524,
+      "logSHA256": "19ce4c3fe936ba5a289b545d890b7ffce48ced29d4b7b20a8c6b10a871321dd4",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/test-owned-sqlite-fixture.py"
+      ]
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 66.7565341249574,
+      "logSHA256": "6c7f519ba59cfe15821929aa673c6ea04090a71c2769610c638e04686bf0a629",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ]
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.9778434168547392,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/integration-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl"
+      ]
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.0976285829674453,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/integration-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ]
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 5.144513041945174,
+      "logSHA256": "81fc65ff2ee2f728ca9ddb724bfe80ab41844cc90ed164306626ce62475e20f8",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/test-python-sdk.py"
+      ]
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.6130645421799272,
+      "logSHA256": "08635f70c655021cb5f38f4aaece7e62dd70ad27a3667a0d37aabc92faa5e385",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/deletion-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/deletion-report.json"
+      ]
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.683506584027782,
+      "logSHA256": "dd79f0e010c78001999a882fb6cc89af7fbcafac1e18d2514dc4158f2350657b",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/recap-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/recap-report.json"
+      ]
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.0530492500402033,
+      "logSHA256": "1cca8c3eda67dfba07573c186abf56bd548e0a03485fd88465cb82b6027d0ac2",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/backup-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/backup-report.json"
+      ]
+    },
+    {
+      "name": "native-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.1319753751158714,
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/erasure-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl"
+      ]
+    },
+    {
+      "name": "native-wipe",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 6.874503209022805,
+      "logSHA256": "6ae8e507b8308691cc54ac2f6feb525be6c1561162627f148394accbbf75defb",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/wipe-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/wipe-report.json"
+      ]
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 17.69142391718924,
+      "logSHA256": "fd67430436ae0bb5bf4149aadddff9684748e4de501a3451c20003f400fe6b38",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/vault-process"
+      ]
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 8.148928249953315,
+      "logSHA256": "2772722343881a1e334e27d3704277c8b0912d5cc617220b7467d46541b5ce34",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-terminal-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/terminal-held-reader",
+        "--held-reader"
+      ]
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 6.459950666874647,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-query-interruption-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/query-interruption"
+      ]
+    },
+    {
+      "name": "schema32-sync-capture",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.4515102079603821,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/sync-capture-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-sync-capture"
+      ]
+    },
+    {
+      "name": "schema32-entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 9.2519923329819,
+      "logSHA256": "4d2d1077ac53f811d51ef4c162818fcce5fdc84faaf9652b93866e145b8f463b",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/entity-memory-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-entity-memory"
+      ]
+    },
+    {
+      "name": "schema32-project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 2.1604674588888884,
+      "logSHA256": "ff1b7159c9764cff6979db072e74d7ed0eccd6d3b680da48e4f1aaddea272162",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/project-corrections-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-project-corrections"
+      ]
+    },
+    {
+      "name": "schema32-text-observation",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.3529699170030653,
+      "logSHA256": "1f57832b5533c696fcf50d14067ee8a365ea618397669dce01713c6e15011272",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/text-observation-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-text-observation"
+      ]
+    },
+    {
+      "name": "schema32-accessibility-text",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.5577635830268264,
+      "logSHA256": "a47a6a63b8c8d2af6789768ece94b1bdfbd4bc4219e03aa3668e8d88bc9be601",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/accessibility-text-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-accessibility-text"
+      ]
+    },
+    {
+      "name": "schema32-tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.0430871250573546,
+      "logSHA256": "7d63f109cf2761610017b17666a42fa51a71241267a541d109e412251e2ab345",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/tag-index-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-tag-index"
+      ]
+    },
+    {
+      "name": "schema32-capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.3786785830743611,
+      "logSHA256": "37f1caacd41b15986198b255e6fb59c261fbc68bb397a874647f5363229460cb",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/capture-region-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-capture-region"
+      ]
+    },
+    {
+      "name": "schema32-historical-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.37797675002366304,
+      "logSHA256": "205ea45dc0d39f888a84b2deb4ed4c657c5d591761d4af7eae5e653d17afd607",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/historical-erasure-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/schema32-historical-erasure"
+      ]
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.521273999940604,
+      "logSHA256": "9e122245da747de41ef0ba9b2c3003e5e1d9e228b95842d541b6a8a26c574e19",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/historical-client-smoke.py",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--old-cli",
+        ".artifacts/sync-optional-references-v1/qualification-v2/OSwind.app/Contents/MacOS/oswindctl",
+        "--old-sha256",
+        "4653944db3460c0f7324fbe6f2484056c1fd88cad85c3332f8302347e883d188",
+        "--old-schema",
+        "31",
+        "--current-schema",
+        "32",
+        "--root",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/actual-older-client"
+      ]
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 1.1847566249780357,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind-macos.zip"
+      ]
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.09657783294096589,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind-macos.zip",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/extracted"
+      ]
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.037422124994918704,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/OSwind.app"
+      ]
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "wallSeconds": 0.03684929106384516,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        ".artifacts/media-cleanup-admission-v1/qualification-v1/extracted/OSwind.app"
+      ]
+    }
+  ],
+  "stageCount": 27,
+  "native": {
+    "defined": 39,
+    "passed": 39,
+    "skipped": 0,
+    "failures": 0
+  },
+  "distinctFullAndNativeMethods": 2060,
+  "newNativeMethodsBeyondFull": 37,
+  "app": {
+    "fileCount": 34,
+    "CLI_SHA256": "dca8114426763e2e2855b197f7ac08c1b7e6a3eb1c98378df005eb7a98154bf3",
+    "executableSHA256": "b0fbf3baa85a534db781309978c6370dc90a9b08700592687508ad1fb5f58ff2",
+    "zipSHA256": "266890a9ebf7e455cf8bc18fdfb514953daa9d030f4be5c46533213aef8366b5",
+    "everyZipAndExtractedFileEqual": true,
+    "strictCodesignPassed": true,
+    "signature": "ad hoc",
+    "priorAppTreesUnchanged": 38
+  },
+  "independentReview": {
+    "reportSHA256": "2f08286fc578e8432dd1835a084f0e9ce55447afd219501a1922203b789c79f5",
+    "reviewerSHA256": "481a1f00821a6934d04209cb37443b897ce74e49aab4b5152cca9d33d074ebab",
+    "nativeLogSHA256": "5ab680f3e2443d35a5ea63c9fc0684019e1e575b3d22563e06a03313b3055ce6",
+    "scope": "Source inputs, all27 raw log hashes, raw39-pass XCTest group, all34 app/ZIP/extracted file hashes, strict signatures,38 prior trees, process-probe receipt and both read-only fixture DBs."
+  },
+  "packagedProcessRegression": {
+    "script": "../scripts/media-cleanup-smoke.py",
+    "scriptSHA256": "99c0aea176dfde4c565796144b94c424da1d270a6074bf81514a8e10b0c46622",
+    "reportSHA256": "53b55aa20a57f77a2e329ef8203c188c367b4f64116e35a8188502531f31c4c6",
+    "CLI_SHA256": "dca8114426763e2e2855b197f7ac08c1b7e6a3eb1c98378df005eb7a98154bf3",
+    "checks": [
+      {
+        "name": "packaged delete/reopen/retry under external shared writer",
+        "state": "passed",
+        "logicalSources": 1,
+        "pendingWhileReserved": 1,
+        "fileAndCachePreserved": true,
+        "generationAdvanced": true,
+        "nonblockingRetryReportsPending": true,
+        "explicitRetryRemovedMedia": 0,
+        "cleanupMayRunDuringOpen": true,
+        "afterReleasePending": 0
+      },
+      {
+        "name": "packaged backup cannot publish after concurrent source erasure",
+        "state": "passed",
+        "copyProgressObserved": true,
+        "SIGSTOPWitness": true,
+        "sharedReservationObserved": true,
+        "erasureCommittedWhileBackupPaused": true,
+        "mediaPreservedUntilRelease": true,
+        "backupRefusedErasedGeneration": true,
+        "destinationAbsent": true,
+        "explicitCleanupFinished": true,
+        "backupStderrSHA256": "2d55d708553d0eb5070cc1afed65d9bac8c894a3390caa56374318244b4711b3"
+      }
+    ],
+    "CI": "Packaged-app probe and always-retained report/stderr added to the native workflow. Hosted execution belongs to the new publication head, not this local result."
+  },
+  "retainedProbeFailure": {
+    "state": "harness-failure-retained",
+    "cause": "Expected explicit retry removedMedia=1, but current CLI opens MemoryStore and completes the dirty queue during initialization before retry. Correct requirement is pending0/no warnings and physical media/cache absent; per-call count may already be0.",
+    "closedReadOnlyObservation": {
+      "pending": 0,
+      "sources": 0,
+      "fileExists": false,
+      "cacheExists": false
+    },
+    "productionBytesChanged": false,
+    "backupStageReached": false
+  },
+  "newIndependentRetainedCrashDBReviewClaimed": false,
+  "limits": [
+    "Owned fixtures only; no personal history/general clipboard/real credentials/device settings/CUA.",
+    "Ad hoc signature and owned native APFS/process tests are not native input, sustained capture/power, distribution/notarization, provider/two-Mac or whole-product/ranking acceptance.",
+    "All83 feature statuses stay unchanged; complete sync F059/service/lifecycle/erasure priority/compaction/cleanup scheduler remain open.",
+    "Existing software stages are reused only because every native/test/script/package byte matches their source; documented publication changed four existing docs and added receipts/docs.",
+    "No new standalone independent retained-crash DB review is claimed. Protected prior app hashes are verified before and after this pipeline, not on every individual stage.",
+    "Does not add standalone current-source crash database review, GUI/TCC, capture/power, notarization/provider or whole-product acceptance.",
+    "Probe-v1 retained an incorrect per-call removal-count oracle: cleanup runs during CLI initialization. Corrected v2 retains strict pending counts, byte preservation while held and physical absence after release. No production source changed.",
+    "Qualification source029d/nativeab571 is frozen. Publication adds a separately executed public process harness, CI wiring and documentation/receipts; production/native Swift/test/package/resource bytes remain equal.",
+    "The probe uses owned valid PNG and synthetic sparse bytes, including a positively observed SIGSTOP/SIGCONT on its own backup during copying. It proves concurrent erasure refusal, not desktop capture or device/power behavior.",
+    "Hosted CI on prior029d may be superseded by publication. No unchecked hosted result is relabeled as successful."
+  ],
+  "recordedAtUTC": "2026-11-01T21:07:57.015695+00:00",
+  "reproductionEnvironment": {
+    "native-vault": {
+      "OSWIND_TEST_NATIVE_VAULT": "1",
+      "OSWIND_TEST_VAULT_TRACE_DIR": "<fresh>/native-traces",
+      "OSWIND_TEST_VAULT_QUERY_TRACE_DIR": "<fresh>/query-traces"
+    },
+    "package": {
+      "OSWIND_APP_OUTPUT": "<fresh>/OSwind.app"
+    },
+    "limit": "Each output root must be new. Reused software build receipts were source-bound before this pipeline; native --skip-build uses that debug executable."
+  },
+  "postPublicProbeImmutability": {
+    "state": "passed",
+    "after": "separately executed public process regression",
+    "priorAppsUnchanged": 38,
+    "currentAppFiles": 34,
+    "currentAppMatchesExtractedArchive": true
+  }
+}

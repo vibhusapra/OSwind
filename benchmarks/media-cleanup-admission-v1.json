@@ -1,0 +1,208 @@
+{
+  "format": "OSwind media cleanup admission and backup fence software evidence",
+  "version": 1,
+  "state": "software_passed",
+  "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+  "nativeSchema": 32,
+  "repositoryTrackedInputs": 1330,
+  "inputManifest": "media-cleanup-admission-inputs-v1.json",
+  "inputManifestSHA256": "9fade1c96ae1d507afcd25db9fdb5d714d1bf8733e55d3598b616956ded9f10e",
+  "newMandatoryControls": 19,
+  "mandatoryWithParent": 70,
+  "softwareStages": [
+    {
+      "stage": "full-debug",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "wallSeconds": 449.57687641703524,
+      "logSHA256": "566310cff7cbb1e70e4abb83687d39311913e6ebe28942ce1d9a8d1ebd5e65cf",
+      "tests": {
+        "defined": 2122,
+        "passed": 2023,
+        "skipped": 99,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "wallSeconds": 400.92764620902017,
+      "logSHA256": "897d96653c5d8e8b9d2bd3fb1f8aaca411b01adfdbee9e5032051aed418a6fb7",
+      "tests": {
+        "defined": 741,
+        "passed": 702,
+        "skipped": 39,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    },
+    {
+      "stage": "optimized",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "wallSeconds": 357.1715281668585,
+      "logSHA256": "b40d14d3ede5fe0c7d1d0bef3f811f52d012784ef78be38afabdf81d745bff36",
+      "tests": {
+        "defined": 741,
+        "passed": 702,
+        "skipped": 39,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 70,
+      "missingMandatory": [],
+      "changedInputs": [],
+      "raceWarning": false,
+      "state": "passed"
+    }
+  ],
+  "processStages": [
+    {
+      "stage": "erasure-process",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "CLI_SHA256": "cf74147101f1c8f5f9b73f6cdef00cac938101227855dd1c64a307b2fb443d98",
+      "harnessSHA256": "bffc733a4e04337a018a9d4cd5dcef1ceec906189b5fd4ba7a415064c7c55c40",
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d",
+      "changedInputs": [],
+      "state": "passed"
+    },
+    {
+      "stage": "deletion-process",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "CLI_SHA256": "cf74147101f1c8f5f9b73f6cdef00cac938101227855dd1c64a307b2fb443d98",
+      "harnessSHA256": "f4a4279d756f61aaad2508d39c67e484e068ece51e85002eb70509c35dc26b92",
+      "logSHA256": "0d2cc79b550f21e1e6a4a462d8b13e3e34d296808c5c0e66df90508a71006ca7",
+      "changedInputs": [],
+      "state": "passed"
+    },
+    {
+      "stage": "wipe-process",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "CLI_SHA256": "cf74147101f1c8f5f9b73f6cdef00cac938101227855dd1c64a307b2fb443d98",
+      "harnessSHA256": "127470e4425b21502a6b19067b3635462699cf8adda0a2c0af5762eb3fe3a6ea",
+      "logSHA256": "210118366b382fea226537b6ef9ad135c5d1f991adec37cc501ac6f6d814bd10",
+      "changedInputs": [],
+      "state": "passed"
+    },
+    {
+      "stage": "backup-process",
+      "source": "ab571d4b4bae69bb8fb7340e70b201330f3693d6",
+      "returncode": 0,
+      "CLI_SHA256": "cf74147101f1c8f5f9b73f6cdef00cac938101227855dd1c64a307b2fb443d98",
+      "harnessSHA256": "9f410ace15be373e4f74980d26c38ca18318b5d47d24988905366211e56ade90",
+      "logSHA256": "fcd295492f67dc63923912b507b6a9a45e22e1668c04e72e0b177d1ffcf60107",
+      "changedInputs": [],
+      "state": "passed"
+    }
+  ],
+  "frozenPrior32Client": {
+    "source": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+    "CLI_SHA256": "ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2",
+    "methodsExecutedAllThree": 2,
+    "newAssertion": "Fresh actual prior32 chat deletion advances current erasure fence without modifying the frozen executable. Existing initialized writer/retraction/source-erasure checks also execute.",
+    "limit": "Generation-trigger compatibility does not make the older binary use the new exclusive cleanup gate or protect its legacy backup implementation."
+  },
+  "backupErasureTables": [
+    "memories",
+    "historical_evidence",
+    "chat_sessions",
+    "chat_turns",
+    "routines",
+    "routine_runs",
+    "routine_run_originals",
+    "memory_entities"
+  ],
+  "newChildProcesses": {
+    "separateWriter": "Real xctest child holds shared lease; parent exclusive flock fails while another shared flock succeeds; deletion defers; child reads intact bytes and admits a new reference before release.",
+    "helperParentSkip": 1,
+    "inheritedTSanRuntime": "Explicit dyld runtime retained for current xctest child; not injected into actual frozen old native executable."
+  },
+  "coverageDelta": {
+    "quietWakeMethod": "OSwindAppTests.WorkspaceWakeLifecycleTests.testQuietPowerAndSessionCallbacksDoNotRequestVisualCatchup",
+    "currentState": "skipped",
+    "reason": "Visual admission requires an unlocked session and allowed thermal state; never changes device settings",
+    "priorSource4cbeState": "passed",
+    "scope": "Full defined2122/pass2023/skip99 independently parsed; all70 mandatory controls pass."
+  },
+  "scalingReceipt": "media-cleanup-scaling-v1.json",
+  "retainedFailures": [
+    {
+      "log": "red-01.log",
+      "kind": "three genuine deletion/erase/retention failures plus opening fixture omitted actual recap dirty marker",
+      "defined": 4,
+      "failures": 27,
+      "unexpected": 6
+    },
+    {
+      "log": "focused-02.log",
+      "kind": "74defined/73passed/one opening fixture marker assumption remains; no crash or production assertion in corrected routes"
+    },
+    {
+      "log": "opening-corrected-red-02.log",
+      "kind": "harness compile failure: unrelated new reservation-argument test still compiled against old API, no opening test executed"
+    },
+    {
+      "log": "opening-corrected-red-03.log",
+      "kind": "genuine original4d60 opening-with-cascaded-recap failure",
+      "defined": 1,
+      "failures": 6,
+      "unexpected": 3
+    },
+    {
+      "log": "build-cache-failure-v1.json",
+      "kind": "nonrelocatable cloned PCM compile failure before tests; fresh v2 scratch directories recover"
+    },
+    {
+      "log": "superseded-source-551-v1.json",
+      "kind": "Genuine required backup retries/publication failure; remaining tests interrupted after source change became necessary."
+    },
+    {
+      "log": "pinned-retry-red-01.log",
+      "kind": "Genuine stale media clone on erasure-triggered retry after source recreation at same logical path",
+      "defined": 1,
+      "failures": 1,
+      "unexpected": 0
+    }
+  ],
+  "currentSourcePackageQualified": false,
+  "newAppArtifact": null,
+  "currentSourceNativeVaultAcceptance": false,
+  "newIndependentRetainedCrashDBReviewClaimed": false,
+  "featureStatusCountsUnchanged": {
+    "liveVerified": 4,
+    "partial": 45,
+    "implemented": 6,
+    "tested": 23,
+    "TODO": 3,
+    "outsideDesktopV0": 2,
+    "requirements": 83,
+    "offeringsPreviouslyResearched": 20
+  },
+  "limits": [
+    "Old32 binaries and raw manual writers do not acquire the new exclusive cleanup gate; this patch cannot change already-running older code.",
+    "Long-running shared reservations may defer physical cleanup until release plus next reopen/invalidation/explicit retry; no automatic scheduler has been added.",
+    "POSIX cooperative lease and logical invalidation are not secure wiping or arbitrary APFS/power-loss proof.",
+    "Current source has no newly qualified signed package.",
+    "Backup erasure fence watches eight content-bearing native tables. Append-only capture remains allowed; no previously published backup can be withdrawn by later source erasure.",
+    "Raw arbitrary media-path overwrites during an otherwise unchanged snapshot remain outside the immutable-media protocol; erasure retries discard all old pins.",
+    "Software build/test wall times are bookkeeping for concurrent runs, not performance measurements.",
+    "Parent source4cbe independent recovered-database/app receipts are distinct and are not claimed for this source.",
+    "Complete personal sync F059, erasure priority/compaction, collection epochs, provider/media/service lifecycle, recovery/conflict/key UI and actual providers/two Macs remain open."
+  ],
+  "recordedAtUTC": "2026-11-01T20:40:43.023255+00:00"
+}

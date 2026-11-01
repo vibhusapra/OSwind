@@ -215,9 +215,10 @@ extension MemoryStore {
             return cleanupErasedAssets(db,sources:preview.sources,turns:preview.conversationTurns,histories:preview.historicalVersions)
         }
     }
-    /// Retries durable pending media work after an interruption or file-system failure.
+    /// Retries durable pending media work. Active reservations defer cleanup with
+    /// explicit pending counts rather than blocking a recording or snapshot.
     public func retryErasureCleanup() -> HistoryErasureResult {
-        (try? {let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()};return try withRoutineDatabase {cleanupErasedAssets($0,sources:0,turns:0)}}()) ?? .init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:0,searchCacheRemoved:false,warnings:["Could not open erasure cleanup state."])
+        (try? withRoutineDatabase {cleanupErasedAssets($0,sources:0,turns:0)}) ?? .init(sources:0,conversationTurns:0,removedMedia:0,sharedMedia:0,pendingMedia:-1,searchCacheRemoved:false,warnings:["Could not open erasure cleanup state. Pending media count is unavailable."])
     }
     private func erasureAssetKey(_ path:String) throws -> String {
         guard let url=assetURL(path) else {throw OSwindError.invalid("An asset reference could not be safely resolved")}
@@ -228,7 +229,33 @@ extension MemoryStore {
             return canonical
         } catch let error as NSError where error.domain==NSCocoaErrorDomain && [NSFileNoSuchFileError,NSFileReadNoSuchFileError].contains(error.code) {return url.standardizedFileURL.path}
     }
-    func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,histories:Int=0,stopOnCancellation:Bool=false) -> HistoryErasureResult {
+    func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,histories:Int=0,stopOnCancellation:Bool=false,reservation:MediaAdmissionLease?=nil) -> HistoryErasureResult {
+        // Logical invalidation is immediate. Files can still be in use by a
+        // snapshot, or awaiting a writer's SQL admission under a shared lease.
+        cancelSearchIndexBuild();releaseSearchIndex()
+        do {
+            guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Commit logical deletion before removing retained files")}
+            let owned:MediaAdmissionLease?
+            if reservation==nil {
+                // The caller holds the SQL mutex: never wait here, or a shared
+                // writer waiting for SQL could deadlock with this cleanup.
+                owned=try MediaAdmissionLease.acquire(root:root,exclusive:true,timeout:0,expectedRoot:mediaRootIdentity)
+            } else {owned=nil}
+            defer {owned?.release()}
+            guard let lease=reservation ?? owned else {throw OSwindError.invalid("Cleanup needs an exclusive reservation")}
+            return try lease.withExclusive(for:mediaRootIdentity) {
+                try requireMediaRootIdentity()
+                return cleanupReservedErasedAssets(db,sources:sources,turns:turns,histories:histories,stopOnCancellation:stopOnCancellation)
+            }
+        } catch {
+            // Keep the queue and cache marker durable. Budget trimming must stop
+            // here rather than sacrifice more history while cleanup is deferred.
+            try? db.execute("INSERT INTO store_metadata(key,value) VALUES('recap_cache_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+            let pending=(try? db.eraseCount("SELECT COUNT(*) FROM erasure_assets")) ?? -1
+            return .init(sources:sources,conversationTurns:turns,removedMedia:0,sharedMedia:0,pendingMedia:pending,searchCacheRemoved:false,warnings:["Media cleanup is pending. Let active media work finish, then retry cleanup in the intended library."],historicalVersions:histories)
+        }
+    }
+    private func cleanupReservedErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,histories:Int,stopOnCancellation:Bool) -> HistoryErasureResult {
         var removed=0,shared=0,warnings=[String](),cursor=""
         do {
             try db.execute("BEGIN IMMEDIATE")

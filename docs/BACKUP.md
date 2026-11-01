@@ -21,6 +21,8 @@ Restored libraries start with recording, microphone/system audio, API service, r
 
 App library selection persists for the app. CLI/MCP defaults remain the normal data directory unless `--data` or `OSWIND_DATA_DIR` selects another. The app's Connect page generates MCP arguments with the current library path. A launcher-provided `OSWIND_DATA_DIR` takes priority over saved app selection on the next launch.
 
+[Erasure fencing](MEDIA-CLEANUP-ADMISSION.md) now retries snapshots when native source/history erasure advances their deletion generation, discards prior media pins on retry, and refuses final publication after deletion during copy/verification. The final generation check and publication share a short SQL writer reservation. Ordinary appends can continue; an already published archive remains independent.
+
 Capture can continue on other connections during backup. Media is privately pinned before a WAL-consistent database snapshot. Newly referenced assets are filled afterward; disappearing unpinned assets trigger bounded snapshot retries (`--max-attempts 1` through `10`, default `3`). Sustained inconsistent sources fail instead of silently dropping media. External tools that overwrite reused asset paths across the snapshot are outside the immutable-capture contract.
 
 Cancel in the app or press Ctrl-C once in the CLI to clean unfinished work. A second Ctrl-C exits immediately. Forced exits can leave private staging directories. A later operation conservatively removes recognized abandoned work whose creator has exited and whose kernel lease is unlocked. For explicit cleanup:
