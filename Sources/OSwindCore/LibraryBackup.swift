@@ -152,12 +152,17 @@ public enum LibraryBackup {
             }
         }
         var completedAttempt = 0
+        var completedGeneration:String?
         for attempt in 1...maxAttempts {
+            // A deleted/recreated source can reuse a logical path. Pins from an
+            // erased attempt must never become the next version's media.
+            if attempt>1 {try index.discardPins {try scratch.tree.remove($0.member)}}
             try Task.checkCancellation(); try index.beginAttempt()
             let snapshot = scratch.url.appendingPathComponent("memory.sqlite")
             if attempt > 1 { try scratch.tree.remove("memory.sqlite") }
             try progress(LibraryBackupProgress(phase:"Snapshotting database",attempt:attempt))
             try source.requireRootIdentity(at:store.root)
+            let generation=try store.withRoutineDatabase {try BackupErasureFence.current($0)}
             try SQLiteSnapshot.copy(source:store.root.appendingPathComponent("memory.sqlite"),to:snapshot) { state in
                 try progress(LibraryBackupProgress(phase:"Snapshotting database",completedItems:Int64(state.copiedPages),totalItems:Int64(state.totalPages),attempt:attempt,unit:"pages"))
             }
@@ -174,10 +179,11 @@ public enum LibraryBackup {
                 }
                 reader.close()
             } catch { reader.close(); throw error }
-            if !missing { completedAttempt = attempt; break }
+            if try store.withRoutineDatabase({try BackupErasureFence.current($0)}) != generation {missing=true}
+            if !missing { completedAttempt = attempt;completedGeneration=generation; break }
             try progress(LibraryBackupProgress(phase:"Retrying changed media",attempt:attempt))
         }
-        guard completedAttempt > 0 else { throw BackupFileError.changed("Referenced media kept disappearing; no partial backup was published") }
+        guard completedAttempt > 0 else { throw BackupFileError.changed("Source history or referenced media kept changing; no partial backup was published") }
         let snapshot = try BackupDataReader(scratch.url.appendingPathComponent("memory.sqlite")); defer { snapshot.close() }
         let counts = try snapshot.counts(), total = try index.activeCount
         var files: Int64 = 0, copied: Int64 = 0
@@ -203,7 +209,15 @@ public enum LibraryBackup {
         _ = try inspect(output.url,workspaceParent:scratch.url)
         try progress(LibraryBackupProgress(phase:"Publishing backup",completedItems:files,totalItems:total,copiedBytes:copied,attempt:completedAttempt))
         try source.requireRootIdentity(at:store.root)
-        try output.publish(as:destination)
+        // The writer reservation closes the final check/rename race across SQL
+        // connections. No callbacks or cancellation checks follow publication.
+        try store.withRoutineDatabase {db in
+            try db.execute("BEGIN IMMEDIATE");defer {try? db.execute("ROLLBACK")}
+            try Task.checkCancellation()
+            guard try BackupErasureFence.current(db)==completedGeneration else {throw BackupFileError.changed("Source history was erased during backup; retry before publishing")}
+            try source.requireRootIdentity(at:store.root)
+            try output.publish(as:destination)
+        }
         var result = info; result.archiveFingerprint = BackupSHA256.hex(headerData)
         return result
     }

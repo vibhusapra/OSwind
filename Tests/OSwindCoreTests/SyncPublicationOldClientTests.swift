@@ -98,7 +98,9 @@ extension SyncIncomingSourceTests {
             XCTAssertEqual(try f.b.chatTurns(chat.id).first?.id,oldTurn.id);XCTAssertTrue(try f.queue.isComplete(next.identity))
             let restored=try run(binary,["--data",f.b.root.path,"chat","show",chat.id]);XCTAssertEqual(restored.0,0);XCTAssertTrue(String(decoding:restored.1,as:UTF8.self).contains("New independent answer after actual old writer"))
             lease.release()
+            let erasureGeneration=try f.b.withRoutineDatabase {try BackupErasureFence.current($0)}
             let removed=try run(binary,["--data",f.b.root.path,"chat","delete",chat.id]);XCTAssertEqual(removed.0,0,String(decoding:removed.2,as:UTF8.self))
+            XCTAssertNotEqual(try f.b.withRoutineDatabase {try BackupErasureFence.current($0)},erasureGeneration)
             XCTAssertEqual(try count(f.b,"chat_turns"),0);XCTAssertEqual(try count(f.b,"personal_sync_publication_bindings"),0);try f.queue.checkAccounting()
             XCTAssertEqual(try hash(),expected)
             print("PUBLICATION_OLD32 sourceErase=\(sourceErase) exactFrozenBinary=true initializedBeforeQueueInstall=true postOpenLeaseObserved=true oldWriterAfterRetraction=true freshReadExportAndDelete=true stableLocalID=true completionAndAccounting=true")

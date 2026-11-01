@@ -57,10 +57,17 @@ final class BackupManifestIndex {
     var activeCount: Int64 { get throws { try db.integer("SELECT COUNT(*) FROM media WHERE active=1") } }
     var activeBytes: Int64 { get throws { try db.integer("SELECT COALESCE(SUM(bytes),0) FROM media WHERE active=1") } }
     func forEachActive(_ body: (BackupPendingMedia) throws -> Void) throws {
+        try enumerate("active=1",body)
+    }
+    func discardPins(removing body:(BackupPendingMedia)throws->Void)throws {
+        try enumerate("pinned=1",body)
+        try db.execute("DELETE FROM media")
+    }
+    private func enumerate(_ condition:String,_ body:(BackupPendingMedia)throws->Void)throws {
         var cursor = ""
         while true {
             try Task.checkCancellation()
-            let statement = try db.prepare("SELECT source_path,member,pinned FROM media WHERE active=1 AND source_path>? ORDER BY source_path LIMIT 128")
+            let statement = try db.prepare("SELECT source_path,member,pinned FROM media WHERE "+condition+" AND source_path>? ORDER BY source_path LIMIT 128")
             db.bind(statement,1,cursor); var page = [BackupPendingMedia](), status = sqlite3_step(statement)
             do {
                 while status == SQLITE_ROW { page.append(BackupPendingMedia(sourcePath:try db.text(statement,0),member:try db.text(statement,1),pinned:sqlite3_column_int(statement,2) != 0)); status = sqlite3_step(statement) }

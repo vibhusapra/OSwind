@@ -179,6 +179,7 @@ public final class MemoryStore: @unchecked Sendable {
         try EntityScopeSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
+        try BackupErasureFence.install(RoutineDatabase(handle:db!))
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
         syncCaptureInstalled=true
