@@ -1,0 +1,17 @@
+{
+  "format": "OSwind authored AAC priming regression",
+  "version": 1,
+  "generatedFromRuntimeSource": "660dd25",
+  "scope": "Owned two-tone PCM and two colored retained source frames, no personal data or external media",
+  "expected": "reject AAC edit leaving more than one encoded packet outside authoredPCM; native decoder correlation maypass while independentFFmpeg playbackfails",
+  "observedUnshiftedFFmpegCorrelation": 0.26578058498417984,
+  "observedDiagnosticBestLagFrames": 2112,
+  "sourceFrames": 6000,
+  "files": {
+    "source.wav": "5643041cc842d47081a8a9b6f516130c90167a5041233ac5e9e6644cf413efb7",
+    "timeline.json": "d2320375c096b70eb9136e367e55871cf417f6e0a4bfe6609d71c4855b4e396a",
+    "unaligned.mp4": "de287029f23646ced718be26d6c49012b77a1214b4062fadc91d31bedc93e45a"
+  },
+  "primaryContext": "https://developer.apple.com/library/archive/technotes/tn2258/_index.html",
+  "limits": "2112isobservedinthisfixture, not a productionconstant or universally assumedencoder delay"
+}

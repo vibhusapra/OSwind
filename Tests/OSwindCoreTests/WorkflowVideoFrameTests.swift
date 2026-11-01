@@ -24,6 +24,14 @@ final class WorkflowVideoFrameTests:XCTestCase {
             try workspace?.cleanup();workspace=nil;try store.close();XCTAssertTrue(store.isClosed)
         }catch {let original=error;try? workspace?.cleanup();workspace=nil;try? store.close();throw original}
     }
+    func testRetainedPrimingFailureCannotPassCompleteNarrationVerification()async throws {
+        let movie=try XCTUnwrap(Bundle.module.url(forResource:"unaligned",withExtension:"mp4",subdirectory:"WorkflowPriming")),source=try XCTUnwrap(Bundle.module.url(forResource:"source",withExtension:"wav",subdirectory:"WorkflowPriming")),plan=try XCTUnwrap(Bundle.module.url(forResource:"timeline",withExtension:"json",subdirectory:"WorkflowPriming"))
+        let timeline=try JSONDecoder().decode(WorkflowTimeline.self,from:Data(contentsOf:plan))
+        do {
+            _ = try await WorkflowMovieVerification.inspect(url:movie,timeline:timeline,narration:source)
+            XCTFail("Retained shifted and clipped narration passed")
+        }catch OSwindError.invalid(let message) {XCTAssertEqual(message,"Workflow AAC edit leaves more than one packet outside the measured narration")}
+    }
     private func renderFixture(store:MemoryStore,workspace:BackupWorkspace)async throws {
         var frames=[WorkflowFramePreview]()
         for index in 0..<2 {
@@ -51,7 +59,7 @@ final class WorkflowVideoFrameTests:XCTestCase {
         let movieDuration=try await combined.load(.duration).seconds;XCTAssertEqual(movieDuration,timeline.duration,accuracy:1.0/24000)
         let sound=try XCTUnwrap(sounds.first),soundFormats=try await sound.load(.formatDescriptions),soundFormat=try XCTUnwrap(soundFormats.first)
         XCTAssertEqual(CMFormatDescriptionGetMediaSubType(soundFormat),kAudioFormatMPEG4AAC)
-        let verification=try await WorkflowMovieVerification.inspect(url:movie,timeline:timeline)
+        let verification=try await WorkflowMovieVerification.inspect(url:movie,timeline:timeline,narration:workspace.url.appendingPathComponent("narration.wav"))
         XCTAssertEqual(verification.decodedAudioFrames,timeline.frames);XCTAssertGreaterThan(verification.decodedAudioRMS,0.01)
 
         if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_WORKFLOW_VIDEO_OUTPUT"] {

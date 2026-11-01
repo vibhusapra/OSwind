@@ -6,6 +6,9 @@ private final class WorkflowMediaCancellation:@unchecked Sendable {
     var cancelled:Bool {lock.withLock {value}}
     func cancel() {lock.withLock {value=true}}
 }
+/// One MP4 writer passes through H264 and encodes PCM to AAC together. Moving a
+/// separately encoded M4A through a composition lost priming in the retained
+/// fixture; never infer complete speech from duration/non-silence alone.
 enum WorkflowVideoMux {
     static func make(timeline:WorkflowTimeline,workspace:BackupWorkspace)async throws->URL {
         try Task.checkCancellation();try workspace.tree.requireRootIdentity(at:workspace.url)
@@ -13,71 +16,65 @@ enum WorkflowVideoMux {
         guard let script=String(data:try workspace.tree.read("narration.txt",limit:12300),encoding:.utf8),
               try WorkflowNarrationAudio.inspect(tree:workspace.tree,stem:"narration",script:script,scriptLimit:12300)==timeline.narration else {throw OSwindError.unavailable("Measured narration changed before video muxing")}
         let videoDigest=try workspace.tree.digest("workflow-video.mov",limit:256*1024*1024)
-        let audio=try await encodeAAC(timeline:timeline,workspace:workspace)
-        let videoAsset=AVURLAsset(url:workspace.url.appendingPathComponent("workflow-video.mov")),audioAsset=AVURLAsset(url:audio)
+        let videoAsset=AVURLAsset(url:workspace.url.appendingPathComponent("workflow-video.mov")),audioAsset=AVURLAsset(url:workspace.url.appendingPathComponent("narration.wav"))
         guard let video=try await videoAsset.loadTracks(withMediaType:.video).first,let sound=try await audioAsset.loadTracks(withMediaType:.audio).first else {throw OSwindError.invalid("Workflow video or narration track is missing")}
-        let duration=CMTime(value:timeline.frames,timescale:24000),range=CMTimeRange(start:.zero,duration:duration)
-        let videoDuration=try await videoAsset.load(.duration).seconds,audioDuration=try await audioAsset.load(.duration).seconds
-        guard videoDuration+1.0/24000>=timeline.duration,audioDuration+1.0/24000>=timeline.duration else {throw OSwindError.invalid("A workflow track omits the end of narration")}
-        let composition=AVMutableComposition()
-        guard let picture=composition.addMutableTrack(withMediaType:.video,preferredTrackID:kCMPersistentTrackID_Invalid),let narration=composition.addMutableTrack(withMediaType:.audio,preferredTrackID:kCMPersistentTrackID_Invalid) else {throw OSwindError.unavailable("Cannot compose narrated workflow tracks")}
-        try picture.insertTimeRange(range,of:video,at:.zero);try narration.insertTimeRange(range,of:sound,at:.zero)
-        let url=workspace.url.appendingPathComponent("workflow.mp4")
-        guard !FileManager.default.fileExists(atPath:url.path),let export=AVAssetExportSession(asset:composition,presetName:AVAssetExportPresetPassthrough),export.supportedFileTypes.contains(.mp4) else {throw OSwindError.unavailable("Cannot prepare an H264/AAC workflow movie")}
-        export.outputURL=url;export.outputFileType = .mp4;export.shouldOptimizeForNetworkUse=true
-        let queue=DispatchQueue(label:"com.oswind.workflow.mux"),state=WorkflowMediaCancellation()
-        await withTaskCancellationHandler {
-            await withCheckedContinuation {continuation in
-                queue.async {
-                    guard !state.cancelled else {continuation.resume();return}
-                    export.exportAsynchronously {continuation.resume()}
-                }
-            }
-        } onCancel: {
-            state.cancel();queue.async {if export.status == .exporting || export.status == .waiting {export.cancelExport()}}
-        }
-        await barrier(queue);try Task.checkCancellation()
-        guard export.status == .completed else {throw export.error ?? OSwindError.unavailable("Workflow movie export did not complete")}
-        guard try workspace.tree.digest("workflow-video.mov",limit:256*1024*1024)==videoDigest,
-              try WorkflowNarrationAudio.inspect(tree:workspace.tree,stem:"narration",script:script,scriptLimit:12300)==timeline.narration else {throw OSwindError.unavailable("Workflow media changed during muxing")}
-        try workspace.tree.requireRootIdentity(at:workspace.url);return url
-    }
-    private static func encodeAAC(timeline:WorkflowTimeline,workspace:BackupWorkspace)async throws->URL {
-        let source=AVURLAsset(url:workspace.url.appendingPathComponent("narration.wav"))
-        guard let track=try await source.loadTracks(withMediaType:.audio).first else {throw OSwindError.invalid("Measured narration has no audio track")}
-        let reader=try AVAssetReader(asset:source),output=AVAssetReaderTrackOutput(track:track,outputSettings:[AVFormatIDKey:kAudioFormatLinearPCM,AVSampleRateKey:24000,AVNumberOfChannelsKey:1,AVLinearPCMBitDepthKey:16,AVLinearPCMIsFloatKey:false,AVLinearPCMIsNonInterleaved:false])
-        output.alwaysCopiesSampleData=false
-        let url=workspace.url.appendingPathComponent("narration.m4a"),writer=try AVAssetWriter(outputURL:url,fileType:.m4a)
-        let input=AVAssetWriterInput(mediaType:.audio,outputSettings:[AVFormatIDKey:kAudioFormatMPEG4AAC,AVSampleRateKey:24000,AVNumberOfChannelsKey:1,AVEncoderBitRateKey:64000]);input.expectsMediaDataInRealTime=false
-        guard reader.canAdd(output),writer.canAdd(input) else {throw OSwindError.unavailable("This Mac cannot prepare local AAC narration")}
-        reader.add(output);writer.add(input)
+        let formats=try await video.load(.formatDescriptions)
+        guard formats.count==1,CMFormatDescriptionGetMediaSubType(formats[0])==kCMVideoCodecType_H264 else {throw OSwindError.invalid("Workflow source video must be H264")}
+        let videoReader=try AVAssetReader(asset:videoAsset),audioReader=try AVAssetReader(asset:audioAsset)
+        let videoOutput=AVAssetReaderTrackOutput(track:video,outputSettings:nil),audioOutput=AVAssetReaderTrackOutput(track:sound,outputSettings:[AVFormatIDKey:kAudioFormatLinearPCM,AVSampleRateKey:24000,AVNumberOfChannelsKey:1,AVLinearPCMBitDepthKey:16,AVLinearPCMIsFloatKey:false,AVLinearPCMIsNonInterleaved:false])
+        videoOutput.alwaysCopiesSampleData=false;audioOutput.alwaysCopiesSampleData=false
+        let url=workspace.url.appendingPathComponent("workflow.mp4"),writer=try AVAssetWriter(outputURL:url,fileType:.mp4)
+        writer.shouldOptimizeForNetworkUse=true
+        let videoInput=AVAssetWriterInput(mediaType:.video,outputSettings:nil,sourceFormatHint:formats[0]),audioInput=AVAssetWriterInput(mediaType:.audio,outputSettings:[AVFormatIDKey:kAudioFormatMPEG4AAC,AVSampleRateKey:24000,AVNumberOfChannelsKey:1,AVEncoderBitRateKey:64000])
+        videoInput.expectsMediaDataInRealTime=false;audioInput.expectsMediaDataInRealTime=false
+        guard videoReader.canAdd(videoOutput),audioReader.canAdd(audioOutput),writer.canAdd(videoInput),writer.canAdd(audioInput) else {throw OSwindError.unavailable("This Mac cannot prepare H264/AAC workflow output")}
+        videoReader.add(videoOutput);audioReader.add(audioOutput);writer.add(videoInput);writer.add(audioInput)
         do {
             try Task.checkCancellation()
-            guard writer.startWriting(),reader.startReading() else {throw reader.error ?? writer.error ?? OSwindError.unavailable("Cannot start native narration encoding")}
+            guard writer.startWriting(),videoReader.startReading(),audioReader.startReading() else {throw writer.error ?? videoReader.error ?? audioReader.error ?? OSwindError.unavailable("Cannot start native workflow muxing")}
             writer.startSession(atSourceTime:.zero)
-            let deadline=ContinuousClock.now.advanced(by:.seconds(60));var samples:Int64=0
-            while let buffer=output.copyNextSampleBuffer() {
+            var picture=videoOutput.copyNextSampleBuffer(),audio=audioOutput.copyNextSampleBuffer(),samples:Int64=0,images=0
+            let deadline=ContinuousClock.now.advanced(by:.seconds(60))
+            while picture != nil || audio != nil {
                 try Task.checkCancellation()
-                let count=CMSampleBufferGetNumSamples(buffer);guard count>0,Int64(count)<=timeline.frames-samples else {throw OSwindError.invalid("Narration sample count differs from its measured timeline")}
+                let isVideo:Bool
+                if let picture {isVideo=audio.map {CMTimeCompare(CMSampleBufferGetPresentationTimeStamp(picture),CMSampleBufferGetPresentationTimeStamp($0))<=0} ?? true}else{isVideo=false}
+                guard let buffer=isVideo ? picture:audio else {throw OSwindError.invalid("Workflow media buffer disappeared")}
+                if CMSampleBufferGetNumSamples(buffer)==0 {
+                    guard CMSampleBufferGetTotalSampleSize(buffer)==0 else {throw OSwindError.invalid("A workflow boundary marker contains media bytes")}
+                    if isVideo {picture=videoOutput.copyNextSampleBuffer()}else{audio=audioOutput.copyNextSampleBuffer()}
+                    continue
+                }
+                let input=isVideo ? videoInput:audioInput,pts=CMSampleBufferGetPresentationTimeStamp(buffer).seconds
+                guard pts.isFinite,pts>=0,pts<timeline.duration+1.0/600 else {throw OSwindError.invalid("Workflow sample timestamp exceeds narration")}
+                if !isVideo {
+                    let count=CMSampleBufferGetNumSamples(buffer)
+                    guard count>0,Int64(count)<=timeline.frames-samples else {throw OSwindError.invalid("Narration sample count differs from its measured timeline")}
+                    samples+=Int64(count)
+                }
                 while !input.isReadyForMoreMediaData {
                     try Task.checkCancellation()
-                    guard writer.status == .writing,ContinuousClock.now<deadline else {throw writer.error ?? OSwindError.unavailable("Native narration encoding timed out")}
+                    guard writer.status == .writing,ContinuousClock.now<deadline else {throw writer.error ?? OSwindError.unavailable("Native workflow encoding timed out")}
                     try await Task.sleep(for:.milliseconds(2))
                 }
-                guard input.append(buffer) else {throw writer.error ?? OSwindError.unavailable("Cannot append complete narration audio")}
-                samples+=Int64(count)
+                guard input.append(buffer) else {throw writer.error ?? OSwindError.unavailable("Cannot append complete workflow media")}
+                if isVideo {images+=1;picture=videoOutput.copyNextSampleBuffer()}else{audio=audioOutput.copyNextSampleBuffer()}
             }
-            guard reader.status == .completed,samples==timeline.frames else {throw reader.error ?? OSwindError.invalid("Native narration encoding omitted samples")}
-            writer.endSession(atSourceTime:CMTime(value:timeline.frames,timescale:24000));input.markAsFinished()
+            guard videoReader.status == .completed,audioReader.status == .completed,samples==timeline.frames,images==timeline.steps.count else {throw videoReader.error ?? audioReader.error ?? OSwindError.invalid("Native workflow muxing omitted source media")}
+            writer.endSession(atSourceTime:CMTime(value:timeline.frames,timescale:24000));videoInput.markAsFinished();audioInput.markAsFinished()
             await finish(writer);try Task.checkCancellation()
-            guard writer.status == .completed else {throw writer.error ?? OSwindError.unavailable("AAC narration finalization failed")}
+            guard writer.status == .completed else {throw writer.error ?? OSwindError.unavailable("Workflow movie finalization failed")}
+            guard try workspace.tree.digest("workflow-video.mov",limit:256*1024*1024)==videoDigest,
+                  try WorkflowNarrationAudio.inspect(tree:workspace.tree,stem:"narration",script:script,scriptLimit:12300)==timeline.narration else {throw OSwindError.unavailable("Workflow media changed during muxing")}
             try workspace.tree.requireRootIdentity(at:workspace.url);return url
         }catch {
-            let original=error;if reader.status == .reading {reader.cancelReading()};if writer.status == .writing {writer.cancelWriting()};throw original
+            let original=error
+            for reader in [videoReader,audioReader] where reader.status == .reading {reader.cancelReading()}
+            if writer.status == .writing {writer.cancelWriting()};throw original
         }
     }
     private static func finish(_ writer:AVAssetWriter)async {
-        let queue=DispatchQueue(label:"com.oswind.workflow.audio-finish"),state=WorkflowMediaCancellation()
+        let queue=DispatchQueue(label:"com.oswind.workflow.movie-finish"),state=WorkflowMediaCancellation()
         await withTaskCancellationHandler {
             await withCheckedContinuation {continuation in
                 queue.async {
@@ -88,7 +85,6 @@ enum WorkflowVideoMux {
                 }
             }
         } onCancel: {state.cancel();queue.async {if writer.status == .writing {writer.cancelWriting()}}}
-        await barrier(queue)
+        await withCheckedContinuation {continuation in queue.async {continuation.resume()}}
     }
-    private static func barrier(_ queue:DispatchQueue)async {await withCheckedContinuation {continuation in queue.async {continuation.resume()}}}
 }
