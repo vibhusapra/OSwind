@@ -41,7 +41,8 @@ public enum ConversationContext {
         var sections = ["# OSwind conversation", "Title: \(session.title.replacingOccurrences(of:"\n",with:" "))", "Exported \(stamp(Date())). Source numbers restart for each answer."]
         for turn in turns {
             sections.append("## \(stamp(turn.timestamp))\n\n### Question\n\n\(quoted(turn.question))\n\n### Answer\n\n\(quoted(turn.answer.text))")
-            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { stamp($0) } ?? "any start") to \(turn.filter.end.map { stamp($0) } ?? "any end") (end exclusive). Time zone: \(turn.timeZone ?? "not recorded"). Saved only: \(turn.filter.favoritesOnly). Tag: \(turn.filter.tag ?? "any"). Entity: \(turn.filter.entityID ?? "any").")
+            let entity=turn.filter.unavailableEntityScope != nil ? "unavailable (original restriction retained)":turn.filter.entityID ?? "any"
+            sections.append("Provider: \(turn.answer.provider). Scope: \(turn.filter.app ?? "all apps"); \(turn.filter.kind?.rawValue ?? "all kinds"); \(turn.filter.start.map { stamp($0) } ?? "any start") to \(turn.filter.end.map { stamp($0) } ?? "any end") (end exclusive). Time zone: \(turn.timeZone ?? "not recorded"). Saved only: \(turn.filter.favoritesOnly). Tag: \(turn.filter.tag ?? "any"). Entity: \(entity).")
             if !turn.answer.warnings.isEmpty { sections.append(turn.answer.warnings.map { "Warning: " + $0 }.joined(separator:"\n\n")) }
             sections.append(turn.filter.sourceStartsOnly==true ? "Time matching: source starts only.":"Time matching: source starts and sampled text span overlaps; gaps are unobserved.")
             sections.append(turn.answer.sources.enumerated().map { i,hit in

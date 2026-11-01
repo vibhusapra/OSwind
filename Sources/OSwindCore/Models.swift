@@ -68,11 +68,6 @@ public struct SearchFilter: Codable, Equatable, Sendable {
     public var limit = 100
     public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, entityID: String? = nil, limit: Int = 100,sourceStartsOnly:Bool?=nil,unavailableEntityScope:UnavailableEntityScope?=nil) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.entityID = entityID; self.limit = limit;self.sourceStartsOnly=sourceStartsOnly;self.unavailableEntityScope=unavailableEntityScope }
     private enum CodingKeys:String,CodingKey {case query,app,kind,start,end,sourceStartsOnly,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,limit}
-    private struct UnavailableSelector:Codable {
-        enum State:String,Codable {case unavailable}
-        let state:State
-        init() {state = .unavailable}
-    }
     public init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
         query=try c.decode(String.self,forKey:.query);app=try c.decodeIfPresent(String.self,forKey:.app);kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)
@@ -80,7 +75,7 @@ public struct SearchFilter: Codable, Equatable, Sendable {
         favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly);tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker);limit=try c.decode(Int.self,forKey:.limit)
         unavailableEntityScope=try c.decodeIfPresent(UnavailableEntityScope.self,forKey:.unavailableEntityScope)
         if unavailableEntityScope != nil {
-            _=try c.decode(UnavailableSelector.self,forKey:.entityID);entityID=nil
+            _=try c.decode(UnavailableEntitySelector.self,forKey:.entityID);entityID=nil
         }else {entityID=try c.decodeIfPresent(String.self,forKey:.entityID)}
     }
     public func encode(to encoder:Encoder)throws {
@@ -92,7 +87,7 @@ public struct SearchFilter: Codable, Equatable, Sendable {
             // An already-open old client must fail decoding, rather than
             // ignore an unknown key and broaden this saved filter. The typed
             // selector is deliberately not a String or a synthetic entity ID.
-            try c.encode(UnavailableSelector(),forKey:.entityID);try c.encode(unavailableEntityScope,forKey:.unavailableEntityScope)
+            try c.encode(UnavailableEntitySelector(),forKey:.entityID);try c.encode(unavailableEntityScope,forKey:.unavailableEntityScope)
         }else {try c.encodeIfPresent(entityID,forKey:.entityID)}
     }
 }

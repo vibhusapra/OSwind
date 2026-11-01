@@ -27,10 +27,26 @@ public struct ActivitySourceScope:Codable,Equatable,Sendable {
     public var tag:String?
     public var speaker:String?
     public var entityID:String?
+    public var unavailableEntityScope:UnavailableEntityScope?
     public var start:Date?
     public var end:Date?
-    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;start=filter.start;end=filter.end}
-    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID,sourceStartsOnly:true)}
+    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;unavailableEntityScope=filter.unavailableEntityScope;start=filter.start;end=filter.end}
+    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID,sourceStartsOnly:true,unavailableEntityScope:unavailableEntityScope)}
+    private enum CodingKeys:String,CodingKey {case app,kind,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,start,end}
+    public init(from decoder:Decoder)throws {
+        let c=try decoder.container(keyedBy:CodingKeys.self)
+        app=try c.decodeIfPresent(String.self,forKey:.app);kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind);favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly)
+        tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker);start=try c.decodeIfPresent(Date.self,forKey:.start);end=try c.decodeIfPresent(Date.self,forKey:.end)
+        unavailableEntityScope=try c.decodeIfPresent(UnavailableEntityScope.self,forKey:.unavailableEntityScope)
+        if unavailableEntityScope != nil {_=try c.decode(UnavailableEntitySelector.self,forKey:.entityID);entityID=nil}else{entityID=try c.decodeIfPresent(String.self,forKey:.entityID)}
+    }
+    public func encode(to encoder:Encoder)throws {
+        guard entityID==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("An entity scope cannot be active and unavailable together")}
+        var c=encoder.container(keyedBy:CodingKeys.self)
+        try c.encodeIfPresent(app,forKey:.app);try c.encodeIfPresent(kind,forKey:.kind);try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker)
+        try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
+        if let unavailableEntityScope {try c.encode(UnavailableEntitySelector(),forKey:.entityID);try c.encode(unavailableEntityScope,forKey:.unavailableEntityScope)}else{try c.encodeIfPresent(entityID,forKey:.entityID)}
+    }
 }
 public struct ActivityCalendarRequest:Equatable,Sendable {
     public var month:String

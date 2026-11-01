@@ -1,5 +1,13 @@
 import Foundation
 
+/// Shared native selector discriminator. Older String-based readers refuse
+/// this object instead of ignoring an unfamiliar unavailable-scope property.
+struct UnavailableEntitySelector:Codable {
+    enum State:String,Codable {case unavailable}
+    let state:State
+    init() {state = .unavailable}
+}
+
 /// An unavailable saved restriction is never an unrestricted query. Optional
 /// provenance describes its former entity; it grants no entity lookup authority.
 public struct UnavailableEntityScope:Codable,Equatable,Sendable {
