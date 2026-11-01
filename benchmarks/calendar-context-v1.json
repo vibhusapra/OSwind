@@ -596,5 +596,29 @@
     "Privacy-aware briefs omit saved summaries/recaps conservatively; production learned-PII completeness is not established.",
     "No full sync, notarized distribution, complete parity, or top-three ranking acceptance."
   ],
-  "recordedAtUTC": "2026-11-01T03:54:10.915645+00:00"
+  "recordedAtUTC": "2026-11-01T03:54:10.915645+00:00",
+  "hostedCI": {
+    "state": "passed",
+    "head": "70a03fcad25b1079f1b3827e1da8ae45179f827b",
+    "run": 41271095273,
+    "url": "https://github.com/vibhusapra/OSwind/actions/runs/41271095273",
+    "jobs": {
+      "benchmark-harnesses": "success",
+      "native": "success"
+    },
+    "nativeLogSHA256": "42c27b7b9dd068cca9ede0c3796eb9101cd7a82e3f8b306f3b0faf5a7d47d8d4",
+    "fullDebug": {
+      "defined": 1775,
+      "passed": 1693,
+      "skipped": 82,
+      "failures": 0
+    },
+    "nativeVault": {
+      "defined": 37,
+      "passed": 37,
+      "skipped": 0,
+      "failures": 0
+    },
+    "scope": "Separate hosted run on the published input-identical feature head. Original local35/37 failures and unresolved cause remain retained; no real Calendar acceptance."
+  }
 }

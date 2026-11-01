@@ -4,6 +4,8 @@ Status: **implemented and software-tested; native acceptance open (F079 partial)
 
 The original full native-vault group has **35 passes and two system-operation timeouts** during repeated clamshell/maintenance sleep. Both failed cases pass in one unchanged-build targeted comparison, which still records one maintenance-sleep event despite a temporary idle assertion. The original failures remain retained; neither a resolved cause nor one all-pass full native group is claimed. Initial compile, raw-reader harness and corrected onboarding/manual-pause failures are also retained. Real Calendar permission/account access, native notification delivery/Focus, manual join and interactive main-window acceptance remain open. Poll policy is not measured physical power.
 
+Hosted CI run [41271095273](https://github.com/vibhusapra/OSwind/actions/runs/41271095273) passes both jobs at `70a03fc`: **1,693 debug passes / 82 skips** and a separate **37/37 native-vault pass**. This hosted result does not erase the original local timeouts or establish native Calendar/notification acceptance.
+
 ![Authored compact meeting sample](../assets/meetings-sample.png)
 
 ## Intended user flow
