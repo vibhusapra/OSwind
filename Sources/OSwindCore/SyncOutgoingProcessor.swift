@@ -94,7 +94,7 @@ struct SyncOutgoingProcessor {
         },runRecipe:{run,recipe,ordinal in
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
-        },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)})
+        },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)},erasedRunConversation:{try self.cache.erasedRunConversation(localRunID:$0)})
             return historical.decorating(base,admit:processor.admitVersion,verify:{value in
                 guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
             })
@@ -108,7 +108,7 @@ struct SyncOutgoingProcessor {
             guard try current(identity).encoded()==row.encoded() else {throw OSwindError.invalid("Outgoing row changed during policy admission")}
             let record=try SyncPortableExporter(references:references).record(identity:identity,row:row),data=try record.encoded()
             guard data.count<=processor.maximumBytes-bytes else {throw OSwindError.unavailable("Outgoing graph exceeds its typed byte budget")};bytes+=data.count
-            for dependency in record.dependencies {
+            for dependency in try record.liveDependencies(conversationIsErased:{try cache.isErasedOptionalConversation(record,identity:$0)}) {
                 if let content=dependency.content {
                     if try cache.record(.init(identity:dependency.identity,content:content),admit:processor.admitVersion)==nil {_=try prepare(dependency.identity)}
                     _=try cache.resolve(dependency.identity,content:content,admit:processor.admitVersion)

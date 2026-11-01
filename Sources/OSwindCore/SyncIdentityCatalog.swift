@@ -157,6 +157,11 @@ struct SyncIdentityCatalog {
         return SyncLocalObject(identity:identity,primary:primary,deleted:deleted)
     }
     func object(_ identity:SyncObjectIdentity)throws->SyncLocalObject? {_=try state();let value=try readObject(identity.key.digest);guard value==nil || value!.identity==identity else {throw OSwindError.database("Sync object identity differs")};return value}
+    func object(for key:SyncObjectKey)throws->SyncLocalObject? {
+        _=try state();let value=try readObject(key.digest)
+        if let value {guard try value.identity.key==key else {throw OSwindError.database("Sync object key differs")}}
+        return value
+    }
     func nativeExists(for key:SyncObjectKey)throws->Bool {
         _=try state();guard let object=try readObject(key.digest) else {return false}
         guard object.identity.table.kind==key.kind else {throw OSwindError.database("Derived retirement identity kind differs")}

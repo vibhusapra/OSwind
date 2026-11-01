@@ -69,3 +69,45 @@ struct RoutineRunOriginalStore {
         let row=try db.statement("INSERT INTO routine_run_originals VALUES(?,?,?)");defer {sqlite3_finalize(row)};db.bind(row,1,id);payload.withUnsafeBytes {_=sqlite3_bind_blob(row,2,$0.baseAddress,Int32(payload.count),db.transient)};db.bind(row,3,try SyncProtocolLimits.hex(frame.encoded()));try db.done(row)
     }
 }
+
+extension RoutineRunOriginalStore {
+    /// Bounded enumeration over the existing chat/rowid index. The callback
+    /// may detach a row or leave an already-erased run for its owning deletion.
+    func forEachLinkedRun(chatID:String,_ body:(String,RoutineRunOriginal,SyncRowSnapshot)throws->Void)throws {
+        var after:Int64?
+        while true {
+            try Task.checkCancellation()
+            let rows:[(Int64,String)] = try {
+                let row=try db.statement("SELECT r.rowid,r.id FROM routine_runs r JOIN routine_run_originals o ON o.run_id=r.id WHERE r.chat_id=?"+(after==nil ? "":" AND r.rowid>?")+" ORDER BY r.rowid LIMIT 128");defer {sqlite3_finalize(row)};db.bind(row,1,chatID);if let after {sqlite3_bind_int64(row,2,after)}
+                var result=[(Int64,String)]()
+                while true {let code=sqlite3_step(row);if code==SQLITE_DONE {break};guard code==SQLITE_ROW else {throw db.error()};result.append((sqlite3_column_int64(row,0),db.text(row,1)))}
+                return result
+            }()
+            guard !rows.isEmpty else {return}
+            for (position,local) in rows {
+                try Task.checkCancellation();after=position
+                guard let original=try read(local),let current=try frame(local),current.cells.count==11,current.cells[8] == .text(Data(chatID.utf8)) else {throw OSwindError.invalid("Run conversation changed during detachment preparation")}
+                try body(local,original,current)
+            }
+        }
+    }
+}
+extension MemoryStore {
+    /// Caller serializes this library's connection and owns the transaction.
+    /// This changes only the nullable link and its exact local fingerprint;
+    /// source bytes, recorded recipe/status and original packet stay intact.
+    func detachRunOriginalConversation(_ id:String,from chat:String,original:RoutineRunOriginal,before:SyncRowSnapshot,db:RoutineDatabase)throws->SyncRowSnapshot {
+        try withRoutineDatabase {connection in guard connection.handle==db.handle else {throw OSwindError.invalid("Use the run's owning library connection")}}
+        guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Run detachment requires its owning transaction")}
+        let store=RoutineRunOriginalStore(db:db),payload=try original.encoded()
+        guard before.cells.count==11,before.cells[0] == .text(Data(id.utf8)),before.cells[8] == .text(Data(chat.utf8)),try store.read(id)?.encoded()==payload,try store.frame(id)?.encoded()==before.encoded() else {throw OSwindError.invalid("Run original changed before optional detachment")}
+        var cells=before.cells;cells[8] = .null;let next=try SyncRowSnapshot(cells)
+        try incomingRunProjection.withRun(next,payload:payload) {
+            let row=try db.statement("UPDATE routine_runs SET chat_id=NULL WHERE id=? AND chat_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,id);db.bind(row,2,chat);try db.done(row)
+            guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Run conversation changed before optional detachment")}
+            try store.replace(id,payload:payload,frame:next)
+        }
+        guard try store.read(id)?.encoded()==payload,try store.frame(id)?.encoded()==next.encoded() else {throw OSwindError.invalid("Run original changed during optional detachment")}
+        return next
+    }
+}

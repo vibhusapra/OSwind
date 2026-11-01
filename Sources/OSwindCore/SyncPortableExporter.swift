@@ -13,6 +13,7 @@ struct SyncPortableReferences {
     var pin:((String)throws->SyncVersionReference?)? = nil
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
     var runOriginal:((String)throws->RoutineRunOriginal?)? = nil
+    var erasedRunConversation:((String)throws->SyncObjectIdentity?)? = nil
 }
 /// Converts the actual captured canonical row schema, not raw SQL supplied by a
 /// peer. Reference/media preparation and the writer's current-row/privacy checks
@@ -87,7 +88,8 @@ struct SyncPortableExporter {
                 recipe=body.recipe.routine==parent ? body.recipe:try .init(routine:parent,editorOrigin:body.recipe.editorOrigin,ordinal:body.recipe.ordinal,definition:nil)
             }else{recipe=try original ?? references.recipe(id,ordinal)}
             guard recipe.routine==parent,(retained != nil || original != nil || recipe.ordinal==ordinal),let trigger=RoutineTrigger(rawValue:try text("trigger")),let status=RoutineRunStatus(rawValue:try text("status")) else {throw OSwindError.invalid("Portable sync run metadata differs")}
-            let chat=try optionalText("chat_id").map {try references.identity(.conversation,[.text(Data($0.utf8))])}
+            var chat=try optionalText("chat_id").map {try references.identity(.conversation,[.text(Data($0.utf8))])}
+            if chat==nil,let retained,case .routineRun(let old)=retained.record.body,old.conversation != nil {chat=try references.erasedRunConversation?(runID)}
             body = try .routineRun(.init(recipe:recipe,scheduledAt:date("scheduled_at"),started:date("started"),finished:optionalDate("finished"),trigger:trigger,status:{if let retained,case .routineRun(let body)=retained.record.body {return body.status};return status}(),conversation:chat,message:optionalText("message"),filter:filter(decode("scope",SearchFilter.self))))
         case .entity:
             guard let kind=EntityKind(rawValue:try text("kind")) else {throw OSwindError.invalid("Portable sync entity kind differs")}

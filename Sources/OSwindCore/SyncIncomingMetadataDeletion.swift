@@ -6,6 +6,7 @@ import CSQLite
 /// own authenticated tombstones. Source erasure needs its full media adapter.
 struct SyncIncomingMetadataDeletion {
     let cache:SyncVersionStore
+    let beforeConversationDeletion:(SyncLocalObject)throws->Void
     var db:RoutineDatabase {cache.database}
     static let tables:Set<SyncCanonicalTable> = [.conversation,.turn,.conversationCitation,.routine,.routineRun,.evidencePin]
     static func accepts(_ kind:SyncObjectKind)->Bool {tables.contains {$0.kind==kind}}
@@ -15,6 +16,9 @@ struct SyncIncomingMetadataDeletion {
     }
     func applyKey(_ key:SyncObjectKey)throws {
         guard try cache.journal.state(for:key).isDeleted,Self.accepts(key.kind) else {throw OSwindError.invalid("Use the corresponding typed metadata deletion adapter")}
+        // Preparation uses the ordinary catalog context. The deletion callback
+        // itself runs under echo suppression and cannot nest catalog writes.
+        if key.kind == .conversation,let object=try cache.catalog.object(for:key),!object.deleted {try beforeConversationDeletion(object)}
         try cache.catalog.deletePeerKey(key,journal:cache.journal) {object in
             // An unknown key only needs its durable journal barrier. There is
             // no native owner to erase and no peer body to download or trust.

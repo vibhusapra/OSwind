@@ -23,7 +23,7 @@ struct SyncIncomingConversationWriter {
         guard !value.isEmpty,value.utf8.count<128,!value.utf8.contains(0) else {throw OSwindError.invalid("Invalid incoming local identifier")};return value
     }
     private var references:SyncPortableReferences {
-        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{_ in throw OSwindError.unavailable("Source projection uses its complete source/media adapter")},recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{_ in throw OSwindError.unavailable("Source projection needs its original session binding")},runRecipe:{try cache.runRecipe(localRunID:$0,recipeID:$1,ordinal:$2,admit:admit)},runOriginal:{try RoutineRunOriginalStore(db:db).read($0)})
+        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{_ in throw OSwindError.unavailable("Source projection uses its complete source/media adapter")},recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{_ in throw OSwindError.unavailable("Source projection needs its original session binding")},runRecipe:{try cache.runRecipe(localRunID:$0,recipeID:$1,ordinal:$2,admit:admit)},runOriginal:{try RoutineRunOriginalStore(db:db).read($0)},erasedRunConversation:{try cache.erasedRunConversation(localRunID:$0)})
         return history.decorating(base,admit:admit,verify:{value in
             guard case .source(let body)=value.record.body else {throw OSwindError.invalid("Historical source differs")}
             var paths=[SyncMediaRole:String]();if let path=value.memory.imagePath {paths[.image]=path};if let path=value.memory.audioPath {paths[.audio]=path};if let path=value.memory.videoPath {paths[.video]=path}
@@ -76,7 +76,9 @@ struct SyncIncomingConversationWriter {
             if let stored=try cache.record(reference,admit:admit) {definition=stored}
             else {let packet=try fetch(reference);guard try packet.reference==reference else {throw OSwindError.invalid("Fetched recipe is not its requested version")};_=try cache.retain(packet,requiredBy:record,admit:admit);definition=packet}
         }else{definition=nil}
-        let original=RoutineRunOriginal(record:record,definition:definition);let payload=try original.encoded(),ordinal=previous?.revision ?? recipe.revision,filter=try body.filter.projected {try id($0)},scope=try SyncProtocolLimits.encode(filter),chat=try body.conversation.map {try id($0)}
+        let original=RoutineRunOriginal(record:record,definition:definition);let payload=try original.encoded(),ordinal=previous?.revision ?? recipe.revision,filter=try body.filter.projected {try id($0)},scope=try SyncProtocolLimits.encode(filter)
+        let chat:String?
+        if let conversation=body.conversation,try !cache.isErasedOptionalConversation(record,identity:conversation) {chat=try id(conversation)}else{chat=nil}
         func text(_ value:String)->SyncRowCell {.text(Data(value.utf8))}
         let frame=try SyncRowSnapshot([text(local),text(recipeID),.integer(Int64(ordinal)),.real(body.scheduledAt.timeIntervalSince1970.bitPattern),.real(body.started.timeIntervalSince1970.bitPattern),body.finished.map{.real($0.timeIntervalSince1970.bitPattern)} ?? .null,text(body.trigger.rawValue),text(body.projectedStatus.rawValue),chat.map(text) ?? .null,body.message.map(text) ?? .null,.blob(scope)])
         try library.incomingRunProjection.withRun(frame,payload:payload) {
@@ -131,9 +133,28 @@ struct SyncIncomingConversationWriter {
         }else if SyncIncomingEntityWriter.tables.contains(where:{$0.kind==key.kind}) {
             try SyncIncomingEntityWriter(library:library,cache:cache,admit:admit,newID:newID).applyDeletionKey(key,admission:admission)
         }else if SyncIncomingMetadataDeletion.accepts(key.kind) {
-            try SyncIncomingMetadataDeletion(cache:cache).applyKey(key)
+            try SyncIncomingMetadataDeletion(cache:cache,beforeConversationDeletion:detachRunsFromConversation).applyKey(key)
         }else {
             try retireRecapCitation(key)
+        }
+    }
+    /// Detach nullable links under the exact native-run permit before the FK
+    /// fires. Otherwise its ordinary update invalidates the retained original.
+    /// Batches follow rowid through the existing chat index, with bounded memory.
+    private func detachRunsFromConversation(_ object:SyncLocalObject)throws {
+        guard object.identity.table == .conversation,let primary=object.primary,primary.count==1,case .text(let bytes)=primary[0],let chat=String(data:bytes,encoding:.utf8),try cache.journal.state(for:object.identity.key).isDeleted else {throw OSwindError.invalid("Use the erased optional conversation's exact local owner")}
+        let store=RoutineRunOriginalStore(db:db)
+        try store.forEachLinkedRun(chatID:chat) {local,original,before in
+            let identity=try cache.catalog.localIdentity(.routineRun,primary:[.text(Data(local.utf8))])
+            if try cache.journal.state(for:identity.key).isDeleted {return}
+            guard let packet=try cache.retainedRunProjection(localRunID:local),case .routineRun(let body)=packet.body,body.conversation==object.identity else {throw OSwindError.unavailable("Prepare the run's exact optional-conversation projection before erasure")}
+            try cache.catalog.applyPeer(identity,primary:[.text(Data(local.utf8))]) {
+                _=try library.detachRunOriginalConversation(local,from:chat,original:original,before:before,db:db)
+            }
+            // The exact original supplies its recipe. Erasure must not invoke
+            // an unrelated body-policy callback through eager recipe lookup.
+            var deletionReferences=references;deletionReferences.runRecipe=nil
+            try cache.bindProjection(packet.reference,references:deletionReferences,admit:{_ in})
         }
     }
     /// Content-free recap deletion. The old global citation retires even when
