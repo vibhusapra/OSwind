@@ -17,6 +17,7 @@ import EventKit
     let meetings:MeetingsModel
     let tools:MCPToolsModel
     let clipboard:ClipboardContextModel
+    let voice:VoiceTypingModel
     private var libraryRetired=false
     private var resumeMeetingsAfterPause=false,resumeScreenWithMeetings=false,resumeOnlyClipboard=false
     let activity:ActivityCalendarModel
@@ -31,7 +32,7 @@ import EventKit
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
     @Published var settings: AppSettings { didSet {
-        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings)
+        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings)
         if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelAnswer()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
@@ -99,7 +100,7 @@ import EventKit
     private var jsonImportWorker:Task<String,Error>?
     private var jsonImportDrainers=0
     var hasPendingJSONImport:Bool {jsonImportWorker != nil || jsonImportTask != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy || clipboard.busy}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy || clipboard.busy || voice.busy}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
@@ -142,7 +143,7 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
@@ -166,6 +167,12 @@ import EventKit
         routines=RoutinesModel(store:store,embedder:embedder,settings:loaded)
         tools=toolsSetup?(store,loaded) ?? MCPToolsModel(store:store,settings:loaded)
         clipboard=clipboardSetup?(store,loaded) ?? ClipboardContextModel(store:store,settings:loaded)
+        voice=voiceSetup?(store,loaded,self.drafting) ?? VoiceTypingModel(store:store,settings:loaded,draft:self.drafting,environment:.live(store:store,recognizer:audio.recognizer))
+        voice.allowed = {[weak self] in
+            guard let self else {return false}
+            return !self.demo && !self.libraryRetired && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy && !self.maintenanceBusy && !self.audio.hasActiveWork && !self.importingAudio
+        }
+        voice.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         meetings.allowed = {[weak self] in
             guard let self else {return false}
             return !self.demo && !self.libraryRetired && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy && !self.maintenanceBusy
@@ -211,7 +218,7 @@ import EventKit
         capture.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         audio.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in:&cancellables)
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
-            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.drafting.clear();self?.meetings.sleep();self?.tools.suspend() }.store(in:&cancellables)
+            NSWorkspace.shared.notificationCenter.publisher(for:name).sink { [weak self] _ in self?.audio.stop();self?.voice.cancel(clearDraft:true);self?.drafting.clear();self?.meetings.sleep();self?.tools.suspend() }.store(in:&cancellables)
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.didWakeNotification).sink { [weak self] _ in self?.resumeConfiguredWorkAfterWake() }.store(in:&cancellables)
         NotificationCenter.default.publisher(for:.EKEventStoreChanged).sink {[weak self] _ in Task {@MainActor in self?.meetings.invalidate()}}.store(in:&cancellables)
@@ -282,7 +289,7 @@ import EventKit
     }
     func prepareForLibrarySwitch() {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
-        libraryRetired=true;meetings.stop(clear:true);tools.suspend();clipboard.stop()
+        libraryRetired=true;meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -503,6 +510,7 @@ import EventKit
         }
     }
     func reviewDraft(_ answer:Answer) {
+        voice.cancel()
         guard !store.isClosed,answer.sources.count<=60 else {errorMessage="This answer cannot be drafted from the current library.";return}
         let proofs=answer.sources.map {($0.id,$0.memory.evidenceHash)},store=self.store
         drafting.review(answer) { [weak self] in
@@ -606,7 +614,7 @@ import EventKit
         // detached preparation not yet holding a lease must finish too.
         jsonImportDrainers+=1;defer {jsonImportDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
-        clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait()
+        voice.cancel(clearDraft:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
     }
     private var lastObservationRefresh = -Double.infinity
@@ -773,7 +781,7 @@ import EventKit
     func pauseAll(discardReplay:Bool=false,manualMeetingPause:Bool=true) {
         if isCollecting {resumeOnlyClipboard=clipboard.running && !isCapturing && !meetings.active;resumeMeetingsAfterPause=meetings.active;resumeScreenWithMeetings=capture.running}
         pauseTimer?.invalidate();pauseTimer=nil;pauseUntil=nil;capture.pause(discardReplay:discardReplay);audio.stop()
-        if manualMeetingPause {meetings.pause()}else {meetings.sleep()};tools.suspend();clipboard.stop()
+        if manualMeetingPause {meetings.pause()}else {meetings.sleep()};tools.suspend();clipboard.stop();voice.cancel(clearDraft:true)
     }
     func pauseForHistoryErasure() {
         drafting.clear()
@@ -788,10 +796,11 @@ import EventKit
         let screenWasRunning = capture.running, audioWasRunning = audio.running, meetingsWereRunning=meetings.active,clipboardWasRunning=clipboard.running
         pauseAll(); pauseUntil = Date().addingTimeInterval(Double(minutes)*60)
         pauseTimer = Timer.scheduledTimer(withTimeInterval:Double(minutes)*60,repeats:false) { [weak self] _ in
-            Task { @MainActor in guard let self else { return }; self.pauseUntil = nil;if clipboardWasRunning {self.clipboard.start()};if meetingsWereRunning {self.meetings.resume()}; if screenWasRunning { self.capture.start() }; if audioWasRunning && !SessionState.locked { await self.audio.start() } }
+            Task { @MainActor in guard let self else { return }; self.pauseUntil = nil;if clipboardWasRunning {self.clipboard.start()};if meetingsWereRunning {self.meetings.resume()}; if screenWasRunning { self.capture.start() }; if audioWasRunning && !self.voice.busy && !SessionState.locked { await self.audio.start() } }
         }
     }
     var collectionStatus:String {
+        if voice.busy {return voice.status}
         if audio.running {return audio.status+(clipboard.running ? " · Clipboard on":"")}
         if capture.running {return capture.status+(clipboard.running ? " · Clipboard on":"")}
         if clipboard.running {return "Clipboard · "+clipboard.status}
@@ -799,9 +808,9 @@ import EventKit
     }
     var isCapturing: Bool { capture.running || audio.running }
     var isCollecting:Bool {isCapturing || meetings.active || clipboard.running}
-    var hasPausableWork:Bool {isCollecting || tools.busy || clipboard.busy}
+    var hasPausableWork:Bool {isCollecting || tools.busy || clipboard.busy || voice.busy}
     func captureNow() async {guard !libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
-    func toggleAudio() async {guard !libraryWipe.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
+    func toggleAudio() async {guard !libraryWipe.busy,!voice.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
     func toggleCapture() {
         guard !libraryWipe.busy else {return};pauseTimer?.invalidate();pauseUntil=nil
         if hasPausableWork {pauseAll()}
@@ -818,14 +827,14 @@ import EventKit
         nativeModels.start(kind,cache:cache,verifyOnly:verifyOnly) { [weak self] result in
             guard let self else{return}
             let unchanged=kind == .parakeet ? self.settings.speech==speech:self.settings.diarization==diarization
-            guard unchanged,!self.audio.hasActiveWork,!self.importingAudio else {
+            guard unchanged,!self.audio.hasActiveWork,!self.importingAudio,!self.voice.busy else {
                 self.nativeModels.message((result.reused ? "Verified.":"Installed.")+" Select Use model after current audio work finishes or to apply your new choice.",for:kind);return
             }
             self.useNativeModel(result)
         }
     }
     func useNativeModel(_ result:NativeModelInstallation) {
-        guard !audio.hasActiveWork,!importingAudio else {nativeModels.message("Finish current audio work before changing models.",for:result.kind);return}
+        guard !audio.hasActiveWork,!importingAudio,!voice.busy else {nativeModels.message("Finish current audio work before changing models.",for:result.kind);return}
         switch result.kind {
         case .parakeet:
             var value=settings.speech;value.engine = .parakeet;value.modelDirectory=result.directory.path;settings.speech=value
@@ -836,6 +845,7 @@ import EventKit
         nativeModels.message("Ready for local transcription.",for:result.kind)
     }
     func importAudio() {
+        guard !voice.busy else {audioImportStatus="Finish voice typing before importing audio.";return}
         guard !importingAudio else { return }
         let panel=NSOpenPanel(); panel.allowedContentTypes=[.audio]; panel.allowsMultipleSelection=false; panel.message="Transcribe this file locally. Clip retention follows your Audio setting."
         guard panel.runModal() == .OK,let file=panel.url else { return }
