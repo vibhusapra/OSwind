@@ -2,6 +2,37 @@ import XCTest
 @testable import OSwindCore
 
 extension SyncIncomingSourceTests {
+    func testKnownRunKeepsExactOriginalAfterOptionalConversationDeletion()throws {
+        let thirdID="00000000-0000-0000-0000-000000006172"
+        let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID),(c,cc)=try endpoint("eraser",thirdID)
+        defer {try? a.close();try? b.close();try? c.close()}
+        try bc.journal.allowPeer(producerID);try bc.journal.allowPeer(thirdID);try cc.journal.allowPeer(producerID)
+        var recipe=RoutineDefinition();recipe.id="owned-known-optional";recipe.prompt="Retain the actual original prompt";recipe.schedule.timeZone="UTC"
+        _=try a.saveRoutine(recipe,now:now);let claim=try XCTUnwrap(a.claimRoutine(id:recipe.id,now:now))
+        _=try a.completeRoutine(claim,answer:.init(text:"Owned completed result",sources:[],provider:"owned",duration:0),policy:.init());try drain(a,ac)
+        let initial=try ac.journal.outbox(),operation=try XCTUnwrap(initial.last {$0.key.kind == .routineRun}),record=try packet(operation,ac)
+        guard case .routineRun(let body)=record.body else {return XCTFail("Expected actual completed run")}
+        let optional=try XCTUnwrap(body.conversation),runCounter=operation.dot.counter;var erasedLocal:String?,runLocal:String?
+        for operation in initial {
+            let packet=try self.packet(operation,ac),local=try receive(operation,packet,b,bc,fetch:{ref in try XCTUnwrap(ac.record(ref,admit:{_ in}))})
+            if packet.identity==record.identity {runLocal=local}
+            if operation.dot.counter<runCounter {
+                let local=try receive(operation,packet,c,cc,fetch:{ref in try XCTUnwrap(ac.record(ref,admit:{_ in}))})
+                if packet.identity==optional {erasedLocal=local}
+            }
+        }
+        let local=try XCTUnwrap(runLocal);XCTAssertEqual(try b.routineRuns().first?.id,local)
+        try c.deleteChat(try XCTUnwrap(erasedLocal));try drain(c,cc)
+        for deletion in try cc.journal.outbox() {try receiveDeletion(deletion,b,bc)}
+        XCTAssertTrue(try bc.journal.state(for:optional.key).isDeleted);XCTAssertFalse(try bc.journal.state(for:record.identity.key).isDeleted)
+        let run=try XCTUnwrap(b.routineRuns().first);XCTAssertEqual(run.id,local);XCTAssertEqual(run.status,.completed);XCTAssertNil(run.chatID)
+        XCTAssertEqual(run.original?.recipePrompt,recipe.prompt)
+        var resolved:SyncPortableRecord?,failure:Error?
+        do {resolved=try bc.resolve(record.identity,content:nil,admit:{_ in})}catch {failure=error}
+        XCTAssertNil(failure,"An independent stored run must retain its exact original after optional conversation deletion: \(String(describing:failure))")
+        XCTAssertEqual(try resolved?.encoded(),try record.encoded())
+        XCTAssertEqual(try b.withRoutineDatabase {try RoutineRunOriginalStore(db:$0).read(local)?.record.encoded()},try record.encoded())
+    }
     func testUnseenRunSurvivesErasedOptionalConversationAndKeepsExactOriginal()throws {
         let thirdID="00000000-0000-0000-0000-000000006171"
         let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID),(c,cc)=try endpoint("eraser",thirdID)
