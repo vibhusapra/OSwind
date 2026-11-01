@@ -1,0 +1,446 @@
+{
+  "format": "OSwind unavailable entity scope component qualification v1",
+  "state": "locally-component-qualified",
+  "librarySchema": 32,
+  "compiledSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+  "finalVerificationSource": "21f8596ffd1553beae8d78dda45501f400e8fa33",
+  "compiledInputs": 816,
+  "finalInputs": 816,
+  "sharedUnchangedInputs": 815,
+  "oracleOnlyDifference": [
+    "scripts/sync-capture-smoke.py"
+  ],
+  "nativeProductionTestsAndDependenciesUnchangedAfterCompilation": true,
+  "finalProcessAndArtifactStages": 18,
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "wallSeconds": 357.66384108294733,
+      "logSHA256": "a7868813663bc753d897cf294e3dd217a67fbdce2ae2c56949f53903cf0e3ce8",
+      "tests": {
+        "defined": 2028,
+        "passed": 1933,
+        "skipped": 95,
+        "failures": 0
+      },
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "wallSeconds": 245.88938816613518,
+      "logSHA256": "0afbb58c68bd2e80f1004b20a24333b63f75567081d780161fa547b84aeceb61",
+      "tests": {
+        "defined": 558,
+        "passed": 523,
+        "skipped": 35,
+        "failures": 0
+      },
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "wallSeconds": 186.74486487498507,
+      "logSHA256": "f1b5385a7f3baa8b7ead4ee0554a24ef3e93daa319d512862a90d1a732ea1d54",
+      "tests": {
+        "defined": 558,
+        "passed": 523,
+        "skipped": 35,
+        "failures": 0
+      },
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "wallSeconds": 198.5262747919187,
+      "logSHA256": "cb8db8004e9bfac20cb5bc987e56ec30e685eebfa4c185c21d258fbf2104773d",
+      "tests": {
+        "defined": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failures": 0
+      },
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "wallSeconds": 0.06397954095155,
+      "logSHA256": "19ce4c3fe936ba5a289b545d890b7ffce48ced29d4b7b20a8c6b10a871321dd4",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "wallSeconds": 120.995469750138,
+      "logSHA256": "09b9e009ff4f1979975ddec8ce12f5a5a2147e65b47c43deb93a6db4676429ce",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "wallSeconds": 1.0299288749229163,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "wallSeconds": 1.2250831660348922,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "wallSeconds": 5.0163752909284085,
+      "logSHA256": "8b12636409f5fb7533842a09cca34befc4ef2c73f9d3c2d6d20ef4e6697d0a94",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "wallSeconds": 0.5981763328891248,
+      "logSHA256": "ce5650b639facbc4c4545c3c52d3bd84e8f022d4b85324aaf496217732353657",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "wallSeconds": 1.830302583053708,
+      "logSHA256": "3dc3584e8d573cff8cc00bf6a755fa0e1ad9ce59d5fce9a8c80a8e7ac496c767",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "wallSeconds": 1.0878627500496805,
+      "logSHA256": "1f0d0fb8ef5a3921d5d1f6b47f59840f17bdc2a3cbe9c6dd7a2e16ea28baa616",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "wallSeconds": 16.97185887489468,
+      "logSHA256": "ca3574ca9b12fafe1137a5c54848cc440654999ea330dffa8d39538f8df82f7b",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "wallSeconds": 7.7079547920729965,
+      "logSHA256": "344b25e052003919616acc94bb824f8196d2e89833f11a6bc17f7bcb3b0923c1",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "wallSeconds": 6.510169833200052,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409",
+      "inheritedFrom": "qualification-v2",
+      "executedSource": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1"
+    },
+    {
+      "name": "schema32-sync-capture",
+      "state": "passed",
+      "wallSeconds": 1.044776750029996,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "schema32-entity-memory",
+      "state": "passed",
+      "wallSeconds": 9.879141582874581,
+      "logSHA256": "f7c2e0b70d4f063d8a691245a2eaf61500d45fb0529d50de31742d6587e9fb8e"
+    },
+    {
+      "name": "schema32-project-corrections",
+      "state": "passed",
+      "wallSeconds": 2.410460083046928,
+      "logSHA256": "3d73dd9c95621c84947b377b6521d86b1c8aceda250fbf1833b9abbc35cf54cd"
+    },
+    {
+      "name": "schema32-text-observation",
+      "state": "passed",
+      "wallSeconds": 1.5333572090603411,
+      "logSHA256": "1d68758d88727312818f6d31f2fcb90e20ac067f02f052e5e278ff2c223df6c0"
+    },
+    {
+      "name": "schema32-accessibility-text",
+      "state": "passed",
+      "wallSeconds": 1.7146890410222113,
+      "logSHA256": "5f3374a86708adbeae15e6aa1b009a79437cdbe3c87cc021523bf928be1a5c7a"
+    },
+    {
+      "name": "schema32-tag-index",
+      "state": "passed",
+      "wallSeconds": 1.1269706671591848,
+      "logSHA256": "a716afde679bb78946ebacfb938447342c7c86f40f79b3cce37cfc0d89e582c4"
+    },
+    {
+      "name": "schema32-capture-region",
+      "state": "passed",
+      "wallSeconds": 0.4184832079336047,
+      "logSHA256": "562eb47872a09f484440aa4536dd2e805bb67c43b3802e13fcff2fc93170c65d"
+    },
+    {
+      "name": "schema32-historical-erasure",
+      "state": "passed",
+      "wallSeconds": 0.4068803752306849,
+      "logSHA256": "3ccba0e96bedc8323bacd3d2c6b9c58769a0d18abb9006388ad4b9fda4165438"
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "wallSeconds": 0.586754416115582,
+      "logSHA256": "9d60b0fadcbd353af14f405a7396d695e73ba50d39a58ced5a5900b72b93c3b6"
+    },
+    {
+      "name": "debug-package",
+      "state": "passed",
+      "wallSeconds": 6.201434124959633,
+      "logSHA256": "1f324dc2e7fa157138a313348a63a3ef0d51ecb00bb9d5f1eb29d845414699b0"
+    },
+    {
+      "name": "render-UnavailableScopeHistory-dark",
+      "state": "passed",
+      "wallSeconds": 2.5483078330289572,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "render-UnavailableScopeHistory-light",
+      "state": "passed",
+      "wallSeconds": 1.8927575000561774,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "render-UnavailableScopeCompact-dark",
+      "state": "passed",
+      "wallSeconds": 1.844756041886285,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "render-UnavailableScopeCompact-light",
+      "state": "passed",
+      "wallSeconds": 1.8829217501915991,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "wallSeconds": 1.192864874843508,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "wallSeconds": 0.0998691669665277,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "wallSeconds": 0.036952042020857334,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "wallSeconds": 0.03733691689558327,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "mandatoryMethods": 37,
+  "mandatoryMethodsAllThreeBuilds": true,
+  "distinctPassedFullAndNativeMethods": 1970,
+  "nativeCases": 39,
+  "nativeSkips": 0,
+  "protectedAppsUnchanged": 32,
+  "stagedFiles": 34,
+  "archiveExtractionEqual": true,
+  "cliSHA256": "ce600b7d4c74eaaba65db61050b9b369a05352a9fe80c145e7a438448e01e6e2",
+  "appSHA256": "6f81276c1c50ab6f5f650ed448c481b79591f435161547fb2b973d391d7f758f",
+  "zipSHA256": "8202aa89319e5646061963a3aa02a6f71376c7df8457dc0a8c6fd856a75755b7",
+  "qualificationSHA256": "9d477fc3ffa5af2389cc4f1d8e1518868a74e29976476539a360c6a23247c493",
+  "independentReviewSHA256": "e87c43d784bc31fac3d69755cc323a913848535ac4062fe9130f98170e2ddded",
+  "retainedCrashDriverSHA256": "18c80b4b6f1e40539cd1b376378e3b9308a5ffe701d6f8b6163c0bff024342f3",
+  "retainedCrashDatabases": [
+    {
+      "build": "debug",
+      "phase": "before",
+      "databaseSHA256": "e1413c73715f7f8706048ebdaf54b8c09a2c115b669134037c2447492c34b9ce",
+      "expectedSHA256": "2004785aa79fb17ed7033f1c4cc5fe9f70c82e6c493d11cf2f3e33f83f482295",
+      "workerLogSHA256": "6308c93d1807de0af2333a3874d023aac2f3fae5f02d878201ff0d60301276e3",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    },
+    {
+      "build": "debug",
+      "phase": "after",
+      "databaseSHA256": "e73568faf3250c9fc00be6b88f097d1184f3f73bfb80493b61be1c9f6ce29f74",
+      "expectedSHA256": "2f787567ad056e184fe29da36ad2edd839f1a9e827fe3f50b93c78d9840f8550",
+      "workerLogSHA256": "404b11d2d2896d5ca304f491f5b4e449ce049f4d9e765382f1ed59a5fc656405",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    },
+    {
+      "build": "thread-sanitizer",
+      "phase": "before",
+      "databaseSHA256": "8da9e37f11272f4b120dd2e3beefe553d7ac047048da8d40bdc9e7351948638c",
+      "expectedSHA256": "e5d740a090dc7b05cd44d71455a0b0e0be8e06c342cc33d8580ab02f6f4410d4",
+      "workerLogSHA256": "e0c02ea370dcf92b449abd02393e34eaa96abe899469dd78067aa04b7e73842a",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    },
+    {
+      "build": "thread-sanitizer",
+      "phase": "after",
+      "databaseSHA256": "8276f0b0cb85bd101689b99575eead79f83074040aed4e32e4f69ec682601855",
+      "expectedSHA256": "67d2e248faade0282a8835bc192b90bc3d0d98ffb25a5f968f388ba50a549983",
+      "workerLogSHA256": "1041e7bed843a37341567b014d2fdab305eeb9ba6fcc0d9be2f931684c5f7706",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    },
+    {
+      "build": "optimized",
+      "phase": "before",
+      "databaseSHA256": "b7721aaaae46a11de0fcddbb4dde2572578612240dfdd7842e233bf92982f903",
+      "expectedSHA256": "5dd81a469831259119809ad9cd62a16d9ab634f99c57f85bb8227862b829e3e4",
+      "workerLogSHA256": "37acaf3c9782fc750180a9303f823f21f0f9a9e7678e1be5827b23b0da07a20d",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    },
+    {
+      "build": "optimized",
+      "phase": "after",
+      "databaseSHA256": "01c7930fa280b80362d66ca69009537820865fbddadb9a8fb1426e50712c271d",
+      "expectedSHA256": "28966e8c2e0b180ef8b1476bd5d50964a737fd2f6c69443a120dfd32b7024e07",
+      "workerLogSHA256": "4f67094d77e0fd0eaa5cd3d044f3dd54acaf6b7784ee04a52fc8a540c51f234d",
+      "exactTurnAndRunFrames": true,
+      "exactOriginal": true,
+      "exactNativeFingerprint": true,
+      "atomicReceipt": true,
+      "noEcho": true,
+      "exactCacheAccounting": true
+    }
+  ],
+  "actualOld31CompatibilityAudit": {
+    "state": "passed-exact-selected-cases-and-real-frozen31-source-binary-audit",
+    "source": "36a0e66b71133b032cbcf435e01fbfa86e1a68b1",
+    "auditorSHA256": "49e3ae1a07d0a5f7e1cf7d4adad90a9b57f9b9ecb83aa169c79875c7eb606b3c",
+    "postQualificationSHA256": "530fdd030b92578e0b85b9c33d3d5c604ffb1299c1b0802bca3e68b6301babe2",
+    "oldProductionSource": "6105b11a06f5fdc071df4b808f059f1b519a5a3b",
+    "oldSourceFilesVerified": 567,
+    "oldTestBinarySHA256": "591ace33270fdaddfa75c8e52edd1efe1d76bc3d2d95d128dd28c7ac69b236af",
+    "oldProbeSHA256": "0d74c747f38c610852331e11dd53ff9175bf12975d412ffcb07e96d7d7d83a0e",
+    "exactCompatibilityMethods": 4,
+    "allMethodsPassedWithoutSkips": true
+  },
+  "renders": [
+    {
+      "file": "assets/unavailable-scope-history-dark.png",
+      "sha256": "7946e45d47da0ab087aa08e629c1754c6085c8b91c8d741dfb3b95918811ce6a",
+      "logicalWidth": 1320,
+      "logicalHeight": 900,
+      "pixelWidth": 2640,
+      "pixelHeight": 1800,
+      "review": "visually reviewed own-app offscreen render; label and full saved answer visible; not native input/capture acceptance"
+    },
+    {
+      "file": "assets/unavailable-scope-history-light.png",
+      "sha256": "960762254e7778f04271825ec53435778ebc4fb3d6047625bce717ee818da31d",
+      "logicalWidth": 1320,
+      "logicalHeight": 900,
+      "pixelWidth": 2640,
+      "pixelHeight": 1800,
+      "review": "visually reviewed own-app offscreen render; label and full saved answer visible; not native input/capture acceptance"
+    },
+    {
+      "file": "assets/unavailable-scope-compact-dark.png",
+      "sha256": "c4c6da41425fab0776ef45e0d87299880c7aaf781f729e567672b3faa3e410fc",
+      "logicalWidth": 1000,
+      "logicalHeight": 700,
+      "pixelWidth": 2000,
+      "pixelHeight": 1400,
+      "review": "visually reviewed own-app offscreen render; label and full saved answer visible; not native input/capture acceptance"
+    },
+    {
+      "file": "assets/unavailable-scope-compact-light.png",
+      "sha256": "d83b577cb849f1d662ff2df08a2183f176929f6b065605c7c57b591fe9539a94",
+      "logicalWidth": 1000,
+      "logicalHeight": 700,
+      "pixelWidth": 2000,
+      "pixelHeight": 1400,
+      "review": "visually reviewed own-app offscreen render; label and full saved answer visible; not native input/capture acceptance"
+    }
+  ],
+  "performanceReport": "sync-unavailable-scopes-performance-v1.json",
+  "performanceHarness": "harnesses/sync-unavailable-scopes-v1.py",
+  "host": {
+    "architecture": "arm64",
+    "cpu": "Apple M5 Max",
+    "memoryBytes": 137438953472,
+    "macOS": "26.6.2",
+    "swift": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0"
+  },
+  "hostedCI": "pending-at-publication",
+  "featureStatus": "F059 remains TODO; no feature status changed",
+  "retainedFailures": [
+    "Unseen scoped turn blocked sender progress; reused injected native entity ID retargeted saved scope.",
+    "Peer scope rewrite invalidated the admitted cached turn before exact rebinding.",
+    "Actual already-open schema31 writer initially accepted schema32 mutations; new writer guard and typed unavailable selector fix it.",
+    "Calendar scope/snapshot round trips lost the restriction and aliased an unscoped cache key; Markdown incorrectly said Entity:any. Two actual cases had eight failures before the fix.",
+    "An older native-client physical oracle incorrectly required volatile SHM byte equality; durable database/WAL/original payload equality remains required.",
+    "First native qualification was intentionally stopped after green full/sanitizer checks for the calendar/export fix. Second reached process checks; the signed product correctly refused a raw writer, but the smoke oracle did not recognize the new guard name. Exactly one script line changed;815 other inputs, all native source/tests/dependencies and staged binary stay identical. Original logs remain retained."
+  ],
+  "limits": [
+    "Owned fixtures only; no personal corpus, general clipboard, real Keychain/calendar/provider acceptance or device setting changes.",
+    "Native scope metadata, exact originals and process recovery are component checks; no enrolled background sync or two-Mac service is enabled.",
+    "Whole-library/scoped collection and publication epochs, compaction, production current-policy/media/transport, enrollment/recovery/conflict UI and actual providers/two Macs remain unfinished.",
+    "Offscreen own-app renders do not accept Mac input, continuous capture, power, distribution or broad parity/ranking.",
+    "Native deletion timing uses inactive capture and no imported originals; one warm observation per size has no paired/causal/energy/competitor meaning."
+  ],
+  "finishedAtUTC": "2026-11-01T16:38:25.929421+00:00",
+  "retainedPassingStages": 15,
+  "actualCompatibilityCaseBreakdown": {
+    "currentPositiveFixtureCases": 2,
+    "old31CodecCase": 1,
+    "old31InitializedReaderWriterCase": 1
+  }
+}

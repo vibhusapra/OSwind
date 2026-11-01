@@ -80,9 +80,23 @@ class FixtureFunctions(unittest.TestCase):
         with self.assertRaises(sqlite3.OperationalError):
             db.execute("INSERT INTO source VALUES(3)")
 
-    def test_unknown_future_schema_does_not_gain_fixture_functions(self):
+    def test_schema32_owned_writer_never_grants_scope_projection(self):
         db = self.connection()
         db.execute("PRAGMA user_version=32")
+        db.execute("CREATE TRIGGER writer32 BEFORE INSERT ON source BEGIN SELECT oswind_unavailable_scope_writer_v1(); END")
+        register_inactive_sync_fixture(db)
+        db.execute("INSERT INTO source VALUES(1)")
+        self.assertEqual(db.execute("SELECT oswind_unavailable_scope_projection_v1(x'00',x'01')").fetchone(), (0,))
+        db.execute("UPDATE personal_sync_capture SET enabled=1")
+        with self.assertRaises(sqlite3.OperationalError):
+            db.execute("INSERT INTO source VALUES(2)")
+        with self.assertRaises(ValueError):
+            register_inactive_sync_fixture(db)
+        self.assertEqual(db.execute("SELECT oswind_unavailable_scope_projection_v1(x'00',x'01')").fetchone(), (0,))
+
+    def test_unknown_future_schema_does_not_gain_fixture_functions(self):
+        db = self.connection()
+        db.execute("PRAGMA user_version=33")
         with self.assertRaises(ValueError):
             register_inactive_sync_fixture(db)
         with self.assertRaises(sqlite3.OperationalError):

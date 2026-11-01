@@ -29,6 +29,7 @@ public enum QueryScopeResolver {
     private struct Token { var raw: String; var range: NSRange; var quoted: Bool }
     private static let relative = try! NSRegularExpression(pattern:"(?<![\\p{L}\\p{N}_/.-])(?:this morning|this afternoon|this evening|last night|this week|last week|this month|last month|(?:this|last) (?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|(?:past|last) [0-9]{1,4} (?:hours?|days?|weeks?|months?)|today|yesterday)(?![\\p{L}\\p{N}_'’/\\-]|\\.[\\p{L}\\p{N}_])",options:.caseInsensitive)
     public static func resolve(_ input: SearchFilter, now: Date = Date(), timeZone: TimeZone = .current, interpret: Bool = true, canonicalApp: ((String) throws -> String)? = nil) throws -> QueryResolution {
+        try input.requireAvailableEntityScope()
         guard input.query.count <= 4000 else { throw QuerySyntaxError("Keep the search query within 4,000 characters.") }
         var filter = input
         if let app = filter.app, !app.isEmpty { filter.app = try canonicalApp?(app) ?? app }

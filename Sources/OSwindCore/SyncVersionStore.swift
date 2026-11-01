@@ -53,7 +53,7 @@ struct SyncVersionStore {
         "sync_sessions_local":"CREATE INDEX sync_sessions_local ON personal_sync_version_sessions(local_key)",
         "sync_runs_local":"CREATE INDEX sync_runs_local ON personal_sync_version_runs(local_key)"
     ]
-    private static func makeTriggers(overrides:[SyncCanonicalTable:SyncCaptureTable]=[:],projectionProtection:Bool=true,runProtection:Bool=true)->[String:String] {
+    private static func makeTriggers(overrides:[SyncCanonicalTable:SyncCaptureTable]=[:],projectionProtection:Bool=true,runProtection:Bool=true,scopeProtection:Bool=true)->[String:String] {
         var result=[String:String]()
         result["sync_versions_budget"]="CREATE TRIGGER sync_versions_budget BEFORE INSERT ON personal_sync_versions BEGIN SELECT CASE WHEN (SELECT used_bytes+new.bytes+128>budget FROM personal_sync_version_state WHERE singleton=1) THEN RAISE(ABORT,'Sync version cache is full') END; END"
         result["sync_versions_added"]="CREATE TRIGGER sync_versions_added AFTER INSERT ON personal_sync_versions BEGIN UPDATE personal_sync_version_state SET used_bytes=used_bytes+new.bytes+128 WHERE singleton=1; END"
@@ -83,6 +83,7 @@ struct SyncVersionStore {
                 else if table == .conversationCitation || table == .recapCitation {sensitive="CASE WHEN oswind_incoming_binding_projection_v1('\(table.rawValue)',\(schema.snapshot("old")),\(schema.snapshot("new")))=1 THEN 0 ELSE ("+sensitive+") END"}
             }
             if table == .routineRun && runProtection {sensitive="CASE WHEN oswind_incoming_run_projection_v1(\(schema.snapshot("new")))=1 THEN 0 ELSE ("+sensitive+") END"}
+            if table == .turn && scopeProtection {sensitive="CASE WHEN oswind_unavailable_scope_projection_v1(\(schema.snapshot("old")),\(schema.snapshot("new")))=1 THEN 0 ELSE ("+sensitive+") END"}
             if table == .source {result["sync_sessions_source_change"]="CREATE TRIGGER sync_sessions_source_change BEFORE UPDATE OF payload ON memories WHEN json_extract(old.payload,'$.audioSessionID') IS NOT json_extract(new.payload,'$.audioSessionID') BEGIN DELETE FROM personal_sync_version_sessions WHERE local_key=\(key); END"}
             if table == .routineRun {result["sync_runs_recipe_change"]="CREATE TRIGGER sync_runs_recipe_change BEFORE UPDATE OF routine_id,revision ON routine_runs WHEN old.routine_id IS NOT new.routine_id OR old.revision IS NOT new.revision BEGIN DELETE FROM personal_sync_version_runs WHERE local_key=\(key); END"}
             result["sync_versions_\(table.rawValue)_change"]="CREATE TRIGGER sync_versions_\(table.rawValue)_change BEFORE UPDATE OF \(schema.columns.joined(separator:",")) ON \(table.rawValue) WHEN \(sensitive) BEGIN \(purge) END"
@@ -95,6 +96,13 @@ struct SyncVersionStore {
         let check=try db.statement("SELECT 1 FROM sqlite_master WHERE name='personal_sync_version_state'");let present=sqlite3_step(check)==SQLITE_ROW;sqlite3_finalize(check);guard present else {return}
         let legacy=makeTriggers(overrides:[table:CitationSchema.legacy(table)],projectionProtection:false)
         for suffix in ["delete","move","change"] {let name="sync_versions_"+table.rawValue+"_"+suffix,row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name);guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==legacy[name] else {throw OSwindError.database("Legacy citation version protection differs")}}
+    }
+    static func migrateEntityScopeProtection(_ db:RoutineDatabase,sourceVersion:Int32)throws {
+        guard try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_version_state'")>0 else {return}
+        let name="sync_versions_chat_turns_change",legacy=makeTriggers(scopeProtection:false)[name]!,row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);let code=sqlite3_step(row),found=code==SQLITE_ROW ? db.text(row,0):nil;sqlite3_finalize(row)
+        if found==triggers[name] {return}
+        guard sourceVersion<32,found==legacy else {throw OSwindError.database("Unavailable scope version protection differs")}
+        try db.execute("DROP TRIGGER "+name);try db.execute(triggers[name]!)
     }
     static func migrateIncomingRunProtection(_ db:RoutineDatabase,sourceVersion:Int32)throws {
         guard try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='personal_sync_version_state'")>0 else {return}
@@ -179,6 +187,7 @@ struct SyncVersionStore {
         if try database.eraseCount("PRAGMA user_version")>=29 {try RoutineRunOriginalSchema.validate(database)}
         if try database.eraseCount("PRAGMA user_version")>=30 {try SyncIncomingEntitySchema.validate(database)}
         if try database.eraseCount("PRAGMA user_version")>=31 {try SyncIncomingSourceErasureSchema.validate(database)}
+        if try database.eraseCount("PRAGMA user_version")>=32 {try EntityScopeSchema.validate(database)}
         schemaStamp.value=cookie
     }
     private func bind(_ row:OpaquePointer,_ index:Int32,_ data:Data) {data.withUnsafeBytes {_ = sqlite3_bind_blob(row,index,$0.baseAddress,Int32(data.count),database.transient)}}
@@ -270,7 +279,7 @@ struct SyncVersionStore {
                     // A quiet restore preserves provenance while a later catalog
                     // gives canonical objects new lifetimes. Rebuild all native
                     // fields and references; never equate two different packets.
-                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)})
+                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)},unavailableFilterScope:{try self.projectionFilterScope($0,record:value)})
                     let rebuilt=try SyncPortableExporter(references:references).record(identity:identity,row:currentRow(identity))
                     guard try rebuilt.encoded()==value.encoded() else {throw OSwindError.invalid("Run original differs from cached projection")}
                 }
@@ -281,9 +290,11 @@ struct SyncVersionStore {
     func bindProjection(_ reference:SyncVersionReference,references:SyncPortableReferences,admit:(SyncPortableRecord)throws->Void)throws {
         try SyncChangeCapture.transaction(database) {
             try context();guard let record=try self.record(reference,admit:admit) else {throw OSwindError.unavailable("Prepare the exact sync version before binding")}
-            let row=try currentRow(reference.identity),rebuilt=try SyncPortableExporter(references:references).record(identity:reference.identity,row:row)
+            var projectionReferences=references
+            projectionReferences.unavailableFilterScope={try self.projectionFilterScope($0,record:record)}
+            let row=try currentRow(reference.identity),rebuilt=try SyncPortableExporter(references:projectionReferences).record(identity:reference.identity,row:row)
             guard try rebuilt.encoded()==record.encoded() else {throw OSwindError.invalid("Sync projection differs from its original local row")}
-            try record.validateDependencies(conversationIsErased:{try self.isErasedOptionalConversation(record,identity:$0)}) {try resolve($0,content:$1,admit:admit)}
+            try record.validateDependencies(conversationIsErased:{try self.isErasedOptionalConversation(record,identity:$0)},entityScopeIsErased:{try self.isErasedOptionalEntityScope(record,identity:$0)}) {try resolve($0,content:$1,admit:admit)}
             var evidence:String?,entity:String?
             if reference.identity.table == .source,case .blob(let data)=row.cells[8] {let memory=try JSONDecoder().decode(Memory.self,from:data);evidence=memory.evidenceHash;entity=memory.entityRevision}
             try context();guard try currentRow(reference.identity).encoded()==row.encoded(),try stored(reference) != nil else {throw OSwindError.invalid("Sync projection source changed during dependency admission")}
@@ -394,14 +405,23 @@ struct SyncVersionStore {
 
 }
 
-// Only the nullable conversation of an independent run may omit a live lookup.
-// Missing live references and every owning/evidence dependency remain required.
+// Optional run conversations and entity-filter references can omit a live
+// lookup only under their admitted barriers. Entity filters project unavailable;
+// missing live references and all owning/evidence dependencies stay required.
 extension SyncPortableRecord {
-    func liveDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool)throws->[SyncPortableDependency] {
-        guard case .routineRun(let body)=self.body,let conversation=body.conversation else {return dependencies}
+    var scopeFilter:SyncFilterBody? {
+        switch body {case .turn(let value):return value.filter;case .routineRun(let value):return value.filter;default:return nil}
+    }
+    func liveDependencies(conversationIsErased:(SyncObjectIdentity)throws->Bool,entityScopeIsErased:(SyncObjectIdentity)throws->Bool={_ in false})throws->[SyncPortableDependency] {
+        let conversation:SyncObjectIdentity?
+        if case .routineRun(let value)=body {conversation=value.conversation}else{conversation=nil}
+        let entity=scopeFilter?.entity
+        guard conversation != nil || entity != nil else {return dependencies}
         return try dependencies.filter {dependency in
-            guard conversation==dependency.identity,dependency.content==nil else {return true}
-            return try !conversationIsErased(dependency.identity)
+            guard dependency.content==nil else {return true}
+            if dependency.identity==conversation,try conversationIsErased(dependency.identity) {return false}
+            if dependency.identity==entity,try entityScopeIsErased(dependency.identity) {return false}
+            return true
         }
     }
 }
@@ -438,5 +458,51 @@ extension SyncVersionStore {
               let packet=try retainedRunProjection(localRunID:localRunID),case .routineRun(let body)=packet.body,let conversation=body.conversation,
               try isErasedOptionalConversation(packet,identity:conversation) else {return nil}
         return conversation
+    }
+}
+
+extension SyncVersionStore {
+    private var currentScopeProjection:UnavailableEntityScope.Projection {
+        .init(origin:catalog.scope.origin,generation:catalog.scope.generation,group:journal.group,epoch:journal.epoch)
+    }
+    func isErasedOptionalEntityScope(_ record:SyncPortableRecord,identity:SyncObjectIdentity)throws->Bool {
+        try context();guard record.scopeFilter?.entity==identity else {return false}
+        try SyncWireCheck.identity(identity,.entity)
+        return try journal.state(for:identity.key).isDeleted
+    }
+    func projectErasedFilterScope(_ identity:SyncObjectIdentity)throws->UnavailableEntityScope? {
+        try context();try SyncWireCheck.identity(identity,.entity)
+        guard try journal.state(for:identity.key).isDeleted else {return nil}
+        return try .init(original:.init(origin:identity.origin,lifetime:identity.lifetime),projection:currentScopeProjection)
+    }
+    /// The actual cached packet chooses the representation. New outgoing packets
+    /// use explicit unavailable provenance; only an exact older admitted packet
+    /// may reconstruct its reference under this generation's genuine barrier.
+    func projectionFilterScope(_ marker:UnavailableEntityScope,record:SyncPortableRecord)throws->SyncFilterScope {
+        try context();guard let expected=record.scopeFilter else {throw OSwindError.invalid("This packet has no entity filter projection")}
+        if let unavailable=expected.unavailableEntityScope {
+            let emitted=try SyncUnavailableEntityScope(marker)
+            guard emitted==unavailable else {throw OSwindError.invalid("Unavailable scope provenance differs from its packet")}
+            return .unavailable(emitted)
+        }
+        guard let entity=expected.entity,marker.original?.origin==entity.origin,marker.original?.lifetime==entity.lifetime,
+              marker.projection==currentScopeProjection,try isErasedOptionalEntityScope(record,identity:entity) else {throw OSwindError.unavailable("Prepare the exact unavailable scope and current deletion barrier")}
+        return .entity(entity)
+    }
+}
+
+extension SyncVersionStore {
+    var scopeRetirementReferences:SyncPortableReferences {
+        .init(identity:{try self.catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Scope retirement does not fetch source bodies")},media:{_ in throw OSwindError.invalid("Scope retirement has no media")},recipe:{try self.recipeVersion(localID:$0,ordinal:$1,admit:{_ in})},session:{_ in throw OSwindError.invalid("Scope retirement has no session token")},runRecipe:{try self.runRecipe(localRunID:$0,recipeID:$1,ordinal:$2,admit:{_ in})},runOriginal:{try RoutineRunOriginalStore(db:self.database).read($0)},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)})
+    }
+    func retirePeerEntityScopes(_ object:SyncLocalObject,library:MemoryStore)throws {
+        try context()
+        guard object.identity.table == .entity,let primary=object.primary,primary.count==1,case .text(let bytes)=primary[0],let entity=String(data:bytes,encoding:.utf8),let marker=try projectErasedFilterScope(object.identity) else {throw OSwindError.invalid("Use the erased entity's exact native scope")}
+        try library.retireEntityScopes(entity,marker:marker,db:database) {table,id,update in
+            let identity=try self.catalog.localIdentity(table,primary:[.text(Data(id.utf8))]),packet=try self.resolve(identity,content:nil,admit:{_ in})
+            guard packet.scopeFilter?.entity==object.identity else {throw OSwindError.invalid("Stored scope differs from its actual packet")}
+            try self.catalog.applyPeer(identity,primary:[.text(Data(id.utf8))]) {try update()}
+            try self.bindProjection(packet.reference,references:self.scopeRetirementReferences,admit:{_ in})
+        }
     }
 }

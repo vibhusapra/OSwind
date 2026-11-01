@@ -1,0 +1,17 @@
+{
+  "file": "cached-native-schema31.sqlite",
+  "sha256": "8c355b155ca56c7f8a7eac7dfc5dcb35921ffa05c6e76f87172f9adabf703781",
+  "source": "6105b11a06f5fdc071df4b808f059f1b519a5a3b",
+  "sourceSchema": 31,
+  "generatedAtUTC": "2026-11-01T15:46:09.801234+00:00",
+  "probeSHA256": "0d74c747f38c610852331e11dd53ff9175bf12975d412ffcb07e96d7d7d83a0e",
+  "testBinarySHA256": "591ace33270fdaddfa75c8e52edd1efe1d76bc3d2d95d128dd28c7ac69b236af",
+  "cachedTables": {
+    "chat_sessions": 1,
+    "chat_turns": 1,
+    "entity_aliases": 1,
+    "memory_entities": 1
+  },
+  "scope": "Authored exact scoped Unicode question and answer, one curated project, active native capture/catalog/journal/cache; no source evidence/media/models/accounts/credentials. Generated with frozen actual schema31 production sources plus an isolated test-only probe.",
+  "generatorFile": "generation-schema31.swift.txt"
+}

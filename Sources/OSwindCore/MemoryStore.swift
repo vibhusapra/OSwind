@@ -5,7 +5,7 @@ import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
     // Version29 retains data-only peer run provenance without importing execution authority.
-    public static let schemaVersion = 31
+    public static let schemaVersion = 32
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -24,6 +24,7 @@ public final class MemoryStore: @unchecked Sendable {
         set { connectionLock.lock();connection=newValue;if newValue==nil {historicalEvidenceCatalog=nil};connectionLock.unlock() }
     }
     private let lock = NSRecursiveLock()
+    let entityScopeProjection=EntityScopeProjection()
     private var syncCaptureInstalled=false
     // Borrowed only while the store SQL lock is held; reset when it closes.
     var historicalEvidenceCatalog:HistoricalEvidenceStore?
@@ -46,7 +47,7 @@ public final class MemoryStore: @unchecked Sendable {
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
         guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
-        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
+        do {try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
@@ -162,6 +163,7 @@ public final class MemoryStore: @unchecked Sendable {
         let upgradedCitations=try CitationSchema.migrate(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncVersionStore.migrateIncomingRunProtection(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncVersionStore.migrateIncomingSourceProtection(RoutineDatabase(handle:db!),sourceVersion:version)
+        try SyncVersionStore.migrateEntityScopeProtection(RoutineDatabase(handle:db!),sourceVersion:version)
         if missingPins {try SyncVersionStore.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
         if upgradedCitations {try HistoricalEvidenceStore.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)}
         try HistoricalErasureSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
@@ -174,6 +176,7 @@ public final class MemoryStore: @unchecked Sendable {
         try SyncOutgoingWorkQueue.migrateEntityOrdering(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try SyncIdentityCatalog.migrateLookupIndexIfPresent(RoutineDatabase(handle:db!))
+        try EntityScopeSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         if version<22 {try exec(EntitySchema.migrateProjectRejections)}
         if version<15 {try rebuildRecapLinks()}
         try exec("PRAGMA user_version=\(Self.schemaVersion); COMMIT")
@@ -240,11 +243,16 @@ public final class MemoryStore: @unchecked Sendable {
         try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT memory_insert")
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
-        if let before=try get(memory.id),before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash,try !incomingSourceProjection.permits(memory) {
+        let previous=try get(memory.id)
+        if let before=previous,try !incomingSourceProjection.permits(memory) {
+            let changed=before.timestamp.timeIntervalSince1970.bitPattern != memory.timestamp.timeIntervalSince1970.bitPattern || before.kind != memory.kind || [before.title,before.app,before.text].map({Data($0.utf8)}) != [memory.title,memory.app,memory.text].map({Data($0.utf8)}) || before.url.map({Data($0.utf8)}) != memory.url.map({Data($0.utf8)})
+            if changed {try retireEntityScopesForSourceRevision(memory.id,db:RoutineDatabase(handle:db!))}
+        }
+        if let before=previous,before.textObservation != nil || memory.textObservation != nil,before.evidenceHash != memory.evidenceHash,try !incomingSourceProjection.permits(memory) {
             let unpin=try prepare("DELETE FROM text_observation_pins WHERE memory_id=?");defer {sqlite3_finalize(unpin)};bind(unpin,1,memory.id)
             guard sqlite3_step(unpin)==SQLITE_DONE else {throw failure()}
         }
-        if memory.kind == .audio || memory.kind == .screen,let current=try get(memory.id),current.transcript != memory.transcript || current.visualRecording != memory.visualRecording,try !incomingSourceProjection.permits(memory) { try invalidateAudioEvidence(memory.id) }
+        if memory.kind == .audio || memory.kind == .screen,let current=previous,current.transcript != memory.transcript || current.visualRecording != memory.visualRecording,try !incomingSourceProjection.permits(memory) { try invalidateAudioEvidence(memory.id) }
         let stmt = try prepare("INSERT INTO memories(id,timestamp,kind,app,title,url,text,favorite,payload,embedding,embedding_model) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET timestamp=excluded.timestamp,kind=excluded.kind,app=excluded.app,title=excluded.title,url=excluded.url,text=excluded.text,favorite=excluded.favorite,payload=excluded.payload,embedding=excluded.embedding,embedding_model=excluded.embedding_model")
         defer { sqlite3_finalize(stmt) }
         var payload = memory; payload.embedding = nil
@@ -347,6 +355,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
     func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true,rowLocalExpressions:Bool=false) -> (String, [String]) {
+        if filter.unavailableEntityScope != nil {return ("0=1",[])}
         // An inverted interval can otherwise match a span crossing both bounds.
         // Public query resolution reports the error; raw store APIs fail closed.
         if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
@@ -440,6 +449,7 @@ public final class MemoryStore: @unchecked Sendable {
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
     public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, expression:SearchExpressionPlan? = nil, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
+        try filter.requireAvailableEntityScope()
         guard mode != .visual else {throw OSwindError.invalid("Use the visual retrieval engine for appearance search")}
         try Task.checkCancellation()
         var queryPlan = try expression ?? SearchExpressionPlan.make(filter.query)

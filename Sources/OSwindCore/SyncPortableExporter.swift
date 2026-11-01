@@ -14,6 +14,7 @@ struct SyncPortableReferences {
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
     var runOriginal:((String)throws->RoutineRunOriginal?)? = nil
     var erasedRunConversation:((String)throws->SyncObjectIdentity?)? = nil
+    var unavailableFilterScope:((UnavailableEntityScope)throws->SyncFilterScope)? = nil
 }
 /// Converts the actual captured canonical row schema, not raw SQL supplied by a
 /// peer. Reference/media preparation and the writer's current-row/privacy checks
@@ -43,7 +44,7 @@ struct SyncPortableExporter {
         func object(_ name:String,_ table:SyncCanonicalTable)throws->SyncObjectIdentity {
             let result=try references.identity(table,[.text(Data(text(name).utf8))]);try SyncWireCheck.identity(result,table);return result
         }
-        func filter(_ value:SearchFilter)throws->SyncFilterBody {try .init(value) {id in try references.identity(.entity,[.text(Data(id.utf8))])}}
+        func filter(_ value:SearchFilter)throws->SyncFilterBody {try .init(value,unavailable:references.unavailableFilterScope) {id in try references.identity(.entity,[.text(Data(id.utf8))])}}
         func passage()throws->PassageRange? {
             let a=try cell("passage_start"),b=try cell("passage_length")
             if a == .null && b == .null {return nil}

@@ -1,0 +1,42 @@
+import XCTest
+@testable import OSwindCore
+
+// Added only to the frozen schema31 source archive. These are actual old
+// decoder and library implementations; this file is not a mirrored decoder.
+extension SyncIncomingSourceTests {
+    func testLegacy31AlreadyOpenWriterRefusesAfterActual32Upgrade()throws {
+        let (store,cache)=try endpoint("open-legacy31",producerID);defer {try? store.close()}
+        let entity=try store.createEntity(kind:.project,name:"Owned upgrade scope"),chat=try store.createChat(title:"Owned upgrade")
+        _=try store.appendChatTurn(sessionID:chat.id,question:"Keep question",answer:.init(text:"Keep answer",sources:[],provider:"owned",duration:0),filter:.init(entityID:entity.id));try drain(store,cache)
+        let binary=try XCTUnwrap(ProcessInfo.processInfo.environment["OSWIND_CURRENT_SCOPE_CLI"]),process=Process(),out=Pipe(),err=Pipe()
+        process.executableURL=URL(fileURLWithPath:binary);process.arguments=["--data",store.root.path,"stats"];process.standardOutput=out;process.standardError=err;try process.run();process.waitUntilExit()
+        let error=String(decoding:err.fileHandleForReading.readDataToEndOfFile(),as:UTF8.self);XCTAssertEqual(process.terminationStatus,0,error)
+        _=out.fileHandleForReading.readDataToEndOfFile()
+        XCTAssertThrowsError(try store.appendChatTurn(sessionID:chat.id,question:"Old writer must refuse",answer:.init(text:"Must not save",sources:[],provider:"owned",duration:0)))
+        XCTAssertThrowsError(try store.insert(Memory(id:"must-not-save",text:"Old writer must refuse")))
+        XCTAssertEqual(try store.chatTurns(chat.id).count,1);XCTAssertNil(try store.get("must-not-save"))
+        let erase=Process(),eraseError=Pipe(),eraseOutput=Pipe();erase.executableURL=URL(fileURLWithPath:binary);erase.arguments=["--data",store.root.path,"entity","delete",entity.id];erase.standardOutput=eraseOutput;erase.standardError=eraseError;try erase.run();erase.waitUntilExit()
+        XCTAssertEqual(erase.terminationStatus,0,String(decoding:eraseError.fileHandleForReading.readDataToEndOfFile(),as:UTF8.self));_=eraseOutput.fileHandleForReading.readDataToEndOfFile()
+        XCTAssertThrowsError(try store.chatTurns(chat.id),"An already-open old decoder must refuse the new unavailable selector instead of broadening it")
+        print("OWNED_LEGACY31_OPEN actual32Migration=true oldTurnAndSourceWritersRefused=true originalAnswerPresent=true")
+    }
+    func testLegacy31CreatesActualActiveScopedLibraryForUpgrade()throws {
+        XCTAssertEqual(MemoryStore.schemaVersion,31)
+        let (store,cache)=try endpoint("legacy31",producerID);defer {try? store.close()}
+        let entity=try store.createEntity(kind:.project,name:"Owned legacy scope"),chat=try store.createChat(title:"Owned legacy scoped answer")
+        _=try store.appendChatTurn(sessionID:chat.id,question:"Original e\u{301} question",answer:.init(text:"Original 👩🏽‍💻 answer",sources:[],provider:"owned",duration:0),filter:.init(entityID:entity.id));try drain(store,cache)
+        let operation=try XCTUnwrap(cache.journal.outbox().last {$0.key.kind == .turn}),record=try packet(operation,cache)
+        try record.encoded().write(to:root.appendingPathComponent("old-active31.json"),options:.withoutOverwriting)
+        print("OWNED_LEGACY31 library=legacy31 activeScope=true actualOutgoing=true")
+    }
+    func testLegacy31DecoderAcceptsOrdinaryCurrentWireAndRefusesUnavailableRestriction()throws {
+        XCTAssertEqual(MemoryStore.schemaVersion,31)
+        let path=try XCTUnwrap(ProcessInfo.processInfo.environment["OSWIND_LEGACY_SCOPE_WIRE_INPUT"]),input=URL(fileURLWithPath:path)
+        let ordinary=try Data(contentsOf:input.appendingPathComponent("wire-active.json")),unavailable=try Data(contentsOf:input.appendingPathComponent("wire-unavailable.json"))
+        XCTAssertNoThrow(try SyncPortableRecord.decode(ordinary))
+        XCTAssertThrowsError(try SyncPortableRecord.decode(unavailable),"An old decoder must not ignore the unavailable restriction and accept a broad scope")
+        let native=try Data(contentsOf:input.appendingPathComponent("native-unavailable.json"))
+        XCTAssertThrowsError(try JSONDecoder().decode(SearchFilter.self,from:native),"An old native decoder must refuse the typed unavailable selector")
+        print("OWNED_LEGACY31_CODEC ordinaryAccepted=true unavailableRefused=true")
+    }
+}

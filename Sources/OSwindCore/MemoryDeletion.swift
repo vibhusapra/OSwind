@@ -37,7 +37,7 @@ extension MemoryStore {
         try withRoutineDatabase {db in
             defer {try? db.clearErasureSelection()}
             let deleted=try erasureCancellable(db) {try db.transaction {
-                try db.prepareCanonicalErasure(id);return try db.eraseSelectedHistory()
+                try db.prepareCanonicalErasure(id);try retireEntityScopesForErasedSources(db);return try db.eraseSelectedHistory()
             }}
             guard deleted.sources>0 || deleted.historical>0 else {return .empty}
             return cleanupErasedAssets(db,sources:deleted.sources,turns:deleted.turns,histories:deleted.historical)
@@ -53,7 +53,7 @@ extension MemoryStore {
                 let beforeTurns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns")
                 let titles=try db.statement("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE timestamp<?)");defer {sqlite3_finalize(titles)};sqlite3_bind_double(titles,1,before.timeIntervalSince1970);try db.done(titles)
                 let chats=try db.statement("DELETE FROM chat_turns WHERE timestamp<?");defer {sqlite3_finalize(chats)};sqlite3_bind_double(chats,1,before.timeIntervalSince1970);try db.done(chats)
-                _=try db.prepareErasure(.init(end:before));let erased=try db.eraseSelectedHistory()
+                _=try db.prepareErasure(.init(end:before));try retireEntityScopesForErasedSources(db);let erased=try db.eraseSelectedHistory()
                 return .init(sources:erased.sources,turns:beforeTurns-(try db.eraseCount("SELECT COUNT(*) FROM chat_turns")),historical:erased.historical)
             }}
             var result=HistoryErasureResult.empty
@@ -73,7 +73,7 @@ extension MemoryStore {
             while let maxBytes,bytes>maxBytes,!stopped,result.pendingMedia==0,result.searchCacheRemoved,!Task.isCancelled {
                 do {
                     let batch=try erasureCancellable(db) {try db.transaction {
-                        try db.prepareOldestErasure(limit:16);return try db.eraseSelectedHistory()
+                        try db.prepareOldestErasure(limit:16);try retireEntityScopesForErasedSources(db);return try db.eraseSelectedHistory()
                     }}
                     guard batch.sources>0 || batch.historical>0 else {break}
                     // No per-source archive scan. Each bounded oldest-first batch commits and

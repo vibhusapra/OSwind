@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Unavailable entity scopes — component qualified
+
+[Unavailable scopes](SYNC-UNAVAILABLE-SCOPES.md) now preserve exact independent saved answers/run provenance across native/peer deletion, last-source pruning, late arrivals, quiet restore and actual process death. Queries refuse before provider/model work; native and calendar value/JSON round trips cannot broaden the restriction, cache keys retain it, and Markdown explicitly labels it unavailable. Native schema 32 fences old writers and String-based old native decoders. Required owners/evidence and missing live definitions remain strict.
+
+The [33-stage receipt](../benchmarks/sync-unavailable-scopes-v1.json) binds 816 inputs: native source `36a0e66` and final verifier `21f8596` differ only in one Python guard-error whitelist;815 inputs and all native production/tests/dependencies/staged bytes stay identical. Full: **1,933 passes / 95 skips**; sanitizer and optimized: **523 passes / 35 skips each**; all 37 mandatory methods run in all three; **39 native passes /no skips**. Independent review verifies six recovered closed crash databases, exact frames/originals/cache/receipt/accounting, strict 34-file app/archive equality, four owned renders and 32 untouched prior apps. Full/native coverage is 1,970 distinct methods. Actual frozen schema-31 source/binary and current-codec fixtures pass independently audited compatibility controls. Earlier genuine failures, the stopped pre-calendar qualification and the corrected raw-writer oracle remain retained.
+
+[Native metadata observation](../benchmarks/sync-unavailable-scopes-performance-v1.json): one warm CLI deletion per size retires 2,000/20,000 authored turn/run filters in 0.189/1.347 s, with 21.36/29.09 MiB whole-process peak RSS. Full row oracles check 22,000 filters plus unaffected controls/sources. This uses inactive capture, no imported originals and no paired baseline; it measures no peer-sync rate, causal speedup, physical energy or competitive rank.
+
+F059 stays **TODO**. All 83 statuses stay **4 live verified / 45 partial / 6 implemented / 23 tested / 3 TODO / 2 outside desktop v0**, across 20 researched offerings. Publication/collection epochs, compaction, production policy/media/transport, enrollment/recovery/conflict UI, actual providers/two Macs, sustained capture/power and notarized distribution remain open. This component is stacked on #123; its own hosted CI remains separate.
+
 ## Optional conversation sync references — component qualified
 
 [Independent run provenance](SYNC-OPTIONAL-REFERENCES.md) now survives a genuine optional-conversation deletion barrier: unseen runs can import and the same sender can progress; stored originals survive both native and peer deletion. Missing live references remain retryable, fresh lifetimes do not reattach old runs, quiet restore preserves attribution, and missing cached originals refuse instead of losing their wire link. Entity scopes remain required. No schema/wire change or public sync control is added.
