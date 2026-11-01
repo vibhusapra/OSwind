@@ -31,6 +31,68 @@ struct SyncPublicationAdmission {
             result += [try citation.identity.key,try body.link.source.identity.key]
         };return result
     }
+    /// Whole-source erasure still purges its native graph, originals and media.
+    /// Withdraw affected answer projections first so the ordinary native FK /
+    /// derived-retirement collector cannot mistake version invalidation for a
+    /// permanent deletion of every independent future/concurrent owner head.
+    private func withdrawSourceDependents(_ change:SyncJournalChange,admission:MediaAdmissionLease)throws->[SyncPublicationOutcome] {
+        let key=change.revision.key,db=cache.database
+        guard key.kind == .source,change.after.isDeleted else {return []}
+        let local=try cache.catalog.object(for:key),activeKey:Data?
+        if let local,!local.deleted,let primary=local.primary,primary.count==1,case .text(let bytes)=primary[0] {activeKey=bytes}else {activeKey=nil}
+        let selected=try db.preparePeerSourceErasure(key.digest,activeKey:activeKey);defer {try? db.clearErasureSelection()}
+        var owners=[String:SyncObjectIdentity]()
+        func include(_ owner:SyncObjectIdentity)throws {
+            guard owner.table == .turn else {return}
+            owners[try owner.key.digest]=owner
+            guard owners.count<=SyncPublicationQueue.maximumJobs else {throw OSwindError.unavailable("Source withdrawal exceeds durable publication capacity")}
+        }
+        for owner in selected {try Task.checkCancellation();try include(owner)}
+        let affected=try db.statement("SELECT id FROM chat_turns WHERE id IN (\(RoutineDatabase.affectedTurns)) LIMIT 4097");defer {sqlite3_finalize(affected)}
+        var code=sqlite3_step(affected)
+        while code==SQLITE_ROW {
+            try Task.checkCancellation()
+            let size=Int(sqlite3_column_bytes(affected,0))
+            guard sqlite3_column_type(affected,0)==SQLITE_TEXT,size>0,size<=SyncProtocolLimits.operationBytes,let pointer=sqlite3_column_text(affected,0) else {throw OSwindError.database("Source withdrawal answer key differs")}
+            if let owner=try cache.catalog.preparedIdentity(.turn,primary:[.text(Data(bytes:pointer,count:size))]) {try include(owner)}
+            code=sqlite3_step(affected)
+        };guard code==SQLITE_DONE else {throw db.error()}
+        let contiguous=try cache.journal.cursor(for:change.revision.dot.replica)==change.revision.dot.counter-1
+        let appliedContext=try queue.hasApplied(change.revision.context)
+        let reason:SyncPublicationPendingReason=contiguous && appliedContext ? .erasedEvidence:.causalGap
+        // A native-only title scrub would invalidate the conversation's exact
+        // canonical binding and block independent later answers. Publish a real
+        // redacted metadata revision, causally after the authentic erasure root.
+        // Construct it from dates/identity and a fixed title; never retain the
+        // erased title, invoke body policy, fetch originals or admit media.
+        let chats=try db.statement("SELECT id,created,updated FROM chat_sessions WHERE title!='Conversation' AND id IN (SELECT session_id FROM chat_turns WHERE id IN (\(RoutineDatabase.affectedTurns))) LIMIT 4097");defer {sqlite3_finalize(chats)}
+        var redactions=[SyncPortableRecord]();code=sqlite3_step(chats)
+        while code==SQLITE_ROW {
+            let size=Int(sqlite3_column_bytes(chats,0))
+            guard redactions.count<SyncPublicationQueue.maximumJobs,sqlite3_column_type(chats,0)==SQLITE_TEXT,size>0,size<=SyncProtocolLimits.operationBytes,let pointer=sqlite3_column_text(chats,0),let identity=try cache.catalog.preparedIdentity(.conversation,primary:[.text(Data(bytes:pointer,count:size))]) else {throw OSwindError.unavailable("Prepare bounded source-erasure conversation identities")}
+            let record=try SyncPortableRecord(identity:identity,body:.conversation(.init(title:"Conversation",created:Date(timeIntervalSince1970:sqlite3_column_double(chats,1)),updated:Date(timeIntervalSince1970:sqlite3_column_double(chats,2)))))
+            redactions.append(record);code=sqlite3_step(chats)
+        };guard code==SQLITE_DONE else {throw db.error()}
+        if !redactions.isEmpty {
+            try cache.journal.observeAppliedRoot(key)
+            let eraser=SyncIncomingConversationWriter(library:writer.library,cache:cache,admit:{_ in},pathsFor:{_,_ in throw OSwindError.invalid("Redacted conversation metadata cannot contain media")},admitMedia:{_,_,_ in throw OSwindError.invalid("Redacted conversation metadata cannot admit media")})
+            for record in redactions {
+                try Task.checkCancellation();try inbox.publishContent(record.encoded(),reference:record.reference.content)
+                _=try cache.journal.put(key:record.identity.key,content:record.reference.content) {_ in
+                    _=try eraser.apply(record,admission:admission,fetchExactSource:{_ in throw OSwindError.invalid("Redacted conversation metadata cannot fetch evidence")})
+                }
+            }
+        }
+        var outcomes=[SyncPublicationOutcome]()
+        for owner in owners.sorted(by:{$0.key<$1.key}).map(\.value) {
+            try Task.checkCancellation();let state=try cache.journal.state(for:owner.key)
+            if state.isDeleted {try queue.retire(owner.key);continue}
+            guard !state.heads.isEmpty else {continue}
+            try queue.stage(owner,reason:reason,dependencies:[key]);try queue.retractWithheldProjection(owner)
+            outcomes.append(.withheld(reason == .causalGap ? .causalGap:.erasedEvidence))
+        }
+        return outcomes
+    }
     private func offer(_ identity:SyncObjectIdentity,citation:SyncPortableRecord?=nil,admission:MediaAdmissionLease,fetchSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationOutcome {
         try queue.context();let key=try identity.key,state=try cache.journal.state(for:key)
         if state.isDeleted {try writer.applyDeletionBarrier(key,admission:admission);try queue.retire(key);return .retired(key)}
@@ -83,6 +145,7 @@ struct SyncPublicationAdmission {
             try queue.context();var outcomes=[SyncPublicationOutcome]()
             let received=try cache.journal.receive(operation,contentAvailable:{try inbox.content($0) != nil}) {change in
                 if change.after.isDeleted {
+                    outcomes += try withdrawSourceDependents(change,admission:admission)
                     if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
                         let contiguous=try cache.journal.cursor(for:change.revision.dot.replica)==change.revision.dot.counter-1
                         if contiguous,try queue.hasApplied(change.revision.context) {
