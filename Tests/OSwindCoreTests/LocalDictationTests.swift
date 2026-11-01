@@ -36,6 +36,15 @@ import Darwin
         do {try await task.value;XCTFail("Late permission opened microphone")}catch is CancellationError {}catch {XCTFail("Unexpected error \(error)")}
         XCTAssertEqual(made,0)
     }
+    func testFinishDuringPendingAuthorizationRevokesLateMicrophoneStart()async throws {
+        var continuation:CheckedContinuation<Bool,Never>?,made=0
+        let recorder=LocalDictationRecorder(authorize:{await withCheckedContinuation {continuation=$0}},makeEngine:{made+=1;throw OSwindError.invalid("Owned late engine attempt")})
+        let task=Task {try await recorder.start()};try await wait {continuation != nil}
+        XCTAssertThrowsError(try recorder.finish(),"Finish without active PCM reports no recording, while revoking pending authorization")
+        continuation?.resume(returning:true)
+        do {try await task.value;XCTFail("Late microphone start after finish")}catch is CancellationError {}catch {XCTFail("Expected revoked startup, got \(error)")}
+        XCTAssertEqual(made,0,"Finish must not let a late permission response create an engine")
+    }
     func testPrivateWorkspaceWAVAndCleanupWithoutSavingHistory()async throws {
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-dictation-"+UUID().uuidString)
         defer {try? FileManager.default.removeItem(at:root)}

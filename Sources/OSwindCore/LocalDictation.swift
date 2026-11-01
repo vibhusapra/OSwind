@@ -59,6 +59,8 @@ final class DictationPCMBuffer:AudioPCMSink,@unchecked Sendable {
         do {try engine.start()}catch {cancel();throw error}
     }
     public func finish() throws ->[Float] {
+        // Finish also revokes an authorization still awaiting its response.
+        generation=UUID()
         engine?.inputNode.removeTap(onBus:0);engine?.stop();engine=nil
         guard let sink else {throw OSwindError.unavailable("No dictation is recording.")}
         self.sink=nil;return try sink.finish()
