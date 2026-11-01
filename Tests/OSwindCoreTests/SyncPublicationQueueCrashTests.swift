@@ -18,7 +18,7 @@ extension SyncIncomingSourceTests {
             guard code==SQLITE_DONE else {throw db.error()}
         };return frames
     }
-    private func openQueueCrash(_ base:URL)throws->(MemoryStore,SyncVersionStore,SyncPublicationQueue,SyncObjectFolder) {
+    func openQueueCrash(_ base:URL)throws->(MemoryStore,SyncVersionStore,SyncPublicationQueue,SyncObjectFolder) {
         let store=try MemoryStore(root:base.appendingPathComponent("receiver")),cache=try store.withRoutineDatabase {db in
             let catalog=try SyncIdentityCatalog.install(db),journal=try SyncJournal.install(database:db,replica:receiverID,group:group,epoch:epoch)
             return try SyncVersionStore.install(catalog:catalog,journal:journal)

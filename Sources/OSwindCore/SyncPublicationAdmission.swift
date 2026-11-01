@@ -31,7 +31,8 @@ struct SyncPublicationAdmission {
             result += [try citation.identity.key,try body.link.source.identity.key]
         };return result
     }
-    /// Whole-source erasure still purges its native graph, originals and media.
+    /// Whole-source erasure purges its native graph/originals and durably stages
+    /// associated media cleanup; the owning service must drain it after leases.
     /// Withdraw affected answer projections first so the ordinary native FK /
     /// derived-retirement collector cannot mistake version invalidation for a
     /// permanent deletion of every independent future/concurrent owner head.

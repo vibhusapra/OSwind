@@ -6,7 +6,12 @@ extension SyncIncomingSourceTests {
         try SyncObjectFolder.create(at:root.appendingPathComponent(name),secret:SyncGroupSecret(),group:group,epoch:epoch)
     }
     func publicationDrain(_ store:MemoryStore,_ cache:SyncVersionStore,_ space:SyncObjectFolder)throws {
-        let processor=SyncOutgoingProcessor(queue:try .install(catalog:cache.catalog),cache:cache,admitRow:{_,_ in},admitVersion:{_ in},media:{_ in []},retainTurnPublication:{try space.publishContent($1,reference:$0)})
+        let processor=SyncOutgoingProcessor(queue:try .install(catalog:cache.catalog),cache:cache,admitRow:{_,_ in},admitVersion:{_ in},media:{memory in
+            try self.paths(memory).map {role,path in
+                let bytes=try Data(contentsOf:store.root.appendingPathComponent(path)),reference=try SyncContentReference(data:bytes)
+                return SyncMediaManifest(role:role,sha256:reference.sha256,bytes:reference.bytes,chunks:[reference])
+            }.sorted{$0.role.rawValue<$1.role.rawValue}
+        },retainTurnPublication:{try space.publishContent($1,reference:$0)})
         for _ in 0..<2000 {if try processor.step() == .idle {return}}
         throw OSwindError.invalid("Owned publication queue did not drain")
     }
