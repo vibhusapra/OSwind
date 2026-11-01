@@ -17,10 +17,13 @@ extension SyncIncomingSourceTests {
         func hash()throws->String {SHA256.hash(data:try Data(contentsOf:binary)).map{String(format:"%02x",$0)}.joined()}
         guard FileManager.default.isExecutableFile(atPath:binary.path),try hash()==expected else {throw OSwindError.invalid("Use the exact owned qualified prior32 CLI")}
         let child=Process(),input=Pipe(),fm=FileManager.default
+        // The frozen executable runs normally even when this XCTest parent is
+        // sanitized. Do not inject the parent's test runtime into old CLI/lsof.
+        var ordinaryEnvironment=ProcessInfo.processInfo.environment;ordinaryEnvironment.removeValue(forKey:"DYLD_INSERT_LIBRARIES")
         let stdout=root.appendingPathComponent("old32-initialized.stdout"),stderr=root.appendingPathComponent("old32-initialized.stderr")
         XCTAssertTrue(fm.createFile(atPath:stdout.path,contents:nil,attributes:[.posixPermissions:0o600]));XCTAssertTrue(fm.createFile(atPath:stderr.path,contents:nil,attributes:[.posixPermissions:0o600]))
         let output=try FileHandle(forWritingTo:stdout),errors=try FileHandle(forWritingTo:stderr);defer {try? output.close();try? errors.close()}
-        child.executableURL=binary;child.standardInput=input;child.standardOutput=output;child.standardError=errors
+        child.executableURL=binary;child.standardInput=input;child.standardOutput=output;child.standardError=errors;child.environment=ordinaryEnvironment
         defer {try? input.fileHandleForWriting.close();if child.isRunning {_=Darwin.kill(child.processIdentifier,SIGKILL);child.waitUntilExit()}}
         func awaitExit(_ process:Process,seconds:TimeInterval=25)throws {
             let deadline=ProcessInfo.processInfo.systemUptime+seconds
@@ -29,7 +32,7 @@ extension SyncIncomingSourceTests {
             process.waitUntilExit()
         }
         func run(_ executable:URL,_ arguments:[String])throws->(Int32,Data,Data) {
-            let process=Process(),out=Pipe(),err=Pipe();process.executableURL=executable;process.arguments=arguments;process.standardOutput=out;process.standardError=err
+            let process=Process(),out=Pipe(),err=Pipe();process.executableURL=executable;process.arguments=arguments;process.standardOutput=out;process.standardError=err;process.environment=ordinaryEnvironment
             try process.run();try awaitExit(process)
             return (process.terminationStatus,out.fileHandleForReading.readDataToEndOfFile(),err.fileHandleForReading.readDataToEndOfFile())
         }
