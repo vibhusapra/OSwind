@@ -168,6 +168,70 @@ struct SyncIdentityCatalog {
         guard !object.deleted,let primary=object.primary else {return false}
         return try exists(object.identity.table,primary)
     }
+    /// Retract one answer projection, not its global lifetime. The authenticated
+    /// owner register and durable admission job must already exist. Move only
+    /// live, non-revoked bindings out of the deletion trigger's local-key lookup
+    /// for this transaction, delete the old native graph, then restore the exact
+    /// original mappings. No tombstone, deleted flag or revocation is cleared.
+    /// Readers see the old committed graph or no graph; local IDs remain stable.
+    func retractTurnProjection(_ identity:SyncObjectIdentity,journal:SyncJournal,expectedRegisterSHA:String)throws {
+        try scoped {
+            try emptyQueue();try SyncWireCheck.identity(identity,.turn);try SyncProtocolLimits.digest(expectedRegisterSHA)
+            guard journal.database.handle==database.handle else {throw OSwindError.invalid("Use the retraction journal's own connection")}
+            let ownerState=try journal.state(for:identity.key)
+            guard !ownerState.isDeleted,!ownerState.heads.isEmpty,SyncProtocolLimits.hex(try ownerState.encoded())==expectedRegisterSHA else {throw OSwindError.invalid("Retraction requires the exact admitted live owner register")}
+            let pending=try database.statement("SELECT 1 FROM personal_sync_publication_jobs WHERE object_digest=? AND origin=? AND lifetime=? AND state_sha=?");defer {sqlite3_finalize(pending)}
+            database.bind(pending,1,try identity.key.digest);database.bind(pending,2,identity.origin);database.bind(pending,3,identity.lifetime);database.bind(pending,4,expectedRegisterSHA)
+            guard sqlite3_step(pending)==SQLITE_ROW else {throw OSwindError.invalid("Durably stage the exact owner before retracting its projection")}
+            guard let owner=try object(identity),!owner.deleted,let primary=owner.primary else {return}
+            guard primary.count==1,case .text(let id)=primary[0],try current(.turn,Data(SHA256.hash(data:Self.keyFrame(.turn,primary))))?.identity==identity else {throw OSwindError.invalid("Retraction native owner mapping differs")}
+            guard try exists(.turn,primary) else {return}
+            let native=try database.statement("SELECT payload FROM chat_turns WHERE id IS ?");defer {sqlite3_finalize(native)}
+            id.withUnsafeBytes {_=sqlite3_bind_text64(native,1,$0.baseAddress?.assumingMemoryBound(to:CChar.self),UInt64(id.count),database.transient,UInt8(SQLITE_UTF8))}
+            guard sqlite3_step(native)==SQLITE_ROW,let payload=try data(native,0,maximum:SyncRowSnapshot.maximumBytes) else {throw OSwindError.database("Retraction native answer disappeared")}
+            var protected=[(SyncObjectIdentity,[SyncRowCell])]();protected.append((identity,primary))
+            let children=try database.statement("SELECT ordinal FROM chat_sources WHERE turn_id IS ? ORDER BY ordinal LIMIT 61");defer {sqlite3_finalize(children)}
+            id.withUnsafeBytes {_=sqlite3_bind_text64(children,1,$0.baseAddress?.assumingMemoryBound(to:CChar.self),UInt64(id.count),database.transient,UInt8(SQLITE_UTF8))}
+            var count=0,code=sqlite3_step(children)
+            while code==SQLITE_ROW {
+                guard count<60,sqlite3_column_type(children,0)==SQLITE_INTEGER else {throw OSwindError.unavailable("Retraction citation graph exceeds its bound")};count+=1
+                let key:[SyncRowCell]=[.text(id),.integer(sqlite3_column_int64(children,0))]
+                if let child=try preparedIdentity(.conversationCitation,primary:key),try !journal.state(for:child.key).isDeleted {protected.append((child,key))}
+                code=sqlite3_step(children)
+            };guard code==SQLITE_DONE else {throw database.error()}
+            struct Move {let identity:SyncObjectIdentity,before:Data,beforeKey:Data,during:Data,duringKey:Data}
+            let temporary=Data(("projection-retract-"+UUID().uuidString.lowercased()).utf8)
+            let moves:[Move]=try protected.map {object,cells in
+                let revoked=try database.statement("SELECT 1 FROM personal_sync_version_revoked WHERE object_digest=?");defer {sqlite3_finalize(revoked)};database.bind(revoked,1,try object.key.digest)
+                guard sqlite3_step(revoked)==SQLITE_DONE else {throw OSwindError.invalid("Retraction cannot clear or bypass a revoked lifetime")}
+                var next=cells;next[0] = .text(temporary)
+                let before=try Self.keyFrame(object.table,cells),during=try Self.keyFrame(object.table,next),duringKey=Data(SHA256.hash(data:during))
+                guard try current(object.table,duringKey)==nil else {throw OSwindError.invalid("Retraction temporary key collides")}
+                return .init(identity:object,before:before,beforeKey:Data(SHA256.hash(data:before)),during:during,duringKey:duringKey)
+            }
+            func relocate(_ move:Move,restoring:Bool)throws {
+                let old=restoring ? move.duringKey:move.beforeKey,new=restoring ? move.beforeKey:move.duringKey,oldFrame=restoring ? move.during:move.before,newFrame=restoring ? move.before:move.during,digest=try move.identity.key.digest
+                let current=try database.statement("UPDATE personal_sync_identity_current SET local_key=? WHERE table_name=? AND local_key=? AND object_digest=?");defer {sqlite3_finalize(current)}
+                bind(current,1,new);database.bind(current,2,move.identity.table.rawValue);bind(current,3,old);database.bind(current,4,digest);try database.done(current)
+                guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Retraction current mapping changed")}
+                let row=try database.statement("UPDATE personal_sync_identities SET local_key=?,key_frame=? WHERE object_digest=? AND deleted=0 AND local_key=? AND key_frame=?");defer {sqlite3_finalize(row)}
+                bind(row,1,new);bind(row,2,newFrame);database.bind(row,3,digest);bind(row,4,old);bind(row,5,oldFrame);try database.done(row)
+                guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Retraction object mapping changed")}
+            }
+            for move in moves {try Task.checkCancellation();try relocate(move,restoring:false)}
+            try SyncChangeCapture.withoutEcho(database,scope:scope) {
+                let row=try database.statement("DELETE FROM chat_turns WHERE id IS ? AND payload IS ?");defer {sqlite3_finalize(row)}
+                id.withUnsafeBytes {_=sqlite3_bind_text64(row,1,$0.baseAddress?.assumingMemoryBound(to:CChar.self),UInt64(id.count),database.transient,UInt8(SQLITE_UTF8))};bind(row,2,payload);try database.done(row)
+                guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Retraction native answer changed")}
+            }
+            for move in moves {try relocate(move,restoring:true)
+                let revoked=try database.statement("SELECT 1 FROM personal_sync_version_revoked WHERE object_digest=?");defer {sqlite3_finalize(revoked)};database.bind(revoked,1,try move.identity.key.digest)
+                guard sqlite3_step(revoked)==SQLITE_DONE,let object=try readObject(move.identity.key.digest),!object.deleted,try object.primary.map({try Self.keyFrame(move.identity.table,$0)})==move.before else {throw OSwindError.invalid("Retraction changed a lifetime or failed to restore its exact native key")}
+            }
+            guard try !exists(.turn,primary),SyncProtocolLimits.hex(try journal.state(for:identity.key).encoded())==expectedRegisterSHA else {throw OSwindError.invalid("Retraction changed its admitted owner")}
+            try Task.checkCancellation()
+        }
+    }
     func localIdentity(_ table:SyncCanonicalTable,primary:[SyncRowCell])throws->SyncObjectIdentity {
         _=try state();let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
         guard let value=try current(table,key),!value.deleted,value.primary==primary else {throw OSwindError.unavailable("The local sync lifetime is unavailable")};return value.identity

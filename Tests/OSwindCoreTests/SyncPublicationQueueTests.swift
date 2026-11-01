@@ -250,4 +250,57 @@ extension SyncIncomingSourceTests {
             XCTAssertEqual(try f.b.chatTurns(chat.id).first?.answer.text,"Independent newer answer");XCTAssertTrue(try f.queue.isComplete(next.identity));try f.queue.checkAccounting()
         }
     }
+
+    func testPublicationQueueEarlyCitationDeletionCannotRetireUnseenIndependentOwnerHead()throws {
+        try withQueueFixture(citations:1) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),citation=try XCTUnwrap(f.operations.first{$0.key.kind == .conversationCitation}),old=try packet(turn,f.ac)
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            guard case .turn(let body)=old.body else {return XCTFail("Owned turn missing")}
+            let next=try SyncPortableRecord(identity:old.identity,body:.turn(.init(conversation:body.conversation,timestamp:body.timestamp,question:body.question,text:"Independent answer across real sender gap",provider:body.provider,duration:body.duration,warnings:body.warnings,filter:body.filter,timeZone:body.timeZone)))
+            let proof=try SyncTurnPublication(group:group,epoch:epoch,owner:next.reference,citations:[]),update=try f.ac.journal.put(key:turn.key,content:next.reference.content,publication:proof.reference),deletion=try f.ac.journal.delete(key:citation.key)
+            XCTAssertTrue(deletion.context.contains(update.dot))
+            let early=try queueReceive(deletion,f.ac,service)
+            XCTAssertEqual(early.receipt.applied,0,"The replacement must be genuinely absent, not merely lack its declaration")
+            XCTAssertEqual(try count(f.b,"chat_turns"),0,"Erase the stale native answer immediately even across a sender gap")
+            XCTAssertFalse(try f.bc.journal.state(for:turn.key).isDeleted,"A citation's causal clock can hide a valid independent owner update")
+            XCTAssertEqual(try queueRetry(f.ac,service),[.withheld(.causalGap)],"A worker retry must not turn an unresolved causal gap into global deletion")
+            XCTAssertTrue(try f.queue.jobs().isEmpty);XCTAssertEqual(try f.queue.jobs(readyOnly:false).first?.reason,.causalGap)
+            try service.retainDeclaration(proof.encoded(),reference:proof.reference)
+            let lease=try f.b.mediaWriteLease();defer {lease.release()}
+            _=try service.receive(update,record:next,admission:lease,fetchSource:{try XCTUnwrap(f.ac.record($0,admit:{_ in}))})
+            _=try queueRetry(f.ac,service)
+            let chat=try XCTUnwrap(f.b.chats().first)
+            XCTAssertEqual(try f.b.chatTurns(chat.id).first?.answer.text,"Independent answer across real sender gap")
+            XCTAssertTrue(try f.queue.isComplete(next.identity));XCTAssertFalse(try f.bc.journal.state(for:turn.key).isDeleted);try f.queue.checkAccounting()
+        }
+    }
+
+    func testPublicationQueueRetractionPreservesExactLiveCitationKeysAndReprojectsSameEvidence()throws {
+        try withQueueFixture(citations:2) {f in
+            let service=queueService(f.b,f.bc,f.queue,f.inbox),turn=try XCTUnwrap(f.operations.first{$0.key.kind == .turn}),old=try packet(turn,f.ac)
+            try supplyDeclarations(f.operations,f.producer,service)
+            for op in f.operations {_=try queueReceive(op,f.ac,service)}
+            let records=try [old]+f.operations.filter{$0.key.kind == .conversationCitation}.map{try packet($0,f.ac)}
+            let mappings=try records.map{try XCTUnwrap(f.bc.catalog.object($0.identity)).primary},outbox=try f.bc.journal.outbox()
+            guard case .turn(let body)=old.body else {return XCTFail("Owned turn missing")}
+            let next=try SyncPortableRecord(identity:old.identity,body:.turn(.init(conversation:body.conversation,timestamp:body.timestamp,question:body.question,text:"Revised answer with identical declared evidence",provider:body.provider,duration:body.duration,warnings:body.warnings,filter:body.filter,timeZone:body.timeZone)))
+            let proof=try SyncTurnPublication(group:group,epoch:epoch,owner:next.reference,citations:Array(records.dropFirst())),update=try f.ac.journal.put(key:turn.key,content:next.reference.content,publication:proof.reference)
+            let lease=try f.b.mediaWriteLease();defer {lease.release()}
+            _=try service.receive(update,record:next,admission:lease,fetchSource:{try XCTUnwrap(f.ac.record($0,admit:{_ in}))})
+            XCTAssertEqual(try count(f.b,"chat_turns"),0);XCTAssertEqual(try count(f.b,"chat_sources"),0)
+            XCTAssertEqual(try count(f.b,"personal_sync_version_revoked"),0);XCTAssertEqual(try count(f.b,"personal_sync_publication_bindings"),0)
+            XCTAssertEqual(try f.bc.journal.outbox(),outbox);XCTAssertEqual(try count(f.b,"personal_sync_changes"),0)
+            for (index,record) in records.enumerated() {
+                XCTAssertEqual(try f.bc.catalog.object(record.identity)?.primary,mappings[index]);XCTAssertFalse(try XCTUnwrap(f.bc.catalog.object(record.identity)).deleted)
+                XCTAssertFalse(try f.bc.catalog.nativeExists(for:record.identity.key))
+                let row=try f.bc.database.statement("SELECT count(*) FROM personal_sync_versions WHERE object_digest=?");defer {sqlite3_finalize(row)};f.bc.database.bind(row,1,try record.identity.key.digest)
+                XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int64(row,0),0,"Retracted native body cache must be purged")
+            }
+            try service.retainDeclaration(proof.encoded(),reference:proof.reference)
+            guard case .projected=try queueRetry(f.ac,service).first else {return XCTFail("Same live citation lifetimes must reproject without revocation bypass")}
+            for (index,record) in records.enumerated() {XCTAssertEqual(try f.bc.catalog.object(record.identity)?.primary,mappings[index]);XCTAssertTrue(try f.bc.catalog.nativeExists(for:record.identity.key))}
+            XCTAssertEqual(try count(f.b,"personal_sync_version_revoked"),0);XCTAssertTrue(try f.queue.isComplete(next.identity));XCTAssertEqual(try f.bc.journal.outbox(),outbox);try f.queue.checkAccounting()
+        }
+    }
 }

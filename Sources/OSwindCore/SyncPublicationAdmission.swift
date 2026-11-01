@@ -34,10 +34,11 @@ struct SyncPublicationAdmission {
     private func offer(_ identity:SyncObjectIdentity,citation:SyncPortableRecord?=nil,admission:MediaAdmissionLease,fetchSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationOutcome {
         try queue.context();let key=try identity.key,state=try cache.journal.state(for:key)
         if state.isDeleted {try writer.applyDeletionBarrier(key,admission:admission);try queue.retire(key);return .retired(key)}
-        if state.isConflicted {try queue.stage(identity,reason:.conflict);return .withheld(.conflict)}
+        if try queue.deferCausalGap(identity) {return .withheld(.causalGap)}
+        if state.isConflicted {try queue.stage(identity,reason:.conflict);try queue.retractWithheldProjection(identity);return .withheld(.conflict)}
         guard let head=state.preferred,let content=head.content else {try queue.stage(identity,reason:.missingOwner);return .withheld(.missingOwner)}
         let reference=SyncVersionReference(identity:identity,content:content)
-        guard let bytes=try inbox.content(content) else {try queue.stage(identity,reason:.missingOwnerContent);return .withheld(.missingOwnerContent)}
+        guard let bytes=try inbox.content(content) else {try queue.stage(identity,reason:.missingOwnerContent);try queue.retractWithheldProjection(identity);return .withheld(.missingOwnerContent)}
         let owner=try SyncPortableRecord.decode(bytes,expected:reference),publication=try declaration(state)
         // A received unlisted child is not work on the independent owner. Check
         // membership before quota checks so it cannot consume owner capacity or
@@ -47,7 +48,7 @@ struct SyncPublicationAdmission {
         // Storage pressure must not precede authentic evidence retirement.
         // Preflight a genuine deletion using the same declared ownership set.
         let erased=try ([key]+parents).contains{try cache.journal.state(for:$0).isDeleted}
-        if !erased,try !queue.hasBindingCapacity(key) {try queue.stage(identity,reason:.storagePressure,dependencies:parents);return .withheld(.storagePressure)}
+        if !erased,try !queue.hasBindingCapacity(key) {try queue.stage(identity,reason:.storagePressure,dependencies:parents);try queue.retractWithheldProjection(identity);return .withheld(.storagePressure)}
         let coordinator=SyncIncomingTurnPublicationWriter(writer:writer),outcome:SyncPublicationOutcome
         do {
             outcome=try SyncChangeCapture.transaction(cache.database) {
@@ -59,12 +60,12 @@ struct SyncPublicationAdmission {
                 return value
             }
         }catch is SyncPublicationPolicyDenied {
-            try queue.stage(identity,reason:.policyDenied,dependencies:parents);return .withheld(.policyDenied)
+            try queue.stage(identity,reason:.policyDenied,dependencies:parents);try queue.retractWithheldProjection(identity);return .withheld(.policyDenied)
         }
         switch outcome {
         case .projected:break
         case .retired:try queue.retire(key)
-        case .withheld(let reason):if reason != .unlistedCitation {try queue.stage(identity,reason:try .init(reason),dependencies:parents)}
+        case .withheld(let reason):if reason != .unlistedCitation {try queue.stage(identity,reason:try .init(reason),dependencies:parents);try queue.retractWithheldProjection(identity)}
         };return outcome
     }
     /// The immutable encrypted body is retained before receipt. If admission or
@@ -83,9 +84,15 @@ struct SyncPublicationAdmission {
             let received=try cache.journal.receive(operation,contentAvailable:{try inbox.content($0) != nil}) {change in
                 if change.after.isDeleted {
                     if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
-                        try cache.journal.observeAppliedRoot(change.revision.key)
-                        _=try cache.journal.delete(key:owner.key) {try writer.applyDeletion($0,admission:admission)}
-                        try queue.retire(owner.key);outcomes.append(.retired(try owner.key))
+                        let contiguous=try cache.journal.cursor(for:change.revision.dot.replica)==change.revision.dot.counter-1
+                        if contiguous,try queue.hasApplied(change.revision.context) {
+                            try cache.journal.observeAppliedRoot(change.revision.key)
+                            _=try cache.journal.delete(key:owner.key) {try writer.applyDeletion($0,admission:admission)}
+                            try queue.retire(owner.key);outcomes.append(.retired(try owner.key))
+                        }else {
+                            try queue.stage(owner,reason:.causalGap,dependencies:[change.revision.key])
+                            try queue.retractWithheldProjection(owner);outcomes.append(.withheld(.causalGap))
+                        }
                     }
                     try writer.applyDeletion(change,admission:admission)
                     if change.revision.key.kind == .turn {try queue.retire(change.revision.key)}
@@ -103,6 +110,10 @@ struct SyncPublicationAdmission {
                 }
                 try queue.wake(change.revision.key)
             }
+            // A previously applied early deletion may drain without another
+            // callback once predecessors arrive. Wake its bounded reason bucket
+            // after cursor progress so durable work can recheck those cursors.
+            if received.applied>0 {_=try queue.wakeReason(.causalGap)}
             try admission.withActive(for:writer.library.mediaRootIdentity) {};return .init(receipt:received,publications:outcomes)
         }
     }

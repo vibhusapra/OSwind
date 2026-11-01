@@ -3,7 +3,7 @@ import CSQLite
 
 enum SyncPublicationPendingReason:String,Codable,Sendable {
     case legacyDeclaration,missingDeclaration,conflict,missingCitation,changedCitation,missingOwner,replacementRequiresReview
-    case missingOwnerContent,policyDenied,storagePressure
+    case missingOwnerContent,policyDenied,storagePressure,causalGap
     init(_ reason:SyncPublicationWithheld) throws {
         guard let value=Self(rawValue:reason.rawValue) else {throw OSwindError.invalid("Unlisted citations cannot enqueue or change an independent owner")};self=value
     }
@@ -123,6 +123,28 @@ struct SyncPublicationQueue {
         guard frame.cells.count==2,case .text=frame.cells[0],case .integer=frame.cells[1] else {throw OSwindError.database("Declared citation key shape differs")}
         guard let owner=try cache.catalog.preparedIdentity(.turn,primary:[frame.cells[0]]),try isComplete(owner) else {return nil};return owner
     }
+    /// Early barriers are authentic before their causal predecessors have all
+    /// arrived. They can withdraw cached data, but cannot prove the current
+    /// owner declaration is fresh. The contiguous cursors, not the observation
+    /// clock (which includes early tombstones), establish applied context.
+    func hasApplied(_ clock:SyncClock)throws->Bool {
+        try context()
+        for (peer,counter) in clock.counters {if (try cache.journal.cursor(for:peer) ?? 0)<counter {return false}}
+        return true
+    }
+    func deferCausalGap(_ identity:SyncObjectIdentity)throws->Bool {
+        try context()
+        let row=try db.statement("SELECT d.kind,d.digest FROM personal_sync_publication_dependencies d JOIN personal_sync_publication_jobs j ON j.object_digest=d.owner_digest WHERE j.object_digest=? AND j.reason='causalGap' LIMIT 122");defer {sqlite3_finalize(row)};db.bind(row,1,try identity.key.digest)
+        var dependencies=[SyncObjectKey](),waiting=false,code=sqlite3_step(row)
+        while code==SQLITE_ROW {
+            guard dependencies.count<Self.maximumDependencies,let kind=SyncObjectKind(rawValue:db.text(row,0)) else {throw OSwindError.database("Causal gap dependencies exceed their bound")}
+            let key=try SyncObjectKey(kind:kind,digest:db.text(row,1)),state=try cache.journal.state(for:key);dependencies.append(key)
+            if state.isDeleted,try !hasApplied(state.clock) {waiting=true}
+            code=sqlite3_step(row)
+        };guard code==SQLITE_DONE else {throw db.error()}
+        if waiting {try stage(identity,reason:.causalGap,dependencies:dependencies)}
+        return waiting
+    }
     func retire(_ key:SyncObjectKey)throws {
         try context();guard key.kind == .turn,try cache.journal.state(for:key).isDeleted else {throw OSwindError.invalid("Publication retirement requires its genuine answer barrier")}
         try remove(key)
@@ -156,6 +178,15 @@ struct SyncPublicationQueue {
             }
             try context();try Task.checkCancellation()
         }
+    }
+    /// Remove a previously visible answer while its current authenticated head
+    /// is withheld. Actual native deletion keeps every reader/export/backup
+    /// unaware of the old body, without changing global lifetime authority.
+    func retractWithheldProjection(_ identity:SyncObjectIdentity)throws {
+        try context();let state=try cache.journal.state(for:identity.key)
+        guard !state.isDeleted,!state.heads.isEmpty else {return}
+        try cache.catalog.retractTurnProjection(identity,journal:cache.journal,expectedRegisterSHA:SyncProtocolLimits.hex(state.encoded()))
+        try context()
     }
     private func remove(_ key:SyncObjectKey)throws {
         let row=try db.statement("DELETE FROM personal_sync_publication_jobs WHERE object_digest=?");defer {sqlite3_finalize(row)};db.bind(row,1,key.digest);try db.done(row)
