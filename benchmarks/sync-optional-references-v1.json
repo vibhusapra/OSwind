@@ -1,0 +1,263 @@
+{
+  "format": "OSwind optional conversation reference qualification",
+  "version": 1,
+  "state": "passed-owned-software-native-process-and-independent-recovery-review",
+  "overallV0Complete": false,
+  "schema": 31,
+  "source": "5aa0c10d311b39b0189d6f797e36a73b1d9f7afe",
+  "branch": "codex/sync-optional-references",
+  "parent": {
+    "pr": "https://github.com/vibhusapra/OSwind/pull/122",
+    "branch": "codex/narrated-workflow",
+    "hostedRun": 41308069017,
+    "bothJobs": "success"
+  },
+  "scope": "Independent completed/imported run provenance across a genuine optional-conversation deletion barrier. Internal component only; F059 remains TODO. Missing-live and entity/owner/evidence dependencies remain required.",
+  "inputs": {
+    "trackedRepositoryFiles": 804,
+    "manifestSHA256": "40404c6c7cae735cfc4d8bbc6bd5da5c281c432c2487e994df75f78c451ca633",
+    "allSourceGitBlobsVerified": true
+  },
+  "review": {
+    "receiptSHA256": "bda4ef6018f29ab0c5c157bfbd571096afa5dc43616698c52ab025a5f276f001",
+    "sourceAndStageLogHashesVerified": true,
+    "mandatoryMethodsAllThreeBuilds": 13,
+    "retainedCrashDatabases": 6,
+    "distinctFullAndNativePassMethods": 1933,
+    "protectedEarlierAppsUnchanged": 30
+  },
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "wallSeconds": 346.094962624833,
+      "logSHA256": "b9bfd8b3667bc45034d1e344a4ec280590fa8f1ce92f3d2ee79cc447bdc29355",
+      "tests": {
+        "defined": 1990,
+        "passed": 1896,
+        "skipped": 94,
+        "failures": 0
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "wallSeconds": 230.94142254116014,
+      "logSHA256": "175d71bbafb456d0c67e37a5d569571c82f0e6af9ab7638d4962538100c22690",
+      "tests": {
+        "defined": 465,
+        "passed": 433,
+        "skipped": 32,
+        "failures": 0
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "wallSeconds": 232.51094624982215,
+      "logSHA256": "15cbfbabd8d7e01cd64e0ff57a0d09b650bafb44f533adc2a7d561569542e2e4",
+      "tests": {
+        "defined": 465,
+        "passed": 433,
+        "skipped": 32,
+        "failures": 0
+      }
+    },
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "wallSeconds": 198.8749037499074,
+      "logSHA256": "12ec3c9cc2a26f221d741218b5dc3584c30ee0a868b9575ef1d132b91a32c161",
+      "tests": {
+        "defined": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "wallSeconds": 119.17998450016603,
+      "logSHA256": "95af53f705f9c5bb507d697ddb713174df05e214cd911c0ec6a3f7ecfc240954"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "wallSeconds": 0.979690499836579,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "wallSeconds": 1.0884634999092668,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "wallSeconds": 4.997214416973293,
+      "logSHA256": "7106b7e844f5f62018a26a0bd1bebf848bbdf6a6e0c266e4a35abc2ccb18483a"
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "wallSeconds": 0.5662367918994278,
+      "logSHA256": "8a97992fd5c6ce2462f4bef1627fbbe666d33715017260cd71a48ca3cc2e8ad2"
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "wallSeconds": 1.6116294160019606,
+      "logSHA256": "ee6d9008db7164aa3c3d0829090b1f80c11367a652bff238f9e9d04327d3dc5f"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "wallSeconds": 0.9980369592085481,
+      "logSHA256": "f48bf50ff4d516ef960f39837380e9c6aad39d2e5a4467a54ffd90b867e72218"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "wallSeconds": 17.748324709013104,
+      "logSHA256": "14ea12a28ada7974533cf2b83f960c6e01ec6643f346504ccfe9c269d7bdaa64"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "wallSeconds": 7.871164791984484,
+      "logSHA256": "e6f75289587a0c9a51545486ea2ce245431188cbcd0b47ad108d62cb763fe99f"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "wallSeconds": 6.406169041991234,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "wallSeconds": 1.2423331658355892,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "wallSeconds": 0.1137597500346601,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "wallSeconds": 0.03976066713221371,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "wallSeconds": 0.03851237497292459,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "crashRecovery": {
+    "state": "passed",
+    "receiptSHA256": "1c81d5ef58232df8af4e99adaf9fcf6b49bf56af5e43a0875b80ca06b88dab66",
+    "cases": [
+      {
+        "build": "debug",
+        "phase": "before",
+        "databaseSHA256": "f999143b3accd6d750b7ac7378c4d1ffb6f0542d73dad20e90d520413d3e6090",
+        "expectedSHA256": "a15a801f63e1d3524735d24233f078da21ab179fee8ffca73bf2fff41bf410a4",
+        "workerLogSHA256": "472abcdec7632b1a407135d970c548193a09409bf7a4ce2bff2510d32bf06d63",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      },
+      {
+        "build": "debug",
+        "phase": "after",
+        "databaseSHA256": "113db77a61946bcb39aa4652ce0ee3960ccc88fe778d3c93b54f011abe71dfc3",
+        "expectedSHA256": "56c59bb77fc372ce18259661f1717ff834e077833186a2e53291a6790b317559",
+        "workerLogSHA256": "d197abc8dc6cb13dc5dae9d3983aa9efbf83ce2a9b2ba99e152c0f336f193e50",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      },
+      {
+        "build": "thread-sanitizer",
+        "phase": "before",
+        "databaseSHA256": "23685fc6a51cfd4b0ed9e797a5d5b499ef83c616c612143411767e417a584569",
+        "expectedSHA256": "646a543fb1012254a3e10c3c631b94b5426e7bf5b8d09ba583434bb6abc50878",
+        "workerLogSHA256": "f3b3297d796b6785d941a5a422984b698df40d0916d1a91df47247c3f44c71af",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      },
+      {
+        "build": "thread-sanitizer",
+        "phase": "after",
+        "databaseSHA256": "bc2ca83adbc145d6a7014231f36cf1018dde8331e0483c222fcf81818ea8fe73",
+        "expectedSHA256": "5600167fc4e83a1c526b0a7938a7701c38f214a4be88cdb5e5e2676a439eb118",
+        "workerLogSHA256": "41561f39052c5fba83385c34ec33def9355fd70970151c61ddb16edee830558a",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      },
+      {
+        "build": "optimized",
+        "phase": "before",
+        "databaseSHA256": "a64e7c13f0f8d7840ee1d89dc736709bfdecd4c654d643b02a352c5e7654dabd",
+        "expectedSHA256": "663215fca236164d5744ae70b151c0ed6682302b2b47aea37114f68e3232b144",
+        "workerLogSHA256": "62f3a170e01c7e489d1795769255332877b89f99ea581a1c183ba3bf062427e5",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      },
+      {
+        "build": "optimized",
+        "phase": "after",
+        "databaseSHA256": "e6f9bcc78e46a810d361e7dea3c77fa6abf4c15250d07c8a5c00c147be36bbeb",
+        "expectedSHA256": "211166bc84b720a735c585f893e5cd44a6bc7cc58c9bb26072c795b8b4eb0ea1",
+        "workerLogSHA256": "c2d2ea251bb27d653dfff7b2ad8416c8bd6ebcdfa41251d2bdd4a85bd6f7fb4d",
+        "exactOriginal": true,
+        "exactNativeFingerprint": true,
+        "atomicReceipt": true,
+        "noEcho": true
+      }
+    ]
+  },
+  "package": {
+    "stagedFiles": 34,
+    "strictAdHocSignaturesVerified": true,
+    "archiveExtractionEqual": true,
+    "appSHA256": "b89794388d063659d1e50b29d9cd4538ed3e6941a4cf3299a82f1a005e6ce8ec",
+    "cliSHA256": "4653944db3460c0f7324fbe6f2484056c1fd88cad85c3332f8302347e883d188",
+    "zipSHA256": "7f577be82aee18e937cbd6b1626bc36ce0e39e592941d1aa06bf582a41c0db9c"
+  },
+  "retainedFailures": [
+    "Unseen run blocked by erased nullable conversation; existing run loses original after native FK nulling.",
+    "Preparation inside suppressed catalog mutation refused; preparation moved before suppression.",
+    "Cache-body corruption allowed optional reference to disappear; exact cached packet is now required.",
+    "Deletion preparation invoked eager recipe body-policy callback; deletion-specific references remove that lookup.",
+    "Focused control fixture expected prebootstrap null instead of unavailable; 130-run fixture initially read only default 128 outbox records.",
+    "Crash fixture compile errors and erroneous retained-conversation-version count preserved separately.",
+    "Qualification-v1 bootstrap used nonexistent historical voice-app path and stopped before tests; v2 protects the actual 30 previous app trees."
+  ],
+  "hostedCI": {
+    "state": "pending-at-publication",
+    "note": "Parent122 has both jobs successful; this child published head requires its own hosted run."
+  },
+  "limits": [
+    "Owned fixture membership is not network authentication or peer enrollment acceptance.",
+    "No public sync service/UI, complete entity-scope deletion, publication/collection epochs, compaction, production media/policy/transport/providers or two physical Macs.",
+    "No changed model/UI sources; earlier actual model/narration/layout results are historical frozen evidence.",
+    "No native desktop input/capture, sustained energy, notarization/updates or competitor-ranking acceptance."
+  ],
+  "finishedAtUTC": "2026-11-01T13:59:20.637976+00:00"
+}

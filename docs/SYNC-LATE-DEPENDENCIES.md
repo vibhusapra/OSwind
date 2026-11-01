@@ -41,7 +41,7 @@ The finalized 23-case selection passes 22 / one worker skip. The same exact fixt
 ## Remaining delivery gates
 
 - Verify early out-of-order parent tombstones followed by unseen children while predecessor gaps remain.
-- Preserve optional deleted references separately: an erased entity filter must not become an unscoped query; deleting an independent optional conversation must not delete an unrelated run or discard exact original provenance. These paths are unimplemented.
+- Preserve optional erased entity scopes without turning them into unscoped queries; this path remains unimplemented. Optional run conversations are now separately [qualified](SYNC-OPTIONAL-REFERENCES.md), preserving exact independent provenance across native/peer deletion and late arrival. Complete synchronization remains TODO.
 - Add publication-group/epoch visibility before exposing an answer whose citation edges have not arrived. Per-record retirement cannot infer unseen edges.
 - Finish scoped/wipe collection barriers, compaction, production policy/media/transport admission, service/enrollment/recovery/conflict UI and actual providers/two-Mac acceptance.
 - Measure candidate-only late-record scale; positive-path pairs below are complete. Warm component results do not establish physical power, native sustained capture, distribution or competitor rank.

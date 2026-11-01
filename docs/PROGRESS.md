@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Optional conversation sync references — component qualified
+
+[Independent run provenance](SYNC-OPTIONAL-REFERENCES.md) now survives a genuine optional-conversation deletion barrier: unseen runs can import and the same sender can progress; stored originals survive both native and peer deletion. Missing live references remain retryable, fresh lifetimes do not reattach old runs, quiet restore preserves attribution, and missing cached originals refuse instead of losing their wire link. Entity scopes remain required. No schema/wire change or public sync control is added.
+
+The [804-input/source-Git receipt](../benchmarks/sync-optional-references-v1.json) passes all 18 stages at `5aa0c10`: **1,896 full passes / 94 explicit skips**, **433 sanitizer and 433 optimized passes / 32 skips each**, all 13 mandatory new methods in all three builds, and **39 native vault passes / no skips**. Six retained crash databases pass independent original/native-frame/cache/receipt review. Strict signed 34-file app/archive equality, API/MCP/SDK/chat/recap/backup and process-interruption checks pass; all 30 prior app trees remain unchanged. Full/native coverage is 1,933 distinct methods. Earlier genuine and harness failures remain retained.
+
+The [single warm metadata observation](../benchmarks/sync-optional-references-performance-v1.json) verifies 11,000 exact originals and twenty prior packets at 1k/10k runs. It uses positive-path records without optional conversations and measures no detachment latency. One observation per size, uncontrolled caches/background/thermal state and no paired baseline establish no causal speedup, energy result or rank.
+
+F059 stays **TODO**. Counts stay **4 live verified / 45 partial / 6 implemented / 23 tested / 3 TODO / 2 outside desktop v0**, across 83 requirements and 20 offerings. Complete entity-scope deletion, publication/collection epochs, compaction, production policy/media/transport, service/enrollment/recovery/conflict UI, actual providers/two Macs, sustained capture/power and notarized distribution remain open. Parent #122 passes both hosted jobs in run 41308069017; the new child published head needs separate hosted CI.
+
 ## Narrated workflow export — locally qualified, native interaction open
 
 F081 moves from TODO to **partial**. [Workflows](NARRATED-WORKFLOWS.md) now provides retained-source/replay-frame review, edited scripts/order/titles, source refresh/opening, a dedicated app workspace, local-helper setup, explicit new-folder export, portable timing/captions/manifests and pause/lock/erasure/switch/Quit drainage. Rendering uses offline stock Kokoro `af_heart` at speed 1.0 and hardware-required H264/AAC; editing alone performs no rendering.

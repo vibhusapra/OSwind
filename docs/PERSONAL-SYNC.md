@@ -2,6 +2,8 @@
 
 In development. F059 remains TODO until a user can pair devices and synchronize the complete supported library. The protocol below is a foundation, not delivered sync or a replacement for the existing complete backup/restore feature.
 
+The latest internal component qualifies [optional conversation references](SYNC-OPTIONAL-REFERENCES.md): preserve independent exact run provenance across deletion, late arrival, quiet restore, rollback/cancellation and actual pre/postcommit death. This does not enable the service or change F059; erased entity scopes, collection/publication epochs, production media/policy/transport and enrollment/provider/two-device delivery remain required. Older component checklists below describe their dated milestones.
+
 ## Delivery requirements
 
 | Requirement | Implementation / acceptance gate |
