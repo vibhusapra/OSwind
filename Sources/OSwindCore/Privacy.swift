@@ -94,6 +94,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var automaticMaintenance = true
     public var apiEnabled = false
     public var meetings = MeetingContextConfiguration()
+    public var mcpConnections=[MCPConnectionProfile]()
     public var routinesEnabled = false
     public var entityAutomaticIndex = false
     public var nativeModelRetention:NativeModelRetention = .twoMinutes
@@ -106,7 +107,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var whisperModel = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Caches/OSwind/models/ggml-base.en.bin").path
     public var transcriptionLanguage = "en"
     public init() {}
-    enum CodingKeys: String, CodingKey { case profile,privacy,piiImports,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,meetings,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
+    enum CodingKeys: String, CodingKey { case profile,privacy,piiImports,visualCaptureMode,allDisplays,snapshotRegions,captureOnLaunch,ai,search,automaticMaintenance,apiEnabled,meetings,mcpConnections,routinesEnabled,entityAutomaticIndex,nativeModelRetention,speech,diarization,retainAudio,audioEnabled,systemAudioEnabled,whisperBinary,whisperModel,transcriptionLanguage }
     public init(from decoder: Decoder) throws {
         self.init(); let c = try decoder.container(keyedBy:CodingKeys.self)
         profile = try c.decodeIfPresent(CaptureProfile.self,forKey:.profile) ?? profile
@@ -124,6 +125,8 @@ public struct AppSettings: Codable, Equatable, Sendable {
         // Malformed calendar preferences never broaden selection or start a service.
         if c.contains(.meetings) {meetings=(try? c.decode(MeetingContextConfiguration.self,forKey:.meetings)) ?? MeetingContextConfiguration()}
         if (try? meetings.validate()) == nil {meetings=MeetingContextConfiguration()}
+        if c.contains(.mcpConnections) {mcpConnections=(try? c.decode([MCPConnectionProfile].self,forKey:.mcpConnections)) ?? []}
+        if (try? MCPConnectionProfile.validate(mcpConnections)) == nil {mcpConnections=[]}
         routinesEnabled = try c.decodeIfPresent(Bool.self,forKey:.routinesEnabled) ?? routinesEnabled
         entityAutomaticIndex = try c.decodeIfPresent(Bool.self,forKey:.entityAutomaticIndex) ?? entityAutomaticIndex
         diarization = try c.decodeIfPresent(DiarizationConfiguration.self,forKey:.diarization) ?? diarization

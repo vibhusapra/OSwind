@@ -8,6 +8,9 @@ public struct MCPServerCommand:Codable,Equatable,Sendable {
     /// time and are never encoded into this configuration or its review record.
     public var credentialNames:[String]
     public init(executable:String,arguments:[String]=[],credentialNames:[String]=[]) {self.executable=executable;self.arguments=arguments;self.credentialNames=credentialNames}
+    public static func ==(a:Self,b:Self)->Bool {
+        Data(a.executable.utf8)==Data(b.executable.utf8) && a.arguments.map {Data($0.utf8)}==b.arguments.map {Data($0.utf8)} && a.credentialNames.map {Data($0.utf8)}==b.credentialNames.map {Data($0.utf8)}
+    }
     public func validate()throws {
         guard executable.hasPrefix("/"),executable.utf8.count<=4096,!executable.utf8.contains(0),arguments.count<=64,arguments.reduce(0,{$0+$1.utf8.count})<=32768,arguments.allSatisfy({!$0.utf8.contains(0)}),credentialNames.count<=32,Set(credentialNames).count==credentialNames.count else {throw OSwindError.invalid("Use an absolute MCP executable and bounded argument array")}
         for name in credentialNames {
@@ -86,6 +89,10 @@ public enum MCPClient {
         try await perform(command,credentials:credentials) {wire,identity in
             let version=try wire.negotiate();let review=try MCPToolReview(commandFingerprint:identity,protocolVersion:version,tools:wire.tools(version));try review.validate();return review
         }
+    }
+    public static func validateArgumentsJSON(_ data:Data)throws {
+        let value=try MCPValue.decode(data,maximum:65536)
+        guard value.fields != nil else {throw OSwindError.invalid("MCP arguments must be a JSON object")}
     }
     /// The caller must explicitly review the exact tool and JSON arguments.
     /// Annotations are descriptive and never grant read-only/write authority.

@@ -116,7 +116,7 @@ import OSwindCore
         }.defaultSize(width:1320,height:850)
             .commands { CommandGroup(after:.newItem) {
                 Button("Search memories") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); NotificationCenter.default.post(name:.oswindFocusSearch,object:nil) }.keyboardShortcut("k")
-                Button(session.model?.isCollecting == true ? "Pause collection" : "Resume collection") { session.model?.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]).disabled(session.model == nil)
+                Button(session.model?.hasPausableWork == true ? "Pause" : "Resume capture") { session.model?.toggleCapture() }.keyboardShortcut("p",modifiers:[.command,.shift]).disabled(session.model == nil)
                 Button("Settings…") { if let model = session.model {model.showSettings=true} else {NotificationCenter.default.post(name:.oswindOpenMain,object:nil)} }.keyboardShortcut(",")
             } }
         MenuBarExtra {
@@ -134,7 +134,7 @@ struct LibraryMenuContent: View {
         VStack(alignment:.leading,spacing:12) {
             Text("OSwind").font(.headline); Text(model.meetings.active && !model.isCapturing ? "Calendar context active":model.capture.status).font(.caption)
             Button("Open OSwind  ⇧⌘Space") { NotificationCenter.default.post(name:.oswindOpenMain,object:nil) }
-            Button(model.isCollecting ? "Pause collection" : "Resume collection") { model.toggleCapture() }
+            Button(model.hasPausableWork ? "Pause" : "Resume capture") { model.toggleCapture() }
             Menu("Pause for…") { ForEach([5,15,30,60],id:\.self) { minutes in Button("\(minutes) minutes") { model.pauseFor(minutes:minutes) } } }
             Button("Capture now") { Task { await model.captureNow() } }
             Button(model.audio.running ? "Stop audio" : "Start audio") { Task {await model.toggleAudio()} }

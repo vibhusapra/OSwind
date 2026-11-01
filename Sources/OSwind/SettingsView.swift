@@ -226,6 +226,10 @@ struct SettingsView: View {
     private var connect: some View {
         Group {
             MeetingSettingsSections(model:m.meetings)
+            Section("External MCP tools") {
+                Text("Connect selected local servers, review exact tool calls and save only the result text you choose. No server starts automatically.").font(.caption).foregroundStyle(.secondary)
+                Button("Open tools workspace") {m.section="Tools";dismiss()}
+            }
             Section("Local API") {
                 Toggle("Enable authenticated loopback API",isOn:Binding(get:{m.settings.apiEnabled},set:{if $0 { m.startAPI() } else { m.stopAPI() }}))
                 Text(m.apiStatus).font(.caption)

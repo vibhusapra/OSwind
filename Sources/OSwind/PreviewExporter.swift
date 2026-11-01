@@ -12,7 +12,12 @@ import OSwindCore
             if dimensions.count == 2 { size = NSSize(width:max(1000,min(3000,dimensions[0])),height:max(680,min(2000,dimensions[1]))) }
         }
         let content: AnyView
-        if model.section == "ContextualDraft" {
+        if ["ToolsReady","ToolsCompact","ToolsResult","ToolsReview","ToolsEmpty","ToolsSetup"].contains(model.section) {
+            let stage=model.section,tools=try await MCPToolsPreview.make(store:model.store,stage:stage)
+            if stage=="ToolsReview",let review=tools.pendingReview {size=NSSize(width:680,height:720);content=AnyView(MCPActionReviewView(review:review,cancel:{},confirm:{}))}
+            else if stage=="ToolsSetup" {size=NSSize(width:700,height:680);content=AnyView(MCPConnectionsView(model:tools))}
+            else {size=stage=="ToolsCompact" ? NSSize(width:770,height:570):NSSize(width:1100,height:780);content=AnyView(MCPToolsView(model:tools).environmentObject(model))}
+        } else if model.section == "ContextualDraft" {
             let answer=Answer(text:"Yesterday, we finished the release checklist and agreed to keep the rollout small [1].\n\nToday, I’m checking the remaining regressions. Maya owns the release decision; the deadline is Friday [2].\n\nBlocker: the final device check is still open.",sources:[.init(memory:Memory(id:"draft-sample-1",app:"Notes",title:"Release checklist · sample",text:"We finished the release checklist and agreed to keep the rollout small."),score:1,match:"sample"),.init(memory:Memory(id:"draft-sample-2",app:"Notes",title:"Release owner · sample",text:"Maya owns the release decision. The deadline is Friday. The final device check is still open."),score:1,match:"sample")],provider:"Local model · sample",duration:0)
             model.drafting.review(answer,validate:{})
             size=NSSize(width:760,height:710);content=AnyView(ContextualDraftView(draft:model.drafting,privacy:model.settings.privacy))

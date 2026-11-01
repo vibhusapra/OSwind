@@ -17,7 +17,7 @@ struct WorkspaceView: View {
                 ScrollViewReader {navigation in
                     ScrollView {
                         VStack(spacing:0) {
-                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Calendar","calendar"),("Meetings","person.2.wave.2"),("People & projects","person.2"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
+                ForEach([("Memories","square.stack.3d.up"),("Ask","sparkles"),("Timeline","clock"),("Calendar","calendar"),("Meetings","person.2.wave.2"),("Tools","puzzlepiece.extension"),("People & projects","person.2"),("Conversations","waveform"),("Saved","bookmark"),("Notes","note.text"),("Recaps","sun.max"),("Routines","calendar.badge.clock"),("Insights","chart.bar.xaxis")],id:\.0) { item in
                     Button { m.section = item.0; m.refresh() } label: { HStack(spacing:12) { Image(systemName:item.1).frame(width:20); Text(item.0); Spacer(); if item.0 == "Memories" { Text("\(m.stats.count)").font(.caption).monospacedDigit() } }.padding(.horizontal,14).padding(.vertical,11).background(m.section == item.0 ? accent.opacity(0.16) : .clear,in:RoundedRectangle(cornerRadius:9)) }.buttonStyle(.plain).padding(.horizontal,12).padding(.bottom,3).id(item.0)
                 }
                         }
@@ -50,23 +50,24 @@ struct WorkspaceView: View {
                 }
                 if m.openingMemoryID != nil { HStack { ProgressView().controlSize(.small); Text("Opening complete source…").font(.caption); Spacer(); Button("Cancel") { m.cancelOpeningMemory() } }.padding(10) }
                 HStack {
-                    HStack(spacing:7) { Circle().fill(m.isCollecting ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running && m.audio.running ? "SCREEN + AUDIO" : m.capture.running ? "CAPTURING" : m.audio.running ? "AUDIO" : m.meetings.active ? "CALENDAR" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
+                    HStack(spacing:7) { Circle().fill(m.hasPausableWork ? accent : .secondary).frame(width:7,height:7); Text(m.capture.running && m.audio.running ? "SCREEN + AUDIO" : m.capture.running ? "CAPTURING" : m.audio.running ? "AUDIO" : m.meetings.active ? "CALENDAR" : m.tools.busy ? "TOOLS ACTIVE" : "PAUSED").font(.system(size:10,weight:.semibold,design:.monospaced)); Text("/ \(m.settings.profile.rawValue.capitalized)").font(.caption).foregroundStyle(.secondary) }
                     Spacer()
                     if m.demo { Text("SAMPLE DATA").font(.system(size:10,weight:.bold,design:.monospaced)).padding(6).background(.orange.opacity(0.12),in:Capsule()) }
                     Button { showNote = true } label: { Label("Quick note",systemImage:"plus") }.buttonStyle(.borderless)
-                    Button { m.toggleCapture() } label: { Label(m.isCollecting ? "Pause" : "Resume",systemImage:m.isCollecting ? "pause.fill" : "play.fill") }.buttonStyle(.bordered)
+                    Button { m.toggleCapture() } label: { Label(m.hasPausableWork ? "Pause" : "Resume capture",systemImage:m.hasPausableWork ? "pause.fill" : "play.fill") }.buttonStyle(.bordered)
                 }.padding(.horizontal,30).padding(.vertical,18)
                 Divider().opacity(0.5)
                 if let scope=m.entityScope {HStack {Label("Sources linked to "+scope.name,systemImage:"person.crop.rectangle.stack").font(.caption);Spacer();Button("Clear scope") {m.entityScope=nil;m.refresh()}}.padding(.horizontal,28).padding(.vertical,10).background(accent.opacity(0.08))}
                 if m.section == "People & projects" {EntityMemoryView(model:m.entityMemory).environmentObject(m)}
                 else if m.section == "Ask" { AskView() }
                 else if m.section == "Meetings" {MeetingsView(model:m.meetings).environmentObject(m)}
+                else if m.section == "Tools" {MCPToolsView(model:m.tools).environmentObject(m)}
                 else if m.section == "Routines" { RoutinesView(model:m.routines) }
                 else if m.section == "Insights" { InsightsView() }
                 else if m.section == "Calendar" {ActivityCalendarView(model:m.activity).environmentObject(m)}
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="People & projects" {Text("Local suggestions · source-linked")}else if m.section=="Meetings" {Text(m.meetings.active ? "Calendar context active":"Calendar context paused")}else if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "People & projects" && m.section != "Calendar" && m.section != "Meetings" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.audio.running ? m.audio.status : m.capture.status).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="People & projects" {Text("Local suggestions · source-linked")}else if m.section=="Meetings" {Text(m.meetings.active ? "Calendar context active":"Calendar context paused")}else if m.section=="Tools" {Text(m.tools.busy ? "Tool work active":"Manual calls only")}else if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "People & projects" && m.section != "Calendar" && m.section != "Meetings" && m.section != "Tools" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
