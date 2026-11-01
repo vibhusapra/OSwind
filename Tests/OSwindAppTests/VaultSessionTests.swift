@@ -157,15 +157,42 @@ import AppKit
     }
     func testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback() async throws {
         try native();let package=root.appendingPathComponent("Before.oswindvault"),moved=root.appendingPathComponent("After.oswindvault"),secret=UUID().uuidString
-        _=try await LibraryVault.create(at:package,name:"Moved session",capacityGiB:1,passphrase:Data(secret.utf8))
-        let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
-        session.unlock(passphrase:secret,remember:false);try await finish(session);let active=try XCTUnwrap(session.model);try active.store.insert(Memory(id:"keep",text:"Moved session history"))
-        try FileManager.default.moveItem(at:package,to:moved)
-        let deadline=SuspendingClock.now.advanced(by:.seconds(15))
-        while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
-        try await finish(session);XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertFalse(session.vaultStatus?.imageAttached ?? true);XCTAssertNil(session.failure)
-        XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),try LibraryVault(package:moved).libraryURL.path)
-        session.unlock(passphrase:secret,remember:false);try await finish(session);XCTAssertNotNil(try session.model?.store.get("keep"));session.requestLock();try await finish(session)
+        var phase="create"
+        func mark(_ value:String) {phase=value;print("OWNED_MOVED_PACKAGE_PHASE "+value)}
+        do {
+            mark("create")
+            _=try await LibraryVault.create(at:package,name:"Moved session",capacityGiB:1,passphrase:Data(secret.utf8))
+            mark("select-locked-package")
+            let session=AppSession(selection:.init(url:package,requiresExisting:true,origin:"selected"),defaults:defaults,locked:{false});try await finish(session)
+            mark("unlock-before-move")
+            session.unlock(passphrase:secret,remember:false);try await finish(session)
+            mark("write-owned-history")
+            let active=try XCTUnwrap(session.model);try active.store.insert(Memory(id:"keep",text:"Moved session history"))
+            mark("move-package")
+            try FileManager.default.moveItem(at:package,to:moved)
+            mark("observe-move-and-lock")
+            let deadline=SuspendingClock.now.advanced(by:.seconds(15))
+            while session.model != nil,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(20))}
+            try await finish(session)
+            mark("verify-move-lock")
+            XCTAssertNil(session.model);XCTAssertTrue(active.store.isClosed);XCTAssertEqual(session.vaultStatus?.state,.locked);XCTAssertFalse(session.vaultStatus?.imageAttached ?? true);XCTAssertNil(session.failure)
+            mark("verify-saved-location")
+            XCTAssertEqual(defaults.string(forKey:LibraryLocationPreferences.key),try LibraryVault(package:moved).libraryURL.path)
+            mark("reopen-moved-history")
+            session.unlock(passphrase:secret,remember:false);try await finish(session);XCTAssertNotNil(try session.model?.store.get("keep"))
+            mark("close-reopened-library")
+            session.requestLock();try await finish(session)
+            mark("verified-locked")
+        } catch {
+            // Fixed operation labels and known-member booleans only. Never
+            // print passphrases, paths, arbitrary members or error text.
+            var record:[String:Any]=["phase":phase,"errorType":String(reflecting:type(of:error))]
+            if let failure=error as? BackupFileError,case .missing(_,let access)=failure,let access {
+                record["memberAccess"]=try JSONSerialization.jsonObject(with:JSONEncoder().encode(access))
+            }
+            print("OWNED_MOVED_PACKAGE_FAILURE "+String(decoding:try JSONSerialization.data(withJSONObject:record,options:[.sortedKeys]),as:UTF8.self))
+            throw error
+        }
     }
     func testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent() async throws {
         try native();let package=root.appendingPathComponent("Monitor.oswindvault"),secret=UUID().uuidString

@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Clipboard hosted native failure — phase diagnosis remains open
+
+Publication0c9b5b7 passes the benchmark job and full1,877-case software suite (1,792 passes/85 skips) in run41288968230, but the owned APFS move case fails with a missing vaultSession member and retains its attached fixture. [Fixed phase diagnostics](VAULT-MOVE-PHASE.md) add eleven nonsecret labels; one instrumented native comparison passes at ac94977. No production fix, harmless-race explanation or unchanged CI rerun is claimed. Hosted native acceptance remains unfinished; feature statuses are unchanged. [Receipt](../benchmarks/vault-move-phase-v1.json).
+
 ## Optional clipboard context — software qualified, native acceptance open
 
 [F082 moves from TODO to partial](CLIPBOARD-CONTEXT.md). Default-off capture ignores existing contents and admits only bounded new plain text after fresh observed-context app/site/secure-field checks. Known secret text and confidential/transient/generated/restored/Handoff/file/image markers refuse. Matching source markers remain claims; app/window labels do not authenticate origin. Current-policy/optional local PII collector admission makes saved text searchable and available to Ask. Privacy/erasure/retired libraries revoke work; actual preparation/readers drain before close and plain Quit. Clipboard-only Pause/Resume avoids screen capture. Permission requests are a separate explicit action; background polling never requests OS access.

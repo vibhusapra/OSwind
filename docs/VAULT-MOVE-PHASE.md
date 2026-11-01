@@ -1,0 +1,11 @@
+# Owned moved-vault failure phases
+
+Clipboard publication head `0c9b5b7` passes the benchmark job and the full software suite in [hosted run 41288968230](https://github.com/vibhusapra/OSwind/actions/runs/41288968230). The native job fails `VaultSessionTests.testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback`, reports a missing `vaultSession` member, and preserves an attached owned fixture. Native hosted qualification is **unfinished**. This change adds test diagnostics; it does not fix or dismiss that failure.
+
+The missing-member diagnostic reports errno 2 and matching initial/named root and parent descriptor identities. It identifies the member category, without proving which operation lost or observed it. The old test did not label its phase, so attributing the failure to creation, move, locking, reopening, sleep or a harmless race would be speculation.
+
+The fixture now emits eleven fixed phase labels: creation, locked selection, pre-move unlock, owned history write, move, move/lock observation, lock verification, location verification, moved-history reopening, close, and verified lock. Both intermediate labels and a whitelisted thrown-error record help locate a later failure, including an error caught inside an XCTest assertion. Output never includes the passphrase, arbitrary member names, paths or file content. Production code, deadlines, assertions, operation ordering and conservative cleanup are unchanged; printing may itself affect timing.
+
+One instrumented owned native comparison passes at `ac94977`, with every phase observed once. It creates an encrypted APFS fixture, opens and moves it, verifies locking/location/history, closes it, and passes the fixture's independent attachment-inventory cleanup check. A passing observation does not establish the original cause or make the failed hosted run green. No unchanged CI rerun was requested.
+
+[Machine-readable receipt](../benchmarks/vault-move-phase-v1.json). Hosted execution of this instrumented fixture and diagnosis of the missing-member cause remain open. All feature statuses are unchanged.
