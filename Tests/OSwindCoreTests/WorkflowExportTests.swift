@@ -1,6 +1,14 @@
 import XCTest
 @testable import OSwindCore
 
+private actor WorkflowExportGate {
+    nonisolated let entered=XCTestExpectation(description:"owned narration worker entered")
+    private var continuation:CheckedContinuation<Void,Never>?
+    private(set) var input:URL?
+    private var opened=false
+    func wait(_ input:URL)async {self.input=input;if opened {return};await withCheckedContinuation {continuation=$0;entered.fulfill()}}
+    func open() {opened=true;continuation?.resume();continuation=nil}
+}
 final class WorkflowExportTests:XCTestCase {
     func withFixture(_ body:(URL,MemoryStore,WorkflowDraft,URL)async throws->Void)async throws {
         let (root,store)=try WorkflowFrameTests.fixture(),parent=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-output-"+UUID().uuidString)
@@ -105,6 +113,26 @@ final class WorkflowExportTests:XCTestCase {
             let destination=parent.appendingPathComponent("Escaped");_ = try await run(store:store,draft:draft,to:destination)
             let tree=try BackupFileTree(root:destination),html=String(decoding:try tree.read("index.html",limit:128*1024),as:UTF8.self),vtt=String(decoding:try tree.read("captions.vtt",limit:128*1024),as:UTF8.self)
             XCTAssertFalse(html.contains("<script>"));XCTAssertTrue(html.contains("&lt;script&gt;"));XCTAssertFalse(vtt.contains("<b>"));XCTAssertEqual(vtt.components(separatedBy:" --> ").count-1,1)
+        }
+    }
+    func testCancelledNoncooperativeNarratorKeepsReservationUntilActualWorkerReturns()async throws {
+        try await withFixture {root,store,draft,parent in
+            let gate=WorkflowExportGate(),permit=WorkflowExportPermit(),destination=parent.appendingPathComponent("Cancelled")
+            var env=Self.environment;env.narration.run={_,args,_,_ in await gate.wait(URL(fileURLWithPath:args[1]))}
+            let environment=env
+            let task=Task {try await self.run(store:store,draft:draft,to:destination,permit:permit,environment:environment)}
+            do {
+            await fulfillment(of:[gate.entered],timeout:5)
+            XCTAssertTrue(permit.invalidate());task.cancel()
+            let captured=await gate.input,input=try XCTUnwrap(captured)
+            XCTAssertTrue(FileManager.default.fileExists(atPath:input.path))
+            XCTAssertThrowsError(try MediaAdmissionLease.acquire(root:root,exclusive:true,timeout:0.02),"Cancelled-but-running worker released its library reservation")
+            await gate.open()
+            do {_ = try await task.value;XCTFail("Cancelled export returned success")}catch is CancellationError {}catch {throw error}
+            XCTAssertFalse(FileManager.default.fileExists(atPath:input.path));XCTAssertFalse(FileManager.default.fileExists(atPath:destination.path))
+            let exclusive=try MediaAdmissionLease.acquire(root:root,exclusive:true,timeout:1);exclusive.release()
+            XCTAssertNotNil(try store.get("owned-screen"))
+            }catch {let original=error;permit.invalidate();task.cancel();await gate.open();_ = try? await task.value;throw original}
         }
     }
 }

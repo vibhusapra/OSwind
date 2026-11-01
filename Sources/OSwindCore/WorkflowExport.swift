@@ -44,7 +44,8 @@ extension NarratedWorkflow {
     static func export(store:MemoryStore,draft:WorkflowDraft,destination:URL,options:WorkflowExportOptions,permit:WorkflowExportPermit,environment:WorkflowExportEnvironment,progress:@escaping @Sendable (WorkflowExportProgress) async throws->Void)async throws->WorkflowExportInfo {
         let draft=try draft.validated();try permit.check();try BackupWorkspace.requireNewDestination(destination)
         let activity=try store.mediaWriteLease();defer {activity.release()}
-        let source=try BackupFileTree(root:store.root),parent=try BackupFileTree(root:destination.deletingLastPathComponent())
+        let source=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath()),parent=try BackupFileTree(root:destination.deletingLastPathComponent())
+        try source.requireRootIdentity(at:store.root)
         guard try !source.isAncestor(of:parent) else {throw OSwindError.invalid("Save the independent workflow outside its source library")}
         let settings=try LibrarySettingsSnapshot.capture(root:store.root);defer {settings.release()}
         return try await withTaskCancellationHandler {
@@ -96,6 +97,7 @@ private enum WorkflowExportOperation {
         try await report(.copying,0)
         try BackupWorkspace.requireNewDestination(destination)
         try parent.requireRootIdentity(at:destination.deletingLastPathComponent())
+        try source.requireRootIdentity(at:store.root)
         guard try !source.isAncestor(of:parent) else {throw OSwindError.invalid("The workflow destination moved inside its source library")}
         _ = try BackupWorkspace.cleanupAbandoned(in:destination.deletingLastPathComponent(),labels:["oswind-workflow-partial"])
         let output=try BackupWorkspace(in:destination.deletingLastPathComponent(),label:"oswind-workflow-partial",parentIdentity:try parent.identity())
@@ -105,6 +107,7 @@ private enum WorkflowExportOperation {
         try await report(.publishing,0)
         try withSources(reservations,store:store,settings:settings,permit:permit) {
             try parent.requireRootIdentity(at:destination.deletingLastPathComponent())
+            try source.requireRootIdentity(at:store.root)
             guard try !source.isAncestor(of:parent) else {throw OSwindError.invalid("The workflow destination moved inside its source library")}
             try permit.beginCommit();try output.publish(as:destination)
         }

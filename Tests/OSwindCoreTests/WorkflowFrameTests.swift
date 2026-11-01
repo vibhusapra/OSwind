@@ -15,8 +15,8 @@ private final class WorkflowPIIBackend:PIINativeBackend,@unchecked Sendable {
     }
 }
 final class WorkflowFrameTests:XCTestCase {
-    static func fixture()throws->(URL,MemoryStore) {
-        let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-frame-"+UUID().uuidString)
+    static func fixture(root selectedRoot:URL?=nil)throws->(URL,MemoryStore) {
+        let root=selectedRoot ?? FileManager.default.temporaryDirectory.appendingPathComponent("oswind-workflow-frame-"+UUID().uuidString)
         let store=try MemoryStore(root:root)
         try Paths.ensure(root.appendingPathComponent("images"))
         let color=try XCTUnwrap(CGColorSpace(name:CGColorSpace.sRGB))
