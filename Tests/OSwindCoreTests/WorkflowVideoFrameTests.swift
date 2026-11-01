@@ -45,14 +45,25 @@ final class WorkflowVideoFrameTests:XCTestCase {
         let red=try VisualImageInput.pixels(image:first.image),blue=try VisualImageInput.pixels(image:second.image),center=112*224+112
         XCTAssertGreaterThan(red[center],0.8);XCTAssertLessThan(red[224*224*2+center],-0.8)
         XCTAssertGreaterThan(blue[224*224*2+center],0.8);XCTAssertLessThan(blue[center],-0.8)
+        let movie=try await WorkflowVideoMux.make(timeline:timeline,workspace:workspace),combined=AVURLAsset(url:movie)
+        let sounds=try await combined.loadTracks(withMediaType:.audio),pictures=try await combined.loadTracks(withMediaType:.video)
+        XCTAssertEqual(sounds.count,1);XCTAssertEqual(pictures.count,1)
+        let movieDuration=try await combined.load(.duration).seconds;XCTAssertEqual(movieDuration,timeline.duration,accuracy:1.0/24000)
+        let sound=try XCTUnwrap(sounds.first),soundFormats=try await sound.load(.formatDescriptions),soundFormat=try XCTUnwrap(soundFormats.first)
+        XCTAssertEqual(CMFormatDescriptionGetMediaSubType(soundFormat),kAudioFormatMPEG4AAC)
+        let verification=try await WorkflowMovieVerification.inspect(url:movie,timeline:timeline)
+        XCTAssertEqual(verification.decodedAudioFrames,timeline.frames);XCTAssertGreaterThan(verification.decodedAudioRMS,0.01)
+
         if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_WORKFLOW_VIDEO_OUTPUT"] {
             let output=URL(fileURLWithPath:destination,isDirectory:true)
             guard !FileManager.default.fileExists(atPath:output.path) else {throw OSwindError.invalid("Choose a new owned raw-video fixture output")}
             try Paths.ensure(output);let tree=try BackupFileTree(root:output,writable:true)
             _ = try workspace.tree.copy("workflow-video.mov",to:tree,as:"workflow-video.mov")
+            for name in ["workflow.mp4","narration.wav","narration.txt","narration.timing.json"] {_ = try workspace.tree.copy(name,to:tree,as:name)}
             try tree.write(png(first.image),as:"decoded-first.png");try tree.write(png(second.image),as:"decoded-second.png")
+            try tree.write(JSONEncoder().encode(verification),as:"movie-verification.json")
             try tree.write(JSONEncoder().encode(draft),as:"draft.json");try tree.write(JSONEncoder().encode(timeline),as:"timeline.json")
-            try tree.write(Data("Owned silent H264 intermediate with synthetic narration used only for timing. AAC/mux not implemented yet. Hardware required: \(hardware)".utf8),as:"scope.txt")
+            try tree.write(Data("Owned H264/AAC movie with synthetic tone narration for timing and codec tests only; this is not a spoken walkthrough. Hardware required: \(hardware)".utf8),as:"scope.txt")
         }
     }
 }
