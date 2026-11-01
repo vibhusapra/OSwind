@@ -157,7 +157,7 @@ import OSwindCore
     private func stageForClosing(_ previous:AppModel) async {
         previous.clearForVaultLock();closingStore=previous.store
         if model === previous {model=nil}
-        await previous.cancelJSONImportAndWait()
+        await previous.cancelExternalWorkAndWait()
     }
     func createVault(at package:URL,name:String,capacityGiB:Int,passphrase:String,copyHistory:Bool,remember:Bool,observeMigration:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) {
         guard maySwitch else {return}
@@ -166,7 +166,7 @@ import OSwindCore
         message="";snapshotNeedsReview=false
         original?.prepareForLibrarySwitch()
         run {
-            await original?.cancelJSONImportAndWait()
+            await original?.cancelExternalWorkAndWait()
             let relay=LibraryProgressRelay(),observer=Task {while !Task.isCancelled {do {try await Task.sleep(for:.milliseconds(100))} catch {break};self.progress=relay.get() ?? self.progress}}
             defer {observer.cancel();self.progress=nil}
             var secret=Data(passphrase.utf8);defer {secret.resetBytes(in:0..<secret.count)}
@@ -201,7 +201,7 @@ import OSwindCore
         }
     }
     private func restorePreparedOriginal(_ original:AppModel) async throws {
-        await original.cancelJSONImportAndWait()
+        await original.cancelExternalWorkAndWait()
         let store=original.store;try await Task.detached(priority:.utility) {try store.close()}.value
         // Restoring the original is cancellation cleanup: a stopped migration
         // still needs a quiet original workspace, with no resumed services.
@@ -234,7 +234,7 @@ import OSwindCore
         terminationRequested=true
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
         guard vaultPackage != nil else {
-            model?.prepareForLibrarySwitch();await model?.cancelJSONImportAndWait();return true
+            model?.prepareForLibrarySwitch();await model?.cancelExternalWorkAndWait();return true
         }
         if vaultStatus?.state != .locked {requestLock();while busy {if let operation {await operation.value} else {break}}}
         let detached=vaultStatus?.imageAttached == false

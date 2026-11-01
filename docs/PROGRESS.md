@@ -1,5 +1,17 @@
 # OSwind delivery ledger
 
+## Native MCP workspace — software qualified, native acceptance open
+
+[F080 stays partial](MCP-WORKSPACE.md). Tools now supports eight inert local stdio connections, scoped credential accounts, exact discovery/call reviews, cancellation and explicit result-text saving through current privacy admission. Saved unverified text becomes searchable and available to Ask. Pause/lock/settings changes revoke reviews; library departure and plain Quit join actual workers before acknowledging completion. No automatic calls or retries occur.
+
+The [752-input/source-Git receipt](../benchmarks/mcp-workspace-v1.json) passes13 stages at46c81b3:1,763 full passes/82 skips;70 sanitizer and70 optimized passes, zero skips/race warnings in those focused builds;22 signed CLI checks, normal/indexed API/MCP, actual quiet backup/restore with SIGINT/SIGKILL, strict34-file equality, installed15 and13 prior trees unchanged. The final signed CLI passes modern officialPythonSDK2.3.0 Unicode interoperability. All38 new native methods run in all three builds.
+
+[Hosted CI at publication headc75a051](https://github.com/vibhusapra/OSwind/actions/runs/41284551394) passes both jobs, including1,763 full passes/82 skips,37 owned native vault passes and22 manual-client checks. The manual-client documentation headf3d2132 also passes both jobs in run41282501845. This receipt documentation follows at a later head.
+
+A subsequent audit found plain-library Quit bypassed pending tools; the actual delegate fixture returns immediate exit before correction. Tool and existing JSON-import cases pass afterward, followed by fresh full/sanitizer/optimized/package qualification. The earlier69-case qualified checkpoint, module-prefix harness error, compiler and visual failures remain retained. All12 revised component renders were inspected. The signed-app input attempt was blocked by the locked Mac; the launched PID was already absent at cleanup, with no confirmed startup, library or server starts. No interaction, real Keychain or broader platform acceptance follows.
+
+HTTP/auth/model-driven tools, complete sync, physical power, notarized distribution and whole-product ranking remain unfinished. Ledger counts stay4 live verified/42 partial/6 implemented/23 tested/6 TODO/2 outside scope,83 total.
+
 ## External MCP manual client — locally qualified, native workflow still open
 
 [F080](MCP-CLIENT.md) moves from TODO to **partial**. Explicit local command/credential-name configuration, modern/legacy stdio discovery, complete readable tool review, deliberate exact-argument calls, changed-executable/schema refusal, bounded I/O/deadlines, provenance and verified direct-child cancellation are implemented. The signed CLI list→review→call/Ctrl-C workflow passes22 checks against the independent existing seven-tool server; an isolated official Python SDK2.3.0 server passes modern interoperability with exact Unicode text.
