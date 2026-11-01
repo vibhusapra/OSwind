@@ -121,6 +121,7 @@ final class SyncObjectFolder:@unchecked Sendable {
     }
     func publishRevision(_ revision:SyncRevision)throws {
         if let reference=revision.content {guard try content(reference) != nil else {throw OSwindError.unavailable("Publish verified sync content before its operation")}}
+        if let declaration=revision.publication {guard try content(declaration) != nil else {throw OSwindError.unavailable("Publish verified answer declaration before its operation")}}
         try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
     }
     func revision(replica:String,sequence:Int64)throws->SyncRevision? {

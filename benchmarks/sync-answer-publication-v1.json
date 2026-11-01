@@ -1,0 +1,725 @@
+{
+  "format": "OSwind source-bound answer publication prerequisite qualification",
+  "version": 1,
+  "state": "component-qualified",
+  "feature": "F059",
+  "featureStatus": "TODO",
+  "source": "6b068ed0f0e469c8bdf5a48b93c2db37e880aece",
+  "nativeSchema": 32,
+  "repositoryInputs": 824,
+  "inputManifest": "sync-answer-publication-inputs-v1.json",
+  "publicInputManifestSHA256": "5475f16be40b36b5539116b0b0804f511745ee6a33f4ba44e6f3b47de998a3b6",
+  "qualifiedInputManifestSHA256": "7377040f4985b6ef1a3528719a39ce11ac6d25c6a286afa884489b06e08c41e2",
+  "qualificationReportSHA256": "55b804275eecc2c98d24ec3f013b11f78f51bb3f9205e9ca0c62070151b5821b",
+  "qualificationDriverSHA256": "a4d2a0b668764d67260c12b0fdaebb4fe210d815fbc88b1b8dd078165474eb87",
+  "independentReviewSHA256": "cc0a9d477150c5065dda7d6cb88b9ace9122e6721b4f10525849fd83496e3df4",
+  "independentReviewerSHA256": "1bb51a8fbe61ce8a7cd6c8f875c6b9e09ba0d4107163377faa23bbd00db770c4",
+  "mandatoryControlsAllThreeBuilds": 57,
+  "newPublicationControls": 20,
+  "distinctFullAndNativePassedMethods": 1990,
+  "stages": [
+    {
+      "name": "full-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "returncode": 0,
+      "wallSeconds": 363.7409912501462,
+      "log": "full-debug.log",
+      "logSHA256": "6f91ddf7280c48f4ecb82f574bf38fc6d4449dba224057e9d10a6afc9ca1c10e",
+      "tests": {
+        "defined": 2049,
+        "passed": 1953,
+        "skipped": 96,
+        "failures": 0
+      }
+    },
+    {
+      "name": "thread-sanitizer",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "Sync|Routine|Conversation|Historical|LibraryWipeModel|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "returncode": 0,
+      "wallSeconds": 286.09024020889774,
+      "log": "thread-sanitizer.log",
+      "logSHA256": "38a7d7df18b36cd49fd3d7ff7fc7bc31a34197898aa6abc7cb5d39ba6e8da004",
+      "tests": {
+        "defined": 579,
+        "passed": 543,
+        "skipped": 36,
+        "failures": 0
+      }
+    },
+    {
+      "name": "optimized",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "Sync|Routine|Conversation|Historical|LibraryWipeModel|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "returncode": 0,
+      "wallSeconds": 254.26221958291717,
+      "log": "optimized.log",
+      "logSHA256": "aaf259035011bb821b5dc5cf97c0e23cfad0a8cf168f57aa03eeadf65990fd1f",
+      "tests": {
+        "defined": 579,
+        "passed": 543,
+        "skipped": 36,
+        "failures": 0
+      }
+    },
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--filter",
+        "NativeVault|VaultSessionTests"
+      ],
+      "returncode": 0,
+      "wallSeconds": 200.54583766614087,
+      "log": "native-vault.log",
+      "logSHA256": "4cb6a0ed2520f04cb7892eff9f7cfb52d25db1376f8114393577f7be58543e52",
+      "tests": {
+        "defined": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/test-owned-sqlite-fixture.py"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.06704979110509157,
+      "log": "owned-writer-fixtures.log",
+      "logSHA256": "19ce4c3fe936ba5a289b545d890b7ffce48ced29d4b7b20a8c6b10a871321dd4"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "command": [
+        "scripts/build-app.sh",
+        "release"
+      ],
+      "returncode": 0,
+      "wallSeconds": 123.51151741691865,
+      "log": "package.log",
+      "logSHA256": "66cff9265a131a2aa2b973e50cbbf19d9738f5786176a520afae44b51e01cde2"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.026880584191531,
+      "log": "api-mcp.log",
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/integration-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--indexed"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.1388468749355525,
+      "log": "indexed-api-mcp.log",
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/test-python-sdk.py"
+      ],
+      "returncode": 0,
+      "wallSeconds": 5.031803791876882,
+      "log": "python-sdk.log",
+      "logSHA256": "1cb85c37d7b08b1d64dd512f8beca2e6b6e2aa1497a140742220953435a3da4f"
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/deletion-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/deletion-report.json"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.6790131248999387,
+      "log": "native-deletion.log",
+      "logSHA256": "d1aae439330a21491edfbf2e479eec25a8df790bd12f923317e42525bf44494a"
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/recap-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--output",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/recap-report.json"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.9051739999558777,
+      "log": "recap-and-routine.log",
+      "logSHA256": "a3e4e4fc278161e62934fa41b7be6be2c5e0873cde88f1e4b286f2b6741e041a"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/backup-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--interruptions",
+        "--output",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/backup-report.json"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.1214191250037402,
+      "log": "backup-interruptions.log",
+      "logSHA256": "91c3ef0e17e1fec50994c9212e1b5dcb00195f93790806f8e6664d05aecbaee3"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/vault-process"
+      ],
+      "returncode": 0,
+      "wallSeconds": 16.81685045803897,
+      "log": "vault-process.log",
+      "logSHA256": "00badb7ee6630f2b3f4d6e92c330296a9a33e3e0d0eaa72d04cb8b4388f69d79"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-terminal-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/terminal-held-reader",
+        "--held-reader"
+      ],
+      "returncode": 0,
+      "wallSeconds": 7.763863542117178,
+      "log": "terminal-held-reader.log",
+      "logSHA256": "fd5f7cb16fce27c5b6d40cd788c4dda320d4ace5e7ed8be89c2ed5bdb82b26f1"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/vault-query-interruption-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/query-interruption"
+      ],
+      "returncode": 0,
+      "wallSeconds": 6.702148166950792,
+      "log": "query-interruption.log",
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409"
+    },
+    {
+      "name": "schema32-sync-capture",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/sync-capture-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-sync-capture"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.4629384169820696,
+      "log": "schema32-sync-capture.log",
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "schema32-entity-memory",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/entity-memory-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-entity-memory"
+      ],
+      "returncode": 0,
+      "wallSeconds": 9.381758874980733,
+      "log": "schema32-entity-memory.log",
+      "logSHA256": "c7de4b425a9b8113546d85f97c2194c910574e0fd29c80056e3793a13f69555c"
+    },
+    {
+      "name": "schema32-project-corrections",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/project-corrections-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-project-corrections"
+      ],
+      "returncode": 0,
+      "wallSeconds": 2.137566292192787,
+      "log": "schema32-project-corrections.log",
+      "logSHA256": "c7dde46405c4e1144aa318c0533c85fd52146ee8812906b009b47651baa77da2"
+    },
+    {
+      "name": "schema32-text-observation",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/text-observation-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-text-observation"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.3578797918744385,
+      "log": "schema32-text-observation.log",
+      "logSHA256": "2105b8b5fde3fc004dc04143d4c572310b4bbf124314e2bdf0f344f7018560c0"
+    },
+    {
+      "name": "schema32-accessibility-text",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/accessibility-text-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-accessibility-text"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.5481076671276242,
+      "log": "schema32-accessibility-text.log",
+      "logSHA256": "2240168d14dd0de9ed003f8db943234beb60d29204597573f79a096091e02f28"
+    },
+    {
+      "name": "schema32-tag-index",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/tag-index-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-tag-index"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.0312944590114057,
+      "log": "schema32-tag-index.log",
+      "logSHA256": "118b04320a7477b9ef0bf7a4c63af19ecdfe5b786462ad27b680f357ce2ec750"
+    },
+    {
+      "name": "schema32-capture-region",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/capture-region-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-capture-region"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.37105720886029303,
+      "log": "schema32-capture-region.log",
+      "logSHA256": "2ce718f99d7241ccbc27fad0ea918e8aa49b13b11a09dcdf8479d32f1f516d1d"
+    },
+    {
+      "name": "schema32-historical-erasure",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/historical-erasure-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/schema32-historical-erasure"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.3639565829653293,
+      "log": "schema32-historical-erasure.log",
+      "logSHA256": "b7281192636e25e3b87547d367e4a5e2f1f5a27ff7e597ecce612e08effc8c12"
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "scripts/historical-client-smoke.py",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "--old-cli",
+        "<checkout>/.artifacts/sync-optional-references-v1/qualification-v2/OSwind.app/Contents/MacOS/oswindctl",
+        "--old-sha256",
+        "4653944db3460c0f7324fbe6f2484056c1fd88cad85c3332f8302347e883d188",
+        "--old-schema",
+        "31",
+        "--current-schema",
+        "32",
+        "--root",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/actual-older-client"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.5165583330672234,
+      "log": "actual-older-client.log",
+      "logSHA256": "17b2804b2d38b021c3584f38fdca5da59018c4660ca01c1987c02cee2fe26c95"
+    },
+    {
+      "name": "retained-publication-crash-debug",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--skip-build",
+        "--filter",
+        "SyncIncomingSourceTests.testPublicationDeath"
+      ],
+      "returncode": 0,
+      "wallSeconds": 7.487522958079353,
+      "log": "retained-publication-crash-debug.log",
+      "logSHA256": "b403128142e5ae393e834965e87e3f13b475d567e652b9f23952c3ba1fd24ab1",
+      "tests": {
+        "defined": 2,
+        "passed": 2,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "retained-publication-crash-tsan",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/tsan-build",
+        "--sanitize=thread",
+        "--skip-build",
+        "--filter",
+        "SyncIncomingSourceTests.testPublicationDeath"
+      ],
+      "returncode": 0,
+      "wallSeconds": 16.253466499969363,
+      "log": "retained-publication-crash-tsan.log",
+      "logSHA256": "820545bc0166561a623c3d89984c99cfa7caa773486768d9f646521f3d7a99c6",
+      "tests": {
+        "defined": 2,
+        "passed": 2,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "retained-publication-crash-release",
+      "state": "passed",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--skip-build",
+        "--filter",
+        "SyncIncomingSourceTests.testPublicationDeath"
+      ],
+      "returncode": 0,
+      "wallSeconds": 5.639101916924119,
+      "log": "retained-publication-crash-release.log",
+      "logSHA256": "69ad65dbdda10fa32a9797018a7dd782c4837743de218b8fbb1ec0630f7a546c",
+      "tests": {
+        "defined": 2,
+        "passed": 2,
+        "skipped": 0,
+        "failures": 0
+      }
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-c",
+        "-k",
+        "--sequesterRsrc",
+        "--keepParent",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind-macos.zip"
+      ],
+      "returncode": 0,
+      "wallSeconds": 1.1858474160544574,
+      "log": "archive.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "command": [
+        "ditto",
+        "-x",
+        "-k",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind-macos.zip",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/extracted"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.09715716703794897,
+      "log": "extract.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/OSwind.app"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.04050537501461804,
+      "log": "strict-app.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "command": [
+        "codesign",
+        "--verify",
+        "--deep",
+        "--strict",
+        "<checkout>/.artifacts/sync-publication-visibility-v1/qualification-v1/extracted/OSwind.app"
+      ],
+      "returncode": 0,
+      "wallSeconds": 0.037265249993652105,
+      "log": "strict-extracted.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "recoveredCrashDatabases": [
+    {
+      "build": "debug",
+      "phase": "before",
+      "databaseSHA256": "de3442ff439bdac58f18ce37ea0de536305fd65184b09ad4becc41a5f5f2c12a",
+      "expectedSHA256": "a2d0419b9fcc39264d731500ad69778af9c6324849db6116c69d984aa3076002",
+      "workerLogSHA256": "41794ce6309b1a6ecaf3039ea8b68b196c0960248874195a0dcd4545f96a42c8",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 0,
+        "chat_sources": 0,
+        "historical_evidence": 1,
+        "personal_sync_versions": 4,
+        "personal_sync_receipts": 6,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    },
+    {
+      "build": "debug",
+      "phase": "after",
+      "databaseSHA256": "62a6ea25022b8949ab23c4a950ab6361f43e71fe78a20c13064ec435999e578c",
+      "expectedSHA256": "3e82d6e240ed80311801f9f84333f8dd946b491154f0b38fd96806f5b030e7d0",
+      "workerLogSHA256": "555d93d1c4b22589388328278b1727d1267032d78b8e35f9f85fadb58118e9a7",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 2,
+        "historical_evidence": 2,
+        "personal_sync_versions": 7,
+        "personal_sync_receipts": 7,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    },
+    {
+      "build": "tsan",
+      "phase": "before",
+      "databaseSHA256": "2b60939d2e43ffef5b0db8b2ecbf3896fc359064be8b75ad7c3543b440579800",
+      "expectedSHA256": "a64fdbd39f15fa3345e9bdca5e42c9c289a9d1fee96e7d6f48aae8a647138ff0",
+      "workerLogSHA256": "63446f309708ca28d91493c8248c1b0fbe34aa7ca6cea6d5e291b95dae1aa25f",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 0,
+        "chat_sources": 0,
+        "historical_evidence": 1,
+        "personal_sync_versions": 4,
+        "personal_sync_receipts": 6,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    },
+    {
+      "build": "tsan",
+      "phase": "after",
+      "databaseSHA256": "75383ec2fdb013feb32fd8857ec67a0361faf5c39106832368187e55b3e4697d",
+      "expectedSHA256": "1a35d124a91675d201fd0719f7ca490ff55efb3e735895a49fb95c5d54f6c61b",
+      "workerLogSHA256": "a884f4e4eb6e06651df205093d167d18262126beed2871d58bb8548421249b67",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 2,
+        "historical_evidence": 2,
+        "personal_sync_versions": 7,
+        "personal_sync_receipts": 7,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    },
+    {
+      "build": "release",
+      "phase": "before",
+      "databaseSHA256": "bf6ec5d12d70d5db7721e5a278446add26ab2b3bf673b6ef5c61cf6ebd8fcbdb",
+      "expectedSHA256": "fc22ba4fbfe041e85a5f34ae019be642cb288bce3a52d779f7d2293bfa3ba4ea",
+      "workerLogSHA256": "ef6a2154d2c911a076e236a3c5e012e81b7837187fb6aee4868caa0165f6989c",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 0,
+        "chat_sources": 0,
+        "historical_evidence": 1,
+        "personal_sync_versions": 4,
+        "personal_sync_receipts": 6,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    },
+    {
+      "build": "release",
+      "phase": "after",
+      "databaseSHA256": "a6df12c2cd59c962125e25824be43900303662d3012729885cf7d971c13eeece",
+      "expectedSHA256": "7d6c11d2889c67be4828e5f9e9839c624bd31e9dabf2e046e92a8c937b382c97",
+      "workerLogSHA256": "dc196586eb5bfe7c7a1233979298a6f8f7351c2d45c742000edf817065ed97f0",
+      "counts": {
+        "memories": 2,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 2,
+        "historical_evidence": 2,
+        "personal_sync_versions": 7,
+        "personal_sync_receipts": 7,
+        "personal_sync_changes": 0,
+        "personal_sync_pending": 0,
+        "personal_sync_outbox": 0
+      },
+      "exactFrames": true,
+      "exactOriginals": true,
+      "receiptAtomic": true,
+      "noEcho": true,
+      "accountingExact": true
+    }
+  ],
+  "priorProtocol": {
+    "source": "9184e39efe494d2be579410f2b2e02ba0ffdf0a3",
+    "oldSourceSHA256": "c6d0a4dce01d7f90da84e1500d7b54bc21feba2fa4db64025921dd272b5e3eb3",
+    "currentSourceSHA256": "051f71456217ed1173aadb0091ad436673fe7e0a29cf7cf378f0a6b15f29974b",
+    "supportSHA256": "4b70245c394d3c0c29f6378f71e21f2f4b88b82db0f9d2dab429c013a595222d",
+    "probeSHA256": "ab0a6bdf650740da21e11ccf685a134dc84588de8da40f78fd75536708eb9b49",
+    "oldBinarySHA256": "34169eb1dd40f7d887a5b57665250d49b334303e4c62403ad9d8f93b08ee58cb",
+    "currentBinarySHA256": "9f2320a516bf88ef263d7d194a52efa185983d1cb713d7aeeb409907594ebb4b",
+    "actualReceivedRevisionSHA256": "49df5537ba1ae2b19fc71f216a33a69fc2dce8510692f6d61c765ad0384217ef",
+    "results": [
+      {
+        "decoder": "old",
+        "result": "legacyAccepted=true currentRejected=true reason=invalid(\"Sync operation is not canonical\")",
+        "logSHA256": "9005ada5aba666bcf3b8b21687719cd044a378b71d752884fc2a9d3b4631a7cc"
+      },
+      {
+        "decoder": "current",
+        "result": "legacyAccepted=true currentRejected=false reason=",
+        "logSHA256": "6e517a0acdf3deed1cd86635c541f5990d22c3c15787c8a22709b875c49741a0"
+      }
+    ],
+    "limit": "Unmodified prior/current protocol files compiled in isolated codec probes with minimal linking stubs; not an old full-app/provider test. Actual received publication revision, legacy positive control."
+  },
+  "artifact": {
+    "files": 34,
+    "archiveExtractionEqual": true,
+    "cliSHA256": "b464d2c260d3a8068f7eab1183b1b0d1f7d2f3e21f3131262db5a94c976fa9aa",
+    "appSHA256": "79bf57382dec19a1768f3ade9f1147b4ce303984055f9433e4d169e1ee6b6f15",
+    "zipSHA256": "0766535f16c3a23363fd7933a319b8cb4a2753a73d8759be25ab4a6b23238a8b",
+    "signing": "strict verified ad-hoc; not notarized"
+  },
+  "protectedPriorAppTreesUnchanged": 36,
+  "retainedDevelopmentFailures": [
+    "Initial owned three-replica low-level adapter case:1case2genuine visibility assertions; fixed by the complete publication path.",
+    "Pre-projection cache lookup; corrected before qualification.",
+    "Test compiler typos and oracles for trailing pin outcome and preexisting historical evidence; logs retained separately."
+  ],
+  "limits": [
+    "Owned fixtures; no personal history/general clipboard/Keychain/device settings/network sync/provider acceptance",
+    "F059 remains TODO; authenticated complete answer publication prerequisite only. Durable withheld scheduling, replacement detachment, library service, current-policy/media, collection controls, enrollment/recovery/revocation/providers/twoMac remain open",
+    "Own offscreen saved-history renders only; prior narration/model/layout evidence remains frozen historical; no CUA/native-input/capture/power/distribution/ranking acceptance",
+    "Explicit withheld outcomes are not a durable retry service. Replacement detachment remains withheld for review. No new throughput, cold-cache, model/GPU, energy, representative capture or competitor-rank measurement.",
+    "Prior/current protocol compatibility compiles the actual unmodified protocol file with minimal linking stubs; no full old-app transport/provider inference."
+  ],
+  "finishedAtUTC": "2026-11-01T17:37:59.280816+00:00"
+}

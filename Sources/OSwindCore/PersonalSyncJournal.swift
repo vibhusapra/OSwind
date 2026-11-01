@@ -182,8 +182,8 @@ struct SyncJournal {
         let row=try database.statement("INSERT INTO personal_sync_receipts(replica,sequence,digest) VALUES(?,?,?)")
         defer {sqlite3_finalize(row)};database.bind(row,1,revision.dot.replica);sqlite3_bind_int64(row,2,revision.dot.counter);database.bind(row,3,digest);try database.done(row);return true
     }
-    @discardableResult func put(key:SyncObjectKey,content:SyncContentReference,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
-        try local(key:key,mutation:.put,content:content,apply:apply)
+    @discardableResult func put(key:SyncObjectKey,content:SyncContentReference,publication:SyncContentReference?=nil,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
+        try local(key:key,mutation:.put,content:content,publication:publication,apply:apply)
     }
     @discardableResult func delete(key:SyncObjectKey,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
         try local(key:key,mutation:.delete,content:nil,apply:apply)
@@ -191,7 +191,7 @@ struct SyncJournal {
     @discardableResult func resolve(key:SyncObjectKey,expectedHeads:Set<SyncDot>,content:SyncContentReference,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
         try local(key:key,mutation:.put,content:content,resolution:expectedHeads,apply:apply)
     }
-    private func local(key:SyncObjectKey,mutation:SyncMutation,content:SyncContentReference?,resolution:Set<SyncDot>?=nil,apply:(SyncJournalChange)throws->Void)throws->SyncRevision {
+    private func local(key:SyncObjectKey,mutation:SyncMutation,content:SyncContentReference?,resolution:Set<SyncDot>?=nil,publication:SyncContentReference?=nil,apply:(SyncJournalChange)throws->Void)throws->SyncRevision {
         try scoped {
             let old=try readState(for:key)
             guard mutation == .delete || !old.isDeleted else {throw OSwindError.invalid("Restore deleted sync content with a new object lifetime")}
@@ -207,7 +207,7 @@ struct SyncJournal {
             let peers=try Self.peerSnapshot(database)
             let context=try old.clock.merged(with:peers.clock).merged(with:observedClock())
             guard context.counters.keys.allSatisfy(peers.ids.contains) else {throw OSwindError.invalid("Sync object context names an unknown peer")}
-            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:context,mutation:mutation,content:content)
+            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:context,mutation:mutation,content:content,publication:publication)
             var next=old;try next.integrate(revision);try save(next)
             let data=try revision.encoded();guard try recordReceipt(revision,data:data) else {throw OSwindError.invalid("Local sync sequence already exists")}
             let outbox=try database.statement("INSERT INTO personal_sync_outbox(sequence,revision) VALUES(?,?)")
