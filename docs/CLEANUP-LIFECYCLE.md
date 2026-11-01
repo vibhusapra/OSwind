@@ -1,6 +1,6 @@
 # Cleanup worker lifetime
 
-Deletion and retention maintenance now own both their detached worker and actor completion. A library departure cancels them and waits for both, including a worker that has not yet reached SQLite or acquired a media reservation. Plain Quit participates in the same drain. Retired or closed models reject queued manual cleanup, deletion, service startup and housekeeping configuration.
+Deletion and retention maintenance now own both their detached worker and actor completion. A library departure cancels them and waits for both, including a worker that has not yet reached SQLite or acquired a media reservation. Plain Quit participates in the same drain. Retired or closed models reject queued manual cleanup, deletion, service startup and housekeeping configuration. Direct settings bindings restore their prior local value without touching controllers or preferences after retirement/close.
 
 The original owned-fixture reproduction had four cases and twelve failing assertions: an exit drain could return while the unowned worker later deleted data, and retired models still accepted manual deletion/maintenance. Separate regressions showed obsolete retention settings deleting a source after automatic retention was disabled or the retention window changed, stale source/search/answer previews surviving cancellation after a real commit, and timers reappearing on retired/closed models. All original failures remain retained in their own logs.
 
@@ -14,9 +14,9 @@ When cancellation follows a committed removal in the current model, source-deriv
 
 ## Verification in progress
 
-Owned actor tests cover direct drain, a canceled drain caller, pre-launch retirement, closed roots, real plain Quit, library switch, before-SQL cancellation, after-commit cancellation, stale UI state, current retention settings, failed settings save and queued timer/service startup. Existing deletion, startup maintenance, import, conversation and workspace-wake controls are included. Preliminary focused coverage passes111 defined cases:96 passed and15 explicitly skipped.
+Owned actor tests cover direct drain, a canceled drain caller, pre-launch retirement, closed roots, real plain Quit, library switch, before-SQL cancellation, after-commit cancellation, stale UI state, current retention settings, failed settings save and queued timer/service startup. Existing deletion, startup maintenance, import, conversation and workspace-wake controls are included. Preliminary focused coverage passes113 defined cases:98 passed and15 explicitly skipped.
 
-Two owned encrypted-APFS session cases pass without skips: a real lock waits while an actual unreserved deletion/maintenance worker is held, the image stays attached until release, normal locking then detaches it, and unlocking preserves the canceled source. Full source-bound software, sanitizer, optimized, native41 and fresh package/independent archive qualification remain pending.
+Two owned encrypted-APFS session cases pass without skips: a real lock waits while an actual unreserved deletion/maintenance worker is held, the image stays attached until release, normal locking then detaches it, and unlocking preserves the canceled source. An earlier sourceae620bf full run passes2065 methods/101 skips and all111 required controls; final settings-binding hardening adds two controls. Current full software, sanitizer, optimized, native41 and fresh package/independent archive qualification remain pending. A first settings rollback implementation reentered its published observer and crashed an owned test; the explicit reentrancy guard passes the isolated and focused cases. This implementation failure is retained separately from original regressions.
 
 ## Separate hosted vault failure
 

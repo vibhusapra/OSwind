@@ -32,7 +32,14 @@ import EventKit
     let visualModelSetup:VisualModelSetupModel
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
+    private var restoringRetiredSettings=false
     @Published var settings: AppSettings { didSet {
+        // A delayed binding can arrive after its view's workspace departed.
+        // Restore the local value before touching controllers or preferences.
+        guard !restoringRetiredSettings else {return}
+        guard !libraryRetired,!store.isClosed else {
+            restoringRetiredSettings=true;settings=oldValue;restoringRetiredSettings=false;return
+        }
         capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
         if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelMaintenanceWork();cancelAnswer()}
         if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}

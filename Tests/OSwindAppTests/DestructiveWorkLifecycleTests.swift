@@ -193,4 +193,14 @@ import OSwindCore
         app.showOnboarding=false;try app.store.close();app.configureAutomaticMaintenance(true)
         XCTAssertFalse(app.housekeepingActive);app.startConfiguredServices();XCTAssertFalse(app.housekeepingActive)
     }
+    func lateBinding(_ closed:Bool)throws {
+        try app.settings.save(root:root)
+        let file=root.appendingPathComponent("settings.json"),before=try Data(contentsOf:file),enabled=app.settings.apiEnabled
+        if closed {try app.store.close()}else {app.prepareForLibrarySwitch()}
+        app.settings.apiEnabled.toggle()
+        XCTAssertEqual(app.settings.apiEnabled,enabled,"A detached view binding must not change its retired model")
+        XCTAssertEqual(try Data(contentsOf:file),before,"No preferences write may follow workspace retirement/close")
+    }
+    func testDirectBindingCannotWriteRetiredLibraryPreferences()throws {try lateBinding(false)}
+    func testDirectBindingCannotWriteClosedLibraryPreferences()throws {try lateBinding(true)}
 }
