@@ -39,6 +39,9 @@ struct SyncFilterBody:Codable,Equatable,Sendable {
     let entity:SyncObjectIdentity?
     let limit:Int
     init(_ filter:SearchFilter,resolve:(String)throws->SyncObjectIdentity)throws {
+        // Until an explicit unavailable wire representation is admitted, never
+        // serialize this native restriction as an ordinary unscoped filter.
+        try filter.requireAvailableEntityScope()
         query=filter.query;app=filter.app;kind=filter.kind;start=filter.start;end=filter.end;sourceStartsOnly=filter.sourceStartsOnly;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;limit=filter.limit
         entity=try filter.entityID.map(resolve);try validate()
     }

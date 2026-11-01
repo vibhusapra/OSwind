@@ -5,7 +5,7 @@ import CryptoKit
 
 public final class MemoryStore: @unchecked Sendable {
     // Version29 retains data-only peer run provenance without importing execution authority.
-    public static let schemaVersion = 31
+    public static let schemaVersion = 32
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -347,6 +347,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
     func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true,rowLocalExpressions:Bool=false) -> (String, [String]) {
+        if filter.unavailableEntityScope != nil {return ("0=1",[])}
         // An inverted interval can otherwise match a span crossing both bounds.
         // Public query resolution reports the error; raw store APIs fail closed.
         if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
@@ -440,6 +441,7 @@ public final class MemoryStore: @unchecked Sendable {
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
     public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, expression:SearchExpressionPlan? = nil, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
+        try filter.requireAvailableEntityScope()
         guard mode != .visual else {throw OSwindError.invalid("Use the visual retrieval engine for appearance search")}
         try Task.checkCancellation()
         var queryPlan = try expression ?? SearchExpressionPlan.make(filter.query)
