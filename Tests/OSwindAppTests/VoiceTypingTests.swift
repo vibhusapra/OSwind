@@ -5,9 +5,10 @@ import AppKit
 
 @MainActor final class VoiceTypingTests:XCTestCase {
     final class Recorder:DictationRecording {
-        var starts=0,finishes=0,cancels=0,full=false
+        var starts=0,finishes=0,cancels=0
         var samples=Array(repeating:Float(0.1),count:16000)
         var startError:Error?,finishError:Error?
+        var readyToFinish=false
         func start()async throws {starts+=1;if let startError {throw startError}}
         func finish()throws->[Float] {finishes+=1;if let finishError {throw finishError};return samples}
         func cancel() {cancels+=1}
@@ -108,6 +109,11 @@ import AppKit
     func testRecordingAndPermissionFailuresDoNotOfferDraft()async throws {
         recorder.startError=OSwindError.unavailable("Owned permission denied");model.start();try await wait {[self] in !model.busy};XCTAssertEqual(transcribes,0)
         recorder.startError=nil;recorder.finishError=OSwindError.unavailable("Owned device interrupted");try await record();try await finish();XCTAssertEqual(transcribes,0);XCTAssertTrue(model.status.contains("interrupted"));XCTAssertTrue(draft.text.isEmpty)
+    }
+    func testTerminalPCMFailureStopsAtNextPollAndNeverTranscribes()async throws {
+        try await record();recorder.finishError=OSwindError.unavailable("Owned device conversion failed");recorder.readyToFinish=true
+        try await wait {[self] in !model.busy}
+        XCTAssertFalse(model.recording);XCTAssertEqual(recorder.finishes,1);XCTAssertEqual(transcribes,0);XCTAssertTrue(model.status.contains("device conversion failed"));XCTAssertTrue(draft.text.isEmpty)
     }
     func testReviewValidationRefusesLockPrivacyAndCanonicalByteMutation()async throws {
         draft.chooseDestination(privacy:app.settings.privacy);try await record();try await finish();draft.chooseDestination(privacy:app.settings.privacy);locked=true;draft.insert(privacy:app.settings.privacy);try await wait {[self] in !draft.busy};XCTAssertEqual(transport.activations,0)

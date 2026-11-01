@@ -74,7 +74,7 @@ import OSwindCore
                     let delta=environment.now()-began
                     guard delta.isFinite,delta>=0 else {throw CancellationError()}
                     let seconds=min(LocalDictation.maximumSeconds,Int(min(delta,30)));if elapsed != seconds {elapsed=seconds}
-                    if environment.recorder.full || delta>=Double(LocalDictation.maximumSeconds) {finishRecording()}
+                    if environment.recorder.readyToFinish || delta>=Double(LocalDictation.maximumSeconds) {finishRecording()}
                 }
                 try current(token,config)
                 guard let samples=pending else {throw CancellationError()};pending=nil

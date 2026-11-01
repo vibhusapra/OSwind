@@ -17,15 +17,15 @@ import Darwin
     }
     func testInvalidCallbackAndCancelDiscardBufferedAudio() throws {
         for bad in [[],[Float.nan],[Float.infinity],Array(repeating:Float(0.1),count:32769)] {
-            let buffer=DictationPCMBuffer();add([0.1,0.2],to:buffer);add(bad,to:buffer);XCTAssertThrowsError(try buffer.finish())
+            let buffer=DictationPCMBuffer();add([0.1,0.2],to:buffer);add(bad,to:buffer);XCTAssertTrue(buffer.readyToFinish);XCTAssertThrowsError(try buffer.finish())
         }
-        let buffer=DictationPCMBuffer();add([0.1],to:buffer);buffer.cancel();add([0.2],to:buffer);XCTAssertTrue(try buffer.finish().isEmpty)
+        let buffer=DictationPCMBuffer();add([0.1],to:buffer);buffer.cancel();add([0.2],to:buffer);XCTAssertFalse(buffer.readyToFinish);XCTAssertTrue(try buffer.finish().isEmpty)
     }
     func testDeniedMicrophoneNeverCreatesEngine()async throws {
         var made=0
         let recorder=LocalDictationRecorder(authorize:{false},makeEngine:{made+=1;throw OSwindError.invalid("Unexpected microphone")})
         do {try await recorder.start();XCTFail("Permission denial accepted")}catch {XCTAssertTrue(error.localizedDescription.contains("Microphone"))}
-        XCTAssertEqual(made,0);XCTAssertFalse(recorder.full)
+        XCTAssertEqual(made,0);XCTAssertFalse(recorder.readyToFinish)
     }
     func testCancelledPermissionWaitCannotOpenOrStartAnotherMicrophone()async throws {
         var continuation:CheckedContinuation<Bool,Never>?,made=0,requests=0

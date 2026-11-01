@@ -8,6 +8,7 @@ final class DictationPCMBuffer:AudioPCMSink,@unchecked Sendable {
     private let lock=NSLock()
     private var samples=[Float](),active=true,failure:String?
     var full:Bool {lock.withLock {samples.count==Self.maximumSamples}}
+    var readyToFinish:Bool {lock.withLock {samples.count==Self.maximumSamples || failure != nil}}
     func add(_ input:UnsafeBufferPointer<Float>,at end:Date) {
         lock.withLock {
             guard active else {return}
@@ -32,7 +33,8 @@ final class DictationPCMBuffer:AudioPCMSink,@unchecked Sendable {
     func start() async throws
     func finish() throws ->[Float]
     func cancel()
-    var full:Bool {get}
+    /// Full PCM or a terminal input/conversion failure; finish stops the device.
+    var readyToFinish:Bool {get}
 }
 
 /// A late permission response after cancellation cannot open a microphone.
@@ -43,7 +45,7 @@ final class DictationPCMBuffer:AudioPCMSink,@unchecked Sendable {
     private var starting=false
     public convenience init() {self.init(authorize:{await AVCaptureDevice.requestAccess(for:.audio)},makeEngine:{AVAudioEngine()})}
     init(authorize:@escaping () async ->Bool,makeEngine:@escaping () throws ->AVAudioEngine) {self.authorize=authorize;self.makeEngine=makeEngine}
-    public var full:Bool {sink?.full ?? false}
+    public var readyToFinish:Bool {sink?.readyToFinish ?? false}
     public func start() async throws {
         guard !starting,engine==nil else {throw OSwindError.unavailable("Dictation microphone is already in use.")}
         starting=true;let token=UUID();generation=token
