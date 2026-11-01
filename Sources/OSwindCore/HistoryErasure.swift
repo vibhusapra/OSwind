@@ -207,6 +207,7 @@ extension MemoryStore {
             let preview=try erasureCancellable(db) {try db.transaction {
                 let matched=try db.prepareErasure(scope);let preview=try db.erasurePreview(scope,matched:matched)
                 guard preview.token==expectedToken else {throw OSwindError.invalid("History changed after preview. Pause capture and preview again before erasing.")}
+                try retireEntityScopesForErasedSources(db)
                 _=try db.eraseSelectedHistory()
                 return preview
             }}

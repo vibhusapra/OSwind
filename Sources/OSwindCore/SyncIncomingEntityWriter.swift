@@ -67,6 +67,8 @@ struct SyncIncomingEntityWriter {
         try admission.withActive(for:library.mediaRootIdentity) {}
         try library.withRoutineDatabase {connection in
             guard connection.handle==db.handle,try cache.journal.state(for:key).isDeleted,Self.tables.contains(where:{$0.kind==key.kind}) else {throw OSwindError.invalid("Use the corresponding typed entity deletion adapter")}
+            try SyncChangeCapture.transaction(db) {
+            if key.kind == .entity,let object=try cache.catalog.object(for:key),!object.deleted {try cache.retirePeerEntityScopes(object,library:library)}
             try cache.catalog.deletePeerKey(key,journal:cache.journal) {object in
                 guard let object else {return}
                 let schema=object.identity.table.schema
@@ -85,7 +87,9 @@ struct SyncIncomingEntityWriter {
                 try execute("DELETE FROM "+schema.name+" WHERE "+schema.primary.map {$0+"=?"}.joined(separator:" AND "),values)
                 if changesProjectRules {try db.bumpEntityRules()}
             }
+            try Task.checkCancellation()
             try admission.withActive(for:library.mediaRootIdentity) {}
+            }
         }
     }
     @discardableResult func apply(_ record:SyncPortableRecord,admission:MediaAdmissionLease,fetchExactSource:(SyncVersionReference)throws->SyncPortableRecord)throws->String {

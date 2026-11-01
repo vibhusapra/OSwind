@@ -156,6 +156,26 @@ final class SearchExpressionTests: XCTestCase {
         let followup = try await engine.answer("Who owns archive? app:Other",configuration:configuration,previousQuestions:[#""archive launch""#])
         XCTAssertEqual(Set(followup.sources.map(\.id)),["old"])
     }
+    func testUnavailableEntityScopeRefusesEveryAnswerProviderAndEmbeddingBeforeRequests()async throws {
+        try source("owned","Owned unrelated source")
+        let configuration=URLSessionConfiguration.ephemeral;configuration.protocolClasses=[ExpressionModelProtocol.self]
+        let session=URLSession(configuration:configuration);defer {session.invalidateAndCancel()}
+        let engine=AnswerEngine(store:store,embedder:LocalEmbedder(),session:session),filter=SearchFilter(query:"Owned",unavailableEntityScope:.init())
+        ExpressionModelProtocol.requests.reset()
+        for provider in AIProvider.allCases {
+            var ai=AIConfiguration();ai.provider=provider
+            for summarize in [false,true] {
+                do {_=try await engine.answer("Owned",configuration:ai,filter:filter,summarize:summarize,key:"owned-fixture-placeholder");XCTFail("Unavailable scope admitted for \(provider)")}
+                catch {guard case OSwindError.unavailable=error else {return XCTFail("Scope must fail before provider configuration: \(error)")}}
+            }
+        }
+        let retrieval=RetrievalEngine(store:store,client:OllamaClient(session:session));var search=SearchConfiguration();search.provider = .ollama
+        for mode in [SearchMode.keyword,.semantic,.hybrid] {
+            do {_=try await retrieval.search(filter,mode:mode,configuration:search);XCTFail("Unavailable scope admitted for \(mode)")}
+            catch {guard case OSwindError.unavailable=error else {return XCTFail("Scope must fail before embedding: \(error)")}}
+        }
+        XCTAssertEqual(ExpressionModelProtocol.requests.value,0)
+    }
     func testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange() async throws {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_EXPRESSION_METAL"] == "1" else { throw XCTSkip("Opt in to the owned 20k-vector Metal scope workload") }
         guard MetalFlatIndex.canFit(dimensions:32,count:20512) else { throw XCTSkip("Metal device unavailable") }

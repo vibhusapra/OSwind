@@ -63,7 +63,8 @@ struct RecordedScopeView: View {
         if let kind = filter.kind { parts.append(kind.rawValue.capitalized) }
         if filter.favoritesOnly { parts.append("Saved") }
         if let tag = filter.tag { parts.append("#"+tag) }
-        if let entity=filter.entityID {parts.append("Entity: "+entity)}
+        if filter.unavailableEntityScope != nil {parts.append("Entity scope unavailable")}
+        else if let entity=filter.entityID {parts.append("Entity: "+entity)}
         if let speaker=filter.speaker { parts.append("Speaker: "+speaker) }
         if let start = filter.start { parts.append("From "+formatter.string(from:start)) }
         if let end = filter.end { parts.append("Before "+formatter.string(from:end)) }
@@ -72,6 +73,6 @@ struct RecordedScopeView: View {
     }
     var body: some View {
         Label(text,systemImage:"line.3.horizontal.decrease.circle").font(.caption2).foregroundStyle(.primary.opacity(0.72)).lineLimit(2).textSelection(.enabled)
-            .help("Recorded scope · \(timeZone ?? "original time zone not recorded") · start inclusive, end exclusive")
+            .help(filter.unavailableEntityScope != nil ? "The original entity was removed. This saved answer keeps its original restriction. Select an available entity in People & projects before starting a new scoped search." : "Recorded scope · \(timeZone ?? "original time zone not recorded") · start inclusive, end exclusive")
     }
 }

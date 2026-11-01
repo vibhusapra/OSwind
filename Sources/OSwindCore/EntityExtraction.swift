@@ -125,7 +125,11 @@ extension MemoryStore {
                 let mention=try db.statement("INSERT OR IGNORE INTO entity_mentions VALUES(?,?,'automatic',?,?,?,?,?)");defer {sqlite3_finalize(mention)};db.bind(mention,1,memory.id);db.bind(mention,2,id);db.bind(mention,3,memory.entityRevision);sqlite3_bind_int64(mention,4,Int64(candidate.start));sqlite3_bind_int64(mention,5,Int64(candidate.length));db.bind(mention,6,source.substring(with:NSRange(location:candidate.start,length:candidate.length)));db.bind(mention,7,candidate.method);try db.done(mention)
             }
             let prune=try db.statement("DELETE FROM memory_entities WHERE id=? AND curated=0 AND NOT EXISTS(SELECT 1 FROM entity_mentions WHERE entity_id=?) AND NOT EXISTS(SELECT 1 FROM entity_project_ignored WHERE entity_id=?)");defer {sqlite3_finalize(prune)}
-            for id in Set(oldIDs) {sqlite3_reset(prune);sqlite3_clear_bindings(prune);db.bind(prune,1,id);db.bind(prune,2,id);db.bind(prune,3,id);try db.done(prune)}
+            for id in Set(oldIDs) where try db.entityCanPrune(id,includeProjectRejections:true) {
+                try retireEntityScopes(id,marker:.init(),db:db)
+                sqlite3_reset(prune);sqlite3_clear_bindings(prune);db.bind(prune,1,id);db.bind(prune,2,id);db.bind(prune,3,id);try db.done(prune)
+                guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Suggested entity changed during scope retirement")}
+            }
             let state=try db.statement("INSERT INTO entity_index_state VALUES(?,?,?) ON CONFLICT(memory_id) DO UPDATE SET processor=excluded.processor,limited=excluded.limited");defer {sqlite3_finalize(state)};db.bind(state,1,memory.id);db.bind(state,2,EntityExtractor.processor(plan));sqlite3_bind_int(state,3,result.limited ? 1:0);try db.done(state)
         }}
     }

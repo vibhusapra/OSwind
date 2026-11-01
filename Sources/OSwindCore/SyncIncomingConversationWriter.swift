@@ -147,7 +147,8 @@ struct SyncIncomingConversationWriter {
         try store.forEachLinkedRun(chatID:chat) {local,original,before in
             let identity=try cache.catalog.localIdentity(.routineRun,primary:[.text(Data(local.utf8))])
             if try cache.journal.state(for:identity.key).isDeleted {return}
-            guard let packet=try cache.retainedRunProjection(localRunID:local),case .routineRun(let body)=packet.body,body.conversation==object.identity else {throw OSwindError.unavailable("Prepare the run's exact optional-conversation projection before erasure")}
+            let packet=try cache.resolve(identity,content:nil,admit:{_ in})
+            guard case .routineRun(let body)=packet.body,body.conversation==object.identity else {throw OSwindError.unavailable("Prepare the run's exact optional-conversation projection before erasure")}
             try cache.catalog.applyPeer(identity,primary:[.text(Data(local.utf8))]) {
                 _=try library.detachRunOriginalConversation(local,from:chat,original:original,before:before,db:db)
             }

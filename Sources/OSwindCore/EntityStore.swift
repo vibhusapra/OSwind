@@ -118,13 +118,16 @@ extension MemoryStore {
             }
             let move=try db.statement("UPDATE entity_aliases SET entity_id=? WHERE entity_id=?");defer {sqlite3_finalize(move)};db.bind(move,1,destinationID);db.bind(move,2,sourceID);try db.done(move)
             let curate=try db.statement("UPDATE memory_entities SET curated=1,detail=? WHERE id=?");defer {sqlite3_finalize(curate)};db.bind(curate,1,detail);db.bind(curate,2,destinationID);try db.done(curate)
+            try retireEntityScopes(sourceID,marker:.init(),db:db)
             let remove=try db.statement("DELETE FROM memory_entities WHERE id=?");defer {sqlite3_finalize(remove)};db.bind(remove,1,sourceID);try db.done(remove)
             if kind == .project {try db.bumpEntityRules()}
         }
     }
     public func deleteEntity(_ id:String)throws {
         try entityWrite {db in
-            let kind=try db.entityKind(id),row=try db.statement("DELETE FROM memory_entities WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,id);try db.done(row);if kind == .project {try db.bumpEntityRules()}
+            let kind=try db.entityKind(id)
+            try retireEntityScopes(id,marker:.init(),db:db)
+            let row=try db.statement("DELETE FROM memory_entities WHERE id=?");defer {sqlite3_finalize(row)};db.bind(row,1,id);try db.done(row);if kind == .project {try db.bumpEntityRules()}
         }
     }
     public func linkEntity(_ id:String,to memoryID:String)throws {
@@ -146,7 +149,11 @@ extension MemoryStore {
             let ignore=try db.statement("INSERT OR IGNORE INTO entity_ignored SELECT ?,kind,key FROM entity_aliases WHERE entity_id=?");defer {sqlite3_finalize(ignore)};db.bind(ignore,1,memoryID);db.bind(ignore,2,id);try db.done(ignore)
             }
             let row=try db.statement("DELETE FROM entity_mentions WHERE memory_id=? AND entity_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,memoryID);db.bind(row,2,id);try db.done(row)
-            if kind != .project {let prune=try db.statement("DELETE FROM memory_entities WHERE id=? AND curated=0 AND NOT EXISTS(SELECT 1 FROM entity_mentions WHERE entity_id=?)");defer {sqlite3_finalize(prune)};db.bind(prune,1,id);db.bind(prune,2,id);try db.done(prune)}
+            if kind != .project,try db.entityCanPrune(id) {
+                try retireEntityScopes(id,marker:.init(),db:db)
+                let prune=try db.statement("DELETE FROM memory_entities WHERE id=? AND curated=0 AND NOT EXISTS(SELECT 1 FROM entity_mentions WHERE entity_id=?)");defer {sqlite3_finalize(prune)};db.bind(prune,1,id);db.bind(prune,2,id);try db.done(prune)
+                guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Entity changed during scope retirement")}
+            }
         }
     }
     public func entitySources(_ id:String,limit:Int=100)throws->[EntitySource] {

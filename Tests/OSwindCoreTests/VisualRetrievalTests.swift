@@ -11,7 +11,7 @@ private actor VisualTestGate {
     func open(){continuation?.resume();continuation=nil}
 }
 private actor FixtureVisualEncoder:VisualEmbeddingService {
-    var images=0,pixels=0,identities=0,batches=0,completedBatches=0
+    var images=0,pixels=0,identities=0,batches=0,completedBatches=0,texts=0
     let gate:VisualTestGate?
     let changedIdentity:Bool
     init(gate:VisualTestGate?=nil,changedIdentity:Bool=false) {self.gate=gate;self.changedIdentity=changedIdentity}
@@ -19,7 +19,7 @@ private actor FixtureVisualEncoder:VisualEmbeddingService {
     func beginBatch() async -> UUID {batches+=1;return UUID()}
     func endBatch(_ token:UUID) async {completedBatches+=1}
     func setRetention(_ value:NativeModelRetention) {}
-    func embed(text:String,directory:URL,compute:VisualCompute) -> VisualEmbedding {VisualEmbedding(modelID:"fixture-visual",vector:text.contains("blue") ? [0,1]:[1,0],seconds:0,truncated:false)}
+    func embed(text:String,directory:URL,compute:VisualCompute) -> VisualEmbedding {texts+=1;return VisualEmbedding(modelID:"fixture-visual",vector:text.contains("blue") ? [0,1]:[1,0],seconds:0,truncated:false)}
     func embed(image:Data,directory:URL,compute:VisualCompute) async throws -> VisualEmbedding {
         images+=1;if let gate {await gate.wait()}
         let value=String(decoding:image,as:UTF8.self);if value=="corrupt" {throw OSwindError.invalid("Fixture decode failed")}
@@ -50,6 +50,16 @@ final class VisualRetrievalTests:XCTestCase {
         _ = try await engine.rebuild(configuration:configuration);let changed=await encoder.images;XCTAssertEqual(changed,3)
         let missingRed=try await engine.search(SearchFilter(query:"red"),configuration:configuration);XCTAssertTrue(missingRed.hits.allSatisfy {$0.score==0})
         XCTAssertThrowsError(try store.hydrate(red.hits))
+    }
+    func testUnavailableEntityScopeNeverLoadsOrCallsVisualModel()async throws {
+        try image("owned",color:"red")
+        let encoder=FixtureVisualEncoder(),engine=VisualRetrievalEngine(store:store,encoder:encoder)
+        for query in ["","red window"] {
+            do {_=try await engine.search(.init(query:query,unavailableEntityScope:.init()),configuration:configuration);XCTFail("Unavailable scope admitted")}
+            catch {guard case OSwindError.unavailable=error else {return XCTFail("Scope must fail before model work: \(error)")}}
+        }
+        let counts=await (encoder.images,encoder.pixels,encoder.identities,encoder.texts,encoder.batches)
+        XCTAssertEqual(counts.0+counts.1+counts.2+counts.3+counts.4,0)
     }
     func testCurrentPrivacyRulesPreventInferenceAndHideExistingMatches() async throws {
         try image("one",color:"red",bundle:"test.blocked")

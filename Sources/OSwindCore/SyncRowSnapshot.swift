@@ -63,6 +63,7 @@ struct SyncRowSnapshot:Equatable,Sendable {
         try SyncIncomingSourceSchema.register(db)
         try SyncIncomingSourceProjection.register(db)
         try SyncIncomingRunProjection.register(db)
+        try EntityScopeProjection.register(db)
         try SyncIncomingEntitySchema.register(db)
         try SyncIncomingSourceErasureSchema.register(db)
         try SyncIncomingSourceErasure.register(db)
