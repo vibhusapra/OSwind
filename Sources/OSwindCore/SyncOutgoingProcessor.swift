@@ -76,7 +76,7 @@ struct SyncOutgoingProcessor {
                 if code==SQLITE_DONE || sqlite3_column_int(row,0)==0 {return .bootstrapped(table,try queue.bootstrap(table,limit:limit).objects)}
             }
             // Even an idle call must validate generation, durability and schema.
-            _=try queue.process(limit:limit) {_ in};return .idle
+            try queue.validateIdle();return .idle
         }
     }
     private final class Batch {

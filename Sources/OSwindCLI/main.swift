@@ -127,6 +127,7 @@ do {
           index-search [--model NAME] [--rebuild] [--use-index]  Prepare fast local retrieval
           eval-retrieval [--model NAME]   Evaluate the diverse relevance fixture
           backup create PATH             Back up database, chats, settings and retained media
+          backup recover PATH            Export local content without sync admission or migrations
           backup inspect PATH            Verify a complete .oswindbackup package
           backup restore PATH --to DIR   Restore into a new, quiet library
           backup cleanup [--directory PARENT] Remove abandoned staging jobs
@@ -325,6 +326,11 @@ do {
         guard let action = args.first else { throw OSwindError.invalid("Use backup create PATH, inspect PATH, restore PATH --to NEW_DIRECTORY, or cleanup") }; args.removeFirst()
         let reporter = BackupCLIProgress()
         switch action {
+        case "recover":
+            guard explicitData != nil || selectedVault != nil || ProcessInfo.processInfo.environment["OSWIND_DATA_DIR"] != nil else {throw OSwindError.invalid("Choose the recovery source with --data, --vault or OSWIND_DATA_DIR")}
+            guard args.count==1,!args[0].hasPrefix("--") else {throw OSwindError.invalid("Use backup recover NEW_BACKUP_PATH with an explicit source --data directory")}
+            let destination=URL(fileURLWithPath:args[0])
+            try encoded(await runBackupCLI {try LibraryRecovery.createBackup(from:root,destination:destination,progress:reporter.update)})
         case "create":
             let attemptsText = try validatedOption("--max-attempts") ?? "3"
             guard let attempts = Int(attemptsText), (1...10).contains(attempts), args.count==1 else { throw OSwindError.invalid("Use backup create PATH [--max-attempts 1–10]") }
@@ -344,7 +350,7 @@ do {
             let directory = try validatedOption("--directory").map { URL(fileURLWithPath:$0) } ?? FileManager.default.temporaryDirectory
             guard args.isEmpty else { throw OSwindError.invalid("Use backup cleanup [--directory PARENT]") }
             try emit(["removed_jobs":BackupWorkspaceCleanup.run(in:directory)])
-        default: throw OSwindError.invalid("Use backup create, inspect, restore or cleanup")
+        default: throw OSwindError.invalid("Use backup create, recover, inspect, restore or cleanup")
         }
     } else if command == "diarize" {
         guard let model=try validatedOption("--speaker-model") else {throw OSwindError.invalid("Use diarize AUDIO --speaker-model LOCAL_DIRECTORY")}

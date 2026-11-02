@@ -17,7 +17,7 @@ import OSwindCore
     @Published var showVaultSetup=false
     @Published private(set) var createdVault:URL?
     @Published private(set) var snapshotNeedsReview=false
-    let recoveryTransfer=LibraryTransferModel()
+    let recoveryTransfer:LibraryTransferModel
     private var selection:LibraryLocationSelection
     private let defaults:UserDefaults
     private let locked:() -> Bool
@@ -32,9 +32,10 @@ import OSwindCore
     private var watchedVaultID:String?
     private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil) {
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel()
+        self.recoveryTransfer.allowed={[weak self] in guard let self else {return false};return !self.terminationRequested && !self.busy && !self.locked()}
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
                 vaultPackage=package;requested=package.appendingPathComponent("Library");watch(package)
@@ -134,11 +135,12 @@ import OSwindCore
         run {let vault=try LibraryVault(package:package);try await vault.forgetPassphrase();self.vaultStatus=try await vault.status();self.message="Saved unlock removed. Your vault passphrase still works."}
     }
     func requestLock() {
-        guard vaultPackage != nil || busy else {return}
+        guard vaultPackage != nil || busy || recoveryTransfer.busy else {return}
         if busy {pendingLock=true;operation?.cancel();return}
         run {try await self.performLock()}
     }
     private func performLock() async throws {
+        await recoveryTransfer.cancelAndWait()
         guard let package=vaultPackage else {return}
         if let previous=model {await stageForClosing(previous)}
         let vault=try LibraryVault(package:package)
@@ -147,6 +149,7 @@ import OSwindCore
         message="Encrypted volume detached. Recording, audio and local API access are stopped."
     }
     private func departCurrent() async throws {
+        await recoveryTransfer.cancelAndWait()
         if vaultPackage != nil {try await performLock()}
         else if let previous=model {
             await stageForClosing(previous)
@@ -233,6 +236,7 @@ import OSwindCore
     func cancelOperation() {if vaultPackage != nil {pendingLock=true};operation?.cancel()}
     func lockForTermination() async -> Bool {
         terminationRequested=true
+        await recoveryTransfer.cancelAndWait()
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
         guard vaultPackage != nil else {
             model?.prepareForLibrarySwitch();await model?.cancelExternalWorkAndWait();return true
@@ -241,6 +245,9 @@ import OSwindCore
         let detached=vaultStatus?.imageAttached == false
         if !detached {terminationRequested=false}
         return detached
+    }
+    var canRecoverContent:Bool {
+        !terminationRequested && !busy && model==nil && !locked() && (vaultPackage==nil || vaultStatus?.state == .unlocked) && FileManager.default.fileExists(atPath:requested.appendingPathComponent("memory.sqlite").path)
     }
     private func run(_ work:@escaping @MainActor () async throws -> Void) {
         guard !busy else {return};busy=true;failure=nil
@@ -341,6 +348,11 @@ struct LibraryRecoveryView:View {
             if !session.busy {
             HStack {Button("Try again") {session.retry()};Button("Choose library…") {session.choose()};Button("Open default library") {session.openDefault()}}.disabled(session.busy || session.recoveryTransfer.busy)
             Button("Create encrypted library…") {session.showVaultSetup=true}.disabled(session.busy)
+            if session.canRecoverContent {
+                Divider();Text("Recover local content").font(.title2.weight(.medium))
+                Text("Export existing content when this library cannot open. Restore the backup as a new library, then set up device pairing again.").font(.callout).foregroundStyle(.secondary)
+                Button("Export recovery backup…") {session.recoveryTransfer.chooseRecovery(source:session.requested)}.disabled(session.recoveryTransfer.busy)
+            }
             Divider();Text("Restore from a backup").font(.title2.weight(.medium));LibraryTransferView(transfer:session.recoveryTransfer,store:nil).disabled(session.busy)
             }
         }.padding(40).frame(maxWidth:800,alignment:.leading).frame(maxWidth:.infinity)}

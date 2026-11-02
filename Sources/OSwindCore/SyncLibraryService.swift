@@ -26,6 +26,14 @@ final class SyncLibraryService:@unchecked Sendable {
     private let mutex=NSRecursiveLock()
     private let token:String
     private var stopped=false
+    private var externalAnchor:SyncDeliveryAnchor?
+    /// Internal admission vertical slice; lifecycle/public activation remains
+    /// owned separately from pairing and this service's scheduler.
+    func installNativeWriterAdmission()throws {
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,let externalAnchor else {throw OSwindError.invalid("Prepare external delivery authority first")}
+        try externalAnchor.installNativeWriterAdmission()
+    }
     private var pendingAfter:Int64=0
     private static let stateSchema="CREATE TABLE personal_sync_service_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,token TEXT NOT NULL,sent INTEGER NOT NULL CHECK(typeof(sent)='integer' AND sent>=0))"
     private static let peerSchema="CREATE TABLE personal_sync_service_heads(replica TEXT PRIMARY KEY,through INTEGER NOT NULL CHECK(typeof(through)='integer' AND through>=0),collection_counter INTEGER NOT NULL CHECK(typeof(collection_counter)='integer' AND collection_counter>=0))"
@@ -83,25 +91,50 @@ final class SyncLibraryService:@unchecked Sendable {
         let row=try db.statement("SELECT origin,generation,group_id,epoch,token FROM personal_sync_service_state WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==cache.catalog.scope.origin,db.text(row,1)==cache.catalog.scope.generation,db.text(row,2)==cache.journal.group,db.text(row,3)==cache.journal.epoch,db.text(row,4)==token else {throw OSwindError.unavailable("Sync service was replaced; reopen its current configuration")}
     }
-    /// Call with an existing media lease. Keep lock order media -> SQL -> settings.
-    private func fenced<T>(_ snapshot:LibrarySettingsSnapshot,_ body:()throws->T)throws->T {
+    /// Attach only before constructing the public scheduler. This verifies a
+    /// signed device transport; it does not grant native writer admission.
+    func attachExternalAnchor(_ anchor:SyncDeliveryAnchor)throws {
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,externalAnchor==nil,anchor.belongs(to:library) else {throw OSwindError.invalid("Attach delivery authority to its current service only")}
+        try anchor.requireTransport(transport);try anchor.validate()
+        try library.withRoutineDatabase {_ in try context()}
+        externalAnchor=anchor
+    }
+    /// Call with an existing media lease. Keep lock order media -> SQL ->
+    /// external authority. Provider writes use read-only fences, never mutate.
+    private func fenced<T>(_ snapshot:LibrarySettingsSnapshot,mutating:Bool=false,_ body:()throws->T)throws->T {
         try library.withRoutineDatabase {db in
-            try SyncChangeCapture.transaction(db) {
+            func perform()throws->T {
                 try context()
                 return try snapshot.withCurrent(root:library.root,policy:snapshot.settings.privacy) {
                     try context();let result=try body();try context();return result
                 }
             }
+            if let externalAnchor {
+                if mutating {return try externalAnchor.mutate(in:db,perform)}
+                return try SyncChangeCapture.transaction(db) {
+                    try externalAnchor.requireCheckpoint(in:db)
+                    let before=sqlite3_total_changes64(db.handle),result=try perform()
+                    guard sqlite3_total_changes64(db.handle)==before else {throw OSwindError.invalid("A delivery read fence attempted a native mutation")}
+                    try externalAnchor.requireCheckpoint(in:db);return result
+                }
+            }
+            return try SyncChangeCapture.transaction(db,perform)
         }
     }
     func stop()throws {
         mutex.lock();defer {mutex.unlock()}
         guard !stopped else {return}
-        try library.withRoutineDatabase {db in
-            let row=try db.statement("UPDATE personal_sync_service_state SET token='' WHERE singleton=1 AND token=?");defer {sqlite3_finalize(row)}
-            db.bind(row,1,token);try db.done(row)
+        do {
+            try library.withRoutineDatabase {db in
+                let row=try db.statement("UPDATE personal_sync_service_state SET token='' WHERE singleton=1 AND token=?");defer {sqlite3_finalize(row)}
+                db.bind(row,1,token);try db.done(row)
+            }
+            stopped=true;externalAnchor?.close();externalAnchor=nil
+        }catch {
+            if externalAnchor != nil {stopped=true;externalAnchor?.close();externalAnchor=nil}
+            throw error
         }
-        stopped=true
         // Native intent capture stays on: offline mutations must not disappear.
         // Explicit disconnect/reconciliation and bounded offline spool remain
         // enrollment-owner work before enabling unattended public scheduling.
@@ -117,6 +150,7 @@ final class SyncLibraryService:@unchecked Sendable {
         let snapshot=try LibrarySettingsSnapshot.capture(root:library.root);defer {snapshot.release()}
         let policy=SyncServicePolicy(settings:snapshot.settings),media=SyncServiceMedia(library:library,inbox:inbox,policy:policy)
         let activity=try library.mediaWriteLease();defer {activity.release()}
+        try externalAnchor?.validate()
         try fenced(snapshot) {}
         // Discover erasure before preparing local bodies. A blocked private
         // row or a large offline backlog must not starve the erasure handoff.
@@ -124,7 +158,7 @@ final class SyncLibraryService:@unchecked Sendable {
         for peer in (networkEnabled ? peers:[]) {
             try Task.checkCancellation()
             guard let head=try transport.serviceHead(replica:peer) else {continue}
-            try fenced(snapshot) {try pin(head)}
+            try fenced(snapshot,mutating:true) {try pin(head)}
             let frontier=try fenced(snapshot) {try SyncCollectionHistory(database:cache.database,replica:cache.journal.replica).current()}
             if head.collectionCounter>frontier[peer] {
                 guard let control=try transport.collectionControl(creator:peer,counter:head.collectionCounter) else {throw OSwindError.unavailable("Peer head arrived before its erasure control; retry after folder delivery")}
@@ -135,7 +169,7 @@ final class SyncLibraryService:@unchecked Sendable {
             heads.append(head)
         }
 
-        let preparation=try fenced(snapshot) {()->SyncLibraryServiceStep? in
+        let preparation=try fenced(snapshot,mutating:true) {()->SyncLibraryServiceStep? in
             let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
             if case .needsGroupReview(let control)=try history.reviewState(journal:cache.journal) {return .needsGroupReview(control)}
             try publications.context()
@@ -152,7 +186,7 @@ final class SyncLibraryService:@unchecked Sendable {
         if !networkEnabled {return .networkPaused(withheld:try fenced(snapshot) {try withheld.count()})}
 
         var sender=SyncLibrarySender(library:library,cache:cache,inbox:transport,admit:policy.admit,supplementalContent:{try self.inbox.content($0)})
-        sender.publicationFence={write in try snapshot.withCurrent(root:self.library.root,policy:snapshot.settings.privacy) {try self.context();try self.publications.context();try write();try self.context()}}
+        sender.publicationFence={write in try snapshot.withCurrent(root:self.library.root,policy:snapshot.settings.privacy) {try self.context();try self.externalAnchor?.requireCheckpoint(in:self.cache.database);try self.publications.context();try write();try self.context();try self.externalAnchor?.requireCheckpoint(in:self.cache.database)}}
         let after=try fenced(snapshot) {try self.sent()}
         let sentResult=try sender.publish(after:after,limit:limit)
         guard case .published(let through,let sent,_,_)=sentResult else {
@@ -163,8 +197,10 @@ final class SyncLibraryService:@unchecked Sendable {
             let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
             let head=try SyncServiceHead(group:cache.journal.group,epoch:cache.journal.epoch,replica:cache.journal.replica,through:through,collectionCounter:history.current()[cache.journal.replica])
             try transport.publishServiceHead(head)
-            let row=try cache.database.statement("UPDATE personal_sync_service_state SET sent=? WHERE singleton=1 AND token=?");defer {sqlite3_finalize(row)}
-            sqlite3_bind_int64(row,1,through);cache.database.bind(row,2,token);try cache.database.done(row)
+        }
+        try fenced(snapshot,mutating:true) {
+            let row=try cache.database.statement("UPDATE personal_sync_service_state SET sent=? WHERE singleton=1 AND token=? AND sent<>?");defer {sqlite3_finalize(row)}
+            sqlite3_bind_int64(row,1,through);cache.database.bind(row,2,token);sqlite3_bind_int64(row,3,through);try cache.database.done(row)
         }
         var writer=SyncIncomingConversationWriter(library:library,cache:cache,admit:policy.admit,pathsFor:{reference,manifests in
             try media.paths(reference,manifests,fetch:{try self.fetch($0)})
@@ -199,7 +235,7 @@ final class SyncLibraryService:@unchecked Sendable {
             // predecessor. Journal causal cursors still advance contiguously.
             operations.sort {if $0.mutation != $1.mutation {return $0.mutation == .delete};return $0.dot.counter<$1.dot.counter}
             for operation in operations {
-                try fenced(snapshot) {
+                try fenced(snapshot,mutating:true) {
                     if let declaration=operation.publication {try retainDeclaration(declaration)}
                     let packet:SyncPortableRecord?
                     if let reference=operation.content,let bytes=try transport.content(reference) {
@@ -212,7 +248,7 @@ final class SyncLibraryService:@unchecked Sendable {
                 }
             }
         }
-        let pending=try fenced(snapshot) {
+        let pending=try fenced(snapshot,mutating:true) {
             // Providers can deliver a declaration after its operation/cursor.
             // Poll durable pending owners fairly even without new operations.
             var jobs=try publications.jobs(limit:limit,readyOnly:false,after:pendingAfter)
@@ -245,8 +281,11 @@ final class SyncLibraryService:@unchecked Sendable {
     }
     private func sent()throws->Int64 {Int64(try cache.database.eraseCount("SELECT sent FROM personal_sync_service_state WHERE singleton=1"))}
     private func pin(_ head:SyncServiceHead)throws {
-        let db=cache.database,row=try db.statement("INSERT INTO personal_sync_service_heads VALUES(?,?,?) ON CONFLICT(replica) DO UPDATE SET through=excluded.through,collection_counter=excluded.collection_counter WHERE through<=excluded.through AND collection_counter<=excluded.collection_counter");defer {sqlite3_finalize(row)}
+        let db=cache.database,row=try db.statement("INSERT INTO personal_sync_service_heads VALUES(?,?,?) ON CONFLICT(replica) DO UPDATE SET through=excluded.through,collection_counter=excluded.collection_counter WHERE through<=excluded.through AND collection_counter<=excluded.collection_counter AND (through<excluded.through OR collection_counter<excluded.collection_counter)");defer {sqlite3_finalize(row)}
         db.bind(row,1,head.replica);sqlite3_bind_int64(row,2,head.through);sqlite3_bind_int64(row,3,head.collectionCounter);try db.done(row)
-        guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Peer head rolled back; review the restored device before resuming")}
+        if sqlite3_changes(db.handle)==0 {
+            let current=try db.statement("SELECT through,collection_counter FROM personal_sync_service_heads WHERE replica=?");defer {sqlite3_finalize(current)};db.bind(current,1,head.replica)
+            guard sqlite3_step(current)==SQLITE_ROW,sqlite3_column_int64(current,0)==head.through,sqlite3_column_int64(current,1)==head.collectionCounter else {throw OSwindError.invalid("Peer head rolled back; review the restored device before resuming")}
+        }
     }
 }
