@@ -12,7 +12,7 @@ extension VaultSessionTests {
         try await SourceWorkTestJob.settle(model);try model.store.insert(Memory(id:"keep",text:"Owned encrypted original"))
         let gate=ImportWorkerGate();defer {gate.release()}
         try kind.start(model,gate:gate,committed:committed);await fulfillment(of:[gate.entered],timeout:10)
-        let expected=committed ? 2:1
+        let expected=committed ? 2:kind.recordedSources
         XCTAssertEqual(try model.store.stats(includeDiskUsage:false).count,expected)
         session.requestLock();await fulfillment(of:[gate.cancelled],timeout:10)
         XCTAssertTrue(session.busy);XCTAssertNil(session.model);XCTAssertFalse(model.store.isClosed)
@@ -38,4 +38,10 @@ extension VaultSessionTests {
     func testNativeLockWaitsForActualSelectedMetadataReader()async throws {try await sourceWorkLock(.selectedPII)}
     func testNativeLockWaitsForActualSourceHydration()async throws {try await sourceWorkLock(.sourceOpening)}
     func testNativeLockWaitsForActiveHistoricalValidation()async throws {try await sourceWorkLock(.historicalValidation)}
+    func testNativeLockWaitsForActualQueryTask()async throws {try await sourceWorkLock(.query)}
+    func testNativeLockWaitsForActualTextRebuildTask()async throws {try await sourceWorkLock(.textRebuild)}
+    func testNativeLockWaitsForActualFastPreparationTask()async throws {try await sourceWorkLock(.fastIndex)}
+    func testNativeLockWaitsForActualAutomaticTextIndexTask()async throws {try await sourceWorkLock(.automaticText)}
+    func testNativeLockWaitsForActualVisualRebuildTask()async throws {try await sourceWorkLock(.visualRebuild)}
+    func testNativeLockWaitsForActualAutomaticVisualIndexTask()async throws {try await sourceWorkLock(.automaticVisual)}
 }

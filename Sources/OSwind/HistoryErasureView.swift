@@ -111,6 +111,6 @@ struct HistoryErasureView:View {
                 m.pauseForHistoryErasure()
                 model.apply(store:m.store) {m.refreshChats();m.routines.reload();m.invalidateStorageEstimate();m.refresh(forceStatistics:true)}
             }
-        } message: {Text("Matching current sources, original versions, retained media and entire answers that cite them will be removed. Shared media stays when another source still uses it. If history changed, you will need a new preview.")}
+        } message: {Text("Matching current sources, original versions, retained media and entire answers that cite them will be removed. Capture pauses, and pending imports and saves are canceled. Shared media stays when another source still uses it. If history changed, you will need a new preview.")}
     }
 }
