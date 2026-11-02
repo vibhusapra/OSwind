@@ -1,6 +1,6 @@
 # Personal sync enrollment — credential foundation WIP
 
-The core can now save and reload its private device/owner/group key material through a dedicated Keychain backend and validate a saved native-library binding. These are internal building blocks. The app still has no public create/join constructor or completed setup flow; F059 remains TODO.
+The core can now save and reload its private device/owner/group key material through a dedicated Keychain backend and validate a saved native-library binding. The [native pairing preview](SYNC-PAIRING-PREVIEW.md) now supplies a public core owner and resumable create/join/review/acceptance UI over a dedicated Keychain envelope. Delivery session activation remains unfinished; F059 remains TODO. This document retains the earlier credential-foundation evidence below.
 
 Private key types remain non-Codable and redact descriptions and Mirror. Only an explicit bounded private-material encoder produces Keychain bytes. Reload checks the certificate, device keys and optional owner authority. An owned native test saves a generated 64-member group's material, reloads the original signing and agreement keys, verifies a packet and opens the original encrypted space, then confirms removal of its disposable credential.
 
@@ -24,9 +24,9 @@ These are focused development checks. They are separate from the [published sign
 
 ## Next delivery work
 
-- Persist a complete credential envelope and pending/active lifecycle; keep every private key out of SQLite, settings, argv, environment and provider objects.
+- Extend the implemented pending/joined/owner/retired pairing envelope into a verified active-delivery credential lifecycle; keep every private key out of SQLite, settings, argv, environment and provider objects.
 - Advance an external writer sequence/digest ceiling before provider publication, and preserve received head/erase/receipt checkpoints. Refuse restored or cloned stale writer state; do not claim global freshness from a withholding provider.
 - Enforce enrolled native writer capability admission, including already-running old clients. Ordinary unenrolled native33 and frozen compatibility evidence must remain meaningful.
-- Deliver real native create/join/fingerprint review through `PersonalSyncModel.prepare`, with actual status, cancellation and partial-install cleanup. Complete state is not a draft or an allocated credential.
+- Connect the implemented native create/join/fingerprint preview to verified session/folder activation through the owned setup boundary, with actual status, cancellation and partial-install cleanup. A paired identity is not an active delivery session.
 - Integrate native local/received erase drain, physical cleanup and exact completion into credential binding renewal; never reset causal/deletion history to reconnect.
 - Finish membership refresh, recovery/revocation/rotation, cold offline and raw-queue pressure, large resumable graphs and selective spool/backup semantics. Revisit the full 83-feature matrix, local GPU/BYOK/design, sustained power and distribution gates.
