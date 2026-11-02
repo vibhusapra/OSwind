@@ -452,7 +452,8 @@
       "tests": 2,
       "failedAssertions": 2,
       "unexpected": 0,
-      "fixedOriginalTestsUnchanged": true
+      "originalFailingAssertionsUnchanged": true,
+      "originalTestExtendedWithWaitingStateRegression": true
     },
     {
       "kind": "owned unsafe-path fixture admission",
