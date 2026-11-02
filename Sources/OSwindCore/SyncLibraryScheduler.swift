@@ -79,7 +79,9 @@ actor SyncLibraryScheduler {
         switch state {case .waitingForLocalReview,.waitingForNativeRetirement:return;default:break}
         guard let worker=task else {return}
         reconfiguring=true;defer {reconfiguring=false}
-        generation=UUID();task=nil;worker.cancel();await worker.value
+        // Retain ownership across the actor suspension: a concurrent stop must
+        // join this same worker before its library can be closed or replaced.
+        generation=UUID();worker.cancel();await worker.value
         guard !finished else {return}
         launch()
     }
