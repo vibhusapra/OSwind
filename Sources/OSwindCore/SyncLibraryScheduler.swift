@@ -33,6 +33,7 @@ actor SyncLibraryScheduler {
     private var stoppingTask:Task<Void,Error>?
     private var finished=false
     private var reconfiguring=false
+    private var retirementReserved=false
     private var processingPaused=false,pausing=false
     private var networkEnabled=true
     private var generation=UUID()
@@ -61,7 +62,7 @@ actor SyncLibraryScheduler {
         for observer in observers.values {observer.yield(value)}
     }
     func start(networkEnabled:Bool?=nil)throws {
-        guard task==nil,!finished,!reconfiguring,!processingPaused,!pausing else {throw OSwindError.invalid("Create a fresh sync scheduler after stopping or replacing its owner")}
+        guard task==nil,!finished,!retirementReserved,!reconfiguring,!processingPaused,!pausing else {throw OSwindError.invalid("Create a fresh sync scheduler after stopping or replacing its owner")}
         if let networkEnabled {self.networkEnabled=networkEnabled}
         launch()
     }
@@ -98,14 +99,23 @@ actor SyncLibraryScheduler {
         guard !finished else {return}
         processingPaused=true
         if pausing {let worker=task;await worker?.value;return}
-        switch state {case .waitingForLocalReview,.waitingForNativeRetirement:return;default:break}
         pausing=true;defer {pausing=false}
         generation=UUID();let worker=task;worker?.cancel();await worker?.value
         guard !finished else {return}
-        task=nil;update(.suspended)
+        task=nil
+        switch state {case .waitingForLocalReview,.waitingForNativeRetirement:break;default:update(.suspended)}
+    }
+    /// Join the actual scheduler worker without closing its credential owner.
+    /// Reservation is terminal: only the retirement owner or stop may proceed.
+    func reserveForRetirement()async throws->SyncLibrarySchedulerState {
+        guard !finished,!retirementReserved,!reconfiguring,!pausing else {throw OSwindError.unavailable("Sync is stopping or changing; reopen before retiring history")}
+        retirementReserved=true
+        await pauseProcessing()
+        guard !finished else {throw OSwindError.unavailable("Sync stopped before retirement began")}
+        return state
     }
     func resumeProcessing()throws {
-        guard !finished,!reconfiguring,!pausing else {throw OSwindError.unavailable("Sync scheduling is stopping or changing")}
+        guard !finished,!retirementReserved,!reconfiguring,!pausing else {throw OSwindError.unavailable("Sync scheduling is stopping or changing")}
         processingPaused=false
         switch state {case .waitingForLocalReview,.waitingForNativeRetirement:return;default:break}
         if task==nil {launch()}
@@ -113,7 +123,7 @@ actor SyncLibraryScheduler {
     /// Pause/resume acknowledges the joined old network worker. A replacement
     /// continues local preparation; no old task may publish a late UI state.
     func setNetworkEnabled(_ enabled:Bool)async throws {
-        guard !finished,!reconfiguring else {throw OSwindError.unavailable("Sync scheduling is stopping or changing")}
+        guard !finished,!retirementReserved,!reconfiguring else {throw OSwindError.unavailable("Sync scheduling is stopping or changing")}
         guard enabled != networkEnabled else {return}
         networkEnabled=enabled
         if processingPaused {return}

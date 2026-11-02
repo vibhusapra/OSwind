@@ -20,6 +20,7 @@ import OSwindCore
     private var generation=UUID(),requestGeneration=UUID()
     private var requested=false,userPaused=false,pendingRefresh=false,notificationAttempted=false
     private var timer:Timer?
+    private let retirement=LibraryTaskRetirement()
     private var loadTask:Task<Void,Never>?,selectionTask:Task<Void,Never>?,deliveryTask:Task<Void,Never>?
     private var rawEvents=[MeetingOccurrence](),loadedRevision:UInt64?,lastRead:Date?
     var allowed:()->Bool={true}
@@ -36,7 +37,7 @@ import OSwindCore
     var configuration:MeetingContextConfiguration {settings.meetings}
     var isPaused:Bool {userPaused}
     var pollingSeconds:TimeInterval {lowPower() ? 90:30}
-    private var canUse:Bool {!store.isClosed && !locked() && allowed() && settings.privacy.exclusion(app:"com.apple.iCal",title:"",url:nil)==nil}
+    private var canUse:Bool {retirement.accepting && !store.isClosed && !locked() && allowed() && settings.privacy.exclusion(app:"com.apple.iCal",title:"",url:nil)==nil}
     private var prefix:String {"com.oswind.meeting."+(configuration.boundLibrary ?? "unbound")+"."+generation.uuidString.lowercased()+"."}
     func apply(_ value:AppSettings) {
         let changed=settings.meetings != value.meetings || settings.privacy != value.privacy
@@ -54,7 +55,7 @@ import OSwindCore
     }
     func connect() {
         guard !busy,canUse else {status="Calendar is unavailable while locked, busy or excluded by Privacy.";return}
-        selectionTask?.cancel();requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
+        retirement.retire(selectionTask);requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
         selectionTask=Task {[weak self] in
             guard let self else {return}
             defer {finishSelection(request)}
@@ -79,7 +80,7 @@ import OSwindCore
         guard !busy,canUse,calendars.contains(where:{$0.key==calendar.key}) else {return}
         var ids=configuration.calendarIDs.filter {Data($0.utf8) != Data(calendar.id.utf8)}
         if enabled {ids.append(calendar.id)}
-        selectionTask?.cancel();requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
+        retirement.retire(selectionTask);requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
         selectionTask=Task {[weak self] in
             guard let self else {return};defer {finishSelection(request)}
             do {
@@ -93,7 +94,7 @@ import OSwindCore
     }
     func setReminderPreferences(enabled:Bool,lead:Int) {
         guard !busy,canUse,configuration.enabled else {return}
-        selectionTask?.cancel();requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
+        retirement.retire(selectionTask);requestGeneration=UUID();let request=requestGeneration;busy=true;self.error=nil
         selectionTask=Task {[weak self] in
             guard let self else {return};defer {finishSelection(request)}
             do {
@@ -130,11 +131,12 @@ import OSwindCore
         // Clearing only the retired generation cannot remove a new generation's
         // notifications when asynchronous OS removal finishes late.
         let oldPrefix=prefix,clearNotifications=notificationAttempted;notificationAttempted=false;generation=UUID();requestGeneration=UUID();timer?.invalidate();timer=nil
-        loadTask?.cancel();loadTask=nil;selectionTask?.cancel();selectionTask=nil;deliveryTask?.cancel();deliveryTask=nil;active=false;busy=false;pendingRefresh=false
+        retirement.retire(loadTask);loadTask=nil;retirement.retire(selectionTask);selectionTask=nil;retirement.retire(deliveryTask);deliveryTask=nil;active=false;busy=false;pendingRefresh=false
         if !preserveRequest {requested=false}
         if clear {events=[];due=[];rawEvents=[];loadedRevision=nil;lastRead=nil;calendars=[];self.error=nil}
-        if clearNotifications {let clear=delivery.clear;Task {await clear(oldPrefix)}}
+        if clearNotifications {let clear=delivery.clear;retirement.hold(Task {await clear(oldPrefix)})}
     }
+    func cancelAndWait()async {stop(clear:true);await retirement.drain()}
     func invalidate() {
         guard active else {return};events=[];due=[];lastRead=nil
         if busy || loadTask != nil {pendingRefresh=true}else {refresh(force:true)}
@@ -208,7 +210,7 @@ import OSwindCore
     private func verify(_ event:MeetingOccurrence,action:@escaping (MeetingOccurrence)->Void) {
         guard active,canUse,!busy else {return}
         let token=generation,c=configuration,policy=settings.privacy,source=provider,date=now(),store=self.store
-        selectionTask?.cancel();requestGeneration=UUID();let request=requestGeneration;busy=true
+        retirement.retire(selectionTask);requestGeneration=UUID();let request=requestGeneration;busy=true
         selectionTask=Task {[weak self] in
             guard let self else {return};defer {finishSelection(request)}
             do {

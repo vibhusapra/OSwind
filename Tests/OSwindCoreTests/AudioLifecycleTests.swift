@@ -45,6 +45,18 @@ import AVFoundation
         audio.stop(); gate.resolve(); await attempt.value
         XCTAssertEqual(acquired,0); XCTAssertFalse(audio.running); XCTAssertEqual(audio.status,"Audio off")
     }
+    func testCancelledOverlappingDrainsJoinLateAuthorizationAndRejectNewStartup()async throws {
+        let gate=Gate();var acquired=0,firstDone=false,secondDone=false
+        let (audio,root)=try fixture(gate) {acquired+=1};defer {audio.stop();try? FileManager.default.removeItem(at:root)}
+        let attempt=Task {await audio.start()};await fulfillment(of:[gate.entered],timeout:5)
+        let first=Task {await audio.cancelAndWait();firstDone=true}
+        let second=Task {await audio.cancelAndWait();secondDone=true};second.cancel()
+        try await Task.sleep(for:.milliseconds(30))
+        XCTAssertFalse(firstDone);XCTAssertFalse(secondDone)
+        await audio.start();XCTAssertFalse(audio.running);XCTAssertEqual(acquired,0)
+        gate.resolve();await attempt.value;await first.value;await second.value
+        XCTAssertTrue(firstDone);XCTAssertTrue(secondDone);XCTAssertEqual(acquired,0)
+    }
     func testFinishDuringAuthorizationCancelsStartup() async throws {
         let gate=Gate(); var acquired=0
         let (audio,root)=try fixture(gate) { acquired += 1 }; defer { audio.stop(); try? FileManager.default.removeItem(at:root) }
@@ -110,10 +122,25 @@ import AVFoundation
     }
     private final class FakeCapture: AudioSystemCapture {
         var active=false, starts=0, stops=0
-        var gate:Gate?
+        var gate:Gate?,stopGate:Gate?
         init(gate:Gate?=nil) { self.gate=gate }
         func start() async throws { starts += 1; if let gate { _ = await gate.authorize() }; active=true }
-        func stop() async throws { stops += 1; active=false }
+        func stop() async throws { stops += 1; if let stopGate {_=await stopGate.authorize()};active=false }
+    }
+    func testDrainJoinsAsynchronousDeviceStopAfterItsPublicHandleWasReleased()async throws {
+        let unused=Gate(),stopGate=Gate(),capture=FakeCapture();capture.stopGate=stopGate
+        let (audio,root)=try fixture(unused,configure:{env in
+            env.systemAvailable={true};env.makeSystemCapture={_,_ in capture}
+        },acquire:{XCTFail("No microphone in this fixture")})
+        defer {stopGate.resolve();audio.stop();try? FileManager.default.removeItem(at:root)}
+        audio.settings.audioEnabled=false;audio.settings.systemAudioEnabled=true
+        await audio.start();XCTAssertTrue(capture.active)
+        audio.stop();await fulfillment(of:[stopGate.entered],timeout:5)
+        var finished=false
+        let drain=Task {await audio.cancelAndWait();finished=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(30));XCTAssertFalse(finished);XCTAssertTrue(capture.active)
+        stopGate.resolve();await drain.value
+        XCTAssertTrue(finished);XCTAssertFalse(capture.active);XCTAssertEqual(capture.stops,1)
     }
     func testStopDuringContentLookupCannotStartStream() async throws {
         let gate=Gate(), capture=FakeCapture()

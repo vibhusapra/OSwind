@@ -42,6 +42,8 @@ public struct CaptureMetrics: Sendable {
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
         }
     }
+    private let producerTasks=LibraryProducerTasks()
+    private var replayDelay:Task<Void,Error>?
     private var replay:ReplayCaptureSession?
     private var replayGate=ReplayCommitGate()
     public var onCapture: ((Memory) -> Void)?
@@ -57,7 +59,7 @@ public struct CaptureMetrics: Sendable {
     private var textCommitWorker:Task<Memory,Error>?
     private var textGate=ReplayCommitGate()
     private var lastTextCapture:TextObservationCursor?
-    private func cancelSnapshotWork(){snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel();textReservationWorker?.cancel();textPreparationWorker?.cancel();textCommitWorker?.cancel();textGate.invalidate();textGate=ReplayCommitGate();lastTextCapture=nil}
+    private func cancelSnapshotWork(){replayDelay?.cancel();snapshotContextWorker?.cancel();snapshotWorker?.cancel();snapshotPassages?.cancel();textReservationWorker?.cancel();textPreparationWorker?.cancel();textCommitWorker?.cancel();textGate.invalidate();textGate=ReplayCommitGate();lastTextCapture=nil}
     private var timer: Timer?
     private var observers = [AnyCancellable]()
     private var busy = false
@@ -74,7 +76,7 @@ public struct CaptureMetrics: Sendable {
         for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification, NSWorkspace.sessionDidBecomeActiveNotification] { observers.append(center.publisher(for:name).sink { [weak self] _ in Task { @MainActor in self?.suspended = false; if let self,self.running {self.configureMode()} } }) }
     }
     public func start() {
-        guard !running else {return}
+        guard producerTasks.accepting,!running else {return}
         if settings.visualCaptureMode == .accessibility {
             guard snapshots.accessibilityPermitted() else {status="Accessibility permission required for text-only capture";return}
         } else {guard snapshots.permitted() else {status="Screen Recording permission required";return}}
@@ -90,14 +92,22 @@ public struct CaptureMetrics: Sendable {
         guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
         if settings.visualCaptureMode == .replay && !settings.allDisplays && settings.snapshotRegions.focusedWindowCrop==nil {
             timer?.invalidate();timer=nil;replay?.stop();
-            let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
+            let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,lifetime:producerTasks,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
             replay=session;session.start()
         } else {replay?.stop();replay=nil;schedule();Task {await captureOnce()}}
     }
     public func pause(discardReplay:Bool=false) { if discardReplay {replayGate.invalidate();replayGate=ReplayCommitGate()}; replay?.stop(discard:discardReplay);replay=nil; running = false; epoch = UUID();cancelSnapshotWork();timer?.invalidate(); timer = nil; status = "Paused" }
+    /// Join late AX/frame/OCR/encoding work as well as its admission callback.
+    /// Cancellation of a drain caller does not release unfinished producers.
+    public func cancelAndWait()async {
+        pause(discardReplay:true)
+        await producerTasks.drain()
+    }
     /// Explicit bounded replay, including a chosen app. Existing permissions
     /// only; never prompts or falls through to a different app when absent.
     public func captureReplay(seconds:Double,targetBundleID:String?=nil) async throws {
+        guard producerTasks.accepting else {throw OSwindError.unavailable("Capture is stopping for its library")}
+        let operation=producerTasks.begin();defer {producerTasks.finish(operation)}
         guard settings.visualCaptureMode != .accessibility else {throw OSwindError.invalid("Text-only mode cannot capture replay · select a pixel mode explicitly in Settings")}
         guard settings.snapshotRegions.valid else {throw OSwindError.invalid("Invalid capture area; choose a new area in Settings")}
         guard !settings.allDisplays else {throw OSwindError.invalid("Replay requires focused-window mode; turn off display capture first")}
@@ -106,9 +116,10 @@ public struct CaptureMetrics: Sendable {
         guard !SessionState.locked,CGPreflightScreenCaptureAccess() else {throw OSwindError.unavailable("Replay needs an unlocked session and existing Screen Recording access")}
         let previousSaved=metrics.saved,previousErrors=metrics.errors
         busy=true;running=true;defer {busy=false;running=false;replay=nil}
-        let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,targetBundleID:targetBundleID,onMemory:{[weak self] memory in self?.metrics.saved+=1;self?.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
+        let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,lifetime:producerTasks,targetBundleID:targetBundleID,onMemory:{[weak self] memory in self?.metrics.saved+=1;self?.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
         replay=session;session.start()
-        do {try await Task.sleep(nanoseconds:UInt64(seconds*1_000_000_000))} catch {session.stop(discard:true);await session.waitUntilStopped();throw error}
+        let delay=Task {try await Task.sleep(nanoseconds:UInt64(seconds*1_000_000_000))};replayDelay=delay;defer {replayDelay=nil}
+        do {try await withTaskCancellationHandler(operation:{try await delay.value},onCancel:{delay.cancel()})} catch {session.stop(discard:true);await session.waitUntilStopped();throw error}
         session.stop();await session.waitUntilStopped()
         guard metrics.errors==previousErrors else {throw OSwindError.unavailable("Replay encountered \(metrics.errors-previousErrors) errors: "+status)}
         guard metrics.saved>previousSaved else {throw OSwindError.unavailable("Replay saved no evidence: "+status)}
@@ -138,6 +149,8 @@ public struct CaptureMetrics: Sendable {
         return now
     }
     public func captureOnce(manual: Bool = false, targetBundleID: String? = nil) async {
+        guard producerTasks.accepting else {return}
+        let operation=producerTasks.begin();defer {producerTasks.finish(operation)}
         guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
         if settings.visualCaptureMode == .accessibility {await captureTextOnce(manual:manual,targetBundleID:targetBundleID);return}
         guard manual || settings.visualCaptureMode != .replay || settings.allDisplays || settings.snapshotRegions.focusedWindowCrop != nil else {return}

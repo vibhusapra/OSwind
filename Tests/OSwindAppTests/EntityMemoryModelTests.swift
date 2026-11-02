@@ -31,6 +31,34 @@ private final class EntityWorkerGate:@unchecked Sendable {
         gate.release();try await wait {gate.count==2 && !model.indexing}
         XCTAssertEqual(gate.peak,1)
     }
+    func testDrainRetainsAlreadyClearedMutationUntilItsActualWorkerReturns()async throws {
+        let (root,store)=try fixture(),gate=EntityWorkerGate();defer {gate.release();try? store.close();try? FileManager.default.removeItem(at:root)}
+        let model=EntityMemoryModel(store:store)
+        model.mutate {database in _=try gate.run("owned",database.entityIndexPlan());_=try database.createEntity(kind:.person,name:"Canceled mutation")}
+        await fulfillment(of:[gate.entered],timeout:5);model.clear()
+        var firstDone=false,secondDone=false
+        let first=Task {await model.cancelAndWait();firstDone=true}
+        let second=Task {await model.cancelAndWait();secondDone=true};second.cancel()
+        try await Task.sleep(for:.milliseconds(30));XCTAssertFalse(firstDone);XCTAssertFalse(secondDone)
+        model.mutate {_ in XCTFail("No mutation can enter a draining producer")}
+        gate.release();await first.value;await second.value
+        XCTAssertTrue(firstDone);XCTAssertTrue(secondDone);XCTAssertTrue(try store.entities().isEmpty)
+        model.mutate {database in _=try database.createEntity(kind:.person,name:"Fresh mutation")}
+        try await wait {!model.editing};XCTAssertEqual(try store.entities().map(\.name),["Fresh mutation"])
+        await model.cancelAndWait()
+    }
+    func testAppStorageDepartureJoinsEntityMutationClearedByItsSynchronousRetirement()async throws {
+        let (root,store)=try fixture(),gate=EntityWorkerGate();try store.close()
+        let app=try AppModel(root:root,startServices:false)
+        defer {gate.release();app.prepareForLibrarySwitch();try? app.store.close();try? FileManager.default.removeItem(at:root)}
+        app.entityMemory.mutate {database in _=try gate.run("owned",database.entityIndexPlan());_=try database.createEntity(kind:.person,name:"Late old library mutation")}
+        await fulfillment(of:[gate.entered],timeout:5)
+        app.prepareForLibrarySwitch();var departed=false
+        let drain=Task {await app.cancelExternalWorkAndWait();departed=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(30));XCTAssertFalse(departed);XCTAssertFalse(app.store.isClosed)
+        gate.release();await drain.value
+        XCTAssertTrue(departed);XCTAssertTrue(try app.store.entities().isEmpty)
+    }
     func testClearCancelsLateMutationWithoutPublishingNamesOrCommitting() async throws {
         let (root,store)=try fixture(),gate=EntityWorkerGate();defer {gate.release();try? store.close();try? FileManager.default.removeItem(at:root)}
         let model=EntityMemoryModel(store:store)

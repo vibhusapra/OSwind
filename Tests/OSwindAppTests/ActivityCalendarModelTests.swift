@@ -36,6 +36,16 @@ private actor CalendarModelFixture {
         model.reload();await fulfillment(of:[fixture.entered],timeout:5);model.deactivate(clear:true);await fixture.release()
         for _ in 0..<10 {await Task.yield()};XCTAssertNil(model.snapshot);XCTAssertNil(model.error);XCTAssertFalse(model.busy)
     }
+    func testCancelledDrainJoinsAlreadyDeactivatedCalendarReadBeforeReopeningAdmission()async throws {
+        let fixture=CalendarModelFixture(gateMonth:"2024-03"),model=ActivityCalendarModel(month:"2024-03",timeZone:zone,load:{try await fixture.load($0)},revision:{await fixture.revision()})
+        model.reload();await fulfillment(of:[fixture.entered],timeout:5);model.deactivate(clear:true)
+        var done=false;let drain=Task {await model.cancelAndWait();done=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(30));XCTAssertFalse(done)
+        model.month="2024-04";model.activate();model.reload()
+        let loads=await fixture.loads;XCTAssertEqual(loads,1)
+        await fixture.release();await drain.value;XCTAssertTrue(done);XCTAssertNil(model.snapshot)
+        model.reload();try await settled(model,month:"2024-04");await model.cancelAndWait()
+    }
     func testUnchangedRevisionDoesNotReloadAndMutationDoes() async throws {
         let fixture=CalendarModelFixture(),model=ActivityCalendarModel(month:"2024-03",timeZone:zone,load:{try await fixture.load($0)},revision:{await fixture.revision()});defer {model.deactivate()}
         model.reload();try await settled(model,month:"2024-03");await model.checkForChanges();let first=await fixture.loads;XCTAssertEqual(first,1)
