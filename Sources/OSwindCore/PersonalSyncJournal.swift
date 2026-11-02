@@ -45,6 +45,7 @@ struct SyncJournal {
             let peer=try db.statement("INSERT INTO personal_sync_peers(replica,cursor) VALUES(?,0) ON CONFLICT(replica) DO NOTHING")
             defer {sqlite3_finalize(peer)};db.bind(peer,1,replica);try db.done(peer)
             try initializeObserved(db)
+            _=try SyncCollectionHistory.install(db,replica:replica)
             _=try Self(database:db,replica:replica,group:group,epoch:epoch)
         }
         return try Self(database:db,replica:replica,group:group,epoch:epoch)
