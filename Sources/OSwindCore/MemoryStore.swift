@@ -172,6 +172,7 @@ public final class MemoryStore: @unchecked Sendable {
         try TextObservationSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,missingPins:missingPins) {
             try SyncChangeCapture.install(on:RoutineDatabase(handle:self.db!),sourceVersion:version,repairMissingPins:missingPins,repairCitationUpgrade:upgradedCitations)
         }
+        if missingPins {try SyncCollectionHistory.repairMissingPinTriggers(RoutineDatabase(handle:db!))}
         try SyncIncomingSourceSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try RoutineRunOriginalSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)
         try SyncIncomingEntitySchema.install(RoutineDatabase(handle:db!),sourceVersion:version,repairMissingPins:missingPins)

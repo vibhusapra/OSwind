@@ -30,10 +30,14 @@ final class VaultProcessStartTests:XCTestCase {
         let program="""
         import pathlib,os,sys
         root=pathlib.Path(\(String(reflecting:root.path)))
-        (root/'ready').write_text(str(os.getpid()))
+        def publish(name,value):
+            pending=root/(name+'.pending')
+            pending.write_text(value)
+            pending.replace(root/name)
+        publish('ready',str(os.getpid()))
         payload=sys.stdin.buffer.read()
         assert len(payload)>1 and payload[-1]==0
-        (root/'consumed').write_text(str(len(payload)))
+        publish('consumed',str(len(payload)))
         print('owned-finished',flush=True)
         """
         try program.write(to:file,atomically:true,encoding:.utf8)
@@ -76,13 +80,17 @@ final class VaultProcessStartTests:XCTestCase {
         let program="""
         import pathlib,os,sys,time
         root=pathlib.Path(\(String(reflecting:root.path)))
+        def publish(name,value):
+            pending=root/(name+'.pending')
+            pending.write_text(value)
+            pending.replace(root/name)
         payload=sys.stdin.buffer.read()
         assert len(payload)>1 and payload[-1]==0
-        (root/'consumed').write_text(str(len(payload)))
+        publish('consumed',str(len(payload)))
         deadline=time.monotonic()+20
         while not (root/'release').exists() and time.monotonic()<deadline:time.sleep(.005)
         assert (root/'release').exists()
-        (root/'completed').write_text('owned-finished')
+        publish('completed','owned-finished')
         """
         try program.write(to:file,atomically:true,encoding:.utf8)
         let gate=OwnedProcessStartGate(expectation(description:"Owned helper received EOF")),secret=Data("owned test credential".utf8)

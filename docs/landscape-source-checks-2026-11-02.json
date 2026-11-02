@@ -1,0 +1,254 @@
+{
+  "format": "OSwind twenty-row targeted primary claim recheck",
+  "checkedAtUTC": "2026-11-02T09:46:33.647263+00:00",
+  "scope": "All20 publisher rows received a targeted primary homepage/pricing/support/README recheck. Scope varies by row; selected API README blob hashes are retained separately. This is not a runtime/security/energy/checkout qualification, nor a claim that every older secondary page was refreshed.",
+  "rows": [
+    {
+      "name": "Screenpipe",
+      "sources": [
+        "https://screenpipe.com/onboarding",
+        "https://docs.screenpipe.com/local-or-cloud-ai",
+        "https://docs.screenpipe.com/recording-controls",
+        "https://github.com/screenpipe/screenpipe",
+        "https://screenpipe.com/changelog",
+        "https://docs.screenpipe.com/architecture",
+        "https://docs.screenpipe.com/storage-and-retention",
+        "https://docs.screenpipe.com/privacy-filter",
+        "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md"
+      ],
+      "review": "November 2 primary pricing, AI/capture/privacy/storage/architecture docs, license, README and changelog; latest listed desktop 2.7.84 dated October 6. No vendor binary, checkout or redaction/power audit. Exact older benchmark source remains separate.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Original Rewind / Limitless",
+      "sources": [
+        "https://www.limitless.ai/",
+        "https://help.limitless.ai/en/articles/13048802-where-can-i-find-my-rewind-data"
+      ],
+      "review": "November 2 official announcement and local-data help page; desktop/web recording unavailable, Rewind capture sunset, continuing Pendant support through 2026. Historical price/help details retain their prior scope. No account or runtime test.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Rewind Desktop (rewind.app)",
+      "sources": [
+        "https://rewind.app/"
+      ],
+      "review": "November 2 direct homepage confirms local screen timeline/search and optional encrypted personal S3 archive; comparison article still cache-miss. This independent product is separate from original Rewind/Limitless. No checkout or binary test.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Pieces",
+      "sources": [
+        "https://pieces.app/pricing"
+      ],
+      "review": "November 2 direct monthly pricing/model/BYOK table: 18.99 USD Pro, 22.99 USD Enterprise or 69.99 USD/quarter. Exact annual selection, billing and app runtime unverified.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Littlebird",
+      "sources": [
+        "https://littlebird.ai/pricing"
+      ],
+      "review": "November 2 direct annual-default plans/limits and cloud-memory FAQ; selected Pro 5x quote only. No account, checkout or runtime/security audit.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Microsoft Recall",
+      "sources": [
+        "https://support.microsoft.com/en-us/windows/ai/ai-features/retrace-your-steps-with-recall"
+      ],
+      "review": "November 2 official support requirements/features recheck. Windows-only; no hardware purchase, account or runtime benchmark.",
+      "runtimeTest": false
+    },
+    {
+      "name": "ScreenMemory",
+      "sources": [
+        "https://screenmemory.app/"
+      ],
+      "review": "November 2 direct homepage/pricing/FAQ; 29 USD Standard / 39 USD Lifetime unchanged. Free-history contradiction retained. No license checkout, runtime or storage benchmark.",
+      "runtimeTest": false
+    },
+    {
+      "name": "TimeScroll",
+      "sources": [
+        "https://timescroll.muzhen.org/"
+      ],
+      "review": "November 2 direct homepage feature/requirements recheck; encrypted vault still beta. Publisher claims only, no downloaded binary, security or battery test.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Retrace (haseab)",
+      "sources": [
+        "https://github.com/haseab/retrace",
+        "https://github.com/haseab/retrace/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 3d2b854a137b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Retrace (jhammant)",
+      "sources": [
+        "https://github.com/jhammant/retrace/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 5b35e6a1ea9c); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "rem",
+      "sources": [
+        "https://github.com/jasonjmcghee/rem/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob eb21245c7e1b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Unlost",
+      "sources": [
+        "https://github.com/Vincent-liuwingsang/unlost/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 2e20b399872b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Pensieve (formerly Memos)",
+      "sources": [
+        "https://github.com/arkohut/pensieve/blob/master/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 567406f40389); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Minne",
+      "sources": [
+        "https://minne.sh/"
+      ],
+      "review": "November 2 direct homepage: free MIT, text-only notes, explicit Insert/undo, own-provider or local Ollama data paths. No runtime or privacy-leak audit.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Omi",
+      "sources": [
+        "https://get.omi.me/omi-offer",
+        "https://help.omi.me/en/articles/13135007-overview",
+        "https://help.omi.me/en/articles/13159726-manage-my-subscription"
+      ],
+      "review": "November 2 direct wearable offer and official Mac/no-hardware/subscription help; 169 USD device / 269 USD first-year bundle / 269.91 USD renewal unchanged. Other monthly/on-phone allowances retain November 1 evidence. Mac-only entitlements and live stock/checkout remain unverified.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Granola",
+      "sources": [
+        "https://www.granola.ai/pricing"
+      ],
+      "review": "November 2 direct pricing/plan comparison; Basic 30-day MCP scope, paid API/integrations and Enterprise controls retained. No account, audio capture, ASR/privacy or billing test.",
+      "runtimeTest": false
+    },
+    {
+      "name": "OpenRecall",
+      "sources": [
+        "https://github.com/openrecall/openrecall/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 1b0c50a057e0); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "OpenHistory",
+      "sources": [
+        "https://openhistory.sh/"
+      ],
+      "review": "November 2 direct homepage/FAQ: Mac 14+, Apple 26+device-inference requirement, BYOK disclosure and redacted local MCP. Source-install/license details retain prior checks; no runtime audit.",
+      "runtimeTest": false
+    },
+    {
+      "name": "silverfish",
+      "sources": [
+        "https://github.com/KonstantinKo/silverfish/blob/main/README.md"
+      ],
+      "review": "November 2 connected GitHub API default-branch README claim check (blob 674e9f7d2735); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Goldfish (goldfish.sh)",
+      "sources": [
+        "https://goldfish.sh/"
+      ],
+      "review": "November 2 direct homepage: free beta and Mac/Windows contextual replies/chat/integrations. Post-beta cost, model data handling and runtime behavior unverified.",
+      "runtimeTest": false
+    }
+  ],
+  "githubREADMEBlobs": [
+    {
+      "repository": "haseab/retrace",
+      "path": "README.md",
+      "blobSHA": "3d2b854a137b15ce1454f2a695c487c5fc87f479",
+      "source": "https://github.com/haseab/retrace/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 96,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "jhammant/retrace",
+      "path": "README.md",
+      "blobSHA": "5b35e6a1ea9c5b4e77c782dee784cc9cf6c3c591",
+      "source": "https://github.com/jhammant/retrace/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 96,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "jasonjmcghee/rem",
+      "path": "README.md",
+      "blobSHA": "eb21245c7e1b4b3a75e854b3e9f7e8889cdf6937",
+      "source": "https://github.com/jasonjmcghee/rem/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 96,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "Vincent-liuwingsang/unlost",
+      "path": "README.md",
+      "blobSHA": "2e20b399872b46132dbe836791d08566ba0c52ed",
+      "source": "https://github.com/Vincent-liuwingsang/unlost/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 96,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "arkohut/pensieve",
+      "path": "README.md",
+      "blobSHA": "567406f40389f87a858fb5efb930c6c73ac18e92",
+      "source": "https://github.com/arkohut/pensieve/blob/master/README.md",
+      "startLine": 1,
+      "endLine": 105,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "openrecall/openrecall",
+      "path": "README.md",
+      "blobSHA": "1b0c50a057e02772b21b549aa6699188e3b0834f",
+      "source": "https://github.com/openrecall/openrecall/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 105,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    },
+    {
+      "repository": "KonstantinKo/silverfish",
+      "path": "README.md",
+      "blobSHA": "674e9f7d27358168672ed84a9c6be421312f8a31",
+      "source": "https://github.com/KonstantinKo/silverfish/blob/main/README.md",
+      "startLine": 1,
+      "endLine": 105,
+      "scope": "Current default-branch README via connected GitHub API; claim check only, no runtime qualification."
+    }
+  ],
+  "failedDirectReads": [
+    {
+      "url": "https://rewind.app/blog/rewind-vs-rewind-desktop",
+      "result": "Cache miss; current30USD/month articleprice remains unverified in this recheck."
+    }
+  ],
+  "limits": [
+    "No new vendor account, billing, binary, privacy/security or power acceptance.",
+    "Current publisher estimates and feature statements remain claims; benchmark source/version and OSwind runtime qualification are separate."
+  ]
+}

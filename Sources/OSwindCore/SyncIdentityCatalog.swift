@@ -251,16 +251,21 @@ struct SyncIdentityCatalog {
         database.bind(s,1,digest);database.bind(s,2,identity.table.rawValue);database.bind(s,3,identity.origin);database.bind(s,4,identity.lifetime);bind(s,5,key);bind(s,6,frame);try database.done(s)
         let c=try database.statement("INSERT INTO personal_sync_identity_current VALUES(?,?,?) ON CONFLICT(table_name,local_key) DO UPDATE SET object_digest=excluded.object_digest");defer {sqlite3_finalize(c)};database.bind(c,1,identity.table.rawValue);bind(c,2,key);database.bind(c,3,digest);try database.done(c)
     }
-    private func ensure(_ table:SyncCanonicalTable,_ key:Data,_ frame:Data?,insertion:Bool)throws->SyncObjectIdentity {
+    private func ensure(_ table:SyncCanonicalTable,_ key:Data,_ frame:Data?,insertion:Bool,creationEra:SyncClock?=nil)throws->SyncObjectIdentity {
         if let old=try current(table,key) {
             if !old.deleted {
                 guard !insertion else {throw OSwindError.invalid("Captured insert collides with a live sync object")}
                 if let frame {let s=try database.statement("UPDATE personal_sync_identities SET key_frame=? WHERE object_digest=?");defer {sqlite3_finalize(s)};bind(s,1,frame);database.bind(s,2,try old.identity.key.digest);try database.done(s)}
+                if let history=try SyncCollectionHistory.ifInstalled(database),try history.objectEra(old.identity.key)==nil {
+                    try history.recordObject(old.identity.key,era:creationEra ?? .empty)
+                }
                 return old.identity
             }
             guard insertion else {throw OSwindError.invalid("Captured update targets a deleted sync lifetime")}
         }
-        let identity=try SyncObjectIdentity(table:table,origin:scope.origin,lifetime:UUID().uuidString.lowercased());try map(identity,key,frame);return identity
+        let identity=try SyncObjectIdentity(table:table,origin:scope.origin,lifetime:UUID().uuidString.lowercased());try map(identity,key,frame)
+        if let history=try SyncCollectionHistory.ifInstalled(database) {try history.recordObject(identity.key,era:creationEra ?? .empty)}
+        return identity
     }
     private func markDeleted(_ identity:SyncObjectIdentity)throws {
         let prior=try database.statement("SELECT local_key FROM personal_sync_identities WHERE object_digest=?");database.bind(prior,1,try identity.key.digest)
@@ -283,7 +288,8 @@ struct SyncIdentityCatalog {
             guard frame.map({Data(SHA256.hash(data:$0))})==change.afterKey else {throw OSwindError.invalid("Captured row primary key differs")}
         }
         if let before=change.beforeKey,let after=change.afterKey,before==after {
-            let identity=try ensure(table,after,frame,insertion:false);return .init(captured:change,before:identity,after:identity)
+            let era=try SyncCollectionHistory.ifInstalled(database)?.captured(sequence:change.sequence)
+            let identity=try ensure(table,after,frame,insertion:false,creationEra:era);return .init(captured:change,before:identity,after:identity)
         }
         var before:SyncObjectIdentity?,after:SyncObjectIdentity?
         if let key=change.beforeKey {
@@ -291,7 +297,7 @@ struct SyncIdentityCatalog {
             else {before=try ensure(table,key,nil,insertion:false)}
             try markDeleted(before!)
         }
-        if let key=change.afterKey {after=try ensure(table,key,frame,insertion:true)}
+        if let key=change.afterKey {let era=try SyncCollectionHistory.ifInstalled(database)?.captured(sequence:change.sequence);after=try ensure(table,key,frame,insertion:true,creationEra:era)}
         return .init(captured:change,before:before,after:after)
     }
     /// The required callback commits typed protocol/cache output here. Throwing
@@ -336,7 +342,8 @@ struct SyncIdentityCatalog {
         try scoped {
             try emptyQueue();guard try exists(table,primary) else {throw OSwindError.invalid("Bootstrap source row missing")}
             let frame=try Self.keyFrame(table,primary),key=Data(SHA256.hash(data:frame))
-            return try ensure(table,key,frame,insertion:false)
+            let era=try SyncCollectionHistory.ifInstalled(database)?.birth(table:table.rawValue,key:key)
+            return try ensure(table,key,frame,insertion:false,creationEra:era)
         }
     }
     /// Bounded durable keyset bootstrap. A caller reads/validates current typed
@@ -382,7 +389,8 @@ struct SyncIdentityCatalog {
                 }
                 let frame=try Self.keyFrame(table,primary)
                 if frame.count>byteLimit-used {guard !values.isEmpty else {throw OSwindError.unavailable("Sync bootstrap key exceeds the requested byte budget")};break}
-                let key=Data(SHA256.hash(data:frame)),identity=try ensure(table,key,frame,insertion:false)
+                let key=Data(SHA256.hash(data:frame)),era=try SyncCollectionHistory.ifInstalled(database)?.birth(table:table.rawValue,key:key)
+                let identity=try ensure(table,key,frame,insertion:false,creationEra:era)
                 values.append(.init(identity:identity,primary:primary));used+=frame.count;lastFrame=frame
                 try Task.checkCancellation();code=sqlite3_step(rows)
             }
@@ -441,6 +449,9 @@ struct SyncIdentityCatalog {
             }
             try SyncChangeCapture.withoutEcho(database,scope:scope) {try apply()}
             guard try exists(identity.table,primary) else {throw OSwindError.invalid("Typed peer adapter did not create its source")}
+            if let history=try SyncCollectionHistory.ifInstalled(database) {
+                try history.recordPeerBirth(identity.key,table:identity.table.rawValue,nativeKey:key,era:history.admittedEra(identity.key))
+            }
         }
     }
     /// A delete operation has no content body, so an unknown wire key need not

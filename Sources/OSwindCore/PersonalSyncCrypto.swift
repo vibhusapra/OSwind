@@ -15,7 +15,7 @@ struct SyncGroupSecret:CustomStringConvertible,CustomDebugStringConvertible,Cust
     var debugDescription:String {description}
     var customMirror:Mirror {Mirror(self,children:["key":"redacted"])}
 }
-enum SyncObjectPurpose:String,Sendable {case operation,contentChunk,checkpoint,membership}
+enum SyncObjectPurpose:String,Sendable {case operation,contentChunk,checkpoint,membership,collectionControl,supersession}
 struct SyncCipherContext:Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     var description:String {"<redacted sync cipher context>"}
     var debugDescription:String {description}

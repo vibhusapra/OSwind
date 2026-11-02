@@ -161,4 +161,40 @@ final class CitationMigrationTests:XCTestCase {
         }
     }
 
+    func testColdPinRepairKeepsActualPostWipeBirthAndPreparedVersionWithoutEcho()throws {
+        var store=try MemoryStore(root:root);defer {try? store.close()}
+        let replica="00000000-0000-0000-0000-000000008101"
+        var current=try store.withRoutineDatabase {db in
+            _=try SyncChangeCapture.activate(db)
+            let catalog=try SyncIdentityCatalog.install(db),journal=try SyncJournal.install(database:db,replica:replica,group:"00000000-0000-0000-0000-000000008102",epoch:"00000000-0000-0000-0000-000000008103")
+            return try SyncVersionStore.install(catalog:catalog,journal:journal)
+        }
+        _=try store.wipeLibrary()
+        let memory=Memory(id:"post-wipe-pin",kind:.note,text:"Owned new lifetime after an actual native wipe")
+        try store.insert(memory);let chat=try store.createChat()
+        _=try store.appendChatTurn(sessionID:chat.id,question:"Owned question",answer:.init(text:"Owned answer",sources:[.init(memory:memory,score:1,match:"owned")],provider:"owned",duration:0))
+        func finish(_ cache:SyncVersionStore)throws {
+            let processor=SyncOutgoingProcessor(queue:try .install(catalog:cache.catalog),cache:cache,admitRow:{_,_ in},admitVersion:{_ in},media:{_ in []})
+            var done=false;for _ in 0..<80 {if try processor.step() == .idle {done=true;break}};XCTAssertTrue(done)
+        }
+        try finish(current)
+        let primary:[SyncRowCell]=[.text(Data(memory.id.utf8))],pin=try current.catalog.localIdentity(.evidencePin,primary:primary),original=try current.resolve(pin,content:nil,admit:{_ in}),before=try current.journal.outbox()
+        let key=Data(SHA256.hash(data:try SyncIdentityCatalog.keyFrame(.evidencePin,primary)))
+        func birth(_ cache:SyncVersionStore)throws->SyncClock? {try SyncCollectionHistory(database:cache.database,replica:replica).birth(table:"text_observation_pins",key:key)}
+        let era=try SyncClock([replica:1]);XCTAssertEqual(try birth(current),era)
+        try store.withRoutineDatabase {try $0.execute("DROP TABLE text_observation_pins")}
+        try store.close();store=try MemoryStore(root:root);current=try cache(store)
+        XCTAssertEqual(try birth(current),era);XCTAssertEqual(try current.catalog.localIdentity(.evidencePin,primary:primary),pin)
+        try finish(current);try assertCaptureAccounting(store)
+        XCTAssertEqual(try current.journal.outbox(),before)
+        XCTAssertEqual(try current.resolve(pin,content:nil,admit:{_ in}).encoded(),try original.encoded())
+        XCTAssertNotNil(try store.get(memory.id))
+    }
+    func testColdPinRepairCannotReinstallAnUnrelatedMissingCollectionHook()throws {
+        try fixture("receiver");let store=try MemoryStore(root:root);_=try cache(store)
+        try store.withRoutineDatabase {try $0.execute("DROP TABLE text_observation_pins; DROP TRIGGER sync_collection_birth_memories_insert")}
+        try store.close();let before=try withDB {try fingerprint($0)}
+        XCTAssertThrowsError(try MemoryStore(root:root)) {XCTAssertTrue(String(describing:$0).lowercased().contains("collection"))}
+        XCTAssertEqual(try withDB {try fingerprint($0)},before,"Cold derived-table repair must roll back when unrelated history protection is damaged")
+    }
 }

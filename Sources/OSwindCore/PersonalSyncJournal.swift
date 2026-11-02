@@ -36,6 +36,7 @@ struct SyncJournal {
             CREATE TABLE IF NOT EXISTS personal_sync_peers(replica TEXT PRIMARY KEY,cursor INTEGER NOT NULL CHECK(cursor>=0));
             CREATE TABLE IF NOT EXISTS personal_sync_registers(kind TEXT NOT NULL,digest TEXT NOT NULL,state BLOB NOT NULL,PRIMARY KEY(kind,digest));
             CREATE TABLE IF NOT EXISTS personal_sync_receipts(replica TEXT NOT NULL,sequence INTEGER NOT NULL,digest TEXT NOT NULL,PRIMARY KEY(replica,sequence));
+            CREATE TABLE IF NOT EXISTS personal_sync_expected_operations(replica TEXT NOT NULL,sequence INTEGER NOT NULL CHECK(sequence>0),digest TEXT NOT NULL CHECK(length(digest)=64),revision BLOB NOT NULL CHECK(typeof(revision)='blob' AND length(revision)>0 AND length(revision)<=65536),PRIMARY KEY(replica,sequence));
             CREATE TABLE IF NOT EXISTS personal_sync_outbox(sequence INTEGER PRIMARY KEY,revision BLOB NOT NULL);
             CREATE TABLE IF NOT EXISTS personal_sync_pending(replica TEXT NOT NULL,sequence INTEGER NOT NULL,revision BLOB NOT NULL,PRIMARY KEY(replica,sequence));
             CREATE TABLE IF NOT EXISTS personal_sync_observed(singleton INTEGER PRIMARY KEY CHECK(singleton=1),clock BLOB NOT NULL CHECK(typeof(clock)='blob' AND length(clock)>=2 AND length(clock)<=1048576));
@@ -45,6 +46,7 @@ struct SyncJournal {
             let peer=try db.statement("INSERT INTO personal_sync_peers(replica,cursor) VALUES(?,0) ON CONFLICT(replica) DO NOTHING")
             defer {sqlite3_finalize(peer)};db.bind(peer,1,replica);try db.done(peer)
             try initializeObserved(db)
+            _=try SyncCollectionHistory.install(db,replica:replica)
             _=try Self(database:db,replica:replica,group:group,epoch:epoch)
         }
         return try Self(database:db,replica:replica,group:group,epoch:epoch)
@@ -153,6 +155,19 @@ struct SyncJournal {
         }
     }
     func cursor(for id:String)throws->Int64? {try validateIdentity();return try readCursor(for:id)}
+    /// A verified collection callback may retire an already registered native
+    /// object without inventing an authored per-object delete operation. A full
+    /// group adapter must additionally handle unprepared native rows and media.
+    @discardableResult func retireKnownCollectionObject(_ key:SyncObjectKey,frontier:SyncClock,apply:(SyncJournalChange)throws->Void)throws->Bool {
+        try scoped {
+            let observed=try SyncCollectionHistory(database:database,replica:replica).current()
+            guard observed.covers(frontier) else {throw OSwindError.invalid("Native collection retirement requires a verified frontier")}
+            let old=try readState(for:key)
+            guard !old.isDeleted,let head=old.preferred,!(head.creationEra ?? .empty).covers(frontier) else {return false}
+            var next=old;try next.retireForCollection(head,frontier:frontier);try save(next)
+            try apply(.init(revision:head,before:old,after:next));return true
+        }
+    }
     private func readCursor(for id:String)throws->Int64? {
         let row=try database.statement("SELECT cursor FROM personal_sync_peers WHERE replica=?");defer {sqlite3_finalize(row)};database.bind(row,1,id)
         let status=sqlite3_step(row);if status==SQLITE_DONE {return nil}
@@ -166,7 +181,11 @@ struct SyncJournal {
         let status=sqlite3_step(row);if status==SQLITE_DONE {return SyncRegister(key:key)}
         guard status==SQLITE_ROW else {throw database.error()}
         let state=try SyncRegister.decode(blob(row,0,limit:SyncProtocolLimits.stateBytes))
-        guard state.key==key else {throw OSwindError.invalid("Sync register identity differs")};return state
+        guard state.key==key else {throw OSwindError.invalid("Sync register identity differs")}
+        if let proof=state.collectionErasure {
+            guard try SyncCollectionHistory(database:database,replica:replica).current().covers(proof) else {throw OSwindError.invalid("Collection retirement has no observed erasing frontier")}
+        }
+        return state
     }
     private func save(_ value:SyncRegister)throws {
         let row=try database.statement("INSERT INTO personal_sync_registers(kind,digest,state) VALUES(?,?,?) ON CONFLICT(kind,digest) DO UPDATE SET state=excluded.state")
@@ -174,16 +193,48 @@ struct SyncJournal {
     }
     private func recordReceipt(_ revision:SyncRevision,data:Data)throws->Bool {
         let digest=SyncProtocolLimits.hex(data)
+        let expected=try database.statement("SELECT digest,revision FROM personal_sync_expected_operations WHERE replica=? AND sequence=?");defer {sqlite3_finalize(expected)}
+        database.bind(expected,1,revision.dot.replica);sqlite3_bind_int64(expected,2,revision.dot.counter)
+        let expectation=sqlite3_step(expected)
+        guard expectation==SQLITE_DONE || expectation==SQLITE_ROW else {throw database.error()}
+        if expectation==SQLITE_ROW {guard database.text(expected,0)==digest,try blob(expected,1,limit:SyncProtocolLimits.operationBytes)==data else {throw OSwindError.invalid("A writer forked an authenticated superseding operation")}}
         let existing=try database.statement("SELECT digest FROM personal_sync_receipts WHERE replica=? AND sequence=?")
         defer {sqlite3_finalize(existing)};database.bind(existing,1,revision.dot.replica);sqlite3_bind_int64(existing,2,revision.dot.counter)
         let status=sqlite3_step(existing)
         if status==SQLITE_ROW {guard database.text(existing,0)==digest else {throw OSwindError.invalid("Sync writer reused a durable sequence")};return false}
         guard status==SQLITE_DONE else {throw database.error()}
         let row=try database.statement("INSERT INTO personal_sync_receipts(replica,sequence,digest) VALUES(?,?,?)")
-        defer {sqlite3_finalize(row)};database.bind(row,1,revision.dot.replica);sqlite3_bind_int64(row,2,revision.dot.counter);database.bind(row,3,digest);try database.done(row);return true
+        defer {sqlite3_finalize(row)};database.bind(row,1,revision.dot.replica);sqlite3_bind_int64(row,2,revision.dot.counter);database.bind(row,3,digest);try database.done(row)
+        let remove=try database.statement("DELETE FROM personal_sync_expected_operations WHERE replica=? AND sequence=?");defer {sqlite3_finalize(remove)}
+        database.bind(remove,1,revision.dot.replica);sqlite3_bind_int64(remove,2,revision.dot.counter);try database.done(remove);return true
     }
-    @discardableResult func put(key:SyncObjectKey,content:SyncContentReference,publication:SyncContentReference?=nil,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
-        try local(key:key,mutation:.put,content:content,publication:publication,apply:apply)
+    private func rememberSuperseding(_ successor:SyncRevision,obsolete:SyncRevision)throws {
+        try SyncSupersessionProof.validate(obsolete:obsolete,successor:successor)
+        guard let cursor=try readCursor(for:successor.dot.replica) else {throw OSwindError.invalid("Superseding operation belongs to an unenrolled peer")}
+        for peer in successor.context.counters.keys {guard try readCursor(for:peer) != nil else {throw OSwindError.invalid("Superseding context names an unenrolled peer")}}
+        for peer in successor.creationEra?.counters.keys ?? Dictionary<String,Int64>().keys {guard try readCursor(for:peer) != nil else {throw OSwindError.invalid("Superseding era names an unenrolled peer")}}
+        let data=try successor.encoded(),digest=SyncProtocolLimits.hex(data)
+        let actual=try database.statement("SELECT digest FROM personal_sync_receipts WHERE replica=? AND sequence=?");defer {sqlite3_finalize(actual)}
+        database.bind(actual,1,successor.dot.replica);sqlite3_bind_int64(actual,2,successor.dot.counter)
+        let code=sqlite3_step(actual)
+        if code==SQLITE_ROW {guard database.text(actual,0)==digest else {throw OSwindError.invalid("Supersession differs from a recorded operation")};return}
+        guard code==SQLITE_DONE,cursor<successor.dot.counter,successor.dot.replica != replica else {throw OSwindError.invalid("Supersession cannot invent this device's history or replace a missing receipt")}
+        let insert=try database.statement("INSERT INTO personal_sync_expected_operations VALUES(?,?,?,?) ON CONFLICT(replica,sequence) DO NOTHING");defer {sqlite3_finalize(insert)}
+        database.bind(insert,1,successor.dot.replica);sqlite3_bind_int64(insert,2,successor.dot.counter);database.bind(insert,3,digest);bind(insert,4,data);try database.done(insert)
+        guard try expectedOperation(replica:successor.dot.replica,sequence:successor.dot.counter)==successor else {throw OSwindError.invalid("Two supersession proofs forked a future operation")}
+    }
+    /// Restores an authenticated opaque header if a provider withholds its
+    /// original operation file. It never supplies or authorizes source content.
+    func expectedOperation(replica:String,sequence:Int64)throws->SyncRevision? {
+        try validateIdentity();_=try SyncDot(replica:replica,counter:sequence)
+        let row=try database.statement("SELECT digest,revision FROM personal_sync_expected_operations WHERE replica=? AND sequence=?");defer {sqlite3_finalize(row)}
+        database.bind(row,1,replica);sqlite3_bind_int64(row,2,sequence)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
+        let data=try blob(row,1,limit:SyncProtocolLimits.operationBytes),value=try SyncRevision.decode(data)
+        guard value.dot.replica==replica,value.dot.counter==sequence,database.text(row,0)==SyncProtocolLimits.hex(data) else {throw OSwindError.invalid("Invalid expected operation checkpoint")};return value
+    }
+    @discardableResult func put(key:SyncObjectKey,content:SyncContentReference,publication:SyncContentReference?=nil,creationEra:SyncClock?=nil,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
+        try local(key:key,mutation:.put,content:content,publication:publication,creationEra:creationEra,apply:apply)
     }
     @discardableResult func delete(key:SyncObjectKey,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
         try local(key:key,mutation:.delete,content:nil,apply:apply)
@@ -191,13 +242,24 @@ struct SyncJournal {
     @discardableResult func resolve(key:SyncObjectKey,expectedHeads:Set<SyncDot>,content:SyncContentReference,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncRevision {
         try local(key:key,mutation:.put,content:content,resolution:expectedHeads,apply:apply)
     }
-    private func local(key:SyncObjectKey,mutation:SyncMutation,content:SyncContentReference?,resolution:Set<SyncDot>?=nil,publication:SyncContentReference?=nil,apply:(SyncJournalChange)throws->Void)throws->SyncRevision {
+    private func local(key:SyncObjectKey,mutation:SyncMutation,content:SyncContentReference?,resolution:Set<SyncDot>?=nil,publication:SyncContentReference?=nil,creationEra:SyncClock?=nil,apply:(SyncJournalChange)throws->Void)throws->SyncRevision {
         try scoped {
             let old=try readState(for:key)
             guard mutation == .delete || !old.isDeleted else {throw OSwindError.invalid("Restore deleted sync content with a new object lifetime")}
             if let resolution {
                 guard old.isConflicted,Set(old.heads.map(\.dot))==resolution else {throw OSwindError.invalid("Sync conflicts changed before resolution")}
             } else if old.isConflicted,mutation == .put {throw OSwindError.invalid("Review sync conflicts before updating this object")}
+
+            let history=SyncCollectionHistory(database:database,replica:replica),frontier=try history.current()
+            var birth:SyncClock?
+            if mutation == .put {
+                let recorded=try history.objectEra(key)
+                if let first=old.heads.first {birth=first.creationEra ?? .empty}
+                else if let recorded {birth=recorded}
+                else if try history.hasLegacyIdentity(key) {birth = .empty}
+                else {birth=creationEra ?? frontier}
+                guard creationEra==nil || creationEra==birth,recorded==nil || recorded==birth,frontier.covers(birth!),birth!.covers(frontier) else {throw OSwindError.invalid("Collection erasure retired this lifetime; restore reviewed content with a new identity")}
+            }
 
             let counter=try database.statement("SELECT sequence FROM personal_sync_local WHERE singleton=1")
             defer {sqlite3_finalize(counter)}
@@ -207,7 +269,7 @@ struct SyncJournal {
             let peers=try Self.peerSnapshot(database)
             let context=try old.clock.merged(with:peers.clock).merged(with:observedClock())
             guard context.counters.keys.allSatisfy(peers.ids.contains) else {throw OSwindError.invalid("Sync object context names an unknown peer")}
-            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:context,mutation:mutation,content:content,publication:publication)
+            let revision=try SyncRevision(key:key,dot:.init(replica:replica,counter:previous+1),context:context,mutation:mutation,content:content,publication:publication,creationEra:birth)
             var next=old;try next.integrate(revision);try save(next)
             let data=try revision.encoded();guard try recordReceipt(revision,data:data) else {throw OSwindError.invalid("Local sync sequence already exists")}
             let outbox=try database.statement("INSERT INTO personal_sync_outbox(sequence,revision) VALUES(?,?)")
@@ -241,10 +303,11 @@ struct SyncJournal {
     // A caller must authenticate/decode the object first. Prepared content is
     // verified outside this transaction; apply must perform typed admission and
     // may throw, rolling back state/cursors/source writes together.
-    func receive(_ revision:SyncRevision,contentAvailable:(SyncContentReference)throws->Bool,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncReceiveResult {
+    func receive(_ revision:SyncRevision,contentAvailable:(SyncContentReference)throws->Bool,retireCollection:((SyncJournalChange)throws->Void)?=nil,supersededBy:((SyncRevision)throws->SyncRevision?)?=nil,apply:(SyncJournalChange)throws->Void={_ in})throws->SyncReceiveResult {
         try scoped {
             guard try readCursor(for:revision.dot.replica) != nil else {throw OSwindError.invalid("Sync peer is not enrolled")}
             for id in revision.context.counters.keys {guard try readCursor(for:id) != nil else {throw OSwindError.invalid("Sync context names an unknown peer")}}
+            for id in revision.creationEra?.counters.keys ?? Dictionary<String,Int64>().keys {guard try readCursor(for:id) != nil else {throw OSwindError.invalid("Sync creation era names an unknown peer")}}
             let encoded=try revision.encoded()
             let inserted=try recordReceipt(revision,data:encoded)
             if inserted {
@@ -263,14 +326,14 @@ struct SyncJournal {
                     if !old.isDeleted {try apply(.init(revision:revision,before:old,after:next))}
                 }
             }
-            return .init(inserted:inserted,applied:try drainInside(limit:256,contentAvailable:contentAvailable,apply:apply))
+            return .init(inserted:inserted,applied:try drainInside(limit:256,contentAvailable:contentAvailable,retireCollection:retireCollection,supersededBy:supersededBy,apply:apply))
         }
     }
-    func drain(limit:Int=256,contentAvailable:(SyncContentReference)throws->Bool,apply:(SyncJournalChange)throws->Void={_ in})throws->Int {
+    func drain(limit:Int=256,contentAvailable:(SyncContentReference)throws->Bool,retireCollection:((SyncJournalChange)throws->Void)?=nil,supersededBy:((SyncRevision)throws->SyncRevision?)?=nil,apply:(SyncJournalChange)throws->Void={_ in})throws->Int {
         guard (1...1024).contains(limit) else {throw OSwindError.invalid("Invalid sync drain bound")}
-        return try scoped {try drainInside(limit:limit,contentAvailable:contentAvailable,apply:apply)}
+        return try scoped {try drainInside(limit:limit,contentAvailable:contentAvailable,retireCollection:retireCollection,supersededBy:supersededBy,apply:apply)}
     }
-    private func drainInside(limit:Int,contentAvailable:(SyncContentReference)throws->Bool,apply:(SyncJournalChange)throws->Void)throws->Int {
+    private func drainInside(limit:Int,contentAvailable:(SyncContentReference)throws->Bool,retireCollection:((SyncJournalChange)throws->Void)?,supersededBy:((SyncRevision)throws->SyncRevision?)?,apply:(SyncJournalChange)throws->Void)throws->Int {
         var applied=0
         while applied<limit {
             try Task.checkCancellation()
@@ -292,9 +355,34 @@ struct SyncJournal {
                 for (peer,counter) in revision.context.counters {if (try readCursor(for:peer) ?? 0)<counter {ready=false;break}}
                 if !ready {continue}
                 let old=try readState(for:revision.key)
-                if !old.isDeleted,let content=revision.content,try !contentAvailable(content) {continue}
-                var next=old;try next.integrate(revision);try save(next)
-                if old != next {try apply(.init(revision:revision,before:old,after:next))}
+                let history=SyncCollectionHistory(database:database,replica:replica),frontier=try history.current(),era=revision.creationEra ?? .empty
+                if revision.mutation == .put,!old.isDeleted {
+                    let known=try history.objectEra(revision.key) ?? old.heads.first.map {$0.creationEra ?? .empty}
+                    guard known==nil || known==era else {throw OSwindError.invalid("A sync lifetime cannot change its creation era before admission or erasure")}
+                }
+                // A declared future frontier waits for authenticated erasure
+                // controls; it never authorizes fetching a body on its own.
+                if revision.mutation == .put,!old.isDeleted,!frontier.covers(era) {continue}
+                var next=old
+                if revision.mutation == .put,!era.covers(frontier) {
+                    try next.retireForCollection(revision,frontier:frontier);try save(next)
+                    if !old.isDeleted && !old.heads.isEmpty {
+                        guard let retireCollection else {throw OSwindError.unavailable("Apply collection retirement with the native erasure adapter before advancing this peer")}
+                        try retireCollection(.init(revision:revision,before:old,after:next))
+                    }
+                } else {
+                    if !old.isDeleted,let content=revision.content,try !contentAvailable(content) {
+                        guard let successor=try supersededBy?(revision) else {continue}
+                        try rememberSuperseding(successor,obsolete:revision)
+                        try next.integrate(revision);try save(next)
+                        // Progress past an unavailable obsolete body, without
+                        // projecting it. The exact future header is retained
+                        // and its later receipt must match this proof.
+                    } else {
+                        try next.integrate(revision);try save(next)
+                        if old != next,!(revision.mutation == .put && next.isDeleted) {try apply(.init(revision:revision,before:old,after:next))}
+                    }
+                }
                 let remove=try database.statement("DELETE FROM personal_sync_pending WHERE replica=? AND sequence=?")
                 database.bind(remove,1,id);sqlite3_bind_int64(remove,2,sequence)
                 do {try database.done(remove);sqlite3_finalize(remove)}catch {sqlite3_finalize(remove);throw error}

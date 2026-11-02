@@ -8,7 +8,7 @@ Local desktop memory for your Mac: save chosen windows and conversations, search
 - [Feature scope and progress](docs/PROGRESS.md) · [Competitive research](docs/landscape.html) · [Benchmark receipts](benchmarks/README.md)
 - [Capture privacy](docs/CAPTURE-PRIVACY.md) · [Component qualification history](docs/COMPONENT-QUALIFICATIONS.md)
 
-The latest [search and indexing qualification](docs/SEARCH-INDEX-LIFECYCLE.md) covers stale results after erasure and actual worker ownership through Quit, switch, wipe and encrypted lock: 2,229 full-suite passes, 362 mandatory controls in three builds, 62 native passes and 32 package/process stages. Component evidence does not close the remaining product gates.
+The latest [internal sync qualification](docs/SYNC-LIBRARY-BARRIERS.md) covers immutable creation eras, explicit group-erasure review and final packet admission after native deletion: 2,274 full-suite passes, 422 required controls in three builds, 62 native passes and 32 package/process stages. Complete native group retirement and the public sync service remain unfinished. Component evidence does not close the remaining product gates.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 

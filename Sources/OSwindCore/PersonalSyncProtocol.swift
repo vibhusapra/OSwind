@@ -109,18 +109,24 @@ struct SyncRevision:Codable,Equatable,Sendable {
     /// Complete turn-evidence declaration, authenticated with this revision.
     /// Missing is a legacy record, never an empty evidence declaration.
     let publication:SyncContentReference?
+    /// Collection-wipe frontier observed when this object lifetime was born.
+    /// Missing is legacy, never evidence of a fresh post-wipe creation. These
+    /// counters are independent of the journal's operation sequence counters.
+    let creationEra:SyncClock?
     var clock:SyncClock {get throws {try context.observing(dot)}}
-    init(key:SyncObjectKey,dot:SyncDot,context:SyncClock,mutation:SyncMutation,content:SyncContentReference?=nil,publication:SyncContentReference?=nil)throws {
+    init(key:SyncObjectKey,dot:SyncDot,context:SyncClock,mutation:SyncMutation,content:SyncContentReference?=nil,publication:SyncContentReference?=nil,creationEra:SyncClock?=nil)throws {
         guard dot.counter>context[dot.replica],(mutation == .put)==(content != nil) else {throw OSwindError.invalid("Invalid sync revision context or content")}
         guard publication==nil || (mutation == .put && key.kind == .turn && publication!.bytes>0 && publication!.bytes<=SyncTurnPublication.maximumBytes) else {throw OSwindError.invalid("Publication declaration requires a bounded turn put")}
         _=try context.observing(dot)
+        guard creationEra==nil || mutation == .put else {throw OSwindError.invalid("A creation era belongs to a content lifetime")}
+        self.creationEra=creationEra
         self.publication=publication
         self.key=key;self.dot=dot;self.context=context;self.mutation=mutation;self.content=content
     }
-    private enum CodingKeys:String,CodingKey {case key,dot,context,mutation,content,publication}
+    private enum CodingKeys:String,CodingKey {case key,dot,context,mutation,content,publication,creationEra}
     init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
-        try self.init(key:c.decode(SyncObjectKey.self,forKey:.key),dot:c.decode(SyncDot.self,forKey:.dot),context:c.decode(SyncClock.self,forKey:.context),mutation:c.decode(SyncMutation.self,forKey:.mutation),content:c.decodeIfPresent(SyncContentReference.self,forKey:.content),publication:c.decodeIfPresent(SyncContentReference.self,forKey:.publication))
+        try self.init(key:c.decode(SyncObjectKey.self,forKey:.key),dot:c.decode(SyncDot.self,forKey:.dot),context:c.decode(SyncClock.self,forKey:.context),mutation:c.decode(SyncMutation.self,forKey:.mutation),content:c.decodeIfPresent(SyncContentReference.self,forKey:.content),publication:c.decodeIfPresent(SyncContentReference.self,forKey:.publication),creationEra:c.decodeIfPresent(SyncClock.self,forKey:.creationEra))
     }
     func encoded()throws->Data {let data=try SyncProtocolLimits.encode(self);guard data.count<=SyncProtocolLimits.operationBytes else {throw OSwindError.invalid("Sync operation exceeds its bound")};return data}
     static func decode(_ data:Data)throws->Self {
@@ -136,18 +142,21 @@ struct SyncRegister:Codable,Equatable,Sendable {
     private(set) var clock:SyncClock
     private(set) var deletions:SyncClock
     private(set) var heads:[SyncRevision]
-    var isDeleted:Bool {!deletions.counters.isEmpty}
+    private(set) var collectionErasure:SyncClock?
+    var isDeleted:Bool {collectionErasure != nil || !deletions.counters.isEmpty}
     var isConflicted:Bool {heads.count>1}
     // Stable projection only. Adapters must also surface isConflicted and keep
     // every head; choosing a projection is not user resolution of a conflict.
     var preferred:SyncRevision? {heads.first}
-    init(key:SyncObjectKey) {self.key=key;clock = .empty;deletions = .empty;heads=[]}
-    private enum CodingKeys:String,CodingKey {case key,clock,deletions,heads}
+    init(key:SyncObjectKey) {self.key=key;clock = .empty;deletions = .empty;heads=[];collectionErasure=nil}
+    private enum CodingKeys:String,CodingKey {case key,clock,deletions,heads,collectionErasure}
     init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
         key=try c.decode(SyncObjectKey.self,forKey:.key);clock=try c.decode(SyncClock.self,forKey:.clock);deletions=try c.decode(SyncClock.self,forKey:.deletions);heads=try c.decode([SyncRevision].self,forKey:.heads)
+        collectionErasure=try c.decodeIfPresent(SyncClock.self,forKey:.collectionErasure)
+        guard collectionErasure==nil || (!collectionErasure!.counters.isEmpty && !clock.counters.isEmpty) else {throw OSwindError.invalid("Invalid collection retirement proof")}
         guard heads.count<=SyncProtocolLimits.peers,clock.covers(deletions),!isDeleted || heads.isEmpty else {throw OSwindError.invalid("Invalid sync register")}
-        for h in heads {guard h.key==key,h.mutation == .put,try clock.covers(h.clock) else {throw OSwindError.invalid("Invalid sync register head")}}
+        for h in heads {guard h.key==key,h.mutation == .put,try clock.covers(h.clock),(h.creationEra ?? .empty)==(heads.first?.creationEra ?? .empty) else {throw OSwindError.invalid("Invalid sync register head or lifetime era")}}
         for (i,h) in heads.enumerated() {for other in heads.dropFirst(i+1) {
             guard h.dot.replica != other.dot.replica,!h.context.contains(other.dot),!other.context.contains(h.dot) else {throw OSwindError.invalid("Sync register heads are not concurrent")}
         }}
@@ -187,11 +196,22 @@ struct SyncRegister:Codable,Equatable,Sendable {
         }
         if clock.contains(revision.dot) {return .obsolete}
         if isDeleted {clock=nextClock;return .suppressedByDeletion}
+        if let first=heads.first,revision.mutation == .put {
+            guard (first.creationEra ?? .empty)==(revision.creationEra ?? .empty) else {throw OSwindError.invalid("A sync lifetime cannot change its creation era")}
+        }
         var next=heads.filter {!revision.context.contains($0.dot)}
         next.append(revision);next=Self.sorted(next)
         guard next.count<=SyncProtocolLimits.peers else {throw OSwindError.invalid("Sync conflicts exceed their bound")}
         clock=nextClock;heads=next
         return isConflicted ? .conflict:.updated
+    }
+    mutating func retireForCollection(_ revision:SyncRevision,frontier:SyncClock)throws {
+        guard revision.key==key,!frontier.counters.isEmpty,!(revision.creationEra ?? .empty).covers(frontier) else {throw OSwindError.invalid("Collection retirement requires an actual erasing frontier")}
+        if let first=heads.first {
+            guard (first.creationEra ?? .empty)==(revision.creationEra ?? .empty) else {throw OSwindError.invalid("An older era declaration cannot erase a different live lifetime")}
+        }
+        clock=try clock.merged(with:revision.clock);heads=[]
+        collectionErasure=try collectionErasure?.merged(with:frontier) ?? frontier
     }
     func encoded()throws->Data {let data=try SyncProtocolLimits.encode(self);guard data.count<=SyncProtocolLimits.stateBytes else {throw OSwindError.invalid("Sync state exceeds its bound")};return data}
     static func decode(_ data:Data)throws->Self {

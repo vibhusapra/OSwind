@@ -1,15 +1,15 @@
 {
-  "reviewed": "November1,2026 America/Los_Angeles: targeted Screenpipe pricing, Original Rewind/Limitless homepage and Omi pages; other seventeen retain their own prior check dates.",
-  "method": "Initial16 profiles reviewed October22; twenty profiles checked October29; Screenpipe, original Rewind/Limitless, Rewind Desktop, Pieces, Littlebird and Granola targeted October31. Publisher text/search caches may lag. Failed direct fetches, plan ambiguity and conflicting help articles remain explicit. Documentation is not runtime, billing, security or power proof.",
+  "reviewed": "November 2,2026 America/Los_Angeles: targeted primary-source checks across all 20 rows; scopes differ by publisher.",
+  "method": "Initial research and per-vendor prior evidence remain retained. November 2 rechecks use publisher pages/support and default-branch GitHub README blobs. Not every secondary page was refreshed. Failed article fetches, ambiguous entitlements and conflicting plan/resource claims remain explicit. Documentation is not runtime, checkout, security, power or ranking proof.",
   "vendors": [
     {
       "name": "Screenpipe",
       "category": "Desktop memory + automation",
       "price": "Free limited history; Basic $250/year (~$21/month); Business $500/seat/year (~$42/month); Enterprise custom.",
       "license": "Source available under a commercial license; source-based commercial/competing-product use is restricted. Official prebuilt builds have separate Terms of Service and plan terms.",
-      "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; optional async text/image redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context. Changelog also advertises calendar reminders, saved AI presets, timed starred sessions, custom MCP connections, clipboard context and narrated SOP exports.",
+      "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; publisher-advertised default form-field scrubbing; selected local text/image or enclave redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context. Changelog also advertises calendar reminders, saved AI presets, timed starred sessions, custom MCP connections, clipboard context and narrated SOP exports.",
       "difference": "Capture, assistant context and automation reference. Business excludes shared teammate context. The plan table lists Max/Ultra beta access, while nearby prose singles out Ultra; exact entitlement and capacity prices need account/checkout verification.",
-      "caveat": "Annual prices are displayed defaults, not a tested checkout. Pricing estimates ~30GB/month; architecture estimates ~5\u201310GB/month and ~600MB RAM, while pricing allows600MB\u20134GB. These are different vendor estimates, not matched energy/storage tests. Our official CLI0.4.53 keyword-HTTP result does not measure desktop2.7.84, capture, AI, audio or power.",
+      "caveat": "Annual page defaults are not a tested checkout. Pricing estimates ~30GB/month and 600 MB–4GB RAM; architecture estimates 5–10GB/month/~600 MB, while current README says 0.5–3GB and 5–20% CPU. These are conflicting publisher estimates, not matched power/storage tests. The official CLI 0.4.53 keyword-HTTP result does not measure advertised desktop 2.7.84, capture, AI or audio. Enclave redaction sends selected raw text off-device; local storage alone does not make AI/sync/integrations local.",
       "sources": [
         "https://screenpipe.com/onboarding",
         "https://docs.screenpipe.com/home",
@@ -22,14 +22,15 @@
         "https://screenpipe.com/terms",
         "https://screenpipe.com/changelog",
         "https://docs.screenpipe.com/architecture",
-        "https://docs.screenpipe.com/storage-and-retention"
+        "https://docs.screenpipe.com/storage-and-retention",
+        "https://github.com/screenpipe/screenpipe"
       ],
-      "checked": "November1 primary annual pricing table recheck; changelog timed out twice. Other docs/license and advertised desktop release retain October31 checks; engine-only CLI0.4.53 benchmark remains separate. No new vendor runtime test."
+      "checked": "November 2 primary pricing, AI/capture/privacy/storage/architecture docs, license, README and changelog; latest listed desktop 2.7.84 dated October 6. No vendor binary, checkout or redaction/power audit. Exact older benchmark source remains separate."
     },
     {
       "name": "Original Rewind / Limitless",
       "category": "Historical desktop memory / pendant",
-      "price": "Wind-down: Pendant sales ended; continuing customers have free Unlimited through2026. Desktop/web recording ended; historical meetings remain through2026. Rewind capture disabled December19,2025.",
+      "price": "Wind-down: Pendant sales ended; continuing customers have free Unlimited through 2026. Desktop/web recording ended; historical meetings remain through 2026. Rewind capture disabled December19,2025.",
       "license": "Proprietary service.",
       "features": "Original Rewind combined screen/audio recall and AI retrieval. Limitless shifted toward meeting/lifelog transcripts and Pendant. Export can include transcripts, chats and audio.",
       "difference": "The authoritative legacy product reference, not an available new desktop competitor. Do not conflate it with rewind.app.",
@@ -40,12 +41,12 @@
         "https://help.limitless.ai/en/articles/9129649-pricing-plans",
         "https://help.limitless.ai/en/articles/13048802-where-can-i-find-my-rewind-data"
       ],
-      "checked": "November1 homepage fetch succeeds; October31 help checks retained. Account/runtime untested."
+      "checked": "November 2 official announcement and local-data help page; desktop/web recording unavailable, Rewind capture sunset, continuing Pendant support through 2026. Historical price/help details retain their prior scope. No account or runtime test."
     },
     {
       "name": "Rewind Desktop (rewind.app)",
       "category": "Visual desktop history",
-      "price": "Publisher search snapshots retrieved November1 again quote $30/month and no free tier. Direct comparison/how-to fetches still fail; checkout remains unverified.",
+      "price": "Earlier publisher-article snapshot quoted $30/month; current homepage has no price and direct article fetch still fails. Current billing unverified.",
       "license": "Proprietary; distinct from original Rewind AI.",
       "features": "Always-on screen history; local OCR keyword search; full-screen timeline; global shortcut; private-window detection; H.264 compression; optional encrypted archive to user-owned S3 with on-demand older video.",
       "difference": "Visual replay and storage are its focus. Source says AI-powered search and meeting/audio transcription are not yet available.",
@@ -54,7 +55,7 @@
         "https://rewind.app/",
         "https://rewind.app/blog/rewind-vs-rewind-desktop"
       ],
-      "checked": "November1 evening homepage and fresh publisher article search snapshots; direct comparison/how-to URLs still return cache misses. No runtime/checkout verification."
+      "checked": "November 2 direct homepage confirms local screen timeline/search and optional encrypted personal S3 archive; comparison article still cache-miss. This independent product is separate from original Rewind/Limitless. No checkout or binary test."
     },
     {
       "name": "Pieces",
@@ -67,7 +68,7 @@
       "sources": [
         "https://pieces.app/pricing"
       ],
-      "checked": "November1 evening primary monthly pricing recheck; unchanged prices and card-required trial. Annual selected amount, app runtime and billing unverified."
+      "checked": "November 2 direct monthly pricing/model/BYOK table: 18.99 USD Pro, 22.99 USD Enterprise or 69.99 USD/quarter. Exact annual selection, billing and app runtime unverified."
     },
     {
       "name": "Littlebird",
@@ -76,12 +77,12 @@
       "license": "Proprietary cloud service.",
       "features": "Active-window work context; bot-free meeting notes; chat, routines, hover, MCP and connected email/calendar/files. Free: 25 total meeting notes, 5 routines, daily credits. Plus: unlimited notes, up to 100 routines, MCP. Higher tiers expand credits/modes.",
       "difference": "Integrated actions and routines, with desktop/web/mobile access. Security page explicitly says context is encrypted and stored in AWS US East, not local-only.",
-      "caveat": "Basic has daily credits,25 lifetime meeting notes,5 routines and2 Max messages/day. Plus trial requires a card. Power advertises2x Plus credits; selected Pro5x starts$100/month, while the12x price was not selected. Unlimited notes do not mean unlimited AI. AWS/cloud and audit statements remain publisher claims.",
+      "caveat": "Basic has daily credits,25 lifetime meeting notes,5 routines and2 Max messages/day. Plus trial requires a card. Power advertises2x Plus credits; selected Pro 5x starts$100/month, while the12x price was not selected. Unlimited notes do not mean unlimited AI. AWS/cloud and audit statements remain publisher claims.",
       "sources": [
         "https://littlebird.ai/pricing",
         "https://littlebird.ai/privacy"
       ],
-      "checked": "October31 pricing and privacy recheck; no app runtime, account billing or certification audit."
+      "checked": "November 2 direct annual-default plans/limits and cloud-memory FAQ; selected Pro 5x quote only. No account, checkout or runtime/security audit."
     },
     {
       "name": "Microsoft Recall",
@@ -97,7 +98,7 @@
         "https://support.microsoft.com/en-us/windows/ai/ai-features/filtering-apps-websites-and-sensitive-information-in-recall",
         "https://learn.microsoft.com/en-us/windows/client-management/manage-recall"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 official support requirements/features recheck. Windows-only; no hardware purchase, account or runtime benchmark."
     },
     {
       "name": "ScreenMemory",
@@ -106,11 +107,11 @@
       "license": "Proprietary macOS app.",
       "features": "Continuous screen recording; visual timeline; high-resolution playback; local OCR; app filters; calendar activity heatmaps; app blacklist; unlimited paid history; multiple monitors and three devices on Standard.",
       "difference": "Simple local visual recall with one-time pricing and a calendar-oriented interface.",
-      "caveat": "Free table also contains an inconsistent Unlimited History row; 24-hour description is the clearer restriction. No local RAG/audio/BYOK promise established by cited page.",
+      "caveat": "Free card still contradicts 24-hour and unlimited history. Publisher FAQ says file access exposes recordings and encryption is planned; local storage is not an encrypted vault. No local RAG/audio/BYOK promise or runtime/energy qualification established here.",
       "sources": [
         "https://screenmemory.app/"
       ],
-      "checked": "November1 evening primary homepage/pricing recheck; free-history contradiction retained. No app runtime, license checkout or billing qualification."
+      "checked": "November 2 direct homepage/pricing/FAQ; 29 USD Standard / 39 USD Lifetime unchanged. Free-history contradiction retained. No license checkout, runtime or storage benchmark."
     },
     {
       "name": "TimeScroll",
@@ -125,7 +126,7 @@
         "https://github.com/XInTheDark/TimeScrollApp",
         "https://github.com/XInTheDark/TimeScrollApp/blob/main/LICENSE"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 direct homepage feature/requirements recheck; encrypted vault still beta. Publisher claims only, no downloaded binary, security or battery test."
     },
     {
       "name": "Retrace (haseab)",
@@ -137,9 +138,10 @@
       "caveat": "Very early development. Audio/Whisper is listed as disabled/coming soon, not shipped parity. Semantic search on website is coming soon.",
       "sources": [
         "https://github.com/haseab/retrace",
-        "https://retrace.to/"
+        "https://retrace.to/",
+        "https://github.com/haseab/retrace/blob/main/README.md"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 3d2b854a137b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "Retrace (jhammant)",
@@ -150,9 +152,10 @@
       "difference": "Explicit local-only boundaries; no retained full-resolution raw frames; extensible per-app collectors. Separate project from haseab/retrace.",
       "caveat": "README claims are not independent validation. Source now describes Windows alongside macOS with differing capabilities.",
       "sources": [
-        "https://github.com/jhammant/retrace"
+        "https://github.com/jhammant/retrace",
+        "https://github.com/jhammant/retrace/blob/main/README.md"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 5b35e6a1ea9c); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "rem",
@@ -163,9 +166,10 @@
       "difference": "Small, inspectable early native implementation focused on rewind and text recovery.",
       "caveat": "README labels very alpha. Semantic/vector search, spatial search, more date filters, fine-grained purge and first-class multimonitor remain unchecked roadmap items.",
       "sources": [
-        "https://github.com/jasonjmcghee/rem"
+        "https://github.com/jasonjmcghee/rem",
+        "https://github.com/jasonjmcghee/rem/blob/main/README.md"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob eb21245c7e1b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "Unlost",
@@ -176,9 +180,10 @@
       "difference": "Reference for semantic retrieval and natural-language filtering rather than just keyword matching.",
       "caveat": "Local/provider LLM-agent integration and remote/cloud storage are explicitly unchecked future work. Repository feature claims were not run.",
       "sources": [
-        "https://github.com/Vincent-liuwingsang/unlost"
+        "https://github.com/Vincent-liuwingsang/unlost",
+        "https://github.com/Vincent-liuwingsang/unlost/blob/main/README.md"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 2e20b399872b); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "Pensieve (formerly Memos)",
@@ -189,9 +194,10 @@
       "difference": "Extensible Python/web architecture and configurable model processing. Renamed because Memos was already taken.",
       "caveat": "README says Mac/Windows, Linux in development. Local-only operation requires local endpoints/configuration; compatibility is not proof every external provider works.",
       "sources": [
-        "https://github.com/arkohut/pensieve"
+        "https://github.com/arkohut/pensieve",
+        "https://github.com/arkohut/pensieve/blob/master/README.md"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 567406f40389); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "Minne",
@@ -204,7 +210,7 @@
       "sources": [
         "https://minne.sh/"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November 2 direct homepage: free MIT, text-only notes, explicit Insert/undo, own-provider or local Ollama data paths. No runtime or privacy-leak audit."
     },
     {
       "name": "Omi",
@@ -222,7 +228,7 @@
         "https://www.omi.me/products/omi-unlimited-yearly-plan-bundle",
         "https://help.omi.me/en/articles/13159726-manage-my-subscription"
       ],
-      "checked": "November1 evening direct wearable offer, yearly product and help recheck; direct price169/229 supersedes older/search129/179. Product page shows sold-out/add-to-cart conflict. Earlier advertised desktop0.12.552 remains a landing-page observation only; no binary/runtime/checkout test."
+      "checked": "November 2 direct wearable offer and official Mac/no-hardware/subscription help; 169 USD device / 269 USD first-year bundle / 269.91 USD renewal unchanged. Other monthly/on-phone allowances retain November 1 evidence. Mac-only entitlements and live stock/checkout remain unverified."
     },
     {
       "name": "Granola",
@@ -235,7 +241,7 @@
       "sources": [
         "https://www.granola.ai/pricing"
       ],
-      "checked": "October31 pricing-matrix recheck; no app runtime or billing qualification."
+      "checked": "November 2 direct pricing/plan comparison; Basic 30-day MCP scope, paid API/integrations and Enterprise controls retained. No account, audio capture, ASR/privacy or billing test."
     },
     {
       "name": "OpenRecall",
@@ -244,12 +250,13 @@
       "license": "AGPL-3.0 repository license",
       "features": "Periodic screenshots, local OCR and semantic search, browser-based history/timeline, selectable local storage and primary-monitor-only option. Python 3.11; macOS, Windows and Linux.",
       "difference": "A portable Python/browser approach. The README recommends user-managed encrypted storage; this differs from an app-managed encrypted library.",
-      "caveat": "Documentation is not a runtime benchmark. The 2024 FAQ describes encryption as future work; do not treat that roadmap as shipped 2026 protection. No code is incorporated into OSwind.",
+      "caveat": "Current README recommends an externally encrypted volume; app-managed vault encryption is not established. Earlier 2024 FAQ encryption roadmap remains historical. No source is incorporated into OSwind and no runtime/security audit was performed.",
       "sources": [
         "https://github.com/openrecall/openrecall",
-        "https://github.com/openrecall/openrecall/wiki/FAQ"
+        "https://github.com/openrecall/openrecall/wiki/FAQ",
+        "https://github.com/openrecall/openrecall/blob/main/README.md"
       ],
-      "checked": "October 29 primary repository/FAQ check; older FAQ roadmap explicitly dated."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 1b0c50a057e0); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "OpenHistory",
@@ -263,7 +270,7 @@
         "https://openhistory.sh/",
         "https://github.com/ztratar/openhistory"
       ],
-      "checked": "October 29 primary README/site check; distribution wording conflict retained."
+      "checked": "November 2 direct homepage/FAQ: Mac 14+, Apple 26+device-inference requirement, BYOK disclosure and redacted local MCP. Source-install/license details retain prior checks; no runtime audit."
     },
     {
       "name": "silverfish",
@@ -272,11 +279,12 @@
       "license": "Apache-2.0 repository license",
       "features": "Foreground AX text/metadata, SQLite FTS5, local Ollama, four model slots with hardware-aware onboarding, hour/day/week summaries, graph/wiki/profile, chat, briefs, contextual rewriting and MCP.",
       "difference": "Text-only local-model architecture with separate model roles. Existing-database import and loopback-only inference are repository claims.",
-      "caveat": "Apple Silicon/macOS and Rust build environment. Cached README may lag current HEAD. No energy, security, interoperability or runtime ranking is established; connected MCP clients have their own data policies.",
+      "caveat": "Apple Silicon/macOS, Rust/Xcode tools and running local Ollama per current API README. No energy, privacy, security, interoperability or runtime-ranking acceptance; connected MCP clients have their own data policies.",
       "sources": [
-        "https://github.com/KonstantinKo/silverfish"
+        "https://github.com/KonstantinKo/silverfish",
+        "https://github.com/KonstantinKo/silverfish/blob/main/README.md"
       ],
-      "checked": "October 29 repository documentation fetch; search provider showed a cached page."
+      "checked": "November 2 connected GitHub API default-branch README claim check (blob 674e9f7d2735); selected lines and hash retained in source-check receipt. No build, runtime, energy or security qualification; license details retain prior evidence unless separately cited."
     },
     {
       "name": "Goldfish (goldfish.sh)",
@@ -290,8 +298,8 @@
         "https://goldfish.sh/",
         "https://goldfish.sh/privacy"
       ],
-      "checked": "October 29 homepage/privacy check; privacy policy last updated October 13, 2026."
+      "checked": "November 2 direct homepage: free beta and Mac/Windows contextual replies/chat/integrations. Post-beta cost, model data handling and runtime behavior unverified."
     }
   ],
-  "latestSourceCheck": "landscape-source-checks-2026-11-01-evening.json"
+  "latestSourceCheck": "landscape-source-checks-2026-11-02.json"
 }
