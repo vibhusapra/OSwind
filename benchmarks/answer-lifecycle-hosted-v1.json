@@ -1,0 +1,101 @@
+{
+  "format": "OSwind answer lifecycle hosted follow-up",
+  "state": "passed",
+  "head": "5a098c7a1f58c2ff6c13a224bf6e12b266fa2949",
+  "PR": 132,
+  "run": 41386628144,
+  "nativeJob": 125088784115,
+  "benchmarkJob": 125088783902,
+  "nativeJobConclusion": "success",
+  "benchmarkConclusion": "success",
+  "commands": [
+    {
+      "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+      "defined": 2263,
+      "passed": 2147,
+      "skipped": 116,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+      "defined": 3,
+      "passed": 3,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+      "defined": 51,
+      "passed": 51,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    }
+  ],
+  "headFoundInCheckoutLog": true,
+  "logSHA256": "e988c5e67ddaf377da1e2a7e56e6e22a26101066fec3d589c5c14c56f8cdf03f",
+  "logBytes": 3032041,
+  "limits": [
+    "Hosted predecessor head5a098c7; no current audio-source CI, physical capture/power, complete sync, notarized distribution, or competitive ranking claim.",
+    "Earlier native inventory and busy-detach failures remain causally unresolved; this successful run does not repair their historical evidence."
+  ],
+  "diagnostics": {
+    "artifactID": 13116796438,
+    "bytes": 19892,
+    "SHA256": "d592dd90843ceda0d78f4f66d2dd720ccff2cb7428a95e5099b9612f0ae3810d",
+    "JSONfiles": {
+      "oswind-vault-native-traces/oswind-native-busy-recovery-06EDAFFF-D104-451E-BCFB-4464E2196751-completed.json": {
+        "SHA256": "67645e7486b5406b1528c77a5d859d7c64b2bbee0a8bc991b6f4b607e0721e3c",
+        "bytes": 17116,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-cancel-recovery-F44F05E8-2009-4BD9-9655-20A216F384F3-completed.json": {
+        "SHA256": "2d460f8e13912a9e061cd0b483b407ab57b24c66a4ca1c31f6917230efee2d25",
+        "bytes": 52951,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-collector-ED69196C-D18F-424A-8BAF-75E7C20B5C55-completed.json": {
+        "SHA256": "e5f135bcd92bf85662896414f5c093ca5cf8cffc382f611706b6575ed2a92738",
+        "bytes": 8568,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-collector-known-reader-54FC97DD-5CC9-4CEE-9045-1390D7B7FF63-completed.json": {
+        "SHA256": "bd11ff1312962e0f95fbed8540bea56cd89c995ddaf80030c4d2778e59eda402",
+        "bytes": 17592,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-collector-known-reader-915F5B44-816D-4D0F-858A-8A10748F3776-completed.json": {
+        "SHA256": "fdcb9a64c612febc3104fab497703b26f65b49a9e90539310ed750ee6a3e642e",
+        "bytes": 22590,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-detach-held-reader-CA08E401-F2A2-4B05-8790-8433743215DA-completed.json": {
+        "SHA256": "2f80b6009d27eb63f0b39f582ec0f4789885c693fb0db201e183e0f2f47bb169",
+        "bytes": 23871,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-detach-settling-8A38A871-BDE2-40A6-8B4B-7411C965EE3F-completed.json": {
+        "SHA256": "b9479070e5f178bce36e9319b355d16b010fe4d8dbd4e825c0dba3a550bcd808",
+        "bytes": 38929,
+        "JSONvalid": true
+      },
+      "oswind-vault-native-traces/oswind-native-workflow-8988771B-8296-409C-94FA-663C7D0E7594-completed.json": {
+        "SHA256": "3caed5d541e8dd8fa53c7ace1131ca87de9e4c45f8cf9e5f2276d3af78bec241",
+        "bytes": 14735,
+        "JSONvalid": true
+      },
+      "oswind-vault-query-traces/query-recovery-completed-F4863052-1B34-4B9F-91BB-6AB9E02B829C.json": {
+        "SHA256": "650e7aab9989f484c75fd3b38467478b67341fb01a18c045b433d74f00d7954e",
+        "bytes": 7640,
+        "JSONvalid": true
+      },
+      "oswind-vault-query-traces/query-refusal-completed-F5CE8FE1-D91D-4ED3-83C5-84CAB09FD6B0.json": {
+        "SHA256": "a75f19ab5cd086fcb60f5d83bf8dc658fd72cc1f184c7a7402276b30bcbac4e9",
+        "bytes": 533,
+        "JSONvalid": true
+      }
+    }
+  }
+}

@@ -1,0 +1,769 @@
+{
+  "format": "OSwind audio import lifecycle qualification v1",
+  "state": "passed",
+  "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+  "nativeSchema": 33,
+  "trackedInputs": 1390,
+  "inputManifest": "audio-import-lifecycle-inputs-v1.json",
+  "inputManifestSHA256": "5a2808462748bc92319e22ecf68942a831ff47f9f56d3a74c9f00a77bd15b48a",
+  "software": [
+    {
+      "stage": "full-debug",
+      "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "tests": {
+        "defined": 2287,
+        "passed": 2173,
+        "skipped": 114,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 266,
+      "logSHA256": "800c5142887b726934ef4b755957ddaea0df0674d9f86abd49fdadcca0b6cb2a",
+      "wallSeconds": 614.6440557080787,
+      "raceWarning": false,
+      "receiptSHA256": "f77674b6347f1e0529a25d05156541d49208ed4b2d1e31d2de853ad6ee57fd71",
+      "skippedIdentities": [
+        "-[OSwindAppTests.ImportLifecycleModelTests testActualNativeGUIJSONAndLimitlessImportWorkers]",
+        "-[OSwindAppTests.LibraryOpeningTests testNativeVaultLockDuringPreparationClosesLateStoreAndDetaches]",
+        "-[OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardConfidentialMarkerAndChangedCounterRefuse]",
+        "-[OSwindAppTests.NativeClipboardReaderTests testActualNamedBoardReturnsExactUTF8WithoutOpeningGeneralClipboard]",
+        "-[OSwindAppTests.NativeClipboardReaderTests testMismatchedSourceIsRefusedBeforeLazyTextProviderRuns]",
+        "-[OSwindAppTests.NativeModelSetupTests testRealVerifiedNativeModelsApplyWhenExplicitCacheIsConfigured]",
+        "-[OSwindAppTests.PIIModelSetupTests testOwnedSettingsStatesRenderWithoutNetworkOrLibrary]",
+        "-[OSwindAppTests.PIIScanRecordViewTests testOwnedPrivacyRecordStatesRenderInBothThemes]",
+        "-[OSwindAppTests.VaultSessionTests testNativeBusyReaderRemainsClosingUntilRetry]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCancelledSetupKeepsOriginalSelectedAndQuiet]",
+        "-[OSwindAppTests.VaultSessionTests testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualCommittedAudioImportAndRetainsItsBytes]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualDecoderAndClipBeforeAudioAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedNoteWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedRecapWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerAfterActualCommittedTurn]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerBeforeConversationAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsPendingMediaWorkerAfterActualCleanupCommit]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsUnreservedPendingMediaWorkerBeforeSQL]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedNoteWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedRecapWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStatisticsWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStorageWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedDeletionWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedMaintenanceWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockAtStartupDetachesWithoutOpeningHistory]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent]",
+        "-[OSwindAppTests.VaultSessionTests testNormalTerminationAwaitsCancelledSetupBeforeReturning]",
+        "-[OSwindAppTests.VaultSessionTests testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes]",
+        "-[OSwindCoreTests.EntityWordPieceTests testPinnedVocabularyMatchesIndependentTokenAndOffsetReferences]",
+        "-[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.HistoricalErasureScaleTests testOwnedOriginalScopeAtBoundedScale]",
+        "-[OSwindCoreTests.LocalRuntimeLiveTests testManagedLocalServerLifecycle]",
+        "-[OSwindCoreTests.MediaCleanupAdmissionTests testMediaReservationWorker]",
+        "-[OSwindCoreTests.MeetingReminderCrashTests testMeetingReminderCrashWorker]",
+        "-[OSwindCoreTests.NativeANNBuildMeasurementsTests testAuthoredNativePreparationAndSampledSelfRecall]",
+        "-[OSwindCoreTests.NativeMediaMigrationTests testNativeMediaMigrationCrashWorker]",
+        "-[OSwindCoreTests.NativeModelRetentionTests testRealNativeWeightsExpireAndReloadWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder]",
+        "-[OSwindCoreTests.NativeVaultActivityCalendarTests testRetainedCalendarValueCannotPinEncryptedDeviceOrQueryClosedStore]",
+        "-[OSwindCoreTests.NativeVaultCancellationTests testCancellationDuringMediaDrainStillClosesStoreAliasAndOwnedImage]",
+        "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedCreateKeepsClosedEncryptedSetupAndCanResume]",
+        "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact]",
+        "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory]",
+        "-[OSwindCoreTests.NativeVaultCollectorTests testCollectorAdmissionAndReopenPreserveEncryptedHistoryWithoutPlaintextFallback]",
+        "-[OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtFirstCollectorLockRetainsPhaseAndRecoversNormally]",
+        "-[OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtSecondCollectorLockRetainsPhaseAndRecoversNormally]",
+        "-[OSwindCoreTests.NativeVaultDetachSettlementTests testKnownHeldReaderCapturesBusyExitAndPreservesHistoryUntilNormalRecovery]",
+        "-[OSwindCoreTests.NativeVaultDetachSettlementTests testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment]",
+        "-[OSwindCoreTests.NativeVaultDetachSettlementTests testReleasedNativeReaderRecoversWithinOneLockRequestWithoutForce]",
+        "-[OSwindCoreTests.NativeVaultImportPreparationTests testSettingsAndImportReservationsReleaseBeforeVerifiedDetach]",
+        "-[OSwindCoreTests.NativeVaultMigrationTests testCancellationDuringCopyClosesHandleAndDetachesWithoutRemovingOriginal]",
+        "-[OSwindCoreTests.NativeVaultMigrationTests testChangedSourceIsReportedAndOriginalIsRetained]",
+        "-[OSwindCoreTests.NativeVaultMigrationTests testHistoryMediaVectorsChatsSettingsAndOriginalSurviveCopy]",
+        "-[OSwindCoreTests.NativeVaultQueryRecoveryTests testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation]",
+        "-[OSwindCoreTests.NativeVaultQueryRecoveryTests testRepeatedInterruptsRefuseStatusAfterTwoCallsAndPermitOrdinaryRecovery]",
+        "-[OSwindCoreTests.NativeVaultTests testMissingOrUnencryptedImageCannotReportAProtectedLockedLibrary]",
+        "-[OSwindCoreTests.NativeVaultTests testMovedAttachedPackageRemainsVisibleAndCanCloseThroughRetainedDirectory]",
+        "-[OSwindCoreTests.NativeVaultTests testOptionalCredentialLifecycleUsesVerifiedPassphraseAndPreservesFallback]",
+        "-[OSwindCoreTests.NativeVaultTests testOwnedEncryptedVolumeAndSQLiteTemporaryPolicies]",
+        "-[OSwindCoreTests.NativeVaultTests testUnmountedImageIsNotCryptographicallyLockedUntilBackingDeviceDetaches]",
+        "-[OSwindCoreTests.NativeVaultVisualIndexTests testEncryptedVisualSnapshotsReleasePinsAndDescriptorsBeforeVerifiedDetach]",
+        "-[OSwindCoreTests.NativeVaultWorkflowExportTests testOwnedWorkflowExportReleasesMountedFilesBeforeNormalLockAndRetainsHistory]",
+        "-[OSwindCoreTests.OwnedDictationASRTests testOwnedPublicSpeechThroughProductionDictation]",
+        "-[OSwindCoreTests.PIIImportTests testActualNativeCPUImportPaths]",
+        "-[OSwindCoreTests.PIIImportTests testActualNativeCoreMLImportPaths]",
+        "-[OSwindCoreTests.PIIImportTests testPinnedNativeEmailMissIsRetainedAsKnownQualityLimitation]",
+        "-[OSwindCoreTests.PIIInspectorNativeTests testActualBackendsPreserveCoordinatesAcrossLongWhitespaceGap]",
+        "-[OSwindCoreTests.PIIInspectorNativeTests testActualCPUCohortMatchesPinnedIndependentReference]",
+        "-[OSwindCoreTests.PIIInspectorNativeTests testActualCPULongDocumentKeepsCompleteOriginalCoordinates]",
+        "-[OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLCohortMatchesPinnedIndependentReference]",
+        "-[OSwindCoreTests.PIIInspectorNativeTests testActualCoreMLLongDocumentKeepsCompleteOriginalCoordinates]",
+        "-[OSwindCoreTests.PIIModelPreparationTests testNativeStreamingMetadataDerivativeMatchesIndependentONNXBytes]",
+        "-[OSwindCoreTests.PIIModelPreparationTests testRealPreparedReuseAndVerifyNeverInvokeNetworkExtractorOrInference]",
+        "-[OSwindCoreTests.PIITokenizerTests testConcurrentEncodingKeepsImmutableSourceTensors]",
+        "-[OSwindCoreTests.PIITokenizerTests testPinnedTokenizerMatchesIndependentGLiNERAndRustTensors]",
+        "-[OSwindCoreTests.PendingMediaNotificationWorkerTests testOwnedNotificationWriterWorker]",
+        "-[OSwindCoreTests.PersonalSyncCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange]",
+        "-[OSwindCoreTests.SnapshotAdmissionTests testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach]",
+        "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SyncCaptureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncCaptureScaleTests testOwnedArchiveScaleAndIncrementalCost]",
+        "-[OSwindCoreTests.SyncIdentityCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncIdentityScaleTests testOwnedIdentityBootstrapAndIncrementalLifetimeScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceScaleTests testOwnedOriginalEvidenceAtBoundedScale]",
+        "-[OSwindCoreTests.SyncOutgoingCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOutgoingScaleTests testOwnedOutgoingPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.SyncVersionCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncVersionScaleTests testOwnedVersionPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.VisualEncoderTests testPinnedNativeTokenizerParityAndModelLifecycle]",
+        "-[OSwindCoreTests.VisualTokenizerDataTests testPinnedCompleteVocabularyMergesAndIndependentTokenReferences]",
+        "-[OSwindCoreTests.WorkflowExportTests testOptInActualKokoroHardwarePortableExport]",
+        "-[OSwindCoreTests.WorkflowNarrationAudioTests testActualOwnedStockKokoroOutputPassesMeasuredAudioAdmission]",
+        "-[OSwindCoreTests.WorkflowNarratorTests testActualOwnedKokoroThroughProductionGuardianAndWorker]",
+        "-[OSwindCoreTests.WorkflowVideoFrameTests testActualSpokenKokoroWorkflowPreservesFullNarrationAcrossNativeMovie]"
+      ]
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "Audio|SpeechRecognitionTests|Speaker|BackupFileTreeTests|BackupCleanupTests|VoiceTypingTests|AnswerLifecycleTests|ChatAdmissionTests|SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 1133,
+        "passed": 1073,
+        "skipped": 60,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 266,
+      "logSHA256": "73bcbded98eed33a56b380d787df6b1ca8c7a1bde5b5411c083550a902bdfe0a",
+      "wallSeconds": 777.7987503330223,
+      "raceWarning": false,
+      "receiptSHA256": "aa71bc3229d0de7f55b3dbe9396aab529cb721cceedb32021b82cdfa2b0729cb",
+      "skippedIdentities": [
+        "-[OSwindAppTests.ImportLifecycleModelTests testActualNativeGUIJSONAndLimitlessImportWorkers]",
+        "-[OSwindAppTests.VaultSessionTests testNativeBusyReaderRemainsClosingUntilRetry]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCancelledSetupKeepsOriginalSelectedAndQuiet]",
+        "-[OSwindAppTests.VaultSessionTests testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualCommittedAudioImportAndRetainsItsBytes]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualDecoderAndClipBeforeAudioAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedNoteWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedRecapWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerAfterActualCommittedTurn]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerBeforeConversationAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsPendingMediaWorkerAfterActualCleanupCommit]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsUnreservedPendingMediaWorkerBeforeSQL]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedNoteWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedRecapWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStatisticsWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStorageWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedDeletionWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedMaintenanceWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockAtStartupDetachesWithoutOpeningHistory]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent]",
+        "-[OSwindAppTests.VaultSessionTests testNormalTerminationAwaitsCancelledSetupBeforeReturning]",
+        "-[OSwindAppTests.VaultSessionTests testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes]",
+        "-[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.HistoricalErasureScaleTests testOwnedOriginalScopeAtBoundedScale]",
+        "-[OSwindCoreTests.MediaCleanupAdmissionTests testMediaReservationWorker]",
+        "-[OSwindCoreTests.NativeMediaMigrationTests testNativeMediaMigrationCrashWorker]",
+        "-[OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder]",
+        "-[OSwindCoreTests.NativeVaultActivityCalendarTests testRetainedCalendarValueCannotPinEncryptedDeviceOrQueryClosedStore]",
+        "-[OSwindCoreTests.PendingMediaNotificationWorkerTests testOwnedNotificationWriterWorker]",
+        "-[OSwindCoreTests.PersonalSyncCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange]",
+        "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SyncCaptureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncCaptureScaleTests testOwnedArchiveScaleAndIncrementalCost]",
+        "-[OSwindCoreTests.SyncIdentityCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncIdentityScaleTests testOwnedIdentityBootstrapAndIncrementalLifetimeScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceScaleTests testOwnedOriginalEvidenceAtBoundedScale]",
+        "-[OSwindCoreTests.SyncOutgoingCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOutgoingScaleTests testOwnedOutgoingPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.SyncVersionCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncVersionScaleTests testOwnedVersionPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.WorkflowNarrationAudioTests testActualOwnedStockKokoroOutputPassesMeasuredAudioAdmission]"
+      ]
+    },
+    {
+      "stage": "optimized",
+      "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/release-build",
+        "-c",
+        "release",
+        "--filter",
+        "Audio|SpeechRecognitionTests|Speaker|BackupFileTreeTests|BackupCleanupTests|VoiceTypingTests|AnswerLifecycleTests|ChatAdmissionTests|SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 1133,
+        "passed": 1073,
+        "skipped": 60,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 266,
+      "logSHA256": "cacb5b11649c3ded1a21c819ce1fd61d3af5486a6022d4748c86283fe11121d8",
+      "wallSeconds": 528.7561307919677,
+      "raceWarning": false,
+      "receiptSHA256": "e0bac74e3af507b02ebb53427b9d45a6aece9b80668ab7a4d48f4e6ca453e1a6",
+      "skippedIdentities": [
+        "-[OSwindAppTests.ImportLifecycleModelTests testActualNativeGUIJSONAndLimitlessImportWorkers]",
+        "-[OSwindAppTests.VaultSessionTests testNativeBusyReaderRemainsClosingUntilRetry]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCancelledSetupKeepsOriginalSelectedAndQuiet]",
+        "-[OSwindAppTests.VaultSessionTests testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal]",
+        "-[OSwindAppTests.VaultSessionTests testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualCommittedAudioImportAndRetainsItsBytes]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualDecoderAndClipBeforeAudioAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedNoteWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedRecapWithoutLosingIt]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerAfterActualCommittedTurn]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerBeforeConversationAdmission]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsPendingMediaWorkerAfterActualCleanupCommit]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsUnreservedPendingMediaWorkerBeforeSQL]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedNoteWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedRecapWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStatisticsWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStorageWorker]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedDeletionWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedMaintenanceWorkerAndPreservesSource]",
+        "-[OSwindAppTests.VaultSessionTests testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockAtStartupDetachesWithoutOpeningHistory]",
+        "-[OSwindAppTests.VaultSessionTests testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent]",
+        "-[OSwindAppTests.VaultSessionTests testNormalTerminationAwaitsCancelledSetupBeforeReturning]",
+        "-[OSwindAppTests.VaultSessionTests testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes]",
+        "-[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.HistoricalErasureScaleTests testOwnedOriginalScopeAtBoundedScale]",
+        "-[OSwindCoreTests.MediaCleanupAdmissionTests testMediaReservationWorker]",
+        "-[OSwindCoreTests.NativeMediaMigrationTests testNativeMediaMigrationCrashWorker]",
+        "-[OSwindCoreTests.NativeSystemAudioTests testOwnedSourcesProduceNativePCMAndRemainIsolatedThroughProductionDecoder]",
+        "-[OSwindCoreTests.NativeVaultActivityCalendarTests testRetainedCalendarValueCannotPinEncryptedDeviceOrQueryClosedStore]",
+        "-[OSwindCoreTests.PendingMediaNotificationWorkerTests testOwnedNotificationWriterWorker]",
+        "-[OSwindCoreTests.PersonalSyncCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SearchExpressionTests testMetalExpressionMasksAcrossQueriesAndUnreplayedContentChange]",
+        "-[OSwindCoreTests.SpeakerRuntimeTests testRealOfflineSpeakersWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SpeechRecognitionTests testRealNativeOfflineModelWhenExplicitlyConfigured]",
+        "-[OSwindCoreTests.SyncCaptureCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncCaptureScaleTests testOwnedArchiveScaleAndIncrementalCost]",
+        "-[OSwindCoreTests.SyncIdentityCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncIdentityScaleTests testOwnedIdentityBootstrapAndIncrementalLifetimeScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker]",
+        "-[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOriginalEvidenceScaleTests testOwnedOriginalEvidenceAtBoundedScale]",
+        "-[OSwindCoreTests.SyncOutgoingCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncOutgoingScaleTests testOwnedOutgoingPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.SyncVersionCrashTests testCrashWorker]",
+        "-[OSwindCoreTests.SyncVersionScaleTests testOwnedVersionPreparationAtBoundedScale]",
+        "-[OSwindCoreTests.WorkflowNarrationAudioTests testActualOwnedStockKokoroOutputPassesMeasuredAudioAdmission]"
+      ]
+    }
+  ],
+  "mandatoryControlsInEveryBuild": 266,
+  "mandatoryDefinitionAudit": {
+    "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+    "required": 266,
+    "ambiguousDefinitions": {},
+    "CoreBackendOwnerQualifiedChecks": 19
+  },
+  "qualificationStages": [
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "6fa7bcd7c47b5539bfab574b28d49770e65ade8c1316d037d425a54c07f65e41",
+      "tests": {
+        "defined": 53,
+        "passed": 53,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "b53b61335ca4d77d039dcd8ebc9b87ab52ae98f80f44b38be5fcc31929537321"
+    },
+    {
+      "name": "migration-crashes",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "2bb86ab7c64a48ed0e58f23def8df478e6bd203649eee2b48748792b3ceafe1c"
+    },
+    {
+      "name": "migration-independent-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "310f25ecba0656c0ce1adaa61502018e2de5e77014769eaa8beec9388cfc2bbc"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "b0497cc0a79bce2e836e1b29bc0a7acb7ac23f7695777880cdd2d7fdc28a1ccf"
+    },
+    {
+      "name": "packaged-media-admission",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "b57392ff6890f2670a668baa013a18ede2ded546fd61a212c54da479089aec7e"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "22595e2490306b8947d37630d20562056572da9db560c588d92a76b2e2a59470"
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a79f8da1aadbfe04814f7cc273b426cbe5a52ba0d098a0661a592bdf5da9edc7"
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "5f6625f94873c151e81ba6c447dd6e4ea4cb14ae95d062b346b97d018d9d7e74"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "765830d9b251ed840ff32b1bdc9190a85fd7c81a522905f82b89329e8e5922ed"
+    },
+    {
+      "name": "audio-normalization",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3660d813178fa47039e4b3680d8ebe24733197584325c2041abf9d30170cbf96"
+    },
+    {
+      "name": "recording-local-speaker-search",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "b253f026e7f11dd1e747ce79871050b8b68e2088b857d47d8842410b802cf243"
+    },
+    {
+      "name": "native-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d"
+    },
+    {
+      "name": "native-wipe",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3a34225939ea351f7e0a2319fb6f83d92071d80ebecbdf125f7a7f0ac20ed9fe"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "09362c8cb6091491bc1d3d87d1852cac224b27d1fad372c5c04d7bb221276e0b"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "5f22e131a6bc55e5c32a50338fdedebe8d9afdebee812107695f66044e06b7fe"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409"
+    },
+    {
+      "name": "schema33-sync-capture",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf"
+    },
+    {
+      "name": "schema33-entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "2f43e62c72e671123be73511a4c0af5255cd711dbb8a1efc59e3c365e5e5948f"
+    },
+    {
+      "name": "schema33-project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a9bc838305295b619bb2718d5576fc54a384dce9348f4c453141b08a90a28241"
+    },
+    {
+      "name": "schema33-text-observation",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "0d93a2f0ef2c5091008cb58763438b0107fc774410997da8f1debcc7bcd358ff"
+    },
+    {
+      "name": "schema33-accessibility-text",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "4fd41bd499bc68d1d1f7fd076a70b95ab055c031a87c22fa7f819c5b212d4fd0"
+    },
+    {
+      "name": "schema33-tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "373e527abe6812c9953b389356acc0d135326d55777f1bcfbf96074a23727e1a"
+    },
+    {
+      "name": "schema33-capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "61c19a46ddd9e3115a18928d16f02e6570d0e2660fe6f31c93cd6dbcf3be9868"
+    },
+    {
+      "name": "schema33-historical-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "c4989ef115f3765a6cbb9439df7f9bdf1f905f41a910e179518070dad015a475"
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "193ff8e408e130fa9f1465535e4531f62c41cdeb9f8b6161c2826a1dd9dfcb7a"
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "native": {
+    "defined": 53,
+    "passed": 53,
+    "skipped": 0,
+    "logSHA256": "6fa7bcd7c47b5539bfab574b28d49770e65ade8c1316d037d425a54c07f65e41"
+  },
+  "distinctFullAndNativeMethods": 2224,
+  "nativeMethodsAdditionalToFull": 51,
+  "independentReview": {
+    "format": "OSwind independent audio import lifecycle package review",
+    "state": "passed",
+    "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+    "nativeSource": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+    "trackedInputs": 1390,
+    "sourceInputsSHA256": "5a2808462748bc92319e22ecf68942a831ff47f9f56d3a74c9f00a77bd15b48a",
+    "nativeDefined": 53,
+    "nativePassed": 53,
+    "nativeSkipped": 0,
+    "all32StageLogsMatch": true,
+    "authoredAudioProbeSHA256": "3660d813178fa47039e4b3680d8ebe24733197584325c2041abf9d30170cbf96",
+    "speakerScopeProbeLogSHA256": "b253f026e7f11dd1e747ce79871050b8b68e2088b857d47d8842410b802cf243",
+    "currentSourceMigrationReviewSHA256": "c106d3ecd855ea3350a222a5ef5c5260416ea9218ba419dc88942aa775c007b4",
+    "nativeLogSHA256": "6fa7bcd7c47b5539bfab574b28d49770e65ade8c1316d037d425a54c07f65e41",
+    "appRegularFiles": 34,
+    "zipAndExtractionEveryFileEqual": true,
+    "strictAppAndExtractedSignatures": true,
+    "priorAppsUnchanged": 51,
+    "packagedProbeSHA256": "b57392ff6890f2670a668baa013a18ede2ded546fd61a212c54da479089aec7e",
+    "bothPackagedFixProbesPass": true,
+    "readOnlyProbeDatabases": "Both empty native/erasure queues, integrity/FK pass, all8 fence triggers present; referenced fixture files absent. Normal mode=ro honors WAL.",
+    "zipSHA256": "69e70bccd402aadac36779ebe88f2b4aa3a67c2ccdc3e33af1a7b762504db5e9",
+    "CLI_SHA256": "6580f0db8534063df2fbf04115eb4142af9eb33ef2e2df098d177f6988013c92",
+    "appSHA256": "be604b133bf9469f67077346efa94294cd57ae71d6e72f6e3ec0c75ceb5f945d",
+    "limits": [
+      "Current-source migration SIGKILL databases have a separate independent reader receipt. GUI/TCC, capture/power, storage power-loss, notarization/provider and whole-product acceptance remain open.",
+      "Source32 predecessor receipts remain frozen; no source32 package or old-client success is promoted to native33. The exact prior32 executable now explicitly refuses this native format."
+    ],
+    "reviewerSHA256": "e34f8955f90cd4d70e273ddfea2e32f8f6848b5cba1c77a165234965f1e8161c",
+    "atUTC": "2026-11-02T04:50:53.970095+00:00"
+  },
+  "independentReviewReceiptSHA256": "d8a2b567e64db4cd6e1c33c62a8107c60be065750c3c0208cb96fc31bf25d95d",
+  "priorAppProtectionScope": "50 earlier qualified app/extraction trees plus one retained failed query-setup candidate; preservation does not promote its failed attempt.",
+  "artifacts": {
+    "app": ".artifacts/audio-import-lifecycle-v1/qualification-v2/OSwind.app",
+    "archive": ".artifacts/audio-import-lifecycle-v1/qualification-v2/OSwind-macos.zip",
+    "zipSHA256": "69e70bccd402aadac36779ebe88f2b4aa3a67c2ccdc3e33af1a7b762504db5e9",
+    "CLI_SHA256": "6580f0db8534063df2fbf04115eb4142af9eb33ef2e2df098d177f6988013c92",
+    "appSHA256": "be604b133bf9469f67077346efa94294cd57ae71d6e72f6e3ec0c75ceb5f945d",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "aa75b445fc523e0f2aef3a6c8d5cc00b6f58bb4862929dffa509d8c66c3ffefb",
+      "Contents/MacOS/oswindctl": "6580f0db8534063df2fbf04115eb4142af9eb33ef2e2df098d177f6988013c92",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "be604b133bf9469f67077346efa94294cd57ae71d6e72f6e3ec0c75ceb5f945d",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    }
+  },
+  "currentSourceHosted": "Separate publication/CI required; predecessor hosted results do not qualify this source.",
+  "retainedQualificationWrapperFailure": {
+    "state": "driver-failed-before-product-stages",
+    "cause": "Copied wrapper retained stages-v2/inputs.json; actual successful source inputs live in stages-v1.",
+    "source": "dfac2e0b82c1730bed81fa697f818d0e3bd07afa",
+    "outputDirectory": "qualification-v1",
+    "outputFiles": [
+      "inputs.json"
+    ],
+    "stageStarted": false,
+    "logSHA256": "836cfb902261dc1b7dbfe10c492731485d0c252376182be2f7c13301d8f5760d",
+    "inputManifestSHA256": "5a2808462748bc92319e22ecf68942a831ff47f9f56d3a74c9f00a77bd15b48a",
+    "recovery": "Correct only wrapper path, fresh qualification-v2; preserve all3 successful software receipts and unused first output; no product/native/package retry."
+  },
+  "behavior": {
+    "actualDetachedImportOwnedThroughDecoderSpeakerAdmissionAndCompletion": true,
+    "retiredClosedAndDrainLaunchDenied": true,
+    "cancelledDrainCallerStillJoins": true,
+    "offMainActorAdmission": true,
+    "currentSavedPrivacyAndRetentionFencedThroughActualCommit": true,
+    "configuredAdmissionRequiresIndependentTransaction": true,
+    "cancelledSQLInsertRollsBackAndRemovesOnlyNewRetainedCopy": true,
+    "committedTranscriptPreserved": true,
+    "retiredStatusSuppressed": true
+  },
+  "retainedFailures": [
+    {
+      "state": "genuine regression",
+      "baseline": "be3f50aa399543a263939e217a0e0da309b15c87",
+      "methods": 3,
+      "failedAssertions": 7,
+      "logSHA256": "aeb6776895b95b78cc26c566ef630ae2c865289711922eede46efd7335396e24",
+      "facts": [
+        "actual import worker missing exit ownership",
+        "drain acknowledged while decoder and clip held",
+        "retired completion status published",
+        "actual admission ran on UI thread"
+      ],
+      "instrumentationOnly": true,
+      "originalAssertionsRetained": true
+    },
+    {
+      "state": "genuine regression",
+      "logSHA256": "2f823607e868a62b4f02cb4967cf879b150789df51f5aff5487212a546425994",
+      "fact": "Actual insert cancellation rolled source back but left new retained copy because cleanup checked task cancellation; unrelated retained recording/input must stay unchanged.",
+      "originalAssertionsRetained": true
+    }
+  ],
+  "limits": [
+    "Owned authored audio/ASR/speaker backends exercise actual wrappers, normalization and persistence; they do not remeasure real-model quality. Earlier read-speech and diarization corpus receipts remain separate.",
+    "Selected metadata/detail validation and search/index/model-preparation lifetimes, actual provider/server cancellation, native GUI/TCC/input, sustained capture/power, complete sync/epochs and providers/two Macs remain open.",
+    "Strict ad hoc package verification does not establish notarized distribution. All 83 feature statuses unchanged; no whole-product parity or competitive rank."
+  ],
+  "predecessorHosted": {
+    "format": "OSwind answer lifecycle hosted follow-up",
+    "state": "passed",
+    "head": "5a098c7a1f58c2ff6c13a224bf6e12b266fa2949",
+    "PR": 132,
+    "run": 41386628144,
+    "nativeJob": 125088784115,
+    "benchmarkJob": 125088783902,
+    "nativeJobConclusion": "success",
+    "benchmarkConclusion": "success",
+    "commands": [
+      {
+        "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+        "defined": 2263,
+        "passed": 2147,
+        "skipped": 116,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+        "defined": 3,
+        "passed": 3,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+        "defined": 51,
+        "passed": 51,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    ],
+    "headFoundInCheckoutLog": true,
+    "logSHA256": "e988c5e67ddaf377da1e2a7e56e6e22a26101066fec3d589c5c14c56f8cdf03f",
+    "logBytes": 3032041,
+    "limits": [
+      "Hosted predecessor head5a098c7; no current audio-source CI, physical capture/power, complete sync, notarized distribution, or competitive ranking claim.",
+      "Earlier native inventory and busy-detach failures remain causally unresolved; this successful run does not repair their historical evidence."
+    ],
+    "diagnostics": {
+      "artifactID": 13116796438,
+      "bytes": 19892,
+      "SHA256": "d592dd90843ceda0d78f4f66d2dd720ccff2cb7428a95e5099b9612f0ae3810d",
+      "JSONfiles": {
+        "oswind-vault-native-traces/oswind-native-busy-recovery-06EDAFFF-D104-451E-BCFB-4464E2196751-completed.json": {
+          "SHA256": "67645e7486b5406b1528c77a5d859d7c64b2bbee0a8bc991b6f4b607e0721e3c",
+          "bytes": 17116,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-cancel-recovery-F44F05E8-2009-4BD9-9655-20A216F384F3-completed.json": {
+          "SHA256": "2d460f8e13912a9e061cd0b483b407ab57b24c66a4ca1c31f6917230efee2d25",
+          "bytes": 52951,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-collector-ED69196C-D18F-424A-8BAF-75E7C20B5C55-completed.json": {
+          "SHA256": "e5f135bcd92bf85662896414f5c093ca5cf8cffc382f611706b6575ed2a92738",
+          "bytes": 8568,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-collector-known-reader-54FC97DD-5CC9-4CEE-9045-1390D7B7FF63-completed.json": {
+          "SHA256": "bd11ff1312962e0f95fbed8540bea56cd89c995ddaf80030c4d2778e59eda402",
+          "bytes": 17592,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-collector-known-reader-915F5B44-816D-4D0F-858A-8A10748F3776-completed.json": {
+          "SHA256": "fdcb9a64c612febc3104fab497703b26f65b49a9e90539310ed750ee6a3e642e",
+          "bytes": 22590,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-detach-held-reader-CA08E401-F2A2-4B05-8790-8433743215DA-completed.json": {
+          "SHA256": "2f80b6009d27eb63f0b39f582ec0f4789885c693fb0db201e183e0f2f47bb169",
+          "bytes": 23871,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-detach-settling-8A38A871-BDE2-40A6-8B4B-7411C965EE3F-completed.json": {
+          "SHA256": "b9479070e5f178bce36e9319b355d16b010fe4d8dbd4e825c0dba3a550bcd808",
+          "bytes": 38929,
+          "JSONvalid": true
+        },
+        "oswind-vault-native-traces/oswind-native-workflow-8988771B-8296-409C-94FA-663C7D0E7594-completed.json": {
+          "SHA256": "3caed5d541e8dd8fa53c7ace1131ca87de9e4c45f8cf9e5f2276d3af78bec241",
+          "bytes": 14735,
+          "JSONvalid": true
+        },
+        "oswind-vault-query-traces/query-recovery-completed-F4863052-1B34-4B9F-91BB-6AB9E02B829C.json": {
+          "SHA256": "650e7aab9989f484c75fd3b38467478b67341fb01a18c045b433d74f00d7954e",
+          "bytes": 7640,
+          "JSONvalid": true
+        },
+        "oswind-vault-query-traces/query-refusal-completed-F5CE8FE1-D91D-4ED3-83C5-84CAB09FD6B0.json": {
+          "SHA256": "a75f19ab5cd086fcb60f5d83bf8dc658fd72cc1f184c7a7402276b30bcbac4e9",
+          "bytes": 533,
+          "JSONvalid": true
+        }
+      }
+    }
+  }
+}
