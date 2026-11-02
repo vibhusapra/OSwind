@@ -3,7 +3,7 @@ import Foundation
 /// Own the actual detached work together with its actor completion. A cancelled
 /// drain caller still waits for both; no new job enters while draining.
 @MainActor final class LibraryWorkRegistry {
-    enum Kind:Hashable,CaseIterable,Sendable {case note,recap,statistics,storage,answer,audioImport}
+    enum Kind:Hashable,CaseIterable,Sendable {case note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation}
     private struct Job {
         let kind:Kind
         let cancel:@Sendable ()->Void
@@ -13,9 +13,9 @@ import Foundation
     private var drainers=0
     var busy:Bool {!jobs.isEmpty}
     var accepting:Bool {drainers==0}
-    @discardableResult func launch<Value:Sendable>(kind:Kind,operation:@escaping @Sendable ()async throws->Value,completion:@escaping @MainActor (Result<Value,Error>,Bool)->Void)->UUID? {
+    @discardableResult func launch<Value:Sendable>(kind:Kind,priority:TaskPriority = .utility,operation:@escaping @Sendable ()async throws->Value,completion:@escaping @MainActor (Result<Value,Error>,Bool)->Void)->UUID? {
         guard accepting else {return nil}
-        let id=UUID(),worker=Task.detached(priority:.utility,operation:operation)
+        let id=UUID(),worker=Task.detached(priority:priority,operation:operation)
         let finished=Task {
             defer {jobs[id]=nil}
             do {
@@ -25,6 +25,12 @@ import Foundation
         }
         jobs[id]=Job(kind:kind,cancel:{worker.cancel();finished.cancel()},join:{_ = try? await worker.value;await finished.value})
         return id
+    }
+    /// Observe an individual job without releasing its registry ownership.
+    /// Cancelling the observer forwards to actual work and still joins it.
+    func wait(for id:UUID)async {
+        guard let job=jobs[id] else {return}
+        await withTaskCancellationHandler {await job.join()} onCancel:{job.cancel()}
     }
     func cancel(kinds:Set<Kind>=Set(Kind.allCases)) {for job in jobs.values where kinds.contains(job.kind) {job.cancel()}}
     func cancelAndWait()async {

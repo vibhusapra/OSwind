@@ -4,9 +4,24 @@ import AppKit
 @testable import OSwind
 
 enum SourceWorkTestJob:CaseIterable {
-    case note,recap,statistics,storage,answer,audioImport
+    case note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation
     @MainActor func start(_ model:AppModel,gate:ImportWorkerGate,committed:Bool=false)throws {
         switch self {
+        case .selectedPII:
+            let store=model.store;model.selected=try XCTUnwrap(store.get("keep"))
+            model.refreshSelectedPIIScan(read:{memory in try? gate.pause();return try store.piiScanStatus(memory.id,matching:memory)})
+        case .sourceOpening:
+            model.openMemory(try XCTUnwrap(model.store.get("keep")),query:"owned",observeRead:{try? gate.pause()})
+        case .historicalValidation:
+            let store=model.store,memory=try XCTUnwrap(store.get("keep")),origin="00000000-0000-0000-0000-000000004102"
+            let body=try SyncSourceBody(memory:memory,origin:origin,media:[]){_,_ in throw OSwindError.invalid("No parent")}
+            let record=try SyncPortableRecord(identity:.init(table:.source,origin:origin,lifetime:UUID().uuidString.lowercased()),body:.source(body))
+            let original=try store.withRoutineDatabase {db in
+                let history=HistoricalEvidenceStore(database:db),handle=UUID().uuidString.lowercased()
+                try history.insert(handle:handle,source:memory.id,record:record,paths:[:],parents:[])
+                return try history.read(handle,verifyMedia:{_,_,_ in}).memory
+            }
+            model.selected=original;model.watchSelectedOriginal(read:{memory in try? gate.pause();return try store.hydrate(memory)})
         case .note:
             if committed {model.addNote("Owned authored note",observeCompletion:{try? gate.pause()})}
             else {model.addNote("Owned authored note",observeWorker:{try gate.pause()})}
@@ -88,4 +103,10 @@ enum SourceWorkTestJob:CaseIterable {
     func testLibrarySwitchWaitsForActualAnswerWorker()async throws {try await switched(.answer)}
     func testPlainQuitWaitsForActualAudioImportWorker()async throws {try await quit(.audioImport)}
     func testLibrarySwitchWaitsForActualAudioImportWorker()async throws {try await switched(.audioImport)}
+    func testPlainQuitWaitsForActualSelectedMetadataReader()async throws {try await quit(.selectedPII)}
+    func testPlainQuitWaitsForActualSourceHydration()async throws {try await quit(.sourceOpening)}
+    func testPlainQuitWaitsForActiveHistoricalValidation()async throws {try await quit(.historicalValidation)}
+    func testLibrarySwitchWaitsForActualSelectedMetadataReader()async throws {try await switched(.selectedPII)}
+    func testLibrarySwitchWaitsForActualSourceHydration()async throws {try await switched(.sourceOpening)}
+    func testLibrarySwitchWaitsForActiveHistoricalValidation()async throws {try await switched(.historicalValidation)}
 }

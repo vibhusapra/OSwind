@@ -35,4 +35,7 @@ extension VaultSessionTests {
     func testNativeLockWaitsForActualUnreservedStorageWorker()async throws {try await sourceWorkLock(.storage)}
     func testNativeLockJoinsAlreadyCommittedNoteWithoutLosingIt()async throws {try await sourceWorkLock(.note,committed:true)}
     func testNativeLockJoinsAlreadyCommittedRecapWithoutLosingIt()async throws {try await sourceWorkLock(.recap,committed:true)}
+    func testNativeLockWaitsForActualSelectedMetadataReader()async throws {try await sourceWorkLock(.selectedPII)}
+    func testNativeLockWaitsForActualSourceHydration()async throws {try await sourceWorkLock(.sourceOpening)}
+    func testNativeLockWaitsForActiveHistoricalValidation()async throws {try await sourceWorkLock(.historicalValidation)}
 }
