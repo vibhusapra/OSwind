@@ -24,7 +24,7 @@ public struct PersonalSyncPairingReview:Equatable,Sendable {
 
 /// Serialized owner of a Keychain anchor and its current native library. The
 /// caller must join every operation and close this owner before leaving storage.
-/// This API cannot construct a delivery session or publish provider objects.
+/// The public API cannot construct a delivery session or publish provider objects.
 public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     private struct Handle:Codable,Equatable {let format:String,version:Int,id:String,protection:SyncCredentialProtection}
     private struct Location:Codable,Equatable {
@@ -50,13 +50,22 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     }
     /// Only encoded into the dedicated private Keychain account. The nonsecret
     /// native handle is immutable and contains neither keys nor these payloads.
+    private struct DeliveryReservation:Codable {let id:String,protection:SyncCredentialProtection}
     private struct Envelope:Codable {
         let format:String,version:Int,id:String,protection:SyncCredentialProtection,location:Location
         let pending:Data?,material:Data?,consumedRequest:String?,retired:Bool
+        let delivery:DeliveryReservation?
         func replacing(pending:Data?=nil,material:Data?=nil,consumed:String?=nil,retired:Bool=false)->Self {
-            .init(format:format,version:version,id:id,protection:protection,location:location,pending:pending,material:material,consumedRequest:consumed,retired:retired)
+            .init(format:format,version:version,id:id,protection:protection,location:location,pending:pending,material:material,consumedRequest:consumed,retired:retired,delivery:delivery)
+        }
+        func reserving(_ next:DeliveryReservation)->Self {
+            .init(format:format,version:version,id:id,protection:protection,location:location,pending:pending,material:material,consumedRequest:consumedRequest,retired:retired,delivery:next)
         }
         func validate()throws {
+            if let delivery {
+                try SyncCredentialStorageLimits.validate(id:delivery.id)
+                guard delivery.protection==protection,!retired,material != nil,pending==nil else {throw OSwindError.invalid("Invalid reserved delivery authority")}
+            }
             guard format=="OSwind.sync.pairing-anchor",version==1 else {throw OSwindError.invalid("Invalid pairing credential")}
             try SyncCredentialStorageLimits.validate(id:id)
             if let consumedRequest {try SyncProtocolLimits.digest(consumedRequest)}
@@ -151,7 +160,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
                 sqlite3_reset(put);sqlite3_clear_bindings(put);db.bind(put,1,Self.handleKey);db.bind(put,2,String(decoding:try SyncProtocolLimits.encode(saved),as:UTF8.self));try db.done(put)
             }
         }
-        let value=Envelope(format:"OSwind.sync.pairing-anchor",version:1,id:saved.id,protection:saved.protection,location:try Location.capture(store,stateRoot:stateRoot,machine:machine),pending:material==nil ? try pending.encodedForKeychain():nil,material:try material?.encodedForKeychain(),consumedRequest:material==nil ? nil:try pending.request.digest,retired:false)
+        let value=Envelope(format:"OSwind.sync.pairing-anchor",version:1,id:saved.id,protection:saved.protection,location:try Location.capture(store,stateRoot:stateRoot,machine:machine),pending:material==nil ? try pending.encodedForKeychain():nil,material:try material?.encodedForKeychain(),consumedRequest:material==nil ? nil:try pending.request.digest,retired:false,delivery:nil)
         try Task.checkCancellation();try backend.create(id:saved.id,bytes:value.encoded())
         return try status(value)
     }
@@ -192,7 +201,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     /// Persist the new membership before returning its encrypted response. A
     /// retry of the exact admitted request is idempotent while it remains valid.
     public func approve(_ review:PersonalSyncPairingReview,now:Date=Date())throws->String {try withAccess {
-        let (value,bytes)=try current();guard let raw=value.material,let owner=try SyncCredentialMaterial.decodeFromKeychain(raw).owner else {throw OSwindError.invalid("Only the group owner can approve devices")}
+        let (value,bytes)=try current();guard value.delivery==nil,let raw=value.material,let owner=try SyncCredentialMaterial.decodeFromKeychain(raw).owner else {throw OSwindError.invalid("Only the group owner can approve devices")}
         let material=try SyncCredentialMaterial.decodeFromKeychain(raw),request=try SyncJoinRequest.decode(review.bytes,now:now),nextOwner=try owner.admitting(request,now:now)
         let joined=try material.joined.withCertificate(nextOwner.certificate),next=try SyncCredentialMaterial(joined:joined,owner:nextOwner)
         let response=try nextOwner.response(to:request,now:now)
@@ -206,10 +215,54 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let next=value.replacing(material:try SyncCredentialMaterial(joined:joined).encodedForKeychain(),consumed:try pending.request.digest)
         try save(next,expected:bytes);return try status(next)
     }}
+    /// Internal setup vertical slice. It creates no scheduler or public
+    /// activation UI; native writer/recovery/erase admission is still required.
+    func prepareAnchoredService(shared:URL,createShared:Bool)throws->SyncLibraryService {try withAccess {
+        let (value,_)=try current()
+        guard !value.retired,let saved=value.material else {throw OSwindError.invalid("Finish pairing before preparing delivery")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(saved),joined=material.joined
+        let native=store.root.standardizedFileURL.resolvingSymlinksInPath().path,sharedPath=shared.standardizedFileURL.resolvingSymlinksInPath().path
+        guard shared.isFileURL,sharedPath != native,!sharedPath.hasPrefix(native+"/"),!native.hasPrefix(sharedPath+"/") else {throw OSwindError.invalid("Keep the shared sync folder outside the native library")}
+        let transport=try createShared ? joined.createTransport(at:shared):joined.openTransport(at:shared)
+        var inbox:SyncObjectFolder?,service:SyncLibraryService?
+        do {
+            let path=store.root.appendingPathComponent("images/device-sync-"+joined.replica,isDirectory:true)
+            inbox=try FileManager.default.fileExists(atPath:path.path) ? joined.openPrivateInbox(at:path):joined.createPrivateInbox(at:path)
+            let peers=joined.certificate.body.members.map(\.replica).filter {$0 != joined.replica}
+            let prepared=try SyncLibraryService.install(library:store,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch,peers:peers,transport:transport,inbox:inbox!)
+            service=prepared;try installDeliveryAnchor(on:prepared);return prepared
+        }catch {try? service?.stop();inbox?.close();transport.close();throw error}
+    }}
+    /// Reserve the external account in the already durable pairing anchor
+    /// BEFORE creating any native delivery marker. Restoring a pre-install
+    /// database can therefore never allocate a fresh zero-floor account.
+    /// This remains internal; no public transfer factory is exposed yet.
+    @discardableResult func installDeliveryAnchor(on service:SyncLibraryService)throws->SyncDeliveryAnchor {try withAccess {
+        guard service.library===store else {throw OSwindError.invalid("Prepare delivery for the pairing owner's current library")}
+        let (value,bytes)=try current()
+        guard !value.retired,let saved=value.material else {throw OSwindError.invalid("Finish pairing before preparing delivery")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(saved)
+        guard material.joined.replica==service.cache.journal.replica,material.joined.certificate.body.group==service.cache.journal.group,material.joined.certificate.body.epoch==service.cache.journal.epoch else {throw OSwindError.invalid("Delivery service differs from this pairing identity")}
+        try service.transport.requireSignedAuthority(material.joined.packetAuthority())
+        let reservation:DeliveryReservation,fresh:Bool
+        if let existing=value.delivery {reservation=existing;fresh=false}
+        else {
+            reservation = .init(id:UUID().uuidString.lowercased(),protection:value.protection);fresh=true
+            try save(value.reserving(reservation),expected:bytes)
+        }
+        let backend=injectedStorage ?? SyncKeychainCredentialStorage(protection:reservation.protection)
+        let anchor:SyncDeliveryAnchor
+        if fresh {anchor=try .create(library:store,cache:service.cache,material:material,id:reservation.id,stateRoot:stateRoot,machine:machine,storage:backend)}
+        else {anchor=try .open(library:store,cache:service.cache,material:material,id:reservation.id,stateRoot:stateRoot,machine:machine,storage:backend)}
+        do {try service.attachExternalAnchor(anchor);return anchor}
+        catch {anchor.close();throw error}
+    }}
     /// Local retirement erases private material but retains a keyless external
     /// tombstone. This is not group revocation or permission to reuse identity.
     public func retire()throws->PersonalSyncPairingStatus {try withAccess {
-        let (value,bytes)=try current(),next=value.replacing(consumed:value.consumedRequest,retired:true)
+        let (value,bytes)=try current()
+        guard value.delivery==nil else {throw OSwindError.unavailable("Retire delivery through its lifecycle owner before retiring pairing")}
+        let next=value.replacing(consumed:value.consumedRequest,retired:true)
         try save(next,expected:bytes);return try status(next)
     }}
 }

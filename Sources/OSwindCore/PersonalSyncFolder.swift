@@ -59,6 +59,10 @@ final class SyncObjectFolder:@unchecked Sendable {
     }
     static func create(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:true,authority:authority)}
     static func open(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:false,authority:authority)}
+    func requireSignedAuthority(_ expected:SyncDevicePacketAuthority)throws {
+        lock.lock();defer {lock.unlock()}
+        guard tree != nil,let authority,authority.replica==expected.replica,authority.certificate==expected.certificate else {throw OSwindError.invalid("Delivery requires this device's current signed transport authority")}
+    }
     var isClosed:Bool {lock.lock();defer {lock.unlock()};return tree==nil}
     /// The caller's owning journal must match this immutable cipher namespace
     /// before retaining any private canonical bytes, not only at declaration
