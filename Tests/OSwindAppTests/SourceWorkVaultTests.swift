@@ -14,9 +14,11 @@ extension VaultSessionTests {
         try kind.start(model,gate:gate,committed:committed);await fulfillment(of:[gate.entered],timeout:10)
         let expected=committed ? 2:1
         XCTAssertEqual(try model.store.stats(includeDiskUsage:false).count,expected)
-        let priorRecapStatus=model.recapSaveStatus,priorCount=model.stats.count,priorBytes=model.stats.bytes
         session.requestLock();await fulfillment(of:[gate.cancelled],timeout:10)
         XCTAssertTrue(session.busy);XCTAssertNil(session.model);XCTAssertFalse(model.store.isClosed)
+        // A sibling statistics job may legitimately publish before requestLock
+        // retires the model. Compare only across the observed retired boundary.
+        let priorRecapStatus=model.recapSaveStatus,priorCount=model.stats.count,priorBytes=model.stats.bytes
         let held=try await LibraryVault(package:package).status();XCTAssertTrue(held.imageAttached);XCTAssertTrue(held.volumeMounted)
         gate.release();try await finish(session)
         XCTAssertNil(session.failure);XCTAssertTrue(model.store.isClosed);XCTAssertFalse(model.hasPendingExitWork)
