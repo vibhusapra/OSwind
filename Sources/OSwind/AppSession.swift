@@ -4,6 +4,12 @@ import Combine
 import Darwin
 import OSwindCore
 
+struct PersonalSyncErasureRecovery:Sendable {
+    let pending:@Sendable (URL)async->Bool
+    let retry:@Sendable (URL,@escaping @Sendable (LibraryBackupProgress)->Void)async throws->LibraryWipeResult
+    static let native=Self(pending:{await PersonalSyncRetirementRecovery.hasPending(root:$0)},retry:{try await PersonalSyncRetirementRecovery.retry(root:$0,progress:$1)})
+}
+
 @MainActor final class AppSession: ObservableObject {
     static weak var current:AppSession?
     @Published var model:AppModel?
@@ -17,6 +23,7 @@ import OSwindCore
     @Published var showVaultSetup=false
     @Published private(set) var createdVault:URL?
     @Published private(set) var snapshotNeedsReview=false
+    @Published private(set) var syncErasurePending=false
     let recoveryTransfer:LibraryTransferModel
     private var selection:LibraryLocationSelection
     private let defaults:UserDefaults
@@ -25,6 +32,7 @@ import OSwindCore
     private var pendingLock=false
     private var terminationRequested=false
     private var closingStore:MemoryStore?
+    private weak var pendingSyncReopen:AppModel?
     private var workspaceSubscriptions=Set<AnyCancellable>()
     private var watcher:DispatchSourceFileSystemObject?
     private var lockMonitor:Timer?
@@ -32,9 +40,10 @@ import OSwindCore
     private var watchedVaultID:String?
     private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil) {
+    private let syncRecovery:PersonalSyncErasureRecovery
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel()
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery
         self.recoveryTransfer.allowed={[weak self] in guard let self else {return false};return !self.terminationRequested && !self.busy && !self.locked()}
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
@@ -217,8 +226,10 @@ import OSwindCore
         defer {progress=previousProgress}
         let worker=Task.detached(priority:.utility) {try opener(root)}
         let store:MemoryStore
-        if restoringOriginal {store=try await worker.value}
-        else {store=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
+        do {
+            if restoringOriginal {store=try await worker.value}
+            else {store=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
+        }catch {syncErasurePending=await syncRecovery.pending(root);throw error}
         do {
             if !restoringOriginal {
                 try Task.checkCancellation()
@@ -226,11 +237,43 @@ import OSwindCore
             }
             if vaultPackage != nil && (locked() || pendingLock || terminationRequested) {throw CancellationError()}
             let candidate=try AppModel(root:root,startServices:false,preparedStore:store,personalSyncSetup:personalSyncSetup)
+            candidate.syncErasureFinished={[weak self,weak candidate] in
+                guard let self,let candidate else {return};self.reopenAfterSyncErasure(candidate)
+            }
+            syncErasurePending=false
             if startServices {candidate.startConfiguredServices()}
             return candidate
         } catch {
             try? await Task.detached(priority:.utility) {try store.close()}.value
             throw error
+        }
+    }
+    private func reopenAfterSyncErasure(_ previous:AppModel) {
+        guard !terminationRequested,model === previous else {return}
+        if busy {pendingSyncReopen=previous;return}
+        // Remove visible access synchronously. A retired controller must not
+        // accept a new capture while the quiet replacement is being prepared.
+        let completed=previous.libraryWipe.result?.cleanupComplete==true,erasureStatus=previous.libraryWipe.status
+        model=nil;closingStore=previous.store
+        run(cancellationMessage:"Opening stopped. Reopen this library to check saved erasure or recovery.") {
+            await self.stageForClosing(previous)
+            let store=previous.store;try await Task.detached(priority:.utility) {try store.close()}.value;self.closingStore=nil
+            self.model=try await self.preparedModel(root:self.requested,startServices:false)
+            self.message=completed ? "History erasure finished. Recording stays paused until you resume it.":"Library reopened with recording paused. "+erasureStatus
+        }
+    }
+    func resumeSyncErasure() {
+        guard canRecoverContent,syncErasurePending else {return}
+        let location=requested,recovery=syncRecovery
+        run(cancellationMessage:"Erasure stopped. Any committed deletion remains; resume saved cleanup before recording.") {
+            let relay=LibraryProgressRelay()
+            let observer=Task {while !Task.isCancelled {do {try await Task.sleep(for:.milliseconds(100))}catch {break};self.progress=relay.get()}}
+            defer {observer.cancel();self.progress=nil}
+            let result=try await recovery.retry(location,{relay.set($0)})
+            guard result.cleanupComplete,!result.cancelled else {self.syncErasurePending=true;self.message="Erasure cleanup remains pending. Resume when you are ready.";return}
+            self.syncErasurePending=false;try Task.checkCancellation()
+            self.model=try await self.preparedModel(root:location,startServices:false)
+            self.message="Saved erasure finished. Recording stays paused until you resume it."
         }
     }
     func cancelOperation() {if vaultPackage != nil {pendingLock=true};operation?.cancel()}
@@ -249,11 +292,11 @@ import OSwindCore
     var canRecoverContent:Bool {
         !terminationRequested && !busy && model==nil && !locked() && (vaultPackage==nil || vaultStatus?.state == .unlocked) && FileManager.default.fileExists(atPath:requested.appendingPathComponent("memory.sqlite").path)
     }
-    private func run(_ work:@escaping @MainActor () async throws -> Void) {
+    private func run(cancellationMessage:String?=nil,_ work:@escaping @MainActor () async throws -> Void) {
         guard !busy else {return};busy=true;failure=nil
         operation=Task {
             do {try await work()}
-            catch is CancellationError {self.message=self.vaultPackage == nil ? "Opening stopped. Existing history was preserved.":"Operation stopped. Existing libraries were preserved. Check vault status before retrying.";if self.vaultPackage != nil,self.locked() {self.pendingLock=true}}
+            catch is CancellationError {self.message=cancellationMessage ?? (self.vaultPackage == nil ? "Opening stopped. Existing history was preserved.":"Operation stopped. Existing libraries were preserved. Check vault status before retrying.");if self.vaultPackage != nil,self.locked() {self.pendingLock=true}}
             catch {self.failure=error.localizedDescription}
             do {
                 if try self.reconcileMovedPackage() {
@@ -267,6 +310,7 @@ import OSwindCore
             }
             self.busy=false;self.operation=nil
             if self.pendingLock {self.pendingLock=false;self.requestLock()}
+            else if let previous=self.pendingSyncReopen {self.pendingSyncReopen=nil;self.reopenAfterSyncErasure(previous)}
         }
     }
     #if DEBUG
@@ -341,11 +385,15 @@ struct LibraryRecoveryView:View {
     var body:some View {
         ScrollView {VStack(alignment:.leading,spacing:22) {
             Image(systemName:session.busy ? "externaldrive.badge.timemachine":"externaldrive.badge.exclamationmark").font(.system(size:42)).foregroundStyle(OSwindTheme.accent)
-            Text(session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
-            Text(session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
+            Text(session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
+            Text(session.syncErasurePending ? "History deletion has a saved cleanup step. Finish it before opening the library or recording again.":session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
             Text(locationLabel ?? session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
             if session.busy {HStack {ProgressView(session.progress?.phase ?? "Opening library…");Button("Stop") {session.cancelOperation()}}}
             if !session.busy {
+            if session.syncErasurePending,session.canRecoverContent {
+                Button("Resume erasure cleanup") {session.resumeSyncErasure()}.buttonStyle(.borderedProminent)
+                if !session.message.isEmpty {Text(session.message).font(.callout).foregroundStyle(.secondary)}
+            }
             HStack {Button("Try again") {session.retry()};Button("Choose library…") {session.choose()};Button("Open default library") {session.openDefault()}}.disabled(session.busy || session.recoveryTransfer.busy)
             Button("Create encrypted library…") {session.showVaultSetup=true}.disabled(session.busy)
             if session.canRecoverContent {

@@ -339,6 +339,24 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         guard let folder=try savedSessionFolder() else {throw OSwindError.unavailable("Choose a shared sync folder first")}
         return try prepareSession(sharedFolder:folder)
     }
+    /// Acquire the original native delivery authority without a provider folder.
+    /// Success transfers this pairing owner to a one-shot local eraser. A live
+    /// session's credential lease refuses this before any native mutation.
+    public func prepareLocalErasure()throws->PersonalSyncLocalErasure {try withAccess {
+        let (value,_)=try current()
+        guard !value.retired,let saved=value.material,let delivery=value.delivery else {throw OSwindError.unavailable("This library has no prepared delivery authority to retire")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(saved),joined=material.joined
+        let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:material,id:delivery.id,stateRoot:stateRoot,machine:machine,storage:injectedStorage ?? SyncKeychainCredentialStorage(protection:delivery.protection))
+        do {
+            let cache=try store.withRoutineDatabase {db in
+                let catalog=try SyncIdentityCatalog.openExisting(db)
+                let journal=try SyncJournal(database:db,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch)
+                return try SyncVersionStore.openExisting(catalog:catalog,journal:journal)
+            }
+            try anchor.installNativeWriterAdmission()
+            return PersonalSyncLocalErasure(library:store,cache:cache,anchor:anchor,pairing:self)
+        }catch {anchor.close();throw error}
+    }}
     private func saveSessionFolder(_ folder:URL)throws {try withAccess {
         _=try current()
         let bookmark=try folder.bookmarkData(options:.minimalBookmark,includingResourceValuesForKeys:nil,relativeTo:nil)

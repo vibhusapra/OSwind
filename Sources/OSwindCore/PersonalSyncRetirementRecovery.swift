@@ -4,6 +4,14 @@ import Foundation
 /// ordinary library or service and never touches a provider folder. The app
 /// closes its previous store and joins this entire operation before departure.
 public enum PersonalSyncRetirementRecovery {
+    public static func hasPending(root:URL)async->Bool {await hasPending(root:root,environment:.native)}
+    static func hasPending(root:URL,environment:SyncNativeWriterEnvironment)async->Bool {
+        // This bounded probe owns its close even if its UI caller is canceled.
+        await Task.detached(priority:.utility) {
+            do {let owner=try SyncRetirementCleanupOwner.open(root:root,environment:environment);try owner.close();return true}
+            catch {return false}
+        }.value
+    }
     public static func retry(root:URL,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})async throws->LibraryWipeResult {
         try await retry(root:root,environment:.native,progress:progress)
     }

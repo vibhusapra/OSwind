@@ -2,6 +2,7 @@ import SwiftUI
 import OSwindCore
 
 @MainActor final class LibraryWipeModel:ObservableObject {
+    typealias Operation = @MainActor (@escaping @Sendable (LibraryBackupProgress)->Void)async throws->LibraryWipeResult
     @Published private(set) var busy=false
     @Published var pendingCleanup=false
     @Published private(set) var progress:LibraryBackupProgress?
@@ -11,7 +12,8 @@ import OSwindCore
     private var task:Task<Void,Never>?
     private var cancelWorker:(()->Void)?
     func cancel() {cancelWorker?();task?.cancel()}
-    func run(store:MemoryStore,retry:Bool,before:@escaping () async->Void={},completion:@escaping (LibraryWipeResult)->Void,onFailure:@escaping ()->Void={}) {
+    func cancelAndWait()async {cancel();let pending=task;await pending?.value}
+    func run(store:MemoryStore,retry:Bool,before:@escaping () async->Void={},operation:Operation?=nil,ownedSync:Bool=false,completion:@escaping (LibraryWipeResult)->Void,onFailure:@escaping ()->Void={}) {
         guard !busy else {return};busy=true;result=nil;error=nil;status=retry ? "Retrying unfinished cleanup…":"Deleting local history…";progress = .init(phase:"Preparing")
         let relay=LibraryProgressRelay()
         task=Task {
@@ -19,13 +21,16 @@ import OSwindCore
             defer {observer.cancel();busy=false;progress=nil;task=nil;cancelWorker=nil}
             do {
                 await before();try Task.checkCancellation()
-                let worker=Task.detached(priority:.utility) {try retry ? store.retryLibraryWipeCleanup(progress:{relay.set($0)}):store.wipeLibrary(progress:{relay.set($0)})};cancelWorker={worker.cancel()}
-                let value=try await worker.value;result=value;pendingCleanup = !value.cleanupComplete
+                let worker:Task<LibraryWipeResult,Error>
+                if let operation {worker=Task {try await operation({relay.set($0)})}}
+                else {worker=Task.detached(priority:.utility) {try retry ? store.retryLibraryWipeCleanup(progress:{relay.set($0)}):store.wipeLibrary(progress:{relay.set($0)})}}
+                cancelWorker={worker.cancel()}
+                let value=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()});result=value;pendingCleanup = !value.cleanupComplete
                 status=retry ? "Cleanup retry checked the earlier pending files.":"Deleted \(value.erasure.sources) sources, \(value.conversations) conversations and \(value.routines) routines."
                 if value.cancelled {status+=" Cleanup stopped after the deletion committed."}
                 completion(value)
-            } catch is CancellationError {status=retry ? "Retry stopped before cleanup began.":"Cancelled before history deletion committed. Existing history remains.";onFailure()}
-            catch {self.error=error.localizedDescription;status=retry ? "Retry did not begin. Existing cleanup state remains.":"History was not deleted by this attempt.";onFailure()}
+            } catch is CancellationError {status=ownedSync ? "Erasure stopped. Reopen the library to check whether cleanup needs to finish.":retry ? "Retry stopped before cleanup began.":"Cancelled before history deletion committed. Existing history remains.";onFailure()}
+            catch {self.error=ownedSync ? "Erasure could not finish. Reopen this library to check its saved cleanup and recovery options.":error.localizedDescription;status=ownedSync ? "Erasure needs attention.":retry ? "Retry did not begin. Existing cleanup state remains.":"History was not deleted by this attempt.";onFailure()}
         }
     }
 }

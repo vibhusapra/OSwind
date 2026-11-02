@@ -2,17 +2,24 @@ import XCTest
 import SwiftUI
 import AppKit
 import Vision
+import CSQLite
 @testable import OSwindCore
 @testable import OSwind
 
 @MainActor final class PersonalSyncPairingModelTests:XCTestCase {
     private var root:URL!,a:MemoryStore!,b:MemoryStore!,storage:PairingAppStorage!
-    var models=[PersonalSyncModel]()
+    var models=[PersonalSyncModel](),sessions=[AppSession]()
+    var preferenceSuites=[String]()
     override func setUpWithError()throws {
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-pairing-app-"+UUID().uuidString)
         a=try MemoryStore(root:root.appendingPathComponent("a"));b=try MemoryStore(root:root.appendingPathComponent("b"));storage=PairingAppStorage()
     }
-    override func tearDown()async throws {for model in models {await model.cancelAndWait()};try a.close();try b.close();try FileManager.default.removeItem(at:root)}
+    override func tearDown()async throws {
+        for session in sessions {_=await session.lockForTermination();try? session.model?.store.close();session.model=nil};sessions=[]
+        for model in models {await model.cancelAndWait()}
+        for name in preferenceSuites {UserDefaults(suiteName:name)?.removePersistentDomain(forName:name)}
+        try a.close();try b.close();try FileManager.default.removeItem(at:root)
+    }
     func model(_ store:MemoryStore,gate:ImportWorkerGate?=nil)->PersonalSyncModel {
         let state=root.appendingPathComponent("state"),storage=storage!
         let value=PersonalSyncModel(store:store,locked:{false},pairingFactory:{store in
@@ -24,6 +31,199 @@ import Vision
         let deadline=ContinuousClock.now.advanced(by:.seconds(15))
         while model.pairingBusy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
         guard !model.pairingBusy else {throw OSwindError.unavailable("Owned pairing action did not finish")}
+    }
+    private func pairedModels()async throws->(PersonalSyncModel,PersonalSyncModel) {
+        try AppSettings().save(root:a.root);try AppSettings().save(root:b.root)
+        let owner=model(a),peer=model(b)
+        owner.performPairing(.create("Desk Mac"));peer.performPairing(.request("Travel Mac"));try await done(owner);try await done(peer)
+        owner.performPairing(.review(try XCTUnwrap(peer.pairingStatus?.request)));try await done(owner)
+        owner.performPairing(.approve(try XCTUnwrap(owner.pairingReview)));try await done(owner)
+        peer.performPairing(.accept(try XCTUnwrap(owner.pairingResponse),try XCTUnwrap(owner.pairingStatus?.rootFingerprint)));try await done(peer)
+        return(owner,peer)
+    }
+    private func connected(_ model:PersonalSyncModel,phase:PersonalSyncStatus.Phase = .upToDate)async throws {
+        let deadline=ContinuousClock.now.advanced(by:.seconds(20))
+        while ContinuousClock.now<deadline {
+            if let error=model.error {throw OSwindError.unavailable(error)}
+            if model.configured,!model.preparing,!model.changing,model.status?.phase==phase {return}
+            try await Task.sleep(for:.milliseconds(5))
+        }
+        throw OSwindError.unavailable("Owned app connection did not reach its expected phase")
+    }
+    func testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries()async throws {
+        let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        try a.insert(Memory(id:"desk",text:"Owned desk memory"));try b.insert(Memory(id:"travel",text:"Owned travel memory"))
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        peer.connectFolder(shared);try await connected(peer)
+        owner.setNetworkEnabled(false);try await connected(owner,phase:.networkPaused)
+        owner.setNetworkEnabled(true);try await connected(owner)
+        XCTAssertTrue(owner.ownsHistoryRetirement);XCTAssertTrue(peer.ownsHistoryRetirement)
+        XCTAssertNil(owner.pairingStatus);XCTAssertNil(peer.pairingStatus)
+        XCTAssertEqual(try a.stats(includeDiskUsage:false).count,2);XCTAssertEqual(try b.stats(includeDiskUsage:false).count,2)
+        XCTAssertEqual(storage.values.count,4)
+        await owner.cancelAndWait();await peer.cancelAndWait();XCTAssertFalse(owner.busy);XCTAssertFalse(peer.busy)
+        owner.prepareForReconnection();owner.reconnectSavedFolder();try await connected(owner)
+        XCTAssertEqual(storage.values.count,4)
+    }
+    func testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation()async throws {
+        let (owner,_)=try await pairedModels(),shared=root.appendingPathComponent("shared"),gate=PairingSaveGate()
+        defer {gate.release();storage.install(nil)}
+        storage.install(gate);owner.connectFolder(shared,create:true)
+        await fulfillment(of:[gate.entered],timeout:10)
+        XCTAssertTrue(owner.preparing);var drained=false
+        let drain=Task {await owner.cancelAndWait();drained=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(40));XCTAssertFalse(drained);XCTAssertFalse(a.isClosed)
+        gate.release();await drain.value;storage.install(nil)
+        XCTAssertFalse(owner.busy);XCTAssertFalse(owner.configured)
+        let accounts=Set(storage.values.keys);XCTAssertEqual(accounts.count,3)
+        owner.prepareForReconnection();owner.connectFolder(shared);try await connected(owner)
+        XCTAssertEqual(Set(storage.values.keys),accounts)
+    }
+    func testActualModelReviewsExactLocalEraseAndResumesOnlyAfterExplicitApproval()async throws {
+        let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        try a.insert(Memory(id:"before-review",text:"Owned history before review"))
+        await owner.cancelAndWait()
+        let credential=try PersonalSyncPairing(store:a,stateRoot:root.appendingPathComponent("state"),machine:PairingAppMachine(),storage:storage)
+        let prepared=try credential.prepareSession(sharedFolder:shared,createSharedFolder:true)
+        let erased=try await prepared.eraseLocalHistory();XCTAssertTrue(erased.cleanupComplete);try await prepared.stop()
+        owner.prepareForReconnection();owner.reconnectSavedFolder();try await connected(owner,phase:.needsLocalEraseReview)
+        owner.requestEraseReview()
+        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.changing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        let review=try XCTUnwrap(owner.eraseReview);XCTAssertEqual(Set(review.deviceNames),Set(["Desk Mac","Travel Mac"]))
+        owner.approveErase(review);try await connected(owner)
+        XCTAssertNil(owner.eraseReview);XCTAssertNil(owner.error)
+        peer.connectFolder(shared);try await connected(peer,phase:.needsReceivedErase)
+        XCTAssertEqual(try a.stats(includeDiskUsage:false).count,0)
+    }
+    func testQueuedReviewRechecksAdmissionAndDoesNotLeaveChangingStateStuck()async throws {
+        let (owner,_)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        await owner.cancelAndWait()
+        let credential=try PersonalSyncPairing(store:a,stateRoot:root.appendingPathComponent("state"),machine:PairingAppMachine(),storage:storage)
+        let prepared=try credential.prepareSession(sharedFolder:shared,createSharedFolder:true)
+        _=try await prepared.eraseLocalHistory();try await prepared.stop()
+        owner.prepareForReconnection();owner.reconnectSavedFolder();try await connected(owner,phase:.needsLocalEraseReview)
+        owner.requestEraseReview()
+        let reviewDeadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.changing,ContinuousClock.now<reviewDeadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(owner.changing)
+        let review=try XCTUnwrap(owner.eraseReview)
+        owner.approveErase(review);owner.allowed={false}
+        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.changing,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(owner.changing)
+        XCTAssertEqual(try a.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM personal_sync_collection_approvals")},0)
+        owner.allowed={true};owner.suspend();XCTAssertNil(owner.eraseReview)
+    }
+    func testErasureDrainWaitsForActualAppProducerBeforeAnyNativeDeletion()async throws {
+        let (owner,_)=try await pairedModels(),shared=root.appendingPathComponent("shared"),gate=PairingAppDrainGate()
+        try a.insert(Memory(id:"held-before-erase",text:"Owned source before held app drain"))
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        let erase=Task {try await owner.eraseHistory(before:{await gate.wait()})}
+        await fulfillment(of:[gate.entered],timeout:10)
+        var departed=false
+        let drain=Task {await owner.cancelAndWait();departed=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(40));XCTAssertFalse(departed);XCTAssertFalse(a.isClosed)
+        XCTAssertEqual(try a.stats(includeDiskUsage:false).count,1)
+        owner.prepareForReconnection();owner.connectFolder(shared);XCTAssertFalse(owner.preparing)
+        gate.release()
+        do {_=try await erase.value;XCTFail("Canceled app drain cannot start logical deletion")}catch {}
+        await drain.value;XCTAssertTrue(departed);XCTAssertFalse(owner.busy);XCTAssertFalse(owner.configured)
+        XCTAssertEqual(try a.stats(includeDiskUsage:false).count,1)
+    }
+    func testDisconnectedModelErasesLocallyWhileProviderFolderIsUnavailable()async throws {
+        let (owner,_)=try await pairedModels(),shared=root.appendingPathComponent("shared"),parked=root.appendingPathComponent("parked-provider")
+        try a.insert(Memory(id:"offline-app",text:"Owned source before native app erasure"))
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        await owner.cancelAndWait();owner.prepareForReconnection()
+        try FileManager.default.moveItem(at:shared,to:parked)
+        let accounts=Set(storage.values.keys)
+        XCTAssertTrue(a.requiresOwnedLibraryErasure);var joined=false
+        let erased=try await owner.eraseHistory(before:{joined=true})
+        XCTAssertTrue(joined);XCTAssertTrue(erased.cleanupComplete);XCTAssertEqual(erased.erasure.sources,1)
+        XCTAssertFalse(owner.busy);XCTAssertFalse(owner.configured);XCTAssertEqual(Set(storage.values.keys),accounts)
+        XCTAssertFalse(FileManager.default.fileExists(atPath:shared.path));XCTAssertEqual(try a.stats(includeDiskUsage:false).count,0)
+        owner.prepareForReconnection();owner.performPairing(.load);try await done(owner)
+        XCTAssertEqual(owner.pairingStatus?.phase,.owner)
+    }
+    private func rootSession()async throws->AppSession {
+        let (owner,peer)=try await pairedModels();await owner.cancelAndWait();await peer.cancelAndWait()
+        let location=a.root;try a.close()
+        return try await openRootSession(location)
+    }
+    private func openRootSession(_ location:URL)async throws->AppSession {
+        let state=root.appendingPathComponent("state"),backend=storage!
+        var quiet=AppSettings();quiet.captureOnLaunch=false;quiet.apiEnabled=false;quiet.routinesEnabled=false;quiet.automaticMaintenance=false;quiet.entityAutomaticIndex=false;quiet.meetings = .init();quiet.clipboard.enabled=false
+        try quiet.save(root:location)
+        let environment=SyncNativeWriterEnvironment(stateRoot:state,machine:PairingAppMachine(),storage:{_ in backend})
+        let suite="com.oswind.tests.sync-reopen."+UUID().uuidString;preferenceSuites.append(suite)
+        let recovery=PersonalSyncErasureRecovery(pending:{await PersonalSyncRetirementRecovery.hasPending(root:$0,environment:environment)},retry:{try await PersonalSyncRetirementRecovery.retry(root:$0,environment:environment,progress:$1)})
+        let session=AppSession(selection:.init(url:location,requiresExisting:true,origin:"owned-sync-reopen"),defaults:UserDefaults(suiteName:suite)!,locked:{false},openStore:{try MemoryStore(root:$0,recoveryReadOnly:false,nativeWriterEnvironment:environment)},personalSyncSetup:{store in PersonalSyncModel(store:store,locked:{false},pairingFactory:{try PersonalSyncPairing(store:$0,stateRoot:state,machine:PairingAppMachine(),storage:backend)})},syncRecovery:recovery)
+        sessions.append(session)
+        try await rootSettled(session) {!session.busy && session.model != nil}
+        session.model!.showOnboarding=false
+        return session
+    }
+    private func rootSettled(_ session:AppSession,_ condition:()->Bool)async throws {
+        let deadline=ContinuousClock.now.advanced(by:.seconds(30))
+        while !condition(),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        guard condition() else {throw OSwindError.unavailable("Owned root transition did not finish: "+(session.failure ?? session.message))}
+    }
+    func testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace()async throws {
+        let session=try await rootSession(),old=try XCTUnwrap(session.model),shared=root.appendingPathComponent("shared")
+        try old.store.insert(Memory(id:"root-erase",text:"Owned source before root erasure"))
+        old.personalSync.connectFolder(shared,create:true);try await connected(old.personalSync)
+        let accounts=Set(storage.values.keys)
+        old.wipeLocalLibrary()
+        try await rootSettled(session) {!session.busy && session.model != nil && session.model !== old}
+        let fresh=try XCTUnwrap(session.model)
+        XCTAssertTrue(old.store.isClosed);XCTAssertFalse(old.personalSync.busy);XCTAssertFalse(old.libraryWipe.busy)
+        XCTAssertEqual(try fresh.store.stats(includeDiskUsage:false).count,0);XCTAssertFalse(fresh.isCollecting)
+        XCTAssertFalse(fresh.settings.captureOnLaunch);XCTAssertFalse(fresh.settings.apiEnabled);XCTAssertFalse(fresh.settings.routinesEnabled)
+        XCTAssertEqual(Set(storage.values.keys),accounts);XCTAssertFalse(session.syncErasurePending)
+        fresh.showOnboarding=false;fresh.personalSync.reconnectSavedFolder();try await connected(fresh.personalSync,phase:.needsLocalEraseReview)
+    }
+    func testEnrolledAppWipeShowsRestrictedRecoveryUntilHeldWALReaderReleases()async throws {
+        let session=try await rootSession(),old=try XCTUnwrap(session.model),shared=root.appendingPathComponent("shared")
+        try old.store.insert(Memory(id:"root-pending",text:"Owned source held by another reader"))
+        old.personalSync.connectFolder(shared,create:true);try await connected(old.personalSync)
+        let reader=try PairingAppWALReader(root:old.store.root);defer {reader.close()}
+        old.wipeLocalLibrary()
+        try await rootSettled(session) {!session.busy && session.model==nil && session.syncErasurePending}
+        XCTAssertTrue(old.store.isClosed);XCTAssertEqual(old.libraryWipe.result?.erasure.sources,1)
+        XCTAssertEqual(old.libraryWipe.result?.cleanupComplete,false);XCTAssertTrue(session.canRecoverContent)
+        reader.close();session.resumeSyncErasure()
+        try await rootSettled(session) {!session.busy && session.model != nil}
+        let fresh=try XCTUnwrap(session.model)
+        XCTAssertFalse(session.syncErasurePending);XCTAssertEqual(try fresh.store.stats(includeDiskUsage:false).count,0)
+        XCTAssertFalse(fresh.isCollecting);XCTAssertFalse(fresh.settings.captureOnLaunch)
+    }
+    func testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval()async throws {
+        let first=try await rootSession(),oldA=try XCTUnwrap(first.model),shared=root.appendingPathComponent("shared")
+        let peerLocation=b.root;try b.close();let second=try await openRootSession(peerLocation),oldB=try XCTUnwrap(second.model)
+        try oldA.store.insert(Memory(id:"peer-root-a",text:"Owned sender root before erase"));try oldB.store.insert(Memory(id:"peer-root-b",text:"Owned receiver root before erase"))
+        oldA.personalSync.connectFolder(shared,create:true);try await connected(oldA.personalSync)
+        oldB.personalSync.connectFolder(shared);try await connected(oldB.personalSync)
+        oldA.personalSync.setNetworkEnabled(false);try await connected(oldA.personalSync,phase:.networkPaused)
+        oldA.personalSync.setNetworkEnabled(true);try await connected(oldA.personalSync)
+        XCTAssertEqual(try oldA.store.stats(includeDiskUsage:false).count,2);XCTAssertEqual(try oldB.store.stats(includeDiskUsage:false).count,2)
+        oldA.wipeLocalLibrary();try await rootSettled(first) {!first.busy && first.model != nil && first.model !== oldA}
+        let freshA=try XCTUnwrap(first.model);freshA.showOnboarding=false
+        freshA.personalSync.reconnectSavedFolder();try await connected(freshA.personalSync,phase:.needsLocalEraseReview)
+        freshA.personalSync.requestEraseReview()
+        try await rootSettled(first) {freshA.personalSync.eraseReview != nil && !freshA.personalSync.changing}
+        freshA.personalSync.approveErase(try XCTUnwrap(freshA.personalSync.eraseReview));try await connected(freshA.personalSync)
+        if second.model === oldB {
+            oldB.personalSync.suspend()
+            try await rootSettled(second) {second.model !== oldB || oldB.libraryWipe.busy || oldB.personalSync.status?.phase == .suspended}
+            if second.model === oldB,!oldB.libraryWipe.busy {oldB.personalSync.wake()}
+        }
+        try await rootSettled(second) {!second.busy && second.model != nil && second.model !== oldB}
+        let freshB=try XCTUnwrap(second.model)
+        XCTAssertTrue(oldB.store.isClosed);XCTAssertEqual(try freshB.store.stats(includeDiskUsage:false).count,0)
+        XCTAssertFalse(freshB.isCollecting);XCTAssertFalse(freshB.settings.captureOnLaunch)
+        XCTAssertEqual(try freshB.store.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM personal_sync_collection_approvals")},0)
+        freshB.showOnboarding=false;freshB.personalSync.reconnectSavedFolder();try await connected(freshB.personalSync)
     }
     func testActualModelCreateReviewApproveAndJoinKeepsKeysOutOfUIAndDeliveryOff()async throws {
         let owner=model(a),joiner=model(b)
@@ -155,4 +355,21 @@ private final class PairingSaveGate:@unchecked Sendable {
     private let condition=NSCondition();private var released=false
     func pause() {condition.lock();defer {condition.unlock()};entered.fulfill();while !released {condition.wait()}}
     func release() {condition.lock();released=true;condition.broadcast();condition.unlock()}
+}
+
+@MainActor private final class PairingAppDrainGate {
+    let entered=XCTestExpectation(description:"App producer drain entered")
+    private var continuation:CheckedContinuation<Void,Never>?
+    func wait()async {await withCheckedContinuation {continuation=$0;entered.fulfill()}}
+    func release() {continuation?.resume();continuation=nil}
+}
+
+private final class PairingAppWALReader {
+    private var database:OpaquePointer?
+    init(root:URL)throws {
+        guard sqlite3_open_v2(root.appendingPathComponent("memory.sqlite").path,&database,SQLITE_OPEN_READONLY|SQLITE_OPEN_FULLMUTEX,nil)==SQLITE_OK else {throw OSwindError.unavailable("Owned WAL reader could not open")}
+        guard sqlite3_exec(database,"BEGIN; SELECT COUNT(*) FROM memories;",nil,nil,nil)==SQLITE_OK else {close();throw OSwindError.unavailable("Owned WAL reader could not retain its snapshot")}
+    }
+    func close() {if let database {sqlite3_exec(database,"ROLLBACK",nil,nil,nil);sqlite3_close(database);self.database=nil}}
+    deinit {close()}
 }

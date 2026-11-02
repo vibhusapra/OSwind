@@ -141,9 +141,7 @@ public actor PersonalSyncSession {
                     if received {_=try service.completeReceivedRetirement(pairing:pairing)}
                     else {_=try service.completeLocalRetirement(pairing:pairing)}
                 }
-                let e=cleaned.erasure,c=staged.counts
-                let erasure=HistoryErasureResult(sources:c.sources,conversationTurns:c.turns,removedMedia:e.removedMedia,sharedMedia:e.sharedMedia,pendingMedia:e.pendingMedia,searchCacheRemoved:e.searchCacheRemoved,warnings:e.warnings,historicalVersions:c.originals)
-                outcome = .success(.init(erasure:erasure,conversations:c.chats,routines:c.routines,routineRuns:c.runs,compacted:cleaned.compacted,cleanupComplete:cleaned.cleanupComplete,cancelled:cleaned.cancelled))
+                outcome = .success(cleaned.attachingLogicalCounts(staged.counts))
             }catch {outcome = .failure(error)}
             // Release both credentials and every retained spool descriptor only
             // after the real operation has finished, even on canceled callers.
