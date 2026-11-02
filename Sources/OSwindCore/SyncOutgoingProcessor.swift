@@ -1,7 +1,7 @@
 import Foundation
 import CSQLite
 
-enum SyncOutgoingStep:Equatable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
+enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
 
 /// Internal synchronous outgoing adapter over all canonical tables. The owning
 /// library supplies current privacy admission and prepared media; no networking,

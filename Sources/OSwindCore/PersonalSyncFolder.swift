@@ -179,4 +179,31 @@ final class SyncObjectFolder:@unchecked Sendable {
         let successor=try self.revision(replica:proof.successor.replica,sequence:proof.successor.counter) ?? proof.successorRevision
         guard try proof.matches(obsolete:revision,successor:successor) else {throw OSwindError.invalid("Supersession changed an operation identity")};return successor
     }
+    func serviceHead(replica:String)throws->SyncServiceHead? {
+        let descriptor=try SyncServiceHead.descriptor(replica),token=try checkpoints.token(for:descriptor)
+        return try withTree {tree in
+            let bytes:Data
+            do {bytes=try tree.read("heads/"+token,limit:8192)}catch BackupFileError.missing {return nil}
+            let value=try SyncServiceHead.decode(checkpoints.open(bytes,expectedToken:token,descriptor:descriptor))
+            guard value.replica==replica,value.group==checkpoints.group,value.epoch==checkpoints.epoch else {throw OSwindError.invalid("Sync head differs from its authenticated address")};return value
+        }
+    }
+    /// Atomic mutable hint. Immutable operations/controls are published first.
+    /// A reader pins monotone counters in its own library and rejects rollback.
+    func publishServiceHead(_ head:SyncServiceHead)throws {
+        try requireNamespace(group:head.group,epoch:head.epoch)
+        let descriptor=try SyncServiceHead.descriptor(head.replica),object=try checkpoints.seal(head.encoded(),descriptor:descriptor)
+        try withTree {tree in
+            if let old=try serviceHead(replica:head.replica) {
+                guard head.through>=old.through,head.collectionCounter>=old.collectionCounter else {throw OSwindError.invalid("Refuse to roll back the published sync head")}
+                if old==head {return}
+            }
+            let heads=try tree.privateDirectory("heads"),temporary=".stage-"+UUID().uuidString.lowercased()
+            try heads.write(object.bytes,as:temporary);defer {try? heads.remove(temporary)}
+            try Task.checkCancellation()
+            try heads.withRootDirectory {directory in
+                guard renameat(directory,temporary,directory,object.token)==0,fsync(directory)==0 else {throw OSwindError.unavailable("Cannot publish authenticated sync head")}
+            }
+        }
+    }
 }

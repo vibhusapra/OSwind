@@ -147,17 +147,19 @@ struct SyncPublicationAdmission {
     /// The immutable encrypted body is retained before receipt. If admission or
     /// capacity fails, the journal/queue/native transaction rolls back together;
     /// the local content space may retain an unreferenced encrypted object.
-    func receive(_ operation:SyncRevision,record:SyncPortableRecord?,admission:MediaAdmissionLease,fetchSource:(SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationAdmissionResult {
+    func receive(_ operation:SyncRevision,record:SyncPortableRecord?,admission:MediaAdmissionLease,allowPendingBody:Bool=false,supersededBy:((SyncRevision)throws->SyncRevision?)?=nil,fetchSource:@escaping (SyncVersionReference)throws->SyncPortableRecord)throws->SyncPublicationAdmissionResult {
         try admission.withActive(for:writer.library.mediaRootIdentity) {}
         try validateRetentionContext()
         if operation.mutation == .put {
-            guard let record,try record.identity.key==operation.key,try record.reference.content==operation.content else {throw OSwindError.invalid("Received publication record differs from its operation")}
-            try inbox.publishContent(record.encoded(),reference:record.reference.content)
+            if let record {
+                guard try record.identity.key==operation.key,try record.reference.content==operation.content else {throw OSwindError.invalid("Received publication record differs from its operation")}
+                try inbox.publishContent(record.encoded(),reference:record.reference.content)
+            } else {guard allowPendingBody else {throw OSwindError.invalid("Received publication requires its exact record")}}
         }else {guard record==nil else {throw OSwindError.invalid("A deletion must remain body-free")}}
         return try writer.library.withRoutineDatabase {connection in
             guard connection.handle==cache.database.handle else {throw OSwindError.invalid("Use the publication library's own connection")}
             try queue.context();var outcomes=[SyncPublicationOutcome]()
-            let received=try cache.journal.receive(operation,contentAvailable:{try inbox.content($0) != nil}) {change in
+            func apply(_ change:SyncJournalChange)throws {
                 if change.after.isDeleted {
                     outcomes += try withdrawSourceDependents(change,admission:admission)
                     if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
@@ -195,6 +197,10 @@ struct SyncPublicationAdmission {
                 }
                 try queue.wake(change.revision.key)
             }
+            // A body-free header may wait for content or advance only under
+            // the journal's real deletion/collection/supersession proof rules.
+            // The same native deletion adapter owns late collection retirement.
+            let received=try cache.journal.receive(operation,contentAvailable:{try inbox.content($0) != nil},retireCollection:apply,supersededBy:supersededBy,apply:apply)
             // A previously applied early deletion may drain without another
             // callback once predecessors arrive. Wake its bounded reason bucket
             // after cursor progress so durable work can recheck those cursors.

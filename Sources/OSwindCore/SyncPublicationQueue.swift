@@ -24,6 +24,7 @@ struct SyncPublicationQueue {
     static let defaultBudget:Int64=64*1024*1024,maximumBudget:Int64=8*1024*1024*1024
     private final class SchemaStamp {let lock=NSLock();var value:Int64?}
     private let stamp=SchemaStamp()
+    private var pinnedLifetime:String? = nil
     static let schemas:[String:String] = {
         var value:[String:String]=[
             "personal_sync_publication_state":"CREATE TABLE personal_sync_publication_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,library_id TEXT NOT NULL,pending_count INTEGER NOT NULL CHECK(pending_count BETWEEN 0 AND 4096),pending_bytes INTEGER NOT NULL CHECK(typeof(pending_bytes)='integer' AND pending_bytes>=0 AND pending_bytes<=pending_budget),pending_budget INTEGER NOT NULL CHECK(typeof(pending_budget)='integer' AND pending_budget>0 AND pending_budget<=8589934592),binding_bytes INTEGER NOT NULL CHECK(typeof(binding_bytes)='integer' AND binding_bytes>=0 AND binding_bytes<=binding_budget),binding_budget INTEGER NOT NULL CHECK(typeof(binding_budget)='integer' AND binding_budget>0 AND binding_budget<=8589934592))",
@@ -65,7 +66,7 @@ struct SyncPublicationQueue {
     }()
     static func install(cache:SyncVersionStore,pendingBudget:Int64=defaultBudget,bindingBudget:Int64=defaultBudget)throws->Self {
         guard (1...maximumBudget).contains(pendingBudget),(1...maximumBudget).contains(bindingBudget) else {throw OSwindError.invalid("Invalid publication storage budget")}
-        let value=Self(cache:cache),db=cache.database
+        var value=Self(cache:cache);let db=cache.database
         return try SyncChangeCapture.transaction(db) {
             try cache.validateIncomingDeletionContext()
             let names=schemas.keys.filter{$0.hasPrefix("personal_sync_")},placeholders=names.map{_ in "?"}.joined(separator:","),row=try db.statement("SELECT count(*) FROM sqlite_master WHERE name IN ("+placeholders+")");defer {sqlite3_finalize(row)}
@@ -80,6 +81,7 @@ struct SyncPublicationQueue {
                 sqlite3_bind_int64(insert,6,pendingBudget);sqlite3_bind_int64(insert,7,bindingBudget);try db.done(insert)
                 for name in schemas.keys.sorted() where name.hasPrefix("sync_") {try db.execute(schemas[name]!)}
             }
+            value.pinnedLifetime=try value.libraryID()
             try value.context();try value.checkAccounting();return value
         }
     }
@@ -91,7 +93,36 @@ struct SyncPublicationQueue {
         try cache.validateIncomingDeletionContext()
         try validateSchema()
         let row=try db.statement("SELECT origin,generation,group_id,epoch,library_id FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(row)}
-        guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==cache.catalog.scope.origin,db.text(row,1)==cache.catalog.scope.generation,db.text(row,2)==cache.journal.group,db.text(row,3)==cache.journal.epoch,try db.text(row,4)==libraryID() else {throw OSwindError.invalid("Publication queue belongs to another trusted library lifetime")}
+        guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==cache.catalog.scope.origin,db.text(row,1)==cache.catalog.scope.generation,db.text(row,2)==cache.journal.group,db.text(row,3)==cache.journal.epoch,db.text(row,4)==pinnedLifetime,try db.text(row,4)==libraryID() else {throw OSwindError.invalid("Publication queue belongs to another trusted library lifetime")}
+    }
+    /// The lifecycle owner has joined producers, completed native group erasure
+    /// and drained physical cleanup. Renew only that exact authenticated receipt.
+    /// Existing queue values pin the old lifetime and can never gain this one.
+    static func renewAfterReceivedCollection(cache:SyncVersionStore,library:MemoryStore,control:SyncCollectionControl)throws {
+        guard !library.isClosed else {throw OSwindError.invalid("Reopen the collection library before renewal")}
+        guard !(try library.hasPendingLibraryWipeCleanup()) else {throw OSwindError.unavailable("Finish native collection cleanup before resuming sync")}
+        try library.withRoutineDatabase {db in
+            guard db.handle==cache.database.handle else {throw OSwindError.invalid("Renew the owning library connection")}
+            try SyncChangeCapture.transaction(db) {
+                try SyncLibraryContext.requireActive(db,cache:cache)
+                let value=Self(cache:cache);try value.validateSchema();try value.checkAccounting()
+                guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'")==0,
+                      (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs"))==0,
+                      (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_bindings"))==0 else {throw OSwindError.invalid("Do not replace live or pending publication authority")}
+                let history=SyncCollectionHistory(database:db,replica:cache.journal.replica)
+                guard try history.reviewState(journal:cache.journal) == .ready,
+                      (try history.knownControls(journal:cache.journal)).contains(control),control.creator != cache.journal.replica else {throw OSwindError.invalid("Resume only an authenticated received collection retirement")}
+                let receipt=try db.statement("SELECT digest FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(receipt)}
+                db.bind(receipt,1,control.creator);sqlite3_bind_int64(receipt,2,control.counter)
+                guard sqlite3_step(receipt)==SQLITE_ROW,try db.text(receipt,0)==control.digest else {throw OSwindError.invalid("Collection retirement receipt missing")}
+                let state=try db.statement("SELECT origin,generation,group_id,epoch FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(state)}
+                guard sqlite3_step(state)==SQLITE_ROW,db.text(state,0)==cache.catalog.scope.origin,db.text(state,1)==cache.catalog.scope.generation,db.text(state,2)==cache.journal.group,db.text(state,3)==cache.journal.epoch else {throw OSwindError.invalid("Collection publication generation differs")}
+                let lifetime=UUID().uuidString.lowercased(),insert=try db.statement("INSERT INTO store_metadata(key,value) VALUES('sync-publication-library-lifetime-v1',?)");defer {sqlite3_finalize(insert)}
+                db.bind(insert,1,lifetime);try db.done(insert)
+                let update=try db.statement("UPDATE personal_sync_publication_state SET library_id=? WHERE singleton=1");defer {sqlite3_finalize(update)}
+                db.bind(update,1,lifetime);try db.done(update)
+            }
+        }
     }
     private func validateSchema()throws {
         stamp.lock.lock();defer {stamp.lock.unlock()}
