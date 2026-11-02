@@ -13,16 +13,23 @@ final class SyncObjectFolder:@unchecked Sendable {
     private let checkpoints:SyncCipherContext
     private let collectionControls:SyncCipherContext
     private let supersessions:SyncCipherContext
+    private let authority:SyncDevicePacketAuthority?
     // Deliberately incompatible with the prior transport: v1 peers do not
     // understand creation eras, group erasure or causal supersession. Never
     // install a v1 marker alongside this one or silently adopt a legacy space.
     private static let markerName="space-v2"
     private static let markerDescriptor=Data("OSwind.sync.space-marker.v2".utf8)
     private static let markerBody=Data("OSwind encrypted object space v2; creation-era-v1; collection-control-v1; supersession-v1".utf8)
-    private init(root:URL,secret:SyncGroupSecret,group:String,epoch:String,create:Bool)throws {
+    private init(root:URL,secret:SyncGroupSecret,group:String,epoch:String,create:Bool,authority:SyncDevicePacketAuthority?)throws {
         try Task.checkCancellation()
         guard root.isFileURL,!root.path.utf8.contains(0) else {throw OSwindError.invalid("Sync object space must be a local directory")}
-        self.root=root
+        self.root=root;self.authority=authority
+        if let authority {
+            guard authority.certificate.body.group==group,authority.certificate.body.epoch==epoch else {throw OSwindError.invalid("Signed object space belongs to another group or epoch")}
+        }
+        let markerName=authority==nil ? Self.markerName:"space-v3"
+        let markerDescriptor=authority==nil ? Self.markerDescriptor:Data("OSwind.sync.space-marker.v3".utf8)
+        let markerBody=authority.map {Data("OSwind encrypted object space v3; device-signature-v1; root-membership-v1\0".utf8)+$0.certificate.body.rootPublicKey+Data(SyncPairingFormat.capabilities.joined(separator:";").utf8)} ?? Self.markerBody
         operations=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.operation)
         chunks=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.contentChunk)
         checkpoints=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.checkpoint)
@@ -34,18 +41,24 @@ final class SyncObjectFolder:@unchecked Sendable {
         }
         let opened=try BackupFileTree(root:root,writable:true)
         tree=opened
+        if authority != nil {
+            do {
+                _=try opened.read(Self.markerName,limit:SyncCipherContext.maximumEnvelopeBytes)
+                throw OSwindError.invalid("A signed object space cannot contain a legacy marker")
+            }catch BackupFileError.missing { /* A v3 space never installs v2. */ }
+        }
         if create {
-            let marker=try checkpoints.seal(Self.markerBody,descriptor:Self.markerDescriptor)
-            try opened.write(marker.bytes,as:Self.markerName)
+            let marker=try checkpoints.seal(markerBody,descriptor:markerDescriptor)
+            try opened.write(marker.bytes,as:markerName)
             try opened.withRootDirectory {guard fsync($0)==0 else {throw OSwindError.unavailable("Cannot flush sync object space")}}
         }
-        let marker=try opened.read(Self.markerName,limit:SyncCipherContext.maximumEnvelopeBytes)
-        let address=try checkpoints.token(for:Self.markerDescriptor)
-        guard try checkpoints.open(marker,expectedToken:address,descriptor:Self.markerDescriptor)==Self.markerBody else {throw OSwindError.invalid("Sync object space marker differs")}
+        let marker=try opened.read(markerName,limit:SyncCipherContext.maximumEnvelopeBytes)
+        let address=try checkpoints.token(for:markerDescriptor)
+        guard try checkpoints.open(marker,expectedToken:address,descriptor:markerDescriptor)==markerBody else {throw OSwindError.invalid("Sync object space marker differs")}
         try opened.requireRootIdentity(at:root)
     }
-    static func create(at root:URL,secret:SyncGroupSecret,group:String,epoch:String)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:true)}
-    static func open(at root:URL,secret:SyncGroupSecret,group:String,epoch:String)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:false)}
+    static func create(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:true,authority:authority)}
+    static func open(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:false,authority:authority)}
     var isClosed:Bool {lock.lock();defer {lock.unlock()};return tree==nil}
     /// The caller's owning journal must match this immutable cipher namespace
     /// before retaining any private canonical bytes, not only at declaration
@@ -64,19 +77,29 @@ final class SyncObjectFolder:@unchecked Sendable {
         return value
     }
     private static func path(_ token:String)throws->String {try SyncProtocolLimits.digest(token);return "objects/\(token.prefix(2))/\(token)"}
-    private func read(_ context:SyncCipherContext,_ descriptor:Data)throws->Data? {
+    private func unwrap(_ bytes:Data,context:SyncCipherContext,descriptor:Data,replica:String?)throws->Data {
+        guard let authority,context.purpose != .contentChunk else {return bytes}
+        guard let replica else {throw OSwindError.invalid("Signed object requires its exact device identity")}
+        return try authority.open(bytes,purpose:context.purpose,descriptor:descriptor,replica:replica)
+    }
+    private func wrap(_ bytes:Data,context:SyncCipherContext,descriptor:Data,replica:String?)throws->Data {
+        guard let authority,context.purpose != .contentChunk else {return bytes}
+        guard let replica else {throw OSwindError.invalid("Signed object requires its exact device identity")}
+        return try authority.seal(bytes,purpose:context.purpose,descriptor:descriptor,replica:replica)
+    }
+    private func read(_ context:SyncCipherContext,_ descriptor:Data,replica:String?=nil)throws->Data? {
         let token=try context.token(for:descriptor)
         return try withTree {tree in
             let bytes:Data
             do {bytes=try tree.read(Self.path(token),limit:SyncCipherContext.maximumEnvelopeBytes)}
             catch BackupFileError.missing {return nil}
-            return try context.open(bytes,expectedToken:token,descriptor:descriptor)
+            return try unwrap(context.open(bytes,expectedToken:token,descriptor:descriptor),context:context,descriptor:descriptor,replica:replica)
         }
     }
-    private func publish(_ context:SyncCipherContext,_ descriptor:Data,_ plaintext:Data)throws {
-        let object=try context.seal(plaintext,descriptor:descriptor)
+    private func publish(_ context:SyncCipherContext,_ descriptor:Data,_ plaintext:Data,replica:String?=nil)throws {
+        let object=try context.seal(wrap(plaintext,context:context,descriptor:descriptor,replica:replica),descriptor:descriptor)
         try withTree {rootTree in
-            if let existing=try read(context,descriptor) {
+            if let existing=try read(context,descriptor,replica:replica) {
                 guard existing==plaintext else {throw OSwindError.invalid("Sync immutable object identity was reused")};return
             }
             let shard=try rootTree.privateDirectory("objects/\(object.token.prefix(2))")
@@ -97,7 +120,7 @@ final class SyncObjectFolder:@unchecked Sendable {
             let linked=shard.withRootDirectory {directory in linkat(directory,temporary,directory,object.token,0)}
             if linked != 0 {
                 let code=errno
-                guard code==EEXIST,let existing=try read(context,descriptor),existing==plaintext else {throw OSwindError.invalid("Cannot atomically publish immutable sync object")}
+                guard code==EEXIST,let existing=try read(context,descriptor,replica:replica),existing==plaintext else {throw OSwindError.invalid("Cannot atomically publish immutable sync object")}
             }
             // The final name links only a completed, fsynced file. No existing
             // final member is overwritten and a crash leaves at most an opaque
@@ -136,19 +159,19 @@ final class SyncObjectFolder:@unchecked Sendable {
     func publishRevision(_ revision:SyncRevision)throws {
         if let reference=revision.content {guard try content(reference) != nil else {throw OSwindError.unavailable("Publish verified sync content before its operation")}}
         if let declaration=revision.publication {guard try content(declaration) != nil else {throw OSwindError.unavailable("Publish verified answer declaration before its operation")}}
-        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded(),replica:revision.dot.replica)
     }
     func revision(replica:String,sequence:Int64)throws->SyncRevision? {
-        guard let bytes=try read(operations,Self.operationDescriptor(replica:replica,sequence:sequence)) else {return nil}
+        guard let bytes=try read(operations,Self.operationDescriptor(replica:replica,sequence:sequence),replica:replica) else {return nil}
         let revision=try SyncRevision.decode(bytes)
         guard revision.dot.replica==replica,revision.dot.counter==sequence else {throw OSwindError.invalid("Sync operation identity differs from its address")};return revision
     }
     func publishCollectionControl(_ control:SyncCollectionControl)throws {
         try requireNamespace(group:control.group,epoch:control.epoch)
-        try publish(collectionControls,SyncCollectionControl.descriptor(creator:control.creator,counter:control.counter),control.encoded())
+        try publish(collectionControls,SyncCollectionControl.descriptor(creator:control.creator,counter:control.counter),control.encoded(),replica:control.creator)
     }
     func collectionControl(creator:String,counter:Int64)throws->SyncCollectionControl? {
-        guard let bytes=try read(collectionControls,SyncCollectionControl.descriptor(creator:creator,counter:counter)) else {return nil}
+        guard let bytes=try read(collectionControls,SyncCollectionControl.descriptor(creator:creator,counter:counter),replica:creator) else {return nil}
         let control=try SyncCollectionControl.decode(bytes)
         guard control.creator==creator,control.counter==counter else {throw OSwindError.invalid("Collection control differs from its opaque address")}
         try requireNamespace(group:control.group,epoch:control.epoch);return control
@@ -157,26 +180,33 @@ final class SyncObjectFolder:@unchecked Sendable {
     /// control is present and authenticated in this immutable object space.
     func publishErasedRevision(_ revision:SyncRevision,control:SyncCollectionControl)throws {
         guard control.erases(revision),try collectionControl(creator:control.creator,counter:control.counter)==control else {throw OSwindError.invalid("Publish a verified erasing control before its body-free old revision")}
-        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded(),replica:revision.dot.replica)
     }
     func publishDeletedRevision(_ revision:SyncRevision,deletion:SyncRevision)throws {
         guard revision.mutation == .put,deletion.mutation == .delete,deletion.key==revision.key,try self.revision(replica:deletion.dot.replica,sequence:deletion.dot.counter)==deletion else {throw OSwindError.invalid("Publish the exact deletion barrier before an old body-free revision")}
-        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded(),replica:revision.dot.replica)
     }
     func publishSupersededRevision(_ revision:SyncRevision,successor:SyncRevision)throws {
         let proof=try SyncSupersessionProof(obsolete:revision,successor:successor)
-        if let existing=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot)) {
+        if let existing=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot),replica:revision.dot.replica) {
             guard try SyncSupersessionProof.decode(existing)==proof else {throw OSwindError.invalid("An immutable supersession proof changed")}
         } else {
             guard try self.revision(replica:successor.dot.replica,sequence:successor.dot.counter)==successor else {throw OSwindError.invalid("Publish the authenticated successor before its obsolete header")}
         }
-        try publish(supersessions,SyncSupersessionProof.descriptor(revision.dot),proof.encoded())
-        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+        try publish(supersessions,SyncSupersessionProof.descriptor(revision.dot),proof.encoded(),replica:revision.dot.replica)
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded(),replica:revision.dot.replica)
     }
     func supersedingRevision(for revision:SyncRevision)throws->SyncRevision? {
-        guard let bytes=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot)) else {return nil}
+        guard let bytes=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot),replica:revision.dot.replica) else {return nil}
         let proof=try SyncSupersessionProof.decode(bytes)
-        let successor=try self.revision(replica:proof.successor.replica,sequence:proof.successor.counter) ?? proof.successorRevision
+        let successor:SyncRevision
+        if let fetched=try self.revision(replica:proof.successor.replica,sequence:proof.successor.counter) {successor=fetched}
+        else {
+            // A's proof may attest its own embedded successor. It cannot stand
+            // in for B's signature while B's actual packet is unavailable.
+            guard authority==nil || proof.successor.replica==revision.dot.replica else {return nil}
+            successor=proof.successorRevision
+        }
         guard try proof.matches(obsolete:revision,successor:successor) else {throw OSwindError.invalid("Supersession changed an operation identity")};return successor
     }
     func serviceHead(replica:String)throws->SyncServiceHead? {
@@ -184,7 +214,7 @@ final class SyncObjectFolder:@unchecked Sendable {
         return try withTree {tree in
             let bytes:Data
             do {bytes=try tree.read("heads/"+token,limit:8192)}catch BackupFileError.missing {return nil}
-            let value=try SyncServiceHead.decode(checkpoints.open(bytes,expectedToken:token,descriptor:descriptor))
+            let value=try SyncServiceHead.decode(unwrap(checkpoints.open(bytes,expectedToken:token,descriptor:descriptor),context:checkpoints,descriptor:descriptor,replica:replica))
             guard value.replica==replica,value.group==checkpoints.group,value.epoch==checkpoints.epoch else {throw OSwindError.invalid("Sync head differs from its authenticated address")};return value
         }
     }
@@ -192,7 +222,7 @@ final class SyncObjectFolder:@unchecked Sendable {
     /// A reader pins monotone counters in its own library and rejects rollback.
     func publishServiceHead(_ head:SyncServiceHead)throws {
         try requireNamespace(group:head.group,epoch:head.epoch)
-        let descriptor=try SyncServiceHead.descriptor(head.replica),object=try checkpoints.seal(head.encoded(),descriptor:descriptor)
+        let descriptor=try SyncServiceHead.descriptor(head.replica),object=try checkpoints.seal(wrap(head.encoded(),context:checkpoints,descriptor:descriptor,replica:head.replica),descriptor:descriptor)
         try withTree {tree in
             if let old=try serviceHead(replica:head.replica) {
                 guard head.through>=old.through,head.collectionCounter>=old.collectionCounter else {throw OSwindError.invalid("Refuse to roll back the published sync head")}

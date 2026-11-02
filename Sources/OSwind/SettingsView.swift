@@ -227,7 +227,7 @@ struct SettingsView: View {
     private var connect: some View {
         Group {
             MeetingSettingsSections(model:m.meetings)
-            if m.personalSync.configured {PersonalSyncStatusView(model:m.personalSync)}
+            if m.personalSync.configured || m.personalSync.preparing || m.personalSync.error != nil {PersonalSyncStatusView(model:m.personalSync)}
             Section("External MCP tools") {
                 Text("Connect selected local servers, review exact tool calls and save only the result text you choose. No server starts automatically.").font(.caption).foregroundStyle(.secondary)
                 Button("Open tools workspace") {m.section="Tools";dismiss()}

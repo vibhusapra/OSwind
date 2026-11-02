@@ -57,6 +57,135 @@ import AppKit
         XCTAssertTrue(blocked,"No actual sync lease was held behind the SQL barrier")
         return gate
     }
+    /// Setup deliberately ignores parent cancellation while the actual installer
+    /// is held. The model must retain the whole operation, not just its result.
+    private func preparation(_ model:AppModel,gate:ImportWorkerGate,probe:SyncPreparationProbe)throws->@Sendable (MemoryStore)async throws->PersonalSyncSession {
+        let group=UUID().uuidString.lowercased(),epoch=UUID().uuidString.lowercased(),replica=UUID().uuidString.lowercased(),secret=SyncGroupSecret()
+        let shared=try SyncObjectFolder.create(at:root.appendingPathComponent("setup-shared-"+UUID().uuidString),secret:secret,group:group,epoch:epoch)
+        let inbox=try SyncObjectFolder.create(at:model.store.root.appendingPathComponent("images/setup-"+UUID().uuidString),secret:secret,group:group,epoch:epoch)
+        folders += [shared,inbox];gates.append(gate)
+        return {store in
+            try await Task.detached {
+                try gate.pause()
+                probe.observeOpen(!store.isClosed)
+                let service=try SyncLibraryService.install(library:store,replica:replica,group:group,epoch:epoch,peers:[],transport:shared,inbox:inbox)
+                let result=try PersonalSyncSession(service:service,schedule:.init(activeSeconds:0.005,idleSeconds:0.02,retrySeconds:0.02))
+                probe.record(result);return result
+            }.value
+        }
+    }
+    func testPreparationOwnsLibraryBeforeInstallAndJoinsLateSessionOnCancelledExit()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let model=app!,gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        try model.personalSync.prepare(preparation(model,gate:gate,probe:probe))
+        XCTAssertTrue(model.hasPendingExitWork);XCTAssertTrue(model.personalSync.preparing)
+        await fulfillment(of:[gate.entered],timeout:10)
+        model.prepareForLibrarySwitch();var drained=false
+        let drain=Task {await model.cancelExternalWorkAndWait();drained=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(40))
+        XCTAssertFalse(drained);XCTAssertFalse(model.store.isClosed);XCTAssertTrue(model.personalSync.busy)
+        gate.release();await drain.value
+        XCTAssertTrue(probe.sawOpen);XCTAssertFalse(model.personalSync.busy);XCTAssertFalse(model.personalSync.configured)
+        let candidate=try XCTUnwrap(probe.session),state=await candidate.status()
+        XCTAssertEqual(state.phase,.stopped);XCTAssertTrue(folders.last!.isClosed)
+    }
+    func testCancelPreparationKeepsAdmissionClosedUntilLateResultHasStopped()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let gate=ImportWorkerGate(),probe=SyncPreparationProbe(),job=try preparation(app,gate:gate,probe:probe)
+        try app.personalSync.prepare(job);await fulfillment(of:[gate.entered],timeout:10)
+        app.personalSync.cancelPreparation()
+        XCTAssertTrue(app.personalSync.preparing);XCTAssertTrue(app.personalSync.busy)
+        XCTAssertThrowsError(try app.personalSync.prepare(job))
+        app.personalSync.prepareForReconnection();XCTAssertTrue(app.personalSync.busy)
+        gate.release();try await wait({!app.personalSync.preparing},"Cancelled setup did not join its late result")
+        XCTAssertFalse(app.personalSync.busy);XCTAssertFalse(app.personalSync.configured);XCTAssertNil(app.personalSync.error)
+        let candidate=try XCTUnwrap(probe.session),state=await candidate.status();XCTAssertEqual(state.phase,.stopped)
+        // New setup can enter only after cleanup. A real retry must supply its
+        // original enrolled identity; making a fresh group here would be wrong.
+        try app.personalSync.prepare {_ in throw OSwindError.unavailable("owned retry reached setup")}
+        try await wait({!app.personalSync.preparing},"Retry did not enter setup after cleanup")
+        XCTAssertNotNil(app.personalSync.error)
+    }
+    func testPreparationAdoptsOnlyCurrentAllowedLibraryAndPreservesSuspensionIntent()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        app.personalSync.start();app.personalSync.suspend()
+        try app.personalSync.prepare(preparation(app,gate:gate,probe:probe));await fulfillment(of:[gate.entered],timeout:10)
+        gate.release()
+        try await wait({app.personalSync.configured && !app.personalSync.changing && app.personalSync.status?.phase == .suspended},"Prepared session ignored processing suspension")
+        XCTAssertFalse(app.isCapturing);XCTAssertEqual(app.apiStatus,"API off")
+        app.personalSync.wake();try await wait({app.personalSync.status?.phase == .upToDate},"Prepared connection did not honor wake intent")
+    }
+    func testPreparationRechecksPrivacyAdmissionBeforeAttachingLateResult()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        try app.personalSync.prepare(preparation(app,gate:gate,probe:probe));await fulfillment(of:[gate.entered],timeout:10)
+        app.showOnboarding=true;gate.release()
+        try await wait({!app.personalSync.preparing},"Denied setup did not finish cleanup")
+        XCTAssertFalse(app.personalSync.configured);XCTAssertFalse(app.personalSync.busy)
+        let candidate=try XCTUnwrap(probe.session),state=await candidate.status();XCTAssertEqual(state.phase,.stopped)
+    }
+    func testPreparationErrorIsSanitizedAndCanBeRetried()async throws {
+        try await SourceWorkTestJob.settle(app)
+        try app.personalSync.prepare {_ in throw OSwindError.invalid("PAIRING-SECRET-DO-NOT-DISPLAY")}
+        try await wait({!app.personalSync.preparing},"Failed setup retained lifetime ownership")
+        XCTAssertFalse(app.personalSync.busy);XCTAssertFalse(app.personalSync.configured)
+        let message=try XCTUnwrap(app.personalSync.error);XCTAssertFalse(message.contains("PAIRING-SECRET"))
+        _=try await attach(app);XCTAssertNil(app.personalSync.error)
+    }
+    func testPreparationDoesNotRetainAbandonedOwnerAndStillStopsLateSession()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        var owner:PersonalSyncModel?=PersonalSyncModel(store:app.store,locked:{false})
+        weak var observed=owner
+        try owner!.prepare(preparation(app,gate:gate,probe:probe));await fulfillment(of:[gate.entered],timeout:10)
+        owner=nil;XCTAssertNil(observed,"The pending operation must not keep its UI owner alive")
+        gate.release();try await wait({probe.session != nil},"Abandoned setup did not return its late session")
+        let candidate=try XCTUnwrap(probe.session),deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while await candidate.status().phase != .stopped,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        let state=await candidate.status();XCTAssertEqual(state.phase,.stopped);XCTAssertTrue(folders.last!.isClosed)
+    }
+    func testOverlappingPreparationDrainsBothWaitForActualLateCleanup()async throws {
+        try await SourceWorkTestJob.settle(app)
+        let model=app!,gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        try model.personalSync.prepare(preparation(model,gate:gate,probe:probe));await fulfillment(of:[gate.entered],timeout:10)
+        var firstDone=false,secondDone=false
+        let first=Task {await model.personalSync.cancelAndWait();firstDone=true}
+        let second=Task {await model.personalSync.cancelAndWait();secondDone=true};second.cancel()
+        try await Task.sleep(for:.milliseconds(30))
+        XCTAssertFalse(firstDone);XCTAssertFalse(secondDone);XCTAssertTrue(model.personalSync.busy)
+        model.personalSync.prepareForReconnection();XCTAssertThrowsError(try model.personalSync.prepare {_ in throw CancellationError()})
+        gate.release();await first.value;await second.value
+        XCTAssertFalse(model.personalSync.busy);XCTAssertFalse(model.personalSync.configured)
+        let candidate=try XCTUnwrap(probe.session),state=await candidate.status();XCTAssertEqual(state.phase,.stopped)
+    }
+    func testNativeVaultLockJoinsPendingSetupBeforeClosingItsLateSession()async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned pending-setup APFS fixture; never opens a user vault or Keychain")}
+        let package=root.appendingPathComponent("SyncSetup.oswindvault"),secret=UUID().uuidString
+        _=try await LibraryVault.create(at:package,name:"Owned sync setup",capacityGiB:1,passphrase:Data(secret.utf8))
+        app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();app=nil
+        let value=AppSession(selection:.init(url:package,requiresExisting:true,origin:"owned-sync-setup"),defaults:defaults,locked:{false},personalSyncSetup:{PersonalSyncModel(store:$0,locked:{false})});session=value
+        try await wait({!value.busy},"Setup vault did not open")
+        value.unlock(passphrase:secret,remember:false);try await wait({!value.busy},"Setup vault did not unlock")
+        XCTAssertNil(value.failure);let model=try XCTUnwrap(value.model)
+        try await SourceWorkTestJob.settle(model);model.showOnboarding=false
+        try model.store.insert(Memory(id:"encrypted-setup-keep",kind:.note,text:"Owned source survives pending sync setup"))
+        let gate=ImportWorkerGate(),probe=SyncPreparationProbe()
+        try model.personalSync.prepare(preparation(model,gate:gate,probe:probe));await fulfillment(of:[gate.entered],timeout:10)
+        value.requestLock();try await wait({value.busy && value.model==nil},"Lock did not retire setup access")
+        XCTAssertFalse(model.store.isClosed);XCTAssertTrue(model.hasPendingExitWork)
+        let held=try await LibraryVault(package:package).status();XCTAssertTrue(held.imageAttached);XCTAssertTrue(held.volumeMounted)
+        gate.release();try await wait({!value.busy},"Lock did not join actual late setup")
+        XCTAssertNil(value.failure);XCTAssertTrue(probe.sawOpen);XCTAssertTrue(model.store.isClosed)
+        XCTAssertFalse(model.hasPendingExitWork);XCTAssertTrue(folders.last!.isClosed)
+        let candidate=try XCTUnwrap(probe.session),state=await candidate.status();XCTAssertEqual(state.phase,.stopped)
+        XCTAssertEqual(value.vaultStatus?.imageAttached,false)
+        value.unlock(passphrase:secret,remember:false);try await wait({!value.busy},"Setup vault did not reopen")
+        XCTAssertNil(value.failure);XCTAssertNotNil(try value.model?.store.get("encrypted-setup-keep"))
+        XCTAssertFalse(value.model?.personalSync.configured ?? true)
+        value.requestLock();try await wait({!value.busy},"Setup fixture did not detach")
+        XCTAssertNil(value.failure);XCTAssertEqual(value.vaultStatus?.imageAttached,false)
+    }
     func testActualSyncWorkerOwnsCancelledDrainUntilSQLAndMediaLeaseReturn()async throws {
         let connection=try await attach(app);let gate=try await heldTick(app)
         app.prepareForLibrarySwitch();let model=app!;var drained=false
@@ -155,4 +284,13 @@ import AppKit
         XCTAssertTrue(app.personalSync.configured)
     }
 
+}
+
+private final class SyncPreparationProbe:@unchecked Sendable {
+    private let lock=NSLock()
+    private var value:PersonalSyncSession?,open=false
+    var session:PersonalSyncSession? {lock.lock();defer {lock.unlock()};return value}
+    var sawOpen:Bool {lock.lock();defer {lock.unlock()};return open}
+    func record(_ candidate:PersonalSyncSession) {lock.lock();value=candidate;lock.unlock()}
+    func observeOpen(_ value:Bool) {lock.lock();open=value;lock.unlock()}
 }

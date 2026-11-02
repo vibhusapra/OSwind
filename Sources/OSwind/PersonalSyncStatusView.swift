@@ -5,7 +5,7 @@ struct PersonalSyncStatusView:View {
     @ObservedObject var model:PersonalSyncModel
     private var title:String {
         switch model.status?.phase {
-        case .none:return "Preparing connection…"
+        case .none:return model.preparing ? "Preparing connection…":"Connection needs attention"
         case .ready:return "Ready to sync"
         case .preparing:return "Preparing local changes"
         case .working:return "Syncing"
@@ -25,10 +25,13 @@ struct PersonalSyncStatusView:View {
     var body:some View {
         Section("Personal device sync") {
             Label(title,systemImage:model.networkPaused ? "pause.circle":"arrow.triangle.2.circlepath")
+            if model.preparing {Button("Cancel setup") {model.cancelPreparation()}.disabled(model.stopping)}
             if let status=model.status,status.withheld>0 {Text("\(status.withheld) changes are held locally by privacy policy.").font(.caption).foregroundStyle(.secondary)}
-            Button(model.networkPaused ? "Resume delivery":"Pause delivery") {model.setNetworkEnabled(model.networkPaused)}
-                .disabled(model.changing || model.stopping)
-            Text("Pausing delivery keeps preparing local changes. Sleeping, locking or leaving this library stops processing before storage closes.").font(.caption).foregroundStyle(.secondary)
+            if model.configured {
+                Button(model.networkPaused ? "Resume delivery":"Pause delivery") {model.setNetworkEnabled(model.networkPaused)}
+                    .disabled(model.changing || model.stopping)
+                Text("Pausing delivery keeps preparing local changes. Sleeping, locking or leaving this library stops processing before storage closes.").font(.caption).foregroundStyle(.secondary)
+            }
             if let error=model.error {Text(error).font(.caption).foregroundStyle(.secondary)}
         }
     }
