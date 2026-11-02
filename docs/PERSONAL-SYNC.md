@@ -6,6 +6,8 @@ The current internal foundation includes [durable answer admission](SYNC-DURABLE
 
 The [current prepared-session app owner](SYNC-APP-OWNER.md) connects the real service to app retirement and reversible processing suspension. It does not expose a public enrollment constructor or complete the remaining trust, recovery, erasure and provider requirements below. Historical receipts retain their original sources.
 
+The [signed pairing/v3 transport component](SYNC-SIGNED-PAIRING.md) now supplies root-signed addition-only membership, exact capabilities, expiring recipient-bound responses and per-device authorship. The app owns asynchronous setup before it may install native state. This still enables no public enrollment: Keychain/pending-request persistence, refresh/recovery/revocation/rotation, old-writer and external rollback authority, erasure application and physical acceptance remain required.
+
 ## Delivery requirements
 
 | Requirement | Implementation / acceptance gate |

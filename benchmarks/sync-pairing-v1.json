@@ -1,0 +1,2046 @@
+{
+  "format": "OSwind.sync-pairing.software.v1",
+  "state": "passed",
+  "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+  "trackedInputs": 1463,
+  "runtimeSource": "85d4dd10d9498c93cbd5a8e73267505359a06b79",
+  "retainedInitialQualificationFailure": {
+    "format": "OSwind.sync-phase-wait-failure.v1",
+    "state": "reviewed-failure",
+    "failedSource": "85d4dd10d9498c93cbd5a8e73267505359a06b79",
+    "failedStage": {
+      "stage": "thread-sanitizer",
+      "state": "failed",
+      "source": "85d4dd10d9498c93cbd5a8e73267505359a06b79",
+      "pid": 78903,
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "VaultProcessStartTests|WorkflowModelTests|SearchIndexLifecycleTests|VisualIndexCoordinationTests|SearchNavigationTests|SelectedRead|SourceOpeningTests|RecapModelTests|Audio|SpeechRecognitionTests|Speaker|BackupFileTreeTests|BackupCleanupTests|VoiceTypingTests|AnswerLifecycleTests|ChatAdmissionTests|SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "returncode": 1,
+      "wallSeconds": 1167.286620958941,
+      "atUTC": "2026-11-02T16:10:40.958358+00:00",
+      "logSHA256": "a9e212aa489b044ba8df9473daecaed2ad224a6e383e79c438d2e36fe3b8f939",
+      "changedInputs": []
+    },
+    "failedMethods": [
+      "-[OSwindCoreTests.SyncOutgoingTests testSessionOwnerSuspendsAllProcessingAndResumesActualThirteenKindDelivery]"
+    ],
+    "assertionFailures": 4,
+    "skipped": 73,
+    "raceWarning": false,
+    "firstMismatch": "preparing was not networkPaused before the test continued into downstream transfer assertions",
+    "correctionSource": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+    "correctionFiles": [
+      "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift"
+    ],
+    "allOtherTrackedInputsUnchanged": true,
+    "focusedDevelopmentRun": {
+      "passed": 2,
+      "skipped": 0,
+      "failures": 0,
+      "raceWarning": false,
+      "logSHA256": "f1e28eaad3f79549375e905dc675413b9e1b8eb7ffd3fac234a74ff51f8e3acf",
+      "observedPhases": [
+        [
+          "upToDate",
+          "0.450330208"
+        ],
+        [
+          "networkPaused",
+          "4.321214125"
+        ],
+        [
+          "upToDate",
+          "2.264683042"
+        ]
+      ],
+      "scope": "Focused development run after editing the test, before committing identical corrected bytes; full fresh source-bound qualification remains required."
+    },
+    "explanation": "The fixture assumed completion after a fixed number of short polls and continued after a failed transition. It now observes actual push phases with a bounded deadline that throws, preserves all delivery assertions and joins the session on failure. This is not a product performance acceptance result.",
+    "limits": [
+      "The original broad sanitizer stage failed and is retained unchanged. Optimized/native stages were not started by that failed serial attempt.",
+      "The correction changes one test file and no production source. It still requires the new complete qualification.",
+      "This inherited test-wait failure is separate from the causally unresolved PR136 missing-vault-session failure."
+    ]
+  },
+  "retainedInitialFailureReviewSHA256": "8b0996391722cd100faa9ee1c47f0dbd741daee46ba7034f88b2521e559ae371",
+  "inputManifestSHA256": "2cc941faedf49486b1b56c677c9435d75f486651373d70ae5427345a7463bcee",
+  "requiredMethods": 514,
+  "newRegularMethods": [
+    "testPairingDeliversExactSignedMembershipOnlyToJoiningMac",
+    "testOwnerMustAdmitExactRequestBeforeProducingResponse",
+    "testWrongFingerprintRecipientAndRequestCannotAcceptResponse",
+    "testRequestProofOfPossessionBindsIdentityNameKeysAndCapabilities",
+    "testRequestExpiryFutureTimeAndUnsafeNamesAreRejected",
+    "testResponseExpiryCannotBeBypassedWithPreviouslyValidCiphertext",
+    "testMembershipSignatureBindsRootGroupEpochOwnerHistoryAndDevices",
+    "testMembershipRejectsAlternateHistoryAndSkippedRevisions",
+    "testResponseSignatureBindsCiphertextEphemeralKeyAndExactRequest",
+    "testCanonicalMessagesRejectUnknownFieldsWhitespaceTruncationAndOversize",
+    "testMembershipBoundAndDistinctDeviceKeysHoldAtCapacity",
+    "testDistinctReplicaCannotReuseAnExistingDevicesPrivateKeys",
+    "testPrivateAuthorityPendingAndJoinedValuesHaveRedactedDiagnostics",
+    "testSignedSpaceHasOnlyV3MarkerAndCannotAdoptLegacySpace",
+    "testSignedOperationAndFullChunksRoundTripWithoutPlaintextHeaders",
+    "testMemberCannotPublishAnotherDevicesOperationsHeadsControlsOrProofs",
+    "testGroupKeyAloneCannotForgeOperationControlHeadOrSupersession",
+    "testCrossDeviceSupersessionRequiresActualSuccessorSignature",
+    "testSameDeviceSupersessionRetainsAuthenticatedEmbeddedFallback",
+    "testDevicePacketBindsEveryAuthorityDimensionAndRejectsTampering",
+    "testJoinedDevicesRunActualNativeServiceOverSignedTransport",
+    "testSignedServiceReopensPartialThirteenKindGraphAndPreservesOriginalCitations",
+    "testPreparationOwnsLibraryBeforeInstallAndJoinsLateSessionOnCancelledExit",
+    "testCancelPreparationKeepsAdmissionClosedUntilLateResultHasStopped",
+    "testPreparationAdoptsOnlyCurrentAllowedLibraryAndPreservesSuspensionIntent",
+    "testPreparationRechecksPrivacyAdmissionBeforeAttachingLateResult",
+    "testPreparationErrorIsSanitizedAndCanBeRetried",
+    "testPreparationDoesNotRetainAbandonedOwnerAndStillStopsLateSession",
+    "testOverlappingPreparationDrainsBothWaitForActualLateCleanup"
+  ],
+  "requiredDefinitions": {
+    "testPublicationQueuePersistsMissingDeclarationAndCompletesAfterLibraryAndInboxReopen": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueuePartialCitationsResumeAfterReopenWithoutPartialNativeAnswer": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueuePolicyDenialRollsBackNativeGroupButRetainsExplicitDurableWorkAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueFullRollsBackSecondReceiptWithoutEvictingFirstJob": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueNativeCitationChangeInvalidatesCompletedDeclarationBinding": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueMissingProtectionRefusesBothCachedUseAndReinstall": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueGapDrainUsesEachOperationsOwnDurableBody": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueBindingBudgetRecoveryWakesStoragePressureAfterBlockedRetry": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueAuthenticEarlyDeletionFreesCapacityWithoutAnswerBody": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueNativeWipeInvalidatesOldLifetimeWithoutReusingPendingAuthority": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueExplicitPolicyReviewWakesOnlyBlockedWorkAfterRepeatedDenial": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueLateDeclarationRetiresAuthenticErasedEvidenceBeforePolicyAtBindingCapacity": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueCoalescesOneOwnerAndIndexesOnlyDeclaredDependencyKeys": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueDeclaredCitationDeletionWithdrawsReadableVersionWithoutRetiringOwnerLifetime": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueuePendingIndependentHeadWithdrawsOldReadableBodyWithoutGlobalRetirement": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueEarlyCitationDeletionCannotRetireUnseenIndependentOwnerHead": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueRetractionPreservesExactLiveCitationKeysAndReprojectsSameEvidence": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift"
+    ],
+    "testPublicationQueueRetractionAbortRestoresMappingsNativeGraphCacheAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationRetractionTests.swift"
+    ],
+    "testPublicationQueueRetractedBackupRestoresQuietWithoutAnswerOrQueueAuthority": [
+      "Tests/OSwindCoreTests/SyncPublicationRetractionTests.swift"
+    ],
+    "testPublicationQueueContiguousThirdPeerDeletionWaitsForItsMissingProducerContext": [
+      "Tests/OSwindCoreTests/SyncPublicationRetractionTests.swift"
+    ],
+    "testPublicationQueueRetractedIndependentHeadSurvivesActualOldSourceErasure": [
+      "Tests/OSwindCoreTests/SyncPublicationRetractionTests.swift"
+    ],
+    "testPublicationQueueDeathDuringCatalogueRelocationRollsBackExactGraph": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift"
+    ],
+    "testPublicationQueueDeathBeforeCommitRollsBackRetractionAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift"
+    ],
+    "testPublicationQueueDeathAfterCommitPreservesRetractionAndDurableRetry": [
+      "Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift"
+    ],
+    "testPublicationQueueIndependentFutureHeadSurvivesPriorCitationRetirement": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueIndependentConcurrentHeadSurvivesThirdPeerCitationRetirement": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueIndependentFutureHeadSurvivesPriorWholeSourceRetirement": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueIndependentConcurrentHeadSurvivesThirdPeerWholeSourceRetirement": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueEarlyWholeSourceErasureAcrossUnseenIndependentHeadDefersUntilGapCloses": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueChangedDeclaredCitationWithdrawsStaleCompleteOwnerUntilNewDeclaration": [
+      "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift"
+    ],
+    "testPublicationQueueSourcePressureRollsBackRootReceiptRedactionAndGraphThenRetriesWithoutEviction": [
+      "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift"
+    ],
+    "testPublicationQueueSourceRedactionRejectsTextCreatedDateWithoutCoercion": [
+      "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift"
+    ],
+    "testPublicationQueueSourceRedactionRejectsBlobCreatedDateWithoutCoercion": [
+      "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift"
+    ],
+    "testPublicationQueueSourceRedactionRejectsTextUpdatedDateWithoutCoercion": [
+      "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift"
+    ],
+    "testPublicationQueueSourceRedactionRejectsBlobUpdatedDateWithoutCoercion": [
+      "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift"
+    ],
+    "testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation": [
+      "Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift"
+    ],
+    "testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation": [
+      "Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift"
+    ],
+    "testPublicationQueueSourceDeathDuringCanonicalRedactionRollsBackGraphAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift"
+    ],
+    "testPublicationQueueSourceDeathDuringProjectionWithdrawalRollsBackGraphAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift"
+    ],
+    "testPublicationQueueSourceDeathDuringNativeSourceDeleteRollsBackGraphAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift"
+    ],
+    "testPublicationQueueSourceDeathBeforeCommitRollsBackGraphAndReceipt": [
+      "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift"
+    ],
+    "testPublicationQueueSourceDeathAfterCommitRetainsMetadataMediaQueueAndIndependentHead": [
+      "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift"
+    ],
+    "testPublicationQueueOldCitationTombstoneCannotWithdrawAlreadyCompleteIndependentVersion": [
+      "Tests/OSwindCoreTests/SyncPublicationMutationTests.swift"
+    ],
+    "testPublicationQueueActualSourceUpdatePreservesCertifiedOriginalAndLaterCitationErasureWithdrawsIt": [
+      "Tests/OSwindCoreTests/SyncPublicationMutationTests.swift"
+    ],
+    "testPublicationQueueForeignGroupInboxRefusesBeforeAnyContentOrNativeWrite": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueForeignEpochInboxRefusesBeforeAnyContentOrNativeWrite": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueWipedLifetimeRefusesSourceBeforeEncryptedRetention": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueWipedLifetimeRefusesDeclarationBeforeEncryptedRetention": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueClosedLibraryRefusesDeclarationBeforeEncryptedRetention": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueDeclarationArrivalRejectsNestedSQLiteBeforeRetentionOrMediaLock": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testPublicationQueueForeignInboxRetryRefusesWithoutChangingDurableWork": [
+      "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift"
+    ],
+    "testOpeningLibraryDoesNotDrainMediaReservedByUncommittedWriter": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testSingleDeleteCommitsButDefersPhysicalCleanupDuringReservation": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testExplicitRetryReportsPendingWorkWithoutWaitingForReservation": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testClosedLibraryRetryReportsUnknownPendingCount": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testActualImageSnapshotDefersUnlinkButRejectsStaleAdmission": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testScopedEraseCommitsButDefersPhysicalCleanupDuringReservation": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testRetentionPreservesUnrelatedHistoryWhileMediaCleanupIsDeferred": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testCleanupInsideTransactionCannotUnlinkFilesBeforeRollback": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testSharedForeignAndReleasedReservationsCannotAuthorizeCleanup": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testChangedRootCannotRemoveReplacementFilesAfterLogicalDelete": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testSeparateProcessReservationDefersCleanupUntilReferenceAdmission": [
+      "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift"
+    ],
+    "testErasureFenceTextOnlyDeletionRetriesSnapshot": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFencePinnedMediaDeletionRetriesSnapshot": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceRecreatedSourceDoesNotReuseErasedVersionsPinnedBytes": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceDeletionDuringCopyVerificationOrPublicationPublishesNothing": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceConcurrentAppendDoesNotInvalidatePointInTimeBackup": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceRolledBackDeletionDoesNotInvalidateBackup": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceChangedTriggerRefusesPublicationAndReopenRepairsIt": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testErasureFenceMalformedGenerationRefusesWithoutPublication": [
+      "Tests/OSwindCoreTests/BackupErasureFenceTests.swift"
+    ],
+    "testInitializedPrior32CannotDrainMediaReservedByCurrentSnapshot": [
+      "Tests/OSwindCoreTests/NativeMediaLegacyTests.swift"
+    ],
+    "testInitializedPrior32QueueReadFenceProtectsMediaEvenWithLegacyDirtyMarker": [
+      "Tests/OSwindCoreTests/NativeMediaLegacyTests.swift"
+    ],
+    "testNativeMediaMigrationPreservesCommittedQueueAndFencesCachedLegacyStatements": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationFailureRollsBackQueueMarkerSchemaAndSource": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationSerializesWithPriorQueueWriter": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationCancellationAfterQueueCopyRestoresSource32": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationCancellationBeforeCommitRestoresSource32": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationCancellationAfterCommitReturnsCommittedLibraryAndPendingWork": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationDeathAfterQueueCopyRestoresSource32": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationDeathBeforeCommitRestoresSource32": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaMigrationDeathAfterCommitPreservesSource33": [
+      "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift"
+    ],
+    "testNativeMediaCurrentQueuePreservesIdempotentInsertUpdateDeleteAndUnicodeBytes": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaUnregisteredConnectionCannotReadQueueEvenWhenEmpty": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaMetadataGuardStopsStaleInitializerBeforeIgnoredInsert": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaDamagedViewStopsCleanupBeforeFileOrCacheRemoval": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaMissingMetadataGuardRefusesReopenWithoutNativeLoss": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaMissingBackingRefusesReopenRatherThanFabricatingEmptyQueue": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testNativeMediaCleanupRemovesBothCacheGenerationsOnlyAfterReservationRelease": [
+      "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift"
+    ],
+    "testRetiredLibraryRejectsQueuedManualDeletion": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testRetiredLibraryRejectsQueuedManualMaintenance": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testDeleteDrainCancelsAndJoinsWorkerBeforeSQLAdmission": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testMaintenanceDrainCancelsAndJoinsWorkerBeforeSQLAdmission": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testClosedLibraryRejectsBothQueuedManualActions": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testRetirementBeforeWorkerLaunchRejectsBothQueuedCompletions": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testCancelledDeleteDrainCallerStillJoinsAndAllowsLaterWork": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testCancelledMaintenanceDrainCallerStillJoinsAndAllowsLaterWork": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testDeleteCommitSurvivesRetirementAndLateCallbackPublishesNoSuccess": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testMaintenanceCommitSurvivesRetirementAndLateCallbackPublishesNoSuccess": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testPlainQuitDelegateWaitsForActualDeletionWorker": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testPlainQuitDelegateWaitsForActualMaintenanceWorker": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testSwitchWaitsForActualDeletionWorkerBeforeClosingOldStore": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testSwitchWaitsForActualMaintenanceWorkerBeforeClosingOldStore": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testDisablingAutomaticRetentionCancelsUncommittedAutomaticWorker": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testChangingRetentionCancelsWorkerUsingObsoletePolicy": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testPolicyCancellationAfterCommitClearsCurrentStaleEvidence": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testAutomaticPreferenceDoesNotRevokeExplicitManualCleanup": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testOnboardingSuspendsUncommittedAutomaticMaintenance": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testFailedPolicySaveStillCancelsObsoleteMaintenance": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testReconfiguringEnabledTimerDoesNotCancelPermittedAutomaticWorker": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testQueuedServiceStartupCannotReactivateRetiredLibrary": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testQueuedCleanupConfigurationCannotStartTimerOnClosedLibrary": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testDirectBindingCannotWriteRetiredLibraryPreferences": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testDirectBindingCannotWriteClosedLibraryPreferences": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testQueuedWipeCannotStartOnRetiredLibrary": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testQueuedWipeCannotStartOnClosedLibrary": [
+      "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift"
+    ],
+    "testWriterReleaseAutomaticallyResumesCommittedDeletionWithoutExtraRetention": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testLibraryStartupResumesEarlierCommittedQueueAfterWriterRelease": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testIdleSharedWriterReleasesNeverStartPeriodicQueueProbes": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testExitDrainJoinsActualUnreservedWorkerAndRejectsRestart": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testCancelledDrainCallerStillWaitsForActualWorker": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testRetirementAfterActualCleanupCannotPublishLateSuccess": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testBackoffSleeperIsCancelledAndJoinedBeforeExit": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testStructuralCleanupFailureDoesNotPollAndDeliberateResumeCanRecover": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testSeparateProcessReleaseNotificationResumesBeforeLongBackoff": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testSeparateProcessDeathRecoversThroughPendingOnlyBackoff": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testReleaseBurstCoalescesAndBoundsAttemptsWhileAnotherWriterRemains": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testExternalWipeKeepsOwnRetryAndClearsWarningAfterSupportedCompletion": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testObservationRootFailureIsVisibleAndCanRetryAfterActualRootRestored": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testPlainQuitDelegateJoinsActualPendingMediaWorker": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testLibrarySwitchJoinsActualPendingMediaWorkerBeforeClosingStore": [
+      "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift"
+    ],
+    "testIdleAttemptLeavesSourcesAndValidCacheUntouched": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testBusyReservationDefersThenOnlyCommittedMediaIsCleaned": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testPendingWipeRetainsItsOwnRetryAndFreshSource": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testStructuralPendingPathNeedsAttentionWithoutFollowingSymlink": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testChangedRootCannotCleanupEitherDirectory": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testSupportedPendingAndReleaseNotificationsStayScopedToRoot": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testCancelledTaskCannotStartPendingCleanup": [
+      "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift"
+    ],
+    "testNativeWipeStopsServicesGuardsBusyAndReportsCommittedCounts": [
+      "Tests/OSwindAppTests/LibraryWipeModelTests.swift"
+    ],
+    "testPendingCleanupIsVisibleOnReopenAndRetryPreservesNewHistory": [
+      "Tests/OSwindAppTests/LibraryWipeModelTests.swift"
+    ],
+    "testStopWhileWaitingLeavesHistoryAndHasAccurateStatus": [
+      "Tests/OSwindAppTests/LibraryWipeModelTests.swift"
+    ],
+    "testOldNoteWorkerCannotRepopulateAfterNativeWipe": [
+      "Tests/OSwindAppTests/LibraryWipeModelTests.swift"
+    ],
+    "testQuietPreparedWorkspaceDoesNotReadCalendarsOnWake": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testOnboardingDefersSavedCalendarAndSwitchPreventsRestart": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testScreenSleepClearsContextAndPauseAllPreventsWakeResume": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testBriefUsesExistingEvidenceConversationAndTreatsCalendarFiltersAsLiteral": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testGlobalPauseAlsoStopsCalendarOnlyCollection": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testCalendarSelectionPersistCallbackUpdatesRealSettingsWithoutLosingOtherPrivacy": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testOpeningMeetingsDoesNotStartCalendarOrUnrelatedVisualRetrieval": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testCompletedWipeClearsSelectionAndAllowsFreshCalendarConnect": [
+      "Tests/OSwindAppTests/MeetingWorkspaceTests.swift"
+    ],
+    "testRetiredModelRejectsQueuedQuickNote": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testRetiredModelRejectsQueuedRecapSave": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testRetiredModelRejectsQueuedJSONImport": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testNoteDrainJoinsActualWorkerBeforeSQL": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testRecapDrainJoinsActualWorkerBeforeSQL": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testCancelledNoteDrainCallerStillWaitsForActualWorker": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testCancelledRecapDrainCallerStillWaitsForActualWorker": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testRetiredNoteCompletionPreservesCommitWithoutLatePublication": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testRetiredRecapCompletionPreservesCommitWithoutLatePublication": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testCurrentNotePolicyCancellationPreservesActualCommit": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testCurrentRecapPolicyCancellationReportsActualCommit": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testPrivacyChangeCancelsBothActualUncommittedWriters": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testWipeWaitsForActualNoteWorkerAndCannotBeRepopulated": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testClosedModelRejectsBothWriteKinds": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testPrivacyRevocationCancelsBothWritersEvenWhenSettingsCannotSave": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testImportOnlyPIIChoiceDoesNotCancelExplicitManualWrites": [
+      "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift"
+    ],
+    "testStatisticsDrainOwnsActualReaderAndSuppressesRetiredSnapshot": [
+      "Tests/OSwindAppTests/SourceReadLifecycleTests.swift"
+    ],
+    "testStorageDrainOwnsActualTraversalAndCannotRestartAfterRetirement": [
+      "Tests/OSwindAppTests/SourceReadLifecycleTests.swift"
+    ],
+    "testCancelledStatisticsDrainCallerStillWaitsAndRejectsNewWork": [
+      "Tests/OSwindAppTests/SourceReadLifecycleTests.swift"
+    ],
+    "testCancelledStorageDrainCallerStillWaitsAndRejectsNewWork": [
+      "Tests/OSwindAppTests/SourceReadLifecycleTests.swift"
+    ],
+    "testStorageFailureKeepsLastGoodEstimateAndCanRetry": [
+      "Tests/OSwindAppTests/SourceReadLifecycleTests.swift"
+    ],
+    "testPlainQuitWaitsForActualNoteWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualRecapWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualStatisticsWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualStorageWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualNoteWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualRecapWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualStatisticsWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualStorageWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualAnswerWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualAnswerWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualAudioImportWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualAudioImportWorker": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualSelectedMetadataReader": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualSourceHydration": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActiveHistoricalValidation": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualSelectedMetadataReader": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualSourceHydration": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActiveHistoricalValidation": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualQueryTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualQueryTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualTextRebuildTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualTextRebuildTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualFastPreparationTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualFastPreparationTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualAutomaticTextIndexTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualAutomaticTextIndexTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualVisualRebuildTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualVisualRebuildTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testPlainQuitWaitsForActualAutomaticVisualIndexTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testLibrarySwitchWaitsForActualAutomaticVisualIndexTask": [
+      "Tests/OSwindAppTests/SourceWorkSessionTests.swift"
+    ],
+    "testRetiredFavoriteActionCannotWriteOldLibrary": [
+      "Tests/OSwindAppTests/RetiredLibraryActionTests.swift"
+    ],
+    "testRetiredChatActionCannotDeleteOldConversation": [
+      "Tests/OSwindAppTests/RetiredLibraryActionTests.swift"
+    ],
+    "testRetiredAPIActionCannotStartOrRelabelListener": [
+      "Tests/OSwindAppTests/RetiredLibraryActionTests.swift"
+    ],
+    "testRetiredRefreshCannotStartNewQuery": [
+      "Tests/OSwindAppTests/RetiredLibraryActionTests.swift"
+    ],
+    "testRetiredSourceOpenCannotLoadAndPublishOldSelection": [
+      "Tests/OSwindAppTests/RetiredLibraryActionTests.swift"
+    ],
+    "testLogicalSizeDeltaAndSymlinkTargetsAreNotCounted": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testOptionalStagingExclusionMatchesThreeRetainedBuckets": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testCancelledEntryNeverStartsTraversal": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testActualTraversalReservationBlocksCloseAndCancellationReleasesIt": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testMovedRootReturnsNoEstimateAndDoesNotTraverseReplacement": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testUnreadableDirectoryDoesNotReturnPartialEstimate": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testClosedStoreRefusesTraversalWithoutLeakingReservation": [
+      "Tests/OSwindCoreTests/StorageUsageTests.swift"
+    ],
+    "testRetiredAskCannotLaunchOrPersistConversation": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testDrainWaitsForActualAnswerWorkerBeforeEngineEntry": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testDrainWaitsForAnswerReadyWorkerBeforeConversationAdmission": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testCancelledDrainCallerStillJoinsActualAnswerWorker": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testExplicitCancelRetainsBusyUntilActualWorkerReturns": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testRetiredCompletionKeepsActualCommittedTurnWithoutPublishing": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testCurrentPrivacyCancellationReportsAlreadyCommittedTurn": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testPrivacyRevocationCancelsAnswerEvenWhenSettingsSaveFails": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testChangedModelChoiceRevokesCapturedAnswerConfiguration": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testWipeWaitsForAnswerAndCannotBeRepopulatedByIt": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testClosedLibraryRejectsAskBeforeLaunch": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testChangedEvidenceRejectsAnswerWithoutCreatingEmptyConversation": [
+      "Tests/OSwindAppTests/AnswerLifecycleTests.swift"
+    ],
+    "testOuterRollbackRemovesWholeFirstConversationAndTurn": [
+      "Tests/OSwindCoreTests/ChatAdmissionTests.swift"
+    ],
+    "testRejectedNestedAdmissionPreservesOuterConversationAndCommit": [
+      "Tests/OSwindCoreTests/ChatAdmissionTests.swift"
+    ],
+    "testRejectedFollowupPreservesExistingCommittedTurn": [
+      "Tests/OSwindCoreTests/ChatAdmissionTests.swift"
+    ],
+    "testCancellationDuringActualTurnInsertRollsBackWholeNewConversation": [
+      "Tests/OSwindCoreTests/ChatAdmissionTests.swift"
+    ],
+    "testExplicitRecordReviewEditAndSingleInsertNeverSavesHistory": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testFinishedDictationStillOwnsIndependentActualStorageWorkerForExit": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testBlockedOrLockedNeverPreparesOrRequestsMicrophone": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testMissingSecureExcludedAndChangedIdentityRefuseBeforeMic": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testCancelPreparationRetainsBusyUntilActualReturn": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testCancelTranscriptionDrainsAndDiscardsLateText": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testPrivacyChangeWhileRecordingStopsAndNeverTranscribes": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testChangedPrivacyAfterTranscriptionRefusesReview": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testPauseAndSettingsChangeCancelRecordingWithoutRestart": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testRetiredLibraryCannotRecordOrPublish": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testAutomaticThirtySecondStopAndTranscriptErrors": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testRecordingAndPermissionFailuresDoNotOfferDraft": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testTerminalPCMFailureStopsAtNextPollAndNeverTranscribes": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testReviewValidationRefusesLockPrivacyAndCanonicalByteMutation": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testPlainQuitWaitsForActualLocalTranscription": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testLibrarySwitchDrainsPreparationBeforeSQLiteClose": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testReplacedRootDuringPreparationRefusesMicrophone": [
+      "Tests/OSwindAppTests/VoiceTypingTests.swift"
+    ],
+    "testActualDecoderAndClipRemainOwnedUntilRetiredDrainCompletes": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testRetiredDrainOwnsActualCommittedImportAndSuppressesLateStatus": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testActualAudioAdmissionRunsOffMainThreadAndPreservesRetainedInput": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testCancelledDrainCallerStillWaitsBeforeClipAdmissionAndRejectsAnotherImport": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testExplicitCancelKeepsBusyUntilActualInferenceReturns": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testPrivacyChangeCancelsActualDecoderEvenWhenSettingsSaveFails": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testRetainChoiceRevokesOldImportAndNextImportRespectsNoRetention": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testIndependentAnswerModelChoiceDoesNotCancelAcceptedAudio": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testCurrentCancellationReportsActualCommittedTranscript": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testRetiredFileEntryCannotLaunchDecoder": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testClosedFileEntryCannotLaunchDecoder": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testWipeWaitsForActualDecoderAndClipCleanup": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testActualSpeakerWrapperAndClipAreJoinedThroughCancellation": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testSpeakerPipelinePersistsRecordingLocalLabelsFromAuthoredBackend": [
+      "Tests/OSwindAppTests/AudioImportLifecycleTests.swift"
+    ],
+    "testChangedSavedPolicyRejectsSourceAndRemovesOnlyNewRetainedCopy": [
+      "Tests/OSwindCoreTests/AudioSettingsAdmissionTests.swift"
+    ],
+    "testIdenticalAtomicSettingsSaveInvalidatesPinnedVersion": [
+      "Tests/OSwindCoreTests/AudioSettingsAdmissionTests.swift"
+    ],
+    "testCancellationDuringActualSourceInsertRollsBackFileAndSource": [
+      "Tests/OSwindCoreTests/AudioSettingsAdmissionTests.swift"
+    ],
+    "testConfiguredAdmissionRefusesOuterTransactionAndPreservesCallerCommit": [
+      "Tests/OSwindCoreTests/AudioSettingsAdmissionTests.swift"
+    ],
+    "testCancelledCleanupCannotFollowSymlinkParent": [
+      "Tests/OSwindCoreTests/BackupCleanupTests.swift"
+    ],
+    "testCancelledCleanupCannotWriteReadOnlyTree": [
+      "Tests/OSwindCoreTests/BackupCleanupTests.swift"
+    ],
+    "testLegacySettingsDefaultToWhisperAndPartialNativeSettingsDecode": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testMissingModelsFailLocallyWithoutCreatingCache": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testModelReuseConfigurationChangeAndExplicitUnload": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testFIFORequestsNeverEnterBackendConcurrently": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testQueuedCancellationDoesNotTranscribeAndReleasesNextRequest": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testCancellationDuringModelLoadNeverCachesOrTranscribesCandidate": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testCancellationDuringInferenceDiscardsResultAndQueueRemainsUsable": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testMalformedBackendOutputCannotEscapeValidation": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testOverdueInferenceCannotReturnTextAndReleasesQueue": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testInvalidBudgetCannotLoadOrTranscribe": [
+      "Tests/OSwindCoreTests/SpeechRecognitionTests.swift"
+    ],
+    "testDisabledUnsupportedAndInvalidModelsNeverLoad": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testResidentReuseAndUnload": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testRawTimelineAndWordAttributionShareResidentBackend": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testNoDetectedSpeechIsEmptyButActualFailuresStillThrow": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testQueuedCancellationAndInferenceCancellationDoNotReturnLabels": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testCancelledModelLoadIsNotReused": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testOverdueResultsAreDiscardedAndRuntimeCanBeReused": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testPLDAParametersAreBoundedTypedAndFinite": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testSpeakerRenamesPersistAndRefuseMergesMissingRecordsAndSecrets": [
+      "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift"
+    ],
+    "testPIIMetadataReaderOwnsExitAndDrainBeforeItsActualReadReturns": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testOpeningReaderOwnsExitAndRetiredDrainUntilActualHydrationReturns": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testNewSelectionCannotForgetOlderHeldMetadataWorker": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testCancelledMetadataObserverStillJoinsActualWorker": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testCancelledDrainStillJoinsOpeningAndRejectsNewReaders": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testNewOpeningSuppressesOldHeldHydrationWithoutLosingItsOwnership": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testSelectedHistoricalValidationOwnsActualReadButNotItsIdleTimer": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testExternalDrainStopsHistoricalValidationFromRestartingAfterReturn": [
+      "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift"
+    ],
+    "testOpeningHydratesFullTimedSourceAndPreservesPassage": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testCancelledOpeningCannotPublishAfterSearchFocusChanges": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testNewOpeningAndLibrarySwitchDiscardOlderWork": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testDeletingPendingSourceCancelsItsOpening": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testVisualOpeningPreservesProofAndClearsItWhenLeavingSource": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testChangedOrErasedSourceFailsWithoutOpeningStaleText": [
+      "Tests/OSwindAppTests/SourceOpeningTests.swift"
+    ],
+    "testOpeningSourceLoadsPrivacyMetadataSeparatelyAndClearsItOnDismiss": [
+      "Tests/OSwindAppTests/PIIScanStatusModelTests.swift"
+    ],
+    "testLateStatusCannotReplaceAnotherSelectedSource": [
+      "Tests/OSwindAppTests/PIIScanStatusModelTests.swift"
+    ],
+    "testLibraryDepartureCannotPublishLateStatus": [
+      "Tests/OSwindAppTests/PIIScanStatusModelTests.swift"
+    ],
+    "testStatusFailureNeverBecomesAnUncheckedFallbackClaim": [
+      "Tests/OSwindAppTests/PIIScanStatusModelTests.swift"
+    ],
+    "testNativeJSONImportReportsPrivacyOmissionsAndGuardsBusyState": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testLibrarySwitchPreventsLateRecapAndImportPublicationInOldModel": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testNativeSaveUsesLinkedStorePathAndDoesNotDuplicateWhileBusy": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testDetailWatcherClosesAfterAnotherConnectionErasesOriginal": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testOriginalCardOpensCurrentSourceAndRejectsStaleRevision": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testHistoricalRecapWatcherUsesExactCardsAndClosesWhenAncestorIsErased": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testHistoricalNativeActionsRefuseToModifyOrDeleteCanonicalOwner": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testHistoricalTextSelectionClosesOnExternalErasureAndLibrarySwitchCancelsWatcher": [
+      "Tests/OSwindAppTests/RecapModelTests.swift"
+    ],
+    "testQueryDrainOwnsActualPreQueryTaskUntilItReturns": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testTextRebuildDrainOwnsActualTaskAndSuppressesRetiredStatus": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testFastPreparationDrainOwnsActualTaskAndSuppressesRetiredStatus": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testManualVisualRebuildDrainOwnsActualPreModelTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testAutomaticTextIndexDrainOwnsActualCapturedSourceTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testAutomaticVisualIndexDrainOwnsActualCapturedSourceTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testRetiredTextRebuildCannotStartOrPublish": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testRetiredFastPreparationCannotStartOrPublish": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testRetiredVisualRebuildCannotStartOrPublish": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testRetiredVisualCaptureEventCannotRestartAutomaticIndex": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledQueryDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledTextRebuildDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledFastPreparationDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledAutomaticTextDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledVisualRebuildDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCancelledAutomaticVisualDrainCallerStillJoinsActualTask": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCurrentTextCancellationKeepsBusyUntilActualWorkerReturns": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCurrentFastCancellationKeepsBusyUntilActualWorkerReturns": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCurrentVisualCancellationKeepsBusyUntilActualWorkerReturns": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testCurrentAutomaticVisualCancellationKeepsBusyUntilActualWorkerReturns": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testActiveTextDrainClearsItsStoppingStatusAfterActualReturn": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testActiveVisualDrainClearsItsStoppingStatusAfterActualReturn": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testDrainRejectsEveryNewQueryIndexAndCapturedSourceEntry": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testPrivacyPauseRejectsActualAlreadyReadQueryAcrossErasure": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testPrivacyPauseCancelsPendingNoteBeforeItsActualAdmission": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testPrivacyPauseCancelsPendingAudioBeforeActualClipReservation": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testPrivacyPauseCancelsPendingJSONBeforeActualFileReservation": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testSuccessfulWipeStillOwnsItsActualFreshQueryUntilReturn": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testClosedStoreRetainsActualQueryOwnershipAndRejectsNewWrites": [
+      "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift"
+    ],
+    "testVisualConfigurationCancelsVisualWorkWithoutInterruptingTextIndexing": [
+      "Tests/OSwindAppTests/VisualIndexCoordinationTests.swift"
+    ],
+    "testTextModelChangeStillInterruptsItsOwnIndexWithoutCancellingVisualWork": [
+      "Tests/OSwindAppTests/VisualIndexCoordinationTests.swift"
+    ],
+    "testChangedPowerPolicyCancelsWorkUsingItsEarlierPolicy": [
+      "Tests/OSwindAppTests/VisualIndexCoordinationTests.swift"
+    ],
+    "testScopedErasureCancelsBothVisualReadersReleasesMediaAndPreventsWakeRestart": [
+      "Tests/OSwindAppTests/VisualIndexCoordinationTests.swift"
+    ],
+    "testShortcutFromPeopleReloadsGlobalResultsAfterProjectScopeClears": [
+      "Tests/OSwindAppTests/SearchNavigationTests.swift"
+    ],
+    "testShortcutDropsConversationOnlyFilterWithoutChangingQuery": [
+      "Tests/OSwindAppTests/SearchNavigationTests.swift"
+    ],
+    "testShortcutAlreadyInMemoriesFindsNewSourcesWithoutQueryChange": [
+      "Tests/OSwindAppTests/SearchNavigationTests.swift"
+    ],
+    "testShortcutFromAskPreservesExplicitProjectAndAppFilters": [
+      "Tests/OSwindAppTests/SearchNavigationTests.swift"
+    ],
+    "testExplicitSourceEditingFrameSelectionAndOrderNeverStartNarrationOrWriteHistory": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testOpenSourceLoadsCurrentCompleteHistoryWithoutNarration": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testEightStepBoundAndInvalidScriptsDisableExport": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testMissingHelperLockedAndRetiredLibraryCannotStartWork": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testCancelledNoncooperativePreviewStaysBusyAndDropsLatePixels": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testPrivacyChangeClearsDraftAndRejectsLatePreview": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testExportSnapshotIsImmutableAndCancellationRevokesBeforeCommit": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testAlreadyPublishedExportIsReportedAfterLateCancellation": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testPauseCancelsActiveWorkAndLaterExplicitPreviewDoesNotResumeCapture": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testDeletionDrainsPreviewBeforeErasingSource": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testLibraryErasureJoinsActualPreviewBeforeDeletingHistory": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testRootReplacementDuringPreviewRejectsLateResult": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testPlainQuitJoinsActualExportBeforeTermination": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testLibrarySwitchJoinsPreviewBeforeClosingSQLite": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testCompletedWorkflowPreviewStillOwnsExitForActualHeldQuery": [
+      "Tests/OSwindAppTests/WorkflowModelTests.swift"
+    ],
+    "testQueuedNativeBirthKeepsItsOriginalEraAcrossActualWipeAndReopen": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testObservedFrontierDoesNotRelabelAnExistingNativeUpsert": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testDeleteReinsertCreatesNewEraWithoutRewritingQueuedOldClaim": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testNativeWipeEraAndControlRollBackWithActualWipeTransaction": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testNativeBirthStampRollsBackWithFailedSourceAdmission": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testMissingCollectionTriggerRefusesReinstallWithoutSilentRepair": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testMissedNativeWipeHookCannotLeaveASeeminglyValidOldFrontier": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testAlreadyOpenNativeWriterRecordsActualWipeAndNewBirth": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testExistingNativeRowsBeforeLedgerInstallationRemainLegacyAfterAnEdit": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testRepeatedActualWipesAdvanceButCleanupRetryPreservesCurrentEra": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testQueueAcknowledgementRemovesOnlyItsAssociatedEraClaims": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testFrozenPrior33CLIRecordsWipeAndPostWipeBirthThroughInstalledSQL": [
+      "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift"
+    ],
+    "testCollectionIdentityKeepsQueuedNativeBirthBeforeLearningAnotherWipe": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionNewNativeLifetimeAfterActualWipePublishesItsOwnEra": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionRetiredLifetimeCannotBeRenewedByAClaimedLaterEra": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionFutureEraWaitsBeforeBodyAndUnknownPeerEraRefuses": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionKnownRetirementRequiresAdapterAndRollsBackItsFailedNativeErasure": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionLocalCopyWipeDoesNotPublishDeletionOfSharedPeerHistory": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionPeerLocalFencePreservesIndependentEditsWhileWipedPeerRefusesOldHistory": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionStaleEraCannotRetireAKnownPostWipeNativeLifetime": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testLegacyMissingEraRemainsDistinctFromExplicitEmptyEraInCanonicalWire": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testContentEditsCannotChangeAnExistingLifetimesCreationEra": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testCollectionRetirementRoundTripsWithoutInventingAnAuthoredDeleteDot": [
+      "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift"
+    ],
+    "testLibraryWipeRejectsPreviouslyUnseenOfflineSourceBeforeItsBodyIsRequested": [
+      "Tests/OSwindCoreTests/SyncCollectionBarrierTests.swift"
+    ],
+    "testSupersessionKeepsOldHeaderAndRecoversExactSuccessorAcrossRestartWithoutOldBody": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testSupersessionRejectsConflictingFutureProofAndLeavesItsEarlierCheckpoint": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionUnreviewedClearRequiresLatestExactCutoffAndSurvivesReopen": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionReviewedControlPrecedesPeerDeletionAndDuplicatePreservesLaterSource": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionApprovedErasePublishesOldHeaderWithoutItsPrunedBody": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testOrdinaryDeletionPublishesBarrierBeforeUnavailableOldBodyWithoutGroupControl": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionPurposeAuthenticationOrderAndReplayDoNotInventForeignWipes": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionControlPassesFullOrdinaryPendingQueueAndItsFailedAdapterRollsBack": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionSenderPolicyFailureDoesNotPublishARecordOrItsBody": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionDisabledOwnerCannotPublishEvenOpaqueDeletionHeaders": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionDisabledOwnerCannotApplyAnAuthenticatedPeerControl": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionReplacedOrSuppressedOwnerCannotPublishPreparedPackets": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionReplacedOrSuppressedReceiverCannotRetireAndActiveRetryWorks": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionFinalAdmissionCannotExportAfterItDeactivatesTheOwner": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionFinalAdmissionCannotExportAfterReentrantNativeSourceRetirement": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionFinalAdmissionCannotPublishRecapAfterItsExactEvidenceIsRetired": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionFailedFinalAdmissionRollsBackItsOwnedMutationAndAllowsAnExactRetry": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testCollectionGraphHeaderRechecksEarlierOwnersAfterEveryPolicyCallback": [
+      "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift"
+    ],
+    "testTransportV2RefusesAuthenticatedLegacyV1SpaceWithoutChangingIt": [
+      "Tests/OSwindCoreTests/SyncTransportCompatibilityTests.swift"
+    ],
+    "testTransportV2DoesNotProvideTheMarkerRequiredByThePriorV1Reader": [
+      "Tests/OSwindCoreTests/SyncTransportCompatibilityTests.swift"
+    ],
+    "testActualSchema25GraphKeepsBodiesCurrentBindingsAndJournalThroughMigration": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testPendingLegacyCitationFrameSurvivesAndProcessesWithExactNewScore": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testFullLegacyQueueRefusesUpgradeWithoutLosingItsOriginalFrameOrBindings": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testMissingLegacyCaptureProtectionRefusesRatherThanRepairingItDuringUpgrade": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testAlreadyOpenOlderReaderCannotJoinHistoricalCitationToCurrentTextAndWriterRefuses": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testMalformedLegacyPendingFrameRefusesWithoutPartialMigration": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testExisting26CitationColumnsDoNotExcuseMissingForeignKeyProtection": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testColdPinRepairKeepsExactVersionAndLifetimeWithoutOutgoingEcho": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testColdPinRepairHonorsPendingDeleteAndRecreateInsteadOfResurrectingOldLifetime": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testColdPinRepairUsesQueuedInsertBeforeIdentityCatalogExists": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testColdPinRepairKeepsActualPostWipeBirthAndPreparedVersionWithoutEcho": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testColdPinRepairCannotReinstallAnUnrelatedMissingCollectionHook": [
+      "Tests/OSwindCoreTests/CitationMigrationTests.swift"
+    ],
+    "testStartedObserverPrecedesStdinAndNativeCancellationStillFinishesAndReaps": [
+      "Tests/OSwindCoreTests/VaultProcessStartTests.swift"
+    ],
+    "testLaunchFailureDoesNotPublishAStartedEvent": [
+      "Tests/OSwindCoreTests/VaultProcessStartTests.swift"
+    ],
+    "testAlreadyCancelledOperationDoesNotPublishAStartedEvent": [
+      "Tests/OSwindCoreTests/VaultProcessStartTests.swift"
+    ],
+    "testInputClosedObservationHasDeliveredCredentialsBeforeNativeCompletion": [
+      "Tests/OSwindCoreTests/VaultProcessStartTests.swift"
+    ],
+    "testCompleteWipeIncludesOrphanFilesAndNestedDirectoriesAndCounts": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testUnsafeOrphanIsDurableAndRetryPreservesNewMedia": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testCancellationDuringInventoryRollsBackWithoutRemovingFiles": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testCancellationAfterCommitKeepsQueueAndReportsActualDeletion": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testPartialMediaCancellationReturnsCommittedCountsAndCanResume": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testActiveMediaWriterDelaysWipeWithoutBlockingDatabaseReads": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testActiveReaderMakesCompactionExplicitAndRetryable": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testSymlinkBucketFailsBeforeLogicalDeletionAndPreservesTarget": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testChangedLibraryRootCannotWipeAnUnrelatedReplacementDirectory": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testRootReplacementAfterCommitPreservesReplacementAndDurableQueue": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testMediaLockSymlinkIsRefused": [
+      "Tests/OSwindCoreTests/LibraryWipeTests.swift"
+    ],
+    "testLogicalWipeRequiresOwningTransactionAndActiveExclusiveLibraryLease": [
+      "Tests/OSwindCoreTests/LibraryWipeStagingTests.swift"
+    ],
+    "testLogicalWipeRollsBackNativeGraphAndInventoryWithoutRemovingFilesOrAuthoringIntent": [
+      "Tests/OSwindCoreTests/LibraryWipeStagingTests.swift"
+    ],
+    "testCommittedLogicalWipeLeavesDurableCleanupAndRetryPreservesLaterMediaWithoutLocalIntent": [
+      "Tests/OSwindCoreTests/LibraryWipeStagingTests.swift"
+    ],
+    "testNativeCollectionPrimitivesRefuseUnownedTransactionsAndLiveNativeKeyRetirement": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionTests.swift"
+    ],
+    "testNativeCollectionRetiresThirteenKindsRawStagedOriginalsAndOrphansWithoutEcho": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionTests.swift"
+    ],
+    "testNativeCollectionFailureRollsBackReceiptRegistersQueuesAndNativeMediaThenRetries": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionTests.swift"
+    ],
+    "testNativeCollectionOlderAndRepeatedControlsPreserveLaterLifetimesAndFreshMedia": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionTests.swift"
+    ],
+    "testNativeCollectionRetiresCompletedRealPublicationBindingAndPreservesPeerCursor": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionOriginalTests.swift"
+    ],
+    "testNativeCollectionAfterLocalWipeRetiresInvalidatedPublicationQueueWithoutApprovingOwnWipe": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionOriginalTests.swift"
+    ],
+    "testNativeCollectionErasesUnpreparedNativeArchivedOriginalAndItsDependents": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionOriginalTests.swift"
+    ],
+    "testNativeCollectionDeathBeforeCommitPreservesWholeLibraryAndNoReceipt": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionCrashTests.swift"
+    ],
+    "testNativeCollectionDeathAfterCommitPreservesReceiptRetirementAndCleanupInventory": [
+      "Tests/OSwindCoreTests/SyncNativeCollectionCrashTests.swift"
+    ],
+    "testServiceTransfersRealThirteenKindGraphWithoutCallerSuppliedPolicyOrMediaHooks": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceTransfersActualImageBytesAndRefusesChangedContentAddress": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceCurrentSavedPrivacyDeniesSecretAndExcludedBrowserBeforePublication": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceRestartUsesDurableSendAndReceiveCursorsAndInvalidatesOldWorker": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceRejectsAuthenticatedHeadRollbackAndYieldsRemoteEraseBeforeExport": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceTransfersRealAudioAndVideoAndHonorsIndependentReceiverRetention": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceMediaStreamsAcrossChunkBoundaryAndFailedAdoptionLeavesNoNativeSource": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceSchedulerOwnsBackgroundDeliveryAndStopJoinsWorker": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceSenderSettingsFencePreventsProviderWriteAfterPolicySave": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServicePolicyChecksContentOfEveryKindWithoutTreatingNumericIdentityAsSecret": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceRefusesNativeLibraryInSharedSpaceAndSpoolOutsideWipeInventory": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceReopensBothLibrariesAndEncryptedSpoolsAfterPartialGraphDelivery": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceDiscoversDelayedDeclarationAfterCursorProgressWithoutAnotherPeerOperation": [
+      "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift"
+    ],
+    "testServiceRenewalRequiresActualNativeErasureInsteadOfGenericControlReceipt": [
+      "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift"
+    ],
+    "testServiceRenewalInvalidatesNativeCompletionWhenAnotherPeerOnlyRecordsGenericRetirement": [
+      "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift"
+    ],
+    "testServiceNativeCompletionConsumptionAndPublicationRenewalRollBackTogether": [
+      "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift"
+    ],
+    "testServiceLocalClearInvalidatesPriorReceivedNativeCompletion": [
+      "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift"
+    ],
+    "testServiceNativeCompletionSQLHooksInvalidateRawFrontierChangesAndRefuseMissingProtection": [
+      "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift"
+    ],
+    "testServiceWithheldSourceDoesNotStarveHealthyRowsOrInventPeerSequenceGaps": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceSavedPolicyReviewReleasesHeldSourceAndDeletionRecreationKeepsNewLifetime": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceHeldWorkSurvivesLibraryReopenAndNativeEditWakesItWithoutPolicyToggle": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServicePeerPutCannotOverwriteHeldNativeEditButAuthenticatedDeletionWins": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceSourceErasureCompletesBeforeConflictingIndependentHeldMetadata": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceHeldNativeErasurePermitIsConnectionScopedAndClearsAfterThrow": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceNetworkPausePreparesLocallyWithClosedTransportAndResumesWithoutLostRows": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceWithheldBudgetFailureDoesNotAcknowledgeOrLoseNativeWorkAndCanRecover": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceSchedulerContinuesLocalPreparationDuringPeerPrivacyConflict": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServiceSchedulerNetworkPauseJoinsRemoteWorkWhileLocalCaptureKeepsDraining": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testServicePolicyReviewUsesPersistedFinitePagesAcrossRestartAndNewArrivals": [
+      "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift"
+    ],
+    "testSessionOwnerSuspendsAllProcessingAndResumesActualThirteenKindDelivery": [
+      "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift"
+    ],
+    "testSessionOwnerPushStreamFinishesAfterJoinedStopWithoutAnotherWorker": [
+      "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift"
+    ],
+    "testSessionOwnerConcurrentSuspendNetworkChangeAndStopNeverRestartsWorker": [
+      "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift"
+    ],
+    "testSessionOwnerCancellingOneStatusConsumerDoesNotStopDeliveryOrOtherConsumers": [
+      "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift"
+    ],
+    "testActualSyncWorkerOwnsCancelledDrainUntilSQLAndMediaLeaseReturn": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testActualOwnerSuspendsForOnboardingAndResumesOnlyItsPreparedConnection": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testActualOwnerNetworkPauseKeepsLocalPreparationWithoutCaptureOrAPI": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testActualWipeWaitsForSyncThenClearsHistoryWithoutRevivingTheOldSession": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPlainQuitJoinsActualSyncWorkerBeforeReplying": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testLibrarySwitchJoinsActualSyncBeforeClosingItsStore": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPreparedSessionCannotAttachToAnotherNativeLibrary": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPairingDeliversExactSignedMembershipOnlyToJoiningMac": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testOwnerMustAdmitExactRequestBeforeProducingResponse": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testWrongFingerprintRecipientAndRequestCannotAcceptResponse": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testRequestProofOfPossessionBindsIdentityNameKeysAndCapabilities": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testRequestExpiryFutureTimeAndUnsafeNamesAreRejected": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testResponseExpiryCannotBeBypassedWithPreviouslyValidCiphertext": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testMembershipSignatureBindsRootGroupEpochOwnerHistoryAndDevices": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testMembershipRejectsAlternateHistoryAndSkippedRevisions": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testResponseSignatureBindsCiphertextEphemeralKeyAndExactRequest": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testCanonicalMessagesRejectUnknownFieldsWhitespaceTruncationAndOversize": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testMembershipBoundAndDistinctDeviceKeysHoldAtCapacity": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testDistinctReplicaCannotReuseAnExistingDevicesPrivateKeys": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testPrivateAuthorityPendingAndJoinedValuesHaveRedactedDiagnostics": [
+      "Tests/OSwindCoreTests/SyncPairingTests.swift"
+    ],
+    "testSignedSpaceHasOnlyV3MarkerAndCannotAdoptLegacySpace": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testSignedOperationAndFullChunksRoundTripWithoutPlaintextHeaders": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testMemberCannotPublishAnotherDevicesOperationsHeadsControlsOrProofs": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testGroupKeyAloneCannotForgeOperationControlHeadOrSupersession": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testCrossDeviceSupersessionRequiresActualSuccessorSignature": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testSameDeviceSupersessionRetainsAuthenticatedEmbeddedFallback": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testDevicePacketBindsEveryAuthorityDimensionAndRejectsTampering": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testJoinedDevicesRunActualNativeServiceOverSignedTransport": [
+      "Tests/OSwindCoreTests/SyncSignedFolderTests.swift"
+    ],
+    "testSignedServiceReopensPartialThirteenKindGraphAndPreservesOriginalCitations": [
+      "Tests/OSwindCoreTests/SyncSignedServiceTests.swift"
+    ],
+    "testPreparationOwnsLibraryBeforeInstallAndJoinsLateSessionOnCancelledExit": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testCancelPreparationKeepsAdmissionClosedUntilLateResultHasStopped": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPreparationAdoptsOnlyCurrentAllowedLibraryAndPreservesSuspensionIntent": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPreparationRechecksPrivacyAdmissionBeforeAttachingLateResult": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPreparationErrorIsSanitizedAndCanBeRetried": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testPreparationDoesNotRetainAbandonedOwnerAndStillStopsLateSession": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ],
+    "testOverlappingPreparationDrainsBothWaitForActualLateCleanup": [
+      "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift"
+    ]
+  },
+  "retainedPreflightBuildFailures": [
+    ".artifacts/sync-preparation-preflight-01.log",
+    ".artifacts/sync-preparation-preflight-02.log"
+  ],
+  "preflightFailureScope": "Fixture compilation during development: duplicate local names and helper access level; corrected before source qualification. Original failed logs retained.",
+  "extraOwnerQualifiedBackendControls": [
+    "-[OSwindCoreTests.SpeechRecognitionTests testLegacySettingsDefaultToWhisperAndPartialNativeSettingsDecode]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMissingModelsFailLocallyWithoutCreatingCache]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testModelReuseConfigurationChangeAndExplicitUnload]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testFIFORequestsNeverEnterBackendConcurrently]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testQueuedCancellationDoesNotTranscribeAndReleasesNextRequest]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringModelLoadNeverCachesOrTranscribesCandidate]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringInferenceDiscardsResultAndQueueRemainsUsable]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMalformedBackendOutputCannotEscapeValidation]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testOverdueInferenceCannotReturnTextAndReleasesQueue]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testInvalidBudgetCannotLoadOrTranscribe]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testDisabledUnsupportedAndInvalidModelsNeverLoad]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testResidentReuseAndUnload]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testRawTimelineAndWordAttributionShareResidentBackend]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testNoDetectedSpeechIsEmptyButActualFailuresStillThrow]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testQueuedCancellationAndInferenceCancellationDoNotReturnLabels]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testCancelledModelLoadIsNotReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testOverdueResultsAreDiscardedAndRuntimeCanBeReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testPLDAParametersAreBoundedTypedAndFinite]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testSpeakerRenamesPersistAndRefuseMergesMissingRecordsAndSecrets]"
+  ],
+  "nativeMethods": [
+    "-[OSwindAppTests.LibraryOpeningTests testNativeVaultLockDuringPreparationClosesLateStoreAndDetaches]",
+    "-[OSwindAppTests.VaultSessionTests testBrokenReservedVaultCannotCreatePlaintextFromExplicitEnvironment]",
+    "-[OSwindAppTests.VaultSessionTests testManagedSelectionCreatesLockedScreenWithoutLoadingCredentialOrStore]",
+    "-[OSwindAppTests.VaultSessionTests testNativeBusyReaderRemainsClosingUntilRetry]",
+    "-[OSwindAppTests.VaultSessionTests testNativeCancelledSetupKeepsOriginalSelectedAndQuiet]",
+    "-[OSwindAppTests.VaultSessionTests testNativeChangedSourceSnapshotDoesNotSwitchOrLockTheOriginal]",
+    "-[OSwindAppTests.VaultSessionTests testNativeCopySwitchLockUnlockAndFallbackPreserveOriginal]",
+    "-[OSwindAppTests.VaultSessionTests testNativeExternalLockEventClearsHistoryAndClosesTheExistingStore]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualCommittedAudioImportAndRetainsItsBytes]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsActualDecoderAndClipBeforeAudioAdmission]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedNoteWithoutLosingIt]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAlreadyCommittedRecapWithoutLosingIt]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerAfterActualCommittedTurn]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsAnswerBeforeConversationAdmission]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsImportsBeforeReservationAndAfterSettingsCapture]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsPendingMediaWorkerAfterActualCleanupCommit]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockJoinsUnreservedPendingMediaWorkerBeforeSQL]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActiveHistoricalValidation]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualAutomaticTextIndexTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualAutomaticVisualIndexTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualFastPreparationTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualQueryTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualSelectedMetadataReader]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualSourceHydration]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualTextRebuildTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedNoteWorker]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedRecapWorker]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStatisticsWorker]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualUnreservedStorageWorker]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForActualVisualRebuildTask]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedDeletionWorkerAndPreservesSource]",
+    "-[OSwindAppTests.VaultSessionTests testNativeLockWaitsForUnreservedMaintenanceWorkerAndPreservesSource]",
+    "-[OSwindAppTests.VaultSessionTests testNativeMovedPackageUpdatesSelectionAndLocksWithoutPlaintextFallback]",
+    "-[OSwindAppTests.VaultSessionTests testNativeSessionLockAtStartupDetachesWithoutOpeningHistory]",
+    "-[OSwindAppTests.VaultSessionTests testNativeSessionLockFallbackStopsAndDetachesWithoutAWorkspaceEvent]",
+    "-[OSwindAppTests.VaultSessionTests testNormalTerminationAwaitsCancelledSetupBeforeReturning]",
+    "-[OSwindAppTests.VaultSessionTests testQuitDelegateReturnsToTheRunLoopUntilVerifiedLockCompletes]",
+    "-[OSwindCoreTests.NativeVaultActivityCalendarTests testRetainedCalendarValueCannotPinEncryptedDeviceOrQueryClosedStore]",
+    "-[OSwindCoreTests.NativeVaultCancellationTests testCancellationDuringMediaDrainStillClosesStoreAliasAndOwnedImage]",
+    "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedCreateKeepsClosedEncryptedSetupAndCanResume]",
+    "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedLockFinishesVerifiedDetachBeforeReturningWithHistoryIntact]",
+    "-[OSwindCoreTests.NativeVaultCancellationTests testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory]",
+    "-[OSwindCoreTests.NativeVaultCollectorTests testCollectorAdmissionAndReopenPreserveEncryptedHistoryWithoutPlaintextFallback]",
+    "-[OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtFirstCollectorLockRetainsPhaseAndRecoversNormally]",
+    "-[OSwindCoreTests.NativeVaultCollectorTests testKnownHeldReaderAtSecondCollectorLockRetainsPhaseAndRecoversNormally]",
+    "-[OSwindCoreTests.NativeVaultDetachSettlementTests testKnownHeldReaderCapturesBusyExitAndPreservesHistoryUntilNormalRecovery]",
+    "-[OSwindCoreTests.NativeVaultDetachSettlementTests testRapidNativeLockUnlockKeepsHistoryAndIndependentlyConfirmsNoAttachment]",
+    "-[OSwindCoreTests.NativeVaultDetachSettlementTests testReleasedNativeReaderRecoversWithinOneLockRequestWithoutForce]",
+    "-[OSwindCoreTests.NativeVaultImportPreparationTests testSettingsAndImportReservationsReleaseBeforeVerifiedDetach]",
+    "-[OSwindCoreTests.NativeVaultMigrationTests testCancellationDuringCopyClosesHandleAndDetachesWithoutRemovingOriginal]",
+    "-[OSwindCoreTests.NativeVaultMigrationTests testChangedSourceIsReportedAndOriginalIsRetained]",
+    "-[OSwindCoreTests.NativeVaultMigrationTests testHistoryMediaVectorsChatsSettingsAndOriginalSurviveCopy]",
+    "-[OSwindCoreTests.NativeVaultQueryRecoveryTests testOwnedVaultRecoversOneRealHelperSIGINTForEachReadOnlyOperation]",
+    "-[OSwindCoreTests.NativeVaultQueryRecoveryTests testRepeatedInterruptsRefuseStatusAfterTwoCallsAndPermitOrdinaryRecovery]",
+    "-[OSwindCoreTests.NativeVaultTests testMissingOrUnencryptedImageCannotReportAProtectedLockedLibrary]",
+    "-[OSwindCoreTests.NativeVaultTests testMovedAttachedPackageRemainsVisibleAndCanCloseThroughRetainedDirectory]",
+    "-[OSwindCoreTests.NativeVaultTests testOptionalCredentialLifecycleUsesVerifiedPassphraseAndPreservesFallback]",
+    "-[OSwindCoreTests.NativeVaultTests testOwnedEncryptedVolumeAndSQLiteTemporaryPolicies]",
+    "-[OSwindCoreTests.NativeVaultTests testUnmountedImageIsNotCryptographicallyLockedUntilBackingDeviceDetaches]",
+    "-[OSwindCoreTests.NativeVaultVisualIndexTests testEncryptedVisualSnapshotsReleasePinsAndDescriptorsBeforeVerifiedDetach]",
+    "-[OSwindCoreTests.NativeVaultWorkflowExportTests testOwnedWorkflowExportReleasesMountedFilesBeforeNormalLockAndRetainsHistory]",
+    "-[OSwindCoreTests.SnapshotAdmissionTests testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach]",
+    "-[OSwindAppTests.PersonalSyncLifecycleTests testNativeVaultLockJoinsActualSyncBeforeDetachingOwnedImage]",
+    "-[OSwindAppTests.PersonalSyncLifecycleTests testNativeVaultLockJoinsPendingSetupBeforeClosingItsLateSession]"
+  ],
+  "nativeExternalObservation": {
+    "command": [
+      "hdiutil",
+      "info",
+      "-plist"
+    ],
+    "returncode": 0,
+    "ownedImagePrefix": "owned-sync-app-",
+    "ownedImagesStillAttached": [],
+    "unrelatedImagePathsRetained": false,
+    "scope": "Post-suite attachment observation for owned sync lifecycle fixtures only; not all user images or device acceptance."
+  },
+  "stages": [
+    {
+      "stage": "full-debug",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "tests": {
+        "defined": 2482,
+        "passed": 2355,
+        "skipped": 127,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 514,
+      "logSHA256": "9b6aad014b02fc90097dc0f4cc4f4bc7a420e56cea83cf06b1c16732fb2c56f7",
+      "wallSeconds": 596.4681242078077,
+      "trackedInputsUnchanged": true,
+      "raceWarning": false
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "tests": {
+        "defined": 1368,
+        "passed": 1295,
+        "skipped": 73,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 514,
+      "logSHA256": "b57417fa03046bc944af7742139ca197a0d8a575d6f4063fcb9895cbdb75751c",
+      "wallSeconds": 758.5263291250449,
+      "trackedInputsUnchanged": true,
+      "raceWarning": false
+    },
+    {
+      "stage": "optimized",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "tests": {
+        "defined": 1368,
+        "passed": 1295,
+        "skipped": 73,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 514,
+      "logSHA256": "d1f9c6aa209dd680bdff4e3c13ff6c64bc0ebe1425ec175ab2cbb82f98ba62be",
+      "wallSeconds": 455.7265552501194,
+      "trackedInputsUnchanged": true,
+      "raceWarning": false
+    },
+    {
+      "stage": "native",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "tests": {
+        "defined": 64,
+        "passed": 64,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 64,
+      "logSHA256": "00c0ffeac92e6d973008d06d62202764fde8dde6ba5f616a56a5902fc0c36209",
+      "wallSeconds": 437.7370570830535,
+      "trackedInputsUnchanged": true,
+      "raceWarning": false
+    }
+  ],
+  "independentFixtures": [
+    {
+      "stage": "full-debug",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/full-debug/signed-reopened-all13-05509915-792e-4c07-9dfe-257f235f1f13",
+      "inputSHA256": {
+        "fixture.json": "f6c12929ac85ebd189844c5af9afcd23c8a315bab17f998b4d8963543fcbeee9",
+        "receiver.sqlite": "537097c2e3a76b8a1b7e11c0ed248d03617d7cb682280e99cc3f36e27b45269a",
+        "producer.sqlite": "446f090812bda85525671dd40c57928ac3085fd9e67a58191ece31bd3d9b7e8c"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "full-debug",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/full-debug/reopened-all13-4b153176-91b7-4b49-8c8b-6e4103fb4978",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "4d9cb1e8ba92f8ceb4fabaa5541907986f842b93e113a6dd60e8ae43e825e114",
+        "producer.sqlite": "6633c1c5992281b7fe449cea57dd4aba69cab631c1bacbfaf3c3210d4eb0626d"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/thread-sanitizer/signed-reopened-all13-6150ddeb-59dd-4a93-a52b-8669469eb790",
+      "inputSHA256": {
+        "fixture.json": "92e7d969218671b033ac3326414cf0cb7cf929f1d0fe5017248b1b98975b01f4",
+        "receiver.sqlite": "5e53c7e3838e9bc29906ea1f4f50a2669e470c32c5a51cf4d22ea399216db31a",
+        "producer.sqlite": "6f123ee49bf1f0559ac3938b31a2c802b41ea0f9307389dc48b09fa5e809ccdf"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/thread-sanitizer/reopened-all13-b2b75c42-9062-4819-98d9-3cb1d0ef4236",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "17067d89c872049281f7609d627a92a47899f1740283dd9c333f9aa76f8f3841",
+        "producer.sqlite": "e9f296e94a0cfebc9c76f8f1d85b937a84cdddf18656af4465a79cf4d8ff29ec"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/optimized/reopened-all13-04e3a9eb-f8a6-485a-bdd7-0e23c107792c",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "47bc325641d4c01a3092f9604f2691b14e134445da6cb3007316a5fcac473881",
+        "producer.sqlite": "65ea6957c330980620c7e846ca3a41a210d2a9e1debfa8f6b778ad5e0454ebde"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "22e82799553c50d485d5872724c3cf8b03ca4f7d",
+      "fixture": ".artifacts/sync-pairing-v2/fixtures/optimized/signed-reopened-all13-193ee8c7-bdb5-443c-af4a-92b2880fdf88",
+      "inputSHA256": {
+        "fixture.json": "8250902d7070be7e4b4923ddb2c6b91dcd3576af8f837103efcf9363bb03a5b0",
+        "receiver.sqlite": "884b3ba9f678a635de9b4fe71ec2c3de7aa35904cb2be5c64280e3753a553018",
+        "producer.sqlite": "81dde46787216ed3b222858183212aa79e9974eae8b85dac835d323f0326a662"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    }
+  ],
+  "fixtureReviewSHA256": "e02a3d914c5e7e0c3cf94a2fe5872ebb5a1aefbc0854f1a6bad958de35a3e668",
+  "limits": [
+    "Internal signed pairing/v3 transport and asynchronous setup ownership only. Public enrollment, Keychain binding and pending-request consumption, device refresh/recovery/revocation/rotation, old-writer admission and external rollback authority remain unfinished.",
+    "Received group erase is surfaced, but the full producer-drain/application/renewal user workflow remains open.",
+    "Software and owned native APFS tests are not signed-GUI/input, real provider/two-Mac, sustained power, notarized distribution, complete feature parity or ranking acceptance.",
+    "Cold offline opening, raw capture overflow/reconciliation, assigned denied operations, storage pressure, large resumable graphs and selective spool/backup semantics remain open.",
+    "Fresh immutable fixture review covers three signed and three legacy graphs. No new package qualification or replay of frozen successful readers; prior app trees and successful reviews remain independent evidence. PR136 missing-vault-session cause remains unresolved."
+  ]
+}

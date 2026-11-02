@@ -2,6 +2,8 @@
 
 The app now owns a prepared `PersonalSyncSession` across Quit, workspace changes, encrypted lock and local wipe. The app-facing actor exposes progress and pause/stop controls; it has no public constructor and exposes no group key, peer list, wire record or erasure authority. Public enrollment is still unfinished. F059 remains TODO.
 
+[Signed pairing and setup ownership](SYNC-SIGNED-PAIRING.md) now extend this checkpoint: setup itself is owned before Core installation, rejected late sessions stop before storage departure and overlapping drains retain admission until cleanup finishes. The qualification below preserves its original source; the linked newer receipt includes the additional preparation/signature tests.
+
 `PersonalSyncModel` serializes configuration requests, coalesces obsolete intents and owns the status consumer and shared terminal stop. Retirement closes admission synchronously. The existing AppModel/AppSession departure paths await actual sync work before SQLite close, wipe or vault detach. A canceled drain caller still waits. Local wipe leaves the old session terminal; reconnection requires a freshly prepared session and its applicable authority checks.
 
 Status uses a bounded push stream, without UI polling or a forwarding worker. Canceling one observer does not cancel other observers or the service. Idle identical states do not invalidate the UI. The Connect section displays native status and network pause/resume for a prepared session. Public setup and enrollment still require their own workflow.
@@ -10,7 +12,7 @@ Network pause joins provider work while local preparation continues. Processing 
 
 Tests hold actual native SQL and positively observe the sync tick's shared media lease with an exclusive-probe refusal. Quit, switch, canceled drains and wipe must wait for that actual tick. An owned APFS lock test keeps the image attached while sync is blocked, then checks SQLite close, image detach and source preservation after reopening. The fixtures use the actual service workers and production policy/media adapters.
 
-Remaining: public create/join, device membership/signatures/capabilities, key recovery/revocation and rollback authority; received group-erase producer-drain/application/renewal UI; cold offline binding, raw-queue overflow/reconciliation, assigned denied immutable operations, storage pressure, resumable large graphs, selective spool GC and backup semantics; physical provider/two-Mac, live UX, sustained power and notarized distribution. Prepared-session ownership is not complete public sync or a whole-product parity/ranking result.
+Remaining: public create/join, persisted Keychain/membership freshness, enrolled old-writer capability fencing, key recovery/revocation/rotation and external rollback authority; received group-erase producer-drain/application/renewal UI; cold offline binding, raw-queue overflow/reconciliation, assigned denied immutable operations, storage pressure, resumable large graphs, selective spool GC and backup semantics; physical provider/two-Mac, live UX, sustained power and notarized distribution. Prepared-session ownership is not complete public sync or a whole-product parity/ranking result.
 
 ## Source-bound verification
 
@@ -22,4 +24,4 @@ These results qualify source code and owned APFS fixtures. They include no new p
 
 ## Previous published-head CI
 
-[Completed hosted CI at `f6dd459`](../benchmarks/sync-library-service-hosted-f6dd-v1.json) passes both jobs: full **2,311 / 129 skips**, native **62 / no skips** and named clipboard **3 / no skips**. All 81 native-job steps succeed and the actual merge checkout tree equals the published head. This qualifies the preceding `dd68dfa` runtime, not the app-owner source above. The unchanged missing-image case passes here; PR136's separate missing-vault-session failure remains causally unresolved.
+[Completed hosted CI at `153f881`](../benchmarks/sync-app-owner-hosted153f-v1.json) passes both jobs: full **2,322 / 130 skips**, native **63 / no skips** and named clipboard **3 / no skips**. All 81 native-job and 16 benchmark-job steps succeed. Actual merge checkout `386a8e3` has the same tree as published head `153f881`. This qualifies the `71c4c04` app-owner runtime, not the subsequent signed-pairing/setup source `85d4dd1`. [Earlier `f6dd459` CI](../benchmarks/sync-library-service-hosted-f6dd-v1.json) remains separate history. The unchanged missing-image case passes here; PR136's missing-vault-session failure remains causally unresolved.

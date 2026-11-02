@@ -1,0 +1,57 @@
+{
+  "format": "OSwind.sync-app-owner.hosted.v1",
+  "state": "passed",
+  "pr": 138,
+  "publishedHead": "153f8816de90212e0ec0fb019917bdf6014003c5",
+  "qualifiedRuntime": "71c4c04abc9bbb72df4ed2dc110c5de6710e2c05",
+  "actualMergeCheckout": "386a8e3fe849a7044a54979db8c4b9f3f0234c9c",
+  "tree": "b40584b79dfeba85a5438ea8a0da4d6a6751bdac",
+  "mergeTreeEqualsPublishedHead": true,
+  "runID": 41472715351,
+  "runAttempt": 1,
+  "jobs": [
+    {
+      "id": 125370206322,
+      "name": "benchmark-harnesses",
+      "conclusion": "success",
+      "steps": 16,
+      "allStepsSuccess": true
+    },
+    {
+      "id": 125370207313,
+      "name": "native",
+      "conclusion": "success",
+      "steps": 81,
+      "allStepsSuccess": true
+    }
+  ],
+  "fullTests": {
+    "defined": 2452,
+    "passed": 2322,
+    "skipped": 130,
+    "failures": 0
+  },
+  "namedClipboard": {
+    "passed": 3,
+    "skipped": 0,
+    "failures": 0
+  },
+  "nativeTests": {
+    "passed": 63,
+    "skipped": 0,
+    "failures": 0
+  },
+  "logBytes": 9489706,
+  "logSHA256": "816a4695515080716f6ece71c4217edea14bea4b4ee4330f59ae5ffe52ec8f07",
+  "evidence": {
+    "pr138-153f-connector-jobs.json": "86a24a76a8410bd2592608fc5606344b6f6134797db7b66fd3363412905cc35d",
+    "pr138-153f-merge.json": "de688d7f18ebe75e96d04e7e9833a451eb31150a0a109444a32d712f6465b627",
+    "pr138-153f-head.json": "a271792c22d9c8afee7a390911393519f3d1a69c84c3ae5dfee45321f40ca465",
+    "pr138-153f-run.json": "011aab590f65bc62521b0585db5c4788bb5133e064fd0aed6031f3fa463d2f78"
+  },
+  "limits": [
+    "This completed hosted run qualifies the previously published153f head and app-owner71c4 runtime, not signed pairing/setup source85d4dd1.",
+    "The unchanged missing-image case passes in this separate run. PR136 missing-vault-session failure remains causally unresolved.",
+    "No public enrollment, actual user Keychain/provider/two-Mac, sustained power, whole-product parity, top-three ranking or notarized-distribution acceptance."
+  ]
+}

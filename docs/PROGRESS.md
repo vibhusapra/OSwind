@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Signed pairing and asynchronous setup — internal WIP
+
+[Signed pairing and transport](SYNC-SIGNED-PAIRING.md) now bind device identity and the exact capability floor to root-signed membership, encrypt a reviewed response to the joining device and verify signatures for operations, erase controls, heads and supersession proofs. A shared group key cannot impersonate another member. V3 installs no legacy marker; cross-device embedded successors require the original device's packet. The app owns setup before native installation and joins ignored cancellation, abandoned owners and late sessions before departure.
+
+Source `22e8279` binds [all 1,463 tracked inputs](../benchmarks/sync-pairing-inputs-v1.json) and the [qualification receipt](../benchmarks/sync-pairing-v1.json). Full debug: **2,355 passed / 127 skipped**. Selected Thread Sanitizer: **1,295 passed / 73 skipped**; optimized: **1,295 passed / 73 skipped**. All **514 required regular methods**, including **29 new regular cases**, plus 19 additional backend controls pass in each software mode with no race warning. The native stage passes **64 methods without skips**, including the new setup-held APFS lock case. An independent post-suite attachment check finds no owned sync images attached. Six fresh immutable readers inspect reopened all-kind fixtures: three v3 signed and three legacy v2, each with 21 exact native wire bodies, original/native citation joins, contiguous cursor 21, one answer binding and no echo. The immutable readers verify SQLite content; adversarial current-source tests exercise signatures. These are owned software/native fixtures, with no new packaged app/signing, actual Keychain, user clipboard, physical two-Mac/provider, energy or distribution acceptance.
+
+Public enrollment, persisted Keychain and rollback authority, member refresh/recovery/revocation/rotation, old-writer admission and received-erase application remain open, along with offline/storage/large-graph and real-device/power/distribution acceptance. **F059 stays TODO; all 83 feature statuses remain unchanged.** Previous source-bound checks below remain historical evidence.
+
 ## Prepared sync in the actual app — ownership verified
 
 [App ownership](SYNC-APP-OWNER.md) now joins actual sync processing and metadata closure through Quit, library switch, local wipe and encrypted lock. Onboarding/sleep suspension stops the whole tick; network pause continues local preparation. Status uses a bounded push stream without UI polling or another forwarding worker. A prepared session has no public constructor and exposes no keys, peer configuration or erasure authority. Default startup creates no sync worker.
