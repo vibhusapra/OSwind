@@ -5,7 +5,7 @@ import XCTest
 @MainActor final class RecapModelTests:XCTestCase {
     var root:URL!,app:AppModel!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString);app=try AppModel(root:root,startServices:false)}
-    override func tearDownWithError() throws {app.prepareForLibrarySwitch();app=nil;try? FileManager.default.removeItem(at:root)}
+    override func tearDown()async throws {app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();app=nil;try? FileManager.default.removeItem(at:root)}
     func source() throws -> Memory {let m=Memory(id:"parent",bundleID:"com.oswind.fixture.original",title:"Original",text:"Maya owns release.");try app.store.insert(m);return m}
     func answer(_ m:Memory)->Answer {.init(text:"Maya owns release [1].",sources:[.init(memory:m,score:1,match:"fixture",passage:PassageRange(start:0,length:4))],provider:"fixture",duration:0)}
     func testNativeJSONImportReportsPrivacyOmissionsAndGuardsBusyState() async throws {

@@ -5,7 +5,7 @@ import XCTest
 @MainActor final class SourceOpeningTests:XCTestCase {
     var root:URL!,app:AppModel!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString);app=try AppModel(root:root,startServices:false)}
-    override func tearDownWithError() throws {app.prepareForLibrarySwitch();app=nil;try? FileManager.default.removeItem(at:root)}
+    override func tearDown()async throws {app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();app=nil;try? FileManager.default.removeItem(at:root)}
     func preview(_ id:String="audio") throws -> Memory {
         let segments=(0..<1000).map {TranscriptSegment(start:Double($0),end:Double($0)+0.8,text:"word\($0)",speaker:"Maya")}
         let text=segments.map(\.text).joined(separator:" ");var memory=Memory(id:id,kind:.audio,text:text)

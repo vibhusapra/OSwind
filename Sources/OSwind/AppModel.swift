@@ -83,12 +83,10 @@ import EventKit
     @Published var selected: Memory? {didSet {if selected==nil {selectedVisual=nil};refreshSelectedPIIScan();watchSelectedOriginal()}}
     @Published var selectedPIIScan:PIIScanStatus?
     @Published var selectedPIIScanError:String?
-    private var piiScanStatusTask:Task<Void,Never>?
     private var piiScanStatusGeneration=UUID()
     @Published private(set) var openingMemoryID:String?
     private var historicalDetailTask:Task<Void,Never>?
     private var historicalDetailGeneration=UUID()
-    private var detailTask:Task<Void,Never>?
     private var detailGeneration=UUID()
     @Published var selectedEvidenceQuery = ""
     @Published var answer: Answer?
@@ -383,56 +381,54 @@ import EventKit
     @Published var selectedPassage: PassageRange?
     @Published var selectedVisual:VisualMatch?
     @discardableResult func refreshSelectedPIIScan(read:(@Sendable (Memory)throws->PIIScanStatus)?=nil) -> Task<Void,Never>? {
-        piiScanStatusTask?.cancel();piiScanStatusTask=nil;piiScanStatusGeneration=UUID()
+        libraryWork.cancel(kinds:[.selectedPII]);piiScanStatusGeneration=UUID()
         selectedPIIScan=nil;selectedPIIScanError=nil
         guard libraryWorkAvailable,let memory=selected,memory.originalEvidence==nil else {return nil}
-        let store=self.store,generation=piiScanStatusGeneration
-        let worker=Task.detached(priority:.utility) {
+        let store=self.store,generation=piiScanStatusGeneration,registry=libraryWork
+        guard let id=registry.launch(kind:.selectedPII,operation:{
             try Task.checkCancellation()
             if let read {return try read(memory)}
             return try store.piiScanStatus(memory.id,matching:memory)
-        }
-        piiScanStatusTask=Task {[weak self] in
-            do {
-                let value=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
-                guard let self,!Task.isCancelled,self.piiScanStatusGeneration==generation,self.selected?.id==memory.id else {return}
-                self.selectedPIIScan=value;self.piiScanStatusTask=nil
-            } catch {
-                guard let self,!Task.isCancelled,self.piiScanStatusGeneration==generation,self.selected?.id==memory.id else {return}
-                self.selectedPIIScanError="The local import-check record is unavailable.";self.piiScanStatusTask=nil
+        },completion:{[weak self] outcome,cancelled in
+            guard let self,!cancelled,self.libraryWorkAvailable,self.piiScanStatusGeneration==generation,self.selected?.id==memory.id else {return}
+            switch outcome {
+            case .success(let value):self.selectedPIIScan=value
+            case .failure:self.selectedPIIScanError="The local import-check record is unavailable."
             }
-        }
-        return piiScanStatusTask
+        }) else {return nil}
+        return Task {await registry.wait(for:id)}
     }
     /// Selection reads are revalidated while visible. Erasure or library shutdown
     /// closes historical text as well as historical recap cards; no current ID
     /// can replace the selected original. Media playback remains unavailable.
-    func watchSelectedOriginal(interval:UInt64=2_000_000_000) {
-        historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
+    func watchSelectedOriginal(interval:UInt64=2_000_000_000,read:(@Sendable (Memory)throws->Memory)?=nil) {
+        historicalDetailTask?.cancel();historicalDetailTask=nil;libraryWork.cancel(kinds:[.historicalValidation]);historicalDetailGeneration=UUID()
         guard libraryWorkAvailable,let memory=selected,memory.originalEvidence != nil else {return}
-        let store=self.store,generation=historicalDetailGeneration
+        let store=self.store,generation=historicalDetailGeneration,registry=libraryWork
         historicalDetailTask=Task { [weak self] in
             while !Task.isCancelled {
-                do {
-                    let worker=Task.detached(priority:.utility) {try store.hydrate(memory)}
-                    let current=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
-                    guard !Task.isCancelled,self?.historicalDetailGeneration==generation else {return}
+                guard self?.historicalDetailGeneration==generation,self?.libraryWorkAvailable==true else {return}
+                guard let id=registry.launch(kind:.historicalValidation,operation:{
+                    try Task.checkCancellation()
+                    let current=try read?(memory) ?? store.hydrate(memory)
+                    try Task.checkCancellation()
                     guard current.originalEvidence==memory.originalEvidence,current.recap==memory.recap else {throw OSwindError.unavailable("Original evidence changed")}
-                    try await Task.sleep(nanoseconds:interval)
-                } catch is CancellationError {return}
-                catch {
-                    guard !Task.isCancelled,self?.historicalDetailGeneration==generation else {return}
-                    self?.selected=nil;self?.deletionStatus="The selected original changed or was removed.";return
-                }
+                },completion:{[weak self] outcome,cancelled in
+                    guard let self,!cancelled,self.libraryWorkAvailable,self.historicalDetailGeneration==generation else {return}
+                    if case .failure(let error)=outcome,!(error is CancellationError) {self.selected=nil;self.deletionStatus="The selected original changed or was removed."}
+                }) else {return}
+                await registry.wait(for:id)
+                guard !Task.isCancelled,self?.historicalDetailGeneration==generation else {return}
+                do {try await Task.sleep(nanoseconds:interval)}catch {return}
             }
         }
     }
     func cancelOpeningMemory() {
-        detailTask?.cancel();detailTask=nil;detailGeneration=UUID();openingMemoryID=nil
+        libraryWork.cancel(kinds:[.sourceOpening]);detailGeneration=UUID();openingMemoryID=nil
     }
-    func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil,visual:VisualMatch?=nil) {
+    func openMemory(_ memory:Memory,query:String,passage:PassageRange?=nil,visual:VisualMatch?=nil,observeRead:(@Sendable ()throws->Void)?=nil) {
         let store=self.store
-        openSource(id:memory.id,query:query,passage:passage,visual:visual) {try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)],pinTextObservations:true)[0].memory}
+        openSource(id:memory.id,query:query,passage:passage,visual:visual) {try observeRead?();return try store.hydrate([SearchHit(memory:memory,score:0,match:"",passage:passage,visual:visual)],pinTextObservations:true)[0].memory}
     }
     func openWorkflowSource(_ source:WorkflowSourceBinding) {
         guard !libraryRetired,!store.isClosed else {return}
@@ -460,15 +456,12 @@ import EventKit
         guard libraryWorkAvailable else {return}
         cancelOpeningMemory();let generation=detailGeneration
         openingMemoryID=id
-        detailTask=Task { [weak self] in
-            let worker=Task.detached(priority:.userInitiated) {try load()}
-            do {
-                let full=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
-                guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
-                self.selectedEvidenceQuery=query;self.selectedPassage=passage;self.selectedVisual=visual;self.selected=full;self.openingMemoryID=nil;self.detailTask=nil
-            } catch {
-                guard let self,!Task.isCancelled,self.detailGeneration==generation else {return}
-                self.openingMemoryID=nil;self.detailTask=nil;self.errorMessage=error.localizedDescription
+        libraryWork.launch(kind:.sourceOpening,priority:.userInitiated,operation:{try Task.checkCancellation();return try load()}) {[weak self] outcome,cancelled in
+            guard let self,!cancelled,self.libraryWorkAvailable,self.detailGeneration==generation else {return}
+            self.openingMemoryID=nil
+            switch outcome {
+            case .success(let full):self.selectedEvidenceQuery=query;self.selectedPassage=passage;self.selectedVisual=visual;self.selected=full
+            case .failure(let error):self.errorMessage=error.localizedDescription
             }
         }
     }
@@ -698,6 +691,8 @@ import EventKit
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
+        cancelOpeningMemory();piiScanStatusGeneration=UUID()
+        historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
         libraryWork.cancel()
         pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
