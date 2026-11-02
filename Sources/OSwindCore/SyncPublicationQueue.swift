@@ -155,6 +155,27 @@ struct SyncPublicationQueue {
         let row=try db.statement("SELECT pending_count=(SELECT count(*) FROM personal_sync_publication_jobs),pending_bytes=512*(SELECT count(*) FROM personal_sync_publication_jobs)+128*(SELECT count(*) FROM personal_sync_publication_dependencies),binding_bytes=256*(SELECT count(*) FROM personal_sync_publication_bindings) FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,(0..<3).allSatisfy({sqlite3_column_int(row,Int32($0))==1}) else {throw OSwindError.database("Publication queue accounting differs")}
     }
+    static func retireCollectionIfInstalled(cache:SyncVersionStore)throws {
+        let db=cache.database,count=try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_publication_state','personal_sync_publication_jobs','personal_sync_publication_dependencies','personal_sync_publication_bindings')")
+        if count==0 {return}
+        guard count==4 else {throw OSwindError.database("Preserve incomplete publication metadata during collection erasure")}
+        guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Retire publication metadata with its collection receipt")}
+        try cache.validateIncomingDeletionContext()
+        let value=Self(cache:cache);try value.validateSchema();try value.checkAccounting()
+        let state=try db.statement("SELECT origin,generation,group_id,epoch,library_id FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(state)}
+        guard sqlite3_step(state)==SQLITE_ROW,db.text(state,0)==cache.catalog.scope.origin,db.text(state,1)==cache.catalog.scope.generation,db.text(state,2)==cache.journal.group,db.text(state,3)==cache.journal.epoch,!db.text(state,4).isEmpty else {throw OSwindError.invalid("Publication collection scope differs")}
+        // A preceding local wipe deliberately invalidates this authority. Its
+        // absence must block publishing, while still allowing authenticated
+        // erasure of the old metadata in its exact owning group/generation.
+        let marker=try db.statement("SELECT value FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'");defer {sqlite3_finalize(marker)}
+        let code=sqlite3_step(marker)
+        guard code==SQLITE_DONE || (code==SQLITE_ROW && db.text(marker,0)==db.text(state,4)) else {throw OSwindError.invalid("Publication collection lifetime differs")}
+        try db.execute("DELETE FROM personal_sync_publication_jobs; DELETE FROM personal_sync_publication_bindings")
+        try value.checkAccounting()
+        // Existing queue objects must not acquire fresh authority after erasure.
+        // A future lifecycle controller must establish the next generation.
+        try db.execute("DELETE FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'")
+    }
     func stage(_ identity:SyncObjectIdentity,reason:SyncPublicationPendingReason,dependencies:[SyncObjectKey]=[])throws {
         try SyncChangeCapture.transaction(db) {
             try context();try SyncWireCheck.identity(identity,.turn);let key=try identity.key,state=try cache.journal.state(for:key)

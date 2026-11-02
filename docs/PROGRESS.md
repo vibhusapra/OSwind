@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Native group retirement — internal WIP
+
+The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now has a [source-bound local qualification](../benchmarks/native-collection-retirement-v1.json) at `2345a25`: **2,286 full passes / 125 skips**, **1,226 sanitizer and optimized passes / 71 skips each**, all **445 required controls**, **62 native passes**, **9 current collection fixture parents without skips**, and **34 package/process stages**. Independent readers inspect actual 13-kind/native/raw/staged/cache/original/publication/media retirement and pre/post-commit SIGKILL WALs; the final review preserves all 61 earlier app trees. Public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged.
+
+[PR #136's completed hosted failure](../benchmarks/sync-library-barriers-hosted-v1.json) remains unresolved: full 2,270 passes/128 skips and clipboard 3 passes, but native 61/62 passes with one missing-session error. Unchanged local and instrumented observations do not establish its cause or a fix.
+
 ## Collection erasure and owning sync transport — internal WIP
 
 [Current behavior and remaining work](SYNC-LIBRARY-BARRIERS.md) cover native creation eras, reviewed body-free group controls, local-clear export blocking, immutable supersession and active-owner admission. Source `26461f5` binds the [1,417-input receipt](../benchmarks/sync-library-barriers-v1.json): **2,274 full passes / 124 skips**, **1,214 sanitizer and optimized passes / 70 skips each**, all **422 required controls**, **62 native passes without skips**, and **32 fresh package/process stages**. Independent review checks all 34 packaged/archive files and 59 prior trees. Original late-publication, single-pass graph and readiness-fixture failures remain retained. Full native group retirement, capability compatibility, service lifecycle and provider/two-Mac acceptance remain open; these tested internal components do not complete sync. F059 stays TODO and all 83 statuses remain unchanged.

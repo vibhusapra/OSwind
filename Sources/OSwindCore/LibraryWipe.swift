@@ -43,14 +43,35 @@ private enum WipeInventory {
         if removeEmpty,depth>0,unlinkat(parent,name,AT_REMOVEDIR) != 0,errno != ENOTEMPTY {throw OSwindError.unavailable("An empty retained-media directory could not be removed")}
     }
 }
-public extension MemoryStore {
-    /// Logical deletion and durable admission of all known/orphan retained paths
-    /// commit together. Files are touched only after COMMIT; failures remain retryable.
-    func wipeLibrary(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeResult {
-        progress(.init(phase:"Waiting for active media writers"))
-        let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
-        return try withRoutineDatabase {db in
-            let counts=try erasureCancellable(db) {try db.transaction { () -> (Int,Int,Int,Int,Int,Int) in
+
+/// The native SQL/inventory phase only. The owner commits its matching intent or
+/// authenticated receipt in the same transaction, then runs physical cleanup.
+struct LibraryWipeCounts {
+    let sources,turns,chats,routines,runs,originals:Int
+}
+
+/// A received group erase needs the same durable physical cleanup, without
+/// authoring another local erase through the native local-intent SQL hooks.
+enum LibraryWipeState {
+    static let pendingPredicate="key IN ('library_wipe_dirty','library_group_wipe_dirty_v1') AND value='1'"
+    static func isPending(_ db:RoutineDatabase)throws->Bool {
+        try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE "+pendingPredicate)>0
+    }
+    static func markReceived(_ db:RoutineDatabase)throws {
+        guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Commit received cleanup with its native erasure receipt")}
+        try db.execute("INSERT INTO store_metadata(key,value) VALUES('library_group_wipe_dirty_v1','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+    }
+}
+
+extension MemoryStore {
+    /// Requires the caller's existing transaction and exclusive media lease.
+    /// This never acquires another lease, commits, removes files, records a local
+    /// wipe intent, or claims that a complete sync group adapter has run.
+    func stageLibraryWipe(reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeCounts {
+        try withRoutineDatabase {db in
+            guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Stage library erasure in the owning transaction")}
+            return try reservation.withExclusive(for:mediaRootIdentity) {
+                try Task.checkCancellation();try requireMediaRootIdentity()
                 let originals=try db.eraseCount("SELECT COUNT(*) FROM historical_evidence"),sources=try db.eraseCount("SELECT total FROM memory_statistics WHERE singleton=1"),turns=try db.eraseCount("SELECT COUNT(*) FROM chat_turns"),chats=try db.eraseCount("SELECT COUNT(*) FROM chat_sessions"),routines=try db.eraseCount("SELECT COUNT(*) FROM routines"),runs=try db.eraseCount("SELECT COUNT(*) FROM routine_runs")
                 progress(.init(phase:"Inventorying retained media"));let put=try db.statement("INSERT OR IGNORE INTO erasure_assets(path) VALUES(?)");defer {sqlite3_finalize(put)};var scanned:Int64=0
                 try WipeInventory.walk(root:root,expectedRoot:mediaRootIdentity,stage:{path in
@@ -58,14 +79,30 @@ public extension MemoryStore {
                     if scanned%100==0 {progress(.init(phase:"Inventorying retained media",completedItems:scanned,unit:"files"))}
                 },removeEmpty:false)
                 progress(.init(phase:"Deleting local history",completedItems:scanned,unit:"files"))
-                try db.execute("DELETE FROM store_metadata WHERE key IN ('meeting-reminder-receipts-v1','meeting-library-lifetime-v1'); DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM memory_entities; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'; INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
-                return (sources,turns,chats,routines,runs,originals)
-            }}
-            progress(.init(phase:"Removing retained media"))
-            return finishLibraryWipe(db,sources:counts.0,turns:counts.1,chats:counts.2,routines:counts.3,runs:counts.4,histories:counts.5,reservation:lease,progress:progress)
+                try db.execute("DELETE FROM store_metadata WHERE key IN ('meeting-reminder-receipts-v1','meeting-library-lifetime-v1'); DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM memory_entities; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
+                return .init(sources:sources,turns:turns,chats:chats,routines:routines,runs:runs,originals:originals)
+            }
         }
     }
-    func hasPendingLibraryWipeCleanup() throws -> Bool {try withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")>0}}
+}
+
+public extension MemoryStore {
+    /// Logical deletion and durable admission of all known/orphan retained paths
+    /// commit together. Files are touched only after COMMIT; failures remain retryable.
+    func wipeLibrary(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeResult {
+        progress(.init(phase:"Waiting for active media writers"))
+        let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
+        return try withRoutineDatabase {db in
+            let counts=try erasureCancellable(db) {try db.transaction { () -> LibraryWipeCounts in
+                let counts=try stageLibraryWipe(reservation:lease,progress:progress)
+                try db.execute("INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+                return counts
+            }}
+            progress(.init(phase:"Removing retained media"))
+            return finishLibraryWipe(db,sources:counts.sources,turns:counts.turns,chats:counts.chats,routines:counts.routines,runs:counts.runs,histories:counts.originals,reservation:lease,progress:progress)
+        }
+    }
+    func hasPendingLibraryWipeCleanup() throws -> Bool {try withRoutineDatabase {try LibraryWipeState.isPending($0)}}
     /// Retries only the sealed pending paths. Never inventories newly recorded files.
     func retryLibraryWipeCleanup(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeResult {
         progress(.init(phase:"Waiting for active media writers"));let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
@@ -94,7 +131,7 @@ private extension MemoryStore {
             } catch {result=result.warning("Database compaction did not finish. Close other library readers and retry cleanup.")}
         }
         let complete=result.pendingMedia==0 && result.searchCacheRemoved && directories && compacted && !Task.isCancelled && result.warnings.isEmpty
-        if complete {do {try db.execute("DELETE FROM store_metadata WHERE key='library_wipe_dirty'")} catch {result=result.warning("Cleanup finished but its completion marker could not be saved. Retry cleanup.")}}
+        if complete {do {try db.execute("DELETE FROM store_metadata WHERE key IN ('library_wipe_dirty','library_group_wipe_dirty_v1')")} catch {result=result.warning("Cleanup finished but its completion marker could not be saved. Retry cleanup.")}}
         if Task.isCancelled {result=result.warning("Cleanup stopped after the history deletion committed. Pending files remain queued for retry.")}
         return .init(erasure:result,conversations:chats,routines:routines,routineRuns:runs,compacted:compacted,cleanupComplete:complete && result.warnings.isEmpty,cancelled:Task.isCancelled)
     }

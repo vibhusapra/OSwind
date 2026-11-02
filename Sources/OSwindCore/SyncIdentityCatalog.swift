@@ -278,6 +278,19 @@ struct SyncIdentityCatalog {
         let s=try database.statement("UPDATE personal_sync_identities SET deleted=1,key_frame=NULL WHERE object_digest=?");defer {sqlite3_finalize(s)};database.bind(s,1,try identity.key.digest);try database.done(s)
         guard sqlite3_changes(database.handle)==1 else {throw OSwindError.invalid("Sync deletion identity missing")}
     }
+    /// Native rows are erased separately in this same collection transaction.
+    /// Retain opaque lifetime history while discarding every reusable raw key.
+    func retireCollectionMappings()throws {
+        guard sqlite3_get_autocommit(database.handle)==0 else {throw OSwindError.invalid("Retire collection mappings in the owning erasure transaction")}
+        try scoped {
+            guard try !state().1 else {throw OSwindError.invalid("Quiesce identity processing before collection erasure")}
+            try emptyQueue()
+            for table in SyncCanonicalTable.allCases {
+                guard try database.eraseCount("SELECT COUNT(*) FROM "+table.rawValue)==0 else {throw OSwindError.invalid("Erase native collection rows before retiring their key frames")}
+            }
+            try database.execute("UPDATE personal_sync_identities SET deleted=1,key_frame=NULL; DELETE FROM personal_sync_identity_current; UPDATE personal_sync_identity_bootstrap SET next_key=NULL,cursor_key=NULL,complete=0")
+        }
+    }
     private func identify(_ change:SyncCapturedChange)throws->SyncIdentifiedChange {
         guard let table=SyncCanonicalTable(rawValue:change.table) else {throw OSwindError.invalid("Unknown sync canonical table")}
         var frame:Data?
