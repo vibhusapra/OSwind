@@ -60,7 +60,7 @@ public extension MemoryStore {
             var writerBusy=false
             let lease:MediaAdmissionLease
             do {lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,timeout:0,expectedRoot:mediaRootIdentity,onBusy:{writerBusy=true})}
-            catch {if writerBusy {return .init(disposition:.waitingForWriters,result:nil)};throw error}
+            catch {if error is CancellationError {throw error};if writerBusy {return .init(disposition:.waitingForWriters,result:nil)};throw error}
             defer {lease.release()}
             // Another process may have finished a wipe between the first probe
             // and reservation. A wipe owns this marker until its own retry.

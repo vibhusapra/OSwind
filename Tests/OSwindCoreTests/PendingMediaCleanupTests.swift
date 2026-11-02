@@ -67,4 +67,12 @@ final class PendingMediaCleanupTests:XCTestCase {
         XCTAssertEqual(try store.delete("erase").pendingMedia,1);lease.release()
         await fulfillment(of:[pending,released,unrelated],timeout:0.5)
     }
+    @MainActor func testCancelledTaskCannotStartPendingCleanup()async throws {
+        try seed();let lease=try store.mediaWriteLease();XCTAssertEqual(try store.delete("erase").pendingMedia,1);lease.release()
+        let store=self.store!
+        let attempt=Task {try store.resumePendingMediaCleanup()};attempt.cancel()
+        do {_ = try await attempt.value;XCTFail("A cancelled attempt must not begin queued cleanup")}
+        catch is CancellationError {}catch {XCTFail("Expected cancellation before cleanup admission")}
+        XCTAssertEqual(try Data(contentsOf:file),bytes);XCTAssertNotNil(try store.get("keep"))
+    }
 }

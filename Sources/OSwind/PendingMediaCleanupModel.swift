@@ -36,7 +36,7 @@ import OSwindCore
         request()
     }
     func resume() {
-        guard !store.isClosed,drainers==0 else {return}
+        guard active || observationFailed,drainers==0,!store.isClosed else {return}
         if observationFailed {start();return}
         guard active else {return};attention=false;wipePending=false;request()
     }

@@ -188,6 +188,7 @@ import MachO
         app.pendingMediaCleanup.resume();try await waitForRemoval(file)
         XCTAssertTrue(app.pendingMediaCleanup.active);XCTAssertNotNil(try app.store.get("keep"))
         app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();let before=app.pendingMediaCleanup.attempts
+        try app.store.close()
         app.pendingMediaCleanup.resume();app.startConfiguredServices();try await Task.sleep(for:.milliseconds(300))
         XCTAssertEqual(app.pendingMediaCleanup.attempts,before);XCTAssertFalse(app.pendingMediaCleanup.active)
     }
