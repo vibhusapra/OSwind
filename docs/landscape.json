@@ -1,5 +1,5 @@
 {
-  "reviewed": "October31,2026 America/Los_Angeles: targeted six-offering recheck; other fourteen last checked October29",
+  "reviewed": "November1,2026 America/Los_Angeles: targeted Screenpipe pricing, Original Rewind/Limitless homepage and Omi pages; other seventeen retain their own prior check dates.",
   "method": "Initial16 profiles reviewed October22; twenty profiles checked October29; Screenpipe, original Rewind/Limitless, Rewind Desktop, Pieces, Littlebird and Granola targeted October31. Publisher text/search caches may lag. Failed direct fetches, plan ambiguity and conflicting help articles remain explicit. Documentation is not runtime, billing, security or power proof.",
   "vendors": [
     {
@@ -24,23 +24,23 @@
         "https://docs.screenpipe.com/architecture",
         "https://docs.screenpipe.com/storage-and-retention"
       ],
-      "checked": "October31 pricing/docs/changelog/license recheck. Engine-only official CLI0.4.53 benchmark remains separate from advertised desktop v2.7.84; no new vendor runtime test."
+      "checked": "November1 primary annual pricing table recheck; changelog timed out twice. Other docs/license and advertised desktop release retain October31 checks; engine-only CLI0.4.53 benchmark remains separate. No new vendor runtime test."
     },
     {
       "name": "Original Rewind / Limitless",
       "category": "Historical desktop memory / pendant",
-      "price": "Historical wind-down announcement: no new Pendant sales and free Unlimited for continuing customers through2026. Direct homepage fetch still times out; a conflicting help pricing article is not accepted as current availability.",
+      "price": "Wind-down: Pendant sales ended; continuing customers have free Unlimited through2026. Desktop/web recording ended; historical meetings remain through2026. Rewind capture disabled December19,2025.",
       "license": "Proprietary service.",
       "features": "Original Rewind combined screen/audio recall and AI retrieval. Limitless shifted toward meeting/lifelog transcripts and Pendant. Export can include transcripts, chats and audio.",
       "difference": "The authoritative legacy product reference, not an available new desktop competitor. Do not conflate it with rewind.app.",
-      "caveat": "The announcement disables original Rewind capture from December19,2025 and desktop/web recording, while keeping existing meeting access through2026. A September9,2026 help page still describes20 free transcription hours and paid upgrades, conflicting with that announcement. Legacy Rewind help says there is no supported API. Treat availability, Rewind data access and Limitless exports separately.",
+      "caveat": "Meta acquisition confirmed. Account access/post-2026 support unverified; older help prices are not current availability. Distinct from rewind.app.",
       "sources": [
         "https://www.limitless.ai/",
         "https://help.limitless.ai/en/articles/13004987-how-to-download-your-limitless-transcripts-and-account-info",
         "https://help.limitless.ai/en/articles/9129649-pricing-plans",
         "https://help.limitless.ai/en/articles/13048802-where-can-i-find-my-rewind-data"
       ],
-      "checked": "October31 export, legacy-data and pricing-help recheck; homepage timeout. A publisher search snapshot repeats the wind-down FAQ."
+      "checked": "November1 homepage fetch succeeds; October31 help checks retained. Account/runtime untested."
     },
     {
       "name": "Rewind Desktop (rewind.app)",
@@ -219,7 +219,7 @@
         "https://help.omi.me/en/articles/13135007-overview",
         "https://www.omi.me/pages/download"
       ],
-      "checked": "October 29 wearable homepage recheck; desktop-plan limits/pricing not freshly confirmed."
+      "checked": "November1 primary download/overview pages and macOS download landing page fetched (advertised0.12.552, no binary download or runtime test). Desktop prices/allowances remain unverified; prior price quote retains October22 date."
     },
     {
       "name": "Granola",

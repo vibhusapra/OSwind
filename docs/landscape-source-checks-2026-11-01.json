@@ -1,0 +1,50 @@
+{
+  "checkedAtUTC": "2026-11-02T00:13:14.836071+00:00",
+  "localDate": "2026-11-01 America/Los_Angeles",
+  "scope": "Targeted primary-page fetches only; no vendor runtime, subscription, billing or download/install validation. Other vendors keep earlier dates.",
+  "checks": [
+    {
+      "vendor": "Screenpipe",
+      "url": "https://screenpipe.com/onboarding",
+      "state": "fetched",
+      "summary": "Annual display remains Free limited history, Basic250USD/year, Business500USD/seat/year, Enterprise custom. Business includes personal device sync and seat management, excludes shared teammate context. Max/Ultra are capacity tiers; Infinite Context/mobile is private beta. Enterprise gates shared context, automatic workflow discovery and cloud API access. Commercial source builds require Enterprise and commercial licensing.",
+      "runtimeTested": false
+    },
+    {
+      "vendor": "Screenpipe",
+      "url": "https://screenpipe.com/changelog",
+      "state": "timeout twice; no current release re-verification",
+      "runtimeTested": false
+    },
+    {
+      "vendor": "Original Rewind / Limitless",
+      "url": "https://www.limitless.ai/",
+      "state": "fetched; earlier homepage timeout no longer applies to this fetch",
+      "summary": "Primary homepage now fetches directly: Meta acquisition, Pendant sales ended, continuing-customer Unlimited free through2026, desktop recording ended, historical meetings remain through2026, and Rewind capture was disabled in December2025. Account access untested.",
+      "runtimeTested": false
+    },
+    {
+      "vendor": "Omi",
+      "url": "https://www.omi.me/pages/download",
+      "state": "fetched",
+      "summary": "Publisher describes macOS meeting summaries and live feedback; source repository and developer Windows link. No desktop plan price or limits shown.",
+      "runtimeTested": false
+    },
+    {
+      "vendor": "Omi",
+      "url": "https://help.omi.me/en/articles/13135007-overview",
+      "state": "fetched",
+      "summary": "Help article dated2026-01-06 describes phone/Mac/wearable conversation capture, transcription, summaries, tasks, memory search, AI chat and selectable marketplace integrations. These are publisher claims. No desktop pricing established.",
+      "runtimeTested": false
+    },
+    {
+      "vendor": "Omi",
+      "url": "https://macos.omi.me/",
+      "resolvedURL": "https://api.omi.me/v2/desktop/download/latest",
+      "state": "fetched landing page only",
+      "advertisedVersion": "0.12.552",
+      "downloaded": false,
+      "runtimeTested": false
+    }
+  ]
+}

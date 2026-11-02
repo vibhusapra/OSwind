@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Cleanup worker lifetime — component qualified
+
+[Cleanup lifecycle](CLEANUP-LIFECYCLE.md) and its [source-bound receipt](../benchmarks/cleanup-lifecycle-v1.json) cover real worker drain through plain Quit, workspace switch and encrypted APFS lock, obsolete-policy cancellation, committed-result invalidation, retired timer/service/settings/wipe rejection and authorized wipe quiescence. All127 mandatory controls pass in three builds;30 package/process stages,41 native methods and independent archive review pass. All83 feature statuses remain unchanged. The predecessor hosted canceled-unlock busy failure remains open; new test-only tracing supplies missing cycle/stage evidence without claiming a production fix. Pending-media scheduling, other worker categories and complete product acceptance remain open.
+
 ## Native33 media compatibility — component qualified
 
 [Native media compatibility](NATIVE-MEDIA-COMPATIBILITY.md) closes a genuine reserved-media deletion by an actual initialized prior32 collector. Native33 migrates the durable queue atomically into a guarded view, fences stale metadata writers and separates current caches from legacy cache removal. Four actual old-client methods execute in every software build; fresh clients refuse without changing database/WAL bytes. Cancellation, cached statements, concurrent SQL writers and three real migration SIGKILL states preserve whole committed data.
