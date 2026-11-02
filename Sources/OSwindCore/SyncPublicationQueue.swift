@@ -100,11 +100,11 @@ struct SyncPublicationQueue {
     /// Existing queue values pin the old lifetime and can never gain this one.
     static func renewAfterReceivedCollection(cache:SyncVersionStore,library:MemoryStore,control:SyncCollectionControl)throws {
         guard !library.isClosed else {throw OSwindError.invalid("Reopen the collection library before renewal")}
-        guard !(try library.hasPendingLibraryWipeCleanup()) else {throw OSwindError.unavailable("Finish native collection cleanup before resuming sync")}
         try library.withRoutineDatabase {db in
             guard db.handle==cache.database.handle else {throw OSwindError.invalid("Renew the owning library connection")}
             try SyncChangeCapture.transaction(db) {
                 try SyncLibraryContext.requireActive(db,cache:cache)
+                guard !(try LibraryWipeState.isPending(db)) else {throw OSwindError.unavailable("Finish native collection cleanup before resuming sync")}
                 let value=Self(cache:cache);try value.validateSchema();try value.checkAccounting()
                 guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'")==0,
                       (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs"))==0,
@@ -115,12 +115,18 @@ struct SyncPublicationQueue {
                 let receipt=try db.statement("SELECT digest FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(receipt)}
                 db.bind(receipt,1,control.creator);sqlite3_bind_int64(receipt,2,control.counter)
                 guard sqlite3_step(receipt)==SQLITE_ROW,try db.text(receipt,0)==control.digest else {throw OSwindError.invalid("Collection retirement receipt missing")}
+                let completion=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(completion)}
+                db.bind(completion,1,SyncCollectionHistory.nativeCompletionKey)
+                guard sqlite3_step(completion)==SQLITE_ROW,try db.text(completion,0)==control.digest else {throw OSwindError.invalid("Complete the exact native collection retirement before renewal")}
                 let state=try db.statement("SELECT origin,generation,group_id,epoch FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(state)}
                 guard sqlite3_step(state)==SQLITE_ROW,db.text(state,0)==cache.catalog.scope.origin,db.text(state,1)==cache.catalog.scope.generation,db.text(state,2)==cache.journal.group,db.text(state,3)==cache.journal.epoch else {throw OSwindError.invalid("Collection publication generation differs")}
                 let lifetime=UUID().uuidString.lowercased(),insert=try db.statement("INSERT INTO store_metadata(key,value) VALUES('sync-publication-library-lifetime-v1',?)");defer {sqlite3_finalize(insert)}
                 db.bind(insert,1,lifetime);try db.done(insert)
                 let update=try db.statement("UPDATE personal_sync_publication_state SET library_id=? WHERE singleton=1");defer {sqlite3_finalize(update)}
                 db.bind(update,1,lifetime);try db.done(update)
+                let consume=try db.statement("DELETE FROM store_metadata WHERE key=? AND value=?");defer {sqlite3_finalize(consume)}
+                db.bind(consume,1,SyncCollectionHistory.nativeCompletionKey);db.bind(consume,2,try control.digest);try db.done(consume)
+                guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Native collection completion changed during renewal")}
             }
         }
     }

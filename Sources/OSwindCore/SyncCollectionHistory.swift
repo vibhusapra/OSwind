@@ -8,6 +8,9 @@ import CSQLite
 struct SyncCollectionHistory {
     let database:RoutineDatabase
     let replica:String
+    // Generic control receipt is not proof of full native retirement. Every
+    // newly observed frontier invalidates the previous native completion.
+    static let nativeCompletionKey="sync-native-collection-completion-v1"
 
     private static let clockSQL="(SELECT CAST('{'||COALESCE(group_concat('\"'||replica||'\":'||counter,','),'')||'}' AS BLOB) FROM (SELECT replica,counter FROM personal_sync_collection_frontier ORDER BY replica))"
     private static let blobCheck="typeof(era)='blob' AND length(era)>=2 AND length(era)<=1048576"
@@ -278,6 +281,7 @@ struct SyncCollectionHistory {
             guard control.counter>before[control.creator] else {return false}
             let update=try database.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,?) ON CONFLICT(replica) DO UPDATE SET counter=excluded.counter");defer {sqlite3_finalize(update)}
             database.bind(update,1,control.creator);sqlite3_bind_int64(update,2,control.counter);try database.done(update)
+            try database.execute("DELETE FROM store_metadata WHERE key='\(Self.nativeCompletionKey)'")
             try retire(current());return true
         }
     }
