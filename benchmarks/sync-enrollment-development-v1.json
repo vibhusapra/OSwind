@@ -1,0 +1,136 @@
+{
+  "format": "OSwind.sync-enrollment-development.v2",
+  "state": "passed-development-checks",
+  "source": "e6ed33ee780adc6db37ad35629a332f57b9eaa4b",
+  "previousDevelopmentSource": "5b4a55e4158118497a025d34e99b5638a1782199",
+  "previousReviewSHA256": "a67e6b54dd9360e4d3579e8fb3f414a940d3b5026a0575d61cd29f6cd6114eb0",
+  "changedSincePreviousReview": [
+    "Sources/OSwindCore/SyncCredentialBinding.swift",
+    "Tests/OSwindCoreTests/SyncCredentialBindingTests.swift"
+  ],
+  "scope": "Focused checks of private credential material, scoped Keychain backend, native binding and vault-copy refusal; no public enrollment or full source/package qualification.",
+  "newRegularMethods": [
+    "testInstallationCreationIsStableAndMissingExistingIdentityNeverRegenerates",
+    "testMalformedAndSymlinkedInstallationStateCannotBeAdopted",
+    "testConcurrentFirstEnrollmentKeepsOneCompleteInstallationIdentity",
+    "testBindingAcceptsCurrentLibraryAndRejectsMachineInstallationAndProtectionChanges",
+    "testCopiedDatabaseCannotReuseOriginalPhysicalBinding",
+    "testSameVolumeRenameRetainsPhysicalLibraryBinding",
+    "testNativeWipeCannotSilentlyReuseEnrolledPublicationBinding",
+    "testIndividualSourceErasureDoesNotRetireWholeLibraryCredentialBinding",
+    "testReplacedOpenRootCannotBeUsedToCreateNewBinding",
+    "testExclusiveCredentialLeaseClosesAndRejectsReplacedLockIdentity",
+    "testCredentialLeaseExcludesAnActualOtherProcessUntilRelease",
+    "testReloadedKeysReadExistingEncryptedSpaceAndAuthenticateOriginalDevice",
+    "testReloadedOwnerCanAdmitAndSealResponseUnderOriginalRoot",
+    "testAnotherMemberCannotPersistOwnerAuthority",
+    "testMalformedSavedKeysNeverYieldAnAuthorityOrExposeSecretInError",
+    "testCanonicalBoundAndDiagnosticRedactionApplyToPrivateMaterial",
+    "testCredentialBoundsRejectInvalidAccountAndEmptyOrOversizeBytes"
+  ],
+  "newNativeMethods": [
+    "testOwnedNativeDataProtectionRequestNeverFallsBackToLoginKeychain",
+    "testOwnedNativeLoginCredentialCreateCompareReplaceAndConfirmedDelete",
+    "testOwnedNativeKeychainReloadsGeneratedOwnerAndDeviceKeysAtMembershipCapacity",
+    "testNativeMachineFingerprintIsBoundedWithoutLoggingHardwareIdentity",
+    "testOwnedNativeVaultCopyCannotReuseOriginalCredentialBinding"
+  ],
+  "inputSHA256": {
+    "Sources/OSwindCore/SyncPairing.swift": "43b58f273cac38c37ba46b058342b0c8ba7c38383ff51e4b2d7ab657ec1cb03c",
+    "Sources/OSwindCore/SyncCredentialStorage.swift": "77893bcc75eb9373a3ee451687af795ae7dd9c711983047935d4db641b3e18af",
+    "Sources/OSwindCore/SyncCredentialBinding.swift": "9798445899f9ae8aa964050f158258d945ba1ef62f2ae9e87c73502f24ff089a",
+    "Tests/OSwindCoreTests/SyncCredentialBindingTests.swift": "e30debf1bde92a45e1552b0c8aa661f184acc3362dbe80c80f7de0793f995b0f",
+    "Tests/OSwindCoreTests/SyncCredentialMaterialTests.swift": "20e564f78556d16f3d994ef524734a38050ed7084abc1464cdfadf254ef52a70",
+    "Tests/OSwindCoreTests/SyncCredentialStorageTests.swift": "5ccb07da8a13aeb9516a579e43dbcd584250b95beb81a9ddbbf0afb162524066"
+  },
+  "stages": [
+    {
+      "stage": "debug-owned-native",
+      "defined": 22,
+      "passed": 22,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0,
+      "newRegularPassed": 17,
+      "newNativePassed": 5,
+      "raceWarning": false,
+      "log": ".artifacts/sync-enrollment-v1/native-all-02.log",
+      "logSHA256": "706dda2e90cf1e0d5e0e1b81a347d2a742d1f7ef509078a444d6556d4e9d610c"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "defined": 44,
+      "passed": 39,
+      "skipped": 5,
+      "failures": 0,
+      "unexpected": 0,
+      "newRegularPassed": 17,
+      "newNativePassed": 0,
+      "raceWarning": false,
+      "log": ".artifacts/sync-enrollment-v1/focused-tsan-02.log",
+      "logSHA256": "f6a314c0b0e5dc038925211ec986c398745286acd4a7cc1ae675fa39cf305b43"
+    },
+    {
+      "stage": "optimized",
+      "defined": 44,
+      "passed": 39,
+      "skipped": 5,
+      "failures": 0,
+      "unexpected": 0,
+      "newRegularPassed": 17,
+      "newNativePassed": 0,
+      "raceWarning": false,
+      "log": ".artifacts/sync-enrollment-v1/focused-optimized-02.log",
+      "logSHA256": "0dcd609ea783e6e04fb54413b2ad2ca4fe2fac9bd93a84ced51530c383f5d714"
+    }
+  ],
+  "actualKeychainScope": {
+    "ownedRandomAccountsOnly": true,
+    "existingUserCredentialRead": false,
+    "loginCreateCompareReplaceDeleteAndGenerated64MemberMaterialReloadPassed": true,
+    "generatedAccountsConfirmedRemoved": true,
+    "dataProtectionAvailableToTestHost": false,
+    "dataProtectionOSStatus": -34018,
+    "silentLoginFallback": false,
+    "OSwindSignedAppEntitlementAcceptance": false,
+    "rawHardwareIdentifierLoggedOrRetained": false
+  },
+  "retainedFailures": {
+    "preflight-02.log": "4b3a73689e8110b95b45470c079fb6705f613269a2d964727b14a5d21181c0de",
+    "preflight-04.log": "f7b73a1bc54d5e1d153a8718dde0499309a96c092bb20d02936623a4cc9268e2",
+    "concurrent-identity-diagnostic-01.log": "ad5154bfaad3683f10ddc83a271cb8ad5238c6cec80f9ab42b7ac2d513aea4a2",
+    "native-vault-clone-red-01.log": "d43e284a69c53dbcfb7aab5749020176dd4dd04484b130e5a40f00e0aa66a04f"
+  },
+  "vaultCopyCounterexample": {
+    "productionSourceBeforeFix": "5b4a55e4158118497a025d34e99b5638a1782199",
+    "redFixtureScope": "New owned native regression fixture added against unchanged5b production before the fix; it failed one assertion and both images detached.",
+    "redLogSHA256": "d43e284a69c53dbcfb7aab5749020176dd4dd04484b130e5a40f00e0aa66a04f",
+    "correction": "Resolve the real native volume and additionally bind host volumeUUID, outer package inode and sparsebundle inode. Inner IDs survive a copied encrypted APFS image and are insufficient on their own.",
+    "positiveOriginalUnlockAndReopen": true,
+    "copiedInnerVolumeInodeOriginAndPublicationLifetimeEqual": true,
+    "copiedOuterPhysicalBindingDiffers": true,
+    "copiedCredentialRefused": true,
+    "ownedSourceStillReadable": true,
+    "bothImagesDetached": true
+  },
+  "externalNativeObservation": {
+    "atUTC": "2026-11-02T17:39:50.384114+00:00",
+    "command": [
+      "hdiutil",
+      "info",
+      "-plist"
+    ],
+    "returncode": 0,
+    "ownedPrefix": "owned-sync-binding-",
+    "ownedImagesStillAttached": [],
+    "unrelatedImagePathsRetained": false,
+    "scope": "Independent attachment observation after the owned credential/vault-copy tests; no whole-product or provider acceptance."
+  },
+  "externalObservationSHA256": "378081b6a3ead6b38716e3a35aba81cacb4faf6e1ad9ccf990f08b682a63fe99",
+  "limits": [
+    "No credential envelope/state/checkpoint lifecycle or public create/join API/UI yet.",
+    "No native enrolled-writer admission/old-writer fence or external published/received rollback anchors yet.",
+    "DP was unavailable to this test host, not established for the production OSwind app. Login binding is software admission, not Secure Enclave/hardware device-only protection.",
+    "No physical two-Mac/provider, capture/power, package/signing/notarized-distribution, whole-product parity or ranking acceptance."
+  ]
+}

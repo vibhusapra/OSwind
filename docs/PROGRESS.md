@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Credential persistence and native binding — enrollment WIP
+
+The [credential foundation](SYNC-ENROLLMENT-WIP.md) now reloads private owner/device/group material from a separate Keychain namespace and binds it to the Mac/installation, native lifetime and physical library. Actual process exclusion, ordinary clone refusal and same-volume rename are tested. An owned encrypted-vault copy exposed a real inner-volume-identity gap; outer package/image binding now refuses that copy while normal original unlock succeeds. All generated credential accounts were confirmed removed; DP was unavailable to the test host without fallback.
+
+[Focused development evidence](../benchmarks/sync-enrollment-development-v1.json) at `e6ed33e`: **17 new regular cases** pass debug/sanitizer/optimized, selected sanitizer and optimized **39 passed / 5 native skips** each, and explicit owned native **22 passed / no skips**, including five native probes. No race warning appears. Original failed fixtures and their corrections remain retained. This is not full source/package or public enrollment acceptance. Credential lifecycle/checkpoints, enrolled writer fencing and the actual native setup flow are still unfinished. **F059 remains TODO.**
+
 ## Signed pairing and asynchronous setup — internal WIP
 
 [Signed pairing and transport](SYNC-SIGNED-PAIRING.md) now bind device identity and the exact capability floor to root-signed membership, encrypt a reviewed response to the joining device and verify signatures for operations, erase controls, heads and supersession proofs. A shared group key cannot impersonate another member. V3 installs no legacy marker; cross-device embedded successors require the original device's packet. The app owns setup before native installation and joins ignored cancellation, abandoned owners and late sessions before departure.
