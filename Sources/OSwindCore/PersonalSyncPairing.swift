@@ -30,6 +30,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     private struct Location:Codable,Equatable {
         let installation:String,machine:String,origin:String,generation:String,volume:String,inode:UInt64,lifetime:String
         let vault:SyncVaultPhysicalBinding?
+        func replacingLifetime(_ value:String)->Self {.init(installation:installation,machine:machine,origin:origin,generation:generation,volume:volume,inode:inode,lifetime:value,vault:vault)}
         static func capture(_ store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint)throws->Self {
             let installation=try SyncLocalCredentialState.installationID(at:stateRoot,create:false),fingerprint=try machine.fingerprint()
             try SyncProtocolLimits.digest(fingerprint)
@@ -61,6 +62,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         func reserving(_ next:DeliveryReservation)->Self {
             .init(format:format,version:version,id:id,protection:protection,location:location,pending:pending,material:material,consumedRequest:consumedRequest,retired:retired,delivery:next)
         }
+        func rebinding(_ next:Location)->Self {.init(format:format,version:version,id:id,protection:protection,location:next,pending:pending,material:material,consumedRequest:consumedRequest,retired:retired,delivery:delivery)}
         func validate()throws {
             if let delivery {
                 try SyncCredentialStorageLimits.validate(id:delivery.id)
@@ -85,9 +87,14 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     private let mutex=NSRecursiveLock(),store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint
     private let injectedStorage:(any SyncCredentialStorage)?
     private var handle:Handle?,storage:(any SyncCredentialStorage)?,lease:SyncCredentialExclusiveLease?,closed=false
+    private var retirementOnly=false
     public convenience init(store:MemoryStore)throws {try self.init(store:store,stateRoot:SyncLocalCredentialState.root,machine:MacSyncMachineFingerprint(),storage:nil)}
-    init(store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint,storage:(any SyncCredentialStorage)?)throws {
+    init(store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint,storage:(any SyncCredentialStorage)?,retirementRecovery:Bool=false)throws {
         self.store=store;self.stateRoot=stateRoot;self.machine=machine;injectedStorage=storage
+        if retirementRecovery {
+            guard let saved=try store.withRetirementDatabase({_ in try readHandle()}) else {throw OSwindError.unavailable("Retirement pairing handle is missing")}
+            try adopt(saved);retirementOnly=true;return
+        }
         let media=try MediaAdmissionLease.acquire(root:store.root,exclusive:false,expectedRoot:store.mediaRootIdentity);defer {media.release()}
         if let saved=try readHandle() {try adopt(saved);_=try current()}
     }
@@ -99,7 +106,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     public func close() {mutex.lock();defer {mutex.unlock()};closed=true;lease?.close();lease=nil;storage=nil}
     private func withAccess<T>(_ body:()throws->T)throws->T {
         mutex.lock();defer {mutex.unlock()}
-        guard !closed,!store.isClosed else {throw OSwindError.unavailable("Pairing owner is closed")}
+        guard !closed,!retirementOnly,!store.isClosed else {throw OSwindError.unavailable("Pairing owner is closed or owned by retirement recovery")}
         let media=try MediaAdmissionLease.acquire(root:store.root,exclusive:false,expectedRoot:store.mediaRootIdentity);defer {media.release()}
         try Task.checkCancellation();return try body()
     }
@@ -122,6 +129,48 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         for (name,sql) in hooks {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name)
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.unavailable("Pairing lifetime protection is missing or changed")}
+        }
+    }
+    static func retirementLifetime(_ db:RoutineDatabase)throws->String {
+        let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,lifetimeKey)
+        guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.unavailable("Retain the original pairing lifetime before retirement")}
+        let value=db.text(row,0);try SyncProtocolLimits.uuid(value);return value
+    }
+    static func openRetirement(store:MemoryStore,environment:SyncNativeWriterEnvironment)throws->PersonalSyncPairing {
+        let protection=try store.withRetirementDatabase {db -> SyncCredentialProtection in
+            let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,handleKey)
+            guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.unavailable("Retirement pairing handle is missing")}
+            return try SyncPairingFormat.decode(Handle.self,Data(db.text(row,0).utf8),limit:1024).protection
+        }
+        return try PersonalSyncPairing(store:store,stateRoot:environment.stateRoot,machine:environment.machine,storage:environment.storage(protection),retirementRecovery:true)
+    }
+    typealias RetirementPreparation=(RoutineDatabase,SyncDeliveryRetirement,Data,String)throws->(()throws->Void)
+    /// Close public command admission BEFORE the erase owner takes an exclusive
+    /// media lease. This avoids a pairing-mutex/media lock inversion. The
+    /// returned preparation can only renew the exact saved original lifetime.
+    func retirementRenewalPreparation()throws->RetirementPreparation {
+        mutex.lock();defer {mutex.unlock()}
+        guard !closed,!store.isClosed,handle != nil,storage != nil,let lease else {throw OSwindError.unavailable("Resume the original pairing owner before renewal")}
+        try lease.requireCurrentIdentity();retirementOnly=true
+        return {[self] db,record,material,anchorID in
+            mutex.lock();defer {mutex.unlock()}
+            guard !closed,let handle,let storage,let lease=self.lease,sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.unavailable("Pairing renewal owner closed or left its transaction")}
+            try lease.requireCurrentIdentity()
+            let bytes=try storage.read(id:handle.id),saved=try Envelope.decode(bytes)
+            guard saved.id==handle.id,saved.protection==handle.protection,!saved.retired,saved.pending==nil,saved.material==material,
+                  saved.delivery?.id==anchorID,saved.delivery?.protection==handle.protection,saved.location.lifetime==record.pairingLifetime else {throw OSwindError.unavailable("Original pairing authority changed during retirement; use recovery")}
+            let current=try readHandle()
+            guard current==handle,try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-pairing-library-lifetime-v1'")==0 else {throw OSwindError.invalid("Renew only the retired native pairing lifetime")}
+            let lifetime=UUID().uuidString.lowercased(),put=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?)");defer {sqlite3_finalize(put)}
+            db.bind(put,1,Self.lifetimeKey);db.bind(put,2,lifetime);try db.done(put)
+            let location=try Location.capture(store,stateRoot:stateRoot,machine:machine)
+            guard location.replacingLifetime(saved.location.lifetime)==saved.location else {throw OSwindError.unavailable("Retirement moved to another physical library or installation")}
+            let encoded=try saved.rebinding(location).encoded()
+            return {[self] in
+                mutex.lock();defer {mutex.unlock()}
+                guard !closed else {throw OSwindError.unavailable("Pairing renewal owner closed before its external save")}
+                try lease.requireCurrentIdentity();try storage.replace(id:handle.id,expected:bytes,bytes:encoded)
+            }
         }
     }
     /// The external pairing reservation survives restoring a database from

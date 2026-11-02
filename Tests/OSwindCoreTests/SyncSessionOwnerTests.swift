@@ -76,6 +76,8 @@ extension SyncOutgoingTests {
     func testSessionOwnerConcurrentSuspendNetworkChangeAndStopNeverRestartsWorker()async throws {
         try await withServicePairAsync {f in
             let session=try PersonalSyncSession(service:f.a,schedule:.init(activeSeconds:0.005,idleSeconds:0.01,retrySeconds:0.01))
+            let observer=try SyncObjectFolder.open(at:f.transport.root,secret:f.secret,group:group,epoch:epoch)
+            defer {observer.close()}
             try await session.setProcessingEnabled(true)
             await withTaskGroup(of:Void.self) {tasks in
                 tasks.addTask {try? await session.setNetworkEnabled(false)}
@@ -85,9 +87,10 @@ extension SyncOutgoingTests {
                 tasks.addTask {try? await session.stop()}
             }
             await expectSessionPhase(session,.stopped)
-            let head=try f.transport.serviceHead(replica:replica)
+            XCTAssertTrue(f.transport.isClosed,"Session stop releases its owned provider descriptor")
+            let head=try observer.serviceHead(replica:replica)
             try await Task.sleep(for:.milliseconds(40))
-            XCTAssertEqual(try f.transport.serviceHead(replica:replica),head)
+            XCTAssertEqual(try observer.serviceHead(replica:replica),head)
             do {try await session.setNetworkEnabled(true);XCTFail("Stopped session changed network") }catch {}
         }
     }

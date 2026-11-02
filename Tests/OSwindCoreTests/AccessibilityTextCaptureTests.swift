@@ -64,6 +64,22 @@ private final class TextEmbeddingCounter:@unchecked Sendable {
         XCTAssertEqual(try store.search(SearchFilter(query:"Friday"),mode:.keyword).first?.memory.id,memory.id)
         XCTAssertEqual(try store.piiScanStatus(memory.id).state,.notRecorded);try assertNoMedia()
     }
+    func testCancelledDrainsJoinActualTextPreparationAndKeepAdmissionClosedUntilItReturns()async throws {
+        let world=TextCaptureWorld(),gate=TextPreparationGate(),calls=TextEmbeddingCounter();var e=world.environment()
+        e.textEmbedding={_,_ in calls.increment();return calls.count==1 ? try gate.embed():nil}
+        let c=try controller(world,environment:e)
+        let capture=Task {await c.captureOnce(manual:true)}
+        await fulfillment(of:[gate.entered],timeout:5)
+        var firstDone=false,secondDone=false
+        let first=Task {await c.cancelAndWait();firstDone=true}
+        let second=Task {await c.cancelAndWait();secondDone=true};second.cancel()
+        try await Task.sleep(for:.milliseconds(30))
+        XCTAssertFalse(firstDone);XCTAssertFalse(secondDone)
+        c.start();await c.captureOnce(manual:true);XCTAssertFalse(c.running);XCTAssertEqual(calls.count,1)
+        gate.release();await capture.value;await first.value;await second.value
+        XCTAssertTrue(firstDone);XCTAssertTrue(secondDone);XCTAssertTrue(gate.sawCancellation);try empty(c)
+        await c.captureOnce(manual:true);XCTAssertEqual(c.metrics.saved,1)
+    }
     func testExplicitTextOnlyStartNeedsAccessibilityAndNeverChecksPixelPermission() async throws {
         let world=TextCaptureWorld();world.permitted=false
         let c=try controller(world);c.start();XCTAssertFalse(c.running);XCTAssertTrue(c.status.contains("Accessibility"));XCTAssertEqual(world.reads,0)

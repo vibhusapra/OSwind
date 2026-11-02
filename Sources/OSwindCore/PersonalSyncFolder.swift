@@ -174,6 +174,17 @@ final class SyncObjectFolder:@unchecked Sendable {
         try requireNamespace(group:control.group,epoch:control.epoch)
         try publish(collectionControls,SyncCollectionControl.descriptor(creator:control.creator,counter:control.counter),control.encoded(),replica:control.creator)
     }
+    /// A received control keeps its original device signature. Reuse that
+    /// authenticated immutable object; never sign on the creator's behalf.
+    func ensureAuthenticatedCollectionControl(_ control:SyncCollectionControl)throws {
+        try requireNamespace(group:control.group,epoch:control.epoch)
+        if let existing=try collectionControl(creator:control.creator,counter:control.counter) {
+            guard existing==control else {throw OSwindError.invalid("Sync immutable collection identity was reused")}
+            return
+        }
+        if let authority,control.creator != authority.replica {throw OSwindError.unavailable("Wait for the original device-signed collection control")}
+        try publishCollectionControl(control)
+    }
     func collectionControl(creator:String,counter:Int64)throws->SyncCollectionControl? {
         guard let bytes=try read(collectionControls,SyncCollectionControl.descriptor(creator:creator,counter:counter),replica:creator) else {return nil}
         let control=try SyncCollectionControl.decode(bytes)

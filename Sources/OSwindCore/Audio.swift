@@ -126,6 +126,7 @@ private struct AudioPrivacyFailure:LocalizedError {
     private var systemSink: AudioAccumulator?
     private struct Chunk {var samples:[Float],date:Date,source:String,epoch:UUID,sessionID:String}
     private var pending:[Chunk]=[]
+    private let producerTasks=LibraryProducerTasks()
     private var privacyJob:(id:UUID,task:Task<Void,Never>)?
     private var contextSession:AccessibilityReadSession
     private var processing = false
@@ -171,7 +172,8 @@ private struct AudioPrivacyFailure:LocalizedError {
         }
     }
     public func start() async {
-        guard !running else { return }
+        guard producerTasks.accepting,!running else { return }
+        let operation=producerTasks.begin();defer {producerTasks.finish(operation)}
         guard !startup.locked() else { status="Locked · audio suspended"; return }
         do {
             if settings.speech.engine == .parakeet { _ = try settings.speech.validateLocalModel() }
@@ -254,8 +256,16 @@ private struct AudioPrivacyFailure:LocalizedError {
     public func stop() {
         privacyTimer?.invalidate(); privacyTimer=nil; privacyJob?.task.cancel();privacyJob=nil;contextSession.cancel();contextSession=AccessibilityReadSession(operation:{[startup] _ in await startup.context()}); preparationTask?.cancel(); preparationTask=nil; transcriptionTask?.cancel(); finishing=false; starting=false; running=false; epoch=UUID()
         engine?.inputNode.removeTap(onBus:0); engine?.stop(); engine=nil
-        if let capture=systemCapture { Task { try? await capture.stop() } }; systemCapture=nil
+        if let capture=systemCapture { stopSystemCapture(capture) }; systemCapture=nil
         micSink?.stop(); systemSink?.stop(); micSink=nil; systemSink=nil; pending.removeAll(); status="Audio off"
+    }
+    private func stopSystemCapture(_ capture:any AudioSystemCapture) {
+        let lifetime=producerTasks,operation=lifetime.begin()
+        Task {defer {lifetime.finish(operation)};try? await capture.stop()}
+    }
+    public func cancelAndWait()async {
+        stop()
+        await producerTasks.drain()
     }
     public func finish() {
         guard running else { return }
@@ -266,7 +276,7 @@ private struct AudioPrivacyFailure:LocalizedError {
             for segment in segments where segment.samples.count>=1600 && AudioAccumulator.audible(segment.samples) {enqueue(segment.samples,date:segment.date,source:source)}
         }
         engine?.inputNode.removeTap(onBus:0); engine?.stop(); engine = nil
-        if let capture=systemCapture { Task { try? await capture.stop() } }; systemCapture=nil; micSink=nil; systemSink=nil
+        if let capture=systemCapture { stopSystemCapture(capture) }; systemCapture=nil; micSink=nil; systemSink=nil
         running = false; status = pending.isEmpty && !processing ? "Audio off" : "Finishing local transcript…"
     }
     private func makeSink(source:String,token:UUID)->AudioAccumulator {
@@ -284,8 +294,9 @@ private struct AudioPrivacyFailure:LocalizedError {
     }
     func requestPrivacyCheck() {
         guard running,privacyJob==nil else {return}
-        let id=UUID(),token=epoch
+        let id=UUID(),token=epoch,lifetime=producerTasks,operation=producerTasks.begin()
         let task=Task {[weak self] in
+            defer {lifetime.finish(operation)}
             guard let self else {return}
             defer {if self.privacyJob?.id==id {self.privacyJob=nil}}
             do {_ = try await self.privacyContext(token)}
@@ -296,13 +307,14 @@ private struct AudioPrivacyFailure:LocalizedError {
     func enqueue(_ samples:[Float],date:Date,source:String) {
         // PCM stays in memory and the waiting queue is bounded. Fresh privacy
         // is required before WAV processing and again at save.
-        guard running || finishing,!starting,!startup.locked() else {return}
+        guard producerTasks.accepting,running || finishing,!starting,!startup.locked() else {return}
         guard pending.count<3 else {transcriptionDrops+=samples.count;refreshIngressStatus();status="Transcription backpressure · dropped segment";return}
         pending.append(Chunk(samples:samples,date:date,source:source,epoch:epoch,sessionID:sessionID))
         if !processing {Task {await drain()}}
     }
     private func drain() async {
-        guard !processing else { return }; processing = true; defer { processing = false }
+        guard producerTasks.accepting,!processing else { return }
+        let operation=producerTasks.begin();processing = true;defer {processing=false;producerTasks.finish(operation)}
         while !pending.isEmpty {
             let chunk=pending.removeFirst(),token=chunk.epoch,config=settings
             guard token==epoch else {continue}

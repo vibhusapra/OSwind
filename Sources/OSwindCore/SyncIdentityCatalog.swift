@@ -59,6 +59,11 @@ struct SyncLocalObject:Sendable {
 struct SyncIdentityCatalog {
     let database:RoutineDatabase
     let scope:SyncCaptureScope
+    static func openExisting(_ db:RoutineDatabase)throws->Self {
+        let value=Self(database:db,scope:try SyncChangeCapture.scope(db))
+        guard try !value.state().1 else {throw OSwindError.unavailable("Join identity processing before retirement renewal")}
+        return value
+    }
     static func install(_ db:RoutineDatabase)throws->Self {
         try SyncChangeCapture.prepare(db)
         return try SyncChangeCapture.transaction(db) {

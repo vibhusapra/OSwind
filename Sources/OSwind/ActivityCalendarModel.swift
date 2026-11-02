@@ -18,6 +18,7 @@ import OSwindCore
     private var generation=UUID()
     private var job:Task<Void,Never>?,monitor:Task<Void,Never>?
     private var lastRevision:ActivityCalendarRevision?,lastRequest:ActivityCalendarRequest?
+    private let retirement=LibraryTaskRetirement()
     private var active=false,pending=false
     private var loadedAt:ContinuousClock.Instant?
     init(store:MemoryStore,timeZone:TimeZone = .current,now:Date=Date()) {
@@ -31,7 +32,7 @@ import OSwindCore
     init(month:String,timeZone:TimeZone,firstWeekday:Int=1,load:@escaping Loader,revision:@escaping Revision) {self.month=month;self.timeZone=timeZone;self.firstWeekday=firstWeekday;self.load=load;self.revision=revision}
     var request:ActivityCalendarRequest {.init(month:month,timeZone:timeZone,firstWeekday:firstWeekday,selectedDay:selectedDay,filter:SearchFilter(app:app,kind:kind,favoritesOnly:favoritesOnly))}
     func activate() {
-        guard !active else {return};active=true;invalidate()
+        guard retirement.accepting,!active else {return};active=true;invalidate()
         monitor=Task {[weak self] in
             while !Task.isCancelled {
                 do {try await Task.sleep(for:.seconds(ProcessInfo.processInfo.isLowPowerModeEnabled ? 10:3))}catch {return}
@@ -40,9 +41,10 @@ import OSwindCore
             }
         }
     }
-    func deactivate(clear:Bool=false) {active=false;monitor?.cancel();monitor=nil;job?.cancel();job=nil;generation=UUID();busy=false;pending=false;if clear {snapshot=nil;lastRequest=nil;lastRevision=nil;error=nil}}
+    func deactivate(clear:Bool=false) {active=false;retirement.retire(monitor);monitor=nil;retirement.retire(job);job=nil;generation=UUID();busy=false;pending=false;if clear {snapshot=nil;lastRequest=nil;lastRevision=nil;error=nil}}
+    func cancelAndWait()async {deactivate(clear:true);await retirement.drain()}
     func resumeAndInvalidate() {if active {invalidate()}else {activate()}}
-    func forgetCounts() {job?.cancel();job=nil;generation=UUID();busy=false;pending=false;snapshot=nil;lastRequest=nil;lastRevision=nil;error=nil}
+    func forgetCounts() {retirement.retire(job);job=nil;generation=UUID();busy=false;pending=false;snapshot=nil;lastRequest=nil;lastRevision=nil;error=nil}
     func invalidate() {
         lastRevision=nil
         if busy {pending=true;return}
@@ -52,13 +54,20 @@ import OSwindCore
         reload()
     }
     func checkForChanges() async {
+        guard retirement.accepting else {return}
+        let worker=Task<Void,Never> {[weak self] in guard let self else {return};await self.checkCurrentRevision()}
+        retirement.hold(worker)
+        await withTaskCancellationHandler(operation:{await worker.value},onCancel:{worker.cancel()})
+    }
+    private func checkCurrentRevision()async {
         guard !busy else {return};let token=generation,current=request
         do {let value=try await revision();guard generation==token,!Task.isCancelled,request==current else {return};if value != lastRevision || current != lastRequest {reload()}}
         catch {guard generation==token,!Task.isCancelled else {return};self.snapshot=nil;self.lastRevision=nil;self.error=error.localizedDescription}
     }
     func reload() {
+        guard retirement.accepting else {return}
         generation=UUID();let token=generation,input=request,load=self.load,revision=self.revision
-        job?.cancel();pending=false;busy=true;error=nil
+        retirement.retire(job);pending=false;busy=true;error=nil
         if let old=lastRequest,old.month != input.month || old.timeZone != input.timeZone || old.filter != input.filter || old.firstWeekday != input.firstWeekday {snapshot=nil}
         job=Task {[weak self] in
             do {

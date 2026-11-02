@@ -8,6 +8,7 @@ import Vision
 /// occurs until the user's existing capture action starts this session.
 @MainActor final class ReplayCaptureSession {
     private let store:MemoryStore,embedder:LocalEmbedder
+    private let lifetime:LibraryProducerTasks
     private let gate:ReplayCommitGate
     private var retiring=[UUID:Task<Void,Never>]()
     private var lastFlush=Date(),retryAfter=Date.distantPast
@@ -25,12 +26,15 @@ import Vision
     private var currentInterval=0.0
     private var stopped=false
     var settings:AppSettings
-    init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings,gate:ReplayCommitGate,targetBundleID:String?=nil,onMemory:@escaping @MainActor (Memory)->Void,onStatus:@escaping @MainActor (String)->Void,onFailure:@escaping @MainActor (String)->Void={_ in}) {
-        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.onMemory=onMemory;self.onStatus=onStatus;self.onFailure=onFailure
+    init(store:MemoryStore,embedder:LocalEmbedder,settings:AppSettings,gate:ReplayCommitGate,lifetime:LibraryProducerTasks?=nil,targetBundleID:String?=nil,onMemory:@escaping @MainActor (Memory)->Void,onStatus:@escaping @MainActor (String)->Void,onFailure:@escaping @MainActor (String)->Void={_ in}) {
+        self.store=store;self.embedder=embedder;self.settings=settings;self.gate=gate;self.lifetime=lifetime ?? LibraryProducerTasks();self.onMemory=onMemory;self.onStatus=onStatus;self.onFailure=onFailure
         contextMonitor=ReplayContextMonitor(target:targetBundleID)
     }
     func start() {
+        guard lifetime.accepting,!stopped else {return}
+        let lifetime=lifetime,operation=lifetime.begin()
         supervisor=Task { [weak self] in
+            defer {lifetime.finish(operation)}
             while !Task.isCancelled {
                 guard let self,!self.stopped else {return}
                 await self.updateBinding()
@@ -48,9 +52,9 @@ import Vision
     private func retire(discard:Bool=false) {
         generation=UUID();binding="";boundContext=nil;if discard {consumer?.cancel()};consumer=nil
         let previousSource=source,previousRecorder=recorder;source=nil;recorder=nil
-        let id=UUID(),notifyFailure=onFailure,notifyStatus=onStatus
+        let id=UUID(),notifyFailure=onFailure,notifyStatus=onStatus,lifetime=lifetime,operation=lifetime.begin()
         retiring[id]=Task { [weak self] in
-            defer {self?.retiring[id]=nil}
+            defer {self?.retiring[id]=nil;lifetime.finish(operation)}
             await previousSource?.stop()
             do {try await previousRecorder?.close(commit:!discard)} catch {if !discard {notifyFailure(error.localizedDescription);notifyStatus("Replay finalization: "+error.localizedDescription)}}
         }
@@ -99,7 +103,9 @@ import Vision
             // Retain window metadata, not the tree body, for supervision.
             var observed=context;observed.accessibilityText="";observed.url=nil;observed.secure=false;boundContext=observed
             onStatus("Replay · \(interval.formatted()) s · hardware HEVC")
+            let lifetime=lifetime,operation=lifetime.begin()
             consumer=Task { [weak self] in
+                defer {lifetime.finish(operation)}
                 do {
                     for try await frame in source.frames {
                         try Task.checkCancellation()

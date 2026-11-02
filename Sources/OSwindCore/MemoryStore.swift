@@ -6,8 +6,8 @@ import CryptoKit
 public final class MemoryStore: @unchecked Sendable {
     // Version33 fences legacy cleanup and stale initializers at the native boundary.
     public static let schemaVersion = 33
-    // Native34 adds local writer admission, without changing content tables.
-    public static let maximumSupportedSchemaVersion = 34
+    // Enrolled35 adds writer generations; native content remains33.
+    public static let maximumSupportedSchemaVersion = 35
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -40,28 +40,29 @@ public final class MemoryStore: @unchecked Sendable {
     public convenience init(root: URL = Paths.data,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil) throws {
         try self.init(root:root,observeUpgrade:observeUpgrade,recoveryReadOnly:false)
     }
-    /// Internal recovery capability: no migrations or services, and SQLite's
-    /// authorizer denies data/schema writes. A read reservation remains usable
-    /// for the backup erasure-fence check; the store is never exposed to the app.
-    init(root:URL,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil,recoveryReadOnly:Bool,nativeWriterEnvironment:SyncNativeWriterEnvironment = .native) throws {
+    /// Read-only recovery installs a data/schema authorizer for backup export.
+    /// Retirement recovery verifies a quarantined owner without migrations;
+    /// its typed cleanup/renewal scopes are never exposed as an app store.
+    init(root:URL,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil,recoveryReadOnly:Bool,nativeWriterEnvironment:SyncNativeWriterEnvironment = .native,retirementRecovery:Bool=false) throws {
         _ = try VaultAccess.context(at:root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
-        if !recoveryReadOnly {try Paths.ensure(root);try Paths.ensure(root.appendingPathComponent("images"));try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))}
+        let existingOnly=recoveryReadOnly || retirementRecovery
+        if !existingOnly {try Paths.ensure(root);try Paths.ensure(root.appendingPathComponent("images"));try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))}
         let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
         closeDirectory=directory
         mediaRootIdentity=try directory.withRootDirectory {file in var metadata=stat();guard fstat(file,&metadata)==0 else {throw OSwindError.unavailable("Cannot inspect the library directory")};return BackupFileStamp(metadata)}
-        let databaseURL=(recoveryReadOnly ? directory.root:root).appendingPathComponent("memory.sqlite")
+        let databaseURL=(existingOnly ? directory.root:root).appendingPathComponent("memory.sqlite")
         // Foundation preserves some Darwin aliases. SQLite NOFOLLOW requires
         // the kernel canonical path, including every ancestor of the file.
         let path:String
-        if recoveryReadOnly {
+        if existingOnly {
             var stamp=stat()
             guard lstat(databaseURL.path,&stamp)==0,stamp.st_mode & S_IFMT == S_IFREG,let resolved=realpath(databaseURL.path,nil) else {throw OSwindError.invalid("Recovery requires an existing regular native database")}
             defer {free(resolved)};path=String(cString:resolved)
         }else {path=databaseURL.path}
-        guard sqlite3_open_v2(path, &db, (recoveryReadOnly ? 0:SQLITE_OPEN_CREATE) | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX | (recoveryReadOnly ? SQLITE_OPEN_NOFOLLOW:0), nil) == SQLITE_OK else {
+        guard sqlite3_open_v2(path, &db, (existingOnly ? 0:SQLITE_OPEN_CREATE) | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX | (existingOnly ? SQLITE_OPEN_NOFOLLOW:0), nil) == SQLITE_OK else {
             let code=sqlite3_extended_errcode(db);sqlite3_close(db);db=nil
             throw OSwindError.database("Cannot open memory store (SQLite \(code))")
         }
@@ -82,6 +83,13 @@ public final class MemoryStore: @unchecked Sendable {
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try nativeWriterAdmission.register(RoutineDatabase(handle:db!))
+            if retirementRecovery {
+                let connection=RoutineDatabase(handle:db!)
+                try connection.execute("PRAGMA synchronous=FULL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue);")
+                try nativeWriterAdmission.openRetirement(connection,library:self,environment:nativeWriterEnvironment)
+                try connection.execute("PRAGMA journal_mode=WAL")
+                syncCaptureInstalled=true;return
+            }
             try nativeWriterAdmission.open(RoutineDatabase(handle:db!),library:self,environment:nativeWriterEnvironment)
         }catch {sqlite3_close(db);db=nil;throw error}
         do {
@@ -217,7 +225,8 @@ public final class MemoryStore: @unchecked Sendable {
         if version<15 {try rebuildRecapLinks()}
         try BackupErasureFence.install(RoutineDatabase(handle:db!))
         try erasureCancellable(RoutineDatabase(handle:db!)) {try NativeMediaSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,observe:observeUpgrade)}
-        try exec("PRAGMA user_version=\(max(Int(version),Self.schemaVersion))")
+        let retainedVersion=try RoutineDatabase(handle:db!).eraseCount("PRAGMA user_version")
+        try exec("PRAGMA user_version=\(max(Int(version),Self.schemaVersion,retainedVersion))")
         if version<Int32(Self.schemaVersion) {observeUpgrade?(.beforeCommit)}
         try Task.checkCancellation();try exec("COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
@@ -254,6 +263,13 @@ public final class MemoryStore: @unchecked Sendable {
         try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self)
         if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))}
         return try body(RoutineDatabase(handle:db))
+    }
+    /// Caller holds media before entering this SQL scope. Normal writes remain
+    /// denied by SQL capabilities; only the typed cleanup scope grants them.
+    func withRetirementDatabase<T>(_ body:(RoutineDatabase)throws->T)throws->T {
+        lock.lock();defer {lock.unlock()}
+        guard nativeWriterAdmission.retirementQuarantined,let db else {throw OSwindError.unavailable("Use the current quarantined retirement library")}
+        return try nativeWriterAdmission.withDeliveryMutation {try body(RoutineDatabase(handle:db))}
     }
     private func exec(_ sql: String) throws {guard let db else {throw OSwindError.unavailable("The library connection is closed")};try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self);if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
     private func failure() -> OSwindError {guard db != nil else {return .unavailable("The library connection is closed")};return .database(String(cString: sqlite3_errmsg(db))) }

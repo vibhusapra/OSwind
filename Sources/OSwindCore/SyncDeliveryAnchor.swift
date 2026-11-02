@@ -13,12 +13,15 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
     }
     private struct Envelope:Codable {
         let format:String,version:Int,id:String,protection:SyncCredentialProtection,binding:SyncEnrollmentBinding,material:Data,token:Token
-        func replacing(_ next:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next)}
+        let retirement:SyncDeliveryRetirement?
+        func replacing(_ next:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:retirement)}
+        func retiring(_ next:Token,binding:SyncEnrollmentBinding,record:SyncDeliveryRetirement)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:record)}
+        func activating(_ next:Token,binding:SyncEnrollmentBinding)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:nil)}
         func encoded()throws->Data {try token.validate();let bytes=try SyncProtocolLimits.encode(self);try SyncCredentialStorageLimits.validate(id:id,bytes:bytes);return bytes}
         static func decode(_ bytes:Data)throws->Self {
             let value=try SyncPairingFormat.decode(Self.self,bytes,limit:SyncCredentialStorageLimits.maximumBytes)
-            guard value.format=="OSwind.sync.delivery-anchor",value.version==1,value.id==value.binding.id,value.protection==value.binding.protection,value.binding.publicationLifetime != nil else {throw OSwindError.invalid("Invalid saved delivery authority")}
-            try value.token.validate();try value.binding.validate();_=try SyncCredentialMaterial.decodeFromKeychain(value.material);return value
+            guard value.format=="OSwind.sync.delivery-anchor",value.version==1,value.id==value.binding.id,value.protection==value.binding.protection,(value.binding.publicationLifetime==nil)==(value.retirement != nil) else {throw OSwindError.invalid("Invalid saved delivery authority")}
+            try value.token.validate();try value.binding.validate();let material=try SyncCredentialMaterial.decodeFromKeychain(value.material);try value.retirement?.validate(material:material);return value
         }
     }
     private static let table="personal_sync_delivery_anchor"
@@ -87,7 +90,7 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         let installation=try SyncLocalCredentialState.installationID(at:stateRoot,create:false)
         let binding=try SyncEnrollmentBinding.capture(store:library,material:material,id:id,protection:storage.protection,machine:machine,installation:installation)
         guard binding.publicationLifetime != nil else {throw OSwindError.invalid("Install the native delivery lifetime first")}
-        let envelope=Envelope(format:"OSwind.sync.delivery-anchor",version:1,id:id,protection:storage.protection,binding:binding,material:try material.encodedForKeychain(),token:token),bytes=try envelope.encoded()
+        let envelope=Envelope(format:"OSwind.sync.delivery-anchor",version:1,id:id,protection:storage.protection,binding:binding,material:try material.encodedForKeychain(),token:token,retirement:nil),bytes=try envelope.encoded()
         try Task.checkCancellation();try storage.create(id:id,bytes:bytes)
         let value=Self(library:library,database:cache.database.handle,storage:storage,machine:machine,stateRoot:stateRoot,lease:lease,envelope:envelope,bytes:bytes,material:material)
         retained=true;try value.validate();return value
@@ -161,12 +164,13 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
     }
     /// Immutable verification for an ordinary native connection. It neither
     /// owns a credential lease nor retains the store or delivery service.
-    static func nativeWriterProof(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment)throws->NativeWriterProof {
+    private static func readWriterAuthority(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,retiring:Bool)throws->(Envelope,SyncCredentialMaterial,any SyncCredentialStorage,Data) {
         let row=try db.statement("SELECT id,protection FROM personal_sync_delivery_anchor WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,let protection=SyncCredentialProtection(rawValue:db.text(row,1)) else {throw OSwindError.unavailable("Native delivery authority is missing; export with backup recover")}
         let id=db.text(row,0),storage=environment.storage(protection)
         guard storage.protection==protection else {throw OSwindError.invalid("Keep the enrolled credential protection tier")}
-        let envelope=try Envelope.decode(storage.read(id:id)),material=try SyncCredentialMaterial.decodeFromKeychain(envelope.material)
+        let bytes=try storage.read(id:id),envelope=try Envelope.decode(bytes),material=try SyncCredentialMaterial.decodeFromKeychain(envelope.material)
+        guard (envelope.retirement != nil)==retiring else {throw OSwindError.unavailable("Use the matching active or retirement recovery owner for this native history")}
         guard envelope.id==id,envelope.protection==protection,try readToken(db,id:id,protection:protection)==envelope.token else {throw OSwindError.unavailable("Native history differs from its external checkpoint; export with backup recover")}
         try requireSchema(db)
         let identity=try db.statement("SELECT replica,group_id,epoch FROM personal_sync_local WHERE singleton=1");defer {sqlite3_finalize(identity)}
@@ -177,7 +181,88 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         while code==SQLITE_ROW {members.append(db.text(peers,0));code=sqlite3_step(peers)}
         guard code==SQLITE_DONE,members==joined.certificate.body.members.map(\.replica).sorted() else {throw OSwindError.unavailable("Native sync membership changed; use recovery")}
         try envelope.binding.verify(store:library,material:material,protection:protection,machine:environment.machine,installation:SyncLocalCredentialState.installationID(at:environment.stateRoot,create:false))
-        return NativeWriterProof(id:id,protection:protection,token:envelope.token,lifetime:envelope.binding.publicationLifetime!)
+        return (envelope,material,storage,bytes)
+    }
+    static func nativeWriterProof(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment)throws->NativeWriterProof {
+        let (value,_,_,_)=try readWriterAuthority(library:library,db:db,environment:environment,retiring:false)
+        return NativeWriterProof(id:value.id,protection:value.protection,token:value.token,lifetime:value.binding.publicationLifetime!)
+    }
+    static func verifyRetirement(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment)throws {
+        let (value,_,_,_)=try readWriterAuthority(library:library,db:db,environment:environment,retiring:true)
+        try value.retirement!.requireLogicalCompletion(db,allowCleaned:true)
+    }
+    static func openRetirement(library:MemoryStore,environment:SyncNativeWriterEnvironment)throws->Self {
+        let id=try library.withRetirementDatabase {db -> String in
+            let row=try db.statement("SELECT id FROM personal_sync_delivery_anchor WHERE singleton=1");defer {sqlite3_finalize(row)}
+            guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.unavailable("Retirement authority is missing")};return db.text(row,0)
+        }
+        try SyncCredentialStorageLimits.validate(id:id)
+        let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:environment.stateRoot)
+        var retained=false;defer {if !retained {lease.close()}}
+        let value=try library.withRetirementDatabase {db -> Self in
+            let (saved,material,storage,bytes)=try readWriterAuthority(library:library,db:db,environment:environment,retiring:true)
+            guard saved.id==id else {throw OSwindError.unavailable("Retirement account changed while opening")}
+            try saved.retirement!.requireLogicalCompletion(db,allowCleaned:true)
+            return Self(library:library,database:db.handle,storage:storage,machine:environment.machine,stateRoot:environment.stateRoot,lease:lease,envelope:saved,bytes:bytes,material:material)
+        }
+        retained=true;return value
+    }
+    func cleanupRetirement(progress:@escaping @Sendable (LibraryBackupProgress)->Void)throws->LibraryWipeResult {
+        let media=try MediaAdmissionLease.acquire(root:library.root,exclusive:true,expectedRoot:library.mediaRootIdentity);defer {media.release()}
+        return try library.withRetirementDatabase {db in
+            lock.lock();defer {lock.unlock()}
+            try requireCheckpoint(in:db)
+            guard let retirement=envelope.retirement,try storage.read(id:id)==bytes else {throw OSwindError.unavailable("Resume the saved retirement authority")}
+            try envelope.binding.verify(store:library,material:material,protection:storage.protection,machine:machine,installation:SyncLocalCredentialState.installationID(at:stateRoot,create:false))
+            try retirement.requireLogicalCompletion(db,allowCleaned:true)
+            let result=try library.nativeWriterAdmission.withRetirementCleanup(db) {
+                try library.retryLibraryWipeCleanup(reservation:media,progress:progress)
+            }
+            try requireCheckpoint(in:db);try NativeMediaSchema.validate(db);try retirement.requireLogicalCompletion(db,allowCleaned:true)
+            return result
+        }
+    }
+    func completeRetirement(pairing:PersonalSyncPairing.RetirementPreparation,expectedKind:SyncDeliveryRetirement.Kind?=nil)throws->SyncCollectionControl {
+        let media=try MediaAdmissionLease.acquire(root:library.root,exclusive:true,expectedRoot:library.mediaRootIdentity);defer {media.release()}
+        return try library.withRetirementDatabase {db in
+            lock.lock();defer {lock.unlock()}
+            try requireCheckpoint(in:db)
+            guard let record=envelope.retirement,expectedKind==nil || expectedKind==record.kind,
+                  try storage.read(id:id)==bytes else {throw OSwindError.unavailable("Resume the exact saved retirement")}
+            try record.requireLogicalCompletion(db,allowCleaned:true)
+            guard !(try LibraryWipeState.isPending(db)),try db.eraseCount("SELECT COUNT(*) FROM erasure_assets")==0 else {throw OSwindError.unavailable("Complete physical cleanup before renewing device sync authority")}
+            return try library.nativeWriterAdmission.withRetirementCleanup(db) {
+                try Task.checkCancellation();try db.execute("BEGIN IMMEDIATE")
+                var externalAttempted=false
+                do {
+                    try requireCheckpoint(in:db)
+                    let catalog=try SyncIdentityCatalog.openExisting(db),joined=material.joined
+                    let journal=try SyncJournal(database:db,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch)
+                    let cache=try SyncVersionStore.openExisting(catalog:catalog,journal:journal)
+                    try SyncPublicationQueue.renewAfterRetirement(cache:cache,library:library,record:record)
+                    let savePairing=try pairing(db,record,envelope.material,id)
+                    let binding=try SyncEnrollmentBinding.capture(store:library,material:material,id:id,protection:storage.protection,machine:machine,installation:SyncLocalCredentialState.installationID(at:stateRoot,create:false))
+                    guard binding.publicationLifetime != nil else {throw OSwindError.invalid("Prepare the new native publication identity")}
+                    try db.execute(Self.advance)
+                    let next=try Self.readToken(db,id:id,protection:storage.protection),updated=envelope.activating(next,binding:binding),encoded=try updated.encoded()
+                    try Task.checkCancellation()
+                    // Two Keychain accounts cannot commit atomically with SQL.
+                    // Any attempted external save denies this owner on failure.
+                    // Saved original lifetimes prevent retrying a partially
+                    // advanced pairing envelope as if it were the old one.
+                    externalAttempted=true;try savePairing()
+                    try storage.replace(id:id,expected:bytes,bytes:encoded)
+                    envelope=updated;bytes=encoded
+                    try db.execute("COMMIT")
+                    try library.nativeWriterAdmission.activateAfterRetirement(db,verified:NativeWriterProof(id:id,protection:storage.protection,token:next,lifetime:binding.publicationLifetime!))
+                    return record.control
+                }catch {
+                    if externalAttempted {poisoned=true;library.nativeWriterAdmission.invalidate()}
+                    do {try db.execute("ROLLBACK");if !externalAttempted {try requireCheckpoint(in:db)}}catch {poisoned=true;library.nativeWriterAdmission.invalidate()}
+                    throw error
+                }
+            }
+        }
     }
     func installNativeWriterAdmission()throws {
         try validate()
@@ -220,7 +305,18 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
     func mutate<T>(in db:RoutineDatabase,_ body:()throws->T)throws->T {
         try library.nativeWriterAdmission.withDeliveryMutation {try mutateOwned(in:db,body)}
     }
-    private func mutateOwned<T>(in db:RoutineDatabase,_ body:()throws->T)throws->T {
+    func retireLocal(in db:RoutineDatabase,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
+        try retireNative(in:db,kind:.local,body)
+    }
+    func retireReceived(in db:RoutineDatabase,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
+        try retireNative(in:db,kind:.received,body)
+    }
+    private func retireNative(in db:RoutineDatabase,kind:SyncDeliveryRetirement.Kind,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
+        try library.nativeWriterAdmission.withRetirementMutation {
+            try mutateOwned(in:db,retiring:{SyncDeliveryRetirement(kind:kind,control:$0.control,pairingLifetime:$0.pairingLifetime,publicationLifetime:self.envelope.binding.publicationLifetime!)},body)
+        }
+    }
+    private func mutateOwned<T>(in db:RoutineDatabase,retiring:((T)throws->SyncDeliveryRetirement)?=nil,_ body:()throws->T)throws->T {
         lock.lock();defer {lock.unlock()}
         try requireCheckpoint(in:db)
         guard sqlite3_get_autocommit(db.handle) != 0,try db.eraseCount("PRAGMA synchronous")>=2 else {throw OSwindError.invalid("Anchor a prepared outer native transaction")}
@@ -231,13 +327,25 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
             try requireCheckpoint(in:db)
             let before=sqlite3_total_changes64(db.handle)
             let value=try body();try Task.checkCancellation()
+            let retirement=try retiring?(value)
+            let retiredBinding:SyncEnrollmentBinding?
+            if let retirement {
+                guard envelope.retirement==nil else {throw OSwindError.invalid("Finish the existing retirement before another erase")}
+                try retirement.validate(material:material);try retirement.requireLogicalCompletion(db)
+                let binding=try SyncEnrollmentBinding.capture(store:library,material:material,id:id,protection:storage.protection,machine:machine,installation:SyncLocalCredentialState.installationID(at:stateRoot,create:false))
+                guard binding.publicationLifetime==nil else {throw OSwindError.invalid("Retire the old publication lifetime in the native erasure transaction")}
+                retiredBinding=binding
+            }else {retiredBinding=nil}
             // Non-wire preparation/projection work must also carry a commit
             // stamp. Wire triggers already changed the token when applicable.
             var next=try Self.readToken(db,id:id,protection:storage.protection)
             if next==envelope.token,sqlite3_total_changes64(db.handle)>before {try db.execute(Self.advance);next=try Self.readToken(db,id:id,protection:storage.protection)}
+            guard retirement==nil || next != envelope.token else {throw OSwindError.invalid("Native retirement must advance its external checkpoint")}
             if next != envelope.token {
                 guard next.serial>envelope.token.serial else {throw OSwindError.invalid("Delivery checkpoint cannot move backwards")}
-                let updated=envelope.replacing(next),encoded=try updated.encoded()
+                let updated:Envelope
+                if let retirement,let retiredBinding {updated=envelope.retiring(next,binding:retiredBinding,record:retirement)}else{updated=envelope.replacing(next)}
+                let encoded=try updated.encoded()
                 externalAttempted=true
                 try storage.replace(id:id,expected:bytes,bytes:encoded)
                 envelope=updated;bytes=encoded
@@ -245,11 +353,15 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
             // After the external boundary, cancellation is not rollback. Finish
             // the owned critical commit, then let the caller observe cancellation.
             try db.execute("COMMIT")
-            try library.nativeWriterAdmission.deliveryCommitted(db,verified:NativeWriterProof(id:id,protection:storage.protection,token:envelope.token,lifetime:envelope.binding.publicationLifetime!))
+            if retirement != nil {library.nativeWriterAdmission.suspendForRetirement()}
+            else {try library.nativeWriterAdmission.deliveryCommitted(db,verified:NativeWriterProof(id:id,protection:storage.protection,token:envelope.token,lifetime:envelope.binding.publicationLifetime!))}
             return value
         }catch {
             if externalAttempted {poisoned=true;library.nativeWriterAdmission.invalidate()}
-            do {try db.execute("ROLLBACK")}catch {poisoned=true}
+            do {
+                try db.execute("ROLLBACK")
+                if !externalAttempted {try library.nativeWriterAdmission.deliveryRolledBack(db)}
+            }catch {poisoned=true;library.nativeWriterAdmission.invalidate()}
             throw error
         }
     }

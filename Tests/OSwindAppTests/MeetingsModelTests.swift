@@ -93,6 +93,15 @@ import AppKit
         let gate=Gate();source.read {$0.nextGate=gate};let model=try model();model.start();await fulfillment(of:[gate.entered],timeout:5)
         model.pause();await gate.open();try await eventually {self.source.read {$0.completed}==1};XCTAssertTrue(model.events.isEmpty);XCTAssertTrue(model.due.isEmpty);XCTAssertFalse(model.active)
     }
+    func testCancelledDrainJoinsAlreadyStoppedCalendarResponseAndRejectsReactivation()async throws {
+        let gate=Gate();source.read {$0.nextGate=gate};let model=try model();model.start();await fulfillment(of:[gate.entered],timeout:5)
+        model.stop(clear:true);var done=false
+        let drain=Task {await model.cancelAndWait();done=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(30));XCTAssertFalse(done)
+        model.start();model.connect();XCTAssertFalse(model.active);XCTAssertEqual(source.read {$0.requests},0)
+        await gate.open();await drain.value;XCTAssertTrue(done);XCTAssertTrue(model.events.isEmpty)
+        model.start();try await loaded(model);await model.cancelAndWait()
+    }
     func testPrivacyEditRevokesInflightReadAndLeavesNoCalendarNames()async throws {
         let gate=Gate();source.read {$0.nextGate=gate};let model=try model();model.start();await fulfillment(of:[gate.entered],timeout:5)
         var blocked=try settings();blocked.privacy.excludedApps.append("com.apple.iCal");model.apply(blocked);await gate.open();try await eventually {self.source.read {$0.completed}==1}

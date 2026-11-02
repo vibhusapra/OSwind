@@ -729,6 +729,8 @@ import EventKit
         pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         await personalSync.cancelAndWait()
+        await capture.cancelAndWait();await audio.cancelAndWait()
+        await entityMemory.cancelAndWait();await meetings.cancelAndWait();await activity.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
         await cancelDestructiveWorkAndWait()
         await pendingMediaCleanup.cancelAndWait()
@@ -980,7 +982,7 @@ import EventKit
         assignInternalSettings(quiet);applySettingsToControllers()
         do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry,before:{[personalSync,workflow,pendingMediaCleanup,libraryWork] in await personalSync.cancelAndWait();await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait();await libraryWork.cancelAndWait()}) {[weak self] result in
+        libraryWipe.run(store:store,retry:retry,before:{[weak self] in await self?.cancelExternalWorkAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
             self.libraryRetired=false;self.personalSync.prepareForReconnection();self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}

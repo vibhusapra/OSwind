@@ -272,10 +272,24 @@ struct SyncCollectionHistory {
     func knownControls(journal:SyncJournal)throws->[SyncCollectionControl] {
         try requireJournal(journal)
         guard try reviewState(journal:journal) == .ready else {throw OSwindError.unavailable("Review the local wipe before exporting any sync objects")}
+        return try frontierControls(journal:journal,allowUnapprovedLocal:false)
+    }
+    /// Renewal of an externally checkpointed peer erase must not depend on a
+    /// separate local group-review decision. Validate every frontier axis, but
+    /// neither export nor approve the captured local control.
+    func requireReceivedRetirementControl(_ control:SyncCollectionControl,journal:SyncJournal)throws {
+        try requireJournal(journal)
+        _=try reviewState(journal:journal)
+        guard control.creator != replica,
+              try frontierControls(journal:journal,allowUnapprovedLocal:true).contains(control) else {throw OSwindError.invalid("Resume only the exact authenticated peer retirement")}
+    }
+    private func frontierControls(journal:SyncJournal,allowUnapprovedLocal:Bool)throws->[SyncCollectionControl] {
         let frontier=try current();var controls=[SyncCollectionControl]()
         for (peer,counter) in frontier.counters.sorted(by:{$0.key<$1.key}) {
             if peer==replica {
-                guard let control=try approvedControl(counter,journal:journal) else {throw OSwindError.unavailable("Group erasure has not been approved")};controls.append(control)
+                if let control=try approvedControl(counter,journal:journal) {controls.append(control)}
+                else if allowUnapprovedLocal {controls.append(try capturedControl(counter,journal:journal))}
+                else {throw OSwindError.unavailable("Group erasure has not been approved")}
             } else {
                 let row=try database.statement("SELECT digest,control FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(row)}
                 database.bind(row,1,peer);sqlite3_bind_int64(row,2,counter)

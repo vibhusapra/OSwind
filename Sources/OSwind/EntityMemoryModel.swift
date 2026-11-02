@@ -20,11 +20,13 @@ import OSwindCore
     private let canIndex:@Sendable ()->Bool
     private let store:MemoryStore
     private var readTask:Task<Void,Never>?,indexTask:Task<Void,Never>?,editTask:Task<Void,Never>?
+    private let retirement=LibraryTaskRetirement()
     private var clearing=false
     private var generation=UUID(),readGeneration=UUID(),pending=false
     init(store:MemoryStore,indexSource:(@Sendable (String,EntityIndexPlan)throws->Bool)?=nil,canIndex:@escaping @Sendable ()->Bool = { !SessionState.locked && !ProcessInfo.processInfo.isLowPowerModeEnabled && ProcessInfo.processInfo.thermalState.rawValue<ProcessInfo.ThermalState.serious.rawValue }) {self.store=store;self.canIndex=canIndex;self.indexSource=indexSource}
     func reload() {
-        readTask?.cancel();readGeneration=UUID();let token=readGeneration,scope=kind,query=self.query,id=selectedID,store=self.store
+        guard retirement.accepting else {return}
+        retirement.retire(readTask);readGeneration=UUID();let token=readGeneration,scope=kind,query=self.query,id=selectedID,store=self.store
         readTask=Task {[weak self] in
             let worker=Task.detached(priority:.utility) {
                 try Task.checkCancellation();let plan=try store.entityIndexPlan()
@@ -38,14 +40,15 @@ import OSwindCore
         }
     }
     func enqueue(_ memory:Memory) {
+        guard retirement.accepting else {return}
         guard memory.kind != .summary else {return}
         guard pendingIDs.count<256 || pendingIDs.contains(memory.id) else {status="Entity capture queue reached 256 sources. Build / resume to catch up.";return}
         pendingIDs.insert(memory.id)
         if !indexing {start(ids:Array(pendingIDs))}
     }
-    func build() {if indexing {pending=true;return};start(ids:nil)}
+    func build() {guard retirement.accepting else {return};if indexing {pending=true;return};start(ids:nil)}
     private func start(ids:[String]?) {
-        guard !indexing else {return}
+        guard retirement.accepting,!indexing else {return}
         guard canIndex() else {status="Local indexing deferred while locked, in Low Power Mode or under thermal pressure.";return}
         if let ids {pendingIDs.subtract(ids)}
         indexing=true;error=nil;status="Reading saved text locally…";let token=generation,slot=UUID(),store=self.store,canIndex=self.canIndex,indexSource=self.indexSource;indexSlot=slot
@@ -88,7 +91,7 @@ import OSwindCore
     }
     private func recordProgress(_ count:Int,token:UUID) {guard generation==token else {return};status="Indexed \(count) sources in this run…"}
     func mutate(_ action:@escaping @Sendable (MemoryStore)throws->Void) {
-        guard !editing else {return};editing=true;error=nil;let token=generation,store=self.store
+        guard retirement.accepting,!editing else {return};editing=true;error=nil;let token=generation,store=self.store
         editTask=Task {[weak self] in
             let worker=Task.detached(priority:.utility) {try Task.checkCancellation();try action(store)}
             do {try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
@@ -96,7 +99,8 @@ import OSwindCore
             guard let self,self.generation==token,!Task.isCancelled else {return};self.editing=false;self.editTask=nil;self.reload()
         }
     }
-    func cancel() {generation=UUID();indexTask?.cancel();editTask?.cancel();editTask=nil;editing=false;pending=false;pendingIDs.removeAll();status="Stopped. Completed source indexes can be resumed."}
-    func clear() {clearing=true;defer {clearing=false};cancel();readGeneration=UUID();readTask?.cancel();readTask=nil;entities=[];sources=[];selected=nil;selectedID=nil;query="";error=nil;progress = .init(eligible:0,indexed:0,limited:0)}
+    func cancel() {generation=UUID();retirement.retire(indexTask);indexTask=nil;retirement.retire(editTask);editTask=nil;editing=false;pending=false;pendingIDs.removeAll();status="Stopped. Completed source indexes can be resumed."}
+    func clear() {clearing=true;defer {clearing=false};cancel();readGeneration=UUID();retirement.retire(readTask);readTask=nil;entities=[];sources=[];selected=nil;selectedID=nil;query="";error=nil;progress = .init(eligible:0,indexed:0,limited:0)}
+    func cancelAndWait()async {clear();await retirement.drain()}
     deinit {readTask?.cancel();indexTask?.cancel();editTask?.cancel()}
 }

@@ -58,7 +58,7 @@ struct SyncLibrarySender {
         if case .needsGroupReview(let proposal)=try metadata({try $0.reviewState(journal:cache.journal)}) {return .needsGroupReview(proposal)}
         try ready()
         let controls=try metadata {try $0.knownControls(journal:cache.journal)}
-        for control in controls {try publication {try inbox.publishCollectionControl(control)}}
+        for control in controls {try publication {try inbox.ensureAuthenticatedCollectionControl(control)}}
         let revisions=try metadata {_ in try cache.journal.outbox(after:sequence,limit:limit)}
         var through=sequence,count=0,totalBytes=0
         for revision in revisions {
