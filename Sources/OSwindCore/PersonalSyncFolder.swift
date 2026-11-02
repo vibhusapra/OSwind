@@ -13,9 +13,12 @@ final class SyncObjectFolder:@unchecked Sendable {
     private let checkpoints:SyncCipherContext
     private let collectionControls:SyncCipherContext
     private let supersessions:SyncCipherContext
-    private static let markerName="space-v1"
-    private static let markerDescriptor=Data("OSwind.sync.space-marker.v1".utf8)
-    private static let markerBody=Data("OSwind encrypted object space v1".utf8)
+    // Deliberately incompatible with the prior transport: v1 peers do not
+    // understand creation eras, group erasure or causal supersession. Never
+    // install a v1 marker alongside this one or silently adopt a legacy space.
+    private static let markerName="space-v2"
+    private static let markerDescriptor=Data("OSwind.sync.space-marker.v2".utf8)
+    private static let markerBody=Data("OSwind encrypted object space v2; creation-era-v1; collection-control-v1; supersession-v1".utf8)
     private init(root:URL,secret:SyncGroupSecret,group:String,epoch:String,create:Bool)throws {
         try Task.checkCancellation()
         guard root.isFileURL,!root.path.utf8.contains(0) else {throw OSwindError.invalid("Sync object space must be a local directory")}

@@ -23,8 +23,7 @@ struct SyncLibrarySender {
 
     private func metadata<T>(_ body:(SyncCollectionHistory)throws->T)throws->T {
         try library.withRoutineDatabase {db in
-            guard db.handle==cache.database.handle else {throw OSwindError.invalid("The sender belongs to another owning library")}
-            _=try cache.journal.cursor(for:cache.journal.replica)
+            try SyncLibraryContext.requireActive(db,cache:cache)
             return try body(SyncCollectionHistory(database:db,replica:cache.journal.replica))
         }
     }

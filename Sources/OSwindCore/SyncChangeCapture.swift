@@ -110,11 +110,15 @@ enum SyncChangeCapture {
         guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Prepare sync capture outside a transaction")}
         try db.execute("PRAGMA synchronous=FULL; PRAGMA recursive_triggers=ON")
     }
-    static func scope(_ db:RoutineDatabase)throws->SyncCaptureScope {
+    static func scope(_ db:RoutineDatabase,requireActive:Bool=false)throws->SyncCaptureScope {
         let row=try db.statement("SELECT origin,generation,enabled,suppressed,used_bytes,budget FROM personal_sync_capture WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.database("Sync capture scope missing")}
         let value=SyncCaptureScope(origin:db.text(row,0),generation:db.text(row,1));try SyncProtocolLimits.uuid(value.origin);try SyncProtocolLimits.uuid(value.generation)
-        guard (0...1).contains(sqlite3_column_int(row,2)),(0...16).contains(sqlite3_column_int(row,3)),sqlite3_column_int64(row,4)>=0,sqlite3_column_int64(row,4)<=sqlite3_column_int64(row,5),(1...maximumQueueBytes).contains(sqlite3_column_int64(row,5)),(2...5).allSatisfy({sqlite3_column_type(row,Int32($0))==SQLITE_INTEGER}) else {throw OSwindError.database("Invalid sync capture state")};return value
+        guard (0...1).contains(sqlite3_column_int(row,2)),(0...16).contains(sqlite3_column_int(row,3)),sqlite3_column_int64(row,4)>=0,sqlite3_column_int64(row,4)<=sqlite3_column_int64(row,5),(1...maximumQueueBytes).contains(sqlite3_column_int64(row,5)),(2...5).allSatisfy({sqlite3_column_type(row,Int32($0))==SQLITE_INTEGER}) else {throw OSwindError.database("Invalid sync capture state")}
+        if requireActive {
+            guard sqlite3_column_int(row,2)==1,sqlite3_column_int(row,3)==0 else {throw OSwindError.unavailable("The owning sync context is inactive or applying peer changes")}
+        }
+        return value
     }
     static func activate(_ db:RoutineDatabase,budget:Int64=defaultQueueBytes)throws->SyncCaptureScope {
         guard (1...maximumQueueBytes).contains(budget) else {throw OSwindError.invalid("Invalid sync capture queue budget")}

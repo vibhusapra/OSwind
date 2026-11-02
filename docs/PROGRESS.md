@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Collection erasure and owning sync transport — internal WIP
+
+[Current behavior and remaining work](SYNC-LIBRARY-BARRIERS.md) cover native creation eras, reviewed body-free group controls, local-clear export blocking, immutable supersession and active-owner admission. Actual encrypted-folder and native-library preflights pass earlier unseen-source and scope regressions. Full native group retirement, capability compatibility, service lifecycle and provider/two-Mac acceptance remain open; this work is not yet component qualified. F059 stays TODO and all 83 statuses remain unchanged.
+
 ## Search and indexing lifetime — component qualified
 
 [Behavior and remaining work](SEARCH-INDEX-LIFECYCLE.md) cover actual query/index ownership, privacy-erasure revocation, finite automatic batches, stale-publication suppression and real Quit/switch/lock checks.

@@ -245,4 +245,59 @@ extension SyncIncomingSourceTests {
         XCTAssertNil(try inbox.content(XCTUnwrap(operation.content)))
         XCTAssertNotNil(try a.get("denied"))
     }
+    func testCollectionDisabledOwnerCannotPublishEvenOpaqueDeletionHeaders()throws {
+        let (a,ac)=try endpoint("disabled-header-owner",producerID);defer {try? a.close()}
+        try a.insert(Memory(id:"deleted",kind:.note,text:"Owned data erased before sync was disabled"));try drain(a,ac)
+        _=try a.delete("deleted");try drain(a,ac)
+        try a.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET enabled=0 WHERE singleton=1")}
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("disabled-header-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        XCTAssertThrowsError(try deliverySender(a,ac,inbox).publish(),"A deactivated owner cannot export a prepared deletion")
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:1))
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:2))
+    }
+    func testCollectionDisabledOwnerCannotApplyAnAuthenticatedPeerControl()throws {
+        let (a,ac)=try endpoint("active-control-owner",producerID),(b,bc)=try endpoint("disabled-control-peer",receiverID)
+        defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
+        _=try a.wipeLibrary();_=try approveDeliveryWipe(a,ac)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("disabled-receiver-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        _=try deliverySender(a,ac,inbox).publish()
+        try b.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET enabled=0 WHERE singleton=1")}
+        var retirements=0
+        let receiver=SyncCollectionReceiver(library:b,cache:bc,inbox:inbox,retire:{_,_ in retirements+=1})
+        XCTAssertThrowsError(try receiver.receive(creator:producerID,counter:1))
+        XCTAssertEqual(retirements,0)
+        XCTAssertEqual(try count(b,"personal_sync_collection_received_controls"),0)
+    }
+    func testCollectionReplacedOrSuppressedOwnerCannotPublishPreparedPackets()throws {
+        for (name,update) in [("replaced","generation='11111111-2222-4333-8444-555555555555'"),("suppressed","suppressed=1")] {
+            let (a,ac)=try endpoint("\(name)-header-owner",producerID);defer {try? a.close()}
+            try a.insert(Memory(id:"deleted",kind:.note,text:"Owned old prepared note"));try drain(a,ac)
+            _=try a.delete("deleted");try drain(a,ac)
+            try a.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET \(update) WHERE singleton=1")}
+            let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("\(name)-header-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+            XCTAssertThrowsError(try deliverySender(a,ac,inbox).publish(),name)
+            XCTAssertNil(try inbox.revision(replica:producerID,sequence:1),name)
+            XCTAssertNil(try inbox.revision(replica:producerID,sequence:2),name)
+        }
+    }
+    func testCollectionReplacedOrSuppressedReceiverCannotRetireAndActiveRetryWorks()throws {
+        let (a,ac)=try endpoint("context-control-owner",producerID);defer {try? a.close()}
+        _=try a.wipeLibrary();_=try approveDeliveryWipe(a,ac)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("context-control-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        _=try deliverySender(a,ac,inbox).publish()
+        for (name,update) in [("replaced","generation='11111111-2222-4333-8444-555555555555'"),("suppressed","suppressed=1")] {
+            let (b,bc)=try endpoint("\(name)-control-peer",receiverID);defer {try? b.close()};try bc.journal.allowPeer(producerID)
+            let scope=bc.catalog.scope
+            try b.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET \(update) WHERE singleton=1")}
+            var retirements=0
+            let receiver=SyncCollectionReceiver(library:b,cache:bc,inbox:inbox,retire:{_,_ in retirements+=1})
+            XCTAssertThrowsError(try receiver.receive(creator:producerID,counter:1),name)
+            XCTAssertEqual(retirements,0,name);XCTAssertEqual(try count(b,"personal_sync_collection_received_controls"),0,name)
+            // Restore only this owned fixture's original capture state. A failed
+            // attempt must not consume its authenticated receipt or cutoff.
+            try b.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET generation='\(scope.generation)',suppressed=0 WHERE singleton=1")}
+            XCTAssertEqual(try receiver.receive(creator:producerID,counter:1),.applied,name)
+            XCTAssertEqual(retirements,1,name);XCTAssertEqual(try count(b,"personal_sync_collection_received_controls"),1,name)
+        }
+    }
 }
