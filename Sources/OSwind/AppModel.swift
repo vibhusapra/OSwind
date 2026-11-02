@@ -32,15 +32,15 @@ import EventKit
     let visualModelSetup:VisualModelSetupModel
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
-    private var restoringRetiredSettings=false
+    private var assigningSettingsInternally=false
     @Published var settings: AppSettings { didSet {
         // A delayed binding can arrive after its view's workspace departed.
         // Restore the local value before touching controllers or preferences.
-        guard !restoringRetiredSettings else {return}
+        guard !assigningSettingsInternally else {return}
         guard !libraryRetired,!store.isClosed else {
-            restoringRetiredSettings=true;settings=oldValue;restoringRetiredSettings=false;return
+            assignInternalSettings(oldValue);return
         }
-        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
+        applySettingsToControllers()
         if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelMaintenanceWork();cancelAnswer()}
         if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}
         if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
@@ -51,6 +51,12 @@ import EventKit
         if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
+    private func assignInternalSettings(_ value:AppSettings) {
+        assigningSettingsInternally=true;settings=value;assigningSettingsInternally=false
+    }
+    private func applySettingsToControllers() {
+        capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
+    }
     @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
     @Published var searchFocusRequest: UUID?
     @Published var query = ""
@@ -853,9 +859,14 @@ import EventKit
         } catch {guard generation==libraryOperationGeneration,!libraryRetired,!Task.isCancelled else {return};indexStatus = "Index catch-up waiting for the local model server"}
     }
     func wipeLocalLibrary(retry:Bool=false) {
-        guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
+        guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
         prepareForLibrarySwitch()
-        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.meetings = .init()
+        // This explicit wipe owns its quiet preferences, after cancellation has
+        // stopped the old workspace. Ordinary retired bindings remain denied.
+        var quiet=settings
+        quiet.captureOnLaunch=false;quiet.apiEnabled=false;quiet.routinesEnabled=false;quiet.entityAutomaticIndex=false;quiet.meetings = .init()
+        assignInternalSettings(quiet);applySettingsToControllers()
+        do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
         libraryWipe.run(store:store,retry:retry,before:{[workflow] in await workflow.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}

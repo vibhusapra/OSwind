@@ -203,4 +203,17 @@ import OSwindCore
     }
     func testDirectBindingCannotWriteRetiredLibraryPreferences()throws {try lateBinding(false)}
     func testDirectBindingCannotWriteClosedLibraryPreferences()throws {try lateBinding(true)}
+    func lateWipe(_ closed:Bool)throws {
+        try app.settings.save(root:root)
+        let file=root.appendingPathComponent("settings.json"),before=try Data(contentsOf:file)
+        if closed {try app.store.close()}else {app.prepareForLibrarySwitch()}
+        app.wipeLocalLibrary()
+        XCTAssertFalse(app.libraryWipe.busy,"A departed workspace cannot accept a queued wipe")
+        XCTAssertNil(app.libraryWipe.result)
+        XCTAssertEqual(try Data(contentsOf:file),before)
+        let reader=try MemoryStore(root:root);defer {try? reader.close()}
+        XCTAssertNotNil(try reader.get("old"))
+    }
+    func testQueuedWipeCannotStartOnRetiredLibrary()throws {try lateWipe(false)}
+    func testQueuedWipeCannotStartOnClosedLibrary()throws {try lateWipe(true)}
 }
