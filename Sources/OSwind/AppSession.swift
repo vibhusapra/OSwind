@@ -30,10 +30,11 @@ import OSwindCore
     private var lockMonitor:Timer?
     private var watchFD:Int32?
     private var watchedVaultID:String?
+    private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)}) {
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;requested=resolved.url
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
                 vaultPackage=package;requested=package.appendingPathComponent("Library");watch(package)
@@ -221,7 +222,7 @@ import OSwindCore
                 if terminationRequested || pendingLock {throw CancellationError()}
             }
             if vaultPackage != nil && (locked() || pendingLock || terminationRequested) {throw CancellationError()}
-            let candidate=try AppModel(root:root,startServices:false,preparedStore:store)
+            let candidate=try AppModel(root:root,startServices:false,preparedStore:store,personalSyncSetup:personalSyncSetup)
             if startServices {candidate.startConfiguredServices()}
             return candidate
         } catch {
