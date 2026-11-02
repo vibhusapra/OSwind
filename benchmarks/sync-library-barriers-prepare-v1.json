@@ -1,0 +1,36 @@
+{
+  "format": "OSwind bounded outgoing preparation observation at older source0b9b107",
+  "state": "passed",
+  "source": "0b9b1070c5e94dfb6da281d28e06633b20fcb051",
+  "observations": [
+    {
+      "records": 1000,
+      "allNativeFramesReencodedAndUnchanged": true,
+      "allCachedBodyHashesMatch": true,
+      "outboxRegisterEraCounts": 1000,
+      "rawWorkPendingEmpty": true,
+      "versionAccountingBytes": 515893,
+      "integrityAndForeignKeys": true,
+      "prepareSeconds": 7.862070833332837,
+      "prepareRecordsPerSecond": 127.1929522385245
+    },
+    {
+      "records": 10000,
+      "allNativeFramesReencodedAndUnchanged": true,
+      "allCachedBodyHashesMatch": true,
+      "outboxRegisterEraCounts": 10000,
+      "rawWorkPendingEmpty": true,
+      "versionAccountingBytes": 5168894,
+      "integrityAndForeignKeys": true,
+      "prepareSeconds": 79.29291049996391,
+      "prepareRecordsPerSecond": 126.1146795715684
+    }
+  ],
+  "samplesPerSize": 1,
+  "wholeProcessPeakRSSBytes": 118767616,
+  "RSSScope": "Whole XCTest process covering both sizes and setup, not per-size algorithm memory.",
+  "testSource": "Tests/OSwindCoreTests/SyncOutgoingScaleTests.swift",
+  "logSHA256": "7df9c37686540f47be4b2de9bae274585539a847e2c00eb46efeac78020f5f27",
+  "independentReviewSHA256": "954f560d5752435cc6afd5c07fb421deb7488c4ce9c9a22f5e60dec5d8a749e4",
+  "limits": "Two single warm owned-text observations. No paired earlier-source control, current erasure-control/media/full transport workload, model inference, power or competitor claim. Timer excludes population/setup/source hashing. Process RSS, if reported separately, includes both dataset sizes and XCTest. This is an earlier source observation; final sender source26461f5 is not measured here."
+}
