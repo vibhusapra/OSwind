@@ -1,5 +1,7 @@
 # OSwind
 
+[Source worker lifetime](docs/SOURCE-WORK-LIFECYCLE.md) now joins actual note, recap, statistics and storage jobs through Quit, switch and encrypted-library lock. The source-bound receipt passes 190 required controls in three builds, 49 owned native methods and 30 package/process stages; independent review preserves 46 earlier apps. Audio file import, Ask and other reader/model setup lifetimes remain open. All 83 feature statuses stay unchanged.
+
 [Committed file cleanup](docs/PENDING-MEDIA-CLEANUP.md) resumes durable deleted-media work through current supported writer events and pending-only backoff, with no periodic idle probe. The source-bound receipt passes149 required controls in three builds,43 owned native methods,30 package/process stages and independent app/archive review with44 earlier apps unchanged. Older producers may need startup/wake/explicit retry. Complete sync, other worker categories, native input, power and distribution remain open; all83 feature statuses stay unchanged.
 
 [Cleanup worker lifetime](docs/CLEANUP-LIFECYCLE.md) owns deletion/maintenance through cancellation and workspace closure. The current source-bound receipt covers127 required controls in debug, sanitizer and optimized builds,41 owned native cases and30 package/process stages. All83 feature statuses stay unchanged; pending-media scheduling and complete product acceptance remain open. The predecessor PR128 hosted canceled-unlock busy failure remains unresolved.

@@ -9,7 +9,7 @@
       "license": "Source available under a commercial license; source-based commercial/competing-product use is restricted. Official prebuilt builds have separate Terms of Service and plan terms.",
       "features": "Screen + mic/system audio; text-only Accessibility or pixels/OCR; local Whisper/Parakeet; history search; AI questions; local/Ollama and cloud providers; MCP; scheduled workflows/capture; app/window/URL scopes; optional async text/image redaction; media-versus-text retention; personal device sync; managed seats; Enterprise SSO/MDM and shared context. Changelog also advertises calendar reminders, saved AI presets, timed starred sessions, custom MCP connections, clipboard context and narrated SOP exports.",
       "difference": "Capture, assistant context and automation reference. Business excludes shared teammate context. The plan table lists Max/Ultra beta access, while nearby prose singles out Ultra; exact entitlement and capacity prices need account/checkout verification.",
-      "caveat": "Annual prices are displayed defaults, not a tested checkout. Pricing estimates ~30GB/month; architecture estimates ~5–10GB/month and ~600MB RAM, while pricing allows600MB–4GB. These are different vendor estimates, not matched energy/storage tests. Our official CLI0.4.53 keyword-HTTP result does not measure desktop2.7.84, capture, AI, audio or power.",
+      "caveat": "Annual prices are displayed defaults, not a tested checkout. Pricing estimates ~30GB/month; architecture estimates ~5\u201310GB/month and ~600MB RAM, while pricing allows600MB\u20134GB. These are different vendor estimates, not matched energy/storage tests. Our official CLI0.4.53 keyword-HTTP result does not measure desktop2.7.84, capture, AI, audio or power.",
       "sources": [
         "https://screenpipe.com/onboarding",
         "https://docs.screenpipe.com/home",
@@ -45,7 +45,7 @@
     {
       "name": "Rewind Desktop (rewind.app)",
       "category": "Visual desktop history",
-      "price": "Publisher comparison search snapshots retrieved October31 quote $30/month and no free tier. Direct article fetch still fails; live checkout is unverified.",
+      "price": "Publisher search snapshots retrieved November1 again quote $30/month and no free tier. Direct comparison/how-to fetches still fail; checkout remains unverified.",
       "license": "Proprietary; distinct from original Rewind AI.",
       "features": "Always-on screen history; local OCR keyword search; full-screen timeline; global shortcut; private-window detection; H.264 compression; optional encrypted archive to user-owned S3 with on-demand older video.",
       "difference": "Visual replay and storage are its focus. Source says AI-powered search and meeting/audio transcription are not yet available.",
@@ -54,7 +54,7 @@
         "https://rewind.app/",
         "https://rewind.app/blog/rewind-vs-rewind-desktop"
       ],
-      "checked": "October31 homepage recheck and publisher comparison search snapshots; direct comparison URLs return cache misses."
+      "checked": "November1 evening homepage and fresh publisher article search snapshots; direct comparison/how-to URLs still return cache misses. No runtime/checkout verification."
     },
     {
       "name": "Pieces",
@@ -67,7 +67,7 @@
       "sources": [
         "https://pieces.app/pricing"
       ],
-      "checked": "October31 pricing recheck; no app runtime or billing qualification."
+      "checked": "November1 evening primary monthly pricing recheck; unchanged prices and card-required trial. Annual selected amount, app runtime and billing unverified."
     },
     {
       "name": "Littlebird",
@@ -102,7 +102,7 @@
     {
       "name": "ScreenMemory",
       "category": "Visual desktop history",
-      "price": "Free 24-hour/single-monitor tier; Standard $29 with one year updates and optional $5/year renewal; Lifetime $39 one-time.",
+      "price": "Free lists 24-hour history/single monitor, but also Unlimited History in the same card (conflicting). Standard $29 includes one year updates/3 devices; optional $5/year renewal. Lifetime $39 one-time.",
       "license": "Proprietary macOS app.",
       "features": "Continuous screen recording; visual timeline; high-resolution playback; local OCR; app filters; calendar activity heatmaps; app blacklist; unlimited paid history; multiple monitors and three devices on Standard.",
       "difference": "Simple local visual recall with one-time pricing and a calendar-oriented interface.",
@@ -110,7 +110,7 @@
       "sources": [
         "https://screenmemory.app/"
       ],
-      "checked": "October 29 documentation recheck; publisher/cache claims, no app runtime qualification."
+      "checked": "November1 evening primary homepage/pricing recheck; free-history contradiction retained. No app runtime, license checkout or billing qualification."
     },
     {
       "name": "TimeScroll",
@@ -209,7 +209,7 @@
     {
       "name": "Omi",
       "category": "Open-source audio memory ecosystem",
-      "price": "Prior October 22 quote: optional $129 device ($179 regular); Pro $29.99/month or $269.91/year. Current wearable page advertises a free plan and unlimited on-phone transcription; desktop pricing/allowances not reverified.",
+      "price": "Current direct wearable offer: device $169 (reference $229); free unlimited on-phone transcription plus 300 cloud minutes/month. Pro $29.99/month or $269.91/year; first year $269 with kit, then $269.91/year. Older/search $129/$179 device quotes conflict. Mac desktop-only allowances/subscription applicability remain unverified.",
       "license": "Open-source ecosystem; inspect per-component licenses before reuse.",
       "features": "Mac/mobile/web audio capture, conversations and summaries, tasks, searchable memories, speaker profiles, custom vocabulary, templates, app integrations and MCP; optional wearable offline capture.",
       "difference": "Audio/real-world and wearable memory with broad integration ecosystem. Mac app can be used without buying hardware.",
@@ -217,9 +217,12 @@
       "sources": [
         "https://get.omi.me/",
         "https://help.omi.me/en/articles/13135007-overview",
-        "https://www.omi.me/pages/download"
+        "https://www.omi.me/pages/download",
+        "https://get.omi.me/omi-offer",
+        "https://www.omi.me/products/omi-unlimited-yearly-plan-bundle",
+        "https://help.omi.me/en/articles/13159726-manage-my-subscription"
       ],
-      "checked": "November1 primary download/overview pages and macOS download landing page fetched (advertised0.12.552, no binary download or runtime test). Desktop prices/allowances remain unverified; prior price quote retains October22 date."
+      "checked": "November1 evening direct wearable offer, yearly product and help recheck; direct price169/229 supersedes older/search129/179. Product page shows sold-out/add-to-cart conflict. Earlier advertised desktop0.12.552 remains a landing-page observation only; no binary/runtime/checkout test."
     },
     {
       "name": "Granola",
@@ -290,5 +293,5 @@
       "checked": "October 29 homepage/privacy check; privacy policy last updated October 13, 2026."
     }
   ],
-  "latestSourceCheck": "landscape-source-checks-2026-10-31.json"
+  "latestSourceCheck": "landscape-source-checks-2026-11-01-evening.json"
 }

@@ -1,0 +1,54 @@
+{
+  "format": "OSwind targeted primary pricing recheck, November1 evening",
+  "checkedAtUTC": "2026-11-02T02:42:46.835691+00:00",
+  "scope": "Four publisher rows only; not a new review of all20. Documentation/search snapshots do not establish runtime, billing or checkout acceptance.",
+  "vendors": [
+    {
+      "name": "ScreenMemory",
+      "sources": [
+        "https://screenmemory.app/"
+      ],
+      "result": "Direct homepage unchanged: Free lists24-hour history/single monitor but also Unlimited History in same list. Standard29USD includes1year updates,3devices, optional5USD/year renewal. Lifetime39USD one-time. Contradictory free allowance preserved.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Pieces",
+      "sources": [
+        "https://pieces.app/pricing"
+      ],
+      "result": "Direct monthly table unchanged: Pro18.99USD/user/month; Enterprise22.99USD/user/month or69.99USD/user/quarter.7-day trial requires card;14-day money-back guarantee. BYOK appears under Enterprise; local/cloud model choice under Pro. Yearly25percent discount advertised, exact selected annual amount not fetched. No free plan.",
+      "runtimeTest": false
+    },
+    {
+      "name": "Rewind Desktop (rewind.app)",
+      "sources": [
+        "https://rewind.app/",
+        "https://rewind.app/blog/rewind-vs-rewind-desktop",
+        "https://rewind.app/blog/find-anything-on-screen"
+      ],
+      "result": "Direct comparison and how-to pages still return cache misses. Fresh publisher search snapshots reproduce30USD/month/no free tier and screen-only OCR/timeline limits; homepage direct/search content distinguishes local keyword search and optional encrypted personalS3 video archive. No checkout verification.",
+      "directArticleFetch": "failed/cache-miss",
+      "runtimeTest": false
+    },
+    {
+      "name": "Omi",
+      "sources": [
+        "https://get.omi.me/omi-offer",
+        "https://www.omi.me/products/omi-unlimited-yearly-plan-bundle",
+        "https://help.omi.me/en/articles/13135007-overview",
+        "https://help.omi.me/en/articles/13159726-manage-my-subscription"
+      ],
+      "result": "Direct offer currently shows device169USD against229USD, replacing earlier129/179 quotes in older/search content. Pro29.99USD/month or269.91USD/year, first-year269USD bundle with kit; yearly product directly shows269USD/12months and269.91USD renewal, with sold-out/add-to-cart UI both present. Free plan says unlimited on-phone transcription plus300cloudminutes/month. Pro says1000questions/month and unlimited transcription. These are wearable/account plan claims, not independently established Mac desktop entitlements. Help overview says wearable optional and Mac meeting recording supported.",
+      "conflicts": [
+        "Search snapshot of sameoffer retains129/179devicequote while directpage169/229. Prefer direct currentrender, retain dated conflict.",
+        "Yearly Shopify product renders both sold-out and add-to-cart; availability unverified.",
+        "Desktop-only allowance and subscription applicability not verified."
+      ],
+      "runtimeTest": false
+    }
+  ],
+  "limits": [
+    "Publisher compliance/energy/storage/quality claims are not independent audits.",
+    "No purchases, accounts, subscriptions, binaries or personal capture were used."
+  ]
+}

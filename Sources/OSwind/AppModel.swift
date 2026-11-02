@@ -27,7 +27,8 @@ import EventKit
     let libraryTransfer = LibraryTransferModel()
     let libraryWipe=LibraryWipeModel()
     lazy var pendingMediaCleanup=PendingMediaCleanupModel(store:store,onFinished:{[weak self] in self?.invalidateStorageEstimate()},onWipeState:{[weak self] pending in self?.libraryWipe.pendingCleanup=pending})
-    private var noteTasks=[UUID:Task<Void,Never>]()
+    let libraryWork=LibraryWorkRegistry()
+    private var libraryWorkAvailable:Bool {!libraryRetired && destructiveDrainers==0 && libraryWork.accepting && !store.isClosed}
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     let visualModelSetup:VisualModelSetupModel
@@ -42,7 +43,7 @@ import EventKit
             assignInternalSettings(oldValue);return
         }
         applySettingsToControllers()
-        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelMaintenanceWork();cancelAnswer()}
+        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();libraryWork.cancel(kinds:[.note,.recap]);cancelMaintenanceWork();cancelAnswer()}
         if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}
         if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
@@ -124,8 +125,7 @@ import EventKit
     private var maintenanceAutomatic=false
     private var destructiveDrainers=0
     var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
-    private var recapSaveTask:Task<Void,Never>?
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
     @Published private(set) var maintenanceStatus=""
@@ -156,8 +156,8 @@ import EventKit
     private(set) var configuredServicesActive=false
     private var cancellables = Set<AnyCancellable>()
     private var refreshTask: Task<Void,Never>?
-    private var statisticsTask: Task<Void,Never>?
-    private var diskUsageTask: Task<Void,Never>?
+    private var statisticsTask:UUID?
+    private var diskUsageTask:UUID?
     private var statisticsUpdatedAt = Date.distantPast
     private var statisticsPending = false
     private var storageGeneration = UUID()
@@ -329,8 +329,8 @@ import EventKit
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
-        libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
+        libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();libraryWork.cancel();libraryWipe.cancel()
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsPending=false; stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -383,7 +383,7 @@ import EventKit
     @discardableResult func refreshSelectedPIIScan(read:(@Sendable (Memory)throws->PIIScanStatus)?=nil) -> Task<Void,Never>? {
         piiScanStatusTask?.cancel();piiScanStatusTask=nil;piiScanStatusGeneration=UUID()
         selectedPIIScan=nil;selectedPIIScanError=nil
-        guard let memory=selected,memory.originalEvidence==nil else {return nil}
+        guard libraryWorkAvailable,let memory=selected,memory.originalEvidence==nil else {return nil}
         let store=self.store,generation=piiScanStatusGeneration
         let worker=Task.detached(priority:.utility) {
             try Task.checkCancellation()
@@ -407,7 +407,7 @@ import EventKit
     /// can replace the selected original. Media playback remains unavailable.
     func watchSelectedOriginal(interval:UInt64=2_000_000_000) {
         historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
-        guard let memory=selected,memory.originalEvidence != nil else {return}
+        guard libraryWorkAvailable,let memory=selected,memory.originalEvidence != nil else {return}
         let store=self.store,generation=historicalDetailGeneration
         historicalDetailTask=Task { [weak self] in
             while !Task.isCancelled {
@@ -455,6 +455,7 @@ import EventKit
         }
     }
     private func openSource(id:String,query:String,passage:PassageRange?,visual:VisualMatch?=nil,load:@escaping @Sendable () throws -> Memory) {
+        guard libraryWorkAvailable else {return}
         cancelOpeningMemory();let generation=detailGeneration
         openingMemoryID=id
         detailTask=Task { [weak self] in
@@ -470,6 +471,7 @@ import EventKit
         }
     }
     func refresh(forceStatistics: Bool = false) {
+        guard libraryWorkAvailable else {return}
         refreshStatistics(force:forceStatistics)
         if section=="People & projects" {refreshTask?.cancel();refreshing=false;entityMemory.reload();return}
         if section=="Calendar" {refreshTask?.cancel();refreshing=false;activity.resumeAndInvalidate();return}
@@ -488,32 +490,44 @@ import EventKit
             catch { guard !Task.isCancelled else { return };if mode == .visual {self?.hits=[];self?.searchWarnings=[error.localizedDescription]} else {self?.errorMessage = error.localizedDescription}; self?.refreshing = false }
         }
     }
-    private func refreshStatistics(force: Bool) {
+    var hasPendingStatistics:Bool {statisticsTask != nil || diskUsageTask != nil}
+    func refreshStatistics(force: Bool,observeWorker:(@Sendable ()throws->Void)?=nil,observeStorage:(@Sendable ()throws->Void)?=nil,statisticsCompleted:(@Sendable ()->Void)?=nil,storageCompleted:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable else {return}
         if statisticsTask != nil { if force { statisticsPending = true }; return }
         guard force || Date().timeIntervalSince(statisticsUpdatedAt) >= 5 else { return }
-        let store = self.store
-        statisticsTask = Task { [weak self] in
-            do {
-                var value = try await Task.detached(priority:.utility) { try store.stats(includeDiskUsage:false) }.value
-                guard let self else { return }; value.bytes = self.stats.bytes
-                self.stats = value; self.statisticsUpdatedAt = Date()
-            } catch { self?.errorMessage = error.localizedDescription }
-            guard let self else { return }; self.statisticsTask = nil
-            if self.statisticsPending { self.statisticsPending = false; self.refreshStatistics(force:true) }
+        let store=self.store,generation=libraryOperationGeneration
+        statisticsTask=libraryWork.launch(kind:.statistics,operation:{
+            defer {statisticsCompleted?()};try observeWorker?();try Task.checkCancellation();return try store.stats(includeDiskUsage:false)
+        }) {outcome,cancelled in
+            self.statisticsTask=nil
+            let pending=self.statisticsPending;self.statisticsPending=false
+            guard !cancelled,self.libraryOperationGeneration==generation,self.libraryWorkAvailable else {return}
+            switch outcome {
+            case .success(var value):value.bytes=self.stats.bytes;self.stats=value;self.statisticsUpdatedAt=Date()
+            case .failure(let error):self.errorMessage=error.localizedDescription
+            }
+            if pending {self.refreshStatistics(force:true)}
         }
         // Storage traversal is independent of both query publication and SQL
         // counts. Coalesce it across captures/keystrokes, including large stores.
-        refreshStorageEstimate()
+        refreshStorageEstimate(observeWorker:observeStorage,observeCompletion:storageCompleted)
     }
     func invalidateStorageEstimate() { storageGeneration = UUID(); storageUpdatedAt = nil }
-    private func refreshStorageEstimate() {
+    private func refreshStorageEstimate(observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable else {return}
         guard diskUsageTask == nil, storageUpdatedAt.map({ Date().timeIntervalSince($0) >= 30 }) ?? true else { return }
-        let store = self.store, generation = storageGeneration
-        diskUsageTask = Task { [weak self] in
-            let bytes = await Task.detached(priority:.utility) { store.diskBytes() }.value
-            guard let self else { return }; self.diskUsageTask = nil
-            if generation == self.storageGeneration { self.stats.bytes = bytes; self.storageUpdatedAt = Date() }
-            else { self.refreshStorageEstimate() }
+        let store=self.store,generation=storageGeneration,libraryGeneration=libraryOperationGeneration
+        diskUsageTask=libraryWork.launch(kind:.storage,operation:{
+            defer {observeCompletion?()};try observeWorker?();try Task.checkCancellation();return try store.storageUsageBytes()
+        }) {outcome,cancelled in
+            self.diskUsageTask=nil
+            guard !cancelled,self.libraryOperationGeneration==libraryGeneration,self.libraryWorkAvailable else {return}
+            switch outcome {
+            case .success(let bytes):
+                if generation==self.storageGeneration {self.stats.bytes=bytes;self.storageUpdatedAt=Date()}
+                else {self.refreshStorageEstimate()}
+            case .failure(let error):self.errorMessage=error.localizedDescription
+            }
         }
     }
     func prepareMeetingBrief(_ event:MeetingOccurrence) {
@@ -573,39 +587,50 @@ import EventKit
     func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "" }
     func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = ""; refreshChats() }
     func refreshChats() {
+        guard libraryWorkAvailable else {return}
         do { chats = try store.chats(); if let id = currentChatID { if try store.chat(id) != nil { chatTurns = try store.chatTurns(id); answer = chatTurns.last?.answer } else { currentChatID = nil; chatTurns = []; answer = nil } } }
         catch { errorMessage = error.localizedDescription }
     }
-    func deleteCurrentChat() { guard !asking, let id = currentChatID else { return }; do { try store.deleteChat(id); newChat(); refreshChats() } catch { errorMessage = error.localizedDescription } }
+    func deleteCurrentChat() { guard libraryWorkAvailable,!asking, let id = currentChatID else { return }; do { try store.deleteChat(id); newChat(); refreshChats() } catch { errorMessage = error.localizedDescription } }
     func exportChat() {
-        guard let id = currentChatID else { return }
-        do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK, let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
+        guard libraryWorkAvailable,let id = currentChatID else { return }
+        do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK,libraryWorkAvailable,let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
     }
-    func saveAnswer(_ value:Answer?=nil) {
-        guard !libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
+    func saveAnswer(_ value:Answer?=nil,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
         savingRecap=true;recapSaveStatus="Saving a source-linked recap…"
-        let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
-        let worker=Task.detached(priority:.utility) {try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)}
-        recapSaveTask=Task {
-            defer {savingRecap=false;recapSaveTask=nil}
-            do {
-                let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
-                guard libraryOperationGeneration==generation else {return}
-                recapSaveStatus="Saved to Recaps with \(result.sources.count) original \(result.sources.count==1 ? "source":"sources").";captured(memory)
-            } catch {
-                guard libraryOperationGeneration==generation else {return}
-                recapSaveStatus="Recap was not saved.";errorMessage=error.localizedDescription
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.recap,operation:{
+            try observeWorker?();try Task.checkCancellation()
+            let memory=try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)
+            observeCompletion?();return memory
+        }) {outcome,cancelled in
+            self.savingRecap=false
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let memory):
+                self.recapSaveStatus=cancelled ? "Recap committed before cancellation. Refresh to review it.":"Saved to Recaps with \(result.sources.count) original \(result.sources.count==1 ? "source":"sources")."
+                if !cancelled {self.captured(memory)}
+            case .failure(let error):
+                self.recapSaveStatus=cancelled ? "Recap save cancelled.":"Recap save did not finish."
+                if !cancelled {self.errorMessage=error.localizedDescription}
             }
         }
     }
-    func addNote(_ text:String,title:String="Quick note",kind:MemoryKind = .note) {
-        guard !libraryWipe.busy else {return}
-        let clean=settings.privacy.sanitize(text).text,embedder=self.embedder,store=self.store,id=UUID(),generation=libraryOperationGeneration
-        let worker=Task.detached(priority:.utility) {var m=Memory(kind:kind,app:"OSwind",title:title,text:clean);m.embedding=embedder.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder.modelID;try Task.checkCancellation();try store.insert(m);return m}
-        noteTasks[id]=Task {
-            defer {noteTasks[id]=nil}
-            do {let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()};guard libraryOperationGeneration==generation else {return};captured(memory)}
-            catch {guard libraryOperationGeneration==generation,!Task.isCancelled else {return};errorMessage=error.localizedDescription}
+    func addNote(_ text:String,title:String="Quick note",kind:MemoryKind = .note,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy else {return}
+        let clean=settings.privacy.sanitize(text).text,embedder=self.embedder,store=self.store,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.note,operation:{
+            try observeWorker?();try Task.checkCancellation()
+            var memory=Memory(kind:kind,app:"OSwind",title:title,text:clean)
+            memory.embedding=embedder.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:embedder.modelID
+            try Task.checkCancellation();try store.insert(memory);observeCompletion?();return memory
+        }) {outcome,cancelled in
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let memory):if !cancelled {self.captured(memory)}
+            case .failure(let error):if !cancelled {self.errorMessage=error.localizedDescription}
+            }
         }
     }
     enum MCPResultSavePhase:Sendable {case started,settingsCaptured}
@@ -656,11 +681,13 @@ import EventKit
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
+        libraryWork.cancel()
         pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
         await cancelDestructiveWorkAndWait()
         await pendingMediaCleanup.cancelAndWait()
+        await libraryWork.cancelAndWait()
     }
     private func cancelDestructiveWork() {
         deletionWorker?.cancel();maintenanceWorker?.cancel();deletionTask?.cancel();maintenanceTask?.cancel()
@@ -771,7 +798,7 @@ import EventKit
         }
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
-    func favorite(_ memory: Memory) { guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
+    func favorite(_ memory: Memory) { guard libraryWorkAvailable else {return};guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     // Observers are internal test seams. Only pre-work observation may throw;
     // a postcommit observation must not turn real deletion into a false failure.
     func delete(_ memory:Memory,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
@@ -873,7 +900,7 @@ import EventKit
         assignInternalSettings(quiet);applySettingsToControllers()
         do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry,before:{[workflow,pendingMediaCleanup] in await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait()}) {[weak self] result in
+        libraryWipe.run(store:store,retry:retry,before:{[workflow,pendingMediaCleanup,libraryWork] in await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait();await libraryWork.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
             self.libraryRetired=false;self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}
@@ -947,10 +974,11 @@ import EventKit
         nativeModels.message("Ready for local transcription.",for:result.kind)
     }
     func importAudio() {
+        guard libraryWorkAvailable,!libraryWipe.busy else {return}
         guard !voice.busy else {audioImportStatus="Finish voice typing before importing audio.";return}
         guard !importingAudio else { return }
         let panel=NSOpenPanel(); panel.allowedContentTypes=[.audio]; panel.allowsMultipleSelection=false; panel.message="Transcribe this file locally. Clip retention follows your Audio setting."
-        guard panel.runModal() == .OK,let file=panel.url else { return }
+        guard panel.runModal() == .OK,libraryWorkAvailable,!libraryWipe.busy,!voice.busy,!importingAudio,let file=panel.url else { return }
         importingAudio=true; audioImportStatus="Preparing audio…"; let configuration=settings
         audioImportTask=Task {
             defer { importingAudio=false; audioImportTask=nil }
@@ -975,9 +1003,9 @@ import EventKit
         }
     }
     func cancelAudioImport() { audioImportTask?.cancel() }
-    func exportData() { pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK, let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
+    func exportData() {guard libraryWorkAvailable else {return};pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK,libraryWorkAvailable,let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
     func importData(limitlessAPI:Bool=false) {
-        guard !importingJSON else {return};let panel=NSOpenPanel();panel.allowedContentTypes=[.json]
+        guard libraryWorkAvailable,!importingJSON else {return};let panel=NSOpenPanel();panel.allowedContentTypes=[.json]
         if limitlessAPI {panel.title="Import Limitless API JSON";panel.message="Choose a saved API response containing data.lifelogs or data.lifelog. Account-export ZIP files, audio and Rewind databases are not supported."}
         if panel.runModal() == .OK,let url=panel.url {importJSONFile(url,limitlessAPI:limitlessAPI)}
     }
@@ -994,7 +1022,7 @@ import EventKit
     enum JSONImportPhase:Sendable {case started,settingsCaptured}
     // The observer is an internal test seam; production callers leave it nil.
     func importJSONFile(_ url:URL,limitlessAPI:Bool=false,observeWorker:(@Sendable (JSONImportPhase)throws->Void)?=nil,scannerFactory:@escaping @Sendable (PIIImportConfiguration) async throws->PIIImportScanner = {try await $0.scanner()}) {
-        guard !store.isClosed,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
+        guard libraryWorkAvailable,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
         let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {()throws->String in
             try Task.checkCancellation();try observeWorker?(.started);try Task.checkCancellation()
@@ -1040,7 +1068,7 @@ import EventKit
     }
 
     func startAPI() {
-        guard !showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        guard libraryWorkAvailable,!showOnboarding,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
         if api != nil {settings.apiEnabled=true;return}
         do {
             api=try LocalAPIServer(store:store,embedder:embedder)

@@ -1,0 +1,563 @@
+{
+  "format": "OSwind source worker lifecycle qualification v1",
+  "state": "passed",
+  "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+  "nativeSchema": 33,
+  "trackedInputs": 1374,
+  "inputManifest": "source-work-lifecycle-inputs-v1.json",
+  "inputManifestSHA256": "8fdb3c94435c8b1870ad6fefa1b62d39e17b109c5184c5a7b607941dc8f7402f",
+  "software": [
+    {
+      "stage": "full-debug",
+      "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "tests": {
+        "defined": 2242,
+        "passed": 2131,
+        "skipped": 111,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 190,
+      "logSHA256": "9f7ccddf3dae15bba3b635df7da61ca91e0aca6ab093056716f0513a03e50cff",
+      "wallSeconds": 545.8722009160556,
+      "raceWarning": false,
+      "receiptSHA256": "28ee2026b65ce8f83f01321facf70faf03b5e5955b94540080062c9c3e296572"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 937,
+        "passed": 884,
+        "skipped": 53,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 190,
+      "logSHA256": "a9bb353d0d3ca856a5ba040bd43b1ba3ab87e883dba65ff9ba6988ebdcdf3e97",
+      "wallSeconds": 636.1465994161554,
+      "raceWarning": false,
+      "receiptSHA256": "96ee7c50b9156200610a0ac24f5d5cdeee0457bd5c9b40fafe5824212c464083"
+    },
+    {
+      "stage": "optimized",
+      "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/release-build",
+        "-c",
+        "release",
+        "--filter",
+        "SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 937,
+        "passed": 884,
+        "skipped": 53,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 190,
+      "logSHA256": "6474bafbe48185902c4c3d3f15640ba5b4e4ec603f631ddcf421f63e3357c21f",
+      "wallSeconds": 309.5763964159414,
+      "raceWarning": false,
+      "receiptSHA256": "6a3b6d8eb7f45029beb106350ab378bf88a83b7235cb761d8936bff17d2ae62c"
+    }
+  ],
+  "mandatoryControlsInEveryBuild": 190,
+  "reusedSuccessfulStages": 16,
+  "retainedFailedCandidateUnchanged": true,
+  "qualificationStages": [
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "c23d48d6c82291f6ddfbb14826b5bde2a98bac145ba3038a2d16dc48c17a713e",
+      "tests": {
+        "defined": 49,
+        "passed": 49,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f70c5e12f81e6ca2a27c5a58d268b60f9b9764c638cc0c6fbef9bce3d25bd541",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "migration-crashes",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3e6be400970835c64d94c5dee5ea7340c49b96bea9ede4c52aa9393a9a39a351",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "migration-independent-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "310f25ecba0656c0ce1adaa61502018e2de5e77014769eaa8beec9388cfc2bbc",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a475039b07c07085a8d48cc5f70b4d63ab493bed806cebb7f0846cc9a20cf411",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "packaged-media-admission",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f13f6610b0baab9238fd2a87171c6ffc91adbf87cb78684ddc0d0a861457cdf2",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "deb78de900ca46d4aa2073f341caf8a77b94b68f6bf20e1178015dd48c297b35",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a19aeacb3d540594668b18bc6ad9fa06ac7f8d110ff62a374114b26b5aacfe3e",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "11c1bb4c87917ded81a9b59047b155127a4998287d1498556f9c29a6971569ce",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a7bf71fd50c1072f5edd9bda0b57671b2bccbe54294c110ad0ed4e00fce7c293",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "native-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "native-wipe",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "fcb00468eb200449f31e882ffa8233bed923a471b88b9d0c4311fbbfbbd7f30c",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "d25e62aa5bb822c6396780ab5f5d58862dedb8c4e3b639fa2005877f52c93551",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "dec81183f5684b17d536315f575ab004c1d2df537439621a79eccbc9746bd6bb",
+      "tests": null,
+      "reusedFrom": ".artifacts/remaining-worker-lifecycle-v1/qualification-v3"
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-sync-capture",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "d94edb9b7aea75b01a27c5fd97c01a9a0803970c6bd348a9f951fc02519f89cf",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "83705a808418955582a083674345d3b865fe8de654c6c92f17870cab74c34d23",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-text-observation",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1593530d40676064b7b73b061b25cff5047f5a288cc624fd9494cf4b6529d01c",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-accessibility-text",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "d118c3dd769e8101098cbd9f26616749d507f8e9fe93aebcce3ed14425158a13",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "eb0307d726ef5a71c12030b77ddc8804c5fa448c85ace846484419c353d22a0e",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "815218c1963518490a3c900aac6b5db192d4495334c29746eb1cf40df06ebe72",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "schema33-historical-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3b2eb6565e0af1e4e77378816a80abae9b53ac56eb1b9dd5fc32d4552cc33809",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ebd9013daa0a25f1bec669c6df8477991963085127268bc0e72359e8d16b0161",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null,
+      "reusedFrom": null
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null,
+      "reusedFrom": null
+    }
+  ],
+  "native": {
+    "defined": 49,
+    "passed": 49,
+    "skipped": 0,
+    "logSHA256": "c23d48d6c82291f6ddfbb14826b5bde2a98bac145ba3038a2d16dc48c17a713e"
+  },
+  "distinctFullAndNativeMethods": 2178,
+  "nativeMethodsAdditionalToFull": 47,
+  "independentReview": {
+    "format": "OSwind independent source worker lifecycle package review",
+    "state": "passed",
+    "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+    "nativeSource": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+    "trackedInputs": 1374,
+    "sourceInputsSHA256": "8fdb3c94435c8b1870ad6fefa1b62d39e17b109c5184c5a7b607941dc8f7402f",
+    "nativeDefined": 49,
+    "nativePassed": 49,
+    "nativeSkipped": 0,
+    "all30StageLogsMatch": true,
+    "currentSourceMigrationReviewSHA256": "96c4f0fe989d1c943d98ca3fed70afb0413d46c7e2a6882697ed02af4f411742",
+    "nativeLogSHA256": "c23d48d6c82291f6ddfbb14826b5bde2a98bac145ba3038a2d16dc48c17a713e",
+    "appRegularFiles": 34,
+    "zipAndExtractionEveryFileEqual": true,
+    "strictAppAndExtractedSignatures": true,
+    "priorAppsUnchanged": 46,
+    "retainedFailedCandidateUnchanged": true,
+    "successfulStagesReused": 16,
+    "freshQuerySetupRecovery": "One bounded fresh same-code attempt; original backing-device inventory failure remains causally unresolved",
+    "packagedProbeSHA256": "f13f6610b0baab9238fd2a87171c6ffc91adbf87cb78684ddc0d0a861457cdf2",
+    "bothPackagedFixProbesPass": true,
+    "readOnlyProbeDatabases": "Both empty native/erasure queues, integrity/FK pass, all8 fence triggers present; referenced fixture files absent. Normal mode=ro honors WAL.",
+    "zipSHA256": "3fafb7a5d0e0c2010e489f8edd2429a1e56ab94893ef3ead2db4c8d364567b53",
+    "CLI_SHA256": "955a78e8a08287692f41d33d16876ead63f8d8fd6ba1a3d81fd18627393cc880",
+    "appSHA256": "e247641a209e7fb67a0dbdbdc9d268ba665c12df066719a46e877b4560193834",
+    "limits": [
+      "Current-source migration SIGKILL databases have a separate independent reader receipt. GUI/TCC, capture/power, storage power-loss, notarization/provider and whole-product acceptance remain open.",
+      "Source32 predecessor receipts remain frozen; no source32 package or old-client success is promoted to native33. The exact prior32 executable now explicitly refuses this native format."
+    ],
+    "reviewerSHA256": "8eb17acd3b2099630657ffcb04cd20e0c9552efe191337a1ea732e4468a3fe0b",
+    "atUTC": "2026-11-02T03:03:13.502927+00:00"
+  },
+  "artifacts": {
+    "app": ".artifacts/remaining-worker-lifecycle-v1/qualification-v4/OSwind.app",
+    "archive": ".artifacts/remaining-worker-lifecycle-v1/qualification-v4/OSwind-macos.zip",
+    "zipSHA256": "3fafb7a5d0e0c2010e489f8edd2429a1e56ab94893ef3ead2db4c8d364567b53",
+    "CLI_SHA256": "955a78e8a08287692f41d33d16876ead63f8d8fd6ba1a3d81fd18627393cc880",
+    "appSHA256": "e247641a209e7fb67a0dbdbdc9d268ba665c12df066719a46e877b4560193834",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "328eccd7a2d5f55272196fb48ed75e85a1b0b6deeeaa9d7d651481681eace97f",
+      "Contents/MacOS/oswindctl": "955a78e8a08287692f41d33d16876ead63f8d8fd6ba1a3d81fd18627393cc880",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "e247641a209e7fb67a0dbdbdc9d268ba665c12df066719a46e877b4560193834",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    }
+  },
+  "predecessorHosted": {
+    "format": "OSwind pending-media scheduler hosted follow-up v1",
+    "state": "passed",
+    "PR": 130,
+    "source": "48f9040f9be1bce0367a0ed8ccf44595e68b146a",
+    "runID": 41372324805,
+    "nativeJob": 125045226285,
+    "benchmarkJob": 125045226546,
+    "bothJobs": "completed/success",
+    "checkoutSeen": true,
+    "nativeLogBytes": 2972450,
+    "nativeLogSHA256": "d12319ce92de890fad70d56356ad770050a15c210f3a7d9dbc9f8d64fe7dda19",
+    "commands": [
+      {
+        "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+        "defined": 2195,
+        "passed": 2087,
+        "skipped": 108,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+        "defined": 3,
+        "passed": 3,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+        "defined": 43,
+        "passed": 43,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    ],
+    "artifact": {
+      "ID": 13110601704,
+      "bytes": 19863,
+      "SHA256": "503adbc54c4f40de728b84c2d10de7ac5bf6e459e4b274a74395a1bdd6103b7e",
+      "strictExtractedJSONfiles": 10
+    },
+    "limits": [
+      "Hosted skip set differs from local full run; native-only encrypted APFS and named-clipboard jobs are counted separately.",
+      "Not sustained capture/power, GUI/TCC, release signing, actual provider/two-Mac acceptance or competitor rank.",
+      "PR128 prior busy detach failure remains separate and unresolved."
+    ],
+    "atUTC": "2026-11-02T02:25:23.256177+00:00"
+  },
+  "currentSourceHosted": "Separate publication/CI still required; predecessor success does not qualify this source.",
+  "behavior": {
+    "ownedActualJobs": [
+      "quick note",
+      "source-linked recap",
+      "statistics",
+      "logical storage estimate"
+    ],
+    "workerAndCompletionJoined": true,
+    "cancelledDrainCallerStillWaits": true,
+    "retiredLaunchGuards": [
+      "quick note",
+      "recap",
+      "JSON import",
+      "favorite",
+      "chat deletion",
+      "API startup",
+      "query refresh",
+      "source opening"
+    ],
+    "currentCancelledCommitReportedHonestly": true,
+    "storageEstimate": "Descriptor-relative regular-file logical sizes with whole-traversal SH reservation, per-entry cancellation, no symlink following and final root identity check. Concurrent filesystem changes may be observed; not allocated APFS space."
+  },
+  "retainedFailures": [
+    {
+      "kind": "packaged query initial-lock inventory refusal",
+      "source": "141375c9d04b160df586fc3f689aa6a36e193b1f",
+      "stage": "qualification-v3/query-interruption",
+      "logSHA256": "b43d9ed71874c3d4e19cff46dc7f8737a5e3ea472a58ec4ca97428ce255a4d35",
+      "trialsStarted": 0,
+      "normalRecoveryDetached": true,
+      "cause": "unknown; strict unexpected backing-device inventory refusal",
+      "continuation": "One fresh owned fixture with identical candidate/code/guards;16 successful stages reused with unchanged hashes,14 later stages executed; original49-native pass retained. No production guard or retry policy changed."
+    },
+    {
+      "kind": "native storage snapshot oracle",
+      "productFailure": false,
+      "source": "250bc6ed0c3d9d09bfe954bdf1caa4712da52397",
+      "defined": 49,
+      "passed": 48,
+      "failedAssertions": 1,
+      "reason": "Independent statistics legitimately completed before retirement. Baseline moved after observed retirement; same held-worker/mounted-image/late-publication assertions retained. Isolated current native test passes. Original source and log retained."
+    },
+    {
+      "kind": "original retired writers/import",
+      "tests": 3,
+      "failedAssertions": 7,
+      "logSHA256": "d964e22abac3b3eb91136e789fb6e4a8fa7ed09922e5b885a2b051e7968fbac1",
+      "baseline": "48f9040f9be1bce0367a0ed8ccf44595e68b146a",
+      "originalAssertionsRetained": true
+    },
+    {
+      "kind": "original reader early drain and late publication/restart",
+      "tests": 2,
+      "failedAssertions": 6,
+      "logSHA256": "cf98eee4ba979d488cb96534e3450182a871c37c72bf9a10d218f82ad9f2a57b",
+      "originalAssertionsRetained": true,
+      "instrumentation": "Nil-default gates added before ownership fix; pre-fix source retained privately."
+    },
+    {
+      "kind": "original retired actions",
+      "tests": 5,
+      "failedAssertions": 6,
+      "logSHA256": "97fb641fa38ae86a3383db4c1faf848f280f358e893f6be3bb8e6be4b4a70562",
+      "originalAssertionsRetained": true,
+      "limit": "API start/relabel attempt assertion does not prove successful socket bind."
+    },
+    {
+      "kind": "session fixture setup",
+      "productFailure": false,
+      "failedMethods": 8,
+      "failedAssertions": 16,
+      "logSHA256": "fb4ac58c461ec2e45632aa576ac21b9b3e976d3ed932cd97f77465e9afaec6b6",
+      "reason": "requiresExisting fixture had settings but no SQLite library. Corrected fixture creates/closes an owned store; production admission unchanged."
+    },
+    {
+      "kind": "new registry-empty oracle integration",
+      "productFailure": false,
+      "failedAssertions": 2,
+      "logSHA256": "6a9adbcbd202ed4dd32bd3eda0087856efc618f114a2e09c71ca17588649aaf7",
+      "reason": "Registry now owns legitimate startup/postwipe readers too. Wait for these before the original writer-empty assertion; held-worker/no-repopulation assertions unchanged."
+    },
+    {
+      "kind": "private qualification driver path",
+      "productFailure": false,
+      "stagesStarted": 0,
+      "reason": "Old stages-v3 input path corrected to stages-v2. First empty output preserved. Same successful software receipts reused; fresh qualification-v3 output."
+    }
+  ],
+  "limits": [
+    "Audio file import still lacks AppModel exit/drain ownership. Ask needs a retired-launch guard and actual-operation audit. Detail/PII/search/index/model setup need individual actual-resource lifetime audits. No universal worker-completion claim.",
+    "Canceled source writes can already have committed; cooperative cancellation cannot undo a transaction past admission/commit. Retired completion suppression is distinct from rollback.",
+    "All83 statuses unchanged. Complete personal sync F059, collection epochs, actual providers/two Macs, native input/TCC, sustained capture/physical power and notarized distribution remain open.",
+    "Native schema33 and wire formats unchanged. Ad hoc signing/owned fixtures do not establish whole-product parity or competitive rank. PR128 earlier hosted busy detach failure remains causally unresolved."
+  ]
+}
