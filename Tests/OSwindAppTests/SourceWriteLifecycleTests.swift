@@ -97,12 +97,14 @@ import XCTest
         while app.libraryWipe.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
         XCTAssertFalse(app.libraryWipe.busy);XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,0)
         while app.hasPendingStatistics,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        try await SourceWorkTestJob.settle(app) // A successful wipe starts a fresh query.
         XCTAssertFalse(app.libraryWork.busy)
     }
     func testClosedModelRejectsBothWriteKinds()async throws {
         let deadline=ContinuousClock.now.advanced(by:.seconds(5))
         while app.hasPendingStatistics,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
         XCTAssertFalse(app.hasPendingStatistics)
+        try await SourceWorkTestJob.settle(app) // Independent startup query is outside the rejected-writer assertion.
         let answer=try recap();try app.store.close()
         app.addNote("Must not start");app.saveAnswer(answer)
         XCTAssertFalse(app.libraryWork.busy);XCTAssertFalse(app.savingRecap)

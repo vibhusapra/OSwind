@@ -4,9 +4,40 @@ import AppKit
 @testable import OSwind
 
 enum SourceWorkTestJob:CaseIterable {
-    case note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation
+    case note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation,query,textRebuild,fastIndex,automaticText,visualRebuild,automaticVisual
+    var recordedSources:Int {self == .automaticText ? 2:1}
     @MainActor func start(_ model:AppModel,gate:ImportWorkerGate,committed:Bool=false)throws {
         switch self {
+        case .query,.textRebuild,.fastIndex,.automaticText,.visualRebuild,.automaticVisual:
+            let phase:AppModel.SearchWorkPhase
+            switch self {
+            case .query:phase = .query
+            case .textRebuild:phase = .textRebuild
+            case .fastIndex:phase = .fastIndex
+            case .automaticText:phase = .automaticText
+            case .visualRebuild:phase = .visualRebuild
+            case .automaticVisual:phase = .automaticVisual
+            default:preconditionFailure("Not an index fixture")
+            }
+            model.settings.captureOnLaunch=false;model.settings.apiEnabled=false;model.settings.routinesEnabled=false;model.settings.automaticMaintenance=false;model.settings.entityAutomaticIndex=false;model.settings.clipboard.enabled=false;model.settings.meetings.enabled=false
+            model.settings.search.indexOnLowPower=true;model.showOnboarding=false
+            model.searchWorkObserver={entered in
+                guard entered==phase else {return}
+                let actualGate=Task.detached(priority:.utility) {try? gate.pause()}
+                await withTaskCancellationHandler {await actualGate.value} onCancel:{actualGate.cancel()}
+            }
+            switch phase {
+            case .query,.queryRead:model.query="Owned";model.refresh()
+            case .textRebuild:model.rebuildIndex()
+            case .fastIndex:model.prepareFastIndex()
+            case .automaticText:model.addNote(String(repeating:"Owned long source sentence. ",count:160))
+            case .visualRebuild,.automaticVisual:
+                guard model.visualPowerAllowed else {throw XCTSkip("Current thermal policy blocks owned visual task fixture")}
+                model.settings.search.visual.enabled=true;model.settings.search.visual.automaticIndex=true;model.settings.search.visual.modelDirectory=model.store.root.path
+                let path="images/owned-index-fixture.dat";try Data("Owned visual fixture bytes".utf8).write(to:model.store.root.appendingPathComponent(path))
+                var source=try XCTUnwrap(model.store.get("keep"));source.kind = .screen;source.imagePath=path;try model.store.insert(source)
+                if phase == .visualRebuild {model.rebuildVisualIndex()}else {model.visualAutoResumeAllowed=true;model.pendingVisualIDs=[source.id];model.startAutomaticVisualIndex()}
+            }
         case .selectedPII:
             let store=model.store;model.selected=try XCTUnwrap(store.get("keep"))
             model.refreshSelectedPIIScan(read:{memory in try? gate.pause();return try store.piiScanStatus(memory.id,matching:memory)})
@@ -78,7 +109,7 @@ enum SourceWorkTestJob:CaseIterable {
         XCTAssertEqual(delegate.applicationShouldTerminate(NSApplication.shared),.terminateCancel)
         await fulfillment(of:[gate.cancelled],timeout:5);XCTAssertFalse(finished);XCTAssertTrue(model.hasPendingExitWork)
         gate.release();await fulfillment(of:[done],timeout:10)
-        XCTAssertTrue(finished);XCTAssertFalse(model.hasPendingExitWork);XCTAssertEqual(try model.store.stats(includeDiskUsage:false).count,1)
+        XCTAssertTrue(finished);XCTAssertFalse(model.hasPendingExitWork);XCTAssertEqual(try model.store.stats(includeDiskUsage:false).count,kind.recordedSources)
         XCTAssertEqual(delegate.applicationShouldTerminate(NSApplication.shared),.terminateNow)
     }
     func switched(_ kind:SourceWorkTestJob)async throws {
@@ -89,7 +120,7 @@ enum SourceWorkTestJob:CaseIterable {
         XCTAssertTrue(session.busy);XCTAssertNil(session.model);XCTAssertFalse(old.store.isClosed)
         gate.release();try await finish();XCTAssertTrue(old.store.isClosed);XCTAssertFalse(old.hasPendingExitWork)
         XCTAssertEqual(session.model?.store.root,next);XCTAssertEqual(try session.model?.store.stats(includeDiskUsage:false).count,0)
-        let previous=try MemoryStore(root:root);defer {try? previous.close()};XCTAssertEqual(try previous.stats(includeDiskUsage:false).count,1)
+        let previous=try MemoryStore(root:root);defer {try? previous.close()};XCTAssertEqual(try previous.stats(includeDiskUsage:false).count,kind.recordedSources)
     }
     func testPlainQuitWaitsForActualNoteWorker()async throws {try await quit(.note)}
     func testPlainQuitWaitsForActualRecapWorker()async throws {try await quit(.recap)}
@@ -109,4 +140,16 @@ enum SourceWorkTestJob:CaseIterable {
     func testLibrarySwitchWaitsForActualSelectedMetadataReader()async throws {try await switched(.selectedPII)}
     func testLibrarySwitchWaitsForActualSourceHydration()async throws {try await switched(.sourceOpening)}
     func testLibrarySwitchWaitsForActiveHistoricalValidation()async throws {try await switched(.historicalValidation)}
+    func testPlainQuitWaitsForActualQueryTask()async throws {try await quit(.query)}
+    func testLibrarySwitchWaitsForActualQueryTask()async throws {try await switched(.query)}
+    func testPlainQuitWaitsForActualTextRebuildTask()async throws {try await quit(.textRebuild)}
+    func testLibrarySwitchWaitsForActualTextRebuildTask()async throws {try await switched(.textRebuild)}
+    func testPlainQuitWaitsForActualFastPreparationTask()async throws {try await quit(.fastIndex)}
+    func testLibrarySwitchWaitsForActualFastPreparationTask()async throws {try await switched(.fastIndex)}
+    func testPlainQuitWaitsForActualAutomaticTextIndexTask()async throws {try await quit(.automaticText)}
+    func testLibrarySwitchWaitsForActualAutomaticTextIndexTask()async throws {try await switched(.automaticText)}
+    func testPlainQuitWaitsForActualVisualRebuildTask()async throws {try await quit(.visualRebuild)}
+    func testLibrarySwitchWaitsForActualVisualRebuildTask()async throws {try await switched(.visualRebuild)}
+    func testPlainQuitWaitsForActualAutomaticVisualIndexTask()async throws {try await quit(.automaticVisual)}
+    func testLibrarySwitchWaitsForActualAutomaticVisualIndexTask()async throws {try await switched(.automaticVisual)}
 }

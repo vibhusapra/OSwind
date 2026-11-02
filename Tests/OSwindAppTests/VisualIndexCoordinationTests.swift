@@ -5,7 +5,7 @@ import XCTest
 @MainActor final class VisualIndexCoordinationTests:XCTestCase {
     var root:URL!,app:AppModel!
     override func setUpWithError() throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-visual-coordination-"+UUID().uuidString);app=try AppModel(root:root,startServices:false)}
-    override func tearDownWithError() throws {app.prepareForLibrarySwitch();app=nil;try? FileManager.default.removeItem(at:root)}
+    override func tearDown()async throws {app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();app=nil;try? FileManager.default.removeItem(at:root)}
     func testVisualConfigurationCancelsVisualWorkWithoutInterruptingTextIndexing() async throws {
         app.indexing=true;app.indexStatus="Text indexing in progress"
         let generation=app.visualGeneration,worker=Task {do {try await Task.sleep(for:.seconds(60))}catch{}}

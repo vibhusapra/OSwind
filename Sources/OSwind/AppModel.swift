@@ -28,7 +28,8 @@ import EventKit
     let libraryWipe=LibraryWipeModel()
     lazy var pendingMediaCleanup=PendingMediaCleanupModel(store:store,onFinished:{[weak self] in self?.invalidateStorageEstimate()},onWipeState:{[weak self] pending in self?.libraryWipe.pendingCleanup=pending})
     let libraryWork=LibraryWorkRegistry()
-    private var libraryWorkAvailable:Bool {!libraryRetired && destructiveDrainers==0 && libraryWork.accepting && !store.isClosed}
+    var libraryStatusAvailable:Bool {!libraryRetired && !store.isClosed}
+    var libraryWorkAvailable:Bool {libraryStatusAvailable && destructiveDrainers==0 && libraryWork.accepting}
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     let visualModelSetup:VisualModelSetupModel
@@ -52,7 +53,7 @@ import EventKit
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
-        if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
+        if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; cancelAutomaticIndexer(); libraryWork.cancel(kinds:[.textRebuild,.fastIndex]);indexing = libraryWork.count(kinds:[.textRebuild,.fastIndex])>0; indexStatus = indexing ? "Stopping previous search work…":"Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
     private func assignInternalSettings(_ value:AppSettings) {
@@ -141,9 +142,13 @@ import EventKit
     @Published var modelStatus = "Check the local server to discover installed models"
     @Published var pullProgress: ModelPullProgress?
     @Published var pullingModel: String?
+    enum SearchWorkPhase:Hashable,Sendable {case query,queryRead,textRebuild,fastIndex,automaticText,visualRebuild,automaticVisual}
+    var searchWorkObserver:(@Sendable (SearchWorkPhase)async throws->Void)?
+    var searchWorkCompleted:(@Sendable (SearchWorkPhase)->Void)?
     @Published var indexing = false
     @Published var indexStatus = "Apple vectors are indexed during capture"
     @Published var indexProgress = 0.0
+    private var searchGeneration=UUID(),automaticIndexGeneration=UUID()
     private var indexGeneration = UUID()
     private var indexTask: Task<Void,Never>?
     private var pullTask: Task<Void,Never>?
@@ -330,7 +335,7 @@ import EventKit
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
         libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();libraryWork.cancel();libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsPending=false; stopAPI(preservePreference:true)
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); cancelAutomaticIndexer(); pullTask?.cancel(); cancelRefresh(); statisticsPending=false; stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -465,25 +470,39 @@ import EventKit
             }
         }
     }
-    func refresh(forceStatistics: Bool = false) {
+    private func cancelRefresh() {
+        searchGeneration=UUID();refreshTask?.cancel();refreshTask=nil;libraryWork.cancel(kinds:[.query]);refreshing=false;pendingRefresh=false
+    }
+    func refresh(forceStatistics:Bool=false) {
         guard libraryWorkAvailable else {return}
-        refreshStatistics(force:forceStatistics)
-        if section=="People & projects" {refreshTask?.cancel();refreshing=false;entityMemory.reload();return}
-        if section=="Calendar" {refreshTask?.cancel();refreshing=false;activity.resumeAndInvalidate();return}
-        if section=="Meetings" || section=="Tools" {refreshTask?.cancel();refreshing=false;return}
-        searchInputError = nil
-        refreshTask?.cancel(); let now = Date(), mode = self.mode
-        let filter = self.filter(at:now), interpret = interpretQuery, store = self.store, configuration = settings.search, engine = RetrievalEngine(store:store,apple:embedder)
-        refreshing = true
-        refreshTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds:150_000_000); guard !Task.isCancelled else { return }
-            do {
-                let result = try await engine.search(filter,mode:mode,configuration:configuration,interpretQuery:interpret,now:now,detail:.preview)
-                guard !Task.isCancelled else { return }; self?.hits = result.hits; self?.resolvedSearch = result.resolution; self?.searchMS = result.duration*1000; self?.searchStrategy = result.strategy ?? ""; self?.searchWarnings = result.warnings; self?.refreshing = false; if self?.pendingRefresh == true { self?.pendingRefresh = false; self?.refresh() }
-            } catch is CancellationError { }
-            catch let error as QuerySyntaxError { guard !Task.isCancelled else { return }; self?.hits = []; self?.resolvedSearch = nil; self?.searchWarnings = []; self?.searchInputError = error.localizedDescription; self?.searchMS = 0; self?.searchStrategy = ""; self?.refreshing = false }
-            catch { guard !Task.isCancelled else { return };if mode == .visual {self?.hits=[];self?.searchWarnings=[error.localizedDescription]} else {self?.errorMessage = error.localizedDescription}; self?.refreshing = false }
-        }
+        refreshStatistics(force:forceStatistics);cancelRefresh()
+        if section=="People & projects" {entityMemory.reload();return}
+        if section=="Calendar" {activity.resumeAndInvalidate();return}
+        if section=="Meetings" || section=="Tools" {return}
+        searchInputError=nil
+        let now=Date(),mode=self.mode,filter=self.filter(at:now),interpret=interpretQuery,configuration=settings.search,engine=RetrievalEngine(store:store,apple:embedder)
+        let generation=searchGeneration,observe=searchWorkObserver,completed=searchWorkCompleted,registry=libraryWork
+        refreshing=true
+        guard let id=registry.launch(kind:.query,priority:.userInitiated,operation:{
+            defer {completed?(.query)}
+            try await Task.sleep(nanoseconds:150_000_000);try Task.checkCancellation()
+            try await observe?(.query);try Task.checkCancellation()
+            let result=try await engine.search(filter,mode:mode,configuration:configuration,interpretQuery:interpret,now:now,detail:.preview)
+            try await observe?(.queryRead);try Task.checkCancellation();return result
+        },completion:{[weak self] outcome,cancelled in
+            guard let self,self.searchGeneration==generation else {return}
+            self.refreshTask=nil;self.refreshing=false
+            guard !cancelled,self.libraryWorkAvailable else {return}
+            switch outcome {
+            case .success(let result):
+                self.hits=result.hits;self.resolvedSearch=result.resolution;self.searchMS=result.duration*1000;self.searchStrategy=result.strategy ?? "";self.searchWarnings=result.warnings
+                if self.pendingRefresh {self.pendingRefresh=false;self.refresh()}
+            case .failure(is CancellationError):break
+            case .failure(let error as QuerySyntaxError):self.hits=[];self.resolvedSearch=nil;self.searchWarnings=[];self.searchInputError=error.localizedDescription;self.searchMS=0;self.searchStrategy=""
+            case .failure(let error):if mode == .visual {self.hits=[];self.searchWarnings=[error.localizedDescription]}else {self.errorMessage=error.localizedDescription}
+            }
+        }) else {refreshing=false;return}
+        refreshTask=Task {await registry.wait(for:id)}
     }
     var hasPendingStatistics:Bool {statisticsTask != nil || diskUsageTask != nil}
     func refreshStatistics(force: Bool,observeWorker:(@Sendable ()throws->Void)?=nil,observeStorage:(@Sendable ()throws->Void)?=nil,statisticsCompleted:(@Sendable ()->Void)?=nil,storageCompleted:(@Sendable ()->Void)?=nil) {
@@ -691,6 +710,7 @@ import EventKit
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
+        cancelRefresh();cancelIndexing();cancelAutomaticIndexer();visualAutoResumeAllowed=false;cancelVisualIndexing()
         cancelOpeningMemory();piiScanStatusGeneration=UUID()
         historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
         libraryWork.cancel()
@@ -728,6 +748,7 @@ import EventKit
         if refreshing {pendingRefresh=true}else {refresh()}
     }
     private func captured(_ memory: Memory) {
+        guard libraryWorkAvailable,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
         if settings.entityAutomaticIndex {entityMemory.enqueue(memory)}
         queueVisualIndex(memory)
         refreshStatistics(force:true)
@@ -738,19 +759,27 @@ import EventKit
         pendingIndex.removeAll { $0.id == memory.id }; pendingIndex.append(memory)
         startAutomaticIndexer()
     }
+    private func cancelAutomaticIndexer() {
+        automaticIndexGeneration=UUID();automaticIndexTask?.cancel();automaticIndexTask=nil;libraryWork.cancel(kinds:[.automaticText]);pendingIndex.removeAll()
+    }
     private func startAutomaticIndexer() {
-        guard automaticIndexTask == nil, settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
-        automaticIndexTask = Task { [weak self] in
-            guard let self else { return }; defer { self.automaticIndexTask = nil; if !self.pendingIndex.isEmpty { self.startAutomaticIndexer() } }
-            while !self.pendingIndex.isEmpty && !Task.isCancelled {
-                guard self.settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { self.indexStatus = "GPU indexing deferred in Low Power Mode"; break }
-                let batch = Array(self.pendingIndex.prefix(16)); self.pendingIndex.removeFirst(batch.count)
-                let configuration = self.settings.search
-                do { _ = try await RetrievalEngine(store:self.store,apple:self.embedder).index(batch,configuration:configuration,shouldContinue:{ configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled }) }
-                catch is CancellationError { break }
-                catch { if !Task.isCancelled { self.indexStatus = error.localizedDescription; self.pendingIndex.removeAll() }; break }
-            }
-        }
+        guard libraryWorkAvailable,!libraryWipe.busy,!libraryWipe.pendingCleanup,automaticIndexTask==nil,libraryWork.count(kinds:[.automaticText])==0,!pendingIndex.isEmpty else {return}
+        guard settings.search.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else {indexStatus="GPU indexing deferred in Low Power Mode";return}
+        let batch=Array(pendingIndex.prefix(16));pendingIndex.removeFirst(batch.count)
+        let configuration=settings.search,engine=RetrievalEngine(store:store,apple:embedder),generation=automaticIndexGeneration,observe=searchWorkObserver,completed=searchWorkCompleted,registry=libraryWork
+        guard let id=registry.launch(kind:.automaticText,operation:{
+            defer {completed?(.automaticText)}
+            try Task.checkCancellation();try await observe?(.automaticText);try Task.checkCancellation()
+            return try await engine.index(batch,configuration:configuration,shouldContinue:{configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled})
+        },completion:{[weak self] outcome,cancelled in
+            guard let self else {return}
+            if registry.count(kinds:[.automaticText])<=1 {self.automaticIndexTask=nil}
+            if self.automaticIndexGeneration==generation,!cancelled,self.libraryWorkAvailable,case .failure(let error)=outcome,!(error is CancellationError) {self.indexStatus=error.localizedDescription;self.pendingIndex.removeAll()}
+            // The completing job leaves the registry after this synchronous
+            // callback. Resume the current queue on the next actor turn.
+            Task {@MainActor [weak self] in self?.startAutomaticIndexer()}
+        }) else {return}
+        automaticIndexTask=Task {await registry.wait(for:id)}
     }
     func startModelServer() {
         guard !startingModelServer else { return }; startingModelServer = true
@@ -770,46 +799,72 @@ import EventKit
         }
     }
     func cancelModelDownload() { pullTask?.cancel() }
-    func rebuildIndex() {
-        guard !indexing else { return }; let configuration = settings.search
-        guard configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { indexStatus = "Disable Low Power Mode or allow indexing below"; return }
-        indexGeneration = UUID(); let generation = indexGeneration
-        indexing = true; indexProgress = 0; indexStatus = "Preparing the selected local model…"
-        indexTask = Task {
-            do { let final = try await RetrievalEngine(store:store,apple:embedder).rebuild(configuration:configuration,shouldContinue:{ configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled }) { state in Task { @MainActor in guard self.indexGeneration == generation else { return }; self.indexProgress = state.total > 0 ? min(1,Double(state.indexed)/Double(state.total)) : 1; self.indexStatus = "\(state.indexed) / \(state.total) memories indexed" } }; guard indexGeneration == generation else { return }; indexStatus = final.indexed == final.total ? "Search index ready · \(final.indexed) memories" : "Index pass complete · \(final.indexed)/\(final.total); new captures may still be indexing"; refresh() }
-            catch is CancellationError { guard indexGeneration == generation else { return }; indexStatus = "Indexing cancelled; completed batches are saved" }
-            catch { guard indexGeneration == generation else { return }; indexStatus = error.localizedDescription }
-            indexing = false
+    private func finishTextIndex(_ outcome:Result<String,Error>,generation:UUID,cancelled:Bool,completeProgress:Bool) {
+        let last=libraryWork.count(kinds:[.textRebuild,.fastIndex])<=1
+        if last {indexTask=nil;indexing=false}
+        let invalidated=indexGeneration != generation || cancelled
+        if last,libraryStatusAvailable,invalidated,indexStatus.hasPrefix("Stopping") {indexStatus="Indexing stopped. Build the selected index to continue."}
+        guard libraryWorkAvailable,!invalidated else {return}
+        switch outcome {
+        case .success(let message):indexStatus=message;if completeProgress {indexProgress=1};refresh()
+        case .failure(is CancellationError):indexStatus="Indexing stopped."
+        case .failure(let error):indexStatus=error.localizedDescription
         }
     }
-    private func watchFastIndex(_ generation: UUID) -> Task<Void,Never> {
-        Task { [weak self] in
+    func rebuildIndex() {
+        guard libraryWorkAvailable,!libraryWipe.busy,!libraryWipe.pendingCleanup,!indexing,libraryWork.count(kinds:[.textRebuild,.fastIndex])==0 else {return}
+        let configuration=settings.search
+        guard configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else {indexStatus="Disable Low Power Mode or allow indexing below";return}
+        indexGeneration=UUID();let generation=indexGeneration,engine=RetrievalEngine(store:store,apple:embedder),observe=searchWorkObserver,completed=searchWorkCompleted,registry=libraryWork
+        indexing=true;indexProgress=0;indexStatus="Preparing the selected local model…"
+        guard let id=registry.launch(kind:.textRebuild,operation:{[weak self] in
+            defer {completed?(.textRebuild)}
+            try Task.checkCancellation();try await observe?(.textRebuild);try Task.checkCancellation()
+            let final=try await engine.rebuild(configuration:configuration,shouldContinue:{configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled}) {state in
+                Task {@MainActor [weak self] in guard let self,self.libraryWorkAvailable,self.indexGeneration==generation,self.indexing else {return};self.indexProgress=state.total>0 ? min(1,Double(state.indexed)/Double(state.total)):1;self.indexStatus="\(state.indexed) / \(state.total) memories indexed"}
+            }
+            return final.indexed==final.total ? "Search index ready · \(final.indexed) memories":"Index pass complete · \(final.indexed)/\(final.total); new captures may still be indexing"
+        },completion:{[weak self] outcome,cancelled in self?.finishTextIndex(outcome,generation:generation,cancelled:cancelled,completeProgress:false)}) else {indexing=false;return}
+        indexTask=Task {await registry.wait(for:id)}
+    }
+    private func watchFastIndex(_ generation:UUID)->Task<Void,Never> {
+        Task {[weak self] in
             while !Task.isCancelled {
-                do { try await Task.sleep(nanoseconds:500_000_000) } catch { return }
-                guard let self, self.indexGeneration == generation else { return }
-                let state = self.store.searchIndexStatus
-                self.indexStatus = state.message + (state.total > 0 ? " · \(state.indexed)/\(state.total)" : "")
-                if state.total > 0 { self.indexProgress = min(1,Double(state.indexed)/Double(state.total)) }
+                do {try await Task.sleep(nanoseconds:500_000_000)}catch {return}
+                guard let self,self.libraryWorkAvailable,self.indexGeneration==generation,self.indexing else {return}
+                let state=self.store.searchIndexStatus;self.indexStatus=state.message+(state.total>0 ? " · \(state.indexed)/\(state.total)":"")
+                if state.total>0 {self.indexProgress=min(1,Double(state.indexed)/Double(state.total))}
             }
         }
     }
     func prepareFastIndex() {
-        guard !indexing else { return }
-        let configuration = settings.search, localEmbedder = embedder; indexGeneration = UUID(); let generation = indexGeneration
-        indexing = true; indexProgress = 0; indexStatus = "Preparing fast retrieval…"
-        indexTask = Task {
-            let observer = watchFastIndex(generation); defer { observer.cancel() }
-            do {
-                let identity: String, dimensions: Int
-                if configuration.provider == .ollama { let batch = try await OllamaClient.shared.embed(["search index identity"],configuration:configuration); identity = batch.modelID; dimensions = batch.vectors[0].count }
-                else { guard let vector = await Task.detached(priority:.utility,operation:{ localEmbedder.embed("search index identity") }).value else { throw OSwindError.unavailable("Apple sentence embeddings are unavailable") }; identity = localEmbedder.modelID; dimensions = vector.count }
-                let state = try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,allowLowPower:configuration.indexOnLowPower)
-                guard indexGeneration == generation else { return }; indexStatus = "Fast retrieval ready · \(state.indexed) vectors"; indexProgress = 1; refresh()
-            } catch { guard indexGeneration == generation else { return }; indexStatus = Task.isCancelled ? "Preparation cancelled; source vectors are retained" : error.localizedDescription }
-            if indexGeneration == generation { indexing = false }
-        }
+        guard libraryWorkAvailable,!libraryWipe.busy,!libraryWipe.pendingCleanup,!indexing,libraryWork.count(kinds:[.textRebuild,.fastIndex])==0 else {return}
+        let configuration=settings.search,localEmbedder=embedder,store=self.store,observe=searchWorkObserver,completed=searchWorkCompleted,registry=libraryWork
+        guard configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else {indexStatus="Disable Low Power Mode or allow indexing below";return}
+        indexGeneration=UUID();let generation=indexGeneration
+        indexing=true;indexProgress=0;indexStatus="Preparing fast retrieval…"
+        let observer=watchFastIndex(generation)
+        guard let id=registry.launch(kind:.fastIndex,operation:{
+            defer {observer.cancel();completed?(.fastIndex)}
+            try Task.checkCancellation();try await observe?(.fastIndex);try Task.checkCancellation()
+            let identity:String,dimensions:Int
+            if configuration.provider == .ollama {let batch=try await OllamaClient.shared.embed(["search index identity"],configuration:configuration);identity=batch.modelID;dimensions=batch.vectors[0].count}
+            else {
+                let worker=Task.detached(priority:.utility) {localEmbedder.embed("search index identity")}
+                let vector=await withTaskCancellationHandler {await worker.value} onCancel:{worker.cancel()}
+                try Task.checkCancellation();guard let vector else {throw OSwindError.unavailable("Apple sentence embeddings are unavailable")};identity=localEmbedder.modelID;dimensions=vector.count
+            }
+            try Task.checkCancellation()
+            let state=try await store.buildSearchIndex(modelID:identity,dimensions:dimensions,allowLowPower:configuration.indexOnLowPower)
+            return "Fast retrieval ready · \(state.indexed) vectors"
+        },completion:{[weak self] outcome,cancelled in self?.finishTextIndex(outcome,generation:generation,cancelled:cancelled,completeProgress:true)}) else {observer.cancel();indexing=false;return}
+        indexTask=Task {await registry.wait(for:id)}
     }
-    func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
+    func cancelIndexing() {
+        indexGeneration=UUID();indexTask?.cancel();libraryWork.cancel(kinds:[.textRebuild,.fastIndex]);store.cancelSearchIndexBuild(pauseAutomatic:true)
+        indexing=libraryWork.count(kinds:[.textRebuild,.fastIndex])>0
+        if indexing {indexStatus="Stopping local search work…"}
+    }
     func favorite(_ memory: Memory) { guard libraryWorkAvailable else {return};guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
     // Observers are internal test seams. Only pre-work observation may throw;
     // a postcommit observation must not turn real deletion into a false failure.
@@ -924,6 +979,10 @@ import EventKit
         if manualMeetingPause {meetings.pause()}else {meetings.sleep()};tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel()
     }
     func pauseForHistoryErasure() {
+        // Privacy confirmation revokes earlier pending source work as well as
+        // collection. No previously read result may return to the cleared UI.
+        cancelRefresh();cancelIndexing();cancelAutomaticIndexer();cancelJSONImport();cancelAudioImport();libraryWork.cancel()
+        hits.removeAll();resolvedSearch=nil;searchWarnings.removeAll();searchInputError=nil
         drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)

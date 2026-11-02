@@ -8,6 +8,7 @@ import AppKit
     var locked=false,previews=0,exports=0,holdPreview=false,holdExport=false,commitBeforeGate=false
     var previewGate:CheckedContinuation<Void,Never>?,exportGate:CheckedContinuation<Void,Never>?
     var exportedDraft:WorkflowDraft?,lastPermit:WorkflowExportPermit?
+    var queryGate:AudioImportGate?
     override func setUp()async throws {
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-workflow-model-"+UUID().uuidString)
         app=try AppModel(root:root,startServices:false,workflowSetup:{[unowned self] store,settings in
@@ -26,8 +27,10 @@ import AppKit
             return WorkflowModel(store:store,settings:settings,environment:env)
         })
         app.showOnboarding=false;model=app.workflow;model.helperPath="/usr/bin/true"
+        try await SourceWorkTestJob.settle(app)
     }
     override func tearDown()async throws {
+        await queryGate?.open();queryGate=nil
         previewGate?.resume();previewGate=nil;exportGate?.resume();exportGate=nil
         app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();try? FileManager.default.removeItem(at:root)
         app=nil;model=nil
@@ -131,5 +134,19 @@ import AppKit
         session.open(destination,persist:false);try await wait {session.busy && session.model==nil};XCTAssertFalse(app.store.isClosed);XCTAssertTrue(model.busy)
         previewGate?.resume();previewGate=nil;try await wait {!session.busy};XCTAssertNil(session.failure);XCTAssertTrue(app.store.isClosed);XCTAssertTrue(model.steps.isEmpty)
         let next=try XCTUnwrap(session.model);next.prepareForLibrarySwitch();await next.cancelExternalWorkAndWait();try next.store.close();session.model=nil
+    }
+    func testCompletedWorkflowPreviewStillOwnsExitForActualHeldQuery()async throws {
+        let gate=AudioImportGate();queryGate=gate
+        let returned=expectation(description:"Independent actual query returned")
+        app.searchWorkObserver={if $0 == .query {await gate.wait()}}
+        app.searchWorkCompleted={if $0 == .query {returned.fulfill()}}
+        app.query="Owned";app.refresh();await fulfillment(of:[gate.entered],timeout:5)
+        try await ready();XCTAssertFalse(model.busy);XCTAssertTrue(app.hasPendingExitWork)
+        model.cancel(clear:true);await model.cancelAndWait()
+        XCTAssertTrue(app.hasPendingExitWork,"Finishing a preview must not acknowledge an independent actual query")
+        var finished=false;let drain=Task {await self.app.cancelExternalWorkAndWait();finished=true}
+        await fulfillment(of:[gate.cancelled],timeout:5);try await Task.sleep(for:.milliseconds(50));XCTAssertFalse(finished)
+        await gate.open();await fulfillment(of:[returned],timeout:5);await drain.value
+        XCTAssertFalse(app.hasPendingExitWork);XCTAssertTrue(model.steps.isEmpty);XCTAssertEqual(exports,0)
     }
 }

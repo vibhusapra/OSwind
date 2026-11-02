@@ -11,8 +11,8 @@ import XCTest
         try app.store.insert(Memory(id:"other-note",kind:.note,app:"Other",text:"release plan"))
         try app.store.insert(Memory(id:"audio",kind:.audio,app:"Fixture",text:"release conversation"))
     }
-    override func tearDownWithError() throws {
-        app.prepareForLibrarySwitch();try app.store.close();app=nil
+    override func tearDown()async throws {
+        app.prepareForLibrarySwitch();await app.cancelExternalWorkAndWait();try app.store.close();app=nil
         try? FileManager.default.removeItem(at:root)
     }
     func settle() async throws {
