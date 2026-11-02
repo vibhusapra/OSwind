@@ -1,0 +1,55 @@
+{
+  "format": "OSwind.sync-service.hosted.v1",
+  "state": "passed",
+  "pr": 138,
+  "publishedHead": "899d1a6d28c44cc259ede23a5507505c52406711",
+  "qualifiedRuntime": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+  "actualMergeCheckout": "b72ea9a395da99994659d5234a69cbae862e0a66",
+  "tree": "946714f1df8daad4c868c0eb2d366d6b5f3ad3e4",
+  "mergeTreeEqualsPublishedHead": true,
+  "runID": 41446201457,
+  "jobs": [
+    {
+      "id": 125279778951,
+      "name": "benchmark-harnesses",
+      "conclusion": "success",
+      "steps": 16,
+      "allStepsSuccess": true
+    },
+    {
+      "id": 125279779584,
+      "name": "native",
+      "conclusion": "success",
+      "steps": 81,
+      "allStepsSuccess": true
+    }
+  ],
+  "fullTests": {
+    "defined": 2424,
+    "passed": 2295,
+    "skipped": 129,
+    "failures": 0
+  },
+  "namedClipboard": {
+    "passed": 3,
+    "skipped": 0,
+    "failures": 0
+  },
+  "nativeTests": {
+    "passed": 62,
+    "skipped": 0,
+    "failures": 0
+  },
+  "logBytes": 9361096,
+  "logSHA256": "fa5455e18571c0b68426094bffdcbba4763f3a602cebde9433cdbcedc4273524",
+  "evidence": {
+    "pr138-published899-jobs.json": "66e4b3d99b92e3d9c4494cb8815753182f31a93c96057186adc2cf94103aa940",
+    "pr138-published899-head.json": "17fbcf0fe1b68399e9019b9abe82594cef6ec776fd418d6cae5385b5b36a160d",
+    "pr138-published899-merge.json": "6f8985ea93fbff657b4901be6080ac1a89bbea6f87417134d37f756f27a53725"
+  },
+  "limits": [
+    "This completed hosted run qualifies the previously published899 head, not later renewal/withheld sourcee791.",
+    "The unchanged missing-image case passes in this separate run. PR136 missing-vault-session failure remains causally unresolved.",
+    "No whole-product parity, top-three, physical provider/two-Mac or sustained-power acceptance."
+  ]
+}

@@ -79,7 +79,8 @@ extension MemoryStore {
                     if scanned%100==0 {progress(.init(phase:"Inventorying retained media",completedItems:scanned,unit:"files"))}
                 },removeEmpty:false)
                 progress(.init(phase:"Deleting local history",completedItems:scanned,unit:"files"))
-                try db.execute("DELETE FROM store_metadata WHERE key IN ('meeting-reminder-receipts-v1','meeting-library-lifetime-v1'); DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM memory_entities; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
+                try SyncWithheldWork.clearIfInstalled(db)
+                try db.execute("DELETE FROM store_metadata WHERE key IN ('meeting-reminder-receipts-v1','meeting-library-lifetime-v1','\(SyncCollectionHistory.nativeCompletionKey)'); DELETE FROM routines; DELETE FROM chat_sessions; DELETE FROM memories; DELETE FROM memory_entities; DELETE FROM vector_changes; UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")
                 return .init(sources:sources,turns:turns,chats:chats,routines:routines,runs:runs,originals:originals)
             }
         }

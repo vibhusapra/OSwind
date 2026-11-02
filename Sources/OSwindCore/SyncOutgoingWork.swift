@@ -129,13 +129,26 @@ struct SyncOutgoingWorkQueue {
         }
     }
     /// Atomically replaces raw intents with opaque, coalesced lifetime work.
-    @discardableResult func stage(limit:Int=128,byteLimit:Int=4*1024*1024)throws->Int {
+    @discardableResult func stage(limit:Int=128,byteLimit:Int=4*1024*1024,identified:(([SyncIdentifiedChange])throws->Void)?=nil)throws->Int {
         try scoped {
             try catalog.process(limit:limit,byteLimit:byteLimit) {batch in
                 for value in batch {
                     if let before=value.before,before != value.after {try enqueue(before,deleted:true,sequence:value.captured.sequence)}
                     if let after=value.after {try enqueue(after,deleted:false,sequence:value.captured.sequence)}
                 }
+                try identified?(batch)
+            }
+        }
+    }
+    /// Move durable local policy holds back to ordinary work. Raw lifetime
+    /// intents must drain first; no private body or new journal dot is created.
+    func requeueWithheld(_ identities:[SyncObjectIdentity])throws {
+        guard identities.count<=256 else {throw OSwindError.invalid("Invalid withheld requeue bound")}
+        try scoped {
+            try idleCapture()
+            for identity in identities {
+                guard let object=try catalog.object(identity) else {throw OSwindError.database("Withheld native owner is missing")}
+                if !object.deleted {try enqueue(identity,deleted:false,sequence:0)}
             }
         }
     }

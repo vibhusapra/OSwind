@@ -1,0 +1,327 @@
+{
+  "format": "OSwind.sync-withheld-service.v1",
+  "state": "passed",
+  "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/138",
+  "trackedInputs": 1444,
+  "softwareReviewSHA256": "1e95d2ea9cda28ae1a6ecd1be74c6dbf513bb466e258268bce0c6d287c2c5bad",
+  "localInputManifestSHA256": "ced1fe6fe9324444c2c029f07f43f4cd76350048d439f27cae1cc15c84ae03bb",
+  "requiredMethods": 474,
+  "serviceMethods": [
+    "testServiceTransfersRealThirteenKindGraphWithoutCallerSuppliedPolicyOrMediaHooks",
+    "testServiceTransfersActualImageBytesAndRefusesChangedContentAddress",
+    "testServiceCurrentSavedPrivacyDeniesSecretAndExcludedBrowserBeforePublication",
+    "testServiceRestartUsesDurableSendAndReceiveCursorsAndInvalidatesOldWorker",
+    "testServiceRejectsAuthenticatedHeadRollbackAndYieldsRemoteEraseBeforeExport",
+    "testServiceTransfersRealAudioAndVideoAndHonorsIndependentReceiverRetention",
+    "testServiceMediaStreamsAcrossChunkBoundaryAndFailedAdoptionLeavesNoNativeSource",
+    "testServiceSchedulerOwnsBackgroundDeliveryAndStopJoinsWorker",
+    "testServiceSenderSettingsFencePreventsProviderWriteAfterPolicySave",
+    "testServicePolicyChecksContentOfEveryKindWithoutTreatingNumericIdentityAsSecret",
+    "testServiceRefusesNativeLibraryInSharedSpaceAndSpoolOutsideWipeInventory",
+    "testServiceReopensBothLibrariesAndEncryptedSpoolsAfterPartialGraphDelivery",
+    "testServiceDiscoversDelayedDeclarationAfterCursorProgressWithoutAnotherPeerOperation",
+    "testServiceRenewalRequiresActualNativeErasureInsteadOfGenericControlReceipt",
+    "testServiceRenewalInvalidatesNativeCompletionWhenAnotherPeerOnlyRecordsGenericRetirement",
+    "testServiceNativeCompletionConsumptionAndPublicationRenewalRollBackTogether",
+    "testServiceLocalClearInvalidatesPriorReceivedNativeCompletion",
+    "testServiceNativeCompletionSQLHooksInvalidateRawFrontierChangesAndRefuseMissingProtection",
+    "testServiceWithheldSourceDoesNotStarveHealthyRowsOrInventPeerSequenceGaps",
+    "testServiceSavedPolicyReviewReleasesHeldSourceAndDeletionRecreationKeepsNewLifetime",
+    "testServiceHeldWorkSurvivesLibraryReopenAndNativeEditWakesItWithoutPolicyToggle",
+    "testServicePeerPutCannotOverwriteHeldNativeEditButAuthenticatedDeletionWins",
+    "testServiceSourceErasureCompletesBeforeConflictingIndependentHeldMetadata",
+    "testServiceHeldNativeErasurePermitIsConnectionScopedAndClearsAfterThrow",
+    "testServiceNetworkPausePreparesLocallyWithClosedTransportAndResumesWithoutLostRows",
+    "testServiceWithheldBudgetFailureDoesNotAcknowledgeOrLoseNativeWorkAndCanRecover",
+    "testServiceSchedulerContinuesLocalPreparationDuringPeerPrivacyConflict",
+    "testServiceSchedulerNetworkPauseJoinsRemoteWorkWhileLocalCaptureKeepsDraining",
+    "testServicePolicyReviewUsesPersistedFinitePagesAcrossRestartAndNewArrivals"
+  ],
+  "extraOwnerQualifiedBackendControls": [
+    "-[OSwindCoreTests.SpeechRecognitionTests testLegacySettingsDefaultToWhisperAndPartialNativeSettingsDecode]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMissingModelsFailLocallyWithoutCreatingCache]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testModelReuseConfigurationChangeAndExplicitUnload]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testFIFORequestsNeverEnterBackendConcurrently]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testQueuedCancellationDoesNotTranscribeAndReleasesNextRequest]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringModelLoadNeverCachesOrTranscribesCandidate]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringInferenceDiscardsResultAndQueueRemainsUsable]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMalformedBackendOutputCannotEscapeValidation]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testOverdueInferenceCannotReturnTextAndReleasesQueue]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testInvalidBudgetCannotLoadOrTranscribe]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testDisabledUnsupportedAndInvalidModelsNeverLoad]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testResidentReuseAndUnload]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testRawTimelineAndWordAttributionShareResidentBackend]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testNoDetectedSpeechIsEmptyButActualFailuresStillThrow]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testQueuedCancellationAndInferenceCancellationDoNotReturnLabels]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testCancelledModelLoadIsNotReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testOverdueResultsAreDiscardedAndRuntimeCanBeReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testPLDAParametersAreBoundedTypedAndFinite]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testSpeakerRenamesPersistAndRefuseMergesMissingRecordsAndSecrets]"
+  ],
+  "stages": [
+    {
+      "stage": "full-debug",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "tests": {
+        "defined": 2440,
+        "passed": 2315,
+        "skipped": 125,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 474,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "logSHA256": "174f3ccfbed6776e7d978de1b6cb7caa0951bfeb95345322817015d03989fb79",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true,
+      "wallSeconds": 524.3954892919865
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "tests": {
+        "defined": 1326,
+        "passed": 1255,
+        "skipped": 71,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 474,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "logSHA256": "87e53e0a50b9ded3565ef2ac32942ee72ef77e103bde252abfa93f78d47e3d93",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true,
+      "wallSeconds": 741.6865770420991
+    },
+    {
+      "stage": "optimized",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "tests": {
+        "defined": 1326,
+        "passed": 1255,
+        "skipped": 71,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 474,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "logSHA256": "5c520cb6887904797e9d368d86b3ab522424c1243df732f33802b90029a5fb73",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true,
+      "wallSeconds": 427.3740701659117
+    }
+  ],
+  "independentFixtures": [
+    {
+      "stage": "full-debug",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "fixture": ".artifacts/sync-withheld-service-v1/fixtures/full-debug/reopened-all13-cedb43b7-5efe-47fa-b67c-4916c1a922a6",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "36f2344f9c0faa8b42c083b0e05e9bd51fdeda9ab600c3f47019d0e3c75dc081",
+        "producer.sqlite": "24a9aa07f2fa79dcb37226a159d1a7a2cd15e2a20ca470b458a538d7c7d35f67"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "fixture": ".artifacts/sync-withheld-service-v1/fixtures/thread-sanitizer/reopened-all13-e5415e36-8ec9-44b1-81f4-4b1c676c51d8",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "3e7595b844166ca8d6cf511f70c5f4499fdd92194230902dbc6458c1c9454b4f",
+        "producer.sqlite": "0e7191e691fc35b119781b84775e54f8ca1d45b5d6d32129bffb00b0d55ee1e6"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+      "fixture": ".artifacts/sync-withheld-service-v1/fixtures/optimized/reopened-all13-e5b1b66d-314e-403f-a631-8313fb2049d4",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "661bcbe309b4f096ef31b8cf2016dcb8d1641d952fdaedac65ce2eed684fccb7",
+        "producer.sqlite": "998db5cddc6cf50756d9b64cbd0f9f058e81c0f4f0abd3e671b74977bcb9592a"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    }
+  ],
+  "compatibilityScope": "Both frozen CLI environment paths are supplied in each original broad runner; the five compatibility methods must pass there, without supplemental reclassification. The prior33 wipe test uses an explicitly synthetic completion sentinel to test SQL invalidation, not authentic native completion.",
+  "ordinaryDebugCLIWipe": {
+    "state": "passed",
+    "source": "e79120fb898225e0d38fefa0fe90605434053d01",
+    "cliSHA256": "67a3ae24fdbde4c9246397c6f6170ed117478f30a2a20e445883c287ff012517",
+    "originalFixtureSHA256": "24a9aa07f2fa79dcb37226a159d1a7a2cd15e2a20ca470b458a538d7c7d35f67",
+    "originalFixtureUnchanged": true,
+    "nativeCounts": {
+      "memories": 0,
+      "chat_sessions": 0,
+      "chat_turns": 0,
+      "personal_sync_withheld": 0,
+      "personal_sync_work": 0,
+      "personal_sync_versions": 0,
+      "historical_evidence": 0,
+      "personal_sync_publication_bindings": 0
+    },
+    "holdState": [
+      0,
+      "",
+      0,
+      0,
+      0
+    ],
+    "bodyFreeLocalDeletionIntents": {
+      "rows": 21,
+      "nativeKinds": 13,
+      "beforeKeyBytes": 32,
+      "afterKeys": 0,
+      "afterBodies": 0
+    },
+    "report": {
+      "cancelled": false,
+      "cleanupComplete": true,
+      "compacted": true,
+      "conversations": 1,
+      "erasure": {
+        "conversationTurns": 1,
+        "historicalVersions": 0,
+        "pendingMedia": 0,
+        "removedMedia": 0,
+        "searchCacheRemoved": true,
+        "sharedMedia": 0,
+        "sources": 3,
+        "warnings": []
+      },
+      "routineRuns": 1,
+      "routines": 1
+    },
+    "copySHA256": "b8ddccef9247ac5e562c43dd811157b2534d961ecb81db86d117e59c70c100c8",
+    "readerDidNotChangeCopy": true,
+    "retainedFirstReaderFailure": "failed-held-wipe-reader-v1.py expected no raw intents; correct local wipe retains body-free deletion intents. The successful wipe process was not rerun.",
+    "scope": "Ordinary current debug CLI and owned copied all13 fixture, with one explicitly synthetic valid owner hold and review cursor inserted before wipe. Verifies whole-library hold/body cleanup, not authentic policy admission, packaged/native APFS or public sync acceptance."
+  },
+  "frozenPrior33OpeningProbe": {
+    "observations": [
+      {
+        "case": "prior33-read",
+        "returncode": 1,
+        "stderr": "OSwind: no such function: oswind_sync_withheld_erasure_v1\n"
+      },
+      {
+        "case": "prior33-write",
+        "returncode": 1,
+        "stderr": "OSwind: no such function: oswind_sync_withheld_erasure_v1\n"
+      },
+      {
+        "case": "current-write",
+        "returncode": 0,
+        "stderr": ""
+      }
+    ],
+    "nativeCounts": {
+      "Owned prior33 withheld capability probe": 0,
+      "Owned current withheld capability probe": 1
+    },
+    "originalFixtureUnchanged": true,
+    "scope": "Owned copied software fixture only. Actual frozen prior33 executable; read and write observations do not establish complete older-client/native/public enrollment fencing."
+  },
+  "originalFailures": [
+    "Baseline899 generic group receipt incorrectly allowed renewal with native records retained; original1-method/2-assertion failure remains in sync-service-renewal-v1/01-before.log.",
+    "C-callback implicit Self and missing test CSQLite import compilation failures retained.",
+    "Native source erasure completed before a later ordinary conversation put conflicted with independent held private metadata; causal trace and corrected assertion remain retained.",
+    "Scheduler projection-admission classification regression and overbroad keyword fixture failure retained.",
+    "First hosted reader assumed a nonexistent ClipboardContractTests suite; corrected reader checks actual named NativeClipboardReaderTests.",
+    "First wipe reader expected no intents; the original successful process retains21 body-free deletion intents across13 kinds. The wipe was not rerun.",
+    "PR136 missing-vault-session native hosted failure remains causally unresolved."
+  ],
+  "retainedDiagnosticManifestSHA256": "13cf6ff51f5b378558165c7a834432be3543c86c03d4285107c2b78e635ca07b",
+  "followup": {
+    "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+    "receipt": "sync-scheduler-join-v1.json",
+    "scope": "Task ownership gap closed after this full-suite baseline; all29 service cases pass in three follow-up build modes, not a second full474-method qualification."
+  },
+  "limits": [
+    "Internal bounded folder service only; public enrollment/UI, per-device identity/recovery/revocation, older-client fencing and external rollback authority remain open.",
+    "Concurrent Stop during network reconfiguration needs a strict task-join ownership audit before public integration. The service mutex serializes actual tick I/O, but tested ordinary pause/resume is not app-wide concurrent shutdown acceptance.",
+    "Held independent private metadata may stop a peer cursor after authenticated source erasure; no silent conflict resolution. Assigned immutable outbox versions can remain blocked after a policy change.",
+    "Network pause continues local preparation in an already installed service. Cold offline transport opening, raw-queue overflow/reconciliation and storage-pressure progress remain open.",
+    "No new package/native APFS qualification, physical provider/two-Mac acceptance, whole-product parity/rank, model quality or sustained power result. Prior successful reviews and all original failures remain frozen.",
+    "Withheld320-byte accounting is a logical metadata budget, not measured filesystem usage. Permitted local encrypted chunk staging can outlive SQL rollback; selective spool GC is still required."
+  ]
+}

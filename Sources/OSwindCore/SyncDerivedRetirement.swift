@@ -52,6 +52,11 @@ enum SyncDerivedRetirement {
         }
     }
     static func collect(cache:SyncVersionStore,root:SyncObjectKey,deleting:Bool=true,body:()throws->Void,retire:(SyncObjectKey)throws->Void)throws {
+        try SyncWithheldWork.withNativeErasure(cache.database,enabled:deleting) {
+            try collectInside(cache:cache,root:root,deleting:deleting,body:body,retire:retire)
+        }
+    }
+    private static func collectInside(cache:SyncVersionStore,root:SyncObjectKey,deleting:Bool,body:()throws->Void,retire:(SyncObjectKey)throws->Void)throws {
         let db=cache.database
         let rootState=try cache.journal.state(for:root)
         guard sqlite3_get_autocommit(db.handle)==0,deleting ? rootState.isDeleted:(!rootState.isDeleted && rootState.heads.count==1) else {throw OSwindError.invalid("Peer retirement requires its admitted owning transaction")}

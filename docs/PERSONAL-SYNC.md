@@ -4,6 +4,10 @@ In development. F059 remains TODO until a user can pair devices and synchronize 
 
 The current internal foundation includes [durable answer admission](SYNC-DURABLE-PUBLICATION.md), [backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md) and [native33 media compatibility](NATIVE-MEDIA-COMPATIBILITY.md). The [current component receipt](../benchmarks/native-media-compatibility-v1.json) binds source `fe54050`, all88 mandatory controls in three builds,30 package/process stages and39 owned native methods. Optimized source14c has identical native/test/package/runtime bytes and a separately declared final-inspection script delta. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
 
+The [current prepared-session app owner](SYNC-APP-OWNER.md) connects the real service to app retirement and reversible processing suspension. It does not expose a public enrollment constructor or complete the remaining trust, recovery, erasure and provider requirements below. Historical receipts retain their original sources.
+
+The [signed pairing/v3 transport component](SYNC-SIGNED-PAIRING.md) now supplies root-signed addition-only membership, exact capabilities, expiring recipient-bound responses and per-device authorship. The app owns asynchronous setup before it may install native state. This still enables no public enrollment: Keychain/pending-request persistence, refresh/recovery/revocation/rotation, old-writer and external rollback authority, erasure application and physical acceptance remain required.
+
 ## Delivery requirements
 
 | Requirement | Implementation / acceptance gate |

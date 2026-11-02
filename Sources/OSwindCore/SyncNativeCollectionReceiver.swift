@@ -51,6 +51,11 @@ struct SyncNativeCollectionReceiver {
                 guard try db.eraseCount("SELECT COUNT(*) FROM "+table.rawValue)==0 else {throw OSwindError.database("Native collection retirement left canonical rows")}
             }
             guard try db.eraseCount("SELECT COUNT(*) FROM historical_evidence")==0,try db.eraseCount("SELECT used_bytes FROM historical_evidence_state WHERE singleton=1")==0 else {throw OSwindError.database("Native collection retirement left archived originals or accounting")}
+            // Commit completion only after the full native/cache/original
+            // retirement succeeds. Physical cleanup remains a separate gate.
+            try SyncCollectionHistory.requireNativeCompletionHooks(db)
+            let complete=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");defer {sqlite3_finalize(complete)}
+            db.bind(complete,1,SyncCollectionHistory.nativeCompletionKey);db.bind(complete,2,try control.digest);try db.done(complete)
         }
     }
 

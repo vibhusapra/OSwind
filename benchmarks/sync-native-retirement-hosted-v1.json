@@ -1,0 +1,62 @@
+{
+  "format": "OSwind.sync-native-retirement.hosted.v1",
+  "state": "passed",
+  "reviewState": "passed",
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/137",
+  "headRevision": "1c5c798a984c16989e58398ba835ea11c5b22445",
+  "checkoutMerge": "16e28ce5858a010e09d13050447f4a878f79d682",
+  "verifiedTree": "681bb925dea30712f846baf9f1cf40f36c2d24ff",
+  "qualifiedRuntimeSource": "2345a256525254a60ac52ec4077127ba330fb566",
+  "runtimeAndBuildSourcesEqualToQualifiedSource": true,
+  "metadataOnlyFiles": [
+    "README.md",
+    "benchmarks/README.md",
+    "benchmarks/native-collection-retirement-inputs-v1.json",
+    "benchmarks/native-collection-retirement-v1.json",
+    "benchmarks/sync-library-barriers-hosted-v1.json",
+    "docs/COMPONENT-QUALIFICATIONS.md",
+    "docs/PROGRESS.md",
+    "docs/SYNC-LIBRARY-BARRIERS.md",
+    "docs/SYNC-NATIVE-RETIREMENT.md",
+    "docs/features.json",
+    "docs/landscape.html"
+  ],
+  "runID": 41438050899,
+  "nativeJobID": 125252676072,
+  "benchmarkJobID": 125252675631,
+  "all81NativeJobStepsSuccess": true,
+  "fullTests": {
+    "defined": 2411,
+    "passed": 2282,
+    "skipped": 129,
+    "failures": 0,
+    "unexpected": 0
+  },
+  "ownedNamedClipboardTests": {
+    "defined": 3,
+    "passed": 3,
+    "skipped": 0,
+    "failures": 0,
+    "unexpected": 0
+  },
+  "nativeVaultAndSessionTests": {
+    "defined": 62,
+    "passed": 62,
+    "skipped": 0,
+    "failures": 0,
+    "unexpected": 0
+  },
+  "previouslyFailingMissingImageCasePassedHere": true,
+  "completeNativeLog": {
+    "path": ".artifacts/sync-native-retirement-v1/pr137-hosted-native-final.log",
+    "bytes": 9382313,
+    "sha256": "f228c6b0b28fe5ea4069c4b0adb9b4905c55310ea1bcd9e826bf614ae42c76e2"
+  },
+  "evidenceSHA256": "cd4d919d6b99ed1ec9976e09e8549f79c4cf557d5aaec70cec36ccf70e5f67b9",
+  "limits": [
+    "Passing hosted checks at PR137 are separate from the newer internal service at PR138.",
+    "PR136 missing-session native failure remains unresolved. The unchanged case passing here does not establish its cause or a fix.",
+    "No physical battery/input, public sync, two-Mac/provider, notarization, whole-product parity or competitor ranking follows from this hosted result."
+  ],
+  "localReviewSHA256": "17ef7b49a15772ad0ec90cfc92b36c00acc2c1b11bfbb0e46d77668d06749d17"
+}

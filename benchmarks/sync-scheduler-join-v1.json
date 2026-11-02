@@ -1,0 +1,230 @@
+{
+  "format": "OSwind.sync-scheduler-join.v1",
+  "state": "passed",
+  "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+  "baselineSource": "e79120fb898225e0d38fefa0fe90605434053d01",
+  "baselineSoftwareReviewSHA256": "1e95d2ea9cda28ae1a6ecd1be74c6dbf513bb466e258268bce0c6d287c2c5bad",
+  "trackedInputs": 1444,
+  "inputManifestSHA256": "f680b941d03070196ddfb74b65056f97c190641996cac2ab84b19859da02eead",
+  "onlyRuntimeDelta": [
+    "Sources/OSwindCore/SyncLibraryScheduler.swift"
+  ],
+  "codeDeltaSHA256": "a5ca2a69e3bf618c0178ba2cbe45e5fab69847179b7582290f091eefd3273900",
+  "implementation": "Retain the existing worker task slot while setNetworkEnabled awaits cancellation/join, so a concurrent stop retains and joins that worker too. A terminal stop still prevents replacement launch.",
+  "serviceMethods": [
+    "testServiceTransfersRealThirteenKindGraphWithoutCallerSuppliedPolicyOrMediaHooks",
+    "testServiceTransfersActualImageBytesAndRefusesChangedContentAddress",
+    "testServiceCurrentSavedPrivacyDeniesSecretAndExcludedBrowserBeforePublication",
+    "testServiceRestartUsesDurableSendAndReceiveCursorsAndInvalidatesOldWorker",
+    "testServiceRejectsAuthenticatedHeadRollbackAndYieldsRemoteEraseBeforeExport",
+    "testServiceTransfersRealAudioAndVideoAndHonorsIndependentReceiverRetention",
+    "testServiceMediaStreamsAcrossChunkBoundaryAndFailedAdoptionLeavesNoNativeSource",
+    "testServiceSchedulerOwnsBackgroundDeliveryAndStopJoinsWorker",
+    "testServiceSenderSettingsFencePreventsProviderWriteAfterPolicySave",
+    "testServicePolicyChecksContentOfEveryKindWithoutTreatingNumericIdentityAsSecret",
+    "testServiceRefusesNativeLibraryInSharedSpaceAndSpoolOutsideWipeInventory",
+    "testServiceReopensBothLibrariesAndEncryptedSpoolsAfterPartialGraphDelivery",
+    "testServiceDiscoversDelayedDeclarationAfterCursorProgressWithoutAnotherPeerOperation",
+    "testServiceRenewalRequiresActualNativeErasureInsteadOfGenericControlReceipt",
+    "testServiceRenewalInvalidatesNativeCompletionWhenAnotherPeerOnlyRecordsGenericRetirement",
+    "testServiceNativeCompletionConsumptionAndPublicationRenewalRollBackTogether",
+    "testServiceLocalClearInvalidatesPriorReceivedNativeCompletion",
+    "testServiceNativeCompletionSQLHooksInvalidateRawFrontierChangesAndRefuseMissingProtection",
+    "testServiceWithheldSourceDoesNotStarveHealthyRowsOrInventPeerSequenceGaps",
+    "testServiceSavedPolicyReviewReleasesHeldSourceAndDeletionRecreationKeepsNewLifetime",
+    "testServiceHeldWorkSurvivesLibraryReopenAndNativeEditWakesItWithoutPolicyToggle",
+    "testServicePeerPutCannotOverwriteHeldNativeEditButAuthenticatedDeletionWins",
+    "testServiceSourceErasureCompletesBeforeConflictingIndependentHeldMetadata",
+    "testServiceHeldNativeErasurePermitIsConnectionScopedAndClearsAfterThrow",
+    "testServiceNetworkPausePreparesLocallyWithClosedTransportAndResumesWithoutLostRows",
+    "testServiceWithheldBudgetFailureDoesNotAcknowledgeOrLoseNativeWorkAndCanRecover",
+    "testServiceSchedulerContinuesLocalPreparationDuringPeerPrivacyConflict",
+    "testServiceSchedulerNetworkPauseJoinsRemoteWorkWhileLocalCaptureKeepsDraining",
+    "testServicePolicyReviewUsesPersistedFinitePagesAcrossRestartAndNewArrivals"
+  ],
+  "stages": [
+    {
+      "stage": "full-debug",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "tests": {
+        "defined": 29,
+        "passed": 29,
+        "skipped": 0,
+        "failures": 0
+      },
+      "command": [
+        "swift",
+        "test",
+        "--filter",
+        "SyncOutgoingTests.testService"
+      ],
+      "logSHA256": "2a185f856e3a907bfca1238bbfa496a25320bee8f0fac022d4eff9eb5b60f19b",
+      "wallSeconds": 68.55192004190758,
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "tests": {
+        "defined": 29,
+        "passed": 29,
+        "skipped": 0,
+        "failures": 0
+      },
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "SyncOutgoingTests.testService"
+      ],
+      "logSHA256": "87c71ad22cc61b1a92fe3161944ff6a4e61e5562dfa15fb4a39fe36ac1cfd6d1",
+      "wallSeconds": 82.64720479189418,
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "tests": {
+        "defined": 29,
+        "passed": 29,
+        "skipped": 0,
+        "failures": 0
+      },
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/release-build",
+        "-c",
+        "release",
+        "--filter",
+        "SyncOutgoingTests.testService"
+      ],
+      "logSHA256": "79223c26ea59a46125818fbf0ad6ecef2d7babb926a157e8f40ea57e47e2b79d",
+      "wallSeconds": 115.47330454201438,
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    }
+  ],
+  "independentFixtures": [
+    {
+      "stage": "full-debug",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "fixture": ".artifacts/sync-scheduler-join-v1/fixtures/full-debug/reopened-all13-fff4f328-7cf2-488f-a20d-a5919bae783c",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "7695cc60671f80a50bd536e9dd4229a2fb16ed2e134b8560b6f5fb6ff309fc3c",
+        "producer.sqlite": "d9166c938124031bf1e34de476fe3273b57fc84623486b312bb8fef8eda04b91"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "fixture": ".artifacts/sync-scheduler-join-v1/fixtures/thread-sanitizer/reopened-all13-19066968-be59-4977-b775-148c2ed599c9",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "bc961027f1157d9e8f0be962fa9c7372be9f6c240cd4ead169d43ea793cb8379",
+        "producer.sqlite": "2a1093b701448c654656347099647af815afd5b9d515dac489769569e3faa583"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+      "fixture": ".artifacts/sync-scheduler-join-v1/fixtures/optimized/reopened-all13-e79684f8-ea95-4199-a033-a18643b3e828",
+      "inputSHA256": {
+        "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+        "receiver.sqlite": "0b452d5c09121dfbb9a0633d4b3b529f7a9fe3c2934bf2acbea93e21b358063f",
+        "producer.sqlite": "3ba80181dcd5af78d093c0a7e091bcb1cd832c1495ab55926a4a5d5c995cee4e"
+      },
+      "nativeCounts": {
+        "memories": 3,
+        "chat_sessions": 1,
+        "chat_turns": 1,
+        "chat_sources": 1,
+        "recap_sources": 1,
+        "routines": 1,
+        "routine_runs": 1,
+        "memory_entities": 3,
+        "entity_aliases": 4,
+        "entity_mentions": 1,
+        "entity_ignored": 1,
+        "entity_project_ignored": 1,
+        "text_observation_pins": 2
+      },
+      "wireVersions": 21,
+      "all13WireBodiesByteEqual": true,
+      "contiguousProducerOperations": 21,
+      "receiverCursor": 21,
+      "receiverReceipts": 21,
+      "receiverOutbox": 0,
+      "pendingWork": 0,
+      "nativePublicationBindings": 1,
+      "nativeSourceAndCitationJoins": true,
+      "receivedRecipeDisabled": true,
+      "allOriginalBytesUnchanged": true
+    }
+  ],
+  "fixtureReviewSHA256": "ba6eb29f194c64f6059b3ca31d00a32ae1cd5f3f1663c39af77cd0f2f2aff67f",
+  "limits": [
+    "All29 existing service/renewal/hold cases run in three current-source builds. This targeted follow-up does not reclassify the predecessor full/selected474-method runs as runs of the newer source.",
+    "Code inspection closes the task-slot ownership gap; ordinary actual background pause/resume/stop tests pass. No newly instrumented deterministic simultaneous Stop/pause race oracle or app-wide producer lifecycle acceptance is claimed.",
+    "Public enrollment/UI, compatibility/recovery/revocation/rollback, cold offline/backpressure/reconciliation, large graphs/spool GC/backups, providers/two Macs/native/power/distribution remain open."
+  ]
+}

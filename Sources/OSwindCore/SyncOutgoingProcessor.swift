@@ -1,7 +1,7 @@
 import Foundation
 import CSQLite
 
-enum SyncOutgoingStep:Equatable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
+enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
 
 /// Internal synchronous outgoing adapter over all canonical tables. The owning
 /// library supplies current privacy admission and prepared media; no networking,
@@ -16,6 +16,7 @@ struct SyncOutgoingProcessor {
     /// Required by future service delivery; nil retains the internal legacy adapter.
     /// The sink durably retains immutable manifest bytes before its revision.
     var retainTurnPublication:((SyncContentReference,Data)throws->Void)? = nil
+    var withholding:(work:SyncWithheldWork,policy:String)? = nil
     var maximumObjects=512
     var maximumBytes=16*1024*1024
     var maximumDepth=32
@@ -23,6 +24,10 @@ struct SyncOutgoingProcessor {
     private var database:RoutineDatabase {queue.database}
     func step(limit:Int=128)throws->SyncOutgoingStep {
         guard queue.catalog.database.handle==cache.database.handle,queue.catalog.scope==cache.catalog.scope,(1...256).contains(limit),(1...4096).contains(maximumObjects),(1...256*1024*1024).contains(maximumBytes),(1...128).contains(maximumDepth) else {throw OSwindError.invalid("Invalid outgoing sync processor context or bounds")}
+        if let withholding {
+            guard withholding.work.catalog.scope==queue.catalog.scope,withholding.work.catalog.database.handle==database.handle else {throw OSwindError.invalid("Use the outgoing processor's owning withheld metadata")}
+            try SyncProtocolLimits.digest(withholding.policy)
+        }
         // Selection and the selected step share the writer transaction, so no
         // peer/local connection can slip a mutation between inspection and work.
         return try SyncChangeCapture.transaction(database) {
@@ -30,7 +35,9 @@ struct SyncOutgoingProcessor {
                 let row=try database.statement("SELECT EXISTS(SELECT 1 FROM "+table+")");defer {sqlite3_finalize(row)}
                 guard sqlite3_step(row)==SQLITE_ROW else {throw database.error()};return sqlite3_column_int(row,0)==1
             }
-            if try any("personal_sync_changes") {return .captured(try queue.stage(limit:limit,byteLimit:captureByteLimit))}
+            if try any("personal_sync_changes") {return .captured(try queue.stage(limit:limit,byteLimit:captureByteLimit,identified:{changes in
+                if let withholding {for change in changes {if let before=change.before {try withholding.work.wake(before)};if let after=change.after {try withholding.work.wake(after)}}}
+            }))}
             if try any("personal_sync_work") {
                 let batch=Batch(processor:self)
                 let count=try queue.process(limit:limit) {values in
@@ -38,11 +45,25 @@ struct SyncOutgoingProcessor {
                     // Entity parents retire after live alias transfers, which
                     // otherwise cascade-delete aliases that remain live globally.
                     for value in values where value.deleted && value.identity.table != .entity {
+                        try withholding?.work.remove(value.identity)
                         let state=try cache.journal.state(for:value.identity.key)
                         if !state.isDeleted {_=try cache.journal.delete(key:value.identity.key)}
                     }
-                    for value in values where !value.deleted {_=try batch.prepare(value.identity)}
+                    for value in values where !value.deleted {
+                        if let withholding {
+                            do {
+                                // A denied owner must roll back every dependency
+                                // put/cache change it tentatively prepared. Do
+                                // not reuse that rolled-back Batch's memoized rows.
+                                try SyncChangeCapture.transaction(database) {_=try Batch(processor:self).prepare(value.identity)}
+                                try withholding.work.remove(value.identity)
+                            }catch let error as SyncPublicationPolicyDenied {
+                                try withholding.work.park(value.identity,denied:error.identity ?? value.identity,policy:withholding.policy)
+                            }
+                        }else{_=try batch.prepare(value.identity)}
+                    }
                     for value in values where value.deleted && value.identity.table == .entity {
+                        try withholding?.work.remove(value.identity)
                         let state=try cache.journal.state(for:value.identity.key)
                         if !state.isDeleted {_=try cache.journal.delete(key:value.identity.key)}
                     }
@@ -103,6 +124,9 @@ struct SyncOutgoingProcessor {
             })
         }
         @discardableResult func prepare(_ identity:SyncObjectIdentity)throws->SyncPortableRecord {
+            do {return try prepareAdmitted(identity)}catch let error as SyncPublicationPolicyDenied {throw SyncPublicationPolicyDenied(identity:error.identity ?? identity)}
+        }
+        private func prepareAdmitted(_ identity:SyncObjectIdentity)throws->SyncPortableRecord {
             try Task.checkCancellation();let digest=try identity.key.digest
             if let value=prepared[digest] {return value}
             guard objects<processor.maximumObjects,visiting.count<processor.maximumDepth,visiting.insert(digest).inserted else {throw OSwindError.unavailable("Outgoing dependency graph is cyclic or exceeds its transaction bound")}

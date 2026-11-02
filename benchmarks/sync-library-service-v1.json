@@ -1,0 +1,273 @@
+{
+  "format": "OSwind.sync-library-service.v1",
+  "state": "component-software-passed-public-sync-WIP",
+  "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+  "pullRequest": "https://github.com/vibhusapra/OSwind/pull/138",
+  "trackedInputs": 1438,
+  "softwareReviewSHA256": "cfee2ff76cda827211f3a53625ba3b48f5a051f17cfb504aeaecbbea23fa4d99",
+  "localInputManifestSHA256": "58814d34bed947d22173f3a91f0d75a4126d29cb35386c69c440f8943ef969e5",
+  "requiredMethods": 458,
+  "serviceMethods": [
+    "testServiceTransfersRealThirteenKindGraphWithoutCallerSuppliedPolicyOrMediaHooks",
+    "testServiceTransfersActualImageBytesAndRefusesChangedContentAddress",
+    "testServiceCurrentSavedPrivacyDeniesSecretAndExcludedBrowserBeforePublication",
+    "testServiceRestartUsesDurableSendAndReceiveCursorsAndInvalidatesOldWorker",
+    "testServiceRejectsAuthenticatedHeadRollbackAndYieldsRemoteEraseBeforeExport",
+    "testServiceTransfersRealAudioAndVideoAndHonorsIndependentReceiverRetention",
+    "testServiceMediaStreamsAcrossChunkBoundaryAndFailedAdoptionLeavesNoNativeSource",
+    "testServiceSchedulerOwnsBackgroundDeliveryAndStopJoinsWorker",
+    "testServiceSenderSettingsFencePreventsProviderWriteAfterPolicySave",
+    "testServicePolicyChecksContentOfEveryKindWithoutTreatingNumericIdentityAsSecret",
+    "testServiceRefusesNativeLibraryInSharedSpaceAndSpoolOutsideWipeInventory",
+    "testServiceReopensBothLibrariesAndEncryptedSpoolsAfterPartialGraphDelivery",
+    "testServiceDiscoversDelayedDeclarationAfterCursorProgressWithoutAnotherPeerOperation"
+  ],
+  "extraOwnerQualifiedBackendControls": [
+    "-[OSwindCoreTests.SpeechRecognitionTests testLegacySettingsDefaultToWhisperAndPartialNativeSettingsDecode]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMissingModelsFailLocallyWithoutCreatingCache]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testModelReuseConfigurationChangeAndExplicitUnload]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testFIFORequestsNeverEnterBackendConcurrently]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testQueuedCancellationDoesNotTranscribeAndReleasesNextRequest]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringModelLoadNeverCachesOrTranscribesCandidate]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testCancellationDuringInferenceDiscardsResultAndQueueRemainsUsable]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testMalformedBackendOutputCannotEscapeValidation]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testOverdueInferenceCannotReturnTextAndReleasesQueue]",
+    "-[OSwindCoreTests.SpeechRecognitionTests testInvalidBudgetCannotLoadOrTranscribe]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testDisabledUnsupportedAndInvalidModelsNeverLoad]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testResidentReuseAndUnload]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testRawTimelineAndWordAttributionShareResidentBackend]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testNoDetectedSpeechIsEmptyButActualFailuresStillThrow]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testQueuedCancellationAndInferenceCancellationDoNotReturnLabels]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testCancelledModelLoadIsNotReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testOverdueResultsAreDiscardedAndRuntimeCanBeReused]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testPLDAParametersAreBoundedTypedAndFinite]",
+    "-[OSwindCoreTests.SpeakerRuntimeTests testSpeakerRenamesPersistAndRefuseMergesMissingRecordsAndSecrets]"
+  ],
+  "stages": [
+    {
+      "stage": "full-debug",
+      "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+      "broadTests": {
+        "defined": 2424,
+        "passed": 2294,
+        "skipped": 130,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "compatibilitySupplement": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "combinedDistinctTests": {
+        "defined": 2424,
+        "passed": 2299,
+        "skipped": 125,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 458,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "broadLogSHA256": "1ab9742fd930245ab9a2d3ed2db879015dea563a6a144e60c0f405420f56234d",
+      "compatibilityLogSHA256": "8b76fb84b3c40ee23fd0793a029ad415974e5d17eb7cad929c9d54c78e606981",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+      "broadTests": {
+        "defined": 1310,
+        "passed": 1234,
+        "skipped": 76,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "compatibilitySupplement": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "combinedDistinctTests": {
+        "defined": 1310,
+        "passed": 1239,
+        "skipped": 71,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 458,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "broadLogSHA256": "7eb75a9a8bdd77ee6b30530a8f3f035c6bd15641b0c51a31f0231a294389a973",
+      "compatibilityLogSHA256": "931522cda1edc834242fa90c4b53bf1f2c3128eddecff91ac9726e8c5d80710d",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    },
+    {
+      "stage": "optimized",
+      "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+      "broadTests": {
+        "defined": 1310,
+        "passed": 1234,
+        "skipped": 76,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "compatibilitySupplement": {
+        "defined": 5,
+        "passed": 5,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "combinedDistinctTests": {
+        "defined": 1310,
+        "passed": 1239,
+        "skipped": 71,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "requiredMethodsPassed": 458,
+      "extraOwnerQualifiedBackendControlsPassed": 19,
+      "broadLogSHA256": "12ee90dd15d66d60bd392482186b07f22fd49778c9be415b09b603574c6f5aa4",
+      "compatibilityLogSHA256": "6ad4a9140faae40f49bde75791aa3d59c989d94c2bb4e7bf593202c4555d3257",
+      "raceWarning": false,
+      "trackedInputsUnchanged": true
+    }
+  ],
+  "independentFixtures": {
+    "format": "OSwind.sync-service-fixtures.v2",
+    "state": "passed",
+    "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+    "scope": "Read-only independent review of three current-source reopened all13 library fixtures, including exact immutable historical-original citation arms; no package, physical Mac, provider, power or product acceptance.",
+    "firstReaderFailure": "failed-fixture-reader-v1.json",
+    "persistedBaselineSHA256": "0b99ba07a640d2f439791d0a30a885ee875b0df4aac66fd6505251d26694b089",
+    "fixtures": [
+      {
+        "stage": "full-debug",
+        "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+        "fixture": ".artifacts/sync-library-service-v1/fixtures/full-debug/reopened-all13-e5858ef5-a0ea-4ac7-9033-9b3c54050c25",
+        "inputSHA256": {
+          "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+          "receiver.sqlite": "e2f747fdb970cfeaaaf653f343a432d7b848900b15d827d45cf8717d60b45b4d",
+          "producer.sqlite": "bafa1c8016e9e20b94896e92e5ab41760ec8ce1f6856ccc82f047a418c85183e"
+        },
+        "nativeCounts": {
+          "memories": 3,
+          "chat_sessions": 1,
+          "chat_turns": 1,
+          "chat_sources": 1,
+          "recap_sources": 1,
+          "routines": 1,
+          "routine_runs": 1,
+          "memory_entities": 3,
+          "entity_aliases": 4,
+          "entity_mentions": 1,
+          "entity_ignored": 1,
+          "entity_project_ignored": 1,
+          "text_observation_pins": 2
+        },
+        "wireVersions": 21,
+        "all13WireBodiesByteEqual": true,
+        "contiguousProducerOperations": 21,
+        "receiverCursor": 21,
+        "receiverReceipts": 21,
+        "receiverOutbox": 0,
+        "pendingWork": 0,
+        "nativePublicationBindings": 1,
+        "nativeSourceAndCitationJoins": true,
+        "receivedRecipeDisabled": true,
+        "allOriginalBytesUnchanged": true
+      },
+      {
+        "stage": "thread-sanitizer",
+        "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+        "fixture": ".artifacts/sync-library-service-v1/fixtures/thread-sanitizer/reopened-all13-4e39cdf2-c23f-4482-8dde-dfbe81187a55",
+        "inputSHA256": {
+          "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+          "receiver.sqlite": "b794fc19b69f0d5fe067606c7b10029a8c80fae81e49398f974237a44deed0f0",
+          "producer.sqlite": "8087ce333de1e61c75bf5863623d3fd66042277a9283014f6808d160e1505433"
+        },
+        "nativeCounts": {
+          "memories": 3,
+          "chat_sessions": 1,
+          "chat_turns": 1,
+          "chat_sources": 1,
+          "recap_sources": 1,
+          "routines": 1,
+          "routine_runs": 1,
+          "memory_entities": 3,
+          "entity_aliases": 4,
+          "entity_mentions": 1,
+          "entity_ignored": 1,
+          "entity_project_ignored": 1,
+          "text_observation_pins": 2
+        },
+        "wireVersions": 21,
+        "all13WireBodiesByteEqual": true,
+        "contiguousProducerOperations": 21,
+        "receiverCursor": 21,
+        "receiverReceipts": 21,
+        "receiverOutbox": 0,
+        "pendingWork": 0,
+        "nativePublicationBindings": 1,
+        "nativeSourceAndCitationJoins": true,
+        "receivedRecipeDisabled": true,
+        "allOriginalBytesUnchanged": true
+      },
+      {
+        "stage": "optimized",
+        "source": "92b9a8470ff85de05043d55b9cb6befcedb66ea6",
+        "fixture": ".artifacts/sync-library-service-v1/fixtures/optimized/reopened-all13-dce24027-7b5c-48cc-8d74-e417c7fb7618",
+        "inputSHA256": {
+          "fixture.json": "63ec4d20000751667c98535f00b6c3f4fab96b4621dccc004b46c2dab9af9e0d",
+          "receiver.sqlite": "13a7a62c88439b7cc94c44a4828dc3f1df40c4db33490341c1ddc2b12015d41a",
+          "producer.sqlite": "fc9c3b7f2047e13dc16bada3ae65a46b099968b4f35e762754401a8825d06590"
+        },
+        "nativeCounts": {
+          "memories": 3,
+          "chat_sessions": 1,
+          "chat_turns": 1,
+          "chat_sources": 1,
+          "recap_sources": 1,
+          "routines": 1,
+          "routine_runs": 1,
+          "memory_entities": 3,
+          "entity_aliases": 4,
+          "entity_mentions": 1,
+          "entity_ignored": 1,
+          "entity_project_ignored": 1,
+          "text_observation_pins": 2
+        },
+        "wireVersions": 21,
+        "all13WireBodiesByteEqual": true,
+        "contiguousProducerOperations": 21,
+        "receiverCursor": 21,
+        "receiverReceipts": 21,
+        "receiverOutbox": 0,
+        "pendingWork": 0,
+        "nativePublicationBindings": 1,
+        "nativeSourceAndCitationJoins": true,
+        "receivedRecipeDisabled": true,
+        "allOriginalBytesUnchanged": true
+      }
+    ]
+  },
+  "originalFailures": [
+    "Initial compile/preparation and fixture-staging failures remain in the local service artifact directory.",
+    "The first independent fixture reader incorrectly required direct memory_id citations; its failed script and receipt are retained. Version2 checks exact historical-original references and persists baselines before read.",
+    "PR136 hosted missing-session native failure remains unresolved; passing PR137 hosted checks do not establish a causal fix."
+  ],
+  "limits": [
+    "Internal bounded folder service only; no public enrollment/UI, native-specific renewal proof, older-client/recovery/rollback fencing or unattended backpressure acceptance.",
+    "The five environment-gated compatibility skips remain in each original broad log; their separate current-source supplemental passes are combined by identity, never counted as new defined tests.",
+    "No new package/native APFS acceptance, whole-product parity/rank, model-quality, sustained GPU/CPU throughput or battery measurement. Older frozen reviews and original failures remain unchanged.",
+    "No public setup/UI activation. Current renewal authorization still needs a native-adapter-specific completion receipt and an in-transaction cleanup recheck before public use.",
+    "The encrypted spool is included in whole-library native cleanup; selective erasure GC, quotas and backup semantics remain open.",
+    "Preparation is bounded at 512 MiB per asset, while publication defaults to 64 MiB per complete graph; resumable larger transfers and shorter writer holds remain open.",
+    "No feature status or product ranking is promoted. All 83 statuses remain unchanged; F059 remains TODO."
+  ]
+}

@@ -1,10 +1,48 @@
 # OSwind delivery ledger
 
+## Signed pairing and asynchronous setup — internal WIP
+
+[Signed pairing and transport](SYNC-SIGNED-PAIRING.md) now bind device identity and the exact capability floor to root-signed membership, encrypt a reviewed response to the joining device and verify signatures for operations, erase controls, heads and supersession proofs. A shared group key cannot impersonate another member. V3 installs no legacy marker; cross-device embedded successors require the original device's packet. The app owns setup before native installation and joins ignored cancellation, abandoned owners and late sessions before departure.
+
+Source `22e8279` binds [all 1,463 tracked inputs](../benchmarks/sync-pairing-inputs-v1.json) and the [qualification receipt](../benchmarks/sync-pairing-v1.json). Full debug: **2,355 passed / 127 skipped**. Selected Thread Sanitizer: **1,295 passed / 73 skipped**; optimized: **1,295 passed / 73 skipped**. All **514 required regular methods**, including **29 new regular cases**, plus 19 additional backend controls pass in each software mode with no race warning. The native stage passes **64 methods without skips**, including the new setup-held APFS lock case. An independent post-suite attachment check finds no owned sync images attached. Six fresh immutable readers inspect reopened all-kind fixtures: three v3 signed and three legacy v2, each with 21 exact native wire bodies, original/native citation joins, contiguous cursor 21, one answer binding and no echo. The immutable readers verify SQLite content; adversarial current-source tests exercise signatures. These are owned software/native fixtures, with no new packaged app/signing, actual Keychain, user clipboard, physical two-Mac/provider, energy or distribution acceptance.
+
+Public enrollment, persisted Keychain and rollback authority, member refresh/recovery/revocation/rotation, old-writer admission and received-erase application remain open, along with offline/storage/large-graph and real-device/power/distribution acceptance. **F059 stays TODO; all 83 feature statuses remain unchanged.** Previous source-bound checks below remain historical evidence.
+
+## Prepared sync in the actual app — ownership verified
+
+[App ownership](SYNC-APP-OWNER.md) now joins actual sync processing and metadata closure through Quit, library switch, local wipe and encrypted lock. Onboarding/sleep suspension stops the whole tick; network pause continues local preparation. Status uses a bounded push stream without UI polling or another forwarding worker. A prepared session has no public constructor and exposes no keys, peer configuration or erasure authority. Default startup creates no sync worker.
+
+Source `71c4c04` binds [all 1,455 inputs](../benchmarks/sync-app-owner-inputs-v1.json): **2,326 passed / 126 skipped** full debug, **1,266 passed / 72 skipped** selected sanitizer and **1,266 passed / 72 skipped** optimized. All **485 regular controls** and 19 additional backend identities pass per mode, with no race warning. **63 native methods pass without skips**, including the actual sync-held APFS lock test. Three fresh independent readers verify reopened all-kind graph fixtures. [Receipt](../benchmarks/sync-app-owner-v1.json).
+
+The app tests positively observe the real tick's media lease behind a SQL barrier. Canceled drains, Quit, switch and wipe wait for it. The owned encrypted image remains attached until sync returns, then closes/detaches and preserves its source after reopen. This does not establish public enrollment or live GUI acceptance. Received-group-erase application/renewal, device authority and setup/recovery remain open, along with the existing offline/storage/large-transfer/provider/power/distribution gates. **F059 stays TODO; all 83 feature statuses remain unchanged.**
+
+## Durable privacy holds and network pause — internal service WIP
+
+[Current behavior](SYNC-WITHHELD-SERVICE.md) keeps permitted captures progressing past privacy-denied owners, persists bounded opaque holds and finite policy review across reopen, protects held native edits from ordinary peer replacement, and joins network pause/resume while preparing locally. Exact native erasure completion is now required and consumed atomically before publication renewal; SQL hooks revoke stale proof. The original generic-receipt renewal bug remains in the retained diagnostic history.
+
+Source `e79120f` binds [all 1,444 inputs](../benchmarks/sync-withheld-service-inputs-v1.json) and a [new receipt](../benchmarks/sync-withheld-service-v1.json): **2,315 passes / 125 skips** full debug, **1,255 passes / 71 skips** selected sanitizer and **1,255 passes / 71 skips** optimized. All **474 required controls**, including 29 service cases, plus 19 owner-qualified backend controls pass in every mode. No race warning appears. Independent readers inspect three reopened-library fixtures covering all 13 kinds. The ordinary debug CLI wipe clears held state and bodies while preserving 21 opaque body-free deletion intents. Original reader failures remain retained.
+
+[Earlier hosted CI](../benchmarks/sync-library-service-hosted-v1.json) passes full 2,295/129 skips, native 62 and clipboard 3 with 81 successful native-job steps and matching merge/head trees. This qualifies the preceding published source `92b9a84` runtime, not source `e79120f`. PR136 remains unresolved. No new package/native APFS acceptance is claimed.
+
+Public enrollment/recovery/revocation/compatibility/rollback and app lifecycle/status/conflict UI; cold offline opening and raw-queue reconciliation; storage pressure, assigned denied outbox versions, large resumable graphs and selective spool/backup semantics remain open. **F059 remains TODO; all 83 statuses are unchanged.** Whole-product parity, ranking, physical power and notarized distribution remain unaccepted.
+
+Worker ownership follow-up `dd68dfa` changes only the scheduler task slot and passes all 29 service cases in each current debug/sanitizer/optimized build. The source `e79120f` broad results above remain the preceding baseline; see [the separate follow-up receipt](../benchmarks/sync-scheduler-join-v1.json). Three fresh readers verify its reopened fixtures covering all 13 kinds. Public app-wide lifecycle acceptance remains open.
+
+## Earlier folder-backed native sync service checkpoint
+
+The [internal service](SYNC-LIBRARY-SERVICE.md) now supplies real saved-policy/media adapters, all 13 native kinds, authenticated discovery hints, durable cursors, delayed-declaration retry and background stop/join scheduling. Source `92b9a84` binds [1,438 tracked inputs](../benchmarks/sync-library-service-inputs-v1.json) and its [software receipt](../benchmarks/sync-library-service-v1.json). Broad debug passes **2,294 / 130 skips**; selected sanitizer and optimized each pass **1,234 / 76 skips**. Five gated compatibility cases pass separately in each mode, yielding **2,299 / 125 remaining skips** and **1,239 / 71**, respectively, across the same defined identities. All **458 required controls**, including 13 service cases, and 19 additional owner-qualified backend checks pass in each combined build. No sanitizer race warning appears.
+
+Independent readers verify three reopened-library fixtures: all 13 kinds and 21 wire bodies match, native/historical-original citations resolve, cursors reach 21, one native answer binding completes and the receiver authors no echo. The first reader's mistaken direct-citation assumption remains retained. This is not a new app/package or physical provider/two-Mac qualification.
+
+At that earlier checkpoint, public setup/UI, native-specific renewal proof and atomic cleanup fencing, older clients/rollback, offline backpressure/reconciliation, large resumable transfers and selective spool GC/backup semantics remain open. Whole-library cleanup includes the private encrypted spool. F059 stays TODO and all 83 statuses are unchanged.
+
 ## Native group retirement — internal WIP
 
 The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now has a [source-bound local qualification](../benchmarks/native-collection-retirement-v1.json) at `2345a25`: **2,286 full passes / 125 skips**, **1,226 sanitizer and optimized passes / 71 skips each**, all **445 required controls**, **62 native passes**, **9 current collection fixture parents without skips**, and **34 package/process stages**. Independent readers inspect actual 13-kind/native/raw/staged/cache/original/publication/media retirement and pre/post-commit SIGKILL WALs; the final review preserves all 61 earlier app trees. Public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged.
 
 [PR #136's completed hosted failure](../benchmarks/sync-library-barriers-hosted-v1.json) remains unresolved: full 2,270 passes/128 skips and clipboard 3 passes, but native 61/62 passes with one missing-session error. Unchanged local and instrumented observations do not establish its cause or a fix.
+
+[PR #137's separate hosted receipt](../benchmarks/sync-native-retirement-hosted-v1.json) passes both jobs at `1c5c798`: full 2,282/129 skips, clipboard 3 and native 62 without skips. Its actual merge checkout tree equals the published head; all 81 native-job steps succeed. The earlier missing-image case passes here, without establishing why PR #136 failed.
 
 ## Collection erasure and owning sync transport — internal WIP
 

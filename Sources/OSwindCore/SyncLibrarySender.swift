@@ -17,6 +17,7 @@ struct SyncLibrarySender {
     let inbox:SyncObjectFolder
     let admit:(SyncPortableRecord)throws->Void
     let supplementalContent:(SyncContentReference)throws->Data?
+    var publicationFence:((()throws->Void)throws->Void)? = nil
     var maximumObjects=512
     var maximumBytes=64*1024*1024
     var maximumDepth=64
@@ -36,10 +37,12 @@ struct SyncLibrarySender {
     /// admission callback and the file link. Recheck after callbacks as well:
     /// they may invalidate this context or create a pending wipe themselves.
     /// External settings/trust still require the service's cancel/join owner.
-    private func publication<T>(validate:()throws->Void={},_ write:()throws->T)throws->T {
+    private func publication(validate:()throws->Void={},_ write:()throws->Void)throws {
         try library.withRoutineDatabase {db in
             try SyncChangeCapture.transaction(db) {
-                try ready();try validate();try ready();return try write()
+                try ready();try validate();try ready()
+                if let publicationFence {try publicationFence {try ready();try write()}}
+                else {try write()}
             }
         }
     }

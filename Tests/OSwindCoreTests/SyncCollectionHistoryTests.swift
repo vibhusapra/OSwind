@@ -165,6 +165,11 @@ final class SyncCollectionHistoryTests:XCTestCase {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_TEST_COLLECTION_PRIOR33_CLI"] else {throw XCTSkip("Explicit frozen prior33 CLI required; this is separate from current-source behavior")}
         let binary=URL(fileURLWithPath:path),digest=SHA256.hash(data:try Data(contentsOf:binary)).map {String(format:"%02x",$0)}.joined()
         guard digest=="6580f0db8534063df2fbf04115eb4142af9eb33ef2e2df098d177f6988013c92" else {throw OSwindError.invalid("Frozen prior33 CLI bytes differ")}
+        // A synthetic marker tests SQL invalidation by the older executable;
+        // it is not claimed as a native completion or renewal authorization.
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?)");defer {sqlite3_finalize(row)};db.bind(row,1,SyncCollectionHistory.nativeCompletionKey);db.bind(row,2,String(repeating:"a",count:64));try db.done(row)
+        }
         for (name,args) in [("wipe",["wipe","--confirm","DELETE-ALL","--json"]),("note",["note","Owned prior33 post-wipe source"])] {
             let process=Process(),log=root.appendingPathComponent("prior33-"+name+".log")
             XCTAssertTrue(FileManager.default.createFile(atPath:log.path,contents:nil))
@@ -176,6 +181,7 @@ final class SyncCollectionHistoryTests:XCTestCase {
             if process.isRunning {_=Darwin.kill(process.processIdentifier,SIGKILL);process.waitUntilExit();throw OSwindError.unavailable("Owned prior33 CLI timed out")}
             process.waitUntilExit();let output=try String(contentsOf:log,encoding:.utf8)
             XCTAssertEqual(process.terminationStatus,0,output)
+            if name=="wipe" {XCTAssertEqual(try store.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-native-collection-completion-v1'")},0)}
         }
         XCTAssertEqual(try ledger {try $0.current()},try SyncClock([replica:1]))
         XCTAssertEqual(try ledger {try $0.pendingWipes().map(\.counter)},[1])
