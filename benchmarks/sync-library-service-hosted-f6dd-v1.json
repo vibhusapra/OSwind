@@ -1,0 +1,55 @@
+{
+  "format": "OSwind.sync-service.hosted.v1",
+  "state": "passed",
+  "pr": 138,
+  "publishedHead": "f6dd4598df9054c8c2c7b8a52ec0a353e335f67b",
+  "qualifiedRuntime": "dd68dfa16ae7f9670ac881a0a09a7d64875f91f1",
+  "actualMergeCheckout": "8fa09f206dd05dbc6ad27287c0bbdb2eb5b483c1",
+  "tree": "f5c41b8b805b44dda60ae895543b31b076ae53f4",
+  "mergeTreeEqualsPublishedHead": true,
+  "runID": 41460070629,
+  "jobs": [
+    {
+      "id": 125326544895,
+      "name": "benchmark-harnesses",
+      "conclusion": "success",
+      "steps": 16,
+      "allStepsSuccess": true
+    },
+    {
+      "id": 125326545455,
+      "name": "native",
+      "conclusion": "success",
+      "steps": 81,
+      "allStepsSuccess": true
+    }
+  ],
+  "fullTests": {
+    "defined": 2440,
+    "passed": 2311,
+    "skipped": 129,
+    "failures": 0
+  },
+  "namedClipboard": {
+    "passed": 3,
+    "skipped": 0,
+    "failures": 0
+  },
+  "nativeTests": {
+    "passed": 62,
+    "skipped": 0,
+    "failures": 0
+  },
+  "logBytes": 9413339,
+  "logSHA256": "219ca7f28e666ade67cff5884203f2b13361fc94bf2cf40a1045329d99f19799",
+  "evidence": {
+    "pr138-f6dd-merge.json": "64282979ec419ec9a578e5e911f8d38bfab1012866c01269f3a9a2176c4a971e",
+    "pr138-f6dd-head.json": "ab930a8c21122ca89f5c29a9b30dbf31c22472913a5899cff50779d74c8fc85c",
+    "pr138-f6dd-jobs.json": "4595a8ef59955b0e489363b5f96a1f8949a3e50314278adb8220531fc6622696"
+  },
+  "limits": [
+    "This completed hosted run qualifies the previously publishedf6dd head, not app-owner source71c4.",
+    "The unchanged missing-image case passes in this separate run. PR136 missing-vault-session failure remains causally unresolved.",
+    "No whole-product parity, top-three, physical provider/two-Mac or sustained-power acceptance."
+  ]
+}

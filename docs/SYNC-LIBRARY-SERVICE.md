@@ -4,6 +4,8 @@
 
 The [later privacy-hold and renewal checkpoint](SYNC-WITHHELD-SERVICE.md) adds durable opaque policy holds, finite saved-policy review, joined network pause with continuing local preparation, and exact native completion consumed atomically during renewal. Its source-bound evidence is separate from the earlier source92 checks below. Public activation remains unfinished.
 
+The [prepared-session app owner](SYNC-APP-OWNER.md) now joins actual work through Quit, switch, local wipe and vault lock and supplies bounded push status. Public enrollment and the received-group-erase application/renewal workflow remain unfinished.
+
 ## Implemented behavior
 
 - A serialized, bounded tick bootstraps/prepares the real native library, publishes complete typed dependency graphs and turn declarations, receives authenticated operations, applies the native writers and retries durable answer work. Callers no longer supply permissive policy or synthetic media callbacks.

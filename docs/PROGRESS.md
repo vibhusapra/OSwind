@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Prepared sync in the actual app — ownership verified
+
+[App ownership](SYNC-APP-OWNER.md) now joins actual sync processing and metadata closure through Quit, library switch, local wipe and encrypted lock. Onboarding/sleep suspension stops the whole tick; network pause continues local preparation. Status uses a bounded push stream without UI polling or another forwarding worker. A prepared session has no public constructor and exposes no keys, peer configuration or erasure authority. Default startup creates no sync worker.
+
+Source `71c4c04` binds [all 1,455 inputs](../benchmarks/sync-app-owner-inputs-v1.json): **2,326 passed / 126 skipped** full debug, **1,266 passed / 72 skipped** selected sanitizer and **1,266 passed / 72 skipped** optimized. All **485 regular controls** and 19 additional backend identities pass per mode, with no race warning. **63 native methods pass without skips**, including the actual sync-held APFS lock test. Three fresh independent readers verify reopened all-kind graph fixtures. [Receipt](../benchmarks/sync-app-owner-v1.json).
+
+The app tests positively observe the real tick's media lease behind a SQL barrier. Canceled drains, Quit, switch and wipe wait for it. The owned encrypted image remains attached until sync returns, then closes/detaches and preserves its source after reopen. This does not establish public enrollment or live GUI acceptance. Received-group-erase application/renewal, device authority and setup/recovery remain open, along with the existing offline/storage/large-transfer/provider/power/distribution gates. **F059 stays TODO; all 83 feature statuses remain unchanged.**
+
 ## Durable privacy holds and network pause — internal service WIP
 
 [Current behavior](SYNC-WITHHELD-SERVICE.md) keeps permitted captures progressing past privacy-denied owners, persists bounded opaque holds and finite policy review across reopen, protects held native edits from ordinary peer replacement, and joins network pause/resume while preparing locally. Exact native erasure completion is now required and consumed atomically before publication renewal; SQL hooks revoke stale proof. The original generic-receipt renewal bug remains in the retained diagnostic history.
