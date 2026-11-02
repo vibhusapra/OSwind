@@ -36,6 +36,9 @@ struct PersonalSyncConnectionDetails:View {
             if let status=model.status,status.withheld>0 {Text("\(status.withheld) changes are held locally by privacy policy.").font(.caption).foregroundStyle(.secondary)}
             if model.configured {
                 if let folder=model.folderURL {Text(folder.path).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)}
+                if model.ownsHistoryRetirement {
+                    Toggle("Reconnect when OSwind opens this library",isOn:Binding(get:{model.reconnectOnLaunch},set:{model.setReconnectOnLaunch($0)})).disabled(model.changing || model.stopping)
+                }
                 Button(model.networkPaused ? "Resume delivery":"Pause delivery") {model.setNetworkEnabled(model.networkPaused)}
                     .disabled(model.changing || model.stopping)
                 Text("Pausing delivery keeps preparing local changes. Sleeping, locking or leaving this library suspends processing before storage closes.").font(.caption).foregroundStyle(.secondary)

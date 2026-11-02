@@ -6,7 +6,7 @@ struct PersonalSyncPairingSheet:View {
     @ObservedObject var model:PersonalSyncModel
     var body:some View {
         PersonalSyncPairingView(model:model)
-            .task {model.performPairing(.load)}
+            .task(id:model.preparing) {if !model.preparing {model.performPairing(.load)}}
             .onDisappear {model.cancelPairing();model.clearPairingMessages()}
     }
 }

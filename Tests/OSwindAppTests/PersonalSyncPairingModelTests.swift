@@ -65,6 +65,117 @@ import CSQLite
         owner.prepareForReconnection();owner.reconnectSavedFolder();try await connected(owner)
         XCTAssertEqual(storage.values.count,4)
     }
+    private func settledConnectionWork(_ value:PersonalSyncModel)async throws {
+        let deadline=ContinuousClock.now.advanced(by:.seconds(20))
+        while (value.preparing || value.changing),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        guard !value.preparing,!value.changing,value.error==nil else {throw OSwindError.unavailable(value.error ?? "Owned sync configuration did not settle")}
+    }
+    func testOptedInRelaunchRestoresOriginalFolderAndDurableNetworkPause()async throws {
+        let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        owner.setReconnectOnLaunch(true);owner.setNetworkEnabled(false);try await connected(owner,phase:.networkPaused)
+        XCTAssertEqual(try a.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:false))
+        let accounts=Set(storage.values.keys)
+        await owner.cancelAndWait();await peer.cancelAndWait()
+        let restored=model(a);restored.configure(active:true);restored.restoreSavedConnectionIfEnabled()
+        try await connected(restored,phase:.networkPaused)
+        XCTAssertTrue(restored.reconnectOnLaunch);XCTAssertTrue(restored.networkPaused)
+        XCTAssertEqual(restored.folderURL?.resolvingSymlinksInPath(),shared.resolvingSymlinksInPath())
+        XCTAssertEqual(Set(storage.values.keys),accounts)
+        restored.setNetworkEnabled(true);try await connected(restored)
+        XCTAssertEqual(try a.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:true))
+        restored.setReconnectOnLaunch(false)
+        try await settledConnectionWork(restored)
+        XCTAssertFalse(restored.changing);XCTAssertFalse(try a.personalSyncPreferences().reconnectOnLaunch)
+        await restored.cancelAndWait()
+        let disabled=model(a);disabled.configure(active:true);disabled.restoreSavedConnectionIfEnabled()
+        try await settledConnectionWork(disabled)
+        XCTAssertFalse(disabled.configured);XCTAssertFalse(disabled.busy);XCTAssertNil(disabled.error)
+        XCTAssertEqual(Set(storage.values.keys),accounts)
+    }
+    func testDisabledStartupNeverOpensPairingAndDeniedWakeCanRetryOriginalIntent()async throws {
+        let unused=PersonalSyncModel(store:a,locked:{false},pairingFactory:{_ in throw OSwindError.unavailable("Disabled startup touched pairing")});models.append(unused)
+        unused.restoreSavedConnectionIfEnabled()
+        try await settledConnectionWork(unused)
+        XCTAssertTrue(storage.values.isEmpty);XCTAssertFalse(unused.busy)
+        XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("state").path))
+        let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        owner.setReconnectOnLaunch(true)
+        try await settledConnectionWork(owner)
+        await owner.cancelAndWait();await peer.cancelAndWait()
+        let restored=model(a);restored.allowed={false};restored.configure(active:true);restored.restoreSavedConnectionIfEnabled()
+        XCTAssertFalse(restored.preparing);XCTAssertFalse(restored.configured)
+        restored.allowed={true};restored.wake();try await connected(restored)
+        XCTAssertTrue(restored.reconnectOnLaunch)
+    }
+    func testCanceledStartupJoinsRealSavedIntentReadBeforeStorageDeparture()async throws {
+        let original=model(a),store=a!,gate=ImportWorkerGate()
+        let holder=Task.detached {try store.withRoutineDatabase {_ in try gate.pause()}}
+        defer {gate.release()}
+        await fulfillment(of:[gate.entered],timeout:10)
+        original.restoreSavedConnectionIfEnabled();XCTAssertTrue(original.preparing)
+        var departed=false
+        let drain=Task {await original.cancelAndWait();departed=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(60));XCTAssertFalse(departed)
+        gate.release();try await holder.value;await drain.value
+        XCTAssertTrue(departed);XCTAssertFalse(original.busy);XCTAssertTrue(storage.values.isEmpty)
+    }
+    func testDepartureJoinsActualPreferenceCommitAfterCallerCancellation()async throws {
+        let (owner,_)=try await pairedModels(),gate=PairingSaveGate()
+        owner.connectFolder(root.appendingPathComponent("shared"),create:true);try await connected(owner)
+        let accounts=Set(storage.values.keys),store=a!
+        _=try store.withRoutineDatabase {db in
+            sqlite3_trace_v2(db.handle,UInt32(SQLITE_TRACE_STMT),{_,context,_,sql in
+                guard let context,let sql else {return 0}
+                let statement=String(cString:sql.assumingMemoryBound(to:CChar.self))
+                if statement.hasPrefix("INSERT INTO store_metadata(key,value) VALUES('sync-session-preferences-v1'") {Unmanaged<PairingSaveGate>.fromOpaque(context).takeUnretainedValue().pause()}
+                return 0
+            },Unmanaged.passUnretained(gate).toOpaque())
+        }
+        defer {gate.release();_=try? store.withRoutineDatabase {sqlite3_trace_v2($0.handle,0,nil,nil)}}
+        owner.setReconnectOnLaunch(true);await fulfillment(of:[gate.entered],timeout:10)
+        var joined=false
+        let drain=Task {await owner.cancelAndWait();joined=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(60));XCTAssertFalse(joined);XCTAssertFalse(store.isClosed)
+        gate.release();await drain.value
+        XCTAssertTrue(joined);XCTAssertFalse(owner.busy);XCTAssertEqual(Set(storage.values.keys),accounts)
+        XCTAssertEqual(try store.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:true))
+    }
+    func testResumeWaitsForSavedPreferenceAndFailedPauseReportsItsSessionScope()async throws {
+        let (owner,_)=try await pairedModels()
+        owner.connectFolder(root.appendingPathComponent("shared"),create:true);try await connected(owner)
+        owner.setReconnectOnLaunch(true);owner.setNetworkEnabled(false);try await connected(owner,phase:.networkPaused)
+        func rejectSaves()throws {try a.withRoutineDatabase {try $0.execute("CREATE TRIGGER owned_reject_sync_preferences BEFORE INSERT ON store_metadata WHEN new.key='sync-session-preferences-v1' BEGIN SELECT RAISE(ABORT,'Owned preference write unavailable'); END")}}
+        func allowSaves()throws {try a.withRoutineDatabase {try $0.execute("DROP TRIGGER IF EXISTS owned_reject_sync_preferences")}}
+        defer {try? allowSaves()}
+        try rejectSaves();owner.setNetworkEnabled(true)
+        let first=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.changing,ContinuousClock.now<first {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(owner.changing);XCTAssertNotNil(owner.error);XCTAssertTrue(owner.networkPaused)
+        XCTAssertEqual(try a.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:false))
+        try allowSaves();owner.setNetworkEnabled(true);try await connected(owner)
+        try rejectSaves();owner.setNetworkEnabled(false)
+        let second=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.changing,ContinuousClock.now<second {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(owner.changing);XCTAssertTrue(owner.networkPaused)
+        XCTAssertTrue(owner.error?.contains("future reconnect uses the previous saved settings")==true)
+        XCTAssertEqual(try a.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:true))
+        try allowSaves();owner.setNetworkEnabled(false);try await connected(owner,phase:.networkPaused)
+        XCTAssertEqual(try a.personalSyncPreferences(),.init(reconnectOnLaunch:true,networkEnabled:false))
+    }
+    func testOwnedReconnectIntentScreensRenderInBothThemes()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_TEST_SYNC_INTENT_RENDER_DIR"] else {throw XCTSkip("Explicit owned reconnect intent render output absent")}
+        let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
+        let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        for dark in [false,true] {try await renderView(PersonalSyncPairingView(model:owner),name:"intent-default",dark:dark,width:660,height:650,directory:directory,expected:"reconnect when oswind opens this library")}
+        owner.setReconnectOnLaunch(true);owner.setNetworkEnabled(false);try await connected(owner,phase:.networkPaused)
+        for dark in [false,true] {try await renderView(PersonalSyncPairingView(model:owner),name:"intent-paused",dark:dark,width:660,height:650,directory:directory,expected:"resume delivery")}
+        await owner.cancelAndWait();await peer.cancelAndWait()
+        let restored=model(a);restored.configure(active:true);restored.restoreSavedConnectionIfEnabled();try await connected(restored,phase:.networkPaused)
+        for dark in [false,true] {try await renderView(PersonalSyncPairingView(model:restored),name:"intent-restored",dark:dark,width:660,height:650,directory:directory,expected:"resume delivery")}
+    }
     func testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation()async throws {
         let (owner,_)=try await pairedModels(),shared=root.appendingPathComponent("shared"),gate=PairingSaveGate()
         defer {gate.release();storage.install(nil)}
@@ -162,6 +273,7 @@ import CSQLite
         sessions.append(session)
         try await rootSettled(session) {!session.busy && session.model != nil}
         session.model!.showOnboarding=false
+        try await settledConnectionWork(session.model!.personalSync)
         return session
     }
     private func rootSettled(_ session:AppSession,_ condition:()->Bool)async throws {
@@ -173,6 +285,7 @@ import CSQLite
         let session=try await rootSession(),old=try XCTUnwrap(session.model),shared=root.appendingPathComponent("shared")
         try old.store.insert(Memory(id:"root-erase",text:"Owned source before root erasure"))
         old.personalSync.connectFolder(shared,create:true);try await connected(old.personalSync)
+        old.personalSync.setReconnectOnLaunch(true);try await settledConnectionWork(old.personalSync)
         let accounts=Set(storage.values.keys)
         old.wipeLocalLibrary()
         try await rootSettled(session) {!session.busy && session.model != nil && session.model !== old}
@@ -180,6 +293,7 @@ import CSQLite
         XCTAssertTrue(old.store.isClosed);XCTAssertFalse(old.personalSync.busy);XCTAssertFalse(old.libraryWipe.busy)
         XCTAssertEqual(try fresh.store.stats(includeDiskUsage:false).count,0);XCTAssertFalse(fresh.isCollecting)
         XCTAssertFalse(fresh.settings.captureOnLaunch);XCTAssertFalse(fresh.settings.apiEnabled);XCTAssertFalse(fresh.settings.routinesEnabled)
+        XCTAssertFalse(fresh.personalSync.configured);XCTAssertFalse(fresh.personalSync.preparing)
         XCTAssertEqual(Set(storage.values.keys),accounts);XCTAssertFalse(session.syncErasurePending)
         fresh.showOnboarding=false;fresh.personalSync.reconnectSavedFolder();try await connected(fresh.personalSync,phase:.needsLocalEraseReview)
     }

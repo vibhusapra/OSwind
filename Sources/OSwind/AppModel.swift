@@ -298,6 +298,7 @@ import EventKit
         guard !libraryRetired,destructiveDrainers==0,configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
         configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping();pendingMediaCleanup.start()
         personalSync.configure(active:!demo)
+        if !demo {personalSync.restoreSavedConnectionIfEnabled()}
         if !demo && settings.routinesEnabled {routines.start()}
         if !demo && settings.meetings.enabled {meetings.start()}
         if !demo && settings.clipboard.enabled {clipboard.start()}

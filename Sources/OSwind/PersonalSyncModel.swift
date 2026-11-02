@@ -14,6 +14,7 @@ import OSwindCore
     @Published private(set) var folderURL:URL?
     @Published private(set) var eraseReview:PersonalSyncEraseReview?
     @Published private(set) var status:PersonalSyncStatus?
+    @Published private(set) var reconnectOnLaunch=false
     @Published private(set) var networkPaused=false
     @Published private(set) var changing=false
     @Published private(set) var stopping=false
@@ -30,7 +31,9 @@ import OSwindCore
     private var pairing:PersonalSyncPairing?,pairingTask:Task<Void,Never>?
     private let pairingFactory:@Sendable (MemoryStore)throws->PersonalSyncPairing
     private var drains=0
-    private var generation=UUID(),retired=false,desiredActive=false,desiredNetwork=true,suspended=false
+    private var generation=UUID(),retired=false,desiredActive=false,desiredNetwork=true,suspended=false,restoreAttempted=false
+    private var savedPreferences=PersonalSyncPreferences()
+    private struct PreparedConnection:Sendable {let session:PersonalSyncSession;let preferences:PersonalSyncPreferences?;let folder:URL?}
     var configured:Bool {session != nil}
     var ownsHistoryRetirement:Bool {session?.ownsHistoryRetirement == true}
     var busy:Bool {drains>0 || pairing != nil || pairingTask != nil || preparation != nil || erasure != nil || session != nil || observer != nil || command != nil || stopTask != nil}
@@ -73,13 +76,16 @@ import OSwindCore
         pairing=nil;desiredActive=true;pairingError=nil;eraseReview=nil
         if let folder {folderURL=folder}
         do {
-            try prepare {store in
+            try prepareOwned {store in
                 let worker=Task.detached(priority:.utility) {
                     let owner=try existing ?? factory(store)
                     do {
                         guard owner.belongs(to:store) else {throw OSwindError.unavailable("Connect only the current native library")}
                         try Task.checkCancellation()
-                        return try folder.map {try owner.prepareSession(sharedFolder:$0,createSharedFolder:create)} ?? owner.prepareSavedSession()
+                        let preferences=try store.personalSyncPreferences()
+                        guard let selected=try folder ?? owner.savedSessionFolder() else {throw OSwindError.unavailable("Choose a shared sync folder first")}
+                        let session=try owner.prepareSession(sharedFolder:selected,createSharedFolder:create)
+                        return PreparedConnection(session:session,preferences:preferences,folder:selected)
                     }catch {owner.close();throw error}
                 }
                 return try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
@@ -91,15 +97,44 @@ import OSwindCore
     /// session. Cancellation is advisory: even a late result is stopped and
     /// joined before library departure. This grants no enrollment authority.
     func prepare(_ operation:@escaping @Sendable (MemoryStore)async throws->PersonalSyncSession)throws {
+        try prepareOwned {store in PreparedConnection(session:try await operation(store),preferences:nil,folder:nil)}
+    }
+    /// Explicitly opted-in startup only; reading an absent/disabled local intent
+    /// never opens Keychain, a provider, or a pairing owner.
+    func restoreSavedConnectionIfEnabled() {
+        guard !restoreAttempted,!retired,!busy,!suspended,!store.isClosed,!locked(),allowed() else {return}
+        restoreAttempted=true;desiredActive=true
+        let factory=pairingFactory
+        do {try prepareOwned {store in
+            let worker=Task.detached(priority:.utility) {()->PreparedConnection? in
+                let preferences=try store.personalSyncPreferences()
+                guard preferences.reconnectOnLaunch else {return nil}
+                try Task.checkCancellation()
+                let owner=try factory(store)
+                do {
+                    guard owner.belongs(to:store),let folder=try owner.savedSessionFolder() else {throw OSwindError.unavailable("Reconnect only the current library's saved folder")}
+                    let session=try owner.prepareSession(sharedFolder:folder)
+                    return .init(session:session,preferences:preferences,folder:folder)
+                }catch {owner.close();throw error}
+            }
+            return try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+        }}catch {self.error="Saved sync could not begin. Reopen the current library and try again."}
+    }
+    private func prepareOwned(_ operation:@escaping @Sendable (MemoryStore)async throws->PreparedConnection?)throws {
         guard !retired,!busy,!store.isClosed,!locked(),allowed() else {throw OSwindError.unavailable("Sync setup requires its current open library")}
         preparing=true;error=nil
         let store=store
         preparation=Task {[weak self] in
             defer {self?.preparing=false;self?.preparation=nil}
             do {
-                let candidate=try await operation(store)
+                guard let prepared=try await operation(store) else {return true}
+                let candidate=prepared.session
                 if !Task.isCancelled,let self,!self.retired,!self.store.isClosed,!self.locked(),self.allowed(),candidate.belongs(to:self.store) {
-                    do {try self.attach(candidate,fromPreparation:true);return true}
+                    do {
+                        if let preferences=prepared.preferences {self.savedPreferences=preferences;self.reconnectOnLaunch=preferences.reconnectOnLaunch;self.desiredNetwork=preferences.networkEnabled;self.networkPaused = !preferences.networkEnabled}
+                        self.folderURL=prepared.folder
+                        try self.attach(candidate,fromPreparation:true);return true
+                    }
                     catch { /* Retain ownership until the rejected result stops. */ }
                 }
                 do {
@@ -182,9 +217,13 @@ import OSwindCore
         enqueueConfiguration()
     }
     func suspend() {guard !retired else {return};suspended=true;eraseReview=nil;enqueueConfiguration()}
-    func wake() {guard !retired else {return};suspended=false;enqueueConfiguration()}
+    func wake() {guard !retired else {return};suspended=false;enqueueConfiguration();if desiredActive {restoreSavedConnectionIfEnabled()}}
     func prepareForReconnection() {
         guard retired,!busy else {return};retired=false;suspended=false;desiredActive=false;desiredNetwork=true;networkPaused=false;status=nil;error=nil;pairingStatus=nil;pairingError=nil
+    }
+    func setReconnectOnLaunch(_ enabled:Bool) {
+        guard !retired,configured,ownsHistoryRetirement,!store.isClosed,!locked(),allowed() else {return}
+        reconnectOnLaunch=enabled;enqueueConfiguration()
     }
     func setNetworkEnabled(_ enabled:Bool) {
         guard !retired,configured,!store.isClosed,!locked(),allowed() else {return}
@@ -264,7 +303,7 @@ import OSwindCore
     }
     private func enqueueConfiguration() {
         guard !retired,let session else {return}
-        let previous=command,scope=UUID(),active=desiredActive && !suspended && !store.isClosed && !locked() && allowed(),network=desiredNetwork
+        let previous=command,scope=UUID(),active=desiredActive && !suspended && !store.isClosed && !locked() && allowed(),network=desiredNetwork,preferences=PersonalSyncPreferences(reconnectOnLaunch:reconnectOnLaunch,networkEnabled:desiredNetwork),store=store
         generation=scope;changing=true;error=nil
         command=Task {[weak self] in
             await previous?.value
@@ -274,6 +313,15 @@ import OSwindCore
                 // Pausing processing first avoids restarting provider work while
                 // onboarding/sleep suspension is taking ownership of the worker.
                 if !active {try await session.setProcessingEnabled(false)}
+                // A requested pause takes effect before its durable write. A
+                // resume starts network work only after the intent is saved.
+                if !network {try await session.setNetworkEnabled(false);self.networkPaused=true}
+                if session.ownsHistoryRetirement,preferences != self.savedPreferences {
+                    let worker=Task.detached(priority:.utility) {try store.savePersonalSyncPreferences(preferences)}
+                    try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+                    self.savedPreferences=preferences
+                }
+                guard !self.retired,self.generation==scope else {return}
                 try await session.setNetworkEnabled(network)
                 if active {
                     guard !self.retired,self.generation==scope,!self.locked(),self.allowed(),!self.store.isClosed else {return}
@@ -283,7 +331,8 @@ import OSwindCore
                 self.networkPaused = !network
             }catch {
                 guard !self.retired,self.generation==scope else {return}
-                self.error="Sync could not change state. Stop and reopen the connection before retrying."
+                self.reconnectOnLaunch=self.savedPreferences.reconnectOnLaunch
+                self.error = !network ? "Delivery is paused for this session, but its saved settings could not be updated. A future reconnect uses the previous saved settings.":"Sync could not save or change state. Reopen this library to check its saved connection before retrying."
             }
         }
     }
