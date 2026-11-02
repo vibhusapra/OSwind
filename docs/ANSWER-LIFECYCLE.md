@@ -26,7 +26,7 @@ The predecessor [PR131 hosted follow-up](../benchmarks/source-work-lifecycle-hos
 
 ## Remaining work
 
-[Audio-file import ownership and off-thread admission](AUDIO-IMPORT-LIFECYCLE.md) now have a separate later source-bound receipt; they are not part of this Ask source. Detail/PII/search/index/model setup need individual lifetime audits. Actual provider and server-side cancellation, natural dialogue accuracy, native GUI/TCC/input, sustained power, complete personal sync F059 and collection epochs, actual providers/two Macs and notarized distribution remain open. Native schema 33 and wire formats are unchanged. All 83 feature statuses stay unchanged; no product parity or competitive rank follows.
+[Audio-file import ownership and off-thread admission](AUDIO-IMPORT-LIFECYCLE.md) now have a separate later source-bound receipt; they are not part of this Ask source. [Selected source readers](SELECTED-READER-LIFECYCLE.md) now have a separate later qualification; search/index/model setup still need individual lifetime audits. Actual provider and server-side cancellation, natural dialogue accuracy, native GUI/TCC/input, sustained power, complete personal sync F059 and collection epochs, actual providers/two Macs and notarized distribution remain open. Native schema 33 and wire formats are unchanged. All 83 feature statuses stay unchanged; no product parity or competitive rank follows.
 
 ## Hosted follow-up
 

@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Selected source reader lifetime — component qualified
+
+[Behavior and remaining work](SELECTED-READER-LIFECYCLE.md) cover actual privacy metadata/hydration/validation ownership, canceled observer/drain joins, loading-state invalidation, exact historical originals and finite active work instead of idle-timer ownership.
+
+Source `b3a92f5` binds the [1,395-input receipt](../benchmarks/selected-reader-lifecycle-v1.json). Full debug: **2,187 passes / 117 explicit skips**. Selected sanitizer and optimized: **1,102 passes / 63 skips each**, with no sanitizer race warning. All **298 required controls** pass in every build; their source definitions are unique, with 19 additional owner-qualified speech/speaker checks. All **56 native/app-session methods pass without skips**, and all **32 fresh package/process stages pass**. Full plus native covers **2,241 distinct methods**.
+
+Independent review checks every byte of the 34-file app/ZIP/extraction, both strict ad hoc signatures, three retained migration crash states, the exact new native reader identities and all 53 earlier app trees. Those include 52 qualified app/extraction trees and the retained failed query-setup candidate; preservation does not promote that failure. Earlier native inventory/busy refusals remain causally unresolved. Hosted CI is a separate publication check.
+
+The separate search/index prototype retains ten original failed methods / 26 assertions and now passes 66 focused checks, including real Quit/switch; its native/package acceptance remains pending. Complete sync F059, native UX/input, physical power, distribution and product ranking remain open. All 83 feature statuses stay unchanged.
+
 ## Audio import lifetime — component qualified
 
 [Behavior and remaining work](AUDIO-IMPORT-LIFECYCLE.md) cover actual local import ownership, off-thread admission, current-settings commit fencing and cancellation-safe new-file rollback.
@@ -8,15 +18,15 @@ Source `dfac2e0` binds the [1,390-input receipt](../benchmarks/audio-import-life
 
 Independent review verifies every byte of the 34-file app/ZIP/extraction, strict ad hoc signatures, three retained migration crash states, exact new native test identities and all 51 prior app trees. Those include 50 qualified app/extraction trees and the retained failed query-setup candidate; preservation does not promote its failure. Earlier native inventory/busy refusals remain causally unresolved. Hosted CI is a separate publication check.
 
-The separately staged selected-reader prototype has retained genuine pre-fix assertions and 49 focused passes/no skips, including real Quit/switch; it has not passed canonical/native/package qualification. Complete sync F059, native input/power and notarized distribution remain open. All 83 feature statuses remain unchanged.
+The later selected-reader source now has its own full qualification above; its original failure and earlier preflight receipts remain distinct. Complete sync F059, native input/power and notarized distribution remain open. All 83 feature statuses remain unchanged.
 
 ## Answer lifetime — component qualified
 
-[Answer lifetime and saving](ANSWER-LIFECYCLE.md) now joins actual Ask work through Quit, switch, wipe and encrypted lock, rejects retired launches, and atomically creates the first conversation with its turn. The source-bound receipt passes all 225 required controls in three builds, 51 native methods and 30 fresh package/process stages; independent review preserves 49 earlier app trees. Audio import, other worker lifetimes and whole-product acceptance remain open. All 83 feature statuses stay unchanged.
+[Answer lifetime and saving](ANSWER-LIFECYCLE.md) now joins actual Ask work through Quit, switch, wipe and encrypted lock, rejects retired launches, and atomically creates the first conversation with its turn. The source-bound receipt passes all 225 required controls in three builds, 51 native methods and 30 fresh package/process stages; independent review preserves 49 earlier app trees. Audio import and selected readers now have separate later qualifications; other worker lifetimes and whole-product acceptance remain open. All 83 feature statuses stay unchanged.
 
 ## Source worker lifetime — component qualified
 
-[Source worker lifetime](SOURCE-WORK-LIFECYCLE.md) now joins actual note, recap, statistics and storage jobs through Quit, switch and encrypted-library lock. The source-bound receipt passes 190 required controls in three builds, 49 owned native methods and 30 package/process stages; independent review preserves 46 earlier apps. Audio file import, Ask and other reader/model setup lifetimes remain open. All 83 feature statuses stay unchanged.
+[Source worker lifetime](SOURCE-WORK-LIFECYCLE.md) now joins actual note, recap, statistics and storage jobs through Quit, switch and encrypted-library lock. The source-bound receipt passes 190 required controls in three builds, 49 owned native methods and 30 package/process stages; independent review preserves 46 earlier apps. Audio import, Ask and selected readers now have separate later qualifications; other worker/model setup lifetimes remain open. All 83 feature statuses stay unchanged.
 
 ## Committed file cleanup — component qualified
 
