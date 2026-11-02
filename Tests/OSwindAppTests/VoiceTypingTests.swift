@@ -40,6 +40,9 @@ import AppKit
         })
         app.showOnboarding=false;model=app.voice
         let appAllowed=model.allowed;model.allowed={[unowned self] in self.allowed && appAllowed()}
+        // Dictation assertions below own voice work. Startup readers have their
+        // own exit lifetime and can legitimately outlast a short fake recording.
+        try await SourceWorkTestJob.settle(app)
     }
     override func tearDown()async throws {
         prepareGate?.resume();prepareGate=nil;transcribeGate?.resume();transcribeGate=nil
@@ -60,6 +63,15 @@ import AppKit
         XCTAssertNil(draft.destination,"Inference requires an explicitly renewed destination");model.cancel();draft.chooseDestination(privacy:app.settings.privacy)
         draft.text="Edited owned words";draft.insert(privacy:app.settings.privacy);try await wait {[self] in !draft.busy}
         XCTAssertEqual(transport.writes,["Edited owned words"]);XCTAssertEqual(transport.activations,1);XCTAssertEqual(transcribes,1);XCTAssertFalse(app.hasPendingExitWork)
+    }
+    func testFinishedDictationStillOwnsIndependentActualStorageWorkerForExit()async throws {
+        let reader=ImportWorkerGate();defer {reader.release()}
+        app.invalidateStorageEstimate();app.refreshStatistics(force:true,observeStorage:{try reader.pause()})
+        await fulfillment(of:[reader.entered],timeout:5)
+        try await record();try await finish();XCTAssertFalse(model.busy)
+        XCTAssertTrue(app.hasPendingStatistics);XCTAssertTrue(app.hasPendingExitWork,"Completed dictation must retain independent reader ownership")
+        XCTAssertTrue(transport.writes.isEmpty);XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,0)
+        reader.release();try await SourceWorkTestJob.settle(app);XCTAssertFalse(app.hasPendingExitWork)
     }
     func testBlockedOrLockedNeverPreparesOrRequestsMicrophone()async throws {
         allowed=false;model.start();XCTAssertFalse(model.busy);allowed=true;locked=true;model.start();XCTAssertFalse(model.busy)
