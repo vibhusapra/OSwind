@@ -33,7 +33,7 @@ extension SyncOutgoingTests {
         sender=try owner.prepareAnchoredService(shared:shared,createShared:false);incoming=try joiner.prepareAnchoredService(shared:shared,createShared:false)
         for _ in 0..<40 {_=try serviceReady(sender!,limit:2);_=try serviceReady(incoming!,limit:2)}
         for table in SyncCanonicalTable.allCases {XCTAssertEqual(try serviceCount(receiver,table.rawValue),expected[table.rawValue],table.rawValue)}
-        for library in [store!,receiver] {XCTAssertEqual(try library.withRoutineDatabase {try $0.eraseCount("PRAGMA user_version")},34)}
+        for library in [store!,receiver] {XCTAssertEqual(try library.withRoutineDatabase {try $0.eraseCount("PRAGMA user_version")},35)}
         XCTAssertEqual(try incoming!.cache.journal.cursor(for:producer),21)
         XCTAssertEqual(try incoming!.cache.journal.outbox().count,0)
         XCTAssertEqual(try serviceCount(receiver,"personal_sync_publication_bindings"),1)
@@ -62,7 +62,7 @@ extension SyncOutgoingTests {
                 publicFloors.append(["id":id,"token":token])
             }
             XCTAssertEqual(publicFloors.count,2)
-            let receipt:[String:Any]=["nativeWriterSchema":34,"tables":expected,"producerReplica":producer,"partialCursor":1,"finalCursor":21,"wireBodies":21,"receiverOutbox":0,"nativeOriginals":2,"externalCheckpoints":publicFloors,"checkpointBackend":"owned deterministic test storage; actual Keychain is tested separately","privateKeysExported":false]
+            let receipt:[String:Any]=["nativeWriterSchema":35,"tables":expected,"producerReplica":producer,"partialCursor":1,"finalCursor":21,"wireBodies":21,"receiverOutbox":0,"nativeOriginals":2,"externalCheckpoints":publicFloors,"checkpointBackend":"owned deterministic test storage; actual Keychain is tested separately","privateKeysExported":false]
             try JSONSerialization.data(withJSONObject:receipt,options:[.sortedKeys,.prettyPrinted]).write(to:output.appendingPathComponent("fixture.json"),options:.withoutOverwriting)
         }
     }

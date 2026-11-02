@@ -35,7 +35,7 @@ final class SyncNativeWriterAdmissionTests:XCTestCase {
     func deliveryID()throws->String {
         try XCTUnwrap(storage.values.first {_,data in (try? JSONSerialization.jsonObject(with:data) as? [String:Any])?["format"] as? String == "OSwind.sync.delivery-anchor"}?.key)
     }
-    func testCurrentConcurrentWritersRefreshCheckpointsAndPreserveVersion34()throws {
+    func testCurrentConcurrentWritersRefreshCheckpointsAndPreserveVersion35()throws {
         try prepare();try service!.installNativeWriterAdmission()
         let second=try reopen();defer {try? second.close()}
         try second.insert(Memory(id:"second",kind:.note,text:"Second admitted native client"))
@@ -43,7 +43,7 @@ final class SyncNativeWriterAdmissionTests:XCTestCase {
         try second.insert(Memory(id:"after-checkpoint",kind:.note,text:"Refresh after another owner's commit"))
         try ready()
         XCTAssertNotNil(try library.get("after-checkpoint"))
-        XCTAssertEqual(try second.withRoutineDatabase {try $0.eraseCount("PRAGMA user_version")},34)
+        XCTAssertEqual(try second.withRoutineDatabase {try $0.eraseCount("PRAGMA user_version")},35)
         XCTAssertEqual(try service!.cache.journal.outbox().count,3)
     }
     func testAlreadyOpenCurrentClientRequiresReopenAfterEnrollment()throws {
@@ -184,7 +184,7 @@ final class SyncNativeWriterAdmissionTests:XCTestCase {
     }
 }
 
-private final class NativeWriterKeychainFixture:SyncCredentialStorage,@unchecked Sendable {
+final class NativeWriterKeychainFixture:SyncCredentialStorage,@unchecked Sendable {
     let protection:SyncCredentialProtection = .loginKeychain
     private let backend=SyncKeychainCredentialStorage(protection:.loginKeychain)
     private(set) var accounts=[String]()

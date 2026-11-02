@@ -38,6 +38,10 @@ struct SyncVersionStore {
     var database:RoutineDatabase {catalog.database}
     private final class SchemaStamp {let lock=NSLock();var value:Int64?}
     private let schemaStamp=SchemaStamp()
+    static func openExisting(catalog:SyncIdentityCatalog,journal:SyncJournal)throws->Self {
+        let value=Self(catalog:catalog,journal:journal)
+        try value.context();return value
+    }
     static let defaultBudget:Int64=256*1024*1024,maximumBudget:Int64=8*1024*1024*1024
     private static let schemas:[String:String]=[
         "personal_sync_version_state":"CREATE TABLE personal_sync_version_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,used_bytes INTEGER NOT NULL CHECK(typeof(used_bytes)='integer' AND used_bytes>=0 AND used_bytes<=budget),budget INTEGER NOT NULL CHECK(typeof(budget)='integer' AND budget>0 AND budget<=8589934592))",

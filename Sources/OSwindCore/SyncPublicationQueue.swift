@@ -99,6 +99,13 @@ struct SyncPublicationQueue {
     /// and drained physical cleanup. Renew only that exact authenticated receipt.
     /// Existing queue values pin the old lifetime and can never gain this one.
     static func renewAfterReceivedCollection(cache:SyncVersionStore,library:MemoryStore,control:SyncCollectionControl)throws {
+        try renewRetirement(cache:cache,library:library,control:control,local:false,expectedLifetime:nil)
+    }
+    static func renewAfterLocalRetirement(cache:SyncVersionStore,library:MemoryStore,record:SyncDeliveryRetirement)throws {
+        guard record.kind == .local else {throw OSwindError.invalid("Renew the exact local retirement")}
+        try renewRetirement(cache:cache,library:library,control:record.control,local:true,expectedLifetime:record.publicationLifetime)
+    }
+    private static func renewRetirement(cache:SyncVersionStore,library:MemoryStore,control:SyncCollectionControl,local:Bool,expectedLifetime:String?)throws {
         guard !library.isClosed else {throw OSwindError.invalid("Reopen the collection library before renewal")}
         try library.withRoutineDatabase {db in
             guard db.handle==cache.database.handle else {throw OSwindError.invalid("Renew the owning library connection")}
@@ -111,16 +118,21 @@ struct SyncPublicationQueue {
                       (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs"))==0,
                       (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_bindings"))==0 else {throw OSwindError.invalid("Do not replace live or pending publication authority")}
                 let history=SyncCollectionHistory(database:db,replica:cache.journal.replica)
-                guard try history.reviewState(journal:cache.journal) == .ready,
-                      (try history.knownControls(journal:cache.journal)).contains(control),control.creator != cache.journal.replica else {throw OSwindError.invalid("Resume only an authenticated received collection retirement")}
-                let receipt=try db.statement("SELECT digest FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(receipt)}
-                db.bind(receipt,1,control.creator);sqlite3_bind_int64(receipt,2,control.counter)
-                guard sqlite3_step(receipt)==SQLITE_ROW,try db.text(receipt,0)==control.digest else {throw OSwindError.invalid("Collection retirement receipt missing")}
+                if local {
+                    guard case .needsGroupReview(let captured)=try history.reviewState(journal:cache.journal),captured==control,control.creator==cache.journal.replica else {throw OSwindError.invalid("Renew local publication only for its exact unapproved erase intent")}
+                }else {
+                    guard try history.reviewState(journal:cache.journal) == .ready,
+                          (try history.knownControls(journal:cache.journal)).contains(control),control.creator != cache.journal.replica else {throw OSwindError.invalid("Resume only an authenticated received collection retirement")}
+                    let receipt=try db.statement("SELECT digest FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(receipt)}
+                    db.bind(receipt,1,control.creator);sqlite3_bind_int64(receipt,2,control.counter)
+                    guard sqlite3_step(receipt)==SQLITE_ROW,try db.text(receipt,0)==control.digest else {throw OSwindError.invalid("Collection retirement receipt missing")}
+                }
                 let completion=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(completion)}
                 db.bind(completion,1,SyncCollectionHistory.nativeCompletionKey)
                 guard sqlite3_step(completion)==SQLITE_ROW,try db.text(completion,0)==control.digest else {throw OSwindError.invalid("Complete the exact native collection retirement before renewal")}
-                let state=try db.statement("SELECT origin,generation,group_id,epoch FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(state)}
+                let state=try db.statement("SELECT origin,generation,group_id,epoch,library_id FROM personal_sync_publication_state WHERE singleton=1");defer {sqlite3_finalize(state)}
                 guard sqlite3_step(state)==SQLITE_ROW,db.text(state,0)==cache.catalog.scope.origin,db.text(state,1)==cache.catalog.scope.generation,db.text(state,2)==cache.journal.group,db.text(state,3)==cache.journal.epoch else {throw OSwindError.invalid("Collection publication generation differs")}
+                if let expectedLifetime {guard db.text(state,4)==expectedLifetime else {throw OSwindError.invalid("Preserve the original retired publication identity")}}
                 let lifetime=UUID().uuidString.lowercased(),insert=try db.statement("INSERT INTO store_metadata(key,value) VALUES('sync-publication-library-lifetime-v1',?)");defer {sqlite3_finalize(insert)}
                 db.bind(insert,1,lifetime);try db.done(insert)
                 let update=try db.statement("UPDATE personal_sync_publication_state SET library_id=? WHERE singleton=1");defer {sqlite3_finalize(update)}

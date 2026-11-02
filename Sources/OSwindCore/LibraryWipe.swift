@@ -46,7 +46,7 @@ private enum WipeInventory {
 
 /// The native SQL/inventory phase only. The owner commits its matching intent or
 /// authenticated receipt in the same transaction, then runs physical cleanup.
-struct LibraryWipeCounts {
+struct LibraryWipeCounts:Sendable {
     let sources,turns,chats,routines,runs,originals:Int
 }
 
@@ -69,6 +69,7 @@ extension MemoryStore {
     /// wipe intent, or claims that a complete sync group adapter has run.
     func stageLibraryWipe(reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeCounts {
         try withRoutineDatabase {db in
+            try nativeWriterAdmission.requireOwnedWholeErasure()
             guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Stage library erasure in the owning transaction")}
             return try reservation.withExclusive(for:mediaRootIdentity) {
                 try Task.checkCancellation();try requireMediaRootIdentity()
@@ -107,9 +108,15 @@ public extension MemoryStore {
     /// Retries only the sealed pending paths. Never inventories newly recorded files.
     func retryLibraryWipeCleanup(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeResult {
         progress(.init(phase:"Waiting for active media writers"));let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
+        return try retryLibraryWipeCleanup(reservation:lease,progress:progress)
+    }
+}
+extension MemoryStore {
+    func retryLibraryWipeCleanup(reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void) throws -> LibraryWipeResult {
+        try reservation.withExclusive(for:mediaRootIdentity) {}
         return try withRoutineDatabase {db in
             progress(.init(phase:"Retrying retained-media cleanup"))
-            return finishLibraryWipe(db,sources:0,turns:0,chats:0,routines:0,runs:0,reservation:lease,progress:progress)
+            return finishLibraryWipe(db,sources:0,turns:0,chats:0,routines:0,runs:0,reservation:reservation,progress:progress)
         }
     }
 }

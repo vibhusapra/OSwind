@@ -14,15 +14,27 @@ struct SyncNativeWriterEnvironment:Sendable {
 /// function; new clients opened before enrollment have a false capability.
 /// Either fails at the persistent BEFORE triggers when the schema refreshes.
 final class SyncNativeWriterAdmission {
+    static let enrolledSchemaVersion=35
+    private let epoch=SyncNativeWriterEpoch()
     private let lock=NSLock()
     private var allowed=false
+    private var retirementGranted=false
     private var proof:SyncDeliveryAnchor.NativeWriterProof?
     private var environment:SyncNativeWriterEnvironment?
     private var checking=false, trustedDepth=0
     private var schemaCookie:Int?
     private var initialized=false
     private var poisoned=false
+    private var retiring=false
+    var retirementQuarantined:Bool {retiring && !poisoned}
     func register(_ db:RoutineDatabase)throws {
+        try epoch.register(db)
+        let retirement=Unmanaged.passRetained(self).toOpaque()
+        guard sqlite3_create_function_v2(db.handle,"oswind_native_sync_retirement_v1",0,SQLITE_UTF8|SQLITE_INNOCUOUS,retirement,{context,_,_ in
+            guard let context,let pointer=sqlite3_user_data(context) else {return}
+            let owner=Unmanaged<SyncNativeWriterAdmission>.fromOpaque(pointer).takeUnretainedValue()
+            owner.lock.lock();let permitted=owner.retirementGranted;owner.lock.unlock();sqlite3_result_int(context,permitted ? 1:0)
+        },nil,nil,{if let p=$0 {Unmanaged<SyncNativeWriterAdmission>.fromOpaque(p).release()}})==SQLITE_OK else {throw db.error()}
         let pointer=Unmanaged.passRetained(self).toOpaque()
         guard sqlite3_create_function_v2(db.handle,"oswind_native_sync_writer_v1",0,SQLITE_UTF8|SQLITE_INNOCUOUS,pointer,{context,_,_ in
             guard let context,let pointer=sqlite3_user_data(context) else {return}
@@ -36,7 +48,7 @@ final class SyncNativeWriterAdmission {
         checking=true;defer {checking=false}
         initialized=true
         let version=try db.eraseCount("PRAGMA user_version")
-        guard version==34 else {
+        guard version>=34 else {
             if version>=33 {try SyncChangeCapture.transaction(db) {try PersonalSyncPairing.requirePreFenceDeliveryAdmission(library:library,db:db,environment:environment)}}
             return
         }
@@ -44,7 +56,9 @@ final class SyncNativeWriterAdmission {
         do {
             proof=try SyncChangeCapture.transaction(db) {
                 let verified=try SyncDeliveryAnchor.nativeWriterProof(library:library,db:db,environment:environment)
-                try Self.requireGuards(db);return verified
+                if version==34 {try self.installGuards(db,replacingLegacy:true)}
+                else {try Self.requireGuards(db);try self.epoch.validate(db);try self.epoch.adopt(db)}
+                return verified
             }
             schemaCookie=try db.eraseCount("PRAGMA schema_version")
             permit(true)
@@ -53,16 +67,18 @@ final class SyncNativeWriterAdmission {
     func require(_ db:RoutineDatabase,library:MemoryStore)throws {
         guard initialized,!checking,trustedDepth==0 else {return}
         guard !poisoned else {throw OSwindError.unavailable("Native delivery admission needs recovery after an ambiguous checkpoint commit")}
+        guard !retiring else {throw OSwindError.unavailable("Native history was erased. Finish owned sync cleanup before reopening normal access.")}
         checking=true;defer {checking=false}
         guard let environment,let proof else {
             // Do not upgrade an already-open pre-enrollment connection into an
             // admitted writer. The owner explicitly admits its own connection.
-            guard try db.eraseCount("PRAGMA user_version") != 34 else {throw OSwindError.unavailable("Device sync changed this library. Reopen it to verify native writer admission, or export with backup recover.")}
+            guard try db.eraseCount("PRAGMA user_version") < 34 else {throw OSwindError.unavailable("Device sync changed this library. Reopen it to verify native writer admission, or export with backup recover.")}
             return
         }
         do {
+            try epoch.requireCurrent(db)
             let cookie=try db.eraseCount("PRAGMA schema_version")
-            if cookie != schemaCookie {try Self.requireGuards(db);schemaCookie=cookie}
+            if cookie != schemaCookie {try Self.requireGuards(db);try epoch.validate(db);schemaCookie=cookie}
             if try !proof.matches(db) {
                 // Serialize checkpoint refresh with another process's native
                 // commit. It saves its external token before SQLite COMMIT.
@@ -73,6 +89,29 @@ final class SyncNativeWriterAdmission {
             permit(true)
         }catch {permit(false);throw error}
     }
+    func openRetirement(_ db:RoutineDatabase,library:MemoryStore,environment:SyncNativeWriterEnvironment)throws {
+        checking=true;defer {checking=false};initialized=true
+        guard try db.eraseCount("PRAGMA user_version")==Self.enrolledSchemaVersion else {throw OSwindError.invalid("Recover retirement from its current enrolled native schema")}
+        try SyncChangeCapture.transaction(db) {
+            try NativeMediaSchema.validate(db)
+            try SyncDeliveryAnchor.verifyRetirement(library:library,db:db,environment:environment)
+            try Self.requireGuards(db);try epoch.validate(db);try epoch.adopt(db)
+        }
+        self.environment=environment;retiring=true;permit(false)
+    }
+    func withRetirementCleanup<T>(_ db:RoutineDatabase,_ body:()throws->T)throws->T {
+        guard retirementQuarantined,environment != nil else {throw OSwindError.invalid("Use the verified quarantined retirement owner")}
+        try Self.requireGuards(db);try epoch.validate(db);try NativeMediaSchema.validate(db)
+        try epoch.requireCurrent(db)
+        trustedDepth+=1;permit(true)
+        defer {trustedDepth-=1;permit(!retiring && !poisoned)}
+        return try body()
+    }
+    func activateAfterRetirement(_ db:RoutineDatabase,verified:SyncDeliveryAnchor.NativeWriterProof)throws {
+        guard retirementQuarantined,trustedDepth>0 else {throw OSwindError.invalid("Renew through the owned retirement scope")}
+        do {try deliveryCommitted(db,verified:verified);retiring=false}
+        catch {invalidate();throw error}
+    }
     func install(_ db:RoutineDatabase,library:MemoryStore,environment:SyncNativeWriterEnvironment)throws {
         guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Install native admission outside a transaction")}
         checking=true;defer {checking=false}
@@ -81,21 +120,49 @@ final class SyncNativeWriterAdmission {
             permit(true)
             try SyncChangeCapture.transaction(db) {
                 guard try verified.matches(db) else {throw OSwindError.unavailable("Delivery checkpoint changed during native enrollment")}
-                if try db.eraseCount("PRAGMA user_version")==34 {try Self.requireGuards(db)}
-                else {
-                    for (name,sql) in try Self.guards(db).sorted(by:{$0.key<$1.key}) {
-                        guard try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE name='\(name)'")==0 else {throw OSwindError.invalid("Native writer guard already exists")}
-                        try db.execute(sql)
-                    }
-                    try db.execute("PRAGMA user_version=34")
-                }
+                let version=try db.eraseCount("PRAGMA user_version")
+                if version==Self.enrolledSchemaVersion {try Self.requireGuards(db);try epoch.validate(db);try epoch.adopt(db)}
+                else {try installGuards(db,replacingLegacy:version==34)}
             }
             self.environment=environment;proof=verified;initialized=true
             schemaCookie=try db.eraseCount("PRAGMA schema_version")
         }catch {permit(false);throw error}
     }
+    private func installGuards(_ db:RoutineDatabase,replacingLegacy:Bool)throws {
+        if replacingLegacy {
+            try Self.requireGuards(db,legacy:true)
+            for name in try Self.guards(db,legacy:true).keys {try db.execute("DROP TRIGGER \(name)")}
+        }else {
+            guard try db.eraseCount("PRAGMA user_version")==33 else {throw OSwindError.invalid("Enroll a current native content library")}
+        }
+        try epoch.install(db)
+        for (name,sql) in try Self.guards(db).sorted(by:{$0.key<$1.key}) {
+            guard try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE name='\(name)'")==0 else {throw OSwindError.invalid("Native writer guard already exists")}
+            try db.execute(sql)
+        }
+        try db.execute("PRAGMA user_version=\(Self.enrolledSchemaVersion)")
+    }
+    func rotateForRetirement(_ db:RoutineDatabase)throws {
+        guard trustedDepth>0,environment != nil,!poisoned else {throw OSwindError.invalid("Retire native writers through the checkpoint owner")}
+        try epoch.rotate(db)
+    }
+    func deliveryRolledBack(_ db:RoutineDatabase)throws {
+        guard environment != nil else {return}
+        guard !poisoned,let proof,try proof.matches(db) else {invalidate();throw OSwindError.unavailable("Native rollback lost its admitted checkpoint")}
+        try epoch.adopt(db)
+    }
     func withDeliveryMutation<T>(_ body:()throws->T)throws->T {
         trustedDepth+=1;defer {trustedDepth-=1};return try body()
+    }
+    func withRetirementMutation<T>(_ body:()throws->T)throws->T {
+        trustedDepth+=1;lock.lock();let previous=retirementGranted;retirementGranted=true;lock.unlock()
+        defer {trustedDepth-=1;lock.lock();retirementGranted=previous;lock.unlock()}
+        return try body()
+    }
+    func requireOwnedWholeErasure()throws {
+        guard environment != nil else {return}
+        lock.lock();let permitted=retirementGranted;lock.unlock()
+        guard permitted else {throw OSwindError.unavailable("Erase an enrolled library through its sync lifecycle owner")}
     }
     func deliveryCommitted(_ db:RoutineDatabase,verified:SyncDeliveryAnchor.NativeWriterProof)throws {
         guard environment != nil else {return}
@@ -104,6 +171,7 @@ final class SyncNativeWriterAdmission {
         // bytes and native boundary, then saved this exact token before COMMIT.
         // Adopt that proof without another Keychain read/decode on every phase.
         do {
+            try epoch.requireCurrent(db)
             guard !poisoned,try verified.matches(db) else {throw OSwindError.unavailable("Committed native admission changed; use recovery")}
             proof=verified;permit(true)
         }
@@ -114,7 +182,8 @@ final class SyncNativeWriterAdmission {
         // delivery owner still stops, while ordinary local recovery stays open.
         guard environment != nil else {return};poisoned=true;permit(false)
     }
-    private static func guards(_ db:RoutineDatabase)throws->[String:String] {
+    func suspendForRetirement() {retiring=true;permit(false)}
+    private static func guards(_ db:RoutineDatabase,legacy:Bool=false)throws->[String:String] {
         let row=try db.statement("SELECT name FROM pragma_table_list WHERE schema='main' AND type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
         defer {sqlite3_finalize(row)}
         var result=[String:String](),code=sqlite3_step(row)
@@ -123,15 +192,21 @@ final class SyncNativeWriterAdmission {
             guard !table.isEmpty,table.utf8.allSatisfy({(97...122).contains($0)||(48...57).contains($0)||$0==95}) else {throw OSwindError.invalid("Unsupported native table name")}
             for op in ["insert","update","delete"] {
                 let name="sync_native_writer_\(table)_\(op)"
-                result[name]="CREATE TRIGGER \(name) BEFORE \(op.uppercased()) ON \(table) BEGIN SELECT CASE WHEN oswind_native_sync_writer_v1()<>1 THEN RAISE(ABORT,'Reopen OSwind to verify device sync writer admission') END; END"
+                let generation=legacy ? "":" OR \(SyncNativeWriterEpoch.guardCondition)"
+                result[name]="CREATE TRIGGER \(name) BEFORE \(op.uppercased()) ON \(table) BEGIN SELECT CASE WHEN oswind_native_sync_writer_v1()<>1\(generation) THEN RAISE(ABORT,'Reopen OSwind to verify device sync writer admission') END; END"
             }
             code=sqlite3_step(row)
         }
-        guard code==SQLITE_DONE,!result.isEmpty else {throw db.error()};return result
+        guard code==SQLITE_DONE,!result.isEmpty else {throw db.error()}
+        if !legacy {for op in ["insert","update"] {
+            let name="sync_native_retirement_metadata_"+op
+            result[name]="CREATE TRIGGER \(name) BEFORE \(op.uppercased()) ON store_metadata WHEN new.key IN ('library_wipe_dirty','library_group_wipe_dirty_v1') AND new.value='1' AND oswind_native_sync_retirement_v1()<>1 BEGIN SELECT RAISE(ABORT,'Erase an enrolled library through its sync lifecycle owner'); END"
+        }}
+        return result
     }
-    private static func requireGuards(_ db:RoutineDatabase)throws {
-        guard try db.eraseCount("PRAGMA user_version")==34 else {throw OSwindError.unavailable("Native writer admission was rolled back; use recovery")}
-        for (name,sql) in try guards(db) {
+    private static func requireGuards(_ db:RoutineDatabase,legacy:Bool=false)throws {
+        guard try db.eraseCount("PRAGMA user_version")==Int(legacy ? 34:enrolledSchemaVersion) else {throw OSwindError.unavailable("Native writer admission was rolled back; use recovery")}
+        for (name,sql) in try guards(db,legacy:legacy) {
             let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name)
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.unavailable("Native writer admission is missing or changed; use recovery")}
         }

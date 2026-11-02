@@ -36,7 +36,7 @@ struct SyncNativeCollectionReceiver {
                 defer {sqlite3_finalize(row)};db.bind(row,1,table.rawValue);db.bind(row,2,"$.\""+creator+"\"");sqlite3_bind_int64(row,3,counter)
                 guard sqlite3_step(row)==SQLITE_DONE else {throw OSwindError.invalid("A later native lifetime cannot be retired by this control")}
             }
-            try retireRegisters(creator:creator,counter:counter,frontier:frontier)
+            try Self.retireRegisters(cache:cache,creator:creator,counter:counter,frontier:frontier)
             try SyncOutgoingWorkQueue.discardForCollection(db,scope:cache.catalog.scope)
             try db.execute("DELETE FROM personal_sync_changes")
             guard try db.eraseCount("SELECT used_bytes FROM personal_sync_capture WHERE singleton=1")==0 else {throw OSwindError.database("Raw collection accounting differs")}
@@ -59,7 +59,7 @@ struct SyncNativeCollectionReceiver {
         }
     }
 
-    private func retireRegisters(creator:String,counter:Int64,frontier:SyncClock)throws {
+    static func retireRegisters(cache:SyncVersionStore,creator:String,counter:Int64,frontier:SyncClock)throws {
         let db=cache.database;var lastKind="",lastDigest=""
         while true {
             try Task.checkCancellation()
