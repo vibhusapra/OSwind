@@ -101,6 +101,9 @@ struct SyncPublicationQueue {
     static func renewAfterReceivedCollection(cache:SyncVersionStore,library:MemoryStore,control:SyncCollectionControl)throws {
         try renewRetirement(cache:cache,library:library,control:control,local:false,expectedLifetime:nil)
     }
+    static func renewAfterRetirement(cache:SyncVersionStore,library:MemoryStore,record:SyncDeliveryRetirement)throws {
+        try renewRetirement(cache:cache,library:library,control:record.control,local:record.kind == .local,expectedLifetime:record.publicationLifetime)
+    }
     static func renewAfterLocalRetirement(cache:SyncVersionStore,library:MemoryStore,record:SyncDeliveryRetirement)throws {
         guard record.kind == .local else {throw OSwindError.invalid("Renew the exact local retirement")}
         try renewRetirement(cache:cache,library:library,control:record.control,local:true,expectedLifetime:record.publicationLifetime)
@@ -121,8 +124,12 @@ struct SyncPublicationQueue {
                 if local {
                     guard case .needsGroupReview(let captured)=try history.reviewState(journal:cache.journal),captured==control,control.creator==cache.journal.replica else {throw OSwindError.invalid("Renew local publication only for its exact unapproved erase intent")}
                 }else {
-                    guard try history.reviewState(journal:cache.journal) == .ready,
-                          (try history.knownControls(journal:cache.journal)).contains(control),control.creator != cache.journal.replica else {throw OSwindError.invalid("Resume only an authenticated received collection retirement")}
+                    if expectedLifetime != nil {
+                        try history.requireReceivedRetirementControl(control,journal:cache.journal)
+                    }else {
+                        guard try history.reviewState(journal:cache.journal) == .ready,
+                              (try history.knownControls(journal:cache.journal)).contains(control),control.creator != cache.journal.replica else {throw OSwindError.invalid("Resume only an authenticated received collection retirement")}
+                    }
                     let receipt=try db.statement("SELECT digest FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(receipt)}
                     db.bind(receipt,1,control.creator);sqlite3_bind_int64(receipt,2,control.counter)
                     guard sqlite3_step(receipt)==SQLITE_ROW,try db.text(receipt,0)==control.digest else {throw OSwindError.invalid("Collection retirement receipt missing")}

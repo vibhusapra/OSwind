@@ -80,6 +80,20 @@ final class SyncSignedFolderTests:XCTestCase {
         _=try forged(proof.encoded(),purpose:.supersession,descriptor:SyncSupersessionProof.descriptor(value.dot))
         XCTAssertThrowsError(try right.supersedingRevision(for:value))
     }
+    func testEnsuringPeerCollectionControlRequiresItsOriginalSignedObject()throws {
+        let control=try SyncCollectionControl(group:group,epoch:epoch,creator:a.replica,counter:1,era:.init([a.replica:1]))
+        XCTAssertThrowsError(try right.ensureAuthenticatedCollectionControl(control))
+        XCTAssertNil(try right.collectionControl(creator:a.replica,counter:1))
+        try left.ensureAuthenticatedCollectionControl(control)
+        let descriptor=try SyncCollectionControl.descriptor(creator:a.replica,counter:1)
+        let cipher=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.collectionControl),token=try cipher.token(for:descriptor)
+        let url=left.root.appendingPathComponent("objects/\(token.prefix(2))/\(token)"),original=try Data(contentsOf:url)
+        try right.ensureAuthenticatedCollectionControl(control)
+        XCTAssertEqual(try Data(contentsOf:url),original,"Reusing a verified peer control cannot rewrite its signature")
+        XCTAssertThrowsError(try right.publishCollectionControl(control),"The direct signing API must still refuse impersonation")
+        _=try forged(control.encoded(),purpose:.collectionControl,descriptor:descriptor)
+        XCTAssertThrowsError(try right.ensureAuthenticatedCollectionControl(control),"Possessing the group key does not authenticate a creator")
+    }
     func testCrossDeviceSupersessionRequiresActualSuccessorSignature()throws {
         let firstBytes=Data("first".utf8),first=try revision(a.replica,body:firstBytes)
         let nextBytes=Data("next".utf8),next=try revision(b.replica,body:nextBytes,context:.init([a.replica:1]))

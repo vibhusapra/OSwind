@@ -222,13 +222,13 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
             return result
         }
     }
-    func completeLocalRetirement(pairing:PersonalSyncPairing.RetirementPreparation)throws->SyncCollectionControl {
+    func completeRetirement(pairing:PersonalSyncPairing.RetirementPreparation,expectedKind:SyncDeliveryRetirement.Kind?=nil)throws->SyncCollectionControl {
         let media=try MediaAdmissionLease.acquire(root:library.root,exclusive:true,expectedRoot:library.mediaRootIdentity);defer {media.release()}
         return try library.withRetirementDatabase {db in
             lock.lock();defer {lock.unlock()}
             try requireCheckpoint(in:db)
-            guard let record=envelope.retirement,record.kind == .local,
-                  try storage.read(id:id)==bytes else {throw OSwindError.unavailable("Resume the exact saved local retirement")}
+            guard let record=envelope.retirement,expectedKind==nil || expectedKind==record.kind,
+                  try storage.read(id:id)==bytes else {throw OSwindError.unavailable("Resume the exact saved retirement")}
             try record.requireLogicalCompletion(db,allowCleaned:true)
             guard !(try LibraryWipeState.isPending(db)),try db.eraseCount("SELECT COUNT(*) FROM erasure_assets")==0 else {throw OSwindError.unavailable("Complete physical cleanup before renewing device sync authority")}
             return try library.nativeWriterAdmission.withRetirementCleanup(db) {
@@ -239,7 +239,7 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
                     let catalog=try SyncIdentityCatalog.openExisting(db),joined=material.joined
                     let journal=try SyncJournal(database:db,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch)
                     let cache=try SyncVersionStore.openExisting(catalog:catalog,journal:journal)
-                    try SyncPublicationQueue.renewAfterLocalRetirement(cache:cache,library:library,record:record)
+                    try SyncPublicationQueue.renewAfterRetirement(cache:cache,library:library,record:record)
                     let savePairing=try pairing(db,record,envelope.material,id)
                     let binding=try SyncEnrollmentBinding.capture(store:library,material:material,id:id,protection:storage.protection,machine:machine,installation:SyncLocalCredentialState.installationID(at:stateRoot,create:false))
                     guard binding.publicationLifetime != nil else {throw OSwindError.invalid("Prepare the new native publication identity")}
@@ -306,8 +306,14 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         try library.nativeWriterAdmission.withDeliveryMutation {try mutateOwned(in:db,body)}
     }
     func retireLocal(in db:RoutineDatabase,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
+        try retireNative(in:db,kind:.local,body)
+    }
+    func retireReceived(in db:RoutineDatabase,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
+        try retireNative(in:db,kind:.received,body)
+    }
+    private func retireNative(in db:RoutineDatabase,kind:SyncDeliveryRetirement.Kind,_ body:()throws->SyncNativeRetirementResult)throws->SyncNativeRetirementResult {
         try library.nativeWriterAdmission.withRetirementMutation {
-            try mutateOwned(in:db,retiring:{SyncDeliveryRetirement(kind:.local,control:$0.control,pairingLifetime:$0.pairingLifetime,publicationLifetime:self.envelope.binding.publicationLifetime!)},body)
+            try mutateOwned(in:db,retiring:{SyncDeliveryRetirement(kind:kind,control:$0.control,pairingLifetime:$0.pairingLifetime,publicationLifetime:self.envelope.binding.publicationLifetime!)},body)
         }
     }
     private func mutateOwned<T>(in db:RoutineDatabase,retiring:((T)throws->SyncDeliveryRetirement)?=nil,_ body:()throws->T)throws->T {

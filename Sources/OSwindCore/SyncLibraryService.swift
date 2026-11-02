@@ -93,12 +93,64 @@ final class SyncLibraryService:@unchecked Sendable {
         guard !stopped,retiring,let externalAnchor else {throw OSwindError.invalid("Cleanup requires the owned retired service")}
         return try externalAnchor.cleanupRetirement(progress:progress)
     }
+    /// A scheduler yields this control before touching native history. Its
+    /// owner joins producers, then authenticates the exact original device
+    /// packet again here; a provider hint or bare caller value cannot erase.
+    func stageReceivedRetirement(_ control:SyncCollectionControl,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})throws->SyncNativeRetirementResult {
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,!retiring,let externalAnchor,peers.contains(control.creator),control.creator != cache.journal.replica,
+              control.group==cache.journal.group,control.epoch==cache.journal.epoch else {throw OSwindError.invalid("Retire only an enrolled peer's current signed control")}
+        guard try transport.collectionControl(creator:control.creator,counter:control.counter)==control else {throw OSwindError.unavailable("The original signed erase control has not arrived")}
+        try library.withRoutineDatabase {db in
+            try context()
+            guard try SyncCollectionHistory(database:db,replica:cache.journal.replica).current()[control.creator]<control.counter else {throw OSwindError.invalid("Preserve native history after an already observed peer erase")}
+        }
+        let media=try MediaAdmissionLease.acquire(root:library.root,exclusive:true,expectedRoot:library.mediaRootIdentity);defer {media.release()}
+        inbox.close()
+        do {
+            let result=try library.withRoutineDatabase {db in
+                try context()
+                return try externalAnchor.retireReceived(in:db) {
+                    let lifetime=try PersonalSyncPairing.retirementLifetime(db)
+                    try library.nativeWriterAdmission.rotateForRetirement(db)
+                    progress(.init(phase:"Applying verified device erasure"))
+                    let receiver=SyncNativeCollectionReceiver(library:library,cache:cache,inbox:inbox)
+                    let counts=try receiver.receiveVerified(control,reservation:media,progress:progress)
+                    try db.execute("UPDATE personal_sync_service_state SET token='' WHERE singleton=1")
+                    return SyncNativeRetirementResult(counts:counts,control:control,pairingLifetime:lifetime)
+                }
+            }
+            retiring=true;return result
+        }catch {stopped=true;externalAnchor.close();self.externalAnchor=nil;throw error}
+    }
     func completeLocalRetirement(pairing:PersonalSyncPairing)throws->SyncCollectionControl {
         guard pairing.belongs(to:library) else {throw OSwindError.invalid("Renew pairing for this retired library only")}
         let preparation=try pairing.retirementRenewalPreparation()
         mutex.lock();defer {mutex.unlock()}
         guard !stopped,retiring,let externalAnchor else {throw OSwindError.invalid("Renew through the owned retired service")}
-        return try externalAnchor.completeLocalRetirement(pairing:preparation)
+        return try externalAnchor.completeRetirement(pairing:preparation,expectedKind:.local)
+    }
+    func completeReceivedRetirement(pairing:PersonalSyncPairing)throws->SyncCollectionControl {
+        guard pairing.belongs(to:library) else {throw OSwindError.invalid("Renew pairing for this retired library only")}
+        let preparation=try pairing.retirementRenewalPreparation()
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,retiring,let externalAnchor else {throw OSwindError.invalid("Renew through the owned retired service")}
+        return try externalAnchor.completeRetirement(pairing:preparation,expectedKind:.received)
+    }
+    /// An explicit reviewed local command, never an automatic consequence of
+    /// deleting this Mac's history. Revalidate the exact captured counter/era.
+    func approveLocalGroupErase(_ control:SyncCollectionControl)throws {
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,!retiring,let externalAnchor else {throw OSwindError.unavailable("Review erasure from the current active sync owner")}
+        let media=try library.mediaWriteLease();defer {media.release()}
+        try library.withRoutineDatabase {db in
+            try context()
+            guard control.creator==cache.journal.replica,control.group==cache.journal.group,control.epoch==cache.journal.epoch else {throw OSwindError.invalid("Review this device's exact local erasure")}
+            try externalAnchor.mutate(in:db) {
+                let approved=try SyncCollectionHistory(database:db,replica:cache.journal.replica).approveGroupErase(journal:cache.journal,counter:control.counter,expectedEra:control.era)
+                guard approved==control else {throw OSwindError.invalid("Local erase intent changed after review")}
+            }
+        }
     }
     private var pendingAfter:Int64=0
     private static let stateSchema="CREATE TABLE personal_sync_service_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,token TEXT NOT NULL,sent INTEGER NOT NULL CHECK(typeof(sent)='integer' AND sent>=0))"

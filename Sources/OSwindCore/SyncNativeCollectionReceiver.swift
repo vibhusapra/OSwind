@@ -12,11 +12,28 @@ struct SyncNativeCollectionReceiver {
 
     func receive(creator:String,counter:Int64)throws->SyncCollectionReceiveResult {
         try SyncCollectionReceiver(library:library,cache:cache,inbox:inbox,retire:{frontier,reservation in
-            try retire(creator:creator,counter:counter,frontier:frontier,reservation:reservation)
+            _=try retire(creator:creator,counter:counter,frontier:frontier,reservation:reservation)
         }).receive(creator:creator,counter:counter)
     }
 
-    private func retire(creator:String,counter:Int64,frontier:SyncClock,reservation:MediaAdmissionLease)throws {
+    /// The service has verified this exact control from its signed transport.
+    /// Use its existing exclusive lease and outer checkpoint transaction.
+    func receiveVerified(_ control:SyncCollectionControl,reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})throws->LibraryWipeCounts {
+        try reservation.withExclusive(for:library.mediaRootIdentity) {}
+        return try library.withRoutineDatabase {db in
+            guard sqlite3_get_autocommit(db.handle)==0,control.creator != cache.journal.replica else {throw OSwindError.invalid("Receive a peer retirement in its owning checkpoint transaction")}
+            try SyncLibraryContext.requireActive(db,cache:cache)
+            let history=SyncCollectionHistory(database:db,replica:cache.journal.replica)
+            var counts:LibraryWipeCounts?
+            let applied=try history.observeVerifiedGroupControl(control,journal:cache.journal,retire:{frontier in
+                counts=try retire(creator:control.creator,counter:control.counter,frontier:frontier,reservation:reservation,progress:progress)
+            })
+            guard applied,let counts else {throw OSwindError.invalid("This peer retirement was already observed; preserve the later native lifetime")}
+            return counts
+        }
+    }
+
+    private func retire(creator:String,counter:Int64,frontier:SyncClock,reservation:MediaAdmissionLease,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})throws->LibraryWipeCounts {
         try library.withRoutineDatabase {db in
             guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Retire native history with its authenticated receipt")}
             try SyncLibraryContext.requireActive(db,cache:cache)
@@ -41,9 +58,10 @@ struct SyncNativeCollectionReceiver {
             try db.execute("DELETE FROM personal_sync_changes")
             guard try db.eraseCount("SELECT used_bytes FROM personal_sync_capture WHERE singleton=1")==0 else {throw OSwindError.database("Raw collection accounting differs")}
             try SyncPublicationQueue.retireCollectionIfInstalled(cache:cache)
-            try SyncChangeCapture.withoutEcho(db,scope:cache.catalog.scope) {
-                _=try library.stageLibraryWipe(reservation:reservation)
+            let counts=try SyncChangeCapture.withoutEcho(db,scope:cache.catalog.scope) {
+                let counts=try library.stageLibraryWipe(reservation:reservation,progress:progress)
                 try LibraryWipeState.markReceived(db)
+                return counts
             }
             try cache.retireCollectionCaches()
             try cache.catalog.retireCollectionMappings()
@@ -56,6 +74,7 @@ struct SyncNativeCollectionReceiver {
             try SyncCollectionHistory.requireNativeCompletionHooks(db)
             let complete=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");defer {sqlite3_finalize(complete)}
             db.bind(complete,1,SyncCollectionHistory.nativeCompletionKey);db.bind(complete,2,try control.digest);try db.done(complete)
+            return counts
         }
     }
 

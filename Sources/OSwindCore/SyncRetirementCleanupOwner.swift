@@ -1,8 +1,8 @@
 import Foundation
 
 /// Internal crash-recovery owner for a saved logical retirement. It exposes no
-/// ordinary MemoryStore, keys or provider writer to the app. Local binding renewal is explicit;
-/// received-erase/public session integration remains unfinished.
+/// ordinary MemoryStore, keys or provider writer to the app. Binding renewal is
+/// explicit and preserves a separate unapproved local group-erasure decision.
 final class SyncRetirementCleanupOwner:@unchecked Sendable {
     private let lock=NSRecursiveLock(),library:MemoryStore,anchor:SyncDeliveryAnchor,pairing:PersonalSyncPairing
     private var closed=false
@@ -29,7 +29,12 @@ final class SyncRetirementCleanupOwner:@unchecked Sendable {
     func completeLocalRetirement()throws->SyncCollectionControl {
         lock.lock();defer {lock.unlock()}
         guard !closed else {throw OSwindError.unavailable("This retirement recovery owner is closed")}
-        return try anchor.completeLocalRetirement(pairing:pairing.retirementRenewalPreparation())
+        return try anchor.completeRetirement(pairing:pairing.retirementRenewalPreparation(),expectedKind:.local)
+    }
+    func completeRetirement()throws->SyncCollectionControl {
+        lock.lock();defer {lock.unlock()}
+        guard !closed else {throw OSwindError.unavailable("This retirement recovery owner is closed")}
+        return try anchor.completeRetirement(pairing:pairing.retirementRenewalPreparation())
     }
     deinit {anchor.close();pairing.close();try? library.close()}
 }
