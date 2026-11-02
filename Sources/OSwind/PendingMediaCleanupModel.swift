@@ -6,6 +6,7 @@ import OSwindCore
 @MainActor final class PendingMediaCleanupModel:ObservableObject {
     @Published private(set) var status=""
     @Published private(set) var busy=false
+    @Published private(set) var lastDisposition:PendingMediaCleanupDisposition?
     private(set) var attempts=0
     private(set) var active=false
     private var knownPending=false,attention=false,wakeRequested=false
@@ -29,7 +30,7 @@ import OSwindCore
     }
     func start() {
         guard !active,drainers==0,!store.isClosed else {return}
-        active=true;generation=UUID();knownPending=false;attention=false;wipePending=false;observationFailed=false;lastAttemptStarted=nil
+        active=true;generation=UUID();knownPending=false;attention=false;wipePending=false;observationFailed=false;lastAttemptStarted=nil;lastDisposition=nil
         let current=generation
         do {observation=try store.observePendingMediaCleanup {[weak self] event in Task {@MainActor in guard let self,self.generation==current else {return};self.hint(event)}}}
         catch {active=false;attention=true;observationFailed=true;status="Deferred media cleanup needs attention: "+error.localizedDescription;return}
@@ -75,6 +76,7 @@ import OSwindCore
                     let result=try await withTaskCancellationHandler {try await owned.value} onCancel:{owned.cancel()}
                     worker=nil
                     guard active,current==generation,!Task.isCancelled else {return}
+                    lastDisposition=result.disposition
                     switch result.disposition {
                     case .idle,.finished:
                         knownPending=false;attention=false;wipePending=false;status="";onWipeState(false)
@@ -107,7 +109,7 @@ import OSwindCore
         sleeper=nil;rateLimited=false
     }
     func stop() {
-        active=false;generation=UUID();wakeRequested=false;knownPending=false;attention=false;wipePending=false;observationFailed=false
+        active=false;generation=UUID();wakeRequested=false;knownPending=false;attention=false;wipePending=false;observationFailed=false;lastDisposition=nil
         observation?.cancel();observation=nil;worker?.cancel();sleeper?.cancel();supervisor?.cancel()
     }
     func cancelAndWait()async {
@@ -123,7 +125,7 @@ import OSwindCore
 struct PendingMediaCleanupStatusView:View {
     @ObservedObject var model:PendingMediaCleanupModel
     var body:some View {
-        if !model.status.isEmpty && (model.busy || model.needsAttention) {
+        if model.lastDisposition == .waitingForWriters || model.needsAttention {
             VStack(alignment:.leading,spacing:8) {
                 Label("Deleted files",systemImage:model.needsAttention ? "exclamationmark.circle":"hourglass").font(.headline)
                 Text(model.needsAttention ? model.status:"Files from earlier deletions are still in use. Cleanup will resume automatically.").font(.caption).textSelection(.enabled)

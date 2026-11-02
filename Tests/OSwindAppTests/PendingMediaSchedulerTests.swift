@@ -48,6 +48,8 @@ import MachO
         XCTAssertNil(app.deletingID);XCTAssertNil(try app.store.get("erase"))
         XCTAssertTrue(FileManager.default.fileExists(atPath:file.path));XCTAssertNotNil(try app.store.get("keep"))
         lease.release();try await waitForRemoval(file)
+        try await eventually {!self.app.pendingMediaCleanup.hasPendingWork}
+        XCTAssertNotEqual(app.pendingMediaCleanup.lastDisposition,.waitingForWriters,"Completed cleanup must not leave a waiting banner during a final idle probe")
         XCTAssertNotNil(try app.store.get("keep"),"Automatic retry must not prune additional history")
     }
     func testLibraryStartupResumesEarlierCommittedQueueAfterWriterRelease()async throws {
