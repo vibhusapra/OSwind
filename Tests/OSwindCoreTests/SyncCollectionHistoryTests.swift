@@ -27,6 +27,7 @@ final class SyncCollectionHistoryTests:XCTestCase {
         // Only stages the future authenticated-control observation boundary.
         // This fixture does not claim peer control verification or erasure.
         try store.withRoutineDatabase {db in
+            try SyncJournal(database:db,replica:replica,group:group,epoch:epoch).allowPeer(peer)
             let s=try db.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,1)");defer {sqlite3_finalize(s)}
             db.bind(s,1,peer);try db.done(s)
         }
@@ -101,6 +102,14 @@ final class SyncCollectionHistoryTests:XCTestCase {
             XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(sqlite3_column_int(row,0),0)
         }
     }
+    func testMissedNativeWipeHookCannotLeaveASeeminglyValidOldFrontier()throws {
+        try store.insert(Memory(id:"before-missed-hook",kind:.note,text:"Owned source before a damaged collection hook"))
+        try store.withRoutineDatabase {try $0.execute("DROP TRIGGER sync_collection_native_wipe_insert")}
+        _=try store.wipeLibrary()
+        XCTAssertNil(try store.get("before-missed-hook"))
+        XCTAssertThrowsError(try ledger {try $0.current()},"A native identity changed by a wipe must invalidate an unstamped collection frontier")
+        XCTAssertThrowsError(try ledger {try $0.pendingWipes()},"A missed hook must not look like a verified empty erasure history")
+    }
     func testAlreadyOpenNativeWriterRecordsActualWipeAndNewBirth()throws {
         let location=root.appendingPathComponent("already-open-writer"),a=try MemoryStore(root:location),b=try MemoryStore(root:location)
         defer {try? a.close();try? b.close()}
@@ -122,6 +131,7 @@ final class SyncCollectionHistoryTests:XCTestCase {
         try legacy.insert(Memory(id:"legacy",kind:.note,text:"Owned before sync installation"))
         try legacy.withRoutineDatabase {db in
             _=try SyncChangeCapture.activate(db);_=try SyncJournal.install(database:db,replica:replica,group:group,epoch:epoch)
+            try SyncJournal(database:db,replica:replica,group:group,epoch:epoch).allowPeer(peer)
             let s=try db.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,1)");defer {sqlite3_finalize(s)};db.bind(s,1,peer);try db.done(s)
         }
         try legacy.insert(Memory(id:"legacy",kind:.note,text:"Owned edit after frontier observation"))

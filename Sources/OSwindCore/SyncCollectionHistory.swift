@@ -16,7 +16,8 @@ struct SyncCollectionHistory {
         "personal_sync_collection_frontier":"CREATE TABLE personal_sync_collection_frontier(replica TEXT PRIMARY KEY,counter INTEGER NOT NULL CHECK(typeof(counter)='integer' AND counter>0))",
         "personal_sync_collection_controls":"CREATE TABLE personal_sync_collection_controls(counter INTEGER PRIMARY KEY CHECK(counter>0),era BLOB NOT NULL CHECK(\(blobCheck)))",
         "personal_sync_collection_births":"CREATE TABLE personal_sync_collection_births(table_name TEXT NOT NULL,key_digest BLOB NOT NULL CHECK(typeof(key_digest)='blob' AND length(key_digest)=32),era BLOB NOT NULL CHECK(\(blobCheck)),PRIMARY KEY(table_name,key_digest))",
-        "personal_sync_collection_changes":"CREATE TABLE personal_sync_collection_changes(sequence INTEGER PRIMARY KEY CHECK(sequence>0),era BLOB NOT NULL CHECK(\(blobCheck)))"
+        "personal_sync_collection_changes":"CREATE TABLE personal_sync_collection_changes(sequence INTEGER PRIMARY KEY CHECK(sequence>0),era BLOB NOT NULL CHECK(\(blobCheck)))",
+        "personal_sync_collection_objects":"CREATE TABLE personal_sync_collection_objects(kind TEXT NOT NULL,digest TEXT NOT NULL,era BLOB NOT NULL CHECK(\(blobCheck)),PRIMARY KEY(kind,digest))"
     ]
 
     static func install(_ db:RoutineDatabase,replica:String)throws->Self {
@@ -49,7 +50,53 @@ struct SyncCollectionHistory {
         else {throw OSwindError.database("Collection history schema member is missing; preserve its state")}
     }
 
-    private static var triggers:[String:String] {
+    static func ifInstalled(_ db:RoutineDatabase)throws->Self? {
+        let exists=try db.statement("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='personal_sync_collection_local'");defer {sqlite3_finalize(exists)}
+        guard sqlite3_step(exists)==SQLITE_ROW else {throw db.error()};if sqlite3_column_int(exists,0)==0 {return nil}
+        let row=try db.statement("SELECT replica FROM personal_sync_collection_local WHERE singleton=1");defer {sqlite3_finalize(row)}
+        guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Collection history identity is missing")}
+        let replica=db.text(row,0);try SyncProtocolLimits.uuid(replica)
+        let value=Self(database:db,replica:replica);_ = try value.current();return value
+    }
+
+    func objectEra(_ key:SyncObjectKey)throws->SyncClock? {
+        _=try identity();let row=try database.statement("SELECT era FROM personal_sync_collection_objects WHERE kind=? AND digest=?");defer {sqlite3_finalize(row)}
+        database.bind(row,1,key.kind.rawValue);database.bind(row,2,key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()};return try decode(row,0)
+    }
+    func admittedEra(_ key:SyncObjectKey)throws->SyncClock {
+        _=try identity();let row=try database.statement("SELECT state FROM personal_sync_registers WHERE kind=? AND digest=?");defer {sqlite3_finalize(row)}
+        database.bind(row,1,key.kind.rawValue);database.bind(row,2,key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return .empty}
+        let size=Int(sqlite3_column_bytes(row,0))
+        guard code==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_BLOB,(1...SyncProtocolLimits.stateBytes).contains(size),let p=sqlite3_column_blob(row,0) else {throw OSwindError.invalid("Invalid admitted collection lifetime")}
+        let state=try SyncRegister.decode(Data(bytes:p,count:size))
+        guard state.key==key,!state.isDeleted else {throw OSwindError.invalid("A retired collection lifetime cannot project native content")}
+        return state.preferred?.creationEra ?? .empty
+    }
+    func hasLegacyIdentity(_ key:SyncObjectKey)throws->Bool {
+        let exists=try database.statement("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='personal_sync_identities'");defer {sqlite3_finalize(exists)}
+        guard sqlite3_step(exists)==SQLITE_ROW else {throw database.error()};if sqlite3_column_int(exists,0)==0 {return false}
+        let row=try database.statement("SELECT EXISTS(SELECT 1 FROM personal_sync_identities WHERE object_digest=?)");defer {sqlite3_finalize(row)};database.bind(row,1,key.digest)
+        guard sqlite3_step(row)==SQLITE_ROW else {throw database.error()};return sqlite3_column_int(row,0)==1
+    }
+    /// Share the identity/queue transaction, before its raw claim is consumed.
+    /// An existing lifetime's era is immutable; a later edit cannot renew it.
+    func recordObject(_ key:SyncObjectKey,era:SyncClock)throws {
+        guard sqlite3_get_autocommit(database.handle)==0,try current().covers(era) else {throw OSwindError.invalid("Record an observed creation era in its identity transaction")}
+        if let previous=try objectEra(key) {guard previous==era else {throw OSwindError.invalid("A sync lifetime cannot change its creation era")};return}
+        let bytes=try SyncProtocolLimits.encode(era),row=try database.statement("INSERT INTO personal_sync_collection_objects(kind,digest,era) VALUES(?,?,?)");defer {sqlite3_finalize(row)}
+        database.bind(row,1,key.kind.rawValue);database.bind(row,2,key.digest);bytes.withUnsafeBytes {_=sqlite3_bind_blob(row,3,$0.baseAddress,Int32(bytes.count),database.transient)};try database.done(row)
+    }
+    func recordPeerBirth(_ key:SyncObjectKey,table:String,nativeKey:Data,era:SyncClock)throws {
+        try recordObject(key,era:era)
+        guard SyncChangeCapture.tables.contains(where:{$0.name==table}),nativeKey.count==32 else {throw OSwindError.invalid("Invalid peer native birth key")}
+        let bytes=try SyncProtocolLimits.encode(era),row=try database.statement("INSERT INTO personal_sync_collection_births(table_name,key_digest,era) VALUES(?,?,?) ON CONFLICT(table_name,key_digest) DO UPDATE SET era=excluded.era");defer {sqlite3_finalize(row)}
+        database.bind(row,1,table);nativeKey.withUnsafeBytes {_=sqlite3_bind_blob(row,2,$0.baseAddress,Int32(nativeKey.count),database.transient)}
+        bytes.withUnsafeBytes {_=sqlite3_bind_blob(row,3,$0.baseAddress,Int32(bytes.count),database.transient)};try database.done(row)
+    }
+
+    private static let triggers:[String:String] = {
         var result=[String:String]()
         let active="(SELECT enabled=1 AND suppressed=0 FROM personal_sync_capture WHERE singleton=1)"
         for table in SyncChangeCapture.tables {
@@ -75,11 +122,23 @@ struct SyncCollectionHistory {
             result[name]="CREATE TRIGGER \(name) AFTER \(operation.uppercased()) ON store_metadata WHEN new.key='library_wipe_dirty' AND new.value='1' BEGIN SELECT CASE WHEN (SELECT counter FROM personal_sync_collection_local WHERE singleton=1)=9223372036854775807 THEN RAISE(ABORT,'Collection wipe sequence exhausted') END; UPDATE personal_sync_collection_local SET counter=counter+1 WHERE singleton=1; INSERT INTO personal_sync_collection_frontier(replica,counter) SELECT replica,counter FROM personal_sync_collection_local WHERE singleton=1 ON CONFLICT(replica) DO UPDATE SET counter=excluded.counter; INSERT INTO personal_sync_collection_controls(counter,era) SELECT counter,\(clockSQL) FROM personal_sync_collection_local WHERE singleton=1; END"
         }
         return result
-    }
+    }()
 
     private func identity()throws->Int64 {
         let row=try database.statement("SELECT replica,counter FROM personal_sync_collection_local WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,database.text(row,0)==replica,sqlite3_column_type(row,1)==SQLITE_INTEGER,sqlite3_column_int64(row,1)>=0 else {throw OSwindError.invalid("Collection history identity differs")}
+        let native=try database.statement("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_capture','personal_sync_changes')");defer {sqlite3_finalize(native)}
+        guard sqlite3_step(native)==SQLITE_ROW else {throw database.error()}
+        let count=sqlite3_column_int(native,0)
+        guard count==0 || count==2 else {throw OSwindError.invalid("Native collection capture schema is incomplete")}
+        // The generic vector-index identity also changes on ordinary deletions.
+        // Validate the actual wipe hooks instead of mistaking those changes for
+        // collection erasure. Never silently reinstall a damaged active hook.
+        if count==2 {
+            for (name,sql) in Self.triggers where name.hasPrefix("sync_collection_native_wipe_") {
+                try Self.require(database,name:name,sql:sql,allowCreate:false)
+            }
+        }
         return sqlite3_column_int64(row,1)
     }
     private func decode(_ row:OpaquePointer,_ column:Int32)throws->SyncClock {
@@ -91,7 +150,10 @@ struct SyncCollectionHistory {
     func current()throws->SyncClock {
         let counter=try identity(),row=try database.statement("SELECT \(Self.clockSQL)");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW else {throw database.error()};let clock=try decode(row,0)
-        guard clock[replica]==counter else {throw OSwindError.invalid("Collection frontier differs from its local wipe sequence")};return clock
+        guard clock[replica]==counter else {throw OSwindError.invalid("Collection frontier differs from its local wipe sequence")}
+        let unknown=try database.statement("SELECT COUNT(*) FROM personal_sync_collection_frontier f LEFT JOIN personal_sync_peers p ON p.replica=f.replica WHERE p.replica IS NULL");defer {sqlite3_finalize(unknown)}
+        guard sqlite3_step(unknown)==SQLITE_ROW,sqlite3_column_int(unknown,0)==0 else {throw OSwindError.invalid("Collection frontier names an unenrolled peer")}
+        return clock
     }
     /// Nil is an unstamped legacy lifetime, not proof of a fresh creation.
     func birth(table:String,key:Data)throws->SyncClock? {
