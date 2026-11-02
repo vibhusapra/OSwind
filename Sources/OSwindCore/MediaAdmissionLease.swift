@@ -20,15 +20,20 @@ public final class MediaAdmissionLease:@unchecked Sendable {
         guard exclusive,file>=0,rootDevice==identity.device,rootInode==identity.inode else {throw OSwindError.invalid("Cleanup requires an active exclusive reservation from this library")}
         return try body()
     }
-    public func release() {lock.lock();defer {lock.unlock()};if file>=0 {flock(file,LOCK_UN);close(file);file = -1}}
+    public func release() {
+        lock.lock();let released=file>=0
+        if released {flock(file,LOCK_UN);close(file);file = -1}
+        lock.unlock()
+        if released && !exclusive {PendingMediaCleanupSignal.post(device:rootDevice,inode:rootInode,event:.writerReleased)}
+    }
     deinit {release()}
-    static func acquire(root:URL,exclusive:Bool,timeout:TimeInterval=30,expectedRoot:BackupFileStamp?=nil) throws -> MediaAdmissionLease {
+    static func acquire(root:URL,exclusive:Bool,timeout:TimeInterval=30,expectedRoot:BackupFileStamp?=nil,onBusy:(()->Void)?=nil) throws -> MediaAdmissionLease {
         try Task.checkCancellation()
         let directory=open(root.standardizedFileURL.resolvingSymlinksInPath().path,O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard directory>=0 else {throw OSwindError.unavailable("Cannot open the media admission directory")};defer {close(directory)}
-        return try acquire(directory:directory,exclusive:exclusive,timeout:timeout,expectedRoot:expectedRoot)
+        return try acquire(directory:directory,exclusive:exclusive,timeout:timeout,expectedRoot:expectedRoot,onBusy:onBusy)
     }
-    static func acquire(directory:Int32,exclusive:Bool,timeout:TimeInterval=30,expectedRoot:BackupFileStamp?=nil) throws -> MediaAdmissionLease {
+    static func acquire(directory:Int32,exclusive:Bool,timeout:TimeInterval=30,expectedRoot:BackupFileStamp?=nil,onBusy:(()->Void)?=nil) throws -> MediaAdmissionLease {
         try Task.checkCancellation()
         var rootMetadata=stat();guard fstat(directory,&rootMetadata)==0 else {throw OSwindError.unavailable("Cannot inspect the media directory")}
         if let expectedRoot {guard rootMetadata.st_dev==expectedRoot.device,rootMetadata.st_ino==expectedRoot.inode else {throw OSwindError.invalid("The library directory changed. Reopen the intended library before writing or wiping.")}}
@@ -39,6 +44,7 @@ public final class MediaAdmissionLease:@unchecked Sendable {
         let deadline=ProcessInfo.processInfo.systemUptime+timeout
         while flock(file,(exclusive ? LOCK_EX:LOCK_SH) | LOCK_NB) != 0 {
             guard errno==EWOULDBLOCK || errno==EAGAIN || errno==EINTR else {throw OSwindError.unavailable("Cannot reserve retained-media access")}
+            if errno==EWOULDBLOCK || errno==EAGAIN {onBusy?()}
             try Task.checkCancellation()
             guard ProcessInfo.processInfo.systemUptime<deadline else {throw OSwindError.unavailable("Retained media is busy. Let the active recording or cleanup finish, then retry.")}
             Thread.sleep(forTimeInterval:0.02)

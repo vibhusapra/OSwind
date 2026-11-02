@@ -26,6 +26,7 @@ import EventKit
     @Published var calendarSliceZone:String?
     let libraryTransfer = LibraryTransferModel()
     let libraryWipe=LibraryWipeModel()
+    lazy var pendingMediaCleanup=PendingMediaCleanupModel(store:store,onFinished:{[weak self] in self?.invalidateStorageEstimate()},onWipeState:{[weak self] pending in self?.libraryWipe.pendingCleanup=pending})
     private var noteTasks=[UUID:Task<Void,Never>]()
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
@@ -123,7 +124,7 @@ import EventKit
     private var maintenanceAutomatic=false
     private var destructiveDrainers=0
     var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
@@ -275,13 +276,13 @@ import EventKit
         if enabled {housekeepingRequested=true;startHousekeeping()}
     }
     func startConfiguredServices() {
-        guard !libraryRetired,!store.isClosed else {return}
+        guard !libraryRetired,!store.isClosed,destructiveDrainers==0 else {return}
         configuredServicesRequested=true;housekeepingRequested=true
         activateConfiguredServices()
     }
     private func activateConfiguredServices() {
-        guard !libraryRetired,configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
-        configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping()
+        guard !libraryRetired,destructiveDrainers==0,configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping();pendingMediaCleanup.start()
         if !demo && settings.routinesEnabled {routines.start()}
         if !demo && settings.meetings.enabled {meetings.start()}
         if !demo && settings.clipboard.enabled {clipboard.start()}
@@ -291,12 +292,13 @@ import EventKit
         resumeAutomaticVisualIndex()
     }
     private func suspendConfiguredServices() {
-        configuredServicesActive=false;stopHousekeeping();drafting.clear()
+        configuredServicesActive=false;stopHousekeeping();pendingMediaCleanup.stop();drafting.clear()
         visualAutoResumeAllowed=false;cancelVisualIndexing();entityMemory.cancel();routines.stop()
         pauseAll(discardReplay:true,manualMeetingPause:false);stopAPI(preservePreference:true)
     }
     private func resumeConfiguredWorkAfterWake() {
-        guard !showOnboarding,!demo,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        guard !libraryRetired,destructiveDrainers==0,!showOnboarding,!demo,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        pendingMediaCleanup.resume()
         routines.tickIfStarted();meetings.wake()
         if configuredServicesActive && settings.entityAutomaticIndex {entityMemory.build()}
         resumeAutomaticVisualIndex()
@@ -320,7 +322,7 @@ import EventKit
     }
     func prepareForLibrarySwitch() {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
-        libraryRetired=true;meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
+        libraryRetired=true;pendingMediaCleanup.stop();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -654,9 +656,11 @@ import EventKit
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
+        pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
         await cancelDestructiveWorkAndWait()
+        await pendingMediaCleanup.cancelAndWait()
     }
     private func cancelDestructiveWork() {
         deletionWorker?.cancel();maintenanceWorker?.cancel();deletionTask?.cancel();maintenanceTask?.cancel()
@@ -786,7 +790,7 @@ import EventKit
                 deletionWorker=worker
                 let result=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
                 guard generation==libraryOperationGeneration,!libraryRetired else {return}
-                deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.historicalVersions) original versions · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
+                deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.historicalVersions) original versions · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) queued for file cleanup"
                 if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
                 invalidateCommittedErasure(result,discardVisible:Task.isCancelled)
                 guard !Task.isCancelled else {return}
@@ -822,7 +826,7 @@ import EventKit
                 guard generation==libraryOperationGeneration,!libraryRetired else {return}
                 if let result {
                     let budget=result.budgetMet==false ? "Storage target not reached.":"Storage target met."
-                    maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.historicalVersions) original versions · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
+                    maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.historicalVersions) original versions · \(result.erasure.pendingMedia) media files queued for cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
                 } else {maintenanceStatus="Automatic retention is off."}
                 if let indexError {maintenanceStatus += " "+indexError}
                 if let result {invalidateCommittedErasure(result.erasure,discardVisible:Task.isCancelled)}else {invalidateStorageEstimate()}
@@ -860,6 +864,7 @@ import EventKit
     }
     func wipeLocalLibrary(retry:Bool=false) {
         guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
+        let resumeCleanup=pendingMediaCleanup.active
         prepareForLibrarySwitch()
         // This explicit wipe owns its quiet preferences, after cancellation has
         // stopped the old workspace. Ordinary retired bindings remain denied.
@@ -868,11 +873,11 @@ import EventKit
         assignInternalSettings(quiet);applySettingsToControllers()
         do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry,before:{[workflow] in await workflow.cancelAndWait()}) {[weak self] result in
+        libraryWipe.run(store:store,retry:retry,before:{[workflow,pendingMediaCleanup] in await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
             self.libraryRetired=false;self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
-            self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping()
-        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.libraryRetired=false;self.startHousekeeping()}
+            self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}
+        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.libraryRetired=false;self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}}
     }
     func pauseAll(discardReplay:Bool=false,manualMeetingPause:Bool=true) {
         if isCollecting {resumeOnlyClipboard=clipboard.running && !isCapturing && !meetings.active;resumeMeetingsAfterPause=meetings.active;resumeScreenWithMeetings=capture.running}

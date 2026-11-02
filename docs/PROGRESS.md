@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Committed file cleanup — component qualified
+
+[Committed file cleanup](PENDING-MEDIA-CLEANUP.md) resumes durable deleted-media work through current supported writer events and pending-only backoff, with no periodic idle probe. The source-bound receipt passes149 required controls in three builds,43 owned native methods,30 package/process stages and independent app/archive review with44 earlier apps unchanged. Older producers may need startup/wake/explicit retry. Complete sync, other worker categories, native input, power and distribution remain open; all83 feature statuses stay unchanged.
+
 ## Cleanup worker lifetime — component qualified
 
 [Cleanup lifecycle](CLEANUP-LIFECYCLE.md) and its [source-bound receipt](../benchmarks/cleanup-lifecycle-v1.json) cover real worker drain through plain Quit, workspace switch and encrypted APFS lock, obsolete-policy cancellation, committed-result invalidation, retired timer/service/settings/wipe rejection and authorized wipe quiescence. All127 mandatory controls pass in three builds;30 package/process stages,41 native methods and independent archive review pass. All83 feature statuses remain unchanged. The predecessor hosted canceled-unlock busy failure remains open; new test-only tracing supplies missing cycle/stage evidence without claiming a production fix. Pending-media scheduling, other worker categories and complete product acceptance remain open.
