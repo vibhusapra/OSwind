@@ -1,0 +1,460 @@
+{
+  "source": "8b1cdc2e4bbfd90a6cd20c307fe7b0fd6d7823f7",
+  "trackedInputsVerified": 1517,
+  "newMethods": 20,
+  "stages": [
+    {
+      "stage": "full-debug",
+      "defined": 2620,
+      "passed": 2484,
+      "skipped": 136,
+      "failed": 0,
+      "changedMethodStates": {
+        "OSwindAppTests.PersonalSyncPairingModelTests.testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testActualModelReviewsExactLocalEraseAndResumesOnlyAfterExplicitApproval": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testQueuedReviewRechecksAdmissionAndDoesNotLeaveChangingStateStuck": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testErasureDrainWaitsForActualAppProducerBeforeAnyNativeDeletion": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testDisconnectedModelErasesLocallyWhileProviderFolderIsUnavailable": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeShowsRestrictedRecoveryUntilHeldWALReaderReleases": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testTerminationJoinsActualRestrictedRecoveryAfterCancellation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicFolderFactoryStartsPausedSavesLocationAndReopensOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicReviewedEraseIsSessionBoundAndCannotResumeDeliveryWithoutExplicitConfiguration": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSavedFolderCannotActivatePortableRestoredHistory": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testInvalidSavedBookmarkRefusesWithoutChangingCredentialsOrNativeContent": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSamePendingEraseRequiresANewReviewAfterSessionReopen": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testRestrictedAsyncRecoveryJoinsCancelledCleanupAndRenewsOnExplicitRetry": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureWorksWithMissingProviderAndPreservesOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureCannotReplaceLiveDeliveryOrCloseItsPairingOwner": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureStopJoinsCanceledLogicalWorkWithoutProviderAccess": "passed",
+        "OSwindCoreTests.PersonalSyncPairingTests.testDeliveryReservationIsVisibleAndRefusesMembershipReviewOrRetirement": "passed"
+      },
+      "logSHA256": "2189b858967523a0a75f475f2ab4a7d387c7620ee4f4a4a9cf7f7138d517138a",
+      "fixtureSHA256": "c7efabf6d586092970135a4453507c206fb7f7c08a18c90d1e8030a7ac55b5d9",
+      "producerSHA256": "934a850266125329c98804cd5de34d6eae88cd90c9d4d530112ae58b96fc6286",
+      "receiverSHA256": "1628ee1e52f023d8f49ff97c351a2fa3b54f5050f01f1bfbf63069b613b1e187",
+      "nativeWriterSchema": 35,
+      "persistentWriterGuards": {
+        "producer": 243,
+        "receiver": 243
+      },
+      "retirementMetadataGuardsPerLibrary": 2,
+      "epochRetentionGuardsPerLibrary": 2,
+      "all13Counts": {
+        "chat_sessions": 1,
+        "chat_sources": 1,
+        "chat_turns": 1,
+        "entity_aliases": 4,
+        "entity_ignored": 1,
+        "entity_mentions": 1,
+        "entity_project_ignored": 1,
+        "memories": 3,
+        "memory_entities": 3,
+        "recap_sources": 1,
+        "routine_runs": 1,
+        "routines": 1,
+        "text_observation_pins": 2
+      },
+      "exactWireBodies": 21,
+      "nativeOriginals": 2,
+      "externalTokenMatches": 2,
+      "receiverEchoes": 0
+    },
+    {
+      "stage": "affected-tsan",
+      "defined": 1005,
+      "passed": 932,
+      "skipped": 73,
+      "failed": 0,
+      "changedMethodStates": {
+        "OSwindAppTests.PersonalSyncPairingModelTests.testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testActualModelReviewsExactLocalEraseAndResumesOnlyAfterExplicitApproval": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testQueuedReviewRechecksAdmissionAndDoesNotLeaveChangingStateStuck": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testErasureDrainWaitsForActualAppProducerBeforeAnyNativeDeletion": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testDisconnectedModelErasesLocallyWhileProviderFolderIsUnavailable": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeShowsRestrictedRecoveryUntilHeldWALReaderReleases": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testTerminationJoinsActualRestrictedRecoveryAfterCancellation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicFolderFactoryStartsPausedSavesLocationAndReopensOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicReviewedEraseIsSessionBoundAndCannotResumeDeliveryWithoutExplicitConfiguration": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSavedFolderCannotActivatePortableRestoredHistory": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testInvalidSavedBookmarkRefusesWithoutChangingCredentialsOrNativeContent": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSamePendingEraseRequiresANewReviewAfterSessionReopen": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testRestrictedAsyncRecoveryJoinsCancelledCleanupAndRenewsOnExplicitRetry": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureWorksWithMissingProviderAndPreservesOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureCannotReplaceLiveDeliveryOrCloseItsPairingOwner": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureStopJoinsCanceledLogicalWorkWithoutProviderAccess": "passed",
+        "OSwindCoreTests.PersonalSyncPairingTests.testDeliveryReservationIsVisibleAndRefusesMembershipReviewOrRetirement": "passed"
+      },
+      "logSHA256": "87129c70d8b7bb10e1f67ee282c12866b3a7ac01c55e91f89729159f3ad664e9",
+      "fixtureSHA256": "244cb0c4f6c4785c0815a46d8393c693e8a2500d65dd493a0c25069cbbd59fa8",
+      "producerSHA256": "e1eda77341587ced65b4d83550adecc75b17b68843364d7b06ec67ccaa93b1a2",
+      "receiverSHA256": "6a29d73027fac01ceb9edcc7eb94234f6ce4629f6ac119238fe69d62ae08a00e",
+      "nativeWriterSchema": 35,
+      "persistentWriterGuards": {
+        "producer": 243,
+        "receiver": 243
+      },
+      "retirementMetadataGuardsPerLibrary": 2,
+      "epochRetentionGuardsPerLibrary": 2,
+      "all13Counts": {
+        "chat_sessions": 1,
+        "chat_sources": 1,
+        "chat_turns": 1,
+        "entity_aliases": 4,
+        "entity_ignored": 1,
+        "entity_mentions": 1,
+        "entity_project_ignored": 1,
+        "memories": 3,
+        "memory_entities": 3,
+        "recap_sources": 1,
+        "routine_runs": 1,
+        "routines": 1,
+        "text_observation_pins": 2
+      },
+      "exactWireBodies": 21,
+      "nativeOriginals": 2,
+      "externalTokenMatches": 2,
+      "receiverEchoes": 0
+    },
+    {
+      "stage": "affected-optimized",
+      "defined": 1005,
+      "passed": 932,
+      "skipped": 73,
+      "failed": 0,
+      "changedMethodStates": {
+        "OSwindAppTests.PersonalSyncPairingModelTests.testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testActualModelReviewsExactLocalEraseAndResumesOnlyAfterExplicitApproval": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testQueuedReviewRechecksAdmissionAndDoesNotLeaveChangingStateStuck": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testErasureDrainWaitsForActualAppProducerBeforeAnyNativeDeletion": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testDisconnectedModelErasesLocallyWhileProviderFolderIsUnavailable": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeShowsRestrictedRecoveryUntilHeldWALReaderReleases": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testTerminationJoinsActualRestrictedRecoveryAfterCancellation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicFolderFactoryStartsPausedSavesLocationAndReopensOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicReviewedEraseIsSessionBoundAndCannotResumeDeliveryWithoutExplicitConfiguration": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSavedFolderCannotActivatePortableRestoredHistory": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testInvalidSavedBookmarkRefusesWithoutChangingCredentialsOrNativeContent": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSamePendingEraseRequiresANewReviewAfterSessionReopen": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testRestrictedAsyncRecoveryJoinsCancelledCleanupAndRenewsOnExplicitRetry": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureWorksWithMissingProviderAndPreservesOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureCannotReplaceLiveDeliveryOrCloseItsPairingOwner": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureStopJoinsCanceledLogicalWorkWithoutProviderAccess": "passed",
+        "OSwindCoreTests.PersonalSyncPairingTests.testDeliveryReservationIsVisibleAndRefusesMembershipReviewOrRetirement": "passed"
+      },
+      "logSHA256": "37a20aa0dd8f6b3c4014867b534d51f65d015bdb9e3352c2d3064a30a1d54b70",
+      "fixtureSHA256": "742e2a70088cf1fb3f2abdfd81a59db265d2307f2fbbcbbbec7188e33e388496",
+      "producerSHA256": "e7ae21b5155f54dcb6d7ab77ecf0a1703da252e7389ca961b1dd7076dfb7d47a",
+      "receiverSHA256": "7f45ae5cfa66f337c3ae0576e0b698fc4970998ca85536833590d4b567d101f2",
+      "nativeWriterSchema": 35,
+      "persistentWriterGuards": {
+        "producer": 243,
+        "receiver": 243
+      },
+      "retirementMetadataGuardsPerLibrary": 2,
+      "epochRetentionGuardsPerLibrary": 2,
+      "all13Counts": {
+        "chat_sessions": 1,
+        "chat_sources": 1,
+        "chat_turns": 1,
+        "entity_aliases": 4,
+        "entity_ignored": 1,
+        "entity_mentions": 1,
+        "entity_project_ignored": 1,
+        "memories": 3,
+        "memory_entities": 3,
+        "recap_sources": 1,
+        "routine_runs": 1,
+        "routines": 1,
+        "text_observation_pins": 2
+      },
+      "exactWireBodies": 21,
+      "nativeOriginals": 2,
+      "externalTokenMatches": 2,
+      "receiverEchoes": 0
+    },
+    {
+      "stage": "owned-native",
+      "defined": 280,
+      "passed": 280,
+      "skipped": 0,
+      "failed": 0,
+      "changedMethodStates": {
+        "OSwindAppTests.PersonalSyncPairingModelTests.testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testCancelledActivationJoinsLateDeliveryCredentialAndCanResumeItsExactReservation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testActualModelReviewsExactLocalEraseAndResumesOnlyAfterExplicitApproval": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testQueuedReviewRechecksAdmissionAndDoesNotLeaveChangingStateStuck": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testErasureDrainWaitsForActualAppProducerBeforeAnyNativeDeletion": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testDisconnectedModelErasesLocallyWhileProviderFolderIsUnavailable": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testEnrolledAppWipeShowsRestrictedRecoveryUntilHeldWALReaderReleases": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testTerminationJoinsActualRestrictedRecoveryAfterCancellation": "passed",
+        "OSwindAppTests.PersonalSyncPairingModelTests.testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicFolderFactoryStartsPausedSavesLocationAndReopensOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testPublicReviewedEraseIsSessionBoundAndCannotResumeDeliveryWithoutExplicitConfiguration": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSavedFolderCannotActivatePortableRestoredHistory": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testInvalidSavedBookmarkRefusesWithoutChangingCredentialsOrNativeContent": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testSamePendingEraseRequiresANewReviewAfterSessionReopen": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testRestrictedAsyncRecoveryJoinsCancelledCleanupAndRenewsOnExplicitRetry": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureWorksWithMissingProviderAndPreservesOriginalAccounts": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureCannotReplaceLiveDeliveryOrCloseItsPairingOwner": "passed",
+        "OSwindCoreTests.SyncNativeReceivedRetirementTests.testNativeOnlyErasureStopJoinsCanceledLogicalWorkWithoutProviderAccess": "passed",
+        "OSwindCoreTests.PersonalSyncPairingTests.testDeliveryReservationIsVisibleAndRefusesMembershipReviewOrRetirement": "passed"
+      },
+      "logSHA256": "01ca5931a516291c65ac20432597b231ba9a4249e390864ab6dc3c5909cf7649",
+      "fixtureSHA256": "b1ac2071210bc7295e7a73e909126f182346ba86aa0b34127c91f906c11371ca",
+      "producerSHA256": "f19595481f25e86d83a4c2df9eeec59ba2429bcead4343024d9ed29e8e915197",
+      "receiverSHA256": "a3de69db55c7dc4bec4c9fc529ef3ad70e189afeca0330f5ff0c890939c22152",
+      "nativeWriterSchema": 35,
+      "persistentWriterGuards": {
+        "producer": 243,
+        "receiver": 243
+      },
+      "retirementMetadataGuardsPerLibrary": 2,
+      "epochRetentionGuardsPerLibrary": 2,
+      "all13Counts": {
+        "chat_sessions": 1,
+        "chat_sources": 1,
+        "chat_turns": 1,
+        "entity_aliases": 4,
+        "entity_ignored": 1,
+        "entity_mentions": 1,
+        "entity_project_ignored": 1,
+        "memories": 3,
+        "memory_entities": 3,
+        "recap_sources": 1,
+        "routine_runs": 1,
+        "routines": 1,
+        "text_observation_pins": 2
+      },
+      "exactWireBodies": 21,
+      "nativeOriginals": 2,
+      "externalTokenMatches": 2,
+      "receiverEchoes": 0
+    }
+  ],
+  "postSuiteOwnedImageInventory": {
+    "ownedAttached": 0,
+    "prefixes": [
+      "oswind-owned-session-",
+      "owned-sync-app-"
+    ]
+  },
+  "scope": "Exact source local software and owned login-Keychain/APFS. No new packaged/signing, production DP-Keychain, live signed-GUI, physical two-Mac/provider, power or ranking acceptance. Two-Mac public folder/manual reconnect, offline local erase and actual app/recovery paths are included. Later reconnect-intent/membership work is outside these inputs. Interactive save/open panels remain unverified.",
+  "ownedOffscreenRenders": [
+    {
+      "name": "unconfigured",
+      "theme": "light",
+      "pngSHA256": "7ddcee1db892e8e1c8f88f1bc98eb948c7594babfa7cb72c83925cac362b51ff",
+      "ocrSHA256": "cb9caade159b245d8f196544ac2ffc8fb216a80dc60d3744499102a5e10136c9"
+    },
+    {
+      "name": "unconfigured",
+      "theme": "dark",
+      "pngSHA256": "63236af67754eb1c7bd1f38ce26df7bee1a1f126b3ff85d55fbb9c185deef3a7",
+      "ocrSHA256": "4429bff6dafa483f054d86f4f10ebda4e26123445e0360577053db421f85ffff"
+    },
+    {
+      "name": "owner",
+      "theme": "light",
+      "pngSHA256": "e517f71cf17aae9babd2960bbfeca1a3938d0112ed3eeea9f725aa0cfc76df05",
+      "ocrSHA256": "36d0bcf29d3a1ce2b1d9e65e7c262184c899c27d8f22595702e2b79d777461c0"
+    },
+    {
+      "name": "owner",
+      "theme": "dark",
+      "pngSHA256": "26113198012656b36db6803ba38470ee4fee54d66e8d859a558fd9a365779dd9",
+      "ocrSHA256": "1c066632cc4fa33b8e59b4014e84867acf553ceae9522a7d0f84afea90aebf34"
+    },
+    {
+      "name": "pending",
+      "theme": "light",
+      "pngSHA256": "04fda052ea6c72a7a8f6be71c8263c4b5fe0441be897eee28361811210e4660e",
+      "ocrSHA256": "01f30366429f958c19e7c24a8a34e52aa21fb62bc900d73be52ad22f895ed5eb"
+    },
+    {
+      "name": "pending",
+      "theme": "dark",
+      "pngSHA256": "5e3f44eafe56ca08eb6337e5e1f178741f5ec69657f23ef693afb1e38e906b28",
+      "ocrSHA256": "018d9c4b597e28fa1b38e1b5c23444d425b2ab0753040a705f879f2d6ca90277"
+    },
+    {
+      "name": "pending-response",
+      "theme": "light",
+      "pngSHA256": "b6ed613beea312793ced5316e5886bcdd874723d36e27d9487f5b31dca503a49",
+      "ocrSHA256": "ae362636046d3a122609e6371b0cd199455dbd7cfb04fcd97ceb98d0e7a64137"
+    },
+    {
+      "name": "pending-response",
+      "theme": "dark",
+      "pngSHA256": "fc519bbf587eb8848ab3ca51533bc0980808d82e5c355b379016bb45e54fa58a",
+      "ocrSHA256": "280786e0833031d1eeaa7469b3b301da1d8d8e5b00bea286ecafac49dcc67073"
+    },
+    {
+      "name": "review",
+      "theme": "light",
+      "pngSHA256": "b41ef409f9f66c2a3ee3f19eb9a5e5937e779b7e0384e620ef0cabc177e1a142",
+      "ocrSHA256": "1a36763d0219ee1d377928457f6ee31f4191d5e1ea884bd491378d4ff50a5410"
+    },
+    {
+      "name": "review",
+      "theme": "dark",
+      "pngSHA256": "f6d2e0e996b9ae80f7e39f60b497a96c6581492a22adae66909f5f511f922bdd",
+      "ocrSHA256": "d9856c7f9845b767c9481d5e00a6f4c9c41dadbc4a6435411ee38f3494ec8361"
+    },
+    {
+      "name": "response",
+      "theme": "light",
+      "pngSHA256": "786ebbafdb0ce81786baa5f31f80fc83fff6d075bf423e65821d02f593e766b6",
+      "ocrSHA256": "37d8ad9381ae48803d62af85377c232b51962a01c059372f21da070670ba030a"
+    },
+    {
+      "name": "response",
+      "theme": "dark",
+      "pngSHA256": "880b8b1176398240133039b0d760452a18d4ea1a9add8f240a1efb96670c709e",
+      "ocrSHA256": "7495ee3aebfa45e6de8cdc5014b7c68b5c46dc2a2f497249b980e1a52795ed0a"
+    },
+    {
+      "name": "paired",
+      "theme": "light",
+      "pngSHA256": "92f046189f675b00128641f44f4a1217c7f631d84840ec2b3e14f2a6ac782208",
+      "ocrSHA256": "b526c79b02956fa2bf1ac761f92766298029fbf9599b5defc25869357e101fa6"
+    },
+    {
+      "name": "paired",
+      "theme": "dark",
+      "pngSHA256": "4ae5ae859e53602f11fea77e666afeeee9f819a8a2517412cb020b13e242817a",
+      "ocrSHA256": "d2b09b55b22fc80ba51bdec0a8d84d25f1d97f56979c9543a77550e949533ef7"
+    },
+    {
+      "name": "retired",
+      "theme": "light",
+      "pngSHA256": "99553f47a4d91d33ca51fb34074a0b9dd39a616fdba182ae8357b035b1a5cd07",
+      "ocrSHA256": "8fe80b928f8cbcf107d1fcb79fb739bc495f2647b4190819d10f3251ffdb932c"
+    },
+    {
+      "name": "retired",
+      "theme": "dark",
+      "pngSHA256": "a2654e92f9014d99566ccba0abed41a9eb3f2f071a91d9cb63510691d9bbe74e",
+      "ocrSHA256": "0a42c64bcd12285ccf0b2b18ae7e5092bc269183c40520d54e935f357c918e55"
+    },
+    {
+      "name": "failure",
+      "theme": "light",
+      "pngSHA256": "22d90cc0dac6882c621cb7a1c3fcccc267b3bd7f29a6abecb178eaf115dc996a",
+      "ocrSHA256": "9e56b8e63797cd7b8d547f16f453489fd48f9ff3cf24337545787bff02c67550"
+    },
+    {
+      "name": "failure",
+      "theme": "dark",
+      "pngSHA256": "3ab3f85e51ba9876ba392953c3e2c2b2e6f9828ddeccda307c023d1ec7c815b2",
+      "ocrSHA256": "28b83333090a93e7356cbaad756c01a1ed93780ebdea629fead882c7ec600852"
+    },
+    {
+      "name": "folder",
+      "theme": "light",
+      "pngSHA256": "1f04eb9ed5b8d97e54d9b404f285a04fc76114e9d06d4cefaf671c4e33230d05",
+      "ocrSHA256": "8d754fac4d81e90eb8fed85cf361c862227321c3f9d7994c8e9835668fa9546f"
+    },
+    {
+      "name": "folder",
+      "theme": "dark",
+      "pngSHA256": "fab8d8aaa7dd6a1c67ed83232af6ed570894ea0c42eb13bf2fec3d9868d9c604",
+      "ocrSHA256": "3f7dd73238f2fef00ae06622b9083d59719a64971c935acf424e97b0bc3c7ba7"
+    },
+    {
+      "name": "connected",
+      "theme": "light",
+      "pngSHA256": "18baaf0418d8b0e45b41c08a8fdeb1b566d4cfa84390dddfeb60b61b3f7b652b",
+      "ocrSHA256": "c49a6ec6d3cf53c350da9d32e7518767de03a73a4c653220eba681c36089fe73"
+    },
+    {
+      "name": "connected",
+      "theme": "dark",
+      "pngSHA256": "88f3c4eddd658a1acff4a27c1867f8d1b31e44cd4c171b15dc6c748d6a055df7",
+      "ocrSHA256": "1e055a8186df2b844880be199efeceec7c0eb3bbb81d3ce49be3ec74ba353d31"
+    },
+    {
+      "name": "reconnect",
+      "theme": "light",
+      "pngSHA256": "2d30567721b1c41236b9e33b2db8a5740409cf387ebc674f4dfb563c2457477f",
+      "ocrSHA256": "86d1a6ca7837755cc903993674039c88e37caca0be6f2d5ee88eddc5ea14a197"
+    },
+    {
+      "name": "reconnect",
+      "theme": "dark",
+      "pngSHA256": "165aae67fd211d999f4560d439c60585f3c7f4279e3d74276939059fbf33802a",
+      "ocrSHA256": "acb341183e0a2c8cb2c2b28b52678a5c9c98dec1cf1e619ad83de6f53ea5040d"
+    },
+    {
+      "name": "erase-waiting",
+      "theme": "light",
+      "pngSHA256": "6d6176c857f46ed6c97d0a18aaf9ef1072e89a8e351dc7fa9e3a3a0ff532c5bb",
+      "ocrSHA256": "20970714e8cdba4525d2af31e569a8a3875c0a7efc63db25a058f63ab91400c4"
+    },
+    {
+      "name": "erase-waiting",
+      "theme": "dark",
+      "pngSHA256": "089efb033265276a6aeb75445e52eb86d070ea6d3b30ac0c2d0d97e457e28aaf",
+      "ocrSHA256": "7c65b822f12751b5f034e9229a8776de0a97a2e74b4494626edf894fab4cf28f"
+    },
+    {
+      "name": "erase-review",
+      "theme": "light",
+      "pngSHA256": "9deeb24e9ca47d9a49085f5d6165e1667c6832eb95f5b50e5b19df87cd396f97",
+      "ocrSHA256": "0832b21ff95d5f4c22a5a4fd478265cfb3e00e68f7a38ec95752209257b5b970"
+    },
+    {
+      "name": "erase-review",
+      "theme": "dark",
+      "pngSHA256": "fbdad9e51004f942df0341290fb98f7b3a6c97be3d3ab7ecc4dab54cd41183fe",
+      "ocrSHA256": "9c21f1c7c4731fcf511fad7f545d1756f74b8b30079b8fa19cb857628eaafb62"
+    },
+    {
+      "name": "recovery-pending",
+      "theme": "light",
+      "pngSHA256": "d0c59f582a126e14cd3f8cb1a818527049004655603726dc11a34fc93ec3ba6f",
+      "ocrSHA256": "45aef1e2cff1b7e91380163eb201ed95522811d843462274ff8f296fb49b6df5"
+    },
+    {
+      "name": "recovery-pending",
+      "theme": "dark",
+      "pngSHA256": "45922bb508a7efccff51d74ed6a73880db77a8b3f6789c5cb66fc40137314db9",
+      "ocrSHA256": "082cb58957b901a0f06532209caed83aa2ffde087baba8675c733ee5af443024"
+    },
+    {
+      "name": "recovery-working",
+      "theme": "light",
+      "pngSHA256": "3836c7e1a68fe6451989cb80936d027fa96a9551301b1592d61171d43aac9700",
+      "ocrSHA256": "68c5c9fb7d345548f47ef39c05db8c385c88e66ac01fcc870bd8e1cbc1b00a24"
+    },
+    {
+      "name": "recovery-working",
+      "theme": "dark",
+      "pngSHA256": "18d62ad8d3857e4d9cfcb2bd1303bf9ac7dd432e3f21354c71d2497090f1d022",
+      "ocrSHA256": "e0d8e8e7eddb2a94571fd8b3882a5e9613021a40ec2eabd9c3de2a1691fc42c4"
+    }
+  ],
+  "reviewReceiptSHA256": "86aa400c3061b6425ca38212bb53bdff15011ff585615cfed200ba6fb01f2880",
+  "retainedFirstFullRun": {
+    "source": "46ed8477e1b85d8aaf5c7aa1f58cc15e760d1e6f",
+    "defined": 2620,
+    "passed": 2483,
+    "skipped": 136,
+    "failed": 1,
+    "logSHA256": "9a174fb7c46a98e82e72f845ea84cae77294f61ccbbe60b1e2e87fb0631a9446",
+    "cause": "Existing refusal fixture reviewed a request after delivery reservation; new guard correctly refuses. Capture exact review before reservation, then assert later review/approval/retirement all refuse. Runtime inputs unchanged by fixture correction. Other stages were not run for this failed first source."
+  },
+  "retainedDevelopmentFailures": [
+    "Two OCR assertions in one connected-owner failure fixture; corrected by closing the session before attempting pairing.",
+    "Initial public recovery cancellation also canceled its private owner.close; fixed with joined uncanceled close.",
+    "Other development compiler, timing-fixture and held-SQL routing failures remain documented in SYNC-PUBLIC-LIFECYCLE-WIP.md."
+  ]
+}
