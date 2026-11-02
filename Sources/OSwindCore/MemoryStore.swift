@@ -970,6 +970,22 @@ extension MemoryStore {
             let stmt=try db.statement("DELETE FROM chat_sessions WHERE id=?");defer {sqlite3_finalize(stmt)};db.bind(stmt,1,id);try db.done(stmt)
         }}
     }
+    /// A rejected first answer must not leave an empty conversation. Existing
+    /// callers' outer transactions retain ownership through a savepoint.
+    @discardableResult public func saveChatTurn(sessionID:String?=nil,question:String,answer:Answer,filter:SearchFilter=SearchFilter(),policy:PrivacyPolicy=PrivacyPolicy())throws->ChatTurn {
+        try Task.checkCancellation();lock.lock();defer {lock.unlock()}
+        guard db != nil else {throw OSwindError.unavailable("The library connection is closed")}
+        let ownsTransaction=sqlite3_get_autocommit(db) != 0
+        try exec(ownsTransaction ? "BEGIN IMMEDIATE":"SAVEPOINT chat_admission")
+        do {
+            try Task.checkCancellation()
+            let id:String
+            if let sessionID {id=sessionID}else {id=try createChat().id}
+            let turn=try appendChatTurn(sessionID:id,question:question,answer:answer,filter:filter,policy:policy)
+            try Task.checkCancellation();try exec(ownsTransaction ? "COMMIT":"RELEASE chat_admission")
+            return turn
+        }catch {try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO chat_admission; RELEASE chat_admission");throw error}
+    }
     @discardableResult public func appendChatTurn(sessionID: String, question: String, answer: Answer, filter: SearchFilter = SearchFilter(), policy: PrivacyPolicy = PrivacyPolicy()) throws -> ChatTurn {
         lock.lock(); defer { lock.unlock() }
         guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, question.count <= 8000, answer.text.count <= 100000, answer.sources.count <= 60 else { throw OSwindError.invalid("Invalid conversation turn size") }

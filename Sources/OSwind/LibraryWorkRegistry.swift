@@ -3,7 +3,7 @@ import Foundation
 /// Own the actual detached work together with its actor completion. A cancelled
 /// drain caller still waits for both; no new job enters while draining.
 @MainActor final class LibraryWorkRegistry {
-    enum Kind:Hashable,CaseIterable,Sendable {case note,recap,statistics,storage}
+    enum Kind:Hashable,CaseIterable,Sendable {case note,recap,statistics,storage,answer}
     private struct Job {
         let kind:Kind
         let cancel:@Sendable ()->Void
