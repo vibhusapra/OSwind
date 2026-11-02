@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Native group retirement — internal WIP
+
+The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now exercises real 13-kind/native/raw/staged/cache/original/publication/media retirement, a separate received-cleanup marker, exact rollback and actual pre/post-commit SIGKILL recovery. Current focused checks pass 23 methods with one owned-worker skip; independent readers preserve the original failures and inspect retained SQLite, WAL and media. Final-source gates, public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged. PR #136's separate hosted native missing-session failure remains unresolved despite an unchanged-test local pass.
+
 ## Collection erasure and owning sync transport — internal WIP
 
 [Current behavior and remaining work](SYNC-LIBRARY-BARRIERS.md) cover native creation eras, reviewed body-free group controls, local-clear export blocking, immutable supersession and active-owner admission. Source `26461f5` binds the [1,417-input receipt](../benchmarks/sync-library-barriers-v1.json): **2,274 full passes / 124 skips**, **1,214 sanitizer and optimized passes / 70 skips each**, all **422 required controls**, **62 native passes without skips**, and **32 fresh package/process stages**. Independent review checks all 34 packaged/archive files and 59 prior trees. Original late-publication, single-pass graph and readiness-fixture failures remain retained. Full native group retirement, capability compatibility, service lifecycle and provider/two-Mac acceptance remain open; these tested internal components do not complete sync. F059 stays TODO and all 83 statuses remain unchanged.

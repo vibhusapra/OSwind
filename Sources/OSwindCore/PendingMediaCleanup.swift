@@ -49,7 +49,7 @@ public extension MemoryStore {
         return try withRoutineDatabase {db in
             func pending()throws->(wipe:Bool,work:Bool) {
                 try NativeMediaSchema.validate(db);try requireMediaRootIdentity()
-                let wipe=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")>0
+                let wipe=try LibraryWipeState.isPending(db)
                 let files=try db.eraseCount("SELECT EXISTS(SELECT 1 FROM erasure_assets)"),cache=try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='recap_cache_dirty_v33' AND value='1'")
                 return (wipe,files>0 || cache>0)
             }

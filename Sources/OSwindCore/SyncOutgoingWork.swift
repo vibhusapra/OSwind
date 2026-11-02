@@ -78,6 +78,21 @@ struct SyncOutgoingWorkQueue {
         let pending=try db.statement("SELECT processing,(SELECT EXISTS(SELECT 1 FROM personal_sync_work)) FROM personal_sync_work_state WHERE singleton=1");defer {sqlite3_finalize(pending)}
         guard sqlite3_step(pending)==SQLITE_ROW,sqlite3_column_int(pending,0)==0,sqlite3_column_int(pending,1)==0 else {throw OSwindError.unavailable("Process identified local sync work before peer apply")}
     }
+    /// Collection erasure supersedes every pending local native lifetime. Keep
+    /// the monotone sequence and let the installed delete hooks account bytes.
+    static func discardForCollection(_ db:RoutineDatabase,scope:SyncCaptureScope)throws {
+        guard sqlite3_get_autocommit(db.handle)==0,try SyncChangeCapture.scope(db,requireActive:true)==scope else {throw OSwindError.invalid("Discard collection work in its active owning transaction")}
+        let count=try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_work','personal_sync_work_state')")
+        if count==0 {return}
+        guard count==2 else {throw OSwindError.database("Preserve incomplete outgoing work during collection erasure")}
+        try validateSchema(db)
+        let state=try db.statement("SELECT origin,generation,processing,used_bytes FROM personal_sync_work_state WHERE singleton=1");defer {sqlite3_finalize(state)}
+        guard sqlite3_step(state)==SQLITE_ROW,db.text(state,0)==scope.origin,db.text(state,1)==scope.generation,sqlite3_column_int(state,2)==0,
+              sqlite3_column_int64(state,3)==Int64(try db.eraseCount("SELECT COUNT(*) FROM personal_sync_work"))*rowBytes else {throw OSwindError.invalid("Quiesce the owning outgoing processor before collection erasure")}
+        try db.execute("DELETE FROM personal_sync_work")
+        try requireNoPending(db)
+        guard try db.eraseCount("SELECT used_bytes FROM personal_sync_work_state WHERE singleton=1")==0 else {throw OSwindError.database("Outgoing collection accounting differs")}
+    }
     private func idleCapture()throws {
         let row=try database.statement("SELECT EXISTS(SELECT 1 FROM personal_sync_changes)");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_int(row,0)==0 else {throw OSwindError.unavailable("Assign all pending capture lifetimes before typed sync export")}

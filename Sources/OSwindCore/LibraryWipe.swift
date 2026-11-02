@@ -50,6 +50,19 @@ struct LibraryWipeCounts {
     let sources,turns,chats,routines,runs,originals:Int
 }
 
+/// A received group erase needs the same durable physical cleanup, without
+/// authoring another local erase through the native local-intent SQL hooks.
+enum LibraryWipeState {
+    static let pendingPredicate="key IN ('library_wipe_dirty','library_group_wipe_dirty_v1') AND value='1'"
+    static func isPending(_ db:RoutineDatabase)throws->Bool {
+        try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE "+pendingPredicate)>0
+    }
+    static func markReceived(_ db:RoutineDatabase)throws {
+        guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Commit received cleanup with its native erasure receipt")}
+        try db.execute("INSERT INTO store_metadata(key,value) VALUES('library_group_wipe_dirty_v1','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+    }
+}
+
 extension MemoryStore {
     /// Requires the caller's existing transaction and exclusive media lease.
     /// This never acquires another lease, commits, removes files, records a local
@@ -89,7 +102,7 @@ public extension MemoryStore {
             return finishLibraryWipe(db,sources:counts.sources,turns:counts.turns,chats:counts.chats,routines:counts.routines,runs:counts.runs,histories:counts.originals,reservation:lease,progress:progress)
         }
     }
-    func hasPendingLibraryWipeCleanup() throws -> Bool {try withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='library_wipe_dirty' AND value='1'")>0}}
+    func hasPendingLibraryWipeCleanup() throws -> Bool {try withRoutineDatabase {try LibraryWipeState.isPending($0)}}
     /// Retries only the sealed pending paths. Never inventories newly recorded files.
     func retryLibraryWipeCleanup(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in}) throws -> LibraryWipeResult {
         progress(.init(phase:"Waiting for active media writers"));let lease=try MediaAdmissionLease.acquire(root:root,exclusive:true,expectedRoot:mediaRootIdentity);defer {lease.release()}
@@ -118,7 +131,7 @@ private extension MemoryStore {
             } catch {result=result.warning("Database compaction did not finish. Close other library readers and retry cleanup.")}
         }
         let complete=result.pendingMedia==0 && result.searchCacheRemoved && directories && compacted && !Task.isCancelled && result.warnings.isEmpty
-        if complete {do {try db.execute("DELETE FROM store_metadata WHERE key='library_wipe_dirty'")} catch {result=result.warning("Cleanup finished but its completion marker could not be saved. Retry cleanup.")}}
+        if complete {do {try db.execute("DELETE FROM store_metadata WHERE key IN ('library_wipe_dirty','library_group_wipe_dirty_v1')")} catch {result=result.warning("Cleanup finished but its completion marker could not be saved. Retry cleanup.")}}
         if Task.isCancelled {result=result.warning("Cleanup stopped after the history deletion committed. Pending files remain queued for retry.")}
         return .init(erasure:result,conversations:chats,routines:routines,routineRuns:runs,compacted:compacted,cleanupComplete:complete && result.warnings.isEmpty,cancelled:Task.isCancelled)
     }

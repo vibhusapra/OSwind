@@ -197,6 +197,20 @@ struct SyncVersionStore {
     /// A tombstone does not require a retained body, but still requires the
     /// complete current schema and durable, same-connection cache context.
     func validateIncomingDeletionContext()throws {try context()}
+    /// All native/current and historical lifetimes are being retired in the
+    /// caller's transaction. Preserve revocations; use real delete accounting.
+    func retireCollectionCaches()throws {
+        guard sqlite3_get_autocommit(database.handle)==0 else {throw OSwindError.invalid("Retire collection caches in the owning erasure transaction")}
+        try context()
+        let originals=try database.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('personal_sync_evidence','personal_sync_evidence_state')")
+        if originals>0 {try SyncOriginalEvidenceStore.validateForErasure(database)}
+        try database.execute("INSERT OR IGNORE INTO personal_sync_version_revoked SELECT object_digest FROM personal_sync_identities; DELETE FROM personal_sync_version_recipes; DELETE FROM personal_sync_version_sessions; DELETE FROM personal_sync_version_runs; DELETE FROM personal_sync_versions")
+        guard try database.eraseCount("SELECT used_bytes FROM personal_sync_version_state WHERE singleton=1")==0 else {throw OSwindError.database("Version collection accounting differs")}
+        if originals>0 {
+            try SyncOriginalEvidenceStore.validateForErasure(database)
+            guard try database.eraseCount("SELECT COUNT(*) FROM personal_sync_evidence")==0,try database.eraseCount("SELECT used_bytes FROM personal_sync_evidence_state WHERE singleton=1")==0 else {throw OSwindError.database("Original collection accounting differs")}
+        }
+    }
     /// Purge a retired lifetime even if its native row disappeared earlier.
     /// Resolve by global digest, so a reused local key keeps its replacement.
     func finishDeletedObject(_ key:SyncObjectKey)throws {
