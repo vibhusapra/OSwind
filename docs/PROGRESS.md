@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Checkpointed delivery qualified; native writer admission and recovery WIP
+
+The [internal checkpoint layer](SYNC-DELIVERY-CHECKPOINTS-WIP.md) at source `5102714` now has [1,485 bound inputs](../benchmarks/sync-delivery-checkpoints-inputs-v1.json) and a [reviewed receipt](../benchmarks/sync-delivery-checkpoints-v1.json). Full Debug **2,410 passed / 135 skipped**; sync sanitizer and optimized each **591 passed / 34 skipped**; owned Keychain **17 passed without skips**. Four independent fixture reads confirm all 13 native content kinds, 21 exact wire bodies, two original evidence bodies, matching external checkpoint tokens and no receiver echo. No successful historical reviewers or package inspections were rerun.
+
+The next [native admission/recovery slice](SYNC-NATIVE-ADMISSION-WIP.md) is implemented for explicit internal installation: enrolled schema34 guards old already-open writers; current writers verify checkpoints before migrations, pre-install restores cannot recreate a reserved delivery account, recovery exports without credentials into a fresh quiet identity, and Quit joins recovery readers. A second service preparation acquires authority before replacing the active command token. Development checks pass; separate broad qualification remains pending. Public activation, exact erase renewal, membership lifecycle, offline/storage/large-transfer and signed-GUI/two-Mac/power/distribution acceptance remain open. **F059 and all 83 feature statuses remain unchanged.**
+
 ## Native pairing preview — delivery enrollment still WIP
 
 [Draft PR #139](https://github.com/vibhusapra/OSwind/pull/139) exposes resumable Settings → Connect create/join, exact signed-request/fingerprint review, recipient-encrypted approval and durable one-time acceptance through a [public core owner and native sheet](SYNC-PAIRING-PREVIEW.md). Its bounded private envelope stays in a dedicated Keychain account; SQLite keeps only a nonsecret handle/lifetime. Whole wipe, native DB rollback, clone/missing-anchor checks and keyless local retirement are explicit. The app joins even a late credential commit after cancellation before storage departure; a wrong-library factory refuses mutation. This preview does not activate delivery or transfer memories.

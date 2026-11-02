@@ -124,6 +124,25 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.unavailable("Pairing lifetime protection is missing or changed")}
         }
     }
+    /// The external pairing reservation survives restoring a database from
+    /// before writer-fence installation. Check it before constructor migrations
+    /// can write, without acquiring the pairing owner's exclusive lease.
+    static func requirePreFenceDeliveryAdmission(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment)throws {
+        let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,handleKey)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return};guard code==SQLITE_ROW else {throw db.error()}
+        let handle=try SyncPairingFormat.decode(Handle.self,Data(db.text(row,0).utf8),limit:1024)
+        guard handle.format=="OSwind.sync.pairing-handle",handle.version==1 else {throw OSwindError.invalid("Invalid pairing handle; use backup recover")}
+        try SyncCredentialStorageLimits.validate(id:handle.id)
+        let storage=environment.storage(handle.protection)
+        guard storage.protection==handle.protection else {throw OSwindError.unavailable("Resume the original pairing protection tier")}
+        let saved=try Envelope.decode(storage.read(id:handle.id))
+        guard saved.id==handle.id,saved.protection==handle.protection else {throw OSwindError.unavailable("Pairing authority differs from its native handle; use recovery")}
+        guard let delivery=saved.delivery else {return}
+        guard try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='personal_sync_delivery_anchor'")==1 else {throw OSwindError.unavailable("Reserved device sync setup is missing from this native history; export with backup recover")}
+        let anchor=try db.statement("SELECT id,protection FROM personal_sync_delivery_anchor WHERE singleton=1");defer {sqlite3_finalize(anchor)}
+        guard sqlite3_step(anchor)==SQLITE_ROW,db.text(anchor,0)==delivery.id,db.text(anchor,1)==delivery.protection.rawValue else {throw OSwindError.unavailable("Resume the originally reserved delivery authority; use recovery")}
+        _=try SyncDeliveryAnchor.nativeWriterProof(library:library,db:db,environment:environment)
+    }
     private func current()throws->(Envelope,Data) {
         guard let handle,let storage,let lease else {throw OSwindError.unavailable("Create or request pairing first")}
         try lease.requireCurrentIdentity()
@@ -223,6 +242,11 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let material=try SyncCredentialMaterial.decodeFromKeychain(saved),joined=material.joined
         let native=store.root.standardizedFileURL.resolvingSymlinksInPath().path,sharedPath=shared.standardizedFileURL.resolvingSymlinksInPath().path
         guard shared.isFileURL,sharedPath != native,!sharedPath.hasPrefix(native+"/"),!native.hasPrefix(sharedPath+"/") else {throw OSwindError.invalid("Keep the shared sync folder outside the native library")}
+        let resumed:SyncDeliveryAnchor?
+        if let reservation=value.delivery {
+            resumed=try .openExisting(library:store,material:material,id:reservation.id,stateRoot:stateRoot,machine:machine,storage:injectedStorage ?? SyncKeychainCredentialStorage(protection:reservation.protection))
+        }else {resumed=nil}
+        var handedOff=false;defer {if !handedOff {resumed?.close()}}
         let transport=try createShared ? joined.createTransport(at:shared):joined.openTransport(at:shared)
         var inbox:SyncObjectFolder?,service:SyncLibraryService?
         do {
@@ -230,7 +254,9 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
             inbox=try FileManager.default.fileExists(atPath:path.path) ? joined.openPrivateInbox(at:path):joined.createPrivateInbox(at:path)
             let peers=joined.certificate.body.members.map(\.replica).filter {$0 != joined.replica}
             let prepared=try SyncLibraryService.install(library:store,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch,peers:peers,transport:transport,inbox:inbox!)
-            service=prepared;try installDeliveryAnchor(on:prepared);return prepared
+            service=prepared
+            if let resumed {try prepared.attachExternalAnchor(resumed)}else {try installDeliveryAnchor(on:prepared)}
+            handedOff=true;return prepared
         }catch {try? service?.stop();inbox?.close();transport.close();throw error}
     }}
     /// Reserve the external account in the already durable pairing anchor

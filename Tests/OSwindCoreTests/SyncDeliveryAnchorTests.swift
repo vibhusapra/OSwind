@@ -14,6 +14,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         for service in services {try? service.stop();service.inbox.close();service.transport.close()}
         pairings.forEach {$0.close()};try a?.close();try b?.close();try FileManager.default.removeItem(at:root)
     }
+    func reopen(_ url:URL)throws->MemoryStore {let backend=storage!;return try MemoryStore(root:url,recoveryReadOnly:false,nativeWriterEnvironment:.init(stateRoot:root.appendingPathComponent("state"),machine:machine,storage:{_ in backend}))}
     func pairing(_ library:MemoryStore)throws->PersonalSyncPairing {
         let value=try PersonalSyncPairing(store:library,stateRoot:root.appendingPathComponent("state"),machine:machine,storage:storage);pairings.append(value);return value
     }
@@ -32,7 +33,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         try store.close();try FileManager.default.copyItem(at:store.root.appendingPathComponent("memory.sqlite"),to:path)
     }
     func restoreDB(_ store:MemoryStore,from path:URL)throws->MemoryStore {
-        let url=store.root;try store.close();try FileManager.default.removeItem(at:url.appendingPathComponent("memory.sqlite"));try FileManager.default.copyItem(at:path,to:url.appendingPathComponent("memory.sqlite"));return try MemoryStore(root:url)
+        let url=store.root;try store.close();try FileManager.default.removeItem(at:url.appendingPathComponent("memory.sqlite"));try FileManager.default.copyItem(at:path,to:url.appendingPathComponent("memory.sqlite"));return try reopen(url)
     }
     func testInternalPairingFactoryPublishesThroughDurableAnchorAndReopensOriginalKeys()throws {
         let owner=try owner(),service=try prepare(owner)
@@ -40,7 +41,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         _=try ready(service)
         XCTAssertEqual(try service.cache.journal.outbox().count,1)
         let accounts=storage.values,source=try a.get("source");XCTAssertNotNil(source)
-        try stop(service);owner.close();try a.close();a=try MemoryStore(root:root.appendingPathComponent("a"))
+        try stop(service);owner.close();try a.close();a=try reopen(root.appendingPathComponent("a"))
         let reopened=try pairing(a),resumed=try prepare(reopened,create:false)
         _=try ready(resumed);XCTAssertEqual(storage.values.count,accounts.count)
         XCTAssertEqual(try resumed.cache.journal.outbox().count,1)
@@ -55,7 +56,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         _=try ready(receiver,limit:1)
         XCTAssertEqual(try receiver.cache.journal.cursor(for:sender.cache.journal.replica),1)
         XCTAssertEqual(try receiver.transport.serviceHead(replica:sender.cache.journal.replica)?.through,6)
-        try stop(receiver);joiner.close();try b.close();b=try MemoryStore(root:root.appendingPathComponent("b"))
+        try stop(receiver);joiner.close();try b.close();b=try reopen(root.appendingPathComponent("b"))
         let reopened=try pairing(b),resumed=try prepare(reopened,create:false)
         for _ in 0..<8 {_=try ready(resumed,limit:1)}
         XCTAssertEqual(try resumed.cache.journal.cursor(for:sender.cache.journal.replica),6)
@@ -73,12 +74,10 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         var owner=try owner();var service=try prepare(owner)
         try stop(service);owner.close()
         let prior=root.appendingPathComponent("before.sqlite");try copyDB(a,to:prior)
-        a=try MemoryStore(root:root.appendingPathComponent("a"));owner=try pairing(a);service=try prepare(owner,create:false)
+        a=try reopen(root.appendingPathComponent("a"));owner=try pairing(a);service=try prepare(owner,create:false)
         try a.insert(Memory(id:"source",kind:.note,text:"Already assigned writer history"));_=try ready(service)
         let before=try transportFiles(service.transport.root)
-        try stop(service);owner.close();a=try restoreDB(a,from:prior)
-        let restored=try pairing(a)
-        XCTAssertThrowsError(try prepare(restored,create:false))
+        try stop(service);owner.close();XCTAssertThrowsError(try restoreDB(a,from:prior),"Constructor must refuse rollback before migrations")
         XCTAssertEqual(try transportFiles(root.appendingPathComponent("shared")),before)
     }
     func testRestoringDatabaseBeforeDeliveryReservationCannotCreateAFreshZeroFloor()throws {
@@ -87,8 +86,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         let service=try prepare(owner)
         try a.insert(Memory(id:"source",kind:.note,text:"Already published before native restore"));_=try ready(service)
         let files=try transportFiles(service.transport.root),accounts=storage.values
-        try stop(service);owner.close();a=try restoreDB(a,from:snapshot)
-        XCTAssertThrowsError(try prepare(pairing(a),create:false))
+        try stop(service);owner.close();XCTAssertThrowsError(try restoreDB(a,from:snapshot),"Constructor must detect the surviving external reservation before migrations")
         XCTAssertEqual(storage.values,accounts,"The externally reserved account must survive a pre-install database restore")
         XCTAssertEqual(try transportFiles(root.appendingPathComponent("shared")),files)
     }
@@ -211,7 +209,7 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         _=try owner.createGroup(deviceName:"Owned persistent delivery")
         let service=try prepare(owner)
         try a.insert(Memory(id:"native",kind:.note,text:"Owned actual Keychain publication"));_=try ready(service)
-        try stop(service);owner.close();try a.close();a=try MemoryStore(root:root.appendingPathComponent("a"))
+        try stop(service);owner.close();try a.close();a=try MemoryStore(root:root.appendingPathComponent("a"),recoveryReadOnly:false,nativeWriterEnvironment:.init(stateRoot:state,machine:MacSyncMachineFingerprint(),storage:{_ in backend}))
         let reopened=try PersonalSyncPairing(store:a,stateRoot:state,machine:MacSyncMachineFingerprint(),storage:backend);pairings.append(reopened)
         let resumed=try prepare(reopened,create:false);_=try ready(resumed)
         XCTAssertEqual(try resumed.cache.journal.outbox().count,1);XCTAssertEqual(backend.accounts.count,2)

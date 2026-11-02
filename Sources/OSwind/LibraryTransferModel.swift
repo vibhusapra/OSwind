@@ -20,6 +20,26 @@ final class LibraryProgressRelay: @unchecked Sendable {
     @Published var markdownFolder: URL?
     private var task: Task<Void,Never>?
     private var cancelWorker: (() -> Void)?
+    var allowed:()->Bool={true}
+    private let recovery:@Sendable (URL,URL,LibraryProgressRelay)throws->LibraryBackupInfo
+    init(recovery:@escaping @Sendable (URL,URL,LibraryProgressRelay)throws->LibraryBackupInfo={try LibraryRecovery.createBackup(from:$0,destination:$1,progress:$2.set)}) {self.recovery=recovery}
+    func chooseRecovery(source:URL) {
+        guard !busy,allowed() else {return}
+        let panel=NSSavePanel();panel.nameFieldStringValue="OSwind Recovered "+Date().formatted(.iso8601.year().month().day())+".oswindbackup"
+        panel.allowedContentTypes=[UTType(exportedAs:"com.oswind.backup",conformingTo:.package)];panel.canCreateDirectories=true
+        panel.message="Export existing local content to a new backup. Restore it as a new library to resume. Existing backups are never replaced."
+        guard panel.runModal() == .OK,let destination=panel.url else {return}
+        recover(source:source,destination:destination)
+    }
+    func recover(source:URL,destination:URL) {
+        guard !busy,allowed() else {return}
+        markdownOperation=false;inspected=nil;archive=nil;restored=nil
+        let recovery=recovery
+        run({try recovery(source,destination,$0)}) {info in
+            self.archive=destination;self.inspected=info
+            self.status="Recovered content verified. Restore a new library to continue; device pairing must be set up again."
+        }
+    }
     func chooseBackup(store: MemoryStore) {
         guard !busy else { return }
         markdownOperation = false
@@ -57,13 +77,15 @@ final class LibraryProgressRelay: @unchecked Sendable {
         }
     }
     func cancel() { cancelWorker?(); task?.cancel() }
+    func cancelAndWait() async {cancel();if let task {await task.value}}
     private func run<T: Sendable>(_ operation: @escaping @Sendable (LibraryProgressRelay) throws -> T, completion: @escaping (T) -> Void) {
+        guard !busy,allowed() else {return}
         busy = true; error = nil; status = ""; progress = LibraryBackupProgress(phase:"Preparing"); let relay = LibraryProgressRelay()
         let worker = Task.detached(priority:.utility) { try operation(relay) }; self.cancelWorker = { worker.cancel() }
         task = Task {
             let observer = Task { while !Task.isCancelled { do { try await Task.sleep(nanoseconds:100_000_000) } catch { break }; self.progress = relay.get() ?? self.progress } }
             defer { observer.cancel(); self.cancelWorker = nil; self.task = nil; self.busy = false; self.progress = nil }
-            do { let info = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() }; completion(info) }
+            do { let info = try await withTaskCancellationHandler { try await worker.value } onCancel: { worker.cancel() };try Task.checkCancellation(); completion(info) }
             catch is CancellationError { status = "Cancelled. Unfinished temporary data was removed." }
             catch {
                 if worker.isCancelled || Task.isCancelled { status = "Cancelled. Unfinished temporary data was removed." }

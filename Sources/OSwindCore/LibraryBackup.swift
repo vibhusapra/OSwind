@@ -32,7 +32,7 @@ struct LibraryBackupHeader: Codable {
     var settings: BackupFileDigest
     var manifest: BackupFileDigest
     func validate() throws {
-        guard format == "OSwind library backup", info.formatVersion == 1, (6...MemoryStore.schemaVersion).contains(info.sourceSchema), info.encryption == "none", info.archiveFingerprint == nil,
+        guard format == "OSwind library backup", info.formatVersion == 1, (6...MemoryStore.maximumSupportedSchemaVersion).contains(info.sourceSchema), info.encryption == "none", info.archiveFingerprint == nil,
               [info.memories,info.conversations,info.turns,info.mediaFiles,info.payloadBytes,database.bytes,settings.bytes,manifest.bytes].allSatisfy({$0>=0}), database.bytes >= 100, settings.bytes <= 1_048_576,
               [database,settings,manifest].allSatisfy({$0.sha256.count==64 && $0.sha256.utf8.allSatisfy({(48...57).contains($0)||(97...102).contains($0)})}) else { throw BackupFileError.invalid("Unsupported or invalid library backup header") }
         _ = try QueryScopeResolver.instant(info.createdAt)
@@ -49,7 +49,7 @@ final class BackupDataReader {
     init(_ url: URL) throws {
         db = try BackupDatabase(url)
         schema = Int(try db.integer("PRAGMA user_version"))
-        guard (6...MemoryStore.schemaVersion).contains(schema) else { throw BackupFileError.invalid("Unsupported backup database schema") }
+        guard (6...MemoryStore.maximumSupportedSchemaVersion).contains(schema) else { throw BackupFileError.invalid("Unsupported backup database schema") }
         for name in ["memories","chat_sessions","chat_turns","chat_sources","semantic_vectors","semantic_passages","passage_manifests"] { try db.requireTable(name) }
         if schema>=13 {for name in ["routines","routine_runs"] {try db.requireTable(name)}}
         if schema>=29 {

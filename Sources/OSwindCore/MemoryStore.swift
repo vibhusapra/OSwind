@@ -6,6 +6,8 @@ import CryptoKit
 public final class MemoryStore: @unchecked Sendable {
     // Version33 fences legacy cleanup and stale initializers at the native boundary.
     public static let schemaVersion = 33
+    // Native34 adds local writer admission, without changing content tables.
+    public static let maximumSupportedSchemaVersion = 34
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -26,6 +28,7 @@ public final class MemoryStore: @unchecked Sendable {
     private let lock = NSRecursiveLock()
     let entityScopeProjection=EntityScopeProjection()
     private var syncCaptureInstalled=false
+    let nativeWriterAdmission=SyncNativeWriterAdmission()
     // Borrowed only while the store SQL lock is held; reset when it closes.
     var historicalEvidenceCatalog:HistoricalEvidenceStore?
     private var metalScopeCache: MetalScopeCache?
@@ -34,23 +37,53 @@ public final class MemoryStore: @unchecked Sendable {
     private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
     /// Upgrade callbacks run on the opening worker; afterCommit runs after the
     /// SQL transaction. Queue UI updates asynchronously; do not reenter this library.
-    public init(root: URL = Paths.data,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil) throws {
+    public convenience init(root: URL = Paths.data,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil) throws {
+        try self.init(root:root,observeUpgrade:observeUpgrade,recoveryReadOnly:false)
+    }
+    /// Internal recovery capability: no migrations or services, and SQLite's
+    /// authorizer denies data/schema writes. A read reservation remains usable
+    /// for the backup erasure-fence check; the store is never exposed to the app.
+    init(root:URL,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil,recoveryReadOnly:Bool,nativeWriterEnvironment:SyncNativeWriterEnvironment = .native) throws {
         _ = try VaultAccess.context(at:root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
-        try Paths.ensure(root); try Paths.ensure(root.appendingPathComponent("images")); try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))
+        if !recoveryReadOnly {try Paths.ensure(root);try Paths.ensure(root.appendingPathComponent("images"));try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))}
         let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
         closeDirectory=directory
         mediaRootIdentity=try directory.withRootDirectory {file in var metadata=stat();guard fstat(file,&metadata)==0 else {throw OSwindError.unavailable("Cannot inspect the library directory")};return BackupFileStamp(metadata)}
-        let path = root.appendingPathComponent("memory.sqlite").path
-        guard sqlite3_open_v2(path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK else { throw OSwindError.database("Cannot open memory store") }
+        let databaseURL=(recoveryReadOnly ? directory.root:root).appendingPathComponent("memory.sqlite")
+        // Foundation preserves some Darwin aliases. SQLite NOFOLLOW requires
+        // the kernel canonical path, including every ancestor of the file.
+        let path:String
+        if recoveryReadOnly {
+            var stamp=stat()
+            guard lstat(databaseURL.path,&stamp)==0,stamp.st_mode & S_IFMT == S_IFREG,let resolved=realpath(databaseURL.path,nil) else {throw OSwindError.invalid("Recovery requires an existing regular native database")}
+            defer {free(resolved)};path=String(cString:resolved)
+        }else {path=databaseURL.path}
+        guard sqlite3_open_v2(path, &db, (recoveryReadOnly ? 0:SQLITE_OPEN_CREATE) | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX | (recoveryReadOnly ? SQLITE_OPEN_NOFOLLOW:0), nil) == SQLITE_OK else {
+            let code=sqlite3_extended_errcode(db);sqlite3_close(db);db=nil
+            throw OSwindError.database("Cannot open memory store (SQLite \(code))")
+        }
         sqlite3_busy_timeout(db, 5000)
         let versionStatement = try prepare("PRAGMA user_version")
         let version = sqlite3_step(versionStatement) == SQLITE_ROW ? sqlite3_column_int(versionStatement,0) : Int32.max; sqlite3_finalize(versionStatement)
-        guard version <= Int32(Self.schemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
+        guard version <= Int32(Self.maximumSupportedSchemaVersion) else { sqlite3_close(db); db = nil; throw OSwindError.unavailable("This memory store was created by a newer OSwind version. Update OSwind before opening it.") }
+        if recoveryReadOnly {
+            do {
+                guard version>=33 else {throw OSwindError.invalid("Recovery export requires a current native library; restore older archives through Backup Restore")}
+                try exec("PRAGMA trusted_schema=OFF; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA cache_size=-4096;")
+                try NativeMediaSchema.register(RoutineDatabase(handle:db!))
+                try LibraryRecovery.installReadAdmission(RoutineDatabase(handle:db!))
+                return
+            }catch {sqlite3_close(db);db=nil;throw error}
+        }
         do {try NativeMediaSchema.register(RoutineDatabase(handle:db!));try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncWithheldWork.register(RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
         catch {sqlite3_close(db);db=nil;throw error}
+        do {
+            try nativeWriterAdmission.register(RoutineDatabase(handle:db!))
+            try nativeWriterAdmission.open(RoutineDatabase(handle:db!),library:self,environment:nativeWriterEnvironment)
+        }catch {sqlite3_close(db);db=nil;throw error}
         do {
             try exec("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA temp.cache_size=-4096;")
             if version>=25 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db!))}
@@ -184,7 +217,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version<15 {try rebuildRecapLinks()}
         try BackupErasureFence.install(RoutineDatabase(handle:db!))
         try erasureCancellable(RoutineDatabase(handle:db!)) {try NativeMediaSchema.install(RoutineDatabase(handle:db!),sourceVersion:version,observe:observeUpgrade)}
-        try exec("PRAGMA user_version=\(Self.schemaVersion)")
+        try exec("PRAGMA user_version=\(max(Int(version),Self.schemaVersion))")
         if version<Int32(Self.schemaVersion) {observeUpgrade?(.beforeCommit)}
         try Task.checkCancellation();try exec("COMMIT")
         } catch { try? exec("ROLLBACK"); sqlite3_close(db); db = nil; throw error }
@@ -218,12 +251,13 @@ public final class MemoryStore: @unchecked Sendable {
     func withRoutineDatabase<T>(_ body:(RoutineDatabase) throws -> T) throws -> T {
         lock.lock();defer {lock.unlock()}
         guard let db else {throw OSwindError.database("Library connection closed")}
+        try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self)
         if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))}
         return try body(RoutineDatabase(handle:db))
     }
-    private func exec(_ sql: String) throws {guard let db else {throw OSwindError.unavailable("The library connection is closed")};if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
+    private func exec(_ sql: String) throws {guard let db else {throw OSwindError.unavailable("The library connection is closed")};try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self);if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }
     private func failure() -> OSwindError {guard db != nil else {return .unavailable("The library connection is closed")};return .database(String(cString: sqlite3_errmsg(db))) }
-    private func prepare(_ sql: String) throws -> OpaquePointer {guard db != nil else {throw OSwindError.unavailable("The library connection is closed")};var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; do {if syncCaptureInstalled,sqlite3_stmt_readonly(stmt)==0 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db!))}}catch {sqlite3_finalize(stmt);throw error};return stmt }
+    private func prepare(_ sql: String) throws -> OpaquePointer {guard let db else {throw OSwindError.unavailable("The library connection is closed")};try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self);var stmt: OpaquePointer?; guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK, let stmt else { throw failure() }; do {if syncCaptureInstalled,sqlite3_stmt_readonly(stmt)==0 {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))}}catch {sqlite3_finalize(stmt);throw error};return stmt }
     private func bind(_ stmt: OpaquePointer, _ index: Int32, _ value: String?) { if let value { sqlite3_bind_text64(stmt,index,value,UInt64(value.utf8.count),transient,UInt8(SQLITE_UTF8)) } else { sqlite3_bind_null(stmt, index) } }
     private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {

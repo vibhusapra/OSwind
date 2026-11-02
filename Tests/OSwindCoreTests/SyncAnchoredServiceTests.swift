@@ -19,6 +19,7 @@ extension SyncOutgoingTests {
         let response=try owner.approve(owner.reviewRequest(request));_=try joiner.acceptResponse(response,trustedRootFingerprint:owner.status().rootFingerprint!)
         sender=try owner.prepareAnchoredService(shared:shared,createShared:true)
         incoming=try joiner.prepareAnchoredService(shared:shared,createShared:false)
+        try sender!.installNativeWriterAdmission();try incoming!.installNativeWriterAdmission()
         let producer=sender!.cache.journal.replica
         for _ in 0..<40 {_=try serviceReady(sender!,limit:1)}
         _=try serviceReady(incoming!,limit:1)
@@ -26,11 +27,13 @@ extension SyncOutgoingTests {
         XCTAssertEqual(try sender!.transport.serviceHead(replica:producer)?.through,21)
         for service in [sender,incoming].compactMap({$0}) {try service.stop();service.inbox.close();service.transport.close()}
         owner.close();joiner.close();try store.close();try receiver.close()
-        store=try MemoryStore(root:root);receiver=try MemoryStore(root:destination)
+        let nativeEnvironment=SyncNativeWriterEnvironment(stateRoot:state,machine:machine,storage:{_ in backend})
+        store=try MemoryStore(root:root,recoveryReadOnly:false,nativeWriterEnvironment:nativeEnvironment);receiver=try MemoryStore(root:destination,recoveryReadOnly:false,nativeWriterEnvironment:nativeEnvironment)
         owner=try PersonalSyncPairing(store:store,stateRoot:state,machine:machine,storage:backend);joiner=try PersonalSyncPairing(store:receiver,stateRoot:state,machine:machine,storage:backend)
         sender=try owner.prepareAnchoredService(shared:shared,createShared:false);incoming=try joiner.prepareAnchoredService(shared:shared,createShared:false)
         for _ in 0..<40 {_=try serviceReady(sender!,limit:2);_=try serviceReady(incoming!,limit:2)}
         for table in SyncCanonicalTable.allCases {XCTAssertEqual(try serviceCount(receiver,table.rawValue),expected[table.rawValue],table.rawValue)}
+        for library in [store!,receiver] {XCTAssertEqual(try library.withRoutineDatabase {try $0.eraseCount("PRAGMA user_version")},34)}
         XCTAssertEqual(try incoming!.cache.journal.cursor(for:producer),21)
         XCTAssertEqual(try incoming!.cache.journal.outbox().count,0)
         XCTAssertEqual(try serviceCount(receiver,"personal_sync_publication_bindings"),1)
@@ -59,7 +62,7 @@ extension SyncOutgoingTests {
                 publicFloors.append(["id":id,"token":token])
             }
             XCTAssertEqual(publicFloors.count,2)
-            let receipt:[String:Any]=["tables":expected,"producerReplica":producer,"partialCursor":1,"finalCursor":21,"wireBodies":21,"receiverOutbox":0,"nativeOriginals":2,"externalCheckpoints":publicFloors,"checkpointBackend":"owned deterministic test storage; actual Keychain is tested separately","privateKeysExported":false]
+            let receipt:[String:Any]=["nativeWriterSchema":34,"tables":expected,"producerReplica":producer,"partialCursor":1,"finalCursor":21,"wireBodies":21,"receiverOutbox":0,"nativeOriginals":2,"externalCheckpoints":publicFloors,"checkpointBackend":"owned deterministic test storage; actual Keychain is tested separately","privateKeysExported":false]
             try JSONSerialization.data(withJSONObject:receipt,options:[.sortedKeys,.prettyPrinted]).write(to:output.appendingPathComponent("fixture.json"),options:.withoutOverwriting)
         }
     }

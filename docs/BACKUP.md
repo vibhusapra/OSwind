@@ -8,6 +8,8 @@ A package contains its source database, notes, tags, favorites, timestamps, reta
 
 **Backups are plaintext and not encrypted.** Package directories/files are created with private permissions. Keep them on trusted storage. Encrypted live libraries are available separately; encrypted backup packages and password/biometric backup opening remain open requirements.
 
+If device-sync admission or credentials prevent opening an existing library, use **Export recovery backup…** on the unavailable-library screen, or `--data /path/to/library backup recover /path/to/Recovered.oswindbackup`. This exports content without sync credentials or migrations, then Restore creates a new quiet library with a fresh identity. Pairing must be set up again. Quit and encrypted lock join recovery before closing storage. See [native admission and recovery](SYNC-NATIVE-ADMISSION-WIP.md).
+
 The command line works independently of the app:
 
 ```bash

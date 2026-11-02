@@ -27,6 +27,13 @@ final class SyncLibraryService:@unchecked Sendable {
     private let token:String
     private var stopped=false
     private var externalAnchor:SyncDeliveryAnchor?
+    /// Internal admission vertical slice; lifecycle/public activation remains
+    /// owned separately from pairing and this service's scheduler.
+    func installNativeWriterAdmission()throws {
+        mutex.lock();defer {mutex.unlock()}
+        guard !stopped,let externalAnchor else {throw OSwindError.invalid("Prepare external delivery authority first")}
+        try externalAnchor.installNativeWriterAdmission()
+    }
     private var pendingAfter:Int64=0
     private static let stateSchema="CREATE TABLE personal_sync_service_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,token TEXT NOT NULL,sent INTEGER NOT NULL CHECK(typeof(sent)='integer' AND sent>=0))"
     private static let peerSchema="CREATE TABLE personal_sync_service_heads(replica TEXT PRIMARY KEY,through INTEGER NOT NULL CHECK(typeof(through)='integer' AND through>=0),collection_counter INTEGER NOT NULL CHECK(typeof(collection_counter)='integer' AND collection_counter>=0))"

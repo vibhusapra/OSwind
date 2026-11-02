@@ -104,6 +104,21 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         let value=Self(library:library,database:cache.database.handle,storage:storage,machine:machine,stateRoot:stateRoot,lease:lease,envelope:envelope,bytes:bytes,material:material)
         retained=true;try value.validate();return value
     }
+    /// Resume the external owner before service installation may replace its
+    /// native command token. A second preparation cannot invalidate a running
+    /// service and only then discover that its credential lease is already held.
+    static func openExisting(library:MemoryStore,material:SyncCredentialMaterial,id:String,stateRoot:URL,machine:any SyncMachineFingerprint,storage:any SyncCredentialStorage)throws->Self {
+        let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:stateRoot)
+        var retained=false;defer {if !retained {lease.close()}}
+        let bytes=try storage.read(id:id),envelope=try Envelope.decode(bytes)
+        guard envelope.id==id,envelope.protection==storage.protection,envelope.material == (try material.encodedForKeychain()) else {throw OSwindError.unavailable("Resume the original delivery credential and membership")}
+        let handle=try library.withRoutineDatabase {db in
+            _=try nativeWriterProof(library:library,db:db,environment:.init(stateRoot:stateRoot,machine:machine,storage:{_ in storage}))
+            return db.handle
+        }
+        let value=Self(library:library,database:handle,storage:storage,machine:machine,stateRoot:stateRoot,lease:lease,envelope:envelope,bytes:bytes,material:material)
+        try value.validate();retained=true;return value
+    }
     private init(library:MemoryStore,database:OpaquePointer,storage:any SyncCredentialStorage,machine:any SyncMachineFingerprint,stateRoot:URL,lease:SyncCredentialExclusiveLease,envelope:Envelope,bytes:Data,material:SyncCredentialMaterial) {
         self.library=library;self.database=database;self.storage=storage;self.machine=machine;self.stateRoot=stateRoot;self.lease=lease;self.envelope=envelope;self.bytes=bytes;self.material=material;id=envelope.id
     }
@@ -135,6 +150,47 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.unavailable("Delivery checkpoint protection is missing or changed")}
         }
     }
+    struct NativeWriterProof {
+        private let id:String,protection:SyncCredentialProtection,token:Token,lifetime:String
+        fileprivate init(id:String,protection:SyncCredentialProtection,token:Token,lifetime:String) {self.id=id;self.protection=protection;self.token=token;self.lifetime=lifetime}
+        func matches(_ db:RoutineDatabase)throws->Bool {
+            guard try SyncDeliveryAnchor.readToken(db,id:id,protection:protection)==token else {return false}
+            let row=try db.statement("SELECT value FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'");defer {sqlite3_finalize(row)}
+            return sqlite3_step(row)==SQLITE_ROW && db.text(row,0)==lifetime
+        }
+    }
+    /// Immutable verification for an ordinary native connection. It neither
+    /// owns a credential lease nor retains the store or delivery service.
+    static func nativeWriterProof(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment)throws->NativeWriterProof {
+        let row=try db.statement("SELECT id,protection FROM personal_sync_delivery_anchor WHERE singleton=1");defer {sqlite3_finalize(row)}
+        guard sqlite3_step(row)==SQLITE_ROW,let protection=SyncCredentialProtection(rawValue:db.text(row,1)) else {throw OSwindError.unavailable("Native delivery authority is missing; export with backup recover")}
+        let id=db.text(row,0),storage=environment.storage(protection)
+        guard storage.protection==protection else {throw OSwindError.invalid("Keep the enrolled credential protection tier")}
+        let envelope=try Envelope.decode(storage.read(id:id)),material=try SyncCredentialMaterial.decodeFromKeychain(envelope.material)
+        guard envelope.id==id,envelope.protection==protection,try readToken(db,id:id,protection:protection)==envelope.token else {throw OSwindError.unavailable("Native history differs from its external checkpoint; export with backup recover")}
+        try requireSchema(db)
+        let identity=try db.statement("SELECT replica,group_id,epoch FROM personal_sync_local WHERE singleton=1");defer {sqlite3_finalize(identity)}
+        let joined=material.joined
+        guard sqlite3_step(identity)==SQLITE_ROW,db.text(identity,0)==joined.replica,db.text(identity,1)==joined.certificate.body.group,db.text(identity,2)==joined.certificate.body.epoch else {throw OSwindError.unavailable("Native sync identity changed; use recovery")}
+        let peers=try db.statement("SELECT replica FROM personal_sync_peers ORDER BY replica LIMIT 65");defer {sqlite3_finalize(peers)}
+        var members=[String](),code=sqlite3_step(peers)
+        while code==SQLITE_ROW {members.append(db.text(peers,0));code=sqlite3_step(peers)}
+        guard code==SQLITE_DONE,members==joined.certificate.body.members.map(\.replica).sorted() else {throw OSwindError.unavailable("Native sync membership changed; use recovery")}
+        try envelope.binding.verify(store:library,material:material,protection:protection,machine:environment.machine,installation:SyncLocalCredentialState.installationID(at:environment.stateRoot,create:false))
+        return NativeWriterProof(id:id,protection:protection,token:envelope.token,lifetime:envelope.binding.publicationLifetime!)
+    }
+    func installNativeWriterAdmission()throws {
+        try validate()
+        let media=try library.mediaWriteLease();defer {media.release()}
+        try library.withRoutineDatabase {db in
+            try requireCheckpoint(in:db)
+            try library.nativeWriterAdmission.install(db,library:library,environment:.init(stateRoot:stateRoot,machine:machine,storage:{[storage] protection in
+                // This anchor already owns the exact protection-tier backend.
+                // The admission verifier rejects any different requested tier.
+                return storage
+            }))
+        }
+    }
     private func available(_ db:RoutineDatabase)throws {
         guard !closed,!poisoned,!library.isClosed,db.handle==database else {throw OSwindError.unavailable("Delivery authority needs to be reopened or recovered")}
         try lease.requireCurrentIdentity()
@@ -162,6 +218,9 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
     /// visible before their checkpoint exists. A failed/ambiguous final commit
     /// poisons admission and leaves the external floor intact for recovery.
     func mutate<T>(in db:RoutineDatabase,_ body:()throws->T)throws->T {
+        try library.nativeWriterAdmission.withDeliveryMutation {try mutateOwned(in:db,body)}
+    }
+    private func mutateOwned<T>(in db:RoutineDatabase,_ body:()throws->T)throws->T {
         lock.lock();defer {lock.unlock()}
         try requireCheckpoint(in:db)
         guard sqlite3_get_autocommit(db.handle) != 0,try db.eraseCount("PRAGMA synchronous")>=2 else {throw OSwindError.invalid("Anchor a prepared outer native transaction")}
@@ -185,9 +244,11 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
             }
             // After the external boundary, cancellation is not rollback. Finish
             // the owned critical commit, then let the caller observe cancellation.
-            try db.execute("COMMIT");return value
+            try db.execute("COMMIT")
+            try library.nativeWriterAdmission.deliveryCommitted(db,verified:NativeWriterProof(id:id,protection:storage.protection,token:envelope.token,lifetime:envelope.binding.publicationLifetime!))
+            return value
         }catch {
-            if externalAttempted {poisoned=true}
+            if externalAttempted {poisoned=true;library.nativeWriterAdmission.invalidate()}
             do {try db.execute("ROLLBACK")}catch {poisoned=true}
             throw error
         }

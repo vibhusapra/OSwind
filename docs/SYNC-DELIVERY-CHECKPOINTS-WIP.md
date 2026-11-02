@@ -20,11 +20,11 @@ New cases cover actual internal pairing-to-service setup/reopen, partial transfe
 
 Earlier development failures remain retained, including the real idle Keychain-write regression and its correction. A deletion fixture initially called a high-level standalone transaction from inside a journal transaction; it now uses the same native SQL transaction for its owned effect. Another fixture incorrectly expected producer and receiver historical-original table counts to match; imported immutable originals are separate from live native sources. The corrected case checks exact original wire bytes and all 21 source/receiver wire bodies instead of that invalid count equality.
 
-These are internal development checks. The new broad source-pinned debug/sanitizer/optimized qualification is still pending at this checkpoint; do not reuse the pairing-preview receipt as qualification for this new runtime.
+Source `5102714` now has its own [1,485-input manifest](../benchmarks/sync-delivery-checkpoints-inputs-v1.json) and [independently reviewed qualification](../benchmarks/sync-delivery-checkpoints-v1.json): full Debug **2,410 passed / 135 skipped**, sync Thread Sanitizer **591 passed / 34 skipped**, optimized **591 passed / 34 skipped**, and explicit owned Keychain **17 passed without skips**. All four retained all-kind fixtures independently match 13 native counts, 21 exact wire bodies, two original evidence bodies, both public external checkpoint tokens, receiver cursor 21 and zero outbox echoes. This is local internal-service qualification; later runtime changes need their own receipt.
 
 ## Required before public activation
 
-- Enrolled native schema/capability admission, including already-open older writers and admission before constructor migrations. Ordinary unenrolled native33 remains unchanged here.
+- [Native writer admission and recovery](SYNC-NATIVE-ADMISSION-WIP.md) now have an explicit internal vertical slice. Its separate broad qualification and public activation remain required.
 - Recovery/quarantine and credential phase/lease handoff; a failed external/native boundary must not make local data irrecoverable.
 - Actual local and received whole-erase producer drain, physical cleanup and exact completion-based binding/checkpoint renewal. Current retired lifetimes refuse delivery; this is not a completed erase/reconnect flow.
 - Public folder/session setup through the app's owned preparation lifetime, membership refresh, revocation and rotation. The reserved credential deliberately refuses membership edits/local pairing-key retirement behind the delivery owner.

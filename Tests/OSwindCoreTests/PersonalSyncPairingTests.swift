@@ -12,6 +12,7 @@ final class PersonalSyncPairingTests:XCTestCase {
         a=try MemoryStore(root:root.appendingPathComponent("a"));b=try MemoryStore(root:root.appendingPathComponent("b"));storage=PairingTestStorage()
     }
     override func tearDownWithError()throws {owners.forEach {$0.close()};try a?.close();try b?.close();try FileManager.default.removeItem(at:root)}
+    func reopen(_ url:URL)throws->MemoryStore {let backend=storage!;return try MemoryStore(root:url,recoveryReadOnly:false,nativeWriterEnvironment:.init(stateRoot:root.appendingPathComponent("state"),machine:machine,storage:{_ in backend}))}
     func open(_ store:MemoryStore)throws->PersonalSyncPairing {
         let value=try PersonalSyncPairing(store:store,stateRoot:root.appendingPathComponent("state"),machine:machine,storage:storage);owners.append(value);return value
     }
@@ -108,11 +109,11 @@ final class PersonalSyncPairingTests:XCTestCase {
         joiner.close();try b.close()
         let saved=root.appendingPathComponent("pending-native.sqlite"),native=root.appendingPathComponent("b/memory.sqlite")
         try FileManager.default.copyItem(at:native,to:saved)
-        b=try MemoryStore(root:root.appendingPathComponent("b"));let accepted=try open(b)
+        b=try reopen(root.appendingPathComponent("b"));let accepted=try open(b)
         _=try accepted.acceptResponse(response,trustedRootFingerprint:owner.status().rootFingerprint!,now:now)
         accepted.close();try b.close()
         try FileManager.default.removeItem(at:native);try FileManager.default.copyItem(at:saved,to:native)
-        b=try MemoryStore(root:root.appendingPathComponent("b"));let restored=try open(b)
+        b=try reopen(root.appendingPathComponent("b"));let restored=try open(b)
         XCTAssertEqual(try restored.status().phase,.paired)
         XCTAssertThrowsError(try restored.acceptResponse(response,trustedRootFingerprint:owner.status().rootFingerprint!,now:now))
     }
@@ -127,9 +128,9 @@ final class PersonalSyncPairingTests:XCTestCase {
     func testCopiedLibraryAndMissingInstallationRefuseWhileOriginalCanResume()throws {
         let owner=try open(a);_=try owner.createGroup(deviceName:"Desk Mac",now:now);owner.close();try a.close()
         let copy=root.appendingPathComponent("copy");try FileManager.default.copyItem(at:a.root,to:copy)
-        let clone=try MemoryStore(root:copy);defer {try? clone.close()}
+        let clone=try reopen(copy);defer {try? clone.close()}
         XCTAssertThrowsError(try open(clone))
-        a=try MemoryStore(root:root.appendingPathComponent("a"));let original=try open(a);XCTAssertEqual(try original.status().phase,.owner);original.close()
+        a=try reopen(root.appendingPathComponent("a"));let original=try open(a);XCTAssertEqual(try original.status().phase,.owner);original.close()
         try FileManager.default.removeItem(at:root.appendingPathComponent("state/installation-v1"))
         XCTAssertThrowsError(try open(a));XCTAssertFalse(FileManager.default.fileExists(atPath:root.appendingPathComponent("state/installation-v1").path))
     }
