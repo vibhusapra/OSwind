@@ -1,0 +1,519 @@
+{
+  "format": "OSwind answer lifecycle qualification v1",
+  "state": "passed",
+  "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+  "nativeSchema": 33,
+  "trackedInputs": 1382,
+  "inputManifest": "answer-lifecycle-inputs-v1.json",
+  "inputManifestSHA256": "b0eeb3807a4cdf1648ff1532964481d713b9e2a6efad70e7543031f6ef613634",
+  "software": [
+    {
+      "stage": "full-debug",
+      "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "tests": {
+        "defined": 2263,
+        "passed": 2150,
+        "skipped": 113,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 225,
+      "logSHA256": "f34e904fdbd7164c84d084cd30999ed69e98d27042cd091878befcb7a95dc826",
+      "wallSeconds": 536.6474718330428,
+      "raceWarning": false,
+      "receiptSHA256": "a3045fdd068d7138f31cb08fc47b64abdc21b159b7b4d6bd6e14f90276786c78"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "VoiceTypingTests|AnswerLifecycleTests|ChatAdmissionTests|SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 974,
+        "passed": 919,
+        "skipped": 55,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 225,
+      "logSHA256": "0d38537b63a8483064940dcc4c08cae35ae60b50805bc67f5166b4c3f3fef93c",
+      "wallSeconds": 617.9537894581445,
+      "raceWarning": false,
+      "receiptSHA256": "5554873e8d6f352df50f83cfae6da22b15ce67d5a5654debc98e388f5cfd4cc7"
+    },
+    {
+      "stage": "optimized",
+      "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/release-build",
+        "-c",
+        "release",
+        "--filter",
+        "VoiceTypingTests|AnswerLifecycleTests|ChatAdmissionTests|SourceWork|SourceWrite|SourceRead|RetiredLibraryAction|StorageUsage|PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 974,
+        "passed": 919,
+        "skipped": 55,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 225,
+      "logSHA256": "901f3a45fe2c02d779812af1a30e7cd835c54652272152dbb5e08a3b5a07454b",
+      "wallSeconds": 306.3358147908002,
+      "raceWarning": false,
+      "receiptSHA256": "b7e622782c680ec4a6e960ae8d67433809736520093281d05807957005fffa10"
+    }
+  ],
+  "mandatoryControlsInEveryBuild": 225,
+  "mandatoryDefinitionAudit": {
+    "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+    "required": 225,
+    "ambiguousDefinitions": {},
+    "note": "Any ambiguous source method requires owner-qualified coverage before publication."
+  },
+  "qualificationStages": [
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "79d0ebe238b48c3d0e3566e1c05c9695398a92275a4b5390b5b4d34042832e85",
+      "tests": {
+        "defined": 51,
+        "passed": 51,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f70c5e12f81e6ca2a27c5a58d268b60f9b9764c638cc0c6fbef9bce3d25bd541",
+      "tests": null
+    },
+    {
+      "name": "migration-crashes",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a3bac1a554cd6e5c9ba0a309c4d04d739e0dac393858cff8c6918252d4ec3a9a",
+      "tests": null
+    },
+    {
+      "name": "migration-independent-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "310f25ecba0656c0ce1adaa61502018e2de5e77014769eaa8beec9388cfc2bbc",
+      "tests": null
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "394c6dc89ce392991fe7a806038c829b999298ce7f746af8cf946e88c77b015b",
+      "tests": null
+    },
+    {
+      "name": "packaged-media-admission",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "38d2c6c6ab99b9de086c81b8c57fa9def8f990672a4caab5ec498dd884e01fd2",
+      "tests": null
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "tests": null
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "tests": null
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "18ed94fee935d60ab16760f93347b2b6d9d3c0d295b96b0726e4d95b02bebe9d",
+      "tests": null
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f952206d34d7249ff80a1d3237373513ed1b1b8948b41d3aac645282d8e9c48d",
+      "tests": null
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f29e747a4077147dfa5172f682b047d2ee7c914e8bdda05fe62b4cefa998eae5",
+      "tests": null
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "347b29b471510de2505d6507f7cec0dfbb914d4326135cc323cb7e16168373c7",
+      "tests": null
+    },
+    {
+      "name": "native-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d",
+      "tests": null
+    },
+    {
+      "name": "native-wipe",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "8830ba9ef40a4c11f0ff8fa5208b1aeb9c244aabbfae8f50b3a4304e77d9fc91",
+      "tests": null
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1f6c29ff5cd3516fef7505d901782d87f9374728748cd02f9f7a38740bb75c4f",
+      "tests": null
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3d2560029eaf0bbec4a26b85811d130f58d8e1c6059e0660313dd40eb9bedafb",
+      "tests": null
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409",
+      "tests": null
+    },
+    {
+      "name": "schema33-sync-capture",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf",
+      "tests": null
+    },
+    {
+      "name": "schema33-entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "7cf046829c337e6a0ff775af3a14da47beaede9a4a411878c017010312bae368",
+      "tests": null
+    },
+    {
+      "name": "schema33-project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "fa13ad171830e160e1dff46f25d98f2285e9461389eaf161a91ad126c8e3e257",
+      "tests": null
+    },
+    {
+      "name": "schema33-text-observation",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "34fa14467bf04c3d1eab12e7babd4fc2f7c7af598f4b74c9b1056adf9d83ee70",
+      "tests": null
+    },
+    {
+      "name": "schema33-accessibility-text",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "b120e0ae17a4cf2097199ab56e2172b5e8fbff7b60b04aa90792255d95ff3fb0",
+      "tests": null
+    },
+    {
+      "name": "schema33-tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "cafa7017baac2af9536a733fa39248e42283a5c814d405b315ca856db5f4c3b2",
+      "tests": null
+    },
+    {
+      "name": "schema33-capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3b086bae2663f48734c7edb670085c986d0b3a349e16e165d26feee4138084cc",
+      "tests": null
+    },
+    {
+      "name": "schema33-historical-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "4464306cb3665c3d72c73c7f1092a5db5ac952771e3d8a37014853fbe0d64976",
+      "tests": null
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "84f3b4d44fb92d536241e82e8765e2c7710c52e89884cfb622619c0091eb625d",
+      "tests": null
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    }
+  ],
+  "native": {
+    "defined": 51,
+    "passed": 51,
+    "skipped": 0,
+    "logSHA256": "79d0ebe238b48c3d0e3566e1c05c9695398a92275a4b5390b5b4d34042832e85"
+  },
+  "distinctFullAndNativeMethods": 2199,
+  "nativeMethodsAdditionalToFull": 49,
+  "independentReview": {
+    "format": "OSwind independent answer lifecycle package review",
+    "state": "passed",
+    "source": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+    "nativeSource": "766cd3a9c987c0900264a80e6fd9da17333251a9",
+    "trackedInputs": 1382,
+    "sourceInputsSHA256": "b0eeb3807a4cdf1648ff1532964481d713b9e2a6efad70e7543031f6ef613634",
+    "nativeDefined": 51,
+    "nativePassed": 51,
+    "nativeSkipped": 0,
+    "all30StageLogsMatch": true,
+    "currentSourceMigrationReviewSHA256": "2aee1f81ec408ec9a5eab775775dbf9f2b191ee218efb30f62dabb58fa392dc5",
+    "nativeLogSHA256": "79d0ebe238b48c3d0e3566e1c05c9695398a92275a4b5390b5b4d34042832e85",
+    "appRegularFiles": 34,
+    "zipAndExtractionEveryFileEqual": true,
+    "strictAppAndExtractedSignatures": true,
+    "priorAppsUnchanged": 49,
+    "packagedProbeSHA256": "38d2c6c6ab99b9de086c81b8c57fa9def8f990672a4caab5ec498dd884e01fd2",
+    "bothPackagedFixProbesPass": true,
+    "readOnlyProbeDatabases": "Both empty native/erasure queues, integrity/FK pass, all8 fence triggers present; referenced fixture files absent. Normal mode=ro honors WAL.",
+    "zipSHA256": "8fec71855d33132ffaf6344b90ae06cc8aee9fce4806e4ee86300f6413e5615b",
+    "CLI_SHA256": "c077fc3ed13cdb1d1bc94245a49a89a6eaa45fdb32a2fab689b6593afc8b6097",
+    "appSHA256": "7521abd33ad9d1e07aea1fd7a2bca0f6668e8d656ae12904bcee114f3cdd5e9a",
+    "limits": [
+      "Current-source migration SIGKILL databases have a separate independent reader receipt. GUI/TCC, capture/power, storage power-loss, notarization/provider and whole-product acceptance remain open.",
+      "Source32 predecessor receipts remain frozen; no source32 package or old-client success is promoted to native33. The exact prior32 executable now explicitly refuses this native format."
+    ],
+    "reviewerSHA256": "c207cac762baca73355e8da1f6be21c7a13e6d2623cb42cf878f59f49387c339",
+    "atUTC": "2026-11-02T03:58:31.353439+00:00"
+  },
+  "priorAppProtectionScope": "48 earlier qualified app/extraction trees and one retained failed query-setup candidate; preservation does not promote that failed attempt.",
+  "artifacts": {
+    "app": ".artifacts/answer-lifecycle-v1/qualification-v1/OSwind.app",
+    "archive": ".artifacts/answer-lifecycle-v1/qualification-v1/OSwind-macos.zip",
+    "zipSHA256": "8fec71855d33132ffaf6344b90ae06cc8aee9fce4806e4ee86300f6413e5615b",
+    "CLI_SHA256": "c077fc3ed13cdb1d1bc94245a49a89a6eaa45fdb32a2fab689b6593afc8b6097",
+    "appSHA256": "7521abd33ad9d1e07aea1fd7a2bca0f6668e8d656ae12904bcee114f3cdd5e9a",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "713c95b06c6014b3812be7fa57974ecf63d98e906c18913fd09efa3661e972e6",
+      "Contents/MacOS/oswindctl": "c077fc3ed13cdb1d1bc94245a49a89a6eaa45fdb32a2fab689b6593afc8b6097",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "7521abd33ad9d1e07aea1fd7a2bca0f6668e8d656ae12904bcee114f3cdd5e9a",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    }
+  },
+  "predecessorHosted": {
+    "format": "OSwind source worker lifecycle hosted follow-up v1",
+    "state": "passed",
+    "head": "485d811cf5bda1cd29bdfb2bc8bb0c86bfacb61f",
+    "PR": 131,
+    "run": 41381158664,
+    "nativeJob": 125072066529,
+    "benchmarkJob": 125072066852,
+    "nativeJobConclusion": "success",
+    "benchmarkConclusion": "success",
+    "commands": [
+      {
+        "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+        "defined": 2242,
+        "passed": 2128,
+        "skipped": 114,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+        "defined": 3,
+        "passed": 3,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      },
+      {
+        "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+        "defined": 49,
+        "passed": 49,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    ],
+    "headFoundInCheckoutLog": true,
+    "logSHA256": "f322d88fc31ceb08c3251579c36e8079d5306c4e4a36a6532391927abb567078",
+    "logBytes": 2973315,
+    "limits": [
+      "Hosted opt-in/physical skip totals stay separate from local source-bound qualification.",
+      "Later passing observation does not causally explain predecessor native inventory/busy refusals; no failed hosted run rerun requested."
+    ],
+    "diagnostics": {
+      "artifactID": 13114072515,
+      "bytes": 19907,
+      "SHA256": "d6facbfbd629155e547ee400f39557fde91710948ae449d35a186cf4d5ab0750",
+      "JSONfiles": 10
+    }
+  },
+  "currentSourceHosted": "Separate publication/CI required; predecessor hosted success does not qualify this source.",
+  "behavior": {
+    "actualAnswerWorkerOwnedThroughAdmissionAndCompletion": true,
+    "retiredAndClosedLaunchDenied": true,
+    "cancelledDrainCallerStillWaits": true,
+    "policyAndAIConfigurationRevocationBeforeSettingsSave": true,
+    "atomicFirstChatAndTurnAdmission": true,
+    "nestedSavepointPreservesOuterOwner": true,
+    "midInsertCancellationRollsBackWholeNewChat": true,
+    "actualCommittedTurnSurvivesCancellation": true,
+    "currentCommittedCancellationReview": "Generic status plus explicit Review saved answer action; no automatic late answer publication.",
+    "retiredCompletionPublishesNoAnswerOrSavedID": true
+  },
+  "retainedFailures": [
+    {
+      "state": "genuine regression",
+      "baseline": "485d811cf5bda1cd29bdfb2bc8bb0c86bfacb61f",
+      "methods": 1,
+      "failedAssertions": 4,
+      "unexpected": 0,
+      "logSHA256": "5b0f38e618f8f10ed51a59c58d573dbacce0b97936519c7830d87c09d04e9960",
+      "provider": "evidence only; no model or provider request",
+      "facts": [
+        "retired Ask launched",
+        "actual old-library conversation persisted",
+        "currentChatID published",
+        "answer evidence published"
+      ],
+      "originalAssertionsRetained": true
+    },
+    {
+      "state": "genuine admission regression in initial answer ownership prototype",
+      "SHA256": "1dcf96480c665bcf97ebbf70521b9730638a5879aabc0b085fda611590618f93",
+      "summary": [
+        "113",
+        "2",
+        "1",
+        "0"
+      ],
+      "failedMethods": [
+        "-[OSwindAppTests.AnswerLifecycleTests testChangedEvidenceRejectsAnswerWithoutCreatingEmptyConversation]"
+      ],
+      "distinctPassed": 110,
+      "reason": "Captured evidence erased before admission correctly rejects the turn, but separate createChat leaves an empty conversation. Need atomic first-conversation plus turn transaction.",
+      "originalAssertionRetained": true
+    },
+    {
+      "state": "failed full run retained",
+      "source": "be3f50aa399543a263939e217a0e0da309b15c87",
+      "full": {
+        "defined": 2262,
+        "passed": 2148,
+        "skipped": 113,
+        "failedAssertions": 1,
+        "unexpected": 0
+      },
+      "all208MandatoryPassed": true,
+      "failedMethod": "VoiceTypingTests.testExplicitRecordReviewEditAndSingleInsertNeverSavesHistory",
+      "assertion": "XCTAssertFalse(app.hasPendingExitWork) after voice/draft work completes",
+      "inspection": "VoiceTypingModel.busy is false when its actual worker finishes. AppModel.hasPendingExitWork now correctly also includes independent registry statistics/storage jobs started by construction. No Ask operation is started in this test.",
+      "classification": "Fixture did not settle independent startup readers before asserting aggregate exit idle; compatible with the failure, but exact active job in the historical failed assertion was not traced.",
+      "next": "Preserve final original assertion. Settle startup readers in fixture, and add a controlled actual storage worker proving dictation completion cannot make aggregate exit ownership false while the reader is held. Require all VoiceTypingTests in all3 builds.",
+      "logSHA256": "b5765ccfeed9bcf83341cecd68ccfe939e2fb474c9c1dd397cd66fdb31256ea5",
+      "noProductExitGuardRemoved": true
+    },
+    {
+      "kind": "fixture compile-only corrections",
+      "logs": [
+        "answers-focused-03.log",
+        "answers-focused-06.log"
+      ],
+      "testsRan": false,
+      "reason": "Conditional closure inference and private test API use corrected without weakening production visibility."
+    }
+  ],
+  "limits": [
+    "Evidence-only authored pipeline fixtures establish task/admission/UI-model behavior, not actual provider/server-side cancellation, natural answer quality, microphone or signed native UI input acceptance.",
+    "All83 feature statuses unchanged. Audio import and other detail/PII/search/index/model setup lifetimes, complete sync F059/epochs, actual providers/two Macs, sustained capture/power and notarized distribution remain open.",
+    "Ad hoc signatures/owned fixtures do not establish whole-product parity or competitive rank. Earlier native inventory/busy refusals remain retained and causally unresolved; later passes are separate observations."
+  ]
+}

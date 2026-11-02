@@ -268,7 +268,7 @@
     "axis": "AI",
     "feature": "Chat history and follow-up context",
     "status": "tested",
-    "evidence": "Durable sessions, subject follow-ups, source hydration/erasure, real local-model smoke; broader dialogue accuracy pending",
+    "evidence": "Durable sessions, subject follow-ups and source hydration/erasure remain. Source766cd3a adds actual Ask worker ownership through Quit/switch/wipe/lock, retired launch rejection, atomic first-chat/turn admission, nested rollback and mid-SQL cancellation, preserved real commits and explicit saved-answer review. All225 required controls pass in three builds;2150 full passes/113 skips,919 TSan and919 optimized passes/55 skips each,51 native/no skips and30 fresh package/process stages. Actual provider/server cancellation, native UI clicks and broader dialogue accuracy remain open. See ANSWER-LIFECYCLE.md.",
     "references": "Littlebird, Pieces"
   },
   {
@@ -468,7 +468,7 @@
     "axis": "Data",
     "feature": "Personal device sync",
     "status": "todo",
-    "evidence": "Internal prerequisites remain separate from complete public sync. Source 141375c owns actual quick-note/recap/statistics/storage workers through cancellation, plain Quit, switch and encrypted lock, rejects tested retired actions, and preserves already committed sources without retired publication. All 190 required controls pass in debug/TSan/optimized;2131 full passes/111 skips,884 TSan passes/53 skips,884 optimized passes/53 skips,49 native/no skips and30 package/process stages. Independent34-file archive review preserves46 earlier apps. Audio file import, Ask and detail/PII/search/index/model setup lifetimes remain open. The previously qualified pending-media scheduler remains available with older-producer startup/wake/retry limits. Complete sync F059 remains TODO: collection/erasure epochs, erasure priority/terminal compaction, current policy/provenance/media transport, orphan/quarantine retention, enrollment/key recovery/revocation/status/conflict UI, backup rollback and actual providers/two Macs. Native input, sustained power and notarized distribution remain open. PR130 hosted jobs pass separately; PR128 busy failure remains causally unresolved. See SOURCE-WORK-LIFECYCLE.md and source-work-lifecycle-v1.json. All 83 statuses unchanged; no parity/rank promotion.",
+    "evidence": "Internal prerequisites remain separate from complete public sync. Source766cd3a extends actual source/read worker ownership to Ask and atomic conversation admission, with225 required controls in three builds,51 native methods and30 fresh package/process stages. Independent34-file archive review preserves49 earlier app trees, including one retained failed candidate without promoting its failure. The previously qualified pending-media scheduler keeps its older-producer startup/wake/retry limits. Audio import and detail/PII/search/index/model setup lifetimes remain open. Complete sync F059 remains TODO: collection/erasure epochs, erasure priority/terminal compaction, current policy/provenance/media transport, orphan/quarantine retention, enrollment/key recovery/revocation/status/conflict UI, backup rollback and actual providers/two Macs. Native input, sustained power and notarized distribution remain open. PR131 hosted jobs pass separately; prior inventory/busy refusals remain causally unresolved. See ANSWER-LIFECYCLE.md and answer-lifecycle-v1.json. All83 statuses unchanged; no parity/rank promotion.",
     "references": "Screenpipe Business"
   },
   {

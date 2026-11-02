@@ -37,3 +37,7 @@ The first native 49-method attempt passed 48 and failed one newly added storage 
 ## Remaining work
 
 Audio import still lacks AppModel exit/drain ownership despite Core cancellation propagation. Code inspection also finds Ask needs a retired-launch guard and actual operation ownership; its reproduction/fix is separate work. Detail/PII/search/index/model setup need individual actual-resource audits. Complete personal sync F059, collection epochs, actual providers/two Macs, native TCC/input, sustained capture/physical power and signed/notarized distribution remain open. Native schema 33 and wire formats are unchanged. All 83 feature statuses stay unchanged; no whole-product parity or competitive rank follows.
+
+Hosted follow-up: [PR131 receipt](../benchmarks/source-work-lifecycle-hosted-v1.json) records both jobs passing at head 485d811: 2,128 full passes/114 skips, 49 native passes/no skips and three named-clipboard methods. This is separate from local qualification and does not explain earlier native inventory/busy refusals.
+
+Ask is subsequently addressed by [answer lifetime and atomic saving](ANSWER-LIFECYCLE.md); its current-source qualification remains separate.

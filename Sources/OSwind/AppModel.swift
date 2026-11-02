@@ -47,6 +47,7 @@ import EventKit
         if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}
         if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
+        if oldValue.ai != settings.ai {cancelAnswer()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -95,7 +96,8 @@ import EventKit
     @Published var chats = [ChatSession]()
     @Published var chatTurns = [ChatTurn]()
     @Published var currentChatID: String?
-    private var answerTask: Task<Void,Never>?
+    @Published var answerStatus:String?
+    @Published private(set) var savedAnswerID:String?
     @Published var errorMessage: String?
     @Published var showSettings = false
     @Published var showOnboarding = false {didSet {
@@ -322,7 +324,7 @@ import EventKit
     }
     func prepareForLibrarySwitch() {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
-        libraryRetired=true;pendingMediaCleanup.stop();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
+        libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -335,7 +337,7 @@ import EventKit
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
         calendarSlice=nil;calendarSliceZone=nil
-        hits.removeAll();selected=nil;selectedVisual=nil;answer=nil;chats.removeAll();chatTurns.removeAll();currentChatID=nil;query="";question="";resolvedSearch=nil;selectedEvidenceQuery="";errorMessage=nil
+        hits.removeAll();selected=nil;selectedVisual=nil;answer=nil;answerStatus=nil;chats.removeAll();chatTurns.removeAll();currentChatID=nil;query="";question="";resolvedSearch=nil;selectedEvidenceQuery="";errorMessage=nil
     }
     var filter: SearchFilter { filter(at:Date()) }
     func filter(at now: Date) -> SearchFilter {
@@ -539,29 +541,43 @@ import EventKit
             ask(prompt,interpretation:false,evidencePolicy:settings.privacy)
         }catch {errorMessage="This meeting is excluded by the current privacy policy."}
     }
-    func ask(_ prompt: String? = nil, summarize: Bool = false, interpretation:Bool?=nil,evidencePolicy:PrivacyPolicy?=nil) {
+    enum AnswerOperationPhase:Sendable {case started,answerReady}
+    func ask(_ prompt: String? = nil, summarize: Bool = false, interpretation:Bool?=nil,evidencePolicy:PrivacyPolicy?=nil,observeWorker:(@Sendable (AnswerOperationPhase)throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy else {return}
         let text = settings.privacy.sanitize(prompt ?? question).text
         guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty, !asking else { return }
-        answerInputError = nil
+        answerInputError = nil;answerStatus=nil;savedAnswerID=nil
         if prompt != nil { question = text }
         let now = Date(), sessionID = currentChatID, interpret = interpretation ?? interpretQuery
         let f = filter(at:now)
-        let config = settings.ai, searchConfig = settings.search, engine = AnswerEngine(store:store,embedder:embedder)
+        let config = settings.ai, searchConfig = settings.search,store=self.store,embedder=self.embedder,generation=libraryOperationGeneration
         let history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
         asking = true
-        answerTask = Task {
-            do {
-                let result = try await engine.answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now,evidencePolicy:evidencePolicy)
+        libraryWork.launch(kind:.answer,operation:{
+            try observeWorker?(.started);try Task.checkCancellation()
+            let result=try await AnswerEngine(store:store,embedder:embedder).answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now,evidencePolicy:evidencePolicy)
+            try observeWorker?(.answerReady);try Task.checkCancellation()
+            // Serialize current-policy admission with settings/retirement. The
+            // actual worker remains owned through this hop and any completion.
+            let saved=try await MainActor.run { ()throws->(String,ChatTurn) in
                 try Task.checkCancellation()
-                let targetID: String
-                if let sessionID { targetID = sessionID }
-                else { targetID = try store.createChat().id; currentChatID = targetID }
-                let turn = try store.appendChatTurn(sessionID:targetID,question:text,answer:result,filter:f,policy:policy)
-                answer = turn.answer; if question == text { question = "" }; refreshChats()
-            } catch is CancellationError { }
-            catch let error as QuerySyntaxError { if !Task.isCancelled { answerInputError = error.localizedDescription } }
-            catch { if !Task.isCancelled { errorMessage = error.localizedDescription } }
-            asking = false
+                guard self.libraryOperationGeneration==generation,self.libraryWorkAvailable else {throw CancellationError()}
+                let turn=try store.saveChatTurn(sessionID:sessionID,question:text,answer:result,filter:f,policy:policy)
+                return (turn.sessionID,turn)
+            }
+            observeCompletion?();return saved
+        }) {outcome,cancelled in
+            self.asking=false
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let (targetID,turn)):
+                guard !cancelled,self.libraryWorkAvailable else {self.savedAnswerID=targetID;self.answerStatus="Answer saved before cancellation.";return}
+                self.currentChatID=targetID;self.answer=turn.answer;if self.question==text {self.question=""};self.refreshChats()
+            case .failure(let error):
+                if cancelled || error is CancellationError {self.answerStatus="Answer cancelled."}
+                else if let syntax=error as? QuerySyntaxError {self.answerInputError=syntax.localizedDescription}
+                else {self.errorMessage=error.localizedDescription}
+            }
         }
     }
     func reviewDraft(_ answer:Answer) {
@@ -583,9 +599,10 @@ import EventKit
             try await withTaskCancellationHandler {try await validation.value} onCancel:{validation.cancel()}
         }
     }
-    func cancelAnswer() { answerTask?.cancel() }
-    func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "" }
-    func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = ""; refreshChats() }
+    func cancelAnswer() {libraryWork.cancel(kinds:[.answer]);if asking,!libraryRetired {answerStatus="Cancelling; waiting for current work to stop…"}}
+    func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "";answerStatus=nil;savedAnswerID=nil }
+    func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = "";answerStatus=nil;savedAnswerID=nil;refreshChats() }
+    func reviewSavedAnswer() {guard libraryWorkAvailable,!asking,let id=savedAnswerID else {return};selectChat(id)}
     func refreshChats() {
         guard libraryWorkAvailable else {return}
         do { chats = try store.chats(); if let id = currentChatID { if try store.chat(id) != nil { chatTurns = try store.chatTurns(id); answer = chatTurns.last?.answer } else { currentChatID = nil; chatTurns = []; answer = nil } } }

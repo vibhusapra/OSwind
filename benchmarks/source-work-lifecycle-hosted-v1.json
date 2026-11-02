@@ -1,0 +1,50 @@
+{
+  "format": "OSwind source worker lifecycle hosted follow-up v1",
+  "state": "passed",
+  "head": "485d811cf5bda1cd29bdfb2bc8bb0c86bfacb61f",
+  "PR": 131,
+  "run": 41381158664,
+  "nativeJob": 125072066529,
+  "benchmarkJob": 125072066852,
+  "nativeJobConclusion": "success",
+  "benchmarkConclusion": "success",
+  "commands": [
+    {
+      "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+      "defined": 2242,
+      "passed": 2128,
+      "skipped": 114,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+      "defined": 3,
+      "passed": 3,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+      "defined": 49,
+      "passed": 49,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    }
+  ],
+  "headFoundInCheckoutLog": true,
+  "logSHA256": "f322d88fc31ceb08c3251579c36e8079d5306c4e4a36a6532391927abb567078",
+  "logBytes": 2973315,
+  "limits": [
+    "Hosted opt-in/physical skip totals stay separate from local source-bound qualification.",
+    "Later passing observation does not causally explain predecessor native inventory/busy refusals; no failed hosted run rerun requested."
+  ],
+  "diagnostics": {
+    "artifactID": 13114072515,
+    "bytes": 19907,
+    "SHA256": "d6facbfbd629155e547ee400f39557fde91710948ae449d35a186cf4d5ab0750",
+    "JSONfiles": 10
+  }
+}

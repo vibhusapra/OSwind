@@ -4,7 +4,7 @@ import AppKit
 @testable import OSwind
 
 enum SourceWorkTestJob:CaseIterable {
-    case note,recap,statistics,storage
+    case note,recap,statistics,storage,answer
     @MainActor func start(_ model:AppModel,gate:ImportWorkerGate,committed:Bool=false)throws {
         switch self {
         case .note:
@@ -17,6 +17,7 @@ enum SourceWorkTestJob:CaseIterable {
             else {model.saveAnswer(answer,observeWorker:{try gate.pause()})}
         case .statistics:model.refreshStatistics(force:true,observeWorker:{try gate.pause()})
         case .storage:model.invalidateStorageEstimate();model.refreshStatistics(force:true,observeStorage:{try gate.pause()})
+        case .answer:model.ask("Owned source",interpretation:false,observeWorker:{if $0 == .started {try gate.pause()}})
         }
     }
     @MainActor static func settle(_ model:AppModel)async throws {
@@ -78,4 +79,6 @@ enum SourceWorkTestJob:CaseIterable {
     func testLibrarySwitchWaitsForActualRecapWorker()async throws {try await switched(.recap)}
     func testLibrarySwitchWaitsForActualStatisticsWorker()async throws {try await switched(.statistics)}
     func testLibrarySwitchWaitsForActualStorageWorker()async throws {try await switched(.storage)}
+    func testPlainQuitWaitsForActualAnswerWorker()async throws {try await quit(.answer)}
+    func testLibrarySwitchWaitsForActualAnswerWorker()async throws {try await switched(.answer)}
 }
