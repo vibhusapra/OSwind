@@ -102,6 +102,46 @@ extension SyncIncomingSourceTests {
 }
 
 extension SyncIncomingSourceTests {
+    func testCollectionLocalCopyWipeDoesNotPublishDeletionOfSharedPeerHistory()throws {
+        let (a,ac)=try endpoint("shared-owner",producerID),(b,bc)=try endpoint("cleared-local-copy",receiverID)
+        defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID);try ac.journal.allowPeer(receiverID)
+        try a.insert(Memory(id:"shared-owned-source",kind:.note,text:"Owned shared history must remain on its other Mac"));try drain(a,ac)
+        let original=try XCTUnwrap(ac.journal.outbox().first),record=try packet(original,ac)
+        let local=try receive(original,record,b,bc,fetch:{_ in throw OSwindError.invalid("No owned source dependencies")})
+        XCTAssertNotNil(try b.get(local))
+        _=try b.wipeLibrary();try drain(b,bc)
+        XCTAssertNil(try b.get(local))
+        let emitted=try bc.journal.outbox()
+        XCTAssertTrue(emitted.filter({$0.mutation == .delete && $0.key==original.key}).isEmpty,"Clearing this Mac's local copy must not publish a group deletion of the shared lifetime")
+        for operation in emitted {try receiveDeletion(operation,a,ac)}
+        XCTAssertNotNil(try a.get("shared-owned-source"),"The other Mac must retain its independent copy after a local-only clear")
+    }
+    func testCollectionPeerLocalFencePreservesIndependentEditsWhileWipedPeerRefusesOldHistory()throws {
+        let (a,ac)=try endpoint("independent-local-history",producerID),(b,bc)=try endpoint("local-only-wipe",receiverID)
+        defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID);try ac.journal.allowPeer(receiverID)
+        try a.insert(Memory(id:"keep-on-a",kind:.note,text:"Owned history stays on the other Mac"));try drain(a,ac)
+        let first=try XCTUnwrap(ac.journal.outbox().first)
+        _=try b.wipeLibrary()
+        // Stage only the verified observation of B's local fence. There is no
+        // authorization to erase A's library, and no group-erasure marker.
+        try a.withRoutineDatabase {db in
+            let row=try db.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,1)");defer {sqlite3_finalize(row)};db.bind(row,1,receiverID);try db.done(row)
+        }
+        try a.insert(Memory(id:"keep-on-a",kind:.note,text:"Owned edit remains allowed on A"))
+        XCTAssertNoThrow(try drain(a,ac),"A peer's local wipe must not block independent history on this Mac")
+        let operations=try ac.journal.outbox()
+        XCTAssertEqual(operations.count,2)
+        XCTAssertEqual(operations.last?.dot.counter,2)
+        XCTAssertEqual(operations.last?.creationEra,.empty)
+        XCTAssertEqual(try a.get("keep-on-a")?.text,"Owned edit remains allowed on A")
+        XCTAssertFalse(try ac.journal.state(for:first.key).isDeleted)
+        var bodyChecks=0,projected=false
+        for op in operations {
+            _=try bc.journal.receive(op,contentAvailable:{_ in bodyChecks+=1;return true}) {_ in projected=true}
+        }
+        XCTAssertEqual(bodyChecks,0);XCTAssertFalse(projected);XCTAssertEqual(try count(b,"memories"),0)
+        XCTAssertEqual(try bc.journal.cursor(for:producerID),operations.last?.dot.counter)
+    }
     func testCollectionStaleEraCannotRetireAKnownPostWipeNativeLifetime()throws {
         let (a,ac)=try endpoint("fresh-producer",producerID),(b,bc)=try endpoint("fresh-receiver",receiverID)
         defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
