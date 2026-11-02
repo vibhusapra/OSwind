@@ -1,10 +1,20 @@
 # OSwind delivery ledger
 
+## Folder-backed native sync service — experimental WIP
+
+The [internal service](SYNC-LIBRARY-SERVICE.md) now supplies real saved-policy/media adapters, all 13 native kinds, authenticated discovery hints, durable cursors, delayed-declaration retry and background stop/join scheduling. Source `92b9a84` binds [1,438 tracked inputs](../benchmarks/sync-library-service-inputs-v1.json) and its [software receipt](../benchmarks/sync-library-service-v1.json). Broad debug passes **2,294 / 130 skips**; selected sanitizer and optimized each pass **1,234 / 76 skips**. Five gated compatibility cases pass separately in each mode, yielding **2,299 / 125 remaining skips** and **1,239 / 71**, respectively, across the same defined identities. All **458 required controls**, including 13 service cases, and 19 additional owner-qualified backend checks pass in each combined build. No sanitizer race warning appears.
+
+Independent readers verify three reopened-library fixtures: all 13 kinds and 21 wire bodies match, native/historical-original citations resolve, cursors reach 21, one native answer binding completes and the receiver authors no echo. The first reader's mistaken direct-citation assumption remains retained. This is not a new app/package or physical provider/two-Mac qualification.
+
+Public setup/UI, native-specific renewal proof and atomic cleanup fencing, older clients/rollback, offline backpressure/reconciliation, large resumable transfers and selective spool GC/backup semantics remain open. Whole-library cleanup includes the private encrypted spool. F059 stays TODO and all 83 statuses are unchanged.
+
 ## Native group retirement — internal WIP
 
 The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now has a [source-bound local qualification](../benchmarks/native-collection-retirement-v1.json) at `2345a25`: **2,286 full passes / 125 skips**, **1,226 sanitizer and optimized passes / 71 skips each**, all **445 required controls**, **62 native passes**, **9 current collection fixture parents without skips**, and **34 package/process stages**. Independent readers inspect actual 13-kind/native/raw/staged/cache/original/publication/media retirement and pre/post-commit SIGKILL WALs; the final review preserves all 61 earlier app trees. Public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged.
 
 [PR #136's completed hosted failure](../benchmarks/sync-library-barriers-hosted-v1.json) remains unresolved: full 2,270 passes/128 skips and clipboard 3 passes, but native 61/62 passes with one missing-session error. Unchanged local and instrumented observations do not establish its cause or a fix.
+
+[PR #137's separate hosted receipt](../benchmarks/sync-native-retirement-hosted-v1.json) passes both jobs at `1c5c798`: full 2,282/129 skips, clipboard 3 and native 62 without skips. Its actual merge checkout tree equals the published head; all 81 native-job steps succeed. The earlier missing-image case passes here, without establishing why PR #136 failed.
 
 ## Collection erasure and owning sync transport — internal WIP
 

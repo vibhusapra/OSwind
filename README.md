@@ -8,7 +8,7 @@ Local desktop memory for your Mac: save chosen windows and conversations, search
 - [Feature scope and progress](docs/PROGRESS.md) · [Competitive research](docs/landscape.html) · [Benchmark receipts](benchmarks/README.md)
 - [Capture privacy](docs/CAPTURE-PRIVACY.md) · [Component qualification history](docs/COMPONENT-QUALIFICATIONS.md)
 
-The latest [native group-erasure qualification](docs/SYNC-NATIVE-RETIREMENT.md) covers all 13 native kinds, queued work, caches, originals, publication bindings and durable media cleanup: 2,286 full-suite passes, 445 required controls in three builds, 62 native passes, nine collection fixture parents and 34 package/process stages. The public sync service remains unfinished. A separate earlier hosted vault missing-session failure is still unresolved; component evidence does not close the remaining product gates.
+The [internal sync service](docs/SYNC-LIBRARY-SERVICE.md) now connects all 13 native kinds to saved privacy settings, real retained media, durable delivery and a background scheduler. Its source-bound software checks pass all 458 required controls in three build modes, with independently inspected reopened-library fixtures. Public setup, unattended backpressure, renewal/compatibility safeguards and real provider/two-Mac acceptance remain unfinished. The separate [native group-erasure package qualification](docs/SYNC-NATIVE-RETIREMENT.md) and [hosted checks](benchmarks/sync-native-retirement-hosted-v1.json) remain available; neither resolves the earlier hosted vault missing-session failure or closes the product gates.
 
 ![Rendered OSwind sample workspace](assets/workspace-sample.png)
 
