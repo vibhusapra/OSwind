@@ -27,7 +27,8 @@ import EventKit
     let libraryTransfer = LibraryTransferModel()
     let libraryWipe=LibraryWipeModel()
     lazy var pendingMediaCleanup=PendingMediaCleanupModel(store:store,onFinished:{[weak self] in self?.invalidateStorageEstimate()},onWipeState:{[weak self] pending in self?.libraryWipe.pendingCleanup=pending})
-    private var noteTasks=[UUID:Task<Void,Never>]()
+    let libraryWork=LibraryWorkRegistry()
+    private var libraryWorkAvailable:Bool {!libraryRetired && destructiveDrainers==0 && libraryWork.accepting && !store.isClosed}
     let routines:RoutinesModel
     let nativeModels:NativeModelSetupModel
     let visualModelSetup:VisualModelSetupModel
@@ -42,10 +43,10 @@ import EventKit
             assignInternalSettings(oldValue);return
         }
         applySettingsToControllers()
-        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelMaintenanceWork();cancelAnswer()}
+        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();libraryWork.cancel(kinds:[.note,.recap]);cancelMaintenanceWork();cancelAnswer()}
         if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}
         if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
-        if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
+        if oldValue.piiImports != settings.piiImports {cancelJSONImport();libraryWork.cancel(kinds:[.note,.recap])}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -124,8 +125,7 @@ import EventKit
     private var maintenanceAutomatic=false
     private var destructiveDrainers=0
     var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
-    private var recapSaveTask:Task<Void,Never>?
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
     @Published private(set) var maintenanceStatus=""
@@ -329,7 +329,7 @@ import EventKit
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
-        libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
+        libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();libraryWork.cancel();libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
@@ -488,13 +488,14 @@ import EventKit
             catch { guard !Task.isCancelled else { return };if mode == .visual {self?.hits=[];self?.searchWarnings=[error.localizedDescription]} else {self?.errorMessage = error.localizedDescription}; self?.refreshing = false }
         }
     }
-    private func refreshStatistics(force: Bool) {
+    var hasPendingStatistics:Bool {statisticsTask != nil || diskUsageTask != nil}
+    func refreshStatistics(force: Bool,observeWorker:(@Sendable ()throws->Void)?=nil,observeStorage:(@Sendable ()throws->Void)?=nil,statisticsCompleted:(@Sendable ()->Void)?=nil,storageCompleted:(@Sendable ()->Void)?=nil) {
         if statisticsTask != nil { if force { statisticsPending = true }; return }
         guard force || Date().timeIntervalSince(statisticsUpdatedAt) >= 5 else { return }
         let store = self.store
         statisticsTask = Task { [weak self] in
             do {
-                var value = try await Task.detached(priority:.utility) { try store.stats(includeDiskUsage:false) }.value
+                var value = try await Task.detached(priority:.utility) {defer {statisticsCompleted?()};try observeWorker?();return try store.stats(includeDiskUsage:false)}.value
                 guard let self else { return }; value.bytes = self.stats.bytes
                 self.stats = value; self.statisticsUpdatedAt = Date()
             } catch { self?.errorMessage = error.localizedDescription }
@@ -503,17 +504,19 @@ import EventKit
         }
         // Storage traversal is independent of both query publication and SQL
         // counts. Coalesce it across captures/keystrokes, including large stores.
-        refreshStorageEstimate()
+        refreshStorageEstimate(observeWorker:observeStorage,observeCompletion:storageCompleted)
     }
     func invalidateStorageEstimate() { storageGeneration = UUID(); storageUpdatedAt = nil }
-    private func refreshStorageEstimate() {
+    private func refreshStorageEstimate(observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
         guard diskUsageTask == nil, storageUpdatedAt.map({ Date().timeIntervalSince($0) >= 30 }) ?? true else { return }
         let store = self.store, generation = storageGeneration
         diskUsageTask = Task { [weak self] in
-            let bytes = await Task.detached(priority:.utility) { store.diskBytes() }.value
-            guard let self else { return }; self.diskUsageTask = nil
-            if generation == self.storageGeneration { self.stats.bytes = bytes; self.storageUpdatedAt = Date() }
-            else { self.refreshStorageEstimate() }
+            do {
+                let bytes = try await Task.detached(priority:.utility) {defer {observeCompletion?()};try observeWorker?();return store.diskBytes()}.value
+                guard let self else { return }; self.diskUsageTask = nil
+                if generation == self.storageGeneration { self.stats.bytes = bytes; self.storageUpdatedAt = Date() }
+                else { self.refreshStorageEstimate() }
+            } catch {self?.diskUsageTask=nil;self?.errorMessage=error.localizedDescription}
         }
     }
     func prepareMeetingBrief(_ event:MeetingOccurrence) {
@@ -581,31 +584,41 @@ import EventKit
         guard let id = currentChatID else { return }
         do { guard let session = try store.chat(id) else { return }; let text = ConversationContext.markdown(session,turns:try store.chatTurns(id,limit:1000)); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-conversation.md"; if panel.runModal() == .OK, let url = panel.url { try text.write(to:url,atomically:true,encoding:.utf8); try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:url.path) } } catch { errorMessage = error.localizedDescription }
     }
-    func saveAnswer(_ value:Answer?=nil) {
-        guard !libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
+    func saveAnswer(_ value:Answer?=nil,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy,!savingRecap,let result=value ?? answer,!result.sources.isEmpty else {return}
         savingRecap=true;recapSaveStatus="Saving a source-linked recap…"
-        let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
-        let worker=Task.detached(priority:.utility) {try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)}
-        recapSaveTask=Task {
-            defer {savingRecap=false;recapSaveTask=nil}
-            do {
-                let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()}
-                guard libraryOperationGeneration==generation else {return}
-                recapSaveStatus="Saved to Recaps with \(result.sources.count) original \(result.sources.count==1 ? "source":"sources").";captured(memory)
-            } catch {
-                guard libraryOperationGeneration==generation else {return}
-                recapSaveStatus="Recap was not saved.";errorMessage=error.localizedDescription
+        let store=self.store,embedder=self.embedder,policy=settings.privacy,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.recap,operation:{
+            try observeWorker?();try Task.checkCancellation()
+            let memory=try store.saveRecap(result,title:"Recap · \(Date().formatted(date:.abbreviated,time:.shortened))",policy:policy,embedder:embedder)
+            observeCompletion?();return memory
+        }) {outcome,cancelled in
+            self.savingRecap=false
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let memory):
+                self.recapSaveStatus=cancelled ? "Recap committed before cancellation. Refresh to review it.":"Saved to Recaps with \(result.sources.count) original \(result.sources.count==1 ? "source":"sources")."
+                if !cancelled {self.captured(memory)}
+            case .failure(let error):
+                self.recapSaveStatus=cancelled ? "Recap save cancelled.":"Recap save did not finish."
+                if !cancelled {self.errorMessage=error.localizedDescription}
             }
         }
     }
-    func addNote(_ text:String,title:String="Quick note",kind:MemoryKind = .note) {
-        guard !libraryWipe.busy else {return}
-        let clean=settings.privacy.sanitize(text).text,embedder=self.embedder,store=self.store,id=UUID(),generation=libraryOperationGeneration
-        let worker=Task.detached(priority:.utility) {var m=Memory(kind:kind,app:"OSwind",title:title,text:clean);m.embedding=embedder.embed(m.searchableText);m.embeddingModel=m.embedding==nil ? nil:embedder.modelID;try Task.checkCancellation();try store.insert(m);return m}
-        noteTasks[id]=Task {
-            defer {noteTasks[id]=nil}
-            do {let memory=try await withTaskCancellationHandler {try await worker.value} onCancel: {worker.cancel()};guard libraryOperationGeneration==generation else {return};captured(memory)}
-            catch {guard libraryOperationGeneration==generation,!Task.isCancelled else {return};errorMessage=error.localizedDescription}
+    func addNote(_ text:String,title:String="Quick note",kind:MemoryKind = .note,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy else {return}
+        let clean=settings.privacy.sanitize(text).text,embedder=self.embedder,store=self.store,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.note,operation:{
+            try observeWorker?();try Task.checkCancellation()
+            var memory=Memory(kind:kind,app:"OSwind",title:title,text:clean)
+            memory.embedding=embedder.embed(memory.searchableText);memory.embeddingModel=memory.embedding==nil ? nil:embedder.modelID
+            try Task.checkCancellation();try store.insert(memory);observeCompletion?();return memory
+        }) {outcome,cancelled in
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let memory):if !cancelled {self.captured(memory)}
+            case .failure(let error):if !cancelled {self.errorMessage=error.localizedDescription}
+            }
         }
     }
     enum MCPResultSavePhase:Sendable {case started,settingsCaptured}
@@ -656,11 +669,13 @@ import EventKit
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
+        libraryWork.cancel()
         pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
         await cancelDestructiveWorkAndWait()
         await pendingMediaCleanup.cancelAndWait()
+        await libraryWork.cancelAndWait()
     }
     private func cancelDestructiveWork() {
         deletionWorker?.cancel();maintenanceWorker?.cancel();deletionTask?.cancel();maintenanceTask?.cancel()
@@ -873,7 +888,7 @@ import EventKit
         assignInternalSettings(quiet);applySettingsToControllers()
         do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry,before:{[workflow,pendingMediaCleanup] in await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait()}) {[weak self] result in
+        libraryWipe.run(store:store,retry:retry,before:{[workflow,pendingMediaCleanup,libraryWork] in await workflow.cancelAndWait();await pendingMediaCleanup.cancelAndWait();await libraryWork.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
             self.libraryRetired=false;self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}
@@ -994,7 +1009,7 @@ import EventKit
     enum JSONImportPhase:Sendable {case started,settingsCaptured}
     // The observer is an internal test seam; production callers leave it nil.
     func importJSONFile(_ url:URL,limitlessAPI:Bool=false,observeWorker:(@Sendable (JSONImportPhase)throws->Void)?=nil,scannerFactory:@escaping @Sendable (PIIImportConfiguration) async throws->PIIImportScanner = {try await $0.scanner()}) {
-        guard !store.isClosed,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
+        guard libraryWorkAvailable,!libraryWipe.busy,!importingJSON,jsonImportDrainers==0 else {return};importingJSON=true;importStatus=limitlessAPI ? "Importing Limitless text and checking privacy rules…":"Importing sources and checking recap links…"
         let store=self.store,embedder=self.embedder,policy=settings.privacy,pii=settings.piiImports,generation=libraryOperationGeneration
         let worker=Task.detached(priority:.utility) {()throws->String in
             try Task.checkCancellation();try observeWorker?(.started);try Task.checkCancellation()
