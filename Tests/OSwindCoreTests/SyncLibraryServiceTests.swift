@@ -116,7 +116,7 @@ extension SyncOutgoingTests {
             XCTAssertThrowsError(try f.a.tick())
             try f.transport.publishCollectionControl(approved)
             try f.transport.publishServiceHead(.init(group:group,epoch:epoch,replica:replica,through:old.through,collectionCounter:approved.counter))
-            try f.receiver.insert(Memory(id:"unsent",timestamp:now,kind:.note,app:"Owned",text:"Owned unsent receiver source"))
+            try f.receiver.insert(Memory(id:"unsent",timestamp:now,kind:.note,app:"Owned",text:"password=owned-blocked-unsent-value"))
             guard case .needsNativeCollectionRetirement(let received)=try serviceReady(f.b) else {return XCTFail("Worker must yield to the lifecycle owner")}
             XCTAssertEqual(received,approved);XCTAssertNotNil(try f.receiver.get("unsent"))
             XCTAssertEqual(try f.transport.serviceHead(replica:f.b.cache.journal.replica)?.through,0)
@@ -274,5 +274,62 @@ extension SyncOutgoingTests {
         defer {shared.close();local.close()}
         XCTAssertThrowsError(try SyncLibraryService.install(library:store,replica:replica,group:group,epoch:epoch,peers:[],transport:shared,inbox:local))
         XCTAssertEqual(try n("SELECT enabled FROM personal_sync_capture"),0,"Refuse unsafe roots before activating capture")
+    }
+
+    func testServiceReopensBothLibrariesAndEncryptedSpoolsAfterPartialGraphDelivery()throws {
+        try seedGraph()
+        let expected=try Dictionary(uniqueKeysWithValues:SyncCanonicalTable.allCases.map {($0.rawValue,try serviceCount(store,$0.rawValue))})
+        try withServicePair {f in
+            for _ in 0..<40 {_=try serviceReady(f.a,limit:1)}
+            _=try serviceReady(f.b,limit:1)
+            let partial=try XCTUnwrap(f.b.cache.journal.cursor(for:replica))
+            XCTAssertGreaterThan(partial,0);XCTAssertLessThan(partial,try XCTUnwrap(f.transport.serviceHead(replica:replica)?.through))
+            try f.a.stop();try f.b.stop();try store.close();try f.receiver.close();f.localA.close();f.localB.close()
+            store=try MemoryStore(root:root)
+            let receiver=try MemoryStore(root:f.receiver.root)
+            let localA=try SyncObjectFolder.open(at:f.localA.root,secret:f.secret,group:group,epoch:epoch)
+            let localB=try SyncObjectFolder.open(at:f.localB.root,secret:f.secret,group:group,epoch:epoch)
+            defer {try? receiver.close();localA.close();localB.close()}
+            let a=try SyncLibraryService.install(library:store,replica:replica,group:group,epoch:epoch,peers:f.a.peers,transport:f.transport,inbox:localA)
+            let b=try SyncLibraryService.install(library:receiver,replica:f.b.cache.journal.replica,group:group,epoch:epoch,peers:[replica],transport:f.transport,inbox:localB)
+            defer {try? a.stop();try? b.stop()}
+            XCTAssertEqual(try b.cache.journal.cursor(for:replica),partial)
+            for _ in 0..<40 {_=try serviceReady(a,limit:2);_=try serviceReady(b,limit:2)}
+            for table in SyncCanonicalTable.allCases {XCTAssertEqual(try serviceCount(receiver,table.rawValue),expected[table.rawValue],table.rawValue)}
+            XCTAssertEqual(try serviceCount(receiver,"personal_sync_publication_jobs"),0)
+            XCTAssertEqual(try serviceCount(receiver,"personal_sync_publication_bindings"),1)
+            XCTAssertEqual(try serviceCount(receiver,"personal_sync_changes"),0)
+            if let destination=ProcessInfo.processInfo.environment["OSWIND_TEST_SYNC_SERVICE_ROOT"] {
+                let output=URL(fileURLWithPath:destination,isDirectory:true).appendingPathComponent("reopened-all13-"+UUID().uuidString.lowercased())
+                try FileManager.default.createDirectory(at:output,withIntermediateDirectories:true,attributes:[.posixPermissions:0o700])
+                try snapshotNativeCollectionBefore(store,to:output.appendingPathComponent("producer.sqlite"))
+                try snapshotNativeCollectionBefore(receiver,to:output.appendingPathComponent("receiver.sqlite"))
+                let receipt:[String:Any]=["tables":expected,"partialCursor":partial,"finalCursor":try XCTUnwrap(b.cache.journal.cursor(for:replica)),"peerOutbox":try b.cache.journal.outbox().count,"publicationJobs":try serviceCount(receiver,"personal_sync_publication_jobs"),"publicationBindings":try serviceCount(receiver,"personal_sync_publication_bindings")]
+                try JSONSerialization.data(withJSONObject:receipt,options:[.prettyPrinted,.sortedKeys]).write(to:output.appendingPathComponent("fixture.json"),options:.withoutOverwriting)
+            }
+        }
+    }
+
+    func testServiceDiscoversDelayedDeclarationAfterCursorProgressWithoutAnotherPeerOperation()throws {
+        try seedGraph()
+        try withServicePair {f in
+            for _ in 0..<40 {_=try serviceReady(f.a)}
+            let operations=try f.a.cache.journal.outbox(),declaration=try XCTUnwrap(operations.compactMap(\.publication).first)
+            XCTAssertLessThan(declaration.bytes,Int64(SyncCipherContext.maximumPlaintextBytes))
+            let cipher=try SyncCipherContext(secret:f.secret,group:group,epoch:epoch,purpose:.contentChunk)
+            let token=try cipher.token(for:Data("OSwind.sync.content.v1\0\(declaration.sha256)\0\(declaration.bytes)\00".utf8))
+            let packet=f.transport.root.appendingPathComponent("objects/\(token.prefix(2))/\(token)"),hidden=root.appendingPathComponent("owned-delayed-declaration")
+            try FileManager.default.moveItem(at:packet,to:hidden)
+            for _ in 0..<40 {_=try serviceReady(f.b)}
+            XCTAssertEqual(try f.b.cache.journal.cursor(for:replica),operations.last?.dot.counter)
+            XCTAssertEqual(try serviceCount(f.receiver,"personal_sync_publication_jobs"),1)
+            XCTAssertEqual(try serviceCount(f.receiver,"chat_turns"),0)
+            try FileManager.default.moveItem(at:hidden,to:packet)
+            _=try serviceReady(f.b)
+            XCTAssertEqual(try f.b.cache.journal.cursor(for:replica),operations.last?.dot.counter)
+            XCTAssertEqual(try serviceCount(f.receiver,"personal_sync_publication_jobs"),0)
+            XCTAssertEqual(try serviceCount(f.receiver,"chat_turns"),1)
+            XCTAssertEqual(try serviceCount(f.receiver,"chat_sources"),1)
+        }
     }
 }

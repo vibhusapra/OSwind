@@ -23,6 +23,7 @@ final class SyncLibraryService:@unchecked Sendable {
     private let mutex=NSRecursiveLock()
     private let token:String
     private var stopped=false
+    private var pendingAfter:Int64=0
     private static let stateSchema="CREATE TABLE personal_sync_service_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,token TEXT NOT NULL,sent INTEGER NOT NULL CHECK(typeof(sent)='integer' AND sent>=0))"
     private static let peerSchema="CREATE TABLE personal_sync_service_heads(replica TEXT PRIMARY KEY,through INTEGER NOT NULL CHECK(typeof(through)='integer' AND through>=0),collection_counter INTEGER NOT NULL CHECK(typeof(collection_counter)='integer' AND collection_counter>=0))"
 
@@ -108,17 +109,9 @@ final class SyncLibraryService:@unchecked Sendable {
         let snapshot=try LibrarySettingsSnapshot.capture(root:library.root);defer {snapshot.release()}
         let policy=SyncServicePolicy(settings:snapshot.settings),media=SyncServiceMedia(library:library,inbox:inbox,policy:policy)
         let activity=try library.mediaWriteLease();defer {activity.release()}
-        let preparation=try fenced(snapshot) {()->SyncLibraryServiceStep? in
-            let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
-            if case .needsGroupReview(let control)=try history.reviewState(journal:cache.journal) {return .needsGroupReview(control)}
-            try publications.context()
-            var processor=SyncOutgoingProcessor(queue:work,cache:cache,admitRow:policy.admitRow,admitVersion:policy.admit,media:media.prepare)
-            processor.retainTurnPublication={reference,data in try self.inbox.publishContent(data,reference:reference)}
-            let step=try processor.step(limit:limit)
-            return step == .idle ? nil:.preparing(step)
-        }
-        if let preparation {return preparation}
-
+        try fenced(snapshot) {}
+        // Discover erasure before preparing local bodies. A blocked private
+        // row or a large offline backlog must not starve the erasure handoff.
         var heads=[SyncServiceHead]()
         for peer in peers {
             try Task.checkCancellation()
@@ -133,6 +126,17 @@ final class SyncLibraryService:@unchecked Sendable {
             }
             heads.append(head)
         }
+
+        let preparation=try fenced(snapshot) {()->SyncLibraryServiceStep? in
+            let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
+            if case .needsGroupReview(let control)=try history.reviewState(journal:cache.journal) {return .needsGroupReview(control)}
+            try publications.context()
+            var processor=SyncOutgoingProcessor(queue:work,cache:cache,admitRow:policy.admitRow,admitVersion:policy.admit,media:media.prepare)
+            processor.retainTurnPublication={reference,data in try self.inbox.publishContent(data,reference:reference)}
+            let step=try processor.step(limit:limit)
+            return step == .idle ? nil:.preparing(step)
+        }
+        if let preparation {return preparation}
 
         var sender=SyncLibrarySender(library:library,cache:cache,inbox:transport,admit:policy.admit,supplementalContent:{try self.inbox.content($0)})
         sender.publicationFence={write in try snapshot.withCurrent(root:self.library.root,policy:snapshot.settings.privacy) {try self.context();try self.publications.context();try write();try self.context()}}
@@ -158,6 +162,13 @@ final class SyncLibraryService:@unchecked Sendable {
             let value=try SyncPortableRecord.decode(bytes,expected:reference)
             try policy.admit(value);try inbox.publishContent(bytes,reference:reference.content);return value
         }
+        @discardableResult func retainDeclaration(_ reference:SyncContentReference)throws->Bool {
+            guard let bytes=try inbox.content(reference) ?? transport.content(reference) else {return false}
+            let value=try SyncTurnPublication.decode(bytes,expected:reference)
+            guard value.group==cache.journal.group,value.epoch==cache.journal.epoch else {throw OSwindError.invalid("Peer declaration namespace differs")}
+            for citation in value.citations {try policy.admit(citation)}
+            try inbox.publishContent(bytes,reference:reference);try publications.wakeDeclaration(reference);return true
+        }
         var received=0
         for head in heads {
             let cursor=try fenced(snapshot) {try cache.journal.cursor(for:head.replica) ?? 0}
@@ -175,12 +186,7 @@ final class SyncLibraryService:@unchecked Sendable {
             operations.sort {if $0.mutation != $1.mutation {return $0.mutation == .delete};return $0.dot.counter<$1.dot.counter}
             for operation in operations {
                 try fenced(snapshot) {
-                    if let declaration=operation.publication,let bytes=try transport.content(declaration) {
-                        let value=try SyncTurnPublication.decode(bytes,expected:declaration)
-                        guard value.group==cache.journal.group,value.epoch==cache.journal.epoch else {throw OSwindError.invalid("Peer declaration namespace differs")}
-                        for citation in value.citations {try policy.admit(citation)}
-                        try inbox.publishContent(bytes,reference:declaration);try publications.wakeDeclaration(declaration)
-                    }
+                    if let declaration=operation.publication {try retainDeclaration(declaration)}
                     let packet:SyncPortableRecord?
                     if let reference=operation.content,let bytes=try transport.content(reference) {
                         let value=try SyncPortableRecord.decode(bytes)
@@ -193,6 +199,22 @@ final class SyncLibraryService:@unchecked Sendable {
             }
         }
         let pending=try fenced(snapshot) {
+            // Providers can deliver a declaration after its operation/cursor.
+            // Poll durable pending owners fairly even without new operations.
+            var jobs=try publications.jobs(limit:limit,readyOnly:false,after:pendingAfter)
+            if jobs.isEmpty,pendingAfter>0 {pendingAfter=0;jobs=try publications.jobs(limit:limit,readyOnly:false)}
+            for job in jobs {
+                let state=try cache.journal.state(for:job.identity.key)
+                if !state.isDeleted,state.heads.count==1,let head=state.heads.first {
+                    if let declaration=head.publication {try retainDeclaration(declaration)}
+                    if job.reason == .missingOwnerContent,let content=head.content,
+                       (try inbox.content(content) ?? transport.content(content)) != nil {
+                        _=try record(.init(identity:job.identity,content:content));try publications.wake(job.identity.key)
+                    }
+                    if job.reason == .policyDenied || job.reason == .storagePressure {try publications.wake(job.identity.key)}
+                }
+                pendingAfter=job.ordinal
+            }
             _=try admission.retry(limit:limit,admission:activity,fetchSource:record)
             try publications.checkAccounting()
             return try cache.database.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs")

@@ -261,10 +261,10 @@ struct SyncPublicationQueue {
     func wakeDeclaration(_ reference:SyncContentReference)throws {
         try SyncChangeCapture.transaction(db) {try context();let row=try db.statement("UPDATE personal_sync_publication_jobs SET ready=1 WHERE declaration_sha=?");defer {sqlite3_finalize(row)};db.bind(row,1,reference.sha256);try db.done(row)}
     }
-    func jobs(limit:Int=64,readyOnly:Bool=true)throws->[SyncPublicationJob] {
-        guard (1...256).contains(limit) else {throw OSwindError.invalid("Invalid publication batch bound")}
+    func jobs(limit:Int=64,readyOnly:Bool=true,after:Int64=0)throws->[SyncPublicationJob] {
+        guard (1...256).contains(limit),after>=0 else {throw OSwindError.invalid("Invalid publication batch bound")}
         return try SyncChangeCapture.transaction(db) {
-            try context();let row=try db.statement("SELECT ordinal,object_digest,origin,lifetime,state_sha,reason,attempts FROM personal_sync_publication_jobs"+(readyOnly ? " INDEXED BY sync_publication_ready WHERE ready=1":"")+" ORDER BY ordinal LIMIT ?");defer {sqlite3_finalize(row)};sqlite3_bind_int(row,1,Int32(limit));var result=[SyncPublicationJob]()
+            try context();let row=try db.statement("SELECT ordinal,object_digest,origin,lifetime,state_sha,reason,attempts FROM personal_sync_publication_jobs"+(readyOnly ? " INDEXED BY sync_publication_ready WHERE ready=1 AND":" WHERE")+" ordinal>? ORDER BY ordinal LIMIT ?");defer {sqlite3_finalize(row)};sqlite3_bind_int64(row,1,after);sqlite3_bind_int(row,2,Int32(limit));var result=[SyncPublicationJob]()
             while true {let code=sqlite3_step(row);if code==SQLITE_DONE {break};guard code==SQLITE_ROW,let reason=SyncPublicationPendingReason(rawValue:db.text(row,5)) else {throw OSwindError.database("Publication job state differs")}
                 let identity=try SyncObjectIdentity(table:.turn,origin:db.text(row,2),lifetime:db.text(row,3));guard try identity.key.digest==db.text(row,1) else {throw OSwindError.database("Publication job identity differs")};try SyncProtocolLimits.digest(db.text(row,4))
                 result.append(.init(ordinal:sqlite3_column_int64(row,0),identity:identity,stateSHA:db.text(row,4),reason:reason,attempts:sqlite3_column_int64(row,6)))
