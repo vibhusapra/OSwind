@@ -2,7 +2,9 @@
 
 ## Native group retirement — internal WIP
 
-The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now exercises real 13-kind/native/raw/staged/cache/original/publication/media retirement, a separate received-cleanup marker, exact rollback and actual pre/post-commit SIGKILL recovery. Current focused checks pass 23 methods with one owned-worker skip; independent readers preserve the original failures and inspect retained SQLite, WAL and media. Final-source gates, public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged. PR #136's separate hosted native missing-session failure remains unresolved despite an unchanged-test local pass.
+The [native erasure adapter](SYNC-NATIVE-RETIREMENT.md) now has a [source-bound local qualification](../benchmarks/native-collection-retirement-v1.json) at `2345a25`: **2,286 full passes / 125 skips**, **1,226 sanitizer and optimized passes / 71 skips each**, all **445 required controls**, **62 native passes**, **9 current collection fixture parents without skips**, and **34 package/process stages**. Independent readers inspect actual 13-kind/native/raw/staged/cache/original/publication/media retirement and pre/post-commit SIGKILL WALs; the final review preserves all 61 earlier app trees. Public lifecycle/service and device/provider acceptance remain open. All 83 statuses stay unchanged.
+
+[PR #136's completed hosted failure](../benchmarks/sync-library-barriers-hosted-v1.json) remains unresolved: full 2,270 passes/128 skips and clipboard 3 passes, but native 61/62 passes with one missing-session error. Unchanged local and instrumented observations do not establish its cause or a fix.
 
 ## Collection erasure and owning sync transport — internal WIP
 

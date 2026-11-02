@@ -1,4 +1,4 @@
-# Native group erasure — internal WIP
+# Native group erasure — internal component
 
 `SyncNativeCollectionReceiver` now supplies the required native adapter for a newly authenticated encrypted group-erasure control. It uses the receiver's existing exclusive media lease and SQLite transaction. This is internal infrastructure; no background sync service is enabled.
 
@@ -8,14 +8,15 @@ Received cleanup uses `library_group_wipe_dirty_v1`. It shares pending-cleanup, 
 
 Retiring stale publication metadata requires the same group, epoch, capture generation, schema and accounting. A prior local wipe can leave its publishing authority invalid; authenticated erasure may clear that metadata without granting fresh publishing authority. Ordinary publication still refuses the invalidated queue.
 
-## Current evidence
+## Qualified source and evidence
 
-- Current focused preflight: **23 passes / one explicit owned-worker skip**, including all 14 local/staged wipe tests, actual 13-kind retirement, raw and staged work, original projections, completed publication bindings, a native archived original, transaction/lease refusal, rollback/retry, later identities and older controls.
-- An earlier candidate related run passed **693 methods / 36 explicit skips**. The later transaction/key-retirement guards have focused evidence, pending the full final-source runs.
-- Independent readers inspect seven consistent SQLite/media snapshots, closed native-original and completed-binding fixtures, the local-clear regression, and actual database/WAL files retained after SIGKILL immediately before and after commit. Database integrity and foreign keys pass. Headers and peer cursors remain unchanged; no local erase echo is created.
-- The original candidate refused group erasure after a local wipe invalidated publication authority. Its two failed assertions, source snapshot and fixed regression remain retained. Initial crash-parent failures came from strict inspection through macOS's `/var` alias; POSIX `realpath` corrects that fixture path while retaining read-only/no-follow flags. An independent-reader attempt also retained its failure before a fresh baseline explicitly accounted for newly created empty coordination WAL files.
+Source `2345a256525254a60ac52ec4077127ba330fb566` binds the [1,428-input receipt](../benchmarks/native-collection-retirement-v1.json): **2,286 full passes / 125 explicit skips**, **1,226 sanitizer and optimized passes / 71 skips each**, all **445 required controls** in every build, **62 native methods without skips**, and **9 additional native-collection fixture parents without skips**. Full plus native covers **2,346 distinct methods**; all nine collection parents are already in the full-suite count.
 
-These are preflights, not a completed final-source/software/package qualification. Frozen successful readers are not rerun or relabeled as later source acceptance.
+All **34 fresh package/process stages** pass. Independent review verifies every byte of the 34-file app/ZIP/extraction, strict ad hoc signatures, migration crash databases, current-source collection fixtures and 61 earlier app trees. The independent readers inspect seven SQLite/media snapshots, closed native-original and completed-binding fixtures, the local-clear regression, and actual database/WAL files retained after SIGKILL before and after commit. Integrity and foreign keys pass; headers and peer cursors remain unchanged, with no local erase echo.
+
+The original candidate refused group erasure after a local wipe invalidated publication authority; its failure and fixed regression remain retained. Initial crash-parent failures came from strict inspection through macOS's `/var` alias; POSIX `realpath` corrects that fixture path while retaining read-only/no-follow flags. A failed reader attempt is retained separately from the fresh baseline that explicitly accounts for newly created empty coordination WAL files. Frozen successful readers are never rerun or relabeled as later source acceptance.
+
+This qualifies the internal component locally. Public service/lifecycle, actual provider/device and whole-product acceptance remain separate requirements. Current-source hosted checks are a separate publication gate.
 
 ## Remaining delivery work
 
@@ -23,4 +24,4 @@ The public owner must cancel and join capture, text/import/model/index/read/publ
 
 F059 remains TODO and all 83 feature statuses remain unchanged. Full native UI/input, sustained physical power, signed/notarized distribution and whole-product parity/ranking remain unverified.
 
-PR #136's separate hosted run passed the full 2,398-method suite with 2,270 passes/128 skips and all three clipboard methods, but its native run failed one of 62 methods with a missing vault-session member. The unchanged vault test passes one local comparison; that does not establish the hosted cause or a fix. The complete failed log and diagnostics remain retained, and no blind rerun was requested.
+PR #136's separate hosted run passed the full 2,398-method suite with 2,270 passes/128 skips and all three clipboard methods, but its native run failed one of 62 methods with a missing vault-session member. The unchanged vault test passes one local comparison, and a separate three-method native suite-order probe passes under Thread Sanitizer without warnings. Those observations and the fresh local native run do not establish the hosted cause or a fix. The complete failed log and diagnostics remain retained, and no blind rerun was requested.
