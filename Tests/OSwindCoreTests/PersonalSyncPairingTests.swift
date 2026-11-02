@@ -52,6 +52,21 @@ final class PersonalSyncPairingTests:XCTestCase {
         _=try joiner.acceptResponse(second,trustedRootFingerprint:owner.status().rootFingerprint!,now:now)
         XCTAssertThrowsError(try joiner.reviewRequest(text,now:now))
     }
+    func testDeliveryReservationIsVisibleAndRefusesMembershipReviewOrRetirement()throws {
+        let owner=try open(a);_=try owner.createGroup(deviceName:"Desk Mac",now:now)
+        let joiner=try open(b),text=try request(joiner),review=try owner.reviewRequest(text,now:now)
+        let response=try owner.approve(review,now:now)
+        _=try joiner.acceptResponse(response,trustedRootFingerprint:owner.status().rootFingerprint!,now:now)
+        XCTAssertFalse(try owner.status().deliveryPrepared)
+        let service=try owner.prepareAnchoredService(shared:root.appendingPathComponent("shared"),createShared:true)
+        defer {try? service.stop();service.inbox.close();service.transport.close()}
+        let before=storage.values
+        XCTAssertTrue(try owner.status().deliveryPrepared)
+        XCTAssertThrowsError(try owner.reviewRequest(text,now:now))
+        XCTAssertThrowsError(try owner.approve(review,now:now))
+        XCTAssertThrowsError(try owner.retire())
+        XCTAssertEqual(storage.values,before)
+    }
     func testWrongFingerprintAndTamperedResponseDoNotConsumePendingRequest()throws {
         let owner=try open(a);_=try owner.createGroup(deviceName:"Desk Mac",now:now)
         let joiner=try open(b),text=try request(joiner),response=try owner.approve(owner.reviewRequest(text,now:now),now:now)

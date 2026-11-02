@@ -388,7 +388,7 @@ struct LibraryRecoveryView:View {
             Text(session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
             Text(session.syncErasurePending ? "History deletion has a saved cleanup step. Finish it before opening the library or recording again.":session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
             Text(locationLabel ?? session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
-            if session.busy {HStack {ProgressView(session.progress?.phase ?? "Opening library…");Button("Stop") {session.cancelOperation()}}}
+            if session.busy {HStack {ProgressView(session.progress?.phase ?? (session.syncErasurePending ? "Finishing erasure cleanup…":"Opening library…"));Button("Stop") {session.cancelOperation()}}}
             if !session.busy {
             if session.syncErasurePending,session.canRecoverContent {
                 Button("Resume erasure cleanup") {session.resumeSyncErasure()}.buttonStyle(.borderedProminent)

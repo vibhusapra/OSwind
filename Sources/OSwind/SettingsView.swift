@@ -231,9 +231,9 @@ struct SettingsView: View {
             MeetingSettingsSections(model:m.meetings)
             if m.personalSync.configured || m.personalSync.preparing || m.personalSync.error != nil {PersonalSyncStatusView(model:m.personalSync)}
             if !m.personalSync.configured && !m.personalSync.preparing {
-                Section("Personal device sync · preview") {
+                Section("Personal device sync · two-Mac preview") {
                     Button("Pair your Macs…") {showSyncPairing=true}
-                    Text("Create a group or review a device invitation. Pairing saves identities locally; memory delivery is still in development.").font(.caption).foregroundStyle(.secondary)
+                    Text("Pair two trusted Macs and connect the same shared folder. Memory transfer is encrypted; capture settings stay under your control.").font(.caption).foregroundStyle(.secondary)
                 }
             }
             Section("External MCP tools") {

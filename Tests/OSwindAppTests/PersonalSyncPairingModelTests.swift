@@ -146,18 +146,18 @@ import CSQLite
         owner.prepareForReconnection();owner.performPairing(.load);try await done(owner)
         XCTAssertEqual(owner.pairingStatus?.phase,.owner)
     }
-    private func rootSession()async throws->AppSession {
+    private func rootSession(recoveryGate:PairingSaveGate?=nil)async throws->AppSession {
         let (owner,peer)=try await pairedModels();await owner.cancelAndWait();await peer.cancelAndWait()
         let location=a.root;try a.close()
-        return try await openRootSession(location)
+        return try await openRootSession(location,recoveryGate:recoveryGate)
     }
-    private func openRootSession(_ location:URL)async throws->AppSession {
+    private func openRootSession(_ location:URL,recoveryGate:PairingSaveGate?=nil)async throws->AppSession {
         let state=root.appendingPathComponent("state"),backend=storage!
         var quiet=AppSettings();quiet.captureOnLaunch=false;quiet.apiEnabled=false;quiet.routinesEnabled=false;quiet.automaticMaintenance=false;quiet.entityAutomaticIndex=false;quiet.meetings = .init();quiet.clipboard.enabled=false
         try quiet.save(root:location)
         let environment=SyncNativeWriterEnvironment(stateRoot:state,machine:PairingAppMachine(),storage:{_ in backend})
         let suite="com.oswind.tests.sync-reopen."+UUID().uuidString;preferenceSuites.append(suite)
-        let recovery=PersonalSyncErasureRecovery(pending:{await PersonalSyncRetirementRecovery.hasPending(root:$0,environment:environment)},retry:{try await PersonalSyncRetirementRecovery.retry(root:$0,environment:environment,progress:$1)})
+        let recovery=PersonalSyncErasureRecovery(pending:{await PersonalSyncRetirementRecovery.hasPending(root:$0,environment:environment)},retry:{location,progress in try await PersonalSyncRetirementRecovery.retry(root:location,environment:environment,progress:{value in recoveryGate?.pause();progress(value)})})
         let session=AppSession(selection:.init(url:location,requiresExisting:true,origin:"owned-sync-reopen"),defaults:UserDefaults(suiteName:suite)!,locked:{false},openStore:{try MemoryStore(root:$0,recoveryReadOnly:false,nativeWriterEnvironment:environment)},personalSyncSetup:{store in PersonalSyncModel(store:store,locked:{false},pairingFactory:{try PersonalSyncPairing(store:$0,stateRoot:state,machine:PairingAppMachine(),storage:backend)})},syncRecovery:recovery)
         sessions.append(session)
         try await rootSettled(session) {!session.busy && session.model != nil}
@@ -192,11 +192,38 @@ import CSQLite
         try await rootSettled(session) {!session.busy && session.model==nil && session.syncErasurePending}
         XCTAssertTrue(old.store.isClosed);XCTAssertEqual(old.libraryWipe.result?.erasure.sources,1)
         XCTAssertEqual(old.libraryWipe.result?.cleanupComplete,false);XCTAssertTrue(session.canRecoverContent)
+        if let path=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_RENDER_DIR"] {
+            let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
+            for dark in [false,true] {try await renderView(LibraryRecoveryView(session:session,locationLabel:"Owned test library"),name:"recovery-pending",dark:dark,width:900,height:800,directory:directory,expected:"resume erasure cleanup")}
+        }
         reader.close();session.resumeSyncErasure()
         try await rootSettled(session) {!session.busy && session.model != nil}
         let fresh=try XCTUnwrap(session.model)
         XCTAssertFalse(session.syncErasurePending);XCTAssertEqual(try fresh.store.stats(includeDiskUsage:false).count,0)
         XCTAssertFalse(fresh.isCollecting);XCTAssertFalse(fresh.settings.captureOnLaunch)
+    }
+    func testTerminationJoinsActualRestrictedRecoveryAfterCancellation()async throws {
+        let gate=PairingSaveGate();defer {gate.release()}
+        let session=try await rootSession(recoveryGate:gate),old=try XCTUnwrap(session.model)
+        try old.store.insert(Memory(id:"cancel-recovery",text:"Owned source before pending erasure"))
+        old.personalSync.connectFolder(root.appendingPathComponent("shared"),create:true);try await connected(old.personalSync)
+        let reader=try PairingAppWALReader(root:old.store.root);defer {reader.close()}
+        old.wipeLocalLibrary();try await rootSettled(session) {!session.busy && session.syncErasurePending && session.model==nil}
+        reader.close();session.resumeSyncErasure();await fulfillment(of:[gate.entered],timeout:10)
+        if let path=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_RENDER_DIR"] {
+            let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
+            for dark in [false,true] {try await renderView(LibraryRecoveryView(session:session,locationLabel:"Owned test library"),name:"recovery-working",dark:dark,width:900,height:800,directory:directory,expected:"stop")}
+        }
+        var joined=false
+        let termination=Task {let value=await session.lockForTermination();joined=true;return value};termination.cancel()
+        try await Task.sleep(for:.milliseconds(60))
+        XCTAssertTrue(session.busy);XCTAssertFalse(joined);XCTAssertNil(session.model)
+        gate.release();let closed=await termination.value
+        XCTAssertTrue(closed);XCTAssertTrue(joined);XCTAssertFalse(session.busy);XCTAssertNil(session.model);XCTAssertTrue(session.syncErasurePending)
+        let state=root.appendingPathComponent("state"),backend=storage!
+        let environment=SyncNativeWriterEnvironment(stateRoot:state,machine:PairingAppMachine(),storage:{_ in backend})
+        let result=try await PersonalSyncRetirementRecovery.retry(root:old.store.root,environment:environment)
+        XCTAssertTrue(result.cleanupComplete,"Canceled Root recovery must release its private SQLite and both credential leases")
     }
     func testApprovedPeerEraseAutomaticallyJoinsAppAndReopensQuietlyWithoutLocalApproval()async throws {
         let first=try await rootSession(),oldA=try XCTUnwrap(first.model),shared=root.appendingPathComponent("shared")
@@ -314,28 +341,51 @@ import CSQLite
         try await render(owner,name:"response",directory:directory)
         joiner.performPairing(.accept(try XCTUnwrap(owner.pairingResponse),try XCTUnwrap(owner.pairingStatus?.rootFingerprint)));try await done(joiner)
         try await render(joiner,name:"paired",directory:directory)
+        owner.clearPairingMessages();try await render(owner,name:"folder",directory:directory)
+        let shared=root.appendingPathComponent("render-shared")
+        owner.connectFolder(shared,create:true);try await connected(owner)
+        try await render(owner,name:"connected",directory:directory)
+        await owner.cancelAndWait();owner.prepareForReconnection();owner.performPairing(.load);try await done(owner)
+        XCTAssertEqual(owner.pairingStatus?.deliveryPrepared,true)
+        try await render(owner,name:"reconnect",directory:directory)
+        _=try await owner.eraseHistory(before:{})
+        owner.prepareForReconnection();owner.reconnectSavedFolder();try await connected(owner,phase:.needsLocalEraseReview)
+        try await render(owner,name:"erase-waiting",directory:directory)
+        owner.requestEraseReview()
+        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while owner.eraseReview==nil,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        let review=try XCTUnwrap(owner.eraseReview)
+        for dark in [false,true] {
+            try await renderView(PersonalSyncEraseReviewView(model:owner,reviewed:review),name:"erase-review",dark:dark,width:560,height:500,directory:directory,expected:"approve group erase")
+        }
+        owner.clearEraseReview()
         joiner.performPairing(.retire);try await done(joiner);try await render(joiner,name:"retired",directory:directory)
+        await owner.cancelAndWait();owner.prepareForReconnection()
         owner.performPairing(.review("Owned invalid request"));try await done(owner);try await render(owner,name:"failure",directory:directory)
     }
     private func render(_ model:PersonalSyncModel,name:String,directory:URL)async throws {
         for dark in [false,true] {
-            let background=dark ? NSColor(calibratedWhite:0.12,alpha:1):NSColor.white
-            let view=PersonalSyncPairingView(model:model,receivingResponse:name=="pending-response").environment(\.colorScheme,dark ? .dark:.light).background(Color(nsColor:background))
-            let host=NSHostingView(rootView:view),window=NSWindow(contentRect:NSRect(x:0,y:0,width:660,height:650),styleMask:[.titled],backing:.buffered,defer:false)
-            window.isReleasedWhenClosed=false;window.appearance=NSAppearance(named:dark ? .darkAqua:.aqua);window.contentView=host
-            host.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(150));host.layoutSubtreeIfNeeded();window.displayIfNeeded()
-            let bitmap=try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in:host.bounds));host.cacheDisplay(in:host.bounds,to:bitmap)
-            let png=try XCTUnwrap(bitmap.representation(using:.png,properties:[:]));try png.write(to:directory.appendingPathComponent("\(name)-\(dark ? "dark":"light").png"))
-            let recognition=VNRecognizeTextRequest();recognition.recognitionLevel = .accurate;recognition.recognitionLanguages=["en-US"]
-            try VNImageRequestHandler(data:png,options:[:]).perform([recognition])
-            let text=(recognition.results ?? []).compactMap {$0.topCandidates(1).first?.string}.joined(separator:" ").lowercased()
-            let expected=["unconfigured":"create a group","owner":"add a mac","pending":"waiting for the group owner","pending-response":"verify and save this mac","review":"approve this exact request","response":"return this encrypted response","paired":"device paired","retired":"local pairing retired","failure":"pairing could not finish"][name]!
-            XCTAssertTrue(text.contains(expected),"Owned \(name) render omitted expected screen content: \(text)")
-            window.contentView=nil;window.close()
-
-
+            let expected=["unconfigured":"create a group","owner":"add a mac","pending":"waiting for the group owner","pending-response":"verify and save this mac","review":"approve this exact request","response":"return this encrypted response","paired":"device paired","retired":"local pairing retired","failure":"pairing could not finish","folder":"connect a shared folder","connected":"up to date","reconnect":"reconnect saved folder","erase-waiting":"review group erase"][name]!
+            try await renderView(PersonalSyncPairingView(model:model,receivingResponse:name=="pending-response"),name:name,dark:dark,width:660,height:650,directory:directory,expected:expected)
         }
     }
+    private func renderView<Content:View>(_ view:Content,name:String,dark:Bool,width:CGFloat,height:CGFloat,directory:URL,expected:String)async throws {
+        _=NSApplication.shared
+        let background=dark ? NSColor(calibratedWhite:0.12,alpha:1):NSColor.white
+        let host=NSHostingView(rootView:view.environment(\.colorScheme,dark ? .dark:.light).background(Color(nsColor:background)))
+        let window=NSWindow(contentRect:NSRect(x:0,y:0,width:width,height:height),styleMask:[.titled],backing:.buffered,defer:false)
+        window.isReleasedWhenClosed=false;window.appearance=NSAppearance(named:dark ? .darkAqua:.aqua);window.contentView=host
+        defer {window.contentView=nil;window.close()}
+        host.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(150));host.layoutSubtreeIfNeeded();window.displayIfNeeded()
+        let bitmap=try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in:host.bounds));host.cacheDisplay(in:host.bounds,to:bitmap)
+        let png=try XCTUnwrap(bitmap.representation(using:.png,properties:[:]));try png.write(to:directory.appendingPathComponent("\(name)-\(dark ? "dark":"light").png"))
+        let recognition=VNRecognizeTextRequest();recognition.recognitionLevel = .accurate;recognition.recognitionLanguages=["en-US"]
+        try VNImageRequestHandler(data:png,options:[:]).perform([recognition])
+        let text=(recognition.results ?? []).compactMap {$0.topCandidates(1).first?.string}.joined(separator:" ").lowercased()
+        try text.write(to:directory.appendingPathComponent("\(name)-\(dark ? "dark":"light").ocr.txt"),atomically:true,encoding:.utf8)
+        XCTAssertTrue(text.contains(expected),"Owned \(name) render omitted expected screen content: \(text)")
+    }
+
 }
 private struct PairingAppMachine:SyncMachineFingerprint {func fingerprint()throws->String {String(repeating:"a",count:64)}}
 private final class PairingAppStorage:SyncCredentialStorage,@unchecked Sendable {
@@ -352,8 +402,8 @@ private final class PairingAppStorage:SyncCredentialStorage,@unchecked Sendable 
 
 private final class PairingSaveGate:@unchecked Sendable {
     let entered=XCTestExpectation(description:"Actual pairing credential save entered")
-    private let condition=NSCondition();private var released=false
-    func pause() {condition.lock();defer {condition.unlock()};entered.fulfill();while !released {condition.wait()}}
+    private let condition=NSCondition();private var released=false,arrived=false
+    func pause() {condition.lock();defer {condition.unlock()};guard !arrived else {return};arrived=true;entered.fulfill();while !released {condition.wait()}}
     func release() {condition.lock();released=true;condition.broadcast();condition.unlock()}
 }
 

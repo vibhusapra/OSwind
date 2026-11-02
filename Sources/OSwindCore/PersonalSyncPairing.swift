@@ -12,6 +12,8 @@ public struct PersonalSyncPairingStatus:Equatable,Sendable {
     public let requestFingerprint:String?
     public let request:String?
     public let expires:Date?
+    /// A delivery reservation survives stopped sessions and forbids membership edits.
+    public let deliveryPrepared:Bool
 }
 public struct PersonalSyncPairingReview:Equatable,Sendable {
     public let deviceName:String
@@ -236,19 +238,19 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     public func status()throws->PersonalSyncPairingStatus {try withAccess {
         guard handle != nil else {
             guard try readHandle()==nil else {throw OSwindError.unavailable("Pairing changed; reopen setup")}
-            return .init(phase:.unconfigured,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)
+            return .init(phase:.unconfigured,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:false)
         }
         return try status(current().0)
     }}
     private func status(_ value:Envelope)throws->PersonalSyncPairingStatus {
-        if value.retired {return .init(phase:.retired,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)}
+        if value.retired {return .init(phase:.retired,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:false)}
         if let bytes=value.pending {
             let pending=try SyncPendingJoin.decodeFromKeychain(bytes)
-            return .init(phase:.waitingForOwner,deviceName:pending.request.body.name,memberNames:[],rootFingerprint:nil,requestFingerprint:try pending.request.digest,request:String(decoding:try pending.request.encoded(),as:UTF8.self),expires:Date(timeIntervalSince1970:TimeInterval(pending.request.body.expires)))
+            return .init(phase:.waitingForOwner,deviceName:pending.request.body.name,memberNames:[],rootFingerprint:nil,requestFingerprint:try pending.request.digest,request:String(decoding:try pending.request.encoded(),as:UTF8.self),expires:Date(timeIntervalSince1970:TimeInterval(pending.request.body.expires)),deliveryPrepared:false)
         }
         let material=try SyncCredentialMaterial.decodeFromKeychain(value.material!)
         let certificate=material.joined.certificate
-        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil)
+        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:value.delivery != nil)
     }
     public func createGroup(deviceName:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
         let pending=try SyncPendingJoin(name:deviceName,now:now),owner=try SyncGroupAuthority(owner:pending.request,now:now)
@@ -262,7 +264,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         try save(next,expected:bytes);return try status(next)
     }}
     public func reviewRequest(_ text:String,now:Date=Date())throws->PersonalSyncPairingReview {try withAccess {
-        let (value,_)=try current();guard let raw=value.material,try SyncCredentialMaterial.decodeFromKeychain(raw).owner != nil else {throw OSwindError.invalid("Review requests on the group owner's Mac")}
+        let (value,_)=try current();guard value.delivery==nil,let raw=value.material,try SyncCredentialMaterial.decodeFromKeychain(raw).owner != nil else {throw OSwindError.invalid("Review requests on the group owner's Mac")}
         guard text.utf8.count<=SyncPairingFormat.requestLimit else {throw OSwindError.invalid("Pairing request exceeds its bound")}
         let request=try SyncJoinRequest.decode(Data(text.utf8),now:now)
         return .init(deviceName:request.body.name,requestFingerprint:try request.digest,expires:Date(timeIntervalSince1970:TimeInterval(request.body.expires)),bytes:try request.encoded())
@@ -284,8 +286,8 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let next=value.replacing(material:try SyncCredentialMaterial(joined:joined).encodedForKeychain(),consumed:try pending.request.digest)
         try save(next,expected:bytes);return try status(next)
     }}
-    /// Internal setup vertical slice. It creates no scheduler or public
-    /// activation UI; native writer/recovery/erase admission is still required.
+    /// Internal service preparation. The public paused-session factory below
+    /// also installs native admission before transferring pairing ownership.
     func prepareAnchoredService(shared:URL,createShared:Bool)throws->SyncLibraryService {try withAccess {
         let (value,_)=try current()
         guard !value.retired,let saved=value.material else {throw OSwindError.invalid("Finish pairing before preparing delivery")}
@@ -369,7 +371,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     /// Reserve the external account in the already durable pairing anchor
     /// BEFORE creating any native delivery marker. Restoring a pre-install
     /// database can therefore never allocate a fresh zero-floor account.
-    /// This remains internal; no public transfer factory is exposed yet.
+    /// Internal primitive used by the public owned-session factory.
     @discardableResult func installDeliveryAnchor(on service:SyncLibraryService)throws->SyncDeliveryAnchor {try withAccess {
         guard service.library===store else {throw OSwindError.invalid("Prepare delivery for the pairing owner's current library")}
         let (value,bytes)=try current()
