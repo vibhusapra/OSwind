@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Search and indexing lifetime — component qualified
+
+[Behavior and remaining work](SEARCH-INDEX-LIFECYCLE.md) cover actual query/index ownership, privacy-erasure revocation, finite automatic batches, stale-publication suppression and real Quit/switch/lock checks.
+
+Source `e3b33e2` binds the [1,399-input receipt](../benchmarks/search-index-lifecycle-v1.json). Full debug: **2,229 passes / 123 explicit skips**. Selected Thread Sanitizer and optimized: **1,165 passes / 69 skips each**, without sanitizer race warnings. All **362 required controls** pass in every build, including all 15 Workflow methods. All **62 native methods pass without skips**, with **32 fresh package/process stages** and **2,289 distinct full-plus-native methods**. Independent review checks all 34 app/ZIP/extracted files, both strict ad hoc signatures, three migration crash states and all 55 earlier app trees.
+
+The retained source75 full-run failure was traced to an independent startup query in a Workflow fixture; sourcee3 preserves its original assertion, settles that query and adds a real held-query countercheck. Complete sync F059, native UX/input, physical power, distribution and product ranking remain open. All83 feature statuses remain unchanged.
+
 ## Selected source reader lifetime — component qualified
 
 [Behavior and remaining work](SELECTED-READER-LIFECYCLE.md) cover actual privacy metadata/hydration/validation ownership, canceled observer/drain joins, loading-state invalidation, exact historical originals and finite active work instead of idle-timer ownership.
@@ -8,7 +16,7 @@ Source `b3a92f5` binds the [1,395-input receipt](../benchmarks/selected-reader-l
 
 Independent review checks every byte of the 34-file app/ZIP/extraction, both strict ad hoc signatures, three retained migration crash states, the exact new native reader identities and all 53 earlier app trees. Those include 52 qualified app/extraction trees and the retained failed query-setup candidate; preservation does not promote that failure. Earlier native inventory/busy refusals remain causally unresolved. Hosted CI is a separate publication check.
 
-The separate search/index prototype retains ten original failed methods / 26 assertions and now passes 66 focused checks, including real Quit/switch; its native/package acceptance remains pending. Complete sync F059, native UX/input, physical power, distribution and product ranking remain open. All 83 feature statuses stay unchanged.
+The later search/index source now has its own full qualification above; its original failures and earlier preflight receipts remain distinct. Complete sync F059, native UX/input, physical power, distribution and product ranking remain open. All 83 feature statuses stay unchanged.
 
 ## Audio import lifetime — component qualified
 

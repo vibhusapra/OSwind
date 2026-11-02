@@ -1,0 +1,25 @@
+# Search and indexing lifetime
+
+Search results or a new source could appear after privacy-erasure confirmation: an earlier query had already read the erased record, and pending note/audio/JSON workers could still commit after capture paused. Separate unowned query/index workers also allowed Quit or a library transition to acknowledge completion before the actual work returned.
+
+The application now registers query, text/fast index and visual index work through their real task return and actor completion. Replaced queries are canceled immediately and cannot publish stale results. New work is refused during a library drain. Manual cancellation keeps busy ownership until the actual task returns, even if a backend ignores cancellation. Blocking text/model preparation runs off the main actor.
+
+Automatic text and visual indexing use finite batches, with the next batch scheduled after the prior job leaves the registry. Idle timers do not keep a library permanently busy. The debounce is finite, owned and cancelable. A canceled observer still joins the actual worker. The existing Core ANN API already joined its captured cache task; this change fixes application ownership and cancellation forwarding rather than changing that fact.
+
+Privacy-erasure confirmation revokes earlier search/index/source/import work and clears the displayed query results. Tests hold actual already-read query results across real SQLite erasure, and separately hold note, audio and JSON admission before reservation. The old code failed all four scenarios. The fixed code does not republish the erased hit or admit those pending sources. Cancellation does not roll back an already committed source, and does not delete external input files. Separate erasure controls govern deletion.
+
+## Qualification
+
+Source `e3b33e2` binds the [1,399-input receipt](../benchmarks/search-index-lifecycle-v1.json). Full debug: **2,229 passes / 123 explicit skips**. Selected Thread Sanitizer and optimized: **1,165 passes / 69 skips each**, without sanitizer race warnings. All **362 required controls** pass in every build, including all 15 Workflow methods. All **62 native methods pass without skips**, with **32 fresh package/process stages** and **2,289 distinct full-plus-native methods**. Independent review checks all 34 app/ZIP/extracted files, both strict ad hoc signatures, three migration crash states and all 55 earlier app trees.
+
+All six new encrypted-lock controls hold actual app work before its return: query, manual text rebuild, fast preparation, automatic text, manual visual and automatic visual. Plain Quit and library switching have separate real app-session controls. These checks establish lifetime and suppression behavior, without substituting fake retrieval or model accuracy results.
+
+The original baseline failures remain retained: ten methods / 26 assertions for missing ownership and retired launches; two stopping-status assertions; and actual already-read query plus note/audio/JSON erasure counterexamples. Fixture-accounting failures remain separate. Source-write aggregate assertions observed exactly one startup/fresh query after the writer ended; settling that independent query preserves the original idle assertions, with additional held-query controls. The first frozen source75 full suite similarly exposed an unsettled query in a Workflow fixture. The exact trace showed query1, no workflow busy state and no pending statistics. Sourcee3 changes only that test fixture and adds a finished-preview/held-query countercheck. The failed full run and passing earlier TSan/optimized runs remain distinct from the final source qualification.
+
+The [input manifest](../benchmarks/search-index-lifecycle-inputs-v1.json) and receipt bind every tracked input, log digest and artifact digest. All 55 prior app trees are unchanged: 54 qualified app/extraction trees plus one retained failed query-setup candidate. Preservation does not turn that failed attempt into success. Earlier inventory/busy native refusals remain causally unresolved. Existing successful independent reviews were not rerun.
+
+Separate hosted receipts now cover [audio import](../benchmarks/audio-import-lifecycle-hosted-v1.json) and [selected readers](../benchmarks/selected-reader-lifecycle-hosted-v1.json). Each identifies the actual tested merge commit and proves its Git tree equals its published head. Hosted counts and locally qualified bundle bytes remain separate. The new search/index head needs its own hosted run after publication.
+
+## Remaining work
+
+Native GUI/input/TCC, sustained capture and physical power, actual provider/server cancellation, complete personal sync F059 and collection epochs, provider/two-Mac acceptance and signed/notarized distribution remain open. Model setup controllers already own their installer workers; no additional installer defect is claimed by this search/index qualification. Native schema33 and wire formats are unchanged. All83 feature statuses stay unchanged; no whole-product parity or competitive rank is claimed.
