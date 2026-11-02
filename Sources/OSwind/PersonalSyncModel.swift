@@ -6,6 +6,11 @@ import OSwindCore
 /// An app retirement closes admission synchronously, then joins all three before
 /// SQLite close, vault unmount or wipe. No enrollment keys enter this model.
 @MainActor final class PersonalSyncModel:ObservableObject {
+    @Published private(set) var pairingStatus:PersonalSyncPairingStatus?
+    @Published private(set) var pairingReview:PersonalSyncPairingReview?
+    @Published private(set) var pairingResponse:String?
+    @Published private(set) var pairingBusy=false
+    @Published private(set) var pairingError:String?
     @Published private(set) var status:PersonalSyncStatus?
     @Published private(set) var networkPaused=false
     @Published private(set) var changing=false
@@ -17,15 +22,18 @@ import OSwindCore
     private var session:PersonalSyncSession?
     private var observer:Task<Void,Never>?,command:Task<Void,Never>?,stopTask:Task<Bool,Never>?
     private var preparation:Task<Bool,Never>?
+    private var pairing:PersonalSyncPairing?,pairingTask:Task<Void,Never>?
+    private let pairingFactory:@Sendable (MemoryStore)throws->PersonalSyncPairing
     private var drains=0
     private var generation=UUID(),retired=false,desiredActive=false,desiredNetwork=true,suspended=false
     var configured:Bool {session != nil}
-    var busy:Bool {drains>0 || preparation != nil || session != nil || observer != nil || command != nil || stopTask != nil}
-    init(store:MemoryStore,locked:@escaping ()->Bool={SessionState.locked}) {self.store=store;self.locked=locked}
+    var busy:Bool {drains>0 || pairing != nil || pairingTask != nil || preparation != nil || session != nil || observer != nil || command != nil || stopTask != nil}
+    init(store:MemoryStore,locked:@escaping ()->Bool={SessionState.locked},pairingFactory:@escaping @Sendable (MemoryStore)throws->PersonalSyncPairing={try PersonalSyncPairing(store:$0)}) {self.store=store;self.locked=locked;self.pairingFactory=pairingFactory}
     deinit {
         // Fallback cancellation prevents an idle subscription retaining a
         // session forever. Real storage departure still awaits cancelAndWait.
-        preparation?.cancel();observer?.cancel();command?.cancel()
+        preparation?.cancel();pairingTask?.cancel();observer?.cancel();command?.cancel()
+        if let pairing {Task.detached {pairing.close()}}
         if let session {Task {try? await session.stop()}}
     }
     /// Called only with a session prepared by the enrollment owner. This cannot
@@ -35,7 +43,7 @@ import OSwindCore
     }
     private func attach(_ candidate:PersonalSyncSession,fromPreparation:Bool)throws {
         guard !retired,session==nil,observer==nil,command==nil,stopTask==nil,
-              (preparation==nil || fromPreparation),!store.isClosed,!locked(),allowed(),candidate.belongs(to:store) else {throw OSwindError.unavailable("Sync requires its current open library")}
+              pairing==nil,pairingTask==nil,(preparation==nil || fromPreparation),!store.isClosed,!locked(),allowed(),candidate.belongs(to:store) else {throw OSwindError.unavailable("Sync requires its current open library")}
         session=candidate;error=nil
         observer=Task {[weak self] in
             let stream=await candidate.updates()
@@ -77,6 +85,57 @@ import OSwindCore
             }
         }
     }
+    enum PairingAction:Sendable {
+        case load,create(String),request(String),renew,review(String),approve(PersonalSyncPairingReview),accept(String,String),retire
+    }
+    private struct PairingResult:Sendable {
+        let owner:PersonalSyncPairing,status:PersonalSyncPairingStatus,review:PersonalSyncPairingReview?,response:String?
+    }
+    /// Pairing owns the same app exit/switch/wipe barrier as a prepared delivery
+    /// session. No detached SQL/Keychain work can outlive this tracked task.
+    func performPairing(_ action:PairingAction) {
+        guard !retired,drains==0,session==nil,preparation==nil,pairingTask==nil,!store.isClosed,!locked(),allowed() else {return}
+        if case .load=action,pairing != nil {return}
+        let existing=pairing,store=store,factory=pairingFactory
+        pairingBusy=true;pairingError=nil;pairingReview=nil;pairingResponse=nil
+        pairingTask=Task {[weak self] in
+            let worker=Task.detached {()throws->PairingResult in
+                let owner=try existing ?? factory(store)
+                do {
+                    guard owner.belongs(to:store) else {throw OSwindError.unavailable("Pair only the current native library")}
+                    try Task.checkCancellation()
+                    var review:PersonalSyncPairingReview?,response:String?
+                    switch action {
+                    case .load:break
+                    case .create(let name):_=try owner.createGroup(deviceName:name)
+                    case .request(let name):_=try owner.requestJoin(deviceName:name)
+                    case .renew:_=try owner.renewRequest()
+                    case .review(let text):review=try owner.reviewRequest(text)
+                    case .approve(let value):response=try owner.approve(value)
+                    case .accept(let text,let fingerprint):_=try owner.acceptResponse(text,trustedRootFingerprint:fingerprint)
+                    case .retire:_=try owner.retire()
+                    }
+                    return try .init(owner:owner,status:owner.status(),review:review,response:response)
+                }catch {if existing==nil {owner.close()};throw error}
+            }
+            defer {self?.pairingTask=nil;self?.pairingBusy=false}
+            do {
+                let result=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+                guard !Task.isCancelled,let self,!self.retired,!store.isClosed,!self.locked(),self.allowed(),result.owner.belongs(to:store) else {result.owner.close();self?.pairing=nil;self?.pairingStatus=nil;return}
+                self.pairing=result.owner;self.pairingStatus=result.status;self.pairingReview=result.review;self.pairingResponse=result.response
+            }catch {
+                // A committed Keychain replacement remains authoritative even
+                // if status refresh/cancellation fails. Reload before retrying.
+                existing?.close()
+                if let self {
+                    self.pairing=nil;self.pairingStatus=nil
+                    if !self.retired,!Task.isCancelled {self.pairingError="Pairing could not finish. Reopen setup to resume its saved state. If access is missing or this library was copied or erased, recovery is required. Local recording remains available."}
+                }
+            }
+        }
+    }
+    func cancelPairing() {pairingTask?.cancel()}
+    func clearPairingMessages() {pairingReview=nil;pairingResponse=nil}
     /// Do not clear the task here: storage still belongs to the real setup job.
     func cancelPreparation() {preparation?.cancel()}
     func start() {
@@ -91,7 +150,7 @@ import OSwindCore
     func suspend() {guard !retired else {return};suspended=true;enqueueConfiguration()}
     func wake() {guard !retired else {return};suspended=false;enqueueConfiguration()}
     func prepareForReconnection() {
-        guard retired,!busy else {return};retired=false;suspended=false;desiredActive=false;desiredNetwork=true;networkPaused=false;status=nil;error=nil
+        guard retired,!busy else {return};retired=false;suspended=false;desiredActive=false;desiredNetwork=true;networkPaused=false;status=nil;error=nil;pairingStatus=nil;pairingError=nil
     }
     func setNetworkEnabled(_ enabled:Bool) {
         guard !retired,configured,!store.isClosed,!locked(),allowed() else {return}
@@ -126,7 +185,8 @@ import OSwindCore
     func retire() {
         guard !retired else {return}
         retired=true;desiredActive=false;generation=UUID();changing=false;status=nil;error=nil
-        preparation?.cancel();command?.cancel();observer?.cancel();stopping=busy
+        preparation?.cancel();pairingTask?.cancel();command?.cancel();observer?.cancel();stopping=busy
+        pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingError=nil
         if let session {stopTask=Task {do {try await session.stop();return true}catch{return false}}}
     }
     /// A cancelled drain caller still waits for the actual core worker and all
@@ -134,7 +194,9 @@ import OSwindCore
     func cancelAndWait()async {
         retire()
         drains+=1;defer {drains-=1}
-        let setup=preparation,stopped=stopTask,configured=command,observed=observer
+        let setup=preparation,paired=pairingTask,stopped=stopTask,configured=command,observed=observer
+        await paired?.value
+        pairing?.close();pairing=nil;pairingTask=nil;pairingBusy=false
         let setupClean=await setup?.value
         let clean=await stopped?.value
         await configured?.value;await observed?.value

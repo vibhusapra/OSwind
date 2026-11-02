@@ -214,6 +214,27 @@ struct SyncPendingJoin:Sendable,CustomStringConvertible,CustomDebugStringConvert
             return .init(keys:keys,secret:try SyncGroupSecret(rawRepresentation:payload.groupSecret),certificate:payload.certificate,replica:request.body.replica)
         }catch {throw OSwindError.invalid("Pairing response could not be verified. Check the trusted Mac fingerprint and request expiry.")}
     }
+    private struct Saved:Codable {let format:String,version:Int,signing:Data,agreement:Data,request:SyncJoinRequest}
+    private init(keys:SyncDeviceKeys,request:SyncJoinRequest)throws {
+        guard request.body.signingPublicKey==keys.signing.publicKey.rawRepresentation,
+              request.body.agreementPublicKey==keys.agreement.publicKey.rawRepresentation else {throw OSwindError.invalid("Pending request keys differ")}
+        // Verify even expired saved requests at their creation time. Resuming
+        // them never extends the actual acceptance deadline.
+        try request.validate(now:Date(timeIntervalSince1970:TimeInterval(request.body.created)))
+        self.keys=keys;self.request=request
+    }
+    func encodedForKeychain()throws->Data {
+        try SyncProtocolLimits.encode(Saved(format:"OSwind.sync.pending-keys",version:1,signing:keys.signing.rawRepresentation,agreement:keys.agreement.rawRepresentation,request:request))
+    }
+    static func decodeFromKeychain(_ bytes:Data)throws->Self {
+        let value=try SyncPairingFormat.decode(Saved.self,bytes,limit:16384)
+        guard value.format=="OSwind.sync.pending-keys",value.version==1 else {throw OSwindError.invalid("Invalid saved pending request")}
+        return try .init(keys:.init(signing:value.signing,agreement:value.agreement),request:value.request)
+    }
+    /// A replacement request gets fresh keys and identity. The owner may have
+    /// admitted the expired request already; reusing its public keys under a new
+    /// nonce would conflict with immutable addition-only membership.
+    func renewed(now:Date)throws->Self {try .init(name:request.body.name,now:now)}
     var description:String {"<redacted pending sync join>"}
     var debugDescription:String {description}
     var customMirror:Mirror {Mirror(self,children:["keys":"redacted"])}
@@ -222,6 +243,11 @@ struct SyncPendingJoin:Sendable,CustomStringConvertible,CustomDebugStringConvert
 struct SyncJoinedGroup:Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     fileprivate let keys:SyncDeviceKeys,secret:SyncGroupSecret
     let certificate:SyncMembershipCertificate,replica:String
+    func withCertificate(_ next:SyncMembershipCertificate)throws->Self {
+        if next != certificate {try next.requireSuccessor(of:certificate)}
+        let value=Self(keys:keys,secret:secret,certificate:next,replica:replica)
+        _=try value.packetAuthority();return value
+    }
     func packetAuthority()throws->SyncDevicePacketAuthority {try .init(keys:keys,certificate:certificate,replica:replica)}
     func createTransport(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func openTransport(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}

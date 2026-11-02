@@ -1,0 +1,215 @@
+import Foundation
+import CSQLite
+
+/// Pairing is durable device admission, not delivery activation. Public values
+/// contain only reviewed public messages. No private material reaches the app.
+public struct PersonalSyncPairingStatus:Equatable,Sendable {
+    public enum Phase:String,Sendable {case unconfigured,waitingForOwner,owner,paired,retired}
+    public let phase:Phase
+    public let deviceName:String
+    public let memberNames:[String]
+    public let rootFingerprint:String?
+    public let requestFingerprint:String?
+    public let request:String?
+    public let expires:Date?
+}
+public struct PersonalSyncPairingReview:Equatable,Sendable {
+    public let deviceName:String
+    public let requestFingerprint:String
+    public let expires:Date
+    // Exact canonical signed request. Approval must return this reviewed value,
+    // rather than reparsing a mutable UI text field after the user clicks.
+    fileprivate let bytes:Data
+}
+
+/// Serialized owner of a Keychain anchor and its current native library. The
+/// caller must join every operation and close this owner before leaving storage.
+/// This API cannot construct a delivery session or publish provider objects.
+public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
+    private struct Handle:Codable,Equatable {let format:String,version:Int,id:String,protection:SyncCredentialProtection}
+    private struct Location:Codable,Equatable {
+        let installation:String,machine:String,origin:String,generation:String,volume:String,inode:UInt64,lifetime:String
+        let vault:SyncVaultPhysicalBinding?
+        static func capture(_ store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint)throws->Self {
+            let installation=try SyncLocalCredentialState.installationID(at:stateRoot,create:false),fingerprint=try machine.fingerprint()
+            try SyncProtocolLimits.digest(fingerprint)
+            try store.validateDirectoryIdentity()
+            let resolved=store.root.standardizedFileURL.resolvingSymlinksInPath()
+            guard let raw=try resolved.resourceValues(forKeys:[.volumeUUIDStringKey]).volumeUUIDString,let volume=UUID(uuidString:raw) else {throw OSwindError.unavailable("Stable library identity unavailable")}
+            let vault=try VaultAccess.context(at:store.root).map {try SyncVaultPhysicalBinding.capture($0)}
+            return try store.withRoutineDatabase {db in try SyncChangeCapture.transaction(db) {
+                guard !(try LibraryWipeState.isPending(db)) else {throw OSwindError.unavailable("Finish library cleanup before pairing")}
+                try PersonalSyncPairing.requireHooks(db)
+                let scope=try SyncChangeCapture.scope(db),lifetime=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(lifetime)}
+                db.bind(lifetime,1,PersonalSyncPairing.lifetimeKey)
+                guard sqlite3_step(lifetime)==SQLITE_ROW else {throw OSwindError.unavailable("Pairing library lifetime retired; recovery is required")}
+                let id=db.text(lifetime,0);try SyncProtocolLimits.uuid(id)
+                return Self(installation:installation,machine:fingerprint,origin:scope.origin,generation:scope.generation,volume:volume.uuidString.lowercased(),inode:store.mediaRootIdentity.inode,lifetime:id,vault:vault)
+            }}
+        }
+    }
+    /// Only encoded into the dedicated private Keychain account. The nonsecret
+    /// native handle is immutable and contains neither keys nor these payloads.
+    private struct Envelope:Codable {
+        let format:String,version:Int,id:String,protection:SyncCredentialProtection,location:Location
+        let pending:Data?,material:Data?,consumedRequest:String?,retired:Bool
+        func replacing(pending:Data?=nil,material:Data?=nil,consumed:String?=nil,retired:Bool=false)->Self {
+            .init(format:format,version:version,id:id,protection:protection,location:location,pending:pending,material:material,consumedRequest:consumed,retired:retired)
+        }
+        func validate()throws {
+            guard format=="OSwind.sync.pairing-anchor",version==1 else {throw OSwindError.invalid("Invalid pairing credential")}
+            try SyncCredentialStorageLimits.validate(id:id)
+            if let consumedRequest {try SyncProtocolLimits.digest(consumedRequest)}
+            if retired {guard pending==nil,material==nil else {throw OSwindError.invalid("Retired pairing retained keys")}}
+            else if let pending {guard material==nil,consumedRequest==nil else {throw OSwindError.invalid("Ambiguous pairing state")};_=try SyncPendingJoin.decodeFromKeychain(pending)}
+            else if let material {guard consumedRequest != nil else {throw OSwindError.invalid("Pairing request consumption missing")};_=try SyncCredentialMaterial.decodeFromKeychain(material)}
+            else {throw OSwindError.invalid("Missing pairing state")}
+        }
+        func encoded()throws->Data {try validate();let bytes=try SyncProtocolLimits.encode(self);try SyncCredentialStorageLimits.validate(id:id,bytes:bytes);return bytes}
+        static func decode(_ bytes:Data)throws->Self {let value=try SyncPairingFormat.decode(Self.self,bytes,limit:SyncCredentialStorageLimits.maximumBytes);try value.validate();return value}
+    }
+    private static let handleKey="sync-pairing-handle-v1",lifetimeKey="sync-pairing-library-lifetime-v1"
+    private static let hooks:[String:String]=Dictionary(uniqueKeysWithValues:["insert","update"].map {op in
+        let name="sync_pairing_native_wipe_"+op
+        return (name,"CREATE TRIGGER \(name) AFTER \(op.uppercased()) ON store_metadata WHEN new.key IN ('library_wipe_dirty','library_group_wipe_dirty_v1') AND new.value='1' BEGIN DELETE FROM store_metadata WHERE key='\(lifetimeKey)'; END")
+    })
+    private let mutex=NSRecursiveLock(),store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint
+    private let injectedStorage:(any SyncCredentialStorage)?
+    private var handle:Handle?,storage:(any SyncCredentialStorage)?,lease:SyncCredentialExclusiveLease?,closed=false
+    public convenience init(store:MemoryStore)throws {try self.init(store:store,stateRoot:SyncLocalCredentialState.root,machine:MacSyncMachineFingerprint(),storage:nil)}
+    init(store:MemoryStore,stateRoot:URL,machine:any SyncMachineFingerprint,storage:(any SyncCredentialStorage)?)throws {
+        self.store=store;self.stateRoot=stateRoot;self.machine=machine;injectedStorage=storage
+        let media=try MediaAdmissionLease.acquire(root:store.root,exclusive:false,expectedRoot:store.mediaRootIdentity);defer {media.release()}
+        if let saved=try readHandle() {try adopt(saved);_=try current()}
+    }
+    public var description:String {"<redacted personal sync pairing owner>"}
+    public var debugDescription:String {description}
+    public var customMirror:Mirror {Mirror(self,children:["pairing":"redacted"])}
+    deinit {lease?.close()}
+    public func belongs(to candidate:MemoryStore)->Bool {candidate===store}
+    public func close() {mutex.lock();defer {mutex.unlock()};closed=true;lease?.close();lease=nil;storage=nil}
+    private func withAccess<T>(_ body:()throws->T)throws->T {
+        mutex.lock();defer {mutex.unlock()}
+        guard !closed,!store.isClosed else {throw OSwindError.unavailable("Pairing owner is closed")}
+        let media=try MediaAdmissionLease.acquire(root:store.root,exclusive:false,expectedRoot:store.mediaRootIdentity);defer {media.release()}
+        try Task.checkCancellation();return try body()
+    }
+    private func readHandle()throws->Handle? {
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,Self.handleKey)
+            let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw db.error()}
+            let bytes=Data(db.text(row,0).utf8),value=try SyncPairingFormat.decode(Handle.self,bytes,limit:1024)
+            guard value.format=="OSwind.sync.pairing-handle",value.version==1 else {throw OSwindError.invalid("Invalid pairing handle")}
+            try SyncCredentialStorageLimits.validate(id:value.id);return value
+        }
+    }
+    private func adopt(_ value:Handle)throws {
+        let backend=injectedStorage ?? SyncKeychainCredentialStorage(protection:value.protection)
+        guard backend.protection==value.protection else {throw OSwindError.unavailable("The saved pairing requires its original Keychain protection")}
+        let owned=try SyncCredentialExclusiveLease(id:value.id,stateRoot:stateRoot)
+        handle=value;storage=backend;lease=owned
+    }
+    private static func requireHooks(_ db:RoutineDatabase)throws {
+        for (name,sql) in hooks {
+            let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(row)};db.bind(row,1,name)
+            guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==sql else {throw OSwindError.unavailable("Pairing lifetime protection is missing or changed")}
+        }
+    }
+    private func current()throws->(Envelope,Data) {
+        guard let handle,let storage,let lease else {throw OSwindError.unavailable("Create or request pairing first")}
+        try lease.requireCurrentIdentity()
+        guard try readHandle()==handle else {throw OSwindError.unavailable("Pairing native handle changed; use recovery")}
+        let bytes=try storage.read(id:handle.id),value=try Envelope.decode(bytes)
+        guard value.id==handle.id,value.protection==handle.protection,
+              value.location == (try Location.capture(store,stateRoot:stateRoot,machine:machine)) else {throw OSwindError.unavailable("Pairing belongs to a different Mac, installation or library lifetime; use recovery")}
+        return (value,bytes)
+    }
+    private func save(_ value:Envelope,expected:Data)throws {
+        guard let storage,let lease else {throw OSwindError.unavailable("Pairing owner is closed")}
+        try lease.requireCurrentIdentity()
+        let (_,currentBytes)=try current();guard currentBytes==expected else {throw SyncCredentialStorageError.changed}
+        // Cancellation before this boundary leaves the old durable state. After
+        // replacement a caller must reload it; cancellation is not rollback.
+        try Task.checkCancellation();try storage.replace(id:value.id,expected:expected,bytes:value.encoded())
+    }
+    private func create(pending:SyncPendingJoin,material:SyncCredentialMaterial?)throws->PersonalSyncPairingStatus {
+        guard handle==nil,try readHandle()==nil else {throw OSwindError.unavailable("An existing pairing must be resumed or recovered")}
+        _=try SyncLocalCredentialState.installationID(at:stateRoot,create:true)
+        let backend=injectedStorage ?? SyncKeychainCredentialStorage(protection:.loginKeychain)
+        let saved=Handle(format:"OSwind.sync.pairing-handle",version:1,id:UUID().uuidString.lowercased(),protection:backend.protection)
+        // Reserve before touching the Keychain. A crash/denial leaves this exact
+        // handle for recovery and can never silently regenerate an old identity.
+        try adopt(saved)
+        try store.withRoutineDatabase {db in
+            guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Pair outside native transactions")}
+            try db.execute("PRAGMA synchronous=FULL")
+            try SyncChangeCapture.transaction(db) {
+                guard try readHandle()==nil,!(try LibraryWipeState.isPending(db)) else {throw OSwindError.unavailable("Library pairing admission changed")}
+                for (_,sql) in Self.hooks {try db.execute(sql)}
+                let put=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?)");defer {sqlite3_finalize(put)}
+                db.bind(put,1,Self.lifetimeKey);db.bind(put,2,UUID().uuidString.lowercased());try db.done(put)
+                sqlite3_reset(put);sqlite3_clear_bindings(put);db.bind(put,1,Self.handleKey);db.bind(put,2,String(decoding:try SyncProtocolLimits.encode(saved),as:UTF8.self));try db.done(put)
+            }
+        }
+        let value=Envelope(format:"OSwind.sync.pairing-anchor",version:1,id:saved.id,protection:saved.protection,location:try Location.capture(store,stateRoot:stateRoot,machine:machine),pending:material==nil ? try pending.encodedForKeychain():nil,material:try material?.encodedForKeychain(),consumedRequest:material==nil ? nil:try pending.request.digest,retired:false)
+        try Task.checkCancellation();try backend.create(id:saved.id,bytes:value.encoded())
+        return try status(value)
+    }
+    public func status()throws->PersonalSyncPairingStatus {try withAccess {
+        guard handle != nil else {
+            guard try readHandle()==nil else {throw OSwindError.unavailable("Pairing changed; reopen setup")}
+            return .init(phase:.unconfigured,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)
+        }
+        return try status(current().0)
+    }}
+    private func status(_ value:Envelope)throws->PersonalSyncPairingStatus {
+        if value.retired {return .init(phase:.retired,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)}
+        if let bytes=value.pending {
+            let pending=try SyncPendingJoin.decodeFromKeychain(bytes)
+            return .init(phase:.waitingForOwner,deviceName:pending.request.body.name,memberNames:[],rootFingerprint:nil,requestFingerprint:try pending.request.digest,request:String(decoding:try pending.request.encoded(),as:UTF8.self),expires:Date(timeIntervalSince1970:TimeInterval(pending.request.body.expires)))
+        }
+        let material=try SyncCredentialMaterial.decodeFromKeychain(value.material!)
+        let certificate=material.joined.certificate
+        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil)
+    }
+    public func createGroup(deviceName:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
+        let pending=try SyncPendingJoin(name:deviceName,now:now),owner=try SyncGroupAuthority(owner:pending.request,now:now)
+        let joined=try pending.accept(owner.response(to:pending.request,now:now),expectedRootFingerprint:owner.fingerprint,now:now)
+        return try create(pending:pending,material:.init(joined:joined,owner:owner))
+    }}
+    public func requestJoin(deviceName:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {try create(pending:.init(name:deviceName,now:now),material:nil)}}
+    public func renewRequest(now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
+        let (value,bytes)=try current();guard let saved=value.pending,!value.retired else {throw OSwindError.invalid("Only a pending request can renew")}
+        let pending=try SyncPendingJoin.decodeFromKeychain(saved).renewed(now:now),next=value.replacing(pending:try pending.encodedForKeychain())
+        try save(next,expected:bytes);return try status(next)
+    }}
+    public func reviewRequest(_ text:String,now:Date=Date())throws->PersonalSyncPairingReview {try withAccess {
+        let (value,_)=try current();guard let raw=value.material,try SyncCredentialMaterial.decodeFromKeychain(raw).owner != nil else {throw OSwindError.invalid("Review requests on the group owner's Mac")}
+        guard text.utf8.count<=SyncPairingFormat.requestLimit else {throw OSwindError.invalid("Pairing request exceeds its bound")}
+        let request=try SyncJoinRequest.decode(Data(text.utf8),now:now)
+        return .init(deviceName:request.body.name,requestFingerprint:try request.digest,expires:Date(timeIntervalSince1970:TimeInterval(request.body.expires)),bytes:try request.encoded())
+    }}
+    /// Persist the new membership before returning its encrypted response. A
+    /// retry of the exact admitted request is idempotent while it remains valid.
+    public func approve(_ review:PersonalSyncPairingReview,now:Date=Date())throws->String {try withAccess {
+        let (value,bytes)=try current();guard let raw=value.material,let owner=try SyncCredentialMaterial.decodeFromKeychain(raw).owner else {throw OSwindError.invalid("Only the group owner can approve devices")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(raw),request=try SyncJoinRequest.decode(review.bytes,now:now),nextOwner=try owner.admitting(request,now:now)
+        let joined=try material.joined.withCertificate(nextOwner.certificate),next=try SyncCredentialMaterial(joined:joined,owner:nextOwner)
+        let response=try nextOwner.response(to:request,now:now)
+        try save(value.replacing(material:next.encodedForKeychain(),consumed:value.consumedRequest),expected:bytes)
+        return String(decoding:response,as:UTF8.self)
+    }}
+    public func acceptResponse(_ text:String,trustedRootFingerprint:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
+        let (value,bytes)=try current();guard let raw=value.pending,!value.retired else {throw OSwindError.invalid("The pending request has already been consumed or retired")}
+        guard text.utf8.count<=SyncPairingFormat.responseLimit else {throw OSwindError.invalid("Pairing response exceeds its bound")}
+        let pending=try SyncPendingJoin.decodeFromKeychain(raw),joined=try pending.accept(Data(text.utf8),expectedRootFingerprint:trustedRootFingerprint,now:now)
+        let next=value.replacing(material:try SyncCredentialMaterial(joined:joined).encodedForKeychain(),consumed:try pending.request.digest)
+        try save(next,expected:bytes);return try status(next)
+    }}
+    /// Local retirement erases private material but retains a keyless external
+    /// tombstone. This is not group revocation or permission to reuse identity.
+    public func retire()throws->PersonalSyncPairingStatus {try withAccess {
+        let (value,bytes)=try current(),next=value.replacing(consumed:value.consumedRequest,retired:true)
+        try save(next,expected:bytes);return try status(next)
+    }}
+}

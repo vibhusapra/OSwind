@@ -1,0 +1,152 @@
+import SwiftUI
+import AppKit
+import OSwindCore
+
+struct PersonalSyncPairingSheet:View {
+    @ObservedObject var model:PersonalSyncModel
+    var body:some View {
+        PersonalSyncPairingView(model:model)
+            .task {model.performPairing(.load)}
+            .onDisappear {model.cancelPairing();model.clearPairingMessages()}
+    }
+}
+
+struct PersonalSyncPairingView:View {
+    @ObservedObject var model:PersonalSyncModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var deviceName=Host.current().localizedName ?? "My Mac"
+    @State private var request=""
+    @State private var response=""
+    @State private var fingerprint=""
+    @State private var copied=false
+    @State private var retireConfirm=false
+    @State private var requestMatches=false
+    @State private var fingerprintMatches=false
+    @State private var pendingStep=0
+    init(model:PersonalSyncModel,receivingResponse:Bool=false) {
+        self.model=model;_pendingStep=State(initialValue:receivingResponse ? 1:0)
+    }
+    var body:some View {
+        VStack(alignment:.leading,spacing:18) {
+            HStack {Image(systemName:"laptopcomputer.and.arrow.down").font(.title2);Text("Pair your Macs").font(.title2.weight(.semibold));Spacer();Button("Done") {dismiss()}.keyboardShortcut(.cancelAction)}
+            Text("Pairing preview").font(.caption.weight(.semibold)).foregroundStyle(.orange)
+            Text("Save device identities and review who can join. Delivery is still being built; pairing does not transfer memories or start capture.").foregroundStyle(.secondary)
+            ScrollView {VStack(alignment:.leading,spacing:16) {
+                if let status=model.pairingStatus {
+                    switch status.phase {
+                    case .unconfigured:begin
+                    case .waitingForOwner:pending(status)
+                    case .owner:owner(status)
+                    case .paired:paired(status)
+                    case .retired:
+                        Label("Local pairing retired",systemImage:"key.slash")
+                        Text("Private sync keys were removed from this Mac's pairing credential. A keyless record remains to prevent reuse. Other Macs' memberships have not been revoked; recovery and group rotation are still being built.").foregroundStyle(.secondary)
+                    }
+                } else if !model.pairingBusy {
+                    Button("Load saved pairing") {model.performPairing(.load)}
+                }
+                if let error=model.pairingError {Label(error,systemImage:"exclamationmark.triangle").foregroundStyle(.orange)}
+                if model.pairingBusy {HStack {ProgressView().controlSize(.small);Text("Saving and verifying…");Spacer();Button("Cancel") {model.cancelPairing()}}}
+            }.padding(.vertical,4)}
+            Divider()
+            Text("Keys stay in this Mac's login Keychain. Pairing uses a local software binding; it does not promise hardware device-only storage. Missing credentials, library copies and whole-library wipes require recovery.").font(.caption).foregroundStyle(.secondary)
+        }.padding(24).frame(width:660,height:650)
+        .disabled(model.stopping)
+        .alert("Retire local pairing?",isPresented:$retireConfirm) {
+            Button("Cancel",role:.cancel) {};Button("Retire keys",role:.destructive) {model.performPairing(.retire)}
+        } message: {Text("Removes private pairing keys from this Mac's saved credential and keeps a keyless recovery record. This does not revoke the device on other Macs. Local memories remain available. Pairing recovery is not yet available in this preview.")}
+    }
+    private var begin:some View {
+        VStack(alignment:.leading,spacing:14) {
+            TextField("Name this Mac",text:$deviceName).textFieldStyle(.roundedBorder)
+            HStack {Button("Create a group") {model.performPairing(.create(deviceName))}.buttonStyle(.borderedProminent)
+                Button("Join an existing group") {model.performPairing(.request(deviceName))}}
+            Text("Create on your main Mac. Join on the next Mac, then compare its request and the owner's fingerprint using a channel you trust.").font(.caption).foregroundStyle(.secondary)
+        }.disabled(model.pairingBusy)
+    }
+    private func pending(_ status:PersonalSyncPairingStatus)->some View {
+        VStack(alignment:.leading,spacing:12) {
+            Label("Waiting for the group owner",systemImage:"person.badge.key")
+            Text(status.deviceName).font(.headline)
+            Picker("Pairing step",selection:$pendingStep) {Text("1. Send request").tag(0);Text("2. Verify response").tag(1)}.pickerStyle(.segmented)
+            if pendingStep==0 {
+                Text("Copy this signed public request to the owner's Mac. Compare the request fingerprint on both screens.")
+                if let value=status.requestFingerprint {Text(value).font(.system(.caption,design:.monospaced)).textSelection(.enabled)}
+                if let value=status.request {message(value,label:"Signed request");Button(copied ? "Copied":"Copy request") {copy(value)}}
+                if let expires=status.expires {Text("Request expires \(expires.formatted(date:.omitted,time:.standard)).").font(.caption).foregroundStyle(.secondary)}
+                Button("I have an approval response") {pendingStep=1}.buttonStyle(.borderedProminent)
+                Button("Replace expired request") {model.performPairing(.renew);response="";fingerprintMatches=false;copied=false}
+                Text("Replacing creates fresh keys and invalidates the old response. If the owner already approved it, the unused membership remains until group rotation is available.").font(.caption).foregroundStyle(.secondary)
+            } else {
+                Text("Paste the encrypted response. Enter the group fingerprint shown on the owner's screen through a channel you trust.")
+                input("Encrypted response",text:$response,limit:98304)
+                TextField("Trusted owner's fingerprint (64 hex characters)",text:$fingerprint).textFieldStyle(.roundedBorder).font(.system(.caption,design:.monospaced)).privacySensitive()
+                Toggle("I compared the owner's fingerprint through a trusted channel",isOn:$fingerprintMatches)
+                Button("Verify and save this Mac") {model.performPairing(.accept(response,fingerprint));response="";fingerprint="";fingerprintMatches=false}.buttonStyle(.borderedProminent).disabled(response.isEmpty || fingerprint.count != 64 || !fingerprintMatches)
+            }
+            retire
+        }.disabled(model.pairingBusy)
+    }
+    private func owner(_ status:PersonalSyncPairingStatus)->some View {
+        VStack(alignment:.leading,spacing:12) {
+            identity(status)
+            if let value=model.pairingResponse {
+                Text("Return this encrypted response to the joining Mac. Give it the group fingerprint above through your trusted channel.")
+                message(value,label:"Encrypted response");Button(copied ? "Copied":"Copy response") {copy(value)}
+                Button("Review another device") {model.clearPairingMessages();copied=false}
+            } else if let review=model.pairingReview {
+                GroupBox {VStack(alignment:.leading,spacing:10) {
+                    Text(review.deviceName).font(.headline)
+                    Text(review.requestFingerprint).font(.system(.caption,design:.monospaced)).textSelection(.enabled)
+                    Text("Expires \(review.expires.formatted(date:.omitted,time:.standard))").font(.caption)
+                    Toggle("The name and request fingerprint match the joining Mac",isOn:$requestMatches)
+                    Button("Approve this exact request") {model.performPairing(.approve(review));request="";requestMatches=false}.buttonStyle(.borderedProminent).disabled(!requestMatches)
+                }}
+                Button("Back to request") {model.clearPairingMessages();requestMatches=false}
+            } else {
+                Text("Add a Mac").font(.headline)
+                Text("Paste its signed request. Review the name and compare the exact request fingerprint with the joining Mac before approval.")
+                input("Signed request",text:$request,limit:8192)
+                Button("Review request") {model.performPairing(.review(request));requestMatches=false}.disabled(request.isEmpty)
+            }
+            retire
+        }.disabled(model.pairingBusy)
+    }
+    private func paired(_ status:PersonalSyncPairingStatus)->some View {
+        VStack(alignment:.leading,spacing:12) {
+            Label("Device paired",systemImage:"checkmark.shield")
+            identity(status)
+            Text("This Mac's identity is saved. Memories remain local while delivery setup, rollback checks and recovery are completed.").foregroundStyle(.secondary)
+            retire
+        }.disabled(model.pairingBusy)
+    }
+    private func identity(_ status:PersonalSyncPairingStatus)->some View {
+        VStack(alignment:.leading,spacing:10) {
+            Text(status.deviceName).font(.headline)
+            Text("Group fingerprint").font(.caption).foregroundStyle(.secondary)
+            if let value=status.rootFingerprint {Text(value).font(.system(.caption,design:.monospaced)).textSelection(.enabled);Button("Copy group fingerprint") {copy(value)}}
+            Text("\(status.memberNames.count) admitted device\(status.memberNames.count==1 ? "":"s") · \(status.memberNames.joined(separator:", "))").font(.caption).foregroundStyle(.secondary)
+        }
+    }
+    private var retire:some View {Button("Retire local pairing keys…",role:.destructive) {retireConfirm=true}.padding(.top,12)}
+    private func input(_ title:String,text:Binding<String>,limit:Int)->some View {
+        VStack(alignment:.leading,spacing:6) {
+            Text(title).font(.caption)
+            TextEditor(text:Binding(get:{text.wrappedValue},set:{value in
+                // Bound retained UI input before handing it to the canonical
+                // decoder. Oversized input is cleared and cannot be approved.
+                text.wrappedValue=value.utf8.count<=limit ? value:""
+                model.clearPairingMessages();requestMatches=false
+            })).font(.system(.caption,design:.monospaced)).frame(height:82).border(.quaternary).privacySensitive()
+        }
+    }
+    private func message(_ value:String,label:String)->some View {
+        DisclosureGroup(label) {Text(value).font(.system(size:10,design:.monospaced)).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading).privacySensitive()}
+    }
+    private func copy(_ value:String) {
+        let board=NSPasteboard.general,item=NSPasteboardItem()
+        item.setString(value,forType:.string)
+        for type in ["org.nspasteboard.ConcealedType","org.nspasteboard.TransientType","org.nspasteboard.AutoGeneratedType"] {item.setData(Data(),forType:.init(type))}
+        board.clearContents();copied=board.writeObjects([item])
+    }
+}
