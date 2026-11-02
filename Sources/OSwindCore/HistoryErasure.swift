@@ -230,6 +230,7 @@ extension MemoryStore {
         } catch let error as NSError where error.domain==NSCocoaErrorDomain && [NSFileNoSuchFileError,NSFileReadNoSuchFileError].contains(error.code) {return url.standardizedFileURL.path}
     }
     func cleanupErasedAssets(_ db:RoutineDatabase,sources:Int,turns:Int,histories:Int=0,stopOnCancellation:Bool=false,reservation:MediaAdmissionLease?=nil) -> HistoryErasureResult {
+        defer {PendingMediaCleanupSignal.post(device:mediaRootIdentity.device,inode:mediaRootIdentity.inode,event:.pending)}
         // Logical invalidation is immediate. Files can still be in use by a
         // snapshot, or awaiting a writer's SQL admission under a shared lease.
         cancelSearchIndexBuild();releaseSearchIndex()

@@ -262,6 +262,8 @@ struct SettingsView: View {
             }
             if m.maintenanceBusy {ProgressView("Cleaning up…")}
             if !m.maintenanceStatus.isEmpty {Text(m.maintenanceStatus).font(.caption).textSelection(.enabled)}
+                Text("Background file cleanup finishes earlier deletions independently of this retention setting.").font(.caption).foregroundStyle(.secondary)
+                PendingMediaCleanupStatusView(model:m.pendingMediaCleanup)
             Section("Markdown & Obsidian") { MarkdownLibraryTransferView(transfer:m.libraryTransfer,store:m.store,policy:m.settings.privacy).disabled(m.libraryWipe.busy) }
             Section("Complete backup & restore") { LibraryTransferView(transfer:m.libraryTransfer,store:m.store).disabled(m.libraryWipe.busy) }
             Section("This library") {
