@@ -4,8 +4,8 @@ import CSQLite
 
 extension SyncIncomingSourceTests {
     private func collectionObserveFixture(_ store:MemoryStore,_ cache:SyncVersionStore,_ peer:String)throws {
-        // Owned post-authentication observation boundary only. Actual peer
-        // control verification/delivery is a separate unfinished integration.
+        // Owned post-authentication, approved group-erasure boundary only.
+        // A local-only intent must never be injected into this trusted state.
         try cache.journal.allowPeer(peer)
         try store.withRoutineDatabase {db in
             let row=try db.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,1)");defer {sqlite3_finalize(row)}
@@ -106,13 +106,25 @@ extension SyncIncomingSourceTests {
         let (a,ac)=try endpoint("shared-owner",producerID),(b,bc)=try endpoint("cleared-local-copy",receiverID)
         defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID);try ac.journal.allowPeer(receiverID)
         try a.insert(Memory(id:"shared-owned-source",kind:.note,text:"Owned shared history must remain on its other Mac"));try drain(a,ac)
-        let original=try XCTUnwrap(ac.journal.outbox().first),record=try packet(original,ac)
-        let local=try receive(original,record,b,bc,fetch:{_ in throw OSwindError.invalid("No owned source dependencies")})
+        let original=try XCTUnwrap(ac.journal.outbox().first)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("actual-opaque-transport"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        let senderA=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{try $0.validate()},supplementalContent:{_ in throw OSwindError.invalid("Owned note has no supplements")})
+        _=try senderA.publish()
+        let wire=try XCTUnwrap(inbox.revision(replica:producerID,sequence:original.dot.counter)),bytes=try XCTUnwrap(inbox.content(XCTUnwrap(wire.content)))
+        let local=try receive(wire,SyncPortableRecord.decode(bytes),b,bc,fetch:{_ in throw OSwindError.invalid("No owned source dependencies")})
         XCTAssertNotNil(try b.get(local))
         _=try b.wipeLibrary();try drain(b,bc)
         XCTAssertNil(try b.get(local))
-        let emitted=try bc.journal.outbox()
+        var admissions=0,supplements=0
+        let senderB=SyncLibrarySender(library:b,cache:bc,inbox:inbox,admit:{_ in admissions+=1},supplementalContent:{_ in supplements+=1;return nil})
+        guard case .needsGroupReview=try senderB.publish() else {return XCTFail("The owning sender must pause before exporting a local clear")}
+        XCTAssertEqual(admissions,0);XCTAssertEqual(supplements,0)
+        let prepared=try bc.journal.outbox()
+        XCTAssertTrue(prepared.contains(where:{$0.mutation == .delete && $0.key==original.key}),"Keep immutable prepared journal state; do not drop an operation to hide publication")
+        var emitted=[SyncRevision]()
+        for op in prepared {if let sent=try inbox.revision(replica:op.dot.replica,sequence:op.dot.counter) {emitted.append(sent)}}
         XCTAssertTrue(emitted.filter({$0.mutation == .delete && $0.key==original.key}).isEmpty,"Clearing this Mac's local copy must not publish a group deletion of the shared lifetime")
+        XCTAssertNil(try inbox.collectionControl(creator:receiverID,counter:1))
         for operation in emitted {try receiveDeletion(operation,a,ac)}
         XCTAssertNotNil(try a.get("shared-owned-source"),"The other Mac must retain its independent copy after a local-only clear")
     }
@@ -122,11 +134,11 @@ extension SyncIncomingSourceTests {
         try a.insert(Memory(id:"keep-on-a",kind:.note,text:"Owned history stays on the other Mac"));try drain(a,ac)
         let first=try XCTUnwrap(ac.journal.outbox().first)
         _=try b.wipeLibrary()
-        // Stage only the verified observation of B's local fence. There is no
-        // authorization to erase A's library, and no group-erasure marker.
-        try a.withRoutineDatabase {db in
-            let row=try db.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,1)");defer {sqlite3_finalize(row)};db.bind(row,1,receiverID);try db.done(row)
-        }
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("local-clear-transport"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        let senderB=SyncLibrarySender(library:b,cache:bc,inbox:inbox,admit:{_ in XCTFail("Do not load a body before local-clear review")},supplementalContent:{_ in XCTFail("Do not load content before local-clear review");return nil})
+        guard case .needsGroupReview=try senderB.publish() else {return XCTFail("A local clear is not authorization to publish a group control")}
+        XCTAssertNil(try inbox.collectionControl(creator:receiverID,counter:1))
+        try a.withRoutineDatabase {db in XCTAssertEqual(try SyncCollectionHistory(database:db,replica:producerID).current()[receiverID],0)}
         try a.insert(Memory(id:"keep-on-a",kind:.note,text:"Owned edit remains allowed on A"))
         XCTAssertNoThrow(try drain(a,ac),"A peer's local wipe must not block independent history on this Mac")
         let operations=try ac.journal.outbox()
@@ -135,6 +147,8 @@ extension SyncIncomingSourceTests {
         XCTAssertEqual(operations.last?.creationEra,.empty)
         XCTAssertEqual(try a.get("keep-on-a")?.text,"Owned edit remains allowed on A")
         XCTAssertFalse(try ac.journal.state(for:first.key).isDeleted)
+        let senderA=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{try $0.validate()},supplementalContent:{_ in throw OSwindError.invalid("Owned note has no supplements")})
+        XCTAssertNoThrow(try senderA.publish())
         var bodyChecks=0,projected=false
         for op in operations {
             _=try bc.journal.receive(op,contentAvailable:{_ in bodyChecks+=1;return true}) {_ in projected=true}

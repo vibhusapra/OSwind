@@ -17,7 +17,9 @@ struct SyncCollectionHistory {
         "personal_sync_collection_controls":"CREATE TABLE personal_sync_collection_controls(counter INTEGER PRIMARY KEY CHECK(counter>0),era BLOB NOT NULL CHECK(\(blobCheck)))",
         "personal_sync_collection_births":"CREATE TABLE personal_sync_collection_births(table_name TEXT NOT NULL,key_digest BLOB NOT NULL CHECK(typeof(key_digest)='blob' AND length(key_digest)=32),era BLOB NOT NULL CHECK(\(blobCheck)),PRIMARY KEY(table_name,key_digest))",
         "personal_sync_collection_changes":"CREATE TABLE personal_sync_collection_changes(sequence INTEGER PRIMARY KEY CHECK(sequence>0),era BLOB NOT NULL CHECK(\(blobCheck)))",
-        "personal_sync_collection_objects":"CREATE TABLE personal_sync_collection_objects(kind TEXT NOT NULL,digest TEXT NOT NULL,era BLOB NOT NULL CHECK(\(blobCheck)),PRIMARY KEY(kind,digest))"
+        "personal_sync_collection_objects":"CREATE TABLE personal_sync_collection_objects(kind TEXT NOT NULL,digest TEXT NOT NULL,era BLOB NOT NULL CHECK(\(blobCheck)),PRIMARY KEY(kind,digest))",
+        "personal_sync_collection_approvals":"CREATE TABLE personal_sync_collection_approvals(counter INTEGER PRIMARY KEY CHECK(counter>0),group_id TEXT NOT NULL,epoch TEXT NOT NULL,digest TEXT NOT NULL CHECK(length(digest)=64),control BLOB NOT NULL CHECK(typeof(control)='blob' AND length(control)>0 AND length(control)<=65536))",
+        "personal_sync_collection_received_controls":"CREATE TABLE personal_sync_collection_received_controls(replica TEXT NOT NULL,counter INTEGER NOT NULL CHECK(typeof(counter)='integer' AND counter>0),digest TEXT NOT NULL CHECK(length(digest)=64),control BLOB NOT NULL CHECK(typeof(control)='blob' AND length(control)>0 AND length(control)<=65536),PRIMARY KEY(replica,counter))"
     ]
 
     static func install(_ db:RoutineDatabase,replica:String)throws->Self {
@@ -177,5 +179,91 @@ struct SyncCollectionHistory {
             values.append((counter,era));code=sqlite3_step(row)
         }
         guard code==SQLITE_DONE else {throw database.error()};return values
+    }
+
+    private func requireJournal(_ journal:SyncJournal)throws {
+        guard journal.database.handle==database.handle,journal.replica==replica,try journal.cursor(for:replica) != nil else {throw OSwindError.invalid("Collection review belongs to another owning journal")}
+    }
+    private func controlBytes(_ row:OpaquePointer,_ column:Int32)throws->Data {
+        let size=Int(sqlite3_column_bytes(row,column))
+        guard sqlite3_column_type(row,column)==SQLITE_BLOB,(1...SyncProtocolLimits.operationBytes).contains(size),let p=sqlite3_column_blob(row,column) else {throw OSwindError.invalid("Invalid collection control storage")}
+        return Data(bytes:p,count:size)
+    }
+    private func capturedControl(_ counter:Int64,journal:SyncJournal)throws->SyncCollectionControl {
+        try requireJournal(journal)
+        let row=try database.statement("SELECT era FROM personal_sync_collection_controls WHERE counter=?");defer {sqlite3_finalize(row)};sqlite3_bind_int64(row,1,counter)
+        guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Captured native wipe control is missing")}
+        return try .init(group:journal.group,epoch:journal.epoch,creator:replica,counter:counter,era:decode(row,0))
+    }
+    private func approvedControl(_ counter:Int64,journal:SyncJournal)throws->SyncCollectionControl? {
+        let row=try database.statement("SELECT group_id,epoch,digest,control FROM personal_sync_collection_approvals WHERE counter=?");defer {sqlite3_finalize(row)};sqlite3_bind_int64(row,1,counter)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
+        let control=try SyncCollectionControl.decode(controlBytes(row,3))
+        guard database.text(row,0)==journal.group,database.text(row,1)==journal.epoch,try database.text(row,2)==control.digest,try control==capturedControl(counter,journal:journal) else {throw OSwindError.invalid("Group review differs from the captured wipe or trusted epoch")}
+        return control
+    }
+    func reviewState(journal:SyncJournal)throws->SyncCollectionReview {
+        try requireJournal(journal);let latest=try identity()
+        guard latest>0 else {return .ready}
+        let control=try capturedControl(latest,journal:journal)
+        return try approvedControl(latest,journal:journal)==nil ? .needsGroupReview(control):.ready
+    }
+    /// Called only for an explicit reviewed group action. Native wipe capture
+    /// never calls this, and no transport path automatically approves a frame.
+    @discardableResult func approveGroupErase(journal:SyncJournal,counter:Int64,expectedEra:SyncClock)throws->SyncCollectionControl {
+        try SyncChangeCapture.transaction(database) {
+            try requireJournal(journal)
+            guard try identity()==counter,counter>0 else {throw OSwindError.invalid("The local wipe changed after review; review its current group cutoff")}
+            let control=try capturedControl(counter,journal:journal)
+            guard control.era==expectedEra else {throw OSwindError.invalid("The captured wipe differs from the reviewed cutoff")}
+            let bytes=try control.encoded(),row=try database.statement("INSERT INTO personal_sync_collection_approvals VALUES(?,?,?,?,?) ON CONFLICT(counter) DO NOTHING");defer {sqlite3_finalize(row)}
+            sqlite3_bind_int64(row,1,counter);database.bind(row,2,journal.group);database.bind(row,3,journal.epoch);database.bind(row,4,try control.digest)
+            bytes.withUnsafeBytes {_=sqlite3_bind_blob(row,5,$0.baseAddress,Int32(bytes.count),database.transient)};try database.done(row)
+            guard try approvedControl(counter,journal:journal)==control else {throw OSwindError.invalid("The group review could not be retained")};return control
+        }
+    }
+    /// At most one exact authenticated/approved control per enrolled frontier
+    /// axis. A raw manually injected frontier cannot authorize publication.
+    func knownControls(journal:SyncJournal)throws->[SyncCollectionControl] {
+        try requireJournal(journal)
+        guard try reviewState(journal:journal) == .ready else {throw OSwindError.unavailable("Review the local wipe before exporting any sync objects")}
+        let frontier=try current();var controls=[SyncCollectionControl]()
+        for (peer,counter) in frontier.counters.sorted(by:{$0.key<$1.key}) {
+            if peer==replica {
+                guard let control=try approvedControl(counter,journal:journal) else {throw OSwindError.unavailable("Group erasure has not been approved")};controls.append(control)
+            } else {
+                let row=try database.statement("SELECT digest,control FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(row)}
+                database.bind(row,1,peer);sqlite3_bind_int64(row,2,counter)
+                guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.unavailable("The observed frontier has no authenticated collection control")}
+                let control=try SyncCollectionControl.decode(controlBytes(row,1))
+                guard control.group==journal.group,control.epoch==journal.epoch,control.creator==peer,control.counter==counter,try database.text(row,0)==control.digest else {throw OSwindError.invalid("Received collection control differs from its trusted frontier")};controls.append(control)
+            }
+        }
+        return controls
+    }
+    /// The owning receiver authenticates the encrypted control first. Only its
+    /// creator's counter advances; claimed foreign context is not independent
+    /// evidence that those other devices' erasures have been observed.
+    @discardableResult func observeVerifiedGroupControl(_ control:SyncCollectionControl,journal:SyncJournal,retire:(SyncClock)throws->Void)throws->Bool {
+        try SyncChangeCapture.transaction(database) {
+            try requireJournal(journal)
+            guard control.group==journal.group,control.epoch==journal.epoch,try journal.cursor(for:control.creator) != nil else {throw OSwindError.invalid("Collection control belongs to an unenrolled peer or different epoch")}
+            for peer in control.era.counters.keys {guard try journal.cursor(for:peer) != nil else {throw OSwindError.invalid("Collection control names an unenrolled peer")}}
+            if control.creator==replica {guard try approvedControl(control.counter,journal:journal)==control else {throw OSwindError.invalid("Another writer attempted to approve this device's local wipe")}}
+            let bytes=try control.encoded(),digest=try control.digest
+            let prior=try database.statement("SELECT digest,control FROM personal_sync_collection_received_controls WHERE replica=? AND counter=?");defer {sqlite3_finalize(prior)}
+            database.bind(prior,1,control.creator);sqlite3_bind_int64(prior,2,control.counter)
+            let code=sqlite3_step(prior)
+            if code==SQLITE_ROW {guard database.text(prior,0)==digest,try controlBytes(prior,1)==bytes else {throw OSwindError.invalid("A collection writer forked its recorded wipe identity")};return false}
+            guard code==SQLITE_DONE else {throw database.error()}
+            let insert=try database.statement("INSERT INTO personal_sync_collection_received_controls VALUES(?,?,?,?)");defer {sqlite3_finalize(insert)}
+            database.bind(insert,1,control.creator);sqlite3_bind_int64(insert,2,control.counter);database.bind(insert,3,digest)
+            bytes.withUnsafeBytes {_=sqlite3_bind_blob(insert,4,$0.baseAddress,Int32(bytes.count),database.transient)};try database.done(insert)
+            let before=try current()
+            guard control.counter>before[control.creator] else {return false}
+            let update=try database.statement("INSERT INTO personal_sync_collection_frontier VALUES(?,?) ON CONFLICT(replica) DO UPDATE SET counter=excluded.counter");defer {sqlite3_finalize(update)}
+            database.bind(update,1,control.creator);sqlite3_bind_int64(update,2,control.counter);try database.done(update)
+            try retire(current());return true
+        }
     }
 }

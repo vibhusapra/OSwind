@@ -11,6 +11,8 @@ final class SyncObjectFolder:@unchecked Sendable {
     private let operations:SyncCipherContext
     private let chunks:SyncCipherContext
     private let checkpoints:SyncCipherContext
+    private let collectionControls:SyncCipherContext
+    private let supersessions:SyncCipherContext
     private static let markerName="space-v1"
     private static let markerDescriptor=Data("OSwind.sync.space-marker.v1".utf8)
     private static let markerBody=Data("OSwind encrypted object space v1".utf8)
@@ -21,6 +23,8 @@ final class SyncObjectFolder:@unchecked Sendable {
         operations=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.operation)
         chunks=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.contentChunk)
         checkpoints=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.checkpoint)
+        collectionControls=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.collectionControl)
+        supersessions=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.supersession)
         if create {
             try BackupWorkspace.requireNewDestination(root)
             guard mkdir(root.path,0o700)==0 else {throw OSwindError.unavailable("Cannot create private sync object space")}
@@ -135,5 +139,41 @@ final class SyncObjectFolder:@unchecked Sendable {
         guard let bytes=try read(operations,Self.operationDescriptor(replica:replica,sequence:sequence)) else {return nil}
         let revision=try SyncRevision.decode(bytes)
         guard revision.dot.replica==replica,revision.dot.counter==sequence else {throw OSwindError.invalid("Sync operation identity differs from its address")};return revision
+    }
+    func publishCollectionControl(_ control:SyncCollectionControl)throws {
+        try requireNamespace(group:control.group,epoch:control.epoch)
+        try publish(collectionControls,SyncCollectionControl.descriptor(creator:control.creator,counter:control.counter),control.encoded())
+    }
+    func collectionControl(creator:String,counter:Int64)throws->SyncCollectionControl? {
+        guard let bytes=try read(collectionControls,SyncCollectionControl.descriptor(creator:creator,counter:counter)) else {return nil}
+        let control=try SyncCollectionControl.decode(bytes)
+        guard control.creator==creator,control.counter==counter else {throw OSwindError.invalid("Collection control differs from its opaque address")}
+        try requireNamespace(group:control.group,epoch:control.epoch);return control
+    }
+    /// Header-only publication is allowed only after the exact erasing group
+    /// control is present and authenticated in this immutable object space.
+    func publishErasedRevision(_ revision:SyncRevision,control:SyncCollectionControl)throws {
+        guard control.erases(revision),try collectionControl(creator:control.creator,counter:control.counter)==control else {throw OSwindError.invalid("Publish a verified erasing control before its body-free old revision")}
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+    }
+    func publishDeletedRevision(_ revision:SyncRevision,deletion:SyncRevision)throws {
+        guard revision.mutation == .put,deletion.mutation == .delete,deletion.key==revision.key,try self.revision(replica:deletion.dot.replica,sequence:deletion.dot.counter)==deletion else {throw OSwindError.invalid("Publish the exact deletion barrier before an old body-free revision")}
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+    }
+    func publishSupersededRevision(_ revision:SyncRevision,successor:SyncRevision)throws {
+        let proof=try SyncSupersessionProof(obsolete:revision,successor:successor)
+        if let existing=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot)) {
+            guard try SyncSupersessionProof.decode(existing)==proof else {throw OSwindError.invalid("An immutable supersession proof changed")}
+        } else {
+            guard try self.revision(replica:successor.dot.replica,sequence:successor.dot.counter)==successor else {throw OSwindError.invalid("Publish the authenticated successor before its obsolete header")}
+        }
+        try publish(supersessions,SyncSupersessionProof.descriptor(revision.dot),proof.encoded())
+        try publish(operations,Self.operationDescriptor(replica:revision.dot.replica,sequence:revision.dot.counter),revision.encoded())
+    }
+    func supersedingRevision(for revision:SyncRevision)throws->SyncRevision? {
+        guard let bytes=try read(supersessions,SyncSupersessionProof.descriptor(revision.dot)) else {return nil}
+        let proof=try SyncSupersessionProof.decode(bytes)
+        let successor=try self.revision(replica:proof.successor.replica,sequence:proof.successor.counter) ?? proof.successorRevision
+        guard try proof.matches(obsolete:revision,successor:successor) else {throw OSwindError.invalid("Supersession changed an operation identity")};return successor
     }
 }
