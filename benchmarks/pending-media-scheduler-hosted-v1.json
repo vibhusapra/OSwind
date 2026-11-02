@@ -1,0 +1,51 @@
+{
+  "format": "OSwind pending-media scheduler hosted follow-up v1",
+  "state": "passed",
+  "PR": 130,
+  "source": "48f9040f9be1bce0367a0ed8ccf44595e68b146a",
+  "runID": 41372324805,
+  "nativeJob": 125045226285,
+  "benchmarkJob": 125045226546,
+  "bothJobs": "completed/success",
+  "checkoutSeen": true,
+  "nativeLogBytes": 2972450,
+  "nativeLogSHA256": "d12319ce92de890fad70d56356ad770050a15c210f3a7d9dbc9f8d64fe7dda19",
+  "commands": [
+    {
+      "command": "OSWIND_TEST_INDEXED_RETRIEVAL_OUTPUT=\"$RUNNER_TEMP/oswind-indexed-retrieval\" OSWIND_TEST_NATIVE_MEDIA_RETAIN=\"$RUNNER_TEMP/oswind-media-migration\" swift test",
+      "defined": 2195,
+      "passed": 2087,
+      "skipped": 108,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_CLIPBOARD=1 swift test --filter NativeClipboardReaderTests",
+      "defined": 3,
+      "passed": 3,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    },
+    {
+      "command": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_VAULT_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-native-traces\" OSWIND_TEST_VAULT_QUERY_TRACE_DIR=\"$RUNNER_TEMP/oswind-vault-query-traces\" swift test --filter 'NativeVault|VaultSessionTests'",
+      "defined": 43,
+      "passed": 43,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    }
+  ],
+  "artifact": {
+    "ID": 13110601704,
+    "bytes": 19863,
+    "SHA256": "503adbc54c4f40de728b84c2d10de7ac5bf6e459e4b274a74395a1bdd6103b7e",
+    "strictExtractedJSONfiles": 10
+  },
+  "limits": [
+    "Hosted skip set differs from local full run; native-only encrypted APFS and named-clipboard jobs are counted separately.",
+    "Not sustained capture/power, GUI/TCC, release signing, actual provider/two-Mac acceptance or competitor rank.",
+    "PR128 prior busy detach failure remains separate and unresolved."
+  ],
+  "atUTC": "2026-11-02T02:25:23.256177+00:00"
+}
