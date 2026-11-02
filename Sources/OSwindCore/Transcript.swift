@@ -1,4 +1,5 @@
 import Foundation
+import CSQLite
 
 public struct TranscriptSegment: Codable, Equatable, Sendable {
     public var start: Double
@@ -69,9 +70,11 @@ public struct SpeechTranscript: Codable, Equatable, Sendable {
 public enum AudioAdmission {
     /// The caller owns the input clip. It is never moved/deleted here. A failed
     /// insert removes only this operation's newly created retained copy.
+    /// A settings snapshot requires an independent SQL transaction so its
+    /// current-version check can protect the actual commit.
     public static func save(_ transcript: SpeechTranscript, file: URL, store: MemoryStore, settings: AppSettings,
                             timestamp: Date, source: String, title: String? = nil, sessionID: String? = nil, recordedLive: Bool = true,
-                            embedder: LocalEmbedder? = nil,admission:MediaAdmissionLease?=nil) throws -> Memory {
+                            embedder: LocalEmbedder? = nil,admission:MediaAdmissionLease?=nil,settingsSnapshot:LibrarySettingsSnapshot?=nil) throws -> Memory {
         try Task.checkCancellation()
         let clean=try transcript.sanitized(policy:settings.privacy)
         guard timestamp.timeIntervalSince1970.isFinite,source.count<=512,sessionID.map({!$0.isEmpty && $0.count<=200}) ?? true else { throw OSwindError.invalid("Invalid audio source metadata") }
@@ -86,7 +89,7 @@ public enum AudioAdmission {
         return try lease.withActive(for:store.mediaRootIdentity) {
         try store.requireMediaRootIdentity()
         var retained: String?, committed=false;var ownedOutput:BackupFileTree?
-        defer {if !committed,let retained {try? ownedOutput?.remove(retained)}}
+        defer {if !committed,let retained {try? ownedOutput?.removeForCleanup(retained)}}
         if settings.retainAudio && !clean.suppressAudio {
             let input=try BackupFileTree(root:file.deletingLastPathComponent().standardizedFileURL.resolvingSymlinksInPath()), output=try BackupFileTree(root:store.root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
             let outputIdentity=try output.identity();guard outputIdentity.device==store.mediaRootIdentity.device,outputIdentity.inode==store.mediaRootIdentity.inode else {throw OSwindError.invalid("The library directory changed before audio retention")}
@@ -96,7 +99,21 @@ public enum AudioAdmission {
             _ = try input.copy(file.lastPathComponent,to:output,as:member)
             memory.audioPath=member
         }
-        try Task.checkCancellation();try store.requireMediaRootIdentity();try store.insert(memory);committed=true;return memory
+        try Task.checkCancellation();try store.requireMediaRootIdentity()
+        if let settingsSnapshot {
+            // Copy and embeddings precede SQL/settings locks. Only the final
+            // commit holds the current-version settings lock; no await or
+            // model/file preparation blocks a settings writer there.
+            try store.withRoutineDatabase {db in
+                guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Configured audio admission must own its transaction")}
+                try db.execute("BEGIN IMMEDIATE")
+                do {
+                    try Task.checkCancellation();try store.insert(memory)
+                    try settingsSnapshot.withCurrent(root:store.root,policy:settings.privacy) {try db.execute("COMMIT")}
+                }catch {try? db.execute("ROLLBACK");throw error}
+            }
+        }else {try store.insert(memory)}
+        committed=true;return memory
         }
     }
 }

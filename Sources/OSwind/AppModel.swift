@@ -48,6 +48,7 @@ import EventKit
         if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.ai != settings.ai {cancelAnswer()}
+        if oldValue.privacy != settings.privacy || oldValue.retainAudio != settings.retainAudio || oldValue.speech != settings.speech || oldValue.diarization != settings.diarization || oldValue.whisperBinary != settings.whisperBinary || oldValue.whisperModel != settings.whisperModel || oldValue.transcriptionLanguage != settings.transcriptionLanguage {cancelAudioImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
         var oldTextSearch=oldValue.search;oldTextSearch.visual=settings.search.visual
@@ -165,7 +166,6 @@ import EventKit
     private var storageGeneration = UUID()
     @Published var importingAudio=false
     @Published var audioImportStatus=""
-    private var audioImportTask: Task<Void,Never>?
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
@@ -332,7 +332,7 @@ import EventKit
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
         libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();libraryWork.cancel();libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsPending=false; stopAPI(preservePreference:true)
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsPending=false; stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -990,36 +990,62 @@ import EventKit
         }
         nativeModels.message("Ready for local transcription.",for:result.kind)
     }
+    enum AudioImportPhase:Sendable {case started,clipPrepared,beforeAdmission}
     func importAudio() {
         guard libraryWorkAvailable,!libraryWipe.busy else {return}
         guard !voice.busy else {audioImportStatus="Finish voice typing before importing audio.";return}
         guard !importingAudio else { return }
         let panel=NSOpenPanel(); panel.allowedContentTypes=[.audio]; panel.allowsMultipleSelection=false; panel.message="Transcribe this file locally. Clip retention follows your Audio setting."
         guard panel.runModal() == .OK,libraryWorkAvailable,!libraryWipe.busy,!voice.busy,!importingAudio,let file=panel.url else { return }
+        importAudioFile(file)
+    }
+    func importAudioFile(_ file:URL,recognizer:SpeechRecognizer?=nil,speakers:SpeakerDiarizer?=nil,observePhase:(@Sendable (AudioImportPhase)async throws->Void)?=nil,observeCompletion:(@Sendable ()async->Void)?=nil,observeAdmission:(@Sendable ()->Void)?=nil) {
+        guard libraryWorkAvailable,!libraryWipe.busy,!voice.busy,!importingAudio else {return}
         importingAudio=true; audioImportStatus="Preparing audio…"; let configuration=settings
-        audioImportTask=Task {
-            defer { importingAudio=false; audioImportTask=nil }
-            do {
+        let recognizer=recognizer ?? audio.recognizer,speakers=speakers ?? audio.speakers,store=self.store,embedder=self.embedder,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.audioImport,operation:{
+                func progress(_ text:String)async throws {
+                    try await MainActor.run {
+                        try Task.checkCancellation();guard self.libraryOperationGeneration==generation,self.libraryWorkAvailable else {throw CancellationError()}
+                        self.audioImportStatus=text
+                    }
+                }
+                try Task.checkCancellation();try await observePhase?(.started);try Task.checkCancellation()
                 if configuration.diarization.enabled {
                     guard SpeakerDiarizer.supported else { throw OSwindError.unavailable("Speaker labels require macOS 15 or later") }
                     _ = try configuration.diarization.localDirectory()
                 }
                 let clip=try await AudioClipSnapshot.prepare(file,store:store); defer { withExtendedLifetime(clip) {} }
-                audioImportStatus="Transcribing locally…"
-                var transcript=try await audio.recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800,workspaceParent:clip.speechFile.deletingLastPathComponent())
+                try await observePhase?(.clipPrepared);try Task.checkCancellation()
+                try await progress("Transcribing locally…")
+                var transcript=try await recognizer.transcribe(file:clip.speechFile,settings:configuration,timeout:1800,workspaceParent:clip.speechFile.deletingLastPathComponent())
                 try Task.checkCancellation(); transcript=try transcript.bounded(toSourceDuration:clip.duration)
                 if configuration.diarization.enabled {
-                    audioImportStatus="Identifying speakers locally…"
-                    transcript=try await audio.speakers.annotate(transcript,file:clip.speechFile,configuration:configuration.diarization)
+                    try await progress("Identifying speakers locally…")
+                    transcript=try await speakers.annotate(transcript,file:clip.speechFile,configuration:configuration.diarization)
                 }
                 try Task.checkCancellation()
-                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:settings,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder,admission:clip.mediaActivity)
-                captured(memory); audioImportStatus="Transcript saved · find it in Conversations"
-            } catch is CancellationError { audioImportStatus="Import cancelled" }
-            catch { audioImportStatus=error.localizedDescription }
+                try await observePhase?(.beforeAdmission);try Task.checkCancellation()
+                let current=try await MainActor.run { ()throws->AppSettings in
+                    try Task.checkCancellation();guard self.libraryOperationGeneration==generation,self.libraryWorkAvailable else {throw CancellationError()};return self.settings
+                }
+                let snapshot=try LibrarySettingsSnapshot.capture(root:store.root);defer {snapshot.release()}
+                guard snapshot.settings.privacy==current.privacy,snapshot.settings.retainAudio==current.retainAudio else {throw OSwindError.unavailable("Saved audio privacy or retention changed. Retry with current settings.")}
+                observeAdmission?()
+                let memory=try AudioAdmission.save(transcript,file:clip.file,store:store,settings:current,timestamp:Date(),source:"Imported audio",title:file.deletingPathExtension().lastPathComponent,sessionID:UUID().uuidString,recordedLive:false,embedder:embedder,admission:clip.mediaActivity,settingsSnapshot:snapshot)
+                await observeCompletion?();return memory
+        }) {outcome,cancelled in
+            self.importingAudio=false
+            guard self.libraryOperationGeneration==generation,!self.libraryRetired else {return}
+            switch outcome {
+            case .success(let memory):
+                if cancelled || !self.libraryWorkAvailable {self.audioImportStatus="Transcript saved before cancellation. Open Conversations to review it."}
+                else {self.captured(memory);self.audioImportStatus="Transcript saved · find it in Conversations"}
+            case .failure(let error):self.audioImportStatus=cancelled || error is CancellationError ? "Import cancelled":error.localizedDescription
+            }
         }
     }
-    func cancelAudioImport() { audioImportTask?.cancel() }
+    func cancelAudioImport() {libraryWork.cancel(kinds:[.audioImport]);if importingAudio,!libraryRetired {audioImportStatus="Cancelling; waiting for local audio work to stop…"}}
     func exportData() {guard libraryWorkAvailable else {return};pauseAll(); let panel = NSSavePanel(); panel.nameFieldStringValue = "OSwind-export.json"; panel.allowedContentTypes = [.json]; if panel.runModal() == .OK,libraryWorkAvailable,let url = panel.url { do { try store.exportJSON(to:url) } catch { errorMessage = error.localizedDescription } } }
     func importData(limitlessAPI:Bool=false) {
         guard libraryWorkAvailable,!importingJSON else {return};let panel=NSOpenPanel();panel.allowedContentTypes=[.json]

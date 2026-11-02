@@ -4,7 +4,7 @@ import AppKit
 @testable import OSwind
 
 enum SourceWorkTestJob:CaseIterable {
-    case note,recap,statistics,storage,answer
+    case note,recap,statistics,storage,answer,audioImport
     @MainActor func start(_ model:AppModel,gate:ImportWorkerGate,committed:Bool=false)throws {
         switch self {
         case .note:
@@ -18,6 +18,11 @@ enum SourceWorkTestJob:CaseIterable {
         case .statistics:model.refreshStatistics(force:true,observeWorker:{try gate.pause()})
         case .storage:model.invalidateStorageEstimate();model.refreshStatistics(force:true,observeStorage:{try gate.pause()})
         case .answer:model.ask("Owned source",interpretation:false,observeWorker:{if $0 == .started {try gate.pause()}})
+        case .audioImport:
+            let file=model.store.root.appendingPathComponent("owned-import.wav");try WAV.data(samples:Array(repeating:Float(0.05),count:16000)).write(to:file)
+            model.settings.speech.engine = .parakeet;model.settings.speech.modelDirectory="/synthetic/authored-decoder"
+            let backend=AuthoredImportBackend(),recognizer=SpeechRecognizer(loader:{_ in backend})
+            model.importAudioFile(file,recognizer:recognizer,observePhase:{if $0 == .started {try gate.pause()}})
         }
     }
     @MainActor static func settle(_ model:AppModel)async throws {
@@ -81,4 +86,6 @@ enum SourceWorkTestJob:CaseIterable {
     func testLibrarySwitchWaitsForActualStorageWorker()async throws {try await switched(.storage)}
     func testPlainQuitWaitsForActualAnswerWorker()async throws {try await quit(.answer)}
     func testLibrarySwitchWaitsForActualAnswerWorker()async throws {try await switched(.answer)}
+    func testPlainQuitWaitsForActualAudioImportWorker()async throws {try await quit(.audioImport)}
+    func testLibrarySwitchWaitsForActualAudioImportWorker()async throws {try await switched(.audioImport)}
 }
