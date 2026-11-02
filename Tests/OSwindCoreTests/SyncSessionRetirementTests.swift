@@ -11,7 +11,8 @@ extension SyncNativeReceivedRetirementTests {
             if await session.status().phase==phase {return}
             try await Task.sleep(for:.milliseconds(5))
         }
-        XCTFail("Owned session did not reach expected phase")
+        let current=await session.status()
+        throw OSwindError.unavailable("Owned session expected \(phase), observed \(current.phase)")
     }
     func testEnrolledSessionOwnsLocalEraseCountsCredentialsAndTerminalStop()async throws {
         let connection=try session(sa,pairing:pa)
@@ -79,7 +80,7 @@ extension SyncNativeReceivedRetirementTests {
     }
 }
 
-private final class SyncSessionEraseGate:@unchecked Sendable {
+final class SyncSessionEraseGate:@unchecked Sendable {
     let entered=XCTestExpectation(description:"Native erasure reached owned gate")
     let cancelled=XCTestExpectation(description:"Actual native erasure observed cancellation")
     private let condition=NSCondition();private var released=false,reported=false
@@ -93,7 +94,7 @@ private final class SyncSessionEraseGate:@unchecked Sendable {
     }
     func release() {condition.lock();released=true;condition.broadcast();condition.unlock()}
 }
-private final class SyncSessionStopProbe:@unchecked Sendable {
+final class SyncSessionStopProbe:@unchecked Sendable {
     private let lock=NSLock();private var finished=false
     var value:Bool {lock.lock();defer {lock.unlock()};return finished}
     func mark() {lock.lock();finished=true;lock.unlock()}

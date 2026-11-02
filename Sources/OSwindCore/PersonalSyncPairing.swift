@@ -24,7 +24,8 @@ public struct PersonalSyncPairingReview:Equatable,Sendable {
 
 /// Serialized owner of a Keychain anchor and its current native library. The
 /// caller must join every operation and close this owner before leaving storage.
-/// The public API cannot construct a delivery session or publish provider objects.
+/// A prepared session takes lifetime ownership of this pairing owner. The app
+/// must join setup and session shutdown before leaving its native library.
 public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     private struct Handle:Codable,Equatable {let format:String,version:Int,id:String,protection:SyncCredentialProtection}
     private struct Location:Codable,Equatable {
@@ -307,6 +308,45 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
             if let resumed {try prepared.attachExternalAnchor(resumed)}else {try installDeliveryAnchor(on:prepared)}
             handedOff=true;return prepared
         }catch {try? service?.stop();inbox?.close();transport.close();throw error}
+    }}
+    /// Explicit folder activation. Finish admitting the intended devices first;
+    /// membership changes after delivery reservation require a later lifecycle.
+    /// Success transfers this owner to the returned, initially paused session.
+    public func prepareSession(sharedFolder:URL,createSharedFolder:Bool=false)throws->PersonalSyncSession {
+        let service=try prepareAnchoredService(shared:sharedFolder,createShared:createSharedFolder)
+        do {
+            try saveSessionFolder(sharedFolder)
+            try service.installNativeWriterAdmission()
+            return try PersonalSyncSession(service:service,pairing:self)
+        }catch {try? service.stop();service.inbox.close();service.transport.close();throw error}
+    }
+    /// A local nonsecret bookmark is separate from group credentials. Resolving
+    /// never mounts a volume or prompts for access. Backups restore only their
+    /// content allowlist, so this local metadata cannot activate a copied library.
+    public func savedSessionFolder()throws->URL? {try withAccess {
+        _=try current()
+        return try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT value FROM store_metadata WHERE key='sync-session-folder-bookmark-v1'");defer {sqlite3_finalize(row)}
+            let status=sqlite3_step(row);if status==SQLITE_DONE {return nil}
+            guard status==SQLITE_ROW,let bytes=Data(base64Encoded:db.text(row,0)),!bytes.isEmpty,bytes.count<=65536 else {throw OSwindError.invalid("Choose the sync folder again; its saved bookmark is invalid")}
+            var stale=false
+            let folder=try URL(resolvingBookmarkData:bytes,options:[.withoutUI,.withoutMounting],relativeTo:nil,bookmarkDataIsStale:&stale)
+            guard !stale,folder.isFileURL else {throw OSwindError.unavailable("Choose the existing sync folder again; its location changed")}
+            return folder
+        }
+    }}
+    public func prepareSavedSession()throws->PersonalSyncSession {
+        guard let folder=try savedSessionFolder() else {throw OSwindError.unavailable("Choose a shared sync folder first")}
+        return try prepareSession(sharedFolder:folder)
+    }
+    private func saveSessionFolder(_ folder:URL)throws {try withAccess {
+        _=try current()
+        let bookmark=try folder.bookmarkData(options:.minimalBookmark,includingResourceValuesForKeys:nil,relativeTo:nil)
+        guard !bookmark.isEmpty,bookmark.count<=65536 else {throw OSwindError.invalid("The selected sync folder bookmark exceeds its bound")}
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("INSERT INTO store_metadata(key,value) VALUES('sync-session-folder-bookmark-v1',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");defer {sqlite3_finalize(row)}
+            db.bind(row,1,bookmark.base64EncodedString());try db.done(row)
+        }
     }}
     /// Reserve the external account in the already durable pairing anchor
     /// BEFORE creating any native delivery marker. Restoring a pre-install

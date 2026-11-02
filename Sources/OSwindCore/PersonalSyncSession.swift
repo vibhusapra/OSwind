@@ -34,9 +34,17 @@ public struct PersonalSyncStatus:Equatable,Sendable {
     }
 }
 
+/// Only the current session creates this exact review. It contains no keys and
+/// cannot authorize a different local erase after the library changes.
+public struct PersonalSyncEraseReview:Equatable,Sendable {
+    public let deviceNames:[String]
+    fileprivate let control:SyncCollectionControl
+    fileprivate let session:UUID
+}
+
 /// The app can own an enrolled session without receiving wire types or keys.
-/// Construction remains internal until enrollment/capability/rollback authority
-/// is delivered. Accepting a prepared session never grants membership itself.
+/// The pairing factory prepares enrollment, native writer and rollback authority
+/// before returning this paused owner. A session never grants new membership.
 public actor PersonalSyncSession {
     private nonisolated let library:MemoryStore
     private let privateInbox:SyncObjectFolder
@@ -46,17 +54,20 @@ public actor PersonalSyncSession {
     private var closed=false
     private var retirement:Task<LibraryWipeResult,Error>?
     private var stopping:Task<Void,Error>?
+    private var reviewing:Task<Void,Error>?
+    private let reviewOwner=UUID()
     init(service:SyncLibraryService,pairing:PersonalSyncPairing?=nil,schedule:SyncLibrarySchedule = .init())throws {
         guard pairing==nil || pairing!.belongs(to:service.library) else {throw OSwindError.invalid("Own pairing for the session's current library")}
         library=service.library;privateInbox=service.inbox;self.service=service;self.pairing=pairing;scheduler=try SyncLibraryScheduler(service:service,schedule:schedule)
     }
     public nonisolated func belongs(to store:MemoryStore)->Bool {library === store}
+    public nonisolated var ownsHistoryRetirement:Bool {pairing != nil}
     public func setProcessingEnabled(_ enabled:Bool)async throws {
-        guard !closed else {throw OSwindError.unavailable("This sync session is stopped")}
+        guard !closed,reviewing==nil else {throw OSwindError.unavailable("This sync session is stopped or reviewing erasure")}
         if enabled {try await scheduler.resumeProcessing()}else{await scheduler.pauseProcessing()}
     }
     public func setNetworkEnabled(_ enabled:Bool)async throws {
-        guard !closed else {throw OSwindError.unavailable("This sync session is stopped")}
+        guard !closed,reviewing==nil else {throw OSwindError.unavailable("This sync session is stopped or reviewing erasure")}
         try await scheduler.setNetworkEnabled(enabled)
     }
     public func stop()async throws {
@@ -64,12 +75,13 @@ public actor PersonalSyncSession {
         let closing:Task<Void,Error>
         if let stopping {closing=stopping}
         else {
-            let pending=retirement,scheduler=scheduler,inbox=privateInbox,transport=service.transport,pairing=pairing
-            pending?.cancel()
+            let pending=retirement,review=reviewing,scheduler=scheduler,inbox=privateInbox,transport=service.transport,pairing=pairing
+            pending?.cancel();review?.cancel()
             closing=Task.detached(priority:.utility) {
                 // Cancellation never acknowledges an unfinished native commit,
                 // physical cleanup or external credential replacement.
                 _=await pending?.result
+                _=await review?.result
                 defer {inbox.close();transport.close();pairing?.close()}
                 try await scheduler.stop()
             }
@@ -77,11 +89,41 @@ public actor PersonalSyncSession {
         }
         try await closing.value
     }
+    /// The app first stops and joins its capture/import/model producers. These
+    /// terminal methods consume the session, including on a failed/canceled
+    /// attempt. Pending committed cleanup requires restricted recovery.
+    public func eraseLocalHistory(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})async throws->LibraryWipeResult {
+        try await retireHistory(received:false,progress:progress)
+    }
+    public func applyReceivedErase(progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})async throws->LibraryWipeResult {
+        try await retireHistory(received:true,progress:progress)
+    }
+    public func localEraseReview()async throws->PersonalSyncEraseReview? {
+        let state=await scheduler.state
+        guard !closed,reviewing==nil,let pairing else {throw OSwindError.unavailable("Review erasure from the current enrolled session")}
+        guard case .waitingForLocalReview(let control)=state else {return nil}
+        return try .init(deviceNames:pairing.status().memberNames,control:control,session:reviewOwner)
+    }
+    /// Explicit approval leaves processing suspended. The app rechecks its
+    /// current lock/onboarding/network intent before resuming this session.
+    public func approveLocalErase(_ review:PersonalSyncEraseReview)async throws {
+        let state=await scheduler.state
+        guard !closed,reviewing==nil,pairing != nil,review.session==reviewOwner,
+              case .waitingForLocalReview(let current)=state,current==review.control else {throw OSwindError.unavailable("Review this session's current local erase first")}
+        let service=service,scheduler=scheduler,control=review.control
+        let worker=Task.detached(priority:.utility) {
+            await scheduler.pauseProcessing();try Task.checkCancellation()
+            try service.approveLocalGroupErase(control)
+            try await scheduler.resolveLocalReview(control)
+        }
+        reviewing=worker;defer {reviewing=nil}
+        try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+    }
     /// Internal until the app supplies its joined producer and recovery paths.
     /// A terminal operation consumes this session; reconnect with a fresh owner
     /// after successful renewal. The caller must first join all other producers.
     func retireHistory(received:Bool,progress:@escaping @Sendable (LibraryBackupProgress)->Void={_ in})async throws->LibraryWipeResult {
-        guard !closed,retirement==nil,let pairing else {throw OSwindError.unavailable("History retirement requires the enrolled session owner")}
+        guard !closed,retirement==nil,reviewing==nil,let pairing else {throw OSwindError.unavailable("History retirement requires the enrolled session owner")}
         closed=true
         let service=service,scheduler=scheduler,inbox=privateInbox,transport=service.transport
         let worker=Task.detached(priority:.utility) {()throws->LibraryWipeResult in

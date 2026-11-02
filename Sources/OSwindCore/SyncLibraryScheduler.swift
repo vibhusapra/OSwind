@@ -114,6 +114,11 @@ actor SyncLibraryScheduler {
         guard !finished else {throw OSwindError.unavailable("Sync stopped before retirement began")}
         return state
     }
+    func resolveLocalReview(_ control:SyncCollectionControl)throws {
+        guard !finished,!retirementReserved,!reconfiguring,!pausing,processingPaused,task==nil,
+              case .waitingForLocalReview(let current)=state,current==control else {throw OSwindError.unavailable("The local erase changed while its review was saving")}
+        update(.suspended)
+    }
     func resumeProcessing()throws {
         guard !finished,!retirementReserved,!reconfiguring,!pausing else {throw OSwindError.unavailable("Sync scheduling is stopping or changing")}
         processingPaused=false
