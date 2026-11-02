@@ -99,8 +99,16 @@ final class BackupFileTree {
         throw BackupFileError.invalid("Backup directory ancestry is too deep")
     }
     func remove(_ relative: String) throws {
+        try removeMember(relative,checkingCancellation:true)
+    }
+    /// Rollback owns this newly created member even after its task is canceled.
+    /// Keep the same writable/path/descriptor/no-follow checks as ordinary IO.
+    func removeForCleanup(_ relative:String)throws {
+        try removeMember(relative,checkingCancellation:false)
+    }
+    private func removeMember(_ relative:String,checkingCancellation:Bool)throws {
         guard writable else { throw BackupFileError.invalid("Archive directories are read-only") }
-        let parts = try Self.components(relative), parent = try directory(parts.dropLast()); defer { close(parent) }
+        let parts = try Self.components(relative), parent = try directory(parts.dropLast(),checkingCancellation:checkingCancellation); defer { close(parent) }
         guard unlinkat(parent,parts.last!,0) == 0 else { throw Self.failure("Cannot remove backup scratch member") }
     }
     func removeAllChildren() throws {
@@ -151,12 +159,12 @@ final class BackupFileTree {
     func identity() throws -> BackupFileStamp {
         var metadata=stat();guard fstat(descriptor,&metadata)==0 else {throw Self.failure("Cannot inspect workspace directory")};return BackupFileStamp(metadata)
     }
-    private func directory(_ parts: ArraySlice<String>, create: Bool = false) throws -> Int32 {
+    private func directory(_ parts: ArraySlice<String>, create: Bool = false,checkingCancellation:Bool=true) throws -> Int32 {
         var current = openat(descriptor,".",O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW)
         guard current >= 0 else { throw Self.failure("Cannot retain backup directory") }
         do {
             for part in parts {
-                try Task.checkCancellation()
+                if checkingCancellation {try Task.checkCancellation()}
                 if create {
                     guard writable else { throw BackupFileError.invalid("Archive directories are read-only") }
                     if mkdirat(current,part,0o700) != 0 && errno != EEXIST { throw Self.failure("Cannot create backup directory") }

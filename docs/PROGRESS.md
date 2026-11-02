@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Audio import lifetime — component qualified
+
+[Behavior and remaining work](AUDIO-IMPORT-LIFECYCLE.md) cover actual local import ownership, off-thread admission, current-settings commit fencing and cancellation-safe new-file rollback.
+
+Source `dfac2e0` binds the [1,390-input receipt](../benchmarks/audio-import-lifecycle-v1.json). Full debug: **2,173 passes / 114 explicit skips**. Selected Thread Sanitizer and optimized: **1,073 / 1,073 passes**, with **60 / 60 skips**, respectively, and no sanitizer race warning. All **266 required controls** pass in every build, with no ambiguous source method definitions and 19 additional owner-qualified speech/speaker identities. All **32 fresh package/process stages** pass, including **53 native/app-session methods without skips**, actual packaged audio normalization/privacy/backup/erasure and speaker scopes/rename. Full plus native covers **2,224 distinct methods**.
+
+Independent review verifies every byte of the 34-file app/ZIP/extraction, strict ad hoc signatures, three retained migration crash states, exact new native test identities and all 51 prior app trees. Those include 50 qualified app/extraction trees and the retained failed query-setup candidate; preservation does not promote its failure. Earlier native inventory/busy refusals remain causally unresolved. Hosted CI is a separate publication check.
+
+The separately staged selected-reader prototype has retained genuine pre-fix assertions and 49 focused passes/no skips, including real Quit/switch; it has not passed canonical/native/package qualification. Complete sync F059, native input/power and notarized distribution remain open. All 83 feature statuses remain unchanged.
+
 ## Answer lifetime — component qualified
 
 [Answer lifetime and saving](ANSWER-LIFECYCLE.md) now joins actual Ask work through Quit, switch, wipe and encrypted lock, rejects retired launches, and atomically creates the first conversation with its turn. The source-bound receipt passes all 225 required controls in three builds, 51 native methods and 30 fresh package/process stages; independent review preserves 49 earlier app trees. Audio import, other worker lifetimes and whole-product acceptance remain open. All 83 feature statuses stay unchanged.
