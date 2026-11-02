@@ -52,6 +52,21 @@ struct SyncCollectionHistory {
         else {throw OSwindError.database("Collection history schema member is missing; preserve its state")}
     }
 
+    /// A dropped derived pin table also drops its two birth hooks. Ordinary
+    /// opening may restore only those hooks in the existing pin-repair
+    /// transaction. Recovered rows must use the retained birth/claim metadata,
+    /// so call this after reconstruction rather than restamping their births.
+    static func repairMissingPinTriggers(_ db:RoutineDatabase)throws {
+        let count=try db.eraseCount("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'personal_sync_collection_%'")
+        guard count>0 else {return}
+        guard count==schemas.count,sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.database("Preserve incomplete collection history during pin repair")}
+        let allowed=Set(["insert","update"].map {"sync_collection_birth_text_observation_pins_"+$0})
+        for (name,sql) in schemas {try require(db,name:name,sql:sql,allowCreate:false)}
+        for (name,sql) in triggers where !allowed.contains(name) {try require(db,name:name,sql:sql,allowCreate:false)}
+        for name in allowed {try require(db,name:name,sql:triggers[name]!,allowCreate:true)}
+        _=try ifInstalled(db)
+    }
+
     static func ifInstalled(_ db:RoutineDatabase)throws->Self? {
         let exists=try db.statement("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='personal_sync_collection_local'");defer {sqlite3_finalize(exists)}
         guard sqlite3_step(exists)==SQLITE_ROW else {throw db.error()};if sqlite3_column_int(exists,0)==0 {return nil}
