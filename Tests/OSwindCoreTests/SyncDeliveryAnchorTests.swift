@@ -234,10 +234,11 @@ final class SyncDeliveryAnchorTests:XCTestCase {
         guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.database("Owned checkpoint reader returned no row")};return sqlite3_column_int64(row,0)
     }
     func testPreparedPairingCannotBeRetiredOrMembershipChangedBehindDelivery()throws {
-        let owner=try owner();_=try prepare(owner)
+        let owner=try owner(),pending=try SyncPendingJoin(name:"Another Mac")
+        let text=String(decoding:try pending.request.encoded(),as:UTF8.self),review=try owner.reviewRequest(text)
+        _=try prepare(owner)
         XCTAssertThrowsError(try owner.retire())
-        let pending=try SyncPendingJoin(name:"Another Mac")
-        let review=try owner.reviewRequest(String(decoding:pending.request.encoded(),as:UTF8.self))
+        XCTAssertThrowsError(try owner.reviewRequest(text))
         XCTAssertThrowsError(try owner.approve(review))
     }
     func testPublicPreviewStillDoesNotActivateCaptureOrExposeDelivery()throws {
