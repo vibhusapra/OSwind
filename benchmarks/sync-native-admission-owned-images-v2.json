@@ -1,0 +1,13 @@
+{
+  "source": "ff23280f34a135b194019384fcf708cf105c1079",
+  "sourceDefinedRootPrefixes": {
+    "Tests/OSwindAppTests/VaultSessionTests.swift": "oswind-owned-session-",
+    "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift": "owned-sync-app-"
+  },
+  "sourceFilesSHA256": {
+    "Tests/OSwindAppTests/VaultSessionTests.swift": "20fb903ac50785ebd811e627bbba0305cbfae26620088f8acd77803f073269c7",
+    "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift": "5dc515df8b06ce32921d92defbe15caa3dd231fbdab67303f4b3b14cb403d17f"
+  },
+  "ownedAttached": 0,
+  "scope": "Supplement only. The frozen v1 reviewer omitted the owned-sync-app namespace in its image inventory; this independent check covers the two actual native fixture classes. No tests or successful reviewer were rerun."
+}

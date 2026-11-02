@@ -24,7 +24,7 @@ Source `5102714` now has its own [1,485-input manifest](../benchmarks/sync-deliv
 
 ## Required before public activation
 
-- [Native writer admission and recovery](SYNC-NATIVE-ADMISSION-WIP.md) now have an explicit internal vertical slice. Its separate broad qualification and public activation remain required.
+- [Native writer admission and recovery](SYNC-NATIVE-ADMISSION-WIP.md) now have an explicit internal vertical slice. Its separate native34 qualification is now recorded at source `ff23280`; later lifetime retirement and public activation remain required.
 - Recovery/quarantine and credential phase/lease handoff; a failed external/native boundary must not make local data irrecoverable.
 - Actual local and received whole-erase producer drain, physical cleanup and exact completion-based binding/checkpoint renewal. Current retired lifetimes refuse delivery; this is not a completed erase/reconnect flow.
 - Public folder/session setup through the app's owned preparation lifetime, membership refresh, revocation and rotation. The reserved credential deliberately refuses membership edits/local pairing-key retirement behind the delivery owner.
