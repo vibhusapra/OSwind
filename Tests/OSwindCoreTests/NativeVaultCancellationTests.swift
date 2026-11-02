@@ -65,14 +65,20 @@ final class NativeVaultCancellationTests:XCTestCase {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned observed native attach cancellation/recovery fixture")}
         let root=FileManager.default.temporaryDirectory.appendingPathComponent("oswind-native-cancel-recovery-"+UUID().uuidString);try Paths.ensure(root)
         let package=root.appendingPathComponent("Owned.oswindvault"),secret=Data(UUID().uuidString.utf8),trigger=OwnedCredentialCancellation(.attach)
-        let vault=try LibraryVault(package:package,nativeDriver:NativeVaultDriver(credentialHelperReady:{trigger.started($0,$1)}))
+        let trace=OwnedVaultNativeTrace(root:root)
+        let driver=NativeVaultDriver(observer:{trace.append($0)},willMutate:{trace.beforeMutation($0,$1)},credentialHelperReady:{trigger.started($0,$1)})
+        let vault=try LibraryVault(package:package,nativeDriver:driver)
         var activeStore:MemoryStore?
         do {
-            _=try await LibraryVault.create(at:package,name:"Owned cancellation recovery",capacityGiB:1,passphrase:secret)
+            trace.setStage("initial-create")
+            _=try await LibraryVault.create(at:package,name:"Owned cancellation recovery",capacityGiB:1,passphrase:secret,nativeDriver:driver)
+            trace.setStage("initial-unlock")
             _=try await vault.unlock(passphrase:secret)
+            trace.setStage("initial-source")
             let initial=try MemoryStore(root:vault.libraryURL);activeStore=initial;try initial.insert(Memory(id:"owned-keep",text:"Owned source survives cancelled unlock"))
-            _=try await vault.lock(store:initial);activeStore=nil
-            for _ in 0..<5 {
+            trace.setStage("initial-lock");_=try await vault.lock(store:initial);activeStore=nil
+            for cycle in 1...5 {
+                trace.setStage("cycle-\(cycle)-cancelled-unlock")
                 let worker=trigger.worker {try await vault.unlock(passphrase:secret)}
                 defer {_ = trigger.finish()}
                 do {_ = try await worker.value;XCTFail("Cancelled unlock published success")}
@@ -80,20 +86,25 @@ final class NativeVaultCancellationTests:XCTestCase {
                 catch {throw error}
                 let observed=try XCTUnwrap(trigger.finish(),"Owned attach start was not observed")
                 XCTAssertGreaterThan(observed.pid,0);XCTAssertTrue(observed.live,"Attach helper was not active after credential delivery")
+                trace.setStage("cycle-\(cycle)-after-cancel-inventory")
                 let afterCancellation=try await ownedAttachmentCount(package);XCTAssertEqual(afterCancellation,0)
+                trace.setStage("cycle-\(cycle)-recovery-unlock")
                 let reopened=try await vault.unlock(passphrase:secret);XCTAssertEqual(reopened.state,.unlocked)
-                let store=try MemoryStore(root:vault.libraryURL);activeStore=store
+                trace.setStage("cycle-\(cycle)-source-read");let store=try MemoryStore(root:vault.libraryURL);activeStore=store
                 XCTAssertEqual(try store.get("owned-keep")?.text,"Owned source survives cancelled unlock")
-                let locked=try await vault.lock(store:store);activeStore=nil
+                trace.setStage("cycle-\(cycle)-recovery-lock");let locked=try await vault.lock(store:store);activeStore=nil
                 XCTAssertEqual(locked.state,.locked);XCTAssertFalse(locked.imageAttached)
-                let afterLock=try await ownedAttachmentCount(package);XCTAssertEqual(afterLock,0)
+                trace.setStage("cycle-\(cycle)-after-lock-inventory");let afterLock=try await ownedAttachmentCount(package);XCTAssertEqual(afterLock,0)
             }
             print("NATIVE_CANCEL_PHASE attach cycles=5 inputClosed=5 activeHelpers=5 historyChecks=5")
+            trace.setStage("completed");try trace.save(root:root,secret:secret,failed:false)
             try await removeDetachedFixture(root,package:package)
         } catch {
             // Preserve the failed encrypted fixture. Only a normal product lock
             // may recover its freshly verified image; never force a device.
-            try? activeStore?.close();_ = try? await vault.lock();throw error
+            trace.markFailure();try? activeStore?.close();_ = try? await vault.lock()
+            do {try trace.save(root:root,secret:secret,failed:true)}catch {XCTFail("Owned cancellation failure trace could not be safely retained")}
+            throw error
         }
     }
     func testCancelledOwnedCreateKeepsClosedEncryptedSetupAndCanResume() async throws {

@@ -32,9 +32,18 @@ import EventKit
     let visualModelSetup:VisualModelSetupModel
     let piiModelSetup:PIIModelSetupModel
     @Published var settingsTab = "Capture"
+    private var assigningSettingsInternally=false
     @Published var settings: AppSettings { didSet {
-        capture.settings = settings; audio.settings = settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
-        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelAnswer()}
+        // A delayed binding can arrive after its view's workspace departed.
+        // Restore the local value before touching controllers or preferences.
+        guard !assigningSettingsInternally else {return}
+        guard !libraryRetired,!store.isClosed else {
+            assignInternalSettings(oldValue);return
+        }
+        applySettingsToControllers()
+        if oldValue.privacy != settings.privacy {drafting.clear();cancelJSONImport();cancelMaintenanceWork();cancelAnswer()}
+        if oldValue.automaticMaintenance && !settings.automaticMaintenance {cancelMaintenanceWork(automaticOnly:true)}
+        if oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelMaintenanceWork()}
         if oldValue.piiImports != settings.piiImports {cancelJSONImport()}
         if oldValue.search.visual != settings.search.visual || oldValue.privacy != settings.privacy || oldValue.search.indexOnLowPower != settings.search.indexOnLowPower {cancelVisualIndexing();if mode == .visual {cancelOpeningMemory();hits=[];selected=nil;selectedVisual=nil;refresh()}}
         // Visual model controls do not invalidate the independent text index.
@@ -42,6 +51,12 @@ import EventKit
         if oldTextSearch != settings.search { indexGeneration = UUID(); indexTask?.cancel(); store.cancelSearchIndexBuild(); if settings.search.indexPolicy == .exact { store.releaseSearchIndex() }; automaticIndexTask?.cancel(); pendingIndex.removeAll(); indexing = false; indexStatus = "Search settings changed; prepare the selected index" }
         do { try settings.save(root:store.root) } catch { errorMessage = error.localizedDescription }
     } }
+    private func assignInternalSettings(_ value:AppSettings) {
+        assigningSettingsInternally=true;settings=value;assigningSettingsInternally=false
+    }
+    private func applySettingsToControllers() {
+        capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
+    }
     @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
     @Published var searchFocusRequest: UUID?
     @Published var query = ""
@@ -101,7 +116,14 @@ import EventKit
     private var jsonImportWorker:Task<String,Error>?
     private var jsonImportDrainers=0
     var hasPendingJSONImport:Bool {jsonImportWorker != nil || jsonImportTask != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || tools.busy || clipboard.busy || voice.busy || workflow.busy}
+    private var deletionTask:Task<Void,Never>?
+    private var deletionWorker:Task<HistoryErasureResult,Error>?
+    private var maintenanceTask:Task<Void,Never>?
+    private var maintenanceWorker:Task<(RetentionCleanupResult?,String?),Error>?
+    private var maintenanceAutomatic=false
+    private var destructiveDrainers=0
+    var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || tools.busy || clipboard.busy || voice.busy || workflow.busy}
     private var recapSaveTask:Task<Void,Never>?
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
@@ -240,23 +262,25 @@ import EventKit
         }
         NSWorkspace.shared.notificationCenter.publisher(for:NSWorkspace.sessionDidBecomeActiveNotification).sink { [weak self] _ in Task {@MainActor in self?.resumeAutomaticVisualIndex()} }.store(in:&cancellables)
     }
-    private func stopHousekeeping() {housekeeping?.invalidate();housekeeping=nil;housekeepingActive=false}
+    private func stopHousekeeping(cancelWork:Bool=true) {housekeeping?.invalidate();housekeeping=nil;housekeepingActive=false;if cancelWork {cancelMaintenanceWork(automaticOnly:true)}}
     private func startHousekeeping() {
-        stopHousekeeping()
-        guard housekeepingRequested,!showOnboarding,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        stopHousekeeping(cancelWork:false)
+        guard !libraryRetired,!store.isClosed,housekeepingRequested,!showOnboarding,!libraryWipe.busy,!libraryWipe.pendingCleanup else {cancelMaintenanceWork(automaticOnly:true);return}
         housekeeping=Timer.scheduledTimer(withTimeInterval:300,repeats:true) { [weak self] _ in Task { @MainActor in self?.maintain(automatic:true) } }
         housekeepingActive=true
     }
     func configureAutomaticMaintenance(_ enabled:Bool) {
+        guard !libraryRetired,!store.isClosed else {return}
         settings.automaticMaintenance=enabled
         if enabled {housekeepingRequested=true;startHousekeeping()}
     }
     func startConfiguredServices() {
+        guard !libraryRetired,!store.isClosed else {return}
         configuredServicesRequested=true;housekeepingRequested=true
         activateConfiguredServices()
     }
     private func activateConfiguredServices() {
-        guard configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        guard !libraryRetired,configuredServicesRequested,!configuredServicesActive,!showOnboarding,!store.isClosed,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
         configuredServicesActive=true;visualAutoResumeAllowed=true;startHousekeeping()
         if !demo && settings.routinesEnabled {routines.start()}
         if !demo && settings.meetings.enabled {meetings.start()}
@@ -303,7 +327,7 @@ import EventKit
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
-        libraryOperationGeneration=UUID();cancelJSONImport();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
+        libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();recapSaveTask?.cancel();for task in noteTasks.values {task.cancel()};libraryWipe.cancel()
         routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); audioImportTask?.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); automaticIndexTask?.cancel(); pendingIndex.removeAll(); pullTask?.cancel(); refreshTask?.cancel(); statisticsTask?.cancel(); diskUsageTask?.cancel(); stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
@@ -627,10 +651,28 @@ import EventKit
     func cancelExternalWorkAndWait() async {
         // Reserve the import-drain gate before yielding to either worker. A
         // detached preparation not yet holding a lease must finish too.
-        jsonImportDrainers+=1;defer {jsonImportDrainers-=1}
+        jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
+        cancelDestructiveWork()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
+        await cancelDestructiveWorkAndWait()
+    }
+    private func cancelDestructiveWork() {
+        deletionWorker?.cancel();maintenanceWorker?.cancel();deletionTask?.cancel();maintenanceTask?.cancel()
+    }
+    private func cancelMaintenanceWork(automaticOnly:Bool=false) {
+        guard !automaticOnly || maintenanceAutomatic else {return}
+        maintenanceWorker?.cancel();maintenanceTask?.cancel()
+    }
+    /// Both the worker and its actor completion belong to the departing library.
+    /// Cancellation of this drain caller does not acknowledge unfinished work.
+    func cancelDestructiveWorkAndWait() async {
+        destructiveDrainers+=1;defer {destructiveDrainers-=1}
+        let deletion=deletionWorker,deleted=deletionTask,maintenance=maintenanceWorker,maintained=maintenanceTask
+        cancelDestructiveWork()
+        if let deletion {_ = try? await deletion.value};if let maintenance {_ = try? await maintenance.value}
+        if let deleted {await deleted.value};if let maintained {await maintained.value}
     }
     private var lastObservationRefresh = -Double.infinity
     private func observed(_ memory:Memory) {
@@ -726,69 +768,105 @@ import EventKit
     }
     func cancelIndexing() { indexTask?.cancel(); store.cancelSearchIndexBuild(pauseAutomatic:true) }
     func favorite(_ memory: Memory) { guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only.";return};do { try store.setFavorite(memory.id,value:!memory.favorite); if selected?.id == memory.id { selected = try store.get(memory.id) }; refresh() } catch { errorMessage = error.localizedDescription } }
-    func delete(_ memory:Memory) {
+    // Observers are internal test seams. Only pre-work observation may throw;
+    // a postcommit observation must not turn real deletion into a false failure.
+    func delete(_ memory:Memory,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard !libraryRetired,!store.isClosed,destructiveDrainers==0,!hasPendingDestructiveWork else {return}
         guard memory.originalEvidence==nil else {errorMessage="Original evidence is read-only. Delete its source from the library to erase it and dependent citations.";return}
         guard !libraryWipe.busy,deletingID==nil,!maintenanceBusy else {return};drafting.clear();tools.suspend();clipboard.invalidate();workflow.cancel(clear:true);deletingID=memory.id;deletionStatus="Deleting source and checking retained media…"
         if openingMemoryID==memory.id {cancelOpeningMemory()};if selected?.id==memory.id {selected=nil}
-        let store=self.store
-        Task {
-            defer {deletingID=nil}
+        let store=self.store,generation=libraryOperationGeneration
+        deletionTask=Task {
+            defer {deletionWorker=nil;deletionTask=nil;deletingID=nil}
             do {
                 await workflow.cancelAndWait()
-                let result=try await Task.detached(priority:.utility) {try store.delete(memory.id)}.value
+                try Task.checkCancellation()
+                guard generation==libraryOperationGeneration,!libraryRetired else {throw CancellationError()}
+                let worker=Task.detached(priority:.utility) {try observeWorker?();try Task.checkCancellation();let result=try store.delete(memory.id);observeCompletion?();return result}
+                deletionWorker=worker
+                let result=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+                guard generation==libraryOperationGeneration,!libraryRetired else {return}
                 deletionStatus="Removed \(result.sources) \(result.sources==1 ? "source":"sources") · \(result.historicalVersions) original versions · \(result.sharedMedia) shared \(result.sharedMedia==1 ? "file":"files") kept · \(result.pendingMedia) pending cleanup"
                 if !result.warnings.isEmpty {errorMessage="The source deletion committed. "+result.warnings.joined(separator:" ")}
-                activity.forgetCounts();invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats()
-            } catch {deletionStatus="Source was not deleted.";errorMessage=error.localizedDescription}
+                invalidateCommittedErasure(result,discardVisible:Task.isCancelled)
+                guard !Task.isCancelled else {return}
+                refresh(forceStatistics:true);refreshChats()
+            } catch is CancellationError {if generation==libraryOperationGeneration,!libraryRetired {deletionStatus="Deletion cancelled before publication."}}
+            catch {guard generation==libraryOperationGeneration,!libraryRetired else {return};deletionStatus="Source was not deleted.";errorMessage=error.localizedDescription}
         }
     }
-    func maintain(automatic:Bool=false) {
+    func maintain(automatic:Bool=false,observeWorker:(@Sendable ()throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
+        guard !libraryRetired,!store.isClosed,destructiveDrainers==0,!hasPendingDestructiveWork else {return}
         guard !automatic || !libraryWipe.pendingCleanup else {return}
         guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil else {return}
         if automatic {guard housekeepingActive,!showOnboarding,!workflow.busy else {return}}
-        let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance
+        let store=self.store,policy=settings.privacy,allowLowPower=settings.search.indexOnLowPower,shouldPrune = !automatic || settings.automaticMaintenance,generation=libraryOperationGeneration
         if shouldPrune {workflow.cancel(clear:true)}
-        maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
-        Task {
-            defer {maintenanceBusy=false}
+        maintenanceAutomatic=automatic;maintenanceBusy=true;maintenanceStatus=shouldPrune ? "Checking retention and retained media…":"Checking search cache…"
+        maintenanceTask=Task {
+            defer {maintenanceWorker=nil;maintenanceTask=nil;maintenanceBusy=false;maintenanceAutomatic=false}
             do {
                 if shouldPrune {await workflow.cancelAndWait()}
-                let (result,indexError)=try await Task.detached(priority:.utility) { () -> (RetentionCleanupResult?,String?) in
+                try Task.checkCancellation()
+                guard generation==libraryOperationGeneration,!libraryRetired else {throw CancellationError()}
+                let worker=Task.detached(priority:.utility) { () -> (RetentionCleanupResult?,String?) in
+                    try observeWorker?();try Task.checkCancellation()
                     let report=shouldPrune ? try store.pruneHistory(before:Date().addingTimeInterval(-Double(policy.retentionDays)*86400),maxBytes:Int64(policy.maxStorageGB)*1_000_000_000):nil
+                    observeCompletion?()
+                    if Task.isCancelled {return (report,nil)}
                     do {try store.checkpointSearchIndexIfIdle(allowLowPower:allowLowPower);return (report,nil)}
                     catch {return (report,"Search cache maintenance did not finish: "+error.localizedDescription)}
-                }.value
+                }
+                maintenanceWorker=worker
+                let (result,indexError)=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}
+                guard generation==libraryOperationGeneration,!libraryRetired else {return}
                 if let result {
                     let budget=result.budgetMet==false ? "Storage target not reached.":"Storage target met."
                     maintenanceStatus="Removed \(result.erasure.sources) \(result.erasure.sources==1 ? "source":"sources") · \(result.erasure.historicalVersions) original versions · \(result.erasure.pendingMedia) media files pending cleanup. "+budget+" "+result.erasure.warnings.joined(separator:" ")
                 } else {maintenanceStatus="Automatic retention is off."}
                 if let indexError {maintenanceStatus += " "+indexError}
-                if let result,result.erasure.sources>0 {activity.forgetCounts();drafting.clear();tools.suspend();clipboard.invalidate()}
-                invalidateStorageEstimate();refresh(forceStatistics:true);refreshChats();await catchUpIndex()
-            } catch {maintenanceStatus="Cleanup did not complete: "+error.localizedDescription;if !automatic {errorMessage=maintenanceStatus}}
+                if let result {invalidateCommittedErasure(result.erasure,discardVisible:Task.isCancelled)}else {invalidateStorageEstimate()}
+                guard !Task.isCancelled else {return}
+                refresh(forceStatistics:true);refreshChats();await catchUpIndex()
+            } catch is CancellationError {if generation==libraryOperationGeneration,!libraryRetired {maintenanceStatus="Cleanup cancelled."}}
+            catch {guard generation==libraryOperationGeneration,!libraryRetired else {return};maintenanceStatus="Cleanup did not complete: "+error.localizedDescription;if !automatic {errorMessage=maintenanceStatus}}
         }
     }
+    private func invalidateCommittedErasure(_ result:HistoryErasureResult,discardVisible:Bool) {
+        activity.forgetCounts();invalidateStorageEstimate()
+        guard result.sources>0 || result.historicalVersions>0 || result.conversationTurns>0 else {return}
+        drafting.clear();tools.suspend();clipboard.invalidate();cancelAnswer();answer=nil
+        // A cancelled completion cannot start fresh IO to revalidate previews.
+        // Drop the old references locally; the next deliberate refresh can read
+        // the surviving graph. A real committed result is still shown above.
+        if discardVisible {selected=nil;selectedVisual=nil;hits=[];chatTurns=[];chats=[];currentChatID=nil}
+    }
     private func catchUpIndex() async {
-        let configuration = settings.search
-        guard !indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
+        let configuration = settings.search,generation=libraryOperationGeneration
+        guard !libraryRetired,!store.isClosed,!Task.isCancelled,!indexing, configuration.indexOnLowPower || !ProcessInfo.processInfo.isLowPowerModeEnabled else { return }
         if configuration.provider == .apple {
             if (try? store.passageBacklog(modelID:embedder.modelID,filter:SearchFilter())) ?? 0 > 0 { rebuildIndex() }
             return
         }
         do {
             let model = try await OllamaClient.shared.models(endpoint:configuration.endpoint).first { $0.name == configuration.model || $0.name == configuration.model + ":latest" }
-            guard settings.search == configuration, let model else { return }
+            guard generation==libraryOperationGeneration,!libraryRetired,!store.isClosed,!Task.isCancelled,settings.search == configuration, let model else { return }
             let prefix = "ollama:\(model.name)@\(model.digest):desktop-v1:"
             let indexes = try store.semanticIndexes().filter { $0.key.hasPrefix(prefix) }
             let indexed = indexes.values.max() ?? 0
             let pendingPassages = try indexes.keys.contains { try store.passageBacklog(modelID:$0,filter:SearchFilter())>0 }
             if indexed < (try store.matchingCount()) || pendingPassages { rebuildIndex() }
-        } catch { indexStatus = "Index catch-up waiting for the local model server" }
+        } catch {guard generation==libraryOperationGeneration,!libraryRetired,!Task.isCancelled else {return};indexStatus = "Index catch-up waiting for the local model server"}
     }
     func wipeLocalLibrary(retry:Bool=false) {
-        guard !libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
+        guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
         prepareForLibrarySwitch()
-        settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.meetings = .init()
+        // This explicit wipe owns its quiet preferences, after cancellation has
+        // stopped the old workspace. Ordinary retired bindings remain denied.
+        var quiet=settings
+        quiet.captureOnLaunch=false;quiet.apiEnabled=false;quiet.routinesEnabled=false;quiet.entityAutomaticIndex=false;quiet.meetings = .init()
+        assignInternalSettings(quiet);applySettingsToControllers()
+        do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
         libraryWipe.run(store:store,retry:retry,before:{[workflow] in await workflow.cancelAndWait()}) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
