@@ -11,6 +11,11 @@ struct SyncCollectionHistory {
     // Generic control receipt is not proof of full native retirement. Every
     // newly observed frontier invalidates the previous native completion.
     static let nativeCompletionKey="sync-native-collection-completion-v1"
+    private static let completionHooksKey="sync-native-completion-hooks-v1"
+    private static let completionHooks:[String:String]=Dictionary(uniqueKeysWithValues:["insert","update","delete"].map {operation in
+        let name="sync_collection_native_completion_"+operation
+        return (name,"CREATE TRIGGER \(name) AFTER \(operation.uppercased()) ON personal_sync_collection_frontier BEGIN DELETE FROM store_metadata WHERE key='\(nativeCompletionKey)'; END")
+    })
 
     private static let clockSQL="(SELECT CAST('{'||COALESCE(group_concat('\"'||replica||'\":'||counter,','),'')||'}' AS BLOB) FROM (SELECT replica,counter FROM personal_sync_collection_frontier ORDER BY replica))"
     private static let blobCheck="typeof(era)='blob' AND length(era)>=2 AND length(era)<=1048576"
@@ -42,9 +47,31 @@ struct SyncCollectionHistory {
             guard sqlite3_step(native)==SQLITE_ROW else {throw db.error()}
             let nativeCount=sqlite3_column_int(native,0)
             guard nativeCount==0 || nativeCount==2 else {throw OSwindError.database("Native collection capture schema is incomplete")}
-            if nativeCount==2 {for (name,sql) in triggers.sorted(by:{$0.key<$1.key}) {try require(db,name:name,sql:sql,allowCreate:fresh)}}
+            if nativeCount==2 {
+                for (name,sql) in triggers.sorted(by:{$0.key<$1.key}) {try require(db,name:name,sql:sql,allowCreate:fresh)}
+                try installCompletionHooks(db)
+            }
             let value=Self(database:db,replica:replica);_ = try value.current();return value
         }
+    }
+    private static func installCompletionHooks(_ db:RoutineDatabase)throws {
+        let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,completionHooksKey)
+        let code=sqlite3_step(row);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()}
+        if code==SQLITE_ROW {guard db.text(row,0)=="1" else {throw OSwindError.database("Native completion hook version differs")};try requireNativeCompletionHooks(db);return}
+        for name in completionHooks.keys {
+            let found=try db.statement("SELECT COUNT(*) FROM sqlite_master WHERE name=?");defer {sqlite3_finalize(found)};db.bind(found,1,name)
+            guard sqlite3_step(found)==SQLITE_ROW,sqlite3_column_int(found,0)==0 else {throw OSwindError.database("Preserve incomplete native completion hook installation")}
+        }
+        // Earlier experimental completions lack persistent invalidation. Never
+        // promote one into authority merely by upgrading the current reader.
+        let clear=try db.statement("DELETE FROM store_metadata WHERE key=?");defer {sqlite3_finalize(clear)};db.bind(clear,1,nativeCompletionKey);try db.done(clear)
+        for (name,sql) in completionHooks {try require(db,name:name,sql:sql,allowCreate:true)}
+        let marker=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,'1')");defer {sqlite3_finalize(marker)};db.bind(marker,1,completionHooksKey);try db.done(marker)
+    }
+    static func requireNativeCompletionHooks(_ db:RoutineDatabase)throws {
+        let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,completionHooksKey)
+        guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)=="1" else {throw OSwindError.invalid("Install current native completion hooks before renewal")}
+        for (name,sql) in completionHooks {try require(db,name:name,sql:sql,allowCreate:false)}
     }
 
     private static func require(_ db:RoutineDatabase,name:String,sql:String,allowCreate:Bool)throws {

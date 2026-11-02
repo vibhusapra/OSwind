@@ -1,4 +1,5 @@
 import XCTest
+import CSQLite
 @testable import OSwindCore
 
 extension SyncOutgoingTests {
@@ -119,6 +120,26 @@ extension SyncOutgoingTests {
                 _=try history.approveGroupErase(journal:f.b.cache.journal,counter:proposal.counter,expectedEra:proposal.era)
                 XCTAssertEqual(try history.reviewState(journal:f.b.cache.journal),.ready)
                 XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-native-collection-completion-v1'"),0)
+            }
+            XCTAssertThrowsError(try SyncPublicationQueue.renewAfterReceivedCollection(cache:f.b.cache,library:f.receiver,control:control))
+        }
+    }
+
+    func testServiceNativeCompletionSQLHooksInvalidateRawFrontierChangesAndRefuseMissingProtection()throws {
+        try seed()
+        try withServicePair {f in
+            _=try serviceReady(f.a,limit:64);_=try serviceReady(f.b,limit:64);try f.b.stop()
+            let control=try serviceFixtureControl(f.a);try f.transport.publishCollectionControl(control)
+            XCTAssertEqual(try SyncNativeCollectionReceiver(library:f.receiver,cache:f.b.cache,inbox:f.transport).receive(creator:replica,counter:control.counter),.applied)
+            XCTAssertTrue(try f.receiver.retryLibraryWipeCleanup().cleanupComplete)
+            try f.receiver.withRoutineDatabase {db in
+                XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-native-collection-completion-v1'"),1)
+                // Bypass the Swift observer to exercise the installed boundary
+                // used by an already-running older writer.
+                let update=try db.statement("UPDATE personal_sync_collection_frontier SET counter=counter+1 WHERE replica=?");defer {sqlite3_finalize(update)};db.bind(update,1,replica);try db.done(update)
+                XCTAssertEqual(try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-native-collection-completion-v1'"),0)
+                try db.execute("DROP TRIGGER sync_collection_native_completion_update")
+                XCTAssertThrowsError(try SyncCollectionHistory.requireNativeCompletionHooks(db))
             }
             XCTAssertThrowsError(try SyncPublicationQueue.renewAfterReceivedCollection(cache:f.b.cache,library:f.receiver,control:control))
         }

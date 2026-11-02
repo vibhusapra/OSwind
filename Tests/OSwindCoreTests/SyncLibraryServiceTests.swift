@@ -3,26 +3,40 @@ import CSQLite
 @testable import OSwindCore
 
 extension SyncOutgoingTests {
-    struct ServicePair {
+    struct ServicePair:Sendable {
         let a:SyncLibraryService,b:SyncLibraryService,receiver:MemoryStore
         let transport:SyncObjectFolder,localA:SyncObjectFolder,localB:SyncObjectFolder,secret:SyncGroupSecret
     }
-    func withServicePair(_ body:(ServicePair)throws->Void)throws {
+    func makeServicePair()throws->ServicePair {
+        var retained=false
         let other="00000000-0000-0000-0000-000000009602",secret=SyncGroupSecret()
         let receiver=try MemoryStore(root:root.appendingPathComponent("service-receiver"))
+        defer {if !retained {try? receiver.close()}}
         let transport=try SyncObjectFolder.create(at:root.deletingLastPathComponent().appendingPathComponent("owned-service-shared-"+UUID().uuidString),secret:secret,group:group,epoch:epoch)
+        defer {if !retained {transport.close();try? FileManager.default.removeItem(at:transport.root)}}
         let localA=try SyncObjectFolder.create(at:root.appendingPathComponent("images/service-local-a"),secret:secret,group:group,epoch:epoch)
+        defer {if !retained {localA.close()}}
         let localB=try SyncObjectFolder.create(at:receiver.root.appendingPathComponent("images/service-local-b"),secret:secret,group:group,epoch:epoch)
-        defer {try? receiver.close();transport.close();localA.close();localB.close();try? FileManager.default.removeItem(at:transport.root)}
+        defer {if !retained {localB.close()}}
         let a=try SyncLibraryService.install(library:store,replica:replica,group:group,epoch:epoch,peers:[other],transport:transport,inbox:localA)
+        defer {if !retained {try? a.stop()}}
         let b=try SyncLibraryService.install(library:receiver,replica:other,group:group,epoch:epoch,peers:[replica],transport:transport,inbox:localB)
-        defer {try? a.stop();try? b.stop()}
-        try body(.init(a:a,b:b,receiver:receiver,transport:transport,localA:localA,localB:localB,secret:secret))
+        retained=true
+        return .init(a:a,b:b,receiver:receiver,transport:transport,localA:localA,localB:localB,secret:secret)
     }
-    @discardableResult func serviceReady(_ service:SyncLibraryService,limit:Int=2)throws->SyncLibraryServiceStep {
+    func finishServicePair(_ f:ServicePair) {
+        try? f.a.stop();try? f.b.stop();try? f.receiver.close();f.transport.close();f.localA.close();f.localB.close();try? FileManager.default.removeItem(at:f.transport.root)
+    }
+    func withServicePair(_ body:(ServicePair)throws->Void)throws {
+        let f=try makeServicePair();defer {finishServicePair(f)};try body(f)
+    }
+    func withServicePairAsync(_ body:(ServicePair)async throws->Void)async throws {
+        let f=try makeServicePair();defer {finishServicePair(f)};try await body(f)
+    }
+    @discardableResult func serviceReady(_ service:SyncLibraryService,limit:Int=2,networkEnabled:Bool=true)throws->SyncLibraryServiceStep {
         for _ in 0..<300 {
-            let step=try service.tick(limit:limit)
-            if case .preparing=step {continue};return step
+            let step=try service.tick(limit:limit,networkEnabled:networkEnabled)
+            switch step {case .preparing,.reviewingPolicy:continue;default:return step}
         };throw OSwindError.invalid("Owned service did not finish bounded preparation")
     }
     func serviceCount(_ store:MemoryStore,_ table:String)throws->Int {try store.withRoutineDatabase {try $0.eraseCount("SELECT COUNT(*) FROM "+table)}}
@@ -72,14 +86,14 @@ extension SyncOutgoingTests {
         try withServicePair {f in
             var settings=AppSettings();settings.privacy.excludedDomains=["owned.example.test"];try settings.save(root:root)
             try store.insert(Memory(id:"blocked",timestamp:now,kind:.screen,app:"Safari",bundleID:"com.apple.Safari",title:"Owned",url:"https://owned.example.test/private",text:"Owned blocked source"))
-            XCTAssertThrowsError(try serviceReady(f.a)) {XCTAssertTrue($0 is SyncPublicationPolicyDenied)}
-            XCTAssertNil(try f.transport.serviceHead(replica:replica))
+            XCTAssertEqual(try serviceReady(f.a),.waitingForPolicy(1))
+            XCTAssertEqual(try f.transport.serviceHead(replica:replica)?.through,0)
             XCTAssertTrue(try f.a.cache.journal.outbox().isEmpty)
             settings.privacy.excludedDomains=[];try settings.save(root:root)
             _=try serviceReady(f.a)
             XCTAssertEqual(try f.transport.serviceHead(replica:replica)?.through,1)
             try store.insert(Memory(id:"secret",timestamp:now,kind:.note,app:"Owned",text:"password=owned-authored-secret-value"))
-            XCTAssertThrowsError(try serviceReady(f.a)) {XCTAssertTrue($0 is SyncPublicationPolicyDenied)}
+            XCTAssertEqual(try serviceReady(f.a),.waitingForPolicy(1))
             XCTAssertEqual(try f.transport.serviceHead(replica:replica)?.through,1)
         }
     }

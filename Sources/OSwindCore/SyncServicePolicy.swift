@@ -4,6 +4,10 @@ import Foundation
 /// A denied version stays pending; its hash must continue to mean the same bytes.
 struct SyncServicePolicy {
     let settings:AppSettings
+    var signature:String {get throws {
+        struct Fields:Encodable {let privacy:PrivacyPolicy;let retainAudio:Bool;let visualCaptureMode:VisualCaptureMode}
+        return try SyncProtocolLimits.hex(SyncProtocolLimits.encode(Fields(privacy:settings.privacy,retainAudio:settings.retainAudio,visualCaptureMode:settings.visualCaptureMode)))
+    }}
 
     func admitSource(app:String,title:String,url:String?,media:Set<SyncMediaRole>)throws {
         let browser=WindowContext.isBrowser(bundle:app)
@@ -14,6 +18,9 @@ struct SyncServicePolicy {
     }
 
     func admit(_ record:SyncPortableRecord)throws {
+        do {try admitContent(record)}catch let error as SyncPublicationPolicyDenied {throw SyncPublicationPolicyDenied(identity:error.identity ?? record.identity)}
+    }
+    private func admitContent(_ record:SyncPortableRecord)throws {
         try record.validate()
         // Scan content fields explicitly. Protocol UUIDs, hashes and session
         // tokens are structural identifiers, not prose or credential values.
@@ -47,7 +54,7 @@ struct SyncServicePolicy {
         if identity.table == .source {
             guard let index=schema.columns.firstIndex(of:"payload"),case .blob(let data)=row.cells[index] else {throw OSwindError.invalid("Sync source policy requires its native payload")}
             let memory=try JSONDecoder().decode(Memory.self,from:data)
-            try admit(memory)
+            do {try admit(memory)}catch let error as SyncPublicationPolicyDenied {throw SyncPublicationPolicyDenied(identity:error.identity ?? identity)}
         }
     }
 

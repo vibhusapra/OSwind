@@ -3,6 +3,8 @@ import CSQLite
 
 enum SyncLibraryServiceStep:Equatable,Sendable {
     case preparing(SyncOutgoingStep)
+    case reviewingPolicy(Int),waitingForPolicy(Int)
+    case networkPaused(withheld:Int)
     case needsGroupReview(SyncCollectionControl)
     case needsNativeCollectionRetirement(SyncCollectionControl)
     case transferred(sent:Int,received:Int,pendingPublications:Int)
@@ -20,6 +22,7 @@ final class SyncLibraryService:@unchecked Sendable {
     let peers:[String]
     private let work:SyncOutgoingWorkQueue
     private let publications:SyncPublicationQueue
+    private let withheld:SyncWithheldWork
     private let mutex=NSRecursiveLock()
     private let token:String
     private var stopped=false
@@ -27,8 +30,8 @@ final class SyncLibraryService:@unchecked Sendable {
     private static let stateSchema="CREATE TABLE personal_sync_service_state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),origin TEXT NOT NULL,generation TEXT NOT NULL,group_id TEXT NOT NULL,epoch TEXT NOT NULL,token TEXT NOT NULL,sent INTEGER NOT NULL CHECK(typeof(sent)='integer' AND sent>=0))"
     private static let peerSchema="CREATE TABLE personal_sync_service_heads(replica TEXT PRIMARY KEY,through INTEGER NOT NULL CHECK(typeof(through)='integer' AND through>=0),collection_counter INTEGER NOT NULL CHECK(typeof(collection_counter)='integer' AND collection_counter>=0))"
 
-    private init(library:MemoryStore,cache:SyncVersionStore,work:SyncOutgoingWorkQueue,publications:SyncPublicationQueue,transport:SyncObjectFolder,inbox:SyncObjectFolder,peers:[String],token:String) {
-        self.library=library;self.cache=cache;self.work=work;self.publications=publications;self.transport=transport;self.inbox=inbox;self.peers=peers;self.token=token
+    private init(library:MemoryStore,cache:SyncVersionStore,work:SyncOutgoingWorkQueue,publications:SyncPublicationQueue,withheld:SyncWithheldWork,transport:SyncObjectFolder,inbox:SyncObjectFolder,peers:[String],token:String) {
+        self.library=library;self.cache=cache;self.work=work;self.publications=publications;self.withheld=withheld;self.transport=transport;self.inbox=inbox;self.peers=peers;self.token=token
     }
 
     static func install(library:MemoryStore,replica:String,group:String,epoch:String,peers:[String],transport:SyncObjectFolder,inbox:SyncObjectFolder,resumeAfterReceivedCollection:SyncCollectionControl?=nil)throws->SyncLibraryService {
@@ -55,6 +58,7 @@ final class SyncLibraryService:@unchecked Sendable {
             let cache=try SyncVersionStore.install(catalog:catalog,journal:journal),work=try SyncOutgoingWorkQueue.install(catalog:catalog)
             if let control=resumeAfterReceivedCollection {try SyncPublicationQueue.renewAfterReceivedCollection(cache:cache,library:library,control:control)}
             let publications=try SyncPublicationQueue.install(cache:cache)
+            let withheld=try SyncWithheldWork.install(catalog:catalog)
             return try SyncChangeCapture.transaction(db) {
                 for (name,schema) in [("personal_sync_service_state",stateSchema),("personal_sync_service_heads",peerSchema)] {
                     let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name)
@@ -66,7 +70,7 @@ final class SyncLibraryService:@unchecked Sendable {
                 let row=try db.statement("INSERT INTO personal_sync_service_state VALUES(1,?,?,?,?,?,0) ON CONFLICT(singleton) DO UPDATE SET token=excluded.token WHERE origin=excluded.origin AND generation=excluded.generation AND group_id=excluded.group_id AND epoch=excluded.epoch");defer {sqlite3_finalize(row)}
                 for (i,text) in [catalog.scope.origin,catalog.scope.generation,group,epoch,token].enumerated() {db.bind(row,Int32(i+1),text)}
                 try db.done(row);guard sqlite3_changes(db.handle)==1 else {throw OSwindError.invalid("Service belongs to another trusted library generation")}
-                let service=SyncLibraryService(library:library,cache:cache,work:work,publications:publications,transport:transport,inbox:inbox,peers:peers.sorted(),token:token)
+                let service=SyncLibraryService(library:library,cache:cache,work:work,publications:publications,withheld:withheld,transport:transport,inbox:inbox,peers:peers.sorted(),token:token)
                 try service.context();return service
             }
         }
@@ -103,7 +107,11 @@ final class SyncLibraryService:@unchecked Sendable {
         // enrollment-owner work before enabling unattended public scheduling.
     }
 
-    func tick(limit:Int=64)throws->SyncLibraryServiceStep {
+    func withheldCount()throws->Int {
+        mutex.lock();defer {mutex.unlock()}
+        return try library.withRoutineDatabase {_ in try context();return try withheld.count()}
+    }
+    func tick(limit:Int=64,networkEnabled:Bool=true)throws->SyncLibraryServiceStep {
         mutex.lock();defer {mutex.unlock()}
         guard (1...128).contains(limit) else {throw OSwindError.invalid("Invalid sync service tick budget")}
         let snapshot=try LibrarySettingsSnapshot.capture(root:library.root);defer {snapshot.release()}
@@ -113,7 +121,7 @@ final class SyncLibraryService:@unchecked Sendable {
         // Discover erasure before preparing local bodies. A blocked private
         // row or a large offline backlog must not starve the erasure handoff.
         var heads=[SyncServiceHead]()
-        for peer in peers {
+        for peer in (networkEnabled ? peers:[]) {
             try Task.checkCancellation()
             guard let head=try transport.serviceHead(replica:peer) else {continue}
             try fenced(snapshot) {try pin(head)}
@@ -131,12 +139,17 @@ final class SyncLibraryService:@unchecked Sendable {
             let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
             if case .needsGroupReview(let control)=try history.reviewState(journal:cache.journal) {return .needsGroupReview(control)}
             try publications.context()
+            let signature=try policy.signature,reviewed=try withheld.reviewPolicy(signature,limit:limit)
+            if try cache.database.eraseCount("SELECT EXISTS(SELECT 1 FROM personal_sync_changes)")==0 {_=try withheld.requeueReady(work,limit:limit)}
             var processor=SyncOutgoingProcessor(queue:work,cache:cache,admitRow:policy.admitRow,admitVersion:policy.admit,media:media.prepare)
+            processor.withholding=(withheld,signature)
             processor.retainTurnPublication={reference,data in try self.inbox.publishContent(data,reference:reference)}
             let step=try processor.step(limit:limit)
-            return step == .idle ? nil:.preparing(step)
+            if step != .idle {return .preparing(step)}
+            return reviewed>0 ? .reviewingPolicy(reviewed):nil
         }
         if let preparation {return preparation}
+        if !networkEnabled {return .networkPaused(withheld:try fenced(snapshot) {try withheld.count()})}
 
         var sender=SyncLibrarySender(library:library,cache:cache,inbox:transport,admit:policy.admit,supplementalContent:{try self.inbox.content($0)})
         sender.publicationFence={write in try snapshot.withCurrent(root:self.library.root,policy:snapshot.settings.privacy) {try self.context();try self.publications.context();try write();try self.context()}}
@@ -153,9 +166,10 @@ final class SyncLibraryService:@unchecked Sendable {
             let row=try cache.database.statement("UPDATE personal_sync_service_state SET sent=? WHERE singleton=1 AND token=?");defer {sqlite3_finalize(row)}
             sqlite3_bind_int64(row,1,through);cache.database.bind(row,2,token);try cache.database.done(row)
         }
-        let writer=SyncIncomingConversationWriter(library:library,cache:cache,admit:policy.admit,pathsFor:{reference,manifests in
+        var writer=SyncIncomingConversationWriter(library:library,cache:cache,admit:policy.admit,pathsFor:{reference,manifests in
             try media.paths(reference,manifests,fetch:{try self.fetch($0)})
         },admitMedia:media.verify)
+        writer.projectionAdmission=withheld.requireProjectionAvailable
         let admission=SyncPublicationAdmission(queue:publications,writer:writer,inbox:inbox)
         func record(_ reference:SyncVersionReference)throws->SyncPortableRecord {
             guard let bytes=try inbox.content(reference.content) ?? transport.content(reference.content) else {throw OSwindError.unavailable("The exact peer record has not arrived")}
@@ -219,6 +233,8 @@ final class SyncLibraryService:@unchecked Sendable {
             try publications.checkAccounting()
             return try cache.database.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs")
         }
+        let held=try fenced(snapshot) {try withheld.count()}
+        if sent==0,received==0,pending==0,held>0 {return .waitingForPolicy(held)}
         return .transferred(sent:sent,received:received,pendingPublications:pending)
     }
 

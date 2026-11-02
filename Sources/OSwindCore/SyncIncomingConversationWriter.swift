@@ -11,6 +11,7 @@ struct SyncIncomingConversationWriter {
     let pathsFor:(SyncVersionReference,[SyncMediaManifest])throws->[SyncMediaRole:String]
     let admitMedia:(SyncVersionReference,[SyncMediaManifest],[SyncMediaRole:String])throws->Void
     var newID:((SyncObjectIdentity)throws->String)? = nil
+    var projectionAdmission:((SyncObjectIdentity)throws->Void)? = nil
     var db:RoutineDatabase {cache.database}
     var history:HistoricalEvidenceStore {library.historicalCatalog(db)}
     private func verifyMedia(_ ref:SyncVersionReference,_ manifests:[SyncMediaManifest],_ paths:[SyncMediaRole:String])throws {try admitMedia(ref,manifests,paths);try library.verifyHistoricalMedia(ref,manifests,paths)}
@@ -197,6 +198,7 @@ struct SyncIncomingConversationWriter {
                 guard !state.isDeleted,state.heads.contains(where:{$0.content==reference.content}) else {throw OSwindError.unavailable("Admit the exact incoming head before projection")}
                 let erased=try record.erasedParents(cache:cache)
                 if !erased.isEmpty {return try retireLate(record,parents:erased,admission:admission)}
+                try projectionAdmission?(record.identity)
                 guard state.heads.count==1 else {throw OSwindError.unavailable("Review incoming conflicts before projection")}
                 var local=""
                 try SyncDerivedRetirement.collect(cache:cache,root:record.identity.key,deleting:false,body:{

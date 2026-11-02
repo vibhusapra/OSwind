@@ -105,6 +105,7 @@ struct SyncPublicationQueue {
             try SyncChangeCapture.transaction(db) {
                 try SyncLibraryContext.requireActive(db,cache:cache)
                 guard !(try LibraryWipeState.isPending(db)) else {throw OSwindError.unavailable("Finish native collection cleanup before resuming sync")}
+                try SyncCollectionHistory.requireNativeCompletionHooks(db)
                 let value=Self(cache:cache);try value.validateSchema();try value.checkAccounting()
                 guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'")==0,
                       (try db.eraseCount("SELECT COUNT(*) FROM personal_sync_publication_jobs"))==0,

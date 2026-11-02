@@ -3,7 +3,10 @@ import CSQLite
 
 /// A caller's current local policy may throw this explicit signal. Other errors
 /// and cancellation remain failures, rather than becoming successful receipts.
-struct SyncPublicationPolicyDenied:Error {}
+struct SyncPublicationPolicyDenied:Error {
+    let identity:SyncObjectIdentity?
+    init(identity:SyncObjectIdentity?=nil) {self.identity=identity}
+}
 struct SyncPublicationAdmissionResult {
     let receipt:SyncReceiveResult
     let publications:[SyncPublicationOutcome]
@@ -159,7 +162,7 @@ struct SyncPublicationAdmission {
         return try writer.library.withRoutineDatabase {connection in
             guard connection.handle==cache.database.handle else {throw OSwindError.invalid("Use the publication library's own connection")}
             try queue.context();var outcomes=[SyncPublicationOutcome]()
-            func apply(_ change:SyncJournalChange)throws {
+            func applyInside(_ change:SyncJournalChange)throws {
                 if change.after.isDeleted {
                     outcomes += try withdrawSourceDependents(change,admission:admission)
                     if let owner=try queue.completedOwner(ofCitation:change.revision.key) {
@@ -196,6 +199,12 @@ struct SyncPublicationAdmission {
                     }
                 }
                 try queue.wake(change.revision.key)
+            }
+            func apply(_ change:SyncJournalChange)throws {
+                if change.after.isDeleted {
+                    guard try cache.journal.state(for:change.revision.key).isDeleted else {throw OSwindError.invalid("Retire local holds only under an admitted deletion")}
+                }
+                try SyncWithheldWork.withNativeErasure(cache.database,enabled:change.after.isDeleted) {try applyInside(change)}
             }
             // A body-free header may wait for content or advance only under
             // the journal's real deletion/collection/supersession proof rules.
