@@ -37,4 +37,27 @@ import XCTest
     }
     func testStatisticsDrainOwnsActualReaderAndSuppressesRetiredSnapshot()async throws {try await read(false)}
     func testStorageDrainOwnsActualTraversalAndCannotRestartAfterRetirement()async throws {try await read(true)}
+    func cancelledDrain(_ storage:Bool)async throws {
+        try await settle();let gate=ImportWorkerGate();defer {gate.release()}
+        if storage {app.invalidateStorageEstimate();app.refreshStatistics(force:true,observeStorage:{try gate.pause()})}
+        else {app.refreshStatistics(force:true,observeWorker:{try gate.pause()})}
+        await fulfillment(of:[gate.entered],timeout:5)
+        var finished=false;let drain=Task {await self.app.cancelExternalWorkAndWait();finished=true};drain.cancel()
+        await fulfillment(of:[gate.cancelled],timeout:5);XCTAssertFalse(finished)
+        app.addNote("Cannot enter during drain",observeWorker:{XCTFail("Drain admitted a new writer")})
+        app.refreshStatistics(force:true,observeWorker:{XCTFail("Drain admitted a new reader")})
+        gate.release();await drain.value;XCTAssertTrue(finished);XCTAssertFalse(app.hasPendingStatistics)
+        XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,0)
+        app.refreshStatistics(force:true);try await settle();XCTAssertEqual(app.stats.count,0)
+    }
+    func testCancelledStatisticsDrainCallerStillWaitsAndRejectsNewWork()async throws {try await cancelledDrain(false)}
+    func testCancelledStorageDrainCallerStillWaitsAndRejectsNewWork()async throws {try await cancelledDrain(true)}
+    func testStorageFailureKeepsLastGoodEstimateAndCanRetry()async throws {
+        try await settle();let bytes=app.stats.bytes;app.invalidateStorageEstimate()
+        app.refreshStatistics(force:true,observeStorage:{throw OSwindError.unavailable("Owned traversal failure")})
+        try await settle();XCTAssertEqual(app.stats.bytes,bytes);XCTAssertNil(app.storageUpdatedAt)
+        XCTAssertEqual(app.errorMessage,"Owned traversal failure")
+        try Data(repeating:3,count:65536).write(to:root.appendingPathComponent("owned-growth"))
+        app.refreshStatistics(force:true);try await settle();XCTAssertGreaterThan(app.stats.bytes,bytes);XCTAssertNotNil(app.storageUpdatedAt)
+    }
 }

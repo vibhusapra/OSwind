@@ -96,11 +96,38 @@ import XCTest
         let deadline=ContinuousClock.now.advanced(by:.seconds(10))
         while app.libraryWipe.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
         XCTAssertFalse(app.libraryWipe.busy);XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,0)
+        while app.hasPendingStatistics,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
         XCTAssertFalse(app.libraryWork.busy)
     }
-    func testClosedModelRejectsBothWriteKinds()throws {
+    func testClosedModelRejectsBothWriteKinds()async throws {
+        let deadline=ContinuousClock.now.advanced(by:.seconds(5))
+        while app.hasPendingStatistics,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(app.hasPendingStatistics)
         let answer=try recap();try app.store.close()
         app.addNote("Must not start");app.saveAnswer(answer)
         XCTAssertFalse(app.libraryWork.busy);XCTAssertFalse(app.savingRecap)
+    }
+    func testPrivacyRevocationCancelsBothWritersEvenWhenSettingsCannotSave()async throws {
+        let note=ImportWorkerGate(),recap=ImportWorkerGate();defer {note.release();recap.release()}
+        try start(false,before:{try note.pause()});try start(true,before:{try recap.pause()})
+        await fulfillment(of:[note.entered,recap.entered],timeout:5)
+        let lock=root.appendingPathComponent(".settings-admission.lock"),target=root.deletingLastPathComponent().appendingPathComponent("owned-settings-marker-"+UUID().uuidString)
+        defer {try? FileManager.default.removeItem(at:target)}
+        try Data("Unchanged marker".utf8).write(to:target);try FileManager.default.removeItem(at:lock);try FileManager.default.createSymbolicLink(at:lock,withDestinationURL:target)
+        app.settings.privacy.redactSecrets.toggle()
+        await fulfillment(of:[note.cancelled,recap.cancelled],timeout:5);XCTAssertNotNil(app.errorMessage)
+        note.release();recap.release();await app.cancelExternalWorkAndWait()
+        XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,1)
+        XCTAssertEqual(try String(contentsOf:target,encoding:.utf8),"Unchanged marker")
+    }
+    func testImportOnlyPIIChoiceDoesNotCancelExplicitManualWrites()async throws {
+        let note=ImportWorkerGate(),recap=ImportWorkerGate();defer {note.release();recap.release()}
+        try start(false,before:{try note.pause()});try start(true,before:{try recap.pause()})
+        await fulfillment(of:[note.entered,recap.entered],timeout:5)
+        app.settings.piiImports.enabled.toggle();note.release();recap.release()
+        let deadline=ContinuousClock.now.advanced(by:.seconds(10))
+        while app.libraryWork.busy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(app.libraryWork.busy);XCTAssertEqual(try app.store.stats(includeDiskUsage:false).count,3)
+        XCTAssertTrue(app.recapSaveStatus?.hasPrefix("Saved") ?? false)
     }
 }
