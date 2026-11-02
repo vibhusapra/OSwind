@@ -1,6 +1,12 @@
 # OSwind delivery ledger
 
-## Native writer admission and recovery qualified; public delivery still WIP
+## Two-Mac public/app component qualified; complete sync remains WIP
+
+Source `8b1cdc2` binds **1,517 inputs**: full Debug **2,484 passed / 136 skipped**, expanded ThreadSanitizer and optimized each **932 passed / 73 skipped**, and explicit owned login-Keychain/APFS/render **280 passed without skips**. All20 new methods pass every selection; no sanitizer race warning appears. [Reviewed receipt](../benchmarks/sync-public-lifecycle-v1.json) · [Inputs](../benchmarks/sync-public-lifecycle-inputs-v1.json) · [Scope and retained failures](SYNC-PUBLIC-LIFECYCLE-WIP.md). Explicit folder activation/manual reconnect, offline native erase, app producer drains, exact group review, quiet replacement and restricted saved recovery are included. The first full run has one retained obsolete refusal fixture failure; runtime sources were unchanged by its correction. Four independent all-kind graphs retain243 guards,21 wire bodies,two originals, matching checkpoints and zero echo;32 owned light/dark layouts pass state-specific OCR.
+
+The preceding [native35 internal layer](SYNC-ERASE-AUTHORITY-WIP.md), source8d5bc1d, separately passes2464 full Debug,895 affected sanitizer/optimized each and237 owned native cases. Those earlier receipts remain frozen. Later opt-in reconnect/pause and embedding-startup changes are separate. Complete membership/revocation/rotation, pressure/large-transfer/provider-retention and physical/signed-GUI/power/notarized distribution gates remain open. **F059 and all83 feature statuses are unchanged.**
+
+## Earlier native34 admission and checkpoint receipts
 
 The [internal checkpoint layer](SYNC-DELIVERY-CHECKPOINTS-WIP.md) at source `5102714` now has [1,485 bound inputs](../benchmarks/sync-delivery-checkpoints-inputs-v1.json) and a [reviewed receipt](../benchmarks/sync-delivery-checkpoints-v1.json). Full Debug **2,410 passed / 135 skipped**; sync sanitizer and optimized each **591 passed / 34 skipped**; owned Keychain **17 passed without skips**. Four independent fixture reads confirm all 13 native content kinds, 21 exact wire bodies, two original evidence bodies, matching external checkpoint tokens and no receiver echo. No successful historical reviewers or package inspections were rerun.
 
