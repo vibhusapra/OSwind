@@ -12,6 +12,8 @@ public struct PersonalSyncPairingStatus:Equatable,Sendable {
     public let requestFingerprint:String?
     public let request:String?
     public let expires:Date?
+    /// A delivery reservation survives stopped sessions and forbids membership edits.
+    public let deliveryPrepared:Bool
 }
 public struct PersonalSyncPairingReview:Equatable,Sendable {
     public let deviceName:String
@@ -24,7 +26,8 @@ public struct PersonalSyncPairingReview:Equatable,Sendable {
 
 /// Serialized owner of a Keychain anchor and its current native library. The
 /// caller must join every operation and close this owner before leaving storage.
-/// The public API cannot construct a delivery session or publish provider objects.
+/// A prepared session takes lifetime ownership of this pairing owner. The app
+/// must join setup and session shutdown before leaving its native library.
 public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     private struct Handle:Codable,Equatable {let format:String,version:Int,id:String,protection:SyncCredentialProtection}
     private struct Location:Codable,Equatable {
@@ -235,19 +238,19 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     public func status()throws->PersonalSyncPairingStatus {try withAccess {
         guard handle != nil else {
             guard try readHandle()==nil else {throw OSwindError.unavailable("Pairing changed; reopen setup")}
-            return .init(phase:.unconfigured,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)
+            return .init(phase:.unconfigured,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:false)
         }
         return try status(current().0)
     }}
     private func status(_ value:Envelope)throws->PersonalSyncPairingStatus {
-        if value.retired {return .init(phase:.retired,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil)}
+        if value.retired {return .init(phase:.retired,deviceName:"",memberNames:[],rootFingerprint:nil,requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:false)}
         if let bytes=value.pending {
             let pending=try SyncPendingJoin.decodeFromKeychain(bytes)
-            return .init(phase:.waitingForOwner,deviceName:pending.request.body.name,memberNames:[],rootFingerprint:nil,requestFingerprint:try pending.request.digest,request:String(decoding:try pending.request.encoded(),as:UTF8.self),expires:Date(timeIntervalSince1970:TimeInterval(pending.request.body.expires)))
+            return .init(phase:.waitingForOwner,deviceName:pending.request.body.name,memberNames:[],rootFingerprint:nil,requestFingerprint:try pending.request.digest,request:String(decoding:try pending.request.encoded(),as:UTF8.self),expires:Date(timeIntervalSince1970:TimeInterval(pending.request.body.expires)),deliveryPrepared:false)
         }
         let material=try SyncCredentialMaterial.decodeFromKeychain(value.material!)
         let certificate=material.joined.certificate
-        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil)
+        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:value.delivery != nil)
     }
     public func createGroup(deviceName:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
         let pending=try SyncPendingJoin(name:deviceName,now:now),owner=try SyncGroupAuthority(owner:pending.request,now:now)
@@ -261,7 +264,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         try save(next,expected:bytes);return try status(next)
     }}
     public func reviewRequest(_ text:String,now:Date=Date())throws->PersonalSyncPairingReview {try withAccess {
-        let (value,_)=try current();guard let raw=value.material,try SyncCredentialMaterial.decodeFromKeychain(raw).owner != nil else {throw OSwindError.invalid("Review requests on the group owner's Mac")}
+        let (value,_)=try current();guard value.delivery==nil,let raw=value.material,try SyncCredentialMaterial.decodeFromKeychain(raw).owner != nil else {throw OSwindError.invalid("Review requests on the group owner's Mac")}
         guard text.utf8.count<=SyncPairingFormat.requestLimit else {throw OSwindError.invalid("Pairing request exceeds its bound")}
         let request=try SyncJoinRequest.decode(Data(text.utf8),now:now)
         return .init(deviceName:request.body.name,requestFingerprint:try request.digest,expires:Date(timeIntervalSince1970:TimeInterval(request.body.expires)),bytes:try request.encoded())
@@ -283,8 +286,8 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let next=value.replacing(material:try SyncCredentialMaterial(joined:joined).encodedForKeychain(),consumed:try pending.request.digest)
         try save(next,expected:bytes);return try status(next)
     }}
-    /// Internal setup vertical slice. It creates no scheduler or public
-    /// activation UI; native writer/recovery/erase admission is still required.
+    /// Internal service preparation. The public paused-session factory below
+    /// also installs native admission before transferring pairing ownership.
     func prepareAnchoredService(shared:URL,createShared:Bool)throws->SyncLibraryService {try withAccess {
         let (value,_)=try current()
         guard !value.retired,let saved=value.material else {throw OSwindError.invalid("Finish pairing before preparing delivery")}
@@ -308,10 +311,67 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
             handedOff=true;return prepared
         }catch {try? service?.stop();inbox?.close();transport.close();throw error}
     }}
+    /// Explicit folder activation. Finish admitting the intended devices first;
+    /// membership changes after delivery reservation require a later lifecycle.
+    /// Success transfers this owner to the returned, initially paused session.
+    public func prepareSession(sharedFolder:URL,createSharedFolder:Bool=false)throws->PersonalSyncSession {
+        let service=try prepareAnchoredService(shared:sharedFolder,createShared:createSharedFolder)
+        do {
+            try saveSessionFolder(sharedFolder)
+            try service.installNativeWriterAdmission()
+            return try PersonalSyncSession(service:service,pairing:self)
+        }catch {try? service.stop();service.inbox.close();service.transport.close();throw error}
+    }
+    /// A local nonsecret bookmark is separate from group credentials. Resolving
+    /// never mounts a volume or prompts for access. Backups restore only their
+    /// content allowlist, so this local metadata cannot activate a copied library.
+    public func savedSessionFolder()throws->URL? {try withAccess {
+        _=try current()
+        return try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT value FROM store_metadata WHERE key='sync-session-folder-bookmark-v1'");defer {sqlite3_finalize(row)}
+            let status=sqlite3_step(row);if status==SQLITE_DONE {return nil}
+            guard status==SQLITE_ROW,let bytes=Data(base64Encoded:db.text(row,0)),!bytes.isEmpty,bytes.count<=65536 else {throw OSwindError.invalid("Choose the sync folder again; its saved bookmark is invalid")}
+            var stale=false
+            let folder=try URL(resolvingBookmarkData:bytes,options:[.withoutUI,.withoutMounting],relativeTo:nil,bookmarkDataIsStale:&stale)
+            guard !stale,folder.isFileURL else {throw OSwindError.unavailable("Choose the existing sync folder again; its location changed")}
+            return folder
+        }
+    }}
+    public func prepareSavedSession()throws->PersonalSyncSession {
+        guard let folder=try savedSessionFolder() else {throw OSwindError.unavailable("Choose a shared sync folder first")}
+        return try prepareSession(sharedFolder:folder)
+    }
+    /// Acquire the original native delivery authority without a provider folder.
+    /// Success transfers this pairing owner to a one-shot local eraser. A live
+    /// session's credential lease refuses this before any native mutation.
+    public func prepareLocalErasure()throws->PersonalSyncLocalErasure {try withAccess {
+        let (value,_)=try current()
+        guard !value.retired,let saved=value.material,let delivery=value.delivery else {throw OSwindError.unavailable("This library has no prepared delivery authority to retire")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(saved),joined=material.joined
+        let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:material,id:delivery.id,stateRoot:stateRoot,machine:machine,storage:injectedStorage ?? SyncKeychainCredentialStorage(protection:delivery.protection))
+        do {
+            let cache=try store.withRoutineDatabase {db in
+                let catalog=try SyncIdentityCatalog.openExisting(db)
+                let journal=try SyncJournal(database:db,replica:joined.replica,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch)
+                return try SyncVersionStore.openExisting(catalog:catalog,journal:journal)
+            }
+            try anchor.installNativeWriterAdmission()
+            return PersonalSyncLocalErasure(library:store,cache:cache,anchor:anchor,pairing:self)
+        }catch {anchor.close();throw error}
+    }}
+    private func saveSessionFolder(_ folder:URL)throws {try withAccess {
+        _=try current()
+        let bookmark=try folder.bookmarkData(options:.minimalBookmark,includingResourceValuesForKeys:nil,relativeTo:nil)
+        guard !bookmark.isEmpty,bookmark.count<=65536 else {throw OSwindError.invalid("The selected sync folder bookmark exceeds its bound")}
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("INSERT INTO store_metadata(key,value) VALUES('sync-session-folder-bookmark-v1',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");defer {sqlite3_finalize(row)}
+            db.bind(row,1,bookmark.base64EncodedString());try db.done(row)
+        }
+    }}
     /// Reserve the external account in the already durable pairing anchor
     /// BEFORE creating any native delivery marker. Restoring a pre-install
     /// database can therefore never allocate a fresh zero-floor account.
-    /// This remains internal; no public transfer factory is exposed yet.
+    /// Internal primitive used by the public owned-session factory.
     @discardableResult func installDeliveryAnchor(on service:SyncLibraryService)throws->SyncDeliveryAnchor {try withAccess {
         guard service.library===store else {throw OSwindError.invalid("Prepare delivery for the pairing owner's current library")}
         let (value,bytes)=try current()

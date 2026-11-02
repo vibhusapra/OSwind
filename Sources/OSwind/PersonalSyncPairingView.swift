@@ -29,10 +29,12 @@ struct PersonalSyncPairingView:View {
     var body:some View {
         VStack(alignment:.leading,spacing:18) {
             HStack {Image(systemName:"laptopcomputer.and.arrow.down").font(.title2);Text("Pair your Macs").font(.title2.weight(.semibold));Spacer();Button("Done") {dismiss()}.keyboardShortcut(.cancelAction)}
-            Text("Pairing preview").font(.caption.weight(.semibold)).foregroundStyle(.orange)
-            Text("Save device identities and review who can join. Delivery is still being built; pairing does not transfer memories or start capture.").foregroundStyle(.secondary)
+            Text("Two-Mac sync preview").font(.caption.weight(.semibold)).foregroundStyle(.orange)
+            Text("Pair two Macs, then connect the same shared folder to exchange encrypted memories. Connecting sync does not change your capture choices.").foregroundStyle(.secondary)
             ScrollView {VStack(alignment:.leading,spacing:16) {
-                if let status=model.pairingStatus {
+                if model.configured || model.preparing {
+                    PersonalSyncConnectionDetails(model:model)
+                } else if let status=model.pairingStatus {
                     switch status.phase {
                     case .unconfigured:begin
                     case .waitingForOwner:pending(status)
@@ -45,11 +47,12 @@ struct PersonalSyncPairingView:View {
                 } else if !model.pairingBusy {
                     Button("Load saved pairing") {model.performPairing(.load)}
                 }
+                if !model.configured,let error=model.error {Label(error,systemImage:"exclamationmark.triangle").foregroundStyle(.orange)}
                 if let error=model.pairingError {Label(error,systemImage:"exclamationmark.triangle").foregroundStyle(.orange)}
                 if model.pairingBusy {HStack {ProgressView().controlSize(.small);Text("Saving and verifying…");Spacer();Button("Cancel") {model.cancelPairing()}}}
             }.padding(.vertical,4)}
             Divider()
-            Text("Keys stay in this Mac's login Keychain. Pairing uses a local software binding; it does not promise hardware device-only storage. Missing credentials, library copies and whole-library wipes require recovery.").font(.caption).foregroundStyle(.secondary)
+            Text("Keys stay in this Mac's login Keychain with a local software binding. Keep the original credentials: missing keys or copied libraries require recovery. Interrupted erasure has a separate cleanup step.").font(.caption).foregroundStyle(.secondary)
         }.padding(24).frame(width:660,height:650)
         .disabled(model.stopping)
         .alert("Retire local pairing?",isPresented:$retireConfirm) {
@@ -93,7 +96,7 @@ struct PersonalSyncPairingView:View {
             if let value=model.pairingResponse {
                 Text("Return this encrypted response to the joining Mac. Give it the group fingerprint above through your trusted channel.")
                 message(value,label:"Encrypted response");Button(copied ? "Copied":"Copy response") {copy(value)}
-                Button("Review another device") {model.clearPairingMessages();copied=false}
+                Button(status.memberNames.count>=2 ? "Continue to folder setup":"Review another device") {model.clearPairingMessages();copied=false}
             } else if let review=model.pairingReview {
                 GroupBox {VStack(alignment:.leading,spacing:10) {
                     Text(review.deviceName).font(.headline)
@@ -103,22 +106,49 @@ struct PersonalSyncPairingView:View {
                     Button("Approve this exact request") {model.performPairing(.approve(review));request="";requestMatches=false}.buttonStyle(.borderedProminent).disabled(!requestMatches)
                 }}
                 Button("Back to request") {model.clearPairingMessages();requestMatches=false}
-            } else {
+            } else if !status.deliveryPrepared && status.memberNames.count<2 {
                 Text("Add a Mac").font(.headline)
                 Text("Paste its signed request. Review the name and compare the exact request fingerprint with the joining Mac before approval.")
                 input("Signed request",text:$request,limit:8192)
                 Button("Review request") {model.performPairing(.review(request));requestMatches=false}.disabled(request.isEmpty)
             }
-            retire
-        }.disabled(model.pairingBusy)
+            if model.pairingResponse==nil && model.pairingReview==nil {folderSetup(status)}
+            if !status.deliveryPrepared {retire}
+        }.disabled(model.pairingBusy || model.preparing)
     }
     private func paired(_ status:PersonalSyncPairingStatus)->some View {
         VStack(alignment:.leading,spacing:12) {
             Label("Device paired",systemImage:"checkmark.shield")
             identity(status)
-            Text("This Mac's identity is saved. Memories remain local while delivery setup, rollback checks and recovery are completed.").foregroundStyle(.secondary)
-            retire
+            folderSetup(status)
+            if !status.deliveryPrepared {retire}
         }.disabled(model.pairingBusy)
+    }
+    private func folderSetup(_ status:PersonalSyncPairingStatus)->some View {
+        VStack(alignment:.leading,spacing:12) {
+            if status.memberNames.count==2 {
+                Divider()
+                Text("Connect a shared folder").font(.headline)
+                Text("Create the sync folder on the first Mac, then select that same folder on the other Mac. Your folder provider must make its files available locally.").foregroundStyle(.secondary)
+                if model.folderURL != nil {Button("Reconnect saved folder") {model.reconnectSavedFolder()}.buttonStyle(.borderedProminent)}
+                HStack {
+                    if !status.deliveryPrepared {Button("Create sync folder…") {chooseFolder(create:true)}}
+                    Button(model.folderURL == nil ? "Choose existing folder…":"Locate existing folder…") {chooseFolder(create:false)}
+                }
+                Text("Use only these two trusted Macs. Membership refresh, revocation and group rotation are still in development. Paired Macs can publish an approved group erase that also removes unsynced local history when observed.").font(.caption).foregroundStyle(.secondary)
+            } else if status.memberNames.count>2 {
+                Text("This setup preview supports two Macs. This group needs membership refresh before it can connect here.").foregroundStyle(.secondary)
+            }
+        }
+    }
+    private func chooseFolder(create:Bool) {
+        if create {
+            let panel=NSSavePanel();panel.title="Create encrypted sync folder";panel.prompt="Create folder";panel.nameFieldStringValue="OSwind Sync";panel.canCreateDirectories=true
+            if panel.runModal() == .OK,let url=panel.url {model.connectFolder(url,create:true)}
+        } else {
+            let panel=NSOpenPanel();panel.title="Choose the existing OSwind sync folder";panel.prompt="Connect folder";panel.canChooseFiles=false;panel.canChooseDirectories=true;panel.allowsMultipleSelection=false;panel.canCreateDirectories=false
+            if panel.runModal() == .OK,let url=panel.url {model.connectFolder(url)}
+        }
     }
     private func identity(_ status:PersonalSyncPairingStatus)->some View {
         VStack(alignment:.leading,spacing:10) {

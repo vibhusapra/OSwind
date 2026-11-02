@@ -58,29 +58,8 @@ final class SyncLibraryService:@unchecked Sendable {
         // descriptor cannot remain a hidden reader through physical cleanup.
         inbox.close()
         do {
-            let result=try library.withRoutineDatabase {db in
-                try context()
-                return try externalAnchor.retireLocal(in:db) {
-                    let pairingLifetime=try PersonalSyncPairing.retirementLifetime(db)
-                    try library.nativeWriterAdmission.rotateForRetirement(db)
-                    try SyncOutgoingWorkQueue.discardForCollection(db,scope:cache.catalog.scope)
-                    try db.execute("DELETE FROM personal_sync_changes")
-                    try SyncPublicationQueue.retireCollectionIfInstalled(cache:cache)
-                    let counts=try SyncChangeCapture.withoutEcho(db,scope:cache.catalog.scope) {
-                        let counts=try library.stageLibraryWipe(reservation:media,progress:progress)
-                        try db.execute("INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
-                        return counts
-                    }
-                    let history=SyncCollectionHistory(database:db,replica:cache.journal.replica)
-                    guard case .needsGroupReview(let control)=try history.reviewState(journal:cache.journal) else {throw OSwindError.invalid("Capture a new local erase intent without approving its group control")}
-                    try SyncNativeCollectionReceiver.retireRegisters(cache:cache,creator:control.creator,counter:control.counter,frontier:control.era)
-                    try cache.retireCollectionCaches();try cache.catalog.retireCollectionMappings()
-                    let complete=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");defer {sqlite3_finalize(complete)}
-                    db.bind(complete,1,SyncCollectionHistory.nativeCompletionKey);db.bind(complete,2,try control.digest);try db.done(complete)
-                    try db.execute("UPDATE personal_sync_service_state SET token='' WHERE singleton=1")
-                    return SyncNativeRetirementResult(counts:counts,control:control,pairingLifetime:pairingLifetime)
-                }
-            }
+            try library.withRoutineDatabase {_ in try context()}
+            let result=try SyncNativeLocalRetirement.stage(library:library,cache:cache,anchor:externalAnchor,reservation:media,progress:progress)
             retiring=true;return result
         }catch {
             // The inbox has closed even if the SQL phase rolls back. Never

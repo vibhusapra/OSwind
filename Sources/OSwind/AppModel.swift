@@ -20,6 +20,7 @@ import EventKit
     let voice:VoiceTypingModel
     let workflow:WorkflowModel
     let personalSync:PersonalSyncModel
+    var syncErasureFinished:(()->Void)?
     private var libraryRetired=false
     private var resumeMeetingsAfterPause=false,resumeScreenWithMeetings=false,resumeOnlyClipboard=false
     let activity:ActivityCalendarModel
@@ -128,7 +129,7 @@ import EventKit
     private var maintenanceAutomatic=false
     private var destructiveDrainers=0
     var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy || personalSync.busy}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWipe.busy || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy || personalSync.busy}
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
     @Published private(set) var maintenanceStatus=""
@@ -200,6 +201,7 @@ import EventKit
         voice=voiceSetup?(store,loaded,self.drafting) ?? VoiceTypingModel(store:store,settings:loaded,draft:self.drafting,environment:.live(store:store,recognizer:audio.recognizer))
         workflow=workflowSetup?(store,loaded) ?? WorkflowModel(store:store,settings:loaded,environment:.live(store:store))
         personalSync=personalSyncSetup?(store) ?? PersonalSyncModel(store:store)
+        personalSync.receivedErase={[weak self] in self?.wipeLocalLibrary(received:true)}
         personalSync.allowed = {[weak self] in
             guard let self else {return false}
             return !self.demo && self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy
@@ -335,9 +337,10 @@ import EventKit
         settings.search.visual.modelDirectory=installed.directory.path
         visualIndexStatus=settings.search.visual.enabled ? "Local visual models are ready. Build / resume to search existing history.":"Local visual models are ready. Enable visual memory, then build / resume its index."
     }
-    func prepareForLibrarySwitch() {
+    func prepareForLibrarySwitch() {prepareForLibrarySwitch(preservingSync:false)}
+    func prepareForLibrarySwitch(preservingSync:Bool) {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
-        personalSync.retire()
+        if preservingSync {personalSync.suspend()}else {personalSync.retire()}
         libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
@@ -715,11 +718,13 @@ import EventKit
         try Task.checkCancellation();guard libraryOperationGeneration==generation,!store.isClosed,!libraryRetired else {throw CancellationError()}
         if let memory {captured(memory)};return result
     }
-    func cancelExternalWorkAndWait() async {
+    func cancelExternalWorkAndWait()async {await cancelExternalWorkAndWait(preservingSync:false,preservingWipe:false)}
+    func cancelExternalWorkAndWait(preservingWipe:Bool)async {await cancelExternalWorkAndWait(preservingSync:false,preservingWipe:preservingWipe)}
+    func cancelExternalWorkAndWait(preservingSync:Bool,preservingWipe:Bool) async {
         // Reserve the import-drain gate before yielding to either worker. A
         // detached preparation not yet holding a lease must finish too.
         jsonImportDrainers+=1;destructiveDrainers+=1;defer {jsonImportDrainers-=1;destructiveDrainers-=1}
-        personalSync.retire()
+        if !preservingSync {personalSync.retire()}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
         cancelRefresh();cancelIndexing();cancelAutomaticIndexer();visualAutoResumeAllowed=false;cancelVisualIndexing()
@@ -728,13 +733,14 @@ import EventKit
         libraryWork.cancel()
         pendingMediaCleanup.stop()
         voice.cancel(clearDraft:true);workflow.cancel(clear:true);clipboard.stop();await tools.cancelAndWait();await clipboard.cancelAndWait();await voice.cancelAndWait();await workflow.cancelAndWait()
-        await personalSync.cancelAndWait()
+        if !preservingSync {await personalSync.cancelAndWait()}
         await capture.cancelAndWait();await audio.cancelAndWait()
         await entityMemory.cancelAndWait();await meetings.cancelAndWait();await activity.cancelAndWait()
         if let importWorker {_ = try? await importWorker.value};if let completion {await completion.value}
         await cancelDestructiveWorkAndWait()
         await pendingMediaCleanup.cancelAndWait()
         await libraryWork.cancelAndWait()
+        if !preservingWipe {await libraryWipe.cancelAndWait()}
     }
     private func cancelDestructiveWork() {
         deletionWorker?.cancel();maintenanceWorker?.cancel();deletionTask?.cancel();maintenanceTask?.cancel()
@@ -971,22 +977,34 @@ import EventKit
             if indexed < (try store.matchingCount()) || pendingPassages { rebuildIndex() }
         } catch {guard generation==libraryOperationGeneration,!libraryRetired,!Task.isCancelled else {return};indexStatus = "Index catch-up waiting for the local model server"}
     }
-    func wipeLocalLibrary(retry:Bool=false) {
-        guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy else {return}
+    func wipeLocalLibrary(retry:Bool=false,received:Bool=false) {
+        guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!maintenanceBusy,deletingID==nil,!libraryTransfer.busy,!personalSync.preparing,!personalSync.pairingBusy else {return}
+        let owned=store.requiresOwnedLibraryErasure
+        if received {guard owned,personalSync.status?.phase == .needsReceivedErase else {return}}
         let resumeCleanup=pendingMediaCleanup.active
-        prepareForLibrarySwitch()
-        // This explicit wipe owns its quiet preferences, after cancellation has
-        // stopped the old workspace. Ordinary retired bindings remain denied.
         var quiet=settings
         quiet.captureOnLaunch=false;quiet.apiEnabled=false;quiet.routinesEnabled=false;quiet.entityAutomaticIndex=false;quiet.meetings = .init()
+        do {try quiet.save(root:store.root)}catch {errorMessage="Quiet preferences could not be saved. History erasure did not start.";return}
+        prepareForLibrarySwitch(preservingSync:owned)
         assignInternalSettings(quiet);applySettingsToControllers()
-        do {try quiet.save(root:store.root)}catch {errorMessage=error.localizedDescription}
         let generation=libraryOperationGeneration
-        libraryWipe.run(store:store,retry:retry,before:{[weak self] in await self?.cancelExternalWorkAndWait()}) {[weak self] result in
+        var operation:LibraryWipeModel.Operation?
+        if owned {
+            operation = {[weak self] progress in
+                guard let self else {throw CancellationError()}
+                return try await self.personalSync.eraseHistory(received:received,before:{[weak self] in await self?.cancelExternalWorkAndWait(preservingSync:true,preservingWipe:true)},progress:progress)
+            }
+        }
+        libraryWipe.run(store:store,retry:retry,before:{[weak self] in if !owned {await self?.cancelExternalWorkAndWait(preservingWipe:true)}},operation:operation,ownedSync:owned) {[weak self] result in
             guard let self,self.libraryOperationGeneration==generation else {return}
+            if owned {self.syncErasureFinished?();return}
             self.libraryRetired=false;self.personalSync.prepareForReconnection();self.routines.reload();self.answer=nil;self.chatTurns=[];self.currentChatID=nil;self.selected=nil;self.hits=[]
             self.invalidateStorageEstimate();self.refresh(forceStatistics:true);self.refreshChats();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}
-        } onFailure: {[weak self] in guard let self,self.libraryOperationGeneration==generation else {return};self.libraryRetired=false;self.personalSync.prepareForReconnection();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}}
+        } onFailure: {[weak self] in
+            guard let self,self.libraryOperationGeneration==generation else {return}
+            if owned {self.syncErasureFinished?();return}
+            self.libraryRetired=false;self.personalSync.prepareForReconnection();self.startHousekeeping();if resumeCleanup {self.pendingMediaCleanup.start()}
+        }
     }
     func pauseAll(discardReplay:Bool=false,manualMeetingPause:Bool=true) {
         if isCollecting {resumeOnlyClipboard=clipboard.running && !isCapturing && !meetings.active;resumeMeetingsAfterPause=meetings.active;resumeScreenWithMeetings=capture.running}
@@ -1024,10 +1042,10 @@ import EventKit
     var isCapturing: Bool { capture.running || audio.running }
     var isCollecting:Bool {isCapturing || meetings.active || clipboard.running}
     var hasPausableWork:Bool {isCollecting || tools.busy || clipboard.busy || voice.busy || workflow.busy}
-    func captureNow() async {guard !libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
-    func toggleAudio() async {guard !libraryWipe.busy,!voice.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
+    func captureNow() async {guard !libraryRetired,!store.isClosed,!libraryWipe.busy else {return};await capture.captureOnce(manual:true)}
+    func toggleAudio() async {guard !libraryRetired,!store.isClosed,!libraryWipe.busy,!voice.busy else {return};if audio.running {audio.finish()} else {await audio.start()}}
     func toggleCapture() {
-        guard !libraryWipe.busy else {return};pauseTimer?.invalidate();pauseUntil=nil
+        guard !libraryRetired,!store.isClosed,!libraryWipe.busy else {return};pauseTimer?.invalidate();pauseUntil=nil
         if hasPausableWork {pauseAll()}
         else {
             let calendar=resumeMeetingsAfterPause,screen=resumeScreenWithMeetings,clipboardOnly=resumeOnlyClipboard

@@ -18,6 +18,7 @@ final class SyncNativeWriterAdmission {
     private let epoch=SyncNativeWriterEpoch()
     private let lock=NSLock()
     private var allowed=false
+    private var enrolled=false
     private var retirementGranted=false
     private var proof:SyncDeliveryAnchor.NativeWriterProof?
     private var environment:SyncNativeWriterEnvironment?
@@ -27,6 +28,8 @@ final class SyncNativeWriterAdmission {
     private var poisoned=false
     private var retiring=false
     var retirementQuarantined:Bool {retiring && !poisoned}
+    var requiresOwnedErasure:Bool {lock.lock();defer {lock.unlock()};return enrolled}
+    private func markEnrolled() {lock.lock();enrolled=true;lock.unlock()}
     func register(_ db:RoutineDatabase)throws {
         try epoch.register(db)
         let retirement=Unmanaged.passRetained(self).toOpaque()
@@ -52,7 +55,7 @@ final class SyncNativeWriterAdmission {
             if version>=33 {try SyncChangeCapture.transaction(db) {try PersonalSyncPairing.requirePreFenceDeliveryAdmission(library:library,db:db,environment:environment)}}
             return
         }
-        self.environment=environment
+        self.environment=environment;markEnrolled()
         do {
             proof=try SyncChangeCapture.transaction(db) {
                 let verified=try SyncDeliveryAnchor.nativeWriterProof(library:library,db:db,environment:environment)
@@ -97,7 +100,7 @@ final class SyncNativeWriterAdmission {
             try SyncDeliveryAnchor.verifyRetirement(library:library,db:db,environment:environment)
             try Self.requireGuards(db);try epoch.validate(db);try epoch.adopt(db)
         }
-        self.environment=environment;retiring=true;permit(false)
+        self.environment=environment;markEnrolled();retiring=true;permit(false)
     }
     func withRetirementCleanup<T>(_ db:RoutineDatabase,_ body:()throws->T)throws->T {
         guard retirementQuarantined,environment != nil else {throw OSwindError.invalid("Use the verified quarantined retirement owner")}
@@ -124,7 +127,7 @@ final class SyncNativeWriterAdmission {
                 if version==Self.enrolledSchemaVersion {try Self.requireGuards(db);try epoch.validate(db);try epoch.adopt(db)}
                 else {try installGuards(db,replacingLegacy:version==34)}
             }
-            self.environment=environment;proof=verified;initialized=true
+            self.environment=environment;markEnrolled();proof=verified;initialized=true
             schemaCookie=try db.eraseCount("PRAGMA schema_version")
         }catch {permit(false);throw error}
     }
