@@ -1,0 +1,7 @@
+# Sentence-model startup — WIP
+
+The CLI and retrieval engine construct a local embedder for several operations that need no vectors. Its earlier constructor eagerly opened Apple's English sentence model. The owner now resolves it on the first availability/vector request under the same lock used for vector operations. Keyword retrieval, empty browsing and blank embedding input leave the model unopened. Both a model and an unavailable result are cached per owner, preserving the existing availability behavior.
+
+Model identity, text windows, pooling and normalization are unchanged; no index migration is needed. Four new controls cover cold construction/blank input, 32 concurrent first uses, actual keyword/empty retrieval through the engine, and existing native model availability/normalized output. A selected development run passes73 methods with one explicit visual-asset gate, including all four new methods. Source-bound broad qualification is still required.
+
+A separate comparison pilot uses unmodified Screenpipe npm0.4.54 and the frozen OSwind7c0292b optimized CLI with authored ID/text-identical1000/100000-row fixtures. Both pass nine rare/broad/absent/app/time controls per scale. These are offline CLI controls with native-initialized vendor schema and authored SQL rows, not capture/API ingestion or representative semantic quality. Candidate timing and original-result parity still need measurement; no speedup, energy or product ranking claim is made here. Historical Screenpipe0.4.53 HTTP measurements remain separate and are not rerun.

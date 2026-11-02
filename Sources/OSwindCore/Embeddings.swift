@@ -3,14 +3,27 @@ import NaturalLanguage
 import Accelerate
 
 public final class LocalEmbedder {
-    private let model: NLEmbedding?
+    private var model:NLEmbedding?
+    private var resolved=false
+    private let loadModel:()->NLEmbedding?
     private let lock = NSLock()
     public let modelID = "apple-nl-sentence-en-v1"
-    public var available: Bool { model != nil }
-    public init() { model = NLEmbedding.sentenceEmbedding(for: .english) }
+    public var available:Bool {
+        lock.lock();defer {lock.unlock()}
+        return resolveModel() != nil
+    }
+    public init() {loadModel={NLEmbedding.sentenceEmbedding(for:.english)}}
+    init(loadModel:@escaping ()->NLEmbedding?) {self.loadModel=loadModel}
+    /// Called only under the same lock that serializes vector requests. Cache
+    /// an unavailable result too, preserving the original per-owner behavior.
+    private func resolveModel()->NLEmbedding? {
+        if !resolved {model=loadModel();resolved=true}
+        return model
+    }
     public func embed(_ text: String) -> [Float]? {
+        guard !text.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else {return nil}
         lock.lock(); defer { lock.unlock() }
-        guard let model, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        guard let model=resolveModel() else {return nil}
         // Bound ingestion cost. Sentence vectors are normalized after pooling text windows.
         let chars = Array(text.prefix(6000)); var sum = [Float](repeating: 0, count: model.dimension); var count = 0
         for start in stride(from: 0, to: chars.count, by: 700) {
