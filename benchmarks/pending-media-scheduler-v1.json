@@ -1,0 +1,496 @@
+{
+  "format": "OSwind pending media scheduler qualification v1",
+  "state": "passed",
+  "source": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+  "nativeSchema": 33,
+  "trackedInputs": 1363,
+  "inputManifest": "pending-media-scheduler-inputs-v1.json",
+  "inputManifestSHA256": "299ecbd75a876c59352b18667599404237186abdd52efe5f71be815aedc7b3ca",
+  "software": [
+    {
+      "stage": "full-debug",
+      "source": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+      "command": [
+        "swift",
+        "test"
+      ],
+      "tests": {
+        "defined": 2195,
+        "passed": 2090,
+        "skipped": 105,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 149,
+      "logSHA256": "cabd2b02652602ebd05a78bdc7729ae9774572a4058ec34753b3ff92c4d2c30c",
+      "wallSeconds": 848.8220302080736,
+      "raceWarning": false,
+      "receiptSHA256": "a5061e92c6a0f330776f8dd1468fa60fa0dbf323d6e651f835bee3b35b58401b"
+    },
+    {
+      "stage": "thread-sanitizer",
+      "source": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/tsan-build",
+        "--sanitize=thread",
+        "--filter",
+        "PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 890,
+        "passed": 843,
+        "skipped": 47,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 149,
+      "logSHA256": "d2e9f3152f6eca4047aab6d9decdcf3b10a139f94d2bacf47202b7a600d41e13",
+      "wallSeconds": 649.6873651249334,
+      "raceWarning": false,
+      "receiptSHA256": "1bf6b5732087676fc1e9612be21eba5c209261ba186eeaff48839772adbb2f52"
+    },
+    {
+      "stage": "optimized",
+      "source": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+      "command": [
+        "swift",
+        "test",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/media-cleanup-admission-v1/stages-v2/release-build",
+        "-c",
+        "release",
+        "--filter",
+        "PendingMedia|MeetingWorkspaceTests|DestructiveWork|DeletionModelTests|MaintenanceStartupTests|ImportLifecycleModelTests|WorkspaceWakeLifecycleTests|NativeMedia|ANNCacheTests|NativeANNIntegrityTests|MetalRetrievalTests|StatisticsTests|IndexMigrationTests|CitationMigrationTests|LibraryBackupTests|MediaCleanupAdmissionTests|MediaDeletionTests|HistoryErasureTests|RecapTests|VisualImageSnapshotTests|VisualIndexStoreTests|Sync|Routine|Conversation|Historical|LibraryWipe|VaultSession|Unavailable|NativeEntityScope|EntityScopeProjection|SearchExpressionTests|VisualRetrievalTests|ActivityCalendar"
+      ],
+      "tests": {
+        "defined": 890,
+        "passed": 843,
+        "skipped": 47,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "mandatory": 149,
+      "logSHA256": "09b7a5c8d916320350c91dd3d35f064bf9550a760e9dec282e6a3ce647bc7725",
+      "wallSeconds": 299.8765872498043,
+      "raceWarning": false,
+      "receiptSHA256": "ae8b665a0d636d0f03997ce8b31555bc7ed0bea60ff77b75be112c8df68cd658"
+    }
+  ],
+  "mandatoryControlsInEveryBuild": 149,
+  "qualificationStages": [
+    {
+      "name": "native-vault",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "678f7f343e826f8a863af9d77215ee11ea0f0e26218c0a032f58017f5ac079a5",
+      "tests": {
+        "defined": 43,
+        "passed": 43,
+        "skipped": 0,
+        "failures": 0,
+        "unexpected": 0
+      }
+    },
+    {
+      "name": "owned-writer-fixtures",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f70c5e12f81e6ca2a27c5a58d268b60f9b9764c638cc0c6fbef9bce3d25bd541",
+      "tests": null
+    },
+    {
+      "name": "migration-crashes",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "fe50ad341b73505c8076e3d55386458ad397cbc07a1ac4b15684633746bd437c",
+      "tests": null
+    },
+    {
+      "name": "migration-independent-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "310f25ecba0656c0ce1adaa61502018e2de5e77014769eaa8beec9388cfc2bbc",
+      "tests": null
+    },
+    {
+      "name": "package",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "a7170bc077e99d93d25cbdab506ba450fffb56938c830977b67ba5ba0801cf73",
+      "tests": null
+    },
+    {
+      "name": "packaged-media-admission",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "aebb7135141629f191b33243409c9ed422ae7747b883e053a2c90b29b19b9c0d",
+      "tests": null
+    },
+    {
+      "name": "api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "1907c76438bf0453c46c3703f215d5c05d3000a7dd574f1a5b71de260b4a5a12",
+      "tests": null
+    },
+    {
+      "name": "indexed-api-mcp",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad73f9d172ec1e9002a0cd4863bbb7412789db5e17a2aacbdcc4815a3a91e3ce",
+      "tests": null
+    },
+    {
+      "name": "python-sdk",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "fa68514341ef9c23475b0520866a099760839996025178e121576a51141568cd",
+      "tests": null
+    },
+    {
+      "name": "native-deletion",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "91a43898311631612ce415afd7bebafc330b223d035a094c42192af8f0f2755c",
+      "tests": null
+    },
+    {
+      "name": "recap-and-routine",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "6af699c91228279ced34b9ec033d3e64eb3e8ad4c181c47fb3bbd5bc2c49c597",
+      "tests": null
+    },
+    {
+      "name": "backup-interruptions",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "3f9f4417cd6c170ffb48231eb2b329dbf8fc3076af43f10c0d1a5f40700cc89d",
+      "tests": null
+    },
+    {
+      "name": "native-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "ad1cb36e99200377537b14f7afdbfa5c7c03a6ca3bb660acc8301a91f200cc4d",
+      "tests": null
+    },
+    {
+      "name": "native-wipe",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "bc07b56f37866a12f1e5364d8d112dc6f29c5321b94e38b834217feeff15a1b0",
+      "tests": null
+    },
+    {
+      "name": "vault-process",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "00011fc3077f282fc770801193143f8dc3fb2177f9a37e13c6b6603dedd03f78",
+      "tests": null
+    },
+    {
+      "name": "terminal-held-reader",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e904191491ac040f1fb15467248250b41e9192013eaa6b289ce60b84361f4c51",
+      "tests": null
+    },
+    {
+      "name": "query-interruption",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "dfb1945cc625f38ea4443139a86568f385f456f15c6017a0bba1995751120409",
+      "tests": null
+    },
+    {
+      "name": "schema33-sync-capture",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "f16f715290eecec5172c2a7a4de1cd2d07665d63acc9c80b32ae6c24433df2cf",
+      "tests": null
+    },
+    {
+      "name": "schema33-entity-memory",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "379bdf4dcfdebaa08510a0317142b40a9d8cc3a25d9e6600a3dbe00f55c99de2",
+      "tests": null
+    },
+    {
+      "name": "schema33-project-corrections",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "8f36ff3f68fd9c6c724a7bba6672696c69bc9d64b006d226847cd9ef0c26cbf2",
+      "tests": null
+    },
+    {
+      "name": "schema33-text-observation",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "014911a3e6f2c22cb88d355721988cc37541beb5a2a15c0b0b1937141cc2aa4f",
+      "tests": null
+    },
+    {
+      "name": "schema33-accessibility-text",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "9fca3e8b7d4939f6130fd375c3a70d2a988cf80e20b78fd7c2bdf1cda0ec701b",
+      "tests": null
+    },
+    {
+      "name": "schema33-tag-index",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "0819cf9ffd29f2553b7f3c242c0ad1aacadbef30fc938f484a9207fda0d44623",
+      "tests": null
+    },
+    {
+      "name": "schema33-capture-region",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "fcb6c365603962496447c5cdd9c33ce3cf132f8f4043c81c21ab6a9f2641bede",
+      "tests": null
+    },
+    {
+      "name": "schema33-historical-erasure",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "8390a15f2cc9ff1f5934a4fa72739cd007093bdd3d33e75c8eea92845f034eec",
+      "tests": null
+    },
+    {
+      "name": "actual-older-client",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "46e8b283ed07616625ff137dfdf7426f9553004edb703c2943f1087b8c34a521",
+      "tests": null
+    },
+    {
+      "name": "archive",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "extract",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "strict-app",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    },
+    {
+      "name": "strict-extracted",
+      "state": "passed",
+      "returncode": 0,
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": null
+    }
+  ],
+  "native": {
+    "defined": 43,
+    "passed": 43,
+    "skipped": 0,
+    "logSHA256": "678f7f343e826f8a863af9d77215ee11ea0f0e26218c0a032f58017f5ac079a5"
+  },
+  "distinctFullAndNativeMethods": 2131,
+  "nativeMethodsAdditionalToFull": 41,
+  "independentReview": {
+    "format": "OSwind independent pending media cleanup scheduler package review",
+    "state": "passed",
+    "source": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+    "nativeSource": "2818215b824b5cc5f8f50679596e9fb3da2a7135",
+    "trackedInputs": 1363,
+    "sourceInputsSHA256": "0b673e5999079d73881b019333f6ff64f4af71b90f92f21af2ede8856b18efda",
+    "nativeDefined": 43,
+    "nativePassed": 43,
+    "nativeSkipped": 0,
+    "all30StageLogsMatch": true,
+    "currentSourceMigrationReviewSHA256": "b395c0cd60ef0218c45ced63f41f561ab5da28a234b82ceb2efe3053498db95c",
+    "nativeLogSHA256": "678f7f343e826f8a863af9d77215ee11ea0f0e26218c0a032f58017f5ac079a5",
+    "appRegularFiles": 34,
+    "zipAndExtractionEveryFileEqual": true,
+    "strictAppAndExtractedSignatures": true,
+    "priorAppsUnchanged": 44,
+    "packagedProbeSHA256": "aebb7135141629f191b33243409c9ed422ae7747b883e053a2c90b29b19b9c0d",
+    "bothPackagedFixProbesPass": true,
+    "readOnlyProbeDatabases": "Both empty native/erasure queues, integrity/FK pass, all8 fence triggers present; referenced fixture files absent. Normal mode=ro honors WAL.",
+    "zipSHA256": "f7eb646e39ee0a1bad53a2be0436c249d7de27577f478d4a2328bad86ecce0fd",
+    "CLI_SHA256": "47eda5a00515b1ec35ee208d0bf9b08f1290a3c669d7f387ec73a4f5f0fa17a7",
+    "appSHA256": "c5720b99470d5b0bfbb67b3545b05035898e63d351ea4becce01f9e908e0ae58",
+    "limits": [
+      "Current-source migration SIGKILL databases have a separate independent reader receipt. GUI/TCC, capture/power, storage power-loss, notarization/provider and whole-product acceptance remain open.",
+      "Source32 predecessor receipts remain frozen; no source32 package or old-client success is promoted to native33. The exact prior32 executable now explicitly refuses this native format."
+    ],
+    "reviewerSHA256": "1dce0699db353d41b3e37e45f0a67ded215ba518fdf92040ac40d7c83e5bb0e6",
+    "atUTC": "2026-11-02T01:20:01.978876+00:00"
+  },
+  "artifacts": {
+    "app": ".artifacts/pending-media-scheduler-v1/qualification-v1/OSwind.app",
+    "archive": ".artifacts/pending-media-scheduler-v1/qualification-v1/OSwind-macos.zip",
+    "zipSHA256": "f7eb646e39ee0a1bad53a2be0436c249d7de27577f478d4a2328bad86ecce0fd",
+    "CLI_SHA256": "47eda5a00515b1ec35ee208d0bf9b08f1290a3c669d7f387ec73a4f5f0fa17a7",
+    "appSHA256": "c5720b99470d5b0bfbb67b3545b05035898e63d351ea4becce01f9e908e0ae58",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "9225ef0527d80103ff90c2c2b44abc022d3ef0107b00e8a41435d21caff0b1ff",
+      "Contents/MacOS/oswindctl": "47eda5a00515b1ec35ee208d0bf9b08f1290a3c669d7f387ec73a4f5f0fa17a7",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "c5720b99470d5b0bfbb67b3545b05035898e63d351ea4becce01f9e908e0ae58",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    }
+  },
+  "predecessorHosted": {
+    "state": "passed",
+    "head": "9ddb59468b29057e1c10d8f2fdff5b7de46e38c0",
+    "PR": 129,
+    "run": 41366723990,
+    "nativeJob": 125028321569,
+    "benchmarkJob": 125028321214,
+    "nativeJobConclusion": "success",
+    "benchmarkConclusion": "success",
+    "full": {
+      "defined": 2170,
+      "passed": 2065,
+      "skipped": 105,
+      "failures": 0,
+      "unexpected": 0
+    },
+    "native": {
+      "defined": 41,
+      "passed": 41,
+      "skipped": 0,
+      "failures": 0,
+      "unexpected": 0
+    },
+    "headFoundInCheckoutLog": true,
+    "logSHA256": "6b25e903e1770de3ae936192f6ec04903d9f64d7e5fd913168d01405ecda4031",
+    "logBytes": 2945221,
+    "nativeDistinctPassed": 41,
+    "limits": [
+      "Local old32 optional executable is absent on hosted runner; counts remain separate.",
+      "This later passing hosted run does not identify or causally fix predecessor PR128 busy failure. No failed-run rerun requested."
+    ],
+    "diagnostics": {
+      "artifactID": 13108450930,
+      "artifactBytes": 19900,
+      "artifactSHA256": "2c5358bb2e2350462cbb6ef5f1dfc8475230b2c71a7b1c8eac2739068919825f",
+      "retainedJSONFiles": 10,
+      "canceledUnlockTrace": {
+        "stage": "completed",
+        "total": 136,
+        "nonzero": 0,
+        "dropped": 0,
+        "beforeMutations": 12,
+        "traceSHA256": "cbfb9479505b678f96b939d7ab2be325a047831cc550508ed28c398d39eca52f"
+      },
+      "limits": "Current hosted five-cycle observation only. Earlier PR128 failed run remains failed and causally unresolved."
+    }
+  },
+  "currentSourceHosted": "Separate publication/CI still required; predecessor success is not promoted to this source.",
+  "behavior": {
+    "oneSupervisorOwnsWorkerAndSleeper": true,
+    "idlePeriodicDatabaseProbes": 0,
+    "minimumAttemptSpacingMS": 250,
+    "writerBackoffMS": [
+      250,
+      1000,
+      4000,
+      15000,
+      30000
+    ],
+    "queueOnlyNoNewRetentionOrWipe": true,
+    "normalOtherProcessRelease": "Actual owned shared lease; event wakes before10-second test backoff.",
+    "otherProcessSIGKILL": "Actual owned helper exit; pending-only backoff recovers kernel-released lock.",
+    "structuralError": "Stops automatic attempts; explicit retry remains available in active workspace.",
+    "scope": "Owned actual queue/file/reservation/child-process fixtures. No physical power or generalized event-latency rate follows."
+  },
+  "retainedFailures": [
+    {
+      "kind": "original missing automatic resume",
+      "log": "release-red-01.log",
+      "source": "9ddb59468b29057e1c10d8f2fdff5b7de46e38c0",
+      "tests": 2,
+      "failedAssertions": 2,
+      "unexpected": 0,
+      "fixedOriginalTestsUnchanged": true
+    },
+    {
+      "kind": "owned unsafe-path fixture admission",
+      "logs": [
+        "focused-04.log",
+        "focused-05.log"
+      ],
+      "productFailure": false,
+      "reason": "Existing source admission correctly refused symlink input. Corrected fixtures admit an ordinary file first and replace it before cleanup; production guard unchanged."
+    },
+    {
+      "kind": "earlier full source invalidated by audit corrections",
+      "receiptSHA256": "4b92bc57acc49c2e165bad84eeee52727731b9fa4561237ee0be8482eab55c83",
+      "source": "22ec31559b9bed4c008c027a0e4b54bd8f96499f",
+      "tests": {
+        "defined": 2194,
+        "passed": 2089,
+        "skipped": 105,
+        "failures": 0,
+        "unexpected": 0
+      },
+      "changedInputs": [
+        "Sources/OSwind/PendingMediaCleanupModel.swift",
+        "Sources/OSwindCore/PendingMediaCleanup.swift",
+        "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift",
+        "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift",
+        "docs/PENDING-MEDIA-CLEANUP.md"
+      ],
+      "missingMandatory": [
+        "testCancelledTaskCannotStartPendingCleanup"
+      ],
+      "currentQualification": false,
+      "reason": "Stopped callback now short-circuits before closed-store inspection; busy catch preserves cancellation; extra canceled-entry/closed-root controls. Earlier run is not promoted to current source."
+    }
+  ],
+  "limits": [
+    "Updated supported writers emit advisory queue/release notifications. Older native33 or raw SQL writers may not signal. Their durable work recovers at startup/wake/explicit retry; immediate discovery from an idle older producer is not established. No repeating idle database poll is introduced to disguise this limit.",
+    "Ownership applies to this committed-file retry and the previously tested deletion/maintenance paths. Other worker categories, collection/erasure epochs, complete sync F059, native input/TCC, sustained capture/physical power, actual providers/two Macs and notarized distribution remain open.",
+    "Native schema33 and wire formats unchanged. Fixtures and ad hoc signatures are not whole-product acceptance, parity or competitive rank. PR128 hosted canceled-unlock busy failure remains a retained failed run; a later passing observation does not establish its cause."
+  ]
+}

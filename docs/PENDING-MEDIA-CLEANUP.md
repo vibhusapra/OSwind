@@ -1,6 +1,6 @@
 # Resuming committed file cleanup
 
-This component is in qualification. The focused software and two owned encrypted-volume checks below are exploratory results, not whole-product acceptance or a release qualification. The previously qualified [cleanup worker lifetime](CLEANUP-LIFECYCLE.md) and PR129 artifacts stay frozen.
+This component has source-bound software/native/package qualification. Its earlier focused runs remain exploratory evidence, separate from the current receipt. Whole-product acceptance and release distribution remain open. The previously qualified [cleanup worker lifetime](CLEANUP-LIFECYCLE.md) and PR129 artifacts stay frozen.
 
 Two original owned tests showed the missing behavior: deleting a source while a supported writer held a shared reservation committed logical erasure and kept the file safe, but releasing the writer did not resume the durable queue. Both tests failed without a manual retry; unrelated older history stayed intact.
 
@@ -10,11 +10,17 @@ An active library observes advisory macOS notifications for committed cleanup an
 
 The retry API only finishes already-committed media/cache erasure. It does not apply retention, inventory orphan files, compact storage or complete an unfinished library wipe. The wipe retains its own explicit retry. Supported completion notifications update its pending warning without taking over its work.
 
-One supervisor owns its actual detached worker and every backoff sleeper. Writer conflicts use250ms,1s,4s,15s then30s backoff. Release hints can wake a long backoff, with a250ms minimum between attempts to bound notification bursts. An idle library has observers and no repeating timer or queue probe. Startup/wake performs a fresh probe; missed release/process-exit notifications recover through pending-only backoff. Structural errors stop automatic retries and present an explicit local retry.
+One supervisor owns its actual detached worker and every backoff sleeper. Writer conflicts use250ms,1s,4s,15s then30s backoff. Release hints can wake a long backoff, with a250ms minimum between attempts to bound notification bursts. While idle, this scheduler keeps observers and creates no repeating timer or queue probe; separate retention maintenance remains independent. Startup/wake performs a fresh probe; missed release/process-exit notifications recover through pending-only backoff. Structural errors stop repeating backoff. Wake/reopen or an explicit local retry can recheck the problem.
 
 Retirement, lock, switch and plain Quit cancel and join the real supervisor/worker/sleeper, including an attempt waiting before SQLite. Cancellation after actual cleanup preserves its committed outcome and suppresses a retired completion. Wipe waits for this worker before beginning its own operation. Quiet prepared libraries do not start this service as a side effect of wiping. A failed observer setup is visible and retryable after the underlying issue is repaired; retirement/close revokes restart.
 
 Storage settings show waiting/error state without an animated waiting spinner. Earlier deletion/maintenance summaries describe the files queued at commit, while background state reports current work. Background file cleanup finishes earlier deletions independently of the retention setting.
+
+## Source-bound qualification
+
+Source `2818215` binds the [1,363-input receipt](../benchmarks/pending-media-scheduler-v1.json). Full debug: **2090pass/105skip**; selected sanitizer: **843pass/47skip**, no race warning; selected optimized: **843pass/47skip**. All **149 mandatory methods** pass in every build. All **30 package/process stages** and **43 owned native methods / no skips** pass. Full plus native covers **2131 distinct methods**. Independent review verifies every byte of34 app/ZIP/extracted files, strict ad hoc signatures, three retained migration crash states and44 unchanged prior app trees.
+
+Updated supported writers emit these notifications. Older native33/raw SQL producers may not signal; their durable work recovers at startup/wake/explicit retry. Immediate idle discovery from such a producer is not established.
 
 ## Exploratory verification
 
@@ -26,4 +32,4 @@ Initial unsafe-path fixtures were correctly rejected by source admission. Correc
 
 ## Remaining acceptance
 
-Full software, selected sanitizer/optimized runs, all149 required controls, current native43, fresh package/process checks and independent archive review are pending. Native input/TCC, sustained capture/physical power, actual providers/two Macs, distribution/notarization, complete sync, collection epochs and other worker categories remain open. PR128's separate hosted canceled-unlock busy failure is unresolved; PR129 hosted validation is tracked separately. Native schema and wire formats are unchanged. All83 feature statuses stay unchanged; no parity or ranking claim follows.
+The source-bound component checks above pass. Broader acceptance remains open. Native input/TCC, sustained capture/physical power, actual providers/two Macs, distribution/notarization, complete sync, collection epochs and other worker categories remain open. PR128's separate hosted canceled-unlock busy failure is unresolved; PR129 hosted validation is tracked separately. Native schema and wire formats are unchanged. All83 feature statuses stay unchanged; no parity or ranking claim follows.

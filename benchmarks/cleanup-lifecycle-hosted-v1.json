@@ -1,0 +1,48 @@
+{
+  "format": "OSwind cleanup worker lifetime hosted follow-up v1",
+  "state": "passed",
+  "head": "9ddb59468b29057e1c10d8f2fdff5b7de46e38c0",
+  "PR": 129,
+  "run": 41366723990,
+  "nativeJob": 125028321569,
+  "benchmarkJob": 125028321214,
+  "nativeJobConclusion": "success",
+  "benchmarkConclusion": "success",
+  "full": {
+    "defined": 2170,
+    "passed": 2065,
+    "skipped": 105,
+    "failures": 0,
+    "unexpected": 0
+  },
+  "native": {
+    "defined": 41,
+    "passed": 41,
+    "skipped": 0,
+    "failures": 0,
+    "unexpected": 0
+  },
+  "headFoundInCheckoutLog": true,
+  "logSHA256": "6b25e903e1770de3ae936192f6ec04903d9f64d7e5fd913168d01405ecda4031",
+  "logBytes": 2945221,
+  "nativeDistinctPassed": 41,
+  "limits": [
+    "Local old32 optional executable is absent on hosted runner; counts remain separate.",
+    "This later passing hosted run does not identify or causally fix predecessor PR128 busy failure. No failed-run rerun requested."
+  ],
+  "diagnostics": {
+    "artifactID": 13108450930,
+    "artifactBytes": 19900,
+    "artifactSHA256": "2c5358bb2e2350462cbb6ef5f1dfc8475230b2c71a7b1c8eac2739068919825f",
+    "retainedJSONFiles": 10,
+    "canceledUnlockTrace": {
+      "stage": "completed",
+      "total": 136,
+      "nonzero": 0,
+      "dropped": 0,
+      "beforeMutations": 12,
+      "traceSHA256": "cbfb9479505b678f96b939d7ab2be325a047831cc550508ed28c398d39eca52f"
+    },
+    "limits": "Current hosted five-cycle observation only. Earlier PR128 failed run remains failed and causally unresolved."
+  }
+}
