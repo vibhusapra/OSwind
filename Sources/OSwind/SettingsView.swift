@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var keyStatus = ""
     @State private var deleteConfirm = false
     @State private var showHistoryErasure=false
+    @State private var showSyncPairing=false
     @State private var downloadName = "qwen3-embedding:0.6b"
     init(initialTab: String = "Capture") { _tab = State(initialValue:initialTab) }
     var body: some View {
@@ -31,6 +32,7 @@ struct SettingsView: View {
                 }
             }.formStyle(.grouped).disabled(m.libraryWipe.busy && tab != "Data") }
         }.padding(24).frame(width:760,height:720)
+        .sheet(isPresented:$showSyncPairing) {PersonalSyncPairingSheet(model:m.personalSync)}
         .sheet(isPresented:$showHistoryErasure) {HistoryErasureView().environmentObject(m)}
         .alert("Delete all local memories?",isPresented:$deleteConfirm) {Button("Cancel",role:.cancel) {};Button("Delete everything",role:.destructive) {m.wipeLocalLibrary()}} message: {Text("Deletes local sources, notes, recaps, routines, conversations and retained screenshots, replay and audio. Capture, API access and scheduling stop. Exports, backups, settings, downloaded models and saved provider keys remain. File cleanup failures stay available to retry.")}
 
@@ -228,6 +230,12 @@ struct SettingsView: View {
         Group {
             MeetingSettingsSections(model:m.meetings)
             if m.personalSync.configured || m.personalSync.preparing || m.personalSync.error != nil {PersonalSyncStatusView(model:m.personalSync)}
+            if !m.personalSync.configured && !m.personalSync.preparing {
+                Section("Personal device sync · preview") {
+                    Button("Pair your Macs…") {showSyncPairing=true}
+                    Text("Create a group or review a device invitation. Pairing saves identities locally; memory delivery is still in development.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
             Section("External MCP tools") {
                 Text("Connect selected local servers, review exact tool calls and save only the result text you choose. No server starts automatically.").font(.caption).foregroundStyle(.secondary)
                 Button("Open tools workspace") {m.section="Tools";dismiss()}

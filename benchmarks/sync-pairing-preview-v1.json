@@ -1,0 +1,133 @@
+{
+  "format": "oswind.sync.pairing-preview.qualification.v1",
+  "runtimeSource": "9ad15a06ef7a4fce447db58d7c33ec5bbc3fb770",
+  "trackedInputCount": 1478,
+  "inputManifestSHA256": "6440f50c4e640aafa9e941b16881078390d4102cdab285721235c2c03b8a482a",
+  "requiredNewRegularMethods": [
+    "OSwindAppTests.PersonalSyncPairingModelTests/testActualModelCreateReviewApproveAndJoinKeepsKeysOutOfUIAndDeliveryOff",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testCancelledDrainWaitsForLateCredentialCommitAndResumesItWithoutRecreatingKeys",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testCancelledLibraryDrainJoinsRealPairingFactoryBeforeStoreMayClose",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testCancelledPairingCanReloadDurableStateAndRetirementClosesAdmission",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testDeniedOrClosedLibraryDoesNotCreateCredentials",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testForeignPairingFactoryCannotMutateAnotherLibrary",
+    "OSwindAppTests.PersonalSyncPairingModelTests/testPairingErrorsAreSanitizedAndReloadCanRecoverOriginalState",
+    "OSwindCoreTests.PersonalSyncPairingTests/testCopiedLibraryAndMissingInstallationRefuseWhileOriginalCanResume",
+    "OSwindCoreTests.PersonalSyncPairingTests/testDurableEnvelopeSupportsFullMembershipAndRefusesOverflowWithoutReplacingSavedState",
+    "OSwindCoreTests.PersonalSyncPairingTests/testExclusiveCredentialOwnerAndProtectionTierCannotBeBypassed",
+    "OSwindCoreTests.PersonalSyncPairingTests/testExpiredRequestResumesButRenewalInvalidatesOldResponseAndPairsWithFreshKeys",
+    "OSwindCoreTests.PersonalSyncPairingTests/testFailedReplacementRetainsPendingStateAndCanRetryExactResponse",
+    "OSwindCoreTests.PersonalSyncPairingTests/testMissingCredentialAfterReservationDoesNotRegenerateAndLocalSourcesRemainUsable",
+    "OSwindCoreTests.PersonalSyncPairingTests/testNativeMetadataContainsOnlyNonsecretHandleAndLifetime",
+    "OSwindCoreTests.PersonalSyncPairingTests/testOpenUnconfiguredIsReadOnlyAndDoesNotAllocateCredentialsOrInstallation",
+    "OSwindCoreTests.PersonalSyncPairingTests/testOversizeAndExpiredReviewFailBeforeMembershipMutation",
+    "OSwindCoreTests.PersonalSyncPairingTests/testRestoringPreAcceptanceDatabaseCannotReplayConsumedRequest",
+    "OSwindCoreTests.PersonalSyncPairingTests/testRetirementPersistsKeylessTombstoneAndRefusesIdentityRecreation",
+    "OSwindCoreTests.PersonalSyncPairingTests/testReviewApprovesExactImmutableRequestAndRetryIsIdempotent",
+    "OSwindCoreTests.PersonalSyncPairingTests/testTwoNativeLibrariesPairAcrossOwnerAndJoinerRestartsWithoutActivatingDelivery",
+    "OSwindCoreTests.PersonalSyncPairingTests/testWholeLibraryWipeInvalidatesPendingPairingButIndividualErasureDoesNot",
+    "OSwindCoreTests.PersonalSyncPairingTests/testWrongFingerprintAndTamperedResponseDoNotConsumePendingRequest"
+  ],
+  "requiredNewOwnedNativeMethods": [
+    "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedPairingScreensRenderInBothThemes",
+    "OSwindCoreTests.PersonalSyncPairingTests/testOwnedNativeKeychainPairingSurvivesReopenAndConsumesResponseDurably"
+  ],
+  "stages": [
+    {
+      "name": "full-debug",
+      "defined": 2528,
+      "passed": 2389,
+      "skipped": 139,
+      "failed": 0,
+      "wallSeconds": 551.3080894160084,
+      "sha256": "0534f12d2f2f30e85f8119a2b591328da2687bde57ccb00fe4652903972e2a09",
+      "command": [
+        "swift",
+        "test"
+      ]
+    },
+    {
+      "name": "focused-tsan",
+      "defined": 144,
+      "passed": 134,
+      "skipped": 10,
+      "failed": 0,
+      "wallSeconds": 86.94314120803028,
+      "sha256": "aa638959e9f7897b7675d4afb6fe2bae7a34129236fa9538bd57f4a39a936431",
+      "command": [
+        "swift",
+        "test",
+        "--sanitize=thread",
+        "--filter",
+        "PersonalSync|SyncCredential|SyncPairing|SyncSigned|testSessionOwner"
+      ]
+    },
+    {
+      "name": "focused-optimized",
+      "defined": 144,
+      "passed": 134,
+      "skipped": 10,
+      "failed": 0,
+      "wallSeconds": 265.63492124993354,
+      "sha256": "6b1db63d7d7a7a617e92f39613915212736d2ca33e29440816f9f8e38ff8fb7c",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--filter",
+        "PersonalSync|SyncCredential|SyncPairing|SyncSigned|testSessionOwner"
+      ]
+    },
+    {
+      "name": "owned-native-render",
+      "defined": 28,
+      "passed": 28,
+      "skipped": 0,
+      "failed": 0,
+      "wallSeconds": 58.11674066702835,
+      "sha256": "4a665955f9b80e28f71ea3f7972c9816ee226e6a3c00dea02749b81c9ef8c59a",
+      "command": [
+        "swift",
+        "test",
+        "--filter",
+        "PersonalSyncPairingModelTests|PersonalSyncPairingTests|SyncCredentialStorageTests"
+      ]
+    }
+  ],
+  "nativeViewRenders": {
+    "failure-dark.png": "1d3c294c8cf7ebc1a900276a1d9faa56954054ea60a5e9530b1f03a01262a79f",
+    "failure-light.png": "ccddbbfc3ed1d49eb50fb5d153c9186f663041e27e0af1020c302ff54d0a51f0",
+    "owner-dark.png": "853bccc45704886275efd97f155a88573228cae19c3115f4a507a575d84cd63d",
+    "owner-light.png": "a8928588258a2423f4add34efba3c3bfb8269c62328655c0034a88bc8979a832",
+    "paired-dark.png": "15775fd505d749920758816c65551fdbbbccc3a636c9701ced2b4227e7aa5bb1",
+    "paired-light.png": "1512a43b71fb0b1444c3ad3320f14541e967dbf418d5fd6ae16b19859a4bbcd8",
+    "pending-dark.png": "54eb3b6bf3bf59402db7840dd6a380e3d57b75462e97064d596220b53611b22c",
+    "pending-light.png": "718865bf921e16a6c98a9d9fe82d9ede3a6c260548ec5acb3854f5bc3d904649",
+    "pending-response-dark.png": "bc8f1e093bbe0acf64a0be298a4b58eabe9a228a01285eb7bedc8efbc42ba905",
+    "pending-response-light.png": "07fbbf38cb78db50fc07bf1519325a5ce1ea0db342dce3f2e2edfa59e8a155ab",
+    "response-dark.png": "5b11c6b04405526923ad79789a769a6f1dd8211f2253f60cce6a2aa9cf1ee576",
+    "response-light.png": "e8f9281737c996a52d30bfa985da8481aeaf578406dca718d976be2d6fa75aef",
+    "retired-dark.png": "8b669634da5d1ce4971bd5a8b6f13f42e56bd6513230cd48e13ba1c94fd10bf2",
+    "retired-light.png": "b19a2a95147448904a2e97dc8ac3d7d9b820984f521e70d9c26e4bb11b4f9a14",
+    "review-dark.png": "177dabb3680d7290f661b4de7f5438b1103d57945a959d7ce9c549c670fd200a",
+    "review-light.png": "15a408a59ba490b269277e84c67dc6073b52020f7f1eadee06434f786efe1135",
+    "unconfigured-dark.png": "418acf1eb2aa637957f42b85c9afdc0e6195236202b2ca3a13578f1bc141c58d",
+    "unconfigured-light.png": "c75abc6a02694841dafd633a842fb2233d9779dbf1c0c72fed4e03bef07748c9"
+  },
+  "reviewerSHA256": "299e39b544298cdaf6b0402b74aea717b2482094a27c00e7b1931fd8b4ddab05",
+  "claims": {
+    "nativePairingPreview": true,
+    "ownedLoginKeychainRoundTrip": true,
+    "oneTimeResponseConsumptionAfterNativeDatabaseRollback": true,
+    "keylessRetirement": true,
+    "ownedOffscreenNativeViewsWithExpectedStateOCR": true,
+    "activeDelivery": false,
+    "productionDataProtectionEntitlement": false,
+    "hardwareDeviceOnlyBinding": false,
+    "outboundOrIncomingDeliveryRollbackProtection": false,
+    "liveSignedAppInteraction": false,
+    "physicalTwoMacProviderTransfer": false,
+    "packageDistributionOrSustainedPowerAcceptance": false,
+    "wholeProductParityOrRanking": false
+  }
+}

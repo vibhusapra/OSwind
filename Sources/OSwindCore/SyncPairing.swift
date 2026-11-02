@@ -40,6 +40,10 @@ struct SyncDeviceKeys:Sendable,CustomStringConvertible,CustomDebugStringConverti
     fileprivate let signing:Curve25519.Signing.PrivateKey
     fileprivate let agreement:Curve25519.KeyAgreement.PrivateKey
     init() {signing = .init();agreement = .init()}
+    fileprivate init(signing:Data,agreement:Data)throws {
+        guard signing.count==32,agreement.count==32 else {throw OSwindError.invalid("Invalid saved sync device keys")}
+        self.signing=try .init(rawRepresentation:signing);self.agreement=try .init(rawRepresentation:agreement)
+    }
     var description:String {"<redacted sync device keys>"}
     var debugDescription:String {description}
     var customMirror:Mirror {Mirror(self,children:["keys":"redacted"])}
@@ -141,6 +145,13 @@ struct SyncGroupAuthority:Sendable,CustomStringConvertible,CustomDebugStringConv
         certificate=try .init(body:.init(format:"OSwind.sync.membership",version:1,group:UUID().uuidString.lowercased(),epoch:UUID().uuidString.lowercased(),revision:1,previous:nil,rootPublicKey:root.publicKey.rawRepresentation,owner:owner.body.replica,capabilities:SyncPairingFormat.capabilities,members:[SyncMember(owner)]),root:root)
     }
     private init(root:Curve25519.Signing.PrivateKey,secret:SyncGroupSecret,certificate:SyncMembershipCertificate) {self.root=root;self.secret=secret;self.certificate=certificate}
+    fileprivate var rootForKeychain:Data {root.rawRepresentation}
+    fileprivate static func restore(root:Data,secret:SyncGroupSecret,certificate:SyncMembershipCertificate)throws->Self {
+        guard root.count==32 else {throw OSwindError.invalid("Invalid saved sync owner key")}
+        let signing=try Curve25519.Signing.PrivateKey(rawRepresentation:root)
+        try certificate.verify(root:signing.publicKey.rawRepresentation)
+        return .init(root:signing,secret:secret,certificate:certificate)
+    }
     var fingerprint:String {get throws {try SyncPairingFormat.fingerprint(root.publicKey.rawRepresentation)}}
     func admitting(_ request:SyncJoinRequest,now:Date=Date())throws->Self {
         try request.validate(now:now);try certificate.verify(root:root.publicKey.rawRepresentation)
@@ -203,6 +214,27 @@ struct SyncPendingJoin:Sendable,CustomStringConvertible,CustomDebugStringConvert
             return .init(keys:keys,secret:try SyncGroupSecret(rawRepresentation:payload.groupSecret),certificate:payload.certificate,replica:request.body.replica)
         }catch {throw OSwindError.invalid("Pairing response could not be verified. Check the trusted Mac fingerprint and request expiry.")}
     }
+    private struct Saved:Codable {let format:String,version:Int,signing:Data,agreement:Data,request:SyncJoinRequest}
+    private init(keys:SyncDeviceKeys,request:SyncJoinRequest)throws {
+        guard request.body.signingPublicKey==keys.signing.publicKey.rawRepresentation,
+              request.body.agreementPublicKey==keys.agreement.publicKey.rawRepresentation else {throw OSwindError.invalid("Pending request keys differ")}
+        // Verify even expired saved requests at their creation time. Resuming
+        // them never extends the actual acceptance deadline.
+        try request.validate(now:Date(timeIntervalSince1970:TimeInterval(request.body.created)))
+        self.keys=keys;self.request=request
+    }
+    func encodedForKeychain()throws->Data {
+        try SyncProtocolLimits.encode(Saved(format:"OSwind.sync.pending-keys",version:1,signing:keys.signing.rawRepresentation,agreement:keys.agreement.rawRepresentation,request:request))
+    }
+    static func decodeFromKeychain(_ bytes:Data)throws->Self {
+        let value=try SyncPairingFormat.decode(Saved.self,bytes,limit:16384)
+        guard value.format=="OSwind.sync.pending-keys",value.version==1 else {throw OSwindError.invalid("Invalid saved pending request")}
+        return try .init(keys:.init(signing:value.signing,agreement:value.agreement),request:value.request)
+    }
+    /// A replacement request gets fresh keys and identity. The owner may have
+    /// admitted the expired request already; reusing its public keys under a new
+    /// nonce would conflict with immutable addition-only membership.
+    func renewed(now:Date)throws->Self {try .init(name:request.body.name,now:now)}
     var description:String {"<redacted pending sync join>"}
     var debugDescription:String {description}
     var customMirror:Mirror {Mirror(self,children:["keys":"redacted"])}
@@ -211,12 +243,55 @@ struct SyncPendingJoin:Sendable,CustomStringConvertible,CustomDebugStringConvert
 struct SyncJoinedGroup:Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     fileprivate let keys:SyncDeviceKeys,secret:SyncGroupSecret
     let certificate:SyncMembershipCertificate,replica:String
+    func withCertificate(_ next:SyncMembershipCertificate)throws->Self {
+        if next != certificate {try next.requireSuccessor(of:certificate)}
+        let value=Self(keys:keys,secret:secret,certificate:next,replica:replica)
+        _=try value.packetAuthority();return value
+    }
     func packetAuthority()throws->SyncDevicePacketAuthority {try .init(keys:keys,certificate:certificate,replica:replica)}
     func createTransport(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func openTransport(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func createPrivateInbox(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch)}
     func openPrivateInbox(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch)}
     var description:String {"<redacted joined sync group>"}
+    var debugDescription:String {description}
+    var customMirror:Mirror {Mirror(self,children:["keys":"redacted"])}
+}
+
+/// The only private-key serialization boundary. The app receives neither this
+/// type nor its bytes. A decoded Keychain value still needs native-library and
+/// installation binding, writer admission and publication-ceiling validation.
+struct SyncCredentialMaterial:Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
+    let joined:SyncJoinedGroup,owner:SyncGroupAuthority?
+    private struct Payload:Codable {
+        let format:String,version:Int,replica:String
+        let signingPrivate:Data,agreementPrivate:Data,groupSecret:Data,ownerPrivate:Data?
+        let certificate:SyncMembershipCertificate
+    }
+    init(joined:SyncJoinedGroup,owner:SyncGroupAuthority?=nil)throws {
+        _=try joined.packetAuthority()
+        if let owner {
+            guard owner.certificate==joined.certificate,joined.replica==owner.certificate.body.owner,
+                  owner.secret.exportForPairing()==joined.secret.exportForPairing() else {throw OSwindError.invalid("Owner authority differs from the enrolled device")}
+        }
+        self.joined=joined;self.owner=owner
+    }
+    func encodedForKeychain()throws->Data {
+        let value=Payload(format:"OSwind.sync.private-material",version:1,replica:joined.replica,signingPrivate:joined.keys.signing.rawRepresentation,agreementPrivate:joined.keys.agreement.rawRepresentation,groupSecret:joined.secret.exportForPairing(),ownerPrivate:owner?.rootForKeychain,certificate:joined.certificate)
+        let bytes=try SyncProtocolLimits.encode(value)
+        guard bytes.count<=SyncCredentialStorageLimits.maximumBytes else {throw OSwindError.invalid("Saved sync credential exceeds its bound")};return bytes
+    }
+    static func decodeFromKeychain(_ bytes:Data)throws->Self {
+        do {
+            let value=try SyncPairingFormat.decode(Payload.self,bytes,limit:SyncCredentialStorageLimits.maximumBytes)
+            guard value.format=="OSwind.sync.private-material",value.version==1 else {throw OSwindError.invalid("Saved sync material is incompatible")}
+            let keys=try SyncDeviceKeys(signing:value.signingPrivate,agreement:value.agreementPrivate),secret=try SyncGroupSecret(rawRepresentation:value.groupSecret)
+            let joined=SyncJoinedGroup(keys:keys,secret:secret,certificate:value.certificate,replica:value.replica)
+            let owner=try value.ownerPrivate.map {try SyncGroupAuthority.restore(root:$0,secret:secret,certificate:value.certificate)}
+            return try .init(joined:joined,owner:owner)
+        }catch {throw OSwindError.invalid("The saved sync credential could not be verified")}
+    }
+    var description:String {"<redacted saved sync material>"}
     var debugDescription:String {description}
     var customMirror:Mirror {Mirror(self,children:["keys":"redacted"])}
 }
