@@ -32,6 +32,21 @@ struct SyncLibrarySender {
         guard try metadata({try $0.reviewState(journal:cache.journal)}) == .ready else {throw OSwindError.unavailable("A local wipe changed before publication; review its group erasure first")}
         try inbox.requireNamespace(group:cache.journal.group,epoch:cache.journal.epoch)
     }
+    /// Native retirement/configuration writers cannot commit between the last
+    /// admission callback and the file link. Recheck after callbacks as well:
+    /// they may invalidate this context or create a pending wipe themselves.
+    /// External settings/trust still require the service's cancel/join owner.
+    private func publication<T>(validate:()throws->Void={},_ write:()throws->T)throws->T {
+        try library.withRoutineDatabase {db in
+            try SyncChangeCapture.transaction(db) {
+                try ready();try validate();try ready();return try write()
+            }
+        }
+    }
+    private func current(_ reference:SyncVersionReference)throws->SyncPortableRecord {
+        guard let record=try cache.record(reference,admit:admit) else {throw OSwindError.unavailable("The exact outgoing version was erased before publication")}
+        return record
+    }
     func publish(after sequence:Int64=0,limit:Int=128,supersessionDepth:Int=0)throws->SyncLibrarySendResult {
         guard sequence>=0,(1...256).contains(limit),(1...16384).contains(maximumObjects),(1...512*1024*1024).contains(maximumBytes),(1...128).contains(maximumDepth),(0...maximumDepth).contains(supersessionDepth) else {throw OSwindError.invalid("Invalid sender work budget")}
         // A native whole-library wipe owns an exclusive media lease. It cannot
@@ -40,24 +55,25 @@ struct SyncLibrarySender {
         if case .needsGroupReview(let proposal)=try metadata({try $0.reviewState(journal:cache.journal)}) {return .needsGroupReview(proposal)}
         try ready()
         let controls=try metadata {try $0.knownControls(journal:cache.journal)}
-        for control in controls {try ready();try inbox.publishCollectionControl(control)}
+        for control in controls {try publication {try inbox.publishCollectionControl(control)}}
         let revisions=try metadata {_ in try cache.journal.outbox(after:sequence,limit:limit)}
         var through=sequence,count=0,totalBytes=0
         for revision in revisions {
             try ready()
             if let control=controls.first(where:{$0.erases(revision)}) {
-                try inbox.publishErasedRevision(revision,control:control)
+                try publication {try inbox.publishErasedRevision(revision,control:control)}
             } else if revision.mutation == .put,let deletion=try deletionBarrier(for:revision) {
-                try ready();try inbox.publishRevision(deletion)
-                try ready();try inbox.publishDeletedRevision(revision,deletion:deletion)
+                try publication {try inbox.publishRevision(deletion)}
+                try publication {try inbox.publishDeletedRevision(revision,deletion:deletion)}
             } else if let replacement=try successor(for:revision) {
                 let successor=replacement.revision
                 if !replacement.certified,successor.dot.replica==cache.journal.replica {
                     let nested=try publish(after:successor.dot.counter-1,limit:1,supersessionDepth:supersessionDepth+1)
                     guard case .published(_,_,_,let bytes)=nested else {throw OSwindError.unavailable("The successor needs renewed group review")};totalBytes+=bytes
                 }
-                try ready();try inbox.publishSupersededRevision(revision,successor:successor)
+                try publication {try inbox.publishSupersededRevision(revision,successor:successor)}
             } else {
+                var graph=[SyncVersionReference]()
                 if let content=revision.content {
                     let object=try metadata {_ in try cache.catalog.object(for:revision.key)}
                     guard let object,!object.deleted else {throw OSwindError.unavailable("The outgoing object has no live typed identity or authenticated erasure proof")}
@@ -70,14 +86,15 @@ struct SyncLibrarySender {
                         sent.insert(key);objects+=1;bytes+=Int(reference.bytes);return true
                     }
                     func emitSupplement(_ reference:SyncContentReference,owner:SyncPortableRecord)throws->Data {
-                        try ready();try admit(owner)
+                        try ready();_=try metadata {_ in try current(owner.reference)}
                         guard let data=try supplementalContent(reference),reference.matches(data) else {throw OSwindError.unavailable("Exact staged publication/media bytes are unavailable; withhold their revision")}
-                        try ready();try admit(owner);try inbox.publishContent(data,reference:reference);return data
+                        try publication(validate:{_=try current(owner.reference)}) {try inbox.publishContent(data,reference:reference)};return data
                     }
                     func emit(_ reference:SyncVersionReference,depth:Int)throws {
                         try ready();guard depth<=maximumDepth else {throw OSwindError.invalid("The outgoing dependency graph exceeds its depth budget")}
                         guard try reserve(reference.content) else {return}
                         guard let record=try metadata({_ in try cache.record(reference,admit:admit)}) else {throw OSwindError.unavailable("The exact outgoing version was erased or is unavailable")}
+                        graph.append(reference)
                         for dependency in record.dependencies {
                             let child:SyncVersionReference
                             if let content=dependency.content {child = .init(identity:dependency.identity,content:content)}
@@ -92,7 +109,7 @@ struct SyncLibrarySender {
                                 }
                             }
                         }
-                        try ready();try admit(record);try inbox.publishContent(record.encoded(),reference:reference.content)
+                        try publication(validate:{_=try current(reference)}) {try inbox.publishContent(record.encoded(),reference:reference.content)}
                     }
                     guard try object.identity.key==revision.key else {throw OSwindError.invalid("The outgoing revision differs from its typed identity")}
                     // Reserve/validate the complete answer declaration and its
@@ -104,12 +121,21 @@ struct SyncLibrarySender {
                         guard manifest.group==cache.journal.group,manifest.epoch==cache.journal.epoch,manifest.owner==ref else {throw OSwindError.invalid("The answer declaration belongs to another owner or epoch")}
                         for citation in manifest.citations {try emit(citation.reference,depth:0)}
                         try emit(ref,depth:0)
-                        guard let owner=try metadata({_ in try cache.record(ref,admit:admit)}) else {throw OSwindError.unavailable("The outgoing answer was erased")}
-                        try ready();try admit(owner);try inbox.publishContent(data,reference:declaration)
+                        try publication(validate:{_=try current(ref)}) {try inbox.publishContent(data,reference:declaration)}
                     } else {try emit(ref,depth:0)}
                     totalBytes+=bytes
                 }
-                try ready();try inbox.publishRevision(revision)
+                // Dependencies may have been retired after their earlier body
+                // writes. Withhold the operation unless its exact typed graph
+                // still passes current admission at the final write boundary.
+                try publication(validate:{
+                    for reference in graph {_=try current(reference)}
+                    // A later dependency's callback could retire an earlier
+                    // one. Finish with a callback-free exact graph check.
+                    for reference in graph {
+                        guard try cache.record(reference,admit:{_ in}) != nil else {throw OSwindError.unavailable("The outgoing graph changed during final policy admission")}
+                    }
+                }) {try inbox.publishRevision(revision)}
             }
             through=revision.dot.counter;count+=1
         }

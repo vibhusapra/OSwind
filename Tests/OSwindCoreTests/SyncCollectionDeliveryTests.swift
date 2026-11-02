@@ -344,4 +344,61 @@ extension SyncIncomingSourceTests {
         XCTAssertNil(try inbox.content(content),"Already-read recap bytes do not authorize retired evidence")
         XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter))
     }
+    func testCollectionFailedFinalAdmissionRollsBackItsOwnedMutationAndAllowsAnExactRetry()throws {
+        for mode in ["disable","retire","wipe-intent"] {
+            let (a,ac)=try endpoint("late-rollback-"+mode,producerID);defer {try? a.close()}
+            try a.insert(Memory(id:"owned",kind:.note,text:"Owned source remains after a rejected reentrant callback"));try drain(a,ac)
+            let revision=try XCTUnwrap(ac.journal.outbox().first),content=try XCTUnwrap(revision.content)
+            let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("late-rollback-space-"+mode),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+            var admissions=0
+            let sender=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{_ in
+                admissions+=1
+                if admissions==2 {
+                    if mode=="retire" {_=try a.delete("owned")}
+                    else {try a.withRoutineDatabase {db in
+                        try db.execute(mode=="disable" ? "UPDATE personal_sync_capture SET enabled=0 WHERE singleton=1":"INSERT INTO store_metadata(key,value) VALUES('library_wipe_dirty','1') ON CONFLICT(key) DO UPDATE SET value='1'")
+                    }}
+                }
+            },supplementalContent:{_ in XCTFail("Owned note has no media");return nil})
+            XCTAssertThrowsError(try sender.publish(),mode);XCTAssertEqual(admissions,2,mode)
+            XCTAssertNil(try inbox.content(content),mode);XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter),mode)
+            XCTAssertNotNil(try a.get("owned"),"Rejected callback mutations share the publication transaction")
+            try a.withRoutineDatabase {db in
+                _=try SyncChangeCapture.scope(db,requireActive:true)
+                XCTAssertEqual(try SyncCollectionHistory(database:db,replica:producerID).current(),.empty)
+            }
+            _=try deliverySender(a,ac,inbox).publish()
+            XCTAssertEqual(try inbox.revision(replica:producerID,sequence:revision.dot.counter),revision,mode)
+            XCTAssertNotNil(try inbox.content(content),mode)
+        }
+    }
+    func testCollectionGraphHeaderRechecksEarlierOwnersAfterEveryPolicyCallback()throws {
+        let (a,ac)=try endpoint("late-graph-owner",producerID);defer {try? a.close()}
+        let source=Memory(id:"evidence",kind:.note,text:"Owned independent evidence stays live")
+        try a.insert(source)
+        let recap=try a.saveRecap(.init(text:"Owned recap removed by a later dependency callback",sources:[.init(memory:source,score:1,match:"owned")],provider:"owned",duration:0),title:"Owned recap");try drain(a,ac)
+        let owner=try ac.catalog.localIdentity(.source,primary:[.text(Data(recap.id.utf8))]),child=try ac.catalog.localIdentity(.source,primary:[.text(Data(source.id.utf8))])
+        let ownerKey=try owner.key,revision=try XCTUnwrap(ac.journal.outbox().first {$0.key==ownerKey})
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("late-graph-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        var childAdmissions=0,retired=false
+        let sender=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{record in
+            if record.identity==child {
+                childAdmissions+=1
+                if childAdmissions==3 {
+                    // Run the actual logical phase used by native deletion in
+                    // this existing admission transaction; never touch files
+                    // before commit. The independent child remains valid.
+                    try a.withRoutineDatabase {db in
+                        defer {try? db.clearErasureSelection()}
+                        try db.prepareCanonicalErasure(recap.id)
+                        let erased=try db.eraseSelectedHistory();XCTAssertEqual(erased.sources,1)
+                    }
+                    XCTAssertNil(try a.get(recap.id));XCTAssertNotNil(try a.get(source.id));retired=true
+                }
+            }
+        },supplementalContent:{_ in XCTFail("Owned recap has no media");return nil})
+        XCTAssertThrowsError(try sender.publish(after:revision.dot.counter-1,limit:1))
+        XCTAssertEqual(childAdmissions,3);XCTAssertTrue(retired)
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter),"A later callback invalidated the already-checked root")
+    }
 }
