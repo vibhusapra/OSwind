@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## Answer lifetime — component qualified
+
+[Answer lifetime and saving](ANSWER-LIFECYCLE.md) now joins actual Ask work through Quit, switch, wipe and encrypted lock, rejects retired launches, and atomically creates the first conversation with its turn. The source-bound receipt passes all 225 required controls in three builds, 51 native methods and 30 fresh package/process stages; independent review preserves 49 earlier app trees. Audio import, other worker lifetimes and whole-product acceptance remain open. All 83 feature statuses stay unchanged.
+
 ## Source worker lifetime — component qualified
 
 [Source worker lifetime](SOURCE-WORK-LIFECYCLE.md) now joins actual note, recap, statistics and storage jobs through Quit, switch and encrypted-library lock. The source-bound receipt passes 190 required controls in three builds, 49 owned native methods and 30 package/process stages; independent review preserves 46 earlier apps. Audio file import, Ask and other reader/model setup lifetimes remain open. All 83 feature statuses stay unchanged.

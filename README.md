@@ -1,5 +1,7 @@
 # OSwind
 
+[Answer lifetime and saving](docs/ANSWER-LIFECYCLE.md) now joins actual Ask work through Quit, switch, wipe and encrypted lock, rejects retired launches, and atomically creates the first conversation with its turn. The source-bound receipt passes all 225 required controls in three builds, 51 native methods and 30 fresh package/process stages; independent review preserves 49 earlier app trees. Audio import, other worker lifetimes and whole-product acceptance remain open. All 83 feature statuses stay unchanged.
+
 [Source worker lifetime](docs/SOURCE-WORK-LIFECYCLE.md) now joins actual note, recap, statistics and storage jobs through Quit, switch and encrypted-library lock. The source-bound receipt passes 190 required controls in three builds, 49 owned native methods and 30 package/process stages; independent review preserves 46 earlier apps. Audio file import, Ask and other reader/model setup lifetimes remain open. All 83 feature statuses stay unchanged.
 
 [Committed file cleanup](docs/PENDING-MEDIA-CLEANUP.md) resumes durable deleted-media work through current supported writer events and pending-only backoff, with no periodic idle probe. The source-bound receipt passes149 required controls in three builds,43 owned native methods,30 package/process stages and independent app/archive review with44 earlier apps unchanged. Older producers may need startup/wake/explicit retry. Complete sync, other worker categories, native input, power and distribution remain open; all83 feature statuses stay unchanged.
