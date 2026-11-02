@@ -133,6 +133,47 @@ final class SyncCredentialBindingTests:XCTestCase {
         guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_SYNC_KEYCHAIN"]=="1" else {throw XCTSkip("Explicit read-only Mac binding probe; hardware identifier is never logged or retained")}
         let digest=try MacSyncMachineFingerprint().fingerprint();try SyncProtocolLimits.digest(digest)
     }
+    func testOwnedNativeVaultCopyCannotReuseOriginalCredentialBinding()async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1" else {throw XCTSkip("Owned1GiB encrypted-vault clone fixture; never opens a user image or Keychain")}
+        let originalPackage=root.appendingPathComponent("Original.oswindvault"),copyPackage=root.appendingPathComponent("Copy.oswindvault"),secret=Data(UUID().uuidString.utf8)
+        var original:LibraryVault?,copy:LibraryVault?,native:MemoryStore?,copied:MemoryStore?,transport:SyncObjectFolder?,inbox:SyncObjectFolder?,service:SyncLibraryService?
+        func cleanup()async {
+            try? service?.stop();inbox?.close();transport?.close();try? native?.close();try? copied?.close()
+            if let original {_ = try? await original.lock()};if let copy {_ = try? await copy.lock()}
+        }
+        do {
+            _=try await LibraryVault.create(at:originalPackage,name:"Owned credential clone",capacityGiB:1,passphrase:secret,keepUnlocked:true)
+            let first=try LibraryVault(package:originalPackage);original=first
+            let opened=try MemoryStore(root:first.libraryURL);native=opened
+            let keys=try material(),installation=UUID().uuidString.lowercased()
+            let shared=try keys.joined.createTransport(at:root.appendingPathComponent("shared-vault"));transport=shared
+            let local=try keys.joined.createPrivateInbox(at:opened.root.appendingPathComponent("images/bound-inbox"));inbox=local
+            let worker=try SyncLibraryService.install(library:opened,replica:keys.joined.replica,group:keys.joined.certificate.body.group,epoch:keys.joined.certificate.body.epoch,peers:[],transport:shared,inbox:local);service=worker
+            try opened.insert(Memory(id:"owned-encrypted",kind:.note,text:"Owned encrypted clone source"))
+            let binding=try SyncEnrollmentBinding.capture(store:opened,material:keys,id:UUID().uuidString.lowercased(),protection:.loginKeychain,machine:machine,installation:installation)
+            XCTAssertNotNil(binding.publicationLifetime);XCTAssertNotNil(binding.vault)
+            try worker.stop();local.close();shared.close();try opened.close()
+            let locked=try await first.lock();XCTAssertFalse(locked.imageAttached)
+            _=try await first.unlock(passphrase:secret)
+            let reopened=try MemoryStore(root:first.libraryURL);native=reopened
+            try binding.verify(store:reopened,material:keys,protection:.loginKeychain,machine:machine,installation:installation)
+            try reopened.close();_=try await first.lock()
+            try FileManager.default.copyItem(at:originalPackage,to:copyPackage)
+            let second=try LibraryVault(package:copyPackage);copy=second
+            _=try await second.unlock(passphrase:secret)
+            let cloned=try MemoryStore(root:second.libraryURL);copied=cloned
+            let copiedBinding=try SyncEnrollmentBinding.capture(store:cloned,material:keys,id:binding.id,protection:.loginKeychain,machine:machine,installation:installation)
+            // Whole APFS image copies preserve the inner filesystem IDs. The
+            // independent outer package must also participate in admission.
+            XCTAssertEqual(copiedBinding.volume,binding.volume);XCTAssertEqual(copiedBinding.inode,binding.inode)
+            XCTAssertEqual(copiedBinding.origin,binding.origin);XCTAssertEqual(copiedBinding.publicationLifetime,binding.publicationLifetime)
+            XCTAssertNotEqual(copiedBinding.vault,binding.vault)
+            XCTAssertThrowsError(try binding.verify(store:cloned,material:keys,protection:.loginKeychain,machine:machine,installation:installation))
+            XCTAssertNotNil(try cloned.get("owned-encrypted"))
+            await cleanup()
+            let a=try await first.status(),b=try await second.status();XCTAssertFalse(a.imageAttached);XCTAssertFalse(b.imageAttached)
+        }catch {await cleanup();throw error}
+    }
 }
 
 private final class InstallationResults:@unchecked Sendable {

@@ -108,10 +108,28 @@ final class SyncCredentialExclusiveLease:@unchecked Sendable {
     }
 }
 
+struct SyncVaultPhysicalBinding:Codable,Equatable,Sendable {
+    let hostVolume:String,packageInode:UInt64,imageInode:UInt64
+    static func capture(_ context:VaultAccessContext)throws->Self {
+        let package=try BackupFileTree(root:context.paths.package),image=try BackupFileTree(root:context.paths.image)
+        let location=context.paths.package.standardizedFileURL.resolvingSymlinksInPath()
+        guard let value=try location.resourceValues(forKeys:[.volumeUUIDStringKey]).volumeUUIDString,let volume=UUID(uuidString:value) else {throw OSwindError.unavailable("The encrypted package has no stable host filesystem identity")}
+        let result=Self(hostVolume:volume.uuidString.lowercased(),packageInode:try package.identity().inode,imageInode:try image.identity().inode)
+        try result.validate();try package.requireRootIdentity(at:context.paths.package);try image.requireRootIdentity(at:context.paths.image)
+        try VaultAccess.validateVolume(paths:context.paths,info:context.info,session:context.session)
+        return result
+    }
+    func validate()throws {
+        try SyncProtocolLimits.uuid(hostVolume)
+        guard packageInode>0,imageInode>0 else {throw OSwindError.invalid("Invalid encrypted sync package identity")}
+    }
+}
+
 struct SyncEnrollmentBinding:Codable,Equatable,Sendable,CustomStringConvertible,CustomDebugStringConvertible,CustomReflectable {
     let format:String,version:Int,id:String,protection:SyncCredentialProtection
     let machine:String,installation:String,origin:String,generation:String,volume:String,inode:UInt64
     let publicationLifetime:String?
+    let vault:SyncVaultPhysicalBinding?
     let group:String,epoch:String,replica:String,rootFingerprint:String
     static func capture(store:MemoryStore,material:SyncCredentialMaterial,id:String,protection:SyncCredentialProtection,machine:any SyncMachineFingerprint,installation:String)throws->Self {
         try SyncCredentialStorageLimits.validate(id:id);try SyncProtocolLimits.uuid(installation)
@@ -122,7 +140,9 @@ struct SyncEnrollmentBinding:Codable,Equatable,Sendable,CustomStringConvertible,
             var stamp=stat()
             guard fstat(file,&stamp)==0,stamp.st_dev==store.mediaRootIdentity.device,stamp.st_ino==store.mediaRootIdentity.inode else {throw OSwindError.unavailable("The open native library directory was replaced")}
         }
-        guard let value=try store.root.resourceValues(forKeys:[.volumeUUIDStringKey]).volumeUUIDString,let uuid=UUID(uuidString:value) else {throw OSwindError.unavailable("This filesystem cannot provide a stable sync library identity")}
+        let nativeLocation=store.root.standardizedFileURL.resolvingSymlinksInPath()
+        guard let value=try nativeLocation.resourceValues(forKeys:[.volumeUUIDStringKey]).volumeUUIDString,let uuid=UUID(uuidString:value) else {throw OSwindError.unavailable("This filesystem cannot provide a stable sync library identity")}
+        let vault=try VaultAccess.context(at:store.root).map {try SyncVaultPhysicalBinding.capture($0)}
         let (scope,lifetime)=try store.withRoutineDatabase {db in try SyncChangeCapture.transaction(db) {
             let scope=try SyncChangeCapture.scope(db)
             let row=try db.statement("SELECT value FROM store_metadata WHERE key='sync-publication-library-lifetime-v1'");defer {sqlite3_finalize(row)}
@@ -130,13 +150,14 @@ struct SyncEnrollmentBinding:Codable,Equatable,Sendable,CustomStringConvertible,
             return (scope,code==SQLITE_ROW ? db.text(row,0):nil)
         }}
         let joined=material.joined
-        let result=Self(format:"OSwind.sync.library-binding",version:1,id:id,protection:protection,machine:fingerprint,installation:installation,origin:scope.origin,generation:scope.generation,volume:uuid.uuidString.lowercased(),inode:store.mediaRootIdentity.inode,publicationLifetime:lifetime,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch,replica:joined.replica,rootFingerprint:try SyncPairingFormat.fingerprint(joined.certificate.body.rootPublicKey))
+        let result=Self(format:"OSwind.sync.library-binding",version:1,id:id,protection:protection,machine:fingerprint,installation:installation,origin:scope.origin,generation:scope.generation,volume:uuid.uuidString.lowercased(),inode:store.mediaRootIdentity.inode,publicationLifetime:lifetime,vault:vault,group:joined.certificate.body.group,epoch:joined.certificate.body.epoch,replica:joined.replica,rootFingerprint:try SyncPairingFormat.fingerprint(joined.certificate.body.rootPublicKey))
         try result.validate();try tree.requireRootIdentity(at:store.root);return result
     }
     func validate()throws {
         guard format=="OSwind.sync.library-binding",version==1,inode>0 else {throw OSwindError.invalid("Invalid saved sync library binding")}
         for value in [id,installation,origin,generation,volume,group,epoch,replica] {try SyncProtocolLimits.uuid(value)}
         try SyncProtocolLimits.digest(machine);try SyncProtocolLimits.digest(rootFingerprint)
+        try vault?.validate()
         if let lifetime=publicationLifetime {
             let uuid=UUID(uuidString:lifetime)?.uuidString.lowercased()==lifetime
             let hex=lifetime.utf8.count==32 && lifetime.utf8.allSatisfy({(48...57).contains($0)||(97...102).contains($0)})
