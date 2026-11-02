@@ -2,6 +2,8 @@
 
 `SyncLibraryService` connects the existing 13-kind native adapters to concrete saved-policy admission, retained-media preparation/adoption, encrypted local spooling, authenticated peer discovery, durable send/receive cursors and a background scheduler. It is an internal service, not a user-enrollable sync product. F059 remains TODO.
 
+The [later privacy-hold and renewal checkpoint](SYNC-WITHHELD-SERVICE.md) adds durable opaque policy holds, finite saved-policy review, joined network pause with continuing local preparation, and exact native completion consumed atomically during renewal. Its source-bound evidence is separate from the earlier source92 checks below. Public activation remains unfinished.
+
 ## Implemented behavior
 
 - A serialized, bounded tick bootstraps/prepares the real native library, publishes complete typed dependency graphs and turn declarations, receives authenticated operations, applies the native writers and retries durable answer work. Callers no longer supply permissive policy or synthetic media callbacks.
@@ -12,18 +14,18 @@
 - Declaration delivery can lag its operation. A bounded rotating scan discovers declarations for durable pending publications even when no new peer operation arrives. Policy/storage retries remain bounded; invalid or unreviewed replacements are not automatically approved.
 - A new service token invalidates prior workers. The scheduler runs utility work off the UI actor, polls idle libraries every 15 seconds, and increases that interval to 60 seconds in Low Power Mode or 120 seconds during serious/critical thermal state. Those are scheduling rules, not measured battery savings. Stop cancels and joins its worker.
 - A discovered peer erasure takes precedence over preparing local bodies, including blocked rows. The worker returns the authenticated control and releases its lease. The actual app owner must join capture/import/model producers before applying `SyncNativeCollectionReceiver`; the worker never joins itself or erases an active producer's library.
-- After an authenticated received native collection retirement and completed physical cleanup, explicit renewal establishes a new publication lifetime. Current queue objects pin their original lifetime and remain invalid after renewal. Ordinary install never renews invalidated authority, and an approved local wipe does not silently become a received group wipe.
+- After an authenticated received native collection retirement and completed physical cleanup, explicit renewal requires its exact native completion digest and consumes it atomically with the new publication lifetime. Pending cleanup is checked in that same transaction; persistent frontier SQL hooks invalidate prior completions. A generic metadata receipt cannot authorize renewal. Current queue objects pin their original lifetime and remain invalid after renewal. Ordinary install never renews invalidated authority, and an approved local wipe does not silently become a received group wipe.
 
 ## Acceptance still required
 
 1. Public create/join/recovery setup, persisted secret ownership and an understandable status/review UI; application Quit, switch, lock, wipe and settings ownership across all real producers.
 2. Per-device authentication, capability fencing against old native clients, key rotation/revocation and an external rollback anchor. Group AEAD authenticates shared-key possession; it does not prove which physical device or human authored a packet. A restored database must not revive old writer authority. In-memory/current-source queue pinning does not establish compatibility with older binaries.
-3. An offline spool that cannot fill raw capture and block ordinary recording, including permanently denied records, disconnect/reconnect, disabled capture reconciliation and local-only clear semantics. Stop currently preserves native intent capture to avoid losing offline mutations; that is not sufficient unattended backpressure handling.
+3. Durable policy holds and joined in-process network pause are implemented. Cold offline startup, a spool that cannot fill raw capture and block ordinary recording, assigned versions newly denied by policy, disconnect/reconnect, disabled/recreated-row reconciliation and local-only clear semantics remain required. Stop currently preserves native intent capture to avoid losing offline mutations; that is not sufficient unattended backpressure handling.
 4. Resumable large-transfer budgets and preparation outside long writer transactions. Assets have a 512 MiB preparation cap; the sender's default complete-graph budget is 64 MiB. Larger complete graphs are refused, not claimed transferred. Current bounded in-transaction hashing/staging is not a sustained capture/sync throughput result.
 5. Per-source encrypted-spool garbage collection, quota/storage reporting and complete backup/restore semantics. Whole-library spool cleanup is covered by native inventory; selective source erasure and old provider ciphertext/backups need their own retention contract.
 6. Real provider ordering/conflict handling, two physical Macs, interruption and restore acceptance, locked vaults, power measurements and signed/notarized distribution. Two owned local library fixtures are not two-Mac acceptance.
 
-## Verification scope
+## Earlier source92 verification scope
 
 The [source-bound software receipt](../benchmarks/sync-library-service-v1.json) at `92b9a84` binds [1,438 tracked inputs](../benchmarks/sync-library-service-inputs-v1.json). All 458 required controls pass in three combined builds. Broad debug passes 2,294 with 130 skips; selected Thread Sanitizer and optimized each pass 1,234 with 76 skips. Five environment-gated compatibility cases pass separately per mode, giving 2,299/125 and 1,239/71 across the same defined identities. Those original broad-run skips remain visible. Independent readers verify 21 exact wire bodies and native/historical-original citations in each of three reopened-library fixtures. The first reader's failed direct-citation assumption is retained.
 

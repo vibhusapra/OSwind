@@ -1,12 +1,24 @@
 # OSwind delivery ledger
 
-## Folder-backed native sync service — experimental WIP
+## Durable privacy holds and network pause — internal service WIP
+
+[Current behavior](SYNC-WITHHELD-SERVICE.md) keeps permitted captures progressing past privacy-denied owners, persists bounded opaque holds and finite policy review across reopen, protects held native edits from ordinary peer replacement, and joins network pause/resume while preparing locally. Exact native erasure completion is now required and consumed atomically before publication renewal; SQL hooks revoke stale proof. The original generic-receipt renewal bug remains in the retained diagnostic history.
+
+Source `e79120f` binds [all 1,444 inputs](../benchmarks/sync-withheld-service-inputs-v1.json) and a [new receipt](../benchmarks/sync-withheld-service-v1.json): **2,315 passes / 125 skips** full debug, **1,255 passes / 71 skips** selected sanitizer and **1,255 passes / 71 skips** optimized. All **474 required controls**, including 29 service cases, plus 19 owner-qualified backend controls pass in every mode. No race warning appears. Independent readers inspect three reopened-library fixtures covering all 13 kinds. The ordinary debug CLI wipe clears held state and bodies while preserving 21 opaque body-free deletion intents. Original reader failures remain retained.
+
+[Earlier hosted CI](../benchmarks/sync-library-service-hosted-v1.json) passes full 2,295/129 skips, native 62 and clipboard 3 with 81 successful native-job steps and matching merge/head trees. This qualifies the preceding published source `92b9a84` runtime, not source `e79120f`. PR136 remains unresolved. No new package/native APFS acceptance is claimed.
+
+Public enrollment/recovery/revocation/compatibility/rollback and app lifecycle/status/conflict UI; cold offline opening and raw-queue reconciliation; storage pressure, assigned denied outbox versions, large resumable graphs and selective spool/backup semantics remain open. **F059 remains TODO; all 83 statuses are unchanged.** Whole-product parity, ranking, physical power and notarized distribution remain unaccepted.
+
+Worker ownership follow-up `dd68dfa` changes only the scheduler task slot and passes all 29 service cases in each current debug/sanitizer/optimized build. The source `e79120f` broad results above remain the preceding baseline; see [the separate follow-up receipt](../benchmarks/sync-scheduler-join-v1.json). Three fresh readers verify its reopened fixtures covering all 13 kinds. Public app-wide lifecycle acceptance remains open.
+
+## Earlier folder-backed native sync service checkpoint
 
 The [internal service](SYNC-LIBRARY-SERVICE.md) now supplies real saved-policy/media adapters, all 13 native kinds, authenticated discovery hints, durable cursors, delayed-declaration retry and background stop/join scheduling. Source `92b9a84` binds [1,438 tracked inputs](../benchmarks/sync-library-service-inputs-v1.json) and its [software receipt](../benchmarks/sync-library-service-v1.json). Broad debug passes **2,294 / 130 skips**; selected sanitizer and optimized each pass **1,234 / 76 skips**. Five gated compatibility cases pass separately in each mode, yielding **2,299 / 125 remaining skips** and **1,239 / 71**, respectively, across the same defined identities. All **458 required controls**, including 13 service cases, and 19 additional owner-qualified backend checks pass in each combined build. No sanitizer race warning appears.
 
 Independent readers verify three reopened-library fixtures: all 13 kinds and 21 wire bodies match, native/historical-original citations resolve, cursors reach 21, one native answer binding completes and the receiver authors no echo. The first reader's mistaken direct-citation assumption remains retained. This is not a new app/package or physical provider/two-Mac qualification.
 
-Public setup/UI, native-specific renewal proof and atomic cleanup fencing, older clients/rollback, offline backpressure/reconciliation, large resumable transfers and selective spool GC/backup semantics remain open. Whole-library cleanup includes the private encrypted spool. F059 stays TODO and all 83 statuses are unchanged.
+At that earlier checkpoint, public setup/UI, native-specific renewal proof and atomic cleanup fencing, older clients/rollback, offline backpressure/reconciliation, large resumable transfers and selective spool GC/backup semantics remain open. Whole-library cleanup includes the private encrypted spool. F059 stays TODO and all 83 statuses are unchanged.
 
 ## Native group retirement — internal WIP
 
