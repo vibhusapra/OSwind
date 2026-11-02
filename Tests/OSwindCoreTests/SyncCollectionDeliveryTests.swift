@@ -300,4 +300,48 @@ extension SyncIncomingSourceTests {
             XCTAssertEqual(retirements,1,name);XCTAssertEqual(try count(b,"personal_sync_collection_received_controls"),1,name)
         }
     }
+    func testCollectionFinalAdmissionCannotExportAfterItDeactivatesTheOwner()throws {
+        let (a,ac)=try endpoint("final-disabled-owner",producerID);defer {try? a.close()}
+        try a.insert(Memory(id:"owned",kind:.note,text:"Owned body must stay local after deactivation"));try drain(a,ac)
+        let revision=try XCTUnwrap(ac.journal.outbox().first),content=try XCTUnwrap(revision.content)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("final-disabled-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        var admissions=0
+        let sender=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{_ in
+            admissions+=1
+            if admissions==2 {try a.withRoutineDatabase {try $0.execute("UPDATE personal_sync_capture SET enabled=0 WHERE singleton=1")}}
+        },supplementalContent:{_ in XCTFail("Owned note has no media");return nil})
+        XCTAssertThrowsError(try sender.publish());XCTAssertEqual(admissions,2)
+        XCTAssertNil(try inbox.content(content),"A later header refusal cannot undo an exported private body")
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter))
+    }
+    func testCollectionFinalAdmissionCannotExportAfterReentrantNativeSourceRetirement()throws {
+        let (a,ac)=try endpoint("final-erased-owner",producerID);defer {try? a.close()}
+        try a.insert(Memory(id:"owned",kind:.note,text:"Owned source retired during its last policy check"));try drain(a,ac)
+        let revision=try XCTUnwrap(ac.journal.outbox().first),content=try XCTUnwrap(revision.content)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("final-erased-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        var admissions=0
+        let sender=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{_ in
+            admissions+=1
+            if admissions==2 {_=try a.delete("owned");XCTAssertNil(try a.get("owned"))}
+        },supplementalContent:{_ in XCTFail("Owned note has no media");return nil})
+        XCTAssertThrowsError(try sender.publish());XCTAssertEqual(admissions,2)
+        XCTAssertNil(try inbox.content(content),"Current native retirement must win before file publication")
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter))
+    }
+    func testCollectionFinalAdmissionCannotPublishRecapAfterItsExactEvidenceIsRetired()throws {
+        let (a,ac)=try endpoint("final-recap-owner",producerID);defer {try? a.close()}
+        let source=Memory(id:"evidence",kind:.note,text:"Owned exact evidence retired after dependency publication")
+        try a.insert(source)
+        let recap=try a.saveRecap(.init(text:"Owned dependent recap",sources:[.init(memory:source,score:1,match:"owned")],provider:"owned",duration:0),title:"Owned recap");try drain(a,ac)
+        let identity=try ac.catalog.localIdentity(.source,primary:[.text(Data(recap.id.utf8))])
+        let key=try identity.key,revision=try XCTUnwrap(ac.journal.outbox().first {$0.key==key}),content=try XCTUnwrap(revision.content)
+        let inbox=try SyncObjectFolder.create(at:root.appendingPathComponent("final-recap-space"),secret:SyncGroupSecret(),group:group,epoch:epoch);defer {inbox.close()}
+        var admissions=0
+        let sender=SyncLibrarySender(library:a,cache:ac,inbox:inbox,admit:{record in
+            if record.identity==identity {admissions+=1;if admissions==2 {_=try a.delete(source.id);XCTAssertNil(try a.get(source.id))}}
+        },supplementalContent:{_ in XCTFail("Owned recap has no media");return nil})
+        XCTAssertThrowsError(try sender.publish(after:revision.dot.counter-1,limit:1));XCTAssertEqual(admissions,2)
+        XCTAssertNil(try inbox.content(content),"Already-read recap bytes do not authorize retired evidence")
+        XCTAssertNil(try inbox.revision(replica:producerID,sequence:revision.dot.counter))
+    }
 }
