@@ -331,6 +331,8 @@ jobs:
           python3 scripts/test-entity-eval.py
       - name: Verify telemetry admission and owned-child boundaries without hardware
         run: python3 scripts/test-power-telemetry.py
+      - name: Verify soak cleanup survives unavailable diagnostics without native capture
+        run: python3 scripts/test-soak-process-owner.py
       - name: Verify paired keyword benchmark result and archive admission offline
         run: python3 scripts/test-keyword-scope-benchmark.py
       - name: Verify retained offline CLI keyword evidence rejects forged results

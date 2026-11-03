@@ -16,7 +16,9 @@ The first actual 65-second pilot saves twelve sources, then traps on a duplicate
 
 The initial parent folder was named locked-control because the preceding GUI attempt encountered a locked Mac. Actual worker prerequisites then reported an unlocked session and existing capture access, and real capture occurred. Its folder name does not make it a refusal control. The later final GUI check confirms PAUSED on invalid resume and clears the repaired footer to Paused without capture; it neither grants nor qualifies GUI capture access.
 
-## Active long run and remaining acceptance
+## Incomplete long run and remaining acceptance
+
+**Subsequent terminal assessment:** this attempt stopped incomplete after ENOSPC in heartbeat/stop/fixture-exit writes. Its stale running status is not current liveness or completion evidence. Last reported uptime is 27,657.44 seconds, with 1,380 attempts, three saved sources and 1,377 lock deferrals. Exact owned PIDs are absent; original child exit codes were not persisted. See the [failure and controller fix](SOAK-CONTROLLER-RECOVERY.md). The attempt is preserved and is not restarted.
 
 A separately rooted run requests 86,400 seconds at 20-second intervals from the frozen successful-pilot worker. Only startup and first real source are established at publication. Keep its process/root/executable identity, every error and lock/source/sleep gap; never restart it silently. A shorter, suspended or incomplete run is not uninterrupted 24-hour capture. Manual requests deliberately bypass automatic duplicate suppression and idle/backoff; Light selects image dimensions/encoding only. Process RSS/CPU is distinct from app-attributed watts, calibrated wall power or battery life. Other development load remains uncontrolled.
 

@@ -108,6 +108,8 @@ Pass `--data /absolute/directory` or `OSWIND_DATA_DIR` for an isolated store. No
 
 For an unlocked Mac with capture permission, `python3 scripts/live-capture-smoke.py` checks real targeted capture/OCR, exclusions, secret redaction, image suppression and deletion using disposable synthetic apps and a temporary store.
 
+The [persistent soak controller](docs/SOAK-CONTROLLER-RECOVERY.md) now joins its owned processes even when diagnostics cannot be written. The original requested 24-hour trial stopped incomplete during disk exhaustion; its partial results and failure are retained. A new sustained capture/power result remains pending.
+
 ## Backup and restore
 
 Settings → Data creates a full `.oswindbackup` package and restores a separate verified library. Retained media, chats, metadata and vectors travel together; credentials, API tokens, models and disposable caches are excluded. Restored services and automatic cleanup start off. Packages are plaintext. See [backup usage and limits](docs/BACKUP.md).

@@ -1,0 +1,142 @@
+{
+  "format": "OSwind soak-controller disk-failure review v1",
+  "state": "reviewed",
+  "inputManifestSHA256": "fb8d2051973a64ac8bfc298511fc0b9a00faaa33816a690381f52c1bf835d4fd",
+  "runnerSHA256": "a7032bbddb0ef566819e0055169fd55edd4f5b9c7049dfafa0611f4b64cbfb30",
+  "reviewerSHA256": "1689ef25d97d37d9caf1cce2c01f9531545b0baee2e89f48366315eab7be88ad",
+  "methods": [
+    "ControllerContracts.test_failed_final_receipt_does_not_leave_live_children",
+    "ControllerContracts.test_fixture_log_close_failure_occurs_after_reaping_and_refuses_completion",
+    "ControllerContracts.test_heartbeat_stop_and_error_receipts_enospc_never_skip_cleanup",
+    "ControllerContracts.test_missing_worker_coverage_preserves_refusal_after_reaping",
+    "ControllerContracts.test_output_failure_immediately_after_fixture_launch_still_reaps",
+    "ControllerContracts.test_process_handle_write_failure_preserves_primary_and_joins_both",
+    "ControllerContracts.test_resource_append_failure_still_joins_both_handles",
+    "ControllerContracts.test_success_receipt_is_published_only_after_both_handles_reaped",
+    "ControllerContracts.test_worker_launch_failure_still_reaps_fixture",
+    "ControllerContracts.test_wrong_provenance_refuses_before_process_or_native_fixture_work",
+    "OwnedProcessTests.test_completed_child_is_reaped_without_stop_or_signal",
+    "OwnedProcessTests.test_graceful_stop_file_joins_without_termination",
+    "OwnedProcessTests.test_ignored_termination_escalates_to_owned_kill_and_wait",
+    "OwnedProcessTests.test_interrupted_final_wait_still_joins_and_records_interrupt",
+    "OwnedProcessTests.test_one_cleanup_exception_still_joins_both_children",
+    "OwnedProcessTests.test_stop_file_enospc_still_reaps_worker_and_fixture",
+    "OwnedProcessTests.test_unrelated_sentinel_is_never_signaled"
+  ],
+  "passed": 17,
+  "skipped": 0,
+  "alteredLogControls": {
+    "missing-case": "rejected",
+    "duplicate-case": "rejected",
+    "wrong-identity": "rejected",
+    "failed-case": "rejected",
+    "hidden-traceback": "rejected"
+  },
+  "priorRuntimeInputsUnchanged": 711,
+  "priorBenchmarkFilesUnchanged": 499,
+  "originalLongRunAssessmentSHA256": "d0bb51bc63631e6e689e0b89b17acb32d8dab5bd0794e23358eea0fbe292e139",
+  "originalControllerSHA256": "91cd41ad877b0044c079267cb7057f5e0888f54c65125fb620a81bce0a0be1fa",
+  "stageLogs": {
+    "python-syntax": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "owned-fault-contracts": "13f41b255317da9ebc80eef0a8fbd8adaf44baa9eba9fa004c151129d7281ca7"
+  },
+  "scope": "Changed Python controller/helper/17-contract tests plus CI selection only; all711 preceding non-workflow runtime inputs unchanged. Inert authored fake fixture/XCTest payloads with real directly owned processes; mocked native codesign/host/ps commands. No native capture, TCC/history/models, filesystem actually filled, old long-run restart or product benchmark. Original observed ENOSPC long run remains incomplete; no24h/power/capture qualification.",
+  "reviewScope": "Codex source/input/hash and exact unittest identity/outcome review. Real owned-child assertions are executed by the retained test code; no separate external PID trace or independent human audit. No successful original runtime/benchmark/soak repeated. The first wrapper fails before testing due __file__ string handling; retained separately, corrected v2 succeeds.",
+  "sourceCommit": "575205fce4199cfe76fe569570fd2bd46bc4a189",
+  "baseSource": "74f822a589a1ab97892a0fa286122a2ef7967b5e",
+  "allFourCommittedInputBlobsMatch": true,
+  "retainedIncompleteLongRun": {
+    "state": "stopped-incomplete-enospc",
+    "observedUTC": "2026-11-03T15:41:33.924471+00:00",
+    "session": 8761,
+    "controllerTerminalExit": 1,
+    "controllerExitCollected": true,
+    "ownedPIDs": {
+      "controller": 85169,
+      "worker": 85204,
+      "fixture": 85184
+    },
+    "ownedPIDsNoLongerPresent": true,
+    "lastReportedStatus": {
+      "attempts": 1380,
+      "captureDeferrals": 1377,
+      "elapsedUptime": 27657.43585916655,
+      "elapsedWall": 27657.54585123062,
+      "errors": 0,
+      "excluded": 0,
+      "oversizeGaps": 0,
+      "pid": 85204,
+      "saved": 3,
+      "scope": "Persistent actual controller/store; explicit generated app target every interval. Initial source deadline15seconds (or shorter configured run); cold-start deferrals stay in all coverage counters. Manual-request cadence, not automatic foreground/idle/thermal app scheduling. Wall/uptime gaps are reported, never uninterrupted coverage. No power/battery/GPU timing or competitor ranking claim.",
+      "sourceCount": 3,
+      "state": "running",
+      "unchanged": 0
+    },
+    "statusIsStaleRunningRecord": true,
+    "controllerTrace": "ENOSPC writing heartbeat, stop-requested, then fixture-exit; missing completed final receipt. Actual worker/fixture exit codes were not persisted.",
+    "rawJSONLines": {
+      "resources.jsonl": {
+        "validJSONRows": 13289,
+        "invalidRowNumbers": []
+      },
+      "attempts.jsonl": {
+        "validJSONRows": 1380,
+        "invalidRowNumbers": []
+      }
+    },
+    "sourceFilesSHA256": {
+      ".artifacts/native-targeted-soak-v1/long-run-controller-v1.log": "40ed9f388678ba23ee8b7ccb21d62e12293dc85429c6ad08f589ab4032de2093",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/status.json": "ab697b016ed50aad1da123e393ad170da703a4c5f0fd7b3cfd3806cf1dae6dd4",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/controller-heartbeat.json": "9d2970b5b797d14a475e8853a1a23c05a92bad6380b6f2d43ca00da556b6bc71",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/process-handle.json": "8353940cc75ae000a47c02a1dc4e772c08fd63836140179832f6a31b725ec103",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/configuration.json": "031933f1c61133b78b7f35de9f5518191b66fcfeee79e6240e6caef6d0aefd4e",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/run-manifest.json": "70f170c37d292d9938356ec2c42d1c101e6620b2db33487ad90ba5a4e952bbf7",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/worker.log": "7d9349a5badba774d5a025d19bdd45e2730d782c6e2f3bb373b266cc3fdd05f2",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/resources.jsonl": "f6f7f5359ab94033a77504c1d1a69b55080223bf8a859e9e9b1ebe9f6488d058",
+      ".artifacts/native-targeted-soak-v1/long-run-v1/owned-soak-9BE5CDE3-DD96-49F5-9A85-8714B8D16608/attempts.jsonl": "09ec3e3fb75fa6123c7bf83bc750ea3aff47d1266b237dae39f292091ce3ce05"
+    },
+    "scope": "Read-only terminal assessment after the original tool session returned exit1 and exact owned PIDs were absent. Original source, frozen worker, logs/results/database are unchanged. This is incomplete roughly7.68h manual-cadence owned-window evidence with mostly locked deferrals, not24h completion, uninterrupted capture, auto scheduling, power/energy or ranking. No restart performed. Preserve ENOSPC failure; a fresh declared long run needs adequate reserved disk and independently verified live handles."
+  },
+  "publishedInputs": {
+    "file": "soak-controller-recovery-inputs-v1.json",
+    "sha256": "ffc46299ddd67b285747a0971242edf4ddb89d4fb8b41f7f117ae5d50d0024fb"
+  },
+  "rawEvidence": {
+    "file": "soak-controller-recovery-raw-v1.zip",
+    "sha256": "1730b04471323d6a3fae89ca0036701336b9a28ce850d21091d2e9d771aabe0f",
+    "bytes": 429628,
+    "members": {
+      "qualification/inputs.json": "fb8d2051973a64ac8bfc298511fc0b9a00faaa33816a690381f52c1bf835d4fd",
+      "qualification/results.json": "416d6eda5c6c93898c0c2a4fcd6fc090310a12545d3a111f45e8656c7131592e",
+      "qualification/reviewed-v1.json": "c432b5e3ff3a8892540e4d5c996a0be1e1ab2efd289d6eeb11c7143fa2ed8cf6",
+      "qualification/python-syntax.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "qualification/owned-fault-contracts.log": "13f41b255317da9ebc80eef0a8fbd8adaf44baa9eba9fa004c151129d7281ca7",
+      "runners/qualify-v1.py": "d3f046e403c1856dd33dd733fbd083967456fbb2764cb7f81826aba25a8b21ea",
+      "runners/qualify-v2.py": "a7032bbddb0ef566819e0055169fd55edd4f5b9c7049dfafa0611f4b64cbfb30",
+      "runners/review-v1.py": "1689ef25d97d37d9caf1cce2c01f9531545b0baee2e89f48366315eab7be88ad",
+      "runners/publish-v1.py": "d31f14d8c6ace1f3f65f51c00b56862da9766a95371de3584f4f33a5c3202723",
+      "runners/qualification-controller-v1.log": "3dcd3bfe3cd889a6e86820a5657e0f7e9fc04c1e6cfb11a8cfa4dd1f31c52d5a",
+      "runners/qualification-controller-v2.log": "1813080fba930e058fdec001ab09fb12e4efa2d0c67399806fef774131485c46",
+      "runners/retained-driver-v1.py": "91cd41ad877b0044c079267cb7057f5e0888f54c65125fb620a81bce0a0be1fa",
+      "runners/development-v1.log": "fb46e2f05f798054febfb5971b70913d9ea288918d20bc89dcd48be7984f70ed",
+      "runners/development-v2.log": "ad2837978c3eba24e0a971d09bb4bbd12eb28e914a068f6bbbbf2b0859a40a38",
+      "source/scripts/native-targeted-capture-soak.py": "19c410efe39a2937c32d2758043481bad27c1fb6494d4b0fe6d40aaea851d14f",
+      "source/scripts/soak_process_owner.py": "d17180ce55230b1fea07d0ef80525c08b61d9a27c9781f02c3d54c77b792f6b6",
+      "source/scripts/test-soak-process-owner.py": "ad11158dcdbf028de8848cad8a00050d7381cfeecd30fa7c9045ac704d53a20b",
+      "source/.github/workflows/ci.yml": "aea11ec9c3fe715bc9f3e15e6712eb2cd564b4982f976d23f3f5ee854d7c6c05",
+      "retained-incomplete-long-run/terminal-assessment.json": "d0bb51bc63631e6e689e0b89b17acb32d8dab5bd0794e23358eea0fbe292e139",
+      "retained-incomplete-long-run/long-run-controller-v1.log": "40ed9f388678ba23ee8b7ccb21d62e12293dc85429c6ad08f589ab4032de2093",
+      "retained-incomplete-long-run/status.json": "ab697b016ed50aad1da123e393ad170da703a4c5f0fd7b3cfd3806cf1dae6dd4",
+      "retained-incomplete-long-run/controller-heartbeat.json": "9d2970b5b797d14a475e8853a1a23c05a92bad6380b6f2d43ca00da556b6bc71",
+      "retained-incomplete-long-run/process-handle.json": "8353940cc75ae000a47c02a1dc4e772c08fd63836140179832f6a31b725ec103",
+      "retained-incomplete-long-run/configuration.json": "031933f1c61133b78b7f35de9f5518191b66fcfeee79e6240e6caef6d0aefd4e",
+      "retained-incomplete-long-run/run-manifest.json": "70f170c37d292d9938356ec2c42d1c101e6620b2db33487ad90ba5a4e952bbf7",
+      "retained-incomplete-long-run/worker.log": "7d9349a5badba774d5a025d19bdd45e2730d782c6e2f3bb373b266cc3fdd05f2",
+      "retained-incomplete-long-run/resources.jsonl": "f6f7f5359ab94033a77504c1d1a69b55080223bf8a859e9e9b1ebe9f6488d058",
+      "retained-incomplete-long-run/attempts.jsonl": "09ec3e3fb75fa6123c7bf83bc750ea3aff47d1266b237dae39f292091ce3ce05",
+      "README.txt": "0f75dad2a3812d430b527e77aba35c0c649bd318815240152a3328ddc7919c21"
+    }
+  },
+  "reviewSHA256": "c432b5e3ff3a8892540e4d5c996a0be1e1ab2efd289d6eeb11c7143fa2ed8cf6",
+  "publisherSHA256": "d31f14d8c6ace1f3f65f51c00b56862da9766a95371de3584f4f33a5c3202723"
+}
