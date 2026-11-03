@@ -323,6 +323,8 @@ jobs:
           python-version: '3.14'
       - name: Verify generated ASR assets without corpus downloads
         run: python3 scripts/test-prepare-asr-eval.py
+      - name: Verify local model setup presets and loopback routing offline
+        run: python3 scripts/test-setup-models.py
       - name: Verify independent entity scorer and admission without corpus downloads
         run: |
           python3 scripts/entity_quality.py

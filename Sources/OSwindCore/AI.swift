@@ -18,7 +18,8 @@ public enum AIProvider: String, Codable, CaseIterable, Sendable {
     public var label: String { switch self { case .evidence: return "Evidence only · no model"; case .apple: return "Apple Intelligence · on device"; case .ollama: return "Ollama · local Metal"; case .compatible: return "OpenAI compatible · BYOK"; case .anthropic: return "Anthropic · BYOK" } }
 }
 public struct AIConfiguration: Codable, Equatable, Sendable {
-    public static let defaultLocalModel = "qwen3:4b-instruct-2507-q4_K_M"
+    public static let defaultLocalModel = "qwen3.5:4b"
+    public static let largerLocalModel = "gemma4:e4b"
     public var provider: AIProvider = .evidence
     public var endpoint = "http://127.0.0.1:11434"
     public var model = AIConfiguration.defaultLocalModel

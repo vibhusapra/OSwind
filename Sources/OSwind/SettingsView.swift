@@ -166,7 +166,8 @@ struct SettingsView: View {
                 ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
                 if !m.localRuntime.isEmpty { Text(m.localRuntime).font(.caption).textSelection(.enabled) }
                 HStack { TextField("Model to download",text:$downloadName); Button("Download") { m.downloadModel(downloadName) }.disabled(m.pullingModel != nil || downloadName.isEmpty) }
-                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · 4B") { downloadName = AIConfiguration.defaultLocalModel } }.font(.caption)
+                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · Qwen3.5 4B") { downloadName = AIConfiguration.defaultLocalModel }; Button("Chat · Gemma4 E4B") { downloadName = AIConfiguration.largerLocalModel } }.font(.caption)
+                Text("Presets fill the download field. After Download, choose the installed model in Answer engine. Qwen3.5 4B is smaller; Gemma4 E4B needs more storage and memory. First answers may require model startup.").font(.caption).foregroundStyle(.secondary)
                 if let model = m.pullingModel {
                     Text("Downloading \(model)").font(.caption)
                     if let fraction = m.pullProgress?.fraction { ProgressView(value:fraction) } else { ProgressView().controlSize(.small) }
