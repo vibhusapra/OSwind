@@ -156,4 +156,6 @@ Saved chat turns retain their actual absolute scope and time zone. Follow-up sub
 
 ![Scoped Ask at the minimum window height](assets/query-scope-ask.png)
 
+[Required content expressions](docs/KEYWORD-EMPTY-CONSTRAINTS.md) now reject globally absent operands before candidate ranking. Content and speaker indexes are checked in the same snapshot; complete row filters and relevance order remain in force. Fresh authored paired CLI results and retained limits are documented.
+
 Saved opt-in reconnect/pause and keyword startup now have [source-bound local qualification](docs/KEYWORD-STARTUP-WIP.md). The [authored three-binary CLI comparison](docs/OFFLINE-KEYWORD-COMPARISON.md) retains improvements and the slower broad-query case with raw evidence. Complete sync, sustained physical energy and signed distribution remain unfinished.

@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Empty required constraints stop before ranking
+
+Runtime `5a3f888` adds same-snapshot necessary expression probes over both content and speaker FTS. Absent required operands skip ranking; possible Boolean branches, negation, split sources/labels, complete before-LIMIT predicates, relevance order and cancellation remain protected. Literal/unconstrained queries add no probes; no cross-search cache or schema/model changes.
+
+**712 committed inputs**, eight ordinary new methods plus one gated actual 48k seed: full Debug **2,619 passed / 164 conditional skips**; focused sanitizer/optimized **347 passed / eight skips each**; owned seed **one passed**, zero failures/race diagnostics. Five altered-log controls reject; normal release/strict ad-hoc package pass with prior resources/Info unchanged. A separate new native component profile retains270 observations / 30 warmups and eight altered-record checks; it identifies broad ranking and impossible-constraint rejection costs without a product speed claim.
+
+The new paired actual CLI workload retains **98 measured processes / 14 warmups**, all 112 ordered complete signatures equal within each case across the previous qualified package and candidate. Physical 48k source rows/payloads and settings are identical in both copies. Seven altered-answer controls reject. Descriptive same-host timings and their background/cache limits are reported in [scope and medians](KEYWORD-EMPTY-CONSTRAINTS.md), with [receipt](../benchmarks/keyword-empty-constraints-v1.json), [inputs](../benchmarks/keyword-empty-constraints-inputs-v1.json) and [raw evidence](../benchmarks/keyword-empty-constraints-raw-v1.zip). All 496 preceding benchmark files and all 83 feature statuses remain unchanged; full sync, physical capture/energy, distribution, full v0 and ranking remain open.
+
 ## Explicit local answer-model loading with matching context
 
 Runtime `9245805` adds an optional Load selected answer model action with cancellation and an expiring memory observation. Its empty finite-retention request uses the existing 8,192-token answer context and contains no captured evidence. The retained first attempt reported the server default 262,144 context; final request/observation alignment is verified at 8,192. Selection generations reject late results, task ownership participates in app retirement/drain, and saved settings remain unchanged.
