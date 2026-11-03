@@ -275,7 +275,7 @@ struct SyncJoinedGroup:Sendable,CustomStringConvertible,CustomDebugStringConvert
     func packetAuthority()throws->SyncDevicePacketAuthority {try .init(keys:keys,certificate:certificate,replica:replica)}
     func createTransport(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func openTransport(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
-    func createPrivateInbox(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch)}
+    func createPrivateInbox(at root:URL)throws->SyncObjectFolder {try .createPrivate(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch)}
     func openPrivateInbox(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch)}
     var description:String {"<redacted joined sync group>"}
     var debugDescription:String {description}
