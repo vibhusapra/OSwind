@@ -25,6 +25,17 @@ public struct SearchExpressionPlan: Sendable {
         var positive: [Atom] {
             switch self { case .atom(let atom): return [atom]; case .not: return []; case .and(let a,let b),.or(let a,let b): return a.positive+b.positive }
         }
+        /// A necessary condition only: atoms may occur on different sources or
+        /// speaker labels. Negation cannot rule out a source from global facts.
+        /// The complete row predicate still decides eligibility before LIMIT.
+        func mayMatchAnySource(_ contains: (Atom) throws -> Bool) rethrows -> Bool {
+            switch self {
+            case .atom(let atom): return try contains(atom)
+            case .not: return true
+            case .and(let a,let b): return try a.mayMatchAnySource(contains) && b.mayMatchAnySource(contains)
+            case .or(let a,let b): return try a.mayMatchAnySource(contains) || b.mayMatchAnySource(contains)
+            }
+        }
         /// Rank candidates already have a canonical source ID. Test its stable
         /// FTS key instead of building a complete archive-wide content ID set.
         /// Speaker operands still use per-atom sets so different labels/body

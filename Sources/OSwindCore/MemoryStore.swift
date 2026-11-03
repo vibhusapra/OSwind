@@ -513,6 +513,22 @@ public final class MemoryStore: @unchecked Sendable {
         }
         return true
     }
+    /// An absent required operand otherwise forces every ranked candidate
+    /// through the row-local expression. Probe both content and speaker FTS in
+    /// this same snapshot; never cache the result across writes/searches.
+    private func searchExpressionCanMatch(_ expression:SearchExpressionPlan)throws->Bool {
+        guard let constraint=expression.constraint else {return true}
+        var observed=[SearchExpressionPlan.Atom:Bool]()
+        return try constraint.mayMatchAnySource {atom in
+            try Task.checkCancellation()
+            if let result=observed[atom] {return result}
+            let row=try prepare("SELECT EXISTS(SELECT 1 FROM memory_fts WHERE memory_fts MATCH ?) OR EXISTS(SELECT 1 FROM speaker_fts WHERE speaker_fts MATCH ?)")
+            defer {sqlite3_finalize(row)}
+            bind(row,1,atom.fts);bind(row,2,atom.fts)
+            guard sqlite3_step(row)==SQLITE_ROW else {throw failure()}
+            let result=sqlite3_column_int(row,0) != 0;observed[atom]=result;return result
+        }
+    }
     /// Inspect the actual source/vector tables inside the search snapshot. A
     /// caller's coverage hint may predate another connection's committed work.
     private func hasSearchVectors(_ model:String)throws->Bool {
@@ -556,7 +572,7 @@ public final class MemoryStore: @unchecked Sendable {
             try? exec("RELEASE search_snapshot")
         }
         sqlite3_progress_handler(db,1000,{_ in Task.isCancelled ? 1:0},nil)
-        guard try searchMetadataCanMatch(filter) else {try Task.checkCancellation();execution?(SearchExecution(strategy:"exact",warnings:[]));return []}
+        guard try searchMetadataCanMatch(filter),try searchExpressionCanMatch(queryPlan) else {try Task.checkCancellation();execution?(SearchExecution(strategy:"exact",warnings:[]));return []}
         var strategy = "exact", diagnostics = [String]()
         let limit = min(500, max(1, filter.limit)); let (whereSQL, values) = conditions(filter,expression:queryPlan,rowLocalExpressions:true)
         let query = queryPlan.keywordFTS
