@@ -1,0 +1,125 @@
+{
+  "format": "Recorded meeting unknown-time correction v1",
+  "sourceCommit": "6aab9590d38824e3897b1dc85194d80547d9cc2c",
+  "inputSHA256": "080edcf3f97bf63d76caa36cbfb49cd723b9855c0e400a0afe034fa60e55419d",
+  "logSHA256": "0ebb57c9bba83be3e3718e32bf98b85ae18ce8468c5a3a055afb6fb3a408deea",
+  "defined": 13,
+  "passed": 12,
+  "skipped": 1,
+  "failed": 0,
+  "command": [
+    "swift",
+    "test",
+    "--filter",
+    "RecordedMeetingTests|RecordedMeetingsModelTests.testOlderViewDepartureCannotClearANewerAppearance|RecordedMeetingsModelTests.testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances"
+  ],
+  "environment": {
+    "OSWIND_RECORDED_MEETING_UI_QA_DIR": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/meeting-sessions-v1/ui-development-v5"
+  },
+  "UIReview": {
+    "inputSHA256": "080edcf3f97bf63d76caa36cbfb49cd723b9855c0e400a0afe034fa60e55419d",
+    "logSHA256": "0ebb57c9bba83be3e3718e32bf98b85ae18ce8468c5a3a055afb6fb3a408deea",
+    "allEightVisuallyReviewed": true,
+    "images": {
+      "setup-failure-dark.png": {
+        "sha256": "0d9f219a366f19fe5854b700cfb3695aa592d8c0132bf2e9de7cb5e3e8bf6d6f",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "recordings-light.png": {
+        "sha256": "4ccef317cea027f01fc6a2528e0bdec3edf8eaf9fa3120457be562fc6be4dfac",
+        "pixels": [
+          1100,
+          720
+        ],
+        "authoredPoints": [
+          1100,
+          720
+        ]
+      },
+      "compact-dark.png": {
+        "sha256": "e7189a0f07c995e24965fc635897cc012c37a76757e62d0b0c86faebdf3aa9d1",
+        "pixels": [
+          770,
+          570
+        ],
+        "authoredPoints": [
+          770,
+          570
+        ]
+      },
+      "empty-light.png": {
+        "sha256": "5aa3cebbb720279baf8ffe3ec10d3d8c3ed1ea433fa773606687bc9d027db399",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "recordings-dark.png": {
+        "sha256": "c7ca1beea76684f8314e0983fe907f489f202b34321af84c98b6269fe75aa8e0",
+        "pixels": [
+          1100,
+          720
+        ],
+        "authoredPoints": [
+          1100,
+          720
+        ]
+      },
+      "empty-dark.png": {
+        "sha256": "bce80f8be6de49f5b87332b0021b46127ffe2449c45460bc59bc5ebf1e33665a",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "setup-failure-light.png": {
+        "sha256": "ec4528bb024611855e2b37716ac72df75841b43f97a500ffde9b1ad509662e9e",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "compact-light.png": {
+        "sha256": "c1e4f8a8dfc155d30234bc5e28d74b28864743dc62bd6b091ea79b724fcc83bf",
+        "pixels": [
+          770,
+          570
+        ],
+        "authoredPoints": [
+          770,
+          570
+        ]
+      }
+    },
+    "finding": "Populated normal/compact scenes correctly show3sessions5clips including the legacy voice note. Both the known import fixture and untimed legacy fixture say saved dates, without claiming import provenance or an original meeting interval. Empty scenes remain0/0, setup refusal remains visible. No observed clipped controls; compact dates wrap readably.",
+    "scope": "Offscreen authored components only; no physical audio/interaction/full qualification."
+  },
+  "rawEvidence": {
+    "file": "recorded-meetings-untimed-raw-v1.zip",
+    "sha256": "3b866f278720e519b616278225c02a3aa914644ad5cf2be21a22b0edbba50386",
+    "bytes": 596046,
+    "allArchivedBytesCompared": true
+  },
+  "scope": "Ten Core tests, appearance-lease regression and eight-scene UI case pass. The existing NativeRecordedMeetingTests class also matches the regex filter and declares its explicit native-flag skip; no native fixture repeated for this label change. Untimed sources do not imply import provenance or original meeting intervals. Namescomputedmetadata semantics/UI/tests changed; cache schema/crypto/ASR untouched. Prior native17result remains separate.",
+  "retainedPublisherAttempt": "Initial inline publication asserted12defined without accounting for the native suffix match and stopped before asset/archive writes. Corrected parser/receipt counts only; successful tests and original logs were not repeated or edited.",
+  "qualificationComplete": false
+}

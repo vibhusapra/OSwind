@@ -4,7 +4,7 @@ Meetings now opens on **Recordings**, alongside the existing **Upcoming** calend
 
 Sessions use the recording IDs already assigned to live microphone/system chunks and imported files. Similar titles, nearby timestamps or matching speaker labels do not merge unrelated conversations. A clip without a recording ID is its own session. Counts explicitly describe loaded clips; **Load older recordings** pages further back without hydrating transcript bodies.
 
-Live coverage is the union of observed source intervals. Overlapping channels are counted once and gaps remain gaps. Imported file duration is shown separately; an import date is not presented as the original meeting time. Speaker names remain local source annotations.
+Live coverage is the union of observed source intervals. Overlapping channels are counted once and gaps remain gaps. Clips without a recorded interval—including imports and older recordings with unknown timing—show their retained clip duration and a saved date. That date is not presented as the original meeting time or proof of import provenance. Speaker names remain local source annotations.
 
 The new SQLite index is derived metadata, rebuilt from canonical audio sources. SQL triggers cover ordinary source updates/deletes, older writers and restore/incoming adapters. It stores recording identifiers, dates and source metadata, with no copied transcript or audio. Initial installation/repair still scans audio payloads to build this index; its large-archive cost has not yet been benchmarked. The steady-state page test denies canonical payload reads while listing recordings.
 
@@ -36,10 +36,14 @@ These are generated fixtures and offscreen components on one Mac. F042 and the f
 
 ## Reviewed components
 
-![Recording sessions](../assets/recorded-meetings-recordings-light.png)
+![Recording sessions](../assets/recorded-meetings-v5-recordings-light.png)
 
-[Dark](../assets/recorded-meetings-recordings-dark.png) · [Compact light](../assets/recorded-meetings-compact-light.png) · [Compact dark](../assets/recorded-meetings-compact-dark.png).
+[Dark](../assets/recorded-meetings-v5-recordings-dark.png) · [Compact light](../assets/recorded-meetings-v5-compact-light.png) · [Compact dark](../assets/recorded-meetings-v5-compact-dark.png).
 
-![Visible local-model setup refusal](../assets/recorded-meetings-setup-failure-light.png)
+![Visible local-model setup refusal](../assets/recorded-meetings-v5-setup-failure-light.png)
 
-[Dark refusal](../assets/recorded-meetings-setup-failure-dark.png) · [Empty light](../assets/recorded-meetings-empty-light.png) · [Empty dark](../assets/recorded-meetings-empty-dark.png).
+[Dark refusal](../assets/recorded-meetings-v5-setup-failure-dark.png) · [Empty light](../assets/recorded-meetings-v5-empty-light.png) · [Empty dark](../assets/recorded-meetings-v5-empty-dark.png).
+
+## Untimed legacy-date correction
+
+A follow-up normal Debug selection has **12passed /1explicit native skip /0failures**:10Core, appearance regression and an eight-scene UI case pass. The regex also selects the native-page class, whose required flag is deliberately absent. A legacy microphone clip without an end timestamp remains distinct from an established recording interval; its retained date does not imply an import. All eight current three-session/five-clip or empty/refusal scenes were inspected. The previous successful native17run and versioned images remain unchanged; no current whole native/sanitizer qualification is implied. [Correction receipt](../benchmarks/recorded-meetings-untimed-v1.json) · [Raw input/source/log/current renders](../benchmarks/recorded-meetings-untimed-raw-v1.zip).
