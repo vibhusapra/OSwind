@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Interrupted private inbox creation is retryable
+
+Source `49f259d` stages a complete authenticated private inbox and publishes it atomically without replacing destinations. Cancellation, preparation failure, destination races and changed physical parents preserve unrelated data; an actual owned SIGKILL leaves no partial final inbox and the original namespace retries after abandoned-stage cleanup. Native create/attach now retain safe internal result diagnostics while preserving fixed helpers, stdin-only credentials, finish-on-cancellation ownership and no mutation retries. The controlled native negative case does not explain PR151's earlier hosted creation failure.
+
+Qualification binds **700 inputs**: full Debug **2,581 passed / 162 conditional skips**; affected sanitizer and optimized **281 passed / 70 skips each**; owned native sanitizer and optimized **74 passed / one child-only skip each**. Zero failures/race diagnostics. All 12 new identities, seven existing cancellation/held-reader regressions, original Keychain pairing and app storage sessions are accounted for. Five altered-log controls reject. Production build and fresh strict ad-hoc package pass; prior resources/bundle information and 478 preceding publications remain unchanged. CI selects the owned crash gate and retains native create diagnostics. [Receipt](../benchmarks/storage-setup-recovery-v1.json) · [Inputs](../benchmarks/storage-setup-recovery-inputs-v1.json) · [Raw evidence](../benchmarks/storage-setup-recovery-raw-v1.zip) · [Scope](STORAGE-SETUP-RECOVERY.md).
+
+Parent PR152's [hosted workflow](https://github.com/vibhusapra/OSwind/actions/runs/41618618388) subsequently completed successfully, including all84 native steps; PR151's original failure remains retained with its cause unknown. **Full sync, physical-device, uninterrupted capture, energy, distribution and ranking acceptance remain open; all83 feature statuses are unchanged.**
+
 ## Exact initial joining response survives setup closure
 
 Source `1ce80bc` saves the encrypted initial joining response and commits its bounded pointer with membership in the original private account. Setup can explicitly recover and copy the same bytes with their original expiry; public approval checks the live clock inside ownership and again at the private write. Legacy already-admitted reissue is reviewed separately. Corrupt/missing plans do not regenerate responses.
