@@ -1,0 +1,165 @@
+{
+  "format": "OSwind new authored model extension plan v1",
+  "state": "frozen-before-extension-or-candidate-inference",
+  "scope": "12 new transparent authored English questions over8 new fictional records, authored after baseline counterexamples but before any candidate-model inference or prompt change. Not held-out natural-user generalization, independent human labels or product ranking.",
+  "profiles": [
+    "apple",
+    "ollama:qwen3:4b-instruct-2507-q4_K_M",
+    "ollama:qwen3.5:4b",
+    "ollama:gemma4:e4b"
+  ],
+  "attempts": "One attempt per question/profile,48 total extension requests. Two new models separately receive24 prior diagnostic questions each in a different copy of the unchanged old16-note corpus;48additional requests. No old48 baseline request is repeated. Retain all output/failure/provider-unavailable rows.",
+  "runtime": "Unchanged qualified release CLI,700 input hashes. Existing product provider/generation settings and per-model no_think modifier retained; no tuning/preset change.",
+  "scoring": "Process/source coverage and citation-number validity are mechanical counts only. Retain every answer and inspect source-based counterexamples, no aggregate semantic accuracy without independent labels. No separate judge-model API.",
+  "documents": [
+    {
+      "key": "orion-old",
+      "text": "Orion release handoff, 2026-08-02: Arun is release owner. This assignment is superseded by the August 9 handoff.",
+      "sha256": "31efc7d6e6f0bdec42581e7b731fd7794282117f2fa739d4f1c1816b699d207d"
+    },
+    {
+      "key": "orion-current",
+      "text": "Orion release handoff, 2026-08-09: Nora replaces Arun as release owner. Eli is the designated backup. This is the latest recorded release assignment.",
+      "sha256": "99c117617d90213bf49d819ac0f815567e5fdc74e4eac9e9249ebaec5a7ed853"
+    },
+    {
+      "key": "orion-date",
+      "text": "Orion launch decision: August 3, 2026 was proposed and rejected. August 8, 2026 is the approved target. No launch completion is recorded.",
+      "sha256": "ff9175e2c1b18295c923c6cb956b0117b0595530912b07d07e7c90bb353173b7"
+    },
+    {
+      "key": "orion-media",
+      "text": "Orion retention configuration: screenshots are retained for 7 days. Raw audio is not retained. These are configured retention rules, not proof of uninterrupted collection.",
+      "sha256": "489268a435c3bf17f925742caa14d3ef27db2b2b02b543d662d4d41644b6600f"
+    },
+    {
+      "key": "lumen-owner",
+      "text": "Lumen work assignment: Sana owns migration and Eli owns documentation. Lumen and Orion are separate projects.",
+      "sha256": "7739ca0de55adbb35b94da375b8bb818c37faf4ca9acce4adacffe4a3106190c"
+    },
+    {
+      "key": "lumen-progress",
+      "text": "Lumen migration status: validation passed. Copying has completed 4 of 9 batches; 5 batches remain pending. Migration has not finished. Passing validation did not finish the copy.",
+      "sha256": "50a420b0bd8c3cd9e713895fd5462a0b53318ff33eb017e95d35f70afdd70295"
+    },
+    {
+      "key": "lumen-review",
+      "text": "Lumen key-rotation review: Cato declined authorization because the audit is pending. Key rotation has not started. No external action completion is recorded.",
+      "sha256": "f4576c6f7af30eadfd8f50d9fe0cb99b1061fa059e81744498c2fc19c01a5ef7"
+    },
+    {
+      "key": "lumen-budget",
+      "text": "Lumen budget: 750 credits approved, 125 credits spent, 625 credits remain available.",
+      "sha256": "9e686a8717f515246c213a69d2045316de5e6754e5fb40a440ba52d4ecbe2b28"
+    }
+  ],
+  "questions": [
+    {
+      "id": "current-owner-backup",
+      "axis": "temporal-multi",
+      "question": "Who is the current Orion release owner and the designated backup?",
+      "supportingDocumentKeys": [
+        "orion-current"
+      ],
+      "expectedReading": "Nora is owner; Eli backup. Arun is superseded."
+    },
+    {
+      "id": "two-project-owners",
+      "axis": "entity-boundary",
+      "question": "Who owns the Orion release and who owns Lumen migration?",
+      "supportingDocumentKeys": [
+        "orion-current",
+        "lumen-owner"
+      ],
+      "expectedReading": "Nora for Orion; Sana for Lumen, each with correct source."
+    },
+    {
+      "id": "rejected-and-target",
+      "axis": "numeric-temporal",
+      "question": "Which Orion launch date was rejected and what is the approved target?",
+      "supportingDocumentKeys": [
+        "orion-date"
+      ],
+      "expectedReading": "August3 2026 rejected; August8 2026 approved target."
+    },
+    {
+      "id": "completion-date",
+      "axis": "false-premise",
+      "question": "When was the Orion launch completed?",
+      "supportingDocumentKeys": [
+        "orion-date"
+      ],
+      "expectedReading": "No completion is recorded; targetAugust8 is not completion proof."
+    },
+    {
+      "id": "media-negative",
+      "axis": "negation",
+      "question": "Does Orion retain raw audio along with screenshots?",
+      "supportingDocumentKeys": [
+        "orion-media"
+      ],
+      "expectedReading": "Screenshots retained7days; raw audio not retained."
+    },
+    {
+      "id": "remaining-batches",
+      "axis": "lookup",
+      "question": "How many Lumen copy batches remain pending?",
+      "supportingDocumentKeys": [
+        "lumen-progress"
+      ],
+      "expectedReading": "5 remain;4of9completed."
+    },
+    {
+      "id": "validation-not-completion",
+      "axis": "false-premise",
+      "question": "Did passing validation finish the Lumen migration?",
+      "supportingDocumentKeys": [
+        "lumen-progress"
+      ],
+      "expectedReading": "No; copying4of9,5pending, notfinished."
+    },
+    {
+      "id": "docs-and-budget",
+      "axis": "multi-fact",
+      "question": "Who owns Lumen documentation and how many Lumen budget credits remain?",
+      "supportingDocumentKeys": [
+        "lumen-owner",
+        "lumen-budget"
+      ],
+      "expectedReading": "Eli documentation;625creditsavailable."
+    },
+    {
+      "id": "declined-authorization",
+      "axis": "false-premise",
+      "question": "Why did Cato authorize Lumen key rotation?",
+      "supportingDocumentKeys": [
+        "lumen-review"
+      ],
+      "expectedReading": "Cato declined, audit pending; rotationnotstarted."
+    },
+    {
+      "id": "absent-revenue",
+      "axis": "absent",
+      "question": "What is Orion customer revenue?",
+      "supportingDocumentKeys": [],
+      "expectedReading": "No customer revenue is recorded; do not infer from Lumen budget."
+    },
+    {
+      "id": "absent-address",
+      "axis": "absent",
+      "question": "What is the Orion postal address?",
+      "supportingDocumentKeys": [],
+      "expectedReading": "No postal address is recorded."
+    },
+    {
+      "id": "media-and-progress",
+      "axis": "multi-fact",
+      "question": "Compare Orion retained media with the recorded Lumen migration status.",
+      "supportingDocumentKeys": [
+        "orion-media",
+        "lumen-progress"
+      ],
+      "expectedReading": "Orion screenshots7days, no raw audio; Lumen4of9copied5pendingnotfinished."
+    }
+  ]
+}
