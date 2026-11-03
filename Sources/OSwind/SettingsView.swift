@@ -123,10 +123,12 @@ struct SettingsView: View {
                         Text(keyStatus).font(.caption)
                         Text("BYOK API billing is separate from a chat subscription. Only retrieved text is sent; screenshots and raw audio are not included. No automatic cloud fallback.").font(.caption).foregroundStyle(.secondary)
                     }
-                    Button("Discover local models") { m.inspectLocalModels() }
-                    if m.settings.ai.provider == .ollama, !m.installedModels.isEmpty {
+                    if m.settings.ai.provider == .ollama {
+                        Button("Discover answer models") { m.localModels.inspect(.answer) }.disabled(!m.localModels.canWork)
+                    }
+                    if m.settings.ai.provider == .ollama, !m.localModels.models(for:.answer).isEmpty {
                         Picker("Installed chat model",selection:$m.settings.ai.model) {
-                            ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("completion") ?? true) }) { model in Text(model.name).tag(model.name) }
+                            ForEach(m.localModels.models(for:.answer).filter { !$0.isRemote && ($0.capabilities?.contains("completion") ?? true) }) { model in Text(model.name).tag(model.name) }
                         }
                     }
                 }
@@ -147,9 +149,10 @@ struct SettingsView: View {
                 if m.settings.search.provider == .ollama {
                     TextField("Local model server",text:$m.settings.search.endpoint)
                     TextField("Embedding model ID",text:$m.settings.search.model)
-                    if !m.installedModels.isEmpty {
+                    Button("Discover search models") { m.localModels.inspect(.search) }.disabled(!m.localModels.canWork)
+                    if !m.localModels.models(for:.search).isEmpty {
                         Picker("Installed embedding model",selection:$m.settings.search.model) {
-                            ForEach(m.installedModels.filter { !$0.isRemote && ($0.capabilities?.contains("embedding") ?? $0.name.contains("embed")) }) { model in Text(model.name).tag(model.name) }
+                            ForEach(m.localModels.models(for:.search).filter { !$0.isRemote && ($0.capabilities?.contains("embedding") ?? $0.name.contains("embed")) }) { model in Text(model.name).tag(model.name) }
                         }
                     }
                 }
@@ -162,17 +165,25 @@ struct SettingsView: View {
             VisualModelSettingsView()
             PIIModelSettingsView(setup:m.piiModelSetup,configuration:$m.settings.piiImports)
             Section("Local model library") {
-                HStack { Button(m.startingModelServer ? "Starting…" : "Start local server") { m.startModelServer() }.disabled(m.startingModelServer); Button("Check local server") { m.inspectLocalModels() }; Text(m.modelStatus).font(.caption).foregroundStyle(.secondary) }
-                ForEach(m.installedModels) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
-                if !m.localRuntime.isEmpty { Text(m.localRuntime).font(.caption).textSelection(.enabled) }
-                HStack { TextField("Model to download",text:$downloadName); Button("Download") { m.downloadModel(downloadName) }.disabled(m.pullingModel != nil || downloadName.isEmpty) }
-                HStack { Button("Embedding · 0.6B") { downloadName = "qwen3-embedding:0.6b" }; Button("Chat · Qwen3.5 4B") { downloadName = AIConfiguration.defaultLocalModel }; Button("Chat · Gemma4 E4B") { downloadName = AIConfiguration.largerLocalModel } }.font(.caption)
-                Text("Presets fill the download field. After Download, choose the installed model in Answer engine. Qwen3.5 4B is smaller; Gemma4 E4B needs more storage and memory. First answers may require model startup.").font(.caption).foregroundStyle(.secondary)
-                if let model = m.pullingModel {
-                    Text("Downloading \(model)").font(.caption)
-                    if let fraction = m.pullProgress?.fraction { ProgressView(value:fraction) } else { ProgressView().controlSize(.small) }
-                    HStack { Text(m.pullProgress?.status ?? "Connecting…").font(.caption); Spacer(); Button("Cancel download") { m.cancelModelDownload() } }
+                Picker("Destination",selection:Binding(get:{m.localModels.role},set:{m.localModels.select($0)})) {
+                    ForEach(m.localModels.availableRoles) { role in Text(role.label).tag(role) }
                 }
+                Text(m.localModels.endpoint).font(.caption).textSelection(.enabled)
+                HStack { Button(m.localModels.startingEndpoint == nil ? "Start local server" : "Starting…") { m.localModels.startServer() }.disabled(!m.localModels.canWork || m.localModels.startingEndpoint != nil); Button("Check selected server") { m.localModels.inspect() }.disabled(!m.localModels.canWork); Text(m.localModels.listing.status).font(.caption).foregroundStyle(.secondary) }
+                if let endpoint = m.localModels.startingEndpoint { Text("Starting \(endpoint)").font(.caption).foregroundStyle(.secondary) }
+                if let outcome = m.localModels.startOutcome { Text(outcome).font(.caption).foregroundStyle(.secondary) }
+                ForEach(m.localModels.listing.models) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
+                if !m.localModels.listing.runtime.isEmpty { Text(m.localModels.listing.runtime).font(.caption).textSelection(.enabled) }
+                if let warning = m.localModels.listing.runtimeWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
+                HStack { TextField("Model to download",text:$downloadName); Button("Download to selected server") { m.localModels.pull(downloadName) }.disabled(!m.localModels.canWork || m.localModels.download != nil || downloadName.isEmpty) }
+                HStack { Button("Embedding · 0.6B") { m.localModels.select(.search); downloadName = "qwen3-embedding:0.6b" }; Button("Chat · Qwen3.5 4B") { m.localModels.select(.answer); downloadName = AIConfiguration.defaultLocalModel }; Button("Chat · Gemma4 E4B") { m.localModels.select(.answer); downloadName = AIConfiguration.largerLocalModel } }.font(.caption)
+                Text("Check the destination before Download. Presets fill the field; chat presets select the answer server when Ollama answers are enabled. Choose the downloaded model in Answer engine or Search model. Qwen3.5 4B is smaller; Gemma4 E4B needs more storage and memory. First answers may require model startup.").font(.caption).foregroundStyle(.secondary)
+                if let download = m.localModels.download {
+                    Text("\(download.cancelling ? "Cancelling" : "Downloading") \(download.model) · \(download.endpoint)").font(.caption)
+                    if let fraction = download.progress?.fraction { ProgressView(value:fraction) } else { ProgressView().controlSize(.small) }
+                    HStack { Text(download.progress?.status ?? "Connecting…").font(.caption); Spacer(); Button("Cancel download") { m.localModels.cancelDownload() }.disabled(download.cancelling) }
+                }
+                if let outcome = m.localModels.downloadOutcome { Text(outcome).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
                 Text("Install and start Ollama with scripts/setup-models.sh if the local server is unavailable. Downloads use Ollama’s model registry; captured content is never included in a model download. Local modes reject known cloud-backed aliases. Whisper setup remains in the script.").font(.caption).foregroundStyle(.secondary)
             }
         }
