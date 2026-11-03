@@ -18,9 +18,7 @@ final class ReplayScreenSource:NSObject,SCStreamOutput,SCStreamDelegate,@uncheck
         let pair=AsyncThrowingStream<ReplayScreenFrame,Error>.makeStream(bufferingPolicy:.bufferingNewest(1))
         frames=pair.stream;continuation=pair.continuation
         super.init()
-        let rect=filter.contentRect,scale=min(2,Double(maximumDimension)/max(1,max(rect.width,rect.height)))
-        let config=SCStreamConfiguration()
-        config.width=max(2,Int(rect.width*scale)/2*2);config.height=max(2,Int(rect.height*scale)/2*2)
+        let config=try NativeCaptureConfiguration.window(size:filter.contentRect.size,nativePixelScale:Double(filter.pointPixelScale),maximumDimension:maximumDimension,evenDimensions:true)
         config.minimumFrameInterval=CMTime(seconds:interval,preferredTimescale:600)
         config.queueDepth=4;config.showsCursor=false;config.pixelFormat=kCVPixelFormatType_32BGRA
         config.captureResolution = .best

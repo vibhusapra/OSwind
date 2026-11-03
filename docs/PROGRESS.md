@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Native source scale and filled window raster
+
+Source `533b301` replaces the assumed 2×scale with actual ScreenCaptureKit pointPixelScale and explicitly fills independent-window snapshot/replay surfaces before bitmap cropping. Native pixels/profile caps, even replay output and unchanged display-crop point coordinates are covered. **Full Debug 2,550 passed / 156 conditional skips; affected TSan and optimized 181 passed / 6 skipped each; zero failures/race diagnostics.** Six new methods and six altered-log controls pass; 694 committed inputs and 472 preceding publications are verified.
+
+A normal production release build and fresh strict ad-hoc package pass. The intervening release --build-tests command failed due to module testability; the failed log and initial signed-binary comparison assertion are retained. Successful tests are not repeated. Actual green/magenta full/left/right capture remains pending the existing unlocked Mac session; locked refusals do not establish pixel correctness. The original 24-hour worker continues separately with lock deferrals and unchanged old runtime. [Receipt](../benchmarks/native-raster-fit-v1.json) · [Inputs](../benchmarks/native-raster-fit-inputs-v1.json) · [Raw evidence](../benchmarks/native-raster-fit-raw-v1.zip) · [Scope](NATIVE-RASTER-FIT-WIP.md). **All 83 feature statuses remain unchanged; full v0/energy/sync/distribution/ranking acceptance is open.**
+
 ## Persistent native capture pilot and separate long run
 
 A new opt-in developer harness keeps one actual CaptureController and store alive while explicitly targeting only a changing generated AppKit window. It records every admission/deferral, wall/uptime/tail gap, process RSS/CPU sample and joined shutdown. Two ordinary terminal-encoding/startup-bound controls pass; the native method skips without explicit configuration.

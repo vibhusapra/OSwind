@@ -61,10 +61,12 @@ struct SnapshotRegionGeometry:Equatable {
     var sourceRect:CGRect
     var outputWidth:Int
     var outputHeight:Int
-    init(size:CGSize,region:SnapshotRegion?,maximumDimension:Int) throws {
-        guard maximumDimension>0,maximumDimension<=8192 else {throw OSwindError.invalid("Invalid snapshot output size")}
-        let rect=try (region ?? SnapshotRegion()).rect(in:size),scale=min(2,Double(maximumDimension)/max(rect.width,rect.height))
-        sourceRect=rect;outputWidth=max(1,Int(floor(rect.width*scale)));outputHeight=max(1,Int(floor(rect.height*scale)))
+    init(size:CGSize,region:SnapshotRegion?,maximumDimension:Int,nativePixelScale:Double) throws {
+        guard maximumDimension>0,maximumDimension<=8192,nativePixelScale.isFinite,nativePixelScale>0 else {throw OSwindError.invalid("Invalid snapshot output size or native pixel scale")}
+        let rect=try (region ?? SnapshotRegion()).rect(in:size),scale=min(nativePixelScale,Double(maximumDimension)/max(rect.width,rect.height))
+        let width=floor(rect.width*scale),height=floor(rect.height*scale)
+        guard width>=1,height>=1 else {throw OSwindError.invalid("The selected source contains no complete native output pixel")}
+        sourceRect=rect;outputWidth=Int(width);outputHeight=Int(height)
     }
 }
 
