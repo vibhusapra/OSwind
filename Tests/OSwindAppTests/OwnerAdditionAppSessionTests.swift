@@ -539,13 +539,30 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         XCTAssertFalse(model.pairingBusy);XCTAssertNil(model.pairingError)
     }
     func testActualOwnerAppExportsExactPublicPageWithoutChangingPrivateAccounts()async throws {
-        let f=try await fixture(),owner=try await ownerApp(f),model=try XCTUnwrap(owner.model).personalSync,request=try XCTUnwrap(f.old.personalSync.membershipRequest),before=storage.values
+        let f=try await fixture(),owner=try await ownerApp(f),ownerModel=try XCTUnwrap(owner.model),model=ownerModel.personalSync,request=try XCTUnwrap(f.old.personalSync.membershipRequest)
+        // This checks WHOLE-fixture byte invariance. Join the other peer's real
+        // ordinary delivery work before the baseline, rather than racing its
+        // legitimate checkpoint saves against a read-only owner operation.
+        let beforeDrain=storage.values;await f.old.personalSync.cancelAndWait()
+        let before=storage.values
+        print("OWNED_OWNER_PAGE_DRAIN otherPeerCheckpointChanged=\(beforeDrain[f.deliveryID] != before[f.deliveryID])")
+        let ownerIDs=try ownerModel.store.withRoutineDatabase {db->(pairing:String,delivery:String) in
+            let row=try db.statement("SELECT id,(SELECT value FROM store_metadata WHERE key='sync-pairing-handle-v1') FROM personal_sync_delivery_anchor");defer {sqlite3_finalize(row)}
+            guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Owned export account roles missing")}
+            let object=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(db.text(row,1).utf8)) as? [String:Any]);return(try XCTUnwrap(object["id"] as? String),db.text(row,0))
+        }
+        func unchanged(_ stage:String) {
+            let after=storage.values,changed=Set(before.keys).union(after.keys).filter {before[$0] != after[$0]}
+            let known=Set([ownerIDs.pairing,ownerIDs.delivery,f.pairingID,f.deliveryID])
+            print("OWNED_OWNER_PAGE_ROLE_DELTA stage=\(stage) ownerPairingChanged=\(changed.contains(ownerIDs.pairing)) ownerDeliveryChanged=\(changed.contains(ownerIDs.delivery)) peerPairingChanged=\(changed.contains(f.pairingID)) peerDeliveryChanged=\(changed.contains(f.deliveryID)) otherChangedCount=\(changed.filter {!known.contains($0)}.count)")
+            XCTAssertTrue(after==before,"Quiescent public export changed private accounts")
+        }
         model.performPairing(.membershipPage(request));try await pairingDone(model)
         XCTAssertEqual(model.membershipPage,f.page);XCTAssertFalse(model.membershipPageCurrent);XCTAssertEqual(model.pairingStatus?.memberNames.count,3)
-        XCTAssertNil(model.pairingResponse);XCTAssertFalse(model.configured);XCTAssertTrue(storage.values==before,"Public export changed private accounts")
+        XCTAssertNil(model.pairingResponse);XCTAssertFalse(model.configured);unchanged("page")
         model.performPairing(.membershipRequest);try await pairingDone(model)
         let current=try XCTUnwrap(model.membershipRequest);model.performPairing(.membershipPage(current));try await pairingDone(model)
-        XCTAssertNil(model.membershipPage);XCTAssertTrue(model.membershipPageCurrent);XCTAssertTrue(storage.values==before)
+        XCTAssertNil(model.membershipPage);XCTAssertTrue(model.membershipPageCurrent);unchanged("current")
         model.clearPairingMessages();XCTAssertFalse(model.membershipPageCurrent);XCTAssertNil(model.membershipPage)
     }
     func testCancelledOwnerExportJoinsActualWorkerBeforeLibraryClose()async throws {

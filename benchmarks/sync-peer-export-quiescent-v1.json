@@ -1,0 +1,35 @@
+{
+  "format": "OSwind quiescent owner export fixture correction v1",
+  "sourceCommit": "8b8b3cb6b6836091b7905a23bdc0f2c3dd79ce97",
+  "qualifiedRuntimeSource": "f5e1bd34ddb4d1a860c6f390bb842cb992faf2e0",
+  "onlyChangedDeclaredInput": "Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift",
+  "defined": 1,
+  "passed": 1,
+  "skipped": 0,
+  "failedMethods": 0,
+  "logSHA256": "351c32c8b2f224764c23743eea00aaaaf7f0bdfb37ff6de0005040fa52a6586f",
+  "inputSHA256": "c8657523b94c8d6432832aad79f917269b637be02fa64d28d4e363e5b0386312",
+  "sourceTestSHA256": "b0b5f7ba2e06ce56417aa32407270f460eed1020be9a6584ab1ea6513b39a353",
+  "command": [
+    "swift",
+    "test",
+    "--sanitize=thread",
+    "--filter",
+    "PeerMembershipAppSessionTests.testActualOwnerAppExportsExactPublicPageWithoutChangingPrivateAccounts"
+  ],
+  "environment": {
+    "OSWIND_TEST_NATIVE_VAULT": "1",
+    "OSWIND_TEST_NATIVE_SYNC_KEYCHAIN": "1"
+  },
+  "testContract": "Join the exact other peer before baseline; retain unchanged assertions over ALL fixture private credential bytes and public-page/current-page semantics. Additional diagnostics classify owner/peer pairing/delivery changes as booleans, never private values. No production or deadline change.",
+  "observedOtherPeerCheckpointChangedDuringThisDrain": false,
+  "allRoleDeltaBooleansFalse": true,
+  "originalFailureCauseProved": false,
+  "limitations": "Retained broadTSAN f5e95selection is still failed. This new isolated fixture result and the separate optimized95pass do not establish a new current whole95selection or explain the original unrecorded per-role difference.",
+  "rawEvidence": {
+    "file": "sync-peer-export-quiescent-raw-v1.zip",
+    "sha256": "69b94942d6372b885dc82dc4a84281735fba00ade6a52429cd041eeddfe11fbf",
+    "bytes": 86388,
+    "allArchivedBytesCompared": true
+  }
+}
