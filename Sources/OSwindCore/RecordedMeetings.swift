@@ -6,7 +6,7 @@ public struct RecordedMeetingSource:Identifiable,Equatable,Sendable {
     public let memoryID:String,sessionKey:String,title:String,app:String,revision:String
     public var id:String {Self.key(grouped:false,id:memoryID)}
     public let timestamp:Date,observedEnd:Date?,duration:Double
-    public var recordedLive:Bool {observedEnd != nil}
+    public var hasObservedInterval:Bool {observedEnd != nil}
     let owner:UUID,grouped:Bool,recordingID:String
     static func key(grouped:Bool,id:String)->String {
         let prefix=grouped ? "recording\u{0}":"single-source\u{0}"
@@ -26,7 +26,7 @@ public struct RecordedMeeting:Identifiable,Equatable,Sendable {
     public let id:String,title:String,sources:[RecordedMeetingSource]
     public var first:Date {sources.map(\.timestamp).min()!}
     public var latest:Date {sources.map {$0.observedEnd ?? $0.timestamp}.max()!}
-    public var includesImports:Bool {sources.contains {!$0.recordedLive}}
+    public var hasUnobservedTimes:Bool {sources.contains {!$0.hasObservedInterval}}
     /// Union of observed live spans avoids double-counting microphone/system
     /// channels. Gaps remain gaps; import dates do not imply recording times.
     public var observedSeconds:Double {

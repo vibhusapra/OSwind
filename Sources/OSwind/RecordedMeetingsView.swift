@@ -54,7 +54,7 @@ struct RecordedMeetingsView:View {
                                     VStack(alignment:.leading,spacing:6) {
                                         Text(session.title).font(.headline).lineLimit(2)
                                         Text(session.first,format:.dateTime.month(.abbreviated).day().hour().minute()).font(.caption).foregroundStyle(.secondary)
-                                        Text("\(session.sources.count) clips loaded"+(session.includesImports ? " · includes imports":"")).font(.caption2).foregroundStyle(.secondary)
+                                        Text("\(session.sources.count) clips loaded"+(session.hasUnobservedTimes ? " · saved dates":"")).font(.caption2).foregroundStyle(.secondary)
                                     }.frame(maxWidth:.infinity,alignment:.leading).padding(12)
                                         .background(model.selectedID==session.id ? OSwindTheme.accent.opacity(0.12):Color.clear,in:RoundedRectangle(cornerRadius:10))
                                 }.buttonStyle(.plain).accessibilityLabel(session.title+", "+String(session.sources.count)+" clips loaded")
@@ -73,7 +73,7 @@ struct RecordedMeetingsView:View {
         VStack(alignment:.leading,spacing:12) {
             Text(session.title).font(.title2.weight(.semibold)).textSelection(.enabled)
             if session.observedSeconds>0 {Text("\(duration(session.observedSeconds)) observed across the loaded live clips").font(.callout).foregroundStyle(.secondary)}
-            if session.includesImports {Text("Imported clips retain their file duration; their import date does not establish when a meeting happened.").font(.caption).foregroundStyle(.secondary)}
+            if session.hasUnobservedTimes {Text("Some clips have no recorded interval. Their saved or import date does not establish when a meeting happened.").font(.caption).foregroundStyle(.secondary)}
             Divider()
             ScrollView {
                 LazyVStack(alignment:.leading,spacing:10) {
@@ -81,7 +81,7 @@ struct RecordedMeetingsView:View {
                         HStack(alignment:.top) {
                             VStack(alignment:.leading,spacing:5) {
                                 Text(source.title.isEmpty ? "Audio recording":source.title).font(.headline).lineLimit(2)
-                                Text(source.app+(source.recordedLive ? " · recorded ":" · imported ")+source.timestamp.formatted(date:.abbreviated,time:.shortened)).font(.caption).foregroundStyle(.secondary)
+                                Text(source.app+(source.hasObservedInterval ? " · recorded ":" · saved ")+source.timestamp.formatted(date:.abbreviated,time:.shortened)).font(.caption).foregroundStyle(.secondary)
                                 Text(source.duration>0 ? duration(source.duration)+" source clip":"Duration unavailable").font(.caption2).foregroundStyle(.secondary)
                             }.frame(maxWidth:.infinity,alignment:.leading)
                             Button("Open transcript") {model.open(source)}.disabled(model.busy || m.openingMemoryID != nil)

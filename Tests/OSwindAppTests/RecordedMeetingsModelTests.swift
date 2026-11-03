@@ -71,12 +71,13 @@ import SwiftUI
         let output=URL(fileURLWithPath:path);try Paths.ensure(output)
         let app=try AppModel(root:root,startServices:false);appModels.append(app);app.showOnboarding=false
         try audio("mic-a",in:app.store);try audio("system-a",in:app.store);try audio("mic-b",at:1_793_738_045,in:app.store);try audio("file-a",session:"import",live:false,title:"Research interview",in:app.store)
-        let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,2)
+        try audio("legacy",session:"legacy-untimed",at:1_793_730_000,live:false,title:"Legacy voice note",in:app.store)
+        let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,3)
         for dark in [false,true] {
-            try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:1100,height:720),dark:dark,model:value,expected:2,to:output.appendingPathComponent("recordings-\(dark ? "dark":"light").png"))
-            try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:770,height:570),dark:dark,model:value,expected:2,to:output.appendingPathComponent("compact-\(dark ? "dark":"light").png"))
+            try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:1100,height:720),dark:dark,model:value,expected:3,to:output.appendingPathComponent("recordings-\(dark ? "dark":"light").png"))
+            try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:770,height:570),dark:dark,model:value,expected:3,to:output.appendingPathComponent("compact-\(dark ? "dark":"light").png"))
         }
-        value.deactivate();for id in ["mic-a","system-a","mic-b","file-a"] {try app.store.delete(id)}
+        value.deactivate();for id in ["mic-a","system-a","mic-b","file-a","legacy"] {try app.store.delete(id)}
         value.activate();try await settle(value);XCTAssertTrue(value.sessions.isEmpty)
         for dark in [false,true] {try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:900,height:650),dark:dark,model:value,expected:0,to:output.appendingPathComponent("empty-\(dark ? "dark":"light").png"))}
         // An owned missing executable fails before microphone/system startup.

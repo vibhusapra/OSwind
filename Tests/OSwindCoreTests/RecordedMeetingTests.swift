@@ -19,14 +19,20 @@ final class RecordedMeetingTests:XCTestCase {
         XCTAssertNil(page.next);XCTAssertEqual(page.examined,5);XCTAssertEqual(groups.count,3)
         let meeting=try XCTUnwrap(groups.first {$0.sources.count==3})
         XCTAssertEqual(meeting.observedSeconds,60,accuracy:0.001);XCTAssertEqual(meeting.latest.timeIntervalSince(meeting.first),75,accuracy:0.001)
-        XCTAssertEqual(meeting.clipSeconds,90);XCTAssertFalse(meeting.includesImports)
+        XCTAssertEqual(meeting.clipSeconds,90);XCTAssertFalse(meeting.hasUnobservedTimes)
         for source in meeting.sources {XCTAssertEqual(try store.recordedMeetingEvidence(source).id,source.memoryID)}
     }
     func testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles()throws {
         try audio("file-a",100,session:"import-a",duration:3600,live:false);try audio("file-b",101,session:"import-b",duration:600,live:false)
         let groups=RecordedMeetingPlanner.group(try store.recordedMeetingPage().sources)
-        XCTAssertEqual(groups.count,2);XCTAssertTrue(groups.allSatisfy {$0.observedSeconds==0 && $0.first==$0.latest && $0.includesImports})
+        XCTAssertEqual(groups.count,2);XCTAssertTrue(groups.allSatisfy {$0.observedSeconds==0 && $0.first==$0.latest && $0.hasUnobservedTimes})
         XCTAssertEqual(groups.reduce(0) {$0+$1.clipSeconds},4200)
+    }
+    func testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown()throws {
+        try audio("legacy",100,session:nil,duration:90,live:false,title:"Old microphone recording")
+        let source=try XCTUnwrap(store.recordedMeetingPage().sources.first),session=try XCTUnwrap(RecordedMeetingPlanner.group([source]).first)
+        XCTAssertFalse(source.hasObservedInterval);XCTAssertTrue(session.hasUnobservedTimes);XCTAssertEqual(session.observedSeconds,0);XCTAssertEqual(session.clipSeconds,90)
+        XCTAssertEqual(session.first,session.latest,"A retained date is not an inferred ninety-second meeting interval")
     }
     func testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource()throws {
         for id in ["a","z","é","e\u{301}"] {try audio(id,100,session:id)}
