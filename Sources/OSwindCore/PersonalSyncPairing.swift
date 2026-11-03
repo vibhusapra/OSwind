@@ -229,6 +229,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
                 let put=try db.statement("INSERT INTO store_metadata(key,value) VALUES(?,?)");defer {sqlite3_finalize(put)}
                 db.bind(put,1,Self.lifetimeKey);db.bind(put,2,UUID().uuidString.lowercased());try db.done(put)
                 sqlite3_reset(put);sqlite3_clear_bindings(put);db.bind(put,1,Self.handleKey);db.bind(put,2,String(decoding:try SyncProtocolLimits.encode(saved),as:UTF8.self));try db.done(put)
+                if let material {try SyncMembershipHistory.retain([material.joined.certificate],anchoredHead:material.joined.certificate,db:db)}
             }
         }
         let value=Envelope(format:"OSwind.sync.pairing-anchor",version:1,id:saved.id,protection:saved.protection,location:try Location.capture(store,stateRoot:stateRoot,machine:machine),pending:material==nil ? try pending.encodedForKeychain():nil,material:try material?.encodedForKeychain(),consumedRequest:material==nil ? nil:try pending.request.digest,retired:false,delivery:nil)
@@ -276,6 +277,7 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let material=try SyncCredentialMaterial.decodeFromKeychain(raw),request=try SyncJoinRequest.decode(review.bytes,now:now),nextOwner=try owner.admitting(request,now:now)
         let joined=try material.joined.withCertificate(nextOwner.certificate),next=try SyncCredentialMaterial(joined:joined,owner:nextOwner)
         let response=try nextOwner.response(to:request,now:now)
+        try retainMembershipHistory([material.joined.certificate,nextOwner.certificate],head:material.joined.certificate)
         try save(value.replacing(material:next.encodedForKeychain(),consumed:value.consumedRequest),expected:bytes)
         return String(decoding:response,as:UTF8.self)
     }}
@@ -284,7 +286,26 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         guard text.utf8.count<=SyncPairingFormat.responseLimit else {throw OSwindError.invalid("Pairing response exceeds its bound")}
         let pending=try SyncPendingJoin.decodeFromKeychain(raw),joined=try pending.accept(Data(text.utf8),expectedRootFingerprint:trustedRootFingerprint,now:now)
         let next=value.replacing(material:try SyncCredentialMaterial(joined:joined).encodedForKeychain(),consumed:try pending.request.digest)
+        try retainMembershipHistory([joined.certificate],head:joined.certificate)
         try save(next,expected:bytes);return try status(next)
+    }}
+    private func retainMembershipHistory(_ certificates:[SyncMembershipCertificate],head:SyncMembershipCertificate)throws {
+        try store.withRoutineDatabase {db in
+            guard sqlite3_get_autocommit(db.handle) != 0 else {throw OSwindError.invalid("Save membership history before its external credential boundary")}
+            try db.execute("PRAGMA synchronous=FULL")
+            try SyncChangeCapture.transaction(db) {try SyncMembershipHistory.retain(certificates,anchoredHead:head,db:db)}
+        }
+    }
+    /// Public certificate only, used to request a root-signed catch-up path.
+    /// No native membership mutation or private credential is returned.
+    func membershipCertificateForRefresh()throws->SyncMembershipCertificate {try withAccess {
+        let value=try current().0
+        guard !value.retired,let material=value.material else {throw OSwindError.invalid("Finish pairing before requesting a membership update")}
+        return try SyncCredentialMaterial.decodeFromKeychain(material).joined.certificate
+    }}
+    func membershipRefresh(after trusted:SyncMembershipCertificate)throws->SyncMembershipRefresh? {try withAccess {
+        let head=try membershipCertificateForRefresh()
+        return try store.withRoutineDatabase {try SyncMembershipHistory.page(after:trusted,anchoredHead:head,db:$0)}
     }}
     /// Internal service preparation. The public paused-session factory below
     /// also installs native admission before transferring pairing ownership.
