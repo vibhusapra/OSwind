@@ -20,7 +20,7 @@ final class SyncObjectFolder:@unchecked Sendable {
     private static let markerName="space-v2"
     private static let markerDescriptor=Data("OSwind.sync.space-marker.v2".utf8)
     private static let markerBody=Data("OSwind encrypted object space v2; creation-era-v1; collection-control-v1; supersession-v1".utf8)
-    private init(root:URL,secret:SyncGroupSecret,group:String,epoch:String,create:Bool,authority:SyncDevicePacketAuthority?)throws {
+    private init(root:URL,secret:SyncGroupSecret,group:String,epoch:String,create:Bool,authority:SyncDevicePacketAuthority?,stagedWorkspace:BackupWorkspace?=nil)throws {
         try Task.checkCancellation()
         guard root.isFileURL,!root.path.utf8.contains(0) else {throw OSwindError.invalid("Sync object space must be a local directory")}
         self.root=root;self.authority=authority
@@ -35,11 +35,19 @@ final class SyncObjectFolder:@unchecked Sendable {
         checkpoints=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.checkpoint)
         collectionControls=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.collectionControl)
         supersessions=try SyncCipherContext(secret:secret,group:group,epoch:epoch,purpose:.supersession)
-        if create {
+        if let stagedWorkspace {
+            guard create,stagedWorkspace.url.standardizedFileURL==root.standardizedFileURL else {throw OSwindError.invalid("Use only the owned empty inbox workspace")}
+            try stagedWorkspace.tree.requireRootIdentity(at:root)
+            try stagedWorkspace.tree.forEachEntry {_ in throw OSwindError.invalid("The inbox workspace is not empty")}
+        } else if create {
             try BackupWorkspace.requireNewDestination(root)
             guard mkdir(root.path,0o700)==0 else {throw OSwindError.unavailable("Cannot create private sync object space")}
         }
         let opened=try BackupFileTree(root:root,writable:true)
+        if let stagedWorkspace {
+            let actual=try opened.identity(),expected=try stagedWorkspace.tree.identity()
+            guard actual.device==expected.device,actual.inode==expected.inode else {throw OSwindError.unavailable("The owned inbox workspace changed")}
+        }
         tree=opened
         if authority != nil {
             do {
@@ -59,6 +67,24 @@ final class SyncObjectFolder:@unchecked Sendable {
     }
     static func create(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:true,authority:authority)}
     static func open(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,authority:SyncDevicePacketAuthority?=nil)throws->SyncObjectFolder {try .init(root:root,secret:secret,group:group,epoch:epoch,create:false,authority:authority)}
+    /// Publish only a fully authenticated local inbox. Shared user-selected
+    /// transport creation retains its separate new-destination workflow.
+    static func createPrivate(at root:URL,secret:SyncGroupSecret,group:String,epoch:String,beforePublication:()throws->Void={})throws->SyncObjectFolder {
+        try Task.checkCancellation();try BackupWorkspace.requireNewDestination(root)
+        let parent=root.deletingLastPathComponent(),label="oswind-sync-inbox"
+        _=try BackupWorkspace.cleanupAbandoned(in:parent,labels:[label])
+        let workspace=try BackupWorkspace(in:parent,label:label)
+        do {
+            let prepared=try Self(root:workspace.url,secret:secret,group:group,epoch:epoch,create:true,authority:nil,stagedWorkspace:workspace)
+            prepared.close()
+            try beforePublication();try Task.checkCancellation()
+            try workspace.publish(as:root)
+            return try open(at:root,secret:secret,group:group,epoch:epoch)
+        } catch {
+            let failure=error;try workspace.cleanup();throw failure
+        }
+    }
+
     func requireSignedAuthority(_ expected:SyncDevicePacketAuthority)throws {
         lock.lock();defer {lock.unlock()}
         guard tree != nil,let authority,authority.replica==expected.replica,authority.certificate==expected.certificate else {throw OSwindError.invalid("Delivery requires this device's current signed transport authority")}

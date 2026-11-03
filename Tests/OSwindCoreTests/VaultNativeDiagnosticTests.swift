@@ -4,7 +4,7 @@ import XCTest
 final class VaultNativeDiagnosticTests:XCTestCase {
     let privateOutput=Data("private fixture /owned/private-history PRIVATE-CREDENTIAL".utf8)
     func testSafeErrorDescriptionReflectionAndSummaryNeverIncludeNativeText()throws {
-        for operation:VaultNativeOperation in [.attachmentInventory,.encryptionProbe,.volumeInfo,.imageDetach,.filesystemUnmount] {
+        for operation:VaultNativeOperation in [.attachmentInventory,.encryptionProbe,.volumeInfo,.imageCreate,.imageAttach,.imageDetach,.filesystemUnmount] {
             let result=VaultProcessResult(status:35,stdout:privateOutput,stderr:privateOutput),error=VaultNativeFailure(operation:operation,result:result)
             let summary=String(decoding:try JSONEncoder().encode(error.summary),as:UTF8.self)
             for text in [error.localizedDescription,String(describing:error),String(reflecting:error),summary] {
@@ -20,7 +20,7 @@ final class VaultNativeDiagnosticTests:XCTestCase {
         XCTAssertTrue(error.localizedDescription.contains("Check vault status"))
     }
     func testObservationNeverExposesInventoryOrDeviceStdout() {
-        for operation:VaultNativeOperation in [.attachmentInventory,.encryptionProbe,.volumeInfo] {
+        for operation:VaultNativeOperation in [.attachmentInventory,.encryptionProbe,.volumeInfo,.imageCreate,.imageAttach] {
             let diagnostic=VaultNativeDiagnostic(operation:operation,result:.init(status:0,stdout:privateOutput,stderr:Data()))
             XCTAssertNil(diagnostic.stdoutSuffix);XCTAssertEqual(diagnostic.summary.stdoutBytes,privateOutput.count)
         }

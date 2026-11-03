@@ -1,9 +1,9 @@
 import Foundation
 
 enum VaultNativeOperation:String,Codable,Sendable {
-    case attachmentInventory,encryptionProbe,volumeInfo,imageDetach,filesystemUnmount
+    case attachmentInventory,encryptionProbe,volumeInfo,imageCreate,imageAttach,imageDetach,filesystemUnmount
     var tool:String {switch self {case .volumeInfo:return "diskutil";case .filesystemUnmount:return "umount";default:return "hdiutil"}}
-    var mutates:Bool {self == .imageDetach || self == .filesystemUnmount}
+    var mutates:Bool {self == .imageCreate || self == .imageAttach || self == .imageDetach || self == .filesystemUnmount}
 }
 
 /// Safe to retain with an error: no arguments, paths, UUIDs, credentials, native
@@ -26,7 +26,9 @@ struct VaultNativeDiagnostic:Codable,Sendable {
     init(operation:VaultNativeOperation,result:VaultProcessResult,durationSeconds:Double=0) {
         summary=VaultNativeSummary(operation:operation,result:result)
         self.durationSeconds=durationSeconds
-        stdoutSuffix=operation.mutates ? String(decoding:result.stdout.suffix(4096),as:UTF8.self):nil
+        // Credential actions can return paths and volume metadata. Their
+        // stdout remains excluded even though the action mutates storage.
+        stdoutSuffix=(operation == .imageDetach || operation == .filesystemUnmount) ? String(decoding:result.stdout.suffix(4096),as:UTF8.self):nil
         stderrSuffix=String(decoding:result.stderr.suffix(4096),as:UTF8.self)
     }
 }
@@ -42,6 +44,8 @@ struct VaultNativeFailure:Error,LocalizedError,CustomStringConvertible,CustomDeb
         case .attachmentInventory:return "Cannot inspect encrypted disk attachments (\(code)\(invalidOutput ? ", invalid inventory":"")). Check vault status before retrying."
         case .volumeInfo:return "Cannot verify the attached APFS volume (\(code)\(invalidOutput ? ", invalid volume information":"")). Its protected state is unconfirmed."
         case .encryptionProbe:return "Cannot verify encrypted disk image (\(code)\(invalidOutput ? ", invalid encryption information":""))."
+        case .imageCreate:return "The encrypted disk image could not be created (\(code)). The incomplete package remains available for inspection."
+        case .imageAttach:return "The vault could not be unlocked (\(code)). Check the passphrase and image availability."
         case .imageDetach:return "The encrypted-image detach action failed (\(code)). If files are in use, close those readers and retry locking. Check vault status before assuming it is locked."
         case .filesystemUnmount:return "The filesystem unmount action reported an error (\(code)). If files are in use, close those readers and retry locking. Check vault status before assuming it is locked."
         }

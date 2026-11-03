@@ -136,8 +136,23 @@ struct NativeVaultDriver:Sendable {
     private func images(identity:VaultQueryIdentity) async throws -> [[String:Any]] {
         try Self.attachmentList(await query(.attachmentInventory,"/usr/bin/hdiutil",["info","-plist"],identity:identity))
     }
+    /// Credential actions retain their real fixed executable, stdin-only
+    /// secret, finish-on-cancellation policy and helper lifetime callback.
+    /// The optional owned observer receives no arguments or stdin bytes.
+    private func observedCredentialAction(_ helper:VaultCredentialHelper,_ arguments:[String],secret:Data) async throws ->VaultProcessResult {
+        let operation:VaultNativeOperation
+        switch helper {case .create:operation = .imageCreate;case .attach:operation = .imageAttach}
+        willMutate?(operation,nil)
+        let start=ContinuousClock.now
+        let result=try await VaultProcess.run("/usr/bin/hdiutil",arguments,secret:secret,timeout:120,cancellation:.finishNativeAction,inputClosed:{credentialHelperReady?(helper,$0)})
+        if let observer {
+            let elapsed=start.duration(to:.now).components
+            observer(.init(operation:operation,result:result,durationSeconds:Double(elapsed.seconds)+Double(elapsed.attoseconds)/1e18))
+        }
+        return result
+    }
     func create(paths:VaultPaths,capacityGiB:Int,secret:Data) async throws {
-        let result=try await VaultProcess.run("/usr/bin/hdiutil",["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction,inputClosed:{credentialHelperReady?(.create,$0)})
+        let result=try await observedCredentialAction(.create,["create","-size","\(capacityGiB)g","-type","SPARSEBUNDLE","-fs","APFS","-encryption","AES-256","-volname","OSwind Private Library","-uid",String(getuid()),"-gid",String(getgid()),"-mode","0700","-stdinpass",paths.image.path],secret:secret)
         guard result.succeeded else {throw OSwindError.unavailable("The encrypted disk image could not be created. The incomplete package remains available for inspection.")}
     }
     func encrypted(paths:VaultPaths) async throws -> Bool {
@@ -154,7 +169,7 @@ struct NativeVaultDriver:Sendable {
     }
     private func attachAndProve(paths:VaultPaths,mount:URL,secret:Data) async throws -> VaultVolumeProof {
         do {
-            let r=try await VaultProcess.run("/usr/bin/hdiutil",["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret,timeout:120,cancellation:.finishNativeAction,inputClosed:{credentialHelperReady?(.attach,$0)})
+            let r=try await observedCredentialAction(.attach,["attach","-nobrowse","-noautoopen","-owners","on","-mountpoint",mount.path,"-stdinpass","-plist",paths.image.path],secret:secret)
             guard r.succeeded else {throw OSwindError.unavailable("The vault could not be unlocked. Check the passphrase and image availability.")}
             guard let proof=try await attachment(paths:paths),proof.mounted,proof.mount.standardizedFileURL==mount.standardizedFileURL else {throw OSwindError.invalid("The attached vault did not match its requested location")};return proof
         } catch {
