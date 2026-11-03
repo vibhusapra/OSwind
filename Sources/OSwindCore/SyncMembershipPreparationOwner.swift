@@ -25,6 +25,20 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
             catch {anchor.close();throw error}
         }catch {pairing.close();throw error}
     }
+    static func prepareApproval(library:MemoryStore,review:PersonalSyncPairingReview,environment:SyncNativeWriterEnvironment,clock:()->Date={Date()})throws->Self {
+        let pairing=try PersonalSyncPairing.openMembershipPairing(library:library,environment:environment)
+        do {
+            let (anchor,snapshot,proof,plan)=try pairing.openOwnerApprovalPreparation(review,clock:clock)
+            do {
+                try anchor.prepareMembership(proof,snapshot:snapshot,approvalPlan:plan,checkBeforeIntent:{try plan.request.validate(now:clock())})
+                return Self(library:library,anchor:anchor,pairing:pairing,pairingLease:nil)
+            }catch {anchor.close();throw error}
+        }catch {pairing.close();throw error}
+    }
+    func completedResponse()throws->PersonalSyncApprovedResponse? {
+        lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership owner is closed")}
+        return try anchor.completedOwnerResponse(inMembershipRecovery:true)
+    }
     static func open(root:URL,environment:SyncNativeWriterEnvironment = .native)throws->Self {
         let library=try MemoryStore(root:root,recoveryReadOnly:false,nativeWriterEnvironment:environment,membershipRecovery:true)
         do {

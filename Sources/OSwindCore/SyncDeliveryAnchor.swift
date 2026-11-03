@@ -16,16 +16,20 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         let retirement:SyncDeliveryRetirement?
         let membershipHead:String?,membershipPreparation:SyncMembershipPreparation?
         let membershipFloor:SyncMembershipFloorPreparation?
-        init(format:String,version:Int,id:String,protection:SyncCredentialProtection,binding:SyncEnrollmentBinding,material:Data,token:Token,retirement:SyncDeliveryRetirement?,membershipHead:String?=nil,membershipPreparation:SyncMembershipPreparation?=nil,membershipFloor:SyncMembershipFloorPreparation?=nil) {
-            self.format=format;self.version=version;self.id=id;self.protection=protection;self.binding=binding;self.material=material;self.token=token;self.retirement=retirement;self.membershipHead=membershipHead;self.membershipPreparation=membershipPreparation;self.membershipFloor=membershipFloor
+        let completedApproval:SyncDeliveryApprovalReference?
+        init(format:String,version:Int,id:String,protection:SyncCredentialProtection,binding:SyncEnrollmentBinding,material:Data,token:Token,retirement:SyncDeliveryRetirement?,membershipHead:String?=nil,membershipPreparation:SyncMembershipPreparation?=nil,membershipFloor:SyncMembershipFloorPreparation?=nil,completedApproval:SyncDeliveryApprovalReference?=nil) {
+            self.format=format;self.version=version;self.id=id;self.protection=protection;self.binding=binding;self.material=material;self.token=token;self.retirement=retirement;self.membershipHead=membershipHead;self.membershipPreparation=membershipPreparation;self.membershipFloor=membershipFloor;self.completedApproval=completedApproval
         }
-        func replacing(_ next:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:retirement,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:membershipFloor)}
+        func replacing(_ next:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:retirement,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:membershipFloor,completedApproval:completedApproval)}
         func retiring(_ next:Token,binding:SyncEnrollmentBinding,record:SyncDeliveryRetirement)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:record,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:membershipFloor)}
         func activating(_ next:Token,binding:SyncEnrollmentBinding)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:next,retirement:nil,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:membershipFloor)}
-        func preparing(_ record:SyncMembershipPreparation,token:Token,head:String?=nil)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:head ?? membershipHead,membershipPreparation:record,membershipFloor:membershipFloor)}
-        func applying(_ record:SyncMembershipPreparation,material:Data,token:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:record.headAfter,membershipPreparation:record,membershipFloor:membershipFloor)}
-        func clearingPreparation()->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:membershipHead,membershipPreparation:nil,membershipFloor:membershipFloor)}
-        func upgradingFloor(_ record:SyncMembershipFloorPreparation?)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:record?.tokenAfter ?? token,retirement:retirement,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:record)}
+        func preparing(_ record:SyncMembershipPreparation,token:Token,head:String?=nil)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:head ?? membershipHead,membershipPreparation:record,membershipFloor:membershipFloor,completedApproval:completedApproval)}
+        func applying(_ record:SyncMembershipPreparation,material:Data,token:Token)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:record.headAfter,membershipPreparation:record,membershipFloor:membershipFloor,completedApproval:completedApproval)}
+        func clearingPreparation()->Self {
+            let completed=membershipPreparation?.disposition == .applying ? (membershipPreparation?.approval ?? completedApproval):completedApproval
+            return .init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:token,retirement:retirement,membershipHead:membershipHead,membershipPreparation:nil,membershipFloor:membershipFloor,completedApproval:completed)
+        }
+        func upgradingFloor(_ record:SyncMembershipFloorPreparation?)->Self {.init(format:format,version:version,id:id,protection:protection,binding:binding,material:material,token:record?.tokenAfter ?? token,retirement:retirement,membershipHead:membershipHead,membershipPreparation:membershipPreparation,membershipFloor:record,completedApproval:completedApproval)}
         func encoded()throws->Data {try token.validate();let bytes=try SyncProtocolLimits.encode(self);try SyncCredentialStorageLimits.validate(id:id,bytes:bytes);return bytes}
         static func decode(_ bytes:Data)throws->Self {
             let value=try SyncPairingFormat.decode(Self.self,bytes,limit:SyncCredentialStorageLimits.maximumBytes)
@@ -37,8 +41,13 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
                 try floor.validate()
                 guard value.token==floor.tokenAfter,value.membershipHead==floor.head,SyncProtocolLimits.hex(value.material)==floor.materialDigest,SyncProtocolLimits.hex(try material.joined.certificate.encoded())==floor.head else {throw OSwindError.invalid("Saved membership floor differs from its exact private authority")}
             }
+            if let approval=value.completedApproval {
+                try approval.validate()
+                guard value.retirement==nil,approval.publicationLifetime==value.binding.publicationLifetime else {throw OSwindError.invalid("Completed approval belongs to another publication lifetime")}
+            }
             if let record=value.membershipPreparation {
                 try record.validate()
+                if let approval=record.approval {try approval.require(pairingID:record.pairingID,head:record.headAfter,publicationLifetime:value.binding.publicationLifetime)}
                 let hash=SyncProtocolLimits.hex(try material.encodedForKeychain()),head=SyncProtocolLimits.hex(try material.joined.certificate.encoded())
                 guard value.retirement==nil,
                       (hash==record.materialBefore && head==record.headBefore) || (record.disposition == .applying && hash==record.materialAfter && head==record.headAfter) else {throw OSwindError.invalid("Prepared membership differs from both saved private candidates")}
@@ -465,6 +474,27 @@ extension SyncDeliveryAnchor {
         }
         retained=true;return result
     }
+    /// Explicit response recovery; normal status never exposes ciphertext.
+    /// A pending, corrupt or missing latest receipt cannot become an older one.
+    func completedOwnerResponse(inMembershipRecovery:Bool=false)throws->PersonalSyncApprovedResponse? {
+        let read:(RoutineDatabase)throws->PersonalSyncApprovedResponse? = {db in
+            self.lock.lock();defer {self.lock.unlock()};try self.available(db)
+            guard try self.storage.read(id:self.id)==self.bytes,self.envelope.retirement==nil,self.envelope.membershipPreparation==nil,self.envelope.membershipFloor==nil else {throw OSwindError.unavailable("Finish the saved delivery operation before response recovery")}
+            guard let reference=self.envelope.completedApproval else {return nil}
+            try reference.validate()
+            guard reference.publicationLifetime==self.envelope.binding.publicationLifetime else {throw OSwindError.invalid("Saved response belongs to another publication lifetime")}
+            let current=try SyncCredentialMaterial.decodeFromKeychain(self.envelope.material)
+            return try PersonalSyncPairing.deliveredApprovalResponse(library:self.library,db:db,environment:self.membershipEnvironment(),reference:reference,deliveryID:self.id,material:current)
+        }
+        return try inMembershipRecovery ? library.withMembershipDatabase(read):library.withRoutineDatabase(read)
+    }
+    static func hasCompletedApproval(library:MemoryStore,deliveryID:String,material:SyncCredentialMaterial,environment:SyncNativeWriterEnvironment)throws->Bool {
+        try library.withRoutineDatabase {db in
+            let (saved,current,_,_)=try readWriterAuthority(library:library,db:db,environment:environment,retiring:false)
+            guard saved.id==deliveryID,try current.encodedForKeychain()==material.encodedForKeychain() else {throw OSwindError.unavailable("Response availability belongs to another owner")}
+            return saved.completedApproval != nil
+        }
+    }
     var membershipPairingID:String? {lock.lock();defer {lock.unlock()};return envelope.membershipPreparation?.pairingID}
     private func membershipEnvironment()->SyncNativeWriterEnvironment {.init(stateRoot:stateRoot,machine:machine,storage:{[storage] _ in storage})}
     private func requireMembershipPreparation(_ db:RoutineDatabase)throws->(SyncMembershipPreparation,SyncMembershipRefresh,MembershipPhase) {
@@ -481,7 +511,7 @@ extension SyncDeliveryAnchor {
         try SyncMembershipHistory.retain(proof.certificates,anchoredHead:proof.base,db:db)
         try Self.saveMembershipToken(record.tokenPrepared,db:db)
     }
-    func prepareMembership(_ proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot)throws {
+    func prepareMembership(_ proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot,approvalPlan:SyncOwnerApprovalPlan?=nil,checkBeforeIntent:()throws->Void={})throws {
         try validate();let media=try library.mediaWriteLease();defer {media.release()}
         try library.withRoutineDatabase {db in
             lock.lock();defer {lock.unlock()};try requireCheckpoint(in:db)
@@ -498,15 +528,24 @@ extension SyncDeliveryAnchor {
                     guard before.serial<Int64.max-2 else {throw OSwindError.unavailable("Membership checkpoint capacity exhausted")}
                     let planBytes=try proof.encoded(),plan=try SyncContentReference(data:planBytes),joined=material.joined
                     let inbox=try joined.openPrivateInbox(at:library.root.appendingPathComponent("images/device-sync-"+joined.replica));defer {inbox.close()};try inbox.publishContent(planBytes,reference:plan)
+                    let approval:SyncDeliveryApprovalReference?
+                    if let approvalPlan {
+                        guard let lifetime=envelope.binding.publicationLifetime else {throw OSwindError.invalid("Approve only the original active publication lifetime")}
+                        let saved=SyncDeliveryApprovalReference(approval:try approvalPlan.reference(),publicationLifetime:lifetime)
+                        try saved.require(pairingID:snapshot.pairingID,head:SyncProtocolLimits.hex(try proof.head.encoded()),publicationLifetime:lifetime)
+                        guard approvalPlan.binding.purpose == .addition,approvalPlan.prior==proof.base,approvalPlan.certificate==proof.head else {throw OSwindError.invalid("Approval differs from the exact signed membership proof")}
+                        try inbox.publishContent(approvalPlan.encoded(),reference:saved.approval.content)
+                        approval=saved
+                    }else {approval=nil}
                     let nativeBefore=try db.eraseCount("PRAGMA user_version")
                     let originalFormat:Int?
                     if nativeBefore==36 {originalFormat=try SyncNativeMembershipState.read(db).version}else {originalFormat=nil}
-                    let record=SyncMembershipPreparation(format:"OSwind.sync.membership-preparation",version:1,operation:UUID().uuidString.lowercased(),plan:plan,pairingID:snapshot.pairingID,pairingBefore:snapshot.pairingBefore,pairingAfter:snapshot.pairingAfter,materialBefore:snapshot.materialBefore,materialAfter:snapshot.materialAfter,headBefore:SyncProtocolLimits.hex(try proof.base.encoded()),headAfter:SyncProtocolLimits.hex(try proof.head.encoded()),nativeBefore:nativeBefore,epochBefore:try library.nativeWriterAdmission.membershipEpoch(db),epochPrepared:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:""),tokenBefore:before,tokenPrepared:.init(serial:before.serial+1,nonce:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")),disposition:.preparing,stateVersionBefore:originalFormat)
+                    let record=SyncMembershipPreparation(format:"OSwind.sync.membership-preparation",version:1,operation:UUID().uuidString.lowercased(),plan:plan,pairingID:snapshot.pairingID,pairingBefore:snapshot.pairingBefore,pairingAfter:snapshot.pairingAfter,materialBefore:snapshot.materialBefore,materialAfter:snapshot.materialAfter,headBefore:SyncProtocolLimits.hex(try proof.base.encoded()),headAfter:SyncProtocolLimits.hex(try proof.head.encoded()),nativeBefore:nativeBefore,epochBefore:try library.nativeWriterAdmission.membershipEpoch(db),epochPrepared:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:""),tokenBefore:before,tokenPrepared:.init(serial:before.serial+1,nonce:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")),disposition:.preparing,stateVersionBefore:originalFormat,approval:approval)
                     try record.require(proof,material:material)
                     try PersonalSyncPairing.verifyMembershipPreparation(library:library,db:db,environment:membershipEnvironment(),record:record,proof:proof,deliveryID:id)
                     try membershipNativePreparation(record,proof:proof,db:db)
                     let updated=envelope.preparing(record,token:record.tokenPrepared),encoded=try updated.encoded()
-                    try Task.checkCancellation();externalAttempted=true;try storage.replace(id:id,expected:bytes,bytes:encoded);envelope=updated;bytes=encoded
+                    try Task.checkCancellation();try checkBeforeIntent();externalAttempted=true;try storage.replace(id:id,expected:bytes,bytes:encoded);envelope=updated;bytes=encoded
                     // Private membership remains old through this critical COMMIT.
                     try db.execute("COMMIT");library.nativeWriterAdmission.suspendForMembership()
                 }catch {
