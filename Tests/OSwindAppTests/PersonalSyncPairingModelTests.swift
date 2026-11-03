@@ -12,7 +12,9 @@ import MachO
     var models=[PersonalSyncModel](),sessions=[AppSession]()
     var preferenceSuites=[String]()
     private var phaseStarted:TimeInterval=0
+    private let phaseTracing=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_PHASE_TRACE"]=="1"
     private func trace(_ phase:String) {
+        guard phaseTracing else {return}
         let line="OWNED_PAIRING_PHASE case=\(name) phase=\(phase) elapsedSeconds=\(ProcessInfo.processInfo.systemUptime-phaseStarted)\n"
         FileHandle.standardOutput.write(Data(line.utf8))
     }
