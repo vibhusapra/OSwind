@@ -402,6 +402,12 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:SyncCredentialMaterial.decodeFromKeychain(saved),id:delivery.id,stateRoot:stateRoot,machine:machine,storage:backend)
         return (anchor,snapshot)
     }}
+    /// Original local authority only; retained inside Core across the exact
+    /// session stop. No keys or storage provider escape into app presentation.
+    func ownerChangeEnvironment()throws->SyncNativeWriterEnvironment {try withAccess {
+        _=try current()
+        return .init(stateRoot:stateRoot,machine:machine,storage:{[injectedStorage] protection in injectedStorage ?? SyncKeychainCredentialStorage(protection:protection)})
+    }}
     /// Internal, stopped-session owner path. Public enrollment guards remain
     /// until the app has a complete session-bound drain/close/reopen operation.
     func reviewDeliveredRequest(_ text:String,now:Date)throws->PersonalSyncPairingReview {try withAccess {

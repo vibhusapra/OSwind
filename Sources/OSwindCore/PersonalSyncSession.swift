@@ -56,12 +56,40 @@ public actor PersonalSyncSession {
     private var stopping:Task<Void,Error>?
     private var reviewing:Task<Void,Error>?
     private let reviewOwner=UUID()
+    private var ownerAdditionReview:(review:PersonalSyncOwnerReview,request:PersonalSyncPairingReview,environment:SyncNativeWriterEnvironment)?
+    private var ownerAdditionTransferred=false
     init(service:SyncLibraryService,pairing:PersonalSyncPairing?=nil,schedule:SyncLibrarySchedule = .init())throws {
         guard pairing==nil || pairing!.belongs(to:service.library) else {throw OSwindError.invalid("Own pairing for the session's current library")}
         library=service.library;privateInbox=service.inbox;self.service=service;self.pairing=pairing;scheduler=try SyncLibraryScheduler(service:service,schedule:schedule)
     }
     public nonisolated func belongs(to store:MemoryStore)->Bool {library === store}
     public nonisolated var ownsHistoryRetirement:Bool {pairing != nil}
+    /// Internal until AppSession owns real producer drain and close/reopen.
+    /// Production entry will use the live clock; deterministic time is private
+    /// to Core tests. Normal delivery ticks do not replace pairing authority.
+    func reviewOwnerAddition(_ text:String,now:Date=Date())throws->PersonalSyncOwnerReview {
+        guard !closed,stopping==nil,retirement==nil,reviewing==nil,!ownerAdditionTransferred,let pairing else {throw OSwindError.unavailable("Review from the current enrolled owner session")}
+        try Task.checkCancellation()
+        let request=try pairing.reviewDeliveredRequest(text,now:now)
+        guard !request.alreadyAdmitted else {throw OSwindError.invalid("This Mac is already admitted; recover its saved response")}
+        let status=try pairing.status()
+        guard status.phase == .owner,let root=status.rootFingerprint else {throw OSwindError.invalid("Only the original group owner can approve a device")}
+        guard status.memberNames.count<SyncProtocolLimits.peers else {throw OSwindError.invalid("This group is at its device limit")}
+        let environment=try pairing.ownerChangeEnvironment()
+        let review=PersonalSyncOwnerReview(deviceName:request.deviceName,requestFingerprint:request.requestFingerprint,rootFingerprint:root,expires:request.expires,currentMemberCount:status.memberNames.count,session:reviewOwner,token:UUID())
+        try Task.checkCancellation();ownerAdditionReview=(review,request,environment);return review
+    }
+    /// Caller first retires/drains the exact app model, then explicitly joins
+    /// this session's stop. Reserve the one-use transfer before awaiting so
+    /// actor reentrancy cannot construct two credential owners.
+    func ownerChangeAfterStopping(_ review:PersonalSyncOwnerReview,clock:@Sendable ()->Date={Date()})async throws->PersonalSyncOwnerChange {
+        guard closed,let stopping,!ownerAdditionTransferred,let stored=ownerAdditionReview,
+              stored.review==review,review.session==reviewOwner else {throw OSwindError.unavailable("Stop and join the exact reviewed session before approval")}
+        ownerAdditionTransferred=true;ownerAdditionReview=nil
+        try await stopping.value
+        try Task.checkCancellation()
+        return try PersonalSyncOwnerChange.draft(library:library,review:stored.request,environment:stored.environment,now:clock())
+    }
     public func setProcessingEnabled(_ enabled:Bool)async throws {
         guard !closed,reviewing==nil else {throw OSwindError.unavailable("This sync session is stopped or reviewing erasure")}
         if enabled {try await scheduler.resumeProcessing()}else{await scheduler.pauseProcessing()}
