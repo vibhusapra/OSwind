@@ -2,12 +2,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 configuration="${1:-release}"
-swift build -c "$configuration"
+build_root="${OSWIND_BUILD_ROOT:-$PWD/.build}"
+swift build --scratch-path "$build_root" -c "$configuration"
 app="${OSWIND_APP_OUTPUT:-$PWD/dist/OSwind.app}"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
-cp ".build/$configuration/OSwind" "$app/Contents/MacOS/OSwind"
-cp ".build/$configuration/oswindctl" "$app/Contents/MacOS/oswindctl"
-cp ".build/$configuration/oswind-preparation-guardian" "$app/Contents/MacOS/oswind-preparation-guardian"
+cp "$build_root/$configuration/OSwind" "$app/Contents/MacOS/OSwind"
+cp "$build_root/$configuration/oswindctl" "$app/Contents/MacOS/oswindctl"
+cp "$build_root/$configuration/oswind-preparation-guardian" "$app/Contents/MacOS/oswind-preparation-guardian"
 cat > "$app/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -70,7 +71,7 @@ ditto ThirdParty/VisualPreparation "$app/Contents/Resources/ThirdParty/VisualPre
 # Preserve dependency resources in the signed resource area. VisualTokenizer
 # constructs explicit local Config values and never uses Hub's fallback bundle.
 for resource in swift-transformers_Hub.bundle swift-crypto_Crypto.bundle; do
-    ditto ".build/$configuration/$resource" "$app/Contents/Resources/$resource"
+    ditto "$build_root/$configuration/$resource" "$app/Contents/Resources/$resource"
 done
 codesign --force --deep --sign - --identifier com.oswind.desktop "$app"
 codesign --verify --deep --strict "$app"

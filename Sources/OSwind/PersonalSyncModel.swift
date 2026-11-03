@@ -6,6 +6,14 @@ import OSwindCore
 /// An app retirement closes admission synchronously, then joins all three before
 /// SQLite close, vault unmount or wipe. No enrollment keys enter this model.
 @MainActor final class PersonalSyncModel:ObservableObject {
+    @Published private(set) var ownerAdditionReview:PersonalSyncOwnerReview?
+    @Published private(set) var ownerReviewBusy=false
+    @Published private(set) var ownerReviewError:String?
+    @Published private(set) var isGroupOwner=false
+    var approveOwnerAddition:((PersonalSyncOwnerReview)->Void)?
+    private var ownerReviewTask:Task<Void,Never>?
+    private var ownerReviewGeneration=UUID()
+    private var reviewedOwnerSession:PersonalSyncSession?
     @Published private(set) var pairingStatus:PersonalSyncPairingStatus?
     @Published private(set) var pairingReview:PersonalSyncPairingReview?
     @Published private(set) var pairingResponse:String?
@@ -37,12 +45,12 @@ import OSwindCore
     private struct PreparedConnection:Sendable {let session:PersonalSyncSession;let preferences:PersonalSyncPreferences?;let folder:URL?}
     var configured:Bool {session != nil}
     var ownsHistoryRetirement:Bool {session?.ownsHistoryRetirement == true}
-    var busy:Bool {drains>0 || pairing != nil || pairingTask != nil || preparation != nil || erasure != nil || session != nil || observer != nil || command != nil || stopTask != nil}
+    var busy:Bool {ownerReviewTask != nil || drains>0 || pairing != nil || pairingTask != nil || preparation != nil || erasure != nil || session != nil || observer != nil || command != nil || stopTask != nil}
     init(store:MemoryStore,locked:@escaping ()->Bool={SessionState.locked},pairingFactory:@escaping @Sendable (MemoryStore)throws->PersonalSyncPairing={try PersonalSyncPairing(store:$0)}) {self.store=store;self.locked=locked;self.pairingFactory=pairingFactory}
     deinit {
         // Fallback cancellation prevents an idle subscription retaining a
         // session forever. Real storage departure still awaits cancelAndWait.
-        preparation?.cancel();pairingTask?.cancel();erasure?.cancel();observer?.cancel();command?.cancel()
+        ownerReviewTask?.cancel();preparation?.cancel();pairingTask?.cancel();erasure?.cancel();observer?.cancel();command?.cancel()
         if let pairing {Task.detached {pairing.close()}}
         if let session {Task {try? await session.stop()}}
     }
@@ -54,7 +62,7 @@ import OSwindCore
     private func attach(_ candidate:PersonalSyncSession,fromPreparation:Bool)throws {
         guard !retired,session==nil,observer==nil,command==nil,stopTask==nil,
               pairing==nil,pairingTask==nil,(preparation==nil || fromPreparation),!store.isClosed,!locked(),allowed(),candidate.belongs(to:store) else {throw OSwindError.unavailable("Sync requires its current open library")}
-        session=candidate;error=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil
+        session=candidate;isGroupOwner=candidate.isGroupOwner;error=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil
         observer=Task {[weak self] in
             let stream=await candidate.updates()
             for await value in stream {
@@ -66,6 +74,35 @@ import OSwindCore
             }
         }
         enqueueConfiguration()
+    }
+    func reviewOwnerRequest(_ text:String) {
+        guard !retired,!stopping,!preparing,ownerReviewTask==nil,isGroupOwner,let current=session,!store.isClosed,!locked(),allowed() else {return}
+        let generation=UUID();ownerReviewGeneration=generation;ownerReviewBusy=true;ownerReviewError=nil;ownerAdditionReview=nil;reviewedOwnerSession=nil
+        ownerReviewTask=Task {[weak self] in
+            defer {if self?.ownerReviewGeneration==generation {self?.ownerReviewBusy=false;self?.ownerReviewTask=nil}}
+            do {
+                let review=try await current.reviewOwnerAddition(text)
+                guard !Task.isCancelled,let self,!self.retired,self.ownerReviewGeneration==generation,self.session === current,!self.store.isClosed,!self.locked(),self.allowed() else {return}
+                self.ownerAdditionReview=review;self.reviewedOwnerSession=current
+            }catch {
+                if let self,!self.retired,!Task.isCancelled,self.ownerReviewGeneration==generation {self.ownerReviewError="This request could not be reviewed. Check that it is current and belongs to a new Mac."}
+            }
+        }
+    }
+    func clearOwnerReview() {
+        ownerReviewTask?.cancel()
+        ownerAdditionReview=nil;reviewedOwnerSession=nil;ownerReviewError=nil
+        // The existing task retains its slot until its real Keychain read
+        // returns; its cancellation guard rejects any late presentation.
+        if ownerReviewTask==nil {ownerReviewBusy=false}
+    }
+    func sessionForOwnerApproval(_ review:PersonalSyncOwnerReview)->PersonalSyncSession? {
+        guard !retired,!stopping,!preparing,ownerReviewTask==nil,ownerAdditionReview==review,
+              let current=session,reviewedOwnerSession === current,!store.isClosed,!locked(),allowed() else {return nil}
+        return current
+    }
+    func approveReviewedOwner(_ review:PersonalSyncOwnerReview) {
+        guard sessionForOwnerApproval(review) != nil else {return};approveOwnerAddition?(review)
     }
     /// Transfer an existing preview owner into the tracked setup job before the
     /// first suspension. The result owns that same pairing credential lease.
@@ -344,6 +381,7 @@ import OSwindCore
     func retire() {
         if !retired {
             retired=true;desiredActive=false;generation=UUID();changing=false;status=nil;error=nil
+            ownerReviewTask?.cancel();ownerAdditionReview=nil;reviewedOwnerSession=nil;ownerReviewError=nil;isGroupOwner=false
             preparation?.cancel();pairingTask?.cancel();command?.cancel();observer?.cancel()
             pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil;pairingError=nil;eraseReview=nil;folderURL=nil
         }
@@ -358,7 +396,8 @@ import OSwindCore
     func cancelAndWait()async {
         retire()
         drains+=1;defer {drains-=1}
-        let setup=preparation,paired=pairingTask,stopped=stopTask,configured=command,observed=observer,erased=erasure
+        let setup=preparation,paired=pairingTask,stopped=stopTask,configured=command,observed=observer,erased=erasure,reviewed=ownerReviewTask
+        await reviewed?.value;ownerReviewTask=nil;ownerReviewBusy=false
         await paired?.value
         pairing?.close();pairing=nil;pairingTask=nil;pairingBusy=false
         let setupClean=await setup?.value

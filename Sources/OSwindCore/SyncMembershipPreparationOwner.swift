@@ -1,7 +1,7 @@
 import Foundation
 
-/// Internal membership owner, unavailable to app/CLI until reviewed owner
-/// approval and the complete session lifecycle are integrated. Preparation
+/// Internal membership owner, retained by the app-facing operation across its
+/// reviewed session handover and joined close. Preparation
 /// keeps old private material; application resumes its exact saved forward
 /// choice. Cancellation before that choice keeps native36's old-writer fence.
 /// It opens no provider; later service startup performs bounded replay.
@@ -35,21 +35,52 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
             }catch {anchor.close();throw error}
         }catch {pairing.close();throw error}
     }
+    /// The app-facing operation must retain its owner before attempting the
+    /// first private save. An ambiguous preparation failure must not discard
+    /// that owner while SQLite close is still blocked.
+    final class ApprovalDraft:@unchecked Sendable {
+        let owner:SyncMembershipPreparationOwner
+        private let proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot,plan:SyncOwnerApprovalPlan
+        private var attempted=false
+        fileprivate init(owner:SyncMembershipPreparationOwner,proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot,plan:SyncOwnerApprovalPlan) {
+            self.owner=owner;self.proof=proof;self.snapshot=snapshot;self.plan=plan
+        }
+        /// One attempt only, including failures before intent. The caller joins
+        /// close, then explicitly reopens saved recovery or makes a new review.
+        func prepare(clock:()->Date={Date()})throws {
+            owner.lock.lock();defer {owner.lock.unlock()}
+            guard !attempted,!owner.closed else {throw OSwindError.unavailable("Finish closing this exact approval attempt before trying again")}
+            attempted=true
+            try owner.anchor.prepareMembership(proof,snapshot:snapshot,approvalPlan:plan,checkBeforeIntent:{try self.plan.request.validate(now:clock())})
+        }
+    }
+    static func approvalDraft(library:MemoryStore,review:PersonalSyncPairingReview,environment:SyncNativeWriterEnvironment,now:Date=Date())throws->ApprovalDraft {
+        let pairing=try PersonalSyncPairing.openMembershipPairing(library:library,environment:environment)
+        do {
+            let (anchor,snapshot,proof,plan)=try pairing.openOwnerApprovalPreparation(review,clock:{now})
+            let owner=Self(library:library,anchor:anchor,pairing:pairing,pairingLease:nil)
+            return ApprovalDraft(owner:owner,proof:proof,snapshot:snapshot,plan:plan)
+        }catch {pairing.close();throw error}
+    }
     func completedResponse()throws->PersonalSyncApprovedResponse? {
         lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership owner is closed")}
         return try anchor.completedOwnerResponse(inMembershipRecovery:true)
     }
     static func open(root:URL,environment:SyncNativeWriterEnvironment = .native)throws->Self {
         let library=try MemoryStore(root:root,recoveryReadOnly:false,nativeWriterEnvironment:environment,membershipRecovery:true)
+        do {return try open(library:library,environment:environment)}
+        catch {try? library.close();throw error}
+    }
+    /// The enclosing operation already owns this store, including failure to
+    /// open private authority. It remains responsible for joined close/retry.
+    static func open(library:MemoryStore,environment:SyncNativeWriterEnvironment)throws->Self {
+        let anchor=try SyncDeliveryAnchor.openMembershipPreparation(library:library,environment:environment)
         do {
-            let anchor=try SyncDeliveryAnchor.openMembershipPreparation(library:library,environment:environment)
-            do {
-                guard let id=anchor.membershipPairingID else {throw OSwindError.unavailable("Original membership pairing account is missing")}
-                let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:environment.stateRoot)
-                do {try anchor.validateMembershipPreparation();return Self(library:library,anchor:anchor,pairing:nil,pairingLease:lease)}
-                catch {lease.close();throw error}
-            }catch {anchor.close();throw error}
-        }catch {try? library.close();throw error}
+            guard let id=anchor.membershipPairingID else {throw OSwindError.unavailable("Original membership pairing account is missing")}
+            let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:environment.stateRoot)
+            do {try anchor.validateMembershipPreparation();return Self(library:library,anchor:anchor,pairing:nil,pairingLease:lease)}
+            catch {lease.close();throw error}
+        }catch {anchor.close();throw error}
     }
     private init(library:MemoryStore,anchor:SyncDeliveryAnchor,pairing:PersonalSyncPairing?,pairingLease:SyncCredentialExclusiveLease?) {self.library=library;self.anchor=anchor;self.pairing=pairing;self.pairingLease=pairingLease}
     func resumeFence()throws {
@@ -70,7 +101,9 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
     }
     func close()throws {
         lock.lock();defer {lock.unlock()};guard !closed else {return}
-        anchor.close();pairing?.close();pairingLease?.close();try library.close();closed=true
+        // A failed SQLite/media close still belongs to this exact owner.
+        // Keep both original credential leases until the store really closes.
+        try library.close();anchor.close();pairing?.close();pairingLease?.close();closed=true
     }
     deinit {anchor.close();pairing?.close();pairingLease?.close();try? library.close()}
 }

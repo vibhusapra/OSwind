@@ -1,0 +1,703 @@
+{
+  "conclusion": "failure",
+  "databaseId": 41715026531,
+  "headSha": "5efde85a5c84a877c787afe9f700276d4aef61d3",
+  "jobs": [
+    {
+      "completedAt": "2026-11-03T22:07:25Z",
+      "conclusion": "success",
+      "databaseId": 126192662299,
+      "name": "native",
+      "startedAt": "2026-11-03T20:52:31Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-03T20:52:34Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-03T20:52:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:40Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-11-03T20:52:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:40Z",
+          "conclusion": "success",
+          "name": "Verify compiled native model catalogs",
+          "number": 3,
+          "startedAt": "2026-11-03T20:52:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:41Z",
+          "conclusion": "success",
+          "name": "Verify pinned tokenizer source and license",
+          "number": 4,
+          "startedAt": "2026-11-03T20:52:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:41Z",
+          "conclusion": "success",
+          "name": "Verify pinned native PII runtime headers and license",
+          "number": 5,
+          "startedAt": "2026-11-03T20:52:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:41Z",
+          "conclusion": "success",
+          "name": "Verify pinned native PII preparation catalog",
+          "number": 6,
+          "startedAt": "2026-11-03T20:52:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T20:52:41Z",
+          "conclusion": "success",
+          "name": "Prepare authored native-index diagnostics",
+          "number": 7,
+          "startedAt": "2026-11-03T20:52:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:35:47Z",
+          "conclusion": "success",
+          "name": "Build and test",
+          "number": 8,
+          "startedAt": "2026-11-03T20:52:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:35:48Z",
+          "conclusion": "success",
+          "name": "Independently inspect retained native media migration crashes",
+          "number": 9,
+          "startedAt": "2026-11-03T21:35:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:35:51Z",
+          "conclusion": "success",
+          "name": "Retain native media migration diagnostics",
+          "number": 10,
+          "startedAt": "2026-11-03T21:35:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:36:22Z",
+          "conclusion": "success",
+          "name": "Verify owned named clipboard adapters without general clipboard access",
+          "number": 11,
+          "startedAt": "2026-11-03T21:35:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:36:24Z",
+          "conclusion": "success",
+          "name": "Retain authored native-index diagnostics",
+          "number": 12,
+          "startedAt": "2026-11-03T21:36:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:36:24Z",
+          "conclusion": "success",
+          "name": "Verify tokenizer patch against resolved upstream",
+          "number": 13,
+          "startedAt": "2026-11-03T21:36:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:09Z",
+          "conclusion": "success",
+          "name": "Verify owned encrypted APFS images and app sessions",
+          "number": 14,
+          "startedAt": "2026-11-03T21:36:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:11Z",
+          "conclusion": "success",
+          "name": "Retain owned native vault diagnostics",
+          "number": 15,
+          "startedAt": "2026-11-03T21:50:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:11Z",
+          "conclusion": "success",
+          "name": "Verify pinned native-model installer without network",
+          "number": 16,
+          "startedAt": "2026-11-03T21:50:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:51Z",
+          "conclusion": "success",
+          "name": "Verify evaluation asset integrity contracts offline",
+          "number": 17,
+          "startedAt": "2026-11-03T21:50:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:52Z",
+          "conclusion": "success",
+          "name": "Verify authored PII scorer and frozen input contracts offline",
+          "number": 18,
+          "startedAt": "2026-11-03T21:50:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:52Z",
+          "conclusion": "success",
+          "name": "Verify visual model tools without downloads",
+          "number": 19,
+          "startedAt": "2026-11-03T21:50:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:50:55Z",
+          "conclusion": "success",
+          "name": "Verify bounded Python SDK protocols without network",
+          "number": 20,
+          "startedAt": "2026-11-03T21:50:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:24Z",
+          "conclusion": "success",
+          "name": "Package app",
+          "number": 21,
+          "startedAt": "2026-11-03T21:50:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:25Z",
+          "conclusion": "success",
+          "name": "CLI smoke test",
+          "number": 22,
+          "startedAt": "2026-11-03T21:58:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:32Z",
+          "conclusion": "success",
+          "name": "Verify capture parser preserves exact target and bounded duration",
+          "number": 23,
+          "startedAt": "2026-11-03T21:58:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:35Z",
+          "conclusion": "success",
+          "name": "Verify capture argument admission without history or native capture",
+          "number": 24,
+          "startedAt": "2026-11-03T21:58:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:37Z",
+          "conclusion": "success",
+          "name": "Retain capture argument admission receipt",
+          "number": 25,
+          "startedAt": "2026-11-03T21:58:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:42Z",
+          "conclusion": "success",
+          "name": "Verify packaged media reservations and backup erasure fencing",
+          "number": 26,
+          "startedAt": "2026-11-03T21:58:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:43Z",
+          "conclusion": "success",
+          "name": "Retain packaged media cleanup process receipt",
+          "number": 27,
+          "startedAt": "2026-11-03T21:58:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:43Z",
+          "conclusion": "success",
+          "name": "Verify inactive owned SQLite fixture boundaries",
+          "number": 28,
+          "startedAt": "2026-11-03T21:58:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:44Z",
+          "conclusion": "success",
+          "name": "Verify owned vault diagnostic admission without native tools",
+          "number": 29,
+          "startedAt": "2026-11-03T21:58:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:53Z",
+          "conclusion": "success",
+          "name": "Verify authored phrase Boolean speaker and metadata query contracts",
+          "number": 30,
+          "startedAt": "2026-11-03T21:58:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:54Z",
+          "conclusion": "success",
+          "name": "Retain authored query contract receipt",
+          "number": 31,
+          "startedAt": "2026-11-03T21:58:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:55Z",
+          "conclusion": "success",
+          "name": "Verify owned canonical capture schema and process boundaries",
+          "number": 32,
+          "startedAt": "2026-11-03T21:58:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:56Z",
+          "conclusion": "success",
+          "name": "Retain canonical capture process receipt",
+          "number": 33,
+          "startedAt": "2026-11-03T21:58:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:57Z",
+          "conclusion": "success",
+          "name": "Verify history-free PII CLI refusals without model downloads",
+          "number": 34,
+          "startedAt": "2026-11-03T21:58:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:57Z",
+          "conclusion": "success",
+          "name": "Verify history-free PII setup CLI without downloads",
+          "number": 35,
+          "startedAt": "2026-11-03T21:58:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:58:58Z",
+          "conclusion": "success",
+          "name": "Verify original-source pattern privacy across imports exports and media",
+          "number": 36,
+          "startedAt": "2026-11-03T21:58:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:01Z",
+          "conclusion": "success",
+          "name": "Verify configured imports reject changed saved policies",
+          "number": 37,
+          "startedAt": "2026-11-03T21:58:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:04Z",
+          "conclusion": "success",
+          "name": "Verify bounded import files and pending collector wipe ordering",
+          "number": 38,
+          "startedAt": "2026-11-03T21:59:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:06Z",
+          "conclusion": "success",
+          "name": "Verify experimental import PII refuses missing assets and invalid settings offline",
+          "number": 39,
+          "startedAt": "2026-11-03T21:59:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:06Z",
+          "conclusion": "success",
+          "name": "Verify PII check records cannot be forged by JSON without model assets",
+          "number": 40,
+          "startedAt": "2026-11-03T21:59:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:09Z",
+          "conclusion": "success",
+          "name": "Verify text-only mode boundaries and quiet portability without desktop capture",
+          "number": 41,
+          "startedAt": "2026-11-03T21:59:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T21:59:11Z",
+          "conclusion": "success",
+          "name": "Verify sampled text scopes and quiet portability without native capture",
+          "number": 42,
+          "startedAt": "2026-11-03T21:59:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:00:48Z",
+          "conclusion": "success",
+          "name": "Exercise encrypted-library CLI and interruptions",
+          "number": 43,
+          "startedAt": "2026-11-03T21:59:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:00:49Z",
+          "conclusion": "success",
+          "name": "Retain owned pattern and terminal process receipts",
+          "number": 44,
+          "startedAt": "2026-11-03T22:00:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:00:53Z",
+          "conclusion": "success",
+          "name": "Exercise explicit external MCP client processes",
+          "number": 45,
+          "startedAt": "2026-11-03T22:00:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:00:54Z",
+          "conclusion": "success",
+          "name": "Exercise API and MCP processes",
+          "number": 46,
+          "startedAt": "2026-11-03T22:00:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:01:05Z",
+          "conclusion": "success",
+          "name": "Exercise explicit text collectors and Python SDK on encrypted APFS",
+          "number": 47,
+          "startedAt": "2026-11-03T22:00:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:02:52Z",
+          "conclusion": "success",
+          "name": "Exercise offline Limitless API text migration on encrypted APFS",
+          "number": 48,
+          "startedAt": "2026-11-03T22:01:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:03:21Z",
+          "conclusion": "success",
+          "name": "Exercise source-linked entity scopes, corrections and quiet backup",
+          "number": 49,
+          "startedAt": "2026-11-03T22:02:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:03:24Z",
+          "conclusion": "success",
+          "name": "Verify stable project corrections and quiet portability",
+          "number": 50,
+          "startedAt": "2026-11-03T22:03:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:04:10Z",
+          "conclusion": "success",
+          "name": "Verify project metadata preserves completed extraction",
+          "number": 51,
+          "startedAt": "2026-11-03T22:03:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:04:47Z",
+          "conclusion": "success",
+          "name": "Exercise indexed API and MCP processes",
+          "number": 52,
+          "startedAt": "2026-11-03T22:04:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:04:48Z",
+          "conclusion": "success",
+          "name": "Exercise durable conversation processes",
+          "number": 53,
+          "startedAt": "2026-11-03T22:04:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:04:54Z",
+          "conclusion": "success",
+          "name": "Exercise long-source evidence and follow-ups",
+          "number": 54,
+          "startedAt": "2026-11-03T22:04:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:31Z",
+          "conclusion": "success",
+          "name": "Exercise local chat provider and incomplete-response boundaries",
+          "number": 55,
+          "startedAt": "2026-11-03T22:04:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:32Z",
+          "conclusion": "success",
+          "name": "Exercise required phrases and Boolean content across CLI, HTTP and MCP",
+          "number": 56,
+          "startedAt": "2026-11-03T22:05:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:35Z",
+          "conclusion": "success",
+          "name": "Exercise preview-guarded erasure and concurrent writer admission",
+          "number": 57,
+          "startedAt": "2026-11-03T22:05:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:36Z",
+          "conclusion": "success",
+          "name": "Exercise original-field erasure in actual schema-26 fixture copies",
+          "number": 58,
+          "startedAt": "2026-11-03T22:05:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:37Z",
+          "conclusion": "success",
+          "name": "Exercise single-delete and retention media safety",
+          "number": 59,
+          "startedAt": "2026-11-03T22:05:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:39Z",
+          "conclusion": "success",
+          "name": "Exercise full-library wipe admission and durable retry",
+          "number": 60,
+          "startedAt": "2026-11-03T22:05:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:42Z",
+          "conclusion": "success",
+          "name": "Exercise source-linked recap chains and portability",
+          "number": 61,
+          "startedAt": "2026-11-03T22:05:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:45Z",
+          "conclusion": "success",
+          "name": "Exercise query scopes, literal mode and saved time bounds",
+          "number": 62,
+          "startedAt": "2026-11-03T22:05:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:46Z",
+          "conclusion": "success",
+          "name": "Verify normalized domain import filtering across CLI HTTP and MCP",
+          "number": 63,
+          "startedAt": "2026-11-03T22:05:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:55Z",
+          "conclusion": "success",
+          "name": "Verify complete calendar counts across CLI HTTP and MCP",
+          "number": 64,
+          "startedAt": "2026-11-03T22:05:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:57Z",
+          "conclusion": "success",
+          "name": "Verify indexed tags and quiet portability",
+          "number": 65,
+          "startedAt": "2026-11-03T22:05:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:58Z",
+          "conclusion": "success",
+          "name": "Verify capture area compatibility and quiet portability",
+          "number": 66,
+          "startedAt": "2026-11-03T22:05:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:05:59Z",
+          "conclusion": "success",
+          "name": "Exercise complete backup, restore and interruption recovery",
+          "number": 67,
+          "startedAt": "2026-11-03T22:05:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:03Z",
+          "conclusion": "success",
+          "name": "Exercise audio normalization, timestamp persistence and privacy",
+          "number": 68,
+          "startedAt": "2026-11-03T22:05:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:09Z",
+          "conclusion": "success",
+          "name": "Verify persistent component-soak harness contracts",
+          "number": 69,
+          "startedAt": "2026-11-03T22:06:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:15Z",
+          "conclusion": "success",
+          "name": "Verify synthetic visual replay across processes",
+          "number": 70,
+          "startedAt": "2026-11-03T22:06:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:21Z",
+          "conclusion": "success",
+          "name": "Exercise portable Markdown and media export",
+          "number": 71,
+          "startedAt": "2026-11-03T22:06:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:23Z",
+          "conclusion": "success",
+          "name": "Exercise scheduled routines and quiet backup restore",
+          "number": 72,
+          "startedAt": "2026-11-03T22:06:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:26Z",
+          "conclusion": "success",
+          "name": "Verify long-transcript preview contracts",
+          "number": 73,
+          "startedAt": "2026-11-03T22:06:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:27Z",
+          "conclusion": "success",
+          "name": "Exercise recording-local speaker search across processes",
+          "number": 74,
+          "startedAt": "2026-11-03T22:06:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:30Z",
+          "conclusion": "success",
+          "name": "Evaluate authored retrieval fixture",
+          "number": 75,
+          "startedAt": "2026-11-03T22:06:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:33Z",
+          "conclusion": "success",
+          "name": "Verify vector scan self-match",
+          "number": 76,
+          "startedAt": "2026-11-03T22:06:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:37Z",
+          "conclusion": "success",
+          "name": "Verify indexed identity and non-self recall",
+          "number": 77,
+          "startedAt": "2026-11-03T22:06:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:06:37Z",
+          "conclusion": "success",
+          "name": "Verify maintained archive statistics",
+          "number": 78,
+          "startedAt": "2026-11-03T22:06:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:13Z",
+          "conclusion": "success",
+          "name": "Verify long-source semantic passage processes",
+          "number": 79,
+          "startedAt": "2026-11-03T22:06:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:16Z",
+          "conclusion": "success",
+          "name": "Render sample workspace",
+          "number": 80,
+          "startedAt": "2026-11-03T22:07:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:18Z",
+          "conclusion": "success",
+          "name": "Package portable archive",
+          "number": 81,
+          "startedAt": "2026-11-03T22:07:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:21Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@v4",
+          "number": 82,
+          "startedAt": "2026-11-03T22:07:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:21Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 164,
+          "startedAt": "2026-11-03T22:07:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-03T22:07:24Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 165,
+          "startedAt": "2026-11-03T22:07:21Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/vibhusapra/OSwind/actions/runs/41715026531/job/126192662299"
+    },
+    {
+      "completedAt": "2026-11-03T20:57:27Z",
+      "conclusion": "cancelled",
+      "databaseId": 126192662630,
+      "name": "benchmark-harnesses",
+      "startedAt": "2026-11-03T20:42:26Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/vibhusapra/OSwind/actions/runs/41715026531/job/126192662630"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-11-03T22:07:26Z",
+  "url": "https://github.com/vibhusapra/OSwind/actions/runs/41715026531"
+}

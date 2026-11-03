@@ -115,7 +115,12 @@ public actor LibraryVault {
                 let markerURL=library.appendingPathComponent(VaultPaths.markerName)
                 if FileManager.default.fileExists(atPath:markerURL.path) {try tree.remove(VaultPaths.markerName)}
                 try tree.write(JSONEncoder().encode(marker),as:VaultPaths.markerName)
-                let store=try MemoryStore(root:library);try store.close()
+                do {let store=try MemoryStore(root:library);try store.close()}
+                catch is PersonalSyncMembershipRecoveryRequired {
+                    // The mounted, marker-verified library has a saved device
+                    // operation. Unlock only the vault; AppSession's ordinary
+                    // open still refuses and presents restricted recovery.
+                }
             }
             try Task.checkCancellation()
             info.setupComplete=true;try paths.write(info,as:VaultPaths.manifestName)

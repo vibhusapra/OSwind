@@ -11,15 +11,31 @@ import MachO
     private var root:URL!,a:MemoryStore!,b:MemoryStore!,storage:PairingAppStorage!
     var models=[PersonalSyncModel](),sessions=[AppSession]()
     var preferenceSuites=[String]()
+    private var phaseStarted:TimeInterval=0
+    private let phaseTracing=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_PHASE_TRACE"]=="1"
+    private func trace(_ phase:String) {
+        guard phaseTracing else {return}
+        let line="OWNED_PAIRING_PHASE case=\(name) phase=\(phase) elapsedSeconds=\(ProcessInfo.processInfo.systemUptime-phaseStarted)\n"
+        FileHandle.standardOutput.write(Data(line.utf8))
+    }
     override func setUpWithError()throws {
+        phaseStarted=ProcessInfo.processInfo.systemUptime;trace("setup-begin")
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-pairing-app-"+UUID().uuidString)
-        a=try MemoryStore(root:root.appendingPathComponent("a"));b=try MemoryStore(root:root.appendingPathComponent("b"));storage=PairingAppStorage()
+        a=try MemoryStore(root:root.appendingPathComponent("a"));trace("setup-store-a")
+        b=try MemoryStore(root:root.appendingPathComponent("b"));trace("setup-store-b")
+        storage=PairingAppStorage();trace("setup-complete")
     }
     override func tearDown()async throws {
+        trace("teardown-begin")
         for session in sessions {_=await session.lockForTermination();try? session.model?.store.close();session.model=nil};sessions=[]
+        trace("teardown-sessions")
         for model in models {await model.cancelAndWait()}
+        trace("teardown-models")
         for name in preferenceSuites {UserDefaults(suiteName:name)?.removePersistentDomain(forName:name)}
-        try a.close();try b.close();try FileManager.default.removeItem(at:root)
+        trace("teardown-preferences")
+        try a.close();trace("teardown-store-a")
+        try b.close();trace("teardown-store-b")
+        try FileManager.default.removeItem(at:root);trace("teardown-complete")
     }
     func model(_ store:MemoryStore,gate:ImportWorkerGate?=nil)->PersonalSyncModel {
         let state=root.appendingPathComponent("state"),storage=storage!
@@ -28,10 +44,15 @@ import MachO
             return try PersonalSyncPairing(store:store,stateRoot:state,machine:PairingAppMachine(),storage:storage)
         });models.append(value);return value
     }
-    func done(_ model:PersonalSyncModel)async throws {
+    func done(_ model:PersonalSyncModel,caller:UInt=#line)async throws {
+        trace("pairing-wait-\(caller)-begin")
         let deadline=ContinuousClock.now.advanced(by:.seconds(15))
         while model.pairingBusy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
-        guard !model.pairingBusy else {throw OSwindError.unavailable("Owned pairing action did not finish")}
+        guard !model.pairingBusy else {
+            trace("pairing-wait-\(caller)-timeout")
+            throw OSwindError.unavailable("Owned pairing action did not finish: caller=\(caller) configured=\(model.configured) preparing=\(model.preparing) stopping=\(model.stopping) error=\(model.pairingError ?? "none")")
+        }
+        trace("pairing-wait-\(caller)-complete")
     }
     private func pairedModels()async throws->(PersonalSyncModel,PersonalSyncModel) {
         try AppSettings().save(root:a.root);try AppSettings().save(root:b.root)
@@ -340,10 +361,14 @@ import MachO
         try await settledConnectionWork(session.model!.personalSync)
         return session
     }
-    private func rootSettled(_ session:AppSession,_ condition:()->Bool)async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(30))
+    private func rootSettled(_ session:AppSession,caller:UInt=#line,diagnostics:()->String={""},_ condition:()->Bool)async throws {
+        let started=ContinuousClock.now,deadline=started.advanced(by:.seconds(30))
         while !condition(),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
-        guard condition() else {throw OSwindError.unavailable("Owned root transition did not finish: "+(session.failure ?? session.message))}
+        guard condition() else {
+            let state="caller=\(caller) busy=\(session.busy) modelPresent=\(session.model != nil) erasurePending=\(session.syncErasurePending) membershipPending=\(session.syncMembershipPending) membershipClosePending=\(session.hasPendingMembershipClose) phase=\(session.progress?.phase ?? "none")"
+            throw OSwindError.unavailable("Owned root transition did not finish: "+state+" "+diagnostics()+" "+(session.failure ?? session.message))
+        }
+        print("OWNED_ROOT_TRANSITION_READY caller=\(caller) budgetSeconds=30 elapsed=\(started.duration(to:ContinuousClock.now))")
     }
     func testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace()async throws {
         let session=try await rootSession(),old=try XCTUnwrap(session.model),shared=root.appendingPathComponent("shared")
@@ -386,7 +411,9 @@ import MachO
         try old.store.insert(Memory(id:"cancel-recovery",text:"Owned source before pending erasure"))
         old.personalSync.connectFolder(root.appendingPathComponent("shared"),create:true);try await connected(old.personalSync)
         let reader=try PairingAppWALReader(root:old.store.root);defer {reader.close()}
-        old.wipeLocalLibrary();try await rootSettled(session) {!session.busy && session.syncErasurePending && session.model==nil}
+        old.wipeLocalLibrary()
+        XCTAssertTrue(old.libraryWipe.busy,"Owned wipe was refused before recovery: "+(old.errorMessage ?? "no app error"))
+        try await rootSettled(session,diagnostics:{"oldClosed=\(old.store.isClosed) wipeBusy=\(old.libraryWipe.busy) wipePending=\(old.libraryWipe.pendingCleanup) wipeStatus=\(old.libraryWipe.status) appError=\(old.errorMessage ?? "none")"}) {!session.busy && session.syncErasurePending && session.model==nil}
         reader.close();session.resumeSyncErasure();await fulfillment(of:[gate.entered],timeout:10)
         if let path=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_RENDER_DIR"] {
             let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
@@ -448,15 +475,16 @@ import MachO
     }
     func testCancelledLibraryDrainJoinsRealPairingFactoryBeforeStoreMayClose()async throws {
         let gate=ImportWorkerGate(),owner=model(a,gate:gate)
-        owner.performPairing(.load);await fulfillment(of:[gate.entered],timeout:10)
+        owner.performPairing(.load);trace("factory-requested")
+        await fulfillment(of:[gate.entered],timeout:10);trace("factory-entered")
         XCTAssertTrue(owner.busy);XCTAssertTrue(owner.pairingBusy)
         var drained=false
         let drain=Task {await owner.cancelAndWait();drained=true};drain.cancel()
-        try await Task.sleep(for:.milliseconds(40));XCTAssertFalse(drained);XCTAssertFalse(a.isClosed)
-        gate.release();await drain.value
+        try await Task.sleep(for:.milliseconds(40));trace("factory-held-after-sleep");XCTAssertFalse(drained);XCTAssertFalse(a.isClosed)
+        gate.release();trace("factory-released");await drain.value;trace("factory-drain-joined")
         XCTAssertFalse(owner.busy);XCTAssertFalse(owner.pairingBusy);XCTAssertNil(owner.pairingStatus)
         XCTAssertTrue(storage.values.isEmpty)
-        try a.close();XCTAssertTrue(a.isClosed)
+        try a.close();trace("factory-store-closed");XCTAssertTrue(a.isClosed)
     }
     func testCancelledDrainWaitsForLateCredentialCommitAndResumesItWithoutRecreatingKeys()async throws {
         let gate=PairingSaveGate();defer {gate.release()};storage.install(gate)

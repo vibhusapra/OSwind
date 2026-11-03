@@ -1,0 +1,30 @@
+{
+  "format": "OSwind actionable research report browser QA v2",
+  "report": "report-v3.html",
+  "sha256": "4d10a965ecd3f75190a0364b7e651906c56e29ccc3878e790a613799d02548b2",
+  "nextActionsSHA256": "d5da06d94e8bae0b276652272bf6d6338a3206345087955c68c5ba80b003e986",
+  "dateUTC": "2026-11-03T19:44:27.468128+00:00",
+  "checks": {
+    "requirementRows": 83,
+    "rowsWithAction": 48,
+    "partialFacet": 45,
+    "partialRowsWithAction": 45,
+    "todoF059FilteredRows": 1,
+    "expandedF059NextActionHeading": "Next action \u00b7 implementation and physical multi-device",
+    "clipboardReadbackContainsExactF059Action": true,
+    "unknownVendorEmptyState": true,
+    "screenpipeVendorSearchCount": 1,
+    "desktopCSSWidth": 1600,
+    "desktopDocumentWidth": 1581,
+    "narrowCSSWidth": 390,
+    "narrowDocumentWidth": 371,
+    "narrowFeatureTableContainer": 346,
+    "narrowFeatureTableContent": 670,
+    "desktopExpandedFeatureVisuallyReviewed": true,
+    "narrowVendorCardVisuallyReviewed": true,
+    "consoleErrors": 0,
+    "temporaryViewportReset": true,
+    "temporaryTabClosed": true
+  },
+  "scope": "V3 retains v2 JavaScript escaping fix and adds explicit inferred next actions for all45partial+3TODO rows, including copied work list. Desktop expanded feature and narrow vendor card screenshots inspected; no print render, proprietary runtime/checkout audit or feature promotion. Report explicitly retains the current sanitizer timeout investigation."
+}
