@@ -131,6 +131,11 @@ struct SettingsView: View {
                             ForEach(m.localModels.models(for:.answer).filter { !$0.isRemote && ($0.capabilities?.contains("completion") ?? true) }) { model in Text(model.name).tag(model.name) }
                         }
                     }
+                    if m.settings.ai.provider == .ollama {
+                        Button("Load selected answer model") { m.localModels.prepareAnswer() }.disabled(!m.localModels.canPrepareAnswer)
+                        answerPreparationStatus
+                        Text("Optional: load the selected installed model without sending captured content. Requests five minutes in memory; the server may unload it sooner. First answers may still need initialization. Cancel stops this request and leaves shared models on the server.").font(.caption).foregroundStyle(.secondary)
+                    }
                 }
             }
             Section("Search model") {
@@ -169,13 +174,13 @@ struct SettingsView: View {
                     ForEach(m.localModels.availableRoles) { role in Text(role.label).tag(role) }
                 }
                 Text(m.localModels.endpoint).font(.caption).textSelection(.enabled)
-                HStack { Button(m.localModels.startingEndpoint == nil ? "Start local server" : "Starting…") { m.localModels.startServer() }.disabled(!m.localModels.canWork || m.localModels.startingEndpoint != nil); Button("Check selected server") { m.localModels.inspect() }.disabled(!m.localModels.canWork); Text(m.localModels.listing.status).font(.caption).foregroundStyle(.secondary) }
+                HStack { Button(m.localModels.startingEndpoint == nil ? "Start local server" : "Starting…") { m.localModels.startServer() }.disabled(!m.localModels.canWork || m.localModels.startingEndpoint != nil || m.localModels.preparing != nil); Button("Check selected server") { m.localModels.inspect() }.disabled(!m.localModels.canWork); Text(m.localModels.listing.status).font(.caption).foregroundStyle(.secondary) }
                 if let endpoint = m.localModels.startingEndpoint { Text("Starting \(endpoint)").font(.caption).foregroundStyle(.secondary) }
                 if let outcome = m.localModels.startOutcome { Text(outcome).font(.caption).foregroundStyle(.secondary) }
                 ForEach(m.localModels.listing.models) { model in HStack { Text(model.name); Spacer(); Text(model.isRemote ? "Cloud alias · unavailable in local mode" : ByteCountFormatter.string(fromByteCount:model.size,countStyle:.file)).font(.caption).foregroundStyle(.secondary) } }
                 if !m.localModels.listing.runtime.isEmpty { Text(m.localModels.listing.runtime).font(.caption).textSelection(.enabled) }
                 if let warning = m.localModels.listing.runtimeWarning { Text(warning).font(.caption).foregroundStyle(.secondary) }
-                HStack { TextField("Model to download",text:$downloadName); Button("Download to selected server") { m.localModels.pull(downloadName) }.disabled(!m.localModels.canWork || m.localModels.download != nil || downloadName.isEmpty) }
+                HStack { TextField("Model to download",text:$downloadName); Button("Download to selected server") { m.localModels.pull(downloadName) }.disabled(!m.localModels.canWork || m.localModels.download != nil || m.localModels.preparing != nil || downloadName.isEmpty) }
                 HStack { Button("Embedding · 0.6B") { m.localModels.select(.search); downloadName = "qwen3-embedding:0.6b" }; Button("Chat · Qwen3.5 4B") { m.localModels.select(.answer); downloadName = AIConfiguration.defaultLocalModel }; Button("Chat · Gemma4 E4B") { m.localModels.select(.answer); downloadName = AIConfiguration.largerLocalModel } }.font(.caption)
                 Text("Check the destination before Download. Presets fill the field; chat presets select the answer server when Ollama answers are enabled. Choose the downloaded model in Answer engine or Search model. Qwen3.5 4B is smaller; Gemma4 E4B needs more storage and memory. First answers may require model startup.").font(.caption).foregroundStyle(.secondary)
                 if let download = m.localModels.download {
@@ -184,8 +189,26 @@ struct SettingsView: View {
                     HStack { Text(download.progress?.status ?? "Connecting…").font(.caption); Spacer(); Button("Cancel download") { m.localModels.cancelDownload() }.disabled(download.cancelling) }
                 }
                 if let outcome = m.localModels.downloadOutcome { Text(outcome).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
+                if m.settings.ai.provider != .ollama, m.localModels.preparing != nil { answerPreparationStatus }
                 Text("Install and start Ollama with scripts/setup-models.sh if the local server is unavailable. Downloads use Ollama’s model registry; captured content is never included in a model download. Local modes reject known cloud-backed aliases. Whisper setup remains in the script.").font(.caption).foregroundStyle(.secondary)
             }
+        }
+    }
+    @ViewBuilder private var answerPreparationStatus: some View {
+        if let work = m.localModels.preparing {
+            HStack {
+                ProgressView().controlSize(.small)
+                Text("\(work.cancelling ? "Cancelling load" : "Loading") · \(work.model) · \(work.endpoint)").font(.caption)
+                Button("Cancel load") { m.localModels.cancelPreparation() }.disabled(work.cancelling)
+            }
+        } else if let value = m.localModels.prepared {
+            TimelineView(.periodic(from:.now,by:15)) { tick in
+                let recent = tick.date < value.observationExpiresAt
+                Text(recent ? "Model load confirmed at \(value.observedAt.formatted(date:.omitted,time:.standard))" : "Model load observation expired").font(.caption)
+                Text("\(value.model) · \(ByteCountFormatter.string(fromByteCount:value.residentBytes,countStyle:.file)) reported in memory. Recheck after \(value.observationExpiresAt.formatted(date:.omitted,time:.standard)); the server may unload it sooner.").font(.caption).foregroundStyle(.secondary)
+            }
+        } else if let status = m.localModels.preparationStatus {
+            Text(status).font(.caption).foregroundStyle(.secondary)
         }
     }
     private var audio: some View {

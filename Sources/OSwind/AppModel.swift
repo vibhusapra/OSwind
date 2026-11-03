@@ -64,7 +64,7 @@ import EventKit
     }
     private func applySettingsToControllers() {
         capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
-        localModels.configure(answer:settings.ai.provider == .ollama ? settings.ai.endpoint:nil,search:settings.search.endpoint)
+        localModels.configure(answer:settings.ai.provider == .ollama ? settings.ai.endpoint:nil,search:settings.search.endpoint,answerModel:settings.ai.provider == .ollama ? settings.ai.model:nil)
     }
     @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
     @Published var searchFocusRequest: UUID?
@@ -197,7 +197,7 @@ import EventKit
         voice=voiceSetup?(store,loaded,self.drafting) ?? VoiceTypingModel(store:store,settings:loaded,draft:self.drafting,environment:.live(store:store,recognizer:audio.recognizer))
         workflow=workflowSetup?(store,loaded) ?? WorkflowModel(store:store,settings:loaded,environment:.live(store:store))
         personalSync=personalSyncSetup?(store) ?? PersonalSyncModel(store:store)
-        localModels.configure(answer:loaded.ai.provider == .ollama ? loaded.ai.endpoint:nil,search:loaded.search.endpoint)
+        localModels.configure(answer:loaded.ai.provider == .ollama ? loaded.ai.endpoint:nil,search:loaded.search.endpoint,answerModel:loaded.ai.provider == .ollama ? loaded.ai.model:nil)
         localModels.allowed = {[weak self] in
             guard let self else {return false}
             return !self.demo && self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy

@@ -13,12 +13,16 @@ struct LocalModelLibraryOperations: Sendable {
     var runtime: @Sendable (String) async throws -> String
     var pull: @Sendable (String, String, @escaping @Sendable (ModelPullProgress) -> Void) async throws -> Void
     var start: @MainActor @Sendable (String) async throws -> String
+    var prepare: @Sendable (String, String) async throws -> LocalModelPreparation = { _, _ in
+        throw OSwindError.unavailable("Model loading is unavailable")
+    }
 
     static var live: Self {
         Self(models: { try await OllamaClient.shared.models(endpoint: $0) },
              runtime: { try await OllamaClient.shared.runtime(endpoint: $0) },
              pull: { try await OllamaClient.shared.pull($0, endpoint: $1, progress: $2) },
-             start: { try await LocalModelServer.shared.start(endpoint: $0) })
+             start: { try await LocalModelServer.shared.start(endpoint: $0) },
+             prepare: { try await OllamaClient.shared.prepare($0, endpoint: $1) })
     }
 }
 
@@ -39,6 +43,12 @@ struct LocalModelLibraryOperations: Sendable {
         var progress: ModelPullProgress?
         var cancelling = false
     }
+    struct PreparationWork {
+        let id: UUID
+        let model: String
+        let endpoint: String
+        var cancelling = false
+    }
 
     @Published private(set) var role: LocalModelLibraryRole = .answer
     @Published private(set) var endpoints: [LocalModelLibraryRole: String] = [:]
@@ -48,6 +58,10 @@ struct LocalModelLibraryOperations: Sendable {
     @Published private(set) var startingEndpoint: String?
     @Published private(set) var startOutcome: String?
     @Published private(set) var pendingInspections = 0
+    @Published private(set) var answerModel: String?
+    @Published private(set) var preparing: PreparationWork?
+    @Published private(set) var prepared: LocalModelPreparation?
+    @Published private(set) var preparationStatus: String?
     var allowed: () -> Bool = { true }
     private let operations: LocalModelLibraryOperations
     private var configuration = UUID()
@@ -55,22 +69,34 @@ struct LocalModelLibraryOperations: Sendable {
     private var latestInspection: [String: UUID] = [:]
     private var pullTask: Task<Void, Never>?
     private var startTask: Task<Void, Never>?
+    private var prepareTask: Task<Void, Never>?
+    private var prepareOwner: UUID?
+    private var prepareCancelled = false
+    private var preparationGeneration = UUID()
     private var retired = false
     private var drainers = 0
 
     init(operations: LocalModelLibraryOperations = .live) { self.operations = operations }
     var endpoint: String { endpoints[role] ?? "" }
     var listing: Listing { listings[endpoint] ?? Listing() }
-    var busy: Bool { !inspections.isEmpty || pullTask != nil || startTask != nil }
+    var busy: Bool { !inspections.isEmpty || pullTask != nil || startTask != nil || prepareOwner != nil }
     var canWork: Bool { !retired && drainers == 0 && allowed() }
     var availableRoles: [LocalModelLibraryRole] { LocalModelLibraryRole.allCases.filter { endpoints[$0] != nil } }
+    var canPrepareAnswer: Bool {
+        canWork && endpoints[.answer] != nil && answerModel?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false && prepareOwner == nil && pullTask == nil && startTask == nil
+    }
     func models(for role: LocalModelLibraryRole) -> [InstalledModel] {
         guard let endpoint = endpoints[role] else { return [] }
         return listings[endpoint]?.models ?? []
     }
 
-    func configure(answer: String?, search: String) {
+    func configure(answer: String?, search: String, answerModel: String? = nil) {
         guard !retired else { return }
+        if answer != endpoints[.answer] || answerModel != self.answerModel {
+            preparationGeneration = UUID(); cancelPreparation()
+            prepared = nil; preparationStatus = nil
+            self.answerModel = answerModel
+        }
         var next: [LocalModelLibraryRole: String] = [.search: search]
         if let answer { next[.answer] = answer }
         guard next != endpoints else { return }
@@ -133,7 +159,7 @@ struct LocalModelLibraryOperations: Sendable {
     }
 
     func startServer() {
-        guard canWork, startTask == nil else { return }
+        guard canWork, startTask == nil, prepareOwner == nil else { return }
         let endpoint = endpoint, operation = operations.start
         do { try validate(endpoint) }
         catch { update(endpoint) { $0.status = error.localizedDescription }; return }
@@ -154,7 +180,7 @@ struct LocalModelLibraryOperations: Sendable {
     }
 
     func pull(_ model: String) {
-        guard canWork, pullTask == nil else { return }
+        guard canWork, pullTask == nil, prepareOwner == nil else { return }
         let endpoint = endpoint, operation = operations.pull
         do {
             try validate(endpoint)
@@ -188,21 +214,66 @@ struct LocalModelLibraryOperations: Sendable {
         download?.cancelling = true
         pullTask?.cancel()
     }
+    func prepareAnswer() {
+        guard canPrepareAnswer, let endpoint = endpoints[.answer], let model = answerModel else { return }
+        do { try validate(endpoint) }
+        catch { preparationStatus = error.localizedDescription; return }
+        let id = UUID(), generation = preparationGeneration, operation = operations.prepare
+        prepareOwner = id; prepareCancelled = false
+        prepared = nil; preparationStatus = nil
+        preparing = PreparationWork(id: id, model: model, endpoint: endpoint)
+        prepareTask = Task { [weak self] in
+            let result: Result<LocalModelPreparation, Error>
+            do { result = .success(try await operation(model, endpoint)) }
+            catch { result = .failure(error) }
+            self?.finishPreparation(id, generation: generation, model: model, endpoint: endpoint, result: result, cancelled: Task.isCancelled)
+        }
+        if prepareCancelled || !canWork { prepareTask?.cancel() }
+    }
+    private func finishPreparation(_ id: UUID, generation: UUID, model: String, endpoint: String, result: Result<LocalModelPreparation, Error>, cancelled: Bool) {
+        guard prepareOwner == id else { return }
+        preparing = nil
+        if canWork, preparationGeneration == generation, endpoints[.answer] == endpoint, answerModel == model {
+            if cancelled || prepareCancelled {
+                preparationStatus = "Model load request cancelled"
+            } else {
+                switch result {
+                case .success(let value):
+                    let untagged = !(model.split(separator: "/").last?.contains(":") ?? true)
+                    guard value.endpoint == endpoint, value.requestedModel == model,
+                          value.model == model || (untagged && value.model == model + ":latest"),
+                          value.observationExpiresAt > Date(), value.observedAt <= Date().addingTimeInterval(1), value.residentBytes > 0 else {
+                        preparationStatus = "The server load observation did not match the selected model"
+                        prepareTask = nil; prepareOwner = nil; objectWillChange.send(); return
+                    }
+                    prepared = value
+                    preparationStatus = "Selected model load confirmed by the server"
+                case .failure(let error):
+                    preparationStatus = error is CancellationError ? "Model load request cancelled" : error.localizedDescription
+                }
+            }
+        }
+        prepareTask = nil; prepareOwner = nil; objectWillChange.send()
+    }
+    func cancelPreparation() {
+        guard prepareOwner != nil else { return }
+        prepareCancelled = true; preparing?.cancelling = true; prepareTask?.cancel()
+    }
     func cancelAll() {
         latestInspection.removeAll()
         for task in inspections.values { task.cancel() }
         listings = listings.mapValues { value in var value = value; value.checking = false; return value }
-        cancelDownload(); startTask?.cancel()
+        cancelDownload(); startTask?.cancel(); cancelPreparation()
     }
     func retire() {
-        retired = true; cancelAll(); listings.removeAll(); downloadOutcome = nil; startOutcome = nil
+        retired = true; cancelAll(); listings.removeAll(); downloadOutcome = nil; startOutcome = nil; prepared = nil; preparationStatus = nil
     }
     func cancelAndWait() async {
         drainers += 1
         defer { drainers -= 1 }
         cancelAll()
-        let tasks = Array(inspections.values), pull = pullTask, start = startTask
+        let tasks = Array(inspections.values), pull = pullTask, start = startTask, prepare = prepareTask
         for task in tasks { await task.value }
-        await pull?.value; await start?.value
+        await pull?.value; await start?.value; await prepare?.value
     }
 }

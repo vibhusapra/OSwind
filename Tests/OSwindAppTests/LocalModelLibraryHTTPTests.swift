@@ -3,8 +3,8 @@ import XCTest
 @testable import OSwindCore
 @testable import OSwind
 
-private final class OwnedModelLibraryHTTPServer: @unchecked Sendable {
-    struct Request { let method: String; let path: String; let model: String?; let authorizationAbsent: Bool }
+final class OwnedModelLibraryHTTPServer: @unchecked Sendable {
+    struct Request { let method: String; let path: String; let model: String?; let authorizationAbsent: Bool; let bodyKeys: Set<String>; let keepAlive: String?; let stream: Bool? }
     let ready = XCTestExpectation(description: "owned loopback listener ready")
     let stopped = XCTestExpectation(description: "owned listener and connections stopped")
     private let listener: NWListener
@@ -13,9 +13,12 @@ private final class OwnedModelLibraryHTTPServer: @unchecked Sendable {
     private var requests: [Request] = []
     private var connections: [UUID: NWConnection] = [:] // queue confined
     private var stopping = false, listenerStopped = false, stopReported = false
+    private let preparationEnabled: Bool
+    private var loaded = false // queue confined
     let model: String
-    init(model: String) throws {
+    init(model: String, preparationEnabled: Bool = false) throws {
         self.model = model
+        self.preparationEnabled = preparationEnabled
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host: "127.0.0.1", port: .any)
         listener = try NWListener(using: parameters)
@@ -62,14 +65,19 @@ private final class OwnedModelLibraryHTTPServer: @unchecked Sendable {
                     guard first.count == 3 else { connection.cancel(); return }
                     let method = String(first[0]), path = String(first[1])
                     let body = buffer[range.upperBound..<(range.upperBound + length)]
-                    let name = (try? JSONSerialization.jsonObject(with: body) as? [String: Any])?["model"] as? String
-                    let request = Request(method: method, path: path, model: name, authorizationAbsent: !lines.contains { $0.lowercased().hasPrefix("authorization:") })
+                    let object = (try? JSONSerialization.jsonObject(with: body) as? [String: Any]) ?? [:]
+                    let name = object["model"] as? String
+                    let request = Request(method: method, path: path, model: name, authorizationAbsent: !lines.contains { $0.lowercased().hasPrefix("authorization:") }, bodyKeys: Set(object.keys), keepAlive: object["keep_alive"] as? String, stream: object["stream"] as? Bool)
                     self.lock.lock(); self.requests.append(request); self.lock.unlock()
                     let response: String
+                    let digest = self.preparationEnabled ? String(repeating:"a",count:64) : "owned-fictional"
                     switch (method, path) {
-                    case ("GET", "/api/tags"): response = "{\"models\":[{\"name\":\"\(self.model)\",\"digest\":\"owned-fictional\",\"size\":10}]}"
-                    case ("GET", "/api/ps"): response = "{\"models\":[]}"
+                    case ("GET", "/api/tags"): response = "{\"models\":[{\"name\":\"\(self.model)\",\"digest\":\"\(digest)\",\"size\":10}]}"
+                    case ("GET", "/api/ps"):
+                        response = self.loaded ? "{\"models\":[{\"name\":\"\(self.model)\",\"digest\":\"\(digest)\",\"size\":4096,\"size_vram\":2048,\"context_length\":8192,\"expires_at\":\"\(Date().addingTimeInterval(300).ISO8601Format())\"}]}" : "{\"models\":[]}"
                     case ("POST", "/api/pull"): response = "{\"status\":\"success\"}\n"
+                    case ("POST", "/api/generate") where self.preparationEnabled:
+                        self.loaded = true; response = "{\"model\":\"\(self.model)\",\"done\":true,\"response\":\"\",\"done_reason\":\"load\"}"
                     default: connection.cancel(); return
                     }
                     let output = Data("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: \(response.utf8.count)\r\nConnection: close\r\n\r\n\(response)".utf8)
