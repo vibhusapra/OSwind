@@ -1,0 +1,134 @@
+{
+  "format": "OSwind targeted Spotlight restoration v2",
+  "state": "restoration-verified",
+  "completedAtUTC": "2026-11-03T00:16:41.830808+00:00",
+  "initialOwnedCount": 4,
+  "finalOwnedCount": 0,
+  "onlyInitialVerifiedTaskCreatedPathsTargeted": true,
+  "initialVerifiedPathsReceiptSHA256": "14c29400a3e96adc3cf77cec95a5b395acb931a8f4dedf94553d49a9ead0f086",
+  "unrelatedSHA256BeforeAndAfter": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "independentObservedCounts": [
+    4,
+    3,
+    2,
+    2,
+    1,
+    0
+  ],
+  "UIObservedCounts": [
+    3,
+    2,
+    2,
+    1,
+    0
+  ],
+  "finalUISignal": "No Locations Added",
+  "doneSucceeded": true,
+  "originalGeneralPaneRestored": true,
+  "globalServicesReset": false,
+  "forceQuitOrSudo": false,
+  "otherSettingsChanged": false,
+  "screenshot": {
+    "file": "spotlight-empty-2026-11-02.jpg",
+    "sha256": "7c87549cb78a0565d88b51d08de99d579a408e9b72ff7398b83079cc218c448f",
+    "bytes": 18512,
+    "ocrSHA256": "4387b4b1185f17980cf6de8f9ad973708d660eec653b6d9ea6beeacbd0324f93"
+  },
+  "finalUIAXSHA256": "d034e40fc488637bd497747bf89c91ab2b3768c5212085e8b0f0ce69c094cfa7",
+  "restoredGeneralSelectionSHA256": "6a0db0c21acc865ae7db0ac72c5d80bf89027f651b481b16c2db4d130785c0ad",
+  "rawArchive": {
+    "file": "spotlight-restoration-raw-v2.zip",
+    "sha256": "c6f65cd19dfcec5b96f7536e11004b410663e399ccc836aebdf7516a87957132",
+    "entries": 30
+  },
+  "reviewerSHA256": "3f2aaed305e49a3c6fdcae0f9c151c0f4ded7129f53c5fd3021f696113505cc8",
+  "rawReads": {
+    "13": {
+      "file": "spotlight-read-13.json",
+      "sha256": "09666acbf147d8f327bfad84e48893c6647ece9362ae62d7e2a0c574df390a17",
+      "state": "observed",
+      "matchingOwnedCount": 4,
+      "removalStatus": null
+    },
+    "14": {
+      "file": "spotlight-read-14.json",
+      "sha256": "b259b0f62795461798230010c3699eaf2c00d4905842457695a5f8e89b5dbe24",
+      "state": "removal-requested",
+      "matchingOwnedCount": 4,
+      "removalStatus": 0
+    },
+    "15": {
+      "file": "spotlight-read-15.json",
+      "sha256": "ed22832f788bd5d031343be66f3e2d2ea7b22dca655e53e17a908f6aa6c16a0b",
+      "state": "observed",
+      "matchingOwnedCount": 0,
+      "removalStatus": null
+    },
+    "16": {
+      "file": "spotlight-read-16.json",
+      "sha256": "3d5f62b480a3c31c969a5c74c6933db00583e68880e3533d60340da008e0ee41",
+      "state": "observed",
+      "matchingOwnedCount": 3,
+      "removalStatus": null
+    },
+    "17": {
+      "file": "spotlight-read-17.json",
+      "sha256": "ce918463b6bd6241789f0de0828ae3247c8b9f24088f0d0a9732c1d39b50b8bd",
+      "state": "observed",
+      "matchingOwnedCount": 2,
+      "removalStatus": null
+    },
+    "18": {
+      "file": "spotlight-read-18.json",
+      "sha256": "ce918463b6bd6241789f0de0828ae3247c8b9f24088f0d0a9732c1d39b50b8bd",
+      "state": "observed",
+      "matchingOwnedCount": 2,
+      "removalStatus": null
+    },
+    "19": {
+      "file": "spotlight-read-19.json",
+      "sha256": "849bb7ab317d15d20a2036e262653331e9c768be9cfdbe1254085d51a6678451",
+      "state": "removal-requested",
+      "matchingOwnedCount": 2,
+      "removalStatus": 0
+    },
+    "20": {
+      "file": "spotlight-read-20.json",
+      "sha256": "a3325cfb01e5d9c049d011897fb25991fb342abc7c08a622a00944623db6e94c",
+      "state": "observed",
+      "matchingOwnedCount": 1,
+      "removalStatus": null
+    },
+    "21": {
+      "file": "spotlight-read-21.json",
+      "sha256": "c766474eff506347d8023a584e88e099caf2120df0b45752218524ca36459f9f",
+      "state": "removal-requested",
+      "matchingOwnedCount": 1,
+      "removalStatus": 0
+    },
+    "22": {
+      "file": "spotlight-read-22.json",
+      "sha256": "ed22832f788bd5d031343be66f3e2d2ea7b22dca655e53e17a908f6aa6c16a0b",
+      "state": "observed",
+      "matchingOwnedCount": 0,
+      "removalStatus": null
+    }
+  },
+  "retainedFailures": [
+    {
+      "stage": "Automatic per-call verifier",
+      "file": "spotlight-restoration-runner-v1.log",
+      "sha256": "0043a81d4ddf251196bf769d071a9be4765ff405cc11f84ad52495298ca611eb",
+      "reason": "Immediate API read15 returned zero after the first removal, contradicted by healthy UI and read16 showing3. Controller stopped without further mutations. Zero rejected as final verification."
+    },
+    {
+      "stage": "System Settings removal",
+      "reason": "Group removal reported Privacy List Error but one owned path was independently removed. Subsequent UI removal also reported errors and left the remaining2 unchanged. Exact-path API requests then removed one at a time; UI and independent reads confirmed1 and0."
+    },
+    {
+      "stage": "First final receipt preflight",
+      "reason": "Screenshot was JPEG despite initial .png filename; header validation failed before any final receipt was written. Renamed without changing image bytes, then verified JPEG header and native OCR."
+    }
+  ],
+  "scope": "Completes targeted restoration of the four remaining original benchmark-created Spotlight exclusions. Final healthy native UI, screenshot/OCR and fresh post-Done API read agree on zero, with unrelated-list hash unchanged. Old frozen comparison/review results stay unchanged. No live capture, power, quality, distribution or ranking acceptance follows."
+}
