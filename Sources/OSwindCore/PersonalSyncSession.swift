@@ -95,10 +95,16 @@ public actor PersonalSyncSession {
         try Task.checkCancellation()
         let proof=try SyncMembershipRefresh.decode(Data(text.utf8)),trusted=try pairing.membershipCertificateForRefresh(),head=try proof.advance(from:trusted)
         guard head != trusted else {throw OSwindError.invalid("This membership page is already applied; request the next page")}
+        // The complete supplied path was verified above. Private preparation
+        // must start at our exact current certificate, even when the public
+        // page includes an already applied prefix. Keep the review fingerprint
+        // bound to the original page rather than this local suffix.
+        guard let current=proof.certificates.firstIndex(of:trusted) else {throw OSwindError.invalid("Membership update does not extend the exact trusted history")}
+        let pending=try SyncMembershipRefresh(base:trusted,updates:Array(proof.certificates.dropFirst(current+1)))
         let environment=try pairing.ownerChangeEnvironment(),workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
         let oldMembers=Set(trusted.body.members.map(\.replica))
         let review=PersonalSyncMembershipReview(rootFingerprint:try SyncPairingFormat.fingerprint(head.body.rootPublicKey),updateFingerprint:SyncProtocolLimits.hex(try proof.encoded()),currentRevision:trusted.body.revision,updatedRevision:head.body.revision,currentMemberCount:trusted.body.members.count,updatedMemberCount:head.body.members.count,addedDeviceNames:head.body.members.filter {!oldMembers.contains($0.replica)}.map(\.name),session:reviewOwner,token:UUID(),workspace:workspace)
-        try Task.checkCancellation();ownerAdditionReview=nil;membershipReview=(review,proof,trusted,environment);return review
+        try Task.checkCancellation();ownerAdditionReview=nil;membershipReview=(review,pending,trusted,environment);return review
     }
     /// App retirement first joins its actual producers and this exact stop.
     /// Reserve the shared one-use transfer before awaiting actor reentrancy.

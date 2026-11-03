@@ -274,3 +274,26 @@ extension PersonalSyncMembershipUpdateTests {
         XCTAssertGreaterThan(pages,1);XCTAssertEqual(current.body.members.count,64);XCTAssertTrue(storage.values==saved)
     }
 }
+
+extension PersonalSyncMembershipUpdateTests {
+    func testOverlappingOlderPageAppliesOnlySuccessorsOfExactCurrentPeer()async throws {
+        let f=try await fixture(),originalRequest=try await f.peerSession.membershipUpdateRequest(),exporter=try XCTUnwrap(f.exporting)
+        let firstPage=try XCTUnwrap(exporter.membershipUpdatePage(for:originalRequest)),ownerThird=try exporter.prepareSavedSession();sessions.append(ownerThird)
+        let fourth=try pair(store(f.folder.deletingLastPathComponent().appendingPathComponent("fourth"))),fourthRequest=try XCTUnwrap(fourth.requestJoin(deviceName:"Owned fourth Mac",now:now).request)
+        let ownerReview=try await ownerThird.reviewOwnerAddition(fourthRequest,now:now),time=now
+        try await ownerThird.stop();let adding=try await ownerThird.ownerChangeAfterStopping(ownerReview,clock:{time});changes.append(adding)
+        let response=try XCTUnwrap(adding.apply(clock:{self.now}));try adding.close();_=try fourth.acceptResponse(response.response,trustedRootFingerprint:f.fingerprint,now:now)
+        let latestOwner=try pair(store(f.ownerStore.root)),overlap=try XCTUnwrap(latestOwner.membershipUpdatePage(for:originalRequest)),wire=try SyncMembershipRefresh.decode(Data(overlap.utf8))
+        XCTAssertEqual(wire.base.body.revision,2);XCTAssertEqual(wire.head.body.revision,4)
+        let firstReview=try await f.peerSession.reviewMembershipUpdate(firstPage);try await f.peerSession.stop();let first=try await change(f.peerSession,firstReview);XCTAssertNil(try first.apply());try first.close()
+        let currentStore=try store(f.peerStore.root),currentPairing=try pair(currentStore),current=try currentPairing.prepareSavedSession();sessions.append(current)
+        let reviewed=try await current.reviewMembershipUpdate(overlap)
+        XCTAssertEqual(reviewed.currentRevision,3);XCTAssertEqual(reviewed.updatedRevision,4);XCTAssertEqual(reviewed.addedDeviceNames,["Owned fourth Mac"])
+        XCTAssertEqual(reviewed.updateFingerprint,SyncProtocolLimits.hex(Data(overlap.utf8)),"The review must describe the supplied page, including its authenticated overlap")
+        try await current.stop();let before=storage.values,operation=try await change(current,reviewed)
+        XCTAssertTrue(storage.values==before,"Retained draft wrote private intent before apply")
+        XCTAssertNil(try operation.apply());try operation.close()
+        let fresh=try store(currentStore.root),paired=try pair(fresh);XCTAssertEqual(try paired.status().memberNames.count,4)
+        try fresh.insert(Memory(id:"after-overlap",text:"Original peer remains writable after overlapping update"));XCTAssertNotNil(try fresh.get("after-overlap"))
+    }
+}
