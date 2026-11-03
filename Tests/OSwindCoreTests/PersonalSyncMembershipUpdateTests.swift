@@ -244,8 +244,10 @@ extension PersonalSyncMembershipUpdateTests {
         for _ in 0..<3 {try await publicCycle(resumed)}
         for library in reopened {
             for text in initialTexts+offlineTexts {XCTAssertTrue(try hasText(text,in:library),"Missing or duplicated original source after reconnect")}
-            let sourceTable=SyncCanonicalTable.source.rawValue
-            XCTAssertEqual(try graph.serviceCount(library,sourceTable),try XCTUnwrap(expected[sourceTable])+5)
+            for table in SyncCanonicalTable.allCases {
+                let original=try XCTUnwrap(expected[table.rawValue]),added=table == .source ? 5:0
+                XCTAssertEqual(try graph.serviceCount(library,table.rawValue),original+added,"Changed or duplicated \(table.rawValue) after reconnect/replay")
+            }
         }
         if let backend=nativeBackend,let enrolledAccounts {
             XCTAssertEqual(Set(backend.accounts),enrolledAccounts,"Reconnect replaced original accounts")

@@ -379,6 +379,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     private struct Fixture {
         let app:AppSession,old:AppModel,page:String,pairingID:String,deliveryID:String,provider:URL,tracker:OwnerOpenTracker,passphrase:String?
+        let ownerRoot:URL
     }
     override func setUpWithError()throws {
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-peer-membership-"+UUID().uuidString);try Paths.ensure(root)
@@ -448,12 +449,72 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         try await ownerSession.stop();let change=try await ownerSession.ownerChangeAfterStopping(ownerReview);changes.append(change)
         let response=try XCTUnwrap(change.apply());try change.close();_=try joining.acceptResponse(response.response,trustedRootFingerprint:fingerprint);joining.close()
         let freshOwner=try store(ownerStore.root),exporter=try pair(freshOwner),page=try XCTUnwrap(exporter.membershipUpdatePage(for:publicRequest));exporter.close()
-        return .init(app:app,old:old,page:page,pairingID:ids.0,deliveryID:ids.1,provider:provider,tracker:tracker,passphrase:passphrase)
+        try freshOwner.savePersonalSyncPreferences(.init(reconnectOnLaunch:false,networkEnabled:false))
+        try freshOwner.close()
+        return .init(app:app,old:old,page:page,pairingID:ids.0,deliveryID:ids.1,provider:provider,tracker:tracker,passphrase:passphrase,ownerRoot:freshOwner.root)
     }
     private func quiet(_ f:Fixture,file:StaticString=#filePath,line:UInt=#line)throws {
         let fresh=try XCTUnwrap(f.app.model,file:file,line:line);XCTAssertFalse(fresh === f.old,file:file,line:line);XCTAssertFalse(fresh.isCapturing,file:file,line:line);XCTAssertEqual(fresh.apiStatus,"API off",file:file,line:line);XCTAssertFalse(fresh.personalSync.configured,file:file,line:line)
         XCTAssertEqual(try fresh.store.personalSyncPreferences(),.init(reconnectOnLaunch:false,networkEnabled:false),file:file,line:line)
         XCTAssertNotNil(try fresh.store.get("keep"),file:file,line:line);XCTAssertNil(f.app.syncApprovalPresentation,file:file,line:line)
+    }
+    private func ownerApp(_ f:Fixture,gate:ImportWorkerGate?=nil)async throws->AppSession {
+        var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.automaticMaintenance=false;settings.entityAutomaticIndex=false;settings.clipboard.enabled=false;settings.meetings.enabled=false;try settings.save(root:f.ownerRoot)
+        let env=environment,tracker=OwnerOpenTracker(env);trackers.append(tracker)
+        let app=AppSession(selection:.init(url:f.ownerRoot,requiresExisting:true,origin:"owned-export"),defaults:defaults,locked:{false},openStore:{try tracker.open($0)},personalSyncSetup:{library in
+            PersonalSyncModel(store:library,locked:{false},pairingFactory:{library in
+                try gate?.pause()
+                return try PersonalSyncPairing(store:library,stateRoot:env.stateRoot,machine:env.machine,storage:env.storage(.loginKeychain))
+            })
+        },ownerAdditionPreview:true)
+        apps.append(app);try await settle(app);XCTAssertNil(app.failure)
+        let model=try XCTUnwrap(app.model);model.showOnboarding=false;try await SourceWorkTestJob.settle(model)
+        XCTAssertFalse(model.isCapturing);XCTAssertEqual(model.apiStatus,"API off");XCTAssertFalse(model.personalSync.configured)
+        return app
+    }
+    private func pairingDone(_ model:PersonalSyncModel)async throws {
+        let deadline=SuspendingClock.now.advanced(by:.seconds(15))
+        while model.pairingBusy,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(model.pairingBusy);XCTAssertNil(model.pairingError)
+    }
+    func testActualOwnerAppExportsExactPublicPageWithoutChangingPrivateAccounts()async throws {
+        let f=try await fixture(),owner=try await ownerApp(f),model=try XCTUnwrap(owner.model).personalSync,request=try XCTUnwrap(f.old.personalSync.membershipRequest),before=storage.values
+        model.performPairing(.membershipPage(request));try await pairingDone(model)
+        XCTAssertEqual(model.membershipPage,f.page);XCTAssertFalse(model.membershipPageCurrent);XCTAssertEqual(model.pairingStatus?.memberNames.count,3)
+        XCTAssertNil(model.pairingResponse);XCTAssertFalse(model.configured);XCTAssertTrue(storage.values==before,"Public export changed private accounts")
+        model.performPairing(.membershipRequest);try await pairingDone(model)
+        let current=try XCTUnwrap(model.membershipRequest);model.performPairing(.membershipPage(current));try await pairingDone(model)
+        XCTAssertNil(model.membershipPage);XCTAssertTrue(model.membershipPageCurrent);XCTAssertTrue(storage.values==before)
+        model.clearPairingMessages();XCTAssertFalse(model.membershipPageCurrent);XCTAssertNil(model.membershipPage)
+    }
+    func testCancelledOwnerExportJoinsActualWorkerBeforeLibraryClose()async throws {
+        let f=try await fixture(),gate=ImportWorkerGate();defer {gate.release()}
+        let owner=try await ownerApp(f,gate:gate),old=try XCTUnwrap(owner.model),model=old.personalSync,request=try XCTUnwrap(f.old.personalSync.membershipRequest),before=storage.values
+        model.performPairing(.membershipPage(request));await fulfillment(of:[gate.entered],timeout:5)
+        model.cancelPairing();let departed=Task {await owner.lockForTermination()}
+        for _ in 0..<10 {await Task.yield()}
+        XCTAssertFalse(old.store.isClosed);XCTAssertTrue(model.busy);XCTAssertNil(model.membershipPage)
+        gate.release();let joined=await departed.value;XCTAssertTrue(joined);XCTAssertFalse(model.busy)
+        try old.store.close();XCTAssertTrue(old.store.isClosed)
+        XCTAssertNil(model.membershipPage);XCTAssertTrue(storage.values==before)
+    }
+    func testRenderPeerRequestReviewAndOwnerExportInBothAppearances()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_PEER_UI_QA_DIR"] else {throw XCTSkip("Explicit generated peer component raster QA; no desktop capture")}
+        let output=URL(fileURLWithPath:path);try Paths.ensure(output);let f=try await fixture()
+        for dark in [false,true] {try await renderPeer(f.old.personalSync,size:.init(width:660,height:650),dark:dark,to:output.appendingPathComponent("request-\(dark ? "dark":"light").png"))}
+        _=try await review(f)
+        for dark in [false,true] {try await renderPeer(f.old.personalSync,size:.init(width:660,height:470),dark:dark,to:output.appendingPathComponent("review-\(dark ? "dark":"light").png"))}
+        let owner=try await ownerApp(f),model=try XCTUnwrap(owner.model).personalSync
+        model.performPairing(.membershipPage(try XCTUnwrap(f.old.personalSync.membershipRequest)));try await pairingDone(model);XCTAssertEqual(model.membershipPage,f.page)
+        for dark in [false,true] {try await renderPeer(model,size:.init(width:660,height:550),dark:dark,to:output.appendingPathComponent("export-\(dark ? "dark":"light").png"))}
+    }
+    private func renderPeer(_ model:PersonalSyncModel,size:NSSize,dark:Bool,to path:URL)async throws {
+        let content=PersonalSyncMembershipUpdateView(model:model,initiallyExpanded:true).padding(24)
+        let view=NSHostingView(rootView:content.frame(width:size.width,height:size.height).background(Color(nsColor:.windowBackgroundColor)).preferredColorScheme(dark ? .dark:.light))
+        let window=NSWindow(contentRect:.init(origin:.zero,size:size),styleMask:[.titled],backing:.buffered,defer:false);window.isReleasedWhenClosed=false;window.contentView=view;defer {window.close()}
+        view.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(350));view.layoutSubtreeIfNeeded();window.displayIfNeeded()
+        let bitmap=try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in:view.bounds));view.cacheDisplay(in:view.bounds,to:bitmap)
+        let bytes=try XCTUnwrap(bitmap.representation(using:.png,properties:[:]));try bytes.write(to:path);XCTAssertGreaterThan(bytes.count,4000)
     }
     func testActualPeerAppAppliesExactReviewAndReopensQuietlyWithoutResponse()async throws {
         let f=try await fixture(),review=try await review(f),accounts=Set(storage.values.keys)
