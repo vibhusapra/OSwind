@@ -5,9 +5,13 @@ import CSQLite
 final class PersonalSyncMembershipUpdateTests:XCTestCase {
     private var root:URL!,stores=[MemoryStore](),pairings=[PersonalSyncPairing](),sessions=[PersonalSyncSession](),changes=[PersonalSyncMembershipChange]()
     private let storage=PairingTestStorage(),now=Date(timeIntervalSince1970:1_800_000_000)
+    private var nativeBackend:NativeWriterKeychainFixture?
     private let machine=SyncCredentialBindingTests.Machine(value:String(repeating:"d",count:64))
     private var serial=0
-    private var environment:SyncNativeWriterEnvironment {.init(stateRoot:root.appendingPathComponent("state"),machine:machine,storage:{[storage] _ in storage})}
+    private var environment:SyncNativeWriterEnvironment {
+        if let nativeBackend {let native=SyncNativeWriterEnvironment.native;return .init(stateRoot:native.stateRoot,machine:native.machine,storage:{_ in nativeBackend})}
+        return .init(stateRoot:root.appendingPathComponent("state"),machine:machine,storage:{[storage] _ in storage})
+    }
     private struct Fixture {
         let ownerStore:MemoryStore,peerStore:MemoryStore,joining:PersonalSyncPairing
         let ownerSession:PersonalSyncSession,peerSession:PersonalSyncSession
@@ -21,13 +25,14 @@ final class PersonalSyncMembershipUpdateTests:XCTestCase {
     override func tearDown()async throws {
         for session in sessions {try await session.stop()}
         try changes.forEach {try $0.close()};pairings.forEach {$0.close()};try stores.forEach {try $0.close()}
+        try nativeBackend?.cleanup()
         try FileManager.default.removeItem(at:root)
     }
     private func store(_ path:URL)throws->MemoryStore {
         let value=try MemoryStore(root:path,recoveryReadOnly:false,nativeWriterEnvironment:environment);stores.append(value);return value
     }
     private func pair(_ store:MemoryStore)throws->PersonalSyncPairing {
-        let value=try PersonalSyncPairing(store:store,stateRoot:environment.stateRoot,machine:machine,storage:storage);pairings.append(value);return value
+        let env=environment,value=try PersonalSyncPairing(store:store,stateRoot:env.stateRoot,machine:env.machine,storage:env.storage(.loginKeychain));pairings.append(value);return value
     }
     private func fixture(advanceOwner:Bool=true)async throws->Fixture {
         serial+=1;let base=root.appendingPathComponent("fixture-\(serial)"),ownerStore=try store(base.appendingPathComponent("owner")),peerStore=try store(base.appendingPathComponent("peer")),owner=try pair(ownerStore),peer=try pair(peerStore)
@@ -65,6 +70,14 @@ final class PersonalSyncMembershipUpdateTests:XCTestCase {
             guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Owned pairing handle missing")}
             let object=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(db.text(row,0).utf8)) as? [String:Any]);return try XCTUnwrap(object["id"] as? String)
         }
+    }
+    private func originalPrivateFields(_ account:String,backend:NativeWriterKeychainFixture)throws->[String:String] {
+        let envelope=try XCTUnwrap(JSONSerialization.jsonObject(with:backend.read(id:account)) as? [String:Any])
+        let material=try XCTUnwrap(Data(base64Encoded:XCTUnwrap(envelope["material"] as? String))),value=try XCTUnwrap(JSONSerialization.jsonObject(with:material) as? [String:Any])
+        var result=[String:String]()
+        for key in ["replica","signingPrivate","agreementPrivate","groupSecret"] {result[key]=try XCTUnwrap(value[key] as? String)}
+        if let owner=value["ownerPrivate"] {result["ownerPrivate"]=try XCTUnwrap(owner as? String)}
+        return result // In-memory only; assertions never print these values.
     }
     private func futurePage(_ f:Fixture)throws->String {
         let envelope=try XCTUnwrap(JSONSerialization.jsonObject(with:storage.read(id:pairingID(f.ownerStore))) as? [String:Any])
@@ -174,16 +187,35 @@ extension PersonalSyncMembershipUpdateTests {
         }
     }
     func testThreePublicSessionsExchangeAllThirteenKindsThenWriteOfflineAndReconnectWithoutDuplicates()async throws {
+        try await threeDeviceTransfer()
+    }
+    func testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts()async throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_SYNC_KEYCHAIN"]=="1" else {throw XCTSkip("Explicit three-library generated login-Keychain and actual Mac binding fixture")}
+        nativeBackend=NativeWriterKeychainFixture()
+        try await threeDeviceTransfer()
+        if testRun?.totalFailureCount==0 {print("OWNED_NATIVE_PUBLIC_THREE_DEVICE originalAccountIDsPreserved=true originalPrivateFieldsPreserved=true actualMacBinding=true graphKinds=13 offlinePeerWrites=2 reconnect=true")}
+    }
+    private func threeDeviceTransfer()async throws {
         let f=try await fixture(advanceOwner:false),graph=SyncOutgoingTests();graph.store=f.ownerStore;graph.root=f.ownerStore.root;try graph.seedGraph()
+        let originalAccounts=nativeBackend.map {Set($0.accounts)}
+        var originalFields=[String:[String:String]]()
+        if let backend=nativeBackend {for library in [f.ownerStore,f.peerStore] {let account=try pairingID(library);originalFields[account]=try originalPrivateFields(account,backend:backend)}}
         let expected=try Dictionary(uniqueKeysWithValues:SyncCanonicalTable.allCases.map {($0.rawValue,try graph.serviceCount(f.ownerStore,$0.rawValue))});XCTAssertTrue(expected.values.allSatisfy {$0>0})
         let request=try await f.peerSession.membershipUpdateRequest(),ownerReview=try await f.ownerSession.reviewOwnerAddition(f.request,now:now),time=now
         try await f.ownerSession.stop();let addition=try await f.ownerSession.ownerChangeAfterStopping(ownerReview,clock:{time});changes.append(addition)
         let response=try XCTUnwrap(addition.apply(clock:{self.now}));try addition.close();_=try f.joining.acceptResponse(response.response,trustedRootFingerprint:f.fingerprint,now:now)
         let ownerStore=try store(f.ownerStore.root),exporter=try pair(ownerStore),page=try XCTUnwrap(exporter.membershipUpdatePage(for:request));exporter.close()
         let review=try await f.peerSession.reviewMembershipUpdate(page);try await f.peerSession.stop();let update=try await change(f.peerSession,review);XCTAssertNil(try update.apply());try update.close()
+        if let backend=nativeBackend,let originalAccounts {
+            XCTAssertEqual(Set(backend.accounts),originalAccounts,"Membership update created replacement accounts")
+            for account in originalAccounts {_=try backend.read(id:account)}
+            for (account,before) in originalFields {XCTAssertTrue(try originalPrivateFields(account,backend:backend)==before,"Original device private fields changed")}
+        }
         let peerStore=try store(f.peerStore.root),joiningStore=try XCTUnwrap(stores.first {f.joining.belongs(to:$0)})
         let owner=try pair(ownerStore),peer=try pair(peerStore),ownerSession=try owner.prepareSavedSession(),peerSession=try peer.prepareSavedSession(),joiningSession=try f.joining.prepareSession(sharedFolder:f.folder)
         sessions += [ownerSession,peerSession,joiningSession]
+        let enrolledAccounts=nativeBackend.map {Set($0.accounts)}
+        if let originalAccounts,let enrolledAccounts {XCTAssertTrue(originalAccounts.isSubset(of:enrolledAccounts));XCTAssertEqual(enrolledAccounts.count,originalAccounts.count+1,"Only the joining Mac's first delivery account should be new")}
         let group=[ownerSession,peerSession,joiningSession],libraries=[ownerStore,peerStore,joiningStore]
         var complete=false
         for _ in 0..<12 {
@@ -214,6 +246,11 @@ extension PersonalSyncMembershipUpdateTests {
             for text in initialTexts+offlineTexts {XCTAssertTrue(try hasText(text,in:library),"Missing or duplicated original source after reconnect")}
             let sourceTable=SyncCanonicalTable.source.rawValue
             XCTAssertEqual(try graph.serviceCount(library,sourceTable),try XCTUnwrap(expected[sourceTable])+5)
+        }
+        if let backend=nativeBackend,let enrolledAccounts {
+            XCTAssertEqual(Set(backend.accounts),enrolledAccounts,"Reconnect replaced original accounts")
+            for account in enrolledAccounts {_=try backend.read(id:account)}
+            for (account,before) in originalFields {XCTAssertTrue(try originalPrivateFields(account,backend:backend)==before,"Reconnect changed original private material")}
         }
         print("OWNED_PUBLIC_THREE_DEVICE graphKinds=13 bidirectionalWrites=3 offlinePeerWrites=2 reconnect=true duplicateReplay=false")
     }

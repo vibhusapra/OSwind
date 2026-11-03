@@ -2,6 +2,7 @@ import XCTest
 import CSQLite
 import AppKit
 import SwiftUI
+import Combine
 @testable import OSwindCore
 @testable import OSwind
 
@@ -545,6 +546,25 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         f.app.requestLock();try await settle(f.app);XCTAssertEqual(f.app.vaultStatus?.imageAttached,true);XCTAssertFalse(f.old.store.isClosed)
         sqlite3_finalize(statement);statement=nil;f.app.retryMembershipClose();try await settle(f.app)
         f.app.requestLock();try await settle(f.app);XCTAssertEqual(f.app.vaultStatus?.imageAttached,false);XCTAssertNil(f.app.syncApprovalPresentation)
+    }
+    func testNativeVaultWatcherCannotReopenWhileOriginalPeerCloseIsBlocked()async throws {
+        let f=try await fixture(nativeVault:true),review=try await review(f)
+        var statement:OpaquePointer?=try f.old.store.withRoutineDatabase {try $0.statement("SELECT 1")};defer {sqlite3_finalize(statement)}
+        f.app.approveSyncMembership(review,from:f.old);try await settle(f.app)
+        XCTAssertTrue(f.app.hasPendingMembershipClose);XCTAssertFalse(f.old.store.isClosed);XCTAssertEqual(f.tracker.count,1);XCTAssertNil(f.app.model)
+        let observed=expectation(description:"Actual vault directory observer refresh entered")
+        let observation=f.app.$busy.filter {$0}.prefix(1).sink {_ in observed.fulfill()};defer {observation.cancel()}
+        let package=try XCTUnwrap(f.app.vaultPackage)
+        try Data("owned watcher probe".utf8).write(to:package.appendingPathComponent(".owned-watcher-probe"))
+        await fulfillment(of:[observed],timeout:5);try await settle(f.app)
+        XCTAssertEqual(f.tracker.count,1,"A metadata notification reopened before the original owner closed")
+        XCTAssertNil(f.app.model,"Pending original close must retain the restricted screen")
+        XCTAssertTrue(f.app.hasPendingMembershipClose);XCTAssertFalse(f.old.store.isClosed)
+        // Close any incorrectly admitted candidate even on the failing control
+        // run, so the owned fixture never detaches with that reader unjoined.
+        if let candidate=f.app.model {candidate.prepareForLibrarySwitch();await candidate.cancelExternalWorkAndWait();try candidate.store.close();f.app.model=nil}
+        sqlite3_finalize(statement);statement=nil;f.app.requestLock();try await settle(f.app)
+        XCTAssertEqual(f.app.vaultStatus?.imageAttached,false);XCTAssertTrue(f.old.store.isClosed);XCTAssertNil(f.app.syncApprovalPresentation)
     }
     func testNativePeerLateLockWaitsForActualFreshStoreBeforeDetach()async throws {
         let f=try await fixture(nativeVault:true),review=try await review(f);f.tracker.holdNext();defer {f.tracker.release()}

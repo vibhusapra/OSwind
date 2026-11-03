@@ -121,6 +121,10 @@ struct PersonalSyncErasureRecovery:Sendable {
         let vault=try LibraryVault(package:package);vaultStatus=try await vault.status()
         if vaultStatus?.state == .unlocked {
             if terminationRequested || locked() {try await performLock();return}
+            // A directory notification is observation, never permission to
+            // bypass an original device-update owner or its reopened identity
+            // check. Only the retained close/retry path may attach that model.
+            guard !hasPendingMembershipClose,membershipFinish==nil else {return}
             if model==nil {model=try await preparedModel(root:vault.libraryURL,startServices:startServices)}
         } else if let previous=model {
             await stageForClosing(previous)
