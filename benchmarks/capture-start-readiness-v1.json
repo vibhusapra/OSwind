@@ -1,0 +1,198 @@
+{
+  "format": "OSwind capture start readiness review v4",
+  "baseSource": "2789996b7db347307107f26d689781f206d19298",
+  "inputCount": 690,
+  "unchangedPriorInputs": 688,
+  "workingChanges": {
+    "Sources/OSwindCore/Capture.swift": "781b9027cb5abbe956da93494ab39e69faaa6b88d809d69eec23b7daf47efe36",
+    "Tests/OSwindCoreTests/CaptureStartReadinessTests.swift": "84d6a86f39375ec053edd42c610bdd0d94aa245c132687c31dfed4ef07b8f288"
+  },
+  "inputManifestSHA256": "28087cb1a7c1aa4954be81b3d4c0ed4d190d726a39e33f85a316d027232a5718",
+  "runnerSHA256": "c0c64b0bea0d338d567959469da9a43963f57cf38698eddf994cc36838c38708",
+  "reviewerSHA256": "436533f9e645bbf3e9b522ce1ceb535f6194c603bcc46c8a860c9ad2bb0a7c1d",
+  "stages": [
+    {
+      "mode": "affected-debug",
+      "defined": 99,
+      "passed": 98,
+      "skipped": [
+        "OSwindCoreTests.SnapshotAdmissionTests.testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach"
+      ],
+      "failed": 0,
+      "newMethodsPassed": [
+        "OSwindCoreTests.CaptureStartReadinessTests.testBlockedStartNeverClaimsRunningOrChecksPermissionsAcrossModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testEmptyDisplaySelectionRefusesStartForPixelModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidSettingsStopActiveControllerAndRepairRequiresExplicitResume",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidationCancelsInFlightContextAndRejectsLateEvidence",
+        "OSwindCoreTests.CaptureStartReadinessTests.testTextOnlyDisplayAndCropScopeRefuseStart",
+        "OSwindCoreTests.CaptureStartReadinessTests.testValidScopeStillRequiresOnlyItsOwnPermission"
+      ],
+      "logSHA256": "871bb24cd1c4153e7eff744bce4e24e08491e2edaeaa1d3c76e6cc9b2fa447d8",
+      "wallSeconds": 48.69941066694446
+    },
+    {
+      "mode": "affected-tsan",
+      "defined": 99,
+      "passed": 98,
+      "skipped": [
+        "OSwindCoreTests.SnapshotAdmissionTests.testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach"
+      ],
+      "failed": 0,
+      "newMethodsPassed": [
+        "OSwindCoreTests.CaptureStartReadinessTests.testBlockedStartNeverClaimsRunningOrChecksPermissionsAcrossModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testEmptyDisplaySelectionRefusesStartForPixelModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidSettingsStopActiveControllerAndRepairRequiresExplicitResume",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidationCancelsInFlightContextAndRejectsLateEvidence",
+        "OSwindCoreTests.CaptureStartReadinessTests.testTextOnlyDisplayAndCropScopeRefuseStart",
+        "OSwindCoreTests.CaptureStartReadinessTests.testValidScopeStillRequiresOnlyItsOwnPermission"
+      ],
+      "logSHA256": "1309e76a9e37b781dcf1f1a9b03ea274c366461f788b821bd4a04eb4cc3b6ea7",
+      "wallSeconds": 56.90847612498328
+    },
+    {
+      "mode": "affected-optimized",
+      "defined": 99,
+      "passed": 98,
+      "skipped": [
+        "OSwindCoreTests.SnapshotAdmissionTests.testNativeVaultSnapshotAdmissionAndCancelledWorkPermitVerifiedDetach"
+      ],
+      "failed": 0,
+      "newMethodsPassed": [
+        "OSwindCoreTests.CaptureStartReadinessTests.testBlockedStartNeverClaimsRunningOrChecksPermissionsAcrossModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testEmptyDisplaySelectionRefusesStartForPixelModes",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidSettingsStopActiveControllerAndRepairRequiresExplicitResume",
+        "OSwindCoreTests.CaptureStartReadinessTests.testInvalidationCancelsInFlightContextAndRejectsLateEvidence",
+        "OSwindCoreTests.CaptureStartReadinessTests.testTextOnlyDisplayAndCropScopeRefuseStart",
+        "OSwindCoreTests.CaptureStartReadinessTests.testValidScopeStillRequiresOnlyItsOwnPermission"
+      ],
+      "logSHA256": "abaddaaf17c366fdef4d546df4227622b8555149d790157d1c58e6e109ca823e",
+      "wallSeconds": 227.837189582875
+    }
+  ],
+  "retainedRedControl": {
+    "failedMethods": 5,
+    "passedPermissionControl": 1,
+    "assertionFailures": 13,
+    "logSHA256": "b26c6cccb41f11514ab615617f65e682f649a61d44361c538f76455faa2c93cd"
+  },
+  "rejectedAlteredLogControls": {
+    "dropped-result": "rejected",
+    "duplicate-result": "rejected",
+    "hidden-failure": "rejected",
+    "missing-new-method": "rejected",
+    "wrong-skip": "rejected"
+  },
+  "newPackage": {
+    "path": "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/capture-start-readiness-v1/qualification-v2/OSwind.app",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "ffbbce9ef66e2a373be457d79b6d0bdb0cf0190d0e954f5b8fc4e111b64dc782",
+      "Contents/MacOS/oswindctl": "befe8768040df34c6fc36342c0a9b02b11001c5a575a1458821f7204c4156219",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "4377c4c420d939e1d15aed924deee1f1889b2e6579b77981fbfe0e6173294269",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "scope": "Fresh local ad-hoc package; build script strict verification. No production signing/notary/DP-Keychain claim."
+  },
+  "nativeQAObservation": {
+    "priorBlockedStart": {
+      "file": ".artifacts/capture-start-readiness-v1/native-qa-v1.json",
+      "sha256": "45e163700f7445fb94b5b33a21531b3646bde2eed8d763e6d0a6262dca0fba57",
+      "scope": "Actual first candidate GUI confirms blocked-start header/button/footer and zero screen sources; repair then exposes stale footer. Normalized manual observation, not automated UI assertions."
+    },
+    "finalRepairCheck": {
+      "file": ".artifacts/capture-start-readiness-v1/native-qa-v2-preflight.json",
+      "sha256": "a9ad0098e4d50d3e992abe6717fffd9f8e843ee2c2fea52fac7b90bac8baab40",
+      "state": "blocked",
+      "reason": "Mac locked before final v2 GUI launch. Repaired footer passes software tests only; final native observation remains pending."
+    }
+  },
+  "scope": "Capture scope readiness and cancellation only. Selected99 methods, not a full-suite rerun. Native-vault conditional remains skipped in these selections. All83feature statuses/landscape unchanged. Final repaired-footer GUI blocked by locked Mac. No new automatic24h, energy, complete sync, production signing or competitor ranking acceptance.",
+  "runtimeCommit": "87ddff021500d0849245d9894ccb95473c13a81e",
+  "allCommittedInputBlobsMatch": true,
+  "inputManifest": "capture-start-readiness-inputs-v1.json",
+  "reviewSHA256": "3a880abaf7aceaa05d50344afa12c15c183a9450d838c198f93e9c48f1a02fc3",
+  "publisherSHA256": "5c3570be12677de0c24fdf734cf5cb4cc4ec0316f90c8dba32b0e99997065108",
+  "host": {
+    "macOS": "26.6.2",
+    "architecture": "arm64"
+  },
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "rawEvidence": {
+    "file": "capture-start-readiness-raw-v1.zip",
+    "sha256": "d1211420a91e6a8db500fbcf83839a76828af5fc0d5ad11ca80d82c741655e12",
+    "bytes": 887425,
+    "members": 33,
+    "allArchivedBytesComparedToReviewedInputs": true,
+    "files": {
+      "README.txt": "f8b5e28f682f57d87eccd7ce8d9401c3a88b88d84bc15095fed48ed72f3e6d98",
+      "controller-v2.log": "a48e6d61587426607e5a9019f425f08a538f218b44ec30783734dfa2eb55f99f",
+      "inputs.json": "d2a3d2620f4fa5073b410ba9211c54ed6b0bc9ff319eb25d5785648e884f0084",
+      "logs/affected-debug.log": "871bb24cd1c4153e7eff744bce4e24e08491e2edaeaa1d3c76e6cc9b2fa447d8",
+      "logs/affected-optimized.log": "abaddaaf17c366fdef4d546df4227622b8555149d790157d1c58e6e109ca823e",
+      "logs/affected-tsan.log": "1309e76a9e37b781dcf1f1a9b03ea274c366461f788b821bd4a04eb4cc3b6ea7",
+      "logs/package.log": "3decba16ad2384e7fa30795092ce22590a9c17be9d89b9bb035f36c53804f336",
+      "native/native-candidate-v1.json": "cb1d514bfd8f87ddf628db5dd3451c48738614702b85dad7020fa9712f590f57",
+      "native/native-candidate-v2.json": "7f0b6763f7ce8f6b8650a2d74b65219ec0cc5c84c63ec6d7d1636cd1a8b18292",
+      "native/qa-v1.json": "45e163700f7445fb94b5b33a21531b3646bde2eed8d763e6d0a6262dca0fba57",
+      "native/qa-v2-preflight.json": "a9ad0098e4d50d3e992abe6717fffd9f8e843ee2c2fea52fac7b90bac8baab40",
+      "prior/controller-v1.log": "e25a196c86fafa150ab640d77ea88fea96081363e5da08cf068bf94ba4f52698",
+      "prior/debug-v1.log": "3f9b48bd9d761192e6e230480ce476a6e46dd88bbf288d318a49e2a341b3d307",
+      "prior/inputs.json": "572097b1a6827b9e4476b42bc8a0387eefcf06235685b3899c2c32b7cee9e8db",
+      "prior/logs/affected-optimized.log": "6dded920a9ca8dcadf38f33969fab05af44c555bb4412f36950fb7cc7d3eaa0c",
+      "prior/logs/affected-tsan.log": "891ab0dd06e684a521d66d2858a7ef20030a9438b12f557f3a0aaa1e7eea35c3",
+      "prior/logs/package.log": "237e720dfdbe5de7901589a3cce12c9ae70df97c5c5efc3e40b946291ed81d64",
+      "prior/results.json": "2f32f5605fe3e771e18814dda1977f09b4a554015fc69e65cb8b2716802c4d12",
+      "prior/runner-v1.py": "44b68d1e2ca87d8e9c75005c58215a98d7aadffa0dc33f2a071b6353edf86afa",
+      "prior/source/Capture.swift": "df8e018017d1fa196f9c486aab6b1b1ddc90e662dba05a4b8dce8d8b2f49cdce",
+      "prior/source/CaptureStartReadinessTests.swift": "9522d83d66078067e796c9d6c42ba73b61d930f7a6cbb8abd17c225b19f01709",
+      "publisher.py": "5c3570be12677de0c24fdf734cf5cb4cc4ec0316f90c8dba32b0e99997065108",
+      "red-baseline-source/Capture.swift": "b46e8dbcbcd836b5113934f009b5b6338446bd49afd577fa4ec506d87b6ce46e",
+      "red-v1.log": "b26c6cccb41f11514ab615617f65e682f649a61d44361c538f76455faa2c93cd",
+      "results.json": "37eae6c41401d8ed138b9c7f509e01bbce8b96ba9f56bddeb863032e04d5b446",
+      "retained-checker-failure/controller-v3.log": "bd354f29895bf268006ecb055c1813d5a0fe07edf38dd62aea5ecaa08a212bb0",
+      "retained-checker-failure/reviewer-v3.py": "8c57c884374ac43df0a2cf69abc49dcffbc4f1f316a016dfbe3a0fd63c169485",
+      "review-controller-v4.log": "b5742fb1c07d997042aac75d44d5b0eb3d65320e5bc14faca4c81c35e77a035d",
+      "reviewed-v4.json": "3a880abaf7aceaa05d50344afa12c15c183a9450d838c198f93e9c48f1a02fc3",
+      "reviewer-v4.py": "436533f9e645bbf3e9b522ce1ceb535f6194c603bcc46c8a860c9ad2bb0a7c1d",
+      "runner-v2.py": "c0c64b0bea0d338d567959469da9a43963f57cf38698eddf994cc36838c38708",
+      "source/Sources/OSwindCore/Capture.swift": "781b9027cb5abbe956da93494ab39e69faaa6b88d809d69eec23b7daf47efe36",
+      "source/Tests/OSwindCoreTests/CaptureStartReadinessTests.swift": "84d6a86f39375ec053edd42c610bdd0d94aa245c132687c31dfed4ef07b8f288"
+    }
+  },
+  "protectedPublications": {
+    "files": 466,
+    "allBaseBytesUnchanged": true,
+    "manifestSHA256": "a318bac67959ec920ec83969f70947477095c8d21f948bb55c86c39a29e8bfc3"
+  },
+  "retainedCheckerFailure": "First executed checker-v3 referenced old runner path; v4 corrects it without rerunning product tests. The failed checker script/log is retained.",
+  "finalNativeRepairAcceptance": "Pending manual unlock; no final GUI pass claimed."
+}
