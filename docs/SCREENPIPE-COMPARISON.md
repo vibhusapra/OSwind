@@ -1,5 +1,7 @@
 # Screenpipe keyword HTTP comparison
 
+The remaining four original benchmark-created Spotlight exclusions are now independently verified removed on November 2 (Pacific): fresh native reads and the healthy Privacy pane agree on zero / No Locations Added, with the unrelated-list hash unchanged and General restored. Intermediate unreliable-zero and UI-error cases remain retained. [Separate restoration receipt](../benchmarks/spotlight-restoration-2026-11-02-v2.json) · [Raw evidence](../benchmarks/spotlight-restoration-raw-v2.zip). No old successful benchmark or reviewer was rerun. Earlier cleanup paragraphs retain their historical observation dates.
+
 PR #91 adds a completed authored keyword HTTP component study on top of PR #90. F071 is partial: desktop capture, physical power, broad parity and a product ranking remain open. Product source stays a5d4af4; benchmark source is 06c81a5.
 
 ## Results

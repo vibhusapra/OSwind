@@ -1,14 +1,29 @@
 # Personal device sync
 
-In development. F059 remains TODO until a user can pair devices and synchronize the complete supported library. The protocol below is a foundation, not delivered sync or a replacement for the existing complete backup/restore feature.
+F059 remains TODO until the complete delivery scope below is implemented and accepted. A user can now configure the two-Mac folder preview; membership changes after delivery starts, broader recovery, pressure/large-transfer/provider behavior and physical acceptance remain unfinished.
 
-The current internal foundation includes [durable answer admission](SYNC-DURABLE-PUBLICATION.md), [backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md) and [native33 media compatibility](NATIVE-MEDIA-COMPATIBILITY.md). The [current component receipt](../benchmarks/native-media-compatibility-v1.json) binds source `fe54050`, all88 mandatory controls in three builds,30 package/process stages and39 owned native methods. Optimized source14c has identical native/test/package/runtime bytes and a separately declared final-inspection script delta. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
+## Current component and remaining delivery work
 
-The [current prepared-session app owner](SYNC-APP-OWNER.md) connects the real service to app retirement and reversible processing suspension. It does not expose a public enrollment constructor or complete the remaining trust, recovery, erasure and provider requirements below. Historical receipts retain their original sources.
+The native workflow now supports create/join, exact signed-request/fingerprint review, recipient-encrypted response acceptance, explicit new/existing folder selection, manual reconnect and opt-in saved reconnect. The intended devices must be admitted before preparing delivery. The initially paused session installs native35 writer admission before transfer to its app owner. Saved delivery pause applies before processing; canceled real preference reads/writes stay joined through departure. Bookmarks and reconnect intent cannot activate portable content recovery.
 
-The [signed pairing/v3 transport component](SYNC-SIGNED-PAIRING.md) now supplies root-signed addition-only membership, exact capabilities, expiring recipient-bound responses and per-device authorship. The app owns asynchronous setup before it may install native state. This still enables no public enrollment: Keychain/pending-request persistence, refresh/recovery/revocation/rotation, old-writer and external rollback authority, erasure application and physical acceptance remain required.
+Local and approved-peer erasure join actual app producers and sync work, retain original native authority, reopen a quiet replacement, and expose restricted saved cleanup after interrupted erasure. Native-only local erasure can proceed without the provider folder. Exact session-bound group review names the affected Macs. Group erase does not purge provider archives or independent backups.
+
+Current source qualification: Source `f4cff25` qualifies saved opt-in reconnect/delivery pause and lazy sentence-model loading over **1524 pinned inputs**. full-debug: 2495 passed / 138 skipped; affected-tsan: 1002 passed / 76 skipped; affected-optimized: 1003 passed / 75 skipped; owned-native: 289 passed / 1 skipped. Zero failures and no sanitizer race warning. All 32 non-render methods added across the stacked public/intent/model changes pass full Debug, sanitizer and optimized selections. The owned native selection passes 29 of those methods and excludes the three SQL-preference controls, already exercised by the other builds. One additional intent-layout method is an explicitly gated render, executed successfully in a separate same-source owned stage with six light/dark PNG/OCR pairs. The previous 32 owned layouts and four all-kind graph/control fixtures pass independently again at this source. [Reviewed runtime receipt](../benchmarks/keyword-startup-v1.json) · [Inputs](../benchmarks/keyword-startup-inputs-v1.json). These are local software/owned login-Keychain/APFS/offscreen checks; production DP-Keychain, interactive signed GUI, physical two-Mac/provider, sustained energy and notarized distribution remain open.
+
+| Remaining work | Required evidence |
+| --- | --- |
+| Membership lifecycle | Add devices after delivery reservation; refresh signed membership on existing peers; remove/revoke devices and rotate keys with durable rollback/epoch checks. Current unsupported edits refuse. |
+| Offline and queue pressure | Reopen while the provider is unavailable; reconcile raw local intent and bound queues/storage without losing committed changes, privacy holds or deletion barriers. |
+| Large libraries and media | Resumable large graph/replay transfers, bounded memory and cancellation, and end-to-end scale beyond the existing authored component fixtures. |
+| Retention and backup semantics | Selective private spool cleanup, acknowledged provider retention/GC and backup/restore behavior that preserves erasure, checkpoint and device-local boundaries. |
+| Complete user workflows | Public conflict review and device/key recovery beyond current folder/status/erase recovery, plus equivalent supported CLI enrollment/device workflows. |
+| Actual devices and distribution | Interactive signed GUI folder/setup behavior, two physical Macs and real providers, production entitlement/Keychain behavior and notarized distribution. |
+| Sustained operation | Representative unattended capture, privacy transitions, responsiveness, long-run storage and physical energy observations. |
+
+The [public/app component](SYNC-PUBLIC-LIFECYCLE-WIP.md), [saved reconnect and model-startup descendant](KEYWORD-STARTUP-WIP.md), [delivery checkpoints](SYNC-DELIVERY-CHECKPOINTS-WIP.md) and [native admission](SYNC-NATIVE-ADMISSION-WIP.md) keep exact-source scopes and failures. Same-host software/owned login-Keychain/APFS/offscreen evidence is distinct from physical-device and production acceptance. No feature-complete or ranking claim is made.
 
 ## Delivery requirements
+
 
 | Requirement | Implementation / acceptance gate |
 | --- | --- |
@@ -22,7 +37,20 @@ The [signed pairing/v3 transport component](SYNC-SIGNED-PAIRING.md) now supplies
 | User workflow | Native setup/pairing/key recovery, status/progress/pause, conflict review and revocation; CLI with secrets through bounded stdin, never argv/environment. No paid backend or account creation required. |
 | Performance | Incremental bounded work, low idle overhead, cancellation, storage pressure, large replay assets and 1m-source checks. Local two-process qualification precedes actual two-Mac acceptance. |
 
+
+## Historical component records
+
+These records and unchecked lists describe earlier checkpoints. Use the current remaining-work table above for delivery planning; historical receipts retain their original scope.
+
+The current internal foundation includes [durable answer admission](SYNC-DURABLE-PUBLICATION.md), [backup erasure fencing](MEDIA-CLEANUP-ADMISSION.md) and [native33 media compatibility](NATIVE-MEDIA-COMPATIBILITY.md). The [current component receipt](../benchmarks/native-media-compatibility-v1.json) binds source `fe54050`, all88 mandatory controls in three builds,30 package/process stages and39 owned native methods. Optimized source14c has identical native/test/package/runtime bytes and a separately declared final-inspection script delta. This enables no public enrollment or synchronization service. All delivery requirements below remain the acceptance scope.
+
+The [current prepared-session app owner](SYNC-APP-OWNER.md) connects the real service to app retirement and reversible processing suspension. It does not expose a public enrollment constructor or complete the remaining trust, recovery, erasure and provider requirements below. Historical receipts retain their original sources.
+
+The [signed pairing/v3 transport component](SYNC-SIGNED-PAIRING.md) now supplies root-signed addition-only membership, exact capabilities, expiring recipient-bound responses and per-device authorship. The app owns asynchronous setup before it may install native state. This still enables no public enrollment: Keychain/pending-request persistence, refresh/recovery/revocation/rotation, old-writer and external rollback authority, erasure application and physical acceptance remain required.
+
+
 ## First implementation layer
+
 
 Internal causal registers use canonical byte-derived object identities, bounded vector clocks, immutable content references and durable deletion clocks. Raw SQLite string IDs are hashed as bytes so different Unicode encodings do not silently alias through Swift String equality. A writer must extend its own prior causal state; reused live revision identities with different content are refused. Concurrent values remain available. Restoration of a deleted object uses a fresh lifetime rather than clearing its old barrier.
 
