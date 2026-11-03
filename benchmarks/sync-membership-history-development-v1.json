@@ -1,0 +1,184 @@
+{
+  "format": "OSwind persistent membership history selected development review v1",
+  "baseSource": "7915ba8559af342abbf1cf1b242e77905a540990",
+  "inputCount": 676,
+  "workingChanges": {
+    "Sources/OSwindCore/PersonalSyncPairing.swift": "aebda22f09c89426ab8d0f04cf226bc0084c7e15673ffdaa06771da03dca44c6",
+    "Sources/OSwindCore/SyncMembershipHistory.swift": "6393efcce632ddb27e40b9fd1b9796554b9525b3a886fff2766d7a192aa6c328",
+    "Tests/OSwindCoreTests/SyncMembershipHistoryTests.swift": "068d91b3d7251dbc72d7acdc16076ba76665929711c38021e10b6fce2513db4c"
+  },
+  "inputManifestSHA256": "3dbb14eea0916de51eefe65eafae8e173a320c961d0701213055610ad71231ac",
+  "runnerSHA256": "4ceb95edeaba032204631c9c2d1e336cb7ae6d4e98106e03008ea2196e49b151",
+  "reviewerSHA256": "23733dab635e9d1da51ac462c502000af1fe25aa71de29de0d6072fed20c1ec1",
+  "stages": [
+    {
+      "mode": "debug",
+      "defined": 134,
+      "passed": 125,
+      "skipped": [
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsActualSyncBeforeDetachingOwnedImage",
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsPendingSetupBeforeClosingItsLateSession",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedPairingScreensRenderInBothThemes",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedReconnectIntentScreensRenderInBothThemes",
+        "OSwindCoreTests.PersonalSyncPairingTests/testOwnedNativeKeychainPairingSurvivesReopenAndConsumesResponseDurably",
+        "OSwindCoreTests.SyncDeliveryAnchorTests/testOwnedNativeKeychainAnchoredDeliveryReopensWithoutReplacingIdentity",
+        "OSwindCoreTests.SyncMembershipHistoryTests/testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedActualKeychainRetirementReopensCleansAndRenewsOriginalAccounts",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedKeychainNativeWriterAdmissionReopensOriginalAccounts"
+      ],
+      "failed": 0,
+      "newHistoryMethods": {
+        "testActualPairingPersistsSeveralAdditionsAndExportsReadOnlyAfterRestart": "passed",
+        "testFailedPrivateCASLeavesHarmlessSignedForkAndRetryUsesExactPrivateHead": "passed",
+        "testHistoryFailureRollsBackInitialReservationAndLeavesJoinResponseRetryable": "passed",
+        "testMissingCorruptMisaddressedAndOversizeIntermediateRefuse": "passed",
+        "testNativeHistoryWriteFailureCannotAdvancePrivateApproval": "passed",
+        "testOrphanBudgetPrunesOnlyPublicForksAndPreservesActiveAncestry": "passed",
+        "testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen": "skipped",
+        "testPortableContentRecoveryExcludesMembershipHistoryAndAuthority": "passed",
+        "testPublicCacheContainsNoPrivateMaterialAndForeignGroupCannotAdvanceIt": "passed",
+        "testSavedHistoryRejectsBlobNoncanonicalAndOverBudgetCacheWithoutChangingPrivateHead": "passed"
+      },
+      "logSHA256": "326698206fb276f40a077273ec766eee23b2efe4d8eed0e53014f02d722c4be7",
+      "wallSeconds": 167.25192862492986
+    },
+    {
+      "mode": "tsan",
+      "defined": 134,
+      "passed": 125,
+      "skipped": [
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsActualSyncBeforeDetachingOwnedImage",
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsPendingSetupBeforeClosingItsLateSession",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedPairingScreensRenderInBothThemes",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedReconnectIntentScreensRenderInBothThemes",
+        "OSwindCoreTests.PersonalSyncPairingTests/testOwnedNativeKeychainPairingSurvivesReopenAndConsumesResponseDurably",
+        "OSwindCoreTests.SyncDeliveryAnchorTests/testOwnedNativeKeychainAnchoredDeliveryReopensWithoutReplacingIdentity",
+        "OSwindCoreTests.SyncMembershipHistoryTests/testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedActualKeychainRetirementReopensCleansAndRenewsOriginalAccounts",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedKeychainNativeWriterAdmissionReopensOriginalAccounts"
+      ],
+      "failed": 0,
+      "newHistoryMethods": {
+        "testActualPairingPersistsSeveralAdditionsAndExportsReadOnlyAfterRestart": "passed",
+        "testFailedPrivateCASLeavesHarmlessSignedForkAndRetryUsesExactPrivateHead": "passed",
+        "testHistoryFailureRollsBackInitialReservationAndLeavesJoinResponseRetryable": "passed",
+        "testMissingCorruptMisaddressedAndOversizeIntermediateRefuse": "passed",
+        "testNativeHistoryWriteFailureCannotAdvancePrivateApproval": "passed",
+        "testOrphanBudgetPrunesOnlyPublicForksAndPreservesActiveAncestry": "passed",
+        "testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen": "skipped",
+        "testPortableContentRecoveryExcludesMembershipHistoryAndAuthority": "passed",
+        "testPublicCacheContainsNoPrivateMaterialAndForeignGroupCannotAdvanceIt": "passed",
+        "testSavedHistoryRejectsBlobNoncanonicalAndOverBudgetCacheWithoutChangingPrivateHead": "passed"
+      },
+      "logSHA256": "8163f550fd890a29113a9df69cc1d960ebaf1be1c2385c875878479f0664cd12",
+      "wallSeconds": 240.44052058295347
+    },
+    {
+      "mode": "optimized",
+      "defined": 134,
+      "passed": 125,
+      "skipped": [
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsActualSyncBeforeDetachingOwnedImage",
+        "OSwindAppTests.PersonalSyncLifecycleTests/testNativeVaultLockJoinsPendingSetupBeforeClosingItsLateSession",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedPairingScreensRenderInBothThemes",
+        "OSwindAppTests.PersonalSyncPairingModelTests/testOwnedReconnectIntentScreensRenderInBothThemes",
+        "OSwindCoreTests.PersonalSyncPairingTests/testOwnedNativeKeychainPairingSurvivesReopenAndConsumesResponseDurably",
+        "OSwindCoreTests.SyncDeliveryAnchorTests/testOwnedNativeKeychainAnchoredDeliveryReopensWithoutReplacingIdentity",
+        "OSwindCoreTests.SyncMembershipHistoryTests/testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedActualKeychainRetirementReopensCleansAndRenewsOriginalAccounts",
+        "OSwindCoreTests.SyncNativeWriterAdmissionTests/testOwnedKeychainNativeWriterAdmissionReopensOriginalAccounts"
+      ],
+      "failed": 0,
+      "newHistoryMethods": {
+        "testActualPairingPersistsSeveralAdditionsAndExportsReadOnlyAfterRestart": "passed",
+        "testFailedPrivateCASLeavesHarmlessSignedForkAndRetryUsesExactPrivateHead": "passed",
+        "testHistoryFailureRollsBackInitialReservationAndLeavesJoinResponseRetryable": "passed",
+        "testMissingCorruptMisaddressedAndOversizeIntermediateRefuse": "passed",
+        "testNativeHistoryWriteFailureCannotAdvancePrivateApproval": "passed",
+        "testOrphanBudgetPrunesOnlyPublicForksAndPreservesActiveAncestry": "passed",
+        "testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen": "skipped",
+        "testPortableContentRecoveryExcludesMembershipHistoryAndAuthority": "passed",
+        "testPublicCacheContainsNoPrivateMaterialAndForeignGroupCannotAdvanceIt": "passed",
+        "testSavedHistoryRejectsBlobNoncanonicalAndOverBudgetCacheWithoutChangingPrivateHead": "passed"
+      },
+      "logSHA256": "40d1bbf3d818688e7100c48c6335ca0e4c377961f0735750686477260fe398c5",
+      "wallSeconds": 299.09260375006124
+    },
+    {
+      "mode": "owned-keychain",
+      "defined": 76,
+      "passed": 76,
+      "skipped": [],
+      "failed": 0,
+      "newHistoryMethods": {
+        "testActualPairingPersistsSeveralAdditionsAndExportsReadOnlyAfterRestart": "passed",
+        "testFailedPrivateCASLeavesHarmlessSignedForkAndRetryUsesExactPrivateHead": "passed",
+        "testHistoryFailureRollsBackInitialReservationAndLeavesJoinResponseRetryable": "passed",
+        "testMissingCorruptMisaddressedAndOversizeIntermediateRefuse": "passed",
+        "testNativeHistoryWriteFailureCannotAdvancePrivateApproval": "passed",
+        "testOrphanBudgetPrunesOnlyPublicForksAndPreservesActiveAncestry": "passed",
+        "testOwnedNativeKeychainFourLibrariesRetainExactOfflineHistoryAcrossNativeReopen": "passed",
+        "testPortableContentRecoveryExcludesMembershipHistoryAndAuthority": "passed",
+        "testPublicCacheContainsNoPrivateMaterialAndForeignGroupCannotAdvanceIt": "passed",
+        "testSavedHistoryRejectsBlobNoncanonicalAndOverBudgetCacheWithoutChangingPrivateHead": "passed"
+      },
+      "logSHA256": "8c35f1560693769eb126effc0371c966e89b5fa22adb1922bc252cc1dabae100",
+      "wallSeconds": 86.6453804159537
+    }
+  ],
+  "scope": "Actual pre-delivery pairing public certificate retention, exact private-head export and portable-recovery exclusion; selected native/lifecycle regression and four owned login-Keychain libraries on one Mac. No active delivery membership mutation, native36/recovery, revocation/rotation, physical devices, provider or production signing acceptance.",
+  "runtimeCommit": "61b55703e09a9598005c1ddeca05ed6d3e78d255",
+  "runtimeCommitTreeMatchesEveryInput": true,
+  "inputManifest": "sync-membership-history-inputs-v1.json",
+  "reviewSHA256": "88e3106b2e47f1b00c4f9b27e3a3d9a65391fc0a19ad1aa60b417f3cb9943345",
+  "publicationScriptSHA256": "43d6470466e6f8f7cfef758460eaad1c289122f0463e49dcf53f310d192028ac",
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "host": {
+    "macOS": "26.6.2",
+    "architecture": "arm64"
+  },
+  "rawEvidence": {
+    "file": "sync-membership-history-raw-v1.zip",
+    "sha256": "f6722b54f2b9f4cb1c6883f460fe195e0775ac8b54468869c4043f9aae5d7931",
+    "bytes": 573335,
+    "memberCount": 23,
+    "allArchivedBytesComparedToReviewedInputs": true,
+    "files": {
+      "README.txt": "e243e0b0b4b2a92f54f94f6fa94968530e87d8970e441790ad31ad650a4ace6c",
+      "controller.log": "bb93e7afe5a5f3c0a48726a0802f10cd7b86c4330ddcd526bdc24d2904e082b8",
+      "inputs.json": "cf0dd50d3032cf999fce21b4d8fe9ee6c946a0233102f07c60d299619e4f2740",
+      "logs/debug.log": "326698206fb276f40a077273ec766eee23b2efe4d8eed0e53014f02d722c4be7",
+      "logs/optimized.log": "40d1bbf3d818688e7100c48c6335ca0e4c377961f0735750686477260fe398c5",
+      "logs/owned-keychain.log": "8c35f1560693769eb126effc0371c966e89b5fa22adb1922bc252cc1dabae100",
+      "logs/tsan.log": "8163f550fd890a29113a9df69cc1d960ebaf1be1c2385c875878479f0664cd12",
+      "results.json": "87011e6e536fa3c79582508a29f26db800e08b4ab39336d522d167cf36e1fe1e",
+      "retained-failures/SyncMembershipHistoryTests.swift": "1c1ecdfd4a0f99eee0e09dbce24ce16691551d1d196fa812b659b0267aa69dab",
+      "retained-failures/compile-controller.log": "88b819c6a4efcca8e11d4a85b43a4a099fdc387cc1d1cb568e0aa422fbd3dffd",
+      "retained-failures/compile-inputs.json": "1aa2671ba63b52f0d33f04aaa44554b941766b821789c28723615b1675255618",
+      "retained-failures/compile-results.json": "b0945b4b8eaf4b3cc947f5fd1dbd3887ddf6988ebe66b758e1298b8f12b3fa39",
+      "retained-failures/compile-runner.py": "ee8c14243ba9e61bd5c02eae875f9e80df3dc0057b77004c5e34da5f7a841293",
+      "retained-failures/compile.log": "a7acbfa31f633218337d951811bc13b83b2113ee58af8c29f972fbc69f838dc8",
+      "retained-failures/initial-controller.log": "b2d4796820eaf5e7e1acbc4c3df26a47330c18fc1b0ac881606a908a77d02d5c",
+      "retained-failures/initial-runner.py": "473c96378e48e9d3c0a9203b40d0f2982ce012d0ea5b82d5aff74e7707b8d362",
+      "review-controller.log": "4760ce90109632ae713d6f396775c0a9d6bbcba744468662a87d0b15c704416e",
+      "reviewed-v1.json": "88e3106b2e47f1b00c4f9b27e3a3d9a65391fc0a19ad1aa60b417f3cb9943345",
+      "reviewer.py": "23733dab635e9d1da51ac462c502000af1fe25aa71de29de0d6072fed20c1ec1",
+      "runner.py": "4ceb95edeaba032204631c9c2d1e336cb7ae6d4e98106e03008ea2196e49b151",
+      "source/Sources/OSwindCore/PersonalSyncPairing.swift": "aebda22f09c89426ab8d0f04cf226bc0084c7e15673ffdaa06771da03dca44c6",
+      "source/Sources/OSwindCore/SyncMembershipHistory.swift": "6393efcce632ddb27e40b9fd1b9796554b9525b3a886fff2766d7a192aa6c328",
+      "source/Tests/OSwindCoreTests/SyncMembershipHistoryTests.swift": "068d91b3d7251dbc72d7acdc16076ba76665929711c38021e10b6fce2513db4c"
+    }
+  },
+  "retainedFailures": [
+    {
+      "stage": "Initial runner preflight",
+      "reason": "Incorrect >900 source-input threshold; actual676. No build/test had run. Corrected source-scope threshold retained in later runners."
+    },
+    {
+      "stage": "Expanded test compilation",
+      "reason": "Missing try on the second throwing XCTAssertEqual argument. Original source/log/pins retained. Production runtime unchanged by correction."
+    }
+  ],
+  "featureStatus": "F059 remains TODO; all83 status values unchanged. Public membership mutation still refuses after delivery reservation.",
+  "frozenEarlierEvidence": "No earlier successful protocol/parent reviewer, package inspection, publication or benchmark was rerun."
+}
