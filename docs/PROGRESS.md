@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Native36 format floor verified against an actual older engine
+
+New internal handovers now commit state format2 before clearing pending intent. An unmodified frozen `d665a30` engine reproduces the earlier gap: genuine native36 admission/raw write, cached writer refusal during handover, then fresh admission of completed format1 with replay still pending. The new format refuses fresh older admission, retains the existing generation fence for cached writers, survives later cancellation and current local erasure/renewal, and preserves the same accounts/keys. Legacy pending records recover without reauthoring or consuming another token, including a rejected upgrade COMMIT.
+
+Runtime `802d0e3` binds **682 inputs**: full-debug: **2534 passed / 144 skipped**; affected-tsan: **705 passed / 43 skipped**; affected-optimized: **705 passed / 43 skipped**; owned-native: **151 passed / 1 skipped**; owned-membership-tsan: **44 passed / 1 skipped**; owned-membership-optimized: **44 passed / 1 skipped**. Zero failures and no race warning. All four new ordinary methods pass each selection; the actual frozen-engine/Keychain method passes in all three owned builds. Seven altered-log controls are rejected, and all 679 original old-runtime inputs plus the frozen executable remain unchanged. [Receipt](../benchmarks/sync-membership-floor-v1.json) · [Inputs](../benchmarks/sync-membership-floor-inputs-v1.json) · [Raw evidence](../benchmarks/sync-membership-floor-raw-v1.zip) · [Scope and remaining migration](SYNC-MEMBERSHIP-FLOOR-WIP.md).
+
+Already-cleared format1 previews can finish replay, but an old writer could have been admitted after their previous handover. They still require a separate durable backfill that rotates the writer generation; this patch does not claim retroactive protection. Public membership controls/response durability, remote capability negotiation, revocation/rotation and the remaining large/offline/provider/physical/power/distribution work remain open. **F059 stays TODO; all 83 statuses are unchanged.**
+
 ## Recoverable native membership handover and bounded later-peer replay
 
 The internal owner now finishes an exact saved forward addition through the original pairing/delivery Keychain accounts and native36 checkpoint. It preserves all existing private keys, pending capture and existing cursors; recognizes ambiguous private saves and rejected commits; adds only signed new peers; and arranges bounded republication without rewinding ordinary sent/public heads. Whole erasure retires replay intent and current privacy holds still apply. Public membership editing remains disabled until durable reviewed joining-response recovery and actual session/UI ownership are integrated.

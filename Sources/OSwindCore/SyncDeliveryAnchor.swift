@@ -191,7 +191,7 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         if membershipRecovery {
             let phase=try membershipPhase(db,library:library,envelope:envelope),record=envelope.membershipPreparation!
             let proof=try membershipProof(library:library,material:material,record:record),candidates=try material.membershipCandidates(proof)
-            nativeMaterial = phase == .applied ? candidates.after:candidates.before
+            nativeMaterial = phase.isApplied ? candidates.after:candidates.before
         } else {
             guard try readToken(db,id:id,protection:protection)==envelope.token else {throw OSwindError.unavailable("Native history differs from its external checkpoint; export with backup recover")}
             try SyncNativeMembershipState.requireActive(db,certificate:material.joined.certificate,floor:envelope.membershipHead)
@@ -396,12 +396,15 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
 // Native preparation deliberately retains old private membership. Full
 // handover/peer bootstrap is a later operation; safe cancellation is complete.
 extension SyncDeliveryAnchor {
-    private enum MembershipPhase {case before,prepared,cancelled,applied}
+    private enum MembershipPhase {
+        case before,prepared,cancelled,applied,legacyApplied
+        var isApplied:Bool {self == .applied || self == .legacyApplied}
+    }
     private static func membershipPhase(_ db:RoutineDatabase,library:MemoryStore,envelope:Envelope)throws->MembershipPhase {
         guard let record=envelope.membershipPreparation else {throw OSwindError.unavailable("No saved membership preparation")};try record.validate()
         let token=try readToken(db,id:envelope.id,protection:envelope.protection),epoch=try library.nativeWriterAdmission.membershipEpoch(db),version=try db.eraseCount("PRAGMA user_version")
         if version==record.nativeBefore,epoch==record.epochBefore,token==record.tokenBefore,envelope.token==record.tokenPrepared,record.disposition == .preparing {
-            if version==36 {guard try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(record.headBefore) else {throw OSwindError.unavailable("Original membership changed before its fence")}}
+            if version==36 {guard try SyncNativeMembershipState.read(db)==record.originalActive else {throw OSwindError.unavailable("Original membership changed before its fence")}}
             else {guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key IN ('\(SyncNativeMembershipState.phaseKey)','\(SyncNativeMembershipState.stateKey)')")==0 else {throw OSwindError.unavailable("Unexpected membership state before native36 preparation")}}
             return .before
         }
@@ -416,10 +419,15 @@ extension SyncDeliveryAnchor {
             }
             if allowed {return .prepared}
         }
-        if state == .active(record.headAfter),record.disposition == .applying,token==envelope.token,
+        if state == .active(record.headAfter,version:state.version),record.disposition == .applying,token==envelope.token,
            token == (try record.appliedToken()),envelope.membershipHead==record.headAfter,
-           SyncProtocolLimits.hex(envelope.material)==record.materialAfter {return .applied}
-        if state == .active(record.headBefore),record.disposition == .cancelling,token==envelope.token,token==record.tokenCancelled,envelope.membershipHead==record.headBefore {return .cancelled}
+           SyncProtocolLimits.hex(envelope.material)==record.materialAfter {
+            if state.version==2 {return .applied}
+            // An interrupted older handover may have committed format1 before
+            // clearing its intent. Its saved fence still excludes old writers.
+            if state.version==1,record.stateVersionBefore==nil {return .legacyApplied}
+        }
+        if state == record.originalActive,record.disposition == .cancelling,token==envelope.token,token==record.tokenCancelled,envelope.membershipHead==record.headBefore {return .cancelled}
         throw OSwindError.unavailable("Native state differs from the exact saved membership preparation")
     }
     private static func membershipProof(library:MemoryStore,material:SyncCredentialMaterial,record:SyncMembershipPreparation)throws->SyncMembershipRefresh {
@@ -431,7 +439,7 @@ extension SyncDeliveryAnchor {
         let (saved,material,_,_)=try readWriterAuthority(library:library,db:db,environment:environment,retiring:false,membershipRecovery:true)
         let record=saved.membershipPreparation!,proof=try membershipProof(library:library,material:material,record:record)
         let updated=try PersonalSyncPairing.verifyMembershipPreparation(library:library,db:db,environment:environment,record:record,proof:proof,deliveryID:saved.id)
-        if try membershipPhase(db,library:library,envelope:saved) == .applied {guard updated else {throw OSwindError.unavailable("Applied native membership is missing its exact new pairing authority")}}
+        if try membershipPhase(db,library:library,envelope:saved).isApplied {guard updated else {throw OSwindError.unavailable("Applied native membership is missing its exact new pairing authority")}}
     }
     static func openMembershipPreparation(library:MemoryStore,environment:SyncNativeWriterEnvironment)throws->Self {
         let id=try library.withMembershipDatabase {db->String in
@@ -480,7 +488,10 @@ extension SyncDeliveryAnchor {
                     guard before.serial<Int64.max-2 else {throw OSwindError.unavailable("Membership checkpoint capacity exhausted")}
                     let planBytes=try proof.encoded(),plan=try SyncContentReference(data:planBytes),joined=material.joined
                     let inbox=try joined.openPrivateInbox(at:library.root.appendingPathComponent("images/device-sync-"+joined.replica));defer {inbox.close()};try inbox.publishContent(planBytes,reference:plan)
-                    let record=SyncMembershipPreparation(format:"OSwind.sync.membership-preparation",version:1,operation:UUID().uuidString.lowercased(),plan:plan,pairingID:snapshot.pairingID,pairingBefore:snapshot.pairingBefore,pairingAfter:snapshot.pairingAfter,materialBefore:snapshot.materialBefore,materialAfter:snapshot.materialAfter,headBefore:SyncProtocolLimits.hex(try proof.base.encoded()),headAfter:SyncProtocolLimits.hex(try proof.head.encoded()),nativeBefore:try db.eraseCount("PRAGMA user_version"),epochBefore:try library.nativeWriterAdmission.membershipEpoch(db),epochPrepared:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:""),tokenBefore:before,tokenPrepared:.init(serial:before.serial+1,nonce:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")),disposition:.preparing)
+                    let nativeBefore=try db.eraseCount("PRAGMA user_version")
+                    let originalFormat:Int?
+                    if nativeBefore==36 {originalFormat=try SyncNativeMembershipState.read(db).version}else {originalFormat=nil}
+                    let record=SyncMembershipPreparation(format:"OSwind.sync.membership-preparation",version:1,operation:UUID().uuidString.lowercased(),plan:plan,pairingID:snapshot.pairingID,pairingBefore:snapshot.pairingBefore,pairingAfter:snapshot.pairingAfter,materialBefore:snapshot.materialBefore,materialAfter:snapshot.materialAfter,headBefore:SyncProtocolLimits.hex(try proof.base.encoded()),headAfter:SyncProtocolLimits.hex(try proof.head.encoded()),nativeBefore:nativeBefore,epochBefore:try library.nativeWriterAdmission.membershipEpoch(db),epochPrepared:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:""),tokenBefore:before,tokenPrepared:.init(serial:before.serial+1,nonce:UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")),disposition:.preparing,stateVersionBefore:originalFormat)
                     try record.require(proof,material:material)
                     try PersonalSyncPairing.verifyMembershipPreparation(library:library,db:db,environment:membershipEnvironment(),record:record,proof:proof,deliveryID:id)
                     try membershipNativePreparation(record,proof:proof,db:db)
@@ -540,7 +551,7 @@ extension SyncDeliveryAnchor {
                         // wire history. Replay its exact already-saved target
                         // rather than consume another serial after COMMIT loss.
                         let next=record.tokenCancelled
-                        try SyncNativeMembershipState.write(.active(record.headBefore),db);try Self.saveMembershipToken(next,db:db)
+                        try SyncNativeMembershipState.write(record.originalActive,db);try Self.saveMembershipToken(next,db:db)
                         let updated=envelope.preparing(record,token:next,head:record.headBefore),encoded=try updated.encoded()
                         if encoded != bytes {try storage.replace(id:id,expected:bytes,bytes:encoded)};envelope=updated;bytes=encoded
                         try db.execute("COMMIT")
@@ -571,7 +582,7 @@ extension SyncDeliveryAnchor {
                 do {try storage.replace(id:id,expected:bytes,bytes:encoded);envelope=updated;bytes=encoded}
                 catch {poisoned=true;library.nativeWriterAdmission.invalidate();throw error}
             }
-            if phase != .applied {
+            if !phase.isApplied {
                 do {
                     try requirePairingLease()
                     try PersonalSyncPairing.completeMembershipPreparation(library:library,db:db,environment:membershipEnvironment(),record:record,proof:proof,deliveryID:id)
@@ -589,7 +600,7 @@ extension SyncDeliveryAnchor {
                             let current=try Self.readToken(db,id:id,protection:storage.protection),target=try record.appliedToken()
                             guard current.serial==record.tokenPrepared.serial+Int64(added.count),target.serial==current.serial+1 else {throw OSwindError.unavailable("Unexpected native wire changes during membership application")}
                             let sent=Int64(try db.eraseCount("SELECT sent FROM personal_sync_service_state WHERE singleton=1"))
-                            try SyncNativeMembershipState.write(.active(record.headAfter),db)
+                            try SyncNativeMembershipState.write(.active(record.headAfter,version:2),db)
                             try SyncMembershipReplay.seed(head:record.headAfter,through:sent,db:db)
                             try Self.saveMembershipToken(target,db:db)
                             let updated=envelope.applying(record,material:try candidates.after.encodedForKeychain(),token:target),encoded=try updated.encoded()
@@ -599,7 +610,22 @@ extension SyncDeliveryAnchor {
                     }
                 }catch {poisoned=true;library.nativeWriterAdmission.invalidate();throw error}
             }
-            try requirePairingLease();_=try requireMembershipPreparation(db)
+            try requirePairingLease();(record,proof,phase)=try requireMembershipPreparation(db)
+            if phase == .legacyApplied {
+                // The old still-pending operation already owns the rotated
+                // writer generation and exact final token. Upgrade only its
+                // local format, without reauthoring peers or consuming tokens.
+                do {try library.nativeWriterAdmission.withMembershipMutation(db) {
+                    try db.execute("BEGIN IMMEDIATE")
+                    do {
+                        (record,proof,phase)=try requireMembershipPreparation(db);try requirePairingLease()
+                        guard phase == .legacyApplied else {throw OSwindError.unavailable("The exact legacy application changed before its format upgrade")}
+                        try SyncNativeMembershipState.write(.active(record.headAfter,version:2),db)
+                        try db.execute("COMMIT")
+                    }catch {try? db.execute("ROLLBACK");throw error}
+                }}catch {poisoned=true;library.nativeWriterAdmission.invalidate();throw error}
+            }
+            guard try requireMembershipPreparation(db).2 == .applied else {throw OSwindError.unavailable("Commit the replay-capable membership floor before clearing its operation")}
             let updated=envelope.clearingPreparation(),encoded=try updated.encoded()
             do {try storage.replace(id:id,expected:bytes,bytes:encoded);envelope=updated;bytes=encoded}
             catch {poisoned=true;library.nativeWriterAdmission.invalidate();throw error}
