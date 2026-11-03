@@ -75,7 +75,7 @@ import OSwindCore
     func applicationShouldHandleReopen(_ sender: NSApplication,hasVisibleWindows flag: Bool) -> Bool { NotificationCenter.default.post(name:.oswindOpenMain,object:nil); return true }
     func applicationShouldTerminate(_ sender:NSApplication) -> NSApplication.TerminateReply {
         if terminationReady {return .terminateNow}
-        guard let session=AppSession.current,session.vaultPackage != nil || session.busy || session.model?.hasPendingExitWork == true else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
+        guard let session=AppSession.current,session.vaultPackage != nil || session.busy || session.hasPendingMembershipClose || session.model?.hasPendingExitWork == true else {AppSession.current?.model?.prepareForLibrarySwitch();return .terminateNow}
         guard !terminationInProgress else {return .terminateCancel}
         terminationInProgress=true
         // terminateLater enters AppKit's nested modal run loop. If terminate()
@@ -107,6 +107,7 @@ import OSwindCore
                 .onReceive(NotificationCenter.default.publisher(for:.oswindLockVault)) {_ in session.requestLock()}
                 .onReceive(NotificationCenter.default.publisher(for:.oswindForgetVaultSecret)) {_ in session.forgetKeychain()}
                 .sheet(isPresented:$session.showVaultSetup) {VaultSetupView(session:session)}
+                .sheet(item:$session.syncApprovalPresentation) {presentation in PersonalSyncApprovalResponseView(presentation:presentation)}
                 .onOpenURL { url in
                     if url.pathExtension.lowercased()=="oswindvault" || (try? LibraryVault.package(containing:url)) != nil {session.open(url);return}
                     if let model = session.model { model.settingsTab = "Data"; model.showSettings = true; model.libraryTransfer.inspect(url) }

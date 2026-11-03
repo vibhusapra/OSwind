@@ -1,0 +1,46 @@
+import XCTest
+import Foundation
+import CSQLite
+@testable import OSwindCore
+
+/// Test-only entrypoint compiled with unchanged ad32c6c predecessor sources.
+final class FrozenFormat2WorkerTests:XCTestCase {
+    func testOwnedFormat2Worker()throws {
+        let env=ProcessInfo.processInfo.environment,fm=FileManager.default
+        guard let path=env["OSWIND_OLD_FORMAT2_ROOT"],let nonce=env["OSWIND_OLD_FORMAT2_NONCE"],let mode=env["OSWIND_OLD_FORMAT2_MODE"] else {throw XCTSkip("Owned predecessor-format2 worker only")}
+        guard UUID(uuidString:nonce)?.uuidString==nonce,["cached","refuse"].contains(mode) else {throw OSwindError.invalid("Invalid owned predecessor scope")}
+        let root=URL(fileURLWithPath:path),expected=fm.temporaryDirectory.appendingPathComponent("owned-completed-format2-"+nonce)
+        guard root.resolvingSymlinksInPath()==expected.resolvingSymlinksInPath(),try String(contentsOf:root.appendingPathComponent("owner"),encoding:.utf8)==nonce else {throw OSwindError.invalid("Invalid predecessor root")}
+        let ids=try SyncPairingFormat.decode([String].self,Data(contentsOf:root.appendingPathComponent("accounts")),limit:2048)
+        guard ids.count==5,Set(ids).count==5 else {throw OSwindError.invalid("Invalid owned account inventory")};try ids.forEach {try SyncCredentialStorageLimits.validate(id:$0)}
+        let storage=FrozenFormat2ReadStorage(ids:Set(ids)),native=SyncNativeWriterEnvironment(stateRoot:root.appendingPathComponent("state"),machine:MacSyncMachineFingerprint(),storage:{_ in storage})
+        if mode=="refuse" {
+            do {let library=try MemoryStore(root:root.appendingPathComponent("main"),recoveryReadOnly:false,nativeWriterEnvironment:native);try library.close();XCTFail("Predecessor accepted unknown completed authority")}
+            catch {guard String(describing:error).contains("Pairing message is not canonical") else {throw error};try Data("unknown-authority-refused".utf8).write(to:root.appendingPathComponent("result-refuse"),options:.withoutOverwriting)}
+            return
+        }
+        let library=try MemoryStore(root:root.appendingPathComponent("main"),recoveryReadOnly:false,nativeWriterEnvironment:native);defer {try? library.close()}
+        XCTAssertEqual(try library.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},2)
+        XCTAssertNotNil(try library.get("canary"))
+        let db=try library.withRoutineDatabase {$0},statement=try db.statement("UPDATE memories SET title=? WHERE id='canary'");defer {sqlite3_finalize(statement)}
+        db.bind(statement,1,"predecessor-positive");XCTAssertEqual(sqlite3_step(statement),SQLITE_DONE);sqlite3_reset(statement);sqlite3_clear_bindings(statement)
+        XCTAssertEqual(sqlite3_get_autocommit(db.handle),1)
+        let lease=try MediaAdmissionLease.acquire(root:library.root,exclusive:false,expectedRoot:library.mediaRootIdentity);defer {lease.release()}
+        try Data("format2-admitted-written-prepared".utf8).write(to:root.appendingPathComponent("ready-cached"),options:.withoutOverwriting)
+        let deadline=ProcessInfo.processInfo.systemUptime+60
+        while !fm.fileExists(atPath:root.appendingPathComponent("release-cached").path),ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.01)}
+        guard fm.fileExists(atPath:root.appendingPathComponent("release-cached").path) else {throw OSwindError.invalid("Owned predecessor release missing")}
+        db.bind(statement,1,"predecessor-must-refuse");XCTAssertNotEqual(sqlite3_step(statement),SQLITE_DONE)
+        XCTAssertThrowsError(try library.insert(Memory(id:"predecessor-must-refuse",text:"Must not discard completed response")))
+        try Data("cached-and-normal-refused".utf8).write(to:root.appendingPathComponent("result-cached"),options:.withoutOverwriting)
+    }
+}
+private struct FrozenFormat2ReadStorage:SyncCredentialStorage {
+    let protection:SyncCredentialProtection = .loginKeychain
+    let ids:Set<String>
+    private let backend=SyncKeychainCredentialStorage(protection:.loginKeychain)
+    func read(id:String)throws->Data {guard ids.contains(id) else {throw OSwindError.invalid("Unowned predecessor account")};return try backend.read(id:id)}
+    func create(id:String,bytes:Data)throws {throw OSwindError.invalid("Predecessor cannot create credentials")}
+    func replace(id:String,expected:Data,bytes:Data)throws {throw OSwindError.invalid("Predecessor cannot replace credentials")}
+    func remove(id:String,expected:Data)throws {throw OSwindError.invalid("Predecessor cannot remove credentials")}
+}

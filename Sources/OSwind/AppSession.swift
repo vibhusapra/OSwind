@@ -24,6 +24,19 @@ struct PersonalSyncErasureRecovery:Sendable {
     @Published private(set) var createdVault:URL?
     @Published private(set) var snapshotNeedsReview=false
     @Published private(set) var syncErasurePending=false
+    @Published private(set) var syncMembershipPending=false
+    @Published var syncApprovalPresentation:SyncApprovalPresentation?
+    private var membershipChange:PersonalSyncOwnerChange?
+    private var membershipClosing=false
+    private struct MembershipFinish {
+        let root:URL,review:PersonalSyncOwnerReview?
+        var response:PersonalSyncApprovedResponse?,error:String?,cancelled=false
+        var closedChange:PersonalSyncOwnerChange?
+    }
+    private var membershipFinish:MembershipFinish?
+    var hasPendingMembershipClose:Bool {membershipClosing || membershipChange != nil}
+    private let membershipRecovery:@Sendable (URL)->PersonalSyncOwnerChange
+    private let ownerAdditionPreview:Bool
     let recoveryTransfer:LibraryTransferModel
     private var selection:LibraryLocationSelection
     private let defaults:UserDefaults
@@ -41,9 +54,9 @@ struct PersonalSyncErasureRecovery:Sendable {
     private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
     private let syncRecovery:PersonalSyncErasureRecovery
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native) {
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native,membershipRecovery:@escaping @Sendable (URL)->PersonalSyncOwnerChange={PersonalSyncOwnerChange.recover(root:$0)},ownerAdditionPreview:Bool=ProcessInfo.processInfo.environment["OSWIND_OWNER_ADDITION_PREVIEW"]=="1") {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery;self.membershipRecovery=membershipRecovery;self.ownerAdditionPreview=ownerAdditionPreview
         self.recoveryTransfer.allowed={[weak self] in guard let self else {return false};return !self.terminationRequested && !self.busy && !self.locked()}
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
@@ -59,6 +72,8 @@ struct PersonalSyncErasureRecovery:Sendable {
     deinit {watcher?.cancel();lockMonitor?.invalidate();operation?.cancel()}
     func retry() {
         guard !terminationRequested,!busy else {return}
+        if hasPendingMembershipClose || membershipFinish != nil && !syncMembershipPending {retryMembershipClose();return}
+        if syncMembershipPending {resumeSyncMembership();return}
         if vaultPackage != nil {run {try await self.loadVault(startServices:false)}}
         else if model==nil {run {try self.selection.validate();self.model=try await self.preparedModel(root:self.selection.url,startServices:false)}}
     }
@@ -83,7 +98,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         }
     }
     private var maySwitch:Bool {
-        guard !terminationRequested,!busy,model?.libraryTransfer.busy != true,model?.libraryWipe.busy != true,!recoveryTransfer.busy else {failure="Complete or cancel the current library operation before switching libraries.";return false};return true
+        guard !terminationRequested,!busy,!hasPendingMembershipClose,model?.libraryTransfer.busy != true,model?.libraryWipe.busy != true,!recoveryTransfer.busy else {failure="Complete or cancel the current library operation before switching libraries.";return false};return true
     }
     func choose() {
         guard maySwitch else {return}
@@ -144,12 +159,16 @@ struct PersonalSyncErasureRecovery:Sendable {
         run {let vault=try LibraryVault(package:package);try await vault.forgetPassphrase();self.vaultStatus=try await vault.status();self.message="Saved unlock removed. Your vault passphrase still works."}
     }
     func requestLock() {
-        guard vaultPackage != nil || busy || recoveryTransfer.busy else {return}
+        syncApprovalPresentation=nil;membershipFinish?.cancelled=true
+        guard vaultPackage != nil || busy || recoveryTransfer.busy || hasPendingMembershipClose else {return}
         if busy {pendingLock=true;operation?.cancel();return}
         run {try await self.performLock()}
     }
     private func performLock() async throws {
+        syncApprovalPresentation=nil
         await recoveryTransfer.cancelAndWait()
+        if hasPendingMembershipClose {try await closeMembershipResources()}
+        membershipFinish=nil
         guard let package=vaultPackage else {return}
         if let previous=model {await stageForClosing(previous)}
         let vault=try LibraryVault(package:package)
@@ -158,7 +177,10 @@ struct PersonalSyncErasureRecovery:Sendable {
         message="Encrypted volume detached. Recording, audio and local API access are stopped."
     }
     private func departCurrent() async throws {
+        syncApprovalPresentation=nil
         await recoveryTransfer.cancelAndWait()
+        if hasPendingMembershipClose {try await closeMembershipResources()}
+        membershipFinish=nil;syncMembershipPending=false
         if vaultPackage != nil {try await performLock()}
         else if let previous=model {
             await stageForClosing(previous)
@@ -168,6 +190,7 @@ struct PersonalSyncErasureRecovery:Sendable {
     /// Remove visible access first, then join imports before a SQLite close or
     /// image mutation. Even a worker not yet holding a reservation must finish.
     private func stageForClosing(_ previous:AppModel) async {
+        syncApprovalPresentation=nil
         previous.clearForVaultLock();closingStore=previous.store
         if model === previous {model=nil}
         await previous.cancelExternalWorkAndWait()
@@ -220,7 +243,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         // still needs a quiet original workspace, with no resumed services.
         model=try await preparedModel(root:store.root,startServices:false,restoringOriginal:true)
     }
-    private func preparedModel(root:URL,startServices:Bool,restoringOriginal:Bool=false) async throws -> AppModel {
+    private func preparedModel(root:URL,startServices:Bool,restoringOriginal:Bool=false,validateStore:((MemoryStore)throws->Void)?=nil) async throws -> AppModel {
         let opener=openStore,previousProgress=progress
         progress = .init(phase:"Preparing local search")
         defer {progress=previousProgress}
@@ -229,22 +252,32 @@ struct PersonalSyncErasureRecovery:Sendable {
         do {
             if restoringOriginal {store=try await worker.value}
             else {store=try await withTaskCancellationHandler {try await worker.value} onCancel:{worker.cancel()}}
-        }catch {syncErasurePending=await syncRecovery.pending(root);throw error}
+        }catch {syncMembershipPending=error is PersonalSyncMembershipRecoveryRequired;syncErasurePending=await syncRecovery.pending(root);throw error}
         do {
             if !restoringOriginal {
                 try Task.checkCancellation()
                 if terminationRequested || pendingLock {throw CancellationError()}
             }
             if vaultPackage != nil && (locked() || pendingLock || terminationRequested) {throw CancellationError()}
+            try validateStore?(store)
             let candidate=try AppModel(root:root,startServices:false,preparedStore:store,personalSyncSetup:personalSyncSetup)
+            if ownerAdditionPreview {
+                candidate.personalSync.approveOwnerAddition={[weak self,weak candidate] review in
+                    guard let self,let candidate else {return};self.approveSyncDevice(review,from:candidate)
+                }
+            }
             candidate.syncErasureFinished={[weak self,weak candidate] in
                 guard let self,let candidate else {return};self.reopenAfterSyncErasure(candidate)
             }
-            syncErasurePending=false
+            syncErasurePending=false;syncMembershipPending=false
             if startServices {candidate.startConfiguredServices()}
             return candidate
         } catch {
-            try? await Task.detached(priority:.utility) {try store.close()}.value
+            if membershipFinish != nil {
+                closingStore=store;membershipClosing=true
+                try await Task.detached(priority:.utility) {try store.close()}.value
+                closingStore=nil;membershipClosing=false
+            }else {try? await Task.detached(priority:.utility) {try store.close()}.value}
             throw error
         }
     }
@@ -262,6 +295,85 @@ struct PersonalSyncErasureRecovery:Sendable {
             self.message=completed ? "History erasure finished. Recording stays paused until you resume it.":"Library reopened with recording paused. "+erasureStatus
         }
     }
+    func approveSyncDevice(_ review:PersonalSyncOwnerReview,from previous:AppModel) {
+        guard ownerAdditionPreview,!terminationRequested,!busy,!hasPendingMembershipClose,model === previous,!locked(),
+              let current=previous.personalSync.sessionForOwnerApproval(review) else {return}
+        syncApprovalPresentation=nil;membershipFinish = .init(root:previous.store.root,review:review)
+        closingStore=previous.store;membershipClosing=true;model=nil
+        // Deny all new work synchronously before the first suspension.
+        previous.clearForVaultLock()
+        run(cancellationMessage:"Approval stopped. Reopen this library to finish any saved device update.") {
+            self.progress = .init(phase:"Stopping recording and local work")
+            await previous.cancelExternalWorkAndWait()
+            do {
+                try await current.stop();try Task.checkCancellation()
+                let change=try await current.ownerChangeAfterStopping(review)
+                self.membershipChange=change
+                self.progress = .init(phase:"Approving the device")
+                let worker=Task.detached(priority:.utility) {try change.apply()}
+                let response=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+                self.membershipFinish?.response=response
+            }catch {self.membershipFinish?.error=error.localizedDescription}
+            self.membershipFinish?.cancelled=Task.isCancelled
+            try await self.finishMembershipCloseAndReopen()
+        }
+    }
+    private func closeMembershipResources()async throws {
+        if let change=membershipChange {
+            try await Task.detached(priority:.utility) {try change.close()}.value
+            membershipFinish?.closedChange=change
+            membershipChange=nil;closingStore=nil
+        }else if let store=closingStore {
+            try await Task.detached(priority:.utility) {try store.close()}.value;closingStore=nil
+        }
+        membershipClosing=false
+    }
+    private func finishMembershipCloseAndReopen()async throws {
+        progress = .init(phase:"Finishing the local device update")
+        defer {progress=nil}
+        try await closeMembershipResources()
+        guard let finish=membershipFinish else {return}
+        if terminationRequested || pendingLock || locked() {
+            membershipFinish=nil;syncApprovalPresentation=nil
+            message="Device update stopped. Reopen this library to check its saved result.";return
+        }
+        let fresh=try await preparedModel(root:finish.root,startServices:false,restoringOriginal:true,validateStore:{store in
+            try finish.review?.validateReopenedStore(store)
+            try finish.closedChange?.validateReopenedStore(store)
+        })
+        if terminationRequested || pendingLock || locked() {
+            fresh.clearForVaultLock();await fresh.cancelExternalWorkAndWait()
+            closingStore=fresh.store;membershipClosing=true
+            try await closeMembershipResources();membershipFinish=nil;syncApprovalPresentation=nil
+            message="Device update stopped. Reopen this library to check its saved result.";return
+        }
+        model=fresh;membershipFinish=nil
+        if !Task.isCancelled,!finish.cancelled,finish.error==nil,let response=finish.response,let review=finish.review,
+           response.requestFingerprint==review.requestFingerprint {
+            syncApprovalPresentation = .init(response:response,rootFingerprint:review.rootFingerprint)
+        }
+        if let error=finish.error {failure=error}
+        message="Library reopened. Recording and sync stay paused until you resume them."
+    }
+    func retryMembershipClose() {
+        guard !terminationRequested,!busy,hasPendingMembershipClose || membershipFinish != nil else {return}
+        run {try await self.finishMembershipCloseAndReopen()}
+    }
+    func resumeSyncMembership() {
+        guard canRecoverContent,syncMembershipPending,!hasPendingMembershipClose else {return}
+        let root=requested
+        membershipFinish = .init(root:root,review:nil);membershipClosing=true
+        // Retain before opening a restricted connection or original accounts.
+        let change=membershipRecovery(root);membershipChange=change
+        run(cancellationMessage:"Recovery stopped. Finish the saved device update before recording.") {
+            self.progress = .init(phase:"Finishing saved device approval")
+            let worker=Task.detached(priority:.utility) {try change.apply()}
+            do {_=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})}
+            catch {self.membershipFinish?.error=error.localizedDescription}
+            self.membershipFinish?.cancelled=Task.isCancelled
+            try await self.finishMembershipCloseAndReopen()
+        }
+    }
     func resumeSyncErasure() {
         guard canRecoverContent,syncErasurePending else {return}
         let location=requested,recovery=syncRecovery
@@ -276,11 +388,15 @@ struct PersonalSyncErasureRecovery:Sendable {
             self.message="Saved erasure finished. Recording stays paused until you resume it."
         }
     }
-    func cancelOperation() {if vaultPackage != nil {pendingLock=true};operation?.cancel()}
+    func cancelOperation() {membershipFinish?.cancelled=true;if vaultPackage != nil {pendingLock=true};operation?.cancel()}
     func lockForTermination() async -> Bool {
-        terminationRequested=true
+        terminationRequested=true;syncApprovalPresentation=nil;membershipFinish?.cancelled=true
         await recoveryTransfer.cancelAndWait()
         if busy {cancelOperation();while busy {if let operation {await operation.value} else {break}}}
+        if hasPendingMembershipClose {
+            do {try await closeMembershipResources();membershipFinish=nil}
+            catch {failure=error.localizedDescription;terminationRequested=false;return false}
+        }
         guard vaultPackage != nil else {
             model?.prepareForLibrarySwitch();await model?.cancelExternalWorkAndWait();return true
         }
@@ -290,7 +406,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         return detached
     }
     var canRecoverContent:Bool {
-        !terminationRequested && !busy && model==nil && !locked() && (vaultPackage==nil || vaultStatus?.state == .unlocked) && FileManager.default.fileExists(atPath:requested.appendingPathComponent("memory.sqlite").path)
+        !terminationRequested && !busy && !hasPendingMembershipClose && model==nil && !locked() && (vaultPackage==nil || vaultStatus?.state == .unlocked) && FileManager.default.fileExists(atPath:requested.appendingPathComponent("memory.sqlite").path)
     }
     private func run(cancellationMessage:String?=nil,_ work:@escaping @MainActor () async throws -> Void) {
         guard !busy else {return};busy=true;failure=nil
@@ -385,11 +501,13 @@ struct LibraryRecoveryView:View {
     var body:some View {
         ScrollView {VStack(alignment:.leading,spacing:22) {
             Image(systemName:session.busy ? "externaldrive.badge.timemachine":"externaldrive.badge.exclamationmark").font(.system(size:42)).foregroundStyle(OSwindTheme.accent)
-            Text(session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
-            Text(session.syncErasurePending ? "History deletion has a saved cleanup step. Finish it before opening the library or recording again.":session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
+            Text(session.hasPendingMembershipClose ? "Finish closing the device update.":session.syncMembershipPending ? "Finish saved device approval.":session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
+            Text(session.hasPendingMembershipClose ? "The original library still has local work open. Retry closing it before opening another workspace.":session.syncMembershipPending ? "A device update has a saved recovery step. Finish it before recording or reconnecting sync.":session.syncErasurePending ? "History deletion has a saved cleanup step. Finish it before opening the library or recording again.":session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
             Text(locationLabel ?? session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
             if session.busy {HStack {ProgressView(session.progress?.phase ?? (session.syncErasurePending ? "Finishing erasure cleanup…":"Opening library…"));Button("Stop") {session.cancelOperation()}}}
             if !session.busy {
+            if session.hasPendingMembershipClose {Button("Retry closing device update") {session.retryMembershipClose()}.buttonStyle(.borderedProminent)}
+            if session.syncMembershipPending,session.canRecoverContent {Button("Finish saved device approval") {session.resumeSyncMembership()}.buttonStyle(.borderedProminent)}
             if session.syncErasurePending,session.canRecoverContent {
                 Button("Resume erasure cleanup") {session.resumeSyncErasure()}.buttonStyle(.borderedProminent)
                 if !session.message.isEmpty {Text(session.message).font(.callout).foregroundStyle(.secondary)}

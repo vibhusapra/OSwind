@@ -202,7 +202,9 @@ final class SyncDeliveryAnchor:@unchecked Sendable,CustomStringConvertible,Custo
         guard storage.protection==protection else {throw OSwindError.invalid("Keep the enrolled credential protection tier")}
         let bytes=try storage.read(id:id),envelope=try Envelope.decode(bytes),material=try SyncCredentialMaterial.decodeFromKeychain(envelope.material)
         guard (envelope.retirement != nil)==retiring else {throw OSwindError.unavailable("Use the matching active or retirement recovery owner for this native history")}
-        guard envelope.id==id,envelope.protection==protection,(envelope.membershipPreparation != nil)==membershipRecovery,(envelope.membershipFloor != nil)==floorRecovery else {throw OSwindError.unavailable("Resume the exact saved membership operation before ordinary access")}
+        guard envelope.id==id,envelope.protection==protection else {throw OSwindError.unavailable("Resume the original delivery authority")}
+        if !membershipRecovery,!floorRecovery,envelope.membershipPreparation != nil {throw PersonalSyncMembershipRecoveryRequired()}
+        guard (envelope.membershipPreparation != nil)==membershipRecovery,(envelope.membershipFloor != nil)==floorRecovery else {throw OSwindError.unavailable("Resume the exact saved membership operation before ordinary access")}
         var nativeMaterial=material
         if membershipRecovery {
             let phase=try membershipPhase(db,library:library,envelope:envelope),record=envelope.membershipPreparation!

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Internal membership owner, unavailable to app/CLI until reviewed owner
-/// approval and the complete session lifecycle are integrated. Preparation
+/// Internal membership owner, retained by the app-facing operation across its
+/// reviewed session handover and joined close. Preparation
 /// keeps old private material; application resumes its exact saved forward
 /// choice. Cancellation before that choice keeps native36's old-writer fence.
 /// It opens no provider; later service startup performs bounded replay.
@@ -68,15 +68,19 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
     }
     static func open(root:URL,environment:SyncNativeWriterEnvironment = .native)throws->Self {
         let library=try MemoryStore(root:root,recoveryReadOnly:false,nativeWriterEnvironment:environment,membershipRecovery:true)
+        do {return try open(library:library,environment:environment)}
+        catch {try? library.close();throw error}
+    }
+    /// The enclosing operation already owns this store, including failure to
+    /// open private authority. It remains responsible for joined close/retry.
+    static func open(library:MemoryStore,environment:SyncNativeWriterEnvironment)throws->Self {
+        let anchor=try SyncDeliveryAnchor.openMembershipPreparation(library:library,environment:environment)
         do {
-            let anchor=try SyncDeliveryAnchor.openMembershipPreparation(library:library,environment:environment)
-            do {
-                guard let id=anchor.membershipPairingID else {throw OSwindError.unavailable("Original membership pairing account is missing")}
-                let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:environment.stateRoot)
-                do {try anchor.validateMembershipPreparation();return Self(library:library,anchor:anchor,pairing:nil,pairingLease:lease)}
-                catch {lease.close();throw error}
-            }catch {anchor.close();throw error}
-        }catch {try? library.close();throw error}
+            guard let id=anchor.membershipPairingID else {throw OSwindError.unavailable("Original membership pairing account is missing")}
+            let lease=try SyncCredentialExclusiveLease(id:id,stateRoot:environment.stateRoot)
+            do {try anchor.validateMembershipPreparation();return Self(library:library,anchor:anchor,pairing:nil,pairingLease:lease)}
+            catch {lease.close();throw error}
+        }catch {anchor.close();throw error}
     }
     private init(library:MemoryStore,anchor:SyncDeliveryAnchor,pairing:PersonalSyncPairing?,pairingLease:SyncCredentialExclusiveLease?) {self.library=library;self.anchor=anchor;self.pairing=pairing;self.pairingLease=pairingLease}
     func resumeFence()throws {

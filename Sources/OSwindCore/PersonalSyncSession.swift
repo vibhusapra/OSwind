@@ -44,9 +44,11 @@ public struct PersonalSyncEraseReview:Equatable,Sendable {
 
 /// The app can own an enrolled session without receiving wire types or keys.
 /// The pairing factory prepares enrollment, native writer and rollback authority
-/// before returning this paused owner. A session never grants new membership.
+/// before returning this paused owner. A stopped owner session can transfer one
+/// exact reviewed addition into a separately retained membership operation.
 public actor PersonalSyncSession {
     private nonisolated let library:MemoryStore
+    public nonisolated let isGroupOwner:Bool
     private let privateInbox:SyncObjectFolder
     private let service:SyncLibraryService
     private let pairing:PersonalSyncPairing?
@@ -61,13 +63,15 @@ public actor PersonalSyncSession {
     init(service:SyncLibraryService,pairing:PersonalSyncPairing?=nil,schedule:SyncLibrarySchedule = .init())throws {
         guard pairing==nil || pairing!.belongs(to:service.library) else {throw OSwindError.invalid("Own pairing for the session's current library")}
         library=service.library;privateInbox=service.inbox;self.service=service;self.pairing=pairing;scheduler=try SyncLibraryScheduler(service:service,schedule:schedule)
+        if let pairing {isGroupOwner=try pairing.status().phase == .owner}else {isGroupOwner=false}
     }
     public nonisolated func belongs(to store:MemoryStore)->Bool {library === store}
     public nonisolated var ownsHistoryRetirement:Bool {pairing != nil}
-    /// Internal until AppSession owns real producer drain and close/reopen.
-    /// Production entry will use the live clock; deterministic time is private
-    /// to Core tests. Normal delivery ticks do not replace pairing authority.
-    func reviewOwnerAddition(_ text:String,now:Date=Date())throws->PersonalSyncOwnerReview {
+    public func reviewOwnerAddition(_ text:String)throws->PersonalSyncOwnerReview {try reviewOwnerAddition(text,now:Date())}
+    public func ownerChangeAfterStopping(_ review:PersonalSyncOwnerReview)async throws->PersonalSyncOwnerChange {try await ownerChangeAfterStopping(review,clock:{Date()})}
+    /// Deterministic clock adapters remain internal to Core tests. Normal
+    /// delivery ticks do not replace pairing authority.
+    func reviewOwnerAddition(_ text:String,now:Date)throws->PersonalSyncOwnerReview {
         guard !closed,stopping==nil,retirement==nil,reviewing==nil,!ownerAdditionTransferred,let pairing else {throw OSwindError.unavailable("Review from the current enrolled owner session")}
         try Task.checkCancellation()
         let request=try pairing.reviewDeliveredRequest(text,now:now)
@@ -76,13 +80,14 @@ public actor PersonalSyncSession {
         guard status.phase == .owner,let root=status.rootFingerprint else {throw OSwindError.invalid("Only the original group owner can approve a device")}
         guard status.memberNames.count<SyncProtocolLimits.peers else {throw OSwindError.invalid("This group is at its device limit")}
         let environment=try pairing.ownerChangeEnvironment()
-        let review=PersonalSyncOwnerReview(deviceName:request.deviceName,requestFingerprint:request.requestFingerprint,rootFingerprint:root,expires:request.expires,currentMemberCount:status.memberNames.count,session:reviewOwner,token:UUID())
+        let workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
+        let review=PersonalSyncOwnerReview(deviceName:request.deviceName,requestFingerprint:request.requestFingerprint,rootFingerprint:root,expires:request.expires,currentMemberCount:status.memberNames.count,session:reviewOwner,token:UUID(),workspace:workspace)
         try Task.checkCancellation();ownerAdditionReview=(review,request,environment);return review
     }
     /// Caller first retires/drains the exact app model, then explicitly joins
     /// this session's stop. Reserve the one-use transfer before awaiting so
     /// actor reentrancy cannot construct two credential owners.
-    func ownerChangeAfterStopping(_ review:PersonalSyncOwnerReview,clock:@Sendable ()->Date={Date()})async throws->PersonalSyncOwnerChange {
+    func ownerChangeAfterStopping(_ review:PersonalSyncOwnerReview,clock:@Sendable ()->Date)async throws->PersonalSyncOwnerChange {
         guard closed,let stopping,!ownerAdditionTransferred,let stored=ownerAdditionReview,
               stored.review==review,review.session==reviewOwner else {throw OSwindError.unavailable("Stop and join the exact reviewed session before approval")}
         ownerAdditionTransferred=true;ownerAdditionReview=nil
