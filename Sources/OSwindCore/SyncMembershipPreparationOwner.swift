@@ -62,6 +62,31 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
             return ApprovalDraft(owner:owner,proof:proof,snapshot:snapshot,plan:plan)
         }catch {pairing.close();throw error}
     }
+    /// Retain the original owner before the first private save on a peer too.
+    /// Opening the exact anchor/snapshot alone publishes no membership intent.
+    final class MembershipDraft:@unchecked Sendable {
+        let owner:SyncMembershipPreparationOwner
+        private let proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot
+        private var attempted=false
+        fileprivate init(owner:SyncMembershipPreparationOwner,proof:SyncMembershipRefresh,snapshot:PersonalSyncPairing.MembershipSnapshot) {
+            self.owner=owner;self.proof=proof;self.snapshot=snapshot
+        }
+        func prepare()throws {
+            owner.lock.lock();defer {owner.lock.unlock()}
+            guard !attempted,!owner.closed else {throw OSwindError.unavailable("Finish closing this exact membership attempt before trying again")}
+            attempted=true
+            try owner.anchor.prepareMembership(proof,snapshot:snapshot)
+        }
+    }
+    static func membershipDraft(library:MemoryStore,proof:SyncMembershipRefresh,trusted:SyncMembershipCertificate,environment:SyncNativeWriterEnvironment)throws->MembershipDraft {
+        let pairing=try PersonalSyncPairing.openMembershipPairing(library:library,environment:environment)
+        do {
+            guard try pairing.membershipCertificateForRefresh()==trusted,try proof.advance(from:trusted) != trusted else {throw OSwindError.unavailable("Review the exact current membership before updating")}
+            let (anchor,snapshot)=try pairing.openMembershipPreparationAnchor(proof)
+            let owner=Self(library:library,anchor:anchor,pairing:pairing,pairingLease:nil)
+            return MembershipDraft(owner:owner,proof:proof,snapshot:snapshot)
+        }catch {pairing.close();throw error}
+    }
     func completedResponse()throws->PersonalSyncApprovedResponse? {
         lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership owner is closed")}
         return try anchor.completedOwnerResponse(inMembershipRecovery:true)

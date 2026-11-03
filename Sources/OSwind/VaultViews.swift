@@ -25,7 +25,7 @@ struct VaultLockedView:View {
                     Button("Retry locking") {session.requestLock()}.buttonStyle(.borderedProminent).disabled(session.busy)
                 } else if state == .unlocked {
                     if session.hasPendingMembershipClose {Button("Retry closing device update") {session.retryMembershipClose()}.buttonStyle(.borderedProminent).disabled(session.busy)}
-                    else if session.syncMembershipPending {Button("Finish saved device approval") {session.resumeSyncMembership()}.buttonStyle(.borderedProminent).disabled(session.busy)}
+                    else if session.syncMembershipPending {Button("Finish saved device update") {session.resumeSyncMembership()}.buttonStyle(.borderedProminent).disabled(session.busy)}
                     HStack {Button("Open library") {session.retry()}.buttonStyle(.borderedProminent);Button("Lock library") {session.requestLock()}}.disabled(session.busy)
                 } else if session.vaultStatus != nil {
                     VStack(alignment:.leading,spacing:12) {

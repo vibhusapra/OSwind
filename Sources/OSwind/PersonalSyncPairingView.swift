@@ -44,6 +44,7 @@ struct PersonalSyncPairingView:View {
                         Label("Local pairing retired",systemImage:"key.slash")
                         Text("Private sync keys were removed from this Mac's pairing credential. A keyless record remains to prevent reuse. Other Macs' memberships have not been revoked; recovery and group rotation are still being built.").foregroundStyle(.secondary)
                     }
+                    if status.phase == .owner,model.approveMembershipUpdate != nil {PersonalSyncMembershipUpdateView(model:model)}
                 } else if !model.pairingBusy {
                     Button("Load saved pairing") {model.performPairing(.load)}
                 }

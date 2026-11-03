@@ -30,6 +30,7 @@ struct PersonalSyncErasureRecovery:Sendable {
     private var membershipClosing=false
     private struct MembershipFinish {
         let root:URL,review:PersonalSyncOwnerReview?
+        var peerReview:PersonalSyncMembershipReview?=nil
         var response:PersonalSyncApprovedResponse?,error:String?,cancelled=false
         var closedChange:PersonalSyncOwnerChange?
     }
@@ -265,6 +266,9 @@ struct PersonalSyncErasureRecovery:Sendable {
                 candidate.personalSync.approveOwnerAddition={[weak self,weak candidate] review in
                     guard let self,let candidate else {return};self.approveSyncDevice(review,from:candidate)
                 }
+                candidate.personalSync.approveMembershipUpdate={[weak self,weak candidate] review in
+                    guard let self,let candidate else {return};self.approveSyncMembership(review,from:candidate)
+                }
             }
             candidate.syncErasureFinished={[weak self,weak candidate] in
                 guard let self,let candidate else {return};self.reopenAfterSyncErasure(candidate)
@@ -328,6 +332,27 @@ struct PersonalSyncErasureRecovery:Sendable {
         }
         membershipClosing=false
     }
+    func approveSyncMembership(_ review:PersonalSyncMembershipReview,from previous:AppModel) {
+        guard ownerAdditionPreview,!terminationRequested,!busy,!hasPendingMembershipClose,model === previous,!locked(),
+              let current=previous.personalSync.sessionForMembershipUpdate(review) else {return}
+        syncApprovalPresentation=nil;membershipFinish = .init(root:previous.store.root,review:nil,peerReview:review)
+        closingStore=previous.store;membershipClosing=true;model=nil
+        previous.clearForVaultLock()
+        run(cancellationMessage:"Update stopped. Reopen this library to finish any saved device update.") {
+            self.progress = .init(phase:"Stopping recording and local work")
+            await previous.cancelExternalWorkAndWait()
+            do {
+                try await current.stop();try Task.checkCancellation()
+                let change=try await current.membershipChangeAfterStopping(review)
+                self.membershipChange=change
+                self.progress = .init(phase:"Updating trusted devices")
+                let worker=Task.detached(priority:.utility) {try change.apply()}
+                _=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
+            }catch {self.membershipFinish?.error=error.localizedDescription}
+            self.membershipFinish?.cancelled=Task.isCancelled
+            try await self.finishMembershipCloseAndReopen()
+        }
+    }
     private func finishMembershipCloseAndReopen()async throws {
         progress = .init(phase:"Finishing the local device update")
         defer {progress=nil}
@@ -339,6 +364,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         }
         let fresh=try await preparedModel(root:finish.root,startServices:false,restoringOriginal:true,validateStore:{store in
             try finish.review?.validateReopenedStore(store)
+            try finish.peerReview?.validateReopenedStore(store)
             try finish.closedChange?.validateReopenedStore(store)
         })
         if terminationRequested || pendingLock || locked() {
@@ -366,7 +392,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         // Retain before opening a restricted connection or original accounts.
         let change=membershipRecovery(root);membershipChange=change
         run(cancellationMessage:"Recovery stopped. Finish the saved device update before recording.") {
-            self.progress = .init(phase:"Finishing saved device approval")
+            self.progress = .init(phase:"Finishing saved device update")
             let worker=Task.detached(priority:.utility) {try change.apply()}
             do {_=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})}
             catch {self.membershipFinish?.error=error.localizedDescription}
@@ -501,13 +527,13 @@ struct LibraryRecoveryView:View {
     var body:some View {
         ScrollView {VStack(alignment:.leading,spacing:22) {
             Image(systemName:session.busy ? "externaldrive.badge.timemachine":"externaldrive.badge.exclamationmark").font(.system(size:42)).foregroundStyle(OSwindTheme.accent)
-            Text(session.hasPendingMembershipClose ? "Finish closing the device update.":session.syncMembershipPending ? "Finish saved device approval.":session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
+            Text(session.hasPendingMembershipClose ? "Finish closing the device update.":session.syncMembershipPending ? "Finish saved device update.":session.syncErasurePending ? "Finish saved erasure.":session.busy ? "Opening your library.":"Your library is unavailable.").font(.largeTitle.weight(.semibold))
             Text(session.hasPendingMembershipClose ? "The original library still has local work open. Retry closing it before opening another workspace.":session.syncMembershipPending ? "A device update has a saved recovery step. Finish it before recording or reconnecting sync.":session.syncErasurePending ? "History deletion has a saved cleanup step. Finish it before opening the library or recording again.":session.busy ? "Preparing local search. Large histories can take a moment; you can stop safely.":session.failure ?? (session.message.isEmpty ? "Reconnect its drive or choose another library.":session.message)).foregroundStyle(.secondary).textSelection(.enabled)
             Text(locationLabel ?? session.requested.path).font(.system(.caption,design:.monospaced)).foregroundStyle(.secondary).textSelection(.enabled)
             if session.busy {HStack {ProgressView(session.progress?.phase ?? (session.syncErasurePending ? "Finishing erasure cleanup…":"Opening library…"));Button("Stop") {session.cancelOperation()}}}
             if !session.busy {
             if session.hasPendingMembershipClose {Button("Retry closing device update") {session.retryMembershipClose()}.buttonStyle(.borderedProminent)}
-            if session.syncMembershipPending,session.canRecoverContent {Button("Finish saved device approval") {session.resumeSyncMembership()}.buttonStyle(.borderedProminent)}
+            if session.syncMembershipPending,session.canRecoverContent {Button("Finish saved device update") {session.resumeSyncMembership()}.buttonStyle(.borderedProminent)}
             if session.syncErasurePending,session.canRecoverContent {
                 Button("Resume erasure cleanup") {session.resumeSyncErasure()}.buttonStyle(.borderedProminent)
                 if !session.message.isEmpty {Text(session.message).font(.callout).foregroundStyle(.secondary)}
