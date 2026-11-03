@@ -100,10 +100,11 @@ enum SnapshotDisplayPrivacy {
             do {selected=try settings.snapshotRegions.resolved(descriptors)}catch {throw SnapshotCaptureDeferral(reason:error.localizedDescription)}
             for source in selected {
                 guard let display=content.displays.first(where:{$0.displayID==source.displayID}) else {continue}
-                let id=source.identifier,crop=settings.snapshotRegions.displayCrops[id],geometry=try SnapshotRegionGeometry(size:source.size,region:crop,maximumDimension:settings.profile.maxDimension)
+                let filter=SCContentFilter(display:display,excludingApplications:excluded,exceptingWindows:[])
+                let id=source.identifier,crop=settings.snapshotRegions.displayCrops[id],geometry=try SnapshotRegionGeometry(size:source.size,region:crop,maximumDimension:settings.profile.maxDimension,nativePixelScale:Double(filter.pointPixelScale))
                 let stillAttached:(SCShareableContent)->Bool = {latest in source.current(in:latest.displays.compactMap(descriptor))}
                 let suffix=crop.map {"-crop-\($0.x)-\($0.y)-\($0.width)-\($0.height)"} ?? ""
-                plans.append(.init(filter:SCContentFilter(display:display,excludingApplications:excluded,exceptingWindows:[]),display:"display-"+id+suffix,title:"Display \(display.displayID)",geometry:geometry,includeAX:false,attached:stillAttached))
+                plans.append(.init(filter:filter,display:"display-"+id+suffix,title:"Display \(display.displayID)",geometry:geometry,includeAX:false,attached:stillAttached))
             }
             guard !plans.isEmpty else {throw SnapshotCaptureDeferral(reason:"No selected display is attached · choose a display in Settings")}
             validate={latest in
@@ -130,10 +131,12 @@ enum SnapshotDisplayPrivacy {
         return plans.map {plan in
             let filter=plan.filter
             return SnapshotCaptureFrame(display:plan.display,title:plan.title,capture:{
-                let config=SCStreamConfiguration(),rect=filter.contentRect,scale=min(2.0,Double(settings.profile.maxDimension)/max(rect.width,rect.height))
-                if let geometry=plan.geometry {config.sourceRect=geometry.sourceRect;config.width=geometry.outputWidth;config.height=geometry.outputHeight}
-                else {config.width=max(1,Int(rect.width*scale));config.height=max(1,Int(rect.height*scale))};config.showsCursor=false;config.captureResolution = .best
-                if plan.crop != nil {config.ignoreShadowsSingleWindow=true}
+                let config:SCStreamConfiguration
+                if let geometry=plan.geometry {
+                    config=SCStreamConfiguration();config.sourceRect=geometry.sourceRect;config.width=geometry.outputWidth;config.height=geometry.outputHeight;config.showsCursor=false;config.captureResolution = .best
+                } else {
+                    config=try NativeCaptureConfiguration.window(size:filter.contentRect.size,nativePixelScale:Double(filter.pointPixelScale),maximumDimension:settings.profile.maxDimension)
+                }
                 let image=try await SCScreenshotManager.captureImage(contentFilter:filter,configuration:config)
                 return try plan.crop?.crop(image) ?? image
             },includeAccessibilityText:plan.includeAX,privacyStillMasked:{

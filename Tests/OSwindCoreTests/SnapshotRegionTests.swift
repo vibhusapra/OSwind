@@ -48,10 +48,10 @@ final class SnapshotRegionTests:XCTestCase {
         XCTAssertThrowsError(try SnapshotRegion().rect(in:.zero));XCTAssertThrowsError(try SnapshotRegion(width:0.001).rect(in:CGSize(width:100,height:100)))
     }
     func testDisplayLocalGeometryAndOutputScalingRespectAspectAndProfileLimit() throws {
-        let crop=SnapshotRegion(x:0.25,y:0.1,width:0.5,height:0.4),result=try SnapshotRegionGeometry(size:CGSize(width:2560,height:1440),region:crop,maximumDimension:1920)
+        let crop=SnapshotRegion(x:0.25,y:0.1,width:0.5,height:0.4),result=try SnapshotRegionGeometry(size:CGSize(width:2560,height:1440),region:crop,maximumDimension:1920,nativePixelScale:2)
         XCTAssertEqual(result.sourceRect,CGRect(x:640,y:144,width:1280,height:576));XCTAssertEqual(result.outputWidth,1920);XCTAssertEqual(result.outputHeight,864)
-        let full=try SnapshotRegionGeometry(size:CGSize(width:100,height:50),region:nil,maximumDimension:1920);XCTAssertEqual(full.outputWidth,200);XCTAssertEqual(full.outputHeight,100)
-        XCTAssertThrowsError(try SnapshotRegionGeometry(size:CGSize(width:100,height:50),region:crop,maximumDimension:0))
+        let full=try SnapshotRegionGeometry(size:CGSize(width:100,height:50),region:nil,maximumDimension:1920,nativePixelScale:2);XCTAssertEqual(full.outputWidth,200);XCTAssertEqual(full.outputHeight,100)
+        XCTAssertThrowsError(try SnapshotRegionGeometry(size:CGSize(width:100,height:50),region:crop,maximumDimension:0,nativePixelScale:2))
     }
     func testOwnedBitmapCropRoundsInwardAndContainsOnlySelectedPixels() throws {
         let context=try XCTUnwrap(CGContext(data:nil,width:10,height:10,bitsPerComponent:8,bytesPerRow:40,space:CGColorSpaceCreateDeviceRGB(),bitmapInfo:CGImageAlphaInfo.premultipliedLast.rawValue))
