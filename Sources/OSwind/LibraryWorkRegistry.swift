@@ -3,7 +3,7 @@ import Foundation
 /// Own the actual detached work together with its actor completion. A cancelled
 /// drain caller still waits for both; no new job enters while draining.
 @MainActor final class LibraryWorkRegistry {
-    enum Kind:Hashable,CaseIterable,Sendable {case note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation,query,textRebuild,fastIndex,automaticText,visualRebuild,automaticVisual}
+    enum Kind:Hashable,CaseIterable,Sendable {case recordedMeetings,note,recap,statistics,storage,answer,audioImport,selectedPII,sourceOpening,historicalValidation,query,textRebuild,fastIndex,automaticText,visualRebuild,automaticVisual}
     private struct Job {
         let kind:Kind
         let cancel:@Sendable ()->Void
@@ -33,6 +33,7 @@ import Foundation
         await withTaskCancellationHandler {await job.join()} onCancel:{job.cancel()}
     }
     func count(kinds:Set<Kind>)->Int {jobs.values.filter {kinds.contains($0.kind)}.count}
+    func cancel(id:UUID) {jobs[id]?.cancel()}
     func cancel(kinds:Set<Kind>=Set(Kind.allCases)) {for job in jobs.values where kinds.contains(job.kind) {job.cancel()}}
     func cancelAndWait()async {
         drainers+=1;defer {drainers-=1}

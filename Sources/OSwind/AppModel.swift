@@ -15,6 +15,7 @@ import EventKit
     let entityMemory:EntityMemoryModel
     @Published var entityScope:MemoryEntity?
     let meetings:MeetingsModel
+    lazy var recordedMeetings=RecordedMeetingsModel(store:store,work:libraryWork)
     let tools:MCPToolsModel
     let clipboard:ClipboardContextModel
     let voice:VoiceTypingModel
@@ -63,7 +64,7 @@ import EventKit
         assigningSettingsInternally=true;settings=value;assigningSettingsInternally=false
     }
     private func applySettingsToControllers() {
-        capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
+        recordedMeetings.invalidate();capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
         localModels.configure(answer:settings.ai.provider == .ollama ? settings.ai.endpoint:nil,search:settings.search.endpoint,answerModel:settings.ai.provider == .ollama ? settings.ai.model:nil)
     }
     @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
@@ -252,6 +253,9 @@ import EventKit
         }
         clipboard.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         tools.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
+        recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !SessionState.locked}
+        recordedMeetings.openSource = {[weak self] source in self?.openRecordedMeetingSource(source)}
+        recordedMeetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         meetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         routines.onChange = {[weak self] in self?.refreshChats()}
         libraryWipe.pendingCleanup=(try? store.hasPendingLibraryWipeCleanup()) ?? false
@@ -344,7 +348,7 @@ import EventKit
     func prepareForLibrarySwitch(preservingSync:Bool) {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
         if preservingSync {personalSync.suspend()}else {personalSync.retire()}
-        libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
+        libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();recordedMeetings.deactivate();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
         drafting.clear()
@@ -459,6 +463,10 @@ import EventKit
             guard let memory=try store.get(source.memoryID) else {throw OSwindError.unavailable("This workflow source is no longer available")}
             return memory
         })
+    }
+    func openRecordedMeetingSource(_ source:RecordedMeetingSource) {
+        let store=self.store
+        openSource(id:source.memoryID,query:"",passage:nil) {try store.recordedMeetingEvidence(source)}
     }
     func openMCPSource(_ id:String) {
         let store=self.store
@@ -774,6 +782,7 @@ import EventKit
     }
     private func captured(_ memory: Memory) {
         guard libraryWorkAvailable,!libraryWipe.busy,!libraryWipe.pendingCleanup else {return}
+        if memory.kind == .audio {recordedMeetings.recordingSaved()}
         if settings.entityAutomaticIndex {entityMemory.enqueue(memory)}
         queueVisualIndex(memory)
         refreshStatistics(force:true)

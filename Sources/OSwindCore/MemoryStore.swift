@@ -9,6 +9,7 @@ public final class MemoryStore: @unchecked Sendable {
     // Enrolled35 adds writer generations; opt-in36 fences membership
     // preparations. Ordinary native content remains33.
     public static let maximumSupportedSchemaVersion = 36
+    let recordedMeetingOwner=UUID()
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -212,6 +213,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
+        try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
