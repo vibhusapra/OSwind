@@ -340,10 +340,14 @@ import MachO
         try await settledConnectionWork(session.model!.personalSync)
         return session
     }
-    private func rootSettled(_ session:AppSession,_ condition:()->Bool)async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(30))
+    private func rootSettled(_ session:AppSession,caller:UInt=#line,diagnostics:()->String={""},_ condition:()->Bool)async throws {
+        let started=ContinuousClock.now,deadline=started.advanced(by:.seconds(30))
         while !condition(),ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
-        guard condition() else {throw OSwindError.unavailable("Owned root transition did not finish: "+(session.failure ?? session.message))}
+        guard condition() else {
+            let state="caller=\(caller) busy=\(session.busy) modelPresent=\(session.model != nil) erasurePending=\(session.syncErasurePending) membershipPending=\(session.syncMembershipPending) membershipClosePending=\(session.hasPendingMembershipClose) phase=\(session.progress?.phase ?? "none")"
+            throw OSwindError.unavailable("Owned root transition did not finish: "+state+" "+diagnostics()+" "+(session.failure ?? session.message))
+        }
+        print("OWNED_ROOT_TRANSITION_READY caller=\(caller) budgetSeconds=30 elapsed=\(started.duration(to:ContinuousClock.now))")
     }
     func testEnrolledAppWipeReplacesClosedOwnerWithQuietFreshWorkspace()async throws {
         let session=try await rootSession(),old=try XCTUnwrap(session.model),shared=root.appendingPathComponent("shared")
@@ -386,7 +390,9 @@ import MachO
         try old.store.insert(Memory(id:"cancel-recovery",text:"Owned source before pending erasure"))
         old.personalSync.connectFolder(root.appendingPathComponent("shared"),create:true);try await connected(old.personalSync)
         let reader=try PairingAppWALReader(root:old.store.root);defer {reader.close()}
-        old.wipeLocalLibrary();try await rootSettled(session) {!session.busy && session.syncErasurePending && session.model==nil}
+        old.wipeLocalLibrary()
+        XCTAssertTrue(old.libraryWipe.busy,"Owned wipe was refused before recovery: "+(old.errorMessage ?? "no app error"))
+        try await rootSettled(session,diagnostics:{"oldClosed=\(old.store.isClosed) wipeBusy=\(old.libraryWipe.busy) wipePending=\(old.libraryWipe.pendingCleanup) wipeStatus=\(old.libraryWipe.status) appError=\(old.errorMessage ?? "none")"}) {!session.busy && session.syncErasurePending && session.model==nil}
         reader.close();session.resumeSyncErasure();await fulfillment(of:[gate.entered],timeout:10)
         if let path=ProcessInfo.processInfo.environment["OSWIND_TEST_PAIRING_RENDER_DIR"] {
             let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
