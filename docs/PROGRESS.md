@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Recording sessions now have a source-linked native workspace
+
+Meetings opens Recordings beside the existing Upcoming calendar view. Existing live/import recording IDs group clips; original transcript/clip actions use current source guards. A derived thin index supports bounded pages without transcript hydration; initial index installation/repair still parses audio payloads and needs large-archive timing. Per-row/open-store references, current-settings publication, registry-owned reads and appearance leases protect stale data and joined departure. Observed interval union preserves gaps/import-date uncertainty; startup refusal remains visible.
+
+**17 selected native Debug methods passed** at c108699 (16new+existing native three-library13-kind regression), including actual retained-page APFS detach and original Keychain invariants. Six corrected populated/compact/empty scenes and two later setup-refusal scenes were reviewed; earlier wrong populated renders remain retained as failed visual QA. The later caption-only change/render case and upstream unrelated peer-test merge are reported separately. Sanitizer/optimized/broad/source/portability/performance and interactive/physical audio acceptance remain open. F042 is not complete and no feature status/ranking is promoted. [Scope and TODOs](RECORDED-MEETINGS-WIP.md) · [Receipt](../benchmarks/recorded-meetings-development-v1.json) · [Raw evidence](../benchmarks/recorded-meetings-development-raw-v1.zip). A new [CI selection](../benchmarks/recorded-meetings-ci-selection-v1.json) preserves prior steps and retains generated PNGs; hosted success is separate.
+
 ## Reviewed peer catch-up and enlarged-group reconnection preview
 
 Runtime `4c0d51d` adds public membership requests/pages, exact-current peer review, retained original-close ownership and quiet recovery. Verified overlapping pages prepare only the suffix after the current trusted certificate while preserving the supplied page's review fingerprint. The real vault metadata observer is prevented from opening a fresh model while original close/finish remains pending. Three-or-more-member folder controls require the existing `OSWIND_OWNER_ADDITION_PREVIEW=1` gate; default setup remains two-Mac.
