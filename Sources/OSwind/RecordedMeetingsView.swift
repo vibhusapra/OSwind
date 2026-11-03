@@ -36,7 +36,7 @@ struct RecordedMeetingsView:View {
                 Button("Refresh") {model.refresh()}.disabled(model.busy)
                 Button("Audio setup") {m.settingsTab="Audio";m.showSettings=true}
             }
-            if m.audio.hasActiveWork {Text(m.audio.status).font(.caption).foregroundStyle(.secondary)}
+            if m.audio.hasActiveWork || m.audio.status != "Audio off" {Text(m.audio.status).font(.caption).foregroundStyle(.secondary)}
             if m.importingAudio {HStack {ProgressView().controlSize(.small);Text(m.audioImportStatus.isEmpty ? "Importing audio…":m.audioImportStatus);Button("Cancel") {m.cancelAudioImport()}}.font(.caption)}
             if let error=model.error {Label(error,systemImage:"exclamationmark.circle").foregroundStyle(.orange).font(.callout)}
             if model.sessions.isEmpty {

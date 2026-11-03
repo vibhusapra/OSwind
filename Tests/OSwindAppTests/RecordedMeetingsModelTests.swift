@@ -66,7 +66,7 @@ import SwiftUI
         gate.release();let clean=await joined.value;XCTAssertTrue(clean);XCTAssertFalse(old.libraryWork.busy);try old.store.close();app.model=nil
         XCTAssertTrue(value.sessions.isEmpty)
     }
-    func testRenderRecordingsCompactAndEmptyInBothAppearances()async throws {
+    func testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording workspace components only")}
         let output=URL(fileURLWithPath:path);try Paths.ensure(output)
         let app=try AppModel(root:root,startServices:false);appModels.append(app);app.showOnboarding=false
@@ -79,6 +79,11 @@ import SwiftUI
         value.deactivate();for id in ["mic-a","system-a","mic-b","file-a"] {try app.store.delete(id)}
         value.activate();try await settle(value);XCTAssertTrue(value.sessions.isEmpty)
         for dark in [false,true] {try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:900,height:650),dark:dark,model:value,expected:0,to:output.appendingPathComponent("empty-\(dark ? "dark":"light").png"))}
+        // An owned missing executable fails before microphone/system startup.
+        // Keep this refusal visible even though no audio work became active.
+        app.settings.speech.engine = .whisper;app.settings.audioEnabled=true;app.settings.whisperBinary=root.appendingPathComponent("owned-missing-whisper").path
+        await app.toggleAudio();XCTAssertFalse(app.audio.running);XCTAssertFalse(app.audio.hasActiveWork);XCTAssertNotEqual(app.audio.status,"Audio off");XCTAssertTrue(app.audio.status.contains("Whisper"))
+        for dark in [false,true] {try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:900,height:650),dark:dark,model:value,expected:0,to:output.appendingPathComponent("setup-failure-\(dark ? "dark":"light").png"))}
     }
     private func render<Content:View>(_ content:Content,size:NSSize,dark:Bool,model:RecordedMeetingsModel,expected:Int,to path:URL)async throws {
         model.activate();try await settle(model)
