@@ -22,6 +22,6 @@ The packaged check uses two separate fictional one-note libraries and omits `--m
 
 The separate [96-attempt model comparison](LOCAL-MODEL-COMPARISON.md) uses the earlier unchanged `49f259d` runtime. Its successful runs, reviewer, publisher and outputs remain frozen. This preset patch does not rerun that comparison or imply identical quality/performance under every deployment. All 485 preceding published benchmark/feature/landscape files remain unchanged.
 
-The current model-library discovery/download controls still use the search endpoint. Defaults share the same loopback server; independently configured chat/search servers need endpoint-aware library controls in a subsequent change. Model startup delays, remaining citation-support failures and observed refusals are retained in the comparison report.
+At this preset runtime, model-library discovery/download controls still use the search endpoint. Defaults share the same loopback server. The later [endpoint-aware model library](MODEL-LIBRARY-ROUTING.md) addresses independently configured chat/search servers under its own qualification. Model startup delays, remaining citation-support failures and observed refusals are retained in the comparison report.
 
 All 83 feature statuses remain unchanged. GUI/TCC and older-Mac acceptance, physical capture and energy, complete sync and signed/notarized distribution remain open. This patch does not establish full v0 completion or a competitive product ranking.

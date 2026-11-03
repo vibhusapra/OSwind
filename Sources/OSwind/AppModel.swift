@@ -36,6 +36,7 @@ import EventKit
     let nativeModels:NativeModelSetupModel
     let visualModelSetup:VisualModelSetupModel
     let piiModelSetup:PIIModelSetupModel
+    let localModels:LocalModelLibraryModel
     @Published var settingsTab = "Capture"
     private var assigningSettingsInternally=false
     @Published var settings: AppSettings { didSet {
@@ -63,6 +64,7 @@ import EventKit
     }
     private func applySettingsToControllers() {
         capture.settings=settings;audio.settings=settings;routines.apply(settings);meetings.apply(settings);tools.apply(settings);clipboard.apply(settings);voice.apply(settings);workflow.apply(settings)
+        localModels.configure(answer:settings.ai.provider == .ollama ? settings.ai.endpoint:nil,search:settings.search.endpoint)
     }
     @Published var section = "Memories" {didSet {if section != "Memories" && section != "Ask" {entityScope=nil}}}
     @Published var searchFocusRequest: UUID?
@@ -129,7 +131,7 @@ import EventKit
     private var maintenanceAutomatic=false
     private var destructiveDrainers=0
     var hasPendingDestructiveWork:Bool {deletionTask != nil || deletionWorker != nil || maintenanceTask != nil || maintenanceWorker != nil}
-    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWipe.busy || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy || personalSync.busy}
+    var hasPendingExitWork:Bool {hasPendingJSONImport || hasPendingDestructiveWork || libraryWipe.busy || libraryWork.busy || pendingMediaCleanup.hasPendingWork || tools.busy || clipboard.busy || voice.busy || workflow.busy || personalSync.busy || localModels.busy}
     private var libraryOperationGeneration=UUID()
     @Published private(set) var maintenanceBusy=false
     @Published private(set) var maintenanceStatus=""
@@ -138,12 +140,6 @@ import EventKit
     @Published var resolvedSearch: QueryResolution?
     @Published var searchInputError: String?
     @Published var answerInputError: String?
-    @Published var installedModels = [InstalledModel]()
-    @Published var localRuntime = ""
-    @Published var startingModelServer = false
-    @Published var modelStatus = "Check the local server to discover installed models"
-    @Published var pullProgress: ModelPullProgress?
-    @Published var pullingModel: String?
     enum SearchWorkPhase:Hashable,Sendable {case query,queryRead,textRebuild,fastIndex,automaticText,visualRebuild,automaticVisual}
     var searchWorkObserver:(@Sendable (SearchWorkPhase)async throws->Void)?
     var searchWorkCompleted:(@Sendable (SearchWorkPhase)->Void)?
@@ -153,7 +149,6 @@ import EventKit
     private var searchGeneration=UUID(),automaticIndexGeneration=UUID()
     private var indexGeneration = UUID()
     private var indexTask: Task<Void,Never>?
-    private var pullTask: Task<Void,Never>?
     private var automaticIndexTask: Task<Void,Never>?
     private var pendingIndex = [Memory]()
     private var pendingRefresh = false
@@ -174,11 +169,12 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
         piiModelSetup=piiSetup ?? PIIModelSetupModel()
+        localModels=localModelSetup ?? LocalModelLibraryModel()
         demo = CommandLine.arguments.contains("--demo")
         let resolved = LibraryLocationPreferences.selection(demo:demo)
         let root = selectedRoot ?? resolved.url
@@ -201,6 +197,12 @@ import EventKit
         voice=voiceSetup?(store,loaded,self.drafting) ?? VoiceTypingModel(store:store,settings:loaded,draft:self.drafting,environment:.live(store:store,recognizer:audio.recognizer))
         workflow=workflowSetup?(store,loaded) ?? WorkflowModel(store:store,settings:loaded,environment:.live(store:store))
         personalSync=personalSyncSetup?(store) ?? PersonalSyncModel(store:store)
+        localModels.configure(answer:loaded.ai.provider == .ollama ? loaded.ai.endpoint:nil,search:loaded.search.endpoint)
+        localModels.allowed = {[weak self] in
+            guard let self else {return false}
+            return !self.demo && self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryWipe.pendingCleanup && !self.libraryTransfer.busy
+        }
+        localModels.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         personalSync.receivedErase={[weak self] in self?.wipeLocalLibrary(received:true)}
         personalSync.allowed = {[weak self] in
             guard let self else {return false}
@@ -350,7 +352,7 @@ import EventKit
         activity.deactivate(clear:true)
         visualAutoResumeAllowed=false;cancelVisualIndexing();visualModelSetup.cancel();piiModelSetup.cancel()
         libraryOperationGeneration=UUID();cancelJSONImport();cancelDestructiveWork();libraryWork.cancel();libraryWipe.cancel()
-        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); cancelAutomaticIndexer(); pullTask?.cancel(); cancelRefresh(); statisticsPending=false; stopAPI(preservePreference:true)
+        routines.stop();capture.pause(discardReplay:true); cancelOpeningMemory(); selected=nil; nativeModels.cancel(); pauseAll(); cancelAnswer(); cancelIndexing(); cancelAutomaticIndexer(); localModels.retire(); cancelRefresh(); statisticsPending=false; stopAPI(preservePreference:true)
     }
     func clearForVaultLock() {
         prepareForLibrarySwitch();libraryTransfer.cancel();routines.clearForLock()
@@ -728,7 +730,7 @@ import EventKit
         if !preservingSync {personalSync.retire()}
         let importWorker=jsonImportWorker,completion=jsonImportTask;importWorker?.cancel();completion?.cancel()
         cancelDestructiveWork()
-        cancelRefresh();cancelIndexing();cancelAutomaticIndexer();visualAutoResumeAllowed=false;cancelVisualIndexing()
+        cancelRefresh();cancelIndexing();cancelAutomaticIndexer();visualAutoResumeAllowed=false;cancelVisualIndexing();localModels.cancelAll()
         cancelOpeningMemory();piiScanStatusGeneration=UUID()
         historicalDetailTask?.cancel();historicalDetailTask=nil;historicalDetailGeneration=UUID()
         libraryWork.cancel()
@@ -741,6 +743,7 @@ import EventKit
         await cancelDestructiveWorkAndWait()
         await pendingMediaCleanup.cancelAndWait()
         await libraryWork.cancelAndWait()
+        await localModels.cancelAndWait()
         if !preservingWipe {await libraryWipe.cancelAndWait()}
     }
     private func cancelDestructiveWork() {
@@ -803,24 +806,6 @@ import EventKit
         }) else {return}
         automaticIndexTask=Task {await registry.wait(for:id)}
     }
-    func startModelServer() {
-        guard !startingModelServer else { return }; startingModelServer = true
-        Task { do { modelStatus = try await LocalModelServer.shared.start(endpoint:settings.search.endpoint); inspectLocalModels() } catch { modelStatus = error.localizedDescription }; startingModelServer = false }
-    }
-    func inspectLocalModels() {
-        let endpoint = settings.search.endpoint; installedModels = []; modelStatus = "Checking local server…"
-        Task { do { let models = try await OllamaClient.shared.models(endpoint:endpoint); let runtime = try await OllamaClient.shared.runtime(endpoint:endpoint); guard settings.search.endpoint == endpoint else { return }; installedModels = models; localRuntime = runtime; modelStatus = models.isEmpty ? "Server ready; download a model below" : "\(models.count) local models available" } catch { modelStatus = "Local server unavailable: " + error.localizedDescription } }
-    }
-    func downloadModel(_ name: String) {
-        guard pullingModel == nil else { return }; pullingModel = name; pullProgress = nil; let endpoint = settings.search.endpoint
-        pullTask = Task {
-            do { try await OllamaClient.shared.pull(name,endpoint:endpoint) { progress in Task { @MainActor in self.pullProgress = progress } }; modelStatus = "Downloaded \(name)" }
-            catch is CancellationError { modelStatus = "Download request cancelled; cached layers can be resumed" }
-            catch { modelStatus = error.localizedDescription }
-            pullingModel = nil; pullProgress = nil; inspectLocalModels()
-        }
-    }
-    func cancelModelDownload() { pullTask?.cancel() }
     private func finishTextIndex(_ outcome:Result<String,Error>,generation:UUID,cancelled:Bool,completeProgress:Bool) {
         let last=libraryWork.count(kinds:[.textRebuild,.fastIndex])<=1
         if last {indexTask=nil;indexing=false}
