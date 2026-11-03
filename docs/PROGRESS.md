@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Answer-support baseline exposes failures despite valid citations
+
+The unchanged `49f259d` runtime now has a frozen **24-question / 16-fictional-note** baseline: **48 completed responses**, Apple Intelligence and installed local Qwen, with identical retrieved-source order. All **40 declared positive-support cases** retrieve their required documents; all **66 citation numbers** are in range and the product emits zero warnings. Those mechanical counts do not establish factual or citation support.
+
+Source-based review finds Apple returning a superseded owner, omitting a requested answer and corrupting a rejected date; Qwen mixes owners across projects, cites the ownership record for a separate audio-retention fact and unnecessarily abstains on an explicit backup assignment. All outputs and ten qualified observations remain retained. The initial BLOB/text harness failure occurred before answer inference; the corrected continuation reuses the original 16 successful seed writes. Five altered-record controls reject; all 700 runtime inputs and 481 preceding publications remain unchanged. No prompt/model fix, independent human semantic score, competitive ranking or feature promotion is claimed. [Scope and counterexamples](ANSWER-SUPPORT-BASELINE.md) · [Receipt](../benchmarks/answer-support-baseline-v1.json) · [Inputs](../benchmarks/answer-support-baseline-inputs-v1.json) · [Raw evidence](../benchmarks/answer-support-baseline-raw-v1.zip).
+
 ## Interrupted private inbox creation is retryable
 
 Source `49f259d` stages a complete authenticated private inbox and publishes it atomically without replacing destinations. Cancellation, preparation failure, destination races and changed physical parents preserve unrelated data; an actual owned SIGKILL leaves no partial final inbox and the original namespace retries after abandoned-stage cleanup. Native create/attach now retain safe internal result diagnostics while preserving fixed helpers, stdin-only credentials, finish-on-cancellation ownership and no mutation retries. The controlled native negative case does not explain PR151's earlier hosted creation failure.
