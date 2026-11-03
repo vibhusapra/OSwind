@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## Native membership preparation qualified; handover remains WIP
+
+The internal preparation owner now retains old private membership while installing native36 phase/metadata guards, rotating the writer generation and saving an exact pending checkpoint. Restricted reopen verifies both original accounts and the encrypted signed proof before any migrations. Explicit cancellation keeps the fence and original membership; rejected commits and ambiguous saves replay the exact saved cancellation target without discarding legitimate pre-fence capture or allocating new credentials.
+
+Runtime `d665a30` binds **679 inputs**: full Debug **2,521 passed / 140 gated skips**, affected Thread Sanitizer and optimized **165 passed / ten skips each**, and owned native **135 passed without skips**. Zero failures and no sanitizer race warning. All 12 new ordinary/frozen-client controls pass each stage; the thirteenth owned-Keychain control runs only in the explicit native stage. Coverage includes every cancellation save boundary, preserved pre-fence capture, real frozen35 pre-enrollment/fresh refusal, four owned Keychain accounts with verified cleanup, native36 erasure renewal and portable content restore. [Receipt](../benchmarks/sync-membership-preparation-v1.json) · [Inputs](../benchmarks/sync-membership-preparation-inputs-v1.json) · [Raw evidence](../benchmarks/sync-membership-preparation-raw-v1.zip) · [Remaining implementation and scope](SYNC-MEMBERSHIP-PREPARATION-WIP.md). Private handover, peer/bootstrap updates, real process death/task-drain and actual controls remain unfinished. **F059 and all 83 statuses remain unchanged.**
+
 ## Persistent public membership history checked; native transition remains WIP
 
 Actual pre-delivery pairing now retains root-signed certificates before private approval/response saves, and exports only the predecessor path ending at the exact private head. Failed saves may leave disposable signed branches; those cannot select a different head. The cache is bounded, preserves known active ancestry, refuses missing/corrupt intermediate certificates, and is excluded from portable content recovery. Delivery reservation still refuses membership edits.
