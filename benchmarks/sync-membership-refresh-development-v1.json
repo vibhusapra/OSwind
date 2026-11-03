@@ -1,0 +1,80 @@
+{
+  "format": "OSwind membership refresh protocol development review v1",
+  "baseSource": "f4cff25d88d0f07b8d24b69ed44fba065aa19464",
+  "inputFiles": {
+    "Sources/OSwindCore/SyncPairing.swift": "9a5752d8b4fcece4e202c917eb55ba75251d1ef32d7860714703d6de00ed9e74",
+    "Sources/OSwindCore/SyncMembershipRefresh.swift": "185ff4df722b590a45af0d3d1e33a0c26800bea150de7471e620bbb3f21c10f8",
+    "Tests/OSwindCoreTests/SyncMembershipRefreshTests.swift": "e5e4d7a6669f6c04778af6df96ca01bc1e17c6742aeb374dc45d0def5fc3f8be",
+    "docs/SYNC-MEMBERSHIP-REFRESH-WIP.md": "d8acc3ea147cbf859a65ee9c307e17f6bf98417a74a34c13ce8c0ff269912aa2"
+  },
+  "reviewerSHA256": "dc1b4223790d1421b2cb758d3abdd537794b55bb23f3d58f4a19c6c5ccd23b4f",
+  "stages": [
+    {
+      "mode": "debug",
+      "defined": 35,
+      "passed": 34,
+      "skipped": 1,
+      "failed": 0,
+      "newMethodsPassed": [
+        "testBoundedPagesReachAllSixtyFourMembersAndValidateTheUnsentTail",
+        "testCanonicalBoundsFormatAndCertificateTamperingRefuse",
+        "testExactOverlapAndRetryWorkButStalePagesCannotRollBack",
+        "testOfflineDeviceAdvancesSeveralSignedAdditionsWithoutChangingItsPrivateKeys",
+        "testSignedForkUnknownRootGapReorderAndDuplicateRefuse"
+      ],
+      "explicitSkip": "Owned native Keychain pairing flag absent; original unchanged case is independently covered by the qualified parent owned-native run.",
+      "logSHA256": "f29f08d1386f98bf56df334fa07f75bdc43c2bb3d3db19b8e5e87671b347d984"
+    },
+    {
+      "mode": "tsan",
+      "defined": 35,
+      "passed": 34,
+      "skipped": 1,
+      "failed": 0,
+      "newMethodsPassed": [
+        "testBoundedPagesReachAllSixtyFourMembersAndValidateTheUnsentTail",
+        "testCanonicalBoundsFormatAndCertificateTamperingRefuse",
+        "testExactOverlapAndRetryWorkButStalePagesCannotRollBack",
+        "testOfflineDeviceAdvancesSeveralSignedAdditionsWithoutChangingItsPrivateKeys",
+        "testSignedForkUnknownRootGapReorderAndDuplicateRefuse"
+      ],
+      "explicitSkip": "Owned native Keychain pairing flag absent; original unchanged case is independently covered by the qualified parent owned-native run.",
+      "logSHA256": "5f991a4f4bc97f92ecbfd024a5e274126c5248285ce633cc44660d021927a6e0"
+    },
+    {
+      "mode": "optimized",
+      "defined": 35,
+      "passed": 34,
+      "skipped": 1,
+      "failed": 0,
+      "newMethodsPassed": [
+        "testBoundedPagesReachAllSixtyFourMembersAndValidateTheUnsentTail",
+        "testCanonicalBoundsFormatAndCertificateTamperingRefuse",
+        "testExactOverlapAndRetryWorkButStalePagesCannotRollBack",
+        "testOfflineDeviceAdvancesSeveralSignedAdditionsWithoutChangingItsPrivateKeys",
+        "testSignedForkUnknownRootGapReorderAndDuplicateRefuse"
+      ],
+      "explicitSkip": "Owned native Keychain pairing flag absent; original unchanged case is independently covered by the qualified parent owned-native run.",
+      "logSHA256": "9a008a654f48b362ccb8beafc0770d955cdf0fe370ecf4ba5640e68cff4a436e"
+    }
+  ],
+  "scope": "Addition-only signed-history page protocol and in-memory joined authority, with actual original device/group material preservation and64-member paged coverage. Not native/Keychain/service membership transition, persistent public history, revocation/rotation or physical acceptance. F059 unchanged.",
+  "developmentReviewSHA256": "e7f9a8b8e71c9c0eccb73dafe976b7e960e9bbc1407e5de63929a0fee652286c",
+  "documentationAfterDevelopment": {
+    "previousSHA256": "d8acc3ea147cbf859a65ee9c307e17f6bf98417a74a34c13ce8c0ff269912aa2",
+    "currentSHA256": "1ed33361c0a42d65be40f018e4836e127597fa987383d5673d63b26d4a3357fc",
+    "purpose": "Update pending test prose to the actual completed development counts; runtime/test bytes stay identical."
+  },
+  "retainedFailures": [
+    {
+      "stage": "Initial Swift frontend syntax parse",
+      "sourceSHA256": "ea4e16e13603b92b1b5a73b498f9c5b7e1caa8b137e3b7f9a5bebcf7bb3adc50",
+      "diagnostic": "Extra closing parenthesis at SyncMembershipRefreshTests.swift:66; original diagnostic retained in tool output, original source retained alongside this record.",
+      "runtimeChanged": false
+    },
+    {
+      "stage": "First waiting controller",
+      "reason": "Stopped before building when parent aggregate-review v1 failed its selector expectation. No development tests ran in that first controller. Corrected parent review completed before the v2 development run."
+    }
+  ]
+}

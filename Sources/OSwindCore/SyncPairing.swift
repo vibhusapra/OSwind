@@ -248,6 +248,12 @@ struct SyncJoinedGroup:Sendable,CustomStringConvertible,CustomDebugStringConvert
         let value=Self(keys:keys,secret:secret,certificate:next,replica:replica)
         _=try value.packetAuthority();return value
     }
+    /// Protocol-only refreshed authority. Native/Keychain application must be
+    /// performed by the delivery lifecycle owner before any service may use it.
+    func withMembershipRefresh(_ refresh:SyncMembershipRefresh)throws->Self {
+        let value=Self(keys:keys,secret:secret,certificate:try refresh.advance(from:certificate),replica:replica)
+        _=try value.packetAuthority();return value
+    }
     func packetAuthority()throws->SyncDevicePacketAuthority {try .init(keys:keys,certificate:certificate,replica:replica)}
     func createTransport(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func openTransport(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
