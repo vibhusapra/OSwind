@@ -41,7 +41,9 @@ final class PreparationProcessTests:XCTestCase {
             XCTAssertNotEqual(kill(pid,0),0,"Owned descendant remained alive")
         }
     }
-    var guardian:URL {URL(fileURLWithPath:#filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(".build/debug/oswind-preparation-guardian")}
+    // Use the helper built beside this test bundle, including external scratch
+    // directories and optimized configurations.
+    var guardian:URL {Bundle(for:Self.self).bundleURL.deletingLastPathComponent().appendingPathComponent("oswind-preparation-guardian")}
     func testGuardianPreservesNormalExitStatus() async throws {
         XCTAssertTrue(FileManager.default.isExecutableFile(atPath:guardian.path))
         let result=try await PreparationProcess.run(python,["-c","print('owned output');raise SystemExit(17)"],environment:[:],timeout:5,guardian:guardian)
