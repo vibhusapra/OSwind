@@ -1,0 +1,220 @@
+{
+  "format": "OSwind CLI capture request admission review v1",
+  "baseSource": "fc4a9a7fe39d530334db11b7b351dd8f93aea66a",
+  "inputCount": 689,
+  "workingChanges": {
+    ".github/workflows/ci.yml": "e46071ce86ba7b0f0175578674907f4c38fd328245b4acf711ce3d428aa6170b",
+    "Sources/OSwindCLI/CaptureRequestCLI.swift": "f848e0a9011d101039f8367074ca9323f030dcc2968e645cb2768e3642aa0068",
+    "Sources/OSwindCLI/main.swift": "7c1087840ec28bae1af963e5649331680feb3d5fa45014b056424a31da991e7c",
+    "Tests/Fixtures/CaptureRequestParserContract.swift": "2dad757a140696e9e4414774aa9bddb55e0ff6789e26e62951afe419cdfb4064",
+    "scripts/capture-request-admission-smoke.py": "a2e431307e3a260245c1e733ee558ac06a116bc4b196e91f0d45fd3759a31a5e",
+    "scripts/test-capture-request-parser.py": "5b6870a42a5b3f1306e37cb13d88033e0412fbd39e3edab070562407ef6d5f59"
+  },
+  "inputManifestSHA256": "1018f3d6259cfea74d3a2f8201fa8898e43021ed8c07eb416dbe90612a767196",
+  "runnerSHA256": "090c54505bcf6167b0106f39bb49bf968f1db07aecfc52ae87deab590423f4f9",
+  "reviewerSHA256": "c657b635d14fdf566d6820de68c98ce2680195859c1ff2cd0ecde8f55ebe3bb1",
+  "unchangedPriorInputs": 686,
+  "newInputFiles": [
+    "Sources/OSwindCLI/CaptureRequestCLI.swift",
+    "Tests/Fixtures/CaptureRequestParserContract.swift"
+  ],
+  "parserContract": {
+    "file": ".artifacts/capture-request-admission-v1/parser-contract-v1.json",
+    "sha256": "dc85d40cec9b8670d5f4e4d16b28e844bea63f64d22e182f0a4bb55e9afcc6da",
+    "checks": 46,
+    "actualInputHashesMatch": true,
+    "reusedWithoutRepeatingUnchangedSuccessfulContract": true
+  },
+  "modes": [
+    {
+      "mode": "debug-process",
+      "malformed": 72,
+      "positive": 7,
+      "compatibility": 2,
+      "capturedMemories": 0,
+      "binarySHA256": "601f6cc7d22b04759aa427a23fbd934d53959d7b8d6a5370a3a5f7e7f6e840f8",
+      "receiptSHA256": "ccb935801c2a27a685504056c6871ba1f0e692db123aae517e0f7757dd826cca"
+    },
+    {
+      "mode": "release-process",
+      "malformed": 72,
+      "positive": 7,
+      "compatibility": 2,
+      "capturedMemories": 0,
+      "binarySHA256": "e29d54c249815cc6c82394237b12062694c616c95ffe0910a861c03afa29d843",
+      "receiptSHA256": "bd9146659f0ced2d2622c1c7e23f916030b9a8ee5a39b8ba752f61836bd4d2fd"
+    },
+    {
+      "mode": "packaged-process",
+      "malformed": 72,
+      "positive": 7,
+      "compatibility": 2,
+      "capturedMemories": 0,
+      "binarySHA256": "dad4ab23b77409b68ccc9830cb3f11fed17de4fd754872855e11e48684f91b14",
+      "receiptSHA256": "312233cf9161a1c9abdadfbfd669464aaf0c7a2643c5a1e6c31a05bc6c4eb3f4"
+    }
+  ],
+  "stages": [
+    {
+      "name": "debug-build",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "9721c8ddefe7741ef4d783860f67f98e04c719db3661f7a83bb6d755d7da7538",
+      "wallSeconds": 4.149007583968341
+    },
+    {
+      "name": "debug-process",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "5516b3b5ce81e374b19f7ef820134d22767034bfc8fdc9493139730034e9ac32",
+      "wallSeconds": 1.8829029579646885
+    },
+    {
+      "name": "release-build",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "ce7c7ed2213c4e08173e6c01cfd55cceffa58b41e5f6eec0660fb6e6959bdc0b",
+      "wallSeconds": 12.529662667075172
+    },
+    {
+      "name": "release-process",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "ce078c2ebc4ab323034850bae14ac40bee75bec6c10281fec13de7983b13225f",
+      "wallSeconds": 1.6322007500566542
+    },
+    {
+      "name": "package",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "b84139aaf48aff18f83304245b8c06ddd4a71b6387323859226d8163e4773fed",
+      "wallSeconds": 4.44157166685909
+    },
+    {
+      "name": "packaged-process",
+      "exit": 0,
+      "expectedExit": 0,
+      "logSHA256": "e46474b8343907f0af4f35f0c9858f24bfdc8ec57aad7c3d9d1189681efd44f0",
+      "wallSeconds": 1.6661950000561774
+    },
+    {
+      "name": "old-binary-control",
+      "exit": 1,
+      "expectedExit": 1,
+      "logSHA256": "276ae53e4dec833e1b59254c0ce5d496006d70dc717e63a725336adae49ab615",
+      "wallSeconds": 0.127941207960248
+    }
+  ],
+  "rejectedAlteredReceiptControls": {
+    "dropped-row": "rejected",
+    "duplicate-row": "rejected",
+    "hidden-filesystem-change": "rejected",
+    "hidden-captured-memory": "rejected",
+    "missing-compatibility": "rejected",
+    "wrong-binary": "rejected",
+    "wrong-policy-outcome": "rejected"
+  },
+  "actualOlderBinaryRejected": {
+    "sha256": "563559f82cafeac40fa8106bd232d977228518b205f872cc0f4821e255630224",
+    "logSHA256": "276ae53e4dec833e1b59254c0ce5d496006d70dc717e63a725336adae49ab615",
+    "firstCase": "capture/missing-target",
+    "capturedMemories": 0,
+    "scope": "Owned disabled policy; older CLI incorrectly returns0 and opens its owned database. The new process harness rejects that behavior, without capturing the user foreground."
+  },
+  "newPackage": {
+    "path": "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/capture-request-admission-v1/qualification-v1/OSwind.app",
+    "files": {
+      "Contents/Info.plist": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+      "Contents/_CodeSignature/CodeResources": "bfe79d4845a6f265e64a9bcb5fa496b4e94e278462d8b22f6b6831f23c061d58",
+      "Contents/MacOS/oswindctl": "dad4ab23b77409b68ccc9830cb3f11fed17de4fd754872855e11e48684f91b14",
+      "Contents/MacOS/oswind-preparation-guardian": "99b52e77c1e75bf5bdb181f47412334af555d733f7215b37ba34231a652e75d0",
+      "Contents/MacOS/OSwind": "52cb1436a0ed14bcb091834ace050f6b0d4529be7f5a497925b679af3532a8fe",
+      "Contents/Resources/OSwind.icns": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+      "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+      "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+      "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+      "Contents/Resources/models/siglip2-source.json": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+      "Contents/Resources/scripts/convert-visual-model.py.lock": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+      "Contents/Resources/scripts/convert-visual-model.py": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+      "Contents/Resources/ThirdParty/NOTICES.txt": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+      "Contents/Resources/ThirdParty/Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+      "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+      "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+      "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+      "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+      "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+      "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+      "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+      "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "scope": "New local ad-hoc package built with existing strict codesign verification; no DeveloperID/notarization/DP-Keychain or signed GUI acceptance."
+  },
+  "scope": "CLI capture/capture-text/capture-replay argument preflight before library/vault/model/native capture access. Actual parser preserves explicit target bytes and finite1..120 replay duration; current-window intent is deliberate. No change to Core or GUI capture policy; all686other prior runtime/test/dependency inputs remain unchanged. No native pixel/AX/audio, GUI/TCC, GPU/model quality, power, soak, complete sync or competitor-ranking qualification.",
+  "runtimeCommit": "20ce51f1551955e1c74449074dbc5a2c7d7483cf",
+  "allCommittedInputBlobsMatch": true,
+  "inputManifest": "capture-request-admission-inputs-v1.json",
+  "reviewSHA256": "23cb75448d069a10cd3b144c3f820ff148544062eac98624cab45314cf0d6c4f",
+  "publisherSHA256": "9c415303b96eb36f67cb579c00ac80a6308c1616a4e9b394fbb8d9f8b3c771e8",
+  "host": {
+    "macOS": "26.6.2",
+    "architecture": "arm64"
+  },
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "rawEvidence": {
+    "file": "capture-request-admission-raw-v1.zip",
+    "sha256": "4c9433b65deececfb04e9bf7a7a6f78a08472632c32f76b5afeac67593fd1b44",
+    "bytes": 103703,
+    "members": 30,
+    "allArchivedBytesComparedToReviewedInputs": true,
+    "files": {
+      "README.txt": "083dea4c478ca8702e6eaee33d62d5a1af673a11b4b5dc0598c6dcebae5431a4",
+      "baseline.json": "75ec04e08de46600135e062e154bf289b4fd57c0dc2e7d9a1e135a930193e699",
+      "baseline.py": "b162bdde028165123cd43b6904e20a357383f76e96c65c16e8d2ac06cabb2b59",
+      "controller.log": "072bbd790129a2aab6e7981d4de8290657407d65870dc388902b3bb382065538",
+      "inputs.json": "ab0b2c120419f29f2ec2cad7b4264dab33660ec088fd1e32ff7387b43d5bbd45",
+      "logs/debug-build.log": "9721c8ddefe7741ef4d783860f67f98e04c719db3661f7a83bb6d755d7da7538",
+      "logs/debug-process.log": "5516b3b5ce81e374b19f7ef820134d22767034bfc8fdc9493139730034e9ac32",
+      "logs/old-binary-control.log": "276ae53e4dec833e1b59254c0ce5d496006d70dc717e63a725336adae49ab615",
+      "logs/package.log": "b84139aaf48aff18f83304245b8c06ddd4a71b6387323859226d8163e4773fed",
+      "logs/packaged-process.log": "e46474b8343907f0af4f35f0c9858f24bfdc8ec57aad7c3d9d1189681efd44f0",
+      "logs/release-build.log": "ce7c7ed2213c4e08173e6c01cfd55cceffa58b41e5f6eec0660fb6e6959bdc0b",
+      "logs/release-process.log": "ce078c2ebc4ab323034850bae14ac40bee75bec6c10281fec13de7983b13225f",
+      "parser-contract.json": "dc85d40cec9b8670d5f4e4d16b28e844bea63f64d22e182f0a4bb55e9afcc6da",
+      "parser-contract.log": "23dce3e21515ce4d4184d366ef8739ef4e9262370a6fbefa7519337a3c144181",
+      "prior-package-provenance.json": "3216b4a27660cbf1644efe84a95d153519620274e1a18e5becf9b3ea40a328a5",
+      "publisher.py": "9c415303b96eb36f67cb579c00ac80a6308c1616a4e9b394fbb8d9f8b3c771e8",
+      "receipts/debug-process.json": "ccb935801c2a27a685504056c6871ba1f0e692db123aae517e0f7757dd826cca",
+      "receipts/packaged-process.json": "312233cf9161a1c9abdadfbfd669464aaf0c7a2643c5a1e6c31a05bc6c4eb3f4",
+      "receipts/release-process.json": "bd9146659f0ced2d2622c1c7e23f916030b9a8ee5a39b8ba752f61836bd4d2fd",
+      "results.json": "8506cabffe44665945a23d60bacc10933a8ee6695a0809a24538bed568229ed3",
+      "review-controller.log": "ac035f4d199c54cd2ffaaf9c03fc50efd22499254405da310db5229492bb2de3",
+      "reviewed-v1.json": "23cb75448d069a10cd3b144c3f820ff148544062eac98624cab45314cf0d6c4f",
+      "reviewer.py": "c657b635d14fdf566d6820de68c98ce2680195859c1ff2cd0ecde8f55ebe3bb1",
+      "runner.py": "090c54505bcf6167b0106f39bb49bf968f1db07aecfc52ae87deab590423f4f9",
+      "source/.github/workflows/ci.yml": "e46071ce86ba7b0f0175578674907f4c38fd328245b4acf711ce3d428aa6170b",
+      "source/Sources/OSwindCLI/CaptureRequestCLI.swift": "f848e0a9011d101039f8367074ca9323f030dcc2968e645cb2768e3642aa0068",
+      "source/Sources/OSwindCLI/main.swift": "7c1087840ec28bae1af963e5649331680feb3d5fa45014b056424a31da991e7c",
+      "source/Tests/Fixtures/CaptureRequestParserContract.swift": "2dad757a140696e9e4414774aa9bddb55e0ff6789e26e62951afe419cdfb4064",
+      "source/scripts/capture-request-admission-smoke.py": "a2e431307e3a260245c1e733ee558ac06a116bc4b196e91f0d45fd3759a31a5e",
+      "source/scripts/test-capture-request-parser.py": "5b6870a42a5b3f1306e37cb13d88033e0412fbd39e3edab070562407ef6d5f59"
+    }
+  },
+  "protectedPublications": {
+    "files": 463,
+    "allBaseBytesUnchanged": true,
+    "manifestSHA256": "0de9fd5029cb92e46f881bba07ade3e2851ae865fc7fb204953a2d56631f8321"
+  },
+  "featureBoundary": "CLI-only admission. All83feature records and landscape unchanged; full v0 acceptance remains open."
+}

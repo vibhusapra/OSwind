@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Capture requests validated before library or native access
+
+Snapshot capture previously accepted missing `--app-bundle` values and unknown arguments, which could fall back to current-window intent. All three capture commands now validate their original invocation before opening a library, vault, model or native capture source. Explicit targets are preserved byte for byte, replay duration must be finite and within 1–120 seconds, and duplicate/missing/empty/unknown/positional arguments fail closed. Deliberately omitted targeting still means the current window.
+
+Runtime `20ce51f` binds **689 runtime/test/dependency inputs and six changed-file hashes**. The actual Foundation-only parser passes **46 contract checks**. Debug, release and local ad-hoc packaged processes each pass **72 malformed refusals, seven valid guarded requests and two unrelated-command compatibility controls**, with zero captured memories. Every malformed request preserves its full owned filesystem footprint. A safely blocked older binary reproduces the defect and fails the new process harness. Seven altered-receipt controls reject invalid evidence. CI runs both parser and packaged-process checks. [Receipt](../benchmarks/capture-request-admission-v1.json) · [Inputs](../benchmarks/capture-request-admission-inputs-v1.json) · [Raw evidence](../benchmarks/capture-request-admission-raw-v1.zip) · [Scope](CAPTURE-REQUEST-ADMISSION-WIP.md).
+
+This CLI-only patch leaves 686 preceding runtime/test/dependency inputs unchanged. The previous full-suite qualification is inherited, not rerun or counted as a new full-suite pass. **All 83 feature records and the competitor landscape remain unchanged.** Native GUI/TCC, captured pixel/audio quality, local model performance, sustained energy, 24-hour operation, full sync and signed distribution still need their own acceptance.
+
 ## Recoverable migration for completed native36 previews
 
 Already-cleared format-1 previews can now acquire the format-2 floor through a separate owned migration. It saves one exact private intent/checkpoint, rotates the native writer generation, preserves existing replay/raw capture/private material, and recovers only the original or exact completed native target. It creates no credentials and opens no provider. Supported format-2 repeats are no-ops. The async transfer API joins completion/close on an uncancelled worker and checks cancellation before intent; actual public session/producer integration remains separate.
