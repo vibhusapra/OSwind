@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Exact initial joining response survives setup closure
+
+Source `1ce80bc` saves the encrypted initial joining response and commits its bounded pointer with membership in the original private account. Setup can explicitly recover and copy the same bytes with their original expiry; public approval checks the live clock inside ownership and again at the private write. Legacy already-admitted reissue is reviewed separately. Corrupt/missing plans do not regenerate responses.
+
+Qualification binds **698 inputs**: full Debug **2,572 passed / 159 conditional skips**; affected sanitizer and optimized **751 passed / 55 skips each**; owned native sanitizer **21 passed / one child-only skip**; expanded owned native optimized **88 passed / five skips**. Zero failures/race diagnostics. All 25 new identities are accounted for. Three real SIGKILL boundaries pass in both owned modes, exact committed response bytes recover, and original login-Keychain accounts are verified removed. Five altered-log controls reject. A fresh production app passes strict ad-hoc verification with prior resources and bundle information unchanged. Earlier failed development checks and an unfinished stopped qualification are retained. [Receipt](../benchmarks/sync-owner-response-v1.json) · [Inputs](../benchmarks/sync-owner-response-inputs-v1.json) · [Raw evidence](../benchmarks/sync-owner-response-raw-v1.zip) · [Scope](SYNC-OWNER-RESPONSE-WIP.md).
+
+Early first-inbox creation still needs atomic staging/publication. Public post-delivery addition and the actual session/close/reconnect lifecycle remain unfinished. Parent PR151's hosted native encrypted-APFS selection failed during image creation; its missing creation-result diagnostics leave the underlying cause unproved and are being addressed separately. **F059 remains TODO; all 83 statuses are unchanged. Full v0, energy, physical-device, distribution and ranking acceptance remain open.**
+
 ## Native source scale and filled window raster
 
 Source `533b301` replaces the assumed 2×scale with actual ScreenCaptureKit pointPixelScale and explicitly fills independent-window snapshot/replay surfaces before bitmap cropping. Native pixels/profile caps, even replay output and unchanged display-crop point coordinates are covered. **Full Debug 2,550 passed / 156 conditional skips; affected TSan and optimized 181 passed / 6 skipped each; zero failures/race diagnostics.** Six new methods and six altered-log controls pass; 694 committed inputs and 472 preceding publications are verified.
