@@ -95,6 +95,8 @@ struct PersonalSyncPairingView:View {
             identity(status)
             if let value=model.pairingResponse {
                 Text("Return this encrypted response to the joining Mac. Give it the group fingerprint above through your trusted channel.")
+                Text("The original request expiry still applies. Recovering this exact response does not extend it.").font(.caption).foregroundStyle(.secondary)
+                if let expiry=model.pairingResponseExpiry {Text("Request expires \(expiry.formatted(date:.abbreviated,time:.standard))").font(.caption).foregroundStyle(expiry<Date() ? .orange:.secondary)}
                 message(value,label:"Encrypted response");Button(copied ? "Copied":"Copy response") {copy(value)}
                 Button(status.memberNames.count>=2 ? "Continue to folder setup":"Review another device") {model.clearPairingMessages();copied=false}
             } else if let review=model.pairingReview {
@@ -103,7 +105,9 @@ struct PersonalSyncPairingView:View {
                     Text(review.requestFingerprint).font(.system(.caption,design:.monospaced)).textSelection(.enabled)
                     Text("Expires \(review.expires.formatted(date:.omitted,time:.standard))").font(.caption)
                     Toggle("The name and request fingerprint match the joining Mac",isOn:$requestMatches)
-                    Button("Approve this exact request") {model.performPairing(.approve(review));request="";requestMatches=false}.buttonStyle(.borderedProminent).disabled(!requestMatches)
+                    if review.alreadyAdmitted {Text("This Mac is already admitted. Reissue its response without changing membership.").font(.caption).foregroundStyle(.secondary)}
+                    else if status.memberNames.count>=2 {Text("This preview cannot add another Mac. Use the original admitted request to recover a legacy approval.").font(.caption).foregroundStyle(.orange)}
+                    Button(review.alreadyAdmitted ? "Return approval for this Mac":"Approve this exact request") {model.performPairing(.approve(review));request="";requestMatches=false}.buttonStyle(.borderedProminent).disabled(!requestMatches || (status.memberNames.count>=2 && !review.alreadyAdmitted))
                 }}
                 Button("Back to request") {model.clearPairingMessages();requestMatches=false}
             } else if !status.deliveryPrepared && status.memberNames.count<2 {
@@ -111,6 +115,17 @@ struct PersonalSyncPairingView:View {
                 Text("Paste its signed request. Review the name and compare the exact request fingerprint with the joining Mac before approval.")
                 input("Signed request",text:$request,limit:8192)
                 Button("Review request") {model.performPairing(.review(request));requestMatches=false}.disabled(request.isEmpty)
+            }
+            if model.pairingResponse==nil && model.pairingReview==nil {
+                if status.lastResponseAvailable {
+                    Button("Recover last joining response") {model.performPairing(.recoverResponse);copied=false}
+                } else if !status.deliveryPrepared && status.memberNames.count>=2 {
+                    DisclosureGroup("Recover a legacy approval") {
+                        Text("Paste the original still-valid request from the admitted Mac. Compare its fingerprint again before reissuing a response.").font(.caption).foregroundStyle(.secondary)
+                        input("Original admitted request",text:$request,limit:8192)
+                        Button("Review original request") {model.performPairing(.review(request));requestMatches=false}.disabled(request.isEmpty)
+                    }
+                }
             }
             if model.pairingResponse==nil && model.pairingReview==nil {folderSetup(status)}
             if !status.deliveryPrepared {retire}

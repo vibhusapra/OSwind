@@ -9,6 +9,7 @@ import OSwindCore
     @Published private(set) var pairingStatus:PersonalSyncPairingStatus?
     @Published private(set) var pairingReview:PersonalSyncPairingReview?
     @Published private(set) var pairingResponse:String?
+    @Published private(set) var pairingResponseExpiry:Date?
     @Published private(set) var pairingBusy=false
     @Published private(set) var pairingError:String?
     @Published private(set) var folderURL:URL?
@@ -53,7 +54,7 @@ import OSwindCore
     private func attach(_ candidate:PersonalSyncSession,fromPreparation:Bool)throws {
         guard !retired,session==nil,observer==nil,command==nil,stopTask==nil,
               pairing==nil,pairingTask==nil,(preparation==nil || fromPreparation),!store.isClosed,!locked(),allowed(),candidate.belongs(to:store) else {throw OSwindError.unavailable("Sync requires its current open library")}
-        session=candidate;error=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil
+        session=candidate;error=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil
         observer=Task {[weak self] in
             let stream=await candidate.updates()
             for await value in stream {
@@ -153,10 +154,10 @@ import OSwindCore
         }
     }
     enum PairingAction:Sendable {
-        case load,create(String),request(String),renew,review(String),approve(PersonalSyncPairingReview),accept(String,String),retire
+        case load,create(String),request(String),renew,review(String),approve(PersonalSyncPairingReview),recoverResponse,accept(String,String),retire
     }
     private struct PairingResult:Sendable {
-        let owner:PersonalSyncPairing,status:PersonalSyncPairingStatus,review:PersonalSyncPairingReview?,response:String?,folder:URL?
+        let owner:PersonalSyncPairing,status:PersonalSyncPairingStatus,review:PersonalSyncPairingReview?,response:String?,expires:Date?,folder:URL?
     }
     /// Pairing owns the same app exit/switch/wipe barrier as a prepared delivery
     /// session. No detached SQL/Keychain work can outlive this tracked task.
@@ -164,34 +165,37 @@ import OSwindCore
         guard !retired,drains==0,session==nil,preparation==nil,pairingTask==nil,!store.isClosed,!locked(),allowed() else {return}
         if case .load=action,pairing != nil {return}
         let existing=pairing,store=store,factory=pairingFactory
-        pairingBusy=true;pairingError=nil;pairingReview=nil;pairingResponse=nil
+        pairingBusy=true;pairingError=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil
         pairingTask=Task {[weak self] in
             let worker=Task.detached {()throws->PairingResult in
                 let owner=try existing ?? factory(store)
                 do {
                     guard owner.belongs(to:store) else {throw OSwindError.unavailable("Pair only the current native library")}
                     try Task.checkCancellation()
-                    var review:PersonalSyncPairingReview?,response:String?
+                    var review:PersonalSyncPairingReview?,response:String?,expires:Date?
                     switch action {
                     case .load:break
                     case .create(let name):_=try owner.createGroup(deviceName:name)
                     case .request(let name):_=try owner.requestJoin(deviceName:name)
                     case .renew:_=try owner.renewRequest()
                     case .review(let text):review=try owner.reviewRequest(text)
-                    case .approve(let value):response=try owner.approve(value)
+                    case .approve(let value):response=try owner.approve(value);expires=value.expires
+                    case .recoverResponse:
+                        guard let saved=try owner.lastApprovedResponse() else {throw OSwindError.unavailable("No saved joining response is available")}
+                        response=saved.response;expires=saved.expires
                     case .accept(let text,let fingerprint):_=try owner.acceptResponse(text,trustedRootFingerprint:fingerprint)
                     case .retire:_=try owner.retire()
                     }
                     let status=try owner.status()
                     let folder=(status.phase == .owner || status.phase == .paired) ? try? owner.savedSessionFolder():nil
-                    return .init(owner:owner,status:status,review:review,response:response,folder:folder)
+                    return .init(owner:owner,status:status,review:review,response:response,expires:expires,folder:folder)
                 }catch {if existing==nil {owner.close()};throw error}
             }
             defer {self?.pairingTask=nil;self?.pairingBusy=false}
             do {
                 let result=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
                 guard !Task.isCancelled,let self,!self.retired,!store.isClosed,!self.locked(),self.allowed(),result.owner.belongs(to:store) else {result.owner.close();self?.pairing=nil;self?.pairingStatus=nil;return}
-                self.pairing=result.owner;self.pairingStatus=result.status;self.pairingReview=result.review;self.pairingResponse=result.response;self.folderURL=result.folder
+                self.pairing=result.owner;self.pairingStatus=result.status;self.pairingReview=result.review;self.pairingResponse=result.response;self.pairingResponseExpiry=result.expires;self.folderURL=result.folder
             }catch {
                 // A committed Keychain replacement remains authoritative even
                 // if status refresh/cancellation fails. Reload before retrying.
@@ -204,7 +208,7 @@ import OSwindCore
         }
     }
     func cancelPairing() {pairingTask?.cancel()}
-    func clearPairingMessages() {pairingReview=nil;pairingResponse=nil}
+    func clearPairingMessages() {pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil}
     /// Do not clear the task here: storage still belongs to the real setup job.
     func cancelPreparation() {preparation?.cancel()}
     func start() {
@@ -264,7 +268,7 @@ import OSwindCore
         if received {guard session?.ownsHistoryRetirement==true else {throw OSwindError.unavailable("Apply a peer erase from its current enrolled session")}}
         let current=session,existing=pairing,factory=pairingFactory,store=store,previous=command,observed=observer,scope=UUID()
         retired=true;desiredActive=false;generation=scope;erasureID=scope;changing=false;stopping=true
-        command?.cancel();observer?.cancel();pairing=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil;eraseReview=nil;folderURL=nil;status=nil;error=nil
+        command?.cancel();observer?.cancel();pairing=nil;pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil;eraseReview=nil;folderURL=nil;status=nil;error=nil
         let worker=Task<LibraryWipeResult,Error> {[weak self] in
             defer {
                 if let self,self.erasureID==scope {
@@ -341,7 +345,7 @@ import OSwindCore
         if !retired {
             retired=true;desiredActive=false;generation=UUID();changing=false;status=nil;error=nil
             preparation?.cancel();pairingTask?.cancel();command?.cancel();observer?.cancel()
-            pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingError=nil;eraseReview=nil;folderURL=nil
+            pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil;pairingError=nil;eraseReview=nil;folderURL=nil
         }
         erasure?.cancel();stopping=busy
         if stopTask==nil,let session {

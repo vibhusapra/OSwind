@@ -14,6 +14,14 @@ enum SyncPairingFormat {
         guard try SyncProtocolLimits.encode(value)==bytes else {throw OSwindError.invalid("Pairing message is not canonical")}
         return value
     }
+    static func verifyOwnerResponse(_ bytes:Data,request:SyncJoinRequest,root:Data)throws {
+        let value=try decode(SyncPairingResponse.self,bytes,limit:responseLimit),context=value.body.context
+        guard context.format=="OSwind.sync.join-response",context.version==1,context.requestDigest == (try request.digest),
+              context.rootPublicKey==root,value.signature.count==64,value.body.sealed.count>=28,value.body.sealed.count<=certificateLimit+4096,
+              try signingKey(root).isValidSignature(value.signature,for:domain("join-response",SyncProtocolLimits.encode(value.body))) else {throw OSwindError.invalid("Saved response authority differs")}
+        _=try agreementKey(context.ephemeralPublicKey)
+    }
+
     static func seconds(_ now:Date)throws->Int64 {
         let value=now.timeIntervalSince1970
         guard value.isFinite,value>=0,value<=253402300799 else {throw OSwindError.invalid("Invalid pairing time")}
@@ -175,6 +183,16 @@ struct SyncGroupAuthority:Sendable,CustomStringConvertible,CustomDebugStringConv
         let response=SyncPairingResponse(body:body,signature:try root.signature(for:SyncPairingFormat.domain("join-response",SyncProtocolLimits.encode(body))))
         let encoded=try SyncProtocolLimits.encode(response)
         guard encoded.count<=SyncPairingFormat.responseLimit else {throw OSwindError.invalid("Pairing response exceeds its bound")};return encoded
+    }
+    func approvalPlan(to request:SyncJoinRequest,prior:SyncMembershipCertificate,pairingID:String,lifetime:String,now:Date=Date())throws->SyncOwnerApprovalPlan {
+        try request.validate(now:now)
+        let purpose:SyncOwnerApprovalPlan.Purpose=prior==certificate ? .legacyReissue:.addition
+        if purpose == .addition {try certificate.requireSuccessor(of:prior)}
+        let response=try self.response(to:request,now:now)
+        let binding=try SyncOwnerApprovalPlan.Binding(format:"OSwind.sync.owner-approval-binding",version:1,purpose:purpose,group:certificate.body.group,epoch:certificate.body.epoch,pairingID:pairingID,lifetime:lifetime,requestDigest:request.digest,predecessor:SyncProtocolLimits.hex(prior.encoded()),head:SyncProtocolLimits.hex(certificate.encoded()),responseDigest:SyncProtocolLimits.hex(response),approvedAt:SyncPairingFormat.seconds(now))
+        let signature=try root.signature(for:SyncPairingFormat.domain("owner-approval",SyncProtocolLimits.encode(binding)))
+        let plan=SyncOwnerApprovalPlan(format:"OSwind.sync.owner-approval-plan",version:1,request:request,prior:prior,certificate:certificate,response:response,binding:binding,signature:signature)
+        _=try plan.encoded();return plan
     }
     var description:String {"<redacted sync group authority>"}
     var debugDescription:String {description}

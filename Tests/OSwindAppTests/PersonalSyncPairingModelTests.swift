@@ -65,6 +65,55 @@ import MachO
             try await Task.sleep(for:.milliseconds(5))
         }
     }
+    func testClosingSetupAndReopeningRecoversExactApprovalWithoutConnecting()async throws {
+        let (owner,peer)=try await pairedModels(),original=try XCTUnwrap(owner.pairingResponse),accounts=Set(storage.values.keys)
+        owner.clearPairingMessages();XCTAssertNil(owner.pairingResponse)
+        XCTAssertTrue(try XCTUnwrap(owner.pairingStatus).lastResponseAvailable)
+        owner.performPairing(.recoverResponse);try await done(owner)
+        XCTAssertEqual(owner.pairingResponse,original);XCTAssertFalse(owner.configured);XCTAssertNil(owner.status)
+        await owner.cancelAndWait();await peer.cancelAndWait()
+        let reopened=model(a);reopened.performPairing(.load);try await done(reopened)
+        XCTAssertNil(reopened.pairingResponse);XCTAssertTrue(try XCTUnwrap(reopened.pairingStatus).lastResponseAvailable)
+        reopened.performPairing(.recoverResponse);try await done(reopened)
+        XCTAssertNil(reopened.pairingError);XCTAssertEqual(reopened.pairingResponse,original)
+        XCTAssertFalse(reopened.configured);XCTAssertFalse(reopened.pairingBusy);XCTAssertTrue(reopened.busy,"The credential owner remains in the library departure barrier");XCTAssertNil(reopened.folderURL);XCTAssertNil(reopened.status)
+        XCTAssertEqual(Set(storage.values.keys),accounts)
+        await reopened.cancelAndWait();XCTAssertFalse(reopened.busy)
+    }
+    func testExplicitRecoveryWithoutApprovalReportsErrorAndCreatesNoCredentials()async throws {
+        let value=model(a);value.performPairing(.create("Desk Mac"));try await done(value)
+        let before=storage.values
+        value.performPairing(.recoverResponse);try await done(value)
+        XCTAssertNotNil(value.pairingError);XCTAssertNil(value.pairingResponse);XCTAssertFalse(value.configured)
+        XCTAssertTrue(storage.values==before,"Original private accounts changed")
+    }
+    func testDepartureJoinsActualBlockedResponseRecoveryDespiteCancellation()async throws {
+        let (owner,peer)=try await pairedModels(),before=storage.values,gate=PairingSaveGate()
+        defer {gate.release();storage.installRead(nil)}
+        storage.installRead(gate);owner.clearPairingMessages();owner.performPairing(.recoverResponse)
+        await fulfillment(of:[gate.entered],timeout:10)
+        var departed=false
+        let drain=Task {await owner.cancelAndWait();departed=true};drain.cancel()
+        try await Task.sleep(for:.milliseconds(60));XCTAssertFalse(departed);XCTAssertTrue(owner.busy)
+        gate.release();await drain.value
+        XCTAssertTrue(departed);XCTAssertFalse(owner.busy);XCTAssertNil(owner.pairingResponse)
+        XCTAssertTrue(storage.values==before,"Original private accounts changed");XCTAssertFalse(owner.configured)
+        await peer.cancelAndWait()
+    }
+    func testOwnedApprovalRecoveryScreensRenderInBothThemes()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_TEST_APPROVAL_RENDER_DIR"] else {throw XCTSkip("Explicit owned approval recovery render output absent")}
+        let directory=URL(fileURLWithPath:path);try Paths.ensure(directory)
+        let (owner,_)=try await pairedModels(),response=try XCTUnwrap(owner.pairingResponse),expiry=try XCTUnwrap(owner.pairingResponseExpiry)
+        owner.clearPairingMessages()
+        for dark in [false,true] {try await renderView(PersonalSyncPairingView(model:owner),name:"approval-recover",dark:dark,width:660,height:650,directory:directory,expected:"recover last joining response")}
+        owner.performPairing(.recoverResponse);try await done(owner)
+        XCTAssertEqual(owner.pairingResponse,response);XCTAssertEqual(owner.pairingResponseExpiry,expiry)
+        for dark in [false,true] {
+            try await renderView(PersonalSyncPairingView(model:owner),name:"approval-restored",dark:dark,width:660,height:650,directory:directory,expected:"request expires")
+            let text=try String(contentsOf:directory.appendingPathComponent("approval-restored-\(dark ? "dark":"light").ocr.txt"),encoding:.utf8)
+            XCTAssertTrue(text.contains("copy response"));XCTAssertTrue(text.contains("original request expiry"))
+        }
+    }
     func testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries()async throws {
         let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")
         try a.insert(Memory(id:"desk",text:"Owned desk memory"));try b.insert(Memory(id:"travel",text:"Owned travel memory"))
@@ -519,12 +568,13 @@ import MachO
 private struct PairingAppMachine:SyncMachineFingerprint {func fingerprint()throws->String {String(repeating:"a",count:64)}}
 private final class PairingAppStorage:SyncCredentialStorage,@unchecked Sendable {
     let protection:SyncCredentialProtection = .loginKeychain
-    private let lock=NSLock();private var saved=[String:Data](),createGate:PairingSaveGate?
+    private let lock=NSLock();private var saved=[String:Data](),createGate:PairingSaveGate?,readGate:PairingSaveGate?
     func install(_ value:PairingSaveGate?) {lock.lock();createGate=value;lock.unlock()}
+    func installRead(_ value:PairingSaveGate?) {lock.lock();readGate=value;lock.unlock()}
     var values:[String:Data] {lock.lock();defer {lock.unlock()};return saved}
     func create(id:String,bytes:Data)throws {lock.lock();let gate=createGate;lock.unlock();gate?.pause()
         lock.lock();defer {lock.unlock()};guard saved[id]==nil else {throw SyncCredentialStorageError.alreadyExists};saved[id]=bytes}
-    func read(id:String)throws->Data {lock.lock();defer {lock.unlock()};guard let bytes=saved[id] else {throw SyncCredentialStorageError.missing};return bytes}
+    func read(id:String)throws->Data {lock.lock();let gate=readGate;lock.unlock();gate?.pause();lock.lock();defer {lock.unlock()};guard let bytes=saved[id] else {throw SyncCredentialStorageError.missing};return bytes}
     func replace(id:String,expected:Data,bytes:Data)throws {lock.lock();defer {lock.unlock()};guard saved[id]==expected else {throw SyncCredentialStorageError.changed};saved[id]=bytes}
     func remove(id:String,expected:Data)throws {lock.lock();defer {lock.unlock()};guard saved[id]==expected else {throw SyncCredentialStorageError.changed};saved.removeValue(forKey:id)}
 }
