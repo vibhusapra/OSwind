@@ -1,0 +1,264 @@
+{
+  "format": "OSwind fresh unlocked 2x native raster review v1",
+  "candidateSource": "533b301913002f68a0eac8072435033ca984e43d",
+  "candidate694GitInputsMatch": true,
+  "baselineSource": "87ddff021500d0849245d9894ccb95473c13a81e",
+  "reports": {
+    "baseline": {
+      "runtime": "87ddff021500d0849245d9894ccb95473c13a81e",
+      "reportSHA256": "f9559607cb5f9a6767dd637b4ee4fc4c763feb397cfd4d17fe6a4a2b6858cfbe",
+      "fixtureExitSHA256": "513ece8dd17f4a667c1e3b448746e19a594b34203b84fc354aeddab1715db62e",
+      "caseSummary": [
+        {
+          "case": "full",
+          "width": 1280,
+          "height": 842,
+          "centralInspectedPixels": 538880,
+          "strongGreenPixels": 266170,
+          "strongMagentaPixels": 265877,
+          "centralWhitePixels": 0,
+          "imageSHA256": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        },
+        {
+          "case": "left",
+          "width": 640,
+          "height": 842,
+          "centralInspectedPixels": 269440,
+          "strongGreenPixels": 266740,
+          "strongMagentaPixels": 0,
+          "centralWhitePixels": 0,
+          "imageSHA256": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        },
+        {
+          "case": "right",
+          "width": 640,
+          "height": 842,
+          "centralInspectedPixels": 269440,
+          "strongGreenPixels": 0,
+          "strongMagentaPixels": 266008,
+          "centralWhitePixels": 0,
+          "imageSHA256": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        }
+      ],
+      "result": "not-reproduced"
+    },
+    "candidate": {
+      "runtime": "533b301913002f68a0eac8072435033ca984e43d",
+      "reportSHA256": "76375ac085242306284c3ce86579089e791c70858362bccfec9c0c09f33b8b12",
+      "fixtureExitSHA256": "df610958585bdcfc87f42037b440b01abd8b47584a50b81bf9800eac93c78cf4",
+      "caseSummary": [
+        {
+          "case": "full",
+          "width": 1280,
+          "height": 842,
+          "centralInspectedPixels": 538880,
+          "strongGreenPixels": 266170,
+          "strongMagentaPixels": 265877,
+          "centralWhitePixels": 0,
+          "imageSHA256": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        },
+        {
+          "case": "left",
+          "width": 640,
+          "height": 842,
+          "centralInspectedPixels": 269440,
+          "strongGreenPixels": 266740,
+          "strongMagentaPixels": 0,
+          "centralWhitePixels": 0,
+          "imageSHA256": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        },
+        {
+          "case": "right",
+          "width": 640,
+          "height": 842,
+          "centralInspectedPixels": 269440,
+          "strongGreenPixels": 0,
+          "strongMagentaPixels": 266008,
+          "centralWhitePixels": 0,
+          "imageSHA256": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+          "oppositeOCRMarkerAbsent": true,
+          "attempts": 1
+        }
+      ],
+      "result": "candidate-verified"
+    }
+  },
+  "alteredRecordControls": {
+    "opposite-pixel": "rejected",
+    "wrong-bundle": "rejected",
+    "bad-image-digest": "rejected",
+    "opposite-ocr": "rejected",
+    "unreaped-fixture": "rejected"
+  },
+  "retainedArtifactFiles": {
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/report.json": "f9559607cb5f9a6767dd637b4ee4fc4c763feb397cfd4d17fe6a4a2b6858cfbe",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/fixture-exit.json": "513ece8dd17f4a667c1e3b448746e19a594b34203b84fc354aeddab1715db62e",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/ready.json": "dd108bfa872d3ebf380d735e5e5b7bc4fc25b2bd22c3903b0a97cf9c06ffb60e",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/full-library/settings.json": "43349bb41e610904d01eff5d11bead72c91496f2e9a3104b3ed93361b528ba5e",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/left-library/settings.json": "afbeccfcfdec13588bf01ef0d7d94d23d9b0a329133f2d60fb276a903bd484db",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/right-library/settings.json": "f1b90b9f68ec6780a50de7dd02a6555bf44e651ebdb61aa771aa8eb1db0846b3",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/right-library/images/057AD645-985C-43A0-82FA-502BCEA49D7E.jpg": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/left-library/images/C1DC8B27-DD14-40D4-BA56-83611E2B41D7.jpg": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/baseline-native-v3-unlocked/full-library/images/8405EDCF-77C6-4B71-ACEF-39B7FB5B7C99.jpg": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/report.json": "76375ac085242306284c3ce86579089e791c70858362bccfec9c0c09f33b8b12",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/fixture-exit.json": "df610958585bdcfc87f42037b440b01abd8b47584a50b81bf9800eac93c78cf4",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/ready.json": "6e1754f631c35061c34aeb38871305065a6b28bc09d5829cb311a101857fc557",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/full-library/settings.json": "43349bb41e610904d01eff5d11bead72c91496f2e9a3104b3ed93361b528ba5e",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/left-library/settings.json": "afbeccfcfdec13588bf01ef0d7d94d23d9b0a329133f2d60fb276a903bd484db",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/right-library/settings.json": "f1b90b9f68ec6780a50de7dd02a6555bf44e651ebdb61aa771aa8eb1db0846b3",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/right-library/images/EA23BFC4-03E9-45B4-B7BC-ACA2F20F083D.jpg": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/left-library/images/4502888F-D1A9-449C-B080-CCC8869D8800.jpg": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+    "/Users/vibhusapra/.codex/worktrees/calendar-meeting-context/oswind/.artifacts/snapshot-source-fit-v1/candidate-native-v2-unlocked/full-library/images/683FC0DB-690D-4C59-9C98-034B937D4763.jpg": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35"
+  },
+  "reviewerSHA256": "c132d2f77d94fc0c89f4720bbdc3654e0a55fbf19a87f35abd8a798a235f26d3",
+  "scope": "Six actual explicitly targeted generated-window captures, same 2x backing/ScreenCaptureKit scale. Full/left/right color content and OCR agree; all raster bytes match between engines. Pixel color inspection covers full width and middle half of height, with visual review of candidate rasters. Both fixture children reaped. Earlier engine also passes; original 1x/padding bug is not reproduced on this display. No causal fix, arbitrary surface privacy, automatic capture scheduling, audio, power,24h or GUI acceptance claim. Original failed runs/waiters unchanged.",
+  "independentPixelDecoder": {
+    "format": "OSwind independent Pillow decode native raster review v1",
+    "priorReviewSHA256": "11e0db5dac98d5937ff09ec256124e662d7f7e8e4815cd14da651f751e43a0df",
+    "reviewerSHA256": "57d9ef5f18d1161ffd8277d97f8fe10f43fd7d27f7a2f3ff3c554610c5078170",
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "pillow": "12.3.0",
+    "colorManagement": "Embedded ICC converted to sRGB through Pillow ImageCms when present",
+    "cases": [
+      {
+        "engine": "baseline",
+        "case": "full",
+        "sha256": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+        "width": 1280,
+        "height": 842,
+        "centralInspectedPixels": 538880,
+        "strongMagentaPixels": 266079,
+        "strongGreenPixels": 266343,
+        "centralWhitePixels": 0
+      },
+      {
+        "engine": "baseline",
+        "case": "left",
+        "sha256": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+        "width": 640,
+        "height": 842,
+        "centralInspectedPixels": 269440,
+        "strongMagentaPixels": 0,
+        "strongGreenPixels": 266764,
+        "centralWhitePixels": 0
+      },
+      {
+        "engine": "baseline",
+        "case": "right",
+        "sha256": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+        "width": 640,
+        "height": 842,
+        "centralInspectedPixels": 269440,
+        "strongMagentaPixels": 266079,
+        "strongGreenPixels": 0,
+        "centralWhitePixels": 0
+      },
+      {
+        "engine": "candidate",
+        "case": "full",
+        "sha256": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+        "width": 1280,
+        "height": 842,
+        "centralInspectedPixels": 538880,
+        "strongMagentaPixels": 266079,
+        "strongGreenPixels": 266343,
+        "centralWhitePixels": 0
+      },
+      {
+        "engine": "candidate",
+        "case": "left",
+        "sha256": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+        "width": 640,
+        "height": 842,
+        "centralInspectedPixels": 269440,
+        "strongMagentaPixels": 0,
+        "strongGreenPixels": 266764,
+        "centralWhitePixels": 0
+      },
+      {
+        "engine": "candidate",
+        "case": "right",
+        "sha256": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+        "width": 640,
+        "height": 842,
+        "centralInspectedPixels": 269440,
+        "strongMagentaPixels": 266079,
+        "strongGreenPixels": 0,
+        "centralWhitePixels": 0
+      }
+    ],
+    "incorrectRasterControls": {
+      "right-raster-as-left": "rejected",
+      "left-raster-as-right": "rejected",
+      "full-raster-as-left": "rejected"
+    },
+    "scope": "Second decoder over the same six retained generated-window JPEGs, current2x display, declared full-width/middle-half-height color oracle. Opposite colors and central white remain absent in cropped cases. This is offline analysis of preserved actual captures, not a repeated live capture or whole-raster/universal privacy/performance/causal-fix acceptance. Earlier engine also passes."
+  },
+  "publishedInputs": {
+    "file": "native-raster-fit-unlocked-inputs-v1.json",
+    "sha256": "891e691017d8b2dab51aee8f2f61ea36e3f5099c5df6097d7eb6464d695f96ac"
+  },
+  "reviewSHA256": "11e0db5dac98d5937ff09ec256124e662d7f7e8e4815cd14da651f751e43a0df",
+  "independentPixelReviewSHA256": "65738104745cfc089e6bcc1b33422011c5749634a32d0693ee6e994dc776249f",
+  "publisherSHA256": "33b2d2f24e8d58c35436c447777d3958677dc13275fd190b5cd848eb5fab0198",
+  "rawEvidence": {
+    "file": "native-raster-fit-unlocked-raw-v1.zip",
+    "sha256": "235cd4622a0113b729d4a12e9d493df09a49b2999d44ab3a2bd348aa851fa827",
+    "bytes": 138345,
+    "members": {
+      "baseline-native-v3-unlocked/report.json": "f9559607cb5f9a6767dd637b4ee4fc4c763feb397cfd4d17fe6a4a2b6858cfbe",
+      "baseline-native-v3-unlocked/fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "baseline-native-v3-unlocked/fixture-exit.json": "513ece8dd17f4a667c1e3b448746e19a594b34203b84fc354aeddab1715db62e",
+      "baseline-native-v3-unlocked/ready.json": "dd108bfa872d3ebf380d735e5e5b7bc4fc25b2bd22c3903b0a97cf9c06ffb60e",
+      "baseline-native-v3-unlocked/full-library/settings.json": "43349bb41e610904d01eff5d11bead72c91496f2e9a3104b3ed93361b528ba5e",
+      "baseline-native-v3-unlocked/left-library/settings.json": "afbeccfcfdec13588bf01ef0d7d94d23d9b0a329133f2d60fb276a903bd484db",
+      "baseline-native-v3-unlocked/right-library/settings.json": "f1b90b9f68ec6780a50de7dd02a6555bf44e651ebdb61aa771aa8eb1db0846b3",
+      "baseline-native-v3-unlocked/right-library/images/057AD645-985C-43A0-82FA-502BCEA49D7E.jpg": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+      "baseline-native-v3-unlocked/left-library/images/C1DC8B27-DD14-40D4-BA56-83611E2B41D7.jpg": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+      "baseline-native-v3-unlocked/full-library/images/8405EDCF-77C6-4B71-ACEF-39B7FB5B7C99.jpg": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+      "candidate-native-v2-unlocked/report.json": "76375ac085242306284c3ce86579089e791c70858362bccfec9c0c09f33b8b12",
+      "candidate-native-v2-unlocked/fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "candidate-native-v2-unlocked/fixture-exit.json": "df610958585bdcfc87f42037b440b01abd8b47584a50b81bf9800eac93c78cf4",
+      "candidate-native-v2-unlocked/ready.json": "6e1754f631c35061c34aeb38871305065a6b28bc09d5829cb311a101857fc557",
+      "candidate-native-v2-unlocked/full-library/settings.json": "43349bb41e610904d01eff5d11bead72c91496f2e9a3104b3ed93361b528ba5e",
+      "candidate-native-v2-unlocked/left-library/settings.json": "afbeccfcfdec13588bf01ef0d7d94d23d9b0a329133f2d60fb276a903bd484db",
+      "candidate-native-v2-unlocked/right-library/settings.json": "f1b90b9f68ec6780a50de7dd02a6555bf44e651ebdb61aa771aa8eb1db0846b3",
+      "candidate-native-v2-unlocked/right-library/images/EA23BFC4-03E9-45B4-B7BC-ACA2F20F083D.jpg": "2fd48303b6ac4ee0255aacb3f90c98098d991ff6e409ff2ab68a26123a3a2564",
+      "candidate-native-v2-unlocked/left-library/images/4502888F-D1A9-449C-B080-CCC8869D8800.jpg": "824b6138b1bd7b39881428da303ff3282a48400d4b59cc54ea2d84f2ec342ce1",
+      "candidate-native-v2-unlocked/full-library/images/683FC0DB-690D-4C59-9C98-034B937D4763.jpg": "7e4860c19985b0917c8106bc28addbf6725a2e181a4e559262b5c645a3524f35",
+      "native-runners/unlocked-attempts-v1.json": "ad7bb8c66dd16f07b68646a1f765e55e06ce8786bc25b15791f0400f9cee9694",
+      "native-runners/reproduce-v2.py": "c3da7d9050014a7733f921212e80d3d38fc7a013ec5c467fc416421d5e48f2cf",
+      "native-runners/reproduce-v3-unlocked.py": "055bc3c5ee238f82c2fad47c3227024cc42097b5e82ad25314aca046917b8966",
+      "native-runners/reproduce-v3-unlocked.log": "57b0a6d1134d050738c6590eaef9f6db754e3e61ac292a41d21d5ad4cb4d9b53",
+      "native-runners/verify-candidate-v1.py": "41f86d1b4a6664b7036eca8a9cb16976585b8f21a42a7422ba7166fe58ad854c",
+      "native-runners/verify-candidate-v2-unlocked.py": "c546849569974a5fdfd49c52c1d96747231c44ffc4255e223825df127453d66f",
+      "native-runners/verify-candidate-v2-unlocked.log": "f11d4ab64737093de223ec90dabf0d3f4239efc26e2845b4b8b308ea14c6d5dd",
+      "native-runners/CropBoundaryFixture.swift": "c7bb99bc4b63cfcb2dc67bc9a041f20c5fdee37d26d5e4f0c832f473890fbeaf",
+      "native-runners/ImageGeometryProbe.swift": "100972c3cc078f2e50906f26558fc510727b3c49f6de17b0dc1ba8a3b5d372ce",
+      "native-runners/SessionReadiness.swift": "0d0da698d1781f2722177a5258597bd3118be9ffbc0926f54776befa2d8e514d",
+      "native-runners/qualification-v1/inputs.json": "9591d12e2b77976d439d3cc4473454107f6622ade1856e05d00d82efe2f049e1",
+      "native-runners/qualification-v1/candidate-debug/provenance.json": "ca6df462493e9fdc74197e1fab5b1dee12335c2486a941b3b9c99e4df34e77e0",
+      "review/current-session-readiness-v1.json": "e1e9808af33ad07ac4d22583138326524f134bd2b0d6c62f2b54ee4f68ef8f0e",
+      "review/review-native-raster-unlocked-v1.py": "c132d2f77d94fc0c89f4720bbdc3654e0a55fbf19a87f35abd8a798a235f26d3",
+      "review/native-raster-unlocked-reviewed-v1.json": "11e0db5dac98d5937ff09ec256124e662d7f7e8e4815cd14da651f751e43a0df",
+      "review/review-native-raster-pillow-v1.py": "57d9ef5f18d1161ffd8277d97f8fe10f43fd7d27f7a2f3ff3c554610c5078170",
+      "review/native-raster-pillow-reviewed-v1.json": "65738104745cfc089e6bcc1b33422011c5749634a32d0693ee6e994dc776249f",
+      "review/native-raster-pillow-review-v1.log": "3c0e2d937a7e510e5d08146cab51f783fd670dccb14bad3ca9380f302985b82c",
+      "review/publish-native-raster-unlocked-v1.py": "33b2d2f24e8d58c35436c447777d3958677dc13275fd190b5cd848eb5fab0198",
+      "README.txt": "52fb6d736e41f37210689099157f42a0305d039824a427342576b14c46ba6e51"
+    },
+    "allArchivedBytesCompared": true
+  }
+}
