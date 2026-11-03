@@ -1,5 +1,7 @@
 # Membership state format floor — WIP
 
+The separately qualified [recoverable preview migration](SYNC-MEMBERSHIP-BACKFILL-WIP.md) at `ae247dc` implements the already-cleared format-1 backfill that remained open at this earlier checkpoint. This file records the preceding runtime; actual public session/owner-add integration and full F059 acceptance remain unfinished.
+
 F059 remains TODO. New internal handovers now write membership state format 2, while the SQLite library remains native36. Ordinary content remains native33 and ordinary enrollment remains native35. Public post-delivery membership editing stays disabled. This is a local library compatibility boundary; remote software capability negotiation remains separate work.
 
 The original compatibility concern is now reproduced with an actual earlier engine. An owned XCTest bundle links unmodified `d665a30` product/runtime/dependency sources: all 679 original inputs match the committed preparation receipt, with one separately hashed test-only worker entry point. The worker can read only the parent's four explicitly listed login-Keychain accounts and refuses account creation, replacement and deletion. It uses the real Mac fingerprint and owned installation/library paths. Its executable is frozen at SHA-256 `80a09cbd70547dc61b1834bd6ef2f20a5867852a9b73ab38030391d0ac7959de`.
