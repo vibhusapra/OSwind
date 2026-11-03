@@ -1,0 +1,33 @@
+{
+  "format": "OSwind peer preview native CI selection v1",
+  "qualificationSource": "4c0d51d86f8de8499406a5375df9a068a5dca906",
+  "metadataMergeSource": "062014173546a96cd53d2d08360fc1b1bc0795e2",
+  "qualifiedWorkflowSHA256": "aea11ec9c3fe715bc9f3e15e6712eb2cd564b4982f976d23f3f5ee854d7c6c05",
+  "priorWorkflowSHA256": "700fb12fa9c9f2c9a3908ed6a13a21524def99fbea8cd8ea1bb4acbef05460ae",
+  "newWorkflowSHA256": "fa4c3f5cdfc1a68b8e37e83862d287d266ee3972f182ce5f00ba36f26b011ea3",
+  "onlyDeclaredRuntimeInputChangedSinceNativeDebug": ".github/workflows/ci.yml",
+  "allOther725InputsUnchanged": true,
+  "priorNativeStepsPreserved": 83,
+  "addedSteps": [
+    {
+      "name": "Verify peer membership update with owned APFS and Keychain",
+      "run": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_PEER_UI_QA_DIR=\"$RUNNER_TEMP/oswind-peer-membership-ui/peer\" OSWIND_EXPANDED_SYNC_UI_QA_DIR=\"$RUNNER_TEMP/oswind-peer-membership-ui/folder\" swift test --filter 'PersonalSyncMembershipUpdateTests|PeerMembershipAppSessionTests'"
+    },
+    {
+      "name": "Retain owned peer membership component renders",
+      "if": "always()",
+      "uses": "actions/upload-artifact@v4",
+      "with": {
+        "name": "owned-peer-membership-ui",
+        "path": "${{ runner.temp }}/oswind-peer-membership-ui/peer/*.png\n${{ runner.temp }}/oswind-peer-membership-ui/folder/*.png\n",
+        "if-no-files-found": "ignore"
+      }
+    }
+  ],
+  "localSelectedNativeDebug": {
+    "passed": 31,
+    "skipped": 0,
+    "failed": 0
+  },
+  "scope": "Static YAML and exact prior-step preservation. Future hosted result separate; no sanitizer/optimized or full-v0 success implied."
+}
