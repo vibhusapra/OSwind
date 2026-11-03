@@ -29,8 +29,8 @@ struct PersonalSyncPairingView:View {
     var body:some View {
         VStack(alignment:.leading,spacing:18) {
             HStack {Image(systemName:"laptopcomputer.and.arrow.down").font(.title2);Text("Pair your Macs").font(.title2.weight(.semibold));Spacer();Button("Done") {dismiss()}.keyboardShortcut(.cancelAction)}
-            Text("Two-Mac sync preview").font(.caption.weight(.semibold)).foregroundStyle(.orange)
-            Text("Pair two Macs, then connect the same shared folder to exchange encrypted memories. Connecting sync does not change your capture choices.").foregroundStyle(.secondary)
+            Text(expandedPreview ? "Multi-Mac membership preview":"Two-Mac sync preview").font(.caption.weight(.semibold)).foregroundStyle(.orange)
+            Text(expandedPreview ? "Pair your Macs, then connect the same shared folder to exchange encrypted memories. All Macs must trust the same signed membership revision before reconnecting.":"Pair two Macs, then connect the same shared folder to exchange encrypted memories. Connecting sync does not change your capture choices.").foregroundStyle(.secondary)
             ScrollView {VStack(alignment:.leading,spacing:16) {
                 if model.configured || model.preparing {
                     PersonalSyncConnectionDetails(model:model)
@@ -60,6 +60,7 @@ struct PersonalSyncPairingView:View {
             Button("Cancel",role:.cancel) {};Button("Retire keys",role:.destructive) {model.performPairing(.retire)}
         } message: {Text("Removes private pairing keys from this Mac's saved credential and keeps a keyless recovery record. This does not revoke the device on other Macs. Local memories remain available. Pairing recovery is not yet available in this preview.")}
     }
+    private var expandedPreview:Bool {model.approveMembershipUpdate != nil}
     private var begin:some View {
         VStack(alignment:.leading,spacing:14) {
             TextField("Name this Mac",text:$deviceName).textFieldStyle(.roundedBorder)
@@ -142,7 +143,7 @@ struct PersonalSyncPairingView:View {
     }
     private func folderSetup(_ status:PersonalSyncPairingStatus)->some View {
         VStack(alignment:.leading,spacing:12) {
-            if status.memberNames.count==2 {
+            if status.memberNames.count==2 || (expandedPreview && status.memberNames.count>2) {
                 Divider()
                 Text("Connect a shared folder").font(.headline)
                 Text("Create the sync folder on the first Mac, then select that same folder on the other Mac. Your folder provider must make its files available locally.").foregroundStyle(.secondary)
@@ -151,9 +152,9 @@ struct PersonalSyncPairingView:View {
                     if !status.deliveryPrepared {Button("Create sync folder…") {chooseFolder(create:true)}}
                     Button(model.folderURL == nil ? "Choose existing folder…":"Locate existing folder…") {chooseFolder(create:false)}
                 }
-                Text("Use only these two trusted Macs. Membership refresh, revocation and group rotation are still in development. Paired Macs can publish an approved group erase that also removes unsynced local history when observed.").font(.caption).foregroundStyle(.secondary)
+                Text(expandedPreview && status.memberNames.count>2 ? "Connect trusted Macs that have applied the same signed membership revision. Device removal and group rotation are still in development. Paired Macs can publish an approved group erase that also removes unsynced local history when observed.":"Use only these two trusted Macs. Membership refresh, revocation and group rotation are still in development. Paired Macs can publish an approved group erase that also removes unsynced local history when observed.").font(.caption).foregroundStyle(.secondary)
             } else if status.memberNames.count>2 {
-                Text("This setup preview supports two Macs. This group needs membership refresh before it can connect here.").foregroundStyle(.secondary)
+                Text("Expanded-group connection is available only in the membership preview. Every Mac must trust the same signed revision.").foregroundStyle(.secondary)
             }
         }
     }

@@ -13,7 +13,7 @@ struct PersonalSyncMembershipUpdateView:View {
     var body:some View {
         DisclosureGroup("Update paired Macs",isExpanded:$expanded) {
             VStack(alignment:.leading,spacing:12) {
-                Text("Membership preview. Updates reopen this library with recording and sync paused. Expanded-group connection is still being verified.").font(.caption).foregroundStyle(.orange)
+                Text("Membership preview. Updates reopen this library with recording and sync paused. Compare revisions on every Mac before reconnecting.").font(.caption).foregroundStyle(.orange)
                 if model.configured {
                     if let review=model.membershipUpdateReview {
                         Text("Review added Macs").font(.headline)

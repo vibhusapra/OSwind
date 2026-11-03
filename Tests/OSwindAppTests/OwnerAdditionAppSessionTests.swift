@@ -462,7 +462,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     private func ownerApp(_ f:Fixture,gate:ImportWorkerGate?=nil)async throws->AppSession {
         try await quietApp(at:f.ownerRoot,gate:gate)
     }
-    private func quietApp(at path:URL,gate:ImportWorkerGate?=nil)async throws->AppSession {
+    private func quietApp(at path:URL,gate:ImportWorkerGate?=nil,preview:Bool=true)async throws->AppSession {
         var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.automaticMaintenance=false;settings.entityAutomaticIndex=false;settings.clipboard.enabled=false;settings.meetings.enabled=false;try settings.save(root:path)
         let env=environment,tracker=OwnerOpenTracker(env);trackers.append(tracker)
         let app=AppSession(selection:.init(url:path,requiresExisting:true,origin:"owned-export"),defaults:defaults,locked:{false},openStore:{try tracker.open($0)},personalSyncSetup:{library in
@@ -470,7 +470,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
                 try gate?.pause()
                 return try PersonalSyncPairing(store:library,stateRoot:env.stateRoot,machine:env.machine,storage:env.storage(.loginKeychain))
             })
-        },ownerAdditionPreview:true)
+        },ownerAdditionPreview:preview)
         apps.append(app);try await settle(app);XCTAssertNil(app.failure)
         let model=try XCTUnwrap(app.model);model.showOnboarding=false;try await SourceWorkTestJob.settle(model)
         XCTAssertFalse(model.isCapturing);XCTAssertEqual(model.apiStatus,"API off");XCTAssertFalse(model.personalSync.configured)
@@ -571,6 +571,26 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     private func renderPeer(_ model:PersonalSyncModel,size:NSSize,dark:Bool,to path:URL)async throws {
         let content=PersonalSyncMembershipUpdateView(model:model,initiallyExpanded:true).padding(24)
+        try await renderComponent(AnyView(content),size:size,dark:dark,to:path)
+    }
+    func testRenderExpandedGroupFolderPreviewAndDefaultGate()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_EXPANDED_SYNC_UI_QA_DIR"] else {throw XCTSkip("Explicit generated folder-setup components; no desktop capture")}
+        let output=URL(fileURLWithPath:path);try Paths.ensure(output);let f=try await fixture(),enabled=try await ownerApp(f),enabledModel=try XCTUnwrap(enabled.model)
+        let enabledSync=enabledModel.personalSync;enabledSync.performPairing(.load);try await pairingDone(enabledSync)
+        XCTAssertEqual(enabledSync.pairingStatus?.memberNames.count,3);XCTAssertNotNil(enabledSync.approveMembershipUpdate)
+        for dark in [false,true] {try await renderComponent(AnyView(PersonalSyncPairingView(model:enabledSync)),size:.init(width:660,height:650),dark:dark,to:output.appendingPathComponent("three-preview-\(dark ? "dark":"light").png"))}
+        let joined=await enabled.lockForTermination();XCTAssertTrue(joined);try enabledModel.store.close();enabled.model=nil
+        let disabled=try await quietApp(at:f.ownerRoot,preview:false),disabledSync=try XCTUnwrap(disabled.model).personalSync
+        disabledSync.performPairing(.load);try await pairingDone(disabledSync)
+        XCTAssertEqual(disabledSync.pairingStatus?.memberNames.count,3);XCTAssertNil(disabledSync.approveMembershipUpdate)
+        for dark in [false,true] {try await renderComponent(AnyView(PersonalSyncPairingView(model:disabledSync)),size:.init(width:660,height:650),dark:dark,to:output.appendingPathComponent("three-default-gate-\(dark ? "dark":"light").png"))}
+        let peerStopped=await f.app.lockForTermination();XCTAssertTrue(peerStopped);try f.old.store.close();f.app.model=nil
+        let ordinary=try await quietApp(at:f.old.store.root,preview:false),ordinarySync=try XCTUnwrap(ordinary.model).personalSync
+        ordinarySync.performPairing(.load);try await pairingDone(ordinarySync)
+        XCTAssertEqual(ordinarySync.pairingStatus?.memberNames.count,2);XCTAssertNil(ordinarySync.approveMembershipUpdate)
+        for dark in [false,true] {try await renderComponent(AnyView(PersonalSyncPairingView(model:ordinarySync)),size:.init(width:660,height:650),dark:dark,to:output.appendingPathComponent("two-default-\(dark ? "dark":"light").png"))}
+    }
+    private func renderComponent(_ content:AnyView,size:NSSize,dark:Bool,to path:URL)async throws {
         let view=NSHostingView(rootView:content.frame(width:size.width,height:size.height).background(Color(nsColor:.windowBackgroundColor)).preferredColorScheme(dark ? .dark:.light))
         let window=NSWindow(contentRect:.init(origin:.zero,size:size),styleMask:[.titled],backing:.buffered,defer:false);window.isReleasedWhenClosed=false;window.contentView=view;defer {window.close()}
         view.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(350));view.layoutSubtreeIfNeeded();window.displayIfNeeded()
