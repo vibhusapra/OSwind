@@ -81,6 +81,19 @@ jobs:
         run: |
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" note "OSwind CI searchable memory"
           dist/OSwind.app/Contents/MacOS/oswindctl --data "$RUNNER_TEMP/oswind" search --mode keyword searchable
+      - name: Verify capture parser preserves exact target and bounded duration
+        run: python3 scripts/test-capture-request-parser.py --output "$RUNNER_TEMP/oswind-capture-parser-v1.json"
+      - name: Verify capture argument admission without history or native capture
+        run: python3 scripts/capture-request-admission-smoke.py --binary dist/OSwind.app/Contents/MacOS/oswindctl --output "$RUNNER_TEMP/oswind-capture-arguments-v1.json"
+      - name: Retain capture argument admission receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-capture-argument-admission
+          path: |
+            ${{ runner.temp }}/oswind-capture-arguments-v1.json
+            ${{ runner.temp }}/oswind-capture-parser-v1.json
+          if-no-files-found: ignore
       - name: Verify packaged media reservations and backup erasure fencing
         run: python3 scripts/media-cleanup-smoke.py dist/OSwind.app/Contents/MacOS/oswindctl --root "$RUNNER_TEMP/oswind-media-cleanup"
       - name: Retain packaged media cleanup process receipt
