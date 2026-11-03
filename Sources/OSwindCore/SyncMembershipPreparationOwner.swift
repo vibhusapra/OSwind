@@ -1,8 +1,10 @@
 import Foundation
 
-/// Internal preparation owner, unavailable to app/CLI until full handover and
-/// new-peer bootstrap are implemented. It opens no provider and changes no
-/// private membership. Cancellation keeps native36's old-writer fence.
+/// Internal membership owner, unavailable to app/CLI until reviewed owner
+/// approval and the complete session lifecycle are integrated. Preparation
+/// keeps old private material; application resumes its exact saved forward
+/// choice. Cancellation before that choice keeps native36's old-writer fence.
+/// It opens no provider; later service startup performs bounded replay.
 final class SyncMembershipPreparationOwner:@unchecked Sendable {
     private let lock=NSRecursiveLock(),library:MemoryStore,anchor:SyncDeliveryAnchor
     private let pairing:PersonalSyncPairing?,pairingLease:SyncCredentialExclusiveLease?
@@ -39,6 +41,14 @@ final class SyncMembershipPreparationOwner:@unchecked Sendable {
     func resumeFence()throws {
         lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership preparation owner is closed")}
         try anchor.continueMembershipFence()
+    }
+    func applyMembership()throws {
+        lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership operation owner is closed")}
+        try anchor.applyMembershipAfterFence {
+            guard let id=self.anchor.membershipPairingID else {throw OSwindError.unavailable("Original membership pairing account is missing")}
+            if let pairing=self.pairing {try pairing.requireMembershipLease(id:id)}
+            else {guard let lease=self.pairingLease else {throw OSwindError.unavailable("Original pairing lease is missing")};try lease.requireCurrentIdentity()}
+        }
     }
     func cancelBeforeHandover()throws {
         lock.lock();defer {lock.unlock()};guard !closed else {throw OSwindError.unavailable("Membership preparation owner is closed")}

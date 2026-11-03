@@ -3,6 +3,7 @@ import SwiftUI
 import AppKit
 import Vision
 import CSQLite
+import MachO
 @testable import OSwindCore
 @testable import OSwind
 
@@ -42,13 +43,27 @@ import CSQLite
         return(owner,peer)
     }
     private func connected(_ model:PersonalSyncModel,phase:PersonalSyncStatus.Phase = .upToDate)async throws {
-        let deadline=ContinuousClock.now.advanced(by:.seconds(20))
-        while ContinuousClock.now<deadline {
+        // Functional readiness is not a wall-time performance benchmark. Keep
+        // the ordinary budget; instrumented native schema work needs more room.
+        let instrumented=(0..<_dyld_image_count()).contains {index in
+            guard let raw=_dyld_get_image_name(index) else {return false}
+            return URL(fileURLWithPath:String(cString:raw)).lastPathComponent=="libclang_rt.tsan_osx_dynamic.dylib"
+        }
+        let seconds=instrumented ? 120:20,started=ContinuousClock.now,deadline=started.advanced(by:.seconds(seconds))
+        while true {
             if let error=model.error {throw OSwindError.unavailable(error)}
-            if model.configured,!model.preparing,!model.changing,model.status?.phase==phase {return}
+            if model.configured,!model.preparing,!model.changing,model.status?.phase==phase {
+                let elapsed=started.duration(to:ContinuousClock.now),parts=elapsed.components,value=Double(parts.seconds)+Double(parts.attoseconds)/1e18
+                if instrumented || value>=20 {print("OWNED_SYNC_APP_READY sanitizer=\(instrumented) timeoutSeconds=\(seconds) elapsedSeconds=\(value) phase=\(String(describing:phase))")}
+                return
+            }
+            // Observe the final state after an actor suspension even when the
+            // clock expired while this executor could not resume.
+            guard ContinuousClock.now<deadline else {
+                throw OSwindError.unavailable("Owned app connection did not reach \(String(describing:phase)); configured=\(model.configured), preparing=\(model.preparing), changing=\(model.changing), phase=\(model.status.map {String(describing:$0.phase)} ?? "none"), sanitizer=\(instrumented), budget=\(seconds)s")
+            }
             try await Task.sleep(for:.milliseconds(5))
         }
-        throw OSwindError.unavailable("Owned app connection did not reach its expected phase")
     }
     func testFolderActivationTransfersPreviewOwnersAndDeliversBothLibraries()async throws {
         let (owner,peer)=try await pairedModels(),shared=root.appendingPathComponent("shared")

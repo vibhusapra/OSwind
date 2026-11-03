@@ -310,12 +310,16 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     struct MembershipSnapshot {
         let pairingID:String,pairingBefore:String,pairingAfter:String,materialBefore:String,materialAfter:String
     }
+    private static func membershipEnvelopes(_ value:Envelope,proof:SyncMembershipRefresh)throws->(before:Data,after:Data,materialBefore:Data,materialAfter:Data) {
+        guard !value.retired,value.pending==nil,value.delivery != nil,let raw=value.material else {throw OSwindError.invalid("Use the originally enrolled pairing")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(raw),candidates=try material.membershipCandidates(proof)
+        let before=try candidates.before.encodedForKeychain(),after=try candidates.after.encodedForKeychain()
+        return (try value.replacing(material:before,consumed:value.consumedRequest).encoded(),try value.replacing(material:after,consumed:value.consumedRequest).encoded(),before,after)
+    }
     private static func membershipSnapshot(_ value:Envelope,bytes:Data,proof:SyncMembershipRefresh)throws->MembershipSnapshot {
-        guard !value.retired,value.pending==nil,value.delivery != nil,let raw=value.material else {throw OSwindError.invalid("Prepare an already enrolled device with its original pairing")}
-        let material=try SyncCredentialMaterial.decodeFromKeychain(raw)
-        guard material.joined.certificate==proof.base else {throw OSwindError.invalid("Membership preparation must start at the exact private certificate")}
-        let next=try material.withMembershipRefresh(proof).encodedForKeychain(),updated=try value.replacing(material:next,consumed:value.consumedRequest).encoded()
-        return .init(pairingID:value.id,pairingBefore:SyncProtocolLimits.hex(bytes),pairingAfter:SyncProtocolLimits.hex(updated),materialBefore:SyncProtocolLimits.hex(raw),materialAfter:SyncProtocolLimits.hex(next))
+        let candidates=try membershipEnvelopes(value,proof:proof)
+        guard candidates.before==bytes else {throw OSwindError.invalid("Start preparation at the exact original private membership")}
+        return .init(pairingID:value.id,pairingBefore:SyncProtocolLimits.hex(candidates.before),pairingAfter:SyncProtocolLimits.hex(candidates.after),materialBefore:SyncProtocolLimits.hex(candidates.materialBefore),materialAfter:SyncProtocolLimits.hex(candidates.materialAfter))
     }
     static func openMembershipPairing(library:MemoryStore,environment:SyncNativeWriterEnvironment)throws->PersonalSyncPairing {
         let protection=try library.withRoutineDatabase {db->SyncCredentialProtection in
@@ -333,19 +337,51 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:SyncCredentialMaterial.decodeFromKeychain(saved),id:delivery.id,stateRoot:stateRoot,machine:machine,storage:backend)
         return (anchor,snapshot)
     }}
-    /// Read-only verification under the caller's native/credential ownership.
-    /// Preparation and cancellation never replace this account.
-    static func verifyMembershipPreparation(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,record:SyncMembershipPreparation,proof:SyncMembershipRefresh,deliveryID:String)throws {
+    /// Both normal admission and saved recovery read only the originally
+    /// enrolled account. This never creates a handle, backend or private key.
+    private static func membershipEnvelope(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,deliveryID:String)throws->(value:Envelope,bytes:Data,storage:any SyncCredentialStorage) {
         let row=try db.statement("SELECT value FROM store_metadata WHERE key=?");defer {sqlite3_finalize(row)};db.bind(row,1,handleKey)
-        guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_bytes(row,0)<=1024 else {throw OSwindError.unavailable("Original membership pairing handle is missing")}
+        guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_TEXT,sqlite3_column_bytes(row,0)>0,sqlite3_column_bytes(row,0)<=1024 else {throw OSwindError.unavailable("Original membership pairing handle is missing")}
         let handle=try SyncPairingFormat.decode(Handle.self,Data(db.text(row,0).utf8),limit:1024)
-        guard handle.format=="OSwind.sync.pairing-handle",handle.version==1,handle.id==record.pairingID else {throw OSwindError.unavailable("Saved membership belongs to another pairing account")}
+        guard handle.format=="OSwind.sync.pairing-handle",handle.version==1 else {throw OSwindError.unavailable("Invalid original membership pairing handle")};try SyncCredentialStorageLimits.validate(id:handle.id)
         let backend=environment.storage(handle.protection);guard backend.protection==handle.protection else {throw OSwindError.unavailable("Keep the original membership protection tier")}
         let bytes=try backend.read(id:handle.id),value=try Envelope.decode(bytes)
-        guard value.id==handle.id,value.protection==handle.protection,value.delivery?.id==deliveryID,
+        guard value.id==handle.id,value.protection==handle.protection,!value.retired,value.pending==nil,value.material != nil,value.delivery?.id==deliveryID,
               value.location == (try Location.capture(library,stateRoot:environment.stateRoot,machine:environment.machine)) else {throw OSwindError.unavailable("Membership pairing moved or changed its original lifetime")}
-        let snapshot=try membershipSnapshot(value,bytes:bytes,proof:proof)
-        guard snapshot.pairingBefore==record.pairingBefore,snapshot.pairingAfter==record.pairingAfter,snapshot.materialBefore==record.materialBefore,snapshot.materialAfter==record.materialAfter else {throw OSwindError.unavailable("Pairing differs from the exact saved membership operation")}
+        return (value,bytes,backend)
+    }
+    static func verifyActiveMembership(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,deliveryID:String,material:Data)throws {
+        let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID)
+        guard saved.value.material==material else {throw OSwindError.unavailable("Pairing and delivery membership differ; use the exact saved operation")}
+    }
+    /// Returns true only for the exact saved new pairing envelope. The two
+    /// candidates preserve all original location/reservation/consumption fields.
+    @discardableResult static func verifyMembershipPreparation(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,record:SyncMembershipPreparation,proof:SyncMembershipRefresh,deliveryID:String)throws->Bool {
+        let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID)
+        guard saved.value.id==record.pairingID else {throw OSwindError.unavailable("Saved membership belongs to another pairing account")}
+        let candidates=try membershipEnvelopes(saved.value,proof:proof),current=SyncProtocolLimits.hex(saved.bytes)
+        guard SyncProtocolLimits.hex(candidates.before)==record.pairingBefore,SyncProtocolLimits.hex(candidates.after)==record.pairingAfter,
+              SyncProtocolLimits.hex(candidates.materialBefore)==record.materialBefore,SyncProtocolLimits.hex(candidates.materialAfter)==record.materialAfter,
+              current==record.pairingBefore || (record.disposition == .applying && current==record.pairingAfter) else {throw OSwindError.unavailable("Pairing differs from both exact saved operation candidates")}
+        return current==record.pairingAfter
+    }
+    func requireMembershipLease(id:String)throws {
+        mutex.lock();defer {mutex.unlock()}
+        guard !closed,handle?.id==id,let lease else {throw OSwindError.unavailable("The original membership pairing owner is closed")};try lease.requireCurrentIdentity()
+    }
+    /// Caller holds both original credential leases and a native36 fence that
+    /// is already proven committed. A failed/ambiguous CAS is never rollback.
+    static func completeMembershipPreparation(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,record:SyncMembershipPreparation,proof:SyncMembershipRefresh,deliveryID:String)throws {
+        guard record.disposition == .applying,try db.eraseCount("PRAGMA user_version")==36,
+              try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.prepared(record),
+              try library.nativeWriterAdmission.membershipEpoch(db)==record.epochPrepared else {throw OSwindError.unavailable("Commit the exact saved native fence before private handover")}
+        if try verifyMembershipPreparation(library:library,db:db,environment:environment,record:record,proof:proof,deliveryID:deliveryID) {return}
+        let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID),candidates=try membershipEnvelopes(saved.value,proof:proof)
+        guard saved.value.id==record.pairingID,SyncProtocolLimits.hex(saved.bytes)==record.pairingBefore,SyncProtocolLimits.hex(candidates.after)==record.pairingAfter else {throw SyncCredentialStorageError.changed}
+        let checkpoint=try db.statement("SELECT id,serial,nonce FROM personal_sync_delivery_anchor WHERE singleton=1");defer {sqlite3_finalize(checkpoint)}
+        guard sqlite3_step(checkpoint)==SQLITE_ROW,db.text(checkpoint,0)==deliveryID,sqlite3_column_type(checkpoint,1)==SQLITE_INTEGER,
+              SyncDeliveryAnchor.Token(serial:sqlite3_column_int64(checkpoint,1),nonce:db.text(checkpoint,2))==record.tokenPrepared else {throw OSwindError.unavailable("The committed native fence changed before private handover")}
+        try Task.checkCancellation();try saved.storage.replace(id:record.pairingID,expected:saved.bytes,bytes:candidates.after)
     }
     /// Internal service preparation. The public paused-session factory below
     /// also installs native admission before transferring pairing ownership.

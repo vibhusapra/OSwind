@@ -12,6 +12,7 @@ final class SyncMembershipPreparationTests:XCTestCase {
     private var environment:SyncNativeWriterEnvironment {.init(stateRoot:root.appendingPathComponent("state"),machine:machine,storage:{[storage] protection in storage.requested(protection);return storage})}
     private struct Fixture {
         let store:MemoryStore,proof:SyncMembershipRefresh,shared:URL,pairingID:String,deliveryID:String,oldPairing:Data,oldMaterial:String,peerCount:Int
+        let third:MemoryStore,thirdPairing:PersonalSyncPairing
     }
     override func setUpWithError()throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-membership-preparation-"+UUID().uuidString);try FileManager.default.createDirectory(at:root,withIntermediateDirectories:false,attributes:[.posixPermissions:0o700])}
     override func tearDownWithError()throws {
@@ -47,7 +48,7 @@ final class SyncMembershipPreparationTests:XCTestCase {
         let handle=try object(Data(read(b.root,"SELECT value FROM store_metadata WHERE key='sync-pairing-handle-v1'").utf8)),pairingID=try XCTUnwrap(handle["id"] as? String),deliveryID=try read(b.root,"SELECT id FROM personal_sync_delivery_anchor")
         let saved=try XCTUnwrap(storage.values[pairingID]),material=try XCTUnwrap(object(saved)["material"] as? String)
         XCTAssertEqual(try read(b.root,"PRAGMA user_version"),"35")
-        return .init(store:b,proof:proof,shared:shared,pairingID:pairingID,deliveryID:deliveryID,oldPairing:saved,oldMaterial:material,peerCount:2)
+        return .init(store:b,proof:proof,shared:shared,pairingID:pairingID,deliveryID:deliveryID,oldPairing:saved,oldMaterial:material,peerCount:2,third:c,thirdPairing:third)
     }
     private func prepare(_ f:Fixture)throws->SyncMembershipPreparationOwner {
         let op=try SyncMembershipPreparationOwner.prepare(library:f.store,proof:f.proof,environment:environment);operations.append(op);return op
@@ -61,7 +62,7 @@ final class SyncMembershipPreparationTests:XCTestCase {
     }
     private func assertOriginal(_ f:Fixture,file:StaticString=#filePath,line:UInt=#line)throws {
         XCTAssertTrue(storage.values[f.pairingID]==f.oldPairing,"Preparation changed pairing authority",file:file,line:line)
-        let envelope=try object(XCTUnwrap(storage.values[f.deliveryID]));XCTAssertEqual(envelope["material"] as? String,f.oldMaterial,file:file,line:line)
+        let envelope=try object(XCTUnwrap(storage.values[f.deliveryID]));XCTAssertTrue((envelope["material"] as? String)==f.oldMaterial,"Preparation changed private delivery material",file:file,line:line)
         XCTAssertEqual(try read(f.store.root,"SELECT COUNT(*) FROM personal_sync_peers"),String(f.peerCount),file:file,line:line)
     }
     private func finish(_ f:Fixture,_ operation:SyncMembershipPreparationOwner)throws->MemoryStore {
@@ -192,6 +193,26 @@ final class SyncMembershipPreparationTests:XCTestCase {
         let fresh=try MemoryStore(root:library.root,recoveryReadOnly:false,nativeWriterEnvironment:env);stores.append(fresh);try fresh.insert(Memory(id:"native-reopened",text:"Original native accounts after cancelled membership fence"));XCTAssertNotNil(try fresh.get("native-reopened"));XCTAssertEqual(backend.accounts,accounts);XCTAssertEqual(accounts.count,4)
         try fresh.close();owner.close();third.close();try backend.cleanup();XCTAssertTrue(backend.accounts.isEmpty)
     }
+    func testOwnedNativeKeychainHandoverReopensNewMembershipWithOriginalAccounts()throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_SYNC_KEYCHAIN"]=="1" else {throw XCTSkip("Explicit owned native Keychain membership preparation fixture")}
+        let backend=NativeWriterKeychainFixture(),state=root.appendingPathComponent("native-state"),mac=MacSyncMachineFingerprint(),env=SyncNativeWriterEnvironment(stateRoot:state,machine:mac,storage:{_ in backend})
+        defer {do {try backend.cleanup()}catch {XCTFail("Owned preparation Keychain cleanup failed")}}
+        func native(_ path:String)throws->(MemoryStore,PersonalSyncPairing) {
+            let library=try MemoryStore(root:root.appendingPathComponent(path),recoveryReadOnly:false,nativeWriterEnvironment:env);stores.append(library)
+            let pairing=try PersonalSyncPairing(store:library,stateRoot:state,machine:mac,storage:backend);pairings.append(pairing);return (library,pairing)
+        }
+        let (_,owner)=try native("native-owner"),(library,peer)=try native("native-peer"),(_,third)=try native("native-third")
+        _=try owner.createGroup(deviceName:"Owned native desk",now:now);try join(peer,to:owner,name:"Owned native travel");let prior=try peer.membershipCertificateForRefresh();try join(third,to:owner,name:"Owned native third")
+        let proof=try XCTUnwrap(owner.membershipRefresh(after:prior)),service=try peer.prepareAnchoredService(shared:root.appendingPathComponent("native-shared"),createShared:true);services.append(service);try service.installNativeWriterAdmission()
+        try service.stop();service.inbox.close();service.transport.close();peer.close()
+        let accounts=backend.accounts,op=try SyncMembershipPreparationOwner.prepare(library:library,proof:proof,environment:env);operations.append(op);try op.close()
+        XCTAssertThrowsError(try MemoryStore(root:library.root,recoveryReadOnly:false,nativeWriterEnvironment:env))
+        let resumed=try SyncMembershipPreparationOwner.open(root:library.root,environment:env);operations.append(resumed);try resumed.resumeFence();try resumed.applyMembership();try resumed.close()
+        let fresh=try MemoryStore(root:library.root,recoveryReadOnly:false,nativeWriterEnvironment:env);stores.append(fresh);try fresh.insert(Memory(id:"native-reopened",text:"Original native accounts after committed membership handover"));XCTAssertNotNil(try fresh.get("native-reopened"));XCTAssertEqual(backend.accounts,accounts);XCTAssertEqual(accounts.count,4)
+        let checked=try PersonalSyncPairing(store:fresh,stateRoot:state,machine:mac,storage:backend);pairings.append(checked)
+        XCTAssertEqual(try checked.status().memberNames.count,3);checked.close()
+        try fresh.close();owner.close();third.close();try backend.cleanup();XCTAssertTrue(backend.accounts.isEmpty)
+    }
     func testActualFrozen35ClientWaitingBeforeEnrollmentAndFreshOpenRefuseNative36()throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE35_CLI"] else {throw XCTSkip("Requires the exact frozen native35 CLI; never replace that binary")}
         let binary=URL(fileURLWithPath:path),expected="c958f555cf55c962b721f2835c5e9675d922a096bb4a4c0948f59016ec50887d"
@@ -216,6 +237,146 @@ final class SyncMembershipPreparationTests:XCTestCase {
         let fresh=Process(),freshError=Pipe();fresh.executableURL=binary;fresh.arguments=["--data",f.store.root.path,"stats"];fresh.environment=childEnvironment;fresh.standardInput=FileHandle.nullDevice;fresh.standardOutput=FileHandle.nullDevice;fresh.standardError=freshError;try fresh.run();let freshMessage=String(decoding:freshError.fileHandleForReading.readDataToEndOfFile(),as:UTF8.self);fresh.waitUntilExit();XCTAssertNotEqual(fresh.terminationStatus,0);XCTAssertTrue(freshMessage.contains("newer OSwind version"))
         _=try finish(f,op);XCTAssertEqual(try hash(),expected)
         print("NATIVE36_FROZEN35_FENCE positive33=true waitingBeforeEnrollmentRefused=true fresh36Refused=true originalBinaryUnchanged=true")
+    }
+    private func activated(_ f:Fixture,_ op:SyncMembershipPreparationOwner)throws->MemoryStore {
+        try op.applyMembership();try op.close();let fresh=try store(f.store.root)
+        XCTAssertEqual(try read(f.store.root,"PRAGMA user_version"),"36")
+        XCTAssertEqual(try read(f.store.root,"SELECT COUNT(*) FROM personal_sync_peers"),String(f.proof.head.body.members.count))
+        let envelope=try object(XCTUnwrap(storage.values[f.deliveryID])),raw=try XCTUnwrap(envelope["material"] as? String)
+        let saved=try object(XCTUnwrap(storage.values[f.pairingID]));XCTAssertTrue((saved["material"] as? String)==raw)
+        XCTAssertNil(envelope["membershipPreparation"]);XCTAssertEqual(envelope["membershipHead"] as? String,SyncProtocolLimits.hex(try f.proof.head.encoded()))
+        let old=try object(XCTUnwrap(Data(base64Encoded:f.oldMaterial))),new=try object(XCTUnwrap(Data(base64Encoded:raw)))
+        for key in ["signingPrivate","agreementPrivate","groupSecret","ownerPrivate"] {XCTAssertTrue((old[key] as? String)==(new[key] as? String),"Handover changed original private keys")}
+        return fresh
+    }
+    func testMembershipHandoverPreservesKeysPendingCaptureAndExistingAccountIDs()throws {
+        let f=try fixture(),provider=try files(f.shared),count=storage.values.count,op=try prepare(f),fresh=try activated(f,op)
+        XCTAssertNotNil(try fresh.get("canary"));XCTAssertEqual(storage.values.count,count);XCTAssertEqual(try files(f.shared),provider)
+        let peer=try pair(fresh);XCTAssertEqual(try peer.status().memberNames.count,3)
+        let service=try peer.prepareAnchoredService(shared:f.shared,createShared:false);services.append(service)
+        XCTAssertEqual(service.peers.count,2)
+        _=try SyncOutgoingTests().serviceReady(service,limit:1)
+        XCTAssertEqual(try service.cache.journal.outbox().count,1)
+    }
+    func testHandoverRecoversBeforeAndAfterEveryPrivateAccountSaveBoundary()throws {
+        for boundary in 1...4 {for after in [false,true] {
+            let f=try fixture(),op=try prepare(f),provider=try files(f.shared),count=storage.values.count
+            storage.failAt=storage.attempts+boundary;storage.failAfter=after
+            XCTAssertThrowsError(try op.applyMembership(),"Owned application boundary \(boundary), after=\(after)");try op.close()
+            let envelope=try object(XCTUnwrap(storage.values[f.deliveryID]))
+            if envelope["membershipPreparation"]==nil {
+                let fresh=try store(f.store.root);XCTAssertNotNil(try fresh.get("canary"));XCTAssertEqual(try pair(fresh).status().memberNames.count,3);XCTAssertThrowsError(try recover(f))
+            }else {
+                let resumed=try recover(f)
+                if let record=envelope["membershipPreparation"] as? [String:Any],record["disposition"] as? String=="applying" {XCTAssertThrowsError(try resumed.cancelBeforeHandover())}
+                _=try activated(f,resumed)
+            }
+            XCTAssertEqual(storage.values.count,count);XCTAssertEqual(try files(f.shared),provider)
+        }}
+    }
+    func testRejectedHandoverCommitReplaysSavedNewMaterialWithoutRepeatingPairingCAS()throws {
+        let f=try fixture(),op=try prepare(f),handle=try f.store.withMembershipDatabase {$0.handle},gate=MembershipCommitGate(),target=storage.attempts+3
+        storage.didReplace={ordinal in if ordinal==target {sqlite3_commit_hook(handle,MembershipCommitGate.callback,Unmanaged.passUnretained(gate).toOpaque())}}
+        XCTAssertThrowsError(try op.applyMembership());storage.didReplace=nil;sqlite3_commit_hook(handle,nil,nil);try op.close();XCTAssertEqual(gate.rejections,1)
+        let paired=storage.values[f.pairingID],envelope=try object(XCTUnwrap(storage.values[f.deliveryID])),token=try XCTUnwrap(envelope["token"] as? [String:Any]),floor=try XCTUnwrap(token["serial"] as? Int64)
+        XCTAssertEqual(try read(f.store.root,"SELECT value FROM store_metadata WHERE key='sync-native-membership-phase-v1'"),"prepared")
+        let resumed=try recover(f);_=try activated(f,resumed)
+        XCTAssertTrue(storage.values[f.pairingID]==paired,"Recovery rewrote an already committed pairing candidate")
+        XCTAssertEqual(Int64(try read(f.store.root,"SELECT serial FROM personal_sync_delivery_anchor")),floor)
+    }
+    func testAppliedNativeMembershipRefusesARolledBackPairingAccount()throws {
+        let f=try fixture(),op=try prepare(f),fresh=try activated(f,op),updated=try XCTUnwrap(storage.values[f.pairingID]);try fresh.close();let count=storage.values.count
+        storage.overwrite(f.pairingID,bytes:f.oldPairing);XCTAssertThrowsError(try store(f.store.root));XCTAssertEqual(storage.values.count,count)
+        storage.overwrite(f.pairingID,bytes:updated);let original=try store(f.store.root);XCTAssertEqual(try pair(original).status().memberNames.count,3)
+    }
+    func testHandoverAfterSavedCancellationIsAnExplicitDifferentOperation()throws {
+        let f=try fixture(),op=try prepare(f),handle=try f.store.withMembershipDatabase {$0.handle},gate=MembershipCommitGate(),target=storage.attempts+2
+        storage.didReplace={ordinal in if ordinal==target {sqlite3_commit_hook(handle,MembershipCommitGate.callback,Unmanaged.passUnretained(gate).toOpaque())}}
+        XCTAssertThrowsError(try op.cancelBeforeHandover());storage.didReplace=nil;sqlite3_commit_hook(handle,nil,nil);try op.close()
+        let resumed=try recover(f);XCTAssertThrowsError(try resumed.applyMembership());let fresh=try finish(f,resumed);try fresh.close()
+        let newStore=try store(f.store.root),new=try SyncMembershipPreparationOwner.prepare(library:newStore,proof:f.proof,environment:environment);operations.append(new);_=try activated(f,new)
+    }
+    func testLaterPeerReceivesCompleteThirteenKindGraphAfterMembershipHandover()throws {
+        let f=try fixture(),graph=SyncOutgoingTests();graph.store=f.store;graph.root=f.store.root;try graph.seedGraph()
+        let expected=try Dictionary(uniqueKeysWithValues:SyncCanonicalTable.allCases.map {($0.rawValue,try graph.serviceCount(f.store,$0.rawValue))})
+        XCTAssertTrue(expected.values.allSatisfy {$0>0})
+        let op=try prepare(f),fresh=try activated(f,op),peer=try pair(fresh),sender=try peer.prepareAnchoredService(shared:f.shared,createShared:false);services.append(sender)
+        let third=f.third,receiver=try f.thirdPairing.prepareAnchoredService(shared:f.shared,createShared:false);services.append(receiver)
+        for _ in 0..<40 {_=try graph.serviceReady(sender,limit:2);_=try graph.serviceReady(receiver,limit:2)}
+        for table in SyncCanonicalTable.allCases {XCTAssertEqual(try graph.serviceCount(third,table.rawValue),expected[table.rawValue],table.rawValue)}
+        XCTAssertTrue(try receiver.cache.journal.outbox().isEmpty);XCTAssertEqual(try graph.serviceCount(third,"personal_sync_publication_bindings"),1)
+    }
+    func testLaterPeerReplayRepublishesPrunedHistoryWithoutRollingBackAdvertisedHead()throws {
+        let f=try fixture(),graph=SyncOutgoingTests(),first=try pair(f.store),initial=try first.prepareAnchoredService(shared:f.shared,createShared:false);services.append(initial)
+        for index in 0..<10 {try f.store.insert(Memory(id:"replay-\(index)",kind:.note,app:"Owned",text:"Owned replay source \(index)"))}
+        for _ in 0..<8 {_=try graph.serviceReady(initial,limit:2)}
+        let producer=initial.cache.journal.replica,old=try XCTUnwrap(initial.transport.serviceHead(replica:producer)?.through)
+        XCTAssertGreaterThan(old,2)
+        try f.store.insert(Memory(id:"canary",kind:.note,text:"Owned current replacement after old cached body was pruned"))
+        try initial.stop();initial.inbox.close();initial.transport.close();first.close()
+        try FileManager.default.removeItem(at:f.shared.appendingPathComponent("objects"))
+        let heads=try files(f.shared.appendingPathComponent("heads")),op=try prepare(f),fresh=try activated(f,op)
+        XCTAssertEqual(try files(f.shared.appendingPathComponent("heads")),heads)
+        let peer=try pair(fresh),sender=try peer.prepareAnchoredService(shared:f.shared,createShared:false);services.append(sender)
+        let third=f.third,receiver=try f.thirdPairing.prepareAnchoredService(shared:f.shared,createShared:false);services.append(receiver)
+        for _ in 0..<24 {
+            _=try graph.serviceReady(sender,limit:2)
+            XCTAssertGreaterThanOrEqual(try XCTUnwrap(sender.transport.serviceHead(replica:producer)?.through),old)
+            XCTAssertGreaterThanOrEqual(Int64(try read(fresh.root,"SELECT sent FROM personal_sync_service_state")) ?? 0,old)
+            _=try graph.serviceReady(receiver,limit:2)
+        }
+        let identity=try fresh.withRoutineDatabase {_ in try XCTUnwrap(sender.cache.catalog.preparedIdentity(.source,primary:[.text(Data("canary".utf8))]))}
+        let local=try third.withRoutineDatabase {_ ->String in
+            let mapping=try XCTUnwrap(receiver.cache.catalog.object(identity)),primary=try XCTUnwrap(mapping.primary)
+            guard primary.count==1,case .text(let key)=primary[0],let value=String(data:key,encoding:.utf8) else {throw OSwindError.invalid("Owned incoming source mapping differs")};return value
+        }
+        XCTAssertEqual(try third.get(local)?.text,"Owned current replacement after old cached body was pruned")
+        XCTAssertEqual(try receiver.cache.journal.state(for:identity.key).preferred?.content,try sender.cache.journal.state(for:identity.key).preferred?.content)
+        XCTAssertEqual(try receiver.cache.journal.cursor(for:producer),try sender.transport.serviceHead(replica:producer)?.through)
+        XCTAssertEqual(try third.stats(includeDiskUsage:false).count,11)
+        XCTAssertEqual(try read(fresh.root,"SELECT COUNT(*) FROM store_metadata WHERE key='sync-membership-replay-v1'"),"0")
+        XCTAssertTrue(try receiver.cache.journal.outbox().isEmpty)
+    }
+    func testMembershipReplayKeepsCurrentPrivacyHoldAndResumesOnlyWhenAllowed()throws {
+        let f=try fixture(),graph=SyncOutgoingTests(),first=try pair(f.store),initial=try first.prepareAnchoredService(shared:f.shared,createShared:false);services.append(initial)
+        try f.store.insert(Memory(id:"canary",kind:.note,app:"Owned",bundleID:"owned.blocked",text:"Owned source withheld during replay"))
+        _=try graph.serviceReady(initial,limit:2);try initial.stop();initial.inbox.close();initial.transport.close();first.close()
+        try FileManager.default.removeItem(at:f.shared.appendingPathComponent("objects"))
+        let op=try prepare(f),fresh=try activated(f,op),peer=try pair(fresh),sender=try peer.prepareAnchoredService(shared:f.shared,createShared:false);services.append(sender)
+        var settings=AppSettings.load(root:fresh.root);settings.privacy.excludedApps.append("owned.blocked");try settings.save(root:fresh.root)
+        let provider=try files(f.shared)
+        XCTAssertThrowsError(try graph.serviceReady(sender,limit:2));XCTAssertEqual(try files(f.shared),provider)
+        let savedSent=try XCTUnwrap(Int64(try read(fresh.root,"SELECT sent FROM personal_sync_service_state")))
+        let cursor=try SyncMembershipReplay.current(sender.cache.database,sent:savedSent)
+        XCTAssertEqual(cursor?.after,0)
+        settings.privacy.excludedApps.removeAll {$0=="owned.blocked"};try settings.save(root:fresh.root)
+        _=try graph.serviceReady(sender,limit:2)
+        XCTAssertEqual(try read(fresh.root,"SELECT COUNT(*) FROM store_metadata WHERE key='sync-membership-replay-v1'"),"0")
+    }
+    func testTaskCancellationAtPrivateBoundariesJoinsUncancelledCloseAndResumesExactChoice()async throws {
+        for boundary in 2...5 {
+            let f=try fixture(),gate=MembershipCancellationGate(),target=storage.attempts+boundary,count=storage.values.count,backend=storage,env=environment
+            storage.didReplace={ordinal in if ordinal==target {gate.block()}}
+            let worker=Task.detached { [library=f.store,proof=f.proof,env] in
+                let owner=try SyncMembershipPreparationOwner.prepare(library:library,proof:proof,environment:env)
+                let outcome:Result<Void,Error>
+                do {try owner.applyMembership();outcome = .success(())}catch {outcome = .failure(error)}
+                // Closing a cancelled worker must still wait for its media/SQL
+                // reservation and release the original credential ownership.
+                try await Task.detached(priority:.utility) {try owner.close()}.value
+                return try outcome.get()
+            }
+            await fulfillment(of:[gate.reached],timeout:10)
+            worker.cancel();gate.release()
+            let outcome=await worker.result;backend.didReplace=nil
+            if case .failure(let error)=outcome {XCTAssertTrue(error is CancellationError,"Cancellation failed with another error")}
+            XCTAssertTrue(f.store.isClosed,"The cancelled worker did not join its native close")
+            let saved=try object(XCTUnwrap(storage.values[f.deliveryID]))
+            if saved["membershipPreparation"]==nil {
+                let fresh=try store(f.store.root);XCTAssertEqual(try pair(fresh).status().memberNames.count,3)
+            }else {let resumed=try recover(f);_=try activated(f,resumed)}
+            XCTAssertEqual(storage.values.count,count)
+        }
     }
     func testNative36RetirementAndPortableRecoveryKeepOriginalSafetyBoundaries()throws {
         let f=try fixture(),op=try prepare(f),fresh=try finish(f,op);try fresh.close()
@@ -256,4 +417,11 @@ private final class MembershipCommitGate {
         let gate=Unmanaged<MembershipCommitGate>.fromOpaque(pointer!).takeUnretainedValue()
         if gate.rejections==0 {gate.rejections+=1;return 1};return 0
     }
+}
+
+private final class MembershipCancellationGate:@unchecked Sendable {
+    let reached=XCTestExpectation(description:"Owned private membership save reached")
+    private let permit=DispatchSemaphore(value:0)
+    func block() {reached.fulfill();permit.wait()}
+    func release() {permit.signal()}
 }
