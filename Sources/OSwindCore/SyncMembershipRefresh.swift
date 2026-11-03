@@ -12,6 +12,7 @@ struct SyncMembershipRefresh:Sendable,CustomStringConvertible,CustomDebugStringC
     }
     private let payload:Payload
     var base:SyncMembershipCertificate {payload.base}
+    var certificates:[SyncMembershipCertificate] {[base]+payload.updates}
     var head:SyncMembershipCertificate {payload.updates.last!}
     var updateCount:Int {payload.updates.count}
 

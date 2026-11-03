@@ -282,6 +282,13 @@ struct SyncCredentialMaterial:Sendable,CustomStringConvertible,CustomDebugString
         }
         self.joined=joined;self.owner=owner
     }
+    /// Preserve every existing private key, including the owner root, while
+    /// deriving only the exact addition-history successor.
+    func withMembershipRefresh(_ refresh:SyncMembershipRefresh)throws->Self {
+        let next=try joined.withMembershipRefresh(refresh)
+        let authority=try owner.map {try SyncGroupAuthority.restore(root:$0.rootForKeychain,secret:next.secret,certificate:next.certificate)}
+        return try .init(joined:next,owner:authority)
+    }
     func encodedForKeychain()throws->Data {
         let value=Payload(format:"OSwind.sync.private-material",version:1,replica:joined.replica,signingPrivate:joined.keys.signing.rawRepresentation,agreementPrivate:joined.keys.agreement.rawRepresentation,groupSecret:joined.secret.exportForPairing(),ownerPrivate:owner?.rootForKeychain,certificate:joined.certificate)
         let bytes=try SyncProtocolLimits.encode(value)

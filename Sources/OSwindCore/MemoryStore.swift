@@ -6,8 +6,9 @@ import CryptoKit
 public final class MemoryStore: @unchecked Sendable {
     // Version33 fences legacy cleanup and stale initializers at the native boundary.
     public static let schemaVersion = 33
-    // Enrolled35 adds writer generations; native content remains33.
-    public static let maximumSupportedSchemaVersion = 35
+    // Enrolled35 adds writer generations; opt-in36 fences membership
+    // preparations. Ordinary native content remains33.
+    public static let maximumSupportedSchemaVersion = 36
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -43,12 +44,12 @@ public final class MemoryStore: @unchecked Sendable {
     /// Read-only recovery installs a data/schema authorizer for backup export.
     /// Retirement recovery verifies a quarantined owner without migrations;
     /// its typed cleanup/renewal scopes are never exposed as an app store.
-    init(root:URL,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil,recoveryReadOnly:Bool,nativeWriterEnvironment:SyncNativeWriterEnvironment = .native,retirementRecovery:Bool=false) throws {
+    init(root:URL,observeUpgrade:(@Sendable (MemoryStoreUpgradePhase)->Void)?=nil,recoveryReadOnly:Bool,nativeWriterEnvironment:SyncNativeWriterEnvironment = .native,retirementRecovery:Bool=false,membershipRecovery:Bool=false) throws {
         _ = try VaultAccess.context(at:root)
         let temporaryPolicy=try VaultAccess.temporaryPolicy(at:root)
         self.root = root; annCache = ANNCache(root:root)
         guard !FileManager.default.fileExists(atPath:root.appendingPathComponent("header.json").path) else { throw OSwindError.invalid("Use Restore Backup to open a backup package as a new library") }
-        let existingOnly=recoveryReadOnly || retirementRecovery
+        let existingOnly=recoveryReadOnly || retirementRecovery || membershipRecovery
         if !existingOnly {try Paths.ensure(root);try Paths.ensure(root.appendingPathComponent("images"));try Paths.ensure(root.appendingPathComponent("audio"));try Paths.ensure(root.appendingPathComponent("video"))}
         let directory=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath())
         closeDirectory=directory
@@ -83,6 +84,14 @@ public final class MemoryStore: @unchecked Sendable {
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try nativeWriterAdmission.register(RoutineDatabase(handle:db!))
+            if membershipRecovery {
+                guard !retirementRecovery else {throw OSwindError.invalid("Select one restricted recovery operation")}
+                let connection=RoutineDatabase(handle:db!)
+                try connection.execute("PRAGMA synchronous=FULL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue);")
+                try nativeWriterAdmission.openMembershipRecovery(connection,library:self,environment:nativeWriterEnvironment)
+                try connection.execute("PRAGMA journal_mode=WAL")
+                syncCaptureInstalled=true;return
+            }
             if retirementRecovery {
                 let connection=RoutineDatabase(handle:db!)
                 try connection.execute("PRAGMA synchronous=FULL; PRAGMA recursive_triggers=ON; PRAGMA secure_delete=ON; PRAGMA foreign_keys=ON; PRAGMA temp_store=\(temporaryPolicy.rawValue);")
@@ -269,6 +278,13 @@ public final class MemoryStore: @unchecked Sendable {
     func withRetirementDatabase<T>(_ body:(RoutineDatabase)throws->T)throws->T {
         lock.lock();defer {lock.unlock()}
         guard nativeWriterAdmission.retirementQuarantined,let db else {throw OSwindError.unavailable("Use the current quarantined retirement library")}
+        return try nativeWriterAdmission.withDeliveryMutation {try body(RoutineDatabase(handle:db))}
+    }
+    /// Existing-only saved membership recovery. No ordinary admission escapes
+    /// this scope; SQL writes additionally require the typed owner capability.
+    func withMembershipDatabase<T>(_ body:(RoutineDatabase)throws->T)throws->T {
+        lock.lock();defer {lock.unlock()}
+        guard nativeWriterAdmission.membershipQuarantined,let db else {throw OSwindError.unavailable("Use the quarantined saved membership operation")}
         return try nativeWriterAdmission.withDeliveryMutation {try body(RoutineDatabase(handle:db))}
     }
     private func exec(_ sql: String) throws {guard let db else {throw OSwindError.unavailable("The library connection is closed")};try nativeWriterAdmission.require(RoutineDatabase(handle:db),library:self);if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))};if sqlite3_exec(db, sql, nil, nil, nil) != SQLITE_OK { throw failure() } }

@@ -50,7 +50,7 @@ final class SyncNativeWriterEpoch {
         }
         _=try read(db)
     }
-    private func read(_ db:RoutineDatabase)throws->String {
+    func read(_ db:RoutineDatabase)throws->String {
         let row=try db.statement("SELECT epoch,(SELECT COUNT(*) FROM personal_sync_native_writer_epoch) FROM personal_sync_native_writer_epoch WHERE singleton=1");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW,sqlite3_column_int(row,1)==1 else {throw OSwindError.unavailable("Native writer generation is missing; use recovery")}
         let value=db.text(row,0)
@@ -64,10 +64,11 @@ final class SyncNativeWriterEpoch {
         let value=try read(db);lock.lock();let current=expected;lock.unlock()
         guard current==value else {throw OSwindError.unavailable("Native history retired this writer. Reopen the library before writing again.")}
     }
-    func rotate(_ db:RoutineDatabase)throws {
+    func rotate(_ db:RoutineDatabase,next requested:String?=nil)throws {
         guard sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Rotate writers in the owning retirement transaction")}
         try requireCurrent(db)
-        let old=try read(db),next=UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")
+        let old=try read(db),next=requested ?? UUID().uuidString.lowercased().replacingOccurrences(of:"-",with:"")
+        guard next != old,next.utf8.count==32,next.utf8.allSatisfy({(48...57).contains($0)||(97...102).contains($0)}) else {throw OSwindError.invalid("Invalid replacement writer generation")}
         lock.lock();let available=transition==nil;if available {transition=(old,next)};lock.unlock()
         guard available else {throw OSwindError.invalid("A native writer transition is already active")}
         defer {lock.lock();transition=nil;lock.unlock()}
