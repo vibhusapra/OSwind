@@ -1,0 +1,9 @@
+{
+  "format": "OSwind offline keyword archive review v1",
+  "validatedMeasurements": 1134,
+  "validatedWarmups": 54,
+  "byteIdenticalOSwindPairs": 396,
+  "summaryGroups": 18,
+  "scope": "Authored offline CLI component only; no energy, capture, semantic-quality or product ranking claim.",
+  "archiveSHA256": "793339e057832d8c6315242c92a03eba245a4082b6578cf3e6fe1257b3a5ca49"
+}

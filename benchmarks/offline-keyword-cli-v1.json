@@ -1,0 +1,1709 @@
+{
+  "format": "OSwind matched offline CLI keyword observations v1",
+  "oswindBaselineSource": "7c0292bac86543b4c8c58eae2a7f109b9a3ba0c3",
+  "oswindBaselineBinarySHA256": "f72d02299cef0a65c789612ab124d13b82fea2f5f462c6fe8931a7ac7036f7bf",
+  "candidateOutputsByteIdenticalToBaseline": true,
+  "oswindSource": "f4cff25d88d0f07b8d24b69ed44fba065aa19464",
+  "oswindBuild": "swift build -c release --product oswindctl",
+  "screenpipePackage": "@screenpipe/cli-darwin-arm64@0.4.54",
+  "screenpipeBuild": "Unmodified publisher prebuilt; compiler options not independently established.",
+  "binaryPins": {
+    "oswind": "0e5a0fd3873f5ecfd3e3a91e6612df037e1acdcf2e7fbdf8c42f42a04b60dd37",
+    "screenpipe": "49aab1665e03da5366314ad859c695958b17970414ae18f1dabad65e9451f3a8"
+  },
+  "repetitions": 21,
+  "harnessSHA256": "53d674710f06505a4893aa94cc68c5f14fc84be74ac0fe302a341047e22ab38a",
+  "host": {
+    "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "architecture": "arm64"
+  },
+  "hostActivity": {
+    "start": {
+      "loadAverage": [
+        4.087890625,
+        5.06640625,
+        6.2509765625
+      ],
+      "recentSystemCPUPercentSum": 314.5,
+      "logicalCPUs": 18,
+      "processNamesRecorded": false,
+      "otherHostActivityControlled": false
+    },
+    "end": {
+      "loadAverage": [
+        5.35888671875,
+        5.22314453125,
+        6.2197265625
+      ],
+      "recentSystemCPUPercentSum": 263.5,
+      "logicalCPUs": 18,
+      "processNamesRecorded": false,
+      "otherHostActivityControlled": false
+    }
+  },
+  "summaries": [
+    {
+      "rows": 1000,
+      "case": "rare-first",
+      "query": "\"1\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.09424999542534,
+            "p95": 65.22758398205042
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.019146,
+            "p95": 0.020134
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006157,
+            "p95": 0.007176999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24199168,
+            "p95": 24264704
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 394,
+            "p95": 394
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.796374961733818,
+            "p95": 33.32679206505418
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017744,
+            "p95": 0.018619
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005565,
+            "p95": 0.006932
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22364160,
+            "p95": 22413312
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 394,
+            "p95": 394
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.384624963626266,
+            "p95": 37.33770898543298
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017962,
+            "p95": 0.018977
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015292,
+            "p95": 0.01735
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37240832,
+            "p95": 37404672
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 464,
+            "p95": 464
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "rare-991",
+      "query": "\"991\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 61.35708396323025,
+            "p95": 67.88379093632102
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018647999999999998,
+            "p95": 0.019618
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006085999999999999,
+            "p95": 0.007349
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24117248,
+            "p95": 24199168
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.343666974455118,
+            "p95": 35.07179208099842
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017069,
+            "p95": 0.018363
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005523,
+            "p95": 0.006679999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22315008,
+            "p95": 22396928
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.09970800951123,
+            "p95": 38.02529210224748
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017945,
+            "p95": 0.019142
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015614999999999999,
+            "p95": 0.017301
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37273600,
+            "p95": 37453824
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 470,
+            "p95": 470
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "rare-last",
+      "query": "\"1000\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.264708103612065,
+            "p95": 73.36370903067291
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018984,
+            "p95": 0.019982
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006279,
+            "p95": 0.006888
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24133632,
+            "p95": 24264704
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 400,
+            "p95": 400
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.015750158578157,
+            "p95": 35.33670888282359
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017291,
+            "p95": 0.018371
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005673,
+            "p95": 0.006745
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22331392,
+            "p95": 22364160
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 400,
+            "p95": 400
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.9632910694927,
+            "p95": 38.75683294609189
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017854,
+            "p95": 0.019552
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015484,
+            "p95": 0.017155
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37208064,
+            "p95": 37830656
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 473,
+            "p95": 473
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "absent",
+      "query": "\"OWNEDABSENT7k11\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 60.69266702979803,
+            "p95": 64.84187510795891
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018342,
+            "p95": 0.019062
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.0060279999999999995,
+            "p95": 0.006993
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23543808,
+            "p95": 23609344
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 28.58899999409914,
+            "p95": 32.11716702207923
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.01686,
+            "p95": 0.017556
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.00536,
+            "p95": 0.006673
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 21643264,
+            "p95": 21692416
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.87016696110368,
+            "p95": 36.416917107999325
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018161,
+            "p95": 0.019029
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015789,
+            "p95": 0.017174
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36814848,
+            "p95": 36995072
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "broad",
+      "query": "\"Owned source\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 64.32512495666742,
+            "p95": 71.17662485688925
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.021584,
+            "p95": 0.023322
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006323,
+            "p95": 0.008050999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 25165824,
+            "p95": 25231360
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 39253,
+            "p95": 39253
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 32.16454200446606,
+            "p95": 34.90324993617833
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.019941,
+            "p95": 0.021389
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005553,
+            "p95": 0.007045
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23363584,
+            "p95": 23478272
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 39253,
+            "p95": 39253
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 36.47929197177291,
+            "p95": 40.41966702789068
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018504,
+            "p95": 0.019998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015694,
+            "p95": 0.018477
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37847040,
+            "p95": 38092800
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 47003,
+            "p95": 47003
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "app-present",
+      "query": "\"991\"",
+      "scope": {
+        "app": "Owned capture scale"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.276958022266626,
+            "p95": 64.84158313833177
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018796999999999998,
+            "p95": 0.019823
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006175,
+            "p95": 0.0072569999999999996
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24166400,
+            "p95": 24264704
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.460832942277193,
+            "p95": 33.63033290952444
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017315,
+            "p95": 0.019466
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005562,
+            "p95": 0.007209999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22315008,
+            "p95": 22528000
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 34.97695806436241,
+            "p95": 38.51737501099706
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017699,
+            "p95": 0.018883999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.01394,
+            "p95": 0.017327
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37322752,
+            "p95": 37617664
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 470,
+            "p95": 470
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "app-absent",
+      "query": "\"991\"",
+      "scope": {
+        "app": "Owned absent app"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 60.867292108014226,
+            "p95": 65.71487500332296
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018404,
+            "p95": 0.019764999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006083,
+            "p95": 0.007342
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23429120,
+            "p95": 23527424
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 28.35216699168086,
+            "p95": 32.66116697341204
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.016782,
+            "p95": 0.017568999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005405,
+            "p95": 0.006377
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 21528576,
+            "p95": 21659648
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.414166981354356,
+            "p95": 37.9651659168303
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018049,
+            "p95": 0.019254999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015962999999999998,
+            "p95": 0.017265
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36831232,
+            "p95": 37158912
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "time-present",
+      "query": "\"991\"",
+      "scope": {
+        "start": "2023-11-14T22:13:19Z",
+        "end": "2023-11-14T22:13:21Z"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 61.964499996975064,
+            "p95": 64.5993328653276
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018963,
+            "p95": 0.01975
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006293,
+            "p95": 0.007170999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24199168,
+            "p95": 24264704
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.65558390133083,
+            "p95": 31.21612500399351
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017436,
+            "p95": 0.01803
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.00564,
+            "p95": 0.006565
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22380544,
+            "p95": 22446080
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.43183393776417,
+            "p95": 36.5572499576956
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017853,
+            "p95": 0.018909
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.014929999999999999,
+            "p95": 0.016911
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37306368,
+            "p95": 37617664
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 470,
+            "p95": 470
+          }
+        }
+      }
+    },
+    {
+      "rows": 1000,
+      "case": "time-absent",
+      "query": "\"991\"",
+      "scope": {
+        "start": "2024-01-01T00:00:00Z",
+        "end": "2024-01-02T00:00:00Z"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.15291586704552,
+            "p95": 73.87020788155496
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018295,
+            "p95": 0.020946
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006141,
+            "p95": 0.008912999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23560192,
+            "p95": 23674880
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 28.43091613613069,
+            "p95": 36.23979212716222
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017098,
+            "p95": 0.020852
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.00554,
+            "p95": 0.007832
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 21626880,
+            "p95": 21823488
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.237250151112676,
+            "p95": 38.00225001759827
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.01812,
+            "p95": 0.019393999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015229,
+            "p95": 0.017228999999999998
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36880384,
+            "p95": 37060608
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "rare-first",
+      "query": "\"1\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 120.75979099608958,
+            "p95": 141.32166700437665
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.06518499999999999,
+            "p95": 0.070739
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.019246,
+            "p95": 0.023749
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 26574848,
+            "p95": 26656768
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 394,
+            "p95": 394
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 90.74362483806908,
+            "p95": 120.37929194048047
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.064024,
+            "p95": 0.078396
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.018313,
+            "p95": 0.024794999999999998
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24772608,
+            "p95": 24936448
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 394,
+            "p95": 394
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 36.0063340049237,
+            "p95": 40.560792200267315
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.01808,
+            "p95": 0.018657999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015347,
+            "p95": 0.016966
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37240832,
+            "p95": 37421056
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 482,
+            "p95": 482
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "rare-991",
+      "query": "\"991\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.394124921411276,
+            "p95": 67.26558296941221
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.01934,
+            "p95": 0.02061
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006378,
+            "p95": 0.0073609999999999995
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24281088,
+            "p95": 24363008
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.56754108890891,
+            "p95": 31.937625026330352
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017851,
+            "p95": 0.018926
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005595999999999999,
+            "p95": 0.0064659999999999995
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22429696,
+            "p95": 22495232
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 36.375374998897314,
+            "p95": 44.14770798757672
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018109999999999998,
+            "p95": 0.01927
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015439,
+            "p95": 0.017089999999999998
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37240832,
+            "p95": 37683200
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 488,
+            "p95": 488
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "rare-last",
+      "query": "\"100000\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.1472077909857,
+            "p95": 73.34383297711611
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018902,
+            "p95": 0.021023999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006268999999999999,
+            "p95": 0.007091999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24215552,
+            "p95": 24477696
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 404,
+            "p95": 404
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.481499921530485,
+            "p95": 36.03820805437863
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017339,
+            "p95": 0.021279
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005561,
+            "p95": 0.0075959999999999995
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22380544,
+            "p95": 22495232
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 404,
+            "p95": 404
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.12154100462794,
+            "p95": 38.65691693499684
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017974,
+            "p95": 0.019358999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015688,
+            "p95": 0.017095
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37175296,
+            "p95": 37781504
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 497,
+            "p95": 497
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "absent",
+      "query": "\"OWNEDABSENT7k11\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.19587498344481,
+            "p95": 64.32187487371266
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018875,
+            "p95": 0.019629999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.0063,
+            "p95": 0.007128
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24494080,
+            "p95": 24526848
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.49954103678465,
+            "p95": 30.902083031833172
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017145,
+            "p95": 0.017758
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005775,
+            "p95": 0.00662
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22544384,
+            "p95": 22593536
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.1472080219537,
+            "p95": 36.84929199516773
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017929,
+            "p95": 0.018852
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.014941999999999999,
+            "p95": 0.017806
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36782080,
+            "p95": 36995072
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "broad",
+      "query": "\"Owned source\"",
+      "scope": {},
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 207.88979204371572,
+            "p95": 225.4599998705089
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.11445899999999999,
+            "p95": 0.11699599999999999
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.051886999999999996,
+            "p95": 0.057796999999999994
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37076992,
+            "p95": 37158912
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 39253,
+            "p95": 39253
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 176.02941603399813,
+            "p95": 192.8774998523295
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.112451,
+            "p95": 0.114913
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.050827,
+            "p95": 0.056035999999999996
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 35291136,
+            "p95": 35438592
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 39253,
+            "p95": 39253
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 73.04766704328358,
+            "p95": 177.84233391284943
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.045347,
+            "p95": 0.047303
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.023178999999999998,
+            "p95": 0.032889
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 60915712,
+            "p95": 61145088
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 49403,
+            "p95": 49403
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "app-present",
+      "query": "\"991\"",
+      "scope": {
+        "app": "Owned capture scale"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.24733404815197,
+            "p95": 68.50158399902284
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.019674999999999998,
+            "p95": 0.021245
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.0065179999999999995,
+            "p95": 0.008003999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24379392,
+            "p95": 24510464
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.741083038970828,
+            "p95": 33.488124841824174
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017709,
+            "p95": 0.019597
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.0055839999999999996,
+            "p95": 0.006683
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22495232,
+            "p95": 22609920
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 36.243166076019406,
+            "p95": 37.84041712060571
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018182999999999998,
+            "p95": 0.018971
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.016042999999999998,
+            "p95": 0.017935
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37306368,
+            "p95": 37634048
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 488,
+            "p95": 488
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "app-absent",
+      "query": "\"991\"",
+      "scope": {
+        "app": "Owned absent app"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 61.066208174452186,
+            "p95": 64.41824999637902
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018498,
+            "p95": 0.019681
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006238,
+            "p95": 0.007123999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23445504,
+            "p95": 23494656
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 28.286416083574295,
+            "p95": 29.871165985241532
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.016857999999999998,
+            "p95": 0.017634999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.005349,
+            "p95": 0.005954999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 21528576,
+            "p95": 21594112
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.28212499804795,
+            "p95": 37.698208121582866
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018383,
+            "p95": 0.018913
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.016239,
+            "p95": 0.017285
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36864000,
+            "p95": 37273600
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "time-present",
+      "query": "\"991\"",
+      "scope": {
+        "start": "2023-11-14T22:13:19Z",
+        "end": "2023-11-14T22:13:21Z"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 62.200999818742275,
+            "p95": 67.40033300593495
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.019318,
+            "p95": 0.020738
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.006292,
+            "p95": 0.007065999999999999
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 24395776,
+            "p95": 24444928
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 29.657291946932673,
+            "p95": 32.926084008067846
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017884999999999998,
+            "p95": 0.01859
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.00551,
+            "p95": 0.006396
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 22560768,
+            "p95": 22626304
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 398,
+            "p95": 398
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.18341714516282,
+            "p95": 37.55887481383979
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017799,
+            "p95": 0.019355999999999998
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.015194,
+            "p95": 0.017626
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 37257216,
+            "p95": 37814272
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 488,
+            "p95": 488
+          }
+        }
+      }
+    },
+    {
+      "rows": 100000,
+      "case": "time-absent",
+      "query": "\"991\"",
+      "scope": {
+        "start": "2024-01-01T00:00:00Z",
+        "end": "2024-01-02T00:00:00Z"
+      },
+      "products": {
+        "oswind-baseline": {
+          "wallMS": {
+            "samples": 21,
+            "median": 60.66774995997548,
+            "p95": 63.82391578517854
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.018293999999999998,
+            "p95": 0.019025
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.0060539999999999995,
+            "p95": 0.006794
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 23543808,
+            "p95": 23658496
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "oswind": {
+          "wallMS": {
+            "samples": 21,
+            "median": 28.449166100472212,
+            "p95": 31.289750011637807
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.016834,
+            "p95": 0.017449
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.00532,
+            "p95": 0.006411
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 21643264,
+            "p95": 21708800
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 5,
+            "p95": 5
+          }
+        },
+        "screenpipe": {
+          "wallMS": {
+            "samples": 21,
+            "median": 35.03412497229874,
+            "p95": 36.10391682013869
+          },
+          "userCPUSeconds": {
+            "samples": 21,
+            "median": 0.017782,
+            "p95": 0.018604
+          },
+          "systemCPUSeconds": {
+            "samples": 21,
+            "median": 0.014409,
+            "p95": 0.017018
+          },
+          "peakRSSBytes": {
+            "samples": 21,
+            "median": 36962304,
+            "p95": 37093376
+          },
+          "stdoutBytes": {
+            "samples": 21,
+            "median": 0,
+            "p95": 0
+          }
+        }
+      }
+    }
+  ],
+  "scope": [
+    "Identical authored IDs/text, nine exact-term/broad/absent/app/time controls at1000/100000 rows; every returned ID/body/app/title/time validated. Broad ties may have different eligible membership/order.",
+    "Offline CLI process startup, DB opening/migration checks, SQL, output serialization/file writes and shutdown together; wall polling resolution about1ms. Child CPU and peakRSS from wait4. No daemon/API latency or isolated backend timing.",
+    "Full native schema initialized by Screenpipe search; authored SQL frame/FTS seed and authored MemoryStore scale baseline. Not capture/API ingestion equivalence or semantic/representative retrieval quality.",
+    "One complete warm-up excluded; filesystem/OS caches uncontrolled; rotating three-product order and shuffled case order. Background host activity remains uncontrolled; no energy or whole-product ranking claim."
+  ],
+  "measuredObservations": 1134,
+  "warmupObservations": 54,
+  "byteIdenticalOSwindPairs": 396,
+  "reviewedArchive": {
+    "path": "offline-keyword-cli-raw-v1.zip",
+    "sha256": "793339e057832d8c6315242c92a03eba245a4082b6578cf3e6fe1257b3a5ca49",
+    "entries": 2389
+  },
+  "review": {
+    "path": "offline-keyword-cli-review-v1.json",
+    "sha256": "28ae3817e7d5d5fa49bf1d7d58262d7cec34b361450d27a3e78e29ae123dfe00",
+    "reviewerSHA256": "d108f316b7178f920f14c325c2c462ccf17e9a6c41fc71157d8010e47f08e8c4",
+    "faultControls": 6,
+    "faultLogSHA256": "71b40fd0510f1c258c1462079631cfc5a9b69efa837f163dd56d27fc782d99b1"
+  },
+  "corpusSHA256": {
+    "1000": "3464d88f1e68fc91a769673acd44d65097894a0e1dcee565fe07a37da9cd3473",
+    "100000": "5bf5b990ff1a2060dad1bc2c1e2c5e2801c1f3ac63e5cbd3ed2ac6de477bb845"
+  },
+  "protocol": "docs/OFFLINE-KEYWORD-COMPARISON.md",
+  "status": "Reviewed authored offline CLI component only. Full runtime qualification is separate.",
+  "retainedPriorFailures": [
+    {
+      "stage": "Python integrity check after committed seed",
+      "exception": "sqlite3.OperationalError: unknown function: vec_length()",
+      "seedCommitted": true,
+      "failedHarnessSHA256": "c683c7387aa04f178e62a9e865945931c4595905b2c9a3bc9606d8c7b5b93b94",
+      "scope": "Python connection lacks the vendor vector extension; use native checker, no integrity success claimed."
+    },
+    {
+      "stage": "Native help probe",
+      "scope": "Initial global --data-dir was rejected; no recorder launched. Correct supported search subcommand flags were used thereafter."
+    }
+  ],
+  "historicalStudy": "screenpipe-keyword-http-v1.json remains unchanged; a different version, interface, workload, source and timing boundary."
+}
