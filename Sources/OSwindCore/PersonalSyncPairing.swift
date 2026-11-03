@@ -330,6 +330,18 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         }
         return try Self(store:library,stateRoot:environment.stateRoot,machine:environment.machine,storage:environment.storage(protection))
     }
+    struct MembershipFloorSnapshot {let pairingID:String,pairingDigest:String,materialDigest:String,head:String}
+    func openMembershipFloorAnchor()throws->(SyncDeliveryAnchor,MembershipFloorSnapshot) {try withAccess {
+        let (value,bytes)=try current()
+        guard !value.retired,value.pending==nil,let delivery=value.delivery,let raw=value.material else {throw OSwindError.unavailable("Resume the original enrolled pairing before upgrading its floor")}
+        let material=try SyncCredentialMaterial.decodeFromKeychain(raw),snapshot=MembershipFloorSnapshot(pairingID:value.id,pairingDigest:SyncProtocolLimits.hex(bytes),materialDigest:SyncProtocolLimits.hex(raw),head:SyncProtocolLimits.hex(try material.joined.certificate.encoded()))
+        let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:material,id:delivery.id,stateRoot:stateRoot,machine:machine,storage:injectedStorage ?? SyncKeychainCredentialStorage(protection:delivery.protection))
+        return (anchor,snapshot)
+    }}
+    static func verifyMembershipFloor(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,record:SyncMembershipFloorPreparation,deliveryID:String,material:Data)throws {
+        try record.validate();let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID)
+        guard saved.value.id==record.pairingID,SyncProtocolLimits.hex(saved.bytes)==record.pairingDigest,saved.value.material==material,SyncProtocolLimits.hex(material)==record.materialDigest else {throw OSwindError.unavailable("Membership floor differs from the original pairing account")}
+    }
     func openMembershipPreparationAnchor(_ proof:SyncMembershipRefresh)throws->(SyncDeliveryAnchor,MembershipSnapshot) {try withAccess {
         let (value,bytes)=try current(),snapshot=try Self.membershipSnapshot(value,bytes:bytes,proof:proof)
         guard let delivery=value.delivery,let saved=value.material else {throw OSwindError.invalid("Resume the original enrolled pairing")}
