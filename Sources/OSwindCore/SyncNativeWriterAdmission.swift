@@ -178,7 +178,7 @@ final class SyncNativeWriterAdmission {
         try record.validate();let version=try db.eraseCount("PRAGMA user_version")
         guard version==record.nativeBefore,try epoch.read(db)==record.epochBefore else {throw OSwindError.unavailable("Membership preparation no longer matches its original writer")}
         try Self.requireGuards(db)
-        if version==Self.membershipSchemaVersion {guard try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(record.headBefore) else {throw OSwindError.unavailable("Native membership changed before preparation")}}
+        if version==Self.membershipSchemaVersion {guard try SyncNativeMembershipState.read(db)==record.originalActive else {throw OSwindError.unavailable("Native membership changed before preparation")}}
         else {
             guard try db.eraseCount("SELECT COUNT(*) FROM store_metadata WHERE key IN ('\(SyncNativeMembershipState.phaseKey)','\(SyncNativeMembershipState.stateKey)')")==0 else {throw OSwindError.unavailable("Unexpected membership state in the original native35 library")}
             for name in try Self.guards(db).keys {try db.execute("DROP TRIGGER \(name)")}

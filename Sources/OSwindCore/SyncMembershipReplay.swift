@@ -28,7 +28,7 @@ enum SyncMembershipReplay {
     /// Membership application is the only seed/reset boundary. Replaying the
     /// exact native application transaction yields the same initial cursor.
     static func seed(head:String,through:Int64,db:RoutineDatabase)throws {
-        guard through>=0,try db.eraseCount("PRAGMA user_version")==36,try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(head) else {throw OSwindError.invalid("Seed replay only for the exact activated native membership")}
+        guard through>=0,try db.eraseCount("PRAGMA user_version")==36,try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(head,version:2) else {throw OSwindError.invalid("Seed replay only for the exact activated native membership")}
         try put(through==0 ? nil:Cursor(head:head,after:0,through:through),db)
     }
     static func current(_ db:RoutineDatabase,sent:Int64)throws->Cursor? {
@@ -36,7 +36,11 @@ enum SyncMembershipReplay {
         let code=sqlite3_step(row);if code==SQLITE_DONE {return nil}
         guard code==SQLITE_ROW,sqlite3_column_type(row,0)==SQLITE_TEXT,sqlite3_column_bytes(row,0)>0,sqlite3_column_bytes(row,0)<=2048 else {throw OSwindError.unavailable("Membership replay cursor is missing or exceeds its bound")}
         let cursor=try SyncPairingFormat.decode(Cursor.self,Data(db.text(row,0).utf8),limit:2048);try cursor.validate()
-        guard cursor.through<=sent,try db.eraseCount("PRAGMA user_version")==36,try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(cursor.head) else {throw OSwindError.unavailable("Membership replay differs from the active native floor")}
+        // Current code can finish a saved format1 internal preview's replay.
+        // New handovers seed only format2; backfilling an existing format1
+        // library's cached-writer fence needs a separate owned transition.
+        let state=try SyncNativeMembershipState.read(db)
+        guard cursor.through<=sent,try db.eraseCount("PRAGMA user_version")==36,state==SyncNativeMembershipState.Value.active(cursor.head,version:state.version) else {throw OSwindError.unavailable("Membership replay differs from the active native floor")}
         return cursor
     }
     static func advance(_ expected:Cursor?,through:Int64,sent:Int64,db:RoutineDatabase)throws {

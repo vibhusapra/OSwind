@@ -389,6 +389,76 @@ final class SyncMembershipPreparationTests:XCTestCase {
         XCTAssertTrue(try recovery.cleanup().cleanupComplete);_=try recovery.completeLocalRetirement();try recovery.close()
         let renewed=try store(active.root);try renewed.insert(Memory(id:"renewed",text:"Native36 whole erase renewal"));XCTAssertNotNil(try renewed.get("renewed"));XCTAssertEqual(try read(active.root,"PRAGMA user_version"),"36")
     }
+
+    func testCancellationAfterEarlierHandoverPreservesFormatFloor()throws {
+        let f=try fixture(),first=try prepare(f),fresh=try activated(f,first)
+        XCTAssertEqual(try fresh.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},2)
+        let owner=try XCTUnwrap(pairings.first),fourthStore=try store(root.appendingPathComponent("floor-fourth")),fourth=try pair(fourthStore)
+        try join(fourth,to:owner,name:"Owned floor fourth")
+        let proof=try XCTUnwrap(owner.membershipRefresh(after:f.proof.head)),count=storage.values.count,op=try SyncMembershipPreparationOwner.prepare(library:fresh,proof:proof,environment:environment);operations.append(op)
+        let envelope=try object(XCTUnwrap(storage.values[f.deliveryID])),pending=try XCTUnwrap(envelope["membershipPreparation"] as? [String:Any])
+        XCTAssertEqual(pending["stateVersionBefore"] as? Int,2)
+        try op.cancelBeforeHandover();try op.close();let reopened=try store(fresh.root)
+        XCTAssertEqual(try reopened.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},2)
+        XCTAssertEqual(try pair(reopened).status().memberNames.count,3);XCTAssertEqual(storage.values.count,count);XCTAssertNotNil(try reopened.get("canary"))
+        XCTAssertThrowsError(try reopened.withRoutineDatabase {db in try reopened.nativeWriterAdmission.withMembershipMutation(db) {try SyncChangeCapture.transaction(db) {try SyncNativeMembershipState.write(.active(SyncProtocolLimits.hex(try f.proof.head.encoded()),version:1),db)}}})
+        XCTAssertEqual(try reopened.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},2)
+    }
+    func testLegacyPreparingAndCancellingRecordsWithoutFloorFieldRemainRecoverable()throws {
+        for cancelling in [false,true] {
+            let f=try fixture(),op=try prepare(f)
+            if cancelling {storage.failAt=storage.attempts+2;storage.failAfter=false;XCTAssertThrowsError(try op.cancelBeforeHandover())}
+            let envelope=try object(XCTUnwrap(storage.values[f.deliveryID])),pending=try XCTUnwrap(envelope["membershipPreparation"] as? [String:Any])
+            XCTAssertNil(pending["stateVersionBefore"]);XCTAssertNil(pending["additions"])
+            for invalid in [0,2,3] {
+                var changed=pending;changed["stateVersionBefore"]=invalid
+                let decoded=try SyncPairingFormat.decode(SyncMembershipPreparation.self,JSONSerialization.data(withJSONObject:changed,options:[.sortedKeys,.withoutEscapingSlashes]),limit:4096)
+                XCTAssertThrowsError(try decoded.validate(),"A native35 predecessor cannot claim a saved native36 format")
+            }
+            XCTAssertEqual(pending["disposition"] as? String,cancelling ? "cancelling":"preparing")
+            try op.close();let resumed=try recover(f),fresh=try finish(f,resumed)
+            XCTAssertEqual(try fresh.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},1)
+        }
+    }
+    func testCommittedLegacyApplyRecoversRejectedFormatUpgradeWithoutNewTokenOrAccounts()throws {
+        let f=try fixture(),op=try prepare(f),handle=try f.store.withMembershipDatabase {$0.handle},gate=MembershipFloorCommitGate(),target=storage.attempts+3,count=storage.values.count
+        // Project the exact old652 committed active1 representation after the
+        // new private delivery save, then reject the separate floor COMMIT.
+        storage.didReplace={ordinal in if ordinal==target {
+            do {try f.store.withMembershipDatabase {db in
+                let row=try db.statement("UPDATE store_metadata SET value=? WHERE key=?");defer {sqlite3_finalize(row)}
+                db.bind(row,1,String(decoding:try SyncProtocolLimits.encode(SyncNativeMembershipState.Value.active(SyncProtocolLimits.hex(try f.proof.head.encoded()),version:1)),as:UTF8.self));db.bind(row,2,SyncNativeMembershipState.stateKey);try db.done(row)
+                sqlite3_commit_hook(db.handle,MembershipFloorCommitGate.callback,Unmanaged.passUnretained(gate).toOpaque())
+            }}catch {XCTFail("Owned legacy committed-state projection failed")}
+        }}
+        XCTAssertThrowsError(try op.applyMembership());storage.didReplace=nil;sqlite3_commit_hook(handle,nil,nil)
+        XCTAssertEqual(gate.rejections,1);XCTAssertEqual(gate.commits,2)
+        let before=try object(XCTUnwrap(storage.values[f.deliveryID])),pending=try XCTUnwrap(before["membershipPreparation"] as? [String:Any]);XCTAssertNil(pending["stateVersionBefore"])
+        let token=try SyncPairingFormat.decode(SyncDeliveryAnchor.Token.self,JSONSerialization.data(withJSONObject:XCTUnwrap(before["token"]),options:[.sortedKeys]),limit:1024)
+        try op.close();let resumed=try recover(f),attempts=storage.attempts,fresh=try activated(f,resumed)
+        XCTAssertEqual(storage.attempts,attempts+1,"Only the pending clear may save externally after the legacy floor COMMIT")
+        let after=try object(XCTUnwrap(storage.values[f.deliveryID])),saved=try SyncPairingFormat.decode(SyncDeliveryAnchor.Token.self,JSONSerialization.data(withJSONObject:XCTUnwrap(after["token"]),options:[.sortedKeys]),limit:1024)
+        XCTAssertEqual(saved,token);XCTAssertEqual(storage.values.count,count);XCTAssertEqual(try fresh.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},2)
+        XCTAssertEqual(try read(fresh.root,"SELECT COUNT(*) FROM personal_sync_peers"),"3")
+    }
+    func testCurrentRuntimeCanFinishAlreadyClearedLegacyReplayWithoutDiscardingIt()throws {
+        let f=try fixture(),graph=SyncOutgoingTests(),initialPair=try pair(f.store),initial=try initialPair.prepareAnchoredService(shared:f.shared,createShared:false);services.append(initial)
+        _=try graph.serviceReady(initial,limit:2);try initial.stop();initial.inbox.close();initial.transport.close();initialPair.close()
+        let op=try prepare(f),fresh=try activated(f,op)
+        // An authored earlier652 cleared active1 snapshot, not a permitted
+        // current API downgrade. Such snapshots predate the new floor.
+        try fresh.withRoutineDatabase {db in try fresh.nativeWriterAdmission.withMembershipMutation(db) {try SyncChangeCapture.transaction(db) {
+            let row=try db.statement("UPDATE store_metadata SET value=? WHERE key=?");defer {sqlite3_finalize(row)}
+            db.bind(row,1,String(decoding:try SyncProtocolLimits.encode(SyncNativeMembershipState.Value.active(SyncProtocolLimits.hex(try f.proof.head.encoded()),version:1)),as:UTF8.self));db.bind(row,2,SyncNativeMembershipState.stateKey);try db.done(row)
+        }}}
+        try fresh.close();let legacy=try store(fresh.root),peer=try pair(legacy),sender=try peer.prepareAnchoredService(shared:f.shared,createShared:false);services.append(sender)
+        let sent=try XCTUnwrap(Int64(try read(legacy.root,"SELECT sent FROM personal_sync_service_state")))
+        XCTAssertGreaterThan(try XCTUnwrap(SyncMembershipReplay.current(sender.cache.database,sent:sent)).through,0)
+        _=try graph.serviceReady(sender,limit:2)
+        XCTAssertEqual(try read(legacy.root,"SELECT COUNT(*) FROM store_metadata WHERE key='sync-membership-replay-v1'"),"0");XCTAssertNotNil(try legacy.get("canary"))
+        XCTAssertEqual(try legacy.withRoutineDatabase {try SyncNativeMembershipState.read($0).version},1,"Backfilling a cleared legacy cached-writer fence is a separate owned transition")
+    }
+
 }
 
 private final class MembershipPreparationStorage:SyncCredentialStorage,@unchecked Sendable {
@@ -424,4 +494,12 @@ private final class MembershipCancellationGate:@unchecked Sendable {
     private let permit=DispatchSemaphore(value:0)
     func block() {reached.fulfill();permit.wait()}
     func release() {permit.signal()}
+}
+
+private final class MembershipFloorCommitGate {
+    private(set) var commits=0,rejections=0
+    static let callback:@convention(c) (UnsafeMutableRawPointer?)->Int32 = {pointer in
+        let gate=Unmanaged<MembershipFloorCommitGate>.fromOpaque(pointer!).takeUnretainedValue();gate.commits+=1
+        if gate.commits==2 {gate.rejections+=1;return 1};return 0
+    }
 }
