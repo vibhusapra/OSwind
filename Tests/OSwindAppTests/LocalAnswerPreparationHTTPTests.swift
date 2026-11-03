@@ -26,11 +26,28 @@ import XCTest
         for (server, model) in [(first, "owned:first"), (second, "owned:second")] {
             let rows = server.snapshot(); XCTAssertEqual(rows.map(\.path), ["/api/tags", "/api/generate", "/api/tags", "/api/ps"])
             let posts = rows.filter { $0.method == "POST" }; XCTAssertEqual(posts.count, 1)
-            XCTAssertEqual(posts.first?.model, model); XCTAssertEqual(posts.first?.bodyKeys, ["model", "stream", "keep_alive"])
+            XCTAssertEqual(posts.first?.model, model); XCTAssertEqual(posts.first?.bodyKeys, ["model", "stream", "keep_alive", "options"])
+            XCTAssertEqual(posts.first?.numContext,8192); XCTAssertEqual(posts.first?.optionKeys,["num_ctx"])
             XCTAssertEqual(posts.first?.stream, false); XCTAssertEqual(posts.first?.keepAlive, "5m")
             XCTAssertTrue(rows.allSatisfy(\.authorizationAbsent)); XCTAssertEqual(library.prepared?.residentBytes, 4096)
         }
         await library.cancelAndWait(); first.stop(); second.stop()
         await fulfillment(of: [first.stopped, second.stopped], timeout: 5)
+    }
+    func testLoadAndActualAnswerRequestsShareTheExistingContextWindow() async throws {
+        let server = try OwnedModelLibraryHTTPServer(model:"owned:answer",preparationEnabled:true)
+        defer {server.stop()};await fulfillment(of:[server.ready],timeout:5)
+        let client = OllamaClient();_ = try await client.prepare("owned:answer",endpoint:server.endpoint)
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer {try? FileManager.default.removeItem(at:root)}
+        let store = try MemoryStore(root:root);defer {try? store.close()}
+        try store.insert(Memory(id:"owned-context-contract",text:"Rima owns the Cobalt handoff checklist."))
+        var configuration = AIConfiguration();configuration.provider = .ollama;configuration.endpoint = server.endpoint;configuration.model = "owned:answer"
+        let answer = try await AnswerEngine(store:store,embedder:LocalEmbedder()).answer("Who owns Cobalt handoff checklist?",configuration:configuration,interpretQuery:false)
+        XCTAssertTrue(answer.text.contains("Rima"));XCTAssertEqual(answer.sources.first?.id,"owned-context-contract")
+        let posts = server.snapshot().filter {$0.method=="POST"};XCTAssertEqual(posts.map(\.path),["/api/generate","/api/chat"])
+        XCTAssertEqual(posts.map(\.numContext),[8192,8192]);XCTAssertEqual(posts[0].optionKeys,["num_ctx"])
+        XCTAssertEqual(posts[1].numPredict,1000);XCTAssertEqual(posts[1].temperature,0.2);XCTAssertEqual(posts[1].think,false)
+        server.stop();await fulfillment(of:[server.stopped],timeout:5)
     }
 }

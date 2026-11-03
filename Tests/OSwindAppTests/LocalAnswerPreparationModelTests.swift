@@ -14,8 +14,8 @@ import XCTest
         var values: [String] = []
         func add(_ value: String) { values.append(value) }
     }
-    nonisolated static func observation(_ model: String, _ endpoint: String, requested: String? = nil, observed: Date = Date(), expiry: Date = Date().addingTimeInterval(300), bytes: Int64 = 4096) -> LocalModelPreparation {
-        LocalModelPreparation(endpoint: endpoint, requestedModel: requested ?? model, model: model, digest: String(repeating: "a", count: 64), observedAt: observed, serverExpiresAt: expiry, residentBytes: bytes, gpuBytes: 2048, contextLength: 8192, serverLoadNanoseconds: 10, elapsedSeconds: 0.01)
+    nonisolated static func observation(_ model: String, _ endpoint: String, requested: String? = nil, observed: Date = Date(), expiry: Date = Date().addingTimeInterval(300), bytes: Int64 = 4096, context: Int? = 8192) -> LocalModelPreparation {
+        LocalModelPreparation(endpoint: endpoint, requestedModel: requested ?? model, model: model, digest: String(repeating: "a", count: 64), observedAt: observed, serverExpiresAt: expiry, residentBytes: bytes, gpuBytes: 2048, contextLength: context, serverLoadNanoseconds: 10, elapsedSeconds: 0.01)
     }
     func operations(_ calls: Calls) -> LocalModelLibraryOperations {
         LocalModelLibraryOperations(models: { _ in await calls.add("inspect"); return [] }, runtime: { _ in "" }, pull: { _, _, _ in await calls.add("pull") }, start: { _ in await calls.add("start"); return "owned start" }, prepare: { model, endpoint in await calls.add("prepare " + model + " " + endpoint); return Self.observation(model, endpoint) })
@@ -72,7 +72,7 @@ import XCTest
     }
     func testWrongIdentityExpiredAndEmptyResidencyReceiptsCannotAppearLoaded() async throws {
         let answer = answer
-        let receipts = [Self.observation("other:answer", answer), Self.observation("owned:answer", "http://127.0.0.1:19483"), Self.observation("owned:answer", answer, requested: "other:requested"), Self.observation("owned:answer", answer, expiry: Date().addingTimeInterval(-1)), Self.observation("owned:answer", answer, bytes: 0)]
+        let receipts = [Self.observation("other:answer", answer), Self.observation("owned:answer", "http://127.0.0.1:19483"), Self.observation("owned:answer", answer, requested: "other:requested"), Self.observation("owned:answer", answer, expiry: Date().addingTimeInterval(-1)), Self.observation("owned:answer", answer, bytes: 0), Self.observation("owned:answer",answer,context:262144), Self.observation("owned:answer",answer,context:nil)]
         for receipt in receipts {
             var ops = operations(Calls()); ops.prepare = { _, _ in receipt }
             let library = LocalModelLibraryModel(operations: ops); library.configure(answer: answer, search: search, answerModel: "owned:answer")

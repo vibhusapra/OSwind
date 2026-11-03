@@ -33,6 +33,7 @@ import XCTest
         let value = try XCTUnwrap(library.prepared,library.preparationStatus ?? "No load observation")
         XCTAssertEqual(value.requestedModel,model);XCTAssertEqual(value.model,model);XCTAssertEqual(value.endpoint,endpoint);XCTAssertEqual(value.digest,digest)
         XCTAssertGreaterThan(value.residentBytes,0);XCTAssertGreaterThan(value.observationExpiresAt,Date())
+        XCTAssertEqual(value.contextLength,AIConfiguration.localContextWindow)
         XCTAssertEqual(library.answerModel,model);XCTAssertEqual(library.role,.search)
         await library.cancelAndWait()
         let encoder = JSONEncoder();encoder.outputFormatting=[.prettyPrinted,.sortedKeys];encoder.dateEncodingStrategy = .iso8601

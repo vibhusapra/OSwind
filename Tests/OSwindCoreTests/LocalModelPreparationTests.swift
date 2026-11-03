@@ -94,7 +94,8 @@ final class LocalModelPreparationTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(value.elapsedSeconds, 0)
         let requests = script.snapshot(); XCTAssertEqual(requests.map { $0.url!.lastPathComponent }, ["tags", "generate", "tags", "ps"])
         let post = requests[1], body = try XCTUnwrap(JSONSerialization.jsonObject(with: try XCTUnwrap(post.httpBody)) as? [String: Any])
-        XCTAssertEqual(Set(body.keys), ["model", "stream", "keep_alive"]); XCTAssertEqual(body["model"] as? String, "owned:small")
+        XCTAssertEqual(Set(body.keys), ["model", "stream", "keep_alive", "options"]); XCTAssertEqual(body["model"] as? String, "owned:small")
+        let options = try XCTUnwrap(body["options"] as? [String: Int]); XCTAssertEqual(options, ["num_ctx":8192]); XCTAssertEqual(AIConfiguration.localContextWindow,8192)
         XCTAssertEqual(body["stream"] as? Bool, false); XCTAssertEqual(body["keep_alive"] as? String, "5m"); XCTAssertEqual(post.timeoutInterval, 300)
         XCTAssertTrue(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == nil && $0.value(forHTTPHeaderField: "Cookie") == nil })
     }
@@ -144,16 +145,17 @@ final class LocalModelPreparationTests: XCTestCase {
         let mutations: [(inout [[String: Any]]) -> Void] = [
             { $0 = [] }, { $0[0]["name"] = "other:small" }, { $0[0]["digest"] = String(repeating: "b", count: 64) },
             { $0.append($0[0]) }, { $0[0]["size"] = 0 }, { $0[0]["size_vram"] = -1 }, { $0[0]["context_length"] = 0 },
+            { $0[0]["context_length"] = 262144 }, { $0[0].removeValue(forKey:"context_length") },
             { $0[0]["expires_at"] = "not-a-date" }, { $0[0]["expires_at"] = "2020-01-01T00:00:00Z" }
         ]
         for mutate in mutations { let script = PreparationHTTPScript(); mutate(&script.running); await refused(script) }
     }
     func testOptionalResidencyFieldsAndFractionalTimezoneExpiryAreSupported() async throws {
         for expiry in ["2099-01-01T00:00:00Z", "2099-01-01T16:47:07.93355-07:00"] {
-            let script = PreparationHTTPScript(); script.running[0].removeValue(forKey: "size_vram"); script.running[0].removeValue(forKey: "context_length"); script.running[0]["expires_at"] = expiry
+            let script = PreparationHTTPScript(); script.running[0].removeValue(forKey: "size_vram"); script.load.removeValue(forKey:"load_duration"); script.running[0]["expires_at"] = expiry
             let endpoint = PreparationHTTPProtocol.register(script); defer { PreparationHTTPProtocol.remove(endpoint) }
             let value = try await client().prepare("owned:small", endpoint: endpoint)
-            XCTAssertNil(value.gpuBytes); XCTAssertNil(value.contextLength); XCTAssertEqual(value.observationExpiresAt, value.observedAt.addingTimeInterval(300))
+            XCTAssertNil(value.gpuBytes); XCTAssertNil(value.serverLoadNanoseconds); XCTAssertEqual(value.contextLength,8192); XCTAssertEqual(value.observationExpiresAt, value.observedAt.addingTimeInterval(300))
         }
     }
     func testCancellationDuringLoadExitsWithoutPublishingLaterTagOrResidencyChecks() async throws {

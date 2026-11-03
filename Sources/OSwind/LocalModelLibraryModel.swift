@@ -242,7 +242,8 @@ struct LocalModelLibraryOperations: Sendable {
                     let untagged = !(model.split(separator: "/").last?.contains(":") ?? true)
                     guard value.endpoint == endpoint, value.requestedModel == model,
                           value.model == model || (untagged && value.model == model + ":latest"),
-                          value.observationExpiresAt > Date(), value.observedAt <= Date().addingTimeInterval(1), value.residentBytes > 0 else {
+                          value.observationExpiresAt > Date(), value.observedAt <= Date().addingTimeInterval(1), value.residentBytes > 0,
+                          value.contextLength == AIConfiguration.localContextWindow else {
                         preparationStatus = "The server load observation did not match the selected model"
                         prepareTask = nil; prepareOwner = nil; objectWillChange.send(); return
                     }

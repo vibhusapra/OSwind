@@ -86,7 +86,7 @@ public actor OllamaClient {
         let clock = ContinuousClock(), start = ContinuousClock.now
         let before = try Self.preparationModel(name, in: await models(endpoint: endpoint))
         try Task.checkCancellation()
-        let payload = try await data(request(endpoint, path: "api/generate", body: ["model": before.name, "stream": false, "keep_alive": "5m"], timeout: 300))
+        let payload = try await data(request(endpoint, path: "api/generate", body: ["model": before.name, "stream": false, "keep_alive": "5m", "options": ["num_ctx": AIConfiguration.localContextWindow]], timeout: 300))
         struct Response: Decodable {
             var model: String; var done: Bool; var response: String?; var thinking: String?
             var done_reason: String?; var eval_count: Int?; var prompt_eval_count: Int?; var load_duration: UInt64?
@@ -110,8 +110,8 @@ public actor OllamaClient {
         let observed = Date()
         guard matches.count == 1, let loaded = matches.first, loaded.size > 0, loaded.expiresAt > observed,
               loaded.gpuBytes == nil || loaded.gpuBytes! >= 0,
-              loaded.contextLength == nil || loaded.contextLength! > 0 else {
-            throw OSwindError.unavailable("The local server did not report the selected model loaded. Check the server and try again.")
+              loaded.contextLength == AIConfiguration.localContextWindow else {
+            throw OSwindError.unavailable("The local server did not report the selected model loaded for the answer context. Check the server and try again.")
         }
         let duration = start.duration(to: clock.now).components
         return LocalModelPreparation(endpoint: endpoint, requestedModel: name, model: before.name, digest: before.digest,
