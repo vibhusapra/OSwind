@@ -40,6 +40,9 @@ public struct CaptureMetrics: Sendable {
             epoch=UUID(); replayGate.invalidate();replayGate=ReplayCommitGate()
             cancelSnapshotWork()
             if running { replay?.stop(discard:true);replay=nil;timer?.invalidate();configureMode() }
+            else if let previousIssue=captureScopeIssue(for:oldValue),status==previousIssue {
+                status=captureScopeIssue ?? "Paused"
+            }
         }
     }
     private let producerTasks=LibraryProducerTasks()
@@ -77,19 +80,30 @@ public struct CaptureMetrics: Sendable {
     }
     public func start() {
         guard producerTasks.accepting,!running else {return}
+        if let issue=captureScopeIssue {status=issue;return}
         if settings.visualCaptureMode == .accessibility {
             guard snapshots.accessibilityPermitted() else {status="Accessibility permission required for text-only capture";return}
         } else {guard snapshots.permitted() else {status="Screen Recording permission required";return}}
         running=true;epoch=UUID();status="Listening for changes";configureMode()
     }
     private var noDisplaysSelected:Bool {settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true}
-    private func configureMode() {
+    private var captureScopeIssue:String? {captureScopeIssue(for:settings)}
+    private func captureScopeIssue(for settings:AppSettings)->String? {
         if settings.visualCaptureMode == .accessibility {
-            do {try AccessibilityCaptureRecord.validateScope(settings)}catch {status=error.localizedDescription;return}
+            do {try AccessibilityCaptureRecord.validateScope(settings)}catch {return error.localizedDescription}
+            return nil
+        }
+        guard settings.snapshotRegions.valid else {return "Invalid capture area · choose a new area in Settings"}
+        guard !(settings.allDisplays && settings.snapshotRegions.selectedDisplays?.isEmpty==true) else {return "No displays selected · choose a display in Settings"}
+        return nil
+    }
+    private func configureMode() {
+        // A rejected startup or a newly invalid scope is paused, not an armed
+        // controller that can silently resume when settings are repaired.
+        if let issue=captureScopeIssue {pause(discardReplay:true);status=issue;return}
+        if settings.visualCaptureMode == .accessibility {
             replay?.stop();replay=nil;schedule();Task {await captureOnce()};return
         }
-        guard !noDisplaysSelected else {status="No displays selected · choose a display in Settings";return}
-        guard settings.snapshotRegions.valid else {status="Invalid capture area · choose a new area in Settings";return}
         if settings.visualCaptureMode == .replay && !settings.allDisplays && settings.snapshotRegions.focusedWindowCrop==nil {
             timer?.invalidate();timer=nil;replay?.stop();
             let session=ReplayCaptureSession(store:store,embedder:embedder,settings:settings,gate:replayGate,lifetime:producerTasks,onMemory:{[weak self] memory in guard let self else {return};self.metrics.saved+=1;self.onCapture?(memory)},onStatus:{[weak self] text in self?.status=text},onFailure:{[weak self] _ in self?.metrics.errors+=1})
