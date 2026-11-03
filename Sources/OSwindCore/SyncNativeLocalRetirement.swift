@@ -15,6 +15,7 @@ struct SyncNativeLocalRetirement {
                 let pairingLifetime=try PersonalSyncPairing.retirementLifetime(db)
                 try library.nativeWriterAdmission.rotateForRetirement(db)
                 try SyncOutgoingWorkQueue.discardForCollection(db,scope:cache.catalog.scope)
+                try SyncMembershipReplay.retire(db)
                 try db.execute("DELETE FROM personal_sync_changes")
                 try SyncPublicationQueue.retireCollectionIfInstalled(cache:cache)
                 let counts=try SyncChangeCapture.withoutEcho(db,scope:cache.catalog.scope) {

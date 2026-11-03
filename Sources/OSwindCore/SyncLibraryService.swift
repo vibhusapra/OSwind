@@ -285,20 +285,24 @@ final class SyncLibraryService:@unchecked Sendable {
 
         var sender=SyncLibrarySender(library:library,cache:cache,inbox:transport,admit:policy.admit,supplementalContent:{try self.inbox.content($0)})
         sender.publicationFence={write in try snapshot.withCurrent(root:self.library.root,policy:snapshot.settings.privacy) {try self.context();try self.externalAnchor?.requireCheckpoint(in:self.cache.database);try self.publications.context();try write();try self.context();try self.externalAnchor?.requireCheckpoint(in:self.cache.database)}}
-        let after=try fenced(snapshot) {try self.sent()}
-        let sentResult=try sender.publish(after:after,limit:limit)
+        let (after,replay)=try fenced(snapshot) {()->(Int64,SyncMembershipReplay.Cursor?) in
+            let sent=try self.sent();return (sent,try SyncMembershipReplay.current(cache.database,sent:sent))
+        }
+        let sentResult=try sender.publish(after:replay?.after ?? after,limit:limit)
         guard case .published(let through,let sent,_,_)=sentResult else {
             if case .needsGroupReview(let control)=sentResult {return .needsGroupReview(control)}
             throw OSwindError.invalid("Unknown sync send result")
         }
+        let advertised=max(after,through)
         try fenced(snapshot) {
             let history=SyncCollectionHistory(database:cache.database,replica:cache.journal.replica)
-            let head=try SyncServiceHead(group:cache.journal.group,epoch:cache.journal.epoch,replica:cache.journal.replica,through:through,collectionCounter:history.current()[cache.journal.replica])
+            let head=try SyncServiceHead(group:cache.journal.group,epoch:cache.journal.epoch,replica:cache.journal.replica,through:advertised,collectionCounter:history.current()[cache.journal.replica])
             try transport.publishServiceHead(head)
         }
         try fenced(snapshot,mutating:true) {
             let row=try cache.database.statement("UPDATE personal_sync_service_state SET sent=? WHERE singleton=1 AND token=? AND sent<>?");defer {sqlite3_finalize(row)}
-            sqlite3_bind_int64(row,1,through);cache.database.bind(row,2,token);sqlite3_bind_int64(row,3,through);try cache.database.done(row)
+            sqlite3_bind_int64(row,1,advertised);cache.database.bind(row,2,token);sqlite3_bind_int64(row,3,advertised);try cache.database.done(row)
+            try SyncMembershipReplay.advance(replay,through:through,sent:advertised,db:cache.database)
         }
         var writer=SyncIncomingConversationWriter(library:library,cache:cache,admit:policy.admit,pathsFor:{reference,manifests in
             try media.paths(reference,manifests,fetch:{try self.fetch($0)})

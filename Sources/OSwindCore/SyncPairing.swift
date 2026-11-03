@@ -248,6 +248,12 @@ struct SyncJoinedGroup:Sendable,CustomStringConvertible,CustomDebugStringConvert
         let value=Self(keys:keys,secret:secret,certificate:next,replica:replica)
         _=try value.packetAuthority();return value
     }
+    /// Protocol-only refreshed authority. Native/Keychain application must be
+    /// performed by the delivery lifecycle owner before any service may use it.
+    func withMembershipRefresh(_ refresh:SyncMembershipRefresh)throws->Self {
+        let value=Self(keys:keys,secret:secret,certificate:try refresh.advance(from:certificate),replica:replica)
+        _=try value.packetAuthority();return value
+    }
     func packetAuthority()throws->SyncDevicePacketAuthority {try .init(keys:keys,certificate:certificate,replica:replica)}
     func createTransport(at root:URL)throws->SyncObjectFolder {try .create(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
     func openTransport(at root:URL)throws->SyncObjectFolder {try .open(at:root,secret:secret,group:certificate.body.group,epoch:certificate.body.epoch,authority:packetAuthority())}
@@ -275,6 +281,28 @@ struct SyncCredentialMaterial:Sendable,CustomStringConvertible,CustomDebugString
                   owner.secret.exportForPairing()==joined.secret.exportForPairing() else {throw OSwindError.invalid("Owner authority differs from the enrolled device")}
         }
         self.joined=joined;self.owner=owner
+    }
+    /// Preserve every existing private key, including the owner root, while
+    /// deriving only the exact addition-history successor.
+    func withMembershipRefresh(_ refresh:SyncMembershipRefresh)throws->Self {
+        let next=try joined.withMembershipRefresh(refresh)
+        let authority=try owner.map {try SyncGroupAuthority.restore(root:$0.rootForKeychain,secret:next.secret,certificate:next.certificate)}
+        return try .init(joined:next,owner:authority)
+    }
+    /// Recover the exact two candidates of an already saved addition proof.
+    /// This may reconstruct old bytes for hash comparison; only the lifecycle
+    /// owner may persist the forward candidate after its native fence commits.
+    func membershipCandidates(_ proof:SyncMembershipRefresh)throws->(before:Self,after:Self) {
+        guard joined.certificate==proof.base || joined.certificate==proof.head else {throw OSwindError.unavailable("Private membership differs from both saved operation candidates")}
+        let before:Self
+        if joined.certificate==proof.base {before=self}
+        else {
+            _=try proof.advance(from:proof.base)
+            let original=SyncJoinedGroup(keys:joined.keys,secret:joined.secret,certificate:proof.base,replica:joined.replica)
+            let root=try owner.map {try SyncGroupAuthority.restore(root:$0.rootForKeychain,secret:original.secret,certificate:original.certificate)}
+            before=try .init(joined:original,owner:root)
+        }
+        return (before,try before.withMembershipRefresh(proof))
     }
     func encodedForKeychain()throws->Data {
         let value=Payload(format:"OSwind.sync.private-material",version:1,replica:joined.replica,signingPrivate:joined.keys.signing.rawRepresentation,agreementPrivate:joined.keys.agreement.rawRepresentation,groupSecret:joined.secret.exportForPairing(),ownerPrivate:owner?.rootForKeychain,certificate:joined.certificate)

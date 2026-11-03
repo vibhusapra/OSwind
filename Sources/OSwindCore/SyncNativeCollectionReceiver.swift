@@ -55,6 +55,7 @@ struct SyncNativeCollectionReceiver {
             }
             try Self.retireRegisters(cache:cache,creator:creator,counter:counter,frontier:frontier)
             try SyncOutgoingWorkQueue.discardForCollection(db,scope:cache.catalog.scope)
+            try SyncMembershipReplay.retire(db)
             try db.execute("DELETE FROM personal_sync_changes")
             guard try db.eraseCount("SELECT used_bytes FROM personal_sync_capture WHERE singleton=1")==0 else {throw OSwindError.database("Raw collection accounting differs")}
             try SyncPublicationQueue.retireCollectionIfInstalled(cache:cache)
