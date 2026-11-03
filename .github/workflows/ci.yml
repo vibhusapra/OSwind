@@ -44,6 +44,15 @@ jobs:
         run: python3 scripts/check-tokenizer-vendor.py --upstream .build/checkouts/swift-transformers
       - name: Verify owned encrypted APFS images and app sessions
         run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_ATOMIC_INBOX_CRASH=1 OSWIND_TEST_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-vault-native-traces" OSWIND_TEST_VAULT_QUERY_TRACE_DIR="$RUNNER_TEMP/oswind-vault-query-traces" OSWIND_TEST_CREDENTIAL_DIAGNOSTIC_DIR="$RUNNER_TEMP/oswind-vault-credential-traces" swift test --filter 'AtomicPrivateInboxTests|NativeVault|VaultSessionTests'
+      - name: Verify owner-addition app lifecycle with owned APFS and Keychain
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_OWNER_UI_QA_DIR="$RUNNER_TEMP/oswind-owner-approval-ui" swift test --filter OwnerAdditionAppSessionTests
+      - name: Retain owned owner-addition component renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-owner-addition-ui
+          path: ${{ runner.temp }}/oswind-owner-approval-ui/*.png
+          if-no-files-found: ignore
       - name: Retain owned native vault diagnostics
         if: always()
         uses: actions/upload-artifact@v4

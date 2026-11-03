@@ -1,0 +1,27 @@
+{
+  "format": "OSwind owner-app follow-up CI selection v1",
+  "qualificationSource": "5efde85a5c84a877c787afe9f700276d4aef61d3",
+  "qualifiedWorkflowSHA256": "aea11ec9c3fe715bc9f3e15e6712eb2cd564b4982f976d23f3f5ee854d7c6c05",
+  "newWorkflowSHA256": "700fb12fa9c9f2c9a3908ed6a13a21524def99fbea8cd8ea1bb4acbef05460ae",
+  "workflowOnlyAfterRuntimeReview": true,
+  "overallRuntimeQualificationPassed": false,
+  "nativeStepCountBefore": 81,
+  "nativeStepCountAfter": 83,
+  "addedSteps": [
+    {
+      "name": "Verify owner-addition app lifecycle with owned APFS and Keychain",
+      "run": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_OWNER_UI_QA_DIR=\"$RUNNER_TEMP/oswind-owner-approval-ui\" swift test --filter OwnerAdditionAppSessionTests"
+    },
+    {
+      "name": "Retain owned owner-addition component renders",
+      "if": "always()",
+      "uses": "actions/upload-artifact@v4",
+      "with": {
+        "name": "owned-owner-addition-ui",
+        "path": "${{ runner.temp }}/oswind-owner-approval-ui/*.png",
+        "if-no-files-found": "ignore"
+      }
+    }
+  ],
+  "checks": "YAML parses; exact prior step list preserved; both explicit native flags and UI destination selected; PNG-only artifact upload always runs. Local WIP receipt records runtime source and failed selections before this workflow-only addition; it is not an all-green runtime qualification. No hosted run success is claimed by this static check."
+}
