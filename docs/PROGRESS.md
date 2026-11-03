@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Persistent native capture pilot and separate long run
+
+A new opt-in developer harness keeps one actual CaptureController and store alive while explicitly targeting only a changing generated AppKit window. It records every admission/deferral, wall/uptime/tail gap, process RSS/CPU sample and joined shutdown. Two ordinary terminal-encoding/startup-bound controls pass; the native method skips without explicit configuration.
+
+Tooling `b3aad61` binds **692 committed inputs plus three changed-file hashes**, with all 690 preceding production/test inputs unchanged. The actual pilot passes **12 requests / 12 indexed sources over 65.35 seconds**, zero errors/deferrals/time gaps, exact source PID/window identity, OCR, images and Apple sentence vectors, normal exit and joined close. Seven altered-record controls reject. A later native GUI check also confirms the repaired footer returns to Paused with zero sources; the earlier locked preflight remains retained. [Pilot receipt](../benchmarks/native-targeted-capture-pilot-v1.json) · [Inputs](../benchmarks/native-targeted-capture-inputs-v1.json) · [Raw evidence](../benchmarks/native-targeted-capture-raw-v1.zip) · [Protocol and remaining work](NATIVE-TARGETED-CAPTURE-WIP.md).
+
+A **distinct 86,400-second run has started** from that frozen worker, requesting the generated window every 20 seconds. Startup is verified, not completion. Manual requests bypass automatic deduplication/idle/thermal backoff; this cannot establish the GUI's automatic scheduling behavior or physical power. Native image inspection found right/bottom blank padding around the window, which now requires scaling/crop-geometry investigation. Earlier failed pilots and harness faults remain preserved. **All 83 feature statuses and the landscape remain unchanged; full v0 acceptance and ranking are still open.**
+
 ## Invalid capture settings remain paused
 
 An actual native QA check reproduced a misleading CAPTURING header while an invalid capture area prevented collection. Capture now validates scope before checking permissions or claiming it is running. Invalidating an active scope cancels pending work and pauses the controller. Repairing that scope clears its stale error to Paused and requires an explicit resume; it never restarts collection merely because settings became valid.
