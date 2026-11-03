@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Invalid capture settings remain paused
+
+An actual native QA check reproduced a misleading CAPTURING header while an invalid capture area prevented collection. Capture now validates scope before checking permissions or claiming it is running. Invalidating an active scope cancels pending work and pauses the controller. Repairing that scope clears its stale error to Paused and requires an explicit resume; it never restarts collection merely because settings became valid.
+
+Runtime `87ddff0` binds **690 inputs**. Selected Debug, Thread Sanitizer and optimized each pass **98 methods / one native-vault skip / zero failures**, including all six new readiness methods; no race warning appears. Coverage includes blocked pixel/text modes, empty display selection, text crop/display refusal, mode-specific permission gates, no automatic restart after repair, and joined cancellation of a late context read. The original baseline has five failed methods, 13 assertion failures and one passing permission control. Five altered-log controls reject invalid evidence. [Receipt](../benchmarks/capture-start-readiness-v1.json) · [Inputs](../benchmarks/capture-start-readiness-inputs-v1.json) · [Raw evidence](../benchmarks/capture-start-readiness-raw-v1.zip) · [Scope](CAPTURE-START-READINESS-WIP.md).
+
+The first native candidate confirms the corrected blocked-start header/button and zero captured sources, then exposes the stale repair footer addressed in the final source. **The Mac locked before the final candidate could launch; its repaired-footer GUI check remains pending.** The fresh local ad-hoc package builds successfully. Earlier successful tests/packages/checkers remain frozen. All 83 feature records and the competitor landscape stay unchanged; this is an affected selection, not a new full-suite, automatic 24-hour, energy, complete-sync, distribution or ranking qualification.
+
 ## Capture requests validated before library or native access
 
 Snapshot capture previously accepted missing `--app-bundle` values and unknown arguments, which could fall back to current-window intent. All three capture commands now validate their original invocation before opening a library, vault, model or native capture source. Explicit targets are preserved byte for byte, replay duration must be finite and within 1–120 seconds, and duplicate/missing/empty/unknown/positional arguments fail closed. Deliberately omitted targeting still means the current window.
