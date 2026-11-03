@@ -21,6 +21,8 @@ final class SyncNativeWriterAdmission {
     private var allowed=false
     private var enrolled=false
     private var retirementGranted=false,membershipGranted=false
+    private var floorPending=false
+    var membershipFloorQuarantined:Bool {floorPending && !poisoned}
     private var membershipPending=false
     var membershipQuarantined:Bool {membershipPending && !poisoned}
     private var proof:SyncDeliveryAnchor.NativeWriterProof?
@@ -79,6 +81,7 @@ final class SyncNativeWriterAdmission {
     func require(_ db:RoutineDatabase,library:MemoryStore)throws {
         guard initialized,!checking,trustedDepth==0 else {return}
         guard !poisoned else {throw OSwindError.unavailable("Native delivery admission needs recovery after an ambiguous checkpoint commit")}
+        guard !floorPending else {throw OSwindError.unavailable("Finish the saved membership floor upgrade before ordinary native access")}
         guard !membershipPending else {throw OSwindError.unavailable("Finish the saved membership operation before ordinary native access")}
         guard !retiring else {throw OSwindError.unavailable("Native history was erased. Finish owned sync cleanup before reopening normal access.")}
         checking=true;defer {checking=false}
@@ -169,7 +172,7 @@ final class SyncNativeWriterAdmission {
         guard environment != nil,!poisoned,!retiring else {throw OSwindError.invalid("Use the original enrolled membership operation owner")}
         try Self.requireGuards(db);try epoch.validate(db);try epoch.requireCurrent(db)
         trustedDepth+=1;lock.lock();membershipGranted=true;allowed=true;lock.unlock()
-        defer {trustedDepth-=1;lock.lock();membershipGranted=false;allowed = !membershipPending && !poisoned;lock.unlock()}
+        defer {trustedDepth-=1;lock.lock();membershipGranted=false;allowed = !membershipPending && !floorPending && !poisoned;lock.unlock()}
         return try body()
     }
     func prepareMembershipFence(_ db:RoutineDatabase,record:SyncMembershipPreparation)throws {
@@ -189,6 +192,24 @@ final class SyncNativeWriterAdmission {
         try db.execute("PRAGMA user_version=\(Self.membershipSchemaVersion)")
         try Self.requireGuards(db)
     }
+    func openMembershipFloorRecovery(_ db:RoutineDatabase,library:MemoryStore,environment:SyncNativeWriterEnvironment)throws {
+        checking=true;defer {checking=false};initialized=true
+        try SyncChangeCapture.transaction(db) {
+            try NativeMediaSchema.validate(db)
+            try SyncDeliveryAnchor.verifyMembershipFloorPreparation(library:library,db:db,environment:environment)
+            try Self.requireGuards(db);try epoch.validate(db);try epoch.adopt(db)
+        }
+        self.environment=environment;markEnrolled();floorPending=true;permit(false)
+    }
+    func prepareMembershipFloorFence(_ db:RoutineDatabase,record:SyncMembershipFloorPreparation)throws {
+        lock.lock();let granted=membershipGranted;lock.unlock()
+        guard granted,trustedDepth>0,environment != nil,!poisoned,sqlite3_get_autocommit(db.handle)==0 else {throw OSwindError.invalid("Upgrade membership floor in its owned transaction")}
+        try record.validate();try Self.requireGuards(db)
+        guard try db.eraseCount("PRAGMA user_version")==Self.membershipSchemaVersion,try epoch.read(db)==record.epochBefore,try SyncNativeMembershipState.read(db)==SyncNativeMembershipState.Value.active(record.head,version:1) else {throw OSwindError.unavailable("Membership floor no longer matches its original writer")}
+        try epoch.rotate(db,next:record.epochAfter)
+        try SyncNativeMembershipState.write(.active(record.head,version:2),db)
+    }
+    func suspendForMembershipFloor() {floorPending=true;permit(false)}
     func suspendForMembership() {membershipPending=true;permit(false)}
     func rotateForRetirement(_ db:RoutineDatabase)throws {
         guard trustedDepth>0,environment != nil,!poisoned else {throw OSwindError.invalid("Retire native writers through the checkpoint owner")}
