@@ -7,14 +7,14 @@ model_dir="${OSWIND_MODEL_DIR:-$HOME/Library/Caches/OSwind/models}"
 mkdir -p "$model_dir"
 chmod 700 "$model_dir"
 if ! curl --fail --silent http://127.0.0.1:11434/api/tags >/dev/null; then
-    OLLAMA_NO_CLOUD=1 nohup ollama serve > "$model_dir/ollama.log" 2>&1 &
+    OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 nohup ollama serve > "$model_dir/ollama.log" 2>&1 &
     for i in {1..30}; do
         if curl --fail --silent http://127.0.0.1:11434/api/tags >/dev/null; then break; fi
         sleep 1
     done
 fi
-ollama pull "${OSWIND_CHAT_MODEL:-qwen3:4b-instruct-2507-q4_K_M}"
-ollama pull "${OSWIND_EMBEDDING_MODEL:-qwen3-embedding:0.6b}"
+OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama pull "${OSWIND_CHAT_MODEL:-qwen3.5:4b}"
+OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama pull "${OSWIND_EMBEDDING_MODEL:-qwen3-embedding:0.6b}"
 python3 - "$model_dir" <<'PY'
 import hashlib, json, pathlib, sys, urllib.request
 root = pathlib.Path(sys.argv[1])
@@ -37,6 +37,6 @@ print('Whisper model: ' + str(path))
 print('Verified SHA256: ' + expected)
 (root / 'manifest.json').write_text(json.dumps({'file':name,'sha256':expected,'source':'https://huggingface.co/ggerganov/whisper.cpp','license':'MIT'},indent=2))
 PY
-printf 'Chat model: %s\n' "${OSWIND_CHAT_MODEL:-qwen3:4b-instruct-2507-q4_K_M}"
+printf 'Chat model: %s\n' "${OSWIND_CHAT_MODEL:-qwen3.5:4b}"
 printf 'Whisper executable: %s\n' "$(command -v whisper-cli)"
 printf '%s\n' 'Select Ollama and the Whisper model path in OSwind Settings.'
