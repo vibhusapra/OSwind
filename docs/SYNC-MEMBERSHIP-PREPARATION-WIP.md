@@ -1,5 +1,7 @@
 # Native membership preparation — WIP
 
+This file records its earlier protocol/preparation runtime. The [later internal handover and bounded replay](SYNC-MEMBERSHIP-HANDOVER-WIP.md) are separately qualified at `bd82fce`; public owner-addition controls and complete F059 remain unfinished.
+
 F059 remains TODO. The public delivery reservation still refuses membership edits. This internal owner prepares the native fence while retaining the original private membership; it does not apply the new membership, alter peers/cursors, return a joining-device response, bootstrap a later peer, revoke a device or rotate its epoch/key. Default local content remains native33 and ordinary enrollment remains native35. Native36 is installed only by this internal operation.
 
 The owner first acquires the original pairing/delivery credential leases and requires the service command token to be stopped. It verifies a bounded root-signed addition page starting at the exact private certificate, derives the unchanged device/group/root keys under the successor certificate, and pins the complete old/new pairing-envelope and material hashes. The public proof is saved through the existing encrypted private inbox; no provider is opened or written. The private pending record also pins the operation ID, native version, old/prepared writer generations and exact checkpoint tokens. SQLite receives only public phase/head/operation/proof addresses and signed certificate history.

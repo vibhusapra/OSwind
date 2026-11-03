@@ -1,5 +1,7 @@
 # Membership refresh — WIP
 
+This file records its earlier protocol/preparation runtime. The [later internal handover and bounded replay](SYNC-MEMBERSHIP-HANDOVER-WIP.md) are separately qualified at `bd82fce`; public owner-addition controls and complete F059 remain unfinished.
+
 Complete device lifecycle remains the delivery target: adding devices after delivery starts, offline peers accepting a verified membership history, removal/revocation and key rotation, durable native/Keychain recovery, native controls and real devices/providers. F059 remains TODO. The public pairing reservation refusal stays in place until the complete transition can be applied safely.
 
 The first implementation supplies an internal addition-history proof. Canonical pages contain a root-signed base certificate and contiguous signed successors, bounded to 98,304 bytes. The exact trusted certificate must occur on the path. Overlapping pages and exact retries are accepted; a signed fork at the same revision, missing step, stale-only page, unknown root/group/epoch, tampering and noncanonical input refuse. Pagination validates the whole supplied path before choosing a fitting prefix, so corruption in an unsent tail is not hidden. Existing device keys and the group secret remain unchanged. This is neither revocation nor an epoch transition.
