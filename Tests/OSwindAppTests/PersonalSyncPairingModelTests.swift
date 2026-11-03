@@ -11,15 +11,29 @@ import MachO
     private var root:URL!,a:MemoryStore!,b:MemoryStore!,storage:PairingAppStorage!
     var models=[PersonalSyncModel](),sessions=[AppSession]()
     var preferenceSuites=[String]()
+    private var phaseStarted:TimeInterval=0
+    private func trace(_ phase:String) {
+        let line="OWNED_PAIRING_PHASE case=\(name) phase=\(phase) elapsedSeconds=\(ProcessInfo.processInfo.systemUptime-phaseStarted)\n"
+        FileHandle.standardOutput.write(Data(line.utf8))
+    }
     override func setUpWithError()throws {
+        phaseStarted=ProcessInfo.processInfo.systemUptime;trace("setup-begin")
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-pairing-app-"+UUID().uuidString)
-        a=try MemoryStore(root:root.appendingPathComponent("a"));b=try MemoryStore(root:root.appendingPathComponent("b"));storage=PairingAppStorage()
+        a=try MemoryStore(root:root.appendingPathComponent("a"));trace("setup-store-a")
+        b=try MemoryStore(root:root.appendingPathComponent("b"));trace("setup-store-b")
+        storage=PairingAppStorage();trace("setup-complete")
     }
     override func tearDown()async throws {
+        trace("teardown-begin")
         for session in sessions {_=await session.lockForTermination();try? session.model?.store.close();session.model=nil};sessions=[]
+        trace("teardown-sessions")
         for model in models {await model.cancelAndWait()}
+        trace("teardown-models")
         for name in preferenceSuites {UserDefaults(suiteName:name)?.removePersistentDomain(forName:name)}
-        try a.close();try b.close();try FileManager.default.removeItem(at:root)
+        trace("teardown-preferences")
+        try a.close();trace("teardown-store-a")
+        try b.close();trace("teardown-store-b")
+        try FileManager.default.removeItem(at:root);trace("teardown-complete")
     }
     func model(_ store:MemoryStore,gate:ImportWorkerGate?=nil)->PersonalSyncModel {
         let state=root.appendingPathComponent("state"),storage=storage!
@@ -28,10 +42,15 @@ import MachO
             return try PersonalSyncPairing(store:store,stateRoot:state,machine:PairingAppMachine(),storage:storage)
         });models.append(value);return value
     }
-    func done(_ model:PersonalSyncModel)async throws {
+    func done(_ model:PersonalSyncModel,caller:UInt=#line)async throws {
+        trace("pairing-wait-\(caller)-begin")
         let deadline=ContinuousClock.now.advanced(by:.seconds(15))
         while model.pairingBusy,ContinuousClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
-        guard !model.pairingBusy else {throw OSwindError.unavailable("Owned pairing action did not finish")}
+        guard !model.pairingBusy else {
+            trace("pairing-wait-\(caller)-timeout")
+            throw OSwindError.unavailable("Owned pairing action did not finish: caller=\(caller) configured=\(model.configured) preparing=\(model.preparing) stopping=\(model.stopping) error=\(model.pairingError ?? "none")")
+        }
+        trace("pairing-wait-\(caller)-complete")
     }
     private func pairedModels()async throws->(PersonalSyncModel,PersonalSyncModel) {
         try AppSettings().save(root:a.root);try AppSettings().save(root:b.root)
@@ -454,15 +473,16 @@ import MachO
     }
     func testCancelledLibraryDrainJoinsRealPairingFactoryBeforeStoreMayClose()async throws {
         let gate=ImportWorkerGate(),owner=model(a,gate:gate)
-        owner.performPairing(.load);await fulfillment(of:[gate.entered],timeout:10)
+        owner.performPairing(.load);trace("factory-requested")
+        await fulfillment(of:[gate.entered],timeout:10);trace("factory-entered")
         XCTAssertTrue(owner.busy);XCTAssertTrue(owner.pairingBusy)
         var drained=false
         let drain=Task {await owner.cancelAndWait();drained=true};drain.cancel()
-        try await Task.sleep(for:.milliseconds(40));XCTAssertFalse(drained);XCTAssertFalse(a.isClosed)
-        gate.release();await drain.value
+        try await Task.sleep(for:.milliseconds(40));trace("factory-held-after-sleep");XCTAssertFalse(drained);XCTAssertFalse(a.isClosed)
+        gate.release();trace("factory-released");await drain.value;trace("factory-drain-joined")
         XCTAssertFalse(owner.busy);XCTAssertFalse(owner.pairingBusy);XCTAssertNil(owner.pairingStatus)
         XCTAssertTrue(storage.values.isEmpty)
-        try a.close();XCTAssertTrue(a.isClosed)
+        try a.close();trace("factory-store-closed");XCTAssertTrue(a.isClosed)
     }
     func testCancelledDrainWaitsForLateCredentialCommitAndResumesItWithoutRecreatingKeys()async throws {
         let gate=PairingSaveGate();defer {gate.release()};storage.install(gate)
