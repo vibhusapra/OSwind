@@ -379,7 +379,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     private struct Fixture {
         let app:AppSession,old:AppModel,page:String,pairingID:String,deliveryID:String,provider:URL,tracker:OwnerOpenTracker,passphrase:String?
-        let ownerRoot:URL
+        let ownerRoot:URL,joiningRoot:URL
     }
     override func setUpWithError()throws {
         root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-peer-membership-"+UUID().uuidString);try Paths.ensure(root)
@@ -445,13 +445,14 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
             let row=try db.statement("SELECT id,(SELECT value FROM store_metadata WHERE key='sync-pairing-handle-v1') FROM personal_sync_delivery_anchor");defer {sqlite3_finalize(row)};guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.invalid("Original peer accounts missing")}
             let handle=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(db.text(row,1).utf8)) as? [String:Any]);return(try XCTUnwrap(handle["id"] as? String),db.text(row,0))
         }
-        let joining=try pair(store(root.appendingPathComponent("joining"))),joiningRequest=try XCTUnwrap(joining.requestJoin(deviceName:"Owned added Mac").request),ownerReview=try await ownerSession.reviewOwnerAddition(joiningRequest)
+        let joiningStore=try store(root.appendingPathComponent("joining")),joining=try pair(joiningStore),joiningRequest=try XCTUnwrap(joining.requestJoin(deviceName:"Owned added Mac").request),ownerReview=try await ownerSession.reviewOwnerAddition(joiningRequest)
         try await ownerSession.stop();let change=try await ownerSession.ownerChangeAfterStopping(ownerReview);changes.append(change)
         let response=try XCTUnwrap(change.apply());try change.close();_=try joining.acceptResponse(response.response,trustedRootFingerprint:fingerprint);joining.close()
+        try joiningStore.savePersonalSyncPreferences(.init(reconnectOnLaunch:false,networkEnabled:false));try joiningStore.close()
         let freshOwner=try store(ownerStore.root),exporter=try pair(freshOwner),page=try XCTUnwrap(exporter.membershipUpdatePage(for:publicRequest));exporter.close()
         try freshOwner.savePersonalSyncPreferences(.init(reconnectOnLaunch:false,networkEnabled:false))
         try freshOwner.close()
-        return .init(app:app,old:old,page:page,pairingID:ids.0,deliveryID:ids.1,provider:provider,tracker:tracker,passphrase:passphrase,ownerRoot:freshOwner.root)
+        return .init(app:app,old:old,page:page,pairingID:ids.0,deliveryID:ids.1,provider:provider,tracker:tracker,passphrase:passphrase,ownerRoot:freshOwner.root,joiningRoot:joiningStore.root)
     }
     private func quiet(_ f:Fixture,file:StaticString=#filePath,line:UInt=#line)throws {
         let fresh=try XCTUnwrap(f.app.model,file:file,line:line);XCTAssertFalse(fresh === f.old,file:file,line:line);XCTAssertFalse(fresh.isCapturing,file:file,line:line);XCTAssertEqual(fresh.apiStatus,"API off",file:file,line:line);XCTAssertFalse(fresh.personalSync.configured,file:file,line:line)
@@ -459,9 +460,12 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         XCTAssertNotNil(try fresh.store.get("keep"),file:file,line:line);XCTAssertNil(f.app.syncApprovalPresentation,file:file,line:line)
     }
     private func ownerApp(_ f:Fixture,gate:ImportWorkerGate?=nil)async throws->AppSession {
-        var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.automaticMaintenance=false;settings.entityAutomaticIndex=false;settings.clipboard.enabled=false;settings.meetings.enabled=false;try settings.save(root:f.ownerRoot)
+        try await quietApp(at:f.ownerRoot,gate:gate)
+    }
+    private func quietApp(at path:URL,gate:ImportWorkerGate?=nil)async throws->AppSession {
+        var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.automaticMaintenance=false;settings.entityAutomaticIndex=false;settings.clipboard.enabled=false;settings.meetings.enabled=false;try settings.save(root:path)
         let env=environment,tracker=OwnerOpenTracker(env);trackers.append(tracker)
-        let app=AppSession(selection:.init(url:f.ownerRoot,requiresExisting:true,origin:"owned-export"),defaults:defaults,locked:{false},openStore:{try tracker.open($0)},personalSyncSetup:{library in
+        let app=AppSession(selection:.init(url:path,requiresExisting:true,origin:"owned-export"),defaults:defaults,locked:{false},openStore:{try tracker.open($0)},personalSyncSetup:{library in
             PersonalSyncModel(store:library,locked:{false},pairingFactory:{library in
                 try gate?.pause()
                 return try PersonalSyncPairing(store:library,stateRoot:env.stateRoot,machine:env.machine,storage:env.storage(.loginKeychain))
@@ -471,6 +475,63 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         let model=try XCTUnwrap(app.model);model.showOnboarding=false;try await SourceWorkTestJob.settle(model)
         XCTAssertFalse(model.isCapturing);XCTAssertEqual(model.apiStatus,"API off");XCTAssertFalse(model.personalSync.configured)
         return app
+    }
+    private func syncReady(_ model:PersonalSyncModel,phase:PersonalSyncStatus.Phase = .upToDate)async throws {
+        // Functional readiness budget, including instrumented native I/O. This
+        // fixture measures no cadence, latency, energy or competitive ranking.
+        let end=SuspendingClock.now.advanced(by:.seconds(120))
+        while SuspendingClock.now<end {
+            if let error=model.error {throw OSwindError.unavailable(error)}
+            if model.configured,!model.preparing,!model.changing,model.status?.phase==phase {return}
+            try await Task.sleep(for:.milliseconds(5))
+        }
+        throw OSwindError.unavailable("Owned three-app sync did not settle: configured=\(model.configured) preparing=\(model.preparing) changing=\(model.changing) stopping=\(model.stopping) allowed=\(model.allowed()) phase=\(String(describing:model.status?.phase))")
+    }
+    private func deliveryCycle(_ models:[AppModel])async throws {
+        for model in models {
+            model.personalSync.setNetworkEnabled(false);try await syncReady(model.personalSync,phase:.networkPaused)
+            model.personalSync.setNetworkEnabled(true);try await syncReady(model.personalSync)
+        }
+    }
+    private func sourceOccurrences(_ text:String,in store:MemoryStore)throws->Int64 {
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT COUNT(*) FROM memories WHERE text=?");defer {sqlite3_finalize(row)};db.bind(row,1,text)
+            guard sqlite3_step(row)==SQLITE_ROW else {throw db.error()};return sqlite3_column_int64(row,0)
+        }
+    }
+    func testThreeActualAppSessionsReconnectAndExchangeWritesWhileOwnerIsOffline()async throws {
+        let f=try await fixture(),review=try await review(f)
+        f.app.approveSyncMembership(review,from:f.old);try await settle(f.app);try quiet(f)
+        let owner=try await ownerApp(f),joining=try await quietApp(at:f.joiningRoot)
+        var models=try [owner,f.app,joining].map {try XCTUnwrap($0.model)}
+        let initial=["Owned owner app write","Owned existing peer app write","Owned joining app write"]
+        for (i,model) in models.enumerated() {
+            // As in the other owned app fixtures, complete onboarding only in
+            // this model. Never alter the user's standard defaults to run QA.
+            print("OWNED_THREE_APP_ADMISSION index=\(i) onboardingBefore=\(model.showOnboarding) workAvailable=\(model.libraryWorkAvailable) allowedBefore=\(model.personalSync.allowed())")
+            model.showOnboarding=false;XCTAssertTrue(model.personalSync.allowed())
+            try model.store.insert(Memory(id:"app-three-\(i)",kind:.note,text:initial[i]));XCTAssertNotNil(model.personalSync.approveMembershipUpdate)
+        }
+        models[0].personalSync.reconnectSavedFolder();models[1].personalSync.reconnectSavedFolder();models[2].personalSync.connectFolder(f.provider)
+        for model in models {try await syncReady(model.personalSync,phase:.networkPaused)}
+        for _ in 0..<3 {try await deliveryCycle(models)}
+        let accounts=Set(storage.values.keys)
+        let stopped=await owner.lockForTermination();XCTAssertTrue(stopped);try models[0].store.close();owner.model=nil
+        let offline=["Owned existing app writes with owner offline","Owned joining app writes with owner offline"]
+        for (i,model) in models.dropFirst().enumerated() {try model.store.insert(Memory(id:"app-offline-\(i)",kind:.note,text:offline[i]))}
+        for _ in 0..<2 {try await deliveryCycle(Array(models.dropFirst()))}
+        for model in models.dropFirst() {for text in offline {XCTAssertEqual(try sourceOccurrences(text,in:model.store),1,"Peer-to-peer delivery needed the offline owner")}}
+        let reopened=try await ownerApp(f),fresh=try XCTUnwrap(reopened.model);XCTAssertFalse(fresh.personalSync.configured)
+        fresh.personalSync.reconnectSavedFolder();try await syncReady(fresh.personalSync);models[0]=fresh
+        for _ in 0..<3 {try await deliveryCycle(models)}
+        for model in models {
+            XCTAssertTrue(model.personalSync.configured);XCTAssertTrue(model.personalSync.ownsHistoryRetirement)
+            for text in initial+offline+["Owned peer source before membership update"] {
+                XCTAssertEqual(try sourceOccurrences(text,in:model.store),1,"Missing or duplicated source after actual app reconnection")
+            }
+            XCTAssertEqual(try model.store.stats(includeDiskUsage:false).count,6)
+        }
+        XCTAssertEqual(Set(storage.values.keys),accounts,"Actual app reconnect replaced original accounts")
     }
     private func pairingDone(_ model:PersonalSyncModel)async throws {
         let deadline=SuspendingClock.now.advanced(by:.seconds(15))
