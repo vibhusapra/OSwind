@@ -43,21 +43,27 @@ public final class PersonalSyncOwnerChange:@unchecked Sendable {
     private let lock=NSRecursiveLock()
     private var operation:SyncMembershipPreparationOwner?
     private let preparation:SyncMembershipPreparationOwner.ApprovalDraft?
+    private let peerPreparation:SyncMembershipPreparationOwner.MembershipDraft?
     private var library:MemoryStore?
     private let recovery:(root:URL,environment:SyncNativeWriterEnvironment)?
     private var attempted=false,finished=false,closed=false
     private var response:PersonalSyncApprovedResponse?
     private var workspace:PersonalSyncOwnerWorkspaceIdentity?
-    private init(operation:SyncMembershipPreparationOwner,preparation:SyncMembershipPreparationOwner.ApprovalDraft?,library:MemoryStore?,workspace:PersonalSyncOwnerWorkspaceIdentity) {
-        self.operation=operation;self.preparation=preparation;self.library=library;self.workspace=workspace;self.recovery=nil
+    private init(operation:SyncMembershipPreparationOwner,preparation:SyncMembershipPreparationOwner.ApprovalDraft?,peerPreparation:SyncMembershipPreparationOwner.MembershipDraft?=nil,library:MemoryStore?,workspace:PersonalSyncOwnerWorkspaceIdentity) {
+        self.operation=operation;self.preparation=preparation;self.peerPreparation=peerPreparation;self.library=library;self.workspace=workspace;self.recovery=nil
     }
     static func draft(library:MemoryStore,review:PersonalSyncPairingReview,environment:SyncNativeWriterEnvironment,now:Date)throws->PersonalSyncOwnerChange {
         let workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
         let prepared=try SyncMembershipPreparationOwner.approvalDraft(library:library,review:review,environment:environment,now:now)
         return .init(operation:prepared.owner,preparation:prepared,library:library,workspace:workspace)
     }
+    static func peerDraft(library:MemoryStore,proof:SyncMembershipRefresh,trusted:SyncMembershipCertificate,environment:SyncNativeWriterEnvironment)throws->PersonalSyncOwnerChange {
+        let workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
+        let prepared=try SyncMembershipPreparationOwner.membershipDraft(library:library,proof:proof,trusted:trusted,environment:environment)
+        return .init(operation:prepared.owner,preparation:nil,peerPreparation:prepared,library:library,workspace:workspace)
+    }
     private init(root:URL,environment:SyncNativeWriterEnvironment) {
-        operation=nil;preparation=nil;library=nil;recovery=(root,environment)
+        operation=nil;preparation=nil;peerPreparation=nil;library=nil;recovery=(root,environment)
     }
     /// Create the retained operation before any storage is opened. Apply and
     /// close run in the app's joined background work; close can be retried.
@@ -88,10 +94,13 @@ public final class PersonalSyncOwnerChange:@unchecked Sendable {
         guard let operation else {throw OSwindError.unavailable("Original membership operation is unavailable")}
         if workspace==nil,let library {workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)}
         if let preparation {try preparation.prepare(clock:clock)}
+        try peerPreparation?.prepare()
         try operation.applyMembership()
         let saved=try operation.completedResponse()
         guard preparation==nil || saved != nil else {throw OSwindError.unavailable("The saved approval response requires recovery")}
-        response=saved;finished=true;return saved
+        // A peer refresh must not present an older joining response that may
+        // still be durably retained by the original pairing account.
+        response=peerPreparation==nil ? saved:nil;finished=true;return response
     }
     public func close()throws {
         lock.lock();defer {lock.unlock()};guard !closed else {return}

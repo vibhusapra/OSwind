@@ -11,6 +11,13 @@ import OSwindCore
     @Published private(set) var ownerReviewError:String?
     @Published private(set) var isGroupOwner=false
     var approveOwnerAddition:((PersonalSyncOwnerReview)->Void)?
+    @Published private(set) var membershipRequest:String?
+    @Published private(set) var membershipPage:String?
+    @Published private(set) var membershipPageCurrent=false
+    @Published private(set) var membershipUpdateReview:PersonalSyncMembershipReview?
+    var approveMembershipUpdate:((PersonalSyncMembershipReview)->Void)?
+    private var reviewedMembershipSession:PersonalSyncSession?
+    // One tracked device-action slot is shared by owner and peer reviews.
     private var ownerReviewTask:Task<Void,Never>?
     private var ownerReviewGeneration=UUID()
     private var reviewedOwnerSession:PersonalSyncSession?
@@ -77,7 +84,7 @@ import OSwindCore
     }
     func reviewOwnerRequest(_ text:String) {
         guard !retired,!stopping,!preparing,ownerReviewTask==nil,isGroupOwner,let current=session,!store.isClosed,!locked(),allowed() else {return}
-        let generation=UUID();ownerReviewGeneration=generation;ownerReviewBusy=true;ownerReviewError=nil;ownerAdditionReview=nil;reviewedOwnerSession=nil
+        let generation=UUID();ownerReviewGeneration=generation;ownerReviewBusy=true;ownerReviewError=nil;ownerAdditionReview=nil;reviewedOwnerSession=nil;membershipUpdateReview=nil;reviewedMembershipSession=nil
         ownerReviewTask=Task {[weak self] in
             defer {if self?.ownerReviewGeneration==generation {self?.ownerReviewBusy=false;self?.ownerReviewTask=nil}}
             do {
@@ -91,7 +98,7 @@ import OSwindCore
     }
     func clearOwnerReview() {
         ownerReviewTask?.cancel()
-        ownerAdditionReview=nil;reviewedOwnerSession=nil;ownerReviewError=nil
+        ownerAdditionReview=nil;reviewedOwnerSession=nil;membershipUpdateReview=nil;reviewedMembershipSession=nil;ownerReviewError=nil
         // The existing task retains its slot until its real Keychain read
         // returns; its cancellation guard rejects any late presentation.
         if ownerReviewTask==nil {ownerReviewBusy=false}
@@ -103,6 +110,43 @@ import OSwindCore
     }
     func approveReviewedOwner(_ review:PersonalSyncOwnerReview) {
         guard sessionForOwnerApproval(review) != nil else {return};approveOwnerAddition?(review)
+    }
+    func requestMembershipUpdate() {
+        guard let current=session else {performPairing(.membershipRequest);return}
+        guard !retired,!stopping,!preparing,ownerReviewTask==nil,!store.isClosed,!locked(),allowed() else {return}
+        let generation=UUID();ownerReviewGeneration=generation;ownerReviewBusy=true;ownerReviewError=nil;membershipRequest=nil
+        ownerReviewTask=Task {[weak self] in
+            defer {if self?.ownerReviewGeneration==generation {self?.ownerReviewBusy=false;self?.ownerReviewTask=nil}}
+            do {
+                let request=try await current.membershipUpdateRequest()
+                guard !Task.isCancelled,let self,!self.retired,self.ownerReviewGeneration==generation,self.session === current,!self.store.isClosed,!self.locked(),self.allowed() else {return}
+                self.membershipRequest=request
+            }catch {
+                if let self,!self.retired,!Task.isCancelled,self.ownerReviewGeneration==generation {self.ownerReviewError="The membership request could not be read. Reopen this library before trying again."}
+            }
+        }
+    }
+    func reviewMembershipPage(_ text:String) {
+        guard !retired,!stopping,!preparing,ownerReviewTask==nil,let current=session,!store.isClosed,!locked(),allowed() else {return}
+        let generation=UUID();ownerReviewGeneration=generation;ownerReviewBusy=true;ownerReviewError=nil;membershipUpdateReview=nil;reviewedMembershipSession=nil;ownerAdditionReview=nil;reviewedOwnerSession=nil
+        ownerReviewTask=Task {[weak self] in
+            defer {if self?.ownerReviewGeneration==generation {self?.ownerReviewBusy=false;self?.ownerReviewTask=nil}}
+            do {
+                let review=try await current.reviewMembershipUpdate(text)
+                guard !Task.isCancelled,let self,!self.retired,self.ownerReviewGeneration==generation,self.session === current,!self.store.isClosed,!self.locked(),self.allowed() else {return}
+                self.membershipUpdateReview=review;self.reviewedMembershipSession=current
+            }catch {
+                if let self,!self.retired,!Task.isCancelled,self.ownerReviewGeneration==generation {self.ownerReviewError="This membership page could not be reviewed. Request a signed update for this Mac's current membership."}
+            }
+        }
+    }
+    func sessionForMembershipUpdate(_ review:PersonalSyncMembershipReview)->PersonalSyncSession? {
+        guard !retired,!stopping,!preparing,ownerReviewTask==nil,membershipUpdateReview==review,
+              let current=session,reviewedMembershipSession === current,!store.isClosed,!locked(),allowed() else {return nil}
+        return current
+    }
+    func approveReviewedMembership(_ review:PersonalSyncMembershipReview) {
+        guard sessionForMembershipUpdate(review) != nil else {return};approveMembershipUpdate?(review)
     }
     /// Transfer an existing preview owner into the tracked setup job before the
     /// first suspension. The result owns that same pairing credential lease.
@@ -191,10 +235,11 @@ import OSwindCore
         }
     }
     enum PairingAction:Sendable {
-        case load,create(String),request(String),renew,review(String),approve(PersonalSyncPairingReview),recoverResponse,accept(String,String),retire
+        case load,create(String),request(String),renew,review(String),approve(PersonalSyncPairingReview),recoverResponse,accept(String,String),retire,membershipRequest,membershipPage(String)
     }
     private struct PairingResult:Sendable {
         let owner:PersonalSyncPairing,status:PersonalSyncPairingStatus,review:PersonalSyncPairingReview?,response:String?,expires:Date?,folder:URL?
+        let membershipRequest:String?,membershipPage:String?,membershipPageCurrent:Bool
     }
     /// Pairing owns the same app exit/switch/wipe barrier as a prepared delivery
     /// session. No detached SQL/Keychain work can outlive this tracked task.
@@ -203,13 +248,14 @@ import OSwindCore
         if case .load=action,pairing != nil {return}
         let existing=pairing,store=store,factory=pairingFactory
         pairingBusy=true;pairingError=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil
+        membershipRequest=nil;membershipPage=nil;membershipPageCurrent=false
         pairingTask=Task {[weak self] in
             let worker=Task.detached {()throws->PairingResult in
                 let owner=try existing ?? factory(store)
                 do {
                     guard owner.belongs(to:store) else {throw OSwindError.unavailable("Pair only the current native library")}
                     try Task.checkCancellation()
-                    var review:PersonalSyncPairingReview?,response:String?,expires:Date?
+                    var review:PersonalSyncPairingReview?,response:String?,expires:Date?,membershipRequest:String?,membershipPage:String?,membershipPageCurrent=false
                     switch action {
                     case .load:break
                     case .create(let name):_=try owner.createGroup(deviceName:name)
@@ -222,10 +268,12 @@ import OSwindCore
                         response=saved.response;expires=saved.expires
                     case .accept(let text,let fingerprint):_=try owner.acceptResponse(text,trustedRootFingerprint:fingerprint)
                     case .retire:_=try owner.retire()
+                    case .membershipRequest:membershipRequest=try owner.membershipUpdateRequest()
+                    case .membershipPage(let request):membershipPage=try owner.membershipUpdatePage(for:request);membershipPageCurrent=membershipPage==nil
                     }
                     let status=try owner.status()
                     let folder=(status.phase == .owner || status.phase == .paired) ? try? owner.savedSessionFolder():nil
-                    return .init(owner:owner,status:status,review:review,response:response,expires:expires,folder:folder)
+                    return .init(owner:owner,status:status,review:review,response:response,expires:expires,folder:folder,membershipRequest:membershipRequest,membershipPage:membershipPage,membershipPageCurrent:membershipPageCurrent)
                 }catch {if existing==nil {owner.close()};throw error}
             }
             defer {self?.pairingTask=nil;self?.pairingBusy=false}
@@ -233,6 +281,7 @@ import OSwindCore
                 let result=try await withTaskCancellationHandler(operation:{try await worker.value},onCancel:{worker.cancel()})
                 guard !Task.isCancelled,let self,!self.retired,!store.isClosed,!self.locked(),self.allowed(),result.owner.belongs(to:store) else {result.owner.close();self?.pairing=nil;self?.pairingStatus=nil;return}
                 self.pairing=result.owner;self.pairingStatus=result.status;self.pairingReview=result.review;self.pairingResponse=result.response;self.pairingResponseExpiry=result.expires;self.folderURL=result.folder
+                self.membershipRequest=result.membershipRequest;self.membershipPage=result.membershipPage;self.membershipPageCurrent=result.membershipPageCurrent
             }catch {
                 // A committed Keychain replacement remains authoritative even
                 // if status refresh/cancellation fails. Reload before retrying.
@@ -245,7 +294,7 @@ import OSwindCore
         }
     }
     func cancelPairing() {pairingTask?.cancel()}
-    func clearPairingMessages() {pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil}
+    func clearPairingMessages() {pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil;membershipRequest=nil;membershipPage=nil;membershipPageCurrent=false}
     /// Do not clear the task here: storage still belongs to the real setup job.
     func cancelPreparation() {preparation?.cancel()}
     func start() {
@@ -382,6 +431,7 @@ import OSwindCore
         if !retired {
             retired=true;desiredActive=false;generation=UUID();changing=false;status=nil;error=nil
             ownerReviewTask?.cancel();ownerAdditionReview=nil;reviewedOwnerSession=nil;ownerReviewError=nil;isGroupOwner=false
+            membershipUpdateReview=nil;reviewedMembershipSession=nil;membershipRequest=nil;membershipPage=nil;membershipPageCurrent=false
             preparation?.cancel();pairingTask?.cancel();command?.cancel();observer?.cancel()
             pairingStatus=nil;pairingReview=nil;pairingResponse=nil;pairingResponseExpiry=nil;pairingError=nil;eraseReview=nil;folderURL=nil
         }

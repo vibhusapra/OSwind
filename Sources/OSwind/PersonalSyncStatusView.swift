@@ -43,6 +43,7 @@ struct PersonalSyncConnectionDetails:View {
                     .disabled(model.changing || model.stopping)
                 Text("Pausing delivery keeps preparing local changes. Sleeping, locking or leaving this library suspends processing before storage closes.").font(.caption).foregroundStyle(.secondary)
                 if model.isGroupOwner,model.approveOwnerAddition != nil {PersonalSyncOwnerAdditionView(model:model)}
+                if model.approveMembershipUpdate != nil {PersonalSyncMembershipUpdateView(model:model)}
                 if model.status?.phase == .needsLocalEraseReview {
                     Text("Your local history was erased. Review the exact saved decision before publishing it to your other Mac. Sync waits for this decision.").font(.callout)
                     Button("Review group erase…") {model.requestEraseReview()}.disabled(model.changing || model.stopping)

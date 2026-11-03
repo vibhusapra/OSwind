@@ -59,7 +59,8 @@ public actor PersonalSyncSession {
     private var reviewing:Task<Void,Error>?
     private let reviewOwner=UUID()
     private var ownerAdditionReview:(review:PersonalSyncOwnerReview,request:PersonalSyncPairingReview,environment:SyncNativeWriterEnvironment)?
-    private var ownerAdditionTransferred=false
+    private var membershipReview:(review:PersonalSyncMembershipReview,proof:SyncMembershipRefresh,trusted:SyncMembershipCertificate,environment:SyncNativeWriterEnvironment)?
+    private var membershipTransferred=false
     init(service:SyncLibraryService,pairing:PersonalSyncPairing?=nil,schedule:SyncLibrarySchedule = .init())throws {
         guard pairing==nil || pairing!.belongs(to:service.library) else {throw OSwindError.invalid("Own pairing for the session's current library")}
         library=service.library;privateInbox=service.inbox;self.service=service;self.pairing=pairing;scheduler=try SyncLibraryScheduler(service:service,schedule:schedule)
@@ -72,7 +73,7 @@ public actor PersonalSyncSession {
     /// Deterministic clock adapters remain internal to Core tests. Normal
     /// delivery ticks do not replace pairing authority.
     func reviewOwnerAddition(_ text:String,now:Date)throws->PersonalSyncOwnerReview {
-        guard !closed,stopping==nil,retirement==nil,reviewing==nil,!ownerAdditionTransferred,let pairing else {throw OSwindError.unavailable("Review from the current enrolled owner session")}
+        guard !closed,stopping==nil,retirement==nil,reviewing==nil,!membershipTransferred,let pairing else {throw OSwindError.unavailable("Review from the current enrolled owner session")}
         try Task.checkCancellation()
         let request=try pairing.reviewDeliveredRequest(text,now:now)
         guard !request.alreadyAdmitted else {throw OSwindError.invalid("This Mac is already admitted; recover its saved response")}
@@ -82,15 +83,46 @@ public actor PersonalSyncSession {
         let environment=try pairing.ownerChangeEnvironment()
         let workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
         let review=PersonalSyncOwnerReview(deviceName:request.deviceName,requestFingerprint:request.requestFingerprint,rootFingerprint:root,expires:request.expires,currentMemberCount:status.memberNames.count,session:reviewOwner,token:UUID(),workspace:workspace)
-        try Task.checkCancellation();ownerAdditionReview=(review,request,environment);return review
+        try Task.checkCancellation();membershipReview=nil;ownerAdditionReview=(review,request,environment);return review
+    }
+    public func membershipUpdateRequest()throws->String {
+        guard !closed,stopping==nil,retirement==nil,reviewing==nil,!membershipTransferred,let pairing else {throw OSwindError.unavailable("Request from the current enrolled session")}
+        try Task.checkCancellation()
+        return try pairing.membershipUpdateRequest()
+    }
+    public func reviewMembershipUpdate(_ text:String)throws->PersonalSyncMembershipReview {
+        guard !closed,stopping==nil,retirement==nil,reviewing==nil,!membershipTransferred,let pairing else {throw OSwindError.unavailable("Review from the current enrolled session")}
+        try Task.checkCancellation()
+        let proof=try SyncMembershipRefresh.decode(Data(text.utf8)),trusted=try pairing.membershipCertificateForRefresh(),head=try proof.advance(from:trusted)
+        guard head != trusted else {throw OSwindError.invalid("This membership page is already applied; request the next page")}
+        // The complete supplied path was verified above. Private preparation
+        // must start at our exact current certificate, even when the public
+        // page includes an already applied prefix. Keep the review fingerprint
+        // bound to the original page rather than this local suffix.
+        guard let current=proof.certificates.firstIndex(of:trusted) else {throw OSwindError.invalid("Membership update does not extend the exact trusted history")}
+        let pending=try SyncMembershipRefresh(base:trusted,updates:Array(proof.certificates.dropFirst(current+1)))
+        let environment=try pairing.ownerChangeEnvironment(),workspace=try PersonalSyncOwnerWorkspaceIdentity.read(library)
+        let oldMembers=Set(trusted.body.members.map(\.replica))
+        let review=PersonalSyncMembershipReview(rootFingerprint:try SyncPairingFormat.fingerprint(head.body.rootPublicKey),updateFingerprint:SyncProtocolLimits.hex(try proof.encoded()),currentRevision:trusted.body.revision,updatedRevision:head.body.revision,currentMemberCount:trusted.body.members.count,updatedMemberCount:head.body.members.count,addedDeviceNames:head.body.members.filter {!oldMembers.contains($0.replica)}.map(\.name),session:reviewOwner,token:UUID(),workspace:workspace)
+        try Task.checkCancellation();ownerAdditionReview=nil;membershipReview=(review,pending,trusted,environment);return review
+    }
+    /// App retirement first joins its actual producers and this exact stop.
+    /// Reserve the shared one-use transfer before awaiting actor reentrancy.
+    public func membershipChangeAfterStopping(_ review:PersonalSyncMembershipReview)async throws->PersonalSyncMembershipChange {
+        guard closed,let stopping,!membershipTransferred,let stored=membershipReview,
+              stored.review==review,review.session==reviewOwner else {throw OSwindError.unavailable("Stop and join the exact reviewed session before updating membership")}
+        membershipTransferred=true;membershipReview=nil;ownerAdditionReview=nil
+        try await stopping.value;try Task.checkCancellation()
+        try review.workspace.validate(library)
+        return try PersonalSyncOwnerChange.peerDraft(library:library,proof:stored.proof,trusted:stored.trusted,environment:stored.environment)
     }
     /// Caller first retires/drains the exact app model, then explicitly joins
     /// this session's stop. Reserve the one-use transfer before awaiting so
     /// actor reentrancy cannot construct two credential owners.
     func ownerChangeAfterStopping(_ review:PersonalSyncOwnerReview,clock:@Sendable ()->Date)async throws->PersonalSyncOwnerChange {
-        guard closed,let stopping,!ownerAdditionTransferred,let stored=ownerAdditionReview,
+        guard closed,let stopping,!membershipTransferred,let stored=ownerAdditionReview,
               stored.review==review,review.session==reviewOwner else {throw OSwindError.unavailable("Stop and join the exact reviewed session before approval")}
-        ownerAdditionTransferred=true;ownerAdditionReview=nil
+        membershipTransferred=true;ownerAdditionReview=nil;membershipReview=nil
         try await stopping.value
         try Task.checkCancellation()
         return try PersonalSyncOwnerChange.draft(library:library,review:stored.request,environment:stored.environment,now:clock())
