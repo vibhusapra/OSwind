@@ -160,4 +160,6 @@ Saved chat turns retain their actual absolute scope and time zone. Follow-up sub
 
 [Required content expressions](docs/KEYWORD-EMPTY-CONSTRAINTS.md) now reject globally absent operands before candidate ranking. Content and speaker indexes are checked in the same snapshot; complete row filters and relevance order remain in force. Fresh authored paired CLI results and retained limits are documented.
 
+[Durable enrolled-owner response recovery](docs/SYNC-DELIVERED-RESPONSE-WIP.md) now preserves the exact encrypted joining response through internal membership handover and process death. Public owner addition stays disabled until the app session/drain/close/reopen lifecycle is integrated; complete sync remains open.
+
 Saved opt-in reconnect/pause and keyword startup now have [source-bound local qualification](docs/KEYWORD-STARTUP-WIP.md). The [authored three-binary CLI comparison](docs/OFFLINE-KEYWORD-COMPARISON.md) retains improvements and the slower broad-query case with raw evidence. Complete sync, sustained physical energy and signed distribution remain unfinished.

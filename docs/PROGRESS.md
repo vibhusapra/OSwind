@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## Enrolled-owner responses survive the final membership save
+
+Core `9f47c46` stores a separately addressed encrypted approval plan and promotes its completed reference in the existing final private-account save. Latest explicit recovery validates original pairing/publication lifetimes and signed history, preserves exact expiry, and refuses missing/corrupt latest responses. Cancellation/later pure membership/floor upgrades preserve prior receipts; retirement clears them. Public enrolled-owner approval remains disabled.
+
+**715 committed inputs**, 14 ordinary and two gated new methods: full Debug **2,633 passed / 166 skips**; broad sanitizer/optimized **772 passed / 58 skips each**; explicit original-Keychain/frozen-client selections **78 passed / three child-only skips each**. All seven new real SIGKILL boundaries pass in both native builds. Five altered logs and three altered death records reject; normal production/strict ad-hoc package pass with prior resources/Info unchanged. Earlier fixture/scope failures remain retained.
+
+[Scope and next app lifecycle](SYNC-DELIVERED-RESPONSE-WIP.md) · [Receipt](../benchmarks/sync-delivered-response-v1.json) · [Inputs](../benchmarks/sync-delivered-response-inputs-v1.json) · [Raw evidence](../benchmarks/sync-delivered-response-raw-v1.zip). All 502 preceding publications and all 83 feature statuses remain unchanged. F059 full sync, actual app drain/close-retry/reopen, physical two-Mac, sustained capture/power, distribution, complete v0 and ranking remain open.
+
 ## Owned soak cleanup no longer depends on writable diagnostics
 
 Controller source `575205f` guards launch through cleanup and reaps both directly owned process handles even if heartbeat, stop, error or exit files cannot be written. It escalates ignored termination, preserves failures, and publishes completed results only after both children are reaped. It does not signal PID-file values, process groups or unrelated processes; the imported helper is hash-pinned in each run manifest.

@@ -265,7 +265,12 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         }
         let material=try SyncCredentialMaterial.decodeFromKeychain(value.material!)
         let certificate=material.joined.certificate
-        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:value.delivery != nil,lastResponseAvailable:value.initialApproval != nil)
+        var responseAvailable=value.initialApproval != nil
+        if !responseAvailable,material.owner != nil,let delivery=value.delivery {
+            let environment=SyncNativeWriterEnvironment(stateRoot:stateRoot,machine:machine,storage:{[injectedStorage] protection in injectedStorage ?? SyncKeychainCredentialStorage(protection:protection)})
+            responseAvailable=(try? SyncDeliveryAnchor.hasCompletedApproval(library:store,deliveryID:delivery.id,material:material,environment:environment))==true
+        }
+        return .init(phase:material.owner==nil ? .paired:.owner,deviceName:certificate.body.members.first {$0.replica==material.joined.replica}!.name,memberNames:certificate.body.members.map(\.name),rootFingerprint:try SyncPairingFormat.fingerprint(certificate.body.rootPublicKey),requestFingerprint:nil,request:nil,expires:nil,deliveryPrepared:value.delivery != nil,lastResponseAvailable:responseAvailable)
     }
     public func createGroup(deviceName:String,now:Date=Date())throws->PersonalSyncPairingStatus {try withAccess {
         let pending=try SyncPendingJoin(name:deviceName,now:now),owner=try SyncGroupAuthority(owner:pending.request,now:now)
@@ -311,7 +316,12 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     public func lastApprovedResponse()throws->PersonalSyncApprovedResponse? {try withAccess {
         let (value,_)=try current();guard let raw=value.material,!value.retired else {return nil}
         let material=try SyncCredentialMaterial.decodeFromKeychain(raw)
-        guard material.owner != nil,value.initialApproval != nil else {return nil}
+        guard material.owner != nil else {return nil}
+        if let delivery=value.delivery {
+            let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:material,id:delivery.id,stateRoot:stateRoot,machine:machine,storage:injectedStorage ?? SyncKeychainCredentialStorage(protection:delivery.protection));defer {anchor.close()}
+            if let response=try anchor.completedOwnerResponse() {return response}
+        }
+        guard value.initialApproval != nil else {return nil}
         return try loadInitialApproval(value,material:material)
     }}
     private func loadInitialApproval(_ value:Envelope,material:SyncCredentialMaterial)throws->PersonalSyncApprovedResponse {
@@ -392,6 +402,48 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
         let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:SyncCredentialMaterial.decodeFromKeychain(saved),id:delivery.id,stateRoot:stateRoot,machine:machine,storage:backend)
         return (anchor,snapshot)
     }}
+    /// Internal, stopped-session owner path. Public enrollment guards remain
+    /// until the app has a complete session-bound drain/close/reopen operation.
+    func reviewDeliveredRequest(_ text:String,now:Date)throws->PersonalSyncPairingReview {try withAccess {
+        let (value,saved)=try current()
+        guard value.delivery != nil,let raw=value.material,let owner=try SyncCredentialMaterial.decodeFromKeychain(raw).owner else {throw OSwindError.invalid("Review an enrolled group owner request")}
+        guard text.utf8.count<=SyncPairingFormat.requestLimit else {throw OSwindError.invalid("Pairing request exceeds its bound")}
+        let request=try SyncJoinRequest.decode(Data(text.utf8),now:now)
+        return .init(deviceName:request.body.name,requestFingerprint:try request.digest,expires:Date(timeIntervalSince1970:TimeInterval(request.body.expires)),alreadyAdmitted:owner.certificate.body.members.contains(try SyncMember(request)),bytes:try request.encoded(),ownerState:SyncProtocolLimits.hex(saved))
+    }}
+    func openOwnerApprovalPreparation(_ review:PersonalSyncPairingReview,clock:()->Date)throws->(SyncDeliveryAnchor,MembershipSnapshot,SyncMembershipRefresh,SyncOwnerApprovalPlan) {try withAccess {
+        let (value,bytes)=try current()
+        guard let delivery=value.delivery,let raw=value.material,let owner=try SyncCredentialMaterial.decodeFromKeychain(raw).owner else {throw OSwindError.invalid("Approve through the enrolled group owner's original accounts")}
+        let now=clock(),request=try SyncJoinRequest.decode(review.bytes,now:now)
+        guard review.ownerState==SyncProtocolLimits.hex(bytes),review.requestFingerprint == (try request.digest),!review.alreadyAdmitted,!owner.certificate.body.members.contains(try SyncMember(request)) else {throw OSwindError.invalid("Review the current new device; an admitted request requires separate response recovery or reissue")}
+        let backend=injectedStorage ?? SyncKeychainCredentialStorage(protection:delivery.protection)
+        let anchor=try SyncDeliveryAnchor.openExisting(library:store,material:SyncCredentialMaterial.decodeFromKeychain(raw),id:delivery.id,stateRoot:stateRoot,machine:machine,storage:backend)
+        do {
+            let next=try owner.admitting(request,now:now),proof=try SyncMembershipRefresh(base:owner.certificate,updates:[next.certificate])
+            let snapshot=try Self.membershipSnapshot(value,bytes:bytes,proof:proof)
+            let plan=try next.approvalPlan(to:request,prior:owner.certificate,pairingID:value.id,lifetime:value.location.lifetime,now:now)
+            try retainMembershipHistory(proof.certificates,head:proof.base)
+            return (anchor,snapshot,proof,plan)
+        }catch {anchor.close();throw error}
+    }}
+    static func verifyApprovalPlan(library:MemoryStore,material:SyncCredentialMaterial,reference:SyncDeliveryApprovalReference,proof:SyncMembershipRefresh,pairingID:String,pairingLifetime:String)throws {
+        try reference.validate()
+        let inbox=try material.joined.openPrivateInbox(at:library.root.appendingPathComponent("images/device-sync-"+material.joined.replica));defer {inbox.close()}
+        guard let bytes=try inbox.content(reference.approval.content),reference.approval.content.matches(bytes) else {throw OSwindError.unavailable("The saved encrypted approval is missing; recovery is required")}
+        let plan=try SyncOwnerApprovalPlan.decode(bytes)
+        try plan.require(reference.approval,current:proof.head,pairingID:pairingID,lifetime:pairingLifetime)
+        guard plan.binding.purpose == .addition,plan.prior==proof.base,plan.certificate==proof.head else {throw OSwindError.invalid("Approval differs from the saved membership proof")}
+    }
+    static func deliveredApprovalResponse(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,reference:SyncDeliveryApprovalReference,deliveryID:String,material:SyncCredentialMaterial)throws->PersonalSyncApprovedResponse {
+        let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID)
+        guard saved.value.material == (try material.encodedForKeychain()),material.owner != nil else {throw OSwindError.unavailable("Saved response requires its original owner membership")}
+        let inbox=try material.joined.openPrivateInbox(at:library.root.appendingPathComponent("images/device-sync-"+material.joined.replica));defer {inbox.close()}
+        guard let bytes=try inbox.content(reference.approval.content),reference.approval.content.matches(bytes) else {throw OSwindError.unavailable("The latest saved response is missing; recovery is required")}
+        let plan=try SyncOwnerApprovalPlan.decode(bytes)
+        try plan.require(reference.approval,current:material.joined.certificate,pairingID:saved.value.id,lifetime:saved.value.location.lifetime)
+        _=try SyncMembershipHistory.page(after:plan.certificate,anchoredHead:material.joined.certificate,db:db)
+        return .init(response:String(decoding:plan.response,as:UTF8.self),deviceName:plan.request.body.name,requestFingerprint:plan.binding.requestDigest,approvedAt:Date(timeIntervalSince1970:TimeInterval(plan.binding.approvedAt)),expires:Date(timeIntervalSince1970:TimeInterval(plan.request.body.expires)))
+    }
     /// Both normal admission and saved recovery read only the originally
     /// enrolled account. This never creates a handle, backend or private key.
     private static func membershipEnvelope(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,deliveryID:String)throws->(value:Envelope,bytes:Data,storage:any SyncCredentialStorage) {
@@ -414,6 +466,10 @@ public final class PersonalSyncPairing:@unchecked Sendable,CustomStringConvertib
     @discardableResult static func verifyMembershipPreparation(library:MemoryStore,db:RoutineDatabase,environment:SyncNativeWriterEnvironment,record:SyncMembershipPreparation,proof:SyncMembershipRefresh,deliveryID:String)throws->Bool {
         let saved=try membershipEnvelope(library:library,db:db,environment:environment,deliveryID:deliveryID)
         guard saved.value.id==record.pairingID else {throw OSwindError.unavailable("Saved membership belongs to another pairing account")}
+        if let approval=record.approval {
+            guard let raw=saved.value.material else {throw OSwindError.invalid("Approval membership material is missing")}
+            try verifyApprovalPlan(library:library,material:SyncCredentialMaterial.decodeFromKeychain(raw),reference:approval,proof:proof,pairingID:saved.value.id,pairingLifetime:saved.value.location.lifetime)
+        }
         let candidates=try membershipEnvelopes(saved.value,proof:proof),current=SyncProtocolLimits.hex(saved.bytes)
         guard SyncProtocolLimits.hex(candidates.before)==record.pairingBefore,SyncProtocolLimits.hex(candidates.after)==record.pairingAfter,
               SyncProtocolLimits.hex(candidates.materialBefore)==record.materialBefore,SyncProtocolLimits.hex(candidates.materialAfter)==record.materialAfter,
