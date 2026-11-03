@@ -7,7 +7,8 @@ import Darwin
 import FoundationModels
 #endif
 
-var args = Array(CommandLine.arguments.dropFirst())
+let invocation = Array(CommandLine.arguments.dropFirst())
+var args = invocation
 func option(_ name: String) -> String? { guard let i = args.firstIndex(of:name), i+1 < args.count else { return nil }; let value = args[i+1]; args.removeSubrange(i...i+1); return value }
 let selectedVault = option("--vault")
 let explicitData = option("--data")
@@ -83,6 +84,8 @@ func vaultPassphrase() throws -> Data {
     return data
 }
 do {
+    let captureRequest=try CaptureCLIRequest.parse(command:command,arguments:args,invocation:invocation)
+    if captureRequest != nil {args.removeAll()}
     guard command != "mcp-client" || (selectedVault==nil && explicitData==nil) else {throw OSwindError.invalid("MCP client does not open a library; omit --data and --vault")}
     guard command != "pii" || (selectedVault==nil && explicitData==nil) else {throw OSwindError.invalid("PII inspection does not use --vault or --data")}
     guard selectedVault==nil || explicitData==nil else {throw OSwindError.invalid("Choose --vault or --data, not both")}
@@ -600,21 +603,22 @@ do {
             }
             if json {try encoded(report)} else {print(report.imported);if report.excluded>0 || report.skippedLinkedRecaps>0 {FileHandle.standardError.write(Data("Import omitted \(report.excluded) excluded records and \(report.skippedLinkedRecaps) linked recaps with excluded, redacted or stale originals.\n".utf8))}}
         case "capture-replay":
-            let bundle=try validatedOption("--app-bundle"),duration=try validatedOption("--seconds")
-            guard let duration,let seconds=Double(duration),args.isEmpty else {throw OSwindError.invalid("Use capture-replay --seconds 1..120 [--app-bundle ID]")}
+            guard let request=captureRequest,let seconds=request.seconds else {throw OSwindError.invalid("Use capture-replay --seconds 1..120 [--app-bundle ID]")}
             let controller=CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root))
-            try await controller.captureReplay(seconds:seconds,targetBundleID:bundle)
+            try await controller.captureReplay(seconds:seconds,targetBundleID:request.targetBundleID)
             try emit(["status":controller.status,"saved":controller.metrics.saved,"errors":controller.metrics.errors])
         case "capture-text":
-            let bundle=try validatedOption("--app-bundle")
-            guard args.isEmpty else {throw OSwindError.invalid("Use capture-text [--app-bundle ID]")}
+            guard let request=captureRequest else {throw OSwindError.invalid("Use capture-text [--app-bundle ID]")}
             let settings=AppSettings.load(root:root)
             guard settings.visualCaptureMode == .accessibility else {throw OSwindError.invalid("Select and save Text only in Capture settings before capture-text")}
             let controller=CaptureController(store:store,embedder:embedder,settings:settings)
-            await controller.captureOnce(manual:true,targetBundleID:bundle)
+            await controller.captureOnce(manual:true,targetBundleID:request.targetBundleID)
             guard controller.metrics.saved==1,controller.metrics.errors==0 else {throw OSwindError.unavailable("Text-only capture saved no complete indexed source: "+controller.status)}
             try emit(["status":controller.status,"saved":controller.metrics.saved,"errors":controller.metrics.errors,"mode":"accessibility"])
-        case "capture": let bundle = option("--app-bundle"); let controller = CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root)); await controller.captureOnce(manual:true,targetBundleID:bundle); print(controller.status)
+        case "capture":
+            guard let request=captureRequest else {throw OSwindError.invalid("Use capture [--app-bundle ID]")}
+            let controller=CaptureController(store:store,embedder:embedder,settings:AppSettings.load(root:root))
+            await controller.captureOnce(manual:true,targetBundleID:request.targetBundleID);print(controller.status)
         case "import-audio":
             var settings=AppSettings.load(root:root)
             let whisperOverride=try validatedOption("--model"), nativeOverride=try validatedOption("--native-model"), computeOverride=try validatedOption("--compute")
