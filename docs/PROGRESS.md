@@ -1,5 +1,15 @@
 # OSwind delivery ledger
 
+## Explicit local answer-model loading with matching context
+
+Runtime `9245805` adds an optional Load selected answer model action with cancellation and an expiring memory observation. Its empty finite-retention request uses the existing 8,192-token answer context and contains no captured evidence. The retained first attempt reported the server default 262,144 context; final request/observation alignment is verified at 8,192. Selection generations reject late results, task ownership participates in app retirement/drain, and saved settings remain unchanged.
+
+Qualification binds **711 inputs** and twenty-one new methods: full Debug **2,611 passed / 163 conditional skips**; focused sanitizer and optimized **150 passed / 37 skips each**; one explicitly gated optimized actual-model case **passed**. Zero failures/race diagnostics. The actual controller loaded `qwen3.5:4b` against unchanged local Ollama 0.40.8/model identities; client load/check elapsed was 31.818 seconds. A separate new fictional-note packaged CLI question returned the supported owner/citation in 0.396 seconds of whole-process time, with exact source identity and unchanged settings. These are descriptive observations, without a controlled cold-start/first-answer speedup, energy or ranking claim.
+
+Two inert actual HTTP servers verify empty request shape; a real AnswerEngine wire contract preserves context 8,192, temperature 0.2, output limit 1,000 and disabled thinking. Five altered logs, six altered live records and five altered smoke answers reject. Production build/fresh strict ad-hoc package pass; prior resources/bundle information and 495 preceding publications remain unchanged. Earlier helper failures and the insufficient initial context observation remain retained. [Scope and observations](LOCAL-ANSWER-PREPARATION.md) · [Receipt](../benchmarks/local-answer-preparation-v1.json) · [Inputs](../benchmarks/local-answer-preparation-inputs-v1.json) · [Raw evidence](../benchmarks/local-answer-preparation-raw-v1.zip).
+
+PR155's [hosted workflow](https://github.com/vibhusapra/OSwind/actions/runs/41639295720) subsequently passed, including all 84 native steps and the offline setup control. **All 83 feature statuses remain unchanged; complete sync, physical capture/energy, distribution, full v0 and ranking acceptance remain open.**
+
 ## Local model controls follow the selected server
 
 Runtime `3128608` replaces the single search-server model list with explicit answer/search destinations and endpoint-specific snapshots. Discovery, startup and downloads use the displayed destination. Newer checks/configuration fence late results; telemetry failure preserves installed models. A cancelled pull retains ownership until its task exits, and model tasks participate in app retirement/drain and exit admission. Saved model choices and the answer/retrieval engine remain unchanged.

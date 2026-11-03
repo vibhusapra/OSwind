@@ -73,6 +73,62 @@ public actor OllamaClient {
         struct Response: Decodable { var models: [InstalledModel] }
         return try JSONDecoder().decode(Response.self,from:await data(request(endpoint,path:"api/tags",timeout:timeout))).models
     }
+    public func runningModels(endpoint: String) async throws -> [RunningLocalModel] {
+        struct Response: Decodable { var models: [RunningLocalModel] }
+        return try JSONDecoder().decode(Response.self, from: await data(request(endpoint, path: "api/ps", timeout: 5))).models
+    }
+    /// Explicit empty-request preload. Never sends prompts, evidence or keys,
+    /// downloads weights, changes global runtime settings or unloads a model.
+    public func prepare(_ name: String, endpoint: String) async throws -> LocalModelPreparation {
+        _ = try Self.localURL(endpoint, path: "api/generate")
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Choose an installed answer model to load") }
+        try Task.checkCancellation()
+        let clock = ContinuousClock(), start = ContinuousClock.now
+        let before = try Self.preparationModel(name, in: await models(endpoint: endpoint))
+        try Task.checkCancellation()
+        let payload = try await data(request(endpoint, path: "api/generate", body: ["model": before.name, "stream": false, "keep_alive": "5m", "options": ["num_ctx": AIConfiguration.localContextWindow]], timeout: 300))
+        struct Response: Decodable {
+            var model: String; var done: Bool; var response: String?; var thinking: String?
+            var done_reason: String?; var eval_count: Int?; var prompt_eval_count: Int?; var load_duration: UInt64?
+        }
+        let response: Response
+        do { response = try JSONDecoder().decode(Response.self, from: payload) }
+        catch { throw OSwindError.network("The local server did not confirm model loading") }
+        guard response.model == before.name, response.done,
+              response.response?.isEmpty != false, response.thinking?.isEmpty != false,
+              response.eval_count == nil || response.eval_count == 0,
+              response.prompt_eval_count == nil || response.prompt_eval_count == 0,
+              response.done_reason == nil || ["load", "stop"].contains(response.done_reason!) else {
+            throw OSwindError.network("The local server returned an unexpected model-load response")
+        }
+        try Task.checkCancellation()
+        let after = try Self.preparationModel(name, in: await models(endpoint: endpoint))
+        guard after.name == before.name, after.digest == before.digest else { throw OSwindError.unavailable("The selected model changed while loading. Check it and try again.") }
+        let running = try await runningModels(endpoint: endpoint)
+        try Task.checkCancellation()
+        let matches = running.filter { $0.name == before.name && $0.digest == before.digest }
+        let observed = Date()
+        guard matches.count == 1, let loaded = matches.first, loaded.size > 0, loaded.expiresAt > observed,
+              loaded.gpuBytes == nil || loaded.gpuBytes! >= 0,
+              loaded.contextLength == AIConfiguration.localContextWindow else {
+            throw OSwindError.unavailable("The local server did not report the selected model loaded for the answer context. Check the server and try again.")
+        }
+        let duration = start.duration(to: clock.now).components
+        return LocalModelPreparation(endpoint: endpoint, requestedModel: name, model: before.name, digest: before.digest,
+                                     observedAt: observed, serverExpiresAt: loaded.expiresAt, residentBytes: loaded.size,
+                                     gpuBytes: loaded.gpuBytes, contextLength: loaded.contextLength,
+                                     serverLoadNanoseconds: response.load_duration,
+                                     elapsedSeconds: Double(duration.seconds) + Double(duration.attoseconds) / 1e18)
+    }
+    private static func preparationModel(_ name: String, in models: [InstalledModel]) throws -> InstalledModel {
+        let untagged = !(name.split(separator: "/").last?.contains(":") ?? true)
+        let candidates = models.filter { $0.name == name || (untagged && $0.name == name + ":latest") }
+        guard candidates.count == 1, let model = candidates.first else { throw OSwindError.unavailable("Choose an unambiguous installed model before loading it") }
+        guard !model.isRemote else { throw OSwindError.invalid("Cloud-backed model aliases cannot be loaded in local mode") }
+        guard model.digest.count == 64, model.digest.allSatisfy({ $0.isASCII && $0.isHexDigit }) else { throw OSwindError.network("The local server did not identify the installed model") }
+        guard model.capabilities?.contains("completion") != false else { throw OSwindError.invalid("Choose a model that supports text completion for answers") }
+        return model
+    }
     public func runtime(endpoint: String) async throws -> String {
         let payload = try await data(request(endpoint,path:"api/ps",timeout:5))
         guard let json = try JSONSerialization.jsonObject(with:payload) as? [String:Any], let models = json["models"] as? [[String:Any]] else { throw OSwindError.network("Invalid local runtime response") }

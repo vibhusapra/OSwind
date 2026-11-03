@@ -20,6 +20,7 @@ public enum AIProvider: String, Codable, CaseIterable, Sendable {
 public struct AIConfiguration: Codable, Equatable, Sendable {
     public static let defaultLocalModel = "qwen3.5:4b"
     public static let largerLocalModel = "gemma4:e4b"
+    public static let localContextWindow = 8192
     public var provider: AIProvider = .evidence
     public var endpoint = "http://127.0.0.1:11434"
     public var model = AIConfiguration.defaultLocalModel
@@ -177,7 +178,7 @@ public final class AnswerEngine {
             var request = URLRequest(url: url); request.httpMethod = "POST"; request.timeoutInterval = 120; request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             let credential: String? = configuration.provider == .ollama ? nil : (key ?? SecretStore.get(configuration.provider.rawValue))
             var body: [String: Any] = ["model": configuration.model, "messages": [["role": "system", "content": system], ["role": "user", "content": prompt]], "stream": false]
-            if configuration.provider == .ollama { body["options"] = ["temperature": 0.2, "num_predict": 1000, "num_ctx": 8192]; body["keep_alive"] = "5m"; body["think"] = false }
+            if configuration.provider == .ollama { body["options"] = ["temperature": 0.2, "num_predict": 1000, "num_ctx": AIConfiguration.localContextWindow]; body["keep_alive"] = "5m"; body["think"] = false }
             else if configuration.provider == .anthropic { guard let credential, !credential.isEmpty else { throw OSwindError.invalid("Save an Anthropic API key in Models settings") }; request.setValue(credential, forHTTPHeaderField: "x-api-key"); request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version"); body["system"] = system; body["messages"] = [["role": "user", "content": prompt]]; body["max_tokens"] = 1200 }
             else { if let credential, !credential.isEmpty { request.setValue("Bearer " + credential, forHTTPHeaderField: "Authorization") }; body["max_completion_tokens"] = 1200; body["store"] = false }
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
