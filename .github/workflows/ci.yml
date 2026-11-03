@@ -65,7 +65,7 @@ jobs:
             ${{ runner.temp }}/oswind-peer-membership-ui/folder/*.png
           if-no-files-found: ignore
       - name: Verify recorded meeting workspace and retained-page vault detach
-        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'
       - name: Retain owned recorded meeting components
         if: always()
         uses: actions/upload-artifact@v4

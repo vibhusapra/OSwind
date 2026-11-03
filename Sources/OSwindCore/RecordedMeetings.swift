@@ -65,6 +65,7 @@ public extension MemoryStore {
         guard (1...512).contains(limit),cursor.map({$0.owner==recordedMeetingOwner}) ?? true else {throw OSwindError.invalid("Use a current recording cursor and a page size of 1–512")}
         let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
         return try withRoutineDatabase {db in try db.transaction {try snapshot.withCurrent(root:root,policy:policy) {
+            try RecordedMeetingSchema.populateIfNeeded(db)
             let whereSQL=cursor==nil ? "":"WHERE started<? OR (started=? AND memory_id<?)"
             let row=try db.statement("SELECT memory_id,grouped,recording_id,started,observed_end,duration,title,app,bundle_id,url,revision FROM recorded_meeting_sources \(whereSQL) ORDER BY started DESC,memory_id DESC LIMIT ?")
             defer {sqlite3_finalize(row)}

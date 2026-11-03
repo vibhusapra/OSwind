@@ -66,6 +66,17 @@ import SwiftUI
         gate.release();let clean=await joined.value;XCTAssertTrue(clean);XCTAssertFalse(old.libraryWork.busy);try old.store.close();app.model=nil
         XCTAssertTrue(value.sessions.isEmpty)
     }
+    func testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles()async throws {
+        let app=try AppModel(root:root,startServices:false);appModels.append(app);app.showOnboarding=false
+        let removed=try audio("removed",session:"remove",in:app.store);try audio("kept",session:"keep",in:app.store)
+        let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,2)
+        app.delete(removed)
+        let end=SuspendingClock.now.advanced(by:.seconds(15));while app.deletingID != nil,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertNil(app.deletingID);try await settle(value)
+        XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["kept"]);XCTAssertNil(try app.store.get("removed"))
+        app.pauseForHistoryErasure();XCTAssertTrue(value.sessions.isEmpty);XCTAssertNil(value.selectedID);XCTAssertFalse(value.busy)
+        XCTAssertNotNil(try app.store.get("kept"),"Pausing removes previews, not canonical surviving sources")
+    }
     func testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording workspace components only")}
         let output=URL(fileURLWithPath:path);try Paths.ensure(output)

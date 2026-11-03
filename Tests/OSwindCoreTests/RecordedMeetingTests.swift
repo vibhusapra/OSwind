@@ -91,6 +91,7 @@ final class RecordedMeetingTests:XCTestCase {
     }
     func testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata()throws {
         try audio("source",100,title:"Review api_key=secretvalue1234567890")
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,1,"First use builds historical metadata before the thin-read check")
         try store.withRoutineDatabase {db in
             // An isolated ordinary fixture connection only. Refuse reads of the
             // canonical payload; this test closes it before any further write.
@@ -100,5 +101,89 @@ final class RecordedMeetingTests:XCTestCase {
         }
         let page=try store.recordedMeetingPage();XCTAssertEqual(page.sources.count,1);XCTAssertFalse(page.sources[0].title.contains("secretvalue1234567890"))
         try store.close()
+    }
+    private func resetDerivedIndex()throws {
+        try store.withRoutineDatabase {db in try db.transaction {
+            for name in RecordedMeetingSchema.triggers.keys {try db.execute("DROP TRIGGER \(name)")}
+            try db.execute("DROP TABLE recorded_meeting_sources; DELETE FROM store_metadata WHERE key='recorded_meeting_index_version'")
+            try RecordedMeetingSchema.install(db)
+        }}
+    }
+    private func indexState()throws->(String,Int) {
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT value,(SELECT count(*) FROM recorded_meeting_sources) FROM store_metadata WHERE key='recorded_meeting_index_version'");defer {sqlite3_finalize(row)}
+            XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);return (db.text(row,0),Int(sqlite3_column_int64(row,1)))
+        }
+    }
+    func testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter()throws {
+        XCTAssertEqual(try indexState().0,"1");XCTAssertEqual(try indexState().1,0)
+        try audio("first-writer",100)
+        let nonce=try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT revision FROM recorded_meeting_sources WHERE memory_id='first-writer'");defer {sqlite3_finalize(row)}
+            XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);return db.text(row,0)
+        }
+        XCTAssertEqual(try store.recordedMeetingPage().sources.first?.revision,nonce)
+    }
+    func testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters()throws {
+        try audio("historical",100);try resetDerivedIndex()
+        try store.withRoutineDatabase {db in
+            try db.execute("DROP TRIGGER recorded_meeting_update")
+            sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+                if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+            },nil)
+            defer {sqlite3_set_authorizer(db.handle,nil,nil)}
+            try db.transaction {try RecordedMeetingSchema.install(db)}
+        }
+        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,0)
+        try store.close();store=try MemoryStore(root:root)
+        try audio("new-writer",130);XCTAssertEqual(try indexState().1,1)
+        try store.close();store=try MemoryStore(root:root)
+        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1,"Opening preserves the pending cache's write-through rows")
+        let page=try store.recordedMeetingPage();XCTAssertEqual(Set(page.sources.map(\.memoryID)),["historical","new-writer"])
+        XCTAssertEqual(try indexState().0,"1");let revisions=Dictionary(uniqueKeysWithValues:page.sources.map {($0.memoryID,$0.revision)})
+        try store.close();store=try MemoryStore(root:root)
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues:try store.recordedMeetingPage().sources.map {($0.memoryID,$0.revision)}),revisions,"Ready opens must not rebuild the cache")
+    }
+    func testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry()throws {
+        try audio("historical",100);try resetDerivedIndex();try audio("new-writer",130)
+        try store.withRoutineDatabase {db in
+            sqlite3_set_authorizer(db.handle,{_,action,table,_,_,_ in
+                if action==SQLITE_INSERT,let table,String(cString:table)=="recorded_meeting_sources" {return SQLITE_DENY};return SQLITE_OK
+            },nil)
+        }
+        XCTAssertThrowsError(try store.recordedMeetingPage())
+        try store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}
+        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1,"Deletion before a failed backfill must roll back")
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,2);XCTAssertEqual(try indexState().0,"1")
+    }
+    func testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry()async throws {
+        for index in 0..<120 {try audio("old-\(index)",Double(index))}
+        try resetDerivedIndex();try audio("new-writer",130)
+        let gate=RecordingBackfillGate(),current=store!
+        try store.withRoutineDatabase {db in
+            let code=sqlite3_create_function_v2(db.handle,"randomblob",1,SQLITE_UTF8,Unmanaged.passUnretained(gate).toOpaque(),{context,_,_ in
+                let gate=Unmanaged<RecordingBackfillGate>.fromOpaque(sqlite3_user_data(context)!).takeUnretainedValue()
+                gate.waitOnce()
+                var bytes=UUID().uuid
+                withUnsafeBytes(of:&bytes) {sqlite3_result_blob(context,$0.baseAddress,16,unsafeBitCast(-1,to:sqlite3_destructor_type.self))}
+            },nil,nil,nil)
+            XCTAssertEqual(code,SQLITE_OK)
+        }
+        let worker=Task.detached {try current.recordedMeetingPage()}
+        let entered=await Task.detached {gate.entered.wait(timeout:.now()+5) == .success}.value
+        worker.cancel();gate.release.signal();XCTAssertTrue(entered,"Cancellation must happen inside the backfill SQL, after deleting prior rows")
+        do {_ = try await worker.value;XCTFail("Expected first-use cancellation")}catch is CancellationError {}catch {XCTFail("Unexpected failure: \(error)")}
+        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1)
+        try store.close();store=try MemoryStore(root:root)
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,121);XCTAssertEqual(try indexState().0,"1")
+    }
+}
+
+private final class RecordingBackfillGate:@unchecked Sendable {
+    let entered=DispatchSemaphore(value:0),release=DispatchSemaphore(value:0)
+    private let lock=NSLock();private var waiting=false
+    func waitOnce() {
+        lock.lock();let first = !waiting;waiting=true;lock.unlock()
+        if first {entered.signal();release.wait()}
     }
 }

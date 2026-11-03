@@ -56,7 +56,8 @@ enum RecordedMeetingSchema {
             );
             """)
             let marker=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
-            var current=existed && sqlite3_step(marker)==SQLITE_ROW && db.text(marker,0)=="1";sqlite3_finalize(marker)
+            let version=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
+            var current=existed && (version=="1" || version=="pending:1")
             for name in triggers.keys.sorted() {
                 let row=try db.statement("SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?");db.bind(row,1,name)
                 if sqlite3_step(row) != SQLITE_ROW || db.text(row,0).trimmingCharacters(in:.whitespacesAndNewlines) != triggers[name]! {current=false}
@@ -64,14 +65,39 @@ enum RecordedMeetingSchema {
             }
             if !current {
                 try db.execute("DROP INDEX IF EXISTS recorded_meeting_time; DROP INDEX IF EXISTS recorded_meeting_group; DELETE FROM recorded_meeting_sources;")
-                try db.execute("INSERT INTO recorded_meeting_sources \(rows("m","FROM memories m WHERE m.kind='audio'"))")
                 for name in triggers.keys.sorted() {try db.execute("DROP TRIGGER IF EXISTS \(name)");try db.execute(triggers[name]!)}
-                try db.execute("INSERT INTO store_metadata(key,value) VALUES('recorded_meeting_index_version','1') ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+                // Normal library opening never scans transcript bodies. Keep
+                // new/old writers coherent immediately, then populate the
+                // historical rows in the owned, cancellable Recordings job.
+                let anySource=try db.statement("SELECT 1 FROM memories LIMIT 1")
+                let status=sqlite3_step(anySource);sqlite3_finalize(anySource)
+                guard status==SQLITE_ROW || status==SQLITE_DONE else {throw db.error()}
+                let empty=status==SQLITE_DONE
+                let state=empty ? "1":"pending:1"
+                try db.execute("INSERT INTO store_metadata(key,value) VALUES('recorded_meeting_index_version','\(state)') ON CONFLICT(key) DO UPDATE SET value=excluded.value")
             }
             try db.execute("""
             CREATE INDEX IF NOT EXISTS recorded_meeting_time ON recorded_meeting_sources(started DESC,memory_id DESC);
             CREATE INDEX IF NOT EXISTS recorded_meeting_group ON recorded_meeting_sources(grouped,recording_id,started,memory_id);
             """)
+            try Task.checkCancellation()
+        }catch {if Task.isCancelled {throw CancellationError()};throw error}
+    }
+    /// Caller owns an IMMEDIATE transaction. A cancelled/failed build rolls
+    /// back both rows and readiness; another connection cannot observe a
+    /// partial page. No source or media handle is retained after publication.
+    static func populateIfNeeded(_ db:RoutineDatabase)throws {
+        let marker=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
+        let version=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
+        if version=="1" {return}
+        guard version=="pending:1" else {throw OSwindError.unavailable("Reopen the library to prepare its recording index")}
+        try Task.checkCancellation()
+        sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)
+        defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
+        do {
+            try db.execute("DELETE FROM recorded_meeting_sources")
+            try db.execute("INSERT INTO recorded_meeting_sources \(rows("m","FROM memories m WHERE m.kind='audio'"))")
+            try db.execute("UPDATE store_metadata SET value='1' WHERE key='recorded_meeting_index_version'")
             try Task.checkCancellation()
         }catch {if Task.isCancelled {throw CancellationError()};throw error}
     }

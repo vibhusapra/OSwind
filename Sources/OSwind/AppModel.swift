@@ -253,7 +253,7 @@ import EventKit
         }
         clipboard.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         tools.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
-        recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !SessionState.locked}
+        recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryTransfer.busy && !SessionState.locked}
         recordedMeetings.openSource = {[weak self] source in self?.openRecordedMeetingSource(source)}
         recordedMeetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         meetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
@@ -949,6 +949,7 @@ import EventKit
     private func invalidateCommittedErasure(_ result:HistoryErasureResult,discardVisible:Bool) {
         activity.forgetCounts();invalidateStorageEstimate()
         guard result.sources>0 || result.historicalVersions>0 || result.conversationTurns>0 else {return}
+        if discardVisible {recordedMeetings.clear()}else {recordedMeetings.invalidate()}
         drafting.clear();tools.suspend();clipboard.invalidate();cancelAnswer();answer=nil
         // A cancelled completion cannot start fresh IO to revalidate previews.
         // Drop the old references locally; the next deliberate refresh can read
@@ -1014,6 +1015,7 @@ import EventKit
         drafting.clear()
         entityMemory.clear();entityScope=nil
         activity.deactivate(clear:true)
+        recordedMeetings.clear()
         // Stop readers holding media reservations before asking erasure to take
         // an exclusive reservation. Wake/power callbacks must not restart them.
         visualAutoResumeAllowed=false;cancelVisualIndexing()
