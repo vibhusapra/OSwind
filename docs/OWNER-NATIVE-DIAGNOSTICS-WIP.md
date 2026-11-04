@@ -1,5 +1,9 @@
 # Owned owner-app vault diagnostics
 
+## Recording-original runtime qualification — 9805caa
+
+The substantive recording-original/reassignment runtime passes selected Debug 807/20, optimized 810/18 and Thread Sanitizer 807/20 (passes/explicit skips), with zero failures or race reports. The 33-class selections include real owned APFS/Keychain owner/peer/source-work/vault joining and recording-name/Calendar lifecycle controls. Exact current sanitizer exit zero is saved before retention; both tested engines and original failures remain preserved. A separate normal canonical app passes signature/product-code, packaged CLI and ZIP round trip after correcting a cross-build comparison boundary without rebuilding. Historical failures and their unproved causes remain visible. These fixtures establish no physical two-Mac/provider, signed interactive/EventKit, capture-quality, controlled-power or production acceptance. [Qualification](../benchmarks/recording-original-recovery-v1.json) · [Raw evidence](../benchmarks/recording-original-recovery-raw-v1.zip).
+
 ## 2026-11-04 hosted follow-up
 
 Exact head `5b48f48`, run 41821091284, completes with all three jobs successful, including the full native packaging/process sequence. Its complete native log and name artifact digest are retained in the [calendar receipt](../benchmarks/recording-calendar-v1.json). This establishes that runner’s successful pass; it does not identify the causes of the earlier PR165 final-detach or initial-create Resource-busy failures below.

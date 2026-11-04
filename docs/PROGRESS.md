@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## 2026-11-04 — exact original recovery and durable recording reassignment
+
+Runtime `9805caa` recovers only a previously admitted recording source from actual retained canonical history after operational cache loss. Missing proof stays unavailable; deliberate transcript purges and erasure cannot resurrect audio. Explicit native scope edits retain bounded owning-lifetime intent through reopen and consume it after checked publication. All-thirteen-kind transport, policy/media/quota/corruption/rollback, current App and real owned APFS/Keychain controls pass in selected **Debug 807-pass/20-skip, optimized 810-pass/18-skip and Thread Sanitizer 807-pass/20-skip** runs, with zero failures/races. The 26 focused methods overlap those selections. The whole current 3,101-method suite has been discovered, not executed locally.
+
+The normal ad-hoc package passes packaged CLI and ZIP/hash/signature round trip. Original failed iterations, actual tested binaries, current authored corpora and both corrected publication/packaging harness failures are retained; neither harness repair rebuilds/replays tests. The current sanitizer exit is recorded before retention; the older 04ac unknown exit remains historical. F042 stays partial: automatic no-edit erasure/outbox reconciliation, full late/concurrent/session/restored transport, live EventKit/signed native interaction, physical ASR/GPU, controlled energy/current automatic 24h, real two-Mac/provider, distribution and ranking remain open. [Scope and TODOs](RECORDING-DETAILS-WIP.md) · [Qualification](../benchmarks/recording-original-recovery-v1.json) · [Raw evidence](../benchmarks/recording-original-recovery-raw-v1.zip).
+
 ## 2026-11-04 — explicitly reviewed calendar links
 
 Draft [PR166](https://github.com/vibhusapra/OSwind/pull/166) now implements historical Calendar review for recordings at runtime `04ac34a`. Choose a recording, open **Link calendar**, select the date and exact occurrence from calendars already selected in Upcoming, then confirm. An unnamed recording creates its label and link together; copying the event title is an explicit action. Removing a link works after Calendar access is lost.
