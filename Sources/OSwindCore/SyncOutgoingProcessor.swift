@@ -1,7 +1,7 @@
 import Foundation
 import CSQLite
 
-enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
+enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),revalidatingRecordings(scanned:Int,queued:Int),idle}
 
 /// Internal synchronous outgoing adapter over all canonical tables. The owning
 /// library supplies current privacy admission and prepared media; no networking,
@@ -74,6 +74,9 @@ struct SyncOutgoingProcessor {
                 let row=try database.statement("SELECT complete FROM personal_sync_identity_bootstrap WHERE table_name=?");defer {sqlite3_finalize(row)};database.bind(row,1,table.rawValue)
                 let code=sqlite3_step(row);guard code==SQLITE_DONE || code==SQLITE_ROW else {throw database.error()}
                 if code==SQLITE_DONE || sqlite3_column_int(row,0)==0 {return .bootstrapped(table,try queue.bootstrap(table,limit:limit).objects)}
+            }
+            if let progress=try SyncRecordingReconciliation.step(queue:queue,cache:cache,limit:limit) {
+                return .revalidatingRecordings(scanned:progress.scanned,queued:progress.queued)
             }
             // Even an idle call must validate generation, durability and schema.
             try queue.validateIdle();return .idle

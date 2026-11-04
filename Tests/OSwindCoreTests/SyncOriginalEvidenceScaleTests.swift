@@ -48,6 +48,7 @@ final class SyncOriginalEvidenceScaleTests:XCTestCase {
                 case .prepared(let objects):batches.append(["objects":objects,"seconds":seconds]);seen+=objects;steps.append(["kind":"prepared","objects":objects,"seconds":seconds])
                 case .bootstrapped(let table,let objects):steps.append(["kind":"bootstrap","table":table.rawValue,"objects":objects,"seconds":seconds])
                 case .captured:throw OSwindError.invalid("Bootstrap fixture unexpectedly captured an edit")
+                case .revalidatingRecordings:throw OSwindError.invalid("Unchanged bootstrap fixture unexpectedly required recording erasure revalidation")
                 case .idle:steps.append(["kind":"idle","objects":0,"seconds":seconds]);complete=true
                 }
             }

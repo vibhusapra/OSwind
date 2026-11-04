@@ -132,6 +132,7 @@ enum HistoricalErasureSchema {
                 try db.execute("INSERT OR IGNORE INTO erasure_assets SELECT j.value FROM personal_sync_evidence e,json_each(CAST(e.paths AS TEXT)) j WHERE (e.object_digest,e.content_sha) IN (SELECT object_digest,content_sha FROM temp.erasure_version_ids)")
             }
             try db.execute("DELETE FROM personal_sync_versions WHERE (object_digest,content_sha) IN (SELECT object_digest,content_sha FROM temp.erasure_version_ids)")
+            try SyncRecordingReconciliation.markErasure(db)
         }
     }
     struct Query {let sql:String;let bind:(OpaquePointer)throws->Void}

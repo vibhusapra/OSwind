@@ -129,7 +129,7 @@ struct SyncIncomingSourceWriter {
                 guard try SyncProtocolLimits.encode(library.get(local))==SyncProtocolLimits.encode(memory),try cache.resolve(record.identity,content:nil,admit:{_ in}).encoded()==record.encoded() else {throw OSwindError.invalid("Incoming source changed during projection")}
                 let after=try cache.journal.state(for:record.identity.key)
                 guard !after.isDeleted,after.heads.count==1,after.heads.first?.content==reference.content else {throw OSwindError.invalid("Incoming source head changed during projection")}
-                try SyncIncomingDependencyAudit.check([record]+promotion.nodes.map(\.packet),cache:cache)
+                try SyncIncomingDependencyAudit.check([record]+promotion.requiredPackets,cache:cache)
                 try promotion.audit()
                 // No caller callbacks after this point: re-read every newly
                 // adopted dependency after the last mutable policy/media hook.

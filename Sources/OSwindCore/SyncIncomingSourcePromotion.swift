@@ -10,6 +10,13 @@ struct SyncIncomingSourcePromotion {
     var nodes:[Node]
     var rebound=[SyncPortableRecord]()
     var db:RoutineDatabase {writer.db}
+    /// The replaced root is a pre-write snapshot, not retained evidence unless
+    /// an actual citation/pin promoted it. Its obsolete dependency graph must
+    /// not block a safe replacement with no such dependency. Live non-root
+    /// recaps and every actually preserved original still need the full audit.
+    var requiredPackets:[SyncPortableRecord] {
+        nodes.filter {Data($0.before.id.utf8) != Data(root.utf8) || $0.original != nil}.map(\.packet)
+    }
     static func prepare(_ writer:SyncIncomingSourceWriter,root:String)throws->Self {
         let db=writer.db,row=try db.statement("WITH RECURSIVE linked(id) AS (SELECT ? UNION SELECT r.recap_id FROM recap_sources r JOIN linked l ON r.source_id=l.id) SELECT m.id FROM memories m JOIN linked l ON l.id=m.id ORDER BY m.id LIMIT 513");defer {sqlite3_finalize(row)};db.bind(row,1,root)
         var memories=[Memory](),code=sqlite3_step(row)
