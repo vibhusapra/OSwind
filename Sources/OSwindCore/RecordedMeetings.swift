@@ -25,12 +25,20 @@ public struct RecordedMeetingPage:Sendable {
 }
 public struct RecordedMeeting:Identifiable,Equatable,Sendable {
     public let id:String,title:String,sources:[RecordedMeetingSource]
-    public var first:Date {sources.map(\.timestamp).min()!}
-    public var latest:Date {sources.map {$0.observedEnd ?? $0.timestamp}.max()!}
-    public var hasUnobservedTimes:Bool {sources.contains {!$0.hasObservedInterval}}
+    public let first:Date,latest:Date
+    public let hasUnobservedTimes:Bool,observedSeconds:Double,clipSeconds:Double
+    init(id:String,title:String,sources:[RecordedMeetingSource]) {
+        precondition(!sources.isEmpty)
+        self.id=id;self.title=title;self.sources=sources
+        first=sources.map(\.timestamp).min()!
+        latest=sources.map {$0.observedEnd ?? $0.timestamp}.max()!
+        hasUnobservedTimes=sources.contains {!$0.hasObservedInterval}
+        observedSeconds=Self.coveredSeconds(in:sources)
+        clipSeconds=sources.reduce(0) {$0+$1.duration}
+    }
     /// Union of observed live spans avoids double-counting microphone/system
     /// channels. Gaps remain gaps; import dates do not imply recording times.
-    public var observedSeconds:Double {
+    private static func coveredSeconds(in sources:[RecordedMeetingSource])->Double {
         let intervals=sources.compactMap {source->DateInterval? in
             guard let end=source.observedEnd,end>source.timestamp else {return nil};return .init(start:source.timestamp,end:end)
         }.sorted {$0.start<$1.start}
@@ -43,7 +51,6 @@ public struct RecordedMeeting:Identifiable,Equatable,Sendable {
         }
         return total+(current?.duration ?? 0)
     }
-    public var clipSeconds:Double {sources.reduce(0) {$0+$1.duration}}
 }
 public enum RecordedMeetingPlanner {
     /// Group only explicit source recording IDs. Similar titles, matching
