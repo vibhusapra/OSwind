@@ -18,6 +18,7 @@ struct RecordingNameReview:Identifiable,Sendable {
     @Published private(set) var error:String?
     @Published private(set) var editorError:String?
     @Published private(set) var notice:String?
+    @Published private(set) var reviewRequired=false
     @Published var editor:RecordingNameReview?
     @Published var removal:RecordingNameReview?
     @Published var draft=""
@@ -37,7 +38,7 @@ struct RecordingNameReview:Identifiable,Sendable {
         self.store=store;self.work=work;self.read=read;self.save=save;self.remove=remove
     }
     var canEdit:Bool {allowed() && loaded && !loading && !saving && rows.count<=1 && source != nil}
-    var canSave:Bool {allowed() && !saving && editor != nil && editor?.source.sessionKey==source?.sessionKey && !draft.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty && draft.count<=200}
+    var canSave:Bool {allowed() && !saving && !reviewRequired && editor != nil && editor?.source.sessionKey==source?.sessionKey && !draft.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty && draft.count<=200}
     func select(_ source:RecordedMeetingSource?,revision:RecordedMeetingRevision?) {
         guard let source,let revision else {clear();return}
         if self.source?.sessionKey != source.sessionKey {
@@ -54,7 +55,7 @@ struct RecordingNameReview:Identifiable,Sendable {
     }
     func clear() {
         suspend();if let writeJob {work.cancel(id:writeJob)};writeJob=nil
-        source=nil;editor=nil;removal=nil;draft="";editorError=nil;reviewDraft=nil;saving=false;notice=nil;removalWrite=nil
+        source=nil;editor=nil;removal=nil;draft="";editorError=nil;reviewDraft=nil;saving=false;notice=nil;removalWrite=nil;reviewRequired=false
     }
     private struct Prepared:Sendable {let values:[RecordedMeetingDetailsSnapshot],revision:RecordedMeetingRevision}
     private func load() {
@@ -74,6 +75,12 @@ struct RecordingNameReview:Identifiable,Sendable {
                 let value=try result.get()
                 try store.withCurrentRecordedMeetingRevision(value.revision) {
                     self.rows=value.values;self.loaded=true;self.error=nil
+                    if let editor=self.editor {
+                        let current=self.rows.count==1 ? self.rows.first:nil
+                        if self.rows.count>1 || editor.expected != current || (editor.source.id==source.id && editor.source.revision != source.revision) {
+                            self.reviewRequired=true;self.editorError="This recording or its saved name changed. Your draft is preserved. Review the latest name before saving."
+                        }
+                    }
                     if let preserved=self.reviewDraft,preserved.session==source.sessionKey,self.rows.count<=1 {
                         self.reviewDraft=nil;self.presentEditor(draft:preserved.text)
                     }
@@ -85,7 +92,7 @@ struct RecordingNameReview:Identifiable,Sendable {
     func beginEditing() {guard canEdit else {return};presentEditor(draft:rows.first?.name ?? "")}
     private func presentEditor(draft:String) {
         guard let source,canEdit else {return}
-        self.draft=draft;editorError=nil;editor=RecordingNameReview(source:source,expected:rows.first)
+        self.draft=draft;editorError=nil;reviewRequired=false;editor=RecordingNameReview(source:source,expected:rows.first)
     }
     func cancelEditor() {guard !saving else {return};reviewDraft=nil;editor=nil}
     func reviewLatest() {
@@ -111,7 +118,7 @@ struct RecordingNameReview:Identifiable,Sendable {
                 if let refreshArchive=self.refreshArchive {refreshArchive()}else {self.load()}
             }catch {
                 if case OSwindError.invalid(let reason)=error {self.editorError=reason}
-                else {self.editorError="The recording or saved name changed, or the library is unavailable. Your draft is preserved. Review the latest name before saving."}
+                else {self.reviewRequired=true;self.editorError="The recording or saved name changed, or the library is unavailable. Your draft is preserved. Review the latest name before saving."}
             }
         }
         if writeJob==nil {saving=false;editorError="The library is closing. Your draft has not been submitted."}

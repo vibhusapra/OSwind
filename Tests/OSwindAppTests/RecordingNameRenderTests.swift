@@ -66,7 +66,7 @@ import SwiftUI
         }
         _=try app.store.saveRecordedMeetingName("A newer name from another window",for:source,replacing:try XCTUnwrap(reviewed.expected))
         archive.names.saveEditor();try await settle(archive)
-        XCTAssertNotNil(archive.names.editorError);XCTAssertEqual(archive.names.draft,"Our next planning review")
+        XCTAssertNotNil(archive.names.editorError);XCTAssertEqual(archive.names.draft,"Our next planning review");XCTAssertFalse(archive.names.canSave)
         for dark in [false,true] {
             try await render(RecordingNameEditorView(names:archive.names,archive:archive,review:reviewed),size:.init(width:500,height:540),dark:dark,to:output.appendingPathComponent(dark ? "stale-draft-dark.png":"stale-draft-light.png")) {XCTAssertNotNil(archive.names.editorError)}
         }

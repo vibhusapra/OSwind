@@ -16,11 +16,14 @@ struct RecordingNameSection:View {
                 }
             }
             if let error=names.error {
-                HStack(alignment:.top) {Label(error,systemImage:"exclamationmark.circle").foregroundStyle(.orange);Button("Refresh") {archive.refresh()}.disabled(archive.busy)}.font(.caption)
+                HStack(alignment:.top) {
+                    Label {Text(error).foregroundStyle(.primary)} icon:{Image(systemName:"exclamationmark.circle").foregroundStyle(.orange)}
+                    Button("Refresh") {archive.refresh()}.disabled(archive.busy)
+                }.font(.caption)
             }
             if let notice=names.notice {Text(notice).font(.caption).foregroundStyle(.secondary)}
             if names.rows.count>1 {
-                Label("Multiple saved names",systemImage:"exclamationmark.bubble").font(.subheadline.weight(.medium))
+                Label("\(names.rows.count) saved names",systemImage:"exclamationmark.bubble").font(.subheadline.weight(.medium))
                 Text("Review each definition. Remove the ones you no longer want, then edit the remaining name.").font(.caption).foregroundStyle(.secondary)
                 ScrollView {
                     LazyVStack(alignment:.leading,spacing:8) {
@@ -57,12 +60,13 @@ struct RecordingNameEditorView:View {
         VStack(alignment:.leading,spacing:16) {
             Text(review.expected==nil ? "Name this recording":"Rename recording").font(.title2.weight(.semibold))
             Text(review.source.belongsToSession ? "This name follows the clips in this recording session. Original transcripts and dates stay the same.":"This name applies to this clip version. Original transcripts and dates stay the same.").font(.callout).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
-            if let expected=review.expected {Text("Current name: "+expected.name).font(.caption).foregroundStyle(.secondary).textSelection(.enabled).fixedSize(horizontal:false,vertical:true)}
+            if let expected=review.expected {Text((names.reviewRequired ? "Name when editing began: ":"Saved name: ")+expected.name).font(.caption).foregroundStyle(.secondary).textSelection(.enabled).fixedSize(horizontal:false,vertical:true)}
             TextField("Recording name",text:$names.draft).textFieldStyle(.roundedBorder).disabled(names.saving).focused($nameFocused).accessibilityIdentifier("recording-name-field")
                 .onSubmit {if names.canSave && !archive.busy {names.saveEditor()}}
             Text("\(names.draft.count)/200 characters").font(.caption).foregroundStyle(names.draft.count>200 ? Color.orange:Color.secondary)
             if let error=names.editorError {
-                Label(error,systemImage:"exclamationmark.circle").font(.callout).foregroundStyle(.orange).fixedSize(horizontal:false,vertical:true)
+                Label {Text(error).foregroundStyle(.primary)} icon:{Image(systemName:"exclamationmark.circle").foregroundStyle(.orange)}
+                    .font(.callout).fixedSize(horizontal:false,vertical:true)
                 Button("Review latest name, keep draft") {names.reviewLatest()}.disabled(names.saving || archive.busy)
             }
             HStack {

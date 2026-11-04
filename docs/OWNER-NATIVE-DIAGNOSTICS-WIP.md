@@ -13,3 +13,10 @@ Local development evidence before porting to the PR branch:
 - On the same retained binary, without rebuilding: **108 passed, five explicit skips, zero failures** across vault sessions, source-work sessions, peer membership and recording models. All pinned inputs and previously retained actual engines remained unchanged. These selections do not complete the whole suite or hosted qualification.
 
 Actual engines, original failed compilation, source snapshots, input hashes, trace review and logs remain under `.artifacts/recording-session-links-v1/`. A current-head hosted result remains a separate gate; the old failure is not waived or described as fixed.
+
+
+At the exact PR follow-up source `19f8099`, the local owned owner-app selection passes **29 methods / one explicit render skip / zero failures**. Its three traces contain 178 native calls, all status zero. The final application detach is observed with zero mounted-volume process handles. This does not explain the original hosted failure.
+
+Hosted run `41801997905` at that head completes with benchmark success and native failure in the **earlier core-vault step**. `NativeVaultCancellationTests.testCancelledOwnedUnlockCanImmediatelyRecoverWithHistory` fails during its uncancelled `initial-create`, before its intended cancellation boundary. The native trace records `hdiutil: create failed - Resource busy`, status 1; the underlying busy resource is unproved. Owner-addition and later steps are skipped, so this run supplies no new owner-app outcome. Do not infer timing or overlap from buffered XCTest log timestamps.
+
+The full 10,127,696-byte job log and 19,055-byte ZIP with 11 diagnostic files are retained in `.artifacts/recording-change-awareness-v1/native-ci-19f8099-v1/`. ZIP SHA-256 `e82e800ce5ad61b78aa1fb72a1eb61964ab967bf41ec42500697a35844a0776a` matches the uploaded artifact. These are failed-run evidence; the CI binary itself was not exported. The original `c2daf5b` failed log/artifact are preserved separately. Neither failure is called fixed, reclassified as a passing run or rerun merely to obtain green checks.

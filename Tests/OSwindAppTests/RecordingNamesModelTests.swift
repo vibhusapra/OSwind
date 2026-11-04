@@ -43,11 +43,21 @@ import AppKit
         try select(value);try await settle(value);value.beginEditing();value.draft="My draft"
         let fresh=try store.saveRecordedMeetingName("Another edit",for:target,replacing:saved)
         value.saveEditor();try await settle(value)
-        XCTAssertNotNil(value.editorError);XCTAssertNotNil(value.editor);XCTAssertEqual(value.draft,"My draft")
+        XCTAssertNotNil(value.editorError);XCTAssertNotNil(value.editor);XCTAssertEqual(value.draft,"My draft");XCTAssertFalse(value.canSave)
         XCTAssertEqual(try store.recordedMeetingDetails(for:target),[fresh])
         value.reviewLatest();XCTAssertNil(value.editor);value.editorDismissed();try await settle(value)
         XCTAssertEqual(value.editor?.expected,fresh);XCTAssertEqual(value.draft,"My draft")
         value.saveEditor();try await settle(value);XCTAssertEqual(value.rows.map(\.name),["My draft"])
+    }
+    func testRefreshRequiresReviewBeforeSubmittingADraftAgainstChangedNames()async throws {
+        try audio();let target=try source(),saved=try store.saveRecordedMeetingName("First",for:target),value=model()
+        try select(value);try await settle(value);value.beginEditing();value.draft="Keep this draft"
+        _=try store.saveRecordedMeetingName("Changed elsewhere",for:target,replacing:saved)
+        try select(value);try await settle(value)
+        XCTAssertEqual(value.draft,"Keep this draft");XCTAssertNotNil(value.editor);XCTAssertTrue(value.reviewRequired);XCTAssertFalse(value.canSave)
+        XCTAssertEqual(try store.recordedMeetingDetails(for:target).first?.name,"Changed elsewhere")
+        value.reviewLatest();value.editorDismissed();try await settle(value)
+        XCTAssertFalse(value.reviewRequired);XCTAssertTrue(value.canSave);XCTAssertEqual(value.editor?.expected?.name,"Changed elsewhere")
     }
     func testConflictingDefinitionsRequireExplicitIndividualRemoval()async throws {
         let original=try audio(),target=try source(),saved=try store.saveRecordedMeetingName("One",for:target)
