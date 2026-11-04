@@ -21,9 +21,29 @@ final class RecordingDetailsTests:XCTestCase {
         func finish(_ value:Int32) {lock.withLock {steps=max(steps,value)}}
         var result:(Int,Int32) {lock.withLock {(starts,steps)}}
     }
-    func testFirstSessionNameCancelsDuringDeferredCanonicalIndexBuild()async throws {
+    func testFirstSessionNameDoesNotBuildAnExistingAudioArchiveIndex()throws {
+        try audio("first-name-audio")
+        let target=try source("first-name-audio")
+        try store.withRoutineDatabase {db in
+            try db.execute("DROP INDEX memory_recording_sessions_v1")
+            sqlite3_set_authorizer(db.handle,{_,action,name,_,_,_ in
+                if action==SQLITE_CREATE_INDEX,let name,String(cString:name)==RecordingRelationshipIndexes.sessions {return SQLITE_DENY};return SQLITE_OK
+            },nil)
+        }
+        defer {_ = try? store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}}
+        var saved:RecordedMeetingDetailsSnapshot?
+        XCTAssertNoThrow(saved=try store.saveRecordedMeetingName("A quick first name",for:target))
+        guard saved != nil else {return}
+        try store.withRoutineDatabase {db in
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
+            try RecordingRelationshipIndexes.install(db)
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0,"Reopening an existing named archive must also defer this scan")
+        }
+    }
+    func testDeferredCanonicalSessionIndexCancelsDuringFirstErasure()async throws {
         for index in 0..<1000 {try audio("deferred-\(index)",offset:Double(index))}
         let target=try XCTUnwrap(store.recordedMeetingPage().sources.first),probe=IndexBuildProbe(),store=store!
+        let saved=try store.saveRecordedMeetingName("Keep this name after cancellation",for:target)
         try store.withRoutineDatabase {try $0.execute("DROP INDEX memory_recording_sessions_v1")}
         let worker=Task.detached {
             try store.withRoutineDatabase {db in
@@ -35,17 +55,18 @@ final class RecordingDetailsTests:XCTestCase {
                     return 0
                 },Unmanaged.passUnretained(probe).toOpaque())
                 defer {sqlite3_trace_v2(db.handle,0,nil,nil);withExtendedLifetime(probe) {}}
-                _=try store.saveRecordedMeetingName("Cancelled first session name",for:target)
+                _=try store.previewErasure(.init(kind:.audio))
             }
         }
-        do {try await worker.value;XCTFail("Cancelled index build committed a recording name")}catch is CancellationError {}catch {throw error}
+        do {try await worker.value;XCTFail("Cancelled index build returned an erasure preview")}catch is CancellationError {}catch {throw error}
         let (starts,steps)=probe.result
         XCTAssertEqual(starts,1);XCTAssertGreaterThan(steps,0)
         XCTAssertLessThanOrEqual(steps,2000,"Cancellation must interrupt the canonical index scan, not wait for the whole archive")
         try store.withRoutineDatabase {db in
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
-            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM memories WHERE kind='recording-metadata'"),0)
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM memories WHERE kind='recording-metadata'"),1)
         }
+        XCTAssertNotNil(try store.get(saved.id))
         XCTAssertEqual(try store.recordedMeetingPage().sources.count,512)
     }
     func testCanonicalRecordingRelationshipsUseExpressionIndexes()throws {
@@ -62,13 +83,17 @@ final class RecordingDetailsTests:XCTestCase {
             }
         }
     }
-    func testExistingAudioArchiveDefersSessionIndexUntilFirstSessionName()throws {
+    func testExistingAudioArchiveDefersSessionIndexUntilSessionErasureNeedsIt()throws {
         let original=try audio("legacy-audio")
         try store.withRoutineDatabase {db in
             try db.execute("DROP INDEX memory_recording_sessions_v1");try RecordingRelationshipIndexes.install(db)
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
         }
         _=try store.saveRecordedMeetingName("First session label",for:source(original.id))
+        try store.withRoutineDatabase {db in
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
+        }
+        _=try store.previewErasure(.init(kind:.audio))
         try store.withRoutineDatabase {db in
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),1)
         }
