@@ -31,6 +31,31 @@ import CSQLite
         let end=ContinuousClock.now.advanced(by:.seconds(10));while work.busy,ContinuousClock.now<end {try await Task.sleep(for:.milliseconds(5))};XCTAssertFalse(work.busy)
     }
     func choose()async throws {model.open();try await settle();XCTAssertTrue(model.loaded);model.selectedID=try XCTUnwrap(model.events.first?.id);XCTAssertTrue(model.canSave)}
+    func testCalendarSaveFinishesWhileParentQuietRefreshIsStillReading()async throws {
+        final class NextRead:@unchecked Sendable {
+            private let lock=NSLock();private var value:ImportWorkerGate?
+            func arm(_ gate:ImportWorkerGate) {lock.lock();value=gate;lock.unlock()}
+            func take()->ImportWorkerGate? {lock.lock();defer {lock.unlock()};let result=value;value=nil;return result}
+        }
+        let read=NextRead(),heldRead=ImportWorkerGate(),heldCalendar=MeetingsModelTests.Gate()
+        let names=RecordingNamesModel(store:store,work:work,calendarProvider:provider.source(),read:{store,source in
+            let rows=try store.recordedMeetingDetails(for:source);if let gate=read.take() {try gate.pause()};return rows
+        });names.allowed={true}
+        defer {heldRead.release();names.clear()}
+        names.select(source,revision:try store.recordedMeetingRevision());try await settle()
+        let calendar=names.calendar;calendar.open();try await settle();calendar.selectedID=try XCTUnwrap(calendar.events.first?.id)
+        provider.state {$0.nextGate=heldCalendar};calendar.save();await fulfillment(of:[heldCalendar.entered],timeout:5)
+        var next=try XCTUnwrap(store.get(source.memoryID));next.id="clip-during-calendar-save";next.timestamp=start.addingTimeInterval(30);try store.insert(next)
+        let latest=try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==next.id})
+        read.arm(heldRead);names.suspend();names.select(latest,revision:try store.recordedMeetingRevision());await fulfillment(of:[heldRead.entered],timeout:5)
+        await heldCalendar.open()
+        let end=ContinuousClock.now.advanced(by:.seconds(5));while calendar.saving,ContinuousClock.now<end {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(calendar.saving);XCTAssertNotNil(try store.get(saved.id)?.recordingDetails?.calendar)
+        XCTAssertFalse(calendar.presented,"A completed save must close even while its parent is quietly refreshing")
+        XCTAssertNotNil(calendar.notice,"The committed result must not disappear because a parent read is still in flight")
+        heldRead.release();try await settle();names.clear()
+    }
+
     func testLiveSessionAppendPreservesChosenCalendarOccurrence()async throws {
         try await choose();let chosen=model.selectedID
         var next=try XCTUnwrap(store.get(source.memoryID));next.id="next-live-clip";next.timestamp=start.addingTimeInterval(60);next.title="Next captured clip";try store.insert(next)

@@ -104,7 +104,7 @@ import OSwindCore
         }else {recheckRecording()}
     }
     func save() {
-        guard canSave,let value=prepared,let selected=events.first(where:{$0.id==selectedID}),let source else {return}
+        guard canSave,let value=prepared,let selected=events.first(where:{$0.id==selectedID}),source != nil else {return}
         write(source:value.source,expected:expected,value:value,event:selected)
     }
     func unlink() {

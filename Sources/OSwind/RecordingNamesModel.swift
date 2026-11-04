@@ -40,7 +40,9 @@ struct RecordingNameReview:Identifiable,Sendable {
          remove:@escaping @Sendable (MemoryStore,RecordedMeetingDetailsSnapshot,RecordedMeetingSource)throws->HistoryErasureResult={try $0.removeRecordedMeetingName($1,for:$2)}) {
         self.store=store;self.work=work;self.read=read;self.save=save;self.remove=remove
         calendar=RecordingCalendarModel(store:store,work:work,provider:calendarProvider)
-        calendar.allowed={[weak self] in guard let self else {return false};return self.allowed() && self.loaded && !self.loading && !self.saving && self.editor==nil && self.removal==nil}
+        // canEdit gates opening while names load. A reviewed calendar job
+        // still owns its completion during an ordinary parent refresh.
+        calendar.allowed={[weak self] in guard let self else {return false};return self.allowed() && !self.saving && self.editor==nil && self.removal==nil}
         calendar.refreshArchive={[weak self] in if let refresh=self?.refreshArchive {refresh()}else {self?.load()}}
         calendarChanges=calendar.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}
 
