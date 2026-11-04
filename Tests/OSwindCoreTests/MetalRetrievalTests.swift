@@ -93,6 +93,27 @@ final class MetalRetrievalTests: XCTestCase {
         try other.setFavorite(target,value:false)
         XCTAssertTrue(try compare(store,SearchFilter(query:"meaning",favoritesOnly:true,tag:"changed",limit:10)).isEmpty)
         _ = try compare(store,SearchFilter(query:"meaning",app:"A",kind:.note,start:Date(timeIntervalSince1970:100),end:Date(timeIntervalSince1970:15000),tag:"work",limit:10))
+        // Session IDs compare by their stored bytes, including canonically
+        // equivalent Unicode. Switch real GPU masks and then regroup a clip
+        // through another connection without changing its evidence text.
+        var firstRecording=try XCTUnwrap(other.get("row-1")),secondRecording=try XCTUnwrap(other.get("row-3"))
+        // get() returns the payload without its separately stored embedding.
+        // Preserve the authored vectors when replacing this fixture's rows.
+        firstRecording.embedding=VectorScalingEvaluation.vector(row:1,dimensions:32)
+        secondRecording.embedding=VectorScalingEvaluation.vector(row:3,dimensions:32)
+        firstRecording.audioSessionID="é";secondRecording.audioSessionID="e\u{301}"
+        try other.insert(firstRecording);try other.insert(secondRecording)
+        XCTAssertEqual(try store.vectorCount(modelID:model),20_000)
+        _ = try await store.buildSearchIndex(modelID:model,dimensions:32)
+        let firstScope=SearchFilter(query:"meaning",recordingScope:try .init(sessionID:"é")),secondScope=SearchFilter(query:"meaning",recordingScope:try .init(sessionID:"e\u{301}"))
+        XCTAssertEqual(try compare(store,firstScope).map(\.id),["row-1"])
+        XCTAssertEqual(try compare(store,secondScope).map(\.id),["row-3"])
+        XCTAssertEqual(try compare(store,firstScope).map(\.id),["row-1"])
+        firstRecording.audioSessionID=secondRecording.audioSessionID;try other.insert(firstRecording)
+        XCTAssertTrue(try compare(store,firstScope).isEmpty)
+        XCTAssertEqual(Set(try compare(store,secondScope).map(\.id)),Set(["row-1","row-3"]))
+        let singleScope=SearchFilter(query:"meaning",recordingScope:try .init(sourceID:"row-3",revision:secondRecording.evidenceHash))
+        XCTAssertEqual(try compare(store,singleScope).map(\.id),["row-3"])
         try other.delete(target)
         var fresh = Memory(id:"new",text:"New vector from another connection"); fresh.embedding = query; fresh.embeddingModel = model; try other.insert(fresh)
         // Public erasure clears persisted graphs. Rebuild and require the Metal path again.

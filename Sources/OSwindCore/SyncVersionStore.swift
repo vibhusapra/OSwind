@@ -12,7 +12,7 @@ extension SyncPortableRecord {
     var dependencies:[SyncPortableDependency] {
         func object(_ id:SyncObjectIdentity)->SyncPortableDependency {.init(identity:id,content:nil)}
         func version(_ ref:SyncVersionReference)->SyncPortableDependency {.init(identity:ref.identity,content:ref.content)}
-        func filter(_ f:SyncFilterBody)->[SyncPortableDependency] {f.entity.map {[object($0)]} ?? []}
+        func filter(_ f:SyncFilterBody)->[SyncPortableDependency] {(f.entity.map {[object($0)]} ?? [])+(f.recordingScope?.source.map {[version($0)]} ?? [])}
         switch body {
         case .source(let v):return (v.recap?.sources ?? []).map {version($0.source)}
         case .turn(let v):return [object(v.conversation)]+filter(v.filter)
@@ -297,8 +297,10 @@ struct SyncVersionStore {
                     // A quiet restore preserves provenance while a later catalog
                     // gives canonical objects new lifetimes. Rebuild all native
                     // fields and references; never equate two different packets.
-                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{_,_ in throw OSwindError.invalid("Run projection cannot request source bodies")},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)},unavailableFilterScope:{try self.projectionFilterScope($0,record:value)})
-                    let rebuilt=try SyncPortableExporter(references:references).record(identity:identity,row:currentRow(identity))
+                    let rebuilt=try withoutActuallyEscaping(admit) { bound in
+                    let references=SyncPortableReferences(identity:{try catalog.localIdentity($0,primary:$1)},source:{try self.sourceVersion(localID:$0,revision:$1,admit:bound)},media:{_ in throw OSwindError.invalid("Run projection has no media")},recipe:{_,_ in throw OSwindError.invalid("Retained run recipe is required")},session:{_ in throw OSwindError.invalid("Run projection has no session token")},runOriginal:{id in guard Data(id.utf8)==bytes else {throw OSwindError.invalid("Native run original key differs")};return original},erasedRunConversation:{try self.erasedRunConversation(localRunID:$0)},unavailableFilterScope:{try self.projectionFilterScope($0,record:value)})
+                    return try SyncPortableExporter(references:references).record(identity:identity,row:currentRow(identity))
+                    }
                     guard try rebuilt.encoded()==value.encoded() else {throw OSwindError.invalid("Run original differs from cached projection")}
                 }
             }

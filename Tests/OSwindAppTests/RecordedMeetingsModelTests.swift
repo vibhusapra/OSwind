@@ -89,10 +89,60 @@ import SwiftUI
         locked=true;value.invalidate();XCTAssertFalse(value.allowed());XCTAssertFalse(value.busy);XCTAssertTrue(value.sessions.isEmpty)
         XCTAssertNotNil(try app.store.get("owned"),"Locking a view does not erase its canonical source")
     }
+    func testRecordingAskRouteAndSavedChatFollowupRetainExactScope()async throws {
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false;app.settings.ai.provider = .evidence
+        try audio("allowed",session:"selected",in:app.store);try audio("neighbor",session:"other",in:app.store)
+        let value=app.recordedMeetings;value.activate();try await settle(value)
+        value.selectedID=try XCTUnwrap(value.sessions.first {$0.sources.first?.memoryID=="allowed"}).id;value.askSelected()
+        let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+        while app.section != "Ask",SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertEqual(app.section,"Ask");XCTAssertEqual(app.recordingScope?.id,"selected");XCTAssertEqual(app.range,"All time")
+        app.ask("source",interpretation:false)
+        while app.asking,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(app.asking);XCTAssertEqual(app.answer?.sources.map(\.id),["allowed"])
+        let chat=try XCTUnwrap(app.currentChatID);app.newChat();XCTAssertNil(app.recordingScope);app.selectChat(chat)
+        XCTAssertEqual(app.recordingScope?.id,"selected");app.ask("source",interpretation:false)
+        while app.asking,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(app.asking);XCTAssertEqual(app.answer?.sources.map(\.id),["allowed"])
+        XCTAssertTrue(try app.store.chatTurns(chat).allSatisfy {$0.filter.recordingScope?.id=="selected"})
+    }
+    func testRecordingRecapShortcutIncludesOlderRecordingAndPreservesScopedFollowup()async throws {
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false;app.settings.ai.provider = .evidence
+        try audio("old",session:"selected",at:946_684_800,in:app.store);try audio("neighbor",session:"other",at:946_684_800,in:app.store)
+        app.section="Ask";app.recordingScope=try .init(sessionID:"selected");app.range="Today";app.interpretQuery=true
+        app.recapSelection()
+        func settled()async throws {
+            let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+            while app.asking,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+            XCTAssertFalse(app.asking)
+        }
+        try await settled();XCTAssertEqual(app.range,"All time");XCTAssertEqual(app.answer?.sources.map(\.id),["old"])
+        XCTAssertTrue(app.answer?.warnings.contains(where:{$0.contains("distributed sample")})==true)
+        app.draftStandup();try await settled();XCTAssertEqual(app.range,"All time");XCTAssertEqual(app.answer?.sources.map(\.id),["old"])
+        let chat=try XCTUnwrap(app.currentChatID),turns=try app.store.chatTurns(chat)
+        XCTAssertEqual(turns.count,2);XCTAssertTrue(turns.allSatisfy {$0.filter.start==nil && $0.filter.recordingScope?.id=="selected"})
+    }
+    func testRenderScopedRecordingActionsAndAskBadge()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDING_SCOPE_UI_DIR"] else {throw XCTSkip("Explicit generated scoped recording components only")}
+        let output=URL(fileURLWithPath:path);try Paths.ensure(output)
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false
+        try audio("a",in:app.store);try audio("b",in:app.store)
+        let value=app.recordedMeetings;value.activate();try await settle(value)
+        for dark in [false,true] {
+            try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:770,height:570),dark:dark,model:value,expected:1,to:output.appendingPathComponent("recording-actions-\(dark ? "dark":"light").png"))
+            app.recordingScope=try .init(sessionID:"recording");app.interpretQuery=false;app.range="All time";app.section="Ask"
+            try await render(AskView().environmentObject(app),size:.init(width:1000,height:720),dark:dark,model:value,expected:1,to:output.appendingPathComponent("scoped-ask-\(dark ? "dark":"light").png"))
+        }
+    }
     func testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording workspace components only")}
         let output=URL(fileURLWithPath:path);try Paths.ensure(output)
-        let app=try AppModel(root:root,startServices:false);appModels.append(app);app.showOnboarding=false
+        let app=try AppModel(root:root,startServices:false,audioSetup:{store,embedder,settings in
+            var startup=AudioStartupEnvironment();startup.locked={false}
+            startup.authorizeMicrophone={XCTFail("Missing-model refusal must precede microphone authorization");return false}
+            startup.makeEngine={throw OSwindError.unavailable("Owned render never opens audio hardware")}
+            return AudioController(store:store,embedder:embedder,settings:settings,startup:startup)
+        },recordingsLocked:{false});appModels.append(app);app.showOnboarding=false
         try audio("mic-a",in:app.store);try audio("system-a",in:app.store);try audio("mic-b",at:1_793_738_045,in:app.store);try audio("file-a",session:"import",live:false,title:"Research interview",in:app.store)
         try audio("legacy",session:"legacy-untimed",at:1_793_730_000,live:false,title:"Legacy voice note",in:app.store)
         let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,3)

@@ -10,6 +10,7 @@ import OSwindCore
     @Published private(set) var hasOlder=false
     @Published var selectedID:String?
     var allowed:()->Bool={false}
+    var beginChat:((RecordedMeetingSource,Bool)->Void)?
     var openSource:((RecordedMeetingSource)->Void)?
     private let store:MemoryStore,work:LibraryWorkRegistry
     private let readPage:@Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage
@@ -53,6 +54,9 @@ import OSwindCore
             }catch {self.error="Recordings could not refresh. Retry after the current library or privacy change."}
         }
         if job==nil {busy=false}
+    }
+    func askSelected(summarize:Bool=false) {
+        guard allowed(),!busy,let source=selected?.sources.first,sources[source.id]==source else {return};beginChat?(source,summarize)
     }
     func open(_ source:RecordedMeetingSource) {
         guard allowed(),!busy,sources[source.id]==source else {return};openSource?(source)

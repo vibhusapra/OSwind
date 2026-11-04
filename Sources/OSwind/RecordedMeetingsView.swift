@@ -46,7 +46,7 @@ struct RecordedMeetingsView:View {
                     Text("Record with your chosen microphone or system-audio settings, or import a file. Calendar access is optional. Recording IDs keep clips together; nearby timestamps do not merge separate conversations.")
                 }.frame(maxWidth:.infinity,maxHeight:.infinity)
             }else {
-                HSplitView {
+                HStack(alignment:.top,spacing:16) {
                     ScrollView {
                         LazyVStack(alignment:.leading,spacing:8) {
                             ForEach(model.sessions) {session in
@@ -61,8 +61,9 @@ struct RecordedMeetingsView:View {
                             }
                             if model.hasOlder {Button("Load older recordings") {model.loadOlder()}.disabled(model.busy).padding(.vertical,10)}
                         }.padding(.trailing,10)
-                    }.frame(minWidth:220,idealWidth:270,maxWidth:350)
-                    if let session=model.selected {detail(session).padding(.leading,18)}else {ContentUnavailableView("Choose a session",systemImage:"waveform")}
+                    }.frame(minWidth:200,idealWidth:230,maxWidth:270)
+                    Divider()
+                    if let session=model.selected {detail(session).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topLeading)}else {ContentUnavailableView("Choose a session",systemImage:"waveform")}
                 }
             }
             Text("Only loaded clips are counted. Live spans preserve observed gaps and overlapping audio channels; import dates are not original meeting times. Speaker labels remain local to each source recording.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
@@ -72,6 +73,11 @@ struct RecordedMeetingsView:View {
     private func detail(_ session:RecordedMeeting)->some View {
         VStack(alignment:.leading,spacing:12) {
             Text(session.title).font(.title2.weight(.semibold)).textSelection(.enabled)
+            HStack {
+                Button("Ask about recording") {model.askSelected()}.disabled(model.busy || m.asking)
+                Button("Recap") {model.askSelected(summarize:true)}.disabled(model.busy || m.asking)
+            }
+            Text(session.sources.first?.belongsToSession == true ? "Ask searches the full recording session. Recaps use a bounded sample and excerpts.":"Ask and recap use this source version.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
             if session.observedSeconds>0 {Text("\(duration(session.observedSeconds)) observed across the loaded live clips").font(.callout).foregroundStyle(.secondary)}
             if session.hasUnobservedTimes {Text("Some clips have no recorded interval. Their saved or import date does not establish when a meeting happened.").font(.caption).foregroundStyle(.secondary)}
             Divider()

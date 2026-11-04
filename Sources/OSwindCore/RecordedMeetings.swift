@@ -6,6 +6,7 @@ public struct RecordedMeetingSource:Identifiable,Equatable,Sendable {
     public let memoryID:String,sessionKey:String,title:String,app:String,revision:String
     public var id:String {Self.key(grouped:false,id:memoryID)}
     public let timestamp:Date,observedEnd:Date?,duration:Double
+    public var belongsToSession:Bool {grouped}
     public var hasObservedInterval:Bool {observedEnd != nil}
     let owner:UUID,grouped:Bool,recordingID:String
     static func key(grouped:Bool,id:String)->String {

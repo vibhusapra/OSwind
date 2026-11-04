@@ -492,10 +492,11 @@ do {
                     let settings = AppSettings.load(root:root); var configuration = settings.ai
                     if let value = try validatedOption("--provider") { guard let provider = AIProvider(rawValue:value) else { throw OSwindError.invalid("Unknown AI provider") }; configuration.provider = provider }
                     configuration.model = try validatedOption("--model") ?? configuration.model; configuration.endpoint = try validatedOption("--endpoint") ?? configuration.endpoint
-                    let filter = try searchFilter(), question = settings.privacy.sanitize(args.joined(separator:" ")).text
+                    var filter = try searchFilter();let question = settings.privacy.sanitize(args.joined(separator:" ")).text
                     guard !question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else { throw OSwindError.invalid("Enter a question") }
-                    let history = ConversationContext.questions(try store.chatTurns(id))
-                    let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history,interpretQuery:!literalQuery)
+                    let turns=try store.chatTurns(id);filter.recordingScope=turns.last?.filter.recordingScope
+                    let history = ConversationContext.questions(turns)
+                    let answer = try await AnswerEngine(store:store,embedder:embedder).answer(question,configuration:configuration,filter:filter,searchConfiguration:settings.search,previousQuestions:history,interpretQuery:!literalQuery,evidencePolicy:filter.recordingScope==nil ? nil:settings.privacy)
                     try Task.checkCancellation()
                     try encoded(store.appendChatTurn(sessionID:id,question:question,answer:answer,filter:filter,policy:settings.privacy))
                 } else { throw OSwindError.invalid("Use chat list, new, show, ask, save-recap, export or delete") }

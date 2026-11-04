@@ -63,14 +63,18 @@ public struct SearchFilter: Codable, Equatable, Sendable {
     public var speaker: String?
     /// Source membership in a local suggested or curated entity; never proof of identity.
     public var entityID: String?
+    public var recordingScope:RecordingScope?
     /// Retains an unavailable restriction across history and backup; never clear it implicitly.
     public var unavailableEntityScope:UnavailableEntityScope?
     public var limit = 100
-    public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, entityID: String? = nil, limit: Int = 100,sourceStartsOnly:Bool?=nil,unavailableEntityScope:UnavailableEntityScope?=nil) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.entityID = entityID; self.limit = limit;self.sourceStartsOnly=sourceStartsOnly;self.unavailableEntityScope=unavailableEntityScope }
-    private enum CodingKeys:String,CodingKey {case query,app,kind,start,end,sourceStartsOnly,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,limit}
+    public init(query: String = "", app: String? = nil, kind: MemoryKind? = nil, start: Date? = nil, end: Date? = nil, favoritesOnly: Bool = false, tag: String? = nil, speaker: String? = nil, entityID: String? = nil, limit: Int = 100,sourceStartsOnly:Bool?=nil,unavailableEntityScope:UnavailableEntityScope?=nil,recordingScope:RecordingScope?=nil) { self.query = query; self.app = app; self.kind = kind; self.start = start; self.end = end; self.favoritesOnly = favoritesOnly; self.tag = tag; self.speaker = speaker; self.entityID = entityID; self.limit = limit;self.sourceStartsOnly=sourceStartsOnly;self.unavailableEntityScope=unavailableEntityScope;self.recordingScope=recordingScope }
+    private enum CodingKeys:String,CodingKey {case query,app,kind,start,end,sourceStartsOnly,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,recordingScope,limit}
     public init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
-        query=try c.decode(String.self,forKey:.query);app=try c.decodeIfPresent(String.self,forKey:.app);kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)
+        query=try c.decode(String.self,forKey:.query);app=try c.decodeIfPresent(String.self,forKey:.app)
+        recordingScope=try c.decodeIfPresent(RecordingScope.self,forKey:.recordingScope)
+        if recordingScope != nil {let selector=try c.decode(RecordingKindSelector.self,forKey:.kind);try selector.validate();kind=selector.value}
+        else {kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)}
         start=try c.decodeIfPresent(Date.self,forKey:.start);end=try c.decodeIfPresent(Date.self,forKey:.end);sourceStartsOnly=try c.decodeIfPresent(Bool.self,forKey:.sourceStartsOnly)
         favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly);tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker);limit=try c.decode(Int.self,forKey:.limit)
         unavailableEntityScope=try c.decodeIfPresent(UnavailableEntityScope.self,forKey:.unavailableEntityScope)
@@ -81,7 +85,8 @@ public struct SearchFilter: Codable, Equatable, Sendable {
     public func encode(to encoder:Encoder)throws {
         guard entityID==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("An entity filter cannot be active and unavailable together")}
         var c=encoder.container(keyedBy:CodingKeys.self)
-        try c.encode(query,forKey:.query);try c.encodeIfPresent(app,forKey:.app);try c.encodeIfPresent(kind,forKey:.kind);try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
+        try c.encode(query,forKey:.query);try c.encodeIfPresent(app,forKey:.app);if recordingScope != nil {try c.encode(RecordingKindSelector(kind),forKey:.kind)}else {try c.encodeIfPresent(kind,forKey:.kind)}
+        try c.encodeIfPresent(recordingScope,forKey:.recordingScope);try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
         try c.encodeIfPresent(sourceStartsOnly,forKey:.sourceStartsOnly);try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker);try c.encode(limit,forKey:.limit)
         if let unavailableEntityScope {
             // An already-open old client must fail decoding, rather than

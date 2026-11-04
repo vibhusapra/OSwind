@@ -14,6 +14,7 @@ import EventKit
     let audio: AudioController
     let entityMemory:EntityMemoryModel
     @Published var entityScope:MemoryEntity?
+    @Published var recordingScope:RecordingScope?
     let meetings:MeetingsModel
     lazy var recordedMeetings=RecordedMeetingsModel(store:store,work:libraryWork)
     let tools:MCPToolsModel
@@ -170,7 +171,7 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recordingsLocked:@escaping ()->Bool={SessionState.locked}) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,audioSetup:((MemoryStore,LocalEmbedder,AppSettings)->AudioController)?=nil,recordingsLocked:@escaping ()->Bool={SessionState.locked}) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
@@ -188,7 +189,7 @@ import EventKit
         let loaded = AppSettings.load(root:root)
         settings = loaded
         capture = CaptureController(store:store, embedder:embedder, settings:loaded)
-        audio = AudioController(store:store, embedder:embedder, settings:loaded)
+        audio = audioSetup?(store,embedder,loaded) ?? AudioController(store:store, embedder:embedder, settings:loaded)
         entityMemory=EntityMemoryModel(store:store)
         activity=ActivityCalendarModel(store:store)
         meetings=meetingsSetup?(store,loaded) ?? MeetingsModel(store:store,settings:loaded)
@@ -254,6 +255,7 @@ import EventKit
         clipboard.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         tools.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryTransfer.busy && !recordingsLocked()}
+        recordedMeetings.beginChat = {[weak self] source,summary in self?.beginRecordingChat(source,summarize:summary)}
         recordedMeetings.openSource = {[weak self] source in self?.openRecordedMeetingSource(source)}
         recordedMeetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         meetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
@@ -348,6 +350,7 @@ import EventKit
     func prepareForLibrarySwitch(preservingSync:Bool) {
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
         if preservingSync {personalSync.suspend()}else {personalSync.retire()}
+        recordingScope=nil
         libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();recordedMeetings.deactivate();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
@@ -376,7 +379,7 @@ import EventKit
         case "Choose day": start = calendar.startOfDay(for:date); end = calendar.date(byAdding:.day,value:1,to:start!)
         default: break
         }
-        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",entityID:entityScope?.id,limit:200,sourceStartsOnly:range=="Calendar slice" ? true:nil)
+        return SearchFilter(query:query,app:appFilter == "All apps" ? nil : appFilter,kind:section == "Conversations" ? .audio : section == "Notes" ? .note : section == "Recaps" ? .summary : nil,start:start,end:end,favoritesOnly:section == "Saved",entityID:entityScope?.id,limit:200,sourceStartsOnly:range=="Calendar slice" ? true:nil,recordingScope:section=="Ask" ? recordingScope:nil)
     }
     func browseEntity(_ entity:MemoryEntity,ask:Bool) {
         cancelOpeningMemory();selected=nil;hits=[];resolvedSearch=nil;entityScope=entity;query="";appFilter="All apps";range="All time";section=ask ? "Ask":"Memories";refresh()
@@ -578,7 +581,27 @@ import EventKit
             ask(prompt,interpretation:false,evidencePolicy:settings.privacy)
         }catch {errorMessage="This meeting is excluded by the current privacy policy."}
     }
+    func beginRecordingChat(_ reference:RecordedMeetingSource,summarize:Bool=false) {
+        guard libraryWorkAvailable,!asking,recordedMeetings.allowed() else {return}
+        let store=self.store,generation=libraryOperationGeneration
+        libraryWork.launch(kind:.query,operation:{try store.recordingScope(for:reference)}) {[weak self] result,cancelled in
+            guard let self,!cancelled,self.libraryOperationGeneration==generation,self.libraryWorkAvailable,!self.asking,self.recordedMeetings.allowed() else {return}
+            do {
+                let scope=try result.get();self.newChat();self.recordingScope=scope;self.entityScope=nil;self.calendarSlice=nil;self.calendarSliceZone=nil;self.range="All time";self.appFilter="All apps";self.query="";self.interpretQuery=false;self.section="Ask"
+                if summarize {self.ask("Summarize this recording and identify supported decisions and next steps.",summarize:true,interpretation:false,evidencePolicy:self.settings.privacy)}
+            }catch {self.errorMessage="This recording changed or is excluded. Refresh before asking about it."}
+        }
+    }
     enum AnswerOperationPhase:Sendable {case started,answerReady}
+    func recapSelection() {
+        let recording=recordingScope != nil
+        range=recording ? "All time":"Today"
+        ask(recording ? "Summarize this recording with decisions, open questions and next steps. Cite evidence.":"Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true,interpretation:recording ? false:nil)
+    }
+    func draftStandup() {
+        if recordingScope==nil {range="Today"}
+        ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true,interpretation:recordingScope==nil ? nil:false)
+    }
     func ask(_ prompt: String? = nil, summarize: Bool = false, interpretation:Bool?=nil,evidencePolicy:PrivacyPolicy?=nil,observeWorker:(@Sendable (AnswerOperationPhase)throws->Void)?=nil,observeCompletion:(@Sendable ()->Void)?=nil) {
         guard libraryWorkAvailable,!libraryWipe.busy else {return}
         let text = settings.privacy.sanitize(prompt ?? question).text
@@ -586,13 +609,15 @@ import EventKit
         answerInputError = nil;answerStatus=nil;savedAnswerID=nil
         if prompt != nil { question = text }
         let now = Date(), sessionID = currentChatID, interpret = interpretation ?? interpretQuery
-        let f = filter(at:now)
+        var f = filter(at:now)
+        if f.recordingScope==nil,let retained=chatTurns.last?.filter.recordingScope {f.recordingScope=retained}
         let config = settings.ai, searchConfig = settings.search,store=self.store,embedder=self.embedder,generation=libraryOperationGeneration
         let history = summarize ? [] : ConversationContext.questions(chatTurns), policy = settings.privacy
+        let scopedPolicy=evidencePolicy ?? (f.recordingScope==nil ? nil:policy)
         asking = true
-        libraryWork.launch(kind:.answer,operation:{
+        libraryWork.launch(kind:.answer,operation:{[f] in
             try observeWorker?(.started);try Task.checkCancellation()
-            let result=try await AnswerEngine(store:store,embedder:embedder).answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now,evidencePolicy:evidencePolicy)
+            let result=try await AnswerEngine(store:store,embedder:embedder).answer(text,configuration:config,filter:f,summarize:summarize,searchConfiguration:searchConfig,previousQuestions:history,interpretQuery:interpret,now:now,evidencePolicy:scopedPolicy)
             try observeWorker?(.answerReady);try Task.checkCancellation()
             // Serialize current-policy admission with settings/retirement. The
             // actual worker remains owned through this hop and any completion.
@@ -637,8 +662,12 @@ import EventKit
         }
     }
     func cancelAnswer() {libraryWork.cancel(kinds:[.answer]);if asking,!libraryRetired {answerStatus="Cancelling; waiting for current work to stop…"}}
-    func newChat() { guard !asking else { return }; currentChatID = nil; chatTurns = []; answer = nil; question = "";answerStatus=nil;savedAnswerID=nil }
-    func selectChat(_ id: String) { guard !asking else { return }; currentChatID = id; question = "";answerStatus=nil;savedAnswerID=nil;refreshChats() }
+    func newChat() { guard !asking else { return }; recordingScope=nil; currentChatID = nil; chatTurns = []; answer = nil; question = "";answerStatus=nil;savedAnswerID=nil }
+    func selectChat(_ id: String) {
+        guard !asking else {return};currentChatID=id;question="";answerStatus=nil;savedAnswerID=nil;chatTurns=[];answer=nil
+        do {chatTurns=try store.chatTurns(id);recordingScope=chatTurns.last?.filter.recordingScope;answer=chatTurns.last?.answer;refreshChats()}
+        catch {recordingScope = .unavailable;errorMessage=error.localizedDescription}
+    }
     func reviewSavedAnswer() {guard libraryWorkAvailable,!asking,let id=savedAnswerID else {return};selectChat(id)}
     func refreshChats() {
         guard libraryWorkAvailable else {return}

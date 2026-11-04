@@ -65,7 +65,7 @@ jobs:
             ${{ runner.temp }}/oswind-peer-membership-ui/folder/*.png
           if-no-files-found: ignore
       - name: Verify recorded meeting workspace and retained-page vault detach
-        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" OSWIND_RECORDING_SCOPE_UI_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|RecordingScopeTests|SyncIncomingSourceTests.testRecordingSessionScopeSurvivesIncomingOriginRemappingAndReexport|SyncIncomingSourceTests.testSingleRecordingVersionScopeSurvivesExactIncomingProjection|SyncIncomingSourceTests.testRecordingScopedRunPreservesQuietRestoreAndRefusesLostSessionProvenance'
       - name: Retain owned recorded meeting components
         if: always()
         uses: actions/upload-artifact@v4

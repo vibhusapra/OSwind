@@ -208,6 +208,12 @@ struct AskView: View {
                 Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
                 Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
             }
+            if let recording=m.recordingScope {
+                HStack {
+                    Label(recording.selector == .session ? "This recording only":recording.selector == .source ? "This source version only":"Recording unavailable",systemImage:"waveform").font(.callout)
+                    Spacer();Button("New general chat") {m.newChat()}.disabled(m.asking)
+                }.padding(10).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:10))
+            }
             HStack {
                 Menu {
                     if m.chats.isEmpty { Text("No saved conversations yet") }
@@ -232,7 +238,7 @@ struct AskView: View {
             HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }.onChange(of:m.question) { m.answerInputError = nil }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(compact ? 14 : 18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
             QueryScopeControls(query:$m.question,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.answerInputError).disabled(m.asking)
             if let status=m.answerStatus {HStack {Text(status).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true);if m.savedAnswerID != nil {Button("Review saved answer") {m.reviewSavedAnswer()}.font(.caption).disabled(m.asking)}}.accessibilityIdentifier("answer-operation-status")}
-            HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
+            HStack { Button(m.recordingScope==nil ? "Recap today":"Recap recording") { m.recapSelection() }; Button("Draft a standup") { m.draftStandup() }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
             if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary); Spacer(); Button("Cancel") { m.cancelAnswer() } } }
             ScrollViewReader { reader in
                 ScrollView {
