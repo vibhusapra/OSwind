@@ -1,5 +1,11 @@
 # Owned owner-app vault diagnostics
 
+## 2026-11-04 hosted follow-up
+
+Exact head `5b48f48`, run 41821091284, completes with all three jobs successful, including the full native packaging/process sequence. Its complete native log and name artifact digest are retained in the [calendar receipt](../benchmarks/recording-calendar-v1.json). This establishes that runner’s successful pass; it does not identify the causes of the earlier PR165 final-detach or initial-create Resource-busy failures below.
+
+The intervening `656a2ca` native job 126529004012 is terminal failure: native test stages pass, then artifact upload steps 19 and 22 fail with `Failed to CreateArtifact: Unable to make request: ENOTFOUND`. Later stages are skipped. The full original log/metadata and failure receipt are preserved. No terminal jobs were rerun to replace their outcomes. Current calendar-source publication is a separate CI gate.
+
 PR165's original hosted native job failed the final detach assertion in `testNativeSavedApprovalSurvivesDetachAndUnlockReturnsOnlyRecovery`. Its benchmark job passed. The full failed log and uploaded artifact are retained locally. The artifact's digest matches CI, but its traces belong to the earlier core-native step; the failed owner-app step had no native observer. The cause remains unproved.
 
 The app session now accepts an internal vault-construction dependency, whose default still constructs the ordinary public `LibraryVault`. Owned owner-addition fixtures supply the existing internal native-driver observer through that dependency, covering the application's real lock, unlock and status operations. No global observer or production environment switch is added.
