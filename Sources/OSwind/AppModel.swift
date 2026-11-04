@@ -15,6 +15,7 @@ import EventKit
     let entityMemory:EntityMemoryModel
     @Published var entityScope:MemoryEntity?
     @Published var recordingScope:RecordingScope?
+    private var recordingChatRequest:UUID?
     let meetings:MeetingsModel
     lazy var recordedMeetings=RecordedMeetingsModel(store:store,work:libraryWork)
     let tools:MCPToolsModel
@@ -351,6 +352,7 @@ import EventKit
         resumeMeetingsAfterPause=false;resumeScreenWithMeetings=false
         if preservingSync {personalSync.suspend()}else {personalSync.retire()}
         recordingScope=nil
+        recordingChatRequest=nil
         libraryRetired=true;answerStatus=nil;savedAnswerID=nil;pendingMediaCleanup.stop();recordedMeetings.deactivate();meetings.stop(clear:true);tools.suspend();clipboard.stop();voice.cancel(clearDraft:true);workflow.cancel(clear:true)
         configuredServicesRequested=false;configuredServicesActive=false
         housekeepingRequested=false;stopHousekeeping()
@@ -581,11 +583,15 @@ import EventKit
             ask(prompt,interpretation:false,evidencePolicy:settings.privacy)
         }catch {errorMessage="This meeting is excluded by the current privacy policy."}
     }
-    func beginRecordingChat(_ reference:RecordedMeetingSource,summarize:Bool=false) {
+    func beginRecordingChat(_ reference:RecordedMeetingSource,summarize:Bool=false,readScope:@escaping @Sendable (MemoryStore,RecordedMeetingSource)throws->RecordingScope={try $0.recordingScope(for:$1)}) {
         guard libraryWorkAvailable,!asking,recordedMeetings.allowed() else {return}
-        let store=self.store,generation=libraryOperationGeneration
-        libraryWork.launch(kind:.query,operation:{try store.recordingScope(for:reference)}) {[weak self] result,cancelled in
-            guard let self,!cancelled,self.libraryOperationGeneration==generation,self.libraryWorkAvailable,!self.asking,self.recordedMeetings.allowed() else {return}
+        let store=self.store,generation=libraryOperationGeneration,request=UUID(),originSection=section
+        recordingChatRequest=request
+        libraryWork.launch(kind:.query,operation:{try readScope(store,reference)}) {[weak self] result,cancelled in
+            guard let self,self.recordingChatRequest==request else {return}
+            self.recordingChatRequest=nil
+            guard !cancelled,self.libraryOperationGeneration==generation,self.libraryWorkAvailable,!self.asking,self.recordedMeetings.allowed(),self.section==originSection,
+                  self.recordedMeetings.selected?.sources.contains(where:{$0.id==reference.id && $0.revision==reference.revision})==true else {return}
             do {
                 let scope=try result.get();self.newChat();self.recordingScope=scope;self.entityScope=nil;self.calendarSlice=nil;self.calendarSliceZone=nil;self.range="All time";self.appFilter="All apps";self.query="";self.interpretQuery=false;self.section="Ask"
                 if summarize {self.ask("Summarize this recording and identify supported decisions and next steps.",summarize:true,interpretation:false,evidencePolicy:self.settings.privacy)}
@@ -662,9 +668,9 @@ import EventKit
         }
     }
     func cancelAnswer() {libraryWork.cancel(kinds:[.answer]);if asking,!libraryRetired {answerStatus="Cancelling; waiting for current work to stop…"}}
-    func newChat() { guard !asking else { return }; recordingScope=nil; currentChatID = nil; chatTurns = []; answer = nil; question = "";answerStatus=nil;savedAnswerID=nil }
+    func newChat() { guard !asking else { return }; recordingChatRequest=nil; recordingScope=nil; currentChatID = nil; chatTurns = []; answer = nil; question = "";answerStatus=nil;savedAnswerID=nil }
     func selectChat(_ id: String) {
-        guard !asking else {return};currentChatID=id;question="";answerStatus=nil;savedAnswerID=nil;chatTurns=[];answer=nil
+        guard !asking else {return};recordingChatRequest=nil;currentChatID=id;question="";answerStatus=nil;savedAnswerID=nil;chatTurns=[];answer=nil
         do {chatTurns=try store.chatTurns(id);recordingScope=chatTurns.last?.filter.recordingScope;answer=chatTurns.last?.answer;refreshChats()}
         catch {recordingScope = .unavailable;errorMessage=error.localizedDescription}
     }

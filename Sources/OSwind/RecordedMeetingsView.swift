@@ -50,14 +50,15 @@ struct RecordedMeetingsView:View {
                     ScrollView {
                         LazyVStack(alignment:.leading,spacing:8) {
                             ForEach(model.sessions) {session in
+                                let countLabel=String(session.sources.count)+(session.sources.count==1 ? " clip loaded":" clips loaded")
                                 Button {model.selectedID=session.id} label: {
                                     VStack(alignment:.leading,spacing:6) {
                                         Text(session.title).font(.headline).lineLimit(2)
                                         Text(session.first,format:.dateTime.month(.abbreviated).day().hour().minute()).font(.caption).foregroundStyle(.secondary)
-                                        Text("\(session.sources.count) clips loaded"+(session.hasUnobservedTimes ? " · saved dates":"")).font(.caption2).foregroundStyle(.secondary)
+                                        Text(countLabel+(session.hasUnobservedTimes ? " · saved dates":"")).font(.caption2).foregroundStyle(.secondary)
                                     }.frame(maxWidth:.infinity,alignment:.leading).padding(12)
                                         .background(model.selectedID==session.id ? OSwindTheme.accent.opacity(0.12):Color.clear,in:RoundedRectangle(cornerRadius:10))
-                                }.buttonStyle(.plain).accessibilityLabel(session.title+", "+String(session.sources.count)+" clips loaded")
+                                }.buttonStyle(.plain).accessibilityLabel(session.title+", "+countLabel)
                             }
                             if model.hasOlder {Button("Load older recordings") {model.loadOlder()}.disabled(model.busy).padding(.vertical,10)}
                         }.padding(.trailing,10)

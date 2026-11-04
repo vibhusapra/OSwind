@@ -106,6 +106,39 @@ import SwiftUI
         XCTAssertFalse(app.asking);XCTAssertEqual(app.answer?.sources.map(\.id),["allowed"])
         XCTAssertTrue(try app.store.chatTurns(chat).allSatisfy {$0.filter.recordingScope?.id=="selected"})
     }
+    func testPendingRecordingRequestCannotReplaceNewChatHistoryOrDepartedSection()async throws {
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false
+        try audio("a",session:"selected",in:app.store)
+        let history=try app.store.saveChatTurn(question:"Owned general history",answer:.init(text:"No evidence",sources:[],provider:"evidence",duration:0))
+        let value=app.recordedMeetings;value.activate();try await settle(value);let reference=try XCTUnwrap(value.selected?.sources.first)
+        for action in ["new","history","section"] {
+            app.newChat();app.section="Meetings"
+            let gate=ImportWorkerGate();defer {gate.release()}
+            app.beginRecordingChat(reference,readScope:{store,source in try gate.pause();return try store.recordingScope(for:source)})
+            await fulfillment(of:[gate.entered],timeout:5)
+            switch action {case "new":app.newChat();case "history":app.selectChat(history.sessionID);default:app.section="Notes"}
+            gate.release()
+            let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+            while app.libraryWork.count(kinds:[.query])>0,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+            XCTAssertEqual(app.libraryWork.count(kinds:[.query]),0);XCTAssertNil(app.recordingScope,action)
+            XCTAssertEqual(app.section,action=="section" ? "Notes":"Meetings",action)
+            XCTAssertEqual(app.currentChatID,action=="history" ? history.sessionID:nil,action)
+        }
+    }
+    func testNewerRecordingRequestWinsWhenEarlierScopeReadFinishesLast()async throws {
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false;app.section="Meetings"
+        try audio("a",session:"first",in:app.store);try audio("b",session:"second",in:app.store)
+        let value=app.recordedMeetings;value.activate();try await settle(value)
+        let first=try XCTUnwrap(value.sessions.first {$0.sources.first?.memoryID=="a"}),second=try XCTUnwrap(value.sessions.first {$0.sources.first?.memoryID=="b"})
+        value.selectedID=first.id;let gate=ImportWorkerGate();defer {gate.release()}
+        app.beginRecordingChat(try XCTUnwrap(first.sources.first),readScope:{store,source in try gate.pause();return try store.recordingScope(for:source)})
+        await fulfillment(of:[gate.entered],timeout:5);value.selectedID=second.id;value.askSelected()
+        let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+        while app.recordingScope?.id != "second",SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertEqual(app.recordingScope?.id,"second");gate.release()
+        while app.libraryWork.count(kinds:[.query])>0,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertEqual(app.libraryWork.count(kinds:[.query]),0);XCTAssertEqual(app.recordingScope?.id,"second");XCTAssertEqual(app.section,"Ask")
+    }
     func testRecordingRecapShortcutIncludesOlderRecordingAndPreservesScopedFollowup()async throws {
         let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false;app.settings.ai.provider = .evidence
         try audio("old",session:"selected",at:946_684_800,in:app.store);try audio("neighbor",session:"other",at:946_684_800,in:app.store)

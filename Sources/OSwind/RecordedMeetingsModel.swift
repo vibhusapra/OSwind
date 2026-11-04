@@ -49,7 +49,7 @@ import OSwindCore
                     for source in page.sources {self.sources[source.id]=source}
                     self.sessions=RecordedMeetingPlanner.group(Array(self.sources.values));self.cursor=page.next;self.hasOlder=page.next != nil
                     if self.selectedID==nil || !self.sessions.contains(where:{$0.id==self.selectedID}) {self.selectedID=self.sessions.first?.id}
-                    self.status="\(self.sessions.count) recording sessions · \(self.sources.count) clips loaded"+(self.hasOlder ? " · older recordings available":"")
+                    self.status="\(self.sessions.count) recording\(self.sessions.count==1 ? "":"s") · \(self.sources.count) clip\(self.sources.count==1 ? "":"s") loaded"+(self.hasOlder ? " · older recordings available":"")
                 }
             }catch {self.error="Recordings could not refresh. Retry after the current library or privacy change."}
         }
