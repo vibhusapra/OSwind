@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## 2026-11-03 — durable recording names backend in progress
+
+Unpublished branch `codex/recording-session-links` now stores user-authored names separately from audio, with exact session/source-version targets, optimistic metadata-row revisions, privacy checks and conflict detection. Runtime `0c32217` passes **107 selected Debug methods / zero skips or failures**, including the four preceding failed lifetime/publication probes and 25 existing portable-record controls. A separate new non-nil calendar-association/quiet-restore case passes on the same production bytes; retained links do not restore Calendar authorization or rewrite recording dates. Original failed runs and actual engines remain preserved.
+
+The UI, new metadata transport, live/historical calendar review, current sanitizer/optimized/performance/native-metadata and package qualification remain open. A temporary explicit transport refusal prevents dropping unsupported metadata. This is not a released feature or v0 completion; PR165 remains the latest qualified development package. [Backend scope, evidence and next work](RECORDING-DETAILS-WIP.md).
+
 ## 2026-11-03 — recording changes refresh coherent loaded history
 
 Source `ec02cdd` observes local/compatible-old-writer/incoming audio changes while Recordings is foreground and active, refreshes the loaded window coherently, preserves quiet selection, clears previews for privacy changes and keeps older history reachable behind an excluded head. Prepared publication uses nonwaiting read-only admission with no external credential refresh on the main actor. Current selected optimized and Thread Sanitizer runs each have **628 defined / 607 passed / 21 expected skips / zero failures**, without a race diagnostic. A separate current 99-pass/two-skip focused run supplies 16 manually reviewed light/dark components, including quiet update and hidden-head states. Real APFS/original-Keychain/all-13-kind, actual old CLI, public peer/app-departure, scope/backup/privacy and Metal checks pass.

@@ -208,4 +208,23 @@ final class RecordingDetailsTests:XCTestCase {
         for (id,old) in [("grouped",a),("legacy",b)] {let ref=try XCTUnwrap(page.sources.first {$0.memoryID==id}),named=try XCTUnwrap(restored.recordedMeetingDetails(for:ref).first);XCTAssertEqual(named.id,old.id);XCTAssertEqual(named.name,old.name)}
         XCTAssertFalse(AppSettings.load(root:destination).meetings.enabled)
     }
+    func testStoredCalendarAssociationSurvivesQuietRestoreWithoutReauthorizingCalendar()throws {
+        try audio("a");let ref=try source("a"),saved=try store.saveRecordedMeetingName("Explicit user label",for:ref)
+        let library=try store.authorizeMeetingLibrary()
+        var settings=AppSettings.load(root:store.root);settings.meetings.enabled=true;settings.meetings.calendarIDs=["owned-calendar"];settings.meetings.boundLibrary=library;try settings.save(root:store.root)
+        XCTAssertTrue(settings.meetings.admits(libraryIdentity:library))
+        let event=try MeetingOccurrence(calendarID:"owned-calendar",seriesID:"owned-series",originalOccurrence:Date(timeIntervalSince1970:5000),start:Date(timeIntervalSince1970:6000),end:Date(timeIntervalSince1970:6600),title:"Do not copy event title",participants:["Do not copy attendee"],joinURL:URL(string:"https://owned.invalid/do-not-copy-token"))
+        let link=try RecordingCalendarLink(event:event,libraryIdentity:library)
+        var record=try XCTUnwrap(store.get(saved.id));record.recordingDetails = .init(scope:saved.details.scope,calendar:link);try store.insert(record)
+        let archive=root.appendingPathComponent("linked.oswindbackup"),destination=root.appendingPathComponent("linked-restored"),info=try LibraryBackup.create(store:store,destination:archive)
+        _=try LibraryBackup.restore(archive,to:destination,expectedFingerprint:info.archiveFingerprint)
+        let restored=try MemoryStore(root:destination);defer {try? restored.close()}
+        let restoredSource=try XCTUnwrap(restored.recordedMeetingPage().sources.first),restoredName=try XCTUnwrap(restored.recordedMeetingDetails(for:restoredSource).first)
+        XCTAssertEqual(restoredName.id,saved.id);XCTAssertEqual(restoredName.details.calendar,link)
+        let quiet=AppSettings.load(root:destination).meetings
+        XCTAssertFalse(quiet.enabled);XCTAssertNil(quiet.boundLibrary);XCTAssertTrue(quiet.calendarIDs.isEmpty);XCTAssertFalse(quiet.admits(libraryIdentity:link.libraryIdentity))
+        XCTAssertEqual(try restored.get("a")?.timestamp,Date(timeIntervalSince1970:100),"The explicitly linked event date does not rewrite recording time")
+        let encoded=String(decoding:try JSONEncoder().encode(try XCTUnwrap(restored.get(saved.id))),as:UTF8.self)
+        for forbidden in ["Do not copy event title","Do not copy attendee","do-not-copy-token"] {XCTAssertFalse(encoded.contains(forbidden))}
+    }
 }
