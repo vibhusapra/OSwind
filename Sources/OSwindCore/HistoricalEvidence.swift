@@ -201,6 +201,21 @@ extension HistoricalEvidenceStore {
         let after=try read(handle,sourceID:value.sourceID,verifyMedia:{_,_,_ in})
         guard try after.record.encoded()==value.record.encoded(),try SyncProtocolLimits.encode(after.memory)==SyncProtocolLimits.encode(value.memory) else {throw OSwindError.invalid("Historical egress changed during admission")};return try value.reference
     }
+    /// Locate one exact archival body; this does not grant journal authority.
+    /// The caller must separately prove its live native affiliation/lifetime.
+    func recordingOriginal(_ reference:SyncVersionReference,sourceID:String,admit:(SyncPortableRecord)throws->Void,verify:(HistoricalEvidence)throws->Void)throws->HistoricalEvidence? {
+        try context();try reference.validate(.source)
+        let row=try database.statement("SELECT handle FROM historical_evidence WHERE object_digest=? AND content_sha=? AND source_id=? COLLATE BINARY LIMIT 2")
+        defer {sqlite3_finalize(row)};database.bind(row,1,try reference.identity.key.digest);database.bind(row,2,reference.content.sha256);database.bind(row,3,sourceID)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()}
+        let handle=database.text(row,0);guard sqlite3_step(row)==SQLITE_DONE else {throw OSwindError.database("Recording original is ambiguous")}
+        let value=try read(handle,sourceID:sourceID,verifyMedia:{_,_,_ in})
+        guard try value.reference==reference else {throw OSwindError.database("Recording original reference differs")}
+        try admit(value.record);try verify(value)
+        let after=try read(handle,sourceID:sourceID,verifyMedia:{_,_,_ in})
+        guard try after.reference==reference,try after.record.encoded()==value.record.encoded(),try SyncProtocolLimits.encode(after.memory)==SyncProtocolLimits.encode(value.memory) else {throw OSwindError.invalid("Recording original changed during admission")}
+        return after
+    }
     func decorating(_ base:SyncPortableReferences,admit:@escaping (SyncPortableRecord)throws->Void,verify:@escaping (HistoricalEvidence)throws->Void)->SyncPortableReferences {
         var result=base
         result.recordingSource={memory,id,revision in

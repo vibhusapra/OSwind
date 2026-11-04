@@ -6,8 +6,23 @@ final class SyncOutgoingTests:XCTestCase {
     var root:URL!,store:MemoryStore!,queue:SyncOutgoingWorkQueue!,cache:SyncVersionStore!
     let replica="00000000-0000-0000-0000-000000000801",group="00000000-0000-0000-0000-000000000802",epoch="00000000-0000-0000-0000-000000000803"
     let now=Date(timeIntervalSince1970:1_792_700_000)
-    override func setUpWithError()throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-sync-outgoing-"+UUID().uuidString);store=try MemoryStore(root:root)}
-    override func tearDownWithError()throws {try store.close();store=nil;try FileManager.default.removeItem(at:root)}
+    var recordingOriginalRetained=false
+    override func setUpWithError()throws {
+        let fm=FileManager.default;recordingOriginalRetained=false
+        let originalCase=name.contains("testRecordingOriginalRecovery") || name.contains("testRecordingNameRecovers") || name.contains("testRecordingNativeTranscript") || name.contains("testRecordingAffiliationScopeChange") || name.contains("testRecordingMetadataExplicitDifferent") || name.contains("testRecordingReassignment")
+        if originalCase,let path=ProcessInfo.processInfo.environment["OSWIND_RECORDING_ORIGINAL_QA_DIR"] {
+            let base=URL(fileURLWithPath:path,isDirectory:true)
+            guard base.path==path,base.standardizedFileURL.path==path,base.resolvingSymlinksInPath().path==path,fm.fileExists(atPath:base.deletingLastPathComponent().path) else {throw OSwindError.invalid("Use a fresh absolute owned recording-recovery output")}
+            let marker=base.appendingPathComponent("owned-fixture")
+            if !fm.fileExists(atPath:path) {try fm.createDirectory(at:base,withIntermediateDirectories:false,attributes:[.posixPermissions:0o700]);try Data("OSwind authored recording original recovery v1".utf8).write(to:marker,options:.withoutOverwriting)}
+            guard try Data(contentsOf:marker)==Data("OSwind authored recording original recovery v1".utf8) else {throw OSwindError.invalid("Missing owned recording-recovery marker")}
+            root=base.appendingPathComponent(name.replacingOccurrences(of:"[^A-Za-z0-9_.-]",with:"_",options:.regularExpression))
+            guard !fm.fileExists(atPath:root.path) else {throw OSwindError.invalid("Owned recording-recovery test output must be fresh")}
+            recordingOriginalRetained=true
+        }else {root=fm.temporaryDirectory.appendingPathComponent("owned-sync-outgoing-"+UUID().uuidString)}
+        store=try MemoryStore(root:root)
+    }
+    override func tearDownWithError()throws {try store.close();store=nil;if !recordingOriginalRetained {try FileManager.default.removeItem(at:root)}}
     func install(budget:Int64=SyncOutgoingWorkQueue.defaultBudget)throws {
         try store.withRoutineDatabase {db in
             _=try SyncChangeCapture.activate(db);let c=try SyncIdentityCatalog.install(db),j=try SyncJournal.install(database:db,replica:replica,group:group,epoch:epoch)

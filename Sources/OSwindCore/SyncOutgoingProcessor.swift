@@ -119,7 +119,10 @@ struct SyncOutgoingProcessor {
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
         },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)},erasedRunConversation:{try self.cache.erasedRunConversation(localRunID:$0)})
-            base.recordingSourceBinding={memory in try self.cache.recordingSourceBinding(memory,admit:self.processor.admitVersion)}
+            let verifyOriginal:(HistoricalEvidence)throws->Void={value in
+                guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
+            }
+            base.recordingSourceBinding={memory in try self.cache.recordingSourceBinding(memory,historical:self.historical,admit:self.processor.admitVersion,verifyOriginal:verifyOriginal)}
             base.recordingSource={_,id,revision in
                 try self.cache.currentRecordingSource(localID:id,revision:revision,prepare:{_=try self.prepare($0)},admit:self.processor.admitVersion)
             }
@@ -135,9 +138,7 @@ struct SyncOutgoingProcessor {
                 if let token=try self.cache.sessionBinding(localID:id,admit:{_ in try self.processor.admitRow(identity,self.current(identity))}) {return token}
                 return try SyncSessionToken(origin:identity.origin,localID:session)
             }
-            return historical.decorating(base,admit:processor.admitVersion,verify:{value in
-                guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
-            })
+            return historical.decorating(base,admit:processor.admitVersion,verify:verifyOriginal)
         }
         @discardableResult func prepare(_ identity:SyncObjectIdentity)throws->SyncPortableRecord {
             do {return try prepareAdmitted(identity)}catch let error as SyncPublicationPolicyDenied {throw SyncPublicationPolicyDenied(identity:error.identity ?? identity)}

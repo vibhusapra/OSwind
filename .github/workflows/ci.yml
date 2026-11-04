@@ -406,10 +406,12 @@ jobs:
           OSWIND_RECORDING_CALENDAR_UI_QA_DIR: ${{ runner.temp }}/oswind-recording-names/calendar
           OSWIND_SESSION_NAME_BENCH_DIR: ${{ runner.temp }}/oswind-recording-names/lookup
           OSWIND_TEST_VAULT_TRACE_DIR: ${{ runner.temp }}/oswind-recording-names/native-traces
+          OSWIND_RECORDING_ORIGINAL_QA_DIR: ${{ runner.temp }}/oswind-recording-names/originals/outgoing
+          OSWIND_TEST_INCOMING_SOURCE_ROOT: ${{ runner.temp }}/oswind-recording-names/originals/incoming
         run: |
-          mkdir -p "$RUNNER_TEMP/oswind-recording-names"
-          swift test --jobs 4 --filter 'RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests|RecordingCalendar|MeetingContextTests|MeetingsModelTests|MeetingRequestTests|VaultSessionTests.testNativeRecordingName|VaultSessionTests.testNativeRecordingCalendar'
-      - name: Retain owned recording-name components and lookup observations
+          mkdir -p "$RUNNER_TEMP/oswind-recording-names/originals"
+          swift test --jobs 4 --filter 'RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests|RecordingCalendar|MeetingContextTests|MeetingsModelTests|MeetingRequestTests|VaultSessionTests.testNativeRecordingName|VaultSessionTests.testNativeRecordingCalendar|SyncOutgoingTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingNameRecovers|SyncOutgoingTests.testRecordingNativeTranscript|SyncOutgoingTests.testRecordingReassignment|SyncOutgoingTests.testRecordingAffiliationScopeChangeAndNativeDeleteInvalidateItsLifetime|SyncOutgoingTests.testRecordingMetadataExplicitDifferentNativeTargetCannotReuseOldAffiliation|SyncIncomingSourceTests.testRecordingOriginalRecovery'
+      - name: Retain owned recording-name components, lookup observations and authored original recovery corpora
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -421,4 +423,6 @@ jobs:
             ${{ runner.temp }}/oswind-recording-names/calendar/*.png
             ${{ runner.temp }}/oswind-recording-names/lookup/result.json
             ${{ runner.temp }}/oswind-recording-names/native-traces/*.json
+            ${{ runner.temp }}/oswind-recording-names/originals/
+          include-hidden-files: true
           if-no-files-found: ignore

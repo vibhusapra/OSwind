@@ -215,6 +215,7 @@ public final class MemoryStore: @unchecked Sendable {
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
         try RecordingAffiliationStore.install(RoutineDatabase(handle:db!))
+        try RecordingReassignmentStore.install(RoutineDatabase(handle:db!))
         try RecordingRelationshipIndexes.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
@@ -377,6 +378,9 @@ public final class MemoryStore: @unchecked Sendable {
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
         try replaceSpeakerProjection(memory);try replaceSearchPreview(memory);try replaceVisualProjection(memory);try replaceRecapLinks(memory,deferred:deferRecapLinks)
+        if let previous,try !incomingSourceProjection.permits(memory) {
+            try RecordingReassignmentStore.rememberNativeChange(RoutineDatabase(handle:db!),before:previous,after:memory)
+        }
         try Task.checkCancellation();try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
         if ownsTransaction {_ = finishRecapInvalidation()}
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
