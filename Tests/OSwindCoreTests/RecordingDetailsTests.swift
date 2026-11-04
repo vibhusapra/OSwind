@@ -14,6 +14,40 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    private final class IndexBuildProbe:@unchecked Sendable {
+        private let lock=NSLock()
+        private var starts=0,steps:Int32=0
+        func begin() {lock.withLock {starts+=1}}
+        func finish(_ value:Int32) {lock.withLock {steps=max(steps,value)}}
+        var result:(Int,Int32) {lock.withLock {(starts,steps)}}
+    }
+    func testFirstSessionNameCancelsDuringDeferredCanonicalIndexBuild()async throws {
+        for index in 0..<1000 {try audio("deferred-\(index)",offset:Double(index))}
+        let target=try XCTUnwrap(store.recordedMeetingPage().sources.first),probe=IndexBuildProbe(),store=store!
+        try store.withRoutineDatabase {try $0.execute("DROP INDEX memory_recording_sessions_v1")}
+        let worker=Task.detached {
+            try store.withRoutineDatabase {db in
+                sqlite3_trace_v2(db.handle,UInt32(SQLITE_TRACE_STMT|SQLITE_TRACE_PROFILE),{mask,context,raw,_ in
+                    guard let context,let raw,let sql=sqlite3_sql(OpaquePointer(raw)),String(cString:sql).hasPrefix("CREATE INDEX memory_recording_sessions_v1 ") else {return 0}
+                    let probe=Unmanaged<IndexBuildProbe>.fromOpaque(context).takeUnretainedValue()
+                    if mask==UInt32(SQLITE_TRACE_STMT) {probe.begin();withUnsafeCurrentTask {$0?.cancel()}}
+                    if mask==UInt32(SQLITE_TRACE_PROFILE) {probe.finish(sqlite3_stmt_status(OpaquePointer(raw),SQLITE_STMTSTATUS_VM_STEP,0))}
+                    return 0
+                },Unmanaged.passUnretained(probe).toOpaque())
+                defer {sqlite3_trace_v2(db.handle,0,nil,nil);withExtendedLifetime(probe) {}}
+                _=try store.saveRecordedMeetingName("Cancelled first session name",for:target)
+            }
+        }
+        do {try await worker.value;XCTFail("Cancelled index build committed a recording name")}catch is CancellationError {}catch {throw error}
+        let (starts,steps)=probe.result
+        XCTAssertEqual(starts,1);XCTAssertGreaterThan(steps,0)
+        XCTAssertLessThanOrEqual(steps,2000,"Cancellation must interrupt the canonical index scan, not wait for the whole archive")
+        try store.withRoutineDatabase {db in
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM memories WHERE kind='recording-metadata'"),0)
+        }
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,512)
+    }
     func testCanonicalRecordingRelationshipsUseExpressionIndexes()throws {
         try audio("indexed-audio");_=try store.saveRecordedMeetingName("Indexed session",for:source("indexed-audio"))
         try store.withRoutineDatabase {db in
