@@ -75,7 +75,7 @@ struct RecordedMeetingsView:View {
     }
     private func detail(_ session:RecordedMeeting)->some View {
         VStack(alignment:.leading,spacing:12) {
-            Text(session.title).font(.title2.weight(.semibold)).textSelection(.enabled)
+            RecordingNameSection(names:model.names,archive:model,originalTitle:session.title)
             HStack {
                 Button("Ask about recording") {model.askSelected()}.disabled(model.busy || m.asking)
                 Button("Recap") {model.askSelected(summarize:true)}.disabled(model.busy || m.asking)

@@ -20,7 +20,8 @@ private struct RecordingRefreshPlan:Sendable {
     @Published private(set) var error:String?
     @Published private(set) var status="Record a meeting or import audio to keep its sources together."
     @Published private(set) var hasOlder=false
-    @Published var selectedID:String?
+    @Published var selectedID:String? {didSet {if oldValue != selectedID {updateNamesForSelection()}}}
+    let names:RecordingNamesModel
     var allowed:()->Bool={false}
     var beginChat:((RecordedMeetingSource,Bool)->Void)?
     var openSource:((RecordedMeetingSource)->Void)?
@@ -33,10 +34,14 @@ private struct RecordingRefreshPlan:Sendable {
     private var sources=[String:RecordedMeetingSource](),cursor:RecordedMeetingCursor?,job:UUID?,revisionJob:UUID?,generation=UUID(),visible=false,appearance:UUID?
     private var loadedRevision:RecordedMeetingRevision?,loadedPages=0,pending:RecordingRefreshPlan?,checkPending=false
     private var monitor:Task<Void,Never>?
-    init(store:MemoryStore,work:LibraryWorkRegistry,foreground:@escaping ()->Bool={NSApp?.isActive==true && !SessionState.locked},pollSeconds:@escaping ()->Double={ProcessInfo.processInfo.isLowPowerModeEnabled ? 10:3},readRevision:@escaping @Sendable (MemoryStore)throws->RecordedMeetingRevision={try $0.recordedMeetingRevision()},readWindow:@escaping @Sendable (MemoryStore,Int,[RecordedMeetingSource])throws->RecordedMeetingWindow={try $0.recordedMeetingWindow(pages:$1,retaining:$2)},groupSources:@escaping @Sendable ([RecordedMeetingSource])throws->[RecordedMeeting]={RecordedMeetingPlanner.group($0)},readPage:@escaping @Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage = {try $0.recordedMeetingPage(before:$1)}) {
+    init(store:MemoryStore,work:LibraryWorkRegistry,foreground:@escaping ()->Bool={NSApp?.isActive==true && !SessionState.locked},pollSeconds:@escaping ()->Double={ProcessInfo.processInfo.isLowPowerModeEnabled ? 10:3},readRevision:@escaping @Sendable (MemoryStore)throws->RecordedMeetingRevision={try $0.recordedMeetingRevision()},readWindow:@escaping @Sendable (MemoryStore,Int,[RecordedMeetingSource])throws->RecordedMeetingWindow={try $0.recordedMeetingWindow(pages:$1,retaining:$2)},groupSources:@escaping @Sendable ([RecordedMeetingSource])throws->[RecordedMeeting]={RecordedMeetingPlanner.group($0)},nameDetails:RecordingNamesModel?=nil,readPage:@escaping @Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage = {try $0.recordedMeetingPage(before:$1)}) {
         self.store=store;self.work=work;self.foreground=foreground;self.pollSeconds=pollSeconds;self.readRevision=readRevision;self.readWindow=readWindow;self.readPage=readPage;self.groupSources=groupSources
+        self.names=nameDetails ?? RecordingNamesModel(store:store,work:work)
+        self.names.allowed={[weak self] in guard let self else {return false};return self.visible && self.allowed() && !self.store.isClosed}
+        self.names.refreshArchive={[weak self] in self?.refresh()}
     }
     var selected:RecordedMeeting? {sessions.first {$0.id==selectedID}}
+    private func updateNamesForSelection() {names.select(selected?.sources.first,revision:loadedRevision)}
     @discardableResult func activate()->UUID {
         let token=UUID();appearance=token;visible=true;refresh();monitor?.cancel()
         monitor=Task {[weak self] in
@@ -55,6 +60,7 @@ private struct RecordingRefreshPlan:Sendable {
     }
     func invalidate() {let reload=visible,plan=refreshPlan;clear();if reload {refresh(plan)}}
     func clear() {
+        names.clear()
         generation=UUID();if let job {work.cancel(id:job)};if let revisionJob {work.cancel(id:revisionJob)}
         job=nil;revisionJob=nil;busy=false;cursor=nil;hasOlder=false;error=nil;loadedRevision=nil;loadedPages=0;pending=nil;checkPending=false
         sessions=[];sources=[:];selectedID=nil;status="Record a meeting or import audio to keep its sources together."
@@ -63,6 +69,7 @@ private struct RecordingRefreshPlan:Sendable {
     func refresh() {refresh(refreshPlan,quiet:!sessions.isEmpty)}
     private func refresh(_ plan:RecordingRefreshPlan,retries:Int=1,quiet:Bool=false) {
         if quiet && !sessions.isEmpty {
+            names.suspend()
             generation=UUID();if let job {work.cancel(id:job)};if let revisionJob {work.cancel(id:revisionJob)}
             job=nil;revisionJob=nil;busy=false;pending=nil;checkPending=false;error=nil;status="Updating recordings…"
         }else {clear();selectedID=plan.selectedID}
@@ -124,6 +131,7 @@ private struct RecordingRefreshPlan:Sendable {
                     if self.selectedID==nil || !self.sessions.contains(where:{$0.id==self.selectedID}) {self.selectedID=self.sessions.first?.id}
                     self.status="\(self.sessions.count) recording\(self.sessions.count==1 ? "":"s") · \(self.sources.count) clip\(self.sources.count==1 ? "":"s") loaded"+(self.hasOlder ? " · older recordings available":"")
                 }
+                self.updateNamesForSelection()
                 if self.checkPending {self.checkPending=false;_ = self.requestChangeCheck()}
             }catch {
                 let budget=older ? priorPages+1:max(max(plan.pages,priorPages),1)
