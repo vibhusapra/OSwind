@@ -2,6 +2,12 @@ import Foundation
 import Combine
 import OSwindCore
 
+private struct PreparedRecordedMeetings:Sendable {
+    let page:RecordedMeetingPage
+    let sources:[String:RecordedMeetingSource]
+    let sessions:[RecordedMeeting]
+}
+
 @MainActor final class RecordedMeetingsModel:ObservableObject {
     @Published private(set) var sessions=[RecordedMeeting]()
     @Published private(set) var busy=false
@@ -14,8 +20,9 @@ import OSwindCore
     var openSource:((RecordedMeetingSource)->Void)?
     private let store:MemoryStore,work:LibraryWorkRegistry
     private let readPage:@Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage
+    private let groupSources:@Sendable ([RecordedMeetingSource])throws->[RecordedMeeting]
     private var sources=[String:RecordedMeetingSource](),cursor:RecordedMeetingCursor?,job:UUID?,generation=UUID(),visible=false,appearance:UUID?
-    init(store:MemoryStore,work:LibraryWorkRegistry,readPage:@escaping @Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage = {try $0.recordedMeetingPage(before:$1)}) {self.store=store;self.work=work;self.readPage=readPage}
+    init(store:MemoryStore,work:LibraryWorkRegistry,groupSources:@escaping @Sendable ([RecordedMeetingSource])throws->[RecordedMeeting]={RecordedMeetingPlanner.group($0)},readPage:@escaping @Sendable (MemoryStore,RecordedMeetingCursor?)throws->RecordedMeetingPage = {try $0.recordedMeetingPage(before:$1)}) {self.store=store;self.work=work;self.readPage=readPage;self.groupSources=groupSources}
     var selected:RecordedMeeting? {sessions.first {$0.id==selectedID}}
     @discardableResult func activate()->UUID {
         let token=UUID();appearance=token;visible=true;refresh();return token
@@ -38,16 +45,21 @@ import OSwindCore
     func loadOlder() {guard hasOlder else {return};load(older:true)}
     private func load(older:Bool) {
         guard visible,!busy,allowed(),!store.isClosed else {return}
-        let token=generation,store=store,readPage=readPage,cursor=older ? cursor:nil
+        let token=generation,store=store,readPage=readPage,groupSources=groupSources,cursor=older ? cursor:nil,existing=older ? sources:[:]
         busy=true;error=nil
-        job=work.launch(kind:.recordedMeetings,operation:{try Task.checkCancellation();return try readPage(store,cursor)}) {[weak self] result,cancelled in
+        job=work.launch(kind:.recordedMeetings,operation:{
+            try Task.checkCancellation();let page=try readPage(store,cursor)
+            var combined=existing
+            for source in page.sources {try Task.checkCancellation();combined[source.id]=source}
+            let sessions=try groupSources(Array(combined.values));try Task.checkCancellation()
+            return PreparedRecordedMeetings(page:page,sources:combined,sessions:sessions)
+        }) {[weak self] result,cancelled in
             guard let self,self.generation==token else {return};self.job=nil;self.busy=false
             guard !cancelled,self.visible,self.allowed(),!store.isClosed else {return}
             do {
-                let page=try result.get()
+                let prepared=try result.get(),page=prepared.page
                 try store.withCurrentRecordedMeetingPage(page) {
-                    for source in page.sources {self.sources[source.id]=source}
-                    self.sessions=RecordedMeetingPlanner.group(Array(self.sources.values));self.cursor=page.next;self.hasOlder=page.next != nil
+                    self.sources=prepared.sources;self.sessions=prepared.sessions;self.cursor=page.next;self.hasOlder=page.next != nil
                     if self.selectedID==nil || !self.sessions.contains(where:{$0.id==self.selectedID}) {self.selectedID=self.sessions.first?.id}
                     self.status="\(self.sessions.count) recording\(self.sessions.count==1 ? "":"s") · \(self.sources.count) clip\(self.sources.count==1 ? "":"s") loaded"+(self.hasOlder ? " · older recordings available":"")
                 }

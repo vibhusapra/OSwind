@@ -52,6 +52,31 @@ import SwiftUI
         let value=model {_,_ in try other.recordedMeetingPage()};value.activate();try await settle(value)
         XCTAssertNotNil(value.error);XCTAssertTrue(value.sessions.isEmpty)
     }
+    func testGroupingRunsOffMainThreadAndRechecksPrivacyBeforePublication()async throws {
+        try audio("a");let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,groupSources:{sources in
+            XCTAssertFalse(Thread.isMainThread,"Grouping must not run in the actor publication callback")
+            try gate.pause();return RecordedMeetingPlanner.group(sources)
+        });value.allowed={true};models.append(value)
+        value.activate();await fulfillment(of:[gate.entered],timeout:5)
+        XCTAssertTrue(value.busy);XCTAssertTrue(value.sessions.isEmpty)
+        var settings=AppSettings();settings.privacy.excludedApps.append("owned.meeting");try settings.save(root:root)
+        gate.release();try await settle(value);XCTAssertTrue(value.sessions.isEmpty);XCTAssertNotNil(value.error)
+    }
+    func testActualAppDepartureJoinsBlockedGroupingBeforeStoreClose()async throws {
+        let location=root.appendingPathComponent("app-group");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
+        let suite="org.oswind.tests.recorded-group."+UUID().uuidString;suites.append(suite)
+        let app=AppSession(selection:.init(url:location,requiresExisting:false,origin:"owned-group"),defaults:UserDefaults(suiteName:suite)!,locked:{false});sessions.append(app)
+        let end=SuspendingClock.now.advanced(by:.seconds(20));while app.busy,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertFalse(app.busy);XCTAssertNil(app.failure);let old=try XCTUnwrap(app.model);old.showOnboarding=false;try audio("a",in:old.store)
+        let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:old.store,work:old.libraryWork,groupSources:{sources in try gate.pause();return RecordedMeetingPlanner.group(sources)});value.allowed={[weak old] in old?.libraryWorkAvailable==true};models.append(value)
+        value.activate();await fulfillment(of:[gate.entered],timeout:5);value.deactivate()
+        let joined=Task {await app.lockForTermination()};for _ in 0..<10 {await Task.yield()}
+        XCTAssertTrue(old.libraryWork.busy);XCTAssertFalse(old.store.isClosed);XCTAssertTrue(value.sessions.isEmpty)
+        gate.release();let clean=await joined.value;XCTAssertTrue(clean);XCTAssertFalse(old.libraryWork.busy);try old.store.close();app.model=nil
+        XCTAssertTrue(value.sessions.isEmpty)
+    }
     func testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose()async throws {
         let location=root.appendingPathComponent("app");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
         let suite="org.oswind.tests.recorded-meeting."+UUID().uuidString;suites.append(suite)
