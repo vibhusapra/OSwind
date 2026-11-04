@@ -1,0 +1,984 @@
+{
+  "format": "Recorded meeting canonical-identifier qualification v1",
+  "source": "29bd6c3e7f4592416c14f02e3530189a52c9c21b",
+  "review": {
+    "source": "29bd6c3e7f4592416c14f02e3530189a52c9c21b",
+    "pinnedInputs": 733,
+    "allGitBlobsAndWorkingInputsVerified": true,
+    "reviewedUTC": "2026-11-04T00:38:36.527100+00:00",
+    "records": {
+      "negative": {
+        "defined": 3,
+        "statuses": {
+          "failed": 2,
+          "passed": 1
+        },
+        "assertionIssues": 13,
+        "unexpectedIssues": 2,
+        "methods": [
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource",
+            "status": "failed",
+            "seconds": 1.335
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen",
+            "status": "failed",
+            "seconds": 0.158
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers",
+            "status": "passed",
+            "seconds": 0.065
+          }
+        ],
+        "skipReasons": [],
+        "logSHA256": "7fabb9b074ae0d58e1e94a18973df890ba087b607d6d90efb2999a8b702f05ce",
+        "raceReport": false,
+        "result": {
+          "command": [
+            "swift",
+            "test",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingIdentifierTests"
+          ],
+          "exitCode": 1,
+          "elapsedSeconds": 91.19816991686821,
+          "sourcesUnchanged": true,
+          "logSHA256": "7fabb9b074ae0d58e1e94a18973df890ba087b607d6d90efb2999a8b702f05ce"
+        }
+      },
+      "fixed-v2": {
+        "defined": 30,
+        "statuses": {
+          "passed": 28,
+          "failed": 1,
+          "skipped": 1
+        },
+        "assertionIssues": 2,
+        "unexpectedIssues": 0,
+        "methods": [
+          {
+            "class": "OSwindCoreTests.NativeRecordedMeetingTests",
+            "method": "testRetainedMetadataPageDoesNotPinOwnedEncryptedImageAfterStoreClose",
+            "status": "passed",
+            "seconds": 15.458
+          },
+          {
+            "class": "OSwindCoreTests.PersonalSyncMembershipUpdateTests",
+            "method": "testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts",
+            "status": "passed",
+            "seconds": 30.092
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource",
+            "status": "passed",
+            "seconds": 0.06
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen",
+            "status": "passed",
+            "seconds": 0.114
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testPriorCacheCannotBeConsumedUntilReopenRepairsItsGroupingSemantics",
+            "status": "passed",
+            "seconds": 0.098
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testBackupRestoreRebuildsPendingMetadataAndKeepsCanonicalSessionFields",
+            "status": "passed",
+            "seconds": 0.439
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testReviewedHistoryErasureRemovesDerivedRowsAndRefusesRetainedReferences",
+            "status": "passed",
+            "seconds": 0.1
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry",
+            "status": "passed",
+            "seconds": 0.323
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testChangingAudioToNoteRemovesItsProjectionAndRestoringItGetsANewReference",
+            "status": "passed",
+            "seconds": 0.063
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource",
+            "status": "passed",
+            "seconds": 0.065
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testExplicitRecordingGroupsPreserveSourcesAndUnionChannelsWithoutFillingGaps",
+            "status": "passed",
+            "seconds": 0.067
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry",
+            "status": "passed",
+            "seconds": 0.064
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles",
+            "status": "passed",
+            "seconds": 0.055
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown",
+            "status": "passed",
+            "seconds": 0.056
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacySQLPayloadMutationMaintainsThinIndexAndReopenRepairsDroppedTrigger",
+            "status": "passed",
+            "seconds": 0.095
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter",
+            "status": "passed",
+            "seconds": 0.055
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters",
+            "status": "passed",
+            "seconds": 0.167
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata",
+            "status": "passed",
+            "seconds": 0.056
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPrivacyExclusionsStillAdvanceCursorAndCurrentPolicyRefusesRetainedReference",
+            "status": "passed",
+            "seconds": 0.06
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSettingsChangeBeforePublicationRefusesWithoutPublishingOldMetadata",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSourceUpdateDeletionRecreationRegroupingAndForeignStoreRefuseStaleReferences",
+            "status": "passed",
+            "seconds": 0.104
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles",
+            "status": "failed",
+            "seconds": 1.859
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose",
+            "status": "passed",
+            "seconds": 0.13
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testForeignPageCannotPublishInAnotherLibrary",
+            "status": "passed",
+            "seconds": 0.111
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testLoadGroupsAndOpensExactCurrentSourceReference",
+            "status": "passed",
+            "seconds": 0.061
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testOlderViewDepartureCannotClearANewerAppearance",
+            "status": "passed",
+            "seconds": 0.066
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testPrivacyChangeAfterReadBeforePublicationHidesOldRows",
+            "status": "passed",
+            "seconds": 0.066
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances",
+            "status": "skipped",
+            "seconds": 0.053
+          },
+          {
+            "class": "OSwindCoreTests.SyncIncomingSourceTests",
+            "method": "testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata",
+            "status": "passed",
+            "seconds": 0.319
+          }
+        ],
+        "skipReasons": [
+          "Explicit generated recording workspace components only"
+        ],
+        "logSHA256": "e34c24530781b374b736ecdee77befae9bb320e025b584edc709e033d9894c7a",
+        "raceReport": false,
+        "result": {
+          "command": [
+            "swift",
+            "test",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts"
+          ],
+          "exitCode": 1,
+          "elapsedSeconds": 64.6779932079371,
+          "sourcesUnchanged": true,
+          "logSHA256": "e34c24530781b374b736ecdee77befae9bb320e025b584edc709e033d9894c7a"
+        }
+      },
+      "diagnostic-v3": {
+        "defined": 1,
+        "statuses": {
+          "failed": 1
+        },
+        "assertionIssues": 2,
+        "unexpectedIssues": 0,
+        "methods": [
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles",
+            "status": "failed",
+            "seconds": 0.792
+          }
+        ],
+        "skipReasons": [],
+        "logSHA256": "65dd0798df0321995f61078c9f1465b05a7330a5451a6fbab849125c29cecb7b",
+        "raceReport": false,
+        "result": {
+          "command": [
+            "swift",
+            "test",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingsModelTests.testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles"
+          ],
+          "exitCode": 1,
+          "elapsedSeconds": 11.770839790813625,
+          "sourcesUnchanged": true,
+          "logSHA256": "65dd0798df0321995f61078c9f1465b05a7330a5451a6fbab849125c29cecb7b"
+        }
+      },
+      "fixed-admission-v4": {
+        "defined": 31,
+        "statuses": {
+          "passed": 30,
+          "skipped": 1
+        },
+        "assertionIssues": 0,
+        "unexpectedIssues": 0,
+        "methods": [
+          {
+            "class": "OSwindCoreTests.NativeRecordedMeetingTests",
+            "method": "testRetainedMetadataPageDoesNotPinOwnedEncryptedImageAfterStoreClose",
+            "status": "passed",
+            "seconds": 4.756
+          },
+          {
+            "class": "OSwindCoreTests.PersonalSyncMembershipUpdateTests",
+            "method": "testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts",
+            "status": "passed",
+            "seconds": 29.686
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource",
+            "status": "passed",
+            "seconds": 0.059
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen",
+            "status": "passed",
+            "seconds": 0.113
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testPriorCacheCannotBeConsumedUntilReopenRepairsItsGroupingSemantics",
+            "status": "passed",
+            "seconds": 0.093
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testBackupRestoreRebuildsPendingMetadataAndKeepsCanonicalSessionFields",
+            "status": "passed",
+            "seconds": 0.43
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testReviewedHistoryErasureRemovesDerivedRowsAndRefusesRetainedReferences",
+            "status": "passed",
+            "seconds": 0.096
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry",
+            "status": "passed",
+            "seconds": 0.316
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testChangingAudioToNoteRemovesItsProjectionAndRestoringItGetsANewReference",
+            "status": "passed",
+            "seconds": 0.059
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource",
+            "status": "passed",
+            "seconds": 0.059
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testExplicitRecordingGroupsPreserveSourcesAndUnionChannelsWithoutFillingGaps",
+            "status": "passed",
+            "seconds": 0.06
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry",
+            "status": "passed",
+            "seconds": 0.055
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles",
+            "status": "passed",
+            "seconds": 0.056
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown",
+            "status": "passed",
+            "seconds": 0.052
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacySQLPayloadMutationMaintainsThinIndexAndReopenRepairsDroppedTrigger",
+            "status": "passed",
+            "seconds": 0.092
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters",
+            "status": "passed",
+            "seconds": 0.163
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata",
+            "status": "passed",
+            "seconds": 0.05
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPrivacyExclusionsStillAdvanceCursorAndCurrentPolicyRefusesRetainedReference",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSettingsChangeBeforePublicationRefusesWithoutPublishingOldMetadata",
+            "status": "passed",
+            "seconds": 0.047
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSourceUpdateDeletionRecreationRegroupingAndForeignStoreRefuseStaleReferences",
+            "status": "passed",
+            "seconds": 0.089
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles",
+            "status": "passed",
+            "seconds": 0.136
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose",
+            "status": "passed",
+            "seconds": 0.123
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppRecordingsRefuseLockedAdmissionAndCanReloadAfterUnlock",
+            "status": "passed",
+            "seconds": 0.094
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testForeignPageCannotPublishInAnotherLibrary",
+            "status": "passed",
+            "seconds": 0.111
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testLoadGroupsAndOpensExactCurrentSourceReference",
+            "status": "passed",
+            "seconds": 0.063
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testOlderViewDepartureCannotClearANewerAppearance",
+            "status": "passed",
+            "seconds": 0.064
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testPrivacyChangeAfterReadBeforePublicationHidesOldRows",
+            "status": "passed",
+            "seconds": 0.058
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances",
+            "status": "skipped",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.SyncIncomingSourceTests",
+            "method": "testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata",
+            "status": "passed",
+            "seconds": 0.339
+          }
+        ],
+        "skipReasons": [
+          "Explicit generated recording workspace components only"
+        ],
+        "logSHA256": "91ebe1a412cb36aa29dbb5aeca31e3e229c0cf1d7cd4ff379d9c7f05af81f76a",
+        "raceReport": false,
+        "result": {
+          "command": [
+            "swift",
+            "test",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts"
+          ],
+          "exitCode": 0,
+          "elapsedSeconds": 69.88662720820867,
+          "sourcesUnchanged": true,
+          "logSHA256": "91ebe1a412cb36aa29dbb5aeca31e3e229c0cf1d7cd4ff379d9c7f05af81f76a"
+        }
+      },
+      "optimized": {
+        "defined": 31,
+        "statuses": {
+          "passed": 30,
+          "skipped": 1
+        },
+        "assertionIssues": 0,
+        "unexpectedIssues": 0,
+        "methods": [
+          {
+            "class": "OSwindCoreTests.NativeRecordedMeetingTests",
+            "method": "testRetainedMetadataPageDoesNotPinOwnedEncryptedImageAfterStoreClose",
+            "status": "passed",
+            "seconds": 15.621
+          },
+          {
+            "class": "OSwindCoreTests.PersonalSyncMembershipUpdateTests",
+            "method": "testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts",
+            "status": "passed",
+            "seconds": 29.016
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource",
+            "status": "passed",
+            "seconds": 0.057
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen",
+            "status": "passed",
+            "seconds": 0.117
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testPriorCacheCannotBeConsumedUntilReopenRepairsItsGroupingSemantics",
+            "status": "passed",
+            "seconds": 0.091
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers",
+            "status": "passed",
+            "seconds": 0.052
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testBackupRestoreRebuildsPendingMetadataAndKeepsCanonicalSessionFields",
+            "status": "passed",
+            "seconds": 0.396
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testReviewedHistoryErasureRemovesDerivedRowsAndRefusesRetainedReferences",
+            "status": "passed",
+            "seconds": 0.102
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry",
+            "status": "passed",
+            "seconds": 0.294
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testChangingAudioToNoteRemovesItsProjectionAndRestoringItGetsANewReference",
+            "status": "passed",
+            "seconds": 0.057
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource",
+            "status": "passed",
+            "seconds": 0.06
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testExplicitRecordingGroupsPreserveSourcesAndUnionChannelsWithoutFillingGaps",
+            "status": "passed",
+            "seconds": 0.07
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry",
+            "status": "passed",
+            "seconds": 0.057
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles",
+            "status": "passed",
+            "seconds": 0.055
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown",
+            "status": "passed",
+            "seconds": 0.052
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacySQLPayloadMutationMaintainsThinIndexAndReopenRepairsDroppedTrigger",
+            "status": "passed",
+            "seconds": 0.092
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter",
+            "status": "passed",
+            "seconds": 0.051
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters",
+            "status": "passed",
+            "seconds": 0.164
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata",
+            "status": "passed",
+            "seconds": 0.057
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPrivacyExclusionsStillAdvanceCursorAndCurrentPolicyRefusesRetainedReference",
+            "status": "passed",
+            "seconds": 0.058
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSettingsChangeBeforePublicationRefusesWithoutPublishingOldMetadata",
+            "status": "passed",
+            "seconds": 0.057
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSourceUpdateDeletionRecreationRegroupingAndForeignStoreRefuseStaleReferences",
+            "status": "passed",
+            "seconds": 0.105
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles",
+            "status": "passed",
+            "seconds": 0.146
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose",
+            "status": "passed",
+            "seconds": 0.123
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppRecordingsRefuseLockedAdmissionAndCanReloadAfterUnlock",
+            "status": "passed",
+            "seconds": 0.097
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testForeignPageCannotPublishInAnotherLibrary",
+            "status": "passed",
+            "seconds": 0.111
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testLoadGroupsAndOpensExactCurrentSourceReference",
+            "status": "passed",
+            "seconds": 0.071
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testOlderViewDepartureCannotClearANewerAppearance",
+            "status": "passed",
+            "seconds": 0.066
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testPrivacyChangeAfterReadBeforePublicationHidesOldRows",
+            "status": "passed",
+            "seconds": 0.061
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances",
+            "status": "skipped",
+            "seconds": 0.052
+          },
+          {
+            "class": "OSwindCoreTests.SyncIncomingSourceTests",
+            "method": "testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata",
+            "status": "passed",
+            "seconds": 0.298
+          }
+        ],
+        "skipReasons": [
+          "Explicit generated recording workspace components only"
+        ],
+        "logSHA256": "fa0a5846283492a097e3936b501ad3951c7fb7ee9514e152aaec202775e7f5e6",
+        "raceReport": false,
+        "result": {
+          "source": "29bd6c3e7f4592416c14f02e3530189a52c9c21b",
+          "command": [
+            "swift",
+            "test",
+            "-c",
+            "release",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts"
+          ],
+          "exitCode": 0,
+          "elapsedSeconds": 294.5249642080162,
+          "inputsUnchanged": true,
+          "logSHA256": "fa0a5846283492a097e3936b501ad3951c7fb7ee9514e152aaec202775e7f5e6"
+        }
+      },
+      "tsan": {
+        "defined": 31,
+        "statuses": {
+          "passed": 30,
+          "skipped": 1
+        },
+        "assertionIssues": 0,
+        "unexpectedIssues": 0,
+        "methods": [
+          {
+            "class": "OSwindCoreTests.NativeRecordedMeetingTests",
+            "method": "testRetainedMetadataPageDoesNotPinOwnedEncryptedImageAfterStoreClose",
+            "status": "passed",
+            "seconds": 4.782
+          },
+          {
+            "class": "OSwindCoreTests.PersonalSyncMembershipUpdateTests",
+            "method": "testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts",
+            "status": "passed",
+            "seconds": 40.972
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource",
+            "status": "passed",
+            "seconds": 0.097
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen",
+            "status": "passed",
+            "seconds": 0.196
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testPriorCacheCannotBeConsumedUntilReopenRepairsItsGroupingSemantics",
+            "status": "passed",
+            "seconds": 0.16
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingIdentifierTests",
+            "method": "testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers",
+            "status": "passed",
+            "seconds": 0.09
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testBackupRestoreRebuildsPendingMetadataAndKeepsCanonicalSessionFields",
+            "status": "passed",
+            "seconds": 0.856
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingPortabilityTests",
+            "method": "testReviewedHistoryErasureRemovesDerivedRowsAndRefusesRetainedReferences",
+            "status": "passed",
+            "seconds": 0.183
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry",
+            "status": "passed",
+            "seconds": 0.749
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testChangingAudioToNoteRemovesItsProjectionAndRestoringItGetsANewReference",
+            "status": "passed",
+            "seconds": 0.11
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource",
+            "status": "passed",
+            "seconds": 0.114
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testExplicitRecordingGroupsPreserveSourcesAndUnionChannelsWithoutFillingGaps",
+            "status": "passed",
+            "seconds": 0.116
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry",
+            "status": "passed",
+            "seconds": 0.104
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles",
+            "status": "passed",
+            "seconds": 0.097
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown",
+            "status": "passed",
+            "seconds": 0.09
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testLegacySQLPayloadMutationMaintainsThinIndexAndReopenRepairsDroppedTrigger",
+            "status": "passed",
+            "seconds": 0.167
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter",
+            "status": "passed",
+            "seconds": 0.1
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters",
+            "status": "passed",
+            "seconds": 0.278
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata",
+            "status": "passed",
+            "seconds": 0.089
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testPrivacyExclusionsStillAdvanceCursorAndCurrentPolicyRefusesRetainedReference",
+            "status": "passed",
+            "seconds": 0.102
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSettingsChangeBeforePublicationRefusesWithoutPublishingOldMetadata",
+            "status": "passed",
+            "seconds": 0.096
+          },
+          {
+            "class": "OSwindCoreTests.RecordedMeetingTests",
+            "method": "testSourceUpdateDeletionRecreationRegroupingAndForeignStoreRefuseStaleReferences",
+            "status": "passed",
+            "seconds": 0.189
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles",
+            "status": "passed",
+            "seconds": 0.277
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose",
+            "status": "passed",
+            "seconds": 0.219
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testActualAppRecordingsRefuseLockedAdmissionAndCanReloadAfterUnlock",
+            "status": "passed",
+            "seconds": 0.164
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testForeignPageCannotPublishInAnotherLibrary",
+            "status": "passed",
+            "seconds": 0.189
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testLoadGroupsAndOpensExactCurrentSourceReference",
+            "status": "passed",
+            "seconds": 0.108
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testOlderViewDepartureCannotClearANewerAppearance",
+            "status": "passed",
+            "seconds": 0.106
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testPrivacyChangeAfterReadBeforePublicationHidesOldRows",
+            "status": "passed",
+            "seconds": 0.104
+          },
+          {
+            "class": "OSwindAppTests.RecordedMeetingsModelTests",
+            "method": "testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances",
+            "status": "skipped",
+            "seconds": 0.089
+          },
+          {
+            "class": "OSwindCoreTests.SyncIncomingSourceTests",
+            "method": "testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata",
+            "status": "passed",
+            "seconds": 0.643
+          }
+        ],
+        "skipReasons": [
+          "Explicit generated recording workspace components only"
+        ],
+        "logSHA256": "242fd9194eb3b4cfd191f824dc2efb9af1da27a5b6c8378f86bc0e862a22eaa4",
+        "raceReport": false,
+        "result": {
+          "source": "29bd6c3e7f4592416c14f02e3530189a52c9c21b",
+          "command": [
+            "swift",
+            "test",
+            "--sanitize",
+            "thread",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts"
+          ],
+          "exitCode": 0,
+          "elapsedSeconds": 137.8259329579305,
+          "inputsUnchanged": true,
+          "logSHA256": "242fd9194eb3b4cfd191f824dc2efb9af1da27a5b6c8378f86bc0e862a22eaa4"
+        }
+      }
+    },
+    "currentSelectedQualificationPassed": true,
+    "fullCurrentSuiteQualified": false,
+    "currentNormalReleasePackaged": false,
+    "hostedCIObserved": false,
+    "physicalLockUIAudioPowerAutomatic24hQualified": false,
+    "featureStatusPromoted": false,
+    "notes": [
+      "Negative production matched ac5bf82; three newly authored methods yielded two failed methods,13 assertion issues and2unexpected, with admission-limit rejection passing. All original logs/inputs and actual negative engine retained.",
+      "The fixed-v2 normal31-predecessor selection had30defined/28pass/1skip/1failed method(2issues). A subsequent diagnostic reproduction observed real SessionState.locked=true as the sole denied recorded-view gate. The original run did not capture that state, so its precise cause is not claimed.",
+      "AppModel recordingsLocked defaults to real SessionState.locked. Owned deletion fixture now injects false; an added actual-AppModel unit tests locked/unlocked/locked admission. These do not qualify a real OS-lock interaction.",
+      "The normal Debug v4 source precedes a test-only cleanup extracting evidence before XCTAssertEqual; current optimized/TSAN pins match the committed source exactly. No assertion or production guard was weakened.",
+      "Cache version2 preserves canonical nonempty IDs verbatim, keeps the source grapheme cap, refuses older cache semantics until reopening repairs them, and does not infer unrelated sessions from titles/times.",
+      "Earlier ac5bf82 broad319 selections,290performance observations and normal release package remain historical and unchanged. No new timings, whole-current suite, package, GUI/physical acceptance or competitor rank is claimed."
+    ]
+  },
+  "protectedHistoricalArtifacts": {
+    "docs/features.json": "0d47186450d9fdcae6cd9248afd5fe6af6d02dcea974a45d6fb238426b0bcbfa",
+    "docs/desktop-memory-landscape-2026-11-03.html": "4d10a965ecd3f75190a0364b7e651906c56e29ccc3878e790a613799d02548b2",
+    "benchmarks/recorded-meetings-startup-v1.json": "72b8fbd95b1e4da5dab206948f0fab7f36e44925cf67ca67a7bef619e52d4de7",
+    "benchmarks/recorded-meetings-startup-raw-v1.zip": "663e26c09a2d33a38095052876169b01279cbedc236fc1482c05d4f43d86f7d9",
+    "benchmarks/recorded-meetings-ci-selection-v2.json": "26649285686f4b0592050746deb8902dbba03f3e476ebc4ce77f39e102654ab3"
+  },
+  "rawArchive": {
+    "path": "benchmarks/recorded-meetings-identifiers-raw-v1.zip",
+    "bytes": 1047579,
+    "members": 50,
+    "sha256": "28605efd2759e7555c93e7a39d7d9ad6a4386e18132652080a54a513f4f76a92"
+  },
+  "scope": "Canonical identifier correctness and selected native/software regression only. Earlier performance and normal package belong to ac5bf82 and remain unchanged; no new current-source performance/package/whole-suite/physical claim."
+}

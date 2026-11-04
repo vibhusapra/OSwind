@@ -61,7 +61,7 @@ struct WorkspaceView: View {
                 if let scope=m.entityScope {HStack {Label("Sources linked to "+scope.name,systemImage:"person.crop.rectangle.stack").font(.caption);Spacer();Button("Clear scope") {m.entityScope=nil;m.refresh()}}.padding(.horizontal,28).padding(.vertical,10).background(accent.opacity(0.08))}
                 if m.section == "People & projects" {EntityMemoryView(model:m.entityMemory).environmentObject(m)}
                 else if m.section == "Ask" { AskView() }
-                else if m.section == "Meetings" {MeetingsView(model:m.meetings).environmentObject(m)}
+                else if m.section == "Meetings" {MeetingWorkspaceView(calendar:m.meetings,recordings:m.recordedMeetings).environmentObject(m)}
                 else if m.section == "Tools" {MCPToolsView(model:m.tools).environmentObject(m)}
                 else if m.section == "Workflows" {WorkflowView(model:m.workflow,openMemories:{m.section="Memories";m.refresh()},openSource:m.openWorkflowSource)}
                 else if m.section == "Routines" { RoutinesView(model:m.routines) }
@@ -69,7 +69,7 @@ struct WorkspaceView: View {
                 else if m.section == "Calendar" {ActivityCalendarView(model:m.activity).environmentObject(m)}
                 else { memories }
                 Divider().opacity(0.5)
-                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.collectionStatus).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="People & projects" {Text("Local suggestions · source-linked")}else if m.section=="Meetings" {Text(m.meetings.active ? "Calendar context active":"Calendar context paused")}else if m.section=="Tools" {Text(m.tools.busy ? "Tool work active":"Manual calls only")}else if m.section=="Workflows" {Text(m.workflow.busy ? "Local workflow work active":"Manual export only")}else if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "People & projects" && m.section != "Calendar" && m.section != "Meetings" && m.section != "Tools" && m.section != "Workflows" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
+                HStack(spacing:8) { Image(systemName:"lock.shield").foregroundStyle(accent); Text(m.collectionStatus).lineLimit(1); Spacer(); if m.refreshing { ProgressView().controlSize(.mini) }; Group {if m.section=="People & projects" {Text("Local suggestions · source-linked")}else if m.section=="Meetings" {Text("Recording sessions · calendar optional")}else if m.section=="Tools" {Text(m.tools.busy ? "Tool work active":"Manual calls only")}else if m.section=="Workflows" {Text(m.workflow.busy ? "Local workflow work active":"Manual export only")}else if m.section=="Calendar" {ActivityCalendarFooter(model:m.activity)}else {Text("\(m.hits.count) \(m.hits.count == 1 ? "result" : "results") · \(Int(m.searchMS)) ms").monospacedDigit()}}; if m.section != "People & projects" && m.section != "Calendar" && m.section != "Meetings" && m.section != "Tools" && m.section != "Workflows" && !m.searchStrategy.isEmpty { Text(m.searchStrategy == "metal-exact-rerank" ? "Metal" : m.searchStrategy == "ann-exact-rerank" ? "Indexed" : "Exact").foregroundStyle(.tertiary) }; Text("⇧⌘Space").foregroundStyle(.tertiary) }.font(.caption2).foregroundStyle(.secondary).padding(.horizontal,24).padding(.vertical,11)
             }.background(Color(nsColor:.windowBackgroundColor))
         }
         .sheet(isPresented:$m.showSettings,onDismiss:{ m.refresh(); if m.searchFocusRequest != nil { m.searchFocusRequest = UUID() } }) { SettingsView(initialTab:m.settingsTab).id(m.settingsTab).environmentObject(m) }
@@ -208,6 +208,12 @@ struct AskView: View {
                 Label("ASK YOUR MEMORY",systemImage:"sparkles").font(.system(size:11,weight:.semibold,design:.monospaced)).foregroundStyle(accent)
                 Text("Pick up where your mind left off.").font(.system(size:32,weight:.medium,design:.rounded))
             }
+            if let recording=m.recordingScope {
+                HStack {
+                    Label(recording.selector == .session ? "This recording only":recording.selector == .source ? "This source version only":"Recording unavailable",systemImage:"waveform").font(.callout)
+                    Spacer();Button("New general chat") {m.newChat()}.disabled(m.asking)
+                }.padding(10).background(accent.opacity(0.08),in:RoundedRectangle(cornerRadius:10))
+            }
             HStack {
                 Menu {
                     if m.chats.isEmpty { Text("No saved conversations yet") }
@@ -232,7 +238,7 @@ struct AskView: View {
             HStack { TextField(m.chatTurns.isEmpty ? "What did we decide about…" : "Ask a follow-up…",text:$m.question).textFieldStyle(.plain).onSubmit { m.ask() }.onChange(of:m.question) { m.answerInputError = nil }; Button { m.ask() } label: { Image(systemName:"arrow.up") }.accessibilityLabel("Ask question").buttonStyle(.borderedProminent).disabled(m.asking || m.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty) }.padding(compact ? 14 : 18).background(.background,in:RoundedRectangle(cornerRadius:12)).overlay(RoundedRectangle(cornerRadius:12).strokeBorder(.primary.opacity(0.1)))
             QueryScopeControls(query:$m.question,filter:m.filter,enabled:$m.interpretQuery,knownApps:Array(m.stats.apps.keys),executionError:m.answerInputError).disabled(m.asking)
             if let status=m.answerStatus {HStack {Text(status).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true);if m.savedAnswerID != nil {Button("Review saved answer") {m.reviewSavedAnswer()}.font(.caption).disabled(m.asking)}}.accessibilityIdentifier("answer-operation-status")}
-            HStack { Button("Recap today") { m.range = "Today"; m.ask("Summarize today's work with decisions, open questions and next steps. Cite evidence.",summarize:true) }; Button("Draft a standup") { m.range = "Today"; m.ask("Draft a standup: completed work, in progress, and blockers. Only use recorded evidence.",summarize:true) }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
+            HStack { Button(m.recordingScope==nil ? "Recap today":"Recap recording") { m.recapSelection() }; Button("Draft a standup") { m.draftStandup() }; Button("Action items") { m.ask("Extract action items, owners and deadlines explicitly stated in recorded evidence. Mark missing details.",summarize:true) } }.buttonStyle(.bordered).disabled(m.asking)
             if m.asking { HStack { ProgressView().controlSize(.small); Text("Reading your selected memories…").foregroundStyle(.secondary); Spacer(); Button("Cancel") { m.cancelAnswer() } } }
             ScrollViewReader { reader in
                 ScrollView {

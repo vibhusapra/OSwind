@@ -130,6 +130,7 @@ public final class AnswerEngine {
             guard let policy=evidencePolicy else {return true}
             return hit.memory.kind != .summary && hit.memory.recap==nil && policy.exclusion(app:hit.memory.bundleID,title:hit.memory.title,url:hit.memory.url)==nil
         }
+        try store.requireRecordingEvidence(hits,scope:resolution.filter.recordingScope)
         guard !hits.isEmpty else { return Answer(text: "I couldn’t find recorded evidence for that question. Try a different phrase or date range.", sources: [], provider: "evidence", duration: Date().timeIntervalSince(start),warnings:retrievalWarnings,resolution:resolution) }
         let excerptQuery = ConversationContext.retrievalQuery(resolution.filter.query,previousQuestions:previousQuestions)
         let excerptBudget = summarize ? 600 : 800
@@ -143,7 +144,7 @@ public final class AnswerEngine {
         if hits.contains(where:{$0.memory.textObservation != nil}) {retrievalWarnings.append("Text spans contain sampled first/last observations with unobserved gaps; they do not establish continuous activity or attention.")}
         let context = passages.enumerated().map { "[\($0.offset+1)] \($0.element)" }.joined(separator:"\n\n")
         if hits.contains(where:{ ($0.memory.text as NSString).length > excerptBudget }) { retrievalWarnings.append("Long sources use bounded excerpts; ellipses mark omitted text. Open source cards to inspect the complete records.") }
-        if summarize { retrievalWarnings.append("This recap uses a distributed sample of the selected timeline, not every recorded moment.") }
+        if summarize { retrievalWarnings.append(resolution.filter.recordingScope==nil ? "This recap uses a distributed sample of the selected timeline, not every recorded moment.":"This recording recap uses a distributed sample of its sources and bounded excerpts, not every spoken word.") }
         try Task.checkCancellation()
         if configuration.provider == .evidence {
             return Answer(text: "Recorded evidence (no language model used):\n\n" + context, sources: hits, provider: "evidence", duration: Date().timeIntervalSince(start),warnings:retrievalWarnings,resolution:resolution)

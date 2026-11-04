@@ -6,7 +6,7 @@ import CoreFoundation
 public enum Integration {
     public static func json<T: Encodable>(_ value: T) throws -> Any { let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .custom { date, encoder in try ISOTime.encode(date,to:encoder) }; return try JSONSerialization.jsonObject(with: encoder.encode(value)) }
     public static func filter(_ args: [String: Any]) throws -> SearchFilter {
-        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","entity","detail","limit","mode","sourceStartsOnly"])
+        let allowed = Set(["query","app","kind","start","end","favorites","literal","tag","speaker","entity","detail","limit","mode","sourceStartsOnly","recordingScope"])
         guard Set(args.keys).isSubset(of:allowed) else { throw OSwindError.invalid("Unknown search parameter") }
         for name in ["query","app","kind","start","end","tag","speaker","entity","detail","mode"] {
             if let value = args[name] {
@@ -32,10 +32,12 @@ public enum Integration {
         func date(_ key: String) throws -> Date? { guard let value = args[key] as? String else { return nil }; return try QueryScopeResolver.instant(value) }
         if let speaker=args["speaker"] as? String { guard speaker.count<=128,!speaker.utf8.contains(0) else { throw OSwindError.invalid("Keep speaker labels within 128 characters") } }
         if let entity=args["entity"] as? String {try validateEntityID(entity)}
-        return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,speaker:args["speaker"] as? String,entityID:args["entity"] as? String,limit:limit,sourceStartsOnly:args["sourceStartsOnly"] as? Bool)
+        let recording:RecordingScope?
+        if let raw=args["recordingScope"] {recording=try JSONDecoder().decode(RecordingScope.self,from:JSONSerialization.data(withJSONObject:raw,options:.fragmentsAllowed))}else {recording=nil}
+        return SearchFilter(query:query,app:args["app"] as? String,kind:(args["kind"] as? String).flatMap(MemoryKind.init),start:try date("start"),end:try date("end"),favoritesOnly:args["favorites"] as? Bool ?? false,tag:args["tag"] as? String,speaker:args["speaker"] as? String,entityID:args["entity"] as? String,limit:limit,sourceStartsOnly:args["sourceStartsOnly"] as? Bool,recordingScope:recording)
     }
     public static func activityRequest(_ args:[String:Any]) throws -> ActivityCalendarRequest {
-        let metadata=Set(["app","kind","start","end","favorites","tag","speaker","entity"])
+        let metadata=Set(["app","kind","start","end","favorites","tag","speaker","entity","recordingScope"])
         guard Set(args.keys).isSubset(of:metadata.union(["month","timeZone","firstWeekday","day"])) else {throw OSwindError.invalid("Unknown activity parameter; calendar counts metadata, not search relevance")}
         guard let month=args["month"] as? String else {throw OSwindError.invalid("Enter month as YYYY-MM")}
         var zone=TimeZone.current
@@ -72,7 +74,12 @@ public enum Integration {
         var common: [String: Any] = ["query": ["type":"string","description":"Double-quoted phrases are required; uppercase AND/OR/NOT and parentheses combine content conditions (each OR branch needs a positive term). Otherwise words are soft ranking cues. Words plus optional local-time scopes (yesterday, last week, on:YYYY-MM-DD), app:\"Name\", kind:audio, speaker:\"Name\", tag:name, is:favorite. Scopes intersect explicit filters; invalid/conflicting scopes fail. Set literal to disable interpretation."], "app": ["type":"string"], "kind": ["type":"string", "enum":MemoryKind.allCases.map(\.rawValue)], "start": ["type":"string", "description":"Inclusive ISO 8601 timestamp"], "end": ["type":"string", "description":"Exclusive ISO 8601 timestamp"], "limit": ["type":"integer", "minimum":1, "maximum":100], "favorites": ["type":"boolean"], "tag": ["type":"string"], "speaker": ["type":"string","description":"Recording-local speaker label; does not identify people across recordings"], "entity": ["type":"string","description":"Local entity ID from memory_entities; matches source membership, not verified identity"], "detail": ["type":"string","enum":["full","preview"],"description":"Defaults to full. Preview omits timed segments but retains original text and explicit summary/revision metadata; get_memory returns the complete source."], "mode": ["type":"string","enum":["hybrid","keyword","semantic","visual"]], "literal":["type":"boolean","description":"Use ordinary token ranking; disable date/scope, required-phrase and Boolean interpretation"]]
         let annotation: [String: Any] = ["readOnlyHint":true,"destructiveHint":false,"openWorldHint":false]
         common["sourceStartsOnly"]=["type":"boolean","description":"When true, time filters match source starts only. Default also includes bounded sampled text observation spans; gaps are unobserved, not continuous activity."]
-        var activityProperties=common.filter {["app","kind","start","end","favorites","tag","speaker","entity"].contains($0.key)}
+        common["recordingScope"]=["description":"Restrict to an exact audio recording session or one exact source evidence version. Other filters intersect this restriction. Unavailable scopes fail; they never search the general library.","oneOf":[
+            ["type":"object","properties":["selector":["const":"session"],"id":["type":"string","minLength":1]],"required":["selector","id"],"additionalProperties":false],
+            ["type":"object","properties":["selector":["const":"source"],"id":["type":"string","minLength":1],"revision":["type":"string","minLength":1]],"required":["selector","id","revision"],"additionalProperties":false],
+            ["type":"object","properties":["selector":["const":"unavailable"]],"required":["selector"],"additionalProperties":false]
+        ]]
+        var activityProperties=common.filter {["app","kind","start","end","favorites","tag","speaker","entity","recordingScope"].contains($0.key)}
         activityProperties["month"]=["type":"string","description":"Gregorian YYYY-MM"]
         activityProperties["timeZone"]=["type":"string","description":"Time zone identifier, default this Mac's current zone"]
         activityProperties["firstWeekday"]=["type":"integer","minimum":1,"maximum":7,"description":"Sunday=1, Monday=2; defaults to Sunday"]
@@ -154,6 +161,10 @@ public final class LocalAPIServer: @unchecked Sendable {
             guard ["true","false"].contains(value) else { return (400,["error":"\(name) must be true or false"]) }; args[name] = value == "true"
         } }
         if let value=args["firstWeekday"] as? String {guard let integer=Int(value) else {return (400,["error":"firstWeekday must be an integer from 1 to 7"])};args["firstWeekday"]=integer}
+        if let value=args["recordingScope"] as? String {
+            guard let object=try? JSONSerialization.jsonObject(with:Data(value.utf8)),object is [String:Any] else {return (400,["error":"recordingScope must be a JSON object"])}
+            args["recordingScope"]=object
+        }
         do {
             if components.path == "/v1/entities" {return (200,try await Integration.execute("memory_entities",args:args,store:store,embedder:embedder))}
             if components.path == "/v1/entity-sources" {return (200,try await Integration.execute("entity_sources",args:args,store:store,embedder:embedder))}

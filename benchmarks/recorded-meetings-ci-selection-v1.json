@@ -1,0 +1,23 @@
+{
+  "format": "Recorded meeting native CI static review v1",
+  "priorWorkflowSHA256": "fa4c3f5cdfc1a68b8e37e83862d287d266ee3972f182ce5f00ba36f26b011ea3",
+  "newWorkflowSHA256": "3747b7ba413da3cd0df7cd6c766e85c99897632580312471dff6ab11cccbf469",
+  "priorNativeStepsPreserved": 85,
+  "addedSteps": [
+    {
+      "name": "Verify recorded meeting workspace and retained-page vault detach",
+      "run": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR=\"$RUNNER_TEMP/oswind-recorded-meeting-ui\" swift test --filter 'RecordedMeetingTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'"
+    },
+    {
+      "name": "Retain owned recorded meeting components",
+      "if": "always()",
+      "uses": "actions/upload-artifact@v4",
+      "with": {
+        "name": "owned-recorded-meeting-ui",
+        "path": "${{ runner.temp }}/oswind-recorded-meeting-ui/*.png",
+        "if-no-files-found": "ignore"
+      }
+    }
+  ],
+  "scope": "Static YAML parse, preservation of all prior steps, explicit native flags and PNG-only always upload. No hosted success or full current source qualification is implied."
+}

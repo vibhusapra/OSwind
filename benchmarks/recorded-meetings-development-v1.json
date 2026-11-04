@@ -1,0 +1,267 @@
+{
+  "format": "OSwind recorded meeting workspace development evidence v1",
+  "sourceAfterUpstreamTestMetadataMerge": "56b19facf1a090fd1e206e35b1aab268f385c4d5",
+  "native17Source": "c1086996976d8d5c43a382c6be7987aae13736a5",
+  "native17InputSHA256": "1bb9e326ed00d0897077df39cac124d711c93e195f515b5acf45392ef2f5d939",
+  "native17LogSHA256": "ac3f04ce07025e708854da30dd68a1b24ffa8810037f2c8a698d93113871a93e",
+  "native17Defined": 17,
+  "native17Passed": 17,
+  "native17Skipped": 0,
+  "newMethodsInNative17": 16,
+  "UIOnlyCorrectionSource": "c2726e2a07b6b4ffa892c9b3e26c541a9c808023",
+  "UIOnlyCasePassed": 1,
+  "UIOnlyInputSHA256": "c771d2c6213c1db54eca89a65427990efa881b0e370ef882032af326637ef3f1",
+  "UIOnlyLogSHA256": "56aee330b2411546ef3c6355aa50bf732910cd445838fd5dde1954d9cb56f4dd",
+  "uiV3Review": {
+    "format": "Recorded workspace v3 current visual review",
+    "inputSHA256": "1bb9e326ed00d0897077df39cac124d711c93e195f515b5acf45392ef2f5d939",
+    "testLogSHA256": "ac3f04ce07025e708854da30dd68a1b24ffa8810037f2c8a698d93113871a93e",
+    "images": {
+      "recordings-light.png": {
+        "sha256": "136808675f4656b7770815fe394b686431d901bc7c0b2938bce1753c1181f9ed",
+        "pixels": [
+          1100,
+          720
+        ],
+        "authoredPoints": [
+          1100,
+          720
+        ]
+      },
+      "compact-dark.png": {
+        "sha256": "eeae6e8be6d72b2f421b021956b450908ab99792e0f88c22c577eb3d8392a80e",
+        "pixels": [
+          770,
+          570
+        ],
+        "authoredPoints": [
+          770,
+          570
+        ]
+      },
+      "empty-light.png": {
+        "sha256": "5aa3cebbb720279baf8ffe3ec10d3d8c3ed1ea433fa773606687bc9d027db399",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "recordings-dark.png": {
+        "sha256": "0f3145d059ec7e69680e609a31caa74e40b1c80e376e24dcec6c51ee14ae4631",
+        "pixels": [
+          1100,
+          720
+        ],
+        "authoredPoints": [
+          1100,
+          720
+        ]
+      },
+      "empty-dark.png": {
+        "sha256": "bce80f8be6de49f5b87332b0021b46127ffe2449c45460bc59bc5ebf1e33665a",
+        "pixels": [
+          900,
+          650
+        ],
+        "authoredPoints": [
+          900,
+          650
+        ]
+      },
+      "compact-light.png": {
+        "sha256": "cf91516686c886b2f0323b9bc8eafca2bdd129957435a29aa79750b1358ecdbf",
+        "pixels": [
+          770,
+          570
+        ],
+        "authoredPoints": [
+          770,
+          570
+        ]
+      }
+    },
+    "allSixVisuallyInspected": true,
+    "UIQualificationPassed": true,
+    "observations": "Both normal and compact populated scenes show2sessions/4clips and3original live-source rows; no observed clipped controls. Both empty scenes show0sessions/0clips with centered empty content and top-aligned header. Source-open buttons visible; compact dates wrap readably. Original v2 wrong populated renders remain retained.",
+    "limits": "Offscreen authored components only. Record/import buttons route existing production entry points, not physical audio/input acceptance. Full workspace calendar tab, VoiceOver/keyboard and actual capture still need native interaction."
+  },
+  "uiV4Review": {
+    "format": "Recorded workspace setup-refusal UI review v4",
+    "inputSHA256": "c771d2c6213c1db54eca89a65427990efa881b0e370ef882032af326637ef3f1",
+    "logSHA256": "56aee330b2411546ef3c6355aa50bf732910cd445838fd5dde1954d9cb56f4dd",
+    "images": {
+      "setup-failure-dark.png": {
+        "sha256": "0d9f219a366f19fe5854b700cfb3695aa592d8c0132bf2e9de7cb5e3e8bf6d6f",
+        "pixels": [
+          900,
+          650
+        ]
+      },
+      "recordings-light.png": {
+        "sha256": "136808675f4656b7770815fe394b686431d901bc7c0b2938bce1753c1181f9ed",
+        "pixels": [
+          1100,
+          720
+        ]
+      },
+      "compact-dark.png": {
+        "sha256": "eeae6e8be6d72b2f421b021956b450908ab99792e0f88c22c577eb3d8392a80e",
+        "pixels": [
+          770,
+          570
+        ]
+      },
+      "empty-light.png": {
+        "sha256": "5aa3cebbb720279baf8ffe3ec10d3d8c3ed1ea433fa773606687bc9d027db399",
+        "pixels": [
+          900,
+          650
+        ]
+      },
+      "recordings-dark.png": {
+        "sha256": "0f3145d059ec7e69680e609a31caa74e40b1c80e376e24dcec6c51ee14ae4631",
+        "pixels": [
+          1100,
+          720
+        ]
+      },
+      "empty-dark.png": {
+        "sha256": "bce80f8be6de49f5b87332b0021b46127ffe2449c45460bc59bc5ebf1e33665a",
+        "pixels": [
+          900,
+          650
+        ]
+      },
+      "setup-failure-light.png": {
+        "sha256": "ec4528bb024611855e2b37716ac72df75841b43f97a500ffde9b1ad509662e9e",
+        "pixels": [
+          900,
+          650
+        ]
+      },
+      "compact-light.png": {
+        "sha256": "cf91516686c886b2f0323b9bc8eafca2bdd129957435a29aa79750b1358ecdbf",
+        "pixels": [
+          770,
+          570
+        ]
+      }
+    },
+    "priorSixByteIdentical": {
+      "recordings-light.png": true,
+      "compact-dark.png": true,
+      "empty-light.png": true,
+      "recordings-dark.png": true,
+      "empty-dark.png": true,
+      "compact-light.png": true
+    },
+    "allEightExactImagesVisuallyReviewed": true,
+    "newFailureScenes": "Both show Choose a local Whisper model first despite no active audio work; Audio setup remains visible. Missing owned executable prevents hardware startup. Original six are byte-identical to the individually reviewed v3 populated/compact/empty images.",
+    "limits": "Offscreen generated components; no actual microphone/system audio, playback or API request. Calendar wrapper interaction and full keyboard/VoiceOver still open."
+  },
+  "onlyDeclaredInputChangedByLaterUpstreamMerge": [
+    "Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift"
+  ],
+  "qualificationsComplete": false,
+  "rawEvidence": {
+    "file": "recorded-meetings-development-raw-v1.zip",
+    "sha256": "d681d57a390be8686ca2277ac032435fa9c68003da10341d5f879321797d5729",
+    "bytes": 2042216,
+    "members": {
+      "development/setup-refusal-ui-v4.log": "56aee330b2411546ef3c6355aa50bf732910cd445838fd5dde1954d9cb56f4dd",
+      "development/ui-development-review-v4.json": "7823573c3aa789a51b5f4ac0576fe52cd6cea0fababfcaecbc97825168620223",
+      "development/ui-v4-prior-image-byte-comparison.json": "140853f737e2e46d32d5ceda2ef73f2ed96c88023b9a9463de2c700e784e37bc",
+      "development/native-core-app-and-ui-v3.log": "ac3f04ce07025e708854da30dd68a1b24ffa8810037f2c8a698d93113871a93e",
+      "development/ui-development-review-v2.json": "3f17ea1574e625e1e87ee79558cc0ca6c75e2eae8341b3441b754538a4db8ddc",
+      "development/ui-development-review-v3.json": "c27663661913ac1daccb4611713b95b42ea810cf650e9d02f3af6cb1f05777b8",
+      "development/core-app-and-ui-v2.log": "f9286a3fa963fc796ddfd8846918edee18432f728cc5d9e0dd382b10efb74c09",
+      "development/core-development-v1.log": "348f29be086024b0b0891bcb411853a78457f11623fda91f3968477f7748fddf",
+      "development/development-v1/result.json": "d1e69b479ff40b7376c5f24f3f781c0ee8e96df952daaa604d5db8a45eecd601",
+      "development/development-v1/inputs.json": "977131cf79c7e0c40d5470f08918b19447e0f407c7cedbe6d0aae9b82a95ed94",
+      "development/development-v1/source/Sources/OSwindCore/RecordedMeetingSchema.swift": "5e7b3ea1b48831ba6ae9fc7e244c6926e9f14bb5086cde7e48ce73b8ea685f39",
+      "development/development-v1/source/Sources/OSwindCore/RecordedMeetings.swift": "566f0ea3214e7f8a781cbf6190068b22fa95b6c149b2b13dfee15744a5c254e6",
+      "development/development-v1/source/Sources/OSwindCore/MemoryStore.swift": "86ba47f46dd9f82c8ab6762eff1ce984bd1dd579968771cc8586a74f8b3d1d9f",
+      "development/development-v1/source/Sources/OSwind/RecordedMeetingsModel.swift": "e9e58d4aeb5f083115a22e8e35ccce0049fac11292f44500c11115b847b1c6eb",
+      "development/development-v1/source/Sources/OSwind/AppModel.swift": "09285c98a2136e190f064930c0f3f509009f8926a605f52419b48add8c8bb077",
+      "development/development-v1/source/Sources/OSwind/WorkspaceView.swift": "c78b61861e62e7b8f62ca5a0dc85035a805b32c9bb48de44a45815bccb777ab2",
+      "development/development-v1/source/Sources/OSwind/RecordedMeetingsView.swift": "60a5aee76163a91dd92de6b91c424a1e2c1b81a882bc1e7f6f780ea6dac755ab",
+      "development/development-v1/source/Sources/OSwind/LibraryWorkRegistry.swift": "907f0c66c21001bf998066f05eed0139dc7ec08539bd686aa6df7c337f93c2ec",
+      "development/development-v1/source/Tests/OSwindCoreTests/RecordedMeetingTests.swift": "1fd8fc1be988000b10bd24ef4163cce4bb48620c53b834a78fe6a030eb2ae7e4",
+      "development/development-v2/result.json": "453cba3803b57485d926a29ed1e8b492fa60f1eea34045e9678f512abad688f8",
+      "development/development-v2/inputs.json": "8319e98f56cfdc07a41740ee933f52de6d5749aa71d74b162eed99fe41dd64c9",
+      "development/development-v2/source/Sources/OSwindCore/RecordedMeetingSchema.swift": "5e7b3ea1b48831ba6ae9fc7e244c6926e9f14bb5086cde7e48ce73b8ea685f39",
+      "development/development-v2/source/Sources/OSwindCore/RecordedMeetings.swift": "566f0ea3214e7f8a781cbf6190068b22fa95b6c149b2b13dfee15744a5c254e6",
+      "development/development-v2/source/Sources/OSwindCore/MemoryStore.swift": "86ba47f46dd9f82c8ab6762eff1ce984bd1dd579968771cc8586a74f8b3d1d9f",
+      "development/development-v2/source/Sources/OSwind/RecordedMeetingsModel.swift": "8d6b584973705ed409760a0814119dafa4f5d489f3892240c249586e68cf7571",
+      "development/development-v2/source/Sources/OSwind/AppModel.swift": "09285c98a2136e190f064930c0f3f509009f8926a605f52419b48add8c8bb077",
+      "development/development-v2/source/Sources/OSwind/WorkspaceView.swift": "c78b61861e62e7b8f62ca5a0dc85035a805b32c9bb48de44a45815bccb777ab2",
+      "development/development-v2/source/Sources/OSwind/RecordedMeetingsView.swift": "60a5aee76163a91dd92de6b91c424a1e2c1b81a882bc1e7f6f780ea6dac755ab",
+      "development/development-v2/source/Sources/OSwind/LibraryWorkRegistry.swift": "907f0c66c21001bf998066f05eed0139dc7ec08539bd686aa6df7c337f93c2ec",
+      "development/development-v2/source/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift": "a9a89de7004a70bdcd634a6de2dedf6ccd655d874ca40d4998cb48102bd382c5",
+      "development/development-v2/source/Tests/OSwindCoreTests/RecordedMeetingTests.swift": "5fabc60b9c1e9ebadec62b9362824f8f126a8449f6bd65bfa3eaaed8926b5f24",
+      "development/development-v3/result.json": "c93934d26bb4efaf967c46ac9e48af6157fcfa886b6b38f7791e607e91e0a30e",
+      "development/development-v3/inputs.json": "1bb9e326ed00d0897077df39cac124d711c93e195f515b5acf45392ef2f5d939",
+      "development/development-v3/source/Sources/OSwindCore/RecordedMeetingSchema.swift": "5e7b3ea1b48831ba6ae9fc7e244c6926e9f14bb5086cde7e48ce73b8ea685f39",
+      "development/development-v3/source/Sources/OSwindCore/RecordedMeetings.swift": "566f0ea3214e7f8a781cbf6190068b22fa95b6c149b2b13dfee15744a5c254e6",
+      "development/development-v3/source/Sources/OSwindCore/MemoryStore.swift": "86ba47f46dd9f82c8ab6762eff1ce984bd1dd579968771cc8586a74f8b3d1d9f",
+      "development/development-v3/source/Sources/OSwind/RecordedMeetingsModel.swift": "a3ab87178dd0d9fdd2318f8f58dafa6af7b0d432a6dcf25380e2e351f4799f42",
+      "development/development-v3/source/Sources/OSwind/AppModel.swift": "09285c98a2136e190f064930c0f3f509009f8926a605f52419b48add8c8bb077",
+      "development/development-v3/source/Sources/OSwind/WorkspaceView.swift": "c78b61861e62e7b8f62ca5a0dc85035a805b32c9bb48de44a45815bccb777ab2",
+      "development/development-v3/source/Sources/OSwind/RecordedMeetingsView.swift": "46f0c7120e7b542c0d2e1ba8b1c963999a9b8180f1c78706519ede16aa444227",
+      "development/development-v3/source/Sources/OSwind/LibraryWorkRegistry.swift": "907f0c66c21001bf998066f05eed0139dc7ec08539bd686aa6df7c337f93c2ec",
+      "development/development-v3/source/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift": "7668779dcbb1e1802d574ccbea63b880a9d9c165a1ca1812b576d40edb0957b3",
+      "development/development-v3/source/Tests/OSwindCoreTests/RecordedMeetingTests.swift": "3b0faf8cdf4d5d314eab93b18a83478ae0e7f6146d6a2bcaae9593b2b7b36044",
+      "development/development-v3/source/Tests/OSwindCoreTests/NativeRecordedMeetingTests.swift": "43614452557b5101a26670cb27386e6b43617014b4e3de20e55df4c8fef050f5",
+      "development/development-v4/result.json": "e5953b9525e537eb3bc16cda8d62d46498119d450cf8199a7afbb56931644bbd",
+      "development/development-v4/inputs.json": "c771d2c6213c1db54eca89a65427990efa881b0e370ef882032af326637ef3f1",
+      "development/development-v4/source/Sources/OSwind/RecordedMeetingsView.swift": "8d1e87d4ed74228d0ef26a3779544527f11d77df8dd47426bc20eb7cfb4e73db",
+      "development/development-v4/source/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift": "832517837fc0275b34e3144718eb4f3609bb43b8413b68d9b49ebc6c65063a1d",
+      "renders/ui-development-v2/recordings-light.png": "136808675f4656b7770815fe394b686431d901bc7c0b2938bce1753c1181f9ed",
+      "renders/ui-development-v2/compact-dark.png": "1a5211a64bcb92864d6b21a420a1e387493405c692d2ebf22d42c968abf5645c",
+      "renders/ui-development-v2/empty-light.png": "78358e630143daec2b33eafeb4e1cb35f93a3dc527927dc0abe51cc1037df68d",
+      "renders/ui-development-v2/recordings-dark.png": "6e7da447e8497c6e06f7bdf6d9173954fbafe5ce1145441967e8800ca49e70db",
+      "renders/ui-development-v2/empty-dark.png": "12fd707c4581ecea7d6a1a3064650aa766583ba78dfa96e4e89df72aa99bae64",
+      "renders/ui-development-v2/compact-light.png": "6c6fadaa672e7a5fead11561d7c99d9eda20320e4638e5d145037d1d6c68d239",
+      "renders/ui-development-v3/recordings-light.png": "136808675f4656b7770815fe394b686431d901bc7c0b2938bce1753c1181f9ed",
+      "renders/ui-development-v3/compact-dark.png": "eeae6e8be6d72b2f421b021956b450908ab99792e0f88c22c577eb3d8392a80e",
+      "renders/ui-development-v3/empty-light.png": "5aa3cebbb720279baf8ffe3ec10d3d8c3ed1ea433fa773606687bc9d027db399",
+      "renders/ui-development-v3/recordings-dark.png": "0f3145d059ec7e69680e609a31caa74e40b1c80e376e24dcec6c51ee14ae4631",
+      "renders/ui-development-v3/empty-dark.png": "bce80f8be6de49f5b87332b0021b46127ffe2449c45460bc59bc5ebf1e33665a",
+      "renders/ui-development-v3/compact-light.png": "cf91516686c886b2f0323b9bc8eafca2bdd129957435a29aa79750b1358ecdbf",
+      "renders/ui-development-v4/setup-failure-dark.png": "0d9f219a366f19fe5854b700cfb3695aa592d8c0132bf2e9de7cb5e3e8bf6d6f",
+      "renders/ui-development-v4/recordings-light.png": "136808675f4656b7770815fe394b686431d901bc7c0b2938bce1753c1181f9ed",
+      "renders/ui-development-v4/compact-dark.png": "eeae6e8be6d72b2f421b021956b450908ab99792e0f88c22c577eb3d8392a80e",
+      "renders/ui-development-v4/empty-light.png": "5aa3cebbb720279baf8ffe3ec10d3d8c3ed1ea433fa773606687bc9d027db399",
+      "renders/ui-development-v4/recordings-dark.png": "0f3145d059ec7e69680e609a31caa74e40b1c80e376e24dcec6c51ee14ae4631",
+      "renders/ui-development-v4/empty-dark.png": "bce80f8be6de49f5b87332b0021b46127ffe2449c45460bc59bc5ebf1e33665a",
+      "renders/ui-development-v4/setup-failure-light.png": "ec4528bb024611855e2b37716ac72df75841b43f97a500ffde9b1ad509662e9e",
+      "renders/ui-development-v4/compact-light.png": "cf91516686c886b2f0323b9bc8eafca2bdd129957435a29aa79750b1358ecdbf",
+      "publisher/publish-development-v1.py": "ad203a2fa8d814b077a050c2227dd77a17676884f814c6de6e56b37304bace16",
+      "source/Sources/OSwind/AppModel.swift": "09285c98a2136e190f064930c0f3f509009f8926a605f52419b48add8c8bb077",
+      "source/Sources/OSwind/LibraryWorkRegistry.swift": "907f0c66c21001bf998066f05eed0139dc7ec08539bd686aa6df7c337f93c2ec",
+      "source/Sources/OSwind/RecordedMeetingsModel.swift": "a3ab87178dd0d9fdd2318f8f58dafa6af7b0d432a6dcf25380e2e351f4799f42",
+      "source/Sources/OSwind/RecordedMeetingsView.swift": "8d1e87d4ed74228d0ef26a3779544527f11d77df8dd47426bc20eb7cfb4e73db",
+      "source/Sources/OSwind/WorkspaceView.swift": "c78b61861e62e7b8f62ca5a0dc85035a805b32c9bb48de44a45815bccb777ab2",
+      "source/Sources/OSwindCore/MemoryStore.swift": "86ba47f46dd9f82c8ab6762eff1ce984bd1dd579968771cc8586a74f8b3d1d9f",
+      "source/Sources/OSwindCore/RecordedMeetingSchema.swift": "5e7b3ea1b48831ba6ae9fc7e244c6926e9f14bb5086cde7e48ce73b8ea685f39",
+      "source/Sources/OSwindCore/RecordedMeetings.swift": "566f0ea3214e7f8a781cbf6190068b22fa95b6c149b2b13dfee15744a5c254e6",
+      "source/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift": "832517837fc0275b34e3144718eb4f3609bb43b8413b68d9b49ebc6c65063a1d",
+      "source/Tests/OSwindCoreTests/NativeRecordedMeetingTests.swift": "43614452557b5101a26670cb27386e6b43617014b4e3de20e55df4c8fef050f5",
+      "source/Tests/OSwindCoreTests/RecordedMeetingTests.swift": "3b0faf8cdf4d5d314eab93b18a83478ae0e7f6146d6a2bcaae9593b2b7b36044",
+      "README.txt": "d2bf4e58a04f1d4e8e314dbca2e3a1aa7008c5315f8f23a0fac788496a88e02b"
+    },
+    "allArchivedBytesCompared": true
+  },
+  "scope": "Bounded metadata pages without transcript reads; explicit recording IDs, gap-aware observed-time union, import-date distinction, row-nonce and current open-store refs, current-settings UI publication, joined actualAppSession departure, foreign-page refusal, older-view departure token, ordinary-source SQL cache updates/rebuild, encrypted-page no-FD-detach, native13-kind sync regression. Core full schemas remain33/35/36; index is additive derived metadata.",
+  "remaining": [
+    "Session-specific Ask/recap and durable calendar occurrence linking/title editing",
+    "Cache migration/performance and portable/backup/current privacy corpus",
+    "Current source sanitizer/optimized and broader regression; release package",
+    "Wrapper tab interaction, keyboard/VoiceOver and physical audio/ASR/device/permission acceptance"
+  ],
+  "limitations": "Generated fixtures and offscreen components on one Mac. No current whole suite or post-merge whole17run, no physical mic/system/voice quality, no provider request, no completeF042/v0/ranking claim."
+}

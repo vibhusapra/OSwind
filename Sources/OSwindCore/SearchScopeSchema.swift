@@ -30,6 +30,12 @@ struct MetalScopeKey: Equatable {
     var predicate: String
     var values: [String]
     var expression: String? = nil
+    static func ==(a:Self,b:Self)->Bool {
+        func same(_ x:String,_ y:String)->Bool {x.utf8.elementsEqual(y.utf8)}
+        let expressionSame:Bool
+        switch (a.expression,b.expression) {case (nil,nil):expressionSame=true;case let (x?,y?):expressionSame=same(x,y);default:expressionSame=false}
+        return a.sequence==b.sequence && same(a.identity,b.identity) && same(a.model,b.model) && same(a.revision,b.revision) && same(a.predicate,b.predicate) && a.values.count==b.values.count && zip(a.values,b.values).allSatisfy {same($0.0,$0.1)} && expressionSame
+    }
 }
 struct MetalScopeSnapshot {
     var key: MetalScopeKey

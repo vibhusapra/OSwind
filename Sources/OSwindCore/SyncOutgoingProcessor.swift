@@ -105,7 +105,7 @@ struct SyncOutgoingProcessor {
             try processor.queue.catalog.registerExisting(table,primary:primary)
         }
         var references:SyncPortableReferences {
-            let base=SyncPortableReferences(identity:{try self.identity($0,$1)},source:{id,revision in
+            var base=SyncPortableReferences(identity:{try self.identity($0,$1)},source:{id,revision in
             let identity=try self.identity(.source,[.text(Data(id.utf8))]);_=try self.prepare(identity)
             return try self.cache.sourceVersion(localID:id,revision:revision,admit:self.processor.admitVersion)
         },media:processor.media,recipe:{id,ordinal in
@@ -119,6 +119,18 @@ struct SyncOutgoingProcessor {
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
         },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)},erasedRunConversation:{try self.cache.erasedRunConversation(localRunID:$0)})
+            base.recordingSession={session in
+                try RecordedMeetingSchema.populateIfNeeded(self.db)
+                let row=try self.db.statement("SELECT memory_id FROM recorded_meeting_sources WHERE grouped=1 AND recording_id=? ORDER BY memory_id LIMIT 1");defer {sqlite3_finalize(row)};self.db.bind(row,1,session)
+                let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw self.db.error()}
+                let id=self.db.text(row,0),identity=try self.identity(.source,[.text(Data(id.utf8))]),frame=try self.current(identity)
+                try self.processor.admitRow(identity,frame)
+                guard case .blob(let payload)=frame.cells[8] else {throw OSwindError.invalid("Recording scope source differs")}
+                let memory=try JSONDecoder().decode(Memory.self,from:payload)
+                guard memory.kind == .audio,memory.audioSessionID.map({Data($0.utf8)})==Data(session.utf8) else {throw OSwindError.unavailable("Recording scope changed during preparation")}
+                if let token=try self.cache.sessionBinding(localID:id,admit:{_ in try self.processor.admitRow(identity,self.current(identity))}) {return token}
+                return try SyncSessionToken(origin:identity.origin,localID:session)
+            }
             return historical.decorating(base,admit:processor.admitVersion,verify:{value in
                 guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
             })

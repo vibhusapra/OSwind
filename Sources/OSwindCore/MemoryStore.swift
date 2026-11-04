@@ -9,6 +9,7 @@ public final class MemoryStore: @unchecked Sendable {
     // Enrolled35 adds writer generations; opt-in36 fences membership
     // preparations. Ordinary native content remains33.
     public static let maximumSupportedSchemaVersion = 36
+    let recordedMeetingOwner=UUID()
     let incomingSourceProjection=SyncIncomingSourceProjection()
     let incomingRunProjection=SyncIncomingRunProjection()
     let incomingSourceErasure=SyncIncomingSourceErasure()
@@ -75,12 +76,12 @@ public final class MemoryStore: @unchecked Sendable {
             do {
                 guard version>=33 else {throw OSwindError.invalid("Recovery export requires a current native library; restore older archives through Backup Restore")}
                 try exec("PRAGMA trusted_schema=OFF; PRAGMA temp_store=\(temporaryPolicy.rawValue); PRAGMA cache_size=-4096;")
-                try NativeMediaSchema.register(RoutineDatabase(handle:db!))
+                try RecordingScopeSQL.register(RoutineDatabase(handle:db!));try NativeMediaSchema.register(RoutineDatabase(handle:db!))
                 try LibraryRecovery.installReadAdmission(RoutineDatabase(handle:db!))
                 return
             }catch {sqlite3_close(db);db=nil;throw error}
         }
-        do {try NativeMediaSchema.register(RoutineDatabase(handle:db!));try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncWithheldWork.register(RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
+        do {try RecordingScopeSQL.register(RoutineDatabase(handle:db!));try NativeMediaSchema.register(RoutineDatabase(handle:db!));try SyncChangeCapture.register(on:RoutineDatabase(handle:db!));try SyncWithheldWork.register(RoutineDatabase(handle:db!));try SyncIncomingSourceProjection.register(RoutineDatabase(handle:db!),permit:incomingSourceProjection);try SyncIncomingRunProjection.register(RoutineDatabase(handle:db!),permit:incomingRunProjection);try EntityScopeProjection.register(RoutineDatabase(handle:db!),permit:entityScopeProjection);try SyncIncomingSourceErasure.register(RoutineDatabase(handle:db!),permit:incomingSourceErasure)}
         catch {sqlite3_close(db);db=nil;throw error}
         do {
             try nativeWriterAdmission.register(RoutineDatabase(handle:db!))
@@ -212,6 +213,7 @@ public final class MemoryStore: @unchecked Sendable {
         if version < 5 { try exec(StatisticsSchema.selectiveFTSUpdate) }
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
+        try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
@@ -442,7 +444,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT payload FROM memories WHERE id=?"); defer { sqlite3_finalize(stmt) }; bind(stmt, 1, id); return sqlite3_step(stmt) == SQLITE_ROW ? try decode(stmt) : nil
     }
     func conditions(_ filter: SearchFilter, prefix: String = "m.", expression: SearchExpressionPlan? = nil,includeTextObservations:Bool=true,rowLocalExpressions:Bool=false) -> (String, [String]) {
-        if filter.unavailableEntityScope != nil {return ("0=1",[])}
+        if filter.unavailableEntityScope != nil || filter.recordingScope?.selector == .unavailable {return ("0=1",[])}
         // An inverted interval can otherwise match a span crossing both bounds.
         // Public query resolution reports the error; raw store APIs fail closed.
         if filter.start?.timeIntervalSince1970.isFinite == false || filter.end?.timeIntervalSince1970.isFinite == false {return ("0=1",[])}
@@ -465,6 +467,12 @@ public final class MemoryStore: @unchecked Sendable {
         if filter.favoritesOnly { parts.append("\(prefix)favorite=1") }
         if let tag = filter.tag { parts.append("EXISTS (SELECT 1 FROM memory_tags t WHERE t.memory_id=\(prefix)id AND t.tag=?)"); values.append(tag) }
         if let entity=filter.entityID { parts.append("EXISTS (SELECT 1 FROM entity_mentions e WHERE e.memory_id=\(prefix)id AND e.entity_id=?)"); values.append(entity) }
+        if let recording=filter.recordingScope {
+            parts.append("\(prefix)kind='audio'")
+            if recording.selector == .session {
+                parts.append("(SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version')=? AND EXISTS(SELECT 1 FROM recorded_meeting_sources _recording WHERE _recording.memory_id=\(prefix)id AND _recording.grouped=1 AND _recording.recording_id=?)");values += [RecordedMeetingSchema.currentVersion,recording.id!]
+            }else {parts.append("\(prefix)id=? AND oswind_recording_evidence_v1(\(prefix)payload)=?");values += [recording.id!,recording.revision!]}
+        }
         if let speaker=filter.speaker { parts.append("EXISTS (SELECT 1 FROM audio_speakers s WHERE s.memory_id=\(prefix)id AND s.label_key=?)"); values.append(SpeakerLabel.key(speaker)) }
         if let constraint = expression?.constraint {
             if expression?.materialized == true { parts.append("\(prefix)id IN (SELECT id FROM temp.search_expression_scope)") }
@@ -552,7 +560,7 @@ public final class MemoryStore: @unchecked Sendable {
         return 0.08 * coverage / (1 + Double(rank)*0.1)
     }
     public func search(_ filter: SearchFilter, mode: SearchMode = .hybrid, vector: [Float]? = nil, modelID: String? = nil, minimumSimilarity: Double = 0.15, similarityFusion: Bool = false, indexPolicy: SearchIndexPolicy = .exact, indexedCount: Int? = nil, allowIndexOnLowPower: Bool = false, detail:SearchDetail = .full, expression:SearchExpressionPlan? = nil, execution: ((SearchExecution) -> Void)? = nil) throws -> [SearchHit] {
-        try filter.requireAvailableEntityScope()
+        try filter.requireAvailableEntityScope();try prepareRecordingScope(filter.recordingScope)
         guard mode != .visual else {throw OSwindError.invalid("Use the visual retrieval engine for appearance search")}
         try Task.checkCancellation()
         var queryPlan = try expression ?? SearchExpressionPlan.make(filter.query)
@@ -652,13 +660,13 @@ public final class MemoryStore: @unchecked Sendable {
         } catch {try Task.checkCancellation();throw error}
     }
     public func matchingCount(_ filter: SearchFilter = SearchFilter()) throws -> Int {
-        lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
+        lock.lock(); defer { lock.unlock() }; try prepareRecordingScope(filter.recordingScope); let (whereSQL,values) = conditions(filter)
         let stmt = try prepare(whereSQL == "1=1" ? "SELECT total FROM memory_statistics WHERE singleton=1" : "SELECT COUNT(*) FROM memories m WHERE \(whereSQL)"); defer { sqlite3_finalize(stmt) }
         for (i,v) in values.enumerated() { bind(stmt,Int32(i+1),v) }
         return sqlite3_step(stmt) == SQLITE_ROW ? Int(sqlite3_column_int(stmt,0)) : 0
     }
     public func vectorCount(modelID: String, filter: SearchFilter = SearchFilter()) throws -> Int {
-        lock.lock(); defer { lock.unlock() }; let (whereSQL,values) = conditions(filter)
+        lock.lock(); defer { lock.unlock() }; try prepareRecordingScope(filter.recordingScope); let (whereSQL,values) = conditions(filter)
         let sql = whereSQL == "1=1" ? "SELECT COALESCE((SELECT parents FROM vector_statistics WHERE model=?),0)" : "SELECT COUNT(*) FROM memories m CROSS JOIN vector_keys r ON r.memory_id=m.id WHERE r.ordinal=0 AND r.model=? AND \(whereSQL)"
         let stmt = try prepare(sql)
         defer { sqlite3_finalize(stmt) }; bind(stmt,1,modelID); for (i,v) in values.enumerated() { bind(stmt,Int32(i+2),v) }
@@ -667,6 +675,7 @@ public final class MemoryStore: @unchecked Sendable {
     /// Coverage counts have the same scope as retrieval, independent of query
     /// words. Reuse only within an unchanged transactional metadata/vector state.
     public func indexCoverage(modelID: String, filter: SearchFilter = SearchFilter()) throws -> (indexed:Int,total:Int) {
+        try prepareRecordingScope(filter.recordingScope)
         lock.lock(); defer { lock.unlock() }
         try exec("SAVEPOINT coverage_snapshot"); defer { try? exec("RELEASE coverage_snapshot") }
         let state = try prepare("SELECT (SELECT value FROM store_metadata WHERE key='identity'),COALESCE((SELECT MAX(seq) FROM vector_changes),0),(SELECT hex(revision) FROM search_scope_revision WHERE singleton=1)")
@@ -682,6 +691,7 @@ public final class MemoryStore: @unchecked Sendable {
         return (indexed,total)
     }
     public func resolveQueryScope(_ filter: SearchFilter, interpret: Bool = true, now: Date = Date(), timeZone: TimeZone = .current) throws -> QueryResolution {
+        try prepareRecordingScope(filter.recordingScope)
         lock.lock(); defer { lock.unlock() }
         try exec("SAVEPOINT query_scope_snapshot"); defer { try? exec("RELEASE query_scope_snapshot") }
         return try QueryScopeResolver.resolve(filter,now:now,timeZone:timeZone,interpret:interpret) { app in
@@ -732,6 +742,7 @@ public final class MemoryStore: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }; let stmt = try prepare("SELECT model,parents FROM vector_statistics WHERE parents>0"); defer { sqlite3_finalize(stmt) }; var result = [String:Int](); while sqlite3_step(stmt) == SQLITE_ROW { result[string(stmt,0)] = Int(sqlite3_column_int(stmt,1)) }; return result
     }
     public func timelineSample(_ filter: SearchFilter, limit: Int = 24, detail:SearchDetail = .full) throws -> [Memory] {
+        try prepareRecordingScope(filter.recordingScope)
         lock.lock(); defer { lock.unlock() }
         let count = min(100, max(2, limit)), (whereSQL, values) = conditions(filter)
         let payload=detail == .preview ? "COALESCE(preview.payload,m.payload)":"m.payload"
@@ -1092,6 +1103,16 @@ extension MemoryStore {
             guard let session = try chat(sessionID) else { throw OSwindError.invalid("Conversation no longer exists") }
             for hit in answer.sources { guard hit.memory.searchPreview==nil,hit.memory.originalEvidence==nil,let current = try get(hit.id), current.evidenceHash == hit.memory.evidenceHash else { throw OSwindError.unavailable("Evidence changed during the answer. Ask again using the remaining memories.") } }
             var scope = answer.resolution?.filter ?? filter; scope.query = ""
+            let previous=try prepare("SELECT payload FROM chat_turns WHERE session_id=? ORDER BY timestamp DESC,id DESC LIMIT 1")
+            defer {sqlite3_finalize(previous)};bind(previous,1,sessionID)
+            let previousStatus=sqlite3_step(previous)
+            if previousStatus==SQLITE_ROW {
+                guard let bytes=sqlite3_column_blob(previous,0) else {throw OSwindError.database("Missing previous conversation scope")}
+                let payload=try JSONDecoder().decode(ChatPayload.self,from:Data(bytes:bytes,count:Int(sqlite3_column_bytes(previous,0))))
+                if let retained=payload.filter.recordingScope,scope.recordingScope != retained {throw OSwindError.invalid("A recording conversation must retain its scope. Start a new conversation to search elsewhere.")}
+            }else if previousStatus != SQLITE_DONE {throw failure()}
+            if let requested=filter.recordingScope,scope.recordingScope != requested {throw OSwindError.invalid("An answer cannot change its recording scope")}
+            if let recording=scope.recordingScope {for hit in answer.sources {guard let current=try get(hit.id),recording.matches(current) else {throw OSwindError.unavailable("Evidence is outside the selected recording")}}}
             scope.speaker=scope.speaker.map { policy.sanitize($0).text }
             let payload = ChatPayload(question:policy.sanitize(question).text,text:policy.sanitize(answer.text).text,provider:answer.provider,duration:answer.duration,warnings:answer.warnings,filter:scope,timeZone:answer.resolution?.timeZone)
             let id = UUID().uuidString, timestamp = Date(), data = try JSONEncoder().encode(payload)
@@ -1264,7 +1285,7 @@ extension MemoryStore {
         return sqlite3_step(stmt) == SQLITE_ROW
     }
     public func passageBacklog(modelID: String, filter: SearchFilter) throws -> Int {
-        lock.lock(); defer { lock.unlock() }; let (predicate,values) = conditions(filter)
+        lock.lock(); defer { lock.unlock() }; try prepareRecordingScope(filter.recordingScope); let (predicate,values) = conditions(filter)
         // UTF-8 length is a conservative fast upper bound; a short multibyte
         // record receives an empty completion manifest during its next pass.
         let stmt = try prepare("SELECT COUNT(*) FROM memories m INDEXED BY memories_passage_candidates WHERE \(predicate) AND length(CAST(m.text AS BLOB))>2400 AND NOT EXISTS(SELECT 1 FROM passage_manifests p WHERE p.memory_id=m.id AND p.model=? AND p.version=?)")

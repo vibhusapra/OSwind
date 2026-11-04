@@ -28,14 +28,19 @@ public struct ActivitySourceScope:Codable,Equatable,Sendable {
     public var speaker:String?
     public var entityID:String?
     public var unavailableEntityScope:UnavailableEntityScope?
+    public var recordingScope:RecordingScope?
     public var start:Date?
     public var end:Date?
-    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;unavailableEntityScope=filter.unavailableEntityScope;start=filter.start;end=filter.end}
-    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID,sourceStartsOnly:true,unavailableEntityScope:unavailableEntityScope)}
-    private enum CodingKeys:String,CodingKey {case app,kind,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,start,end}
+    public init(_ filter:SearchFilter) {app=filter.app;kind=filter.kind;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;entityID=filter.entityID;unavailableEntityScope=filter.unavailableEntityScope;recordingScope=filter.recordingScope;start=filter.start;end=filter.end}
+    public var filter:SearchFilter {SearchFilter(app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,entityID:entityID,sourceStartsOnly:true,unavailableEntityScope:unavailableEntityScope,recordingScope:recordingScope)}
+    private enum CodingKeys:String,CodingKey {case app,kind,favoritesOnly,tag,speaker,entityID,unavailableEntityScope,recordingScope,start,end}
     public init(from decoder:Decoder)throws {
         let c=try decoder.container(keyedBy:CodingKeys.self)
-        app=try c.decodeIfPresent(String.self,forKey:.app);kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind);favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly)
+        recordingScope=try c.decodeIfPresent(RecordingScope.self,forKey:.recordingScope)
+        app=try c.decodeIfPresent(String.self,forKey:.app)
+        if recordingScope != nil {let selector=try c.decode(RecordingKindSelector.self,forKey:.kind);try selector.validate();kind=selector.value}
+        else {kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)}
+        favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly)
         tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker);start=try c.decodeIfPresent(Date.self,forKey:.start);end=try c.decodeIfPresent(Date.self,forKey:.end)
         unavailableEntityScope=try c.decodeIfPresent(UnavailableEntityScope.self,forKey:.unavailableEntityScope)
         if unavailableEntityScope != nil {_=try c.decode(UnavailableEntitySelector.self,forKey:.entityID);entityID=nil}else{entityID=try c.decodeIfPresent(String.self,forKey:.entityID)}
@@ -43,8 +48,10 @@ public struct ActivitySourceScope:Codable,Equatable,Sendable {
     public func encode(to encoder:Encoder)throws {
         guard entityID==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("An entity scope cannot be active and unavailable together")}
         var c=encoder.container(keyedBy:CodingKeys.self)
-        try c.encodeIfPresent(app,forKey:.app);try c.encodeIfPresent(kind,forKey:.kind);try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker)
-        try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
+        try c.encodeIfPresent(app,forKey:.app)
+        if recordingScope != nil {try c.encode(RecordingKindSelector(kind),forKey:.kind)}else {try c.encodeIfPresent(kind,forKey:.kind)}
+        try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker)
+        try c.encodeIfPresent(recordingScope,forKey:.recordingScope);try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end)
         if let unavailableEntityScope {try c.encode(UnavailableEntitySelector(),forKey:.entityID);try c.encode(unavailableEntityScope,forKey:.unavailableEntityScope)}else{try c.encodeIfPresent(entityID,forKey:.entityID)}
     }
 }
@@ -130,20 +137,23 @@ extension MemoryStore {
     /// embeddings, media and the result limit are unused. Tag scopes use a
     /// transactionally maintained covering metadata projection, not payloads.
     public func activityCalendar(_ request:ActivityCalendarRequest) throws -> ActivityCalendarSnapshot {
+        try prepareRecordingScope(request.filter.recordingScope)
         try Task.checkCancellation();var snapshot=try request.layout(),buckets=[ActivityBucket]()
         for (slot,day) in snapshot.days.enumerated() {if let start=day.start,let end=day.end {buckets.append(.init(kind:0,slot:slot,start:start,end:end))}}
         for (slot,hour) in snapshot.hours.enumerated() {buckets.append(.init(kind:1,slot:slot,start:hour.start,end:hour.end))}
         guard !buckets.isEmpty,buckets.count<=128 else {throw OSwindError.invalid("Calendar bucket limit exceeded")}
         var filter=request.filter
         let source:String
-        if filter.tag != nil {
+        if filter.recordingScope != nil {source="memories m"}
+        else if filter.tag != nil {
             source="(SELECT memory_id AS id,tag,timestamp,app,kind,favorite FROM memory_tags INDEXED BY memory_tags_scope) m"
         }else if [filter.app != nil,filter.kind != nil,filter.favoritesOnly].filter({$0}).count>1 || filter.speaker != nil || filter.entityID != nil {
             // A single-filter index omits the other metadata; combining them
             // otherwise fetches large source pages just to inspect flags.
             source="memories m INDEXED BY memories_activity_time"
         }else {source="memories m"}
-        let tag=filter.tag;filter.tag=nil
+        let tag=filter.recordingScope==nil ? filter.tag:nil
+        if tag != nil {filter.tag=nil}
         var predicate=conditions(filter,includeTextObservations:false)
         if let tag {predicate.0 += " AND m.tag=?";predicate.1.append(tag)}
         return try withRoutineDatabase {database in

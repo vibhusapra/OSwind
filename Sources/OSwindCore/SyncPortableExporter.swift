@@ -9,6 +9,7 @@ struct SyncPortableReferences {
     let media:(Memory)throws->[SyncMediaManifest]
     let recipe:(String,Int64)throws->SyncRoutineRevision
     let session:(Memory)throws->SyncSessionToken?
+    var recordingSession:((String)throws->SyncSessionToken?)? = nil
     var historical:((String,String)throws->SyncVersionReference)? = nil
     var pin:((String)throws->SyncVersionReference?)? = nil
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
@@ -44,7 +45,7 @@ struct SyncPortableExporter {
         func object(_ name:String,_ table:SyncCanonicalTable)throws->SyncObjectIdentity {
             let result=try references.identity(table,[.text(Data(text(name).utf8))]);try SyncWireCheck.identity(result,table);return result
         }
-        func filter(_ value:SearchFilter)throws->SyncFilterBody {try .init(value,unavailable:references.unavailableFilterScope) {id in try references.identity(.entity,[.text(Data(id.utf8))])}}
+        func filter(_ value:SearchFilter)throws->SyncFilterBody {try .init(value,unavailable:references.unavailableFilterScope,recordingSession:references.recordingSession,recordingSource:{try references.source($0,.evidence($1))}) {id in try references.identity(.entity,[.text(Data(id.utf8))])}}
         func passage()throws->PassageRange? {
             let a=try cell("passage_start"),b=try cell("passage_length")
             if a == .null && b == .null {return nil}

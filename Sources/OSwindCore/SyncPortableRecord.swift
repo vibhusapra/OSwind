@@ -51,8 +51,9 @@ struct SyncFilterBody:Codable,Equatable,Sendable {
     let tag:String?,speaker:String?
     let entity:SyncObjectIdentity?
     let unavailableEntityScope:SyncUnavailableEntityScope?
+    let recordingScope:SyncRecordingScope?
     let limit:Int
-    init(_ filter:SearchFilter,unavailable:((UnavailableEntityScope)throws->SyncFilterScope)?=nil,resolve:(String)throws->SyncObjectIdentity)throws {
+    init(_ filter:SearchFilter,unavailable:((UnavailableEntityScope)throws->SyncFilterScope)?=nil,recordingSession:((String)throws->SyncSessionToken?)?=nil,recordingSource:((String,String)throws->SyncVersionReference)?=nil,resolve:(String)throws->SyncObjectIdentity)throws {
         query=filter.query;app=filter.app;kind=filter.kind;start=filter.start;end=filter.end;sourceStartsOnly=filter.sourceStartsOnly;favoritesOnly=filter.favoritesOnly;tag=filter.tag;speaker=filter.speaker;limit=filter.limit
         if let marker=filter.unavailableEntityScope {
             guard filter.entityID==nil else {throw OSwindError.invalid("Unavailable entity scope cannot also select an active entity")}
@@ -60,6 +61,7 @@ struct SyncFilterBody:Codable,Equatable,Sendable {
             if let unavailable {scope=try unavailable(marker)}else{scope = .unavailable(try .init(marker))}
             switch scope {case .entity(let value):entity=value;unavailableEntityScope=nil;case .unavailable(let value):entity=nil;unavailableEntityScope=value}
         }else{entity=try filter.entityID.map(resolve);unavailableEntityScope=nil}
+        recordingScope=try filter.recordingScope.map {try .init($0,session:recordingSession,source:recordingSource)}
         try validate()
     }
     func validate()throws {
@@ -69,16 +71,36 @@ struct SyncFilterBody:Codable,Equatable,Sendable {
         guard (1...10000).contains(limit),start==nil || end==nil || start!<=end! else {throw OSwindError.invalid("Invalid sync query bounds")}
         guard entity==nil || unavailableEntityScope==nil else {throw OSwindError.invalid("Sync entity scope cannot be active and unavailable")}
         if let entity {try SyncWireCheck.identity(entity,.entity)}
-        try unavailableEntityScope?.validate()
+        try unavailableEntityScope?.validate();try recordingScope?.validate()
     }
-    func projected(erasedEntity:((SyncObjectIdentity)throws->UnavailableEntityScope?)?=nil,resolve:(SyncObjectIdentity)throws->String)throws->SearchFilter {
+    func projected(erasedEntity:((SyncObjectIdentity)throws->UnavailableEntityScope?)?=nil,recordingSource:(SyncVersionReference)throws->RecordingScope={_ in throw OSwindError.unavailable("Recording original projection is required")},resolve:(SyncObjectIdentity)throws->String)throws->SearchFilter {
         try validate();var value=SearchFilter(query:query,app:app,kind:kind,start:start,end:end,favoritesOnly:favoritesOnly,tag:tag,speaker:speaker,limit:limit,sourceStartsOnly:sourceStartsOnly)
         if let unavailableEntityScope {value.unavailableEntityScope=try unavailableEntityScope.projected()}
         else if let entity {
             if let marker=try erasedEntity?(entity) {value.unavailableEntityScope=marker}
             else{value.entityID=try resolve(entity)}
         }
+        value.recordingScope=try recordingScope?.projected(source:recordingSource)
         return value
+    }
+    private enum CodingKeys:String,CodingKey {case query,app,kind,start,end,sourceStartsOnly,favoritesOnly,tag,speaker,entity,unavailableEntityScope,recordingScope,limit}
+    init(from decoder:Decoder)throws {
+        let c=try decoder.container(keyedBy:CodingKeys.self)
+        query=try c.decode(String.self,forKey:.query);app=try c.decodeIfPresent(String.self,forKey:.app)
+        recordingScope=try c.decodeIfPresent(SyncRecordingScope.self,forKey:.recordingScope)
+        if recordingScope != nil {let selector=try c.decode(RecordingKindSelector.self,forKey:.kind);try selector.validate();kind=selector.value}
+        else {kind=try c.decodeIfPresent(MemoryKind.self,forKey:.kind)}
+        start=try c.decodeIfPresent(Date.self,forKey:.start);end=try c.decodeIfPresent(Date.self,forKey:.end);sourceStartsOnly=try c.decodeIfPresent(Bool.self,forKey:.sourceStartsOnly)
+        favoritesOnly=try c.decode(Bool.self,forKey:.favoritesOnly);tag=try c.decodeIfPresent(String.self,forKey:.tag);speaker=try c.decodeIfPresent(String.self,forKey:.speaker)
+        entity=try c.decodeIfPresent(SyncObjectIdentity.self,forKey:.entity);unavailableEntityScope=try c.decodeIfPresent(SyncUnavailableEntityScope.self,forKey:.unavailableEntityScope);limit=try c.decode(Int.self,forKey:.limit)
+        try validate()
+    }
+    func encode(to encoder:Encoder)throws {
+        try validate();var c=encoder.container(keyedBy:CodingKeys.self)
+        try c.encode(query,forKey:.query);try c.encodeIfPresent(app,forKey:.app)
+        if recordingScope != nil {try c.encode(RecordingKindSelector(kind),forKey:.kind)}else {try c.encodeIfPresent(kind,forKey:.kind)}
+        try c.encodeIfPresent(recordingScope,forKey:.recordingScope);try c.encodeIfPresent(start,forKey:.start);try c.encodeIfPresent(end,forKey:.end);try c.encodeIfPresent(sourceStartsOnly,forKey:.sourceStartsOnly)
+        try c.encode(favoritesOnly,forKey:.favoritesOnly);try c.encodeIfPresent(tag,forKey:.tag);try c.encodeIfPresent(speaker,forKey:.speaker);try c.encodeIfPresent(entity,forKey:.entity);try c.encodeIfPresent(unavailableEntityScope,forKey:.unavailableEntityScope);try c.encode(limit,forKey:.limit)
     }
 }
 struct SyncConversationBody:Codable,Equatable,Sendable {

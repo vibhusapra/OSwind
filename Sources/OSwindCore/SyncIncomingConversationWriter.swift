@@ -45,6 +45,11 @@ struct SyncIncomingConversationWriter {
         var visiting=Set<String>(),remaining=512;try ensureSource(ref,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)
         return try history.adopt(ref,cache:cache,pathsFor:pathsFor,admit:admit,verifyMedia:verifyMedia)
     }
+    private func recordingScope(_ reference:SyncVersionReference,record:SyncPortableRecord,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->RecordingScope {
+        let sourceID=try id(reference.identity),evidence=try original(reference,requestedBy:record,fetch:fetch)
+        guard evidence.memory.kind == .audio else {throw OSwindError.invalid("Recording scope original is not audio")}
+        return try .init(sourceID:sourceID,revision:evidence.memory.evidenceHash)
+    }
     private struct RecipeProjection {let definition:RoutineDefinition,revision:Int,nextDue:Date}
     private func projectRecipe(_ body:SyncRoutineBody,record:SyncPortableRecord,local:String)throws->RecipeProjection {
         let current=try db.routine(local)
@@ -77,7 +82,7 @@ struct SyncIncomingConversationWriter {
             if let stored=try cache.record(reference,admit:admit) {definition=stored}
             else {let packet=try fetch(reference);guard try packet.reference==reference else {throw OSwindError.invalid("Fetched recipe is not its requested version")};_=try cache.retain(packet,requiredBy:record,admit:admit);definition=packet}
         }else{definition=nil}
-        let original=RoutineRunOriginal(record:record,definition:definition);let payload=try original.encoded(),ordinal=previous?.revision ?? recipe.revision,filter=try body.filter.projected(erasedEntity:{try cache.projectErasedFilterScope($0)}) {try id($0)},scope=try SyncProtocolLimits.encode(filter)
+        let original=RoutineRunOriginal(record:record,definition:definition);let payload=try original.encoded(),ordinal=previous?.revision ?? recipe.revision,filter=try body.filter.projected(erasedEntity:{try cache.projectErasedFilterScope($0)},recordingSource:{try self.recordingScope($0,record:record,fetch:fetch)}) {try id($0)},scope=try SyncProtocolLimits.encode(filter)
         let chat:String?
         if let conversation=body.conversation,try !cache.isErasedOptionalConversation(record,identity:conversation) {chat=try id(conversation)}else{chat=nil}
         func text(_ value:String)->SyncRowCell {.text(Data(value.utf8))}
@@ -262,7 +267,7 @@ struct SyncIncomingConversationWriter {
                     }
                 case .turn(let body):
                     local=try id(record.identity,create:true);let conversation=try id(body.conversation)
-                    let value=ChatPayload(question:body.question,text:body.text,provider:body.provider,duration:body.duration,warnings:body.warnings,filter:try body.filter.projected(erasedEntity:{try cache.projectErasedFilterScope($0)}) {try id($0)},timeZone:body.timeZone)
+                    let value=ChatPayload(question:body.question,text:body.text,provider:body.provider,duration:body.duration,warnings:body.warnings,filter:try body.filter.projected(erasedEntity:{try cache.projectErasedFilterScope($0)},recordingSource:{try self.recordingScope($0,record:record,fetch:fetchExactSource)}) {try id($0)},timeZone:body.timeZone)
                     let data=try SyncProtocolLimits.encode(value)
                     try cache.catalog.applyPeer(record.identity,primary:[.text(Data(local.utf8))]) {
                         let row=try db.statement("INSERT INTO chat_turns(id,session_id,timestamp,payload) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET session_id=excluded.session_id,timestamp=excluded.timestamp,payload=excluded.payload");defer {sqlite3_finalize(row)}

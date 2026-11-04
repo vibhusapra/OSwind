@@ -1,0 +1,28 @@
+{
+  "priorReceipt": "benchmarks/recorded-meetings-ci-selection-v1.json",
+  "priorReceiptSHA256": "33de2955913306958246c193a26066658d18a991edb7b51ad5ba9efde28e1ffd",
+  "currentSource": "ac5bf825ba7b70149f47287ccb9399c0e55d525b",
+  "currentWorkflowSHA256": "b68772c5293ea507f16572d356ff5613e078adaad8fe80abe532f20c29c2d32c",
+  "onlyChange": "Existing recorded-meeting selection additionally covers portability tests and the incoming-origin recording test. All other workflow bytes preserved against eec995a.",
+  "recordedStepCommand": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR=\"$RUNNER_TEMP/oswind-recorded-meeting-ui\" swift test --filter 'RecordedMeetingTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'",
+  "hostedObserved": false,
+  "localUIRenderRepeated": false,
+  "yamlParse": "Ruby standard-library Psych successfully parsed current trusted workflow; native step count 87; prior 85 upstream steps and the PNG-only always-upload are unchanged.",
+  "currentNativeSteps": 87,
+  "localSourceSelection": {
+    "optimized": {
+      "defined": 26,
+      "statuses": {
+        "passed": 25,
+        "skipped": 1
+      }
+    },
+    "tsan": {
+      "defined": 26,
+      "statuses": {
+        "passed": 25,
+        "skipped": 1
+      }
+    }
+  }
+}
