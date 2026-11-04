@@ -1,5 +1,11 @@
 # OSwind delivery ledger
 
+## 2026-11-04 — selected recording-name optimized and sanitizer checks
+
+Runtime `2815828` passes **90 optimized methods / one explicit skip / zero failures** and **89 Thread Sanitizer methods / two explicit skips / zero failures**, including owned APFS read/write shutdown controls. The old-CLI gate is configured separately and passes on each identical retained binary, with no rebuild. Two initial direct-sanitizer launch aborts reached zero methods and are retained; the direct Xcode runner plus runtime preload succeeds. All 28 name/editor PNGs match the reviewed Debug output.
+
+The optimized 5,000-row lookup probe retains all samples (empty 0.103 ms, sparse 2.926 ms, dense 5.579 ms medians). This is warm shared-host API evidence, without controlled energy/UI/capture or competitor claims. An additive recording-names CI job retains its generated artifacts and preserves every prior workflow byte; static review passes, hosted results remain pending. Complete transport/calendar/legacy-alias, broader regression, packaging and physical/power/automatic24h gates remain open. [Receipt](../benchmarks/recording-session-names-qualified-v1.json) · [Scope](RECORDING-DETAILS-WIP.md#selected-optimized-and-sanitizer-qualification).
+
 ## 2026-11-04 — bounded recording names in the archive sidebar
 
 Saved names and conflict indicators now appear for loaded explicit sessions before selection, including older pinned selections. Source titles remain unchanged. The bounded batch reads at most two definitions per session and publishes labels with the current page revision/privacy guard. The current Debug selection passes **90 methods / zero skips or failures**; a separate test-only 2,000-conflict work-bound check passes. Eight changed archive layouts are reviewed; six editor layouts are byte-identical to prior reviewed renders.

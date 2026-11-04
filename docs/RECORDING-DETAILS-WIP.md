@@ -87,7 +87,17 @@ Warm Debug lookup medians over 5,000 authored audio rows (23 measured samples pl
 | All 512 named | 9.304 ms | 9.006 ms | 1,033 → 10 |
 | 512 named plus 4,488 unrelated names | 9.219 ms | 9.145 ms | 1,033 → 10 |
 
-These sequential shared-host observations establish a bounded statement count, not a general wall-time improvement: the sparse case regresses. Setup, mutation and trace counting are outside timings; settings/snapshot/lookup are included. Canonical payload reads and DML are denied. This is neither UI latency nor cold-OS, power, ASR or competitor evidence. All observations, original failed logs, pinned input/actual-engine manifests and native rasters are in the [receipt](../benchmarks/recording-session-names-v1.json) and [raw evidence](../benchmarks/recording-session-names-raw-v1.zip). Current optimized/sanitizer qualification remains open.
+These sequential shared-host observations establish a bounded statement count, not a general wall-time improvement: the sparse case regresses. Setup, mutation and trace counting are outside timings; settings/snapshot/lookup are included. Canonical payload reads and DML are denied. This is neither UI latency nor cold-OS, power, ASR or competitor evidence. All observations, original failed logs, pinned input/actual-engine manifests and native rasters are in the [receipt](../benchmarks/recording-session-names-v1.json) and [raw evidence](../benchmarks/recording-session-names-raw-v1.zip). The selected optimized/sanitizer checks below now pass; whole affected regression and normal packaging remain open.
+
+## Selected optimized and sanitizer qualification
+
+Runtime `2815828` has **90 optimized passes / one explicit old-CLI skip / zero failures**, and **89 Thread Sanitizer passes / two explicit skips / zero failures**. Both include actual owned encrypted APFS name-read/name-write shutdown and reopen controls, archive revision/privacy/cancellation cases and generated native components. The sanitizer's second skip is the opt-in timing probe; timings are measured in the optimized run instead. The old-CLI control is then configured and passes separately on each **same retained actual test binary, without a rebuild**. These counts overlap other selections and are not a whole-suite total.
+
+The direct sanitizer follow-up initially aborted before any methods because the runtime loaded too late. Preloading through the `xcrun` intermediary also aborted. Both logs and zero-method results are retained. Invoking Xcode's actual `xctest` executable directly with the sanitizer runtime preloaded passes the configured control on the identical bundle. The main sanitizer selection has no sanitizer race diagnostics. This does not erase either failed launch or prove race freedom outside these controls.
+
+All 14 optimized and all 14 sanitizer name/editor PNGs match the reviewed v3 rasters byte-for-byte. Optimized warm lookup medians are **0.103 ms** (empty), **2.926 ms** (one name), **5.579 ms** (512 named), and **5.557 ms** (512 named plus 4,488 unrelated names), with 9/10/10/10 statements. All 100 observations including eight labelled warmups are retained. The observed host is an Apple M5 Max / 128 GiB / macOS 26.6.2; no load, thermal or energy control is claimed. These measurements add no competitor ranking or physical capture acceptance.
+
+A dedicated additive CI job now selects the name/Core/archive/native/component controls and retains bounded authored lookup results, PNGs and native trace JSON. Every previous workflow byte remains unchanged. Static YAML parsing and selection review pass; hosted results are pending. The job has no old executable and preserves that explicit skip. Local current-runtime old-CLI results do not establish a complete old sync-client matrix. [Qualification receipt](../benchmarks/recording-session-names-qualified-v1.json) · [Raw evidence](../benchmarks/recording-session-names-qualified-raw-v1.zip).
 
 ## Required before publishing the feature
 
@@ -98,7 +108,8 @@ These sequential shared-host observations establish a bounded statement count, n
 - [ ] Define legacy exact-version revalidation without scanning unrelated transcript bodies.
 - [x] Add the selected-recording registry-owned name editor and explicit conflict review/removal, preserving drafts through stale-edit review. Selected native lifecycle and component controls pass. Legacy exact-version aliases and interactive acceptance remain open.
 - [ ] Add explicit calendar choice and historical occurrence resolution, with fresh native access, selected calendars, library lifetime, privacy, provider revision and source validation before saving. Peer/restored references remain dormant until current local review. No title/time matching or automatic joining/invitations.
-- [ ] Run current optimized/Thread Sanitizer, native metadata/real-Keychain, whole affected regression, meaningful changed-runtime performance, light/dark/compact/error/conflict renders and normal packaging.
+- [x] Run selected current optimized/Thread Sanitizer, native metadata/real-Keychain, changed lookup measurements and light/dark/compact/error/conflict components.
+- [ ] Complete the whole affected regression, transport/device matrix, meaningful full-workspace performance and normal packaging; obtain hosted qualification independently.
 - [ ] Keep the broader physical microphone/system-audio, native wrapper/keyboard/VoiceOver, ASR/device quality, controlled power/current automatic24h, separate owner/peer failures and production distribution gates visible.
 
 [Core types and APIs](../Sources/OSwindCore/RecordingDetails.swift) · [Derived metadata index](../Sources/OSwindCore/RecordingDetailsSchema.swift) · [Owned behavior controls](../Tests/OSwindCoreTests/RecordingDetailsTests.swift).

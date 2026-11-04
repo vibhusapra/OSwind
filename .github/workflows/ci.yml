@@ -390,3 +390,33 @@ jobs:
         run: |
           python3 -m pip install --require-hashes --only-binary=:all: --no-deps --target "$RUNNER_TEMP/oswind-parquet-reader" -r benchmarks/requirements-screenpipe-oracle.txt
           PYTHONPATH="$RUNNER_TEMP/oswind-parquet-reader" python3 scripts/test-screenpipe-parquet.py
+
+  recording-names:
+    name: Recording names and native lifecycle
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify recording metadata, guarded edits, archive aliases and native shutdown
+        env:
+          OSWIND_TEST_NATIVE_VAULT: '1'
+          OSWIND_TEST_NATIVE_SYNC_KEYCHAIN: '1'
+          OSWIND_RECORDING_NAMES_UI_QA_DIR: ${{ runner.temp }}/oswind-recording-names/names
+          OSWIND_RECORDED_MEETING_UI_QA_DIR: ${{ runner.temp }}/oswind-recording-names/archive
+          OSWIND_RECORDING_SCOPE_UI_DIR: ${{ runner.temp }}/oswind-recording-names/scope
+          OSWIND_SESSION_NAME_BENCH_DIR: ${{ runner.temp }}/oswind-recording-names/lookup
+          OSWIND_TEST_VAULT_TRACE_DIR: ${{ runner.temp }}/oswind-recording-names/native-traces
+        run: |
+          mkdir -p "$RUNNER_TEMP/oswind-recording-names"
+          swift test --jobs 4 --filter 'RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests'
+      - name: Retain owned recording-name components and lookup observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recording-names-owned-evidence
+          path: |
+            ${{ runner.temp }}/oswind-recording-names/names/*.png
+            ${{ runner.temp }}/oswind-recording-names/archive/*.png
+            ${{ runner.temp }}/oswind-recording-names/scope/*.png
+            ${{ runner.temp }}/oswind-recording-names/lookup/result.json
+            ${{ runner.temp }}/oswind-recording-names/native-traces/*.json
+          if-no-files-found: ignore
