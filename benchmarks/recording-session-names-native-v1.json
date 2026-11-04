@@ -1,0 +1,133 @@
+{
+  "runtimeSource": "281582871034651d0990f73ae5b0164957255078",
+  "scope": "Separate actual owned encrypted APFS read/write shutdown checks on the identical retained optimized and TSAN engines; not physical interactive desktop acceptance.",
+  "selectionCorrection": "The original selected class filter omitted methods defined in RecordingNameVaultTests.swift. That file extends VaultSessionTests; CI now selects VaultSessionTests.testNativeRecordingName explicitly. Initial selected counts do not include these two methods.",
+  "runs": {
+    "optimized": {
+      "source": "257c4eb3210d19a96ab6a9f76094eefd41d3144e",
+      "runtimeSource": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../../optimized/actual-engine",
+      "rebuild": false,
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+        "-XCTest",
+        "OSwindAppTests.VaultSessionTests/testNativeRecordingNameReadIsJoinedBeforeVaultDetach,OSwindAppTests.VaultSessionTests/testNativeRecordingNameWriteIsJoinedAndCancelledBeforeVaultDetach",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/optimized/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 21.978122459026054,
+      "inputsAndActualEngineUnchanged": true,
+      "methods": 2,
+      "counts": {
+        "passed": 2,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "b76aa7d8cece18916de2402fe0509aca5855ca1fd7298bd67acfeafa65de03fa",
+      "scope": "Two explicit VaultSessionTests methods defined in RecordingNameVaultTests.swift, omitted from earlier name-only class selection."
+    },
+    "thread-sanitizer": {
+      "source": "257c4eb3210d19a96ab6a9f76094eefd41d3144e",
+      "runtimeSource": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../../thread-sanitizer/actual-engine",
+      "rebuild": false,
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+        "-XCTest",
+        "OSwindAppTests.VaultSessionTests/testNativeRecordingNameReadIsJoinedBeforeVaultDetach,OSwindAppTests.VaultSessionTests/testNativeRecordingNameWriteIsJoinedAndCancelledBeforeVaultDetach",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/thread-sanitizer/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 14.305849041091278,
+      "inputsAndActualEngineUnchanged": true,
+      "methods": 2,
+      "counts": {
+        "passed": 2,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "fd97bba133400340d36c0cb0eafb2bbffbf77b4784dca4808dc9c5eb0bd92c28",
+      "scope": "Two explicit VaultSessionTests methods defined in RecordingNameVaultTests.swift, omitted from earlier name-only class selection."
+    }
+  },
+  "actualEngineManifests": {
+    "optimized": [
+      {
+        "path": "optimized/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "sha256": "91cea5fbb48df344c7af674f3d05aea4e103f1f500eba2a98641cc7ebde776bf",
+        "bytes": 96943184,
+        "mode": "0o755"
+      },
+      {
+        "path": "optimized/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "bytes": 647,
+        "mode": "0o644"
+      },
+      {
+        "path": "optimized/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "sha256": "ca4dfc05c386028207a54242c4e59844cd93c64b37347f3fd6fddba25ba639cc",
+        "bytes": 160586905,
+        "mode": "0o644"
+      },
+      {
+        "path": "optimized/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "sha256": "a0341119314514f15b5873a54c7cca37997e73e3065f2a7ea12cbfa0ad0f25b1",
+        "bytes": 31915076,
+        "mode": "0o644"
+      },
+      {
+        "path": "optimized/actual-engine/oswindctl",
+        "sha256": "d193508e5a565287a6fb3fd036b8956b9fad807f69bca520f60fd5517a7550a9",
+        "bytes": 39773528,
+        "mode": "0o755"
+      }
+    ],
+    "thread-sanitizer": [
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "sha256": "792cf8f7451ee5fe7ddc873d7e88813fa951a57f288e42d294b5e66b570997f0",
+        "bytes": 186045648,
+        "mode": "0o755"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "bytes": 647,
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "sha256": "eff7c8445d53a767c16c44f3cbba13025ffaa9d9ebcbe759444ddbed10274c3e",
+        "bytes": 146566668,
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "sha256": "2e2c6cf4e5e1de54b8d8b2b30d65934f0ed60ed8b737c646d5400012d6167299",
+        "bytes": 50693886,
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/oswindctl",
+        "sha256": "8ca7f6b16da418988d2f404422f79dab486027e667ad5679f071ed231ecec400",
+        "bytes": 81857888,
+        "mode": "0o755"
+      }
+    ]
+  },
+  "ciStaticReview": {
+    "workflowSHA256": "e7615d3ae56e8dac668c891b4a1e6d05428a0bad87f52e46c32cbcff2ca385b8",
+    "allPriorWorkflowBytesUnchanged": true,
+    "priorSource": "2815828",
+    "yamlParsed": true,
+    "selectedNativeMethodPrefix": "VaultSessionTests.testNativeRecordingName",
+    "hostedStatus": "pending"
+  },
+  "rawEvidence": {
+    "path": "benchmarks/recording-session-names-native-raw-v1.zip",
+    "sha256": "2fd9e446b15511b36e673ea06f1aff8801782a7d424663adf23a3a6bc6635144",
+    "bytes": 96379,
+    "scope": "Inputs, test driver, exact logs and available native trace JSON, actual engine manifests. No executables rebuilt."
+  }
+}

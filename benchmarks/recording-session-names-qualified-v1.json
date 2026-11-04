@@ -381,25 +381,12 @@
     }
   ],
   "ciStaticReview": {
-    "scope": "Static YAML parse and additive source review only; not hosted execution. Every previous workflow byte is retained as an unchanged prefix.",
-    "workflowSHA256": "474b996013967fa3b02a1e195dd61adeff49bed24de1b25957be8a9e21982102",
-    "priorSHA256": "53ee7e64d0c372af4f43d91d6a4361744f9dd1e8ee02a83e8f2dc7ee54b6ab83",
-    "priorBytesUnchanged": true,
-    "jobs": [
-      "native",
-      "benchmark-harnesses",
-      "recording-names"
-    ],
-    "selectedClasses": [
-      "RecordingDetailsTests",
-      "RecordedMeetingsModelTests",
-      "RecordingNamesModelTests",
-      "RecordingSessionNamePerformanceTests",
-      "RecordingNameRenderTests"
-    ],
-    "separateNameRasterDirectory": true,
-    "nativeVaultAndKeychainOptIns": true,
-    "explicitOldCLIUnavailableGate": "No retained old executable is supplied by this job. That control remains an explicit CI skip; local actual-binary checks are recorded separately."
+    "workflowSHA256": "e7615d3ae56e8dac668c891b4a1e6d05428a0bad87f52e46c32cbcff2ca385b8",
+    "allPriorWorkflowBytesUnchanged": true,
+    "priorSource": "2815828",
+    "yamlParsed": true,
+    "selectedNativeMethodPrefix": "VaultSessionTests.testNativeRecordingName",
+    "hostedStatus": "pending"
   },
   "runtimeInputsUnchanged": true,
   "runtimeInputCount": 735,
@@ -981,5 +968,7 @@
     "bytes": 2067337,
     "sha256": "c77404e514ddefbd0e12f469053f4a17deb1182a2ebbe4dcdd67e05aaee44e0f",
     "scope": "Actual binary manifests, inputs, logs, both pre-test launch aborts, corrected same-binary launch, native rasters and raw samples. Executables/source snapshots retained locally; no binary rebuilt for provenance."
-  }
+  },
+  "selectionCorrection": "The original selected class filter omitted methods defined in RecordingNameVaultTests.swift. That file extends VaultSessionTests; CI now selects VaultSessionTests.testNativeRecordingName explicitly. Initial selected counts do not include these two methods.",
+  "separateNativeWorkReceipt": "benchmarks/recording-session-names-native-v1.json"
 }

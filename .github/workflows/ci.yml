@@ -407,7 +407,7 @@ jobs:
           OSWIND_TEST_VAULT_TRACE_DIR: ${{ runner.temp }}/oswind-recording-names/native-traces
         run: |
           mkdir -p "$RUNNER_TEMP/oswind-recording-names"
-          swift test --jobs 4 --filter 'RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests'
+          swift test --jobs 4 --filter 'RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests|VaultSessionTests.testNativeRecordingName'
       - name: Retain owned recording-name components and lookup observations
         if: always()
         uses: actions/upload-artifact@v4
