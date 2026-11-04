@@ -1,6 +1,7 @@
 import XCTest
 import AppKit
 import SwiftUI
+import Combine
 @testable import OSwindCore
 @testable import OSwind
 
@@ -62,6 +63,17 @@ import SwiftUI
         XCTAssertTrue(value.busy);XCTAssertTrue(value.sessions.isEmpty)
         var settings=AppSettings();settings.privacy.excludedApps.append("owned.meeting");try settings.save(root:root)
         gate.release();try await settle(value);XCTAssertTrue(value.sessions.isEmpty);XCTAssertNotNil(value.error)
+    }
+    func testDeletedRecordingDuringGroupingCannotReappearFromPreparedPage()async throws {
+        try audio("deleted");let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,groupSources:{sources in try gate.pause();return RecordedMeetingPlanner.group(sources)})
+        value.allowed={true};models.append(value)
+        var publishedIDs=[String]();let observer=value.$sessions.sink {publishedIDs += $0.flatMap(\.sources).map(\.memoryID)};defer {observer.cancel()}
+        value.activate();await fulfillment(of:[gate.entered],timeout:5)
+        let other=try MemoryStore(root:root);try other.delete("deleted");try other.close()
+        XCTAssertNil(try store.get("deleted"));XCTAssertTrue(try store.recordedMeetingPage().sources.isEmpty)
+        gate.release();try await settle(value)
+        XCTAssertTrue(value.sessions.isEmpty);XCTAssertFalse(publishedIDs.contains("deleted"),"A page already obsolete before publication must not flash its removed source")
     }
     func testActualAppDepartureJoinsBlockedGroupingBeforeStoreClose()async throws {
         let location=root.appendingPathComponent("app-group");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
