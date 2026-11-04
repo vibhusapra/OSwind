@@ -45,13 +45,20 @@ jobs:
       - name: Verify owned encrypted APFS images and app sessions
         run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_ATOMIC_INBOX_CRASH=1 OSWIND_TEST_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-vault-native-traces" OSWIND_TEST_VAULT_QUERY_TRACE_DIR="$RUNNER_TEMP/oswind-vault-query-traces" OSWIND_TEST_CREDENTIAL_DIAGNOSTIC_DIR="$RUNNER_TEMP/oswind-vault-credential-traces" swift test --filter 'AtomicPrivateInboxTests|NativeVault|VaultSessionTests'
       - name: Verify owner-addition app lifecycle with owned APFS and Keychain
-        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_OWNER_UI_QA_DIR="$RUNNER_TEMP/oswind-owner-approval-ui" swift test --filter OwnerAdditionAppSessionTests
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_OWNER_VAULT_TRACE_DIR="$RUNNER_TEMP/oswind-owner-vault-traces" OSWIND_OWNER_UI_QA_DIR="$RUNNER_TEMP/oswind-owner-approval-ui" swift test --filter OwnerAdditionAppSessionTests
       - name: Retain owned owner-addition component renders
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: owned-owner-addition-ui
           path: ${{ runner.temp }}/oswind-owner-approval-ui/*.png
+          if-no-files-found: ignore
+      - name: Retain owned owner-addition vault diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owned-owner-addition-vault
+          path: ${{ runner.temp }}/oswind-owner-vault-traces/*.json
           if-no-files-found: ignore
       - name: Verify peer membership update with owned APFS and Keychain
         run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_PEER_UI_QA_DIR="$RUNNER_TEMP/oswind-peer-membership-ui/peer" OSWIND_EXPANDED_SYNC_UI_QA_DIR="$RUNNER_TEMP/oswind-peer-membership-ui/folder" swift test --filter 'PersonalSyncMembershipUpdateTests|PeerMembershipAppSessionTests'
@@ -65,7 +72,7 @@ jobs:
             ${{ runner.temp }}/oswind-peer-membership-ui/folder/*.png
           if-no-files-found: ignore
       - name: Verify recorded meeting workspace and retained-page vault detach
-        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" OSWIND_RECORDING_SCOPE_UI_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|RecordingScopeTests|SyncIncomingSourceTests.testRecordingSessionScopeSurvivesIncomingOriginRemappingAndReexport|SyncIncomingSourceTests.testSingleRecordingVersionScopeSurvivesExactIncomingProjection|SyncIncomingSourceTests.testRecordingScopedRunPreservesQuietRestoreAndRefusesLostSessionProvenance'
+        run: OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" OSWIND_RECORDING_SCOPE_UI_DIR="$RUNNER_TEMP/oswind-recorded-meeting-ui" swift test --filter 'RecordedMeetingTests|RecordedMeetingRevisionTests|SyncNativeWriterAdmissionTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|RecordingScopeTests|SyncIncomingSourceTests.testRecordingSessionScopeSurvivesIncomingOriginRemappingAndReexport|SyncIncomingSourceTests.testSingleRecordingVersionScopeSurvivesExactIncomingProjection|SyncIncomingSourceTests.testRecordingScopedRunPreservesQuietRestoreAndRefusesLostSessionProvenance'
       - name: Retain owned recorded meeting components
         if: always()
         uses: actions/upload-artifact@v4

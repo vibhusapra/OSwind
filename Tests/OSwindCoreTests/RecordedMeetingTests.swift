@@ -89,6 +89,41 @@ final class RecordedMeetingTests:XCTestCase {
         XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=true});XCTAssertFalse(published)
         let current=try store.recordedMeetingPage();try store.withCurrentRecordedMeetingPage(current) {published=true};XCTAssertTrue(published);XCTAssertTrue(current.sources.isEmpty)
     }
+    // Desired change-awareness contract: a page already obsolete at the
+    // freshness check must not publish. These controls deliberately start on
+    // unchanged production code, before implementing that additional gate.
+    func testPageCannotPublishAfterOtherConnectionDeletesRecording()throws {
+        try audio("source",100);let page=try store.recordedMeetingPage()
+        let other=try MemoryStore(root:root);defer {try? other.close()};try other.delete("source")
+        XCTAssertNil(try store.get("source"));XCTAssertTrue(try store.recordedMeetingPage().sources.isEmpty)
+        var published=false
+        XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=true});XCTAssertFalse(published)
+    }
+    func testPageCannotPublishAfterOtherConnectionRegroupsRecording()throws {
+        var memory=try audio("source",100),published=false
+        let page=try store.recordedMeetingPage(),old=try XCTUnwrap(page.sources.first)
+        let other=try MemoryStore(root:root);defer {try? other.close()}
+        memory.audioSessionID="changed-session";memory.title="Changed owned recording";try other.insert(memory)
+        XCTAssertThrowsError(try store.recordedMeetingEvidence(old))
+        XCTAssertEqual(try store.recordedMeetingPage().sources.first?.title,memory.title)
+        XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=true});XCTAssertFalse(published)
+    }
+    func testPageCannotPublishAfterOtherConnectionAddsRecording()throws {
+        try audio("source",100);let page=try store.recordedMeetingPage()
+        let other=try MemoryStore(root:root);defer {try? other.close()}
+        var memory=Memory(id:"arrived",timestamp:Date(timeIntervalSince1970:101),kind:.audio,app:"Owned audio",title:"Arrived recording",text:"Authored arriving words")
+        memory.audioSessionID="arrived-session";memory.transcript = .init(text:memory.text,duration:30,segments:[.init(start:0,end:30,text:memory.text)],model:"Authored fixture");try other.insert(memory)
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,2)
+        var published=false
+        XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=true});XCTAssertFalse(published)
+    }
+    func testPageRemainsPublishableAfterOtherConnectionChangesOnlyNotes()throws {
+        try audio("source",100);let page=try store.recordedMeetingPage()
+        let other=try MemoryStore(root:root);defer {try? other.close()}
+        try other.insert(Memory(id:"note",kind:.note,app:"Owned notes",title:"Changed note",text:"Authored unrelated words"))
+        var published=false;try store.withCurrentRecordedMeetingPage(page) {published=true};XCTAssertTrue(published)
+        XCTAssertEqual(try store.recordedMeetingPage().sources,page.sources)
+    }
     func testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata()throws {
         try audio("source",100,title:"Review api_key=secretvalue1234567890")
         XCTAssertEqual(try store.recordedMeetingPage().sources.count,1,"First use builds historical metadata before the thin-read check")

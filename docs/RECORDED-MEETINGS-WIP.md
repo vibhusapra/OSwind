@@ -10,6 +10,48 @@ The new SQLite index is derived metadata, rebuilt from canonical audio sources. 
 
 Ephemeral references belong to the exact open store and carry a per-row nonce. Updates, regrouping, deletion/recreation, foreign libraries and closed stores refuse stale source opening. Metadata pages retain values rather than vault descriptors. UI publication rechecks current settings; opening uses the normal source/detail path. Read jobs belong to the actual app departure registry, and a previous view's disappearance cannot clear a newer appearance.
 
+## Recording changes refresh the loaded history
+
+Source `ec02cdd` adds foreground, visible, unlocked/admitted recording-change checks (3 seconds normally, 10 in Low Power Mode) and the same check after local recording saves. SQL reads and grouping remain owned by the app work registry; departure cancels the monitor and joins actual work before close. The public two-peer AppModel fixture observes an incoming recording and its deletion without a local recording-saved signal. That fixture injects a 50 ms cadence; it is not a measurement of default scheduling or physical two-Mac behavior.
+
+An opaque local nonce advances on committed recording-metadata insert/update/delete, including compatible prior writers and incoming projection. Unrelated note, screen and vector-only changes leave it alone. Rollback, missing/malformed nonce and trigger repair are covered. The canonical source-cache version remains 2; no transported kind, source identity rewrite or historical transcript scan is added on ready open. An actual retained signed 195b CLI imports authored audio, advances the nonce and leaves the new triggers installed.
+
+An older page can only merge into the same audio revision. A refresh rereads the already loaded page budget in one consistent snapshot, re-reads retained selection from current thin rows, and preserves the cursor through more than 512 new arrivals. Deleted/regrouped sources and changed titles are replaced coherently. Quiet audio refresh keeps the last selection/detail visible with actions disabled; privacy changes clear previews before replacement. If the newest page is entirely excluded, **Load older recordings** remains reachable in the empty view.
+
+Prepared-page publication tries the SQL and settings locks without waiting and uses a read-only snapshot, preserving existing SQLite authorizers and configuration. A matching cached native proof needs no external credential access on the main actor; changed authority refuses until a normal owned background read refreshes admission. Freshness is checked as of that snapshot; an external commit after it is later state. The established media → SQL → snapshot mutex → settings-file lock order is retained.
+
+Current selected optimized and Thread Sanitizer runs each have **628 defined / 607 passed / 21 explicit skips / zero failures**, with no race diagnostic. Skips are retained child entry helpers and explicit scale/prior-binary/render/performance opt-ins; exact reasons are in the receipt. Selected real encrypted APFS, original-Keychain/all-13-kind sync, Metal retrieval, privacy/erasure, backup/restore, incoming/outgoing scope and actual app departure controls pass. This is not a whole-suite result. A separate current 101-method Debug selection has 99 passes/two prior-native-binary skips, and all **16 actual light/dark component rasters** were manually inspected.
+
+Original five desired-contract probes against unchanged prior production have one pass/four failed methods/eight issues: already-obsolete pages publish after an external audio insert/delete/regroup, and a blocked model republishes a deleted source. Manual idle refresh was the old explicit design, not a claimed broken automatic observer. The unrelated-note control passes. These failed artifacts remain retained. The first hidden-head render fixture then failed after its hosting window deliberately deactivated the model; explicit reactivation corrects the fixture, followed by the passing full focused run. That original failed attempt is also retained.
+
+Two distinct counterbalanced comparisons each use eight process pairs per authored corpus: **64 separate processes total**, with **656 page observations** in the archive comparison. Archive paging compares actual retained 195b against ec02cdd using the unchanged earlier benchmark definition. Full loaded-history refresh compares actual pre-ID-cache and current engines implementing the same refresh behavior, with an identical new benchmark definition. It measures the genuine immutable-source-ID/hex-conversion change; it is not compared with the old head-only manual refresh. Every process has a new copied library. Original corpora, source inputs and actual frozen engines stay unchanged; complete source IDs and canonical row invariants are checked. In the refresh trial, only one original title/payload.title changes and one authored audio source is added. Warmup/initial traversal/mutations are separate; timed reads deny all SQL writes and canonical transcript-payload reads.
+
+| Authored corpus / measured stage | Baseline median ms | Candidate median ms |
+|---|---:|---:|
+| 20,000 authored clips: archive paging, publication | 0.808 | 0.860 |
+| 20,000 authored clips: archive paging, completion | 51.299 | 32.605 |
+| 20,000 authored clips: loaded-history refresh, windowRead | 941.650 | 193.000 |
+| 20,000 authored clips: loaded-history refresh, publication | 5.761 | 5.312 |
+| 20,000 authored clips: loaded-history refresh, completion | 1376.155 | 254.857 |
+| 256 large authored imports: archive paging, publication | 0.255 | 0.263 |
+| 256 large authored imports: archive paging, completion | 13.153 | 3.724 |
+| 256 large authored imports: loaded-history refresh, windowRead | 12.315 | 2.649 |
+| 256 large authored imports: loaded-history refresh, publication | 0.410 | 0.344 |
+| 256 large authored imports: loaded-history refresh, completion | 18.987 | 4.160 |
+
+Archive publication medians increased slightly in this comparison: 0.808 → 0.860 ms for 20k clips and 0.255 → 0.263 ms for large imports. These small publication costs remain in the results alongside the lower completion times.
+
+Pooled pages are dependent observations. The receipt retains all eight paired process medians/reductions, raw values, linear-interpolated p95s, maxima, warmups, initial traversals and outliers. Publication ends at loaded-status emission and excludes deferred cleanup/rendering; completion includes worker scheduling and a 1 ms polling observer. Store construction is outside the clocks. One shared Mac and the older manual-cadence soak remain uncontrolled background context. These timings do not establish frames/vsync/input latency, OS-cold launch, capture overhead, speech, battery/thermal behavior or competitor rank.
+
+A fresh normal release development app passes strict deep ad-hoc signature verification, the empty-library smoke, actual packaged-CLI scope control and exact all-file/mode/signature ZIP round trip. Its Core compiler command excludes `-enable-testing`; test engines remain separately preserved. The package is a local development artifact, with native activation, production signing/notarization and release acceptance still open.
+
+[Current source/input/test/performance/package receipt](../benchmarks/recording-change-awareness-v1.json) · [All original logs, observations, source snapshots and rasters](../benchmarks/recording-change-awareness-raw-v1.zip).
+
+![Quiet recording refresh](../assets/recorded-meetings-v6-updating-dark.png)
+![Older recordings remain reachable](../assets/recorded-meetings-v6-hidden-head-light.png)
+
+Named sessions/reviewed calendar-occurrence links, native wrapper/keyboard/VoiceOver/record/import/open/playback, physical speech/device quality, controlled energy and current automatic-app 24h acceptance remain open. Quiet-restored grouped peer re-enrollment still needs original session bindings. Separate owner/peer failed broad gates are not erased by these passes. The 83-feature ledger, dated 20-offering report and all preceding published evidence remain unchanged; F042, full v0 parity and top-three placement remain unfinished.
+
 ## Initial workspace evidence
 
 - The source-pinned development run at `c108699` passed **17 selected native Debug methods**, with no skips: 16 new Core/App/native methods plus the existing real-Keychain three-library/all-13-kind sync regression.
@@ -30,14 +72,15 @@ At that stage, an upstream merge changed an unrelated peer test and documentatio
 - [ ] Fresh sync enrollment after quiet restore of grouped peer audio needs its original session bindings; current code refuses to rehash a projection.
 - [x] Measure first-open/first-use metadata costs and move historical backfill into the cancellable Recordings load; retain all process latency/RSS observations.
 - [x] Generated portable backup/restore, incoming-origin projection/deletion and current privacy/erasure regression for the derived index.
-- [x] Selected optimized/sanitizer regression; ac5bf82 also has strict ad-hoc development packaging. Current identifier checks are scoped below; whole-current-suite and hosted qualification remain open.
+- [x] Current selected optimized/sanitizer regression at ec02cdd: 628 methods in each mode, 607 passed and 21 expected skips. Whole-suite and current hosted qualification remain open.
 - [x] Controlled grapheme/NUL/byte-distinct session IDs, admission limits and prior-cache repair.
-- [ ] Incoming-change UI invalidation and actual list-publication/frame-cost audit.
-- [x] Current normal release/ad-hoc development package at 7ab704b, packaged CLI scope control and exact ZIP/signature round trip. Native interaction and release acceptance remain open.
+- [x] Incoming-change UI invalidation, coherent loaded history and model/SQL/publication cost comparisons.
+- [ ] Actual native frame/vsync/input cost and controlled capture/energy acceptance.
+- [x] Current normal release/ad-hoc development package at ec02cdd, packaged CLI scope control and exact ZIP/signature round trip. Native interaction and release acceptance remain open.
 - [ ] Recorded/Upcoming wrapper interaction, keyboard/VoiceOver and actual native record/import/open/playback flows.
 - [ ] Physical microphone/system-audio, permission/device switching, transcription quality and power acceptance.
 
-These are generated fixtures and offscreen components on one Mac. F042 and the full v0 remain unfinished; no feature status or competitive ranking is promoted. No microphone/system recording, playback or provider/API request was made by these tests.
+These are generated fixtures and offscreen components on one Mac. F042 and the full v0 remain unfinished; no feature status or competitive ranking is promoted. Physical microphone/system recording, playback and external AI/cloud-provider acceptance remain open.
 
 ## Reviewed components
 

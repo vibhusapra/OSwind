@@ -283,6 +283,21 @@ public final class MemoryStore: @unchecked Sendable {
         if syncCaptureInstalled {try SyncChangeCapture.prepareWriterIfActive(RoutineDatabase(handle:db))}
         return try body(RoutineDatabase(handle:db))
     }
+    /// Short publication-only snapshot. No waiting for this connection, SQLite
+    /// locks, credential refresh or a writer reservation. Existing authorizers
+    /// stay installed; query_only additionally forbids callback writes.
+    func withAvailableRoutineSnapshot<T>(_ body:(RoutineDatabase)throws->T)throws->T {
+        guard lock.try() else {throw RecordedMeetingRefreshError.busy};defer {lock.unlock()}
+        guard let db,sqlite3_get_autocommit(db) != 0 else {throw RecordedMeetingRefreshError.busy}
+        let sql=RoutineDatabase(handle:db),timeout=try sql.eraseCount("PRAGMA busy_timeout"),queryOnly=try sql.eraseCount("PRAGMA query_only")
+        sqlite3_busy_timeout(db,0);defer {sqlite3_busy_timeout(db,Int32(timeout))}
+        try sql.execute("PRAGMA query_only=ON");defer {try? sql.execute("PRAGMA query_only=\(queryOnly)")}
+        try sql.execute("SAVEPOINT prepared_publication")
+        do {
+            try nativeWriterAdmission.requirePreparedRead(sql)
+            let result=try body(sql);try sql.execute("RELEASE prepared_publication");return result
+        }catch {try? sql.execute("ROLLBACK TO prepared_publication");try? sql.execute("RELEASE prepared_publication");throw error}
+    }
     /// Caller holds media before entering this SQL scope. Normal writes remain
     /// denied by SQL capabilities; only the typed cleanup scope grants them.
     func withRetirementDatabase<T>(_ body:(RoutineDatabase)throws->T)throws->T {

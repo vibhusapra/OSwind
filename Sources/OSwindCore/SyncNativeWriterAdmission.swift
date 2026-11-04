@@ -105,6 +105,19 @@ final class SyncNativeWriterAdmission {
             permit(true)
         }catch {permit(false);throw error}
     }
+    /// Publication may use the worker's already verified admission, but must
+    /// never refresh Keychain/external delivery state or take a writer slot.
+    /// Refuse a changed proof/schema; an owned worker can verify it normally.
+    func requirePreparedRead(_ db:RoutineDatabase)throws {
+        guard initialized,!checking,trustedDepth==0,!poisoned,!floorPending,!membershipPending,!retiring else {throw OSwindError.unavailable("Refresh the library before publishing prepared data")}
+        guard let proof,environment != nil else {
+            guard try db.eraseCount("PRAGMA user_version")<34 else {throw OSwindError.unavailable("Reopen this library to verify native admission")}
+            return
+        }
+        try epoch.requireCurrent(db)
+        lock.lock();let permitted=allowed;lock.unlock()
+        guard permitted,try db.eraseCount("PRAGMA schema_version")==schemaCookie,try proof.matches(db) else {throw RecordedMeetingRefreshError.changed}
+    }
     func openRetirement(_ db:RoutineDatabase,library:MemoryStore,environment:SyncNativeWriterEnvironment)throws {
         checking=true;defer {checking=false};initialized=true
         guard [Self.enrolledSchemaVersion,Self.membershipSchemaVersion].contains(try db.eraseCount("PRAGMA user_version")) else {throw OSwindError.invalid("Recover retirement from its current enrolled native schema")}

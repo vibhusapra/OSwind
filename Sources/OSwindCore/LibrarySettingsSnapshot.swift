@@ -15,9 +15,9 @@ public final class LibrarySettingsSnapshot:@unchecked Sendable {
     private init(settings:AppSettings,tree:BackupFileTree,current:SettingsFileAccess.Current) {
         self.settings=settings;self.tree=tree;file=current.file;stamp=current.stamp;bytes=current.bytes
     }
-    public static func capture(root:URL) throws -> LibrarySettingsSnapshot {
+    public static func capture(root:URL,waitForLock:Bool=true) throws -> LibrarySettingsSnapshot {
         let tree=try BackupFileTree(root:root.standardizedFileURL.resolvingSymlinksInPath(),writable:true)
-        return try SettingsFileAccess.withLock(tree:tree,exclusive:false) {
+        return try SettingsFileAccess.withLock(tree:tree,exclusive:false,waitForLock:waitForLock) {
             try tree.requireRootIdentity(at:root)
             let current=try SettingsFileAccess.read(tree:tree)
             do {
@@ -37,10 +37,10 @@ public final class LibrarySettingsSnapshot:@unchecked Sendable {
     deinit {release()}
     // Lock order: media activity -> SQL -> snapshot mutex -> settings file lock.
     // A settings saver must never acquire SQL while holding the file lock.
-    func withCurrent<T>(root:URL,policy:PrivacyPolicy,_ body:()throws->T) throws -> T {
+    func withCurrent<T>(root:URL,policy:PrivacyPolicy,waitForLock:Bool=true,_ body:()throws->T) throws -> T {
         mutex.lock();defer {mutex.unlock()}
         guard let tree,settings.privacy==policy else {throw OSwindError.invalid("Use an active settings snapshot and its privacy policy for this import")}
-        return try SettingsFileAccess.withLock(tree:tree,exclusive:false) {
+        return try SettingsFileAccess.withLock(tree:tree,exclusive:false,waitForLock:waitForLock) {
             try tree.requireRootIdentity(at:root)
             let current=try SettingsFileAccess.read(tree:tree);defer {if current.file>=0 {close(current.file)}}
             guard current.stamp==stamp,current.bytes==bytes else {throw OSwindError.unavailable("Saved settings changed during import preparation. Retry the import using the current settings.")}
@@ -55,7 +55,7 @@ public final class LibrarySettingsSnapshot:@unchecked Sendable {
 enum SettingsFileAccess {
     static let maximumBytes=4*1024*1024
     struct Current {var file:Int32 = -1;var stamp:BackupFileStamp?;var bytes:Data?}
-    static func withLock<T>(tree:BackupFileTree,exclusive:Bool,_ body:()throws->T) throws -> T {
+    static func withLock<T>(tree:BackupFileTree,exclusive:Bool,waitForLock:Bool=true,_ body:()throws->T) throws -> T {
         try tree.withRootDirectory {directory in
             let name=".settings-admission.lock",file=openat(directory,name,O_RDWR | O_CREAT | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC,0o600)
             guard file>=0 else {throw OSwindError.unavailable("Cannot open the settings admission lock")};defer {close(file)}
@@ -64,6 +64,7 @@ enum SettingsFileAccess {
             let deadline=ProcessInfo.processInfo.systemUptime+1
             while flock(file,(exclusive ? LOCK_EX:LOCK_SH) | LOCK_NB) != 0 {
                 guard errno==EWOULDBLOCK || errno==EAGAIN || errno==EINTR else {throw OSwindError.unavailable("Cannot reserve settings access")}
+                guard waitForLock else {throw OSwindError.unavailable("Settings are busy. Retry after the current save commits.")}
                 try Task.checkCancellation()
                 guard ProcessInfo.processInfo.systemUptime<deadline else {throw OSwindError.unavailable("Settings are busy. Retry after the current save or import commits.")}
                 Thread.sleep(forTimeInterval:0.005)
