@@ -1,5 +1,9 @@
 # OSwind delivery ledger
 
+## 2026-11-03 — recorded-session first-use indexing and source lifecycle
+
+Source `ac5bf82` defers historical recording metadata indexing to a cancellable first Recordings load, preserves write-through updates and clears own deleted/erased recording previews. Optimized and Thread Sanitizer selections each have 319 defined / 304 passed / 15 explicit skips / 0 failures. The skips are nine child helpers, three opt-in scale probes, two exact-old-client probes and one render case; no whole-suite or hosted qualification is claimed. A strict ad-hoc development package passed. Eight counterbalanced pairs per authored shape verify first-open and first-use costs, all exact sources and frozen engines; all 290 observations, first-open outliers and the failed incoming-fixture development run are retained. Named sessions, durable calendar links, exact session Ask/recaps, native interactions and physical/power/automatic 24-hour acceptance remain unfinished. No feature-ledger status or ranking changed. [Details](RECORDED-MEETINGS-WIP.md#deferred-archive-indexing-and-current-selected-checks) · [Receipt](../benchmarks/recorded-meetings-startup-v1.json).
+
 ## Recording sessions now have a source-linked native workspace
 
 Meetings opens Recordings beside the existing Upcoming calendar view. Existing live/import recording IDs group clips; original transcript/clip actions use current source guards. A derived thin index supports bounded pages without transcript hydration; initial index installation/repair still parses audio payloads and needs large-archive timing. Per-row/open-store references, current-settings publication, registry-owned reads and appearance leases protect stale data and joined departure. Observed interval union preserves gaps/import-date uncertainty; startup refusal remains visible.
