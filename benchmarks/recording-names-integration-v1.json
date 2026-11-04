@@ -1,0 +1,3749 @@
+{
+  "runtimeTestSource": "281582871034651d0990f73ae5b0164957255078",
+  "reportSource": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+  "scope": "Separate same-retained-engine optimized and sanitizer broad selections, fresh ordinary release development package, and exact-head hosted name-job evidence. Counts overlap other selections. Full v0/top-three/physical/distribution qualification remains open.",
+  "broad": {
+    "optimized": {
+      "source": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+      "actualRuntimeSource": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "session-names-current-qualification-v1/optimized/actual-engine",
+      "rebuild": false,
+      "command": [
+        "xcrun",
+        "xctest",
+        "-XCTest",
+        "OSwindCoreTests.SyncOutgoingTests,OSwindCoreTests.SyncIncomingSourceTests,OSwindCoreTests.RecordedMeetingTests,OSwindCoreTests.RecordedMeetingRevisionTests,OSwindCoreTests.RecordedMeetingIdentifierTests,OSwindCoreTests.RecordedMeetingPortabilityTests,OSwindCoreTests.NativeRecordedMeetingTests,OSwindCoreTests.HistoryErasureTests,OSwindCoreTests.HistoricalErasureMigrationTests,OSwindCoreTests.HistoricalErasureScopeTests,OSwindCoreTests.HistoricalErasureCrashTests,OSwindCoreTests.SyncHistoricalCitationTests,OSwindCoreTests.RecordingDetailsTests,OSwindCoreTests.SyncRecordingDetailsTests,OSwindCoreTests.SyncOriginalEvidenceTests,OSwindCoreTests.SyncPortableRecordTests,OSwindCoreTests.RecordingScopeTests,OSwindAppTests.VaultSessionTests,OSwindAppTests.SourceWorkSessionTests,OSwindAppTests.PeerMembershipAppSessionTests,OSwindAppTests.OwnerAdditionAppSessionTests,OSwindAppTests.RecordedMeetingsModelTests,OSwindAppTests.RecordingNamesModelTests,OSwindAppTests.LibraryOpeningTests",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/optimized/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 488.5417399161961,
+      "actualEngineAndInputsUnchanged": true,
+      "methods": 689,
+      "counts": {
+        "passed": 666,
+        "skipped": 23,
+        "failed": 0
+      },
+      "classes": {
+        "SyncOutgoingTests": {
+          "passed": 89,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncIncomingSourceTests": {
+          "passed": 214,
+          "skipped": 14,
+          "failed": 0
+        },
+        "RecordedMeetingTests": {
+          "passed": 18,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingRevisionTests": {
+          "passed": 12,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingIdentifierTests": {
+          "passed": 4,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingPortabilityTests": {
+          "passed": 2,
+          "skipped": 0,
+          "failed": 0
+        },
+        "NativeRecordedMeetingTests": {
+          "passed": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoryErasureTests": {
+          "passed": 17,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureMigrationTests": {
+          "passed": 25,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureScopeTests": {
+          "passed": 14,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureCrashTests": {
+          "passed": 2,
+          "skipped": 1,
+          "failed": 0
+        },
+        "SyncHistoricalCitationTests": {
+          "passed": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordingDetailsTests": {
+          "passed": 40,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncRecordingDetailsTests": {
+          "passed": 9,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncOriginalEvidenceTests": {
+          "passed": 24,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncPortableRecordTests": {
+          "passed": 25,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordingScopeTests": {
+          "passed": 10,
+          "skipped": 2,
+          "failed": 0
+        },
+        "VaultSessionTests": {
+          "passed": 38,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SourceWorkSessionTests": {
+          "passed": 30,
+          "skipped": 0,
+          "failed": 0
+        },
+        "PeerMembershipAppSessionTests": {
+          "passed": 17,
+          "skipped": 2,
+          "failed": 0
+        },
+        "OwnerAdditionAppSessionTests": {
+          "passed": 29,
+          "skipped": 1,
+          "failed": 0
+        },
+        "RecordedMeetingsModelTests": {
+          "passed": 29,
+          "skipped": 3,
+          "failed": 0
+        },
+        "RecordingNamesModelTests": {
+          "passed": 8,
+          "skipped": 0,
+          "failed": 0
+        },
+        "LibraryOpeningTests": {
+          "passed": 8,
+          "skipped": 0,
+          "failed": 0
+        }
+      },
+      "logSHA256": "e60040366b8ba36052cc921988e5791f0f5015a5af71a9c7368ac2d0562b86ae",
+      "assertionIssues": [],
+      "skips": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift:74: -[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker] : Test skipped - Only run as owned historical erasure crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:372: -[OSwindAppTests.OwnerAdditionAppSessionTests testRenderActualOwnerReviewAndResponseInBothAppearances] : Test skipped - Explicit authored component raster QA; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:623: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderExpandedGroupFolderPreviewAndDefaultGate] : Test skipped - Explicit generated folder-setup components; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:609: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderPeerRequestReviewAndOwnerExportInBothAppearances] : Test skipped - Explicit generated peer component raster QA; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:238: -[OSwindAppTests.RecordedMeetingsModelTests testRenderQuietRefreshKeepsSelectedRecordingInBothAppearances] : Test skipped - Explicit generated recording refresh components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:426: -[OSwindAppTests.RecordedMeetingsModelTests testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances] : Test skipped - Explicit generated recording workspace components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:414: -[OSwindAppTests.RecordedMeetingsModelTests testRenderScopedRecordingActionsAndAskBadge] : Test skipped - Explicit generated scoped recording components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:59: -[OSwindCoreTests.RecordingScopeTests testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl] : Test skipped - Explicit current CLI and retained development-v10 control required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:141: -[OSwindCoreTests.RecordingScopeTests testActualPriorReaderShowsPlainChatAndRefusesRecordingScopedChat] : Test skipped - Explicit frozen prior reader required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift:83: -[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker] : Test skipped - Only run as owned retirement crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift:84: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker] : Test skipped - Only run as owned incoming-run crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift:50: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker] : Test skipped - Only run as owned incoming-source crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift:77: -[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker] : Test skipped - Only run as owned late-dependency crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift:232: -[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker] : Test skipped - Only run as owned optional-conversation crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift:10: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale] : Test skipped - Explicit owned routine-scale output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift:11: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale] : Test skipped - Explicit owned incoming-source scale output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift:23: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale] : Test skipped - Explicit owned fanout output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker] : Test skipped - Only run as owned publication crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift:93: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker] : Test skipped - Only run as owned publication-queue crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift:109: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker] : Test skipped - Only run as owned source-withdrawal crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker] : Test skipped - Only run as owned unavailable-scope crash child"
+      ]
+    },
+    "threadSanitizer": {
+      "source": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+      "actualRuntimeSource": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "session-names-current-qualification-v1/thread-sanitizer/actual-engine",
+      "rebuild": false,
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+        "-XCTest",
+        "OSwindCoreTests.SyncOutgoingTests,OSwindCoreTests.SyncIncomingSourceTests,OSwindCoreTests.RecordedMeetingTests,OSwindCoreTests.RecordedMeetingRevisionTests,OSwindCoreTests.RecordedMeetingIdentifierTests,OSwindCoreTests.RecordedMeetingPortabilityTests,OSwindCoreTests.NativeRecordedMeetingTests,OSwindCoreTests.HistoryErasureTests,OSwindCoreTests.HistoricalErasureMigrationTests,OSwindCoreTests.HistoricalErasureScopeTests,OSwindCoreTests.HistoricalErasureCrashTests,OSwindCoreTests.SyncHistoricalCitationTests,OSwindCoreTests.RecordingDetailsTests,OSwindCoreTests.SyncRecordingDetailsTests,OSwindCoreTests.SyncOriginalEvidenceTests,OSwindCoreTests.SyncPortableRecordTests,OSwindCoreTests.RecordingScopeTests,OSwindAppTests.VaultSessionTests,OSwindAppTests.SourceWorkSessionTests,OSwindAppTests.PeerMembershipAppSessionTests,OSwindAppTests.OwnerAdditionAppSessionTests,OSwindAppTests.RecordedMeetingsModelTests,OSwindAppTests.RecordingNamesModelTests,OSwindAppTests.LibraryOpeningTests",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/thread-sanitizer/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 841.4562454589177,
+      "actualEngineAndInputsUnchanged": true,
+      "methods": 689,
+      "counts": {
+        "passed": 666,
+        "skipped": 23,
+        "failed": 0
+      },
+      "classes": {
+        "SyncOutgoingTests": {
+          "passed": 89,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncIncomingSourceTests": {
+          "passed": 214,
+          "skipped": 14,
+          "failed": 0
+        },
+        "RecordedMeetingTests": {
+          "passed": 18,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingRevisionTests": {
+          "passed": 12,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingIdentifierTests": {
+          "passed": 4,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordedMeetingPortabilityTests": {
+          "passed": 2,
+          "skipped": 0,
+          "failed": 0
+        },
+        "NativeRecordedMeetingTests": {
+          "passed": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoryErasureTests": {
+          "passed": 17,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureMigrationTests": {
+          "passed": 25,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureScopeTests": {
+          "passed": 14,
+          "skipped": 0,
+          "failed": 0
+        },
+        "HistoricalErasureCrashTests": {
+          "passed": 2,
+          "skipped": 1,
+          "failed": 0
+        },
+        "SyncHistoricalCitationTests": {
+          "passed": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordingDetailsTests": {
+          "passed": 40,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncRecordingDetailsTests": {
+          "passed": 9,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncOriginalEvidenceTests": {
+          "passed": 24,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SyncPortableRecordTests": {
+          "passed": 25,
+          "skipped": 0,
+          "failed": 0
+        },
+        "RecordingScopeTests": {
+          "passed": 10,
+          "skipped": 2,
+          "failed": 0
+        },
+        "VaultSessionTests": {
+          "passed": 38,
+          "skipped": 0,
+          "failed": 0
+        },
+        "SourceWorkSessionTests": {
+          "passed": 30,
+          "skipped": 0,
+          "failed": 0
+        },
+        "PeerMembershipAppSessionTests": {
+          "passed": 17,
+          "skipped": 2,
+          "failed": 0
+        },
+        "OwnerAdditionAppSessionTests": {
+          "passed": 29,
+          "skipped": 1,
+          "failed": 0
+        },
+        "RecordedMeetingsModelTests": {
+          "passed": 29,
+          "skipped": 3,
+          "failed": 0
+        },
+        "RecordingNamesModelTests": {
+          "passed": 8,
+          "skipped": 0,
+          "failed": 0
+        },
+        "LibraryOpeningTests": {
+          "passed": 8,
+          "skipped": 0,
+          "failed": 0
+        }
+      },
+      "logSHA256": "ed1452a56e2893dccb81033fbfabf8dfcadfbf5878745ec138c3061d78377e2e",
+      "assertionIssues": [],
+      "skips": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift:74: -[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker] : Test skipped - Only run as owned historical erasure crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:372: -[OSwindAppTests.OwnerAdditionAppSessionTests testRenderActualOwnerReviewAndResponseInBothAppearances] : Test skipped - Explicit authored component raster QA; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:623: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderExpandedGroupFolderPreviewAndDefaultGate] : Test skipped - Explicit generated folder-setup components; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:609: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderPeerRequestReviewAndOwnerExportInBothAppearances] : Test skipped - Explicit generated peer component raster QA; no desktop capture",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:238: -[OSwindAppTests.RecordedMeetingsModelTests testRenderQuietRefreshKeepsSelectedRecordingInBothAppearances] : Test skipped - Explicit generated recording refresh components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:426: -[OSwindAppTests.RecordedMeetingsModelTests testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances] : Test skipped - Explicit generated recording workspace components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/RecordedMeetingsModelTests.swift:414: -[OSwindAppTests.RecordedMeetingsModelTests testRenderScopedRecordingActionsAndAskBadge] : Test skipped - Explicit generated scoped recording components only",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:59: -[OSwindCoreTests.RecordingScopeTests testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl] : Test skipped - Explicit current CLI and retained development-v10 control required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:141: -[OSwindCoreTests.RecordingScopeTests testActualPriorReaderShowsPlainChatAndRefusesRecordingScopedChat] : Test skipped - Explicit frozen prior reader required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift:83: -[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker] : Test skipped - Only run as owned retirement crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift:84: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker] : Test skipped - Only run as owned incoming-run crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift:50: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker] : Test skipped - Only run as owned incoming-source crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift:77: -[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker] : Test skipped - Only run as owned late-dependency crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift:232: -[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker] : Test skipped - Only run as owned optional-conversation crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift:10: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale] : Test skipped - Explicit owned routine-scale output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift:11: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale] : Test skipped - Explicit owned incoming-source scale output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift:23: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale] : Test skipped - Explicit owned fanout output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker] : Test skipped - Only run as owned publication crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift:93: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker] : Test skipped - Only run as owned publication-queue crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift:109: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker] : Test skipped - Only run as owned source-withdrawal crash child",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker] : Test skipped - Only run as owned unavailable-scope crash child"
+      ]
+    }
+  },
+  "trackedRuntimeInputs": [
+    {
+      "path": "Package.resolved",
+      "sha256": "d15415229e18a6a5a13dc23037487b113d95b26fc84aa07540e9bb3878a96785"
+    },
+    {
+      "path": "Package.swift",
+      "sha256": "d7c054e330cba9615455750a8f8509d4ef6e605daab1f9fc8964047a91ee263f"
+    },
+    {
+      "path": "Sources/CMacNotifications/module.modulemap",
+      "sha256": "1819e99ec1a903c163e2dd2ec09f94c27cfab2524d0920bcb1af8c623d480fda"
+    },
+    {
+      "path": "Sources/CMacNotifications/shim.h",
+      "sha256": "d8e4061d28a3847dd6e7bc1df5e546f18f9bc72f381cb3739deb9cc38e1f45c2"
+    },
+    {
+      "path": "Sources/CSQLite/module.modulemap",
+      "sha256": "bbfe59a972a3e8e09e347c04bc22c0eacd2544881af8a4b6068bfc30b38466e8"
+    },
+    {
+      "path": "Sources/CSQLite/shim.h",
+      "sha256": "b052d8e561e942f97b503033ecd2eaa2b35213bdbf374983efe9e68eabdfc024"
+    },
+    {
+      "path": "Sources/OSwind/ActivityCalendarModel.swift",
+      "sha256": "3f3b5e27a599bf480138cad948110cbd1bf80893b79d80575845bbba43dbf471"
+    },
+    {
+      "path": "Sources/OSwind/ActivityCalendarView.swift",
+      "sha256": "af1b63816fa6f4080f8a23d174d9af3dea1efebd3a38d83ae1eeaa4bebbf6419"
+    },
+    {
+      "path": "Sources/OSwind/AppModel.swift",
+      "sha256": "dfe725406f0436d3fbaa8ec821519b6c1977cf0cb82ff83ce9b40cc5eef1c3fd"
+    },
+    {
+      "path": "Sources/OSwind/AppSession.swift",
+      "sha256": "b153ffb1520e4883444ad1eb253043ac950c010246ee35a1de561b0797ee418d"
+    },
+    {
+      "path": "Sources/OSwind/AppVisualIndex.swift",
+      "sha256": "91e19db895686fa1399291fbba004114452c14738a3c77c7ad8aa2e0a8fac75d"
+    },
+    {
+      "path": "Sources/OSwind/AudioPlaybackView.swift",
+      "sha256": "601a58a67d3136527fe79bcd301b69df47142399ccebbcd27279c7b644e04459"
+    },
+    {
+      "path": "Sources/OSwind/ClipboardContextModel.swift",
+      "sha256": "9498d1dc0efb4f499d4118e1dac32cad31463573d89efa2b8be086c0e2935337"
+    },
+    {
+      "path": "Sources/OSwind/ClipboardContextSettingsView.swift",
+      "sha256": "e215dded3ae6a288352b436a0946beb723f4684032a7afa29b401423b465ceeb"
+    },
+    {
+      "path": "Sources/OSwind/ClipboardReader.swift",
+      "sha256": "6dffd69b82b316bbee48863f98dcaebe635fd1a316932eea731ab8e027cc72fa"
+    },
+    {
+      "path": "Sources/OSwind/ClipboardSettingsPreview.swift",
+      "sha256": "36bd09287ba120ae76f12bfb3419f0a7463bc95a5dc98a1919e030ec0f957e1f"
+    },
+    {
+      "path": "Sources/OSwind/ContextualDraftModel.swift",
+      "sha256": "a6eb9fd8302d9150123d1dc7f78d681af34f98795473a13c526d2e6d920999e4"
+    },
+    {
+      "path": "Sources/OSwind/ContextualDraftView.swift",
+      "sha256": "f93ecdb603c8bdd3cd6f8d3873be6cc701a2e1fcd84af1c92d30a702cb277ed6"
+    },
+    {
+      "path": "Sources/OSwind/DraftInsertion.swift",
+      "sha256": "63d7bbe946735b6d52012b57b40f00abb713ed97d3166ddac13171d4c415c120"
+    },
+    {
+      "path": "Sources/OSwind/EntityMemoryModel.swift",
+      "sha256": "365041274a0947c81ab720b3c32dd0d18ad2b1805e6ccffa52fb3dbd3ba7ebcb"
+    },
+    {
+      "path": "Sources/OSwind/EntityMemoryView.swift",
+      "sha256": "6c95254570d037f788e74e3da2cc8e99cf99ae4ddbf8b89c9e841c627bb55492"
+    },
+    {
+      "path": "Sources/OSwind/EvidenceSnippetView.swift",
+      "sha256": "42debbb1b5a477626a35866eec2cbb22ca3655ad3609417dcb7ed09533d2d217"
+    },
+    {
+      "path": "Sources/OSwind/GlobalShortcutModel.swift",
+      "sha256": "e88aeb3262682f6c8602a986a0567addbc00971b9c34d946761d80d21be0efcb"
+    },
+    {
+      "path": "Sources/OSwind/HistoryErasureView.swift",
+      "sha256": "a45b858dc0dac3d8d040e644fca345106168babf60858a158732f8e7ac6dec83"
+    },
+    {
+      "path": "Sources/OSwind/LibraryTaskRetirement.swift",
+      "sha256": "64f2c84d4b3beb9028530cc56ba4687b9ed5b3bfcd0dea7bee473ff4ab3db2e6"
+    },
+    {
+      "path": "Sources/OSwind/LibraryTransferModel.swift",
+      "sha256": "b9be15b16b87509d56300f32b34be55fe710aa045f868abc10c6ff85b6e84d8c"
+    },
+    {
+      "path": "Sources/OSwind/LibraryWipeView.swift",
+      "sha256": "e531fe7fe0790a417ff3ff83e2baa74845c837749130b72c15a648acf9c5f519"
+    },
+    {
+      "path": "Sources/OSwind/LibraryWorkRegistry.swift",
+      "sha256": "907f0c66c21001bf998066f05eed0139dc7ec08539bd686aa6df7c337f93c2ec"
+    },
+    {
+      "path": "Sources/OSwind/LocalModelLibraryModel.swift",
+      "sha256": "9b743890c0af9a3585890add207e6932d67ab7cbeda86b8b05ad361d0f42d697"
+    },
+    {
+      "path": "Sources/OSwind/MCPKeychainCredentials.swift",
+      "sha256": "62558a041d576df43ea3b10ba14aa5245e81b06d8c467ce39ba545c54f40a4ae"
+    },
+    {
+      "path": "Sources/OSwind/MCPToolsModel.swift",
+      "sha256": "64c1fb6e358efdd5e4f0eb1aa743aaba1b72f70786117c37a041dc60f545b105"
+    },
+    {
+      "path": "Sources/OSwind/MCPToolsPreview.swift",
+      "sha256": "70465ba238b41d987c07ede6122f475c99c86774b3f627fad363d57602bd6267"
+    },
+    {
+      "path": "Sources/OSwind/MCPToolsView.swift",
+      "sha256": "1adbd40c9975271a636ac475527a371c5a6cacc1a09c9efeb99ea285a47ce902"
+    },
+    {
+      "path": "Sources/OSwind/MeetingServices.swift",
+      "sha256": "d7a37168b39fe10ca2e4b46fee129cfad5330b62e08dc57e43684905e6c498de"
+    },
+    {
+      "path": "Sources/OSwind/MeetingsModel.swift",
+      "sha256": "104c6d6442405f880a0cfd4327b1356e195512767fa6d2243039730cadb9c79a"
+    },
+    {
+      "path": "Sources/OSwind/MeetingsView.swift",
+      "sha256": "fb24e53d18c3f345253212021bf01a24f60a024aec59ffe940397c1ce8b2acef"
+    },
+    {
+      "path": "Sources/OSwind/NativeModelDownloadView.swift",
+      "sha256": "43bc49a1f0c513e1a692d5f99edf386d09c166874773be613b8a2d9661abd8a9"
+    },
+    {
+      "path": "Sources/OSwind/NativeModelSetupModel.swift",
+      "sha256": "a5bb6252e25aa88761f09a13665ca92e51f62e1c0169aa9c0804ccdd906445f0"
+    },
+    {
+      "path": "Sources/OSwind/OSwindApp.swift",
+      "sha256": "95fbac38fd78bb9d1a4390b03ff85e1479919f78c77b1ecc8a17a01568f2ef85"
+    },
+    {
+      "path": "Sources/OSwind/PIIModelSettingsView.swift",
+      "sha256": "47646dc5c491a93ba58927c4e42f9c9125fecf30ecf9c1d5daf03a9a48979494"
+    },
+    {
+      "path": "Sources/OSwind/PIIModelSetupModel.swift",
+      "sha256": "8faac1235c65c788342f1c45010790e8b3ef43efedd6c928840bef07264e0bec"
+    },
+    {
+      "path": "Sources/OSwind/PIIScanRecordView.swift",
+      "sha256": "a3627620e11e5e88af5bb1e3be62119f2b5beaef8ee355631c6bd5cf57184827"
+    },
+    {
+      "path": "Sources/OSwind/PendingMediaCleanupModel.swift",
+      "sha256": "4cc5d5a680d76b55115ff3b8e4e61f5ec55105dfcc90e017686e34cebf411d62"
+    },
+    {
+      "path": "Sources/OSwind/PersonalSyncMembershipUpdateView.swift",
+      "sha256": "0c2924aacbffd52840dd66f6451aea9e215e2af576059001294015c29bd1e333"
+    },
+    {
+      "path": "Sources/OSwind/PersonalSyncModel.swift",
+      "sha256": "135929b323f168a08dff84b64d2412bbc25102173027be6af53aaae89eb17902"
+    },
+    {
+      "path": "Sources/OSwind/PersonalSyncOwnerViews.swift",
+      "sha256": "d2846c44cec12c412414e0db12ed05b9be6a70a18d50fb77d38e086bd60d65d6"
+    },
+    {
+      "path": "Sources/OSwind/PersonalSyncPairingView.swift",
+      "sha256": "aa83ac8e176aa9a82f62bb83ccbcfa1be2c66d28f0de12b4e70572329e9b73a3"
+    },
+    {
+      "path": "Sources/OSwind/PersonalSyncStatusView.swift",
+      "sha256": "7062603dec09aa5add5376241725f2dc046c2bb4722b6bdc7a615593209eef44"
+    },
+    {
+      "path": "Sources/OSwind/PreviewExporter.swift",
+      "sha256": "e18fe619fb1a10ef54f73a22f6ff80594ed0f8ffbec39c2054afb2108c8b600c"
+    },
+    {
+      "path": "Sources/OSwind/QueryScopeViews.swift",
+      "sha256": "a18437bf6c7ece4d4f6a8ed45549fc4edbc95f87b3bf0d09811aa930ebb8116c"
+    },
+    {
+      "path": "Sources/OSwind/RecapEvidenceView.swift",
+      "sha256": "fbc7338e3c14a52a19fc0786daf783d3f6564d387932886bb4c0cb37fe1be90a"
+    },
+    {
+      "path": "Sources/OSwind/RecordedMeetingsModel.swift",
+      "sha256": "78a26cd311903aef3bac2df662fe8be089d54586aaa8c7c2da6cf14a50d2ed60"
+    },
+    {
+      "path": "Sources/OSwind/RecordedMeetingsView.swift",
+      "sha256": "3fb827c4955102a6c20c509855a2b2dd2d313bcb678f6f38e451e69a60b1ca03"
+    },
+    {
+      "path": "Sources/OSwind/RecordingNameViews.swift",
+      "sha256": "f835fcb3d4199515660b4e44699034ad0603a91c6a38e439aee390c71e4e731a"
+    },
+    {
+      "path": "Sources/OSwind/RecordingNamesModel.swift",
+      "sha256": "16d0faacc3f251a6fe14115e0a78c08b6147c0c0b16dc992c3baf5ef24ff4bf2"
+    },
+    {
+      "path": "Sources/OSwind/RoutinesModel.swift",
+      "sha256": "814d1546167af6fd09922e980e50fe9d84c2b7158de7c06d4c5b56b52c2d3855"
+    },
+    {
+      "path": "Sources/OSwind/RoutinesView.swift",
+      "sha256": "c83483a5bc075846c30125c148168ca3e693133b2f90b9fc64723ee82461732b"
+    },
+    {
+      "path": "Sources/OSwind/SettingsView.swift",
+      "sha256": "bcfb4539bd20b0a4d2b47ae0e06a7d09e859f7e600fc14819efb4e5b1bf906e2"
+    },
+    {
+      "path": "Sources/OSwind/SnapshotRegionsView.swift",
+      "sha256": "ba7ba9319e47a0aff1afb00d4aa1edad1c062bd5eebb8a3654c77f63bcb6b16a"
+    },
+    {
+      "path": "Sources/OSwind/TextObservationSummary.swift",
+      "sha256": "01b7dd32ec71be321c278e383b0f7bfe8f3921be08cd040d1e85e8c1c53d771b"
+    },
+    {
+      "path": "Sources/OSwind/Theme.swift",
+      "sha256": "8691b50c210801ddaa242aec733c949294f46e17aa5856c76285671ac4fb7a57"
+    },
+    {
+      "path": "Sources/OSwind/VaultViews.swift",
+      "sha256": "ecab053e913ecb72865e593c9ebd73c8c263fc5643e743d9f425c47806fd9b7c"
+    },
+    {
+      "path": "Sources/OSwind/VideoReplayView.swift",
+      "sha256": "3e1370fe6b8e709eb1e4d40f7ff1dc142712fe7759e15bc113cef2ec5dc2e932"
+    },
+    {
+      "path": "Sources/OSwind/VisualHitImage.swift",
+      "sha256": "f9133914bb73562ea2d5119f8d660ab763ce4fd78616638bc85bc0fd788ac1b2"
+    },
+    {
+      "path": "Sources/OSwind/VisualModelSettingsView.swift",
+      "sha256": "34f768fb073727fee489d3ef876b4ffaab651d51880c1df53c74e4b1a1508d81"
+    },
+    {
+      "path": "Sources/OSwind/VisualModelSetupModel.swift",
+      "sha256": "47b09907034b74ad2e9c2c42c34df5cbdbf1849bb7969e47a87ab0445bee6624"
+    },
+    {
+      "path": "Sources/OSwind/VoiceTypingModel.swift",
+      "sha256": "d4154a8e5f84e50acd476990e60d430adb5b15b73574fbbb937d74bbadd3a320"
+    },
+    {
+      "path": "Sources/OSwind/VoiceTypingPreview.swift",
+      "sha256": "5ca91246652e4718822a8ef36aeedf167179cadd9d92c36ce85fb7d62ac7d560"
+    },
+    {
+      "path": "Sources/OSwind/WorkflowModel.swift",
+      "sha256": "114c2c41c48c15522c69325929102b08bb149ef5cfd5fc849988e0c33ad45b8f"
+    },
+    {
+      "path": "Sources/OSwind/WorkflowPreview.swift",
+      "sha256": "3250f58ad6b066088cac7cb918c07b4074b26bac6e0af0752fcda541ef0bfa7c"
+    },
+    {
+      "path": "Sources/OSwind/WorkflowView.swift",
+      "sha256": "429f73f6a862561bf580e9e8df78533a2ec72459d22e82a5286dc4b279ea8a89"
+    },
+    {
+      "path": "Sources/OSwind/WorkspaceView.swift",
+      "sha256": "a752cdc6c6ca894024ee0a410a8fe5db69a0f86cf48dcccdfa87936c626c2843"
+    },
+    {
+      "path": "Sources/OSwindCLI/BackupCLI.swift",
+      "sha256": "433b85ee7ee681317d753e9f0b15789a7e713ea525c750cb2194c8c289fc4ddc"
+    },
+    {
+      "path": "Sources/OSwindCLI/CaptureRequestCLI.swift",
+      "sha256": "f848e0a9011d101039f8367074ca9323f030dcc2968e645cb2768e3642aa0068"
+    },
+    {
+      "path": "Sources/OSwindCLI/CollectorCLI.swift",
+      "sha256": "3fac9eddb22be86a1a670073e7c13f954fd3d0f1b094421b9aa8d9a05ac5024f"
+    },
+    {
+      "path": "Sources/OSwindCLI/EntityCLI.swift",
+      "sha256": "b80252e526ac30efb821da6d478b3a1b410b28d9db8cec51d5b9ad02f6e77109"
+    },
+    {
+      "path": "Sources/OSwindCLI/MCPClientCLI.swift",
+      "sha256": "b9ca9810623289972802123dc0ee6ca5fa331fa25e8a0f4f23586bbe0de604ad"
+    },
+    {
+      "path": "Sources/OSwindCLI/NativeModelCLI.swift",
+      "sha256": "ab4798b9f0fd3268001de629e28a95c0a8e49eba69331554c4134693389d368c"
+    },
+    {
+      "path": "Sources/OSwindCLI/PrivateJSON.swift",
+      "sha256": "205eb93f57147a9fd33a99044a2855133b6e01189a61232a313bfb45f06bf152"
+    },
+    {
+      "path": "Sources/OSwindCLI/RoutineCLI.swift",
+      "sha256": "7c4182cb55a78390d27914741bdaa1448d706d6d8fd1c172e25f07e82d8a58dc"
+    },
+    {
+      "path": "Sources/OSwindCLI/VaultCLI.swift",
+      "sha256": "fc0c40c80ee7f72235e1630abbf0f4e1a0fb43a9f577a546e2b7a500de1f3aa6"
+    },
+    {
+      "path": "Sources/OSwindCLI/VisualModelCLI.swift",
+      "sha256": "cba17ab98d61f7ef2631ab6f7b4deef6733440fdcf2e8b4a2328a58f4cb44fa3"
+    },
+    {
+      "path": "Sources/OSwindCLI/WorkflowCLI.swift",
+      "sha256": "ef02df686d0fb709de4635240feb28087c85a4c74eb2e16442cee47f7a17de4a"
+    },
+    {
+      "path": "Sources/OSwindCLI/main.swift",
+      "sha256": "a1274e691a8ad4ce52172ca37ca0309377d2c99760336fd0c1e998a5ee6d141a"
+    },
+    {
+      "path": "Sources/OSwindCore/AI.swift",
+      "sha256": "ef9dee93261a27b491de23e28e694d9aab4037e6ba1b1c3293059544edc0f0a1"
+    },
+    {
+      "path": "Sources/OSwindCore/ANNCache.swift",
+      "sha256": "ba81bad9242478120663f7d54cbf7dbf014ba682ce42c71f798c51b88dae9681"
+    },
+    {
+      "path": "Sources/OSwindCore/AccessibilityContext.swift",
+      "sha256": "052ebc5528efaecaff3ffd92c58bf4ac35b433e9af0add12e7db94ed511547cb"
+    },
+    {
+      "path": "Sources/OSwindCore/AccessibilityTextCapture.swift",
+      "sha256": "02de901eed19ad0af6724b5e4699303448c0055f6f8722180700e04f43ef7574"
+    },
+    {
+      "path": "Sources/OSwindCore/ActivityCalendar.swift",
+      "sha256": "a221ff6f6567756e00f7d1db2bf9690021dbaca6d9d4fedac4c9f25a4702eef7"
+    },
+    {
+      "path": "Sources/OSwindCore/Audio.swift",
+      "sha256": "8fbf60271a98c6e71ab02dccf50cb2dff2afaf378b57542b18af8e7c9577f2ec"
+    },
+    {
+      "path": "Sources/OSwindCore/AudioEvidence.swift",
+      "sha256": "a860bd65218baf59e79640672ce3404c6a3cee6364f5d50585957ac892dada2c"
+    },
+    {
+      "path": "Sources/OSwindCore/AudioIngress.swift",
+      "sha256": "61c30f874ee1b6e8869562eba9446c9f96ce3868fb818e069063c4e211b9bb99"
+    },
+    {
+      "path": "Sources/OSwindCore/AudioNormalization.swift",
+      "sha256": "f905e9b27c0b22f9818ec7a4813c707065ad9bfe127884037cf4e842bfd70eba"
+    },
+    {
+      "path": "Sources/OSwindCore/AudioSearchEvaluation.swift",
+      "sha256": "a794a741f8669159dae8cb5e6befe4ae5afcbdd9dc277a0c814dfd6f1209dbc7"
+    },
+    {
+      "path": "Sources/OSwindCore/BackupDatabase.swift",
+      "sha256": "fe15c3f3678441672930c451bbd640c573c4665deb62b1031f784115a799d448"
+    },
+    {
+      "path": "Sources/OSwindCore/BackupErasureFence.swift",
+      "sha256": "a56f941ad3dda9e02d1572e9a2b3931b178bb94ac352007d3b3bcbd7aafcff96"
+    },
+    {
+      "path": "Sources/OSwindCore/BackupFileTree.swift",
+      "sha256": "85473f25d00b006b2e86f10b5faeabbb517f3fce9fdf9d134ed061e70f11f076"
+    },
+    {
+      "path": "Sources/OSwindCore/BackupManifest.swift",
+      "sha256": "d0cedd93dd3a29c779ecfb5e822e680dca5491f5919c727f14ca8fe924147585"
+    },
+    {
+      "path": "Sources/OSwindCore/BackupWorkspace.swift",
+      "sha256": "f6d4bb823aef7181d397ffab49ca8fba2a597d254f07c171a48755913ad551ae"
+    },
+    {
+      "path": "Sources/OSwindCore/BenchmarkLatency.swift",
+      "sha256": "bdb4444b7e6dd879a1f3eef7caa55558a7094b72647934c2e487717a55a49dd5"
+    },
+    {
+      "path": "Sources/OSwindCore/Capture.swift",
+      "sha256": "781b9027cb5abbe956da93494ab39e69faaa6b88d809d69eec23b7daf47efe36"
+    },
+    {
+      "path": "Sources/OSwindCore/CitationSchema.swift",
+      "sha256": "7b250df87468d195aafc48d1482f7c2e380c8733b04f6d9c261b73914b080479"
+    },
+    {
+      "path": "Sources/OSwindCore/ClipboardContext.swift",
+      "sha256": "51784657ab6bc848d711207518f3aec6b57e520a73495ac3b3baf3fed35d06ce"
+    },
+    {
+      "path": "Sources/OSwindCore/ClipboardReadWorker.swift",
+      "sha256": "c47907243fd551b8f39365dd9884c158055b9c4d8a8bca2396de06918a153e99"
+    },
+    {
+      "path": "Sources/OSwindCore/Conversations.swift",
+      "sha256": "cb9c8c34c10e62c37e2ed208011231f49f4c37824375846ac06dabdd2e91d131"
+    },
+    {
+      "path": "Sources/OSwindCore/Embeddings.swift",
+      "sha256": "fd594d819137a193520bd54c2d0643e6528e4105fe4e8855501e7ddd18a04291"
+    },
+    {
+      "path": "Sources/OSwindCore/Entities.swift",
+      "sha256": "f0dacc6be6acd2cd3bb1d8480ea1b0326d1b0fff3da1754c94253127be0ddb5c"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityExtraction.swift",
+      "sha256": "9ff104dcf6ac85b741c2297e6845d48af3abe15d727cd1b71ad8fa8181a13a9c"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityIntegration.swift",
+      "sha256": "9f4f65f4d1c7be158681cfce01cb1811c7e749ece7ba1055bd5dcebbaf2ddd49"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityNERDecoding.swift",
+      "sha256": "bde50783656a336f4994986a7db9dc0abe458dec35110dcffad5388a0350e7bf"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityScopeProjection.swift",
+      "sha256": "056222c88068aae4491d4b0727f1c748cf77a218882d71a5d27c16e756cb5ed5"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityScopeRetirement.swift",
+      "sha256": "885068b920f434f212cf8bcc8a4c561a89d0f50391584d1ea16a66a3a1e2d720"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityStore.swift",
+      "sha256": "c5594ed324cfb0c89a35d243b3aff83eb1d19bd3b79195dbed3b27b2e06259f2"
+    },
+    {
+      "path": "Sources/OSwindCore/EntityWordPiece.swift",
+      "sha256": "fb14f512d3da778dce1e18ddd3f8530c64bf128509394a1998f9f52377c804bd"
+    },
+    {
+      "path": "Sources/OSwindCore/EvidenceText.swift",
+      "sha256": "41a016ce937fe89a2cac2bc8333fe2ea4a63c0c0c232b74325a8f6c62b8728bf"
+    },
+    {
+      "path": "Sources/OSwindCore/FocusedWindowBinding.swift",
+      "sha256": "cb98e90b67942e6332f16e0f3cb10603e043da0e56da684c83772d58f0732703"
+    },
+    {
+      "path": "Sources/OSwindCore/FullTextIdentitySchema.swift",
+      "sha256": "18be02cf7fb9fbd1231b526e52c091eabb0dff10bd6370b02a7c77f6e1b6e0d3"
+    },
+    {
+      "path": "Sources/OSwindCore/HistoricalErasureSchema.swift",
+      "sha256": "a020f71d48104f84c5a5c337225fd6dd9535e646b55e049f8f0f0b0d6af6ea74"
+    },
+    {
+      "path": "Sources/OSwindCore/HistoricalEvidence.swift",
+      "sha256": "4f80329caa3b85f48c7ff3c60252f29e528a1e959f9058b29d85c4a60014b1f3"
+    },
+    {
+      "path": "Sources/OSwindCore/HistoricalEvidenceMemory.swift",
+      "sha256": "7400f5c71fbbb8d68abc75de4964b378ecdbd73cd4a8ce810277a1f0ac814bab"
+    },
+    {
+      "path": "Sources/OSwindCore/HistoryErasure.swift",
+      "sha256": "05b6a03f6c8e2357748f7b0b1a0660f3f67ae6edec073d52cfc06ab86d823c64"
+    },
+    {
+      "path": "Sources/OSwindCore/ISOTime.swift",
+      "sha256": "dddbd7ad9512672c65743e95751ddec5358a32d7761e13d5d3497ad3143e4fac"
+    },
+    {
+      "path": "Sources/OSwindCore/IndexPowerPolicy.swift",
+      "sha256": "4d4695c6f0a55e617661368ba37e43b3181e3335188510492bb2f6245ac30ff3"
+    },
+    {
+      "path": "Sources/OSwindCore/Integration.swift",
+      "sha256": "b75497018c0b0c96bd91c62b8709a7beecf6815a270463addb14d01880033b35"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryBackup.swift",
+      "sha256": "fc620802728b53dc4072d94b712052d7c41cefcf9c575b9f395ddc6b76f927fb"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryImportFile.swift",
+      "sha256": "0148e82c8bd38734728689e40ddc7dfd1fe8f1fb9f7ced92f03f49c4f8b00639"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryLocation.swift",
+      "sha256": "7ddddfc9354b7e9b52079f50e877f5f1dd3aec10c54b0ec2b961ffc334859fd9"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryProducerTasks.swift",
+      "sha256": "5f099669f2dd14c0f6f9f946259e99c38a31a993c02204eb9ad00608d9812456"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryRecovery.swift",
+      "sha256": "39d0140a67e1940deea91b54ad1c136cd35286df5f105c11847344c0f5cff86d"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryRestore.swift",
+      "sha256": "afd619c748070aa57b348ea0658fd3fa5fdbd05ffd9135359fa6ce6304f89d54"
+    },
+    {
+      "path": "Sources/OSwindCore/LibrarySettingsSnapshot.swift",
+      "sha256": "f83fd1dc2936ddd2f8cf94851917a50c7d2267320ff52c07f1ed762136e53266"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryVault.swift",
+      "sha256": "02acb81d9806c4438f3c49b7c112bacb04edd78e443c41e8e52bd8ce2bee8eba"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryVaultTypes.swift",
+      "sha256": "82868f5480838125dd547888b3828421379ad29026a0e37f3b3bb5b4d0b91128"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryWipe.swift",
+      "sha256": "cbf3afd600b7f35d7f079144df427a83bc5a07eef8c658199ca80396c8024c69"
+    },
+    {
+      "path": "Sources/OSwindCore/LibraryWorkspace.swift",
+      "sha256": "828df9d5328ec3f105855651454295fa8cf537fb4193e89f2183a3a7ab74089b"
+    },
+    {
+      "path": "Sources/OSwindCore/LimitlessImport.swift",
+      "sha256": "0df029c392ec14d9b9ef620333448b889e312524e77d779c4f5d9dc9eeb6333e"
+    },
+    {
+      "path": "Sources/OSwindCore/LocalDictation.swift",
+      "sha256": "185f1a856bd571770f896d1d28f7f02679918d3ec11bf44f78e6022ce04304eb"
+    },
+    {
+      "path": "Sources/OSwindCore/LocalModelPreparation.swift",
+      "sha256": "a0370c328801642a5fce6e5d683538560f696407fd584a04ab8366f73b6f3ced"
+    },
+    {
+      "path": "Sources/OSwindCore/LocalModelServer.swift",
+      "sha256": "ebde3c05720d0d6a6e70e18c374f50625d7a2c89fbff772c0ffb0ed425fc9503"
+    },
+    {
+      "path": "Sources/OSwindCore/MCPClient.swift",
+      "sha256": "368c4d9cd340c394db6b719d0148e7869d0df80faa8b9788b61e97144b5682bb"
+    },
+    {
+      "path": "Sources/OSwindCore/MCPConnections.swift",
+      "sha256": "d94aabcf2fe307fe02fbacbf123037a1a2b8322955e63acd0a38a230dda4afbd"
+    },
+    {
+      "path": "Sources/OSwindCore/MCPJSON.swift",
+      "sha256": "c3580f3408afdeabfe19d617f6b4c2aeb00c619b238ac3ddd58ff87710f4fcca"
+    },
+    {
+      "path": "Sources/OSwindCore/MCPWire.swift",
+      "sha256": "27b1a0096803f3cf40839e0c5c284f36f80755c772ad3282171b62dd67885bf8"
+    },
+    {
+      "path": "Sources/OSwindCore/MarkdownExport.swift",
+      "sha256": "47ae85f442913cc9b35fe14c0670a9097e30cba47cdfa7f3bfa7c19d6696f7da"
+    },
+    {
+      "path": "Sources/OSwindCore/MediaAdmissionLease.swift",
+      "sha256": "60ab2ef6b420782ff61a44309e0981f707df22ff589a3e0b0f7a344b75f0ccb0"
+    },
+    {
+      "path": "Sources/OSwindCore/MeetingContext.swift",
+      "sha256": "583e9a055fe556b2cc08e9579f6656e12e6d51062e7d2e1ab2f6878f31d1743a"
+    },
+    {
+      "path": "Sources/OSwindCore/MeetingReminderLedger.swift",
+      "sha256": "e83932490eced9389d7beb7279656ced1016e29720b8c356447a600398ab99f6"
+    },
+    {
+      "path": "Sources/OSwindCore/MemoryDeletion.swift",
+      "sha256": "548724feb375ccc5f1e5db43bb310429c9dc7264fa8432ca0f5361980f37a7f1"
+    },
+    {
+      "path": "Sources/OSwindCore/MemoryStore.swift",
+      "sha256": "45cf99329958db29c1fa116e10124b24eeef70405b0871a9f17f5b521d432901"
+    },
+    {
+      "path": "Sources/OSwindCore/MetalFlatIndex.swift",
+      "sha256": "bc123b38261efd5f80e7ec2c48c853332bc6f6d9130b6bb54eca082f532a6bc4"
+    },
+    {
+      "path": "Sources/OSwindCore/ModelRuntime.swift",
+      "sha256": "2b4e5ac4c6abcee453a7cc164e065c0bd42df8766dbc58fd2f9ef75ef4646179"
+    },
+    {
+      "path": "Sources/OSwindCore/Models.swift",
+      "sha256": "3530d5dc4ea6ea7cceb19bc6c89d2c904ff9e0dfb1af1761aa828ff5df65afc8"
+    },
+    {
+      "path": "Sources/OSwindCore/NarratedWorkflow.swift",
+      "sha256": "d427c0ddcd8831101795b9d24ccdda17a9415d4d650de22e9ac83bfd97ce7298"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeANN.swift",
+      "sha256": "895aa13b59f1574b619d8865a76347c4f9e8d5d204f4babd27a4061c1463b844"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeCaptureConfiguration.swift",
+      "sha256": "43ce19f6579b227866fcc559155973698891c86c12fac02ddb0d0c0d959838f7"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeInputActivity.swift",
+      "sha256": "adec639dd09a690ac931c9f2e3a3611cfdfaef6816bfe5f98b42068da89017d7"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeMediaSchema.swift",
+      "sha256": "6a2a9934ee8c9a0e6927408e405210698a151f94b5c83a9176a1df1a1bfd6408"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeModelCatalog.generated.swift",
+      "sha256": "643ab764d24589e8e46b30d8407d0de6160b6006b488d8b66347c77e6bf85c58"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeModelCatalog.swift",
+      "sha256": "65dde4c00546a7af26b961304edabff0112572bba465a82ef2b2c42dda419bfb"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeModelHTTP.swift",
+      "sha256": "103297692afd0bb39c2c047cc5bc03b37f64c0a0384ef0bcc1ed1fa96e28cf7b"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeModelInstaller.swift",
+      "sha256": "2eb7e4e516557006554fa9c311abb37136b32b0f4ad7e4d5c981aeb8b5af2001"
+    },
+    {
+      "path": "Sources/OSwindCore/NativeModelRetention.swift",
+      "sha256": "e71275f86a019e348811db4cd8dca1eb19dd06476c092142d98843f4f314706c"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIDecoding.swift",
+      "sha256": "9ab543367e843f6421749fceeafef5fec9f49ca4872751a0c60692c7c6de4a52"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIDocument.swift",
+      "sha256": "0e682b31c01e2059a9313eefc256f61f540d0e6da5512df4f03355ecfa5e1c74"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIImportScanner.swift",
+      "sha256": "504743701ea043c4e774d2566ad71a75a7ad4e561fca82ff0be32076a90bfd48"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIInspector.swift",
+      "sha256": "c11bdb367960b6983396cd1918be3127200f19e5160b4439f9b0ca8e0461e11f"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIModelPreparation.swift",
+      "sha256": "2681b07976ad5716bbea58c47bf7c24a0aa31fd522820fdd1834cd0d80571761"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIScanRecord.swift",
+      "sha256": "13103b55e45b2bc735fa016140ed71c2117f1ddb332a3fd19c5c9d53f2fb670a"
+    },
+    {
+      "path": "Sources/OSwindCore/PIISetupCatalog.generated.swift",
+      "sha256": "680a8868179ec4238ff4b398d82d968cb721203a4540506f70f8a198276beb61"
+    },
+    {
+      "path": "Sources/OSwindCore/PIITokenizer.swift",
+      "sha256": "3f96940e65893d9e8ac6ae882506c1cc667353042f1ebed9c7866d4e4528674e"
+    },
+    {
+      "path": "Sources/OSwindCore/PIIWordCharacters.generated.swift",
+      "sha256": "7828bb30c29306e04507065e66d255c0d814b2785fa819348508c90a92c66518"
+    },
+    {
+      "path": "Sources/OSwindCore/PendingMediaCleanup.swift",
+      "sha256": "ece8c7beecbb2b20d0e29432cad5cb5753a14164cc65b8dcf9a8102663a0dc90"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncCrypto.swift",
+      "sha256": "b2db87e8d28743b8f39aa5fe3fb0aa4958c4c18a910bbf6f203f4aa440f0a274"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncFolder.swift",
+      "sha256": "b43866fe7f2429ad3007f5f15f9124e55a60f88870c2e823ab21bd5efe2709b5"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncJournal.swift",
+      "sha256": "a55ea3cff915dd9af3d809cc478a8c2a5c6e4a6ce02e6801b73f374d68359b60"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncLocalErasure.swift",
+      "sha256": "44882343f8a19524abfa86bdf81c06b0f6d58c695c395765499418308dbf18b7"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncMembershipUpdate.swift",
+      "sha256": "bab1d9332537d800890078a66311779e824d25099d146cf6748bc5aa0cad7a14"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncOwnerChange.swift",
+      "sha256": "28b5e9183ee24e281326c099a887e470d924d06ded49e6267a19330ec20e3af5"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncPairing.swift",
+      "sha256": "940bbb9af27177f3f1f15152c7c92370b49b7b65d8eba718575b4f32b2349ab0"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncPreferences.swift",
+      "sha256": "72d3c604138fa7c5166ae55fde064cc35a8f7e0b9e90a4d124cfb99e3001698a"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncProtocol.swift",
+      "sha256": "f7fa7f5a3c7eee9e5ddebf84b0b44a21dc9bf38a1204466249ce7040e4e06e92"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncRetirementRecovery.swift",
+      "sha256": "f42087a38f323ed672d5a062dffef8f8fa27103f1b5f831082cc85d5b6999db0"
+    },
+    {
+      "path": "Sources/OSwindCore/PersonalSyncSession.swift",
+      "sha256": "62f5cf594cb8b72910d790e752c90c341850635834a0f626307608c2ee2fc7d2"
+    },
+    {
+      "path": "Sources/OSwindCore/PreparationProcess.swift",
+      "sha256": "00d9cedc6ec675f0594d08717704a3ae60a453c9f22243e6c42f32a981b16387"
+    },
+    {
+      "path": "Sources/OSwindCore/Privacy.swift",
+      "sha256": "0e6023e823123fdc66da588f63a73e42b98ada3131f23c92301435294d2f0cae"
+    },
+    {
+      "path": "Sources/OSwindCore/QueryScopeResolver.swift",
+      "sha256": "af1f569bb23f6a6065566451d94348f7736fabdb4b89986e809ae8e51939fb1e"
+    },
+    {
+      "path": "Sources/OSwindCore/Recap.swift",
+      "sha256": "c430a9f898efab1ea30f180277ecaafa68f74800f4bb1f2ba76472537b66fbd0"
+    },
+    {
+      "path": "Sources/OSwindCore/RecapInterchange.swift",
+      "sha256": "3089e8501ee539bbb4569bc1ed2ff647d7c5a076ae8845e57bf9f3c2f05f55a2"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordedMeetingSchema.swift",
+      "sha256": "81d2c802ec976d4e5338e79dba1ccd13d069c200a4f3237a26d296710fb8dae4"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordedMeetings.swift",
+      "sha256": "74c11c54fd94d9aeae057fa8ac7a4da79c2b2f47571b444a7180ee690dc02bc6"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingAffiliationStore.swift",
+      "sha256": "a57b2f86d52eff33a41b42749d0d3d7f7c33c6cd0b30cf72abc04d6412d8033b"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingDetails.swift",
+      "sha256": "82b3ca6abd73f606f787fdd93ae1665122aa533e3fe9b9254595014df9e4183e"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingDetailsSchema.swift",
+      "sha256": "ed97e72e0a74d5d3c910a1905e4eb06cf4771131f5834b2ea0911980591cd2d5"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingRelationshipIndexes.swift",
+      "sha256": "7312a77a0e965ab9e828283e3b56d3fe77109cd8a7e2cd46ded32db92e4ab950"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingScope.swift",
+      "sha256": "766323c6c9d1e31769fc3ba0730cc194779d73358796799db8afbd2507ae3db2"
+    },
+    {
+      "path": "Sources/OSwindCore/RecordingSessionNames.swift",
+      "sha256": "a483a33d0e0b91b1f58f9a600398f87f37e8e75f1a01505a68be32483835ccc6"
+    },
+    {
+      "path": "Sources/OSwindCore/ReplayCaptureSession.swift",
+      "sha256": "96b610c25c741e7e97bc63b7d9c5ff549046b087d5faa64f5e28b95e9fc1240c"
+    },
+    {
+      "path": "Sources/OSwindCore/ReplayCommitGate.swift",
+      "sha256": "90420594252a7abddf3252f19695f4d2ba455cff72b23dfe43ac68ac3a2f992c"
+    },
+    {
+      "path": "Sources/OSwindCore/ReplayContextMonitor.swift",
+      "sha256": "c5037cf243dd34bc0115bd132853fa12c0dd4f01b7e5b50854c48394cf32098b"
+    },
+    {
+      "path": "Sources/OSwindCore/ReplayScreenSource.swift",
+      "sha256": "90212e2f37045d2f780899f7f5050c0d7123bdcba3c70d80619b62fb36a8bca5"
+    },
+    {
+      "path": "Sources/OSwindCore/ReplayVideoEncoder.swift",
+      "sha256": "fd761fe617ecaf6046f9ab2528a27c980ec62079d625756f29b35b93810758b3"
+    },
+    {
+      "path": "Sources/OSwindCore/Retrieval.swift",
+      "sha256": "9b91a03618865b8db82440c57b091dbbae2bb90888f7711d2101aa3865517674"
+    },
+    {
+      "path": "Sources/OSwindCore/RetrievalEvaluation.swift",
+      "sha256": "a9c065bb57867566f7b0a124ecb096d8ecb686944471b47be42e6c30bb0b6ee5"
+    },
+    {
+      "path": "Sources/OSwindCore/RoutineRunOriginal.swift",
+      "sha256": "f56bb16a2b97539e89192d8384822694ce0a34a8887f3dbee0154abd63fe6204"
+    },
+    {
+      "path": "Sources/OSwindCore/RoutineStore.swift",
+      "sha256": "67a7195b21889074d4632b016e705faeef07b78a00f58aaf91855f824022fd4e"
+    },
+    {
+      "path": "Sources/OSwindCore/Routines.swift",
+      "sha256": "505ebd7956baa0310c49014b4e9938bbe3e1b69d5385ebb9841a0bcbe0bde3c6"
+    },
+    {
+      "path": "Sources/OSwindCore/SQLiteSnapshot.swift",
+      "sha256": "08118c751b8a55100b31a2b0a723d77c232045c3b229d5050be556d0a117cf3c"
+    },
+    {
+      "path": "Sources/OSwindCore/SearchExpression.swift",
+      "sha256": "d66a2ac3a40aeb46cac9cea3b76791e24618b64f5b83c4bb82c946cd0467c862"
+    },
+    {
+      "path": "Sources/OSwindCore/SearchPreview.swift",
+      "sha256": "bbe7529740bfea7cad7f008cce4b21d8844a45280cd2679c7139672afeb84f0a"
+    },
+    {
+      "path": "Sources/OSwindCore/SearchScopeSchema.swift",
+      "sha256": "2f4f4f56a015dd2187c9189c4bcbc1db992e753bfec74e597fc4c6f518f7a083"
+    },
+    {
+      "path": "Sources/OSwindCore/SemanticPassage.swift",
+      "sha256": "a63995abf63ecead46dcd0b7bb3f74f43652fcb18f82435f4819d6a9e4af3f66"
+    },
+    {
+      "path": "Sources/OSwindCore/SnapshotCaptureSource.swift",
+      "sha256": "5e1211fb563ad6a893ed02a7d51b0bd74a5e6962aca345bd76c49c9b9c91e605"
+    },
+    {
+      "path": "Sources/OSwindCore/SnapshotRegions.swift",
+      "sha256": "77f90489ca9d442870e75420a05845a85918750fd1d94e6cae71c9239ef30d83"
+    },
+    {
+      "path": "Sources/OSwindCore/SpeakerAttribution.swift",
+      "sha256": "f82fd0ba580d5068767fa251168677bb1e05639a01985ea91b5af699713ad4cb"
+    },
+    {
+      "path": "Sources/OSwindCore/SpeakerDiarizer.swift",
+      "sha256": "4b1811aa5d5acf04d7269cd62c95bb92fd9cfbd973087c606c6fa3965de1ccb5"
+    },
+    {
+      "path": "Sources/OSwindCore/SpeakerSearch.swift",
+      "sha256": "b954b3a000d942497a2666c952411f0c30a5fe4be7e1c11c5433aeca3be8ccae"
+    },
+    {
+      "path": "Sources/OSwindCore/SpeakerTimeline.swift",
+      "sha256": "e564e7f5f6958b088e8b1f52e9da053b7afda28bda442ad7baefc19f3a79a4df"
+    },
+    {
+      "path": "Sources/OSwindCore/SpeechRecognition.swift",
+      "sha256": "73d76eecf0fc1a94ea8dfd3d3f89771d730e456d82a5ca8d5f869395d814127e"
+    },
+    {
+      "path": "Sources/OSwindCore/StatisticsEvaluation.swift",
+      "sha256": "68f3c93dc5757f18f57d2ff6108758f34d0288bd10f29070a9346cf97c3f5f68"
+    },
+    {
+      "path": "Sources/OSwindCore/StatisticsSchema.swift",
+      "sha256": "92379218d454a422c4025f309310e994e13cd984e832559d3059e09b2763c0c3"
+    },
+    {
+      "path": "Sources/OSwindCore/StorageUsage.swift",
+      "sha256": "fb52672977814a2379bd0af725961dd45af34a6c1769666ab7415cc83ed0ee22"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncChangeCapture.swift",
+      "sha256": "bf895cd7e1e86575c4b2151df9f068647253d87491d09fbdb2dfa9860b85f433"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncCollectionControl.swift",
+      "sha256": "6c59c6069a83dcd0c10dc58fd08707106e10c5a4365882d845fe94515c63e073"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncCollectionHistory.swift",
+      "sha256": "92a322ea51bb1bfa0e87247a88ce0af3b4c7eefe634e42e2cc73ab293af9798b"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncCollectionReceiver.swift",
+      "sha256": "99e4c51f8794f55ac276addfb606353709474b061dff55da02fa30ced5946024"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncCredentialBinding.swift",
+      "sha256": "9798445899f9ae8aa964050f158258d945ba1ef62f2ae9e87c73502f24ff089a"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncCredentialStorage.swift",
+      "sha256": "77893bcc75eb9373a3ee451687af795ae7dd9c711983047935d4db641b3e18af"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncDeliveryAnchor.swift",
+      "sha256": "fa990394958f89c252d2b3faf6df9a8a59cfdb707331e33619a1682d0a1aa1b7"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncDeliveryApprovalReference.swift",
+      "sha256": "a66f0da5859abd881297494f4a8ea67db26a65aebeaf7355db3747e37c2a9742"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncDeliveryRetirement.swift",
+      "sha256": "dc67113febb67b137404abf2eeee6ed1d28b01f5f8c61b60a0ad51dcc1006a28"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncDerivedRetirement.swift",
+      "sha256": "d2c16ca574fa850aae34bd53c6ef2c821b7b46d8d2a3582dbb7288cd4839d9b4"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIdentityCatalog.swift",
+      "sha256": "cf4a937c9f4bf7f355166d0430d842e039352b8ec97afe7651f60d55a9618344"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingConversationWriter.swift",
+      "sha256": "cbdbe383f7668a441373eb0052820759fab4c34a8152cfd860f4e81d7a910cdf"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingEntitySchema.swift",
+      "sha256": "975f70d1068b1a1f4e77ee337d96dd281b38974e5651a636e9a33a2a170c859f"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingEntityWriter.swift",
+      "sha256": "554d5a9a0e200b76f58454ee203762b56ad5dee17bc458dcee7cabc5fce80990"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingMetadataDeletion.swift",
+      "sha256": "dbab79d286bb27de52e16b44561b473c6d0e7d37241c5af2434e9ab9d93b6d15"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingRunProjection.swift",
+      "sha256": "a7614ed30d0ed3956594f0ff5aa34cf54f5e3dd9b8c04eb698642841a61be75d"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingSourceErasure.swift",
+      "sha256": "6f65586331ac7f5e25d6e2cebac67d69afbdf70491ef9b56d0801379a6448927"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingSourceProjection.swift",
+      "sha256": "4404fcf7b13ccd50a973f5c22bb551a606079497198d9dee6c47786eb9e3a8c2"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingSourcePromotion.swift",
+      "sha256": "c1d49ad90439735637fbb1a8c0bc4342e0849c6c8944258cded81e00f2b882b2"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncIncomingSourceWriter.swift",
+      "sha256": "79b040c8b47a80a0f1f42f9cc40adb6cfb533f66e8eb8b80ac6501769fb8b441"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncLibraryContext.swift",
+      "sha256": "d5fd4b9a8e22a2b6ad6e015c54052a01c22c5b310b6c1756ebc9a89037a40945"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncLibraryScheduler.swift",
+      "sha256": "b70e80b893cc8e9f7d3a62c7e03afc40763c79c51034f555b84bebb7e9c19631"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncLibrarySender.swift",
+      "sha256": "73c779ce3876cc64a5252844d51ca5f6f69022d87bb581b9d6f18b80418e258a"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncLibraryService.swift",
+      "sha256": "57f1a75e9d2f858bae9fcc5665f7b174c0c7cce371e7d7a99f11a25de2bea621"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipFloorOwner.swift",
+      "sha256": "b79e7ef2eaaf106d98a22b6c3dad48513f5ff64112887f58a3bcd485e7525d04"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipFloorPreparation.swift",
+      "sha256": "2c6be531f94ead6e1c4de7c0c8c349a168c08c8858bb9a09cb1f1db174bbb263"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipHistory.swift",
+      "sha256": "6393efcce632ddb27e40b9fd1b9796554b9525b3a886fff2766d7a192aa6c328"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipPreparation.swift",
+      "sha256": "30ef9b51bd87100dcb2affe68dee1ca713da37b9ae17ada5df4d7747a277ce66"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipPreparationOwner.swift",
+      "sha256": "70fca537b6ab53b0a1748861cfb3da6e85483c5e8bc0589cfeae7835c2e27254"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipRefresh.swift",
+      "sha256": "eb4ce712dd7c5fb67aaaf70bad32ef38153170f883dcc6c71ec8e1f0a4d9625e"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncMembershipReplay.swift",
+      "sha256": "1940eebee184e3d185ccce9dae65d2d9ba6ff97b5d35c1e4be325ac72d456212"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncNativeCollectionReceiver.swift",
+      "sha256": "f072be1c6d13ef6dd35698f41fe19bff64e5640f8f6a0531c3be5f5ab42fbc80"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncNativeLocalRetirement.swift",
+      "sha256": "a6d3ecb1d480e79ece5d3f9464814196122f4eadca1732fb8fb60115f16b873e"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncNativeWriterAdmission.swift",
+      "sha256": "9f12c8ee3f32b11fa094de65932f84ae7385863c7a2bc1c73435b3380f7c7d88"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncNativeWriterEpoch.swift",
+      "sha256": "5429c489263da0789986b54b5357efaed7322299d42624594a5c1d2de80c1453"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncOriginalEvidence.swift",
+      "sha256": "8c8e5557ac51c643b877ee8e4bacf649cad47a2b6cba2182b6ce61a50d17f80e"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncOutgoingProcessor.swift",
+      "sha256": "e89c2464056614e7ceceb01bbf2b8268077236caffdcef90d056129323b96b56"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncOutgoingWork.swift",
+      "sha256": "c114999239de98221d0a77edc892b01652d4e2605ed1f3d72f5e8b77b6a4ad48"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncOwnerApproval.swift",
+      "sha256": "2679f676d3cf91f93b76e9b27a10a170cb316d80ce9c32a252eb7aaa75fe8f58"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPairing.swift",
+      "sha256": "20ffc7b0b1f71ede79210cd80fd4120a20d653535e5e41fd0c622e0a89bf8667"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPeerSourceErasurePlan.swift",
+      "sha256": "99ee16a4ee4b4595ea8089eb81b4c0f702b49f5e7b26af0033f25dce86016a7b"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPortableExporter.swift",
+      "sha256": "9a7c1bc85833223ec89d93714820d75292459790a4c40cf2c63ae32870b4c723"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPortableRecord.swift",
+      "sha256": "a019580f335043295c8e1aa529734020d8257d7783bf4cde06b1e0d9a37a4821"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPortableSource.swift",
+      "sha256": "1d2b5933be867927518b54235a2a8e23347603e85e6e7473d36ccfdb360556ae"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPublicationAdmission.swift",
+      "sha256": "a24c3b9f0d469cf93f4ad5091b7dcdb30b09f733683067f649be4fcb0aa7e7ad"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncPublicationQueue.swift",
+      "sha256": "0fa536527a8890cc37c459553b5e576177b25f14c8b905602d429e8c591f6ec4"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncRecordingDetails.swift",
+      "sha256": "d341f4e869e3046abb6d7ebcd3801e1f556073d15cbcfc617e4ee6e76462cd26"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncRecordingScope.swift",
+      "sha256": "2478118921a9047dfe39c6ecdef64ea5a0436e639a075c9777735b22a1460150"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncRetiredDependency.swift",
+      "sha256": "0da692272d053781429e138e5dddf56bd54576a25c3a27cb6a5dd4a7b141e2ea"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncRetirementCleanupOwner.swift",
+      "sha256": "c0597bb6495f723f68dd49facb0524126c2fb6c99be65ed49e6a1ac489acb890"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncRowSnapshot.swift",
+      "sha256": "8711f0feec67ed1bb17743bcc01e82ecf43bd59dbeb9c964d4f5bb452283205e"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncServiceHead.swift",
+      "sha256": "cee1eb66da4d813486d125ee281e9cfea1037bea7c289ec1f82abcfb0c313de1"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncServiceMedia.swift",
+      "sha256": "dcabc768a33957c9845b7df3fb86ee83dcd10a9e91e1fa117cfce785fdd85c64"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncServicePolicy.swift",
+      "sha256": "bbb0daf700b59111240f6571eb936607a68e3a44a74bd8c2498b364ced1f2505"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncSupersessionProof.swift",
+      "sha256": "43a0a9e663c1141e3b18e86fa7fae7df01de05379ec19d01f577aca5fa3dc28a"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncTurnPublication.swift",
+      "sha256": "33bae2ea0d389fcfc6f09e9dbd7674fb74820b5461892146fbe26c9fb88a89f1"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncVersionStore.swift",
+      "sha256": "2814a6d64049f206b356fea76931915e012c81f4801d8e39b78882627b680b72"
+    },
+    {
+      "path": "Sources/OSwindCore/SyncWithheldWork.swift",
+      "sha256": "f385d81aa853f167ef46eab7cb107dce5c42e7ce51443a3799095a1e19b7bd0b"
+    },
+    {
+      "path": "Sources/OSwindCore/TagIndexSchema.swift",
+      "sha256": "3d7503d986549b2b75134936eb60d2c9280900558511d92abc6f3eb45e7e9ae5"
+    },
+    {
+      "path": "Sources/OSwindCore/TextCollector.swift",
+      "sha256": "040ae99727177015b9b42cd2f7174b1c1287cdc5655b99b600b4599f123288ae"
+    },
+    {
+      "path": "Sources/OSwindCore/TextObservationSpan.swift",
+      "sha256": "56d9087dc8880a7b0822b1b127a4a92a2d289aea1e64a8f286c1607bf61cf9c2"
+    },
+    {
+      "path": "Sources/OSwindCore/Transcript.swift",
+      "sha256": "911a35868c78aa36df694763f77d1c391f4190105f6954e7d930c33ca40670a5"
+    },
+    {
+      "path": "Sources/OSwindCore/TranscriptParagraph.swift",
+      "sha256": "dd162a65c8ae82e885ebcd3a6645fa77107a3ae8ff75554084a2193ee1e55e0c"
+    },
+    {
+      "path": "Sources/OSwindCore/UnavailableEntityScope.swift",
+      "sha256": "a72578f365d1a7191c9ccb1303125bc0c20e67d14170a2c87dfc67e8a870d4e0"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultAccess.swift",
+      "sha256": "9c7693cc0d362eb8a8367de7ae04c0479623fd18043d9334235db7552f5b8ed4"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultAttachCompletion.swift",
+      "sha256": "364c1d6ebad648fde6c26f70d5debd8a8a496d6b262c8bb65957ec9ac522b344"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultDetachSettlement.swift",
+      "sha256": "7e1774f449bdbea1229c8412ec85d9488284f10ae96f2817d63e846ed5effade"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultEjectTransition.swift",
+      "sha256": "832129619fbff7193cace2b89a927aa3a04f61bf6b086080ee29d3c10baf6b52"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultNativeDiagnostic.swift",
+      "sha256": "1a3036445d2a0df23bc0caa2cd4a589d7217a7ff3fe610e22fa72287a45f02ad"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultProcess.swift",
+      "sha256": "ce3d8b0db669c37fd86c5a556bae383dde5c524bdb6c59d40bc26f0c046cac2c"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultReadOnlyQuery.swift",
+      "sha256": "9d40580c78df0903bab6fcef3f3084f56ccfe369acaf3b2a74b6869f8cfa585a"
+    },
+    {
+      "path": "Sources/OSwindCore/VaultSecrets.swift",
+      "sha256": "82a8af54df1ec41e3d30af1f946cd515780809249d79b74c9d5a0eda101318bc"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorCandidateSQL.swift",
+      "sha256": "5fc5b2c48b7c72741b11674f620a6cb12be256f202ddf36b1abd3dd1bd6da5be"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorIndexSource.swift",
+      "sha256": "8f27bf49c32e7ee1d63b8fc908e205d4b3eb9bc9eb302910297a3868b23062e5"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorJournal.swift",
+      "sha256": "efca977226dba5fb0f764b88a74447f39bda2eeac65b92a88ad76f4107f106c8"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorScalingEvaluation.swift",
+      "sha256": "4f040b29cbea54667a5744a9a7afcaa235a723c33295baf6a84b5433437db46f"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorSearch.swift",
+      "sha256": "b902b1d01214ebd3e2b7f634313611df0b7b15f8c2c8b7f428fc772c3ca2ffb8"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorSearchBackend.swift",
+      "sha256": "5029c109ca7ba834567cd744669c8c09ab634af4e746bec89305955fd32cd09d"
+    },
+    {
+      "path": "Sources/OSwindCore/VectorStatistics.swift",
+      "sha256": "0e63807187513dbb8ce49020970777bf09cd99b760f8b2ce83b651ad7fa1b12d"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualChunkRecorder.swift",
+      "sha256": "3dc96225e6484f0bfe7b6ac652995798a7469401133bc7413a6477c3829423a0"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualEncoder.swift",
+      "sha256": "21df9c23d8cc2ae4532452587f2e8497aded5dd664ee2e9535b4843a07977117"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualEvidence.swift",
+      "sha256": "c19430c93dedebb38d526e24c8552253758992dad108bf5f0f22eb808f6c12ff"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualImageInput.swift",
+      "sha256": "90c01b43560efa1ad6379bc8af8add56f1775b613e4a2cbeabd08276f803f8c9"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualImageSnapshot.swift",
+      "sha256": "bc906d69989d04ba9ec18f5fed5bace42e24e81451f78dcba84b9b836a24efdb"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualIndexSearch.swift",
+      "sha256": "380e722bac40a92d58863a5e297bedb6cddf0f68341eabd7ddb6f4a1520abb7d"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualIndexStore.swift",
+      "sha256": "7e9ac01952f2b2581b537961335257a392884534f61ae58028d3182ee9416a41"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualMediaSnapshot.swift",
+      "sha256": "ef3df8f77992871a4173419f77f2f51ca89dbe0e6247ea364902d42f99665a85"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualMemoryEvaluation.swift",
+      "sha256": "9ffef54135d3e918dc7a8616e5958572459a70790d2f967efb43b863fac5ee20"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualModelBundle.swift",
+      "sha256": "f4c1848c3c8318928d0fac880c3bb481095fcffed526586c05e76406f15f5d94"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualModelPreparation.swift",
+      "sha256": "dbc130ce298eed3a6646914030f64b029d020d4beeea921bc459f435870f848c"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualOCR.swift",
+      "sha256": "8204288e028c4ccf58940c3c51ac26b03064b05504c52bf4188ed26e62bc466f"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualPreparationCatalog.swift",
+      "sha256": "9bd757ae173998a33829938c3325734142a3cb71e6dbd421c22c43699df39446"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualPreview.swift",
+      "sha256": "ea94f9f74cbc77b9239f3d768863f490b46792f01a74de2278a8176de254c74b"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualRecording.swift",
+      "sha256": "ae162c7efcb70840fb575f40d6208317e4ae87333fd30e6b72bdecce322a6d6a"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualReplayBenchmark.swift",
+      "sha256": "ab57d2dcff8147b3a5635446895f4966137164d3d16bd89d234556875a6a1534"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualRetrieval.swift",
+      "sha256": "22d99e3e7b5d9a2feb9fc59a2d61cb48f6ff3c8ea52bc3db1e66bc6fd9285354"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualSourcePlan.swift",
+      "sha256": "82c01af04a081d8a3acae9019b0f2dbf9d28162c03b6ac8efec542c56a92bc68"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualTokenizer.swift",
+      "sha256": "f84910817ba769ab76673e8fe835d0278d20c48d4affcc9c0cdbbe26dda4d26e"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualTokenizerData.swift",
+      "sha256": "1d97acb89b4990e6ef135107e2ca3ff4a125128bb9556a7d9c949ec4160572b4"
+    },
+    {
+      "path": "Sources/OSwindCore/VisualVideoSnapshot.swift",
+      "sha256": "a62857870ddfd4cd6857dc3a9a3ad0ab3c75f02b5e21480cb4ac387a6e4a41d6"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowAACEdit.swift",
+      "sha256": "129e2c08c207eab38602ca2be367958e25f81421e1f6d32e8c1c9803039ad1da"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowExport.swift",
+      "sha256": "742c6ec1438aa687ea9607f0d971932a3640f3f75bba2bc30c66ac7cd6ed1e9a"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowExportFiles.swift",
+      "sha256": "f1b1a253e429cdf6dee285fcabfff128bd5eca48af9dcae6ac6c4ba0a337dc4c"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowFrames.swift",
+      "sha256": "486ea08a0bef09981caa6699cb5bb1208a219671e702c5051fdbc4d9bb7825c8"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowMovieVerification.swift",
+      "sha256": "8935c5089a65109f7b8ced50fe190ff51c077f42159d86af3d6e4b19d1ea830a"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowNarrationAudio.swift",
+      "sha256": "d46a27c6f7c559790b5fb9a4f2f5545a3665232bf271afb261680a758f5811dd"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowNarrator.swift",
+      "sha256": "c6c28124cbf25b9144bd7806203050e02764ca7b1756069402e2ff0d59505b3d"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowTimeline.swift",
+      "sha256": "f8271f7b5f1d16f12ee114003044f71e8d0a59f4982c8903a00e1f4840311e79"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowVideoFrames.swift",
+      "sha256": "66e9508d575aa6c21b669424330bea13d1da9205928b8a65f6e60f8b325dabe0"
+    },
+    {
+      "path": "Sources/OSwindCore/WorkflowVideoMux.swift",
+      "sha256": "226720858408d2538e63e6e72e95ed31688f2d524cbb49405e8354513bae9e97"
+    },
+    {
+      "path": "Sources/OSwindPreparationGuardian/main.c",
+      "sha256": "5c58c687f9a554091f0a3bdecfc925e280868a82f666bc8c3c3e543b71035bc1"
+    },
+    {
+      "path": "Tests/Fixtures/AudioSourceFixture.swift",
+      "sha256": "9646a36d4c8a009a0df9c7f27839f28ab00a33f22d340e98629b87a46d22c27a"
+    },
+    {
+      "path": "Tests/Fixtures/CaptureFixture.swift",
+      "sha256": "c272ea3c859004eef9499edc9baaab7b73c4aaa2db74868eb9fd2f96d490eaeb"
+    },
+    {
+      "path": "Tests/Fixtures/CaptureRequestParserContract.swift",
+      "sha256": "2dad757a140696e9e4414774aa9bddb55e0ff6789e26e62951afe419cdfb4064"
+    },
+    {
+      "path": "Tests/Fixtures/ChangingCaptureFixture.swift",
+      "sha256": "5ab7b857064fe3e1762ac121aa4e0db87ac3daa10e3135fb0f9b500336f1a3a0"
+    },
+    {
+      "path": "Tests/Fixtures/VisualPreprocessing.json",
+      "sha256": "1dae9ca91168fe36462d5c9cea1430cb590a415ddc3e094dae7321738bdec37b"
+    },
+    {
+      "path": "Tests/Fixtures/VisualTokenizer.json",
+      "sha256": "331906c4cdc95b05ef7ebc38773936ac7ba522985c53bb0d0180c9db5ebf02d8"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AccessibilityCaptureSetupTests.swift",
+      "sha256": "05720a47a48f44a2fa20980e4286bfed3585aeeb13eb4ebac9e8a4eb602be63d"
+    },
+    {
+      "path": "Tests/OSwindAppTests/ActivityCalendarModelTests.swift",
+      "sha256": "e58e41c0a4584dfc995938e0931889f39161a578b97e706f295d78b6297a9525"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AnswerLifecycleTests.swift",
+      "sha256": "04cbad28068bceb158e84e085b7f868903978e6015f050a397e17f903699b428"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AnswerWorkVaultTests.swift",
+      "sha256": "950e609c49ee48c2f27195da94517458bc9fc28ca5cd63f7470d10d4de5733e7"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AppOwnerVaultNativeTrace.swift",
+      "sha256": "7911bd9d08a2514f16d1942db305e2506740a3455bb5da7f6a8f8bcc72eba9e7"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AudioImportLifecycleTests.swift",
+      "sha256": "be512f02251f9ef69446620507e7831c3dbd9bdbfc82256aba5922d76de28445"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AudioImportWorkVaultTests.swift",
+      "sha256": "d8b90905653c0b8899f0939de532f4974f9567f30e8fbbe63238d04615eb5ce4"
+    },
+    {
+      "path": "Tests/OSwindAppTests/AudioPlaybackTests.swift",
+      "sha256": "fe6ae4e1d231f4ca480c76fbae4cb936d96767fc4b36738dab4939834d032f83"
+    },
+    {
+      "path": "Tests/OSwindAppTests/ClipboardContextModelTests.swift",
+      "sha256": "8a1f7b1ac7aea0f8339a7c0ee5d4cb56a826f35ab619eaf7e27fda7267382362"
+    },
+    {
+      "path": "Tests/OSwindAppTests/ClipboardWorkspaceTests.swift",
+      "sha256": "8f6e032818a924dab04e15a256e57b88f7add154a36dc9ee8fd76d90517a5246"
+    },
+    {
+      "path": "Tests/OSwindAppTests/ContextualDraftTests.swift",
+      "sha256": "c3b0a14483471d9670da9296bb12df5dd1a2444aad0d1565c42bcbdba06fe89a"
+    },
+    {
+      "path": "Tests/OSwindAppTests/DeletionModelTests.swift",
+      "sha256": "fdfa21e33bdeb28f965a4156794f673e45d9735018ff817713e97966da5d5b3a"
+    },
+    {
+      "path": "Tests/OSwindAppTests/DestructiveWorkLifecycleTests.swift",
+      "sha256": "fb11fe27d0f4be93abea4dadd34ba88c213d453b97d55b78e07633556154c33d"
+    },
+    {
+      "path": "Tests/OSwindAppTests/DestructiveWorkVaultTests.swift",
+      "sha256": "081c286d4e972c8e0d590e4ec78cd9c223a353f4d6c3355479800d9621a8c983"
+    },
+    {
+      "path": "Tests/OSwindAppTests/EntityMemoryModelTests.swift",
+      "sha256": "0b61e79371e042fad46a58b708b3d56fe44435a5a612dbbe6398dcc50e21f29d"
+    },
+    {
+      "path": "Tests/OSwindAppTests/GlobalShortcutModelTests.swift",
+      "sha256": "a9631dc27001fa75381d87bedabf120ab09a9abe85e4bc1f48904ea884422778"
+    },
+    {
+      "path": "Tests/OSwindAppTests/HistoryErasureModelTests.swift",
+      "sha256": "beadd315bb56404cd544381611bd3a6efe092ac53b409664ae0f797cf713cfe9"
+    },
+    {
+      "path": "Tests/OSwindAppTests/ImportLifecycleModelTests.swift",
+      "sha256": "30ca7f95585fc62cb32fe297901f7f1c651e4e360180dd9339d65942118ffd51"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LibraryOpeningTests.swift",
+      "sha256": "ba3fc2b67928867395df8dfee16fa01475468f5d8b8638b327c5cadc76bad705"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LibraryRecoveryTransferTests.swift",
+      "sha256": "7864d0dddb24a07454a436cb70b64dccf920eb3f0b727c7b765c86f505221400"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LibraryWipeModelTests.swift",
+      "sha256": "1a56071d43740d2b250d8c871e81722f7b47666b0dd07f2ae6915afe11ab208b"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LimitlessImportModelTests.swift",
+      "sha256": "d2541905f5f7cd5be50451bfc95667d8b4f24bef058403a566ced23b338bbe7d"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LocalAnswerPreparationHTTPTests.swift",
+      "sha256": "1d0360ab225088142a9d92d658e33b4ece5d1f2297b6240795f2d047a311b2d7"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LocalAnswerPreparationLiveTests.swift",
+      "sha256": "f7883742d8f79fbee8a963d7dc5b0ec182887a11a5bf1761b90a2e1082c83902"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LocalAnswerPreparationModelTests.swift",
+      "sha256": "790e64c4d58bae831d0bdf718fd44c31f6f214072e3023b59cb1c5b98288271c"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LocalModelLibraryHTTPTests.swift",
+      "sha256": "3fa6974728fd4d45fa2cd1307150940db7c6f06be915fcba4e2cc039349366a2"
+    },
+    {
+      "path": "Tests/OSwindAppTests/LocalModelLibraryTests.swift",
+      "sha256": "221cdd639eb9c5503c8489c2a3f807570674ffb243e28e391aa170c8a3a828c9"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MCPToolsModelTests.swift",
+      "sha256": "ec35da876e407c645f1e5f81779bf080e7a64350eab5bd60ccdd5bd439540509"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MCPWorkspaceTests.swift",
+      "sha256": "9a5d505e90a6f7efce8c75a9bf0d8dbc4065662a24f05d1d968d6aa2f01bdeef"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MaintenanceStartupTests.swift",
+      "sha256": "1bb63ba18315372c891ce327cf96758d0959c64b135e288a36fd4ccfc03edf85"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MarkdownTransferTests.swift",
+      "sha256": "68fec94a72e7d23a08364d8b03e82fafa9775c0a4e315d6aff83d6ad332ca0c6"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MeetingWorkspaceTests.swift",
+      "sha256": "d4bc535678acf0ea6455caca5bd6e2ab3c543450c3f4f7938932caf4fc29bad6"
+    },
+    {
+      "path": "Tests/OSwindAppTests/MeetingsModelTests.swift",
+      "sha256": "22d3c5354584aaa712fc2b876a4c9590a4c5d01f91e501f2227aa613f1d010e4"
+    },
+    {
+      "path": "Tests/OSwindAppTests/NativeClipboardReaderTests.swift",
+      "sha256": "16d55dc9a2965445aa595045a8a8737d1716753d4b7bd557215dbee991d12357"
+    },
+    {
+      "path": "Tests/OSwindAppTests/NativeModelSetupTests.swift",
+      "sha256": "5f128c0ca1ba742f379f09e0db2d16b330ce8031dd951e3c9eaec23e96ba6f82"
+    },
+    {
+      "path": "Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift",
+      "sha256": "6311799581b3f6da1da7cb600e5833ae298d8862292149eced6ee978ea2672c6"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PIIImportModelTests.swift",
+      "sha256": "670e2f8734593473f779e51fa2e37e3551ad9cca8ae407c8d8f2bb7cbe6d4b16"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PIIModelSetupTests.swift",
+      "sha256": "0a90cad2158862b1fd0d0c15a032460dd886da0ba2bfb085554e60a7d5c88ffb"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PIIScanRecordViewTests.swift",
+      "sha256": "f3fee13c7df22fbb2e55f274433f4cf5fe0cdb89c2ced189d059c98e95b97ead"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PIIScanStatusModelTests.swift",
+      "sha256": "4c9d762f6d981ef1fa1522da7ead06bbdb4961d7049280983ac78d7167c2c9dd"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PendingMediaSchedulerTests.swift",
+      "sha256": "19e3ad43b90034a88c9910a675f4377d5ff45d4b09161899cdadc9c719b131ba"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PendingMediaSchedulerVaultTests.swift",
+      "sha256": "85c6e71602f37dd63bcc670a63930074e66ceb1af1d18cfe18da500d44dcc565"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PersonalSyncLifecycleTests.swift",
+      "sha256": "5dc515df8b06ce32921d92defbe15caa3dd231fbdab67303f4b3b14cb403d17f"
+    },
+    {
+      "path": "Tests/OSwindAppTests/PersonalSyncPairingModelTests.swift",
+      "sha256": "92f77cf54ca5aac3578a80dc62fb63c4ea745a99916e3a9c9fa24450737678b0"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecapModelTests.swift",
+      "sha256": "ffe908145ab686de0b5e41a8908d17e34e2be89ce4d1a7baeaee14c17128ff75"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordedMeetingRefreshBenchmarkTests.swift",
+      "sha256": "25d21ebe05f58d8a4d256cb280fa9e87066995eea9052d978cd217d2beee1365"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordedMeetingViewBenchmarkTests.swift",
+      "sha256": "8b55108c6ba2df009eebeca13a49d67a4805029073ab2221f157c11aa03988e9"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordedMeetingsModelTests.swift",
+      "sha256": "6e0722f180264c570401ba0ba1db894e36bf7d524a82bdf06cc1ea86fd59639b"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordingNameRenderTests.swift",
+      "sha256": "401b994c6cfc9ffd799e06fe2cb42bb4af45ed97451c6333763791c7cfb238e6"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordingNameVaultTests.swift",
+      "sha256": "d2fd13f648c04399259b77004600d658d37ea320e5f9c48eac40a949ca207c12"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RecordingNamesModelTests.swift",
+      "sha256": "7e6f970d5b39a607a125a1f7616908d9a136513ee7f2d32db5c603ddfd99367a"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RetiredLibraryActionTests.swift",
+      "sha256": "5bcd01a23b5d5aa957ed62ccac135046c0938f92d22e7f5b071962de9496f418"
+    },
+    {
+      "path": "Tests/OSwindAppTests/RoutinesModelTests.swift",
+      "sha256": "a9f3d04843c21fbaeed0b64ff50faa6ff1d72aa3a577876cb98cc085b9cc2eb4"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SearchIndexLifecycleTests.swift",
+      "sha256": "12fa35f307d10bb4b6de09a8aa4b3f5d2e4837be04ccbcf3388df60c230892c9"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SearchNavigationTests.swift",
+      "sha256": "9c2e615aefe7628cbdb9e6357cb8f4e212a877365e0f931513ae933d37c63124"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SelectedReadLifecycleTests.swift",
+      "sha256": "b7847d6eee7c290d0d280e9643c6650e3411fec1271a04d9d8109de4c37624a2"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SourceOpeningTests.swift",
+      "sha256": "2d3bc6207c2caf226307c354029eddd6f81892d0220da31967b722e38ec5b447"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SourceReadLifecycleTests.swift",
+      "sha256": "22d895dbb3308381488a88c33671728a709ccabe8a1c8898a18ef8694d214333"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SourceWorkSessionTests.swift",
+      "sha256": "16477f67650f22531a040bcb4233b74b92f74b3687de394e315f6bbacfbc7483"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SourceWorkVaultTests.swift",
+      "sha256": "ad9d6fe8114242221fb48ce2b7fa77798a616fd5ddc1404121c76c8849d0d5a1"
+    },
+    {
+      "path": "Tests/OSwindAppTests/SourceWriteLifecycleTests.swift",
+      "sha256": "cd01dd722fa3b9894784590159b617a56d3790cb6e3c8f1a947bca223f6ba873"
+    },
+    {
+      "path": "Tests/OSwindAppTests/TextObservationModelTests.swift",
+      "sha256": "c3e159337d65041f104f7de0c9cfc8f967094d3b0b2aff5ba07b9859ada04b92"
+    },
+    {
+      "path": "Tests/OSwindAppTests/VaultSessionTests.swift",
+      "sha256": "20fb903ac50785ebd811e627bbba0305cbfae26620088f8acd77803f073269c7"
+    },
+    {
+      "path": "Tests/OSwindAppTests/VideoReplayTests.swift",
+      "sha256": "3d6ede8e78365db27f8d162ead7d12b878e7daf70e1ac06911dff345d8f2446d"
+    },
+    {
+      "path": "Tests/OSwindAppTests/VisualIndexCoordinationTests.swift",
+      "sha256": "7be37a097f3559c4a2bf91dfe9f9776bb27da01788fb12d722e7c4b5ebc985b4"
+    },
+    {
+      "path": "Tests/OSwindAppTests/VisualModelSetupTests.swift",
+      "sha256": "d969cdee65e0ff24fc076dc301c8181bcdc64ee0b0f7d785d23eee7da899b8ad"
+    },
+    {
+      "path": "Tests/OSwindAppTests/VoiceTypingTests.swift",
+      "sha256": "5734c1cc837fd2bf4d389321bf6d6fbcd95a56de086c6f65b3c2c38e3a36b710"
+    },
+    {
+      "path": "Tests/OSwindAppTests/WorkflowModelTests.swift",
+      "sha256": "e403ee7548518abb648a1c36cbb889099e9a5ec9eaee65f849b56cfeddc5db64"
+    },
+    {
+      "path": "Tests/OSwindAppTests/WorkspaceWakeLifecycleTests.swift",
+      "sha256": "217a5ef364c64fd6a54e1982a7f387906598805985783784d375855716a2ad40"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ANNCacheTests.swift",
+      "sha256": "e6d9af49f3cd668bb0ffadc7977aed839dba48879d87fd0c94f95870e2708fe9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AccessibilityCoordinatorTests.swift",
+      "sha256": "1e44dc581622ebdf81b872174ba8be1c813f15774fb50513c5d05386b6cbb357"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AccessibilityReaderTests.swift",
+      "sha256": "0f1aad938517dfa8f0257f84f4ffbf1817566f07ff983511c8e02016c56e8083"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AccessibilityTextCaptureTests.swift",
+      "sha256": "3ef6a2eae8aff427a3ad2bf97becae54636c5fd6173615afb5faa459c30f4867"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ActivityCalendarIntegrationTests.swift",
+      "sha256": "fdcfd9345157591eb4586c9b94a15861d58d7c91845cac1ef12f491659e709ab"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ActivityCalendarTests.swift",
+      "sha256": "df6afd45eaebe0c5456cb7e48d306891bbd979b75925414027386675758a9142"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AtomicPrivateInboxTests.swift",
+      "sha256": "4476ce97383a26e6927ab59fd6bcfb187c893bf759a95c28ae62a8ada66daf4b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioIngressTests.swift",
+      "sha256": "537f0c7d2e508caf0643ded30aa62df036feeedb65b3443d4fa29256ca7683c5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioLifecycleTests.swift",
+      "sha256": "108bbcf173d931580980190301dae3d52220e253a5dd6df9ef09951e181a89f1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioMemoryTests.swift",
+      "sha256": "0b996d8c6a6190102a8809adf153f5ba1ed2be9a8ba58afa52d175af81818906"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioPrivacyTests.swift",
+      "sha256": "93dc2dc40fc411ca0257a2be6f88ef90adb9d576bf39710a6573de25885e4656"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioSettingsAdmissionTests.swift",
+      "sha256": "ae5dc6f81c7e84be281994d8fbfe2e1cefe0ca717c30ea834bfac53a08326a04"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/AudioSourceBoundsTests.swift",
+      "sha256": "fbd1c1413759b5752a70b9b2bffdf6534a454fbb8107c2d90d8839795aa5cbf8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupCleanupTests.swift",
+      "sha256": "d4b845a2ab4378a7f9ef199e5d712fff7cc0dc049d2bb46246cfefcab9ee5865"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupErasureFenceTests.swift",
+      "sha256": "1e2adeaaf4ae6b9644a60eabcd385af227aa519f9b38137f7a40f6a423a049c1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupFileTreeTests.swift",
+      "sha256": "b30e73be347ec0e01dd04eda27f9df9b15eb1add9170a2b15099696645ca9beb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupManifestTests.swift",
+      "sha256": "6d3d47f00525f65fb1ed7b9ce6bca6d87277418068989fa8a81bf6e34c093458"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupMemberAccessTests.swift",
+      "sha256": "90bccad63464e6a0e95e07932a9c75a6c07245e33195aea0174e35b3db495013"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BackupWorkspaceTests.swift",
+      "sha256": "439eb0dfb6cc8ad6e6c6730fa0808a2011cbc3410628ef15f0e723306c5c9bd3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BenchmarkLatencyTests.swift",
+      "sha256": "6e2ab402d8504e9c277538a586262a960d25b7350a1af1895ccfe9f9c75d1b1e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/BrowserPrivacyContextTests.swift",
+      "sha256": "99750845329f782fe38f3fdcd951e26bc444752f80eb0e52611d30e081ac0541"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/CaptureStartReadinessTests.swift",
+      "sha256": "84d6a86f39375ec053edd42c610bdd0d94aa245c132687c31dfed4ef07b8f288"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ChatAdmissionTests.swift",
+      "sha256": "ce1ef4bd9d0511ce25dfee43ad3308e256cf83201b2e3f7a73b09906e4fc0b85"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/CitationMigrationTests.swift",
+      "sha256": "9db4f185716009b52c8f9693b8cde1d2e5f7e05503b762744bf427e828efe703"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ClipboardContextTests.swift",
+      "sha256": "fe7a09385016144afb6bd1e8bc116421e3af746cff0a41bb9c4105c723712e1e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ClipboardReadWorkerTests.swift",
+      "sha256": "e97dcce9ff5cad02a2858abdbcd1462bc908f99161c4df0bfbc8fe984f14aa88"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ConversationTests.swift",
+      "sha256": "254d8c0a33f96a2ab5d473b8013c121323253e297211c79bbc2002e6f221ed18"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EmbeddingLoadingTests.swift",
+      "sha256": "b56c84e4ee79f169497fade30b406ffcd8d5bf0091ec404b9c0c1c625b8257c7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EntityMemoryTests.swift",
+      "sha256": "364bbda760c17b64a45c446351168313d7b13afc1ff2c098582e2e1bbdda8ec3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EntityMetadataTests.swift",
+      "sha256": "65879f3cee07a219e732def23a423ed3607c5fd45cc6598d6202fd7771746213"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EntityNERDecodingTests.swift",
+      "sha256": "c1a79780300958b3c3071565c8125f2165abcb97db73be2476dca0f598a76efc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EntityScopeProjectionTests.swift",
+      "sha256": "6082af65875d0ab537671a3d09aaf720c347537c07aa93da5ea8420275511da7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EntityWordPieceTests.swift",
+      "sha256": "2df8b9ee38d293613a68b78efc3ac27fdc3fdeea052bfcded5c703e4ad1a44a3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/EvidenceTextTests.swift",
+      "sha256": "47a318148d4e5b8b94658dfd0058e6b9e7d383b76c85e064f16c62ccd993de66"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/DeliveredResponseCompatibility/FrozenFormat2Worker.swift.txt",
+      "sha256": "e2d95305da7d2b4532d012316758b031e4d47f3df13885377340655dc59220d5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/producer-schema25.sqlite",
+      "sha256": "166e2b8380f5b7091c60c8e48d32177d485489a795a3f032de2fdf59fa079527"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/provenance.json",
+      "sha256": "e6a413113a86aa4fe83719f92fa69d883fd747775b662bbaa4f5b39d7e82a536"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalCitationMigration/receiver-schema25.sqlite",
+      "sha256": "d65063d0f2934dbee488b21e83464d89b2c9316e31d3a5a4c919f655ea39b7a1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/cached-native-schema28.sqlite",
+      "sha256": "4c3ddb02705c6b5b3ad3ba58fb12702bf9bd477bed4a889d06b2653aefeb23e4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/cached-native-schema29.sqlite",
+      "sha256": "8da14d5ce4eafa1abea8ffb4a971c24ec7a39940c86dc85d562ad451adea8f7a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/cached-native-schema30.sqlite",
+      "sha256": "f7c5af147209b9debb3af36fdad2817ec4e9bfef85cc239d7f8a8c2d12228d71"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/cached-native-schema31.sqlite",
+      "sha256": "8c355b155ca56c7f8a7eac7dfc5dcb35921ffa05c6e76f87172f9adabf703781"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/generation-schema31.swift.txt",
+      "sha256": "0d74c747f38c610852331e11dd53ff9175bf12975d412ffcb07e96d7d7d83a0e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/header.json",
+      "sha256": "4ee5a10db8a594c68c4072010ebf0beff07085e5706e0a643988644a2e153c63"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/media.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/memory.sqlite",
+      "sha256": "55a97ce7016fcde140eaa2fad06aabdb7e6e0bd929fd39b5a9dda43ef1cb822c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/legacy26.oswindbackup/settings.json",
+      "sha256": "2ec0d6819ac1cd5d3cf5d3bf3836d5610dc926b8a8c5688890cb799f10896f09"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-scope-schema26.sqlite",
+      "sha256": "5c5d20da4906a025acea8c1bdc628176bbc88cfd539ce009ff68ebdf394b4556"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-source-schema27.sqlite",
+      "sha256": "fd9648b2a47421b3758185b17d4daf35ce1ee03204883e60d6526f64f142be7a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/original-source-schema28.sqlite",
+      "sha256": "8198bd15561e52423279fec45bede9813995e90893fd129d4977fead6f365f4a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-cached-schema28.json",
+      "sha256": "b896a13021d4ee05280b7b2450dd07ef812e5f8071858c8672ab0f50c8c5f4c9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-cached-schema29.json",
+      "sha256": "970bc3ec9ac9a38b9334e0a7a8af9df96331f4ebd58af811d2dbbc6159e03442"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-cached-schema30.json",
+      "sha256": "4f30d11c24db98cdd04217a88b187ab07f8682c29d752c39ce791475d8473d82"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-cached-schema31.json",
+      "sha256": "5160ae66b1afc7d7cf1c513d5a4b214b8b005c3b6c1901014d58e7980c8a3d28"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-schema27.json",
+      "sha256": "4e28fef84645c5d6e92d2db71ac68f1b6b12f8ebd371ef3493e4474717cdfab4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance-schema28.json",
+      "sha256": "b01aeb24d24c4571efd4680bf54a21306d1ce61c6021202ab7fbc9f0aeb993f7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/HistoricalErasureMigration/provenance.json",
+      "sha256": "fbb28e037f2e9c141c52557c74d3575bb7fe983a001e4080019379b3b117ba4e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/NativeANN/parallel-orphans-v2.usearch",
+      "sha256": "536d92401f698f642d26ac4d238a8bc8382a760315d705d2c7ce9ed66f091289"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/NativeANN/provenance.json",
+      "sha256": "6890dd77b3139fbcb06df15af31b568122c3ee250ec9aa1b8523073dcbced815"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/NativeMediaMigration/owned-pending.png",
+      "sha256": "0254bbb96343f9806745d47d11df8af03364d722e342b380abbfe1b02353d74f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/NativeMediaMigration/provenance.json",
+      "sha256": "84617ee0593c71d25c0ece2f19a4cf995ec2517efa1eaf8300c639d3d26a2889"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/NativeMediaMigration/schema32-pending.sqlite",
+      "sha256": "8fb6509f6cedeb6707e5a458b8412196b598726bd8e101978aa89b3528418bc9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/provenance.json",
+      "sha256": "28e823cbcba10436362bb0ddb516f182b84cac418fe405cfdf71436af61e3dab"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/source.wav",
+      "sha256": "5643041cc842d47081a8a9b6f516130c90167a5041233ac5e9e6644cf413efb7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/timeline.json",
+      "sha256": "d2320375c096b70eb9136e367e55871cf417f6e0a4bfe6609d71c4855b4e396a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/Fixtures/WorkflowPriming/unaligned.mp4",
+      "sha256": "de287029f23646ced718be26d6c49012b77a1214b4062fadc91d31bedc93e45a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/FocusedWindowBindingTests.swift",
+      "sha256": "c134ed2f78aab65e629f4f963890682d7e50e3d23a26ae6dc2f267e920c77aef"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/FullTextIdentityTests.swift",
+      "sha256": "36a964a5633c1593bbe8e5a65d9131bce1177b3c4bc5b1907467bee3b0bfa01a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift",
+      "sha256": "31b3ab1ff7cb9ce9bc9e79f029dd816e9e6754465ff7ecfa8547c66ca28b6732"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoricalErasureMigrationTests.swift",
+      "sha256": "04fa20ce2d185ac3be2ab50f533843fbd8e5a34c3177fa9d8e818c8100bc823f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoricalErasureScaleTests.swift",
+      "sha256": "a36c4a5019ff7ccc15ea09dee8282111d053f06c2b33c9c8db1873bdc6085c96"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoricalErasureScopeTests.swift",
+      "sha256": "2e98e5f9311d7829ec4e1d71c09563b552655653452b8ed10cdc81c85e21eece"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoricalRecapTests.swift",
+      "sha256": "db34f0e95b7cf35841e2a92ac975949c39f6d9283c382ac0b28d53dfebee77a0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/HistoryErasureTests.swift",
+      "sha256": "db908498cbe4197ded235f9173ef7457e167ece9d483217608e2ec19f98a0455"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ISOTimeTests.swift",
+      "sha256": "6441ba73ebf6278750639658396a952bb5ac993bdc1a6efaba42ce3637fdaefc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ImportPreparationTests.swift",
+      "sha256": "3eb3b927f00fb384cc6358495b2c0aa99f7014d7e30c5976dbbc4f95a6dca50c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IncomingEntityMigrationTests.swift",
+      "sha256": "c38ee5f330741af2da988e268fc46569979c1a59f943ebb68b64b4b8aba7cd46"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IncomingRunMigrationTests.swift",
+      "sha256": "eb7ae88bcae36e16a339b6971c74d01df17a028dad5c3ccd1755ecb1730725a5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IncomingSourceErasureMigrationTests.swift",
+      "sha256": "9f327a8505d8b771c595a3147b8ad7d41cf3ab624842e3755d3c16e82d4c1a2c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IncomingSourceMigrationTests.swift",
+      "sha256": "11a00a3be5fab69ef227141ccf6b60e284e87e3392b98d69bf3be67aebca523d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IndexMigrationTests.swift",
+      "sha256": "89ea3bb6033b9f619c72cdce9030dbfc7b0a3366ce475006f4d525e4da4a514f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/IndexedRetrievalTests.swift",
+      "sha256": "642c9efc8cd4d30e859254d64005bb47e9f115578a56b8b4afe9320bbf449d03"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/KeywordConstraintTests.swift",
+      "sha256": "03338329d29bc665ce7d6e09b991a904ac9f8048ebe086d304b8aea9564e1d18"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/KeywordRankingTests.swift",
+      "sha256": "15d29ca01b495d198a63b8c8a8de154ba7508a813898e91b74402dadaa6d8203"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryBackupTests.swift",
+      "sha256": "a22a11659be2286e8665e5319f163c5a5126d357d944954e788ccc34c91c30fb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryImportFileTests.swift",
+      "sha256": "06e82dde290837597b94da05fdbdd8ff6d59e9619f7371642dc4c9f7936c8266"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryLocationTests.swift",
+      "sha256": "11317d5cdddb4a089c913abb1254c9a29217ae7222065c7872210fe90a301644"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryRecoveryTests.swift",
+      "sha256": "627d42f5cfaaa47f791f0aa9590fd7abf83144f22be66424c8c59aed5581cf41"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryRestoreTests.swift",
+      "sha256": "72ebb8e7c81c87d61fbec0c4346c9f5823e37533e978e670a1621a20b44a2114"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibrarySettingsSnapshotTests.swift",
+      "sha256": "e185c80283aaff865f164b9facacbd7390e483dcbdc9ed5c8e818fa5498390fa"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryWipeStagingTests.swift",
+      "sha256": "6b43a421ede3df1961987c0389002ce9d7213fd82de87ea06194808de81ad488"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryWipeTests.swift",
+      "sha256": "0b82012204802271189bc15b0814b10278dd7d86768ff326eaa52d6284896091"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LibraryWorkspaceTests.swift",
+      "sha256": "2ce8c4929dae8ccf9735078d9ea3b0b370f2e18500fa025b764a4f35fbc51a44"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LimitlessImportTests.swift",
+      "sha256": "b799690150e5f8eae7c5de6075d38c442ad231148fcedc869cf4ad8bdb483a45"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LocalDictationTests.swift",
+      "sha256": "efa787d85093302d09e507c21d15a0753d63cf33595c664321e482f4c08c21db"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LocalModelPreparationTests.swift",
+      "sha256": "2b936b038a670bfba265f689b26a7a979cb806ff4f1216aafa4adc0fbcc44ab8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/LocalRuntimeLiveTests.swift",
+      "sha256": "0d22ec99ef66c074be81070d46ec8fa2d4aa23bb35acd85f1b4403b5d645e16c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MCPClientTests.swift",
+      "sha256": "5298dcd3a532248ec6ad66407921eff7bbd712b3d88c783b52e2853bc773fd7b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MCPConnectionTests.swift",
+      "sha256": "197a2502721a17778704bccf539a95d6839d32f301397cbcc56b0dfc752c79a8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MCPJSONTests.swift",
+      "sha256": "3537e311e321d7ab343cb4cbf4d3c9232a1af39374cbd33563e4c880455a510e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MarkdownExportTests.swift",
+      "sha256": "6358c04bc79c40fb24ae94c99b7ef9e6f768287d9dad0e7409a311b8a6eaded6"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MediaCleanupAdmissionTests.swift",
+      "sha256": "94e96d50671937afa4988081e89e17441f6b7bfe45a9a443f3652af7e14a7a4d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MediaDeletionTests.swift",
+      "sha256": "c6dfb6b073fd309c226682b607e3d5be49cbb6b32ccdd11c40881355321416a5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MeetingContextTests.swift",
+      "sha256": "b9d21ec177608a722370f8a1b99d4be2cb9ba20144791e6962d46836646e1a6b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MeetingEvidencePolicyTests.swift",
+      "sha256": "349f7f605178e37094352969c03d91214e0f4cf802f5b0bce4804a515e222546"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MeetingReminderCrashTests.swift",
+      "sha256": "86f64d01e1d25ceaae13ceef151ddf823c405560c8cd75ea1d5199b974df4860"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MeetingRequestTests.swift",
+      "sha256": "f483f8da76889972bba01766401756c5c17f900aaa0d0d3a56ef3be961889f95"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/MetalRetrievalTests.swift",
+      "sha256": "5afdfeae70b0d58e7611a78559a51211febf9e3ad05993302d55c1a7f183cdd2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NarratedWorkflowTests.swift",
+      "sha256": "7823194c995e422f72428f8c25ed6bfbdbcf11a60ca75307d856cf71a3108ce0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeANNBuildMeasurementsTests.swift",
+      "sha256": "ac2da18aade53c96ae68c0abb49d45592a0e8a6cd777e9140926cef88b65dcb4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeANNIntegrityTests.swift",
+      "sha256": "105efa851141c533a2fa1c11de543ba1b1bfcfdba14a2e3f1abc486c92917693"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeCaptureConfigurationTests.swift",
+      "sha256": "980d943fea2f504206f7c9c9bf0b96999f6bdae18470eceef254a54473093556"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeEntityScopeRetirementTests.swift",
+      "sha256": "ed2f6df62eacf9d2687b5ecb2b6e21cc492d2a6d01942efb6fa787ae6d8e009b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeInputActivityTests.swift",
+      "sha256": "355efbd6e495e31b8acd248e39d43a2e5f7c1f9711d3e562ae07979e101b77eb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeMediaLegacyTests.swift",
+      "sha256": "8abd6d7f3b13af033d3b3a61c425b209452bffbea5ea5b1b92f5ea69a71dafa3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeMediaMigrationTests.swift",
+      "sha256": "666ffbb0056bd85965c0af9641d21a3cd3855975be37dbac5a0aeb474b25014b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeMediaSchemaTests.swift",
+      "sha256": "a2e387b11ec8eebb719145bd8e24e0a45bfd1922d5e28d36656cdf99e6e09d93"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeModelHTTPTests.swift",
+      "sha256": "b54ae2466afce48d6a26d9492bf3bf3ef99894f5530c938d1d4174bea2f9eea8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeModelInstallerTests.swift",
+      "sha256": "bed1b684bad0e7147c7950c8dd3c86db7cdd24c7c4c53084a1bbf3014ca2ae2a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeModelRetentionTests.swift",
+      "sha256": "a7eebcbbd78fb850469aff8e6dc8c0c131405122b2e582af57cbcd7ef1ce8be5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeRecordedMeetingTests.swift",
+      "sha256": "43614452557b5101a26670cb27386e6b43617014b4e3de20e55df4c8fef050f5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeSystemAudioTests.swift",
+      "sha256": "0afe51c57d8b42e05d2f698100e3b360f46b2915b6be40c20fbde7be8a4abdba"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeTargetedCaptureSoakTests.swift",
+      "sha256": "699bba6892b2cf992859f6371205939e3fa18f2e01d9dc75b82f178ad2705227"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultActivityCalendarTests.swift",
+      "sha256": "5885b2b9f5677611ced81ebeec9bcbcd03cc13b75f4d17aa7008c9bc9937414b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultCancellationTests.swift",
+      "sha256": "e265e99741788933addf60c351815c6df5e9d85a0e400c37039034ec0cb7f089"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultImportPreparationTests.swift",
+      "sha256": "4651462d0c64708c6d90880ed103286ff53b5156fae398078e68d010855a5b9e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultQueryRecoveryTests.swift",
+      "sha256": "41b31340758b69ea70209bf6b00b30cb4b0e2fe3d9a074cdc117f78d13f93d8a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultVisualIndexTests.swift",
+      "sha256": "e46ce63ef320221afd1fb3522be15da71885031151d2956824491959cb2c4dcc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/NativeVaultWorkflowExportTests.swift",
+      "sha256": "cfd2bca1adeb20e50285b0190a1740716b5815f5769e2a551739929a82df9de1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/OwnedIndexedRetrievalProbe.swift",
+      "sha256": "af629f75062a73736b37c9274b6a2b9e083208011ac289cb6be3049c5c6a7fb0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/OwnedVaultNativeTrace.swift",
+      "sha256": "c966ae33d97b4aef894d1d99bf4fb452b09858044a088e42dd3f59aa97734011"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIDecodingTests.swift",
+      "sha256": "552ef9f748750acbed0365f599d6461db0a5181784a56535158b12fc1eaf0cce"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIDocumentInspectorTests.swift",
+      "sha256": "3ec4a6ccf044740a4276fbf7635e80690fc7cd19d444b178d9199a60f7968606"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIDocumentTests.swift",
+      "sha256": "8cf897d8b1068c43bb18d6dc3e791ca249a710916e17c555c05260f84f852865"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIImportTests.swift",
+      "sha256": "bd3989b21112714ebfcc8f57a43985130568b21dc87a4302a06823ea04893af9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIInspectorNativeTests.swift",
+      "sha256": "8476147e43fa924e11a4cabe144dc27a261a971387af7a66ccde4fed3902c7e0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIInspectorTests.swift",
+      "sha256": "86a80e1196d4f3399e44490a10be41bb1890d2441cc2f803c0eb55c9c1b655b5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIModelPreparationTests.swift",
+      "sha256": "44b42178859bfd9c40def6085da9c2d28b23501236193acc682e3088441c1536"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIIScanRecordTests.swift",
+      "sha256": "45089c115a4cbf660eaabe899a8c9306af2d8fefc55130ea712b1732c2156e17"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PIITokenizerTests.swift",
+      "sha256": "003bb01533111f441cde2a71bdb2f215452501124615e120403b551152a35e53"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PassageRuntimeTests.swift",
+      "sha256": "886b50dc0c36f5c6411fe1953da53d85a39a7ba79e0386b10b86e07b931f9073"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PassageTests.swift",
+      "sha256": "27d7476acea7a89b125e7f8a1464120bc2358e6763fd48b25865e8bc9d8a97c4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PendingMediaCleanupTests.swift",
+      "sha256": "53308e4abe6d5a44fd6266922720dac3aa3e5862b005b99c44c56f8863b76821"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PendingMediaNotificationWorkerTests.swift",
+      "sha256": "b6d3c090d6a4f68c8f27de119df9bb6bec7bd4b15634be01b582472fdfb67870"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncApprovedResponseTests.swift",
+      "sha256": "fa3eb5ef45b42103f64e619a5a0c82ac538acc59955ba48bbe1692c07e0da505"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncCausalityTests.swift",
+      "sha256": "cce436de8d49bc7f9c046e71b27f87d8cdb7dbdfb51c54f3ab5cd70aa489944e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncCrashTests.swift",
+      "sha256": "b7d2940a010fd910821086a2898989a559cb70331a6d78b49873f8c08a3451fa"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncCryptoTests.swift",
+      "sha256": "904ebb5b41418a3a6f4ad51cc6a9381acbcfcd42516fc47b85f78c1e8db5f425"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncFolderSessionTests.swift",
+      "sha256": "1c56e767f3a28b43114c993d1f786a070a295a0df596b5a47b7e267091222539"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncFolderTests.swift",
+      "sha256": "2a76974ca4c0e1ba0af7a5137c7ae199ead960915dabb53ae09137572d0a26d5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncJournalTests.swift",
+      "sha256": "162d83913b189323cc3e5bc4ed914d37ec7c8d02472e9e2362bc0455735bfeb2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncMembershipUpdateTests.swift",
+      "sha256": "21b4262efb6ed05ccb820a924ccf50a0067aeef7c4d0921bdb1e7b7675f51a18"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncOfflineErasureTests.swift",
+      "sha256": "91b5ca8869cb2324be9762e339eb80f417eec84adeb2d56f59518478e1defde8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncPairingTests.swift",
+      "sha256": "cc32c9b0d59ce84bfc78e1704b4e80412102224568bba94e8b149f67fa0a9bac"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncPreferencesTests.swift",
+      "sha256": "165c15848b0434eb9a17e12c2d79d20b52fc5c20e6e077909a4b66a3a201d820"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PersonalSyncProtocolTests.swift",
+      "sha256": "f44a6559b76e544d49bf231b6892089c510e25eaba79813b66cc12b079073d64"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PreparationProcessTests.swift",
+      "sha256": "813f8ce66c6449889a6c1a68384ede4e138628d20030abf7fc1a1aa6aca7ca6d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PrivacyAndIntegrationTests.swift",
+      "sha256": "2365fbd7f602b59849d7a8732cfa6283e3e843f179069dd079e9759efed547be"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/PrivacyMaskUnionTests.swift",
+      "sha256": "e0037e8449095321a0ecee6bb0289051280dad88d0701183a02e33e87586d537"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ProjectCorrectionTests.swift",
+      "sha256": "5e133c8aa6181eacfbc91d32253ce82d4baef16831fcb85dc73ffa4f55147caa"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/QueryScopeIntegrationTests.swift",
+      "sha256": "a4acaa5ef3c6fc7b50bdf483d1bb4a010df70c2aa8b6536fd0002be3a29fc619"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/QueryScopeTests.swift",
+      "sha256": "96ed0d9b18bde94fe6a83a33c0ed479f057ebfd322381a3a554a3a15030ed955"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecapTests.swift",
+      "sha256": "6414c63cc210f517c8f3e3fad81567c825605f418ba28c96d170d77f84662c30"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordedMeetingBenchmarkTests.swift",
+      "sha256": "4695350b09d462a1e9d46bcc95f202fe07b3b4b8fb149d8b45b65f73ee6aff79"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordedMeetingIdentifierTests.swift",
+      "sha256": "5e909edbf7a82cd82025b119fb3ee8f1c1b955133df064fd8ec50d5fd13578cc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordedMeetingPortabilityTests.swift",
+      "sha256": "d3b438222b39c17eeb84bb15a58b5184ae98de0b2292bcdeaf3940959f248930"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordedMeetingRevisionTests.swift",
+      "sha256": "efaf3627f9a4e57b575e37fca71fbb36ed45cc48f7f4a5d7704657137f6fa0de"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordedMeetingTests.swift",
+      "sha256": "7a73f7e569b1e580310ca53cd6feebd75608828a921ca215b2b9aa8f8d372a32"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingAffiliationStoreTests.swift",
+      "sha256": "17ef9b2114e20ff732385606720a0c316c631c5de0e3bd030f955af7cbdf9018"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingDetailsTests.swift",
+      "sha256": "f2960890b21652ec84559b36fb1ca0e6c32571895bef330a881338535b64bd04"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingNameErasureTests.swift",
+      "sha256": "e8d6e4bc46e96d5c5614cf4b62f4b093ce579fc7039fb5bc8d0cd10e55460d75"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingScopePortabilityTests.swift",
+      "sha256": "942f422a3bfe3e0ee147597bba0060c4f6ce9e00bfa309100516f2707b302af9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingScopeTests.swift",
+      "sha256": "159c0865c72f68e2c19618ed339c69ee6d24ac215aff27622b1a06970bf13d48"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RecordingSessionNamePerformanceTests.swift",
+      "sha256": "1197c545bd86649049b8ef2246a4316a2673d4ce49ddd4eb3aac56a82ad916bd"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/ReplayContextMonitorTests.swift",
+      "sha256": "56dca438e4550b233eca2ccbcb67f6aad229c050dcf22a1c577503a7929145d1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/RoutineTests.swift",
+      "sha256": "c8f57d7e80e5ddab660eb866bc69d3438d9605f0a85f075cf3a590c495e9585b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SQLiteSnapshotTests.swift",
+      "sha256": "a10923b9da74214eb69753dc10f5902ac9526529273f5022a9aa381cb8506c83"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SearchExpressionFeasibilityTests.swift",
+      "sha256": "c722973b4a1841c71b812cafa883f3e42dbf9bc713f33023227d7316f6f410ae"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SearchExpressionTests.swift",
+      "sha256": "91b1eee05c434421c3e262eca6928d31c6c52a9448df9e1c0e1eade1ed1c591d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SearchPreviewTests.swift",
+      "sha256": "baef726181e04e3732fcc1e50d4b4d6f4f6db4a5824fac47ac4e178ada5affa3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SearchScopeTests.swift",
+      "sha256": "2fba344ec1d48f203f078c6220c968b4ba049e074f8a82804949134ac4acf420"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SemanticIndexTests.swift",
+      "sha256": "456be0fca6894e15db414dcab1aad5f5317385ec0a5a7a82cad6a2ccafe96c3e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SnapshotAdmissionTests.swift",
+      "sha256": "e80e678f933ba509b73edbef2dedf67f868bf8c78beb876b14eaa04674c7ec00"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SnapshotRegionTests.swift",
+      "sha256": "4c8298c7fac1fa77e9beb3be1c024a20407bf3f1e458e8f08421e81a34d2f035"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SpeakerAttributionTests.swift",
+      "sha256": "5dc2d36f19809c86994ad3e9346ef5352bdf0261dcc288684cf7437b581821fe"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SpeakerEvidenceTests.swift",
+      "sha256": "cb1223760c019565608025b0787b803b25c78e258de770b297dccf21c748d1c4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SpeakerRuntimeTests.swift",
+      "sha256": "3bce5688d771b3f2f312df01a0eb73abec20b8e9ddbbd414c222c988022c0555"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SpeakerTimelineTests.swift",
+      "sha256": "daf6cbe164f334d67ca2017ad37043cef6090d97369b5a9804fd7b41a1e71a3b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SpeechRecognitionTests.swift",
+      "sha256": "635484fe997eb0efbef57d1f829b67a2bcacd7f0ce23c246e00f17e879c46a03"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/StatisticsTests.swift",
+      "sha256": "c76d7589efb4bb5274cf4b070756fb674505a0c601bbcd1cfc8200831f0653db"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/StorageUsageTests.swift",
+      "sha256": "c25dacdf20ffab97eb0e458e0533d5356544139bddb73d8629dade1ba19d1612"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/StoreLifecycleTests.swift",
+      "sha256": "9bb20dac8315413d4b67219338f84da90f3f09037a6744d289a90e317ad8dabc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/StoreTests.swift",
+      "sha256": "35c52718c3681fec599a72e00656f49faa5dffab0357c9d16d5fd385aa43e575"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncAnchoredServiceTests.swift",
+      "sha256": "10721b4fe4222bcdc141da35a764acbb260349fa188ddb81d6826c8fe10b7644"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCaptureCrashTests.swift",
+      "sha256": "83fe44e988633283cb37049d9522edb22bcaf6117f7866fc38ec33ea7ad0630a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCaptureScaleTests.swift",
+      "sha256": "9c180cc90410a57e25fd3e88b07aa51411de7e12544eb09656cabd64f37b967c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncChangeCaptureTests.swift",
+      "sha256": "3403b694b91ac7a5dc39b71c404df64e321dc683e33bdd2a1d0677c35611b290"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCollectionAdmissionTests.swift",
+      "sha256": "57e166a82caa60d0c620c7c8c5bdacda8d4e238f903c13bdc774fbd4cd35d8b3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCollectionBarrierTests.swift",
+      "sha256": "c5ba248445afc0bbeac18f709b32579e3e73e128c6d6a4b2e38cebd4a8457645"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCollectionDeliveryTests.swift",
+      "sha256": "735a60c2b276dc3b3b74d65303a325ffd5d6da72ef2653cc384ca158ed3ff2ac"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCollectionHistoryTests.swift",
+      "sha256": "9a198571e3604c095bb32c599f4e3314d8529b25670639f553fa03ef481cbef0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCompletedResponseCompatibilityTests.swift",
+      "sha256": "9a9fe7fd859d6fac139be872b9cba157846cf60af4850f59246ea7f7e759a7fa"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCredentialBindingTests.swift",
+      "sha256": "e30debf1bde92a45e1552b0c8aa661f184acc3362dbe80c80f7de0793f995b0f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCredentialMaterialTests.swift",
+      "sha256": "20e564f78556d16f3d994ef524734a38050ed7084abc1464cdfadf254ef52a70"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncCredentialStorageTests.swift",
+      "sha256": "5ccb07da8a13aeb9516a579e43dbcd584250b95beb81a9ddbbf0afb162524066"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncDeliveryAnchorTests.swift",
+      "sha256": "41b55534a2442f93f286d1be03998f7f8c9b81cf1a203b32caf622ce44907680"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncDeliveryOwnerResponseCrashTests.swift",
+      "sha256": "d292c5834e818cd65d7a61d6262e099d6f45dcf29b90977b2b6d4e45226f7a4d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncDeliveryOwnerResponseTests.swift",
+      "sha256": "7289b6098677a29709d1293e9169258e20edb05d553deaf1896bb5d275bfea13"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift",
+      "sha256": "08464224ed85a3dabb4f92043835d61af4936246456b5716621c4d101f6b613c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncDerivedRetirementTests.swift",
+      "sha256": "68848c04656a8b8ebd3be1e8a7d555764c888456ac172eb602fc88ccbf7bc011"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncHistoricalCitationTests.swift",
+      "sha256": "f4d8d333c50ddabda93ca041d6da38c78a8513ca08b612f2ba6852e606174ab2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIdentityCatalogTests.swift",
+      "sha256": "8da29d01ff9cd8417e5c48c48f18f80198a1a809ff52e0c0242b096253314bfd"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIdentityCrashTests.swift",
+      "sha256": "2721a2dbd20375615439dc088805998646b3e6c0cdb0bc8a7da64b67ce4ef11b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIdentityLookupCostTests.swift",
+      "sha256": "9b6c54cf915b5b10d092f40779c1fc922e6ee2a00b35bf3ce2ad40e308a4b3da"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIdentityScaleTests.swift",
+      "sha256": "c77dede1f7e11372c315868f916e9f59793df112d3c5ba7c6e07cc94475288b8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingDeletionTests.swift",
+      "sha256": "f23f09fd83d40f9b7f09090a0016f836b355f716846535b3e15b67ee4f8f1b88"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingEntityTests.swift",
+      "sha256": "e6c7eb6bc7d9d95987dd3508114f52ca4628535b3a732249e0b9431294421849"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingProjectionPermitTests.swift",
+      "sha256": "9056dbf3ebc38507e7369e522df1ea1dd76736baac6e4121a531cd07e87b5259"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingRecordingDetailsTests.swift",
+      "sha256": "354084264506decc68662cd6656bee4ad37e27fed1d638c41a82ff895acdc3e2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingRoutineTests.swift",
+      "sha256": "319be5c9303f7bf44183f634e30b07914aa5801672ef35f8012b29bedf133801"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift",
+      "sha256": "59662a8462d0d9b41bb89f0d2893945a6088d48d2dc41f156266ff46268530f0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift",
+      "sha256": "e82d7b7a6b55af4a7ab34806ea206d14972c2b89701cdc77d6a9252dbd6d3f5a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift",
+      "sha256": "86a8c4e35d1dab9f0b697fab23d34e34dcabe805030db7706aff930112b3c295"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingSourceErasureTests.swift",
+      "sha256": "22e8d6be1c386149b81bd1047fa89c96b8c44da6ae4d532d1c2505d054a7910f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift",
+      "sha256": "89fd6cdc4a7805e5b972988f46aa1e2084bf6a7b1eb1c76da86aa9486046370b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncIncomingSourceTests.swift",
+      "sha256": "b7e7ff7d5e88def2e0e42d4d17f63c4d963600e8e6f9799d0479b55c547047e4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLateAdmissionTests.swift",
+      "sha256": "706d82d5ba34a2b7e415f4af5757e9811411cbb0c4a4485b6144d33d33c36356"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLateConflictTests.swift",
+      "sha256": "90d9e45998bf5d5a004f2611595381ac3e07b5bda8b12734621ce0ff926e008d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift",
+      "sha256": "2c613e8514728196ac1fd78a47dccf14c698e1e45983b68797a8d356e4c5a9a3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLateDependencyTests.swift",
+      "sha256": "c60d77f77867f63ff5608f245dfbee431f654be496ec18bfb364237e9881fe79"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLateGraphTests.swift",
+      "sha256": "b0c79d2d09d7eaa3f40a25a8a5aa8a430c548a8d151b4d2a98f534dd2765decb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncLibraryServiceTests.swift",
+      "sha256": "be65828bdc33f6d16b13c196faa2931117b82dcca87c6f9941dfdceed8a77154"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipBackfillCrashTests.swift",
+      "sha256": "366d86dba5cf1cf09d8d833927ec3dc921b20c056a8980698fc6c7e31ccb7305"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipBackfillNativeTests.swift",
+      "sha256": "553ceb0cb2941300985dcfcc32dabcdc9d187c737b6800dac772210f37f1b14a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipBackfillTests.swift",
+      "sha256": "7e97b04fa464deb3600addd415d7ef36d9d2341d60ae9046427904a79c8fecfb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipCrashTests.swift",
+      "sha256": "050027e791e603b3d0d6341ba791c519654ff934056c3306e84445c105b6c69d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipFloorTests.swift",
+      "sha256": "8ebb15aee450e94cd44df77fb527c392cea3f9f1a8738d32987ce79ac4374412"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipHistoryTests.swift",
+      "sha256": "068d91b3d7251dbc72d7acdc16076ba76665929711c38021e10b6fce2513db4c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipOwnerCloseTests.swift",
+      "sha256": "363b7b4691b862557321565b83fc430314562e44990f28b9c2a79def5435bd6d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipPreparationTests.swift",
+      "sha256": "799b79e49039323bee92c6af3adc61195148ca67f7c14f6ef1833f57288f9984"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMembershipRefreshTests.swift",
+      "sha256": "e5e4d7a6669f6c04778af6df96ca01bc1e17c6742aeb374dc45d0def5fc3f8be"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMutationCostTests.swift",
+      "sha256": "426dec72094bb144a281d74590918b2bb7bf610c34c1035fb93f96386531a64c"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift",
+      "sha256": "61b70c3ba487ea99b0b50ab7f6e68b1f9b6c8b07548b54cda15b9ef9505799c7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeCollectionCrashTests.swift",
+      "sha256": "89b1669be84108433bfe389f0c2077ed26737c8a23609968f5b72c5e5a539663"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeCollectionOriginalTests.swift",
+      "sha256": "1cf61222c5ec698aa32a77eff10fede4cc804a2155fce7b8fadafadf93e87674"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeCollectionTests.swift",
+      "sha256": "9d9a515ec705ff354ec351c882b8da95834cfdfad41036f36c584e41fe0fbf85"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeLogicalRetirementTests.swift",
+      "sha256": "599a01e35d32d5953098acce9dd5c27a61354f97e943627e9db4161074b3bff7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeReceivedRetirementTests.swift",
+      "sha256": "42a8333ded0701411f4e0c29af2b38f6c0c46a8f1bb3a79e3799d592b38d32de"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeRetirementCleanupTests.swift",
+      "sha256": "5784a40494ab724403fa5daf033b5d4c115c10d6ea8bb32def01ad99fbd3b80d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeRetirementCompatibilityTests.swift",
+      "sha256": "c7acc9675a1152973875f9f0b269fad178e4c2977accbb5f23b949cfd0c51330"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeRetirementRenewalTests.swift",
+      "sha256": "34d94345605d869a3c8fa8b8308dd7405dbe78da2d260e535ddf47836b20f7f9"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeWriterAdmissionTests.swift",
+      "sha256": "e10a202b83fe5e5d2e92d695546dda00a3613eca4c19c05c947a062c3136c7dd"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncNativeWriterEpochTests.swift",
+      "sha256": "610e308537a89be6385f89e8ec1a1eb6f98a225ea170a1ba4d83ead1744fa8c3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift",
+      "sha256": "88c28a8f1ff0bb46b8ea15bc1d4ce14c8f20cbc5db1b716125f1a0b9140836d3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOriginalEvidenceCrashTests.swift",
+      "sha256": "f2be421125608f5e698cf9a7a51e554be451d73d788b0bbdd48837ef4d4f5913"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOriginalEvidenceScaleTests.swift",
+      "sha256": "add04e2e24a3a0bd3cf15efc8e74d671f43691f6a7189b1beb89a7649637f693"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOriginalEvidenceTests.swift",
+      "sha256": "d7e07adb20db7e7cb04e284fa2e29629972696b8f79a95af2deaf4f58272336e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOutgoingCrashTests.swift",
+      "sha256": "02c3d026d2ce82f3fa63b330b0e5b8167b30c94cf40f218bd757d855882f8891"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOutgoingScaleTests.swift",
+      "sha256": "c1cec40670237a827152f3c188ecaa4a20e49e5909625752abf075a5aacbb780"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOutgoingTests.swift",
+      "sha256": "dfa2546c6abae6427185eb71f68b606b1b6764298a9648b9b24f7ce78019da75"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOwnerApprovalCrashTests.swift",
+      "sha256": "7b3220a88843c760a46ed2d32d3023388448010e79e5c448953bc31d535f0d3f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOwnerApprovalTests.swift",
+      "sha256": "a0379f03a3ed05c10f250b22ee325c45b9565d42a2ad7c204bb25650a648dcaa"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncOwnerSessionTransferTests.swift",
+      "sha256": "e6e344edf474febdf4d0411b1000fd23853502f11f235a645d524c144141f28e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPairingTests.swift",
+      "sha256": "72b1e7d091e101b130e50c2351ea1b2f81efe969997ec72f7c4150f97eaca963"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPortableRecordTests.swift",
+      "sha256": "77eccbee7127f70ea27f832152eb1794ecf691c6bc066be927f78c92e9e2e6e7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationCrashTests.swift",
+      "sha256": "d5e1d0a9c315a42fb89afbc26158dead96a4e5f1e0127e442415dd505ee534cf"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationMutationTests.swift",
+      "sha256": "f0d117cb60a9bc9569a0be3b64b17e9e45cf38e5b6e6072f3f6e2638e3735778"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationNativeValidationTests.swift",
+      "sha256": "c75ab0d59ea6134e06ee42a9c8a362625d2bb66f5d40b32e0f557fc44695380a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift",
+      "sha256": "91408f0112c9272828eecd55872c3a5c602e62be719e01cb65631ff36c7d1b58"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift",
+      "sha256": "d3d880e2d73a48dce3329c67f90789af5839afc5a0239d4fab88c3c3018a7d98"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationQueueTests.swift",
+      "sha256": "8f9668b45555e931bdc1527a83d7ce04292932da395122a40f400ac5250cc6dd"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationRetentionScopeTests.swift",
+      "sha256": "2e486bd2f6aba1dae399643320c802ea2e668aa496a2ca6cc2ba41c683d14410"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationRetractionTests.swift",
+      "sha256": "e9cc735bdba8380970839a06b21173e47974ddbc484c02fde0b92ef8ac5c7bc2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift",
+      "sha256": "5b3f796496d2eaea53d613b21b3c8989aba0db379df959523e2a2478a2883e39"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationVersionRetirementTests.swift",
+      "sha256": "f4ef9cf17f744ead8d9446fdad9628741c31f4ce4b949fa37681d886ac9cc504"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncPublicationVisibilityTests.swift",
+      "sha256": "56d1b634247dfbd0498cd2a3152b21615899c0c4eb3557b217f9476282f2cfb8"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncRecordingAffiliationTests.swift",
+      "sha256": "8da1a224e13db63e12094b6ce1a2eab6231650f66b5c8f5b363f7a6b7105b118"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncRecordingDetailsTests.swift",
+      "sha256": "b78fb609e4ef19836b369a1dacd23cd3bbeff465e9d22ff00eb3c4bb54112941"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncRowSnapshotTests.swift",
+      "sha256": "503bb7a9205889081149ecd5c5e96ca50d04ffd88af9e1073c26cb512c7bf2db"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncServiceRenewalTests.swift",
+      "sha256": "ce8e09e28f1bc7ac3a44d15aa5a89a4b6edd3e05ee68126fa6b8126aabe07bc2"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncSessionOwnerTests.swift",
+      "sha256": "967ac4842de7c7321812b8f10bf2d24f747765209ceb6f98d2a78376cbd70308"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncSessionRetirementTests.swift",
+      "sha256": "8dcb70f0926b0c19a01b2c946893364f5f939f21628697d3bcd52b78b9c16e08"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncSignedFolderTests.swift",
+      "sha256": "7890a1786c2e48f35723c097db223332cdd5cfbbaedcc569de7604908b4d353f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncSignedServiceTests.swift",
+      "sha256": "eba48091a1cbc1f34afe6cde9c5b9db901e318514d3b9a11f4888ed8d33f47fe"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncTransportCompatibilityTests.swift",
+      "sha256": "bfb9b28165ae1a9ae6db89d26b9ddb41dee4fd0f22ed1698847870e2d83630d7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncTurnPublicationProtocolTests.swift",
+      "sha256": "bc18d6dd3590ad6e17e265f9334cb8eff31ba0e5c1b24bae07c6ac512f85347f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift",
+      "sha256": "afebfd1063cfe7ce92fe33ecdfbe804a62fa616eead9d02b47193d961eeef2ce"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncUnavailableScopeTests.swift",
+      "sha256": "85d346ab34c6fc4aaeb0b4b38d983e03a6471bf065e3b75616712deeb11fe24d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncVersionCrashTests.swift",
+      "sha256": "6ed2075157d9ad7df8be8e16c9e9acef1a7c7f926fff044a84175335cf848723"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncVersionScaleTests.swift",
+      "sha256": "992afdc764238d232e20d0ed49d0078bc940fa894147da103eabbf457d054df7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncVersionStoreTests.swift",
+      "sha256": "7984695ce8e4cb7f009a95ec2ffecb6ac1cdcd6e905380f46e280b3363c5fbe1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/SyncWithheldServiceTests.swift",
+      "sha256": "f5809861774233c8beef798ea4aefbf328dc0bfbe88eee980d0bb5ed2d49495e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/TagIndexTests.swift",
+      "sha256": "eac719f682aa24a98748f55c94eeef77423539b9295e0564e3a4ace3425b7612"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/TextCollectorTests.swift",
+      "sha256": "51c0b6da82da1e590f3c5935f16e8ff118d9f15269bd33021d7dbfdfe4914e79"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/TextObservationCaptureTests.swift",
+      "sha256": "20444c7787c956be3d623a86a26bd5176387c1746d498156c0be9d03d7859588"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/TextObservationStoreTests.swift",
+      "sha256": "b2c6e98ab6ae192038c617abc24faa7f1ae0cfc7313d4fc32d7c86ba3a5bad72"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/TranscriptParagraphTests.swift",
+      "sha256": "65fb8b4b1d2ce48411d59a1f472479b6cc514982ac7312957b384735c322d45f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/UnavailableEntityScopeTests.swift",
+      "sha256": "1fb1824b3432c0883e3a419f6440fd371b3e4dcc17359a2dc03a7b0f2529be76"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/UnavailableScopeMigrationTests.swift",
+      "sha256": "9962a7b6559efecbe8e2b8767fb0b87e3f998cc1f990ebbdafa450f84a1b5142"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultAttachCompletionTests.swift",
+      "sha256": "29d56c1f181724e83ae9b3fbdc78b0b4ad94bb17b99f4588d12bc288b8263f6b"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultCredentialDiagnosticTests.swift",
+      "sha256": "0a26d0605532e06cc580df63ead13415f4c3f63afc020fdcbd8698d8a9cf4bb4"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultDetachSettlementTests.swift",
+      "sha256": "f962338df7c32a24f7203b8f1a8af3af9d367359c5c8a4b1befc8e1720630620"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultEjectTransitionTests.swift",
+      "sha256": "a68196af9390476a5328a874ba475662ddabaee30e8efc8a00c2d541c5bf05e5"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultFailedDetachTests.swift",
+      "sha256": "5d1cfe57945f8c9e3859f45a41ddf86f41adc4d193d3debed5f8cf23fe0346bf"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultMigrationTests.swift",
+      "sha256": "a0e64cfb3e379e7c97b722493d99b9af0dde30930ecd4edbc8a10ed2f17c6122"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultNativeDiagnosticTests.swift",
+      "sha256": "3ae54a3dfe6ccdef1d5f4b3611d44d10faae5affb14e9744a7672e6c9f4a3255"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultProcessCancellationTests.swift",
+      "sha256": "e9576eb687015e5a5273bf505cbe7c1827db581774c131cc171bfe3fdab45c09"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultProcessStartTests.swift",
+      "sha256": "8959bdfd7d58e690fac7151a149d4c8f1b7f73d81d116f16c18737f9a2f02a5d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultQueryDriverTests.swift",
+      "sha256": "8b3cef1edf84ca3c5a686be5ddf55b4335150d723a6fdbdea2ea4dda6747a9a7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultReadOnlyQueryTests.swift",
+      "sha256": "8641c50665eaff09edd09ab8c64aced82d7d1769ba493865aa6b6935b90893fb"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VaultTests.swift",
+      "sha256": "e51d498fae19cb32738f97965cf0145f97e82b4c0b207ccff9afffb6aec4e7f7"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VectorJournalTests.swift",
+      "sha256": "bb30f0c7da04249bb1a49394034f988fea186a7f7f85dfc44018d5ee88132d6d"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VectorSearchTests.swift",
+      "sha256": "46065ff501c46496e1dd093f11732466a16cad076b9a240f473d43ca57244b4f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisionFixtureTests.swift",
+      "sha256": "d00d48ba78589d5fe01c08268be3e4226f6352041216195de24041dbf82d8a2f"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualEncoderTests.swift",
+      "sha256": "a0a62ef14122195ce113e99397894f423c3b64f7f127cfd69641977b4f6b12db"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualImageSnapshotTests.swift",
+      "sha256": "9fd0d9890f1403b90484a9e1d6c955229efe9e1e005aa13d54835f233ea6fbb1"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualIndexStoreTests.swift",
+      "sha256": "9555afbf396a97cab893d574591414df2d0171cbd61677cade82cfcbbfc49f68"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualModelPreparationTests.swift",
+      "sha256": "fa0f54b5d2ba55750b33b85acadd27b19bce282857c990d58cc070519fc99e25"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualRecordingTests.swift",
+      "sha256": "9a03a78d81825cccb6599f21a2bc13313fc762c6c47377d2bae22231e6f19575"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualRetrievalTests.swift",
+      "sha256": "1ccd30209fe6bfb9a08343b06d5fd37b07b569ceb71d08ff804235b4f4f470dc"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualSourcePlanTests.swift",
+      "sha256": "db50e28b054655d3ef35073d3a86fa0069856f8c3ed03a3bff9affb903fa7be6"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/VisualTokenizerDataTests.swift",
+      "sha256": "c374df937bc5506d0ea3a8aeccabcdfe3933c69dac211df62b6bad7f539c618e"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowExportTests.swift",
+      "sha256": "94aa4bcba99420f8cad92a401956e0a69f490aad4e5384fab238ddcc2a32ce34"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowFrameTests.swift",
+      "sha256": "7fe46af136b432231be492f96ea3e58909660ee1082c84b82f33651735eb644a"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowNarrationAudioTests.swift",
+      "sha256": "2b09b8e4b57e6a52820f26a9121e27af9cb6ce53d80ead88897170a093cd99fd"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowNarratorTests.swift",
+      "sha256": "66e5291d59287d27d87b1326cfd264f13cb882c6cbdc2e81766c0072749f96f0"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowTimelineTests.swift",
+      "sha256": "3e3633ca35f9f9b0fdb0bcabdd4c2d8a8f20dd330df51921cfe56c5704b42ee3"
+    },
+    {
+      "path": "Tests/OSwindCoreTests/WorkflowVideoFrameTests.swift",
+      "sha256": "c856cddc62f1da8324f0aa43bc8d85735c8ca8e4f01678605b61e74e0422eb4a"
+    }
+  ],
+  "normalPackage": {
+    "source": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+    "scope": "Same actual fresh normal-release app from v1; corrected postbuild harness, no rebuild or repeated passed CLI commands. Strict ad-hoc signing is development packaging, not notarization/distribution or physical/interactive acceptance.",
+    "app": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/normal-names-package-v1/OSwind.app",
+    "rebuild": false,
+    "originalHarnessFailure": {
+      "driverHandle": 20275,
+      "driverExitCode": 1,
+      "failure": "KeyError: text at flat-result assertion; returned API shape is [{match,memory,score}]",
+      "methodsAffected": "Post-build Python harness, after successful normal build, strict signatures and all three exit-0 CLI commands.",
+      "buildLogSHA256": "d9ea462bdc1a18471cf74734067f418753009ac23f655c360722add37964f2b9",
+      "rebuildForCorrection": false
+    },
+    "inputsAndAllPriorActualEnginesUnchanged": true,
+    "executables": {
+      "OSwind": {
+        "packagedSHA256": "44ad2d6835b876380d2fcd23ec966d2bdcefd9e848d1b221e54da4ccac81d66a",
+        "buildProductSHA256": "f087ca1de42a0d248c7a1484e6265daf8c3f9ac015289683c23e55edad6a65d5",
+        "textSection": {
+          "bytes": 18566372,
+          "sha256": "b5b172858466ab44c0420d42cf5c7fde28cb6c7f54770068625df225bd95281d"
+        },
+        "bytes": 47838128
+      },
+      "oswindctl": {
+        "packagedSHA256": "054406c6ee82e12648861fd74eb3e8c49c70bd23cf43ac8a859d9245ae9f7cfc",
+        "buildProductSHA256": "78f143777c38c2ec9182e2f96b1afc97f4047858c6bd6bd8bd02de976445b194",
+        "textSection": {
+          "bytes": 15857876,
+          "sha256": "63e443c56e224d78e7a5c039948f69dfc872e57be7b61255e5596b045d097ee5"
+        },
+        "bytes": 35970208
+      },
+      "oswind-preparation-guardian": {
+        "packagedSHA256": "c158c5f79fc2fb60eefec889a07d0451e89646c3fc54427bf7035fc34b6cdebb",
+        "buildProductSHA256": "f97fd2774e0dd1f7bd0432c6a85d1ec16ca3a894e6a3e9d7002e6cf69ccbe4da",
+        "textSection": {
+          "bytes": 1196,
+          "sha256": "2d8bf06c64bf813e8e9dc736f22e0bc2dccca94af17e99b622b2f3f328844502"
+        },
+        "bytes": 53376
+      }
+    },
+    "smoke": {
+      "empty-stats": {
+        "exitCode": 0,
+        "scope": "Original command passed the v1 invoke return-code assertion; outputs retained, command not repeated.",
+        "stdoutSHA256": "404c57dc83f94122eb1abac0ba2300999d3812a8033eef7b5e60cc6565412dfa",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "authored-note": {
+        "exitCode": 0,
+        "scope": "Original command passed the v1 invoke return-code assertion; outputs retained, command not repeated.",
+        "stdoutSHA256": "3e0de70a24e304eae958d8c66c2ef8d8af32f46b885daad664cbf58ad3046411",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "literal-keyword": {
+        "exitCode": 0,
+        "scope": "Original command passed the v1 invoke return-code assertion; outputs retained, command not repeated.",
+        "stdoutSHA256": "8ef9486ba60f1ca1da783cd71d50148a72ccac7cc6f5866b8f9ef354d70daef7",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exactAuthoredIDMatchesKeywordResult": true
+    },
+    "resources": [
+      {
+        "path": "Contents/Resources/OSwind.icns",
+        "bytes": 447716,
+        "sha256": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/Apache-2.0.txt",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md",
+        "bytes": 16008,
+        "sha256": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE",
+        "bytes": 1267,
+        "sha256": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE",
+        "bytes": 11339,
+        "sha256": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md",
+        "bytes": 2932,
+        "sha256": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md",
+        "bytes": 1770,
+        "sha256": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md",
+        "bytes": 1431,
+        "sha256": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md",
+        "bytes": 10541,
+        "sha256": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/NOTICES.txt",
+        "bytes": 4912,
+        "sha256": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE",
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt",
+        "bytes": 1077,
+        "sha256": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt",
+        "bytes": 961,
+        "sha256": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE",
+        "bytes": 1453,
+        "sha256": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md",
+        "bytes": 1062,
+        "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt",
+        "bytes": 11359,
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt",
+        "bytes": 11751,
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE",
+        "bytes": 11347,
+        "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE",
+        "bytes": 1084,
+        "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947"
+      },
+      {
+        "path": "Contents/Resources/models/siglip2-source.json",
+        "bytes": 1381,
+        "sha256": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py",
+        "bytes": 14825,
+        "sha256": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py.lock",
+        "bytes": 82078,
+        "sha256": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0"
+      },
+      {
+        "path": "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy",
+        "bytes": 398,
+        "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json",
+        "bytes": 234,
+        "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json",
+        "bytes": 20746,
+        "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f"
+      }
+    ],
+    "developmentArchive": {
+      "path": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/normal-names-package-verify-v2/OSwind-recording-names-development.zip",
+      "bytes": 25284615,
+      "sha256": "094412b829f720ed5338a53b37b0e55c4ad732a3e51ae2e9080a840be22ebfd3"
+    },
+    "exitCode": 0,
+    "archiveRoundTrip": {
+      "archiveSHA256": "094412b829f720ed5338a53b37b0e55c4ad732a3e51ae2e9080a840be22ebfd3",
+      "zipCRC": "all entries pass",
+      "roundtripSignatureExitCode": 0,
+      "allThreeExecutablesMatch": true,
+      "scope": "Round-trip of same development ZIP and app, no rebuild, no GUI launch or notarization."
+    }
+  },
+  "hostedNames": {
+    "head": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+    "run": 41816662560,
+    "job": 126529007537,
+    "conclusion": "success",
+    "artifact": 13315711831,
+    "artifactDigestMatches": true,
+    "artifactSHA256": "9564a0c741265a47218e92cd5c89273676fb18c2e70030123bace21719978d0a",
+    "artifactBytes": 1843917,
+    "jobLogSHA256": "ca5adc457e1fecf207edbaa9b39f739b7c4e626914b5d33d1a4024ca652e4c83",
+    "jobLogBytes": 9492904,
+    "counts": {
+      "passed": 92,
+      "skipped": 1
+    },
+    "methods": 93,
+    "nativeMethodResults": [
+      [
+        "OSwindAppTests.VaultSessionTests testNativeRecordingNameReadIsJoinedBeforeVaultDetach",
+        "passed"
+      ],
+      [
+        "OSwindAppTests.VaultSessionTests testNativeRecordingNameWriteIsJoinedAndCancelledBeforeVaultDetach",
+        "passed"
+      ]
+    ],
+    "skips": [
+      "2026-11-04T10:56:50.7093700Z /Users/runner/work/OSwind/OSwind/Tests/OSwindCoreTests/RecordingDetailsTests.swift:234: -[OSwindCoreTests.RecordingDetailsTests testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation] : Test skipped - Explicit retained pre-metadata CLI and owned output required"
+    ],
+    "files": [
+      {
+        "path": "names/conflicts-compact-dark.png",
+        "bytes": 97448,
+        "sha256": "65a901cfec9bfbf36162dd1277670cf41f1e70cedc395cb5b9f672638fa7e8d4"
+      },
+      {
+        "path": "names/conflicts-compact-light.png",
+        "bytes": 94648,
+        "sha256": "cffd31e090d502bed57ad9422e16caac150bf626f9df1d69a122a1c3daadf7e8"
+      },
+      {
+        "path": "names/conflicts-regular-dark.png",
+        "bytes": 120182,
+        "sha256": "538d4f9e9d1d9f66060b0380a50ffb9f877fbe4e65bff149a7e85e723694063f"
+      },
+      {
+        "path": "names/conflicts-regular-light.png",
+        "bytes": 116452,
+        "sha256": "eb27ffa5920079517382be51d31aeade10b74bfb9612fc46a494c36ed7cb1ce3"
+      },
+      {
+        "path": "names/editor-dark.png",
+        "bytes": 25674,
+        "sha256": "2dea7291e7380fe9222bd4dea5b1cb7726c168313fd92594d2cca93bcaea05fc"
+      },
+      {
+        "path": "names/editor-light.png",
+        "bytes": 24934,
+        "sha256": "d314fd5bec5200e173e08c78442e9207a0c1620296af3ce68834a8fa483925ce"
+      },
+      {
+        "path": "names/named-compact-dark.png",
+        "bytes": 76870,
+        "sha256": "97ac69cf41b0f1d985a099a70d2b61a21d3646981df5609fac911721c0bcd285"
+      },
+      {
+        "path": "names/named-compact-light.png",
+        "bytes": 74682,
+        "sha256": "fbfec423984bc284da96769900279ab9f01ad78c3066c5845eb141cddc5812b2"
+      },
+      {
+        "path": "names/named-regular-dark.png",
+        "bytes": 84088,
+        "sha256": "859d70b69294b6a88f7add28cb6a121192a259664d5034c02e242df74d5517e2"
+      },
+      {
+        "path": "names/named-regular-light.png",
+        "bytes": 81665,
+        "sha256": "271d4a965262baeaeccdf6c68a6e625405b16978ce96c947ded3773ac7d3121c"
+      },
+      {
+        "path": "names/saving-dark.png",
+        "bytes": 25394,
+        "sha256": "18c2f9431dd53cf82b38d7feeeb96b782273746e04d9d5e6578c45e471f377e7"
+      },
+      {
+        "path": "names/saving-light.png",
+        "bytes": 24843,
+        "sha256": "d65e505e65922ffe97dbcfcd65e4531d70a8f7358f861bf1ddf0de6a5721079d"
+      },
+      {
+        "path": "names/stale-draft-dark.png",
+        "bytes": 38106,
+        "sha256": "83e83a7d496a0ca24dc7bf346fb0cca72855652a57449cba10c9594c42262bc0"
+      },
+      {
+        "path": "names/stale-draft-light.png",
+        "bytes": 36915,
+        "sha256": "b69664a7f254599dd0bfeb8f5b468295716941457d67749fd77d1947e37ea4a3"
+      },
+      {
+        "path": "archive/compact-dark.png",
+        "bytes": 89128,
+        "sha256": "1bc18ee523be8d238cfc2e39381117f9b2115b9bbfbd7092b12f2c1be2863ed5"
+      },
+      {
+        "path": "archive/compact-light.png",
+        "bytes": 86414,
+        "sha256": "80c8ca88852f1d8c27989c3977442868a47db6405d389a00aa84dbb2079ae109"
+      },
+      {
+        "path": "archive/empty-dark.png",
+        "bytes": 64719,
+        "sha256": "716ab1a21d1053b92847d20c3a0fc7d0cd0ec66a0fe651c28c6c20e8538b7004"
+      },
+      {
+        "path": "archive/empty-light.png",
+        "bytes": 62961,
+        "sha256": "d638370a2dcd3677cdc18b295a6c2a36cb2d85280f7e172bc683b2c045c6ef4e"
+      },
+      {
+        "path": "archive/hidden-head-dark.png",
+        "bytes": 58778,
+        "sha256": "dc9aa50882467e8dcec7429964026e8e31995776f5cc4028fd09ea6441b1918f"
+      },
+      {
+        "path": "archive/hidden-head-light.png",
+        "bytes": 57059,
+        "sha256": "8acdb267c27087c9aff7529d47914fda7a0131feb6a28d2af9d7effab3b94d04"
+      },
+      {
+        "path": "archive/recordings-dark.png",
+        "bytes": 103049,
+        "sha256": "1f344833041f17e80b9d0cc28fc70942c2db0138872b2daf14d269fdcb7c1e47"
+      },
+      {
+        "path": "archive/recordings-light.png",
+        "bytes": 100440,
+        "sha256": "5538c4240e47e85318218140eee4727401f77d060aea047c17963e594acbc4b9"
+      },
+      {
+        "path": "archive/setup-failure-dark.png",
+        "bytes": 66641,
+        "sha256": "77de4d5949d1b03104345c9ffcdd623fa5c372a4c75e7d43eb642c096d6ebbc4"
+      },
+      {
+        "path": "archive/setup-failure-light.png",
+        "bytes": 64886,
+        "sha256": "6b5c62e23e22caba4240566bda1101289d11a18695f111a710446533ed05f55d"
+      },
+      {
+        "path": "archive/updating-dark.png",
+        "bytes": 69478,
+        "sha256": "d5bbbc81f2c43c537415b6990b507f7cea584dc2ff0f95f7043571e353a30de5"
+      },
+      {
+        "path": "archive/updating-light.png",
+        "bytes": 67776,
+        "sha256": "c23e12ba4f2a5061d49ea320f01914e26050e3fc8bb81a26a9f02b449d7ddd4d"
+      },
+      {
+        "path": "scope/recording-actions-dark.png",
+        "bytes": 75916,
+        "sha256": "618c51971a2384fb5fef4e0e3ff5f66bbaa3fad8ba2d9633001eb383936bf39e"
+      },
+      {
+        "path": "scope/recording-actions-light.png",
+        "bytes": 73516,
+        "sha256": "a6ad8a564d444069bc94b4cc0d029c07300955f6a1570c08b856cfb6795570ec"
+      },
+      {
+        "path": "scope/scoped-ask-dark.png",
+        "bytes": 73494,
+        "sha256": "a3dc8ac8453fd0e3dd215e72eeabfe213959c219f017b6baaf86f3e9208ea2fe"
+      },
+      {
+        "path": "scope/scoped-ask-light.png",
+        "bytes": 71196,
+        "sha256": "ac1c61314f6e17412043e15509388369a806cbbbceb1817baebd6bb55589a7b4"
+      },
+      {
+        "path": "lookup/result.json",
+        "bytes": 12013,
+        "sha256": "47a24f1d5a49e0c8b576d67e4a666e3968389ab8333b8d40d3fbb405a3d706a3"
+      }
+    ],
+    "scope": "Exact-head hosted recording-names job log and uploaded artifact retained. Both named native VaultSession methods actually ran and passed. Not the separate main native job, which remains pending. CI executable itself was not exported."
+  },
+  "hostedVisualSubset": {
+    "scope": "Four hosted native component rasters manually inspected: compact named/conflict and stale-draft light/dark. All hosted artifacts retained; no claim of reviewing every CI raster or interactive GUI.",
+    "result": "Named sidebar and original capture are distinct; conflicts preserve capture title; stale review text remains readable and Save disabled. Hosted date labels use UTC rather than local Pacific time.",
+    "images": [
+      {
+        "path": "names/conflicts-compact-dark.png",
+        "bytes": 97448,
+        "sha256": "65a901cfec9bfbf36162dd1277670cf41f1e70cedc395cb5b9f672638fa7e8d4"
+      },
+      {
+        "path": "names/named-compact-light.png",
+        "bytes": 74682,
+        "sha256": "fbfec423984bc284da96769900279ab9f01ad78c3066c5845eb141cddc5812b2"
+      },
+      {
+        "path": "names/stale-draft-dark.png",
+        "bytes": 38106,
+        "sha256": "83e83a7d496a0ca24dc7bf346fb0cca72855652a57449cba10c9594c42262bc0"
+      },
+      {
+        "path": "names/stale-draft-light.png",
+        "bytes": 36915,
+        "sha256": "b69664a7f254599dd0bfeb8f5b468295716941457d67749fd77d1947e37ea4a3"
+      }
+    ]
+  },
+  "mainNativeCI": {
+    "head": "656a2ca9a7f23619012f203238f4b8a3319259bd",
+    "job": 126529004012,
+    "run": 41816662560,
+    "state": "in_progress",
+    "lastObservedPhase": "Build and test, step 8",
+    "scope": "This snapshot is separate from the successful name and benchmark jobs. No complete main native CI success or explanation of PR165 failures is claimed."
+  },
+  "remaining": [
+    "Full retained-original recovery and late/concurrent/combined sync/restore session-name lifecycle; complete actual old sync-client matrix",
+    "Current native calendar selection/resolution, legacy exact-version archive aliases and meaningful full named-workspace measurements",
+    "Signed interactive keyboard/VoiceOver, physical microphone/system-audio and ASR/device quality",
+    "Controlled power/current automatic24h, physical two-Mac/provider acceptance and production signing/notarization/installer/updates"
+  ],
+  "rawEvidence": {
+    "path": "benchmarks/recording-names-integration-raw-v1.zip",
+    "sha256": "3df1886f3e96b3c0e2fac36aa44b4fd3aa8f4394cca7e244a4d4575483f8509a",
+    "bytes": 2872021,
+    "scope": "Logs, input and actual-engine manifests, raw CI artifact ZIP/digest, packaging verification and original postbuild harness failure. Actual local engines and development app/ZIP remain retained separately, without provenance rebuilds."
+  }
+}

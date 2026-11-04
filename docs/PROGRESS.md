@@ -1,5 +1,13 @@
 # OSwind delivery ledger
 
+## 2026-11-04 — recording-name broad integration and a fresh development app
+
+Draft [PR166](https://github.com/vibhusapra/OSwind/pull/166) contains durable labels, guarded editing/conflict review and explicit-session archive names. Unchanged runtime `2815828` passes **666 methods / 23 explicit skips / zero failures in each separate same-engine optimized and sanitizer broad run (689 defined each)**. Counts overlap prior selections. The sanitizer has no race reports. Source/test inputs and retained actual engines stay unchanged.
+
+A fresh normal-release ad-hoc app passes signatures, executable code-section checks and an owned CLI note/keyword round trip. Its initial flat-JSON postbuild assertion failed; the correct nested result verifies on the same package and original command outputs without rebuilding. The ZIP also passes extraction/signature/digest checks and is copied to `~/Documents/OSwind-builds/2026-11-04-recording-names-656a2ca/`. This is a development build, with production distribution and interactive acceptance still open.
+
+At exact head `656a2ca`, the dedicated hosted name/native job passes **92 methods / one explicit old-CLI skip / zero failures**, including both actual APFS name-work methods. Its full log and matching uploaded-artifact digest are retained; the CI executable is not exported. Benchmark-harness CI succeeds; the main native job remains in progress at the recorded snapshot. Documentation-only descendant checks are separate. Complete retained-original/late/concurrent/combined sync lifecycle, calendar/legacy aliases, full named-workspace timing, physical audio/ASR/accessibility, two-Mac/power/current automatic24h and notarized distribution remain open. No v0 or ranking promotion. [Detailed scope/TODOs](RECORDING-DETAILS-WIP.md#broad-integration-and-development-package) · [Receipt](../benchmarks/recording-names-integration-v1.json).
+
 ## 2026-11-04 — selected recording-name optimized and sanitizer checks
 
 Runtime `2815828` passes **90 optimized methods / one explicit skip / zero failures** and **89 Thread Sanitizer methods / two explicit skips / zero failures**, with the two owned APFS read/write shutdown methods qualified separately on each identical retained engine (**two passed / zero skips or failures each**, no rebuild). The initial class filter omitted those `VaultSessionTests` extension methods; the dedicated CI job now selects their explicit method prefix. The old-CLI gate is configured separately and passes on each identical retained binary, with no rebuild. Two initial direct-sanitizer launch aborts reached zero methods and are retained; the direct Xcode runner plus runtime preload succeeds. All 28 name/editor PNGs match the reviewed Debug output.
