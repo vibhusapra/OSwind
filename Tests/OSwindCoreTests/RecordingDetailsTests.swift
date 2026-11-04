@@ -1,4 +1,5 @@
 import XCTest
+import CSQLite
 @testable import OSwindCore
 
 final class RecordingDetailsTests:XCTestCase {
@@ -38,6 +39,63 @@ final class RecordingDetailsTests:XCTestCase {
         XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=old.name})
         XCTAssertNil(published)
     }
+    func testMetadataRollbackPreservesCommittedNameNonceAndRecordingRevision()throws {
+        try audio("a");let ref=try source("a"),saved=try store.saveRecordedMeetingName("Before",for:ref),before=try store.recordedMeetingRevision()
+        enum OwnedRollback:Error {case stop}
+        XCTAssertThrowsError(try store.withRoutineDatabase {db in try db.transaction {
+            var body=try XCTUnwrap(store.get(saved.id));body.title="Rolled back";try store.insert(body)
+            XCTAssertNotEqual(try store.recordedMeetingRevision(),before);throw OwnedRollback.stop
+        }})
+        XCTAssertEqual(try store.recordedMeetingRevision(),before);XCTAssertEqual(try store.recordedMeetingDetails(for:ref),[saved])
+    }
+    func testMetadataTriggerRepairDefersPayloadParsingAndKeepsCanonicalAudioUntouched()throws {
+        let audio=try audio("a"),ref=try source("a"),saved=try store.saveRecordedMeetingName("Keep canonical name",for:ref)
+        try store.withRoutineDatabase {db in try db.transaction {
+            try db.execute("DROP TRIGGER recorded_details_source_update; DELETE FROM recorded_meeting_details")
+            XCTAssertEqual(sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+                if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+            },nil),SQLITE_OK)
+            defer {sqlite3_set_authorizer(db.handle,nil,nil)}
+            try RecordingDetailsSchema.install(db)
+        }}
+        let rebuilt=try XCTUnwrap(store.recordedMeetingDetails(for:ref).first)
+        XCTAssertEqual(rebuilt.id,saved.id);XCTAssertEqual(rebuilt.name,saved.name);XCTAssertNotEqual(rebuilt.revision,saved.revision)
+        XCTAssertEqual(try store.get("a"),audio);XCTAssertThrowsError(try store.saveRecordedMeetingName("Old cache snapshot",for:ref,replacing:saved))
+    }
+    func testReadyArchiveReadsAndPublicationDenyCanonicalPayloadAndAllSQLWritesWithNamesPresent()throws {
+        try audio("a");let named=try store.saveRecordedMeetingName("Thin metadata",for:source("a"))
+        try store.withRoutineDatabase {db in
+            XCTAssertEqual(sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+                if [SQLITE_INSERT,SQLITE_UPDATE,SQLITE_DELETE].contains(action) {return SQLITE_DENY}
+                if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+            },nil),SQLITE_OK)
+        }
+        defer {_ = try? store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}}
+        let page=try store.recordedMeetingPage();XCTAssertEqual(page.sources.count,1);_ = try store.recordedMeetingRevision();var published=false
+        try store.withCurrentRecordedMeetingPage(page) {published=true};XCTAssertTrue(published)
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("SELECT name,details,revision FROM recorded_meeting_details WHERE memory_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,named.id)
+            XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(db.text(row,0),named.name);XCTAssertEqual(db.text(row,2),named.revision)
+            XCTAssertEqual(try JSONDecoder().decode(RecordingDetails.self,from:Data(db.text(row,1).utf8)),named.details)
+        }
+    }
+    func testBuiltInSQLWriterRefreshesMetadataNonceAndInvalidatesPreparedNames()throws {
+        try audio("a");let ref=try source("a"),first=try store.saveRecordedMeetingName("Before",for:ref),page=try store.recordedMeetingPage()
+        var edited=try XCTUnwrap(store.get(first.id));edited.title="Changed through SQL";let data=try JSONEncoder().encode(edited)
+        try store.withRoutineDatabase {db in
+            let row=try db.statement("UPDATE memories SET payload=?,title=? WHERE id=?");defer {sqlite3_finalize(row)}
+            _=data.withUnsafeBytes {sqlite3_bind_blob(row,1,$0.baseAddress,Int32(data.count),unsafeBitCast(-1,to:sqlite3_destructor_type.self))};db.bind(row,2,edited.title);db.bind(row,3,edited.id);try db.done(row)
+        }
+        let current=try XCTUnwrap(store.recordedMeetingDetails(for:ref).first)
+        XCTAssertEqual(current.name,edited.title);XCTAssertNotEqual(current.revision,first.revision);XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {})
+    }
+    func testUnrelatedNotesDoNotAdvanceMetadataRevisionAndNameRenameDropsOldEmbedding()throws {
+        try audio("a");let ref=try source("a"),first=try store.saveRecordedMeetingName("Before",for:ref),before=try store.recordedMeetingRevision()
+        try store.insert(Memory(kind:.note,title:"Unrelated",text:"Ordinary authored note"));XCTAssertEqual(try store.recordedMeetingRevision(),before)
+        var body=try XCTUnwrap(store.get(first.id));body.embedding=[1,0,0];body.embeddingModel="owned-previous-caption";try store.insert(body)
+        let current=try XCTUnwrap(store.recordedMeetingDetails(for:ref).first),changed=try store.saveRecordedMeetingName("New caption",for:ref,replacing:current)
+        XCTAssertNil(try store.get(changed.id)?.embedding);XCTAssertNil(try store.get(changed.id)?.embeddingModel)
+    }
     func testNamePersistsWithoutChangingAudioAndFollowsNewClipsInExactSession()throws {
         let a=try audio("a"),b=try audio("b",offset:40),ref=try source("a")
         let saved=try store.saveRecordedMeetingName("  Planning discussion  ",for:ref)
@@ -47,7 +105,7 @@ final class RecordingDetailsTests:XCTestCase {
         try audio("new",offset:80);XCTAssertEqual(try store.recordedMeetingDetails(for:source("new")),[saved])
         try audio("unrelated",session:"other",offset:80);XCTAssertTrue(try store.recordedMeetingDetails(for:source("unrelated")).isEmpty)
         XCTAssertEqual(try store.recordedMeetingPage().sources.count,4,"The metadata record is not an audio clip")
-        XCTAssertEqual(try store.get(saved.id)?.kind,.recording)
+        XCTAssertEqual(try store.get(saved.id)?.kind,.recordingMetadata)
     }
     func testRenameRequiresExactCurrentSnapshotAcrossConnections()throws {
         try audio("a");let ref=try source("a"),initial=try store.saveRecordedMeetingName("Initial",for:ref)
@@ -111,14 +169,14 @@ final class RecordingDetailsTests:XCTestCase {
     func testInvalidNamesAndMixedCapturedMetadataRefuseWithoutSaving()throws {
         try audio("a");let ref=try source("a")
         for name in [""," \n ","Line\nbreak","NUL\u{0}name",String(repeating:"x",count:201),"e"+String(repeating:"\u{301}",count:5000)] {XCTAssertThrowsError(try store.saveRecordedMeetingName(name,for:ref))}
-        var invalid=Memory(kind:.recording,title:"Missing binding",text:"");XCTAssertThrowsError(try store.insert(invalid))
+        var invalid=Memory(kind:.recordingMetadata,title:"Missing binding",text:"");XCTAssertThrowsError(try store.insert(invalid))
         invalid.recordingDetails = .init(scope:try .init(sessionID:"session"));invalid.audioPath="audio/not-captured.wav";XCTAssertThrowsError(try store.insert(invalid))
         invalid.audioPath=nil;invalid.kind = .note;XCTAssertThrowsError(try store.insert(invalid))
-        invalid.kind = .recording;invalid.text=String(repeating:"x",count:32768);XCTAssertThrowsError(try store.insert(invalid))
+        invalid.kind = .recordingMetadata;invalid.text=String(repeating:"x",count:32768);XCTAssertThrowsError(try store.insert(invalid))
         XCTAssertTrue(try store.recordedMeetingDetails(for:ref).isEmpty)
     }
     func testRecordingScopeAndCalendarAssociationChangeEvidenceWithoutChangingEmbeddingText()throws {
-        var value=Memory(kind:.recording,title:"Name",text:"User label")
+        var value=Memory(kind:.recordingMetadata,title:"Name",text:"User label")
         value.recordingDetails = .init(scope:try .init(sessionID:"one"));let hash=value.evidenceHash,text=value.contentHash
         value.recordingDetails = .init(scope:try .init(sessionID:"two"));XCTAssertEqual(value.contentHash,text);XCTAssertNotEqual(value.evidenceHash,hash)
         let event=try MeetingOccurrence(calendarID:"calendar",seriesID:"series",originalOccurrence:Date(timeIntervalSince1970:100),start:Date(timeIntervalSince1970:100),end:Date(timeIntervalSince1970:200),title:"Private event title",participants:["Private attendee"],joinURL:URL(string:"https://owned.invalid/secret-token"))

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum MemoryKind: String, Codable, CaseIterable, Sendable { case screen, audio, note, summary, recording }
+public enum MemoryKind: String, Codable, CaseIterable, Sendable { case screen, audio, note, summary, recordingMetadata = "recording-metadata" }
 public struct TextRegion: Codable, Equatable, Sendable {
     public var text: String
     public var x, y, width, height: Double

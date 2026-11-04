@@ -169,6 +169,7 @@ public extension MemoryStore {
 private enum RecordedMeetingReader {
     static let columns="memory_id,grouped,recording_id,started,observed_end,duration,title,app,bundle_id,url,revision"
     static func prepare(_ db:RoutineDatabase)throws {
+        try RecordingDetailsSchema.prepare(db)
         let row=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
         let ready=sqlite3_step(row)==SQLITE_ROW && db.text(row,0)==RecordedMeetingSchema.currentVersion;sqlite3_finalize(row)
         if !ready {try db.transaction {try RecordedMeetingSchema.populateIfNeeded(db)}}
