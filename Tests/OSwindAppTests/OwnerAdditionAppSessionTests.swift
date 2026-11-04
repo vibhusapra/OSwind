@@ -74,6 +74,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     private var root:URL!,defaults:UserDefaults!,suite:String!
     private var stores=[MemoryStore](),pairings=[PersonalSyncPairing](),coreSessions=[PersonalSyncSession](),apps=[AppSession](),trackers=[OwnerOpenTracker]()
     private var vaults=[LibraryVault]()
+    private var nativeTraces=[(trace:AppOwnerVaultNativeTrace,secret:Data)]()
     private let storage=AppOwnerStorage()
     private var nativeStorage:AppOwnerNativeStorage?
     private let locks=OwnerLockFlag()
@@ -90,6 +91,16 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     override func tearDown()async throws {
         storage.failAfterIntent=false;nativeStorage?.failAfterIntent=false;locks.locked=false;trackers.forEach {$0.release()}
+        for observation in nativeTraces {
+            if (testRun?.totalFailureCount ?? 0)>0 {observation.trace.markFailure()}
+            observation.trace.setStage("teardown")
+        }
+        var diagnosticsSaved=false
+        func saveDiagnostics()throws {
+            guard !diagnosticsSaved else {return};diagnosticsSaved=true
+            for observation in nativeTraces {try observation.trace.save(root:root,secret:observation.secret,failed:(testRun?.totalFailureCount ?? 0)>0)}
+        }
+        defer {do {try saveDiagnostics()}catch {XCTFail("Owned app native diagnostics could not be saved: \(error.localizedDescription)")}}
         for app in apps {
             if app.busy {app.cancelOperation();try await settle(app)}
             if app.hasPendingMembershipClose {app.retryMembershipClose();try await settle(app)}
@@ -102,6 +113,7 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
             guard status.state == .locked,!status.imageAttached else {throw OSwindError.unavailable("Owned encrypted fixture remains attached; directory preserved")}
         }
         try nativeStorage?.cleanup()
+        try saveDiagnostics()
         defaults.removePersistentDomain(forName:suite);try FileManager.default.removeItem(at:root)
     }
     private func store(_ path:URL)throws->MemoryStore {let value=try MemoryStore(root:path,recoveryReadOnly:false,nativeWriterEnvironment:environment);stores.append(value);return value}
@@ -120,12 +132,16 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     private func fixture(expirySeconds:Int?=nil,preferences:PersonalSyncPreferences = .init(reconnectOnLaunch:false,networkEnabled:false),nativeVault:Bool=false,previewEnabled:Bool=true)async throws->Fixture {
         var libraryRoot=root.appendingPathComponent("owner"),passphrase:String?
+        var trace:AppOwnerVaultNativeTrace?,driver:NativeVaultDriver?
         if nativeVault {
             guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_VAULT"]=="1",ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_SYNC_KEYCHAIN"]=="1" else {throw XCTSkip("Explicit owned encrypted APFS and generated login-Keychain fixture")}
             nativeStorage=AppOwnerNativeStorage()
             let package=root.appendingPathComponent("Owned.oswindvault"),secret=UUID().uuidString
-            _=try await LibraryVault.create(at:package,name:"Owned device addition",capacityGiB:1,passphrase:Data(secret.utf8))
-            let vault=try LibraryVault(package:package);vaults.append(vault)
+            let observation=AppOwnerVaultNativeTrace(root:root),observed=NativeVaultDriver(observer:{observation.append($0)},willMutate:{observation.beforeMutation($0,$1)})
+            trace=observation;driver=observed;nativeTraces.append((observation,Data(secret.utf8)))
+            _=try await LibraryVault.create(at:package,name:"Owned device addition",capacityGiB:1,passphrase:Data(secret.utf8),nativeDriver:observed)
+            let vault=try LibraryVault(package:package,nativeDriver:observed);vaults.append(vault)
+            observation.setStage("initial-unlock")
             _=try await vault.unlock(passphrase:Data(secret.utf8));libraryRoot=vault.libraryURL;passphrase=secret
         }
         let library=try store(libraryRoot),owner=try pair(library),first=try pair(store(root.appendingPathComponent("first")))
@@ -139,9 +155,14 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
         var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.automaticMaintenance=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.clipboard.enabled=false;settings.meetings.enabled=false
         try settings.save(root:library.root)
         let environment=environment,locks=locks,tracker=OwnerOpenTracker(environment);trackers.append(tracker)
+        let observedDriver=driver
+        trace?.setStage("app-session")
         let app=AppSession(selection:.init(url:library.root,requiresExisting:true,origin:"owned"),defaults:defaults,locked:{[locks] in locks.locked},openStore:{try tracker.open($0)},personalSyncSetup:{store in
             PersonalSyncModel(store:store,locked:{[locks] in locks.locked},pairingFactory:{try PersonalSyncPairing(store:$0,stateRoot:environment.stateRoot,machine:environment.machine,storage:environment.storage(.loginKeychain))})
-        },syncRecovery:.init(pending:{_ in false},retry:{_,_ in throw OSwindError.invalid("Not an erasure fixture")}),membershipRecovery:{PersonalSyncOwnerChange.recover(root:$0,environment:environment)},ownerAdditionPreview:previewEnabled)
+        },syncRecovery:.init(pending:{_ in false},retry:{_,_ in throw OSwindError.invalid("Not an erasure fixture")}),membershipRecovery:{PersonalSyncOwnerChange.recover(root:$0,environment:environment)},ownerAdditionPreview:previewEnabled,openVault:{package in
+            if let observedDriver {return try LibraryVault(package:package,nativeDriver:observedDriver)}
+            return try LibraryVault(package:package)
+        })
         apps.append(app);try await settle(app);XCTAssertNil(app.failure)
         let old=try XCTUnwrap(app.model);old.showOnboarding=false;try await SourceWorkTestJob.settle(old)
         // Completing onboarding can start the passive saved-preference read.
@@ -326,18 +347,26 @@ private final class AppOwnerNativeStorage:SyncCredentialStorage,@unchecked Senda
     }
     func testNativeSavedApprovalSurvivesDetachAndUnlockReturnsOnlyRecovery()async throws {
         let f=try await fixture(nativeVault:true),review=try await review(f),backend=try XCTUnwrap(nativeStorage)
+        nativeTraces.last?.trace.setStage("approve-save-intent")
         backend.failAfterIntent=true;f.app.approveSyncDevice(review,from:f.old);try await settle(f.app);backend.failAfterIntent=false
         XCTAssertNil(f.app.model);XCTAssertTrue(f.app.syncMembershipPending);XCTAssertTrue(f.old.store.isClosed)
+        nativeTraces.last?.trace.setStage("saved-intent-lock")
         f.app.requestLock();try await settle(f.app);XCTAssertEqual(f.app.vaultStatus?.imageAttached,false)
         try FileManager.default.removeItem(at:f.provider)
+        nativeTraces.last?.trace.setStage("recovery-unlock")
         f.app.unlock(passphrase:try XCTUnwrap(f.passphrase),remember:false);try await settle(f.app)
         XCTAssertEqual(f.app.vaultStatus?.state,.unlocked);XCTAssertNil(f.app.model);XCTAssertTrue(f.app.syncMembershipPending)
         XCTAssertNil(f.app.syncApprovalPresentation)
+        nativeTraces.last?.trace.setStage("membership-recovery")
         f.app.resumeSyncMembership();try await settle(f.app)
         XCTAssertNil(f.app.failure);try assertQuiet(XCTUnwrap(f.app.model));XCTAssertFalse(f.app.syncMembershipPending);XCTAssertNil(f.app.syncApprovalPresentation)
         let fresh=try XCTUnwrap(f.app.model),owner=try pair(fresh.store),response=try XCTUnwrap(owner.lastApprovedResponse())
         XCTAssertEqual(response.requestFingerprint,review.requestFingerprint);_=try f.peer.acceptResponse(response.response,trustedRootFingerprint:f.fingerprint);owner.close()
+        nativeTraces.last?.trace.setStage("recovered-final-lock")
         f.app.requestLock();try await settle(f.app);XCTAssertEqual(f.app.vaultStatus?.imageAttached,false)
+        let observed=try XCTUnwrap(nativeTraces.last?.trace.snapshot())
+        let sawFinalDetach=observed.events.contains {item in item.stage=="recovered-final-lock" && item.event.summary.operation == VaultNativeOperation.imageDetach}
+        XCTAssertTrue(sawFinalDetach,"The diagnostic must observe the application's actual final detach")
     }
     func testRenderActualOwnerReviewAndResponseInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_OWNER_UI_QA_DIR"] else {throw XCTSkip("Explicit authored component raster QA; no desktop capture")}

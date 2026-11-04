@@ -55,9 +55,10 @@ struct PersonalSyncErasureRecovery:Sendable {
     private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
     private let syncRecovery:PersonalSyncErasureRecovery
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native,membershipRecovery:@escaping @Sendable (URL)->PersonalSyncOwnerChange={PersonalSyncOwnerChange.recover(root:$0)},ownerAdditionPreview:Bool=ProcessInfo.processInfo.environment["OSWIND_OWNER_ADDITION_PREVIEW"]=="1") {
+    private let openVault:@Sendable (URL)throws->LibraryVault
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native,membershipRecovery:@escaping @Sendable (URL)->PersonalSyncOwnerChange={PersonalSyncOwnerChange.recover(root:$0)},ownerAdditionPreview:Bool=ProcessInfo.processInfo.environment["OSWIND_OWNER_ADDITION_PREVIEW"]=="1",openVault:@escaping @Sendable (URL)throws->LibraryVault={try LibraryVault(package:$0)}) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
-        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery;self.membershipRecovery=membershipRecovery;self.ownerAdditionPreview=ownerAdditionPreview
+        self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery;self.membershipRecovery=membershipRecovery;self.ownerAdditionPreview=ownerAdditionPreview;self.openVault=openVault
         self.recoveryTransfer.allowed={[weak self] in guard let self else {return false};return !self.terminationRequested && !self.busy && !self.locked()}
         do {
             if let package=try LibraryVault.package(containing:resolved.url) {
@@ -118,7 +119,7 @@ struct PersonalSyncErasureRecovery:Sendable {
     }
     private func loadVault(startServices:Bool) async throws {
         guard let package=vaultPackage else {return}
-        let vault=try LibraryVault(package:package);vaultStatus=try await vault.status()
+        let vault=try self.openVault(package);vaultStatus=try await vault.status()
         if vaultStatus?.state == .unlocked {
             if terminationRequested || locked() {try await performLock();return}
             // A directory notification is observation, never permission to
@@ -138,7 +139,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         message=""
         run {
             var secret=Data(passphrase.utf8);defer {secret.resetBytes(in:0..<secret.count)}
-            let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlock(passphrase:secret)
+            let vault=try self.openVault(package);self.vaultStatus=try await vault.unlock(passphrase:secret)
             try Task.checkCancellation()
             if remember {
                 do {try await vault.rememberPassphrase(secret,using:provider);self.vaultStatus=try await vault.status()}
@@ -153,7 +154,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         guard !terminationRequested,!busy,let package=vaultPackage else {return}
         message=""
         run {
-            let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlockUsingKeychain(using:provider);try Task.checkCancellation()
+            let vault=try self.openVault(package);self.vaultStatus=try await vault.unlockUsingKeychain(using:provider);try Task.checkCancellation()
             if self.locked() {try await self.performLock();return}
             self.model=try await self.preparedModel(root:vault.libraryURL,startServices:false)
             self.message="Library unlocked. Recording starts when you resume it."
@@ -161,7 +162,7 @@ struct PersonalSyncErasureRecovery:Sendable {
     }
     func forgetKeychain() {
         guard !busy,let package=vaultPackage else {return}
-        run {let vault=try LibraryVault(package:package);try await vault.forgetPassphrase();self.vaultStatus=try await vault.status();self.message="Saved unlock removed. Your vault passphrase still works."}
+        run {let vault=try self.openVault(package);try await vault.forgetPassphrase();self.vaultStatus=try await vault.status();self.message="Saved unlock removed. Your vault passphrase still works."}
     }
     func requestLock() {
         syncApprovalPresentation=nil;membershipFinish?.cancelled=true
@@ -176,7 +177,7 @@ struct PersonalSyncErasureRecovery:Sendable {
         membershipFinish=nil
         guard let package=vaultPackage else {return}
         if let previous=model {await stageForClosing(previous)}
-        let vault=try LibraryVault(package:package)
+        let vault=try self.openVault(package)
         vaultStatus=try await vault.lock(store:closingStore);closingStore=nil
         guard vaultStatus?.state == .locked else {throw OSwindError.unavailable("The encrypted volume is still attached. Retry locking when other readers finish.")}
         message="Encrypted volume detached. Recording, audio and local API access are stopped."
@@ -224,10 +225,10 @@ struct PersonalSyncErasureRecovery:Sendable {
                     }
                 } else {_=try await LibraryVault.create(at:package,name:name,capacityGiB:capacityGiB,passphrase:secret);self.createdVault=package}
                 try Task.checkCancellation();try await self.departCurrent()
-                let managed=try LibraryVault(package:package)
+                let managed=try self.openVault(package)
                 self.vaultPackage=managed.packageURL;self.requested=managed.libraryURL;self.selection = .init(url:self.requested,requiresExisting:true,origin:"selected");self.watch(managed.packageURL)
                 try LibraryLocationPreferences.save(package,defaults:self.defaults)
-                let vault=try LibraryVault(package:package);self.vaultStatus=try await vault.unlock(passphrase:secret)
+                let vault=try self.openVault(package);self.vaultStatus=try await vault.unlock(passphrase:secret)
                 try Task.checkCancellation()
                 if remember {do {try await vault.rememberPassphrase(secret);self.vaultStatus=try await vault.status()} catch {self.message="Encrypted library created. Keychain was not updated: "+error.localizedDescription}}
                 if self.locked() {try await self.performLock()} else {self.model=try await self.preparedModel(root:vault.libraryURL,startServices:false)}
@@ -451,7 +452,8 @@ struct PersonalSyncErasureRecovery:Sendable {
                 }
             } catch {self.failure=error.localizedDescription}
             if let package=self.vaultPackage {
-                let status=Task.detached {try await LibraryVault(package:package).status()}
+                let openVault=self.openVault
+                let status=Task.detached {try await openVault(package).status()}
                 if let fresh=try? await status.value {self.vaultStatus=fresh}
             }
             self.busy=false;self.operation=nil
