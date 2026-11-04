@@ -28,8 +28,10 @@ At that stage, an upstream merge changed an unrelated peer test and documentatio
 - [ ] Named recording sessions, durable reviewed calendar-occurrence links and session-scoped Ask/recaps with exact source scope.
 - [x] Measure first-open/first-use metadata costs and move historical backfill into the cancellable Recordings load; retain all process latency/RSS observations.
 - [x] Generated portable backup/restore, incoming-origin projection/deletion and current privacy/erasure regression for the derived index.
-- [x] Selected current source optimized/sanitizer regression and strict ad-hoc development packaging; whole-current-suite and hosted qualification remain open.
-- [ ] Controlled session-ID length/NUL edge cases, incoming-change UI invalidation and actual list-publication/frame-cost audit.
+- [x] Selected optimized/sanitizer regression; ac5bf82 also has strict ad-hoc development packaging. Current identifier checks are scoped below; whole-current-suite and hosted qualification remain open.
+- [x] Controlled grapheme/NUL/byte-distinct session IDs, admission limits and prior-cache repair.
+- [ ] Incoming-change UI invalidation and actual list-publication/frame-cost audit.
+- [ ] Current normal-release package after the identifier change; earlier package evidence is pinned to ac5bf82.
 - [ ] Recorded/Upcoming wrapper interaction, keyboard/VoiceOver and actual native record/import/open/playback flows.
 - [ ] Physical microphone/system-audio, permission/device switching, transcription quality and power acceptance.
 
@@ -51,6 +53,8 @@ A follow-up normal Debug selection has **12passed /1explicit native skip /0failu
 
 ## Deferred archive indexing and current selected checks
 
+This section records **ac5bf82**. Later identifier changes have separate qualification below; these timings, broader test selections and normal package are not relabeled as current-source results.
+
 Opening an existing archive now installs write-through metadata triggers without scanning old transcript bodies. Its first **Recordings** load performs that scan in the owned, cancellable worker and commits readiness atomically. Failure or cancellation rolls rows and readiness back together. New empty libraries are ready immediately; pending and ready reopens preserve new writer rows and existing nonces. Own app deletion and erasure clear or refresh recording previews.
 
 The source-pinned optimized and Thread Sanitizer runs each selected **319 methods: 304 passed, 15 skipped, zero failures**. Every skip was audited: nine child-entry helpers, three opt-in scale probes, two probes requiring the exact prior-format client, and one component-render case. The recorded-workspace CI subset has 26 methods: 25 passed and that one render case skipped locally. The broader runs include actual encrypted APFS page retention/detach, real-Keychain three-library/all-13-kind replay, original private-field preservation, backup/restore, erasure, privacy, import, incoming projection and crash-recovery regressions. There was no sanitizer race report. This does not supersede earlier owner/peer broad WIP failures or qualify the whole current suite.
@@ -69,3 +73,17 @@ All **290 observations** remain available: 130 from the original predecessor/eag
 A separate normal release build from the qualified source was packaged into a new local development app, with all three executables executable and `codesign --verify --deep --strict` passing. Frozen comparator/test engines were preserved unchanged. The first packaging reviewer incorrectly required the normal release executable to equal the optimized-test executable byte for byte. A versioned read-only review corrected that assumption against the retained successful build/package; it did not rebuild, resign or rerun tests. The packaged CLI also passed an owned empty-library stats smoke. This is ad-hoc development packaging, without notarization or current live GUI/audio acceptance. Prior v5 component images above are retained; their render case was not repeated for these metadata changes.
 
 [Source/input/test/package/performance receipt](../benchmarks/recorded-meetings-startup-v1.json) · [Raw observations, original failures, source snapshots and generators](../benchmarks/recorded-meetings-startup-raw-v1.zip) · [Current CI selection static review](../benchmarks/recorded-meetings-ci-selection-v2.json).
+
+## Canonical recording identifiers
+
+Source `29bd6c3` fixes accepted IDs being misclassified by the derived index. Swift admission counts graphemes; SQLite text length counts codepoints and stops at a NUL. Two authored controls on the unchanged prior production code exposed separate sessions and refused source opening for a valid 200-grapheme combining-mark ID and a leading-NUL ID. The three-method control run has two failed methods, 13 assertion issues (two unexpected), and one passing empty/over-limit admission check; its original source/log/engine are retained.
+
+The index now checks nonempty UTF-8 bytes without trimming or normalization. Canonical source admission still rejects empty or over-200-grapheme IDs. Cache version 2 refuses prior grouping semantics. Reopening marks old caches for rebuilding; the first Recordings load rebuilds their rows before use. A generated old-cache fixture checks that behavior. Exact NUL suffixes and byte-distinct Unicode remain separate through reopening, and their original sources stay openable.
+
+The focused normal Debug selection passed **30 methods with one optional render skip**. Current committed-source optimized and Thread Sanitizer selections each have the same **31 defined / 30 passed / 1 render skip / 0 failures**, with no race report. They include privacy, pagination, cancellation/rollback, backup/restore, actual encrypted APFS retained-page detach, real-Keychain three-library/all-13-kind replay and incoming origin separation/deletion.
+
+The first fixed selection also exposed an adjacent app-fixture admission failure. A diagnostic reproduction showed `locked=true` as its only denied gate; the original run did not record that state. The fixture now supplies an explicit unlocked input, and another actual-AppModel unit tests locked → unlocked → locked admission. The production default still reads the real session lock. These are controlled tests, not physical OS-lock interaction or live GUI acceptance. All failed attempts are retained.
+
+[Identifier source/input/test receipt](../benchmarks/recorded-meetings-identifiers-v1.json) · [Original controls, diagnostics and raw evidence](../benchmarks/recorded-meetings-identifiers-raw-v1.zip) · [CI selection review](../benchmarks/recorded-meetings-ci-selection-v3.json).
+
+The broader 319-method runs, 290 performance observations and normal development package above remain pinned to ac5bf82. No new timings, normal package, whole-current-suite, physical/power/automatic 24-hour acceptance or ranking is claimed for this change. Feature statuses remain unchanged. Named sessions, durable calendar links and exact session Ask/recaps remain next product work.
