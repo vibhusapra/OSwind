@@ -92,14 +92,14 @@ enum RecordedMeetingSchema {
     /// Caller owns an IMMEDIATE transaction. A cancelled/failed build rolls
     /// back both rows and readiness; another connection cannot observe a
     /// partial page. No source or media handle is retained after publication.
-    static func populateIfNeeded(_ db:RoutineDatabase)throws {
+    static func populateIfNeeded(_ db:RoutineDatabase,managesProgressHandler:Bool=true)throws {
         let marker=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
         let version=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
         if version==currentVersion {return}
         guard version==pendingVersion else {throw OSwindError.unavailable("Reopen the library to prepare its recording index")}
         try Task.checkCancellation()
-        sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)
-        defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
+        if managesProgressHandler {sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)}
+        defer {if managesProgressHandler {sqlite3_progress_handler(db.handle,0,nil,nil)}}
         do {
             try db.execute("DELETE FROM recorded_meeting_sources")
             try db.execute("INSERT INTO recorded_meeting_sources \(rows("m","FROM memories m WHERE m.kind='audio'"))")

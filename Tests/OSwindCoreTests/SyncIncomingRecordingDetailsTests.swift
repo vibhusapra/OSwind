@@ -2,6 +2,32 @@ import XCTest
 @testable import OSwindCore
 
 extension SyncIncomingSourceTests {
+    func testIncomingRecordingNameSessionErasureRetiresKnownNameOnlyAfterLastClipWithoutNameTombstone()throws {
+        let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID);defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
+        var first=Memory(id:"session-first",timestamp:now,kind:.audio,app:"Owned",title:"First",text:"First authored speech");first.audioSessionID="shared-owned-session"
+        var second=first;second.id="session-second";second.timestamp=now.addingTimeInterval(30);second.text="Second authored speech"
+        try a.insert(first);try a.insert(second)
+        let source=try XCTUnwrap(a.recordedMeetingPage().sources.first),name=try a.saveRecordedMeetingName("Authored session name",for:source);try drain(a,ac)
+        let nameIdentity=try ac.catalog.localIdentity(.source,primary:[.text(Data(name.id.utf8))]),nameKey=try nameIdentity.key
+        for operation in try ac.journal.outbox() {
+            let body=try packet(operation,ac)
+            _=try receive(operation,body,b,bc,fetch:{ref in try XCTUnwrap(ac.record(ref,admit:{_ in}))})
+        }
+        let localName=try XCTUnwrap(bc.catalog.object(nameIdentity)?.primary?.first)
+        guard case .text(let bytes)=localName,let nameID=String(data:bytes,encoding:.utf8) else {return XCTFail("No projected name")}
+        let through=try XCTUnwrap(ac.journal.outbox().last).dot.counter
+        try a.delete(first.id);try drain(a,ac)
+        for operation in try ac.journal.outbox(after:through) {try receiveDeletion(operation,b,bc)}
+        XCTAssertNotNil(try b.get(nameID));XCTAssertFalse(try bc.journal.state(for:nameKey).isDeleted)
+        // A valid source tombstone alone must retire the known dependent name.
+        // Do not depend on a later separate name tombstone from the producer.
+        let secondIdentity=try ac.catalog.localIdentity(.source,primary:[.text(Data(second.id.utf8))]),deleted=try ac.journal.delete(key:secondIdentity.key)
+        try receiveDeletion(deleted,b,bc)
+        XCTAssertNil(try b.get(nameID));XCTAssertTrue(try bc.journal.state(for:nameKey).isDeleted)
+        XCTAssertTrue(try XCTUnwrap(bc.catalog.object(nameIdentity)).deleted)
+        XCTAssertTrue(try bc.journal.outbox().contains {$0.key==nameKey && $0.content==nil},"The derived name retirement must have a durable journal barrier")
+        try b.withRoutineDatabase {try RecordingAffiliationStore.checkAccounting($0)}
+    }
     func testIncomingRecordingMetadataPolicyDenialRollsBackReceiptAndDerivedName()throws {
         let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID);defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
         var memory=Memory(id:"owned-caption",kind:.recordingMetadata,app:"OSwind",title:"Private browsing caption",text:"User-authored label")

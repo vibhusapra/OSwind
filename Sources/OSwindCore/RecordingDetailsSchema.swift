@@ -68,16 +68,17 @@ enum RecordingDetailsSchema {
             try db.execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='\(RecordedMeetingRevisionSchema.key)'")
         }
     }
-    static func prepare(_ db:RoutineDatabase)throws {
+    static func prepare(_ db:RoutineDatabase,managesProgressHandler:Bool=true)throws {
         let marker=try db.statement("SELECT value FROM store_metadata WHERE key='\(key)'")
         let value=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
         if value==currentVersion {return}
         guard value==pendingVersion else {throw OSwindError.unavailable("Reopen the library to prepare its recording names")}
-        if sqlite3_get_autocommit(db.handle)==0 {try populate(db)}else {try db.transaction {try populate(db)}}
+        if sqlite3_get_autocommit(db.handle)==0 {try populate(db,managesProgressHandler:managesProgressHandler)}else {try db.transaction {try populate(db,managesProgressHandler:managesProgressHandler)}}
     }
-    private static func populate(_ db:RoutineDatabase)throws {
+    private static func populate(_ db:RoutineDatabase,managesProgressHandler:Bool)throws {
         try Task.checkCancellation()
-        sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil);defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
+        if managesProgressHandler {sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)}
+        defer {if managesProgressHandler {sqlite3_progress_handler(db.handle,0,nil,nil)}}
         try db.execute("DELETE FROM recorded_meeting_details")
         try db.execute("INSERT INTO recorded_meeting_details \(rows("m","FROM memories m WHERE m.kind='recording-metadata'"))")
         try db.execute("UPDATE store_metadata SET value='\(currentVersion)' WHERE key='\(key)'");try Task.checkCancellation()

@@ -46,7 +46,9 @@ public struct HistoryErasurePreview: Codable, Sendable {
     public let token:String
     public let sources,conversationTurns,mediaReferences:Int
     public let matchedSources:Int
-    public var linkedRecaps:Int {sources-matchedSources}
+    public var linkedRecords:Int {sources-matchedSources}
+    /// Historical API alias; linked recording names now count here too.
+    public var linkedRecaps:Int {linkedRecords}
     public let samples:[HistoryErasureSample]
     public var historicalVersions=0
     public var matchedHistoricalVersions=0
@@ -131,6 +133,29 @@ extension RoutineDatabase {
         guard code==SQLITE_DONE || code==SQLITE_ROW else {throw error()};try expandErasureSelection()
     }
     func expandErasureSelection() throws {
+        var recordingEdge=""
+        if try eraseCount("SELECT EXISTS(SELECT 1 FROM memories WHERE kind='recording-metadata' LIMIT 1)")==1 {
+            guard try eraseCount("SELECT count(*) FROM sqlite_master WHERE name='recorded_meeting_details'")==1 else {throw OSwindError.database("Prepare recording names before reviewing related erasure")}
+            try RecordingDetailsSchema.prepare(self,managesProgressHandler:false)
+            recordingEdge="""
+            UNION SELECT 0,n.memory_id FROM recorded_meeting_details n JOIN linked l ON l.kind=0 AND n.selector='source' AND n.scope_id=l.id COLLATE BINARY
+                JOIN memories a ON a.id=l.id AND a.kind='audio'
+            """
+            if try eraseCount("SELECT EXISTS(SELECT 1 FROM recorded_meeting_details WHERE selector='session')")==1 {
+                // Only libraries with session labels need the recording index.
+                // Its repair/backfill stays in this owned cancellable worker;
+                // ordinary erasure does not hydrate the transcript archive.
+                try RecordedMeetingSchema.populateIfNeeded(self,managesProgressHandler:false)
+                try execute("""
+                INSERT OR IGNORE INTO temp.erasure_ids
+                SELECT n.memory_id FROM recorded_meeting_details n WHERE n.selector='session'
+                AND EXISTS(SELECT 1 FROM recorded_meeting_sources a JOIN temp.erasure_ids e ON e.id=a.memory_id
+                    WHERE a.grouped=1 AND a.recording_id=n.scope_id COLLATE BINARY)
+                AND NOT EXISTS(SELECT 1 FROM recorded_meeting_sources a WHERE a.grouped=1 AND a.recording_id=n.scope_id COLLATE BINARY
+                    AND a.memory_id NOT IN (SELECT id FROM temp.erasure_ids))
+                """)
+            }
+        }
         try execute("""
         INSERT OR IGNORE INTO temp.erasure_ids
         WITH RECURSIVE linked(kind,id) AS (
@@ -140,6 +165,7 @@ extension RoutineDatabase {
             UNION SELECT 1,h.handle FROM historical_evidence h JOIN linked l ON l.kind=0 AND h.source_id=l.id
             UNION SELECT 1,d.child FROM historical_evidence_dependencies d JOIN linked l ON l.kind=1 AND d.parent=l.id
             UNION SELECT 0,r.recap_id FROM recap_sources r JOIN linked l ON l.kind=1 AND r.historical_handle=l.id
+            \(recordingEdge)
         ) SELECT id FROM linked WHERE kind=0;
         INSERT OR IGNORE INTO temp.erasure_historical_ids(handle,matched)
         WITH RECURSIVE originals(handle) AS (
